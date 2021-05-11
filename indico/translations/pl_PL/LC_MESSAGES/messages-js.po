@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2020 ORGANIZATION
+# Copyright (C) 2021 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-12-15 14:00+0100\n"
-"PO-Revision-Date: 2021-04-08 07:18+0000\n"
+"POT-Creation-Date: 2021-05-10 16:36+0200\n"
+"PO-Revision-Date: 2021-04-19 06:58+0000\n"
 "Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/indico/indico/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
@@ -661,7 +661,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "Masz niezapisane zmiany, które stracisz. "
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:708
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1345
 msgid "Confirm action"
 msgstr "Potwierdź"
@@ -878,31 +878,31 @@ msgid ""
 "search\">clear</a> your search."
 msgstr "Możesz <a class=\"js-search\">zmodyfikować</a> lub <a class=\"js-clear-search\">wyczyścić</a> swoje wyszukiwanie."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:444
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:442
 msgid "In favourite categories"
 msgstr "W ulubionych kategoriach"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:451
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:449
 msgid "Search result"
 msgstr "Wyniki wyszukiwania"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:472
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
 msgid "Displaying {0} out of {1} results."
 msgstr "Wyświetlam {0} z {1} wyników."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:473
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:471
 msgid "There are no results."
 msgstr "Brak wyników"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:477
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:475
 msgid "Make the search more specific for more accurate results"
 msgstr "Uściślij wyszukiwanie, aby otrzymać dokładniejsze wyniki"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:482
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:480
 msgid "Clear search"
 msgstr "Wyczyść wyszukiwanie"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Wybrałeś kategorię <em>{0}</em>. Czy chcesz kontynuować?"
 
@@ -1511,7 +1511,7 @@ msgstr "Dodaj sesję"
 
 #: indico/web/client/js/legacy/libs/timetable/Actions.js:269
 msgid "Add session block"
-msgstr "Dodaj sesję"
+msgstr "Dodaj blok sesji"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:43
 msgid "Session"
@@ -1577,7 +1577,7 @@ msgstr "Wszystkie dni"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:689
 msgid "You are viewing the contents of the session block:"
-msgstr "Pokazujesz zawartość tej sesji:"
+msgstr "Pokazujesz zawartość tego bloku sesji:"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:778
 msgid "Your changes triggered the automatic modification of some settings:"
@@ -1626,7 +1626,7 @@ msgstr " do "
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:1017
 msgid "Session block"
-msgstr "Sesja"
+msgstr "Blok sesji"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:1035
 msgid "Contribution"
@@ -2021,7 +2021,7 @@ msgstr "Zmień harmonogram wpisów"
 msgid ""
 "This will change the starting and ending times of the session block {0} so "
 "that it encompasses all entries defined in its timetable."
-msgstr "To zmieni czas rozpoczęcia i zakończenia sesji {0} aby objęła wszystkie pozycje w jej harmonogramie."
+msgstr "To zmieni czas rozpoczęcia i zakończenia bloku sesji {0}, aby objęła wszystkie pozycje w jej harmonogramie."
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:854
 msgid "Are you sure you want to proceed?"

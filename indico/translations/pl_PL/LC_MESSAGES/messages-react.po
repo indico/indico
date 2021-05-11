@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-01-21 09:43+0100\n"
+"POT-Creation-Date: 2021-05-21 16:36+0200\n"
 "Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021\n"
 "Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
 "MIME-Version: 1.0\n"
@@ -270,7 +270,7 @@ msgid "Submit slides"
 msgstr "Złóż slajdy"
 
 #: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:101
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:67
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:70
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:80
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:116
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:63
@@ -286,19 +286,19 @@ msgstr "Złóż pliki"
 msgid "Editable list"
 msgstr "Lista edytowalna"
 
-#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:68
+#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:71
 msgid "other modules"
 msgstr "inne moduły"
 
-#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:84
+#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:87
 msgid "other views"
 msgstr "inny widok"
 
-#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:89
+#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:92
 msgid "Display"
 msgstr "wyświetlenie"
 
-#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:94
+#: indico/modules/events/editing/client/js/editing/page_layout/MenuBar.jsx:98
 msgid "Management"
 msgstr "Zarządzanie"
 
@@ -339,9 +339,9 @@ msgid "Reject"
 msgstr "Odrzuć"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:54
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:52
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:60
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:135
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:55
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:63
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:138
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:92
 msgid "Leave a comment..."
 msgstr "Zostaw komentarz..."
@@ -557,7 +557,7 @@ msgstr "Tę wersję zaktualizowano"
 msgid "{link}Click here to refresh{/link} and see the most recent version."
 msgstr "{link}Kliknij tutaj, aby odświeżyć{/link} i ujrzeć najnowszą wersję."
 
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:64
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:67
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:33
 #: indico/web/client/js/react/components/RequestConfirm.jsx:60
 #: indico/web/client/js/react/components/principals/Search.jsx:332
@@ -583,7 +583,7 @@ msgstr "Zaznacz kod lub tytuł..."
 msgid "Confirm & Approve"
 msgstr "Potwierdź i zatwierdź"
 
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:103
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:106
 msgid "There are no publishable files. Please upload a {types} file."
 msgid_plural ""
 "There are no publishable files. Please upload a file in at least one of the "
@@ -597,7 +597,7 @@ msgstr[2] ""
 msgstr[3] ""
 "Nie ma plików do publikacji. Proszę załadować plik jednego z typów:  {types}"
 
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:126
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:129
 msgid "There is no publishable file uploaded."
 msgstr "Nie załadowano pliku do publikacji."
 
@@ -650,7 +650,7 @@ msgstr ""
 "typy udostępnić."
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:115
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:161
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:176
 msgid "List"
 msgstr "Listuj"
 
@@ -676,8 +676,8 @@ msgid "Configure the tags that can be assigned to revisions"
 msgstr "Skonfiguruj tagi dla wersji"
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:31
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:115
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:127
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:123
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:135
 msgid "Configure"
 msgstr "Skonfiguruj"
 
@@ -856,97 +856,101 @@ msgstr "Wprowadź #id lub poszukiwany łańcuch"
 msgid "There are no editables yet."
 msgstr "Jeszcze nie ma plików do redagowania."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:59
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:67
 msgid "Send emails to the editing team"
 msgstr "Wyślij maile to zespołu redakcyjnego"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:64
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:72
 msgid "Assign an editor to papers"
 msgstr "Przydziel redaktora do artykułów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:65
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:73
 msgid "Assign an editor to posters"
 msgstr "Przydziel redaktora do posterów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:66
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:74
 msgid "Assign an editor to slides"
 msgstr "Przydziel redaktora do slajdów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:82
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:90
 msgid "Submission is open"
 msgstr "Zgłoszenia są otwarte"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:83
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:91
 msgid "Submission is not open"
 msgstr "Zgłoszenia nie są otwarte"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:85
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:93
 msgid "Toggle whether users can submit new editables"
 msgstr "Przełącz możliwość składania nowych plików do redagowania."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:88
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:101
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
 msgid "Close now"
 msgstr "Zamknij teraz"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:88
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:101
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
 msgid "Start now"
 msgstr "Zacznij teraz"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:95
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:103
 msgid "Editing is open"
 msgstr "Redagowanie jest otwarte"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:104
 msgid "Editing is not open"
 msgstr "Redagowanie nie jest otwarte"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:98
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:106
 msgid "Toggle whether editors can review submissions"
 msgstr "Przełącz możliwość recenzowania przez redaktorów złożonych tekstów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:108
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:116
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx:24
 msgid "File types"
 msgstr "Typy plików"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:117
 msgid "Configure file types"
 msgstr "Skonfiguruj typy plików"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:120
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:128
 msgid "Ready for review conditions"
 msgstr "Gotowe dla warunków oceniania"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:121
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:129
 msgid "Configure conditions for reviewing"
 msgstr "Skonfiguruj warunki opiniowania"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:132
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:140
 msgid "Editing team"
 msgstr "Zespół redagujacy"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:133
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:141
 msgid "Configure editing team"
 msgstr "Skonfiguruj zespół redagujący"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:136
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:148
+msgid "Keep editing team members anonymous"
+msgstr "Zachowaj anonimowość członków zespołu edytującego"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:151
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:20
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:43
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:127
 msgid "Contact"
 msgstr "Kontakt"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:139
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:154
 msgid "Manage team"
 msgstr "Zarządzaj zespołem"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:147
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:162
 msgid "Editor assignment"
 msgstr "Przydziały redaktora"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:155
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:170
 msgid "Allow editors to self-assign editables"
 msgstr "Pozwól redaktorom samodzielnie rozdzielić pliki edytowalne"
 
@@ -1519,7 +1523,7 @@ msgstr "Nie ma wystąpienia dnia ({date})."
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:664
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:663
 msgid "Close"
 msgstr "Zamknij"
 
@@ -1791,17 +1795,17 @@ msgid "Changing date or time will revert it back to a pre-booking."
 msgstr "Zmiana daty lub godziny przywróci dane z wstępnej rezerwacji"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:264
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:595
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:594
 msgid "I'll be using it myself"
 msgstr "Własna rezerwacja"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:274
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:601
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:600
 msgid "I'm booking it for someone else"
 msgstr "Rezerwuję dla innej osoby"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:293
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:621
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:620
 msgid "Reason for booking"
 msgstr "Powód rezerwacji"
 
@@ -1841,7 +1845,7 @@ msgstr "Ta rezerwacja zostanie połączona z kontrybucją:"
 
 #: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:44
 msgid "This booking will be linked to a session block:"
-msgstr "Ta rezerwacja zostanie połączona z sesją:"
+msgstr "Ta rezerwacja zostanie połączona z blokiem sesji:"
 
 #: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:47
 msgid "This booking is linked to an event:"
@@ -1853,7 +1857,7 @@ msgstr "Ta rezerwacja jest połączona z kontrybucją:"
 
 #: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:49
 msgid "This booking is linked to a session block:"
-msgstr "Ta rezerwacja jest połączona z sesją:"
+msgstr "Ta rezerwacja jest połączona z blokiem sesji:"
 
 #: indico/modules/rb/client/js/common/bookings/OccurrencesCounter.jsx:25
 msgid "Number of booking occurrences"
@@ -1889,9 +1893,9 @@ msgstr "Twoja rezerwacja zostanie połączona z kontrybucją:"
 
 #: indico/modules/rb/client/js/common/linking/LinkBar.jsx:25
 msgid "Your booking will be linked to a session block:"
-msgstr "Twoja rezerwacja zostanie połączona z sesją:"
+msgstr "Twoja rezerwacja zostanie połączona z blokiem sesji:"
 
-#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:60
+#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:59
 msgid "Exit linking mode"
 msgstr "Opuść tryb łączenia"
 
@@ -1908,7 +1912,7 @@ msgid "Zoom out to include all listed rooms"
 msgstr "Pomniejsz, aby uwzględnić wszystkie wymienione pokoje"
 
 #: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:204
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:589
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:588
 msgid "Usage"
 msgstr "Wykorzystanie"
 
@@ -2372,7 +2376,7 @@ msgid "List of Rooms"
 msgstr "Lista pokojów"
 
 #: indico/modules/rb/client/js/components/Menu.jsx:22
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:673
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:672
 msgid "Bookings"
 msgstr "Rezerwacje"
 
@@ -3080,7 +3084,7 @@ msgid "One or more bookings would conflict with yours."
 msgstr "Jedna lub więcej rezerwacji będzie sprzeczna z Twoimi."
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:170
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:643
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:642
 msgid "Bookings in the past are not allowed."
 msgstr "Rezerwowanie w przeszłości nie jest dozwolone."
 
@@ -3131,15 +3135,15 @@ msgstr "Proszę wskazać użytkownika"
 msgid "You need to provide a reason"
 msgstr "Proszę podać powód"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:415
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:414
 msgid "Choose an event"
 msgstr "Wybierz wydarzenie"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:464
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
 msgid "Event"
 msgstr "Wydarzenie"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:467
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:466
 msgid ""
 "You have an event taking place during the selected time. If you are booking "
 "the room for this event, please select it below. The room of the selected "
@@ -3230,31 +3234,31 @@ msgstr ""
 "Jeżeli utworzysz tę rezerwacje, to następujące nakładające się dni "
 "istniejących rezerwacji wstępnych zostaną automatycznie odrzucone:"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:487
 msgid "Assign the room {room} to this event"
 msgstr "Przydziel pokój {room} dla tego wydarzenia"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:489
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
 msgid "Assign the room {room} to this contribution"
 msgstr "Przydziel pokój  {room} dla tej kontrybucji"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:492
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:491
 msgid "Assign the room {room} to this session block"
-msgstr "Przydziel pokój {room} dla tej sesji"
+msgstr "Przydziel pokój {room} dla tego bloku sesji"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:498
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:497
 msgid "Assign the room {room} to this event (instead of {oldRoom})"
 msgstr "Przydziel pokój {room} dla tego wydarzenia (zamiast {oldRoom})"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:504
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:503
 msgid "Assign the room {room} to this contribution (instead of {oldRoom})"
 msgstr "Przydziel pokój {room} dla tej kontrybucji (zamiast {oldRoom}) "
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:511
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:510
 msgid "Assign the room {room} to this session block (instead of {oldRoom})"
-msgstr "Przydziel pokój {room} dla tej sesji (zamiast {oldRoom}) "
+msgstr "Przydziel pokój {room} dla tego bloku sesji (zamiast {oldRoom}) "
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:665
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:664
 msgid "I've changed my mind!"
 msgstr "Rozmyśliłem się!"
 

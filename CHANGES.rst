@@ -90,10 +90,20 @@ Internal Changes
 
 ----
 
-Version 2.3.5
+Version 2.3.6
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Version 2.3.5
+-------------
+
+*Released on May 11, 2021*
 
 Security fixes
 ^^^^^^^^^^^^^^
