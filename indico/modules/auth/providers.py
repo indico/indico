@@ -8,7 +8,7 @@
 from flask import session
 from flask_multipass.providers.sqlalchemy import SQLAlchemyAuthProviderBase, SQLAlchemyIdentityProviderBase
 
-from indico.modules.auth import Identity
+from indico.modules.auth import Identity, logger
 from indico.modules.auth.forms import LocalLoginForm
 from indico.modules.users import User
 from indico.util.passwords import validate_secure_password
@@ -26,6 +26,7 @@ class IndicoAuthProvider(SQLAlchemyAuthProviderBase):
         if identity.password != password:
             return False
         if error := validate_secure_password('login', password, username=identity.identifier, fast=True):
+            logger.warning('Account %s logged in with an insecure password: %s', identity.identifier, error)
             session['insecure_password_error'] = error
         return True
 
