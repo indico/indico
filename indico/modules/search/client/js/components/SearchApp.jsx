@@ -37,12 +37,12 @@ const camelizeValues = obj =>
     {}
   );
 
-function useSearch(url, query, type, categoryId) {
+function useSearch(url, query, type, scope = {}) {
   const [page, setPage] = useState(1);
 
   const {data, error, loading, lastData} = useIndicoAxios({
     url,
-    options: {params: {...query, type, page, category_id: categoryId}},
+    options: {params: {...query, type, page, ...scope}},
     forceDispatchEffect: () => query?.q,
     trigger: [url, query, page],
   });
@@ -213,7 +213,8 @@ SearchOptions.defaultProps = {
   sortOptions: undefined,
 };
 
-export default function SearchApp({category}) {
+export default function SearchApp({category, eventId}) {
+  const eventSearch = eventId !== null;
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
   const {q, sort, ...filters} = query;
@@ -222,28 +223,49 @@ export default function SearchApp({category}) {
     trigger: 'once',
     camelize: true,
   });
+  let scope = {};
+  if (eventId !== null) {
+    scope = {event_id: eventId};
+  } else if (category !== null) {
+    scope = {category_id: category.id};
+  }
   const [categoryResults, setCategoryPage] = useSearch(
     searchURL(),
-    query,
+    eventSearch ? {q: null} : query,
     'category',
-    category?.id
+    scope
   );
-  const [eventResults, setEventPage] = useSearch(searchURL(), query, 'event', category?.id);
+  const [eventResults, setEventPage] = useSearch(
+    searchURL(),
+    eventSearch ? {q: null} : query,
+    'event',
+    scope
+  );
   const [contributionResults, setContributionPage] = useSearch(
     searchURL(),
     query,
     ['contribution', 'subcontribution'],
-    category?.id
+    scope
   );
-  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', category?.id);
-  const [noteResults, setNotePage] = useSearch(searchURL(), query, 'event_note', category?.id);
-  const searchMap = [
-    [Translate.string('Events'), eventResults, setEventPage, Event],
-    [Translate.string('Contributions'), contributionResults, setContributionPage, Contribution],
-    [Translate.string('Materials'), fileResults, setFilePage, Attachment],
-    [Translate.string('Notes'), noteResults, setNotePage, EventNote],
-    [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
-  ];
+  const [fileResults, setFilePage] = useSearch(searchURL(), query, 'attachment', scope);
+  const [noteResults, setNotePage] = useSearch(
+    searchURL(),
+    eventSearch ? {q: null} : query,
+    'event_note',
+    scope
+  );
+  const searchMap = eventSearch
+    ? [
+        [Translate.string('Contributions'), contributionResults, setContributionPage, Contribution],
+        [Translate.string('Materials'), fileResults, setFilePage, Attachment],
+      ]
+    : [
+        [Translate.string('Events'), eventResults, setEventPage, Event],
+        [Translate.string('Contributions'), contributionResults, setContributionPage, Contribution],
+        [Translate.string('Materials'), fileResults, setFilePage, Attachment],
+        [Translate.string('Notes'), noteResults, setNotePage, EventNote],
+        [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
+      ];
   // Defaults to the first tab loading or with results
   const menuItem =
     activeMenuItem || Math.max(0, searchMap.findIndex(x => x[1].loading || x[1].total));
@@ -253,17 +275,17 @@ export default function SearchApp({category}) {
   const handleQuery = (value, type = 'q') => setQuery(type, value, type === 'q');
 
   return (
-    <Grid columns={2} doubling padded styleName="grid">
-      {Object.keys(results.aggregations).length > 0 && (
+    <Grid columns={2} doubling padded={!eventSearch} styleName="grid">
+      {!eventSearch && Object.keys(results.aggregations).length > 0 && (
         <Grid.Column width={3} only="large screen">
           <SideBar query={filters} aggregations={results.aggregations} onChange={handleQuery} />
         </Grid.Column>
       )}
-      <Grid.Column width={7}>
+      <Grid.Column width={eventSearch ? 16 : 7}>
         <SearchBar
           onSearch={handleQuery}
           searchTerm={q || ''}
-          placeholders={options?.placeholders || []}
+          placeholders={eventSearch ? [] : options?.placeholders || []}
         />
         <Menu pointing secondary styleName="menu">
           {searchMap.map(([label, _results], idx) => (
@@ -294,6 +316,7 @@ export default function SearchApp({category}) {
             data={results.data}
             onPageChange={setPage}
             loading={results.loading}
+            showCategoryPath={!eventSearch}
           />
         )}
       </Grid.Column>
@@ -306,8 +329,10 @@ SearchApp.propTypes = {
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
   }),
+  eventId: PropTypes.number,
 };
 
 SearchApp.defaultProps = {
   category: null,
+  eventId: null,
 };

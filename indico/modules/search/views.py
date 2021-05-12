@@ -6,15 +6,18 @@
 # LICENSE file for more details.
 
 from indico.modules.categories.views import WPCategory
+from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.i18n import _
 from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.views import WPDecorated, WPJinjaMixin
 
 
-class WPSearch(WPJinjaMixin, WPDecorated):
+class WPSearchMixin:
     template_prefix = 'search/'
     bundles = ('module_search.js', 'module_search.css')
 
+
+class WPSearch(WPSearchMixin, WPJinjaMixin, WPDecorated):
     def _get_breadcrumbs(self):
         return render_breadcrumbs(_('Search'))
 
@@ -22,13 +25,14 @@ class WPSearch(WPJinjaMixin, WPDecorated):
         return self._get_page_content(params)
 
 
-class WPCategorySearch(WPCategory):
+class WPCategorySearch(WPSearchMixin, WPCategory):
     """WP for category-scoped search."""
-
-    template_prefix = 'search/'
-    bundles = ('module_search.js', 'module_search.css')
 
     def _get_breadcrumbs(self):
         if not self.category or self.category.is_root:
             return ''
         return render_breadcrumbs(_('Search'), category=self.category)
+
+
+class WPEventSearch(WPSearchMixin, WPConferenceDisplayBase):
+    pass

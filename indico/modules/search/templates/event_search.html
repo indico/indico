@@ -1,0 +1,9 @@
+{% extends 'events/display/conference/base.html' %}
+
+{% block title %}
+    {% trans %}Search{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div id="search-root" data-event-id="{{ event.id }}"></div>
+{% endblock %}

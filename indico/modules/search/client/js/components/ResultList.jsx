@@ -21,6 +21,7 @@ export default function ResultList({
   data,
   loading,
   onPageChange,
+  showCategoryPath,
 }) {
   const {isWideScreen} = useResponsive();
 
@@ -50,7 +51,7 @@ export default function ResultList({
             data.map(item => (
               <List.Item key={nanoid()}>
                 <List.Content>
-                  <Component {...item} />
+                  <Component {...item} showCategoryPath={showCategoryPath} />
                 </List.Content>
               </List.Item>
             ))
@@ -79,4 +80,5 @@ ResultList.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   loading: PropTypes.bool.isRequired,
   onPageChange: PropTypes.func.isRequired,
+  showCategoryPath: PropTypes.bool.isRequired,
 };

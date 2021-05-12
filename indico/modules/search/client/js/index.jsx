@@ -16,10 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (root) {
     const category = root.dataset.category ? JSON.parse(root.dataset.category) : null;
+    const eventId = root.dataset.eventId !== undefined ? parseInt(root.dataset.eventId, 10) : null;
 
     ReactDOM.render(
       <Router>
-        <SearchApp category={category} />
+        <SearchApp category={category} eventId={eventId} />
       </Router>,
       root
     );

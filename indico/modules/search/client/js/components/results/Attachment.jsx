@@ -40,7 +40,7 @@ const iconSelector = filename => {
   }
 };
 
-const Attachment = ({
+export default function Attachment({
   title,
   url,
   attachmentType: type,
@@ -49,32 +49,36 @@ const Attachment = ({
   user,
   categoryPath,
   eventPath,
-}) => (
-  <div styleName="item">
-    <List.Header styleName="header">
-      <Icon size="large" {...(type === 'file' ? iconSelector(filename) : {name: 'linkify'})} />
-      <a href={url}>{title}</a>
-    </List.Header>
-    <List.Description styleName="description">
-      {user && (
+  showCategoryPath,
+}) {
+  const path = showCategoryPath ? [...categoryPath, ...eventPath] : eventPath;
+  return (
+    <div styleName="item">
+      <List.Header styleName="header">
+        <Icon size="large" {...(type === 'file' ? iconSelector(filename) : {name: 'linkify'})} />
+        <a href={url}>{title}</a>
+      </List.Header>
+      <List.Description styleName="description">
+        {user && (
+          <List.Item>
+            <PersonList persons={[user]} />
+          </List.Item>
+        )}
         <List.Item>
-          <PersonList persons={[user]} />
+          <Icon name="calendar alternate outline" />
+          {serializeDate(toMoment(modifiedDt), 'DD MMMM YYYY HH:mm')}
         </List.Item>
-      )}
-      <List.Item>
-        <Icon name="calendar alternate outline" />
-        {serializeDate(toMoment(modifiedDt), 'DD MMMM YYYY HH:mm')}
-      </List.Item>
-      {categoryPath.length !== 0 && (
-        <List.Item>
-          <List.Description>
-            <Path path={[...categoryPath, ...eventPath]} />
-          </List.Description>
-        </List.Item>
-      )}
-    </List.Description>
-  </div>
-);
+        {path.length !== 0 && (
+          <List.Item>
+            <List.Description>
+              <Path path={path} />
+            </List.Description>
+          </List.Item>
+        )}
+      </List.Description>
+    </div>
+  );
+}
 
 Attachment.propTypes = {
   title: PropTypes.string.isRequired,
@@ -88,11 +92,10 @@ Attachment.propTypes = {
   }),
   categoryPath: pathPropType.isRequired,
   eventPath: pathPropType.isRequired,
+  showCategoryPath: PropTypes.bool.isRequired,
 };
 
 Attachment.defaultProps = {
   filename: undefined,
   user: null,
 };
-
-export default Attachment;

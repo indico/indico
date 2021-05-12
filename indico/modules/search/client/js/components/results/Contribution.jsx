@@ -28,7 +28,9 @@ export default function Contribution({
   categoryPath,
   eventPath,
   location,
+  showCategoryPath,
 }) {
+  const path = showCategoryPath ? [...categoryPath, ...eventPath] : eventPath;
   return (
     <div styleName="item">
       <List.Header styleName="header">
@@ -48,10 +50,10 @@ export default function Contribution({
           </List.Item>
         )}
         <LocationItem location={location} />
-        {categoryPath.length !== 0 && (
+        {path.length !== 0 && (
           <List.Item>
             <List.Description>
-              <Path path={[...categoryPath, ...eventPath]} />
+              <Path path={path} />
             </List.Description>
           </List.Item>
         )}
@@ -77,6 +79,7 @@ Contribution.propTypes = {
   }).isRequired,
   categoryPath: pathPropType.isRequired,
   eventPath: pathPropType.isRequired,
+  showCategoryPath: PropTypes.bool.isRequired,
 };
 
 Contribution.defaultProps = {

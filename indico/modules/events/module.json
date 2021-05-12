@@ -8,6 +8,7 @@
         "header": "./header",
         "importing": "./importing",
         "layout": "./layout",
-        "roles": "./roles"
+        "roles": "./roles",
+        "search": "./search"
     }
 }

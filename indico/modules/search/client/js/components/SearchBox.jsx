@@ -25,16 +25,17 @@ const renderResult = ({label}, keyword) => (
 
 export default function SearchBox({onSearch, category}) {
   const [keyword, setKeyword] = useState('');
-  const options = !category.isRoot
-    ? [
-        {
-          value: 'category',
-          title: category.title,
-          label: Translate.string('In this category ↵'),
-        },
-        {value: 'global', title: 'Global', label: Translate.string('All Indico ↵')},
-      ]
-    : [];
+  const options =
+    category && !category.isRoot
+      ? [
+          {
+            value: 'category',
+            title: category.title,
+            label: Translate.string('In this category ↵'),
+          },
+          {value: 'global', title: 'Global', label: Translate.string('All Indico ↵')},
+        ]
+      : [];
 
   const handleSearchChange = event => {
     setKeyword(event.target.value);
@@ -43,7 +44,7 @@ export default function SearchBox({onSearch, category}) {
   // form submit happens when no option is selected in search (eg. in home category)
   const handleSubmit = () => {
     if (keyword.trim()) {
-      onSearch(keyword.trim(), category.isRoot);
+      onSearch(keyword.trim(), category ? category.isRoot : true);
     }
   };
 
@@ -75,5 +76,9 @@ SearchBox.propTypes = {
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     isRoot: PropTypes.bool.isRequired,
-  }).isRequired,
+  }),
+};
+
+SearchBox.defaultProps = {
+  category: null,
 };

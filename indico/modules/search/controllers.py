@@ -17,11 +17,12 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories import Category
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.events import Event
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchOptions, SearchTarget, get_search_provider
 from indico.modules.search.result_schemas import CategoryResultSchema, EventResultSchema, ResultSchema
 from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
-from indico.modules.search.views import WPCategorySearch, WPSearch
+from indico.modules.search.views import WPCategorySearch, WPEventSearch, WPSearch
 from indico.util.caching import memoize_redis
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
@@ -45,6 +46,11 @@ class RHSearchDisplay(RH):
 class RHCategorySearchDisplay(RHDisplayCategoryBase):
     def _process(self):
         return WPCategorySearch.render_template('category_search.html', self.category)
+
+
+class RHEventSearchDisplay(RHDisplayEventBase):
+    def _process(self):
+        return WPEventSearch.render_template('event_search.html', self.event)
 
 
 class RHAPISearch(RH):
