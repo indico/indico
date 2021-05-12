@@ -41,7 +41,7 @@ flake8-colors==0.1.9
     # via -r requirements.dev.in
 flake8-quotes==3.2.0
     # via -r requirements.dev.in
-flake8==3.9.1
+flake8==3.9.2
     # via
     #   -r requirements.dev.in
     #   flake8-colors
@@ -95,7 +95,7 @@ mccabe==0.6.1
     # via flake8
 migra==3.0.1616366383
     # via -r requirements.dev.in
-mirakuru==2.3.0
+mirakuru==2.3.1
     # via pytest-redis
 packaging==20.9
     # via
@@ -154,7 +154,7 @@ pytz==2021.1
     # via
     #   -c requirements.txt
     #   babel
-pyupgrade==2.14.0
+pyupgrade==2.15.0
     # via -r requirements.dev.in
 pywatchman==1.4.1
     # via -r requirements.dev.in
@@ -208,7 +208,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.4
     # via sphinx
-sqlalchemy==1.4.14
+sqlalchemy==1.4.15
     # via
     #   -c requirements.txt
     #   schemainspect

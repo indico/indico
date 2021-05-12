@@ -279,7 +279,7 @@ six==1.16.0
     #   qrcode
 speaklater==1.3
     # via -r requirements.in
-sqlalchemy==1.4.14
+sqlalchemy==1.4.15
     # via
     #   -r requirements.in
     #   alembic
@@ -294,7 +294,7 @@ traitlets==5.0.5
     # via
     #   ipython
     #   matplotlib-inline
-translitcodec==0.6.0
+translitcodec==0.7.0
     # via -r requirements.in
 ua-parser==0.10.0
     # via -r requirements.in
@@ -322,7 +322,7 @@ wtforms[email,ipaddress]==2.3.3
     # via
     #   -r requirements.in
     #   flask-wtf
-xlsxwriter==1.4.2
+xlsxwriter==1.4.3
     # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
