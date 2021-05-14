@@ -46,7 +46,8 @@ def _notify_registration(registration, template_name, to_managers=False, attach_
     mail = make_email(to_list=to_list, template=tpl, html=True, from_address=from_address, attachments=attachments)
     user = session.user if session else None
     signals.core.before_notification_send.send('notify-registration', email=mail, registration=registration,
-                                               template_name=template_name)
+                                               template_name=template_name,
+                                               attach_rejection_reason=attach_rejection_reason)
     send_email(mail, event=registration.registration_form.event, module='Registration', user=user,
                log_metadata={'registration_id': registration.id})
 
