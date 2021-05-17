@@ -137,7 +137,7 @@ def get_related_object(obj, relationship, criteria):
     return cls.query.with_parent(obj, relationship).filter_by(**criteria).first()
 
 
-def get_n_matching(query, n, predicate):
+def get_n_matching(query, n, predicate, *, prefetch_factor=5):
     """Get N objects from a query that satisfy a condition.
 
     This queries for ``n * 5`` objects initially and then loads
@@ -147,21 +147,29 @@ def get_n_matching(query, n, predicate):
     :param query: A sqlalchemy query object
     :param n: The max number of objects to return
     :param predicate: A callable used to filter the found objects
+    :param prefetch_factor: Prefetch ``n * factor`` objects in each query
     """
-    _offset = [0]
+    _offset = 0
 
     def _get():
-        limit = n * 5
-        rv = query.offset(_offset[0]).limit(limit).all()
-        _offset[0] += limit
+        nonlocal _offset
+        limit = n * prefetch_factor
+        rv = query.offset(_offset).limit(limit).all()
+        _offset += limit
         return rv
 
-    results = list(filter(predicate, _get()))
+    results = []
     while len(results) < n:
         objects = _get()
         if not objects:
             break
-        results.extend(x for x in objects if predicate(x))
+
+        for obj in objects:
+            if not predicate(obj):
+                continue
+            results.append(obj)
+            if len(results) == n:
+                break
     return results[:n]
 
 
