@@ -307,6 +307,7 @@ Python features.
 
     cat >> ~/.bashrc <<'EOF'
     export PATH="/opt/indico/.pyenv/bin:$PATH"
+    eval "$(pyenv init --path)"
     eval "$(pyenv init -)"
     EOF
 
