@@ -246,8 +246,14 @@ class ResultItemSchema(OneOfSchema):
         return rv
 
 
+class PageNavSchema(_ResultSchemaBase):
+    prev = fields.Int(required=True, allow_none=True)
+    next = fields.Int(required=True, allow_none=True)
+
+
 class ResultSchema(_ResultSchemaBase):
     total = fields.Int(required=True)
-    pages = fields.Int(required=True)
+    pages = fields.Int(missing=None)
+    pagenav = fields.Nested(PageNavSchema, missing=None)
     results = fields.List(fields.Nested(ResultItemSchema), required=True)
     aggregations = fields.Dict(fields.String(), fields.Nested(AggregationSchema), missing={})

@@ -38,7 +38,7 @@ const camelizeValues = obj =>
   );
 
 function useSearch(url, query, type, scope = {}) {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(undefined);
 
   const {data, error, loading, lastData} = useIndicoAxios({
     url,
@@ -48,13 +48,14 @@ function useSearch(url, query, type, scope = {}) {
   });
 
   useEffect(() => {
-    setPage(1);
+    setPage(undefined);
   }, [query]);
 
   return [
     useMemo(
       () => ({
-        page,
+        page: page || 1,
+        pageNav: data?.pagenav,
         pages: data?.pages || 1,
         total: data?.total || 0,
         data: camelizeKeys(data?.results || []),
@@ -308,11 +309,12 @@ export default function SearchApp({category, eventId}) {
         {!isAnyLoading && (
           <ResultHeader query={q} hasResults={!!results.total} categoryTitle={category?.title} />
         )}
-        {q && (results.total || isAnyLoading) && (
+        {q && (results.total !== 0 || isAnyLoading) && (
           <ResultList
             component={Component}
             page={results.page}
             numPages={results.pages}
+            pageNav={results.pageNav}
             data={results.data}
             onPageChange={setPage}
             loading={results.loading}

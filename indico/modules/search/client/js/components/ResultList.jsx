@@ -8,8 +8,9 @@
 import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {List, Pagination, Placeholder, Segment} from 'semantic-ui-react';
+import {List, Menu, Pagination, Placeholder, Segment} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
 import {useResponsive} from 'indico/react/util';
 
 import './ResultList.module.scss';
@@ -18,6 +19,7 @@ export default function ResultList({
   component: Component,
   page,
   numPages,
+  pageNav,
   data,
   loading,
   onPageChange,
@@ -58,7 +60,18 @@ export default function ResultList({
           )}
         </List>
       </Segment>
-      {numPages > 1 && (
+      {pageNav && (pageNav.next !== null || pageNav.prev !== null) ? (
+        <div styleName="pagination">
+          <Menu pagination>
+            <Menu.Item disabled={pageNav.prev === null} onClick={() => onPageChange(pageNav.prev)}>
+              <Translate>⟨ Previous page</Translate>
+            </Menu.Item>
+            <Menu.Item disabled={pageNav.next === null} onClick={() => onPageChange(pageNav.next)}>
+              <Translate>Next page ⟩</Translate>
+            </Menu.Item>
+          </Menu>
+        </div>
+      ) : numPages > 1 ? (
         <div styleName="pagination">
           <Pagination
             activePage={page}
@@ -68,7 +81,7 @@ export default function ResultList({
             siblingRange={isWideScreen ? 2 : 1}
           />
         </div>
-      )}
+      ) : null}
     </>
   );
 }
@@ -77,8 +90,16 @@ ResultList.propTypes = {
   component: PropTypes.elementType.isRequired,
   page: PropTypes.number.isRequired,
   numPages: PropTypes.number.isRequired,
+  pageNav: PropTypes.shape({
+    prev: PropTypes.number,
+    next: PropTypes.number,
+  }),
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   loading: PropTypes.bool.isRequired,
   onPageChange: PropTypes.func.isRequired,
   showCategoryPath: PropTypes.bool.isRequired,
+};
+
+ResultList.defaultProps = {
+  pageNav: null,
 };

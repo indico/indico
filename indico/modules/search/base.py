@@ -52,7 +52,7 @@ class SearchOptions:
 class IndicoSearchProvider:
     RESULTS_PER_PAGE = 10
 
-    def search(self, query, access, page=1, object_types=(), **params):
+    def search(self, query, access, page=None, object_types=(), **params):
         """Search using a custom service across multiple targets.
 
         :param query: Keyword based query string

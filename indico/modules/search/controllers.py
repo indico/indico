@@ -62,7 +62,7 @@ class RHAPISearch(RH):
     """
 
     @use_kwargs({
-        'page': fields.Int(missing=1),
+        'page': fields.Int(missing=None),
         'q': fields.String(required=True),
         'type': fields.List(EnumField(SearchTarget), missing=None)
     }, location='query', unknown=INCLUDE)
@@ -84,7 +84,7 @@ class RHAPISearchOptions(RH):
 
 
 class InternalSearch(IndicoSearchProvider):
-    def search(self, query, access, page=1, object_types=(), **params):
+    def search(self, query, access, page=None, object_types=(), **params):
         if object_types == [SearchTarget.category]:
             total, results = InternalSearch.search_categories(page, query, params.get('category_id'))
         elif object_types == [SearchTarget.event]:
