@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Icon, List} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 
 import Highlight from './Highlight';
@@ -19,7 +20,9 @@ import '../ResultList.module.scss';
 const EventNote = ({title, url, content, modifiedDt, highlight, categoryPath, eventPath}) => (
   <div styleName="item">
     <List.Header styleName="header">
-      <a href={url}>{title}</a>
+      <a href={url}>
+        {title} (<Translate>Notes</Translate>)
+      </a>
     </List.Header>
     <List.Description styleName="description">
       <Highlight text={content} highlight={highlight.content} />
