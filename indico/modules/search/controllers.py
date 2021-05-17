@@ -5,15 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import math
-
 from flask import jsonify, session
 from marshmallow import INCLUDE, fields
 from marshmallow_enum import EnumField
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import subqueryload, undefer
 
-from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories import Category
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.events import Event
@@ -86,48 +84,76 @@ class RHAPISearchOptions(RH):
 class InternalSearch(IndicoSearchProvider):
     def search(self, query, access, page=None, object_types=(), **params):
         if object_types == [SearchTarget.category]:
-            total, results = InternalSearch.search_categories(page, query, params.get('category_id'))
+            pagenav, results = self.search_categories(query, page, params.get('category_id'))
         elif object_types == [SearchTarget.event]:
-            total, results = InternalSearch.search_events(page, query, params.get('category_id'))
+            pagenav, results = self.search_events(query, page, params.get('category_id'))
         else:
-            total, results = 0, []
+            pagenav, results = {}, []
         return {
-            'total': total,
-            'pages': math.ceil(total / self.RESULTS_PER_PAGE),
+            'total': -1 if results else 0,
+            'pagenav': pagenav,
             'results': results,
         }
 
-    @staticmethod
-    def search_categories(page, q, category_id):
+    def _paginate(self, query, page, column, user):
+        reverse = False
+        pagenav = {'prev': None, 'next': None}
+        if not page:
+            query = query.order_by(column.desc())
+        elif page > 0:  # next page
+            query = query.filter(column < page).order_by(column.desc())
+            # since we asked for a next page we know that a previous page exists
+            pagenav['prev'] = -(page - 1)
+        elif page < 0:  # prev page
+            query = query.filter(column > -page).order_by(column)
+            # since we asked for a previous page we know that a next page exists
+            pagenav['next'] = -(page - 1)
+            reverse = True
+
+        def _can_access(obj):
+            return obj.effective_protection_mode == ProtectionMode.public or obj.can_access(user, allow_admin=False)
+
+        res = get_n_matching(query, self.RESULTS_PER_PAGE + 1, _can_access, prefetch_factor=20)
+
+        if len(res) > self.RESULTS_PER_PAGE:
+            # we queried 1 more so we can see if there are more results available
+            del res[self.RESULTS_PER_PAGE:]
+            if reverse:
+                pagenav['prev'] = -res[-1].id
+            else:
+                pagenav['next'] = res[-1].id
+
+        if reverse:
+            res.reverse()
+
+        return res, pagenav
+
+    def search_categories(self, q, page, category_id):
         query = Category.query if not category_id else Category.get(category_id).deep_children_query
 
-        results = (query
-                   .filter(Category.title_matches(q),
-                           ~Category.is_deleted)
-                   .options(undefer('chain'))
-                   .order_by(db.func.lower(Category.title))
-                   .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
+        query = (query
+                 .filter(Category.title_matches(q),
+                         ~Category.is_deleted)
+                 .options(undefer('chain'),
+                          undefer(Category.effective_protection_mode),
+                          subqueryload(Category.acl_entries)))
 
-        # XXX should we only show categories the user can access?
-        # this would be nicer but then we can't easily paginate...
-        res = DetailedCategorySchema(many=True).dump(results.items)
-        return results.total, CategoryResultSchema(many=True).load(res)
+        objs, pagenav = self._paginate(query, page, Category.id, session.user)
+        res = DetailedCategorySchema(many=True).dump(objs)
+        return pagenav, CategoryResultSchema(many=True).load(res)
 
-    @staticmethod
-    def search_events(page, q, category_id):
+    def search_events(self, q, page, category_id):
         filters = [
             Event.title_matches(q),
-            Event.effective_protection_mode == ProtectionMode.public,
             ~Event.is_deleted
         ]
 
         if category_id is not None:
             filters.append(Event.category_chain_overlaps(category_id))
 
-        results = (Event.query
-                   .filter(*filters)
-                   .order_by(db.func.lower(Event.title))
-                   .paginate(page, IndicoSearchProvider.RESULTS_PER_PAGE))
-
-        res = EventSchema(many=True).dump(results.items)
-        return results.total, EventResultSchema(many=True).load(res)
+        query = (Event.query
+                 .filter(*filters)
+                 .options(subqueryload(Event.acl_entries), undefer(Event.effective_protection_mode)))
+        objs, pagenav = self._paginate(query, page, Event.id, session.user)
+        res = EventSchema(many=True).dump(objs)
+        return pagenav, EventResultSchema(many=True).load(res)
