@@ -19,7 +19,7 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchOptions, SearchTarget, get_search_provider
 from indico.modules.search.result_schemas import CategoryResultSchema, EventResultSchema, ResultSchema
-from indico.modules.search.schemas import DetailedCategorySchema, EventSchema
+from indico.modules.search.schemas import DetailedCategorySchema, HTMLStrippingEventSchema
 from indico.modules.search.views import WPCategorySearch, WPEventSearch, WPSearch
 from indico.util.caching import memoize_redis
 from indico.web.args import use_kwargs
@@ -155,5 +155,5 @@ class InternalSearch(IndicoSearchProvider):
                  .filter(*filters)
                  .options(subqueryload(Event.acl_entries), undefer(Event.effective_protection_mode)))
         objs, pagenav = self._paginate(query, page, Event.id, session.user)
-        res = EventSchema(many=True).dump(objs)
+        res = HTMLStrippingEventSchema(many=True).dump(objs)
         return pagenav, EventResultSchema(many=True).load(res)

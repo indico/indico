@@ -13,6 +13,7 @@ from indico.modules.events import Event
 from indico.modules.search.base import SearchTarget
 from indico.modules.users.models.users import User
 from indico.util.marshmallow import NoneRemovingList
+from indico.util.string import strip_tags
 from indico.web.flask.util import url_for
 
 
@@ -71,3 +72,10 @@ class EventSchema(mm.SQLAlchemyAutoSchema):
     persons = NoneRemovingList(fields.Nested(PersonSchema), attribute='person_links')
     category_id = fields.Int()
     category_path = fields.List(fields.Nested(CategorySchema), attribute='detailed_category_chain')
+
+
+class HTMLStrippingEventSchema(EventSchema):
+    @post_dump
+    def _strip_html(self, data, **kwargs):
+        data['description'] = strip_tags(data['description'])
+        return data
