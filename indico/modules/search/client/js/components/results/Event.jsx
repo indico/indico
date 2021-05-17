@@ -83,7 +83,7 @@ Event.propTypes = {
   persons: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      affiliation: PropTypes.string.isRequired,
+      affiliation: PropTypes.string,
     })
   ).isRequired,
   location: locationPropType.isRequired,

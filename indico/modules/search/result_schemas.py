@@ -37,7 +37,7 @@ class CategoryPathSchema(_ResultSchemaBase):
 
 class PersonSchema(_ResultSchemaBase):
     name = fields.String(required=True)
-    affiliation = fields.String(missing='')
+    affiliation = fields.String(missing=None)
 
 
 class HighlightSchema(_ResultSchemaBase):
