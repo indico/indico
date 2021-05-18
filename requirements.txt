@@ -67,7 +67,7 @@ colorclass==2.2.0
     # via -r requirements.in
 cryptography==3.4.7
     # via authlib
-decorator==5.0.7
+decorator==5.0.9
     # via ipython
 distro==1.5.0
     # via -r requirements.in
@@ -89,7 +89,7 @@ flask-limiter==1.4
     # via -r requirements.in
 flask-marshmallow==0.14.0
     # via -r requirements.in
-flask-migrate==2.7.0
+flask-migrate==3.0.0
     # via -r requirements.in
 flask-multipass==0.3.5
     # via -r requirements.in
@@ -314,7 +314,7 @@ webencodings==0.5.1
     # via
     #   bleach
     #   html5lib
-werkzeug==2.0.0
+werkzeug==2.0.1
     # via
     #   -r requirements.in
     #   flask

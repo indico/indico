@@ -30,7 +30,7 @@ click==7.1.2
     #   pip-tools
 colorama==0.4.4
     # via sphinx-autobuild
-coverage==5.5
+coverage[toml]==5.5
     # via pytest-cov
 docutils==0.16
     # via
@@ -56,7 +56,7 @@ freezegun==1.1.0
     # via -r requirements.dev.in
 gitdb==4.0.7
     # via gitpython
-gitpython==3.1.14
+gitpython==3.1.17
     # via transifex-client
 greenlet==1.1.0
     # via
@@ -130,7 +130,7 @@ pyparsing==2.4.7
     # via
     #   -c requirements.txt
     #   packaging
-pytest-cov==2.11.1
+pytest-cov==2.12.0
     # via -r requirements.dev.in
 pytest-localserver==0.5.0
     # via -r requirements.dev.in
@@ -154,7 +154,7 @@ pytz==2021.1
     # via
     #   -c requirements.txt
     #   babel
-pyupgrade==2.15.0
+pyupgrade==2.17.0
     # via -r requirements.dev.in
 pywatchman==1.4.1
     # via -r requirements.dev.in
@@ -223,6 +223,7 @@ tokenize-rt==4.1.0
     # via pyupgrade
 toml==0.10.2
     # via
+    #   coverage
     #   pep517
     #   pytest
 tornado==6.1
@@ -234,7 +235,7 @@ urllib3==1.26.4
     #   -c requirements.txt
     #   requests
     #   transifex-client
-werkzeug==2.0.0
+werkzeug==2.0.1
     # via
     #   -c requirements.txt
     #   flask
