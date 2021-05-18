@@ -210,7 +210,7 @@ class EventNoteResultSchema(ResultSchemaBase):
 
 class BucketSchema(_ResultSchemaBase):
     key = fields.String(required=True)
-    doc_count = fields.Int(required=True)
+    count = fields.Int(required=True)
     filter = fields.String(required=True)
 
 

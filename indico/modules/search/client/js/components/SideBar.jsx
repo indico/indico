@@ -32,7 +32,7 @@ export default function SideBar({query, aggregations, onChange}) {
 function AggregationList({name, title, items, query, onChange}) {
   items = items
     .filter(b => b.key)
-    .map(({key, filter, docCount: count}) => ({
+    .map(({key, filter, count}) => ({
       key: filter,
       label: key.charAt(0).toUpperCase() + key.slice(1),
       count,
