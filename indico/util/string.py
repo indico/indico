@@ -182,7 +182,7 @@ def sanitize_for_platypus(text):
         return ''
     # Convert to XHTML
     doc = html.fromstring(res)
-    return etree.tostring(doc)
+    return etree.tostring(doc).decode()
 
 
 def is_valid_mail(emails_string, multi=True):
