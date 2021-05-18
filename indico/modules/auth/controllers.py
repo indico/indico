@@ -609,7 +609,7 @@ class RHResetPassword(RH):
             # We usually come here from a multipass login page so we should have a target url
             return multipass.redirect_success()
         form.username.data = identity.identifier
-        return WPAuth.render_template('reset_password.html', form=form, identity=identity,
+        return WPAuth.render_template('reset_password.html', form=form, identity=identity, email_sent=False,
                                       widget_attrs={'username': {'disabled': True}})
 
 
