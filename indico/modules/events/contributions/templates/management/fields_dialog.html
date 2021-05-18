@@ -19,7 +19,7 @@
         </ul>
     </div>
 
-    {% set abstract_content_item = {'title': _("Abstracts content")} %}
+    {% set abstract_content_item = {'id': 'content', 'title': _("Abstracts content")} %}
     {% call(item) sortable_list([abstract_content_item], draggable=false, invisible_handle=true,
                                 id='contributions-fixed-fields', classes='tiles') %}
         <a class="icon-edit js-action-button hide-if-locked" data-ajax-dialog
