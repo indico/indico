@@ -341,6 +341,7 @@ class RHAccounts(RHUserBase):
     def _handle_add_local_account(self, form):
         identity = Identity(provider='indico', identifier=form.data['username'], password=form.data['password'])
         self.user.identities.add(identity)
+        logger.info('User %s added a local account (%s)', self.user, identity.identifier)
         flash(_("Local account added successfully"), 'success')
 
     def _handle_edit_local_account(self, form):
@@ -348,6 +349,7 @@ class RHAccounts(RHUserBase):
         if form.data['new_password']:
             self.user.local_identity.password = form.data['new_password']
             session.pop('insecure_password_error', None)
+            logger.info('User %s (%s) changed their password', self.user, self.user.local_identity.identifier)
         flash(_("Your local account credentials have been updated successfully"), 'success')
 
     def _process(self):
@@ -592,6 +594,7 @@ class RHResetPassword(RH):
             _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
                                {'user': user, 'username': identity.identifier}, data=identity.id)
             session['resetpass_email_sent'] = True
+            logger.info('Password reset requested for user %s', user)
             return redirect(url_for('.resetpass'))
         return WPAuth.render_template('reset_password.html', form=form, identity=None, widget_attrs={},
                                       email_sent=session.pop('resetpass_email_sent', False))
@@ -602,6 +605,7 @@ class RHResetPassword(RH):
             identity.password = form.password.data
             flash(_("Your password has been changed successfully."), 'success')
             login_user(identity.user, identity)
+            logger.info('Password reset confirmed for user %s', identity.user)
             # We usually come here from a multipass login page so we should have a target url
             return multipass.redirect_success()
         form.username.data = identity.identifier
