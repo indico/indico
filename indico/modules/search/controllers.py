@@ -16,24 +16,12 @@ from indico.modules.categories import Category
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.events import Event
 from indico.modules.events.controllers.base import RHDisplayEventBase
-from indico.modules.groups import GroupProxy
 from indico.modules.search.base import IndicoSearchProvider, SearchOptions, SearchTarget, get_search_provider
 from indico.modules.search.result_schemas import CategoryResultSchema, EventResultSchema, ResultSchema
 from indico.modules.search.schemas import DetailedCategorySchema, HTMLStrippingEventSchema
 from indico.modules.search.views import WPCategorySearch, WPEventSearch, WPSearch
-from indico.util.caching import memoize_redis
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
-
-
-@memoize_redis(3600)
-def get_user_access(user):
-    access = [user.identifier] + [u.identifier for u in user.get_merged_from_users_recursive()]
-    access += [GroupProxy(x.id, _group=x).identifier for x in user.local_groups]
-    if user.can_get_all_multipass_groups:
-        access += [GroupProxy(x.name, x.provider.name, x).identifier
-                   for x in user.iter_all_multipass_groups()]
-    return access
 
 
 class RHSearchDisplay(RH):
@@ -68,8 +56,7 @@ class RHAPISearch(RH):
         search_provider = get_search_provider()
         if type == [SearchTarget.category]:
             search_provider = InternalSearch
-        access = get_user_access(session.user) if session.user else []
-        result = search_provider().search(q, access, page, type, **params)
+        result = search_provider().search(q, session.user, page, type, **params)
         return ResultSchema().dump(result)
 
 
@@ -82,11 +69,11 @@ class RHAPISearchOptions(RH):
 
 
 class InternalSearch(IndicoSearchProvider):
-    def search(self, query, access, page=None, object_types=(), **params):
+    def search(self, query, user=None, page=None, object_types=(), **params):
         if object_types == [SearchTarget.category]:
-            pagenav, results = self.search_categories(query, page, params.get('category_id'))
+            pagenav, results = self.search_categories(query, user, page, params.get('category_id'))
         elif object_types == [SearchTarget.event]:
-            pagenav, results = self.search_events(query, page, params.get('category_id'))
+            pagenav, results = self.search_events(query, user, page, params.get('category_id'))
         else:
             pagenav, results = {}, []
         return {
@@ -128,7 +115,7 @@ class InternalSearch(IndicoSearchProvider):
 
         return res, pagenav
 
-    def search_categories(self, q, page, category_id):
+    def search_categories(self, q, user, page, category_id):
         query = Category.query if not category_id else Category.get(category_id).deep_children_query
 
         query = (query
@@ -138,11 +125,11 @@ class InternalSearch(IndicoSearchProvider):
                           undefer(Category.effective_protection_mode),
                           subqueryload(Category.acl_entries)))
 
-        objs, pagenav = self._paginate(query, page, Category.id, session.user)
+        objs, pagenav = self._paginate(query, page, Category.id, user)
         res = DetailedCategorySchema(many=True).dump(objs)
         return pagenav, CategoryResultSchema(many=True).load(res)
 
-    def search_events(self, q, page, category_id):
+    def search_events(self, q, user, page, category_id):
         filters = [
             Event.title_matches(q),
             ~Event.is_deleted
@@ -154,6 +141,6 @@ class InternalSearch(IndicoSearchProvider):
         query = (Event.query
                  .filter(*filters)
                  .options(subqueryload(Event.acl_entries), undefer(Event.effective_protection_mode)))
-        objs, pagenav = self._paginate(query, page, Event.id, session.user)
+        objs, pagenav = self._paginate(query, page, Event.id, user)
         res = HTMLStrippingEventSchema(many=True).dump(objs)
         return pagenav, EventResultSchema(many=True).load(res)

@@ -52,12 +52,12 @@ class SearchOptions:
 class IndicoSearchProvider:
     RESULTS_PER_PAGE = 10
 
-    def search(self, query, access, page=None, object_types=(), **params):
+    def search(self, query, user=None, page=None, object_types=(), **params):
         """Search using a custom service across multiple targets.
 
         :param query: Keyword based query string
-        :param access: The requester access control list
-        :param page: The target page
+        :param user: The user performing the search (for access checks)
+        :param page: The result page to show
         :param object_types: A filter for a specific `SearchTarget`
         :param params: Any additional search params such as filters
 
