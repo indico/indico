@@ -25,7 +25,7 @@ const EventNote = ({title, url, content, modifiedDt, highlight, categoryPath, ev
       </a>
     </List.Header>
     <List.Description styleName="description">
-      {content && <Highlight text={content} highlight={highlight.content} />}
+      <Highlight text={content} highlight={highlight.content} />
       <List.Item>
         <Icon name="calendar alternate outline" />
         {serializeDate(toMoment(modifiedDt), 'DD MMMM YYYY HH:mm')}
