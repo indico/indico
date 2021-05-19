@@ -1,12 +1,12 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
+{% set common_fields = form._common_fields|default([]) %}
 {{ form_header(form) }}
-{{ form_rows(form, fields=form._common_fields) }}
-{{ form_rows(form, skip=form._common_fields) }}
+{{ form_rows(form, fields=common_fields) }}
+{{ form_rows(form, skip=common_fields) }}
 {% call form_footer(form) %}
     <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
-           {% if disabled_until_change|default(true) %}data-disabled-until-change{% endif %}>
-
+           data-disabled-until-change>
     <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
 {% endcall %}
 {% block javascript %}{% endblock %}
