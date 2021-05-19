@@ -52,7 +52,7 @@ export default function Event({
         <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
-        <Highlight text={description} highlight={highlight.description} />
+        {description && <Highlight text={description} highlight={highlight.description} />}
         {['lecture', 'meeting'].includes(eventType) && persons.length !== 0 && (
           <List.Item>
             <PersonList persons={persons} />

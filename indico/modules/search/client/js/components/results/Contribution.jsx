@@ -37,7 +37,7 @@ export default function Contribution({
         <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
-        <Highlight text={description} highlight={highlight.description} />
+        {description && <Highlight text={description} highlight={highlight.description} />}
         {persons.length !== 0 && (
           <List.Item>
             <PersonList persons={persons} />
