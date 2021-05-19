@@ -217,11 +217,11 @@
                     {{ _render_user_settings(languages) }}
                 {% else %}
                     {{ _render_language_selector(languages) }}
-
-                    {% if not request.values.next and request.endpoint != config.MULTIPASS_LOGIN_ENDPOINT %}
+                    {% set next_url = request.values.get('next') %}
+                    {% if not next_url and request.endpoint != config.MULTIPASS_LOGIN_ENDPOINT %}
                         {% set after_login_url = request.relative_url %}
                     {% else %}
-                        {% set after_login_url = request.values.next %}
+                        {% set after_login_url = next_url %}
                     {% endif %}
 
                     <a class="i-button icon-enter" href="{{ url_for_login(after_login_url) }}">
