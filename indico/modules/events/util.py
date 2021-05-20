@@ -379,7 +379,7 @@ class ListGeneratorBase:
         self.list_config['filters'] = filters
         if request.values.get('visible_items'):
             visible_items = json.loads(request.values['visible_items'])
-            self.list_config['items'] = sorted(visible_items)
+            self.list_config['items'] = sorted(visible_items, key=str)
         session.modified = True
 
     def flash_info_message(self, obj):
