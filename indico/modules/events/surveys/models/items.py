@@ -113,7 +113,7 @@ class SurveyItem(DescriptionMixin, db.Model):
     )
 
     # The following columns are only used for SurveyQuestion objects, but by
-    # specifying them here we can access them withouy an extra query when we
+    # specifying them here we can access them without an extra query when we
     # query SurveyItem objects directly instead of going through a subclass.
     # This is done e.g. when using the Survey.top_level_items relationship.
 
