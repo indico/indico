@@ -21,7 +21,7 @@ export default function Highlight({text, highlight}) {
       </div>
     );
   }
-  return <div styleName="summary">{text.slice(0, 240)}</div>;
+  return text ? <div styleName="summary">{text.slice(0, 240)}</div> : null;
 }
 
 Highlight.propTypes = {
