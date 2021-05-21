@@ -94,7 +94,7 @@
             </section>
         {% endif %}
         <section class="cfa-infoline-section">
-            {{ render_cfa_infoline(event, cfa, show_icon=false) }}
+            {{ render_cfa_infoline(event, cfa, show_icon=false, abstracts=abstracts) }}
         </section>
         {% if abstracts %}
             {{ render_user_abstract_list(event, abstracts) }}

@@ -1,4 +1,4 @@
-{% macro render_cfa_infoline(event, cfa, show_icon=true, redirect_first=false) %}
+{% macro render_cfa_infoline(event, cfa, show_icon=true, redirect_first=false, abstracts=[]) %}
     {% set can_submit_abstracts = cfa.is_open or (session.user and cfa.can_submit_abstracts(session.user)) %}
     {% set is_future = not cfa.has_started and not cfa.has_ended and cfa.is_scheduled %}
     <div class="action-box highlight">
