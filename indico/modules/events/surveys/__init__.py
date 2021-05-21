@@ -106,3 +106,9 @@ def _get_placeholders(sender, event, survey, **kwargs):
     yield placeholders.EventTitlePlaceholder
     yield placeholders.SurveyTitlePlaceholder
     yield placeholders.SurveyLinkPlaceholder
+
+
+@signals.event_management.get_cloners.connect
+def _get_survey_cloners(sender, **kwargs):
+    from indico.modules.events.surveys.clone import EventSurveyCloner
+    yield EventSurveyCloner

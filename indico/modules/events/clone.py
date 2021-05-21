@@ -13,8 +13,6 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.sessions import session_settings
-from indico.modules.events.surveys.models.items import SurveyItem
-from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.util import track_location_changes
 from indico.util.i18n import _
 
@@ -155,46 +153,3 @@ class EventProtectionCloner(EventCloner):
         else:
             new_event.acl_entries = clone_principals(EventPrincipal, self.old_event.acl_entries,
                                                      self._event_role_map, self._regform_map)
-
-
-class EventSurveyCloner(EventCloner):
-    name = 'event_survey'
-    friendly_name = _('Surveys')
-    is_default = False
-
-    @property
-    def is_available(self):
-        return self._has_content(self.old_event)
-
-    def has_conflicts(self, target_event):
-        return self._has_content(target_event)
-
-    def run(self, new_event, cloners, shared_data, event_exists=False):
-        with db.session.no_autoflush:
-            self._clone_surveys(new_event)
-        db.session.flush()
-
-    def _has_content(self, event):
-        return len([survey for survey in event.surveys if not survey.is_deleted])
-
-    def _clone_surveys(self, new_event):
-        survey_attrs = get_simple_column_attrs(Survey) - {'uuid', 'start_dt', 'end_dt', '_last_friendly_submission_id'}
-        for old_survey in self.old_event.surveys:
-            survey = Survey()
-            survey.populate_from_attrs(old_survey, survey_attrs)
-            item_map = {}
-            for old_item in old_survey.items:
-                item = self._clone_item(old_item)
-                if old_item.parent:
-                    assert old_item.parent != old_item
-                    if not item_map.get(old_item.parent):
-                        item_map[old_item.parent] = self._clone_item(old_item.parent)
-                    item.parent = item_map[old_item.parent]
-                item_map[old_item] = item
-            survey.items.extend(item_map.values())
-            new_event.surveys.append(survey)
-
-    def _clone_item(self, old_item):
-        item = SurveyItem()
-        item.populate_from_attrs(old_item, get_simple_column_attrs(SurveyItem))
-        return item
