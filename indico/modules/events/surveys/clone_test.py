@@ -7,15 +7,19 @@
 
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.surveys.clone import EventSurveyCloner
-from indico.modules.events.surveys.models.items import SurveyItem, SurveyQuestion, SurveySection
+from indico.modules.events.surveys.models.items import SurveyItem, SurveyQuestion, SurveySection, SurveyText
 from indico.modules.events.surveys.models.surveys import Survey
 
 
 def test_survey_clone(db, create_event, dummy_event):
     survey = Survey(title='test')
-    section = SurveySection(title='test', display_as_section=True)
-    survey.items.append(section)
-    SurveyQuestion(title='question', field_type='text', is_required=True, parent=section)
+    first_section = SurveySection(title='test', display_as_section=True, position=2)
+    survey.items.append(first_section)
+    SurveyQuestion(title='question', field_type='text', is_required=True, parent=first_section)
+    second_section = SurveySection(title='test', display_as_section=True, position=1)
+    survey.items.append(second_section)
+    SurveyText(description='My text', parent=second_section)
+    SurveyQuestion(title='What is your name?', field_type='text', is_required=False, parent=second_section)
     dummy_event.surveys.append(survey)
     db.session.flush()
 
