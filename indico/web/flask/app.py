@@ -16,6 +16,7 @@ from markupsafe import Markup
 from packaging.version import Version
 from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
+from sqlalchemy.pool import QueuePool
 from werkzeug.exceptions import BadRequest
 from werkzeug.local import LocalProxy
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -289,6 +290,27 @@ def configure_db(app):
     plugins_loaded.connect(lambda sender: configure_mappers(), app, weak=False)
 
 
+def check_db():
+    # If something triggered database queries during startup, we have connections in the pool
+    # and when using uwsgi which preforks workers after initializing the WSGI app (ie ``make_app``
+    # runs only once for all workers), this passes a pool containing unusable connections to the
+    # workers, which results in VERY strange databases errors such as "error with status PGRES_TUPLES_OK
+    # and no message from the libpq".
+    # Since we do not expect any queries during startup, and it's a bad idea, we fail hard when
+    # in debug mode. For the unlikely case that existing code is doing this (it shouldn't!), we
+    # just dispose the engine which creates a fresh pool (with no connections in it) to avoid
+    # the errors.
+    if not isinstance(db.engine.pool, QueuePool):
+        # tests that don't use the database have a StaticPool
+        return
+    if db.engine.pool.checkedin() or db.engine.pool.checkedout():
+        if config.DEBUG:
+            raise Exception('Something triggered queries during app initialization. This is probably a bad idea. '
+                            'Read the comment in the method that raised this exception for details.')
+        Logger.get('db').warning('Connection pool populated during startup (%s); resetting it', db.engine.pool.status())
+        db.engine.dispose()
+
+
 def extend_url_map(app):
     app.url_map.converters['list'] = ListConverter
 
@@ -402,4 +424,6 @@ def make_app(testing=False, config_override=None):
         # themes can be provided by plugins
         signals.app_created.send(app)
         config.validate()
+        check_db()
+
     return app
