@@ -13,6 +13,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.sessions import session_settings
+from indico.modules.events.util import track_location_changes
 from indico.util.i18n import _
 
 
@@ -37,7 +38,8 @@ class EventLocationCloner(EventCloner):
         return event.has_location_info
 
     def _clone_location(self, new_event):
-        new_event.location_data = self.old_event.location_data
+        with track_location_changes():
+            new_event.location_data = self.old_event.location_data
 
 
 class EventPersonCloner(EventCloner):
