@@ -8,18 +8,26 @@
 import dataclasses
 
 from indico.core import signals
+from indico.util.decorators import classproperty
 from indico.util.enum import IndicoEnum
 from indico.util.signals import values_from_signal
 
 
-def get_search_provider():
+def get_search_provider(only_active=True):
+    """Get the search provider to use for a search.
+
+    :param only_active: Whether to check that the provider is active;
+                        in case it isn't, the default InternalSearch
+                        provider will be used.
+    """
     from indico.modules.search.controllers import InternalSearch
     providers = values_from_signal(signals.get_search_providers.send(), as_list=True)
 
     if not providers:
         return InternalSearch
     elif len(providers) == 1:
-        return providers[0]
+        provider = providers[0]
+        return provider if not only_active or provider.active else InternalSearch
     else:
         providers_str = ', '.join(f'{x.__module__}.{x.__name__}' for x in providers)
         raise RuntimeError(f'Only one search provider can be defined (found: {providers_str})')
@@ -50,7 +58,19 @@ class SearchOptions:
 
 
 class IndicoSearchProvider:
+    #: The number of results to show per page.
     RESULTS_PER_PAGE = 10
+
+    @classproperty
+    @classmethod
+    def active(cls):
+        """Whether this provider can be used for searching.
+
+        Providers that require any particular config should return
+        ``False`` here so users get the internal search until the
+        provider is fully configured.
+        """
+        return True
 
     def search(self, query, user=None, page=None, object_types=(), **params):
         """Search using a custom service across multiple targets.

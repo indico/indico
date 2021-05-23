@@ -14,7 +14,7 @@ from indico.web.flask.templating import template_hook
 @signals.app_created.connect
 def _check_search_provider(app, **kwargs):
     from .base import get_search_provider
-    get_search_provider()
+    get_search_provider(only_active=False)
 
 
 @template_hook('conference-header-right-column')
