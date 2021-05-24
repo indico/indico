@@ -54,9 +54,9 @@
 {% endmacro %}
 
 {% macro _render_proposed_contrib_types(review_list) %}
-    {%- for type, reviews in review_list|groupby('proposed_contribution_type') if type %}
-        {{- reviews|selectattr('proposed_contribution_type', 'equalto', type)|list|length }}
-        {{ type.name -}}
+    {%- for type, reviews in review_list|selectattr('proposed_contribution_type')|groupby('proposed_contribution_type.name') %}
+        {{- reviews|selectattr('proposed_contribution_type.name', 'equalto', type)|list|length }}
+        {{ type -}}
         {{- ", " if not loop.last -}}
     {% endfor -%}
 {% endmacro %}
