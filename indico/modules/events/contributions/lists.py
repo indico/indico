@@ -169,6 +169,10 @@ class ContributionDisplayListGenerator(ContributionListGenerator):
     list_link_type = 'contribution_display'
     check_access = True
 
+    def __init__(self, event):
+        super().__init__(event)
+        del self.static_items['speakers']
+
     def render_contribution_list(self):
         """Render the contribution list template components.
 
