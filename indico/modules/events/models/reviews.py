@@ -40,6 +40,10 @@ class ProposalGroupProxy:
         return not (self == other)
 
     @property
+    def id(self):
+        return self.instance.id
+
+    @property
     def title(self):
         return getattr(self.instance, self.title_attr)
 
