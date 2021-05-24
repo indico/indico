@@ -129,8 +129,8 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             logger.info('Attachment %s edited by %s', self.attachment, session.user)
-            form.populate_obj(self.attachment, skip={'acl', 'file'})
             self.attachment.folder = folder
+            form.populate_obj(self.attachment, skip={'acl', 'file', 'folder'})
             if self.attachment.is_self_protected:
                 # can't use `=` because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3583
                 self.attachment.acl |= form.acl.data
