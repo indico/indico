@@ -57,6 +57,7 @@ class CustomFieldsMixin:
         else:
             return fv.friendly_data if fv else ''
 
+    @no_autoflush
     def set_custom_field(self, field_id, field_value):
         fv = self.get_field_value(field_id, raw=True)
         if not fv:
