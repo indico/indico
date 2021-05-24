@@ -15,7 +15,7 @@
                         <li>
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
                                    id="field-{{ item_id }}-option-{{ value }}"
-                                   {% if value in filters[item_id] %} checked {% endif %}>
+                                   {% if value in filters.get(item_id, []) %} checked {% endif %}>
                             <label for="field-{{ item_id }}-option-{{ value }}">
                                 {{ caption }}
                             </label>
