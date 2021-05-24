@@ -275,9 +275,15 @@ class RHRegistrationCreate(RHManageRegFormBase):
             for error in form.error_list:
                 flash(error, 'error')
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
-                                                    sections=get_event_section_data(self.regform), regform=self.regform,
+                                                    regform=self.regform,
+                                                    sections=get_event_section_data(self.regform),
                                                     post_url=url_for('.create_registration', self.regform),
-                                                    user_data=self._get_user_data(), management=True)
+                                                    user_data=self._get_user_data(),
+                                                    invitation=None,
+                                                    registration=None,
+                                                    management=True,
+                                                    login_required=False,
+                                                    is_restricted_access=False)
 
 
 class RHRegistrationCreateMultiple(RHManageRegFormBase):
