@@ -2,6 +2,7 @@
 
 {% macro render_user_papers_list(event, contributions, to_review=false, reviewed=false) %}
     <section>
+        {% set id = none %}
         {% if to_review %}
             {% set id = 'to-review-list' %}
         {% elif reviewed %}
