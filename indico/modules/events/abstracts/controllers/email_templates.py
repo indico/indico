@@ -39,7 +39,7 @@ class RHAddEmailTemplate(RHManageAbstractsBase):
             self.event.abstract_email_templates.append(new_tpl)
             db.session.flush()
             return _render_notification_list(self.event)
-        return jsonify_template('events/abstracts/management/notification_tpl_form.html', form=form)
+        return jsonify_template('events/abstracts/management/notification_tpl_form.html', form=form, is_edit=False)
 
 
 class RHSortEmailTemplates(RHManageAbstractsBase):
