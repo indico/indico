@@ -30,11 +30,13 @@ class EventSurveyCloner(EventCloner):
         db.session.flush()
 
     def _has_content(self, event):
-        return len([survey for survey in event.surveys if not survey.is_deleted])
+        return any(survey for survey in event.surveys if not survey.is_deleted)
 
     def _clone_surveys(self, new_event):
         survey_attrs = get_simple_column_attrs(Survey) - {'uuid', 'start_dt', 'end_dt', '_last_friendly_submission_id'}
         for old_survey in self.old_event.surveys:
+            if old_survey.is_deleted:
+                continue
             survey = Survey()
             survey.populate_from_attrs(old_survey, survey_attrs)
             item_map = {}
