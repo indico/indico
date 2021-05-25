@@ -50,7 +50,7 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import check_event_locked, get_field_values, track_time_changes
+from indico.modules.events.util import check_event_locked, get_field_values, track_location_changes, track_time_changes
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -198,7 +198,11 @@ class RHEditContribution(RHManageContributionBase):
                                                    **custom_field_values),
                                   event=self.event, contrib=self.contrib, session_block=parent_session_block)
         if form.validate_on_submit():
-            with track_time_changes(), flash_if_unregistered(self.event, lambda: self.contrib.person_links):
+            with (
+                track_time_changes(),
+                track_location_changes(),
+                flash_if_unregistered(self.event, lambda: self.contrib.person_links)
+            ):
                 update_contribution(self.contrib, *get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.list_generator.render_list(self.contrib)

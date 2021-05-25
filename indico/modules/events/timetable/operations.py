@@ -53,6 +53,7 @@ def update_break_entry(break_, data):
     if start_dt is not None:
         update_timetable_entry(break_.timetable_entry, {'start_dt': start_dt})
     break_.populate_from_dict(data)
+    db.session.flush()
 
 
 def create_session_block_entry(session_, data):

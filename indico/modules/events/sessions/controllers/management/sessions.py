@@ -29,7 +29,7 @@ from indico.modules.events.sessions.operations import (create_session, delete_se
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
                                                  render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
-from indico.modules.events.util import get_random_color
+from indico.modules.events.util import get_random_color, track_location_changes
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
@@ -93,7 +93,8 @@ class RHModifySession(RHManageSessionBase):
     def _process(self):
         form = SessionForm(obj=self.session, event=self.event)
         if form.validate_on_submit():
-            update_session(self.session, form.data)
+            with track_location_changes():
+                update_session(self.session, form.data)
             return jsonify_data(html=_render_session_list(self.event))
         return jsonify_form(form)
 
@@ -237,7 +238,8 @@ class RHManageSessionBlock(RHManageSessionBase):
             session_data = {k[8:]: v for k, v in form.data.items() if k in form.session_fields}
             block_data = {k[6:]: v for k, v in form.data.items() if k in form.block_fields}
             update_session(self.session, session_data)
-            update_session_block(self.session_block, block_data)
+            with track_location_changes():
+                update_session_block(self.session_block, block_data)
             return jsonify_data(flash=False)
         self.commit = False
         return jsonify_template('events/forms/session_block_form.html', form=form, block=self.session_block)

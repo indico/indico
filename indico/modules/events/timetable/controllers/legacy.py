@@ -39,7 +39,7 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
 from indico.modules.events.timetable.reschedule import RescheduleMode, Rescheduler
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
                                                   get_time_changes_notifications, shift_following_entries)
-from indico.modules.events.util import get_field_values, get_random_color, track_time_changes
+from indico.modules.events.util import get_field_values, get_random_color, track_location_changes, track_time_changes
 from indico.util.date_time import as_utc, iterdays
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
@@ -185,9 +185,12 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                                          event=self.event, contrib=contrib, to_schedule=False,
                                          day=tt_entry_dt.date(), session_block=parent_session_block)
             if form.validate_on_submit():
-                with track_time_changes(auto_extend=True, user=session.user) as changes:
-                    with flash_if_unregistered(self.event, lambda: contrib.person_links):
-                        update_contribution(contrib, *get_field_values(form.data))
+                with (
+                    track_time_changes(auto_extend=True, user=session.user) as changes,
+                    track_location_changes(),
+                    flash_if_unregistered(self.event, lambda: contrib.person_links)
+                ):
+                    update_contribution(contrib, *get_field_values(form.data))
                 notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo, entry=self.entry)
                 return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
                                     notifications=notifications)
@@ -201,7 +204,10 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
             form = BreakEntryForm(obj=FormDefaults(break_, time=tt_entry_dt.time()), event=self.event,
                                   day=tt_entry_dt.date(), session_block=parent_session_block)
             if form.validate_on_submit():
-                with track_time_changes(auto_extend=True, user=session.user) as changes:
+                with (
+                    track_time_changes(auto_extend=True, user=session.user) as changes,
+                    track_location_changes()
+                ):
                     update_break_entry(break_, form.data)
                 notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo, entry=self.entry)
                 return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
@@ -211,7 +217,8 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                 session_ = self.entry.session_block.session
                 form = SessionForm(obj=FormDefaults(session_), event=self.event)
                 if form.validate_on_submit():
-                    update_session(session_, form.data)
+                    with track_location_changes():
+                        update_session(session_, form.data)
                     return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session), flash=False)
             else:
                 block = self.entry.session_block
@@ -220,7 +227,10 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                                              event=self.event, session_block=block, to_schedule=False,
                                              day=tt_entry_dt.date())
                 if form.validate_on_submit():
-                    with track_time_changes(auto_extend=True, user=session.user) as changes:
+                    with (
+                        track_time_changes(auto_extend=True, user=session.user) as changes,
+                        track_location_changes()
+                    ):
                         update_session_block(block, form.data)
                     notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo,
                                                                    entry=self.entry)

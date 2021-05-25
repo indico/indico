@@ -20,7 +20,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.timetable.operations import (delete_timetable_entry, schedule_contribution,
                                                         update_timetable_entry)
-from indico.modules.events.util import set_custom_fields, track_location_changes
+from indico.modules.events.util import set_custom_fields
 
 
 def _ensure_consistency(contrib):
@@ -88,8 +88,7 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
     start_dt = contrib_data.pop('start_dt', None)
     if start_dt is not None:
         update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
-    with track_location_changes():
-        changes = contrib.populate_from_dict(contrib_data)
+    changes = contrib.populate_from_dict(contrib_data)
     if custom_fields_data:
         changes.update(set_custom_fields(contrib, custom_fields_data))
     if 'session' in contrib_data:

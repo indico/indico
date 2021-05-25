@@ -40,6 +40,7 @@ class EventLocationCloner(EventCloner):
     def _clone_location(self, new_event):
         with track_location_changes():
             new_event.location_data = self.old_event.location_data
+            db.session.flush()
 
 
 class EventPersonCloner(EventCloner):
