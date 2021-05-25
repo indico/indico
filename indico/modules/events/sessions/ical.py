@@ -45,7 +45,8 @@ def session_to_ical(session, detailed=False):
         from indico.modules.events.contributions.ical import generate_contribution_component
 
         contributions = (Contribution.query.with_parent(session)
-                         .filter(Contribution.is_scheduled).all())
+                         .filter(Contribution.is_scheduled)
+                         .all())
         components = [generate_contribution_component(contribution, related_event_uid)
                       for contribution in contributions]
         for component in components:

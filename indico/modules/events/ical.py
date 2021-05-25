@@ -61,7 +61,7 @@ def generate_basic_component(entity, uid=None, url=None):
             # this happens if desc_text only contains a html comment
             pass
     if url:
-        description.append(f'Agenda: {url}')
+        description.append(url)
     if description:
         component.add('description', '\n'.join(description))
 
