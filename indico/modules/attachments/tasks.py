@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import os
+
 from indico.core.celery import celery
 from indico.core.db import db
 from indico.modules.attachments.models.attachments import Attachment
@@ -23,4 +25,5 @@ def generate_materials_package(attachment_ids, event):
     f.save(context, generated_zip)
     db.session.add(f)
     db.session.commit()
+    os.unlink(generated_zip.name)
     return f.signed_download_url
