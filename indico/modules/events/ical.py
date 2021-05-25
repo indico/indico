@@ -36,10 +36,10 @@ def generate_basic_component(entity, uid=None, url=None):
     if uid:
         component.add('uid', uid)
 
+    if not url and hasattr(entity, 'external_url'):
+        url = entity.external_url
     if url:
         component.add('url', url)
-    elif hasattr(entity, 'external_url'):
-        component.add('url', entity.external_url)
 
     location = (f'{entity.room_name} ({entity.venue_name})'
                 if entity.venue_name and entity.room_name
@@ -60,6 +60,8 @@ def generate_basic_component(entity, uid=None, url=None):
         except ParserError:
             # this happens if desc_text only contains a html comment
             pass
+    if url:
+        description.append(url)
     if description:
         component.add('description', '\n'.join(description))
 
@@ -87,7 +89,8 @@ def generate_event_component(event, user=None):
         as_list=True
     ):
         data.update(update)
-    component.add('description', data['description'])
+    if data['description']:
+        component['description'] = data['description']
 
     return component
 
