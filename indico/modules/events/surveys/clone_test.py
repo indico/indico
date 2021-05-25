@@ -12,15 +12,17 @@ from indico.modules.events.surveys.models.surveys import Survey
 
 
 def test_survey_clone(db, create_event, dummy_event):
-    survey = Survey(title='test')
-    first_section = SurveySection(title='test', display_as_section=True, position=2)
+    survey = Survey(event=dummy_event, title='test')
+
+    first_section = SurveySection(title='section 1', display_as_section=True, position=2)
     survey.items.append(first_section)
-    SurveyQuestion(title='question', field_type='text', is_required=True, parent=first_section)
-    second_section = SurveySection(title='test', display_as_section=True, position=1)
+    first_section.children.append(SurveyQuestion(title='question in s1', field_type='text', is_required=True))
+
+    second_section = SurveySection(title='section 2', display_as_section=True, position=1)
     survey.items.append(second_section)
-    SurveyText(description='My text', parent=second_section)
-    SurveyQuestion(title='What is your name?', field_type='text', is_required=False, parent=second_section)
-    dummy_event.surveys.append(survey)
+    second_section.children.append(SurveyText(description='My text'))
+    second_section.children.append(SurveyQuestion(title='What is your name?', field_type='text', is_required=False))
+
     db.session.flush()
 
     new_event = create_event()
