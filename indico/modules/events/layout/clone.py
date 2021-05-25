@@ -53,8 +53,9 @@ class LayoutCloner(EventCloner):
         return self.old_event.type_ == EventType.conference
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
-        for col in ('logo_metadata', 'logo', 'stylesheet_metadata', 'stylesheet'):
-            setattr(new_event, col, getattr(self.old_event, col))
+        with db.session.no_autoflush:
+            for col in ('logo_metadata', 'logo', 'stylesheet_metadata', 'stylesheet'):
+                setattr(new_event, col, getattr(self.old_event, col))
 
         layout_settings.set_multi(new_event, layout_settings.get_all(self.old_event, no_defaults=True))
         if layout_settings.get(self.old_event, 'use_custom_menu'):
