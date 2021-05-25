@@ -42,7 +42,7 @@
                                         </label>
                                     </td>
                                     <td>
-                                        {% for competence in competences['competences_{}'.format(user.id)] %}
+                                        {% for competence in competences.get('competences_{}'.format(user.id), []) %}
                                             <div class="label i-tag">{{ competence }}</div>
                                         {% endfor %}
                                     </td>

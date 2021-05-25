@@ -21,7 +21,7 @@
                             {% set value = none if value is none else value|string %}
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
                                    id="field_{{ item_id }}_option_{{ value }}"
-                                   {{ 'checked' if value in filters[item_id] }}>
+                                   {{ 'checked' if value in filters.get(item_id, []) }}>
                             <label for="field_{{ item_id }}_option_{{ value }}">
                                 {{- caption -}}
                             </label>
