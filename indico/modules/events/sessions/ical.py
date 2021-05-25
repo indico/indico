@@ -9,6 +9,7 @@ import icalendar
 from werkzeug.urls import url_parse
 
 from indico.core.config import config
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.ical import generate_basic_component
 from indico.web.flask.util import url_for
 
@@ -42,8 +43,11 @@ def session_to_ical(session, detailed=False):
         calendar.add_component(component)
     else:
         from indico.modules.events.contributions.ical import generate_contribution_component
+
+        contributions = (Contribution.query.with_parent(session)
+                         .filter(Contribution.is_scheduled).all())
         components = [generate_contribution_component(contribution, related_event_uid)
-                      for contribution in session.contributions]
+                      for contribution in contributions]
         for component in components:
             calendar.add_component(component)
 
