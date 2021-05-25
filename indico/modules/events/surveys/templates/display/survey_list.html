@@ -1,7 +1,7 @@
 {% extends 'events/display/conference/base.html' if event.type == 'conference' else 'layout/meeting_page_base.html' %}
 
 {% block title %}
-    {{- page_title -}}
+    {{- page_title|default('') -}}
 {% endblock %}
 
 {% block content %}
