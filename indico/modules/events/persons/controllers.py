@@ -25,6 +25,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.controllers.base import RHAuthenticatedEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
@@ -374,7 +375,7 @@ class RHEditEventPerson(RHPersonsBase):
         return jsonify_form(form)
 
 
-class RHEventPersonSearch(RHPersonsBase):
+class RHEventPersonSearch(RHAuthenticatedEventBase):
     def _search_event_persons(self, exact=False, **criteria):
         criteria = {key: v for key, value in criteria.items() if (v := value.strip())}
 
