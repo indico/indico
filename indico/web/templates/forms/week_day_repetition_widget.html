@@ -1,5 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
+{% set disabled = disabled|default(false) %}
+
 {% block html %}
     <div class="week-day-widget">
         <select name="{{ field.name}}" id="{{ field.id }}-day-number"
