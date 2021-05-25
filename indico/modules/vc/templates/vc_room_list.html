@@ -38,7 +38,7 @@
             {% if event_vc_room.vc_room.plugin %}
                 <img src="{{ event_vc_room.vc_room.plugin.icon_url }}" title="{{ event_vc_room.vc_room.plugin.friendly_name }}">
             {% else %}
-                <i class="icon-camera" title="{{ event_vc_room.vc_room.plugin.friendly_name }}"></i>
+                <i class="icon-camera" title="{{ event_vc_room.vc_room.type }}"></i>
             {% endif %}
         </td>
         <td class="entry-location">
