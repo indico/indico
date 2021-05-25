@@ -73,7 +73,7 @@
                                             {%- endif %}
                                         </td>
                                     {% elif item.id == 'payment_date' %}
-                                        <td class="i-table" data-text="{{ registration.transaction.timestamp }}">
+                                        <td class="i-table" data-text="{{ registration.payment_dt }}">
                                             {%- if registration.payment_dt %}
                                                 {{ registration.payment_dt | format_datetime(timezone=registration.event.tzinfo) }}
                                             {%- else %}
