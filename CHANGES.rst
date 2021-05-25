@@ -62,6 +62,7 @@ Improvements
   (:pr:`4899`)
 - Remove the very outdated "Compact style" theme (it's still available via the ``themes_legacy``
   plugin) (:issue:`4900`, :pr:`4899`)
+- Support cloning surveys when cloning events (:issue:`2045`, :pr:`4910`)
 
 Bugfixes
 ^^^^^^^^
