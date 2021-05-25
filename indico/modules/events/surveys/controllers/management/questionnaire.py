@@ -55,7 +55,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
 
     def _remove_false_values(self, data):
         # The forms consider a missing key as False (and a False value as True)
-        for key, value in data.items():
+        for key, value in list(data.items()):
             if value is False:
                 del data[key]
 
