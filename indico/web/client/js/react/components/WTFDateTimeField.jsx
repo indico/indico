@@ -46,7 +46,7 @@ export default function WTFDateTimeField({
   const [currentTimezone, setTimezone] = useState(timezone);
   const earliestMoment = earliest ? moment(earliest) : null;
   const latestMoment = latest ? moment(latest) : null;
-  const format = uses24HourFormat ? 'HH:mm' : 'hh:mm a';
+  const format = uses24HourFormat ? 'H:mm' : 'h:mm a';
   const timePickerRef = useRef(null);
   const clearRef = useRef(null);
 

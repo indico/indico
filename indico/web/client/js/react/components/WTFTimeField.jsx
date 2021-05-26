@@ -14,7 +14,7 @@ import {toMoment} from 'indico/utils/date';
 export default function WTFTimeField({timeId, uses24HourFormat, required, disabled}) {
   const timeField = useMemo(() => document.getElementById(timeId), [timeId]);
   const [time, setTime] = useState(toMoment(timeField.value, 'HH:mm', true));
-  const format = uses24HourFormat ? 'HH:mm' : 'hh:mm a';
+  const format = uses24HourFormat ? 'H:mm' : 'h:mm a';
   const timePickerRef = useRef(null);
 
   const updateTime = useCallback(
