@@ -102,9 +102,15 @@
                                    abstract.accepted_track != context_track) %}
                                 {% set accepted_other = true %}
                                 {% set accepted_other_msg -%}
-                                    {%- trans other_track=abstract.accepted_track.full_title -%}
-                                        This abstract has already been accepted for the track "{{ other_track }}"
-                                    {%- endtrans -%}
+                                    {% if abstract.accepted_track %}
+                                        {%- trans other_track=abstract.accepted_track.full_title -%}
+                                            This abstract has already been accepted for the track "{{ other_track }}"
+                                        {%- endtrans -%}
+                                    {% else %}
+                                        {%- trans -%}
+                                            This abstract has already been accepted
+                                        {%- endtrans -%}
+                                    {% endif %}
                                 {%- endset %}
                             {% else %}
                                 {% set accepted_other = false %}
