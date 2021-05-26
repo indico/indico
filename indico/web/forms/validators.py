@@ -380,8 +380,12 @@ class SoftLength(Length):
     """
 
     def __call__(self, form, field):
+        orig_data = field.data
         field.data = re.sub(r'(\r\n|\r)', '\n', field.data)
-        super().__call__(form, field)
+        try:
+            super().__call__(form, field)
+        finally:
+            field.data = orig_data
 
 
 class SecurePassword:
