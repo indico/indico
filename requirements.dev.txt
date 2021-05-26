@@ -48,7 +48,7 @@ flake8==3.9.2
     #   flake8-quotes
 flask-url-map-serializer==0.0.1
     # via -r requirements.dev.in
-flask==2.0.0
+flask==2.0.1
     # via
     #   -c requirements.txt
     #   flask-url-map-serializer
@@ -76,26 +76,26 @@ iniconfig==1.1.1
     # via pytest
 isort==5.8.0
     # via -r requirements.dev.in
-itsdangerous==2.0.0
+itsdangerous==2.0.1
     # via
     #   -c requirements.txt
     #   flask
-jinja2==3.0.0
+jinja2==3.0.1
     # via
     #   -c requirements.txt
     #   flask
     #   sphinx
 livereload==2.6.3
     # via sphinx-autobuild
-markupsafe==2.0.0
+markupsafe==2.0.1
     # via
     #   -c requirements.txt
     #   jinja2
 mccabe==0.6.1
     # via flake8
-migra==3.0.1616366383
+migra==3.0.1621480950
     # via -r requirements.dev.in
-mirakuru==2.3.1
+mirakuru==2.4.0
     # via pytest-redis
 packaging==20.9
     # via
@@ -136,7 +136,7 @@ pytest-localserver==0.5.0
     # via -r requirements.dev.in
 pytest-mock==3.6.1
     # via -r requirements.dev.in
-pytest-redis==2.0.0
+pytest-redis==2.1.1
     # via -r requirements.dev.in
 pytest==6.2.4
     # via
@@ -154,7 +154,7 @@ pytz==2021.1
     # via
     #   -c requirements.txt
     #   babel
-pyupgrade==2.17.0
+pyupgrade==2.18.3
     # via -r requirements.dev.in
 pywatchman==1.4.1
     # via -r requirements.dev.in
@@ -200,13 +200,13 @@ sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.4
+sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 sqlalchemy==1.4.15
     # via

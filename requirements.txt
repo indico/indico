@@ -4,7 +4,7 @@
 #
 #    pip-compile
 #
-alembic==1.6.2
+alembic==1.6.4
     # via
     #   -r requirements.in
     #   flask-migrate
@@ -34,7 +34,7 @@ blinker==1.4
     #   flask-multipass
     #   flask-pluginengine
     #   sentry-sdk
-celery==5.0.5
+celery==5.1.0
     # via
     #   -r requirements.in
     #   sentry-sdk
@@ -91,7 +91,7 @@ flask-marshmallow==0.14.0
     # via -r requirements.in
 flask-migrate==3.0.0
     # via -r requirements.in
-flask-multipass==0.3.5
+flask-multipass==0.4
     # via -r requirements.in
 flask-pluginengine==0.4
     # via -r requirements.in
@@ -101,9 +101,9 @@ flask-sqlalchemy==2.5.1
     #   flask-migrate
 flask-webpackext==1.0.2
     # via -r requirements.in
-flask-wtf==0.14.3
+flask-wtf==0.15.1
     # via -r requirements.in
-flask==2.0.0
+flask==2.0.1
     # via
     #   -r requirements.in
     #   flask-babel
@@ -137,14 +137,14 @@ ipython-genutils==0.2.0
     # via traitlets
 ipython==7.23.1
     # via -r requirements.in
-itsdangerous==2.0.0
+itsdangerous==2.0.1
     # via
     #   -r requirements.in
     #   flask
     #   flask-wtf
 jedi==0.18.0
     # via ipython
-jinja2==3.0.0
+jinja2==3.0.1
     # via
     #   -r requirements.in
     #   flask
@@ -152,7 +152,7 @@ jinja2==3.0.0
     #   flask-pluginengine
 jsonschema==3.2.0
     # via -r requirements.in
-kombu==5.0.2
+kombu==5.1.0
     # via celery
 limits==1.5.1
     # via flask-limiter
@@ -164,7 +164,7 @@ mako==1.1.4
     # via alembic
 markdown==3.3.4
     # via -r requirements.in
-markupsafe==2.0.0
+markupsafe==2.0.1
     # via
     #   -r requirements.in
     #   jinja2
@@ -306,6 +306,7 @@ vine==5.0.0
     # via
     #   amqp
     #   celery
+    #   kombu
 wcwidth==0.2.5
     # via prompt-toolkit
 webargs==8.0.0
