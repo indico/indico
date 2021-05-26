@@ -155,21 +155,23 @@
             {{ render_user_avatar(abstract.submitter) }}
             <div class="i-timeline-item-box header-indicator-left">
                 <div class="i-box-header">
-                    {% if abstract.state.name == 'invited' %}
-                        {% trans name=abstract.submitter.name -%}
-                            <strong>{{ name }}</strong> was invited to submit an abstract
-                        {%- endtrans %}
-                    {% else %}
-                        {% trans name=abstract.submitter.name -%}
-                            <strong>{{ name }}</strong> submitted this abstract
-                        {%- endtrans %}
-                    {% endif %}
-                    <time datetime="{{ abstract.submitted_dt.isoformat() }}">
-                        {{- abstract.submitted_dt|format_human_date -}}
-                    </time>
-                    {% if abstract.modified_dt %}
-                        {{ render_edited_hint(abstract.modified_dt, abstract.modified_by) }}
-                    {% endif %}
+                    <div class="f-self-stretch">
+                        {% if abstract.state.name == 'invited' %}
+                            {% trans name=abstract.submitter.name -%}
+                                <strong>{{ name }}</strong> was invited to submit an abstract
+                            {%- endtrans %}
+                        {% else %}
+                            {% trans name=abstract.submitter.name -%}
+                                <strong>{{ name }}</strong> submitted this abstract
+                            {%- endtrans %}
+                        {% endif %}
+                        <time datetime="{{ abstract.submitted_dt.isoformat() }}">
+                            {{- abstract.submitted_dt|format_human_date -}}
+                        </time>
+                        {% if abstract.modified_dt %}
+                            {{ render_edited_hint(abstract.modified_dt, abstract.modified_by) }}
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="i-box-content submission-info">
                     {{ _render_submission_info(abstract, field_values) }}
