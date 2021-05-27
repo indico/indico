@@ -381,7 +381,8 @@ class SoftLength(Length):
 
     def __call__(self, form, field):
         orig_data = field.data
-        field.data = re.sub(r'(\r\n|\r)', '\n', field.data)
+        if field.data is not None:
+            field.data = re.sub(r'(\r\n|\r)', '\n', field.data)
         try:
             super().__call__(form, field)
         finally:
