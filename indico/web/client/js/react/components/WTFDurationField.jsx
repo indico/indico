@@ -15,10 +15,7 @@ const timeToSeconds = time => {
     return null;
   }
 
-  // avoid counting seconds in a DST day.
-  const safeDate = time.date(1).month(0);
-
-  return safeDate.diff(safeDate.clone().startOf('day'), 'seconds');
+  return time.hours() * 3600 + time.minutes() * 60;
 };
 
 const secondsToTime = seconds =>
