@@ -79,6 +79,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
                          db.Index(None, 'abstract_id', unique=True, postgresql_where=db.text('NOT is_deleted')),
                          db.CheckConstraint("session_block_id IS NULL OR session_id IS NOT NULL",
                                             'session_block_if_session'),
+                         db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
                          db.ForeignKeyConstraint(['session_block_id', 'session_id'],
                                                  ['events.session_blocks.id', 'events.session_blocks.session_id']),
                          {'schema': 'events'})

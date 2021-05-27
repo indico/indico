@@ -21,7 +21,8 @@ from indico.util.string import format_repr
 
 class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
     __tablename__ = 'breaks'
-    __auto_table_args = {'schema': 'events'}
+    __auto_table_args = (db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
+                         {'schema': 'events'})
     location_backref_name = 'breaks'
     default_colors = ColorTuple('#202020', '#90c0f0')
     possible_render_modes = {RenderMode.markdown}

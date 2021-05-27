@@ -34,6 +34,7 @@ def _get_next_position(context):
 class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, db.Model):
     __tablename__ = 'subcontributions'
     __table_args__ = (db.Index(None, 'friendly_id', 'contribution_id', unique=True),
+                      db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
                       {'schema': 'events'})
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True

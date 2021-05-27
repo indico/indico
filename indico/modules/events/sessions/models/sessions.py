@@ -39,6 +39,9 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     __tablename__ = 'sessions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
                                   postgresql_where=db.text('NOT is_deleted')),
+                         db.CheckConstraint("date_trunc('minute', default_contribution_duration) = "
+                                            "default_contribution_duration",
+                                            'default_contribution_duration_no_seconds'),
                          {'schema': 'events'})
     location_backref_name = 'sessions'
     disallowed_protection_modes = frozenset()

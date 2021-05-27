@@ -20,6 +20,7 @@ from indico.util.string import format_repr
 class SessionBlock(LocationMixin, db.Model):
     __tablename__ = 'session_blocks'
     __auto_table_args = (db.UniqueConstraint('id', 'session_id'),  # useless but needed for the compound fkey
+                         db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
                          {'schema': 'events'})
     location_backref_name = 'session_blocks'
 
