@@ -76,7 +76,7 @@ class RHPersonsBase(RHManageEventBase):
         return {'title': '{} ({})'.format(person_link.subcontribution.contribution.title,
                                           person_link.subcontribution.title),
                 'url': url_for('contributions.manage_contributions', self.event,
-                               selected=person_link.subcontribution.friendly_id)}
+                               selected=person_link.subcontribution.contribution.friendly_id)}
 
     def get_persons(self):
         abstract_strategy = joinedload('abstract_links')
