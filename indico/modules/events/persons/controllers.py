@@ -158,7 +158,7 @@ class RHPersonsBase(RHManageEventBase):
 
             if contributions or subcontributions:
                 data['roles']['speaker'] = BUILTIN_ROLES['speaker'].copy()
-                data['roles']['speaker']['elements'] = dict(contributions, **subcontributions)
+                data['roles']['speaker']['elements'] = contributions | subcontributions
 
             event_user_roles_data = {}
             for role in event_user_roles[event_person.user]:
@@ -191,7 +191,7 @@ class RHPersonsBase(RHManageEventBase):
 
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.items() if any(data['roles'].values())}
-        persons = dict(persons, **internal_role_users)
+        persons = persons | internal_role_users
         return persons
 
 
