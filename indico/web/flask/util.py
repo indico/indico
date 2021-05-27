@@ -96,7 +96,7 @@ def make_view_func(obj):
 def redirect_view(endpoint, code=302):
     """Create a view function that redirects to the given endpoint."""
     def _redirect(**kwargs):
-        params = dict(request.args.to_dict(), **kwargs)
+        params = request.args.to_dict() | kwargs
         return redirect(_url_for(endpoint, **params), code=code)
 
     return _redirect

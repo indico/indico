@@ -183,7 +183,7 @@ def load_config(only_defaults=False, override=None):
                      the configuration.  Any values provided here
                      will override values from the config file.
     """
-    data = dict(DEFAULTS, **INTERNAL_DEFAULTS)
+    data = DEFAULTS | INTERNAL_DEFAULTS
     if not only_defaults:
         path = get_config_path()
         config = _sanitize_data(_parse_config(path))

@@ -128,7 +128,7 @@ class RequestDefinitionBase:
         :param req: the :class:`Request` of the request
         :param data: the form data from the request form
         """
-        req.data = dict(req.data or {}, **data)
+        req.data = (req.data or {}) | data
         is_new = req.id is None
         if is_new:
             db.session.add(req)

@@ -123,8 +123,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         return super()._get_person_link(data, extra_data)
 
     def _serialize_person_link(self, principal, extra_data=None):
-        extra_data = extra_data or {}
-        data = dict(extra_data, **serialize_person_link(principal))
+        data = (extra_data or {}) | serialize_person_link(principal)
         data['isSpeaker'] = principal.is_speaker
         data['authorType'] = principal.author_type.value
         return data

@@ -302,10 +302,12 @@ def serialize_entry_update(entry, session_=None):
     serializer = TimetableSerializer(entry.event, management=True)
     day = entry.start_dt.astimezone(entry.event.tzinfo)
     day_update = serialize_day_update(entry.event, day, block=entry.parent, session_=session_)
-    return dict({'id': serializer._get_entry_key(entry),
-                 'entry': serializer.serialize_timetable_entry(entry),
-                 'autoOps': None},
-                **day_update)
+    return {
+        'id': serializer._get_entry_key(entry),
+        'entry': serializer.serialize_timetable_entry(entry),
+        'autoOps': None,
+        **day_update
+    }
 
 
 def serialize_event_info(event):
@@ -320,7 +322,7 @@ def serialize_event_info(event):
 
 def serialize_session(sess):
     """Return data for a single session."""
-    data = {
+    return {
         '_type': 'Session',
         'address': sess.address,
         'color': '#' + sess.colors.background,
@@ -334,4 +336,3 @@ def serialize_session(sess):
         'title': sess.title,
         'url': url_for('sessions.display_session', sess)
     }
-    return data

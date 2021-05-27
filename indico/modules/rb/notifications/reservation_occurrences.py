@@ -18,8 +18,7 @@ class ReservationOccurrenceNotification(ReservationNotification):
         self.start_dt = format_datetime(occurrence.start_dt)
 
     def _get_email_subject(self, **mail_params):
-        mail_params = dict(mail_params, **{'subject_suffix': '(SINGLE OCCURRENCE)'})
-        return super()._get_email_subject(**mail_params)
+        return super()._get_email_subject(**mail_params, subject_suffix='(SINGLE OCCURRENCE)')
 
     def _make_body(self, mail_params, **body_params):
         body_params['occurrence'] = self.occurrence

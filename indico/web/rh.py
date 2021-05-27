@@ -163,8 +163,9 @@ class RH:
         if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
                 endpoint = spec['endpoint'] or request.endpoint
+                build_args = request.args.to_dict() | new_view_args
                 try:
-                    return redirect(url_for(endpoint, **dict(request.args.to_dict(), **new_view_args)))
+                    return redirect(url_for(endpoint, **build_args))
                 except BuildError as e:
                     if current_app.debug:
                         raise

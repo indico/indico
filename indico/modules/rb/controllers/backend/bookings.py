@@ -323,7 +323,7 @@ class RHUpdateBooking(RHBookingBase):
         db.session.flush()
         today = date.today()
         calendar = get_room_calendar(args['start_dt'] or today, args['end_dt'] or today, [args['room_id']])
-        return jsonify(booking=dict(serialize_booking_details(self.booking), **additional_booking_attrs),
+        return jsonify(booking=(serialize_booking_details(self.booking) | additional_booking_attrs),
                        room_calendar=list(serialize_availability(calendar).values()))
 
 

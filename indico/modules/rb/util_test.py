@@ -98,11 +98,11 @@ def test_get_booking_params_for_event_multiple_times(create_event, create_contri
             'text': f'#{dummy_room.id}',
         },
         'time_info': [
-            (date(2019, 8, 16), dict({'sd': '2019-08-16'}, **expected_params)),
+            (date(2019, 8, 16), {'sd': '2019-08-16', **expected_params}),
             # this day has timetable entries -> not using the event defaults
             (date(2019, 8, 17), {'interval': 'week', 'number': 1, 'recurrence': 'single',
                                  'sd': '2019-08-17', 'st': '09:00', 'et': '20:00'}),
-            (date(2019, 8, 18), dict({'sd': '2019-08-18'}, **expected_params))
+            (date(2019, 8, 18), {'sd': '2019-08-18', **expected_params})
         ]
     }
 

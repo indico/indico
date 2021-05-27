@@ -338,7 +338,7 @@ class AjaxFieldMixin:
         raise NotImplementedError
 
     def get_ajax_url(self, **url_args):
-        kwargs = dict(request.view_args, **request.args.to_dict(False))
+        kwargs = request.view_args | request.args.to_dict(False)
         kwargs.update(url_args)
         kwargs['__wtf_ajax'] = self.id
         return url_for(request.endpoint, **kwargs)

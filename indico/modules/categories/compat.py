@@ -29,4 +29,5 @@ def compat_category(legacy_category_id, path=None):
     # too (you can pass an int for a string argument), but due to the
     # weight of the `int` converter used for new endpoints, the URL will
     # then be handled by the proper endpoint instead of this one.
-    return redirect(url_for(request.endpoint, **dict(request.args.to_dict(), **view_args)), 301)
+    build_args = request.args.to_dict() | view_args
+    return redirect(url_for(request.endpoint, **build_args), 301)

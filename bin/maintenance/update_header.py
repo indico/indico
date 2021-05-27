@@ -123,7 +123,7 @@ def _update_header(file_path, config, substring, regex, data, ci):
         for match in regex.finditer(content):
             if substring in match.group():
                 found = True
-                content = content[:match.start()] + gen_header(dict(data, **config)) + content[match.end():]
+                content = content[:match.start()] + gen_header(data | config) + content[match.end():]
         if shebang_line:
             content = shebang_line + '\n' + content
     if content != orig_content:

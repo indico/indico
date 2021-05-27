@@ -185,8 +185,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
 
     def _serialize_person_link(self, principal, extra_data=None):
-        extra_data = extra_data or {}
-        data = dict(extra_data, **serialize_person_link(principal))
+        data = (extra_data or {}) | serialize_person_link(principal)
         data['isSubmitter'] = self.data[principal] if self.get_form().is_submitted() else principal.is_submitter
         return data
 

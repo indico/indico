@@ -27,7 +27,7 @@ def _checked_call(verbose, args, return_output=False, env=None, input=''):
         click.echo(click.style(f'** {cmd}', fg='blue', bold=True), err=True)
     kwargs = {}
     if env:
-        kwargs['env'] = dict(os.environ, **env)
+        kwargs['env'] = os.environ | env
     try:
         rv = subprocess.check_output(args, stderr=subprocess.STDOUT, input=input, text=True, **kwargs).strip()
     except OSError as exc:

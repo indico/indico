@@ -346,8 +346,7 @@ class WPDecorated(WPBase):
             self._get_header(), breadcrumbs, body, self._get_footer())
 
     def _display(self, params):
-        params = dict(params, **self._kwargs)
-        return self._apply_decoration(self._get_body(params))
+        return self._apply_decoration(self._get_body(params | self._kwargs))
 
     def _get_body(self, params):
         raise NotImplementedError

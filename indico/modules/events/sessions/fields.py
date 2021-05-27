@@ -17,8 +17,7 @@ class SessionBlockPersonLinkListField(PersonLinkListFieldBase):
     widget = JinjaWidget('events/sessions/forms/session_person_link_widget.html')
 
     def _serialize_person_link(self, principal, extra_data=None):
-        extra_data = extra_data or {}
-        return dict(extra_data, **serialize_person_link(principal))
+        return (extra_data or {}) | serialize_person_link(principal)
 
     def _convert_data(self, data):
         return list({self._get_person_link(x) for x in data})

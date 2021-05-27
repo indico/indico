@@ -57,7 +57,7 @@ class ReservationNotification:
 
     def _make_body(self, mail_params, **body_params):
         from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping
-        template_params = dict(mail_params, **body_params)
+        template_params = mail_params | body_params
         template_params['RepeatFrequency'] = RepeatFrequency
         template_params['RepeatMapping'] = RepeatMapping
         return render_template('rb/emails/reservations/{}.txt'.format(mail_params['template_name']), **template_params)

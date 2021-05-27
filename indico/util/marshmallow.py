@@ -319,9 +319,10 @@ class HumanizedDate(Field):
 class FilesField(ModelList):
     """Marshmallow field for a list of previously-uploaded files."""
 
-    default_error_messages = dict(ModelList.default_error_messages, **{
+    default_error_messages = {
+        **ModelList.default_error_messages,
         'claimed': 'File has already been claimed',
-    })
+    }
 
     def __init__(self, allow_claimed=False, **kwargs):
         from indico.modules.files.models.files import File
@@ -338,9 +339,10 @@ class FilesField(ModelList):
 class FileField(ModelField):
     """Marshmallow field for one previously-uploaded file."""
 
-    default_error_messages = dict(ModelList.default_error_messages, **{
+    default_error_messages = {
+        **ModelList.default_error_messages,
         'claimed': 'File has already been claimed',
-    })
+    }
 
     def __init__(self, allow_claimed=False, **kwargs):
         from indico.modules.files.models.files import File

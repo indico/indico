@@ -82,7 +82,7 @@ class RegistrationFormField(RegistrationFormItem):
 
     @property
     def view_data(self):
-        base_dict = dict(self.versioned_data, **self.data)
+        base_dict = self.versioned_data | self.data
         base_dict.update(is_enabled=self.is_enabled, title=self.title, is_required=self.is_required,
                          input_type=self.input_type, html_name=self.html_field_name,
                          **super().view_data)

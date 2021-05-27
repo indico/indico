@@ -415,16 +415,18 @@ _base_args = {
     }, required=True)
 }
 
-_create_args = dict(_base_args, **{
+_create_args = {
+    **_base_args,
     'name': fields.String(required=True)
-})
+}
 
 _update_args = {
     'areas': fields.List(
-        fields.Nested(dict(_base_args, **{
+        fields.Nested({
+            **_base_args,
             'id': fields.Int(required=True),
             'name': fields.String()
-        }), required=True)
+        }, required=True)
     )
 }
 

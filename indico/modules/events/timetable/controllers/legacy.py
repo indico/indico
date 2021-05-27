@@ -426,7 +426,7 @@ class RHLegacyTimetableMoveEntry(RHManageTimetableEntryBase):
         self.serializer = TimetableSerializer(self.event, management=True)
         with track_time_changes(auto_extend=True, user=session.user) as changes:
             entry_data = self._move_entry(request.json)
-        rv = dict(serialize_entry_update(self.entry), **entry_data)
+        rv = serialize_entry_update(self.entry) | entry_data
         notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo, entry=self.entry)
         return jsonify_data(flash=False, entry=rv, notifications=notifications)
 

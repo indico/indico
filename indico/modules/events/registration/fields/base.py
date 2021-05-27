@@ -109,7 +109,7 @@ class RegistrationFormFieldBase:
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
-        return dict(versioned_data, **unversioned_data)
+        return versioned_data | unversioned_data
 
     @property
     def view_data(self):

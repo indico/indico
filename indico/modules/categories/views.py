@@ -83,7 +83,7 @@ class WPCategoryManagement(WPCategory):
     def _get_parent_category_breadcrumb_url(self, category, management=False):
         if not management:
             return category.url
-        params = dict(request.view_args, **request.args.to_dict(False))
+        params = request.view_args | request.args.to_dict(False)
         del params['category_id']
         return url_for(request.endpoint, category, **params)
 

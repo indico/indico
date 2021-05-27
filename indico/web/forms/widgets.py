@@ -88,7 +88,7 @@ class JinjaWidget:
             template = self.template
         if self.single_kwargs:
             kwargs = {'input_args': kwargs}
-        template_module = get_template_module(template, field=field, **dict(self.context, **kwargs))
+        template_module = get_template_module(template, field=field, **(self.context | kwargs))
         javascript = template_module.javascript()
         html = template_module.html()
         if self.inline_js:

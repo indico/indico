@@ -94,13 +94,14 @@ class WPEventBase(WPDecorated):
     def page_metadata(self):
         metadata = super().page_metadata
         return {
-            'og': dict(metadata['og'], **{
+            'og': {
+                **metadata['og'],
                 'title': self.event.title,
                 'type': 'event',
                 'image': (self.event.logo_url if self.event.has_logo else
                           url_for('assets.image', filename='indico_square.png', _external=True)),
                 'description': self.event.description
-            }),
+            },
             'json_ld': serialize_event_for_json_ld(self.event, full=True),
             'keywords': self.event.keywords
         }
