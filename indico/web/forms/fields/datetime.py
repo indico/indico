@@ -189,6 +189,8 @@ class IndicoDurationField(Field):
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = timedelta(seconds=int(valuelist[0]))
+            if self.data.total_seconds() % 60:
+                raise ValueError('Duration cannot contain seconds')
 
 
 class IndicoDateField(DateField):
