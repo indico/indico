@@ -64,7 +64,8 @@ class SuggestedCategory(db.Model):
         target_suggestions = {x.category: x for x in target.suggested_categories}
         for suggestion in source.suggested_categories:
             new_suggestion = target_suggestions.get(suggestion.category) or cls(user=target,
-                                                                                category=suggestion.category)
+                                                                                category=suggestion.category,
+                                                                                score=0)
             new_suggestion.score = max(new_suggestion.score, suggestion.score)
             new_suggestion.is_ignored = new_suggestion.is_ignored or suggestion.is_ignored
         db.session.flush()
