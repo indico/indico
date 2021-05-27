@@ -18,6 +18,7 @@ from wtforms.fields import TimeField
 from wtforms.validators import StopValidation
 
 from indico.core.config import config
+from indico.core.logger import Logger
 from indico.util.date_time import localize_as_utc, relativedelta
 from indico.util.i18n import _, get_current_locale
 from indico.web.forms.fields import JSONField
@@ -190,6 +191,7 @@ class IndicoDurationField(Field):
         if valuelist:
             self.data = timedelta(seconds=int(valuelist[0]))
             if self.data.total_seconds() % 60:
+                Logger.get('forms').warning('Duration with seconds submitted')
                 raise ValueError('Duration cannot contain seconds')
 
 
