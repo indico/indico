@@ -738,7 +738,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """
         title = self.title
         if show_speakers and self.person_links:
-            speakers = ', '.join(sorted([pl.full_name for pl in self.person_links], key=str.lower))
+            speakers = ', '.join(sorted((pl.full_name for pl in self.person_links), key=str.lower))
             title = f'{speakers}, "{title}"'
         if show_series_pos and self.series and self.series.show_sequence_in_title:
             title = f'{title} ({self.series_pos}/{self.series_count})'

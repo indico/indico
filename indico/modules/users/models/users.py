@@ -641,7 +641,7 @@ class User(PersonMixin, db.Model):
         sync_provider = multipass.sync_provider
         if sync_provider is None:
             return None
-        identities = sorted([x for x in self.identities if x.provider == sync_provider.name],
+        identities = sorted((x for x in self.identities if x.provider == sync_provider.name),
                             key=attrgetter('safe_last_login_dt'), reverse=True)
         if not identities:
             return None

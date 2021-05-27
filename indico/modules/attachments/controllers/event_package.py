@@ -232,7 +232,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
                     contrib=contrib.title
                 )
 
-        contribs = sorted([contrib for contrib in self.event.contributions if contrib.timetable_entry],
+        contribs = sorted((contrib for contrib in self.event.contributions if contrib.timetable_entry),
                           key=lambda c: natural_sort_key(c.title))
         return [(contrib.id, escape(_format_contrib(contrib))) for contrib in contribs]
 

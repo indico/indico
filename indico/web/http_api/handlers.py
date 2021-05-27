@@ -244,7 +244,7 @@ def handler(prefix, path):
         if ak and error is None:
             # Commit only if there was an API key and no error
             norm_path, norm_query = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
-            uri = '?'.join([_f for _f in (norm_path, norm_query) if _f])
+            uri = '?'.join(_f for _f in (norm_path, norm_query) if _f)
             ak.register_used(request.remote_addr, uri, not onlyPublic)
             db.session.commit()
         else:

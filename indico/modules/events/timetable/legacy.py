@@ -159,7 +159,7 @@ class TimetableSerializer:
                      'duration': contribution.duration.seconds / 60,
                      'pdf': url_for('contributions.export_pdf', entry.contribution),
                      'presenters': list(map(self._get_person_data,
-                                            sorted([p for p in contribution.person_links if p.is_speaker],
+                                            sorted((p for p in contribution.person_links if p.is_speaker),
                                                    key=lambda x: (x.author_type != AuthorType.primary,
                                                                   x.author_type != AuthorType.secondary,
                                                                   x.display_order_key)))),

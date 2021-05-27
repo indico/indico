@@ -303,7 +303,7 @@ def get_booking_params_for_event(event):
             'params': params
         }
     else:
-        time_info = sorted([
+        time_info = sorted(
             (day, {
                 # if we have a proper start/end time, we provide all args to search
                 'number': 1,
@@ -317,7 +317,7 @@ def get_booking_params_for_event(event):
                 # populate the day and let the user specify the times manually
                 'sd': day.isoformat(),
             }) for day, (start, end) in all_times
-        ])
+        )
         return {
             'type': 'mixed_times',
             'params': params,

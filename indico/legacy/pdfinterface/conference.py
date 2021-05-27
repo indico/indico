@@ -672,7 +672,7 @@ class TimeTablePlain(PDFWithTOC):
                 if contrib.room_name:
                     room = f' - {escape(contrib.room_name)}'
 
-                speakers = '; '.join([self._get_speaker_name(spk) for spk in contrib.speakers])
+                speakers = '; '.join(self._get_speaker_name(spk) for spk in contrib.speakers)
                 if speakers.strip():
                     speaker_word = ngettext('Presenter', 'Presenters', len(contrib.speakers))
                     speakers = f'<font face="Times-Bold"><b>- {speaker_word}: {speakers}</b></font>'

@@ -264,7 +264,7 @@ def import_contributions_from_csv(event, f):
     contrib_data = []
     for num_row, row in enumerate(reader, 1):
         try:
-            start_dt, duration, title, first_name, last_name, affiliation, email = [value.strip() for value in row]
+            start_dt, duration, title, first_name, last_name, affiliation, email = (value.strip() for value in row)
             email = email.lower()
         except ValueError:
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')

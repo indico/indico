@@ -74,11 +74,11 @@ class RHEventProtection(RHManageEventBase):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
         selectable_permissions = {k for k, v in get_available_permissions(Event).items() if v.user_selectable}
         user_permissions = [(p.principal, set(p.permissions)) for p in self.event.acl_entries]
-        hidden_permissions = sorted([
+        hidden_permissions = sorted((
             (principal, sorted(perms))
             for principal, perms in user_permissions
             if perms and not (perms & selectable_permissions)
-        ], key=lambda x: (x[0].principal_order, x[0].name.lower()))
+        ), key=lambda x: (x[0].principal_order, x[0].name.lower()))
         form.permissions.hidden_permissions = [(p.name, perms) for p, perms in hidden_permissions]
         if form.validate_on_submit():
             update_permissions(self.event, form)

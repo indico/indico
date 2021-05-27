@@ -30,7 +30,7 @@ class vRecur(ical.vRecur):
             typ = self.types[key]
             if not type(vals) in ical.prop.SequenceTypes:
                 vals = [vals]
-            vals = ','.join([typ(val).ical() for val in vals])
+            vals = ','.join(typ(val).ical() for val in vals)
             result.append(f'{key}={vals}')
         return ';'.join(result)
 

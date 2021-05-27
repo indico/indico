@@ -564,7 +564,7 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
     todo = []
     for row_num, row in enumerate(reader, 1):
         try:
-            first_name, last_name, affiliation, position, phone, email = [value.strip() for value in row]
+            first_name, last_name, affiliation, position, phone, email = (value.strip() for value in row)
             email = email.lower()
         except ValueError:
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')

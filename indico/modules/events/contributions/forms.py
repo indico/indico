@@ -89,7 +89,7 @@ class ContributionForm(IndicoForm):
 
     @property
     def custom_field_names(self):
-        return tuple([field_name for field_name in self._fields if field_name.startswith('custom_')])
+        return tuple(field_name for field_name in self._fields if field_name.startswith('custom_'))
 
 
 class ContributionProtectionForm(IndicoForm):

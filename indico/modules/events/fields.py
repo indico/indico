@@ -203,8 +203,8 @@ class IndicoThemeSelectField(SelectField):
         allow_default = kwargs.pop('allow_default', False)
         event_type = kwargs.pop('event_type').name
         super().__init__(*args, **kwargs)
-        self.choices = sorted([(tid, theme['title'])
-                               for tid, theme in theme_settings.get_themes_for(event_type).items()],
+        self.choices = sorted(((tid, theme['title'])
+                               for tid, theme in theme_settings.get_themes_for(event_type).items()),
                               key=lambda x: x[1].lower())
         if allow_default:
             self.choices.insert(0, ('', _('Category default')))
