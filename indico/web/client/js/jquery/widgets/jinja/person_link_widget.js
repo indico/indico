@@ -8,11 +8,11 @@
 /* global showFormErrors:false strnatcmp:false */
 
 import _ from 'lodash';
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
-import {FavoritesProvider} from 'indico/react/hooks';
+import {useFavoriteUsers} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {$T} from 'indico/utils/i18n';
 
@@ -69,6 +69,8 @@ import {$T} from 'indico/utils/i18n';
     const $form = $field.closest('form');
     let customOrder = !$buttonAlphaOrder.hasClass('active');
     let maxNewPersonID = 0;
+
+    let forceUpdateUserSearch = () => {};
 
     function setNewPersonID(person) {
       person.id = `new-${maxNewPersonID}`;
@@ -231,6 +233,7 @@ import {$T} from 'indico/utils/i18n';
       });
       $buttonRemove.on('click', function() {
         $field.principalfield('removeOne', person.id);
+        forceUpdateUserSearch();
       });
     }
 
@@ -387,6 +390,7 @@ import {$T} from 'indico/utils/i18n';
 
     $buttonAddMyself.on('click', function() {
       $field.principalfield('add', [options.sessionUser]);
+      forceUpdateUserSearch();
     });
 
     function getSortingMessage() {
@@ -470,9 +474,22 @@ import {$T} from 'indico/utils/i18n';
       }
     });
 
-    const existing = _.map($fieldDisplay.find('.person-row'), function(e) {
-      return `User:${$(e).data('person').userId}`;
-    });
+    const getExistingUsers = () =>
+      _.map($fieldDisplay.find('.person-row'), function(e) {
+        const person = $(e).data('person');
+        if (person._type === undefined) {
+          // new entry not linked to anyone
+          return null;
+        } else if (person._type === 'PersonLink') {
+          return `User:${person.userId}`;
+        } else if (person._type === 'Avatar') {
+          // newly added users from search only have a `new-n` ID but we can use their identifier
+          return person.identifier || `User:${person.id}`;
+        } else {
+          console.error(`Invalid person type ${person._type}: ${person}`);
+          return null;
+        }
+      }).filter(id => id !== null);
 
     const searchTrigger = triggerProps => (
       <span className="i-button highlight" type="button" {...triggerProps}>
@@ -491,35 +508,44 @@ import {$T} from 'indico/utils/i18n';
       }
     };
 
+    const UserSearchWrapper = () => {
+      const [favoriteUsers] = useFavoriteUsers();
+      // This is super ugly, but we need to trigger a re-render from outside the
+      // react code to use the new existingUsers list
+      const [, _setState] = useState();
+      forceUpdateUserSearch = () => _setState({});
+
+      return (
+        <UserSearch
+          favorites={favoriteUsers}
+          existing={getExistingUsers()}
+          onAddItems={people => {
+            $field.principalfield(
+              'add',
+              people.map(({identifier, id, name, firstName, lastName, email, affiliation}) => ({
+                identifier,
+                name,
+                id,
+                familyName: lastName,
+                firstName,
+                email,
+                affiliation,
+                _type: getLegacyType(identifier),
+              }))
+            );
+            forceUpdateUserSearch();
+          }}
+          disabled={options.disableUserSearch}
+          withExternalUsers={options.allow.externalUsers}
+          triggerFactory={searchTrigger}
+          withEventPersons={options.eventId !== null}
+          eventId={options.eventId}
+        />
+      );
+    };
+
     ReactDOM.render(
-      <FavoritesProvider>
-        {([favorites]) => (
-          <UserSearch
-            favorites={favorites}
-            existing={existing}
-            onAddItems={people => {
-              $field.principalfield(
-                'add',
-                people.map(({identifier, id, name, firstName, lastName, email, affiliation}) => ({
-                  identifier,
-                  name,
-                  id,
-                  familyName: lastName,
-                  firstName,
-                  email,
-                  affiliation,
-                  _type: getLegacyType(identifier),
-                }))
-              );
-            }}
-            disabled={options.disableUserSearch}
-            withExternalUsers={options.allow.externalUsers}
-            triggerFactory={searchTrigger}
-            withEventPersons={options.eventId !== null}
-            eventId={options.eventId}
-          />
-        )}
-      </FavoritesProvider>,
+      <UserSearchWrapper />,
       document.getElementById(`principalField-${options.fieldId}`)
     );
   };
