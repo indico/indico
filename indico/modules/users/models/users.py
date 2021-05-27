@@ -647,7 +647,7 @@ class User(PersonMixin, db.Model):
                 continue
             if old_value == new_value:
                 continue
-            flash(_("Your {field_name} has been synchronised from '{old_value}' to '{new_value}'.").format(
+            flash(_("Your {field_name} has been synchronized from '{old_value}' to '{new_value}'.").format(
                   field_name=syncable_fields[field], old_value=old_value, new_value=new_value))
             setattr(self, field, new_value)
 

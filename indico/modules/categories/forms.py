@@ -192,8 +192,8 @@ class CategoryRoleForm(IndicoForm):
     code = StringField(_('Code'), [DataRequired(), Length(max=3)], filters=[lambda x: x.upper() if x else ''],
                        render_kw={'style': 'width:60px; text-align:center; text-transform:uppercase;'},
                        description=_('A shortcut (max. 3 characters) for the role'))
-    color = IndicoSinglePalettePickerField(_('Colour'), color_list=get_role_colors(), text_color='ffffff',
-                                           description=_('The colour used when displaying the role'))
+    color = IndicoSinglePalettePickerField(_('Color'), color_list=get_role_colors(), text_color='ffffff',
+                                           description=_('The color used when displaying the role'))
 
     def __init__(self, *args, **kwargs):
         self.role = kwargs.get('obj')

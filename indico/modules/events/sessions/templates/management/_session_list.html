@@ -76,7 +76,7 @@
                                        data-href="{{ url_for('.session_rest', sess) }}"
                                        data-colors="{{ default_colors | tojson | forceescape }}"
                                        data-color="{{ sess.colors | tojson | forceescape }}"
-                                       title="{% if not event.is_locked %}{% trans %}Change colour{% endtrans %}{% endif %}"></a>
+                                       title="{% if not event.is_locked %}{% trans %}Change color{% endtrans %}{% endif %}"></a>
                                     <a href="#" class="i-link highlight icon-edit edit-session hide-if-locked"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"

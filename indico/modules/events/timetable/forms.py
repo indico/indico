@@ -95,7 +95,7 @@ class BreakEntryForm(EntryFormMixin, IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     description = TextAreaField(_('Description'))
     location_data = IndicoLocationField(_('Location'))
-    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors())
+    colors = IndicoPalettePickerField(_('Colors'), color_list=get_colors())
 
 
 class ContributionEntryForm(EntryFormMixin, ContributionForm):

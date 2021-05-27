@@ -38,7 +38,7 @@ class SessionForm(IndicoForm):
     type = QuerySelectField(_('Type'), get_label='name', allow_blank=True, blank_text=_('No type selected'))
     location_data = IndicoLocationField(_('Default location'),
                                         description=_('Default location for blocks inside the session.'))
-    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors())
+    colors = IndicoPalettePickerField(_('Colors'), color_list=get_colors())
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
