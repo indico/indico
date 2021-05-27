@@ -60,6 +60,12 @@ class IndicoRequest(Request):
     parameter_storage_class = ImmutableOrderedMultiDict
     user_agent_class = ParsedUserAgent
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.remote_addr is not None and self.remote_addr.startswith('::ffff:'):
+            # convert ipv6-style ipv4 to the regular ipv4 notation
+            self.remote_addr = self.remote_addr[7:]
+
     @cached_property
     def id(self):
         return uuid4().hex[:16]
@@ -68,14 +74,6 @@ class IndicoRequest(Request):
     def relative_url(self):
         """The request's path including its query string if applicable."""
         return self.script_root + self.full_path.rstrip('?')
-
-    @cached_property
-    def remote_addr(self):
-        ip = super().remote_addr
-        if ip is not None and ip.startswith('::ffff:'):
-            # convert ipv6-style ipv4 to the regular ipv4 notation
-            ip = ip[7:]
-        return ip
 
     @cached_property
     def bearer_token(self):
