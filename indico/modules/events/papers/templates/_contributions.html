@@ -213,9 +213,9 @@
                         {% set icon = icon_from_mimetype(spotlight_file.file.content_type, 'icon-file-filled') %}
                         <div class="paper-content flexcol">
                             <div class="flexrow f-a-center spotlight-file i-button text-color borderless paper-file"
-                                title="{{ spotlight_file.filename }}">
+                                 title="{{ spotlight_file.file.filename }}">
                                 <a href="{{ spotlight_file.download_url }}"
-                                class="attachment spotlight-file-name flexrow f-a-center truncate-text {{ icon }}">
+                                   class="attachment spotlight-file-name flexrow f-a-center truncate-text {{ icon }}">
                                     <span class="title truncate-text">{{ spotlight_file.file.filename }}</span>
                                 </a>
                             </div>
