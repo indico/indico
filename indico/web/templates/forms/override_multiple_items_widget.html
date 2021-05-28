@@ -22,7 +22,7 @@
                                     <input class="table-input" type="text" placeholder="{{ row[item.id] }}"
                                            value="{{ field.get_overridden_value(row, item.id) }}"
                                            data-key="{{ field.get_row_key(row) }}" data-field="{{ item.id }}"
-                                           {% if disabled %}disabled{% endif %}>
+                                           {% if disabled|default(false) %}disabled{% endif %}>
                                 {% else %}
                                     {{ row[item.id] }}
                                 {% endif %}
