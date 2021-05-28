@@ -10,7 +10,7 @@
                 <span class="timetable-title" data-anchor="{{ subcontrib.slug }}">
                     {% if theme_settings.number_contributions %}
                         {%- set n_scontrib = theme_context.num_subcontribution -%}
-                        {{- 'abcdefghijklmnopqrstuvwxyz'[n_scontrib % 28 - 1] * (n_scontrib / 28 + 1)|int }})
+                        {{- 'abcdefghijklmnopqrstuvwxyz'[(n_scontrib - 1) % 26] * ((n_scontrib - 1) // 26 + 1) }})
                     {% endif %}
                     {{- subcontrib.title -}}
                 </span>
