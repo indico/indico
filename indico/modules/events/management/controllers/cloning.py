@@ -166,11 +166,7 @@ class RHCloneEvent(RHManageEventBase):
             form = prev_form
             step = step - 1
 
-        if step == 4:
-            tpl_args.update({
-                'step_title': dict(CLONE_REPEAT_CHOICES)[request.form['repeatability']],
-            })
-        elif step > 4:
+        if step > 4:
             # last step - perform actual cloning
             form = REPEAT_FORM_MAP[request.form['repeatability']](self.event)
 
@@ -195,6 +191,10 @@ class RHCloneEvent(RHManageEventBase):
             else:
                 # back to step 4, since there's been an error
                 step = 4
+
+        if step == 4:
+            tpl_args['step_title'] = dict(CLONE_REPEAT_CHOICES)[request.form['repeatability']]
+
         dependencies = {c.name: {'requires': list(c.requires_deep), 'required_by': list(c.required_by_deep)}
                         for c in EventCloner.get_cloners(self.event)}
         return jsonify_template('events/management/clone_event.html', event=self.event, step=step, form=form,
