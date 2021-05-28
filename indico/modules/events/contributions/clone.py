@@ -7,20 +7,24 @@
 
 from copy import deepcopy
 
+from flask import session
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.contributions import logger as contributions_logger
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.timetable.operations import schedule_contribution
 from indico.util.i18n import _
 
@@ -113,6 +117,16 @@ class ContributionCloner(EventCloner):
         new_contribution = cloner._create_new_contribution(event, contribution,
                                                            preserve_session=preserve_session,
                                                            excluded_attrs={'friendly_id'})
+        db.session.flush()
+        signals.event.contribution_created.send(new_contribution)
+        contributions_logger.info('Contribution %s created by %s (from %s)', new_contribution, session.user,
+                                  contribution)
+        new_contribution.log(
+            EventLogRealm.management, EventLogKind.positive, 'Contributions',
+            f'Contribution {new_contribution.verbose_title} has been cloned from #{contribution.friendly_id}',
+            session.user
+        )
+        db.session.flush()
         if preserve_session:
             entry = schedule_contribution(new_contribution, contribution.timetable_entry.start_dt,
                                           session_block=new_contribution.session_block)

@@ -64,7 +64,9 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
     signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, user)
     contrib.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                f'Contribution "{contrib.title}" has been created', user)
+                f'Contribution {contrib.verbose_title} has been created', user)
+    # Note: If you ever add more stuff here that should run for any new contribution, make sure
+    # to also add it to ContributionCloner.clone_single_contribution
     return contrib
 
 
