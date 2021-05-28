@@ -50,7 +50,7 @@ _bp.add_url_rule('/e/<path:event_id>', 'shorturl', event_or_shorturl, strict_sla
                  defaults={'shorturl_namespace': True})
 # XXX: these two entries below use a string event_id on purpose, since they need to handle shortcuts
 # and possibly legacy ids as well
-_bp.add_url_rule('/event/<event_id>/', 'display', event_or_shorturl)
+_bp.add_url_rule('/event/<event_id>/', 'display', event_or_shorturl, strict_slashes=False)
 _bp.add_url_rule('/event/<event_id>/overview', 'display_overview', event_or_shorturl,
                  defaults={'force_overview': True})
 _bp.add_url_rule('/event/<int:event_id>/other-view', 'display_other', redirect_view('timetable.timetable'))

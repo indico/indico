@@ -28,6 +28,8 @@ def event_or_shorturl(event_id, shorturl_namespace=False, force_overview=False):
         # we call the RH to display the event
         if shorturl_namespace:
             return redirect(event.url)
+        elif not request.path.endswith('/'):
+            return redirect(event.url, 301)
         else:
             request.view_args['event_id'] = int(event_id)
             return RHDisplayEvent().process()
