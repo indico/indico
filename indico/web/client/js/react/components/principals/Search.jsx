@@ -236,7 +236,7 @@ const searchFactory = config => {
         setLoading(false);
       }
     };
-    const favoriteResults = Object.values(favorites);
+    const favoriteResults = favorites ? Object.values(favorites) : [];
     const resultDisplay = result ||
       lastResult.current || {results: favoriteResults, total: favoriteResults.length};
 
