@@ -254,8 +254,8 @@ const searchFactory = config => {
         </div>
         <div styleName="results" style={{opacity: loading ? 0.5 : 1}}>
           <SearchResults
-            results={resultDisplay?.results || []}
-            total={resultDisplay?.total || 0}
+            results={resultDisplay.results}
+            total={resultDisplay.total}
             favorites={favorites}
             onAdd={onAdd}
             onRemove={onRemove}
