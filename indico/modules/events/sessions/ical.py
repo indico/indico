@@ -38,10 +38,10 @@ def session_to_ical(session, detailed=False):
 
     related_event_uid = f'indico-event-{session.event.id}@{url_parse(config.BASE_URL).host}'
 
-    if not detailed:
+    if not detailed and session.blocks:
         component = generate_session_component(session, related_event_uid)
         calendar.add_component(component)
-    else:
+    elif detailed:
         from indico.modules.events.contributions.ical import generate_contribution_component
 
         contributions = (Contribution.query.with_parent(session)
