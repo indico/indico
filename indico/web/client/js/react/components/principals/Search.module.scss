@@ -24,6 +24,24 @@
   justify-content: space-between;
 
   > :global(.icon) {
-    margin-left: 0.5em;
+    margin-left: auto;
   }
+}
+
+.search-content {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.search-content .form {
+  flex: 1;
+  margin-right: 2em;
+}
+
+.search-content .results {
+  flex: 0 1 60%;
+}
+
+.search-content .results .placeholder {
+  text-align: center;
 }

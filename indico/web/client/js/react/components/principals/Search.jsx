@@ -13,7 +13,7 @@ import userSearchInfoURL from 'indico-url:users.user_search_info';
 import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {
@@ -221,30 +221,86 @@ const searchFactory = config => {
     withEventPersons,
     eventId,
   }) => {
-    const [result, setResult] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [result, _setResult] = useState(null);
+    const lastResult = useRef(null);
+    const setResult = value => {
+      lastResult.current = result;
+      _setResult(value);
+    };
+    const handleSearch = async data => {
+      setLoading(true);
+      try {
+        await runSearch(data, setResult, withEventPersons, eventId);
+      } finally {
+        setLoading(false);
+      }
+    };
+    const favoriteResults = Object.values(favorites);
+    const resultDisplay = result ||
+      lastResult.current || {results: favoriteResults, total: favoriteResults.length};
 
-    const handleSearch = data => runSearch(data, setResult, withEventPersons, eventId);
     return (
-      <>
-        <SearchForm
-          onSearch={handleSearch}
-          onAdd={onAdd}
-          onRemove={onRemove}
-          isAdded={isAdded}
-          favorites={favorites}
-          single={single}
-        />
-        {result !== null && (
+      <div styleName="search-content">
+        <div styleName="form">
+          <SearchForm
+            onSearch={handleSearch}
+            onAdd={onAdd}
+            onRemove={onRemove}
+            isAdded={isAdded}
+            favorites={favorites}
+            single={single}
+          />
+        </div>
+        <div styleName="results" style={{opacity: loading ? 0.5 : 1}}>
           <SearchResults
-            results={result.results}
-            total={result.total}
+            results={resultDisplay?.results || []}
+            total={resultDisplay?.total || 0}
             favorites={favorites}
             onAdd={onAdd}
             onRemove={onRemove}
             isAdded={isAdded}
           />
-        )}
-      </>
+        </div>
+      </div>
+    );
+  };
+
+  const SearchStaged = ({single, staged, onRemove}) => {
+    if (!staged || !staged.length) {
+      return null;
+    }
+
+    if (single) {
+      return (
+        <Label circular styleName="staged-label">
+          {staged[0].name}
+          <Icon name="delete" onClick={() => onRemove(staged[0])} />
+        </Label>
+      );
+    }
+
+    return (
+      <Popup
+        trigger={
+          <Label circular styleName="staged-label">
+            {staged.length}
+          </Label>
+        }
+        position="bottom left"
+        hoverable
+      >
+        <List>
+          {_.sortBy(staged, 'name').map(x => (
+            <List.Item key={x.identifier}>
+              <div styleName="staged-list-item">
+                {x.name}
+                <Icon styleName="button" name="delete" onClick={() => onRemove(x)} />
+              </div>
+            </List.Item>
+          ))}
+        </List>
+      </Popup>
     );
   };
   /* eslint-enable react/prop-types */
@@ -326,7 +382,6 @@ const searchFactory = config => {
     return (
       <Modal
         trigger={trigger}
-        size="tiny"
         dimmer="inverted"
         centered={false}
         open={open}
@@ -336,40 +391,14 @@ const searchFactory = config => {
         closeIcon
       >
         <Modal.Header>
-          {modalTitle(single)}
-          {!single && !!staged.length && (
-            <>
-              {' '}
-              <Popup
-                trigger={
-                  <Label circular styleName="staged-label">
-                    {staged.length}
-                  </Label>
-                }
-                position="bottom left"
-                hoverable
-              >
-                <List>
-                  {_.sortBy(staged, 'name').map(x => (
-                    <List.Item key={x.identifier}>
-                      <div styleName="staged-list-item">
-                        {x.name}
-                        <Icon styleName="button" name="delete" onClick={() => handleRemove(x)} />
-                      </div>
-                    </List.Item>
-                  ))}
-                </List>
-              </Popup>
-            </>
-          )}
-          {single && alwaysConfirm && !!staged.length && (
-            <>
-              {' '}
-              <Label circular styleName="staged-label">
-                {staged[0].name}
-                <Icon name="delete" onClick={() => handleRemove(staged[0])} />
-              </Label>
-            </>
+          {modalTitle(single)}{' '}
+          {(!single || alwaysConfirm) && (
+            <SearchStaged
+              single={single}
+              alwaysConfirm={alwaysConfirm}
+              staged={staged}
+              onRemove={handleRemove}
+            />
           )}
         </Modal.Header>
         <Modal.Content>
