@@ -31,15 +31,15 @@
 .search-content {
   display: flex;
   justify-content: space-evenly;
+  flex-wrap: wrap;
 }
 
 .search-content .form {
-  flex: 1;
   margin-right: 2em;
 }
 
 .search-content .results {
-  flex: 0 1 60%;
+  flex: 1 1 60%;
 }
 
 .search-content .results .placeholder {
