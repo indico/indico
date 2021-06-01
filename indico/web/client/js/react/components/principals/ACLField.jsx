@@ -167,7 +167,8 @@ const ACLField = props => {
             <Dropdown
               text={Translate.string('Event Role')}
               button
-              upward
+              defaultUpward
+              scrolling
               floating
               disabled={eventRoleOptions.length === 0}
               options={eventRoleOptions}
@@ -182,7 +183,8 @@ const ACLField = props => {
             <Dropdown
               text={Translate.string('Category Role')}
               button
-              upward
+              defaultUpward
+              scrolling
               floating
               disabled={categoryRoleOptions.length === 0}
               options={categoryRoleOptions}
