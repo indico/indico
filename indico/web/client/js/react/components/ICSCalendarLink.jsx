@@ -9,7 +9,7 @@ import signURL from 'indico-url:core.sign_url';
 
 import PropTypes from 'prop-types';
 import React, {useReducer, useState} from 'react';
-import {Button, Dropdown, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
+import {Button, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -17,19 +17,12 @@ import {snakifyKeys} from 'indico/utils/case';
 
 import './ICSCalendarLink.module.scss';
 
-const initialState = {
-  open: false,
-  url: null,
-  text: null,
-  source: null,
-};
-
 function popupReducer(state, action) {
   switch (action.type) {
     case 'CLOSE':
       return {...state, url: null, open: false};
     case 'OPEN':
-      return {...state, open: true, text: action.text, source: action.source};
+      return {open: true, key: action.key, source: action.source};
     case 'LOADED':
       return {...state, url: action.url, source: null};
     default:
@@ -37,18 +30,9 @@ function popupReducer(state, action) {
   }
 }
 
-export default function ICSCalendarLink({
-  endpoint,
-  params,
-  renderButton,
-  dropdownPosition,
-  popupPosition,
-  options,
-  ...restProps
-}) {
-  const [popupState, dispatch] = useReducer(popupReducer, initialState);
+export default function ICSCalendarLink({endpoint, params, renderButton, popupPosition, options}) {
+  const [popupState, dispatch] = useReducer(popupReducer, {open: false});
   const [copied, setCopied] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const copyButton = (
     <Button
@@ -82,78 +66,34 @@ export default function ICSCalendarLink({
     dispatch({type: 'CLOSE'});
   };
 
-  const handleSetOption = async (text, extraParams) => {
-    if (popupState.open) {
-      handleClose();
-    } else {
+  const handleSetOption = async (key, extraParams) => {
+    if (!popupState.open || popupState.key !== key) {
       const source = indicoAxios.CancelToken.source();
-      dispatch({type: 'OPEN', text, source});
+      dispatch({type: 'OPEN', key, source});
       const url = await fetchURL(extraParams, source);
       dispatch({type: 'LOADED', url});
     }
   };
 
-  let trigger;
-
-  if (options.length > 1) {
-    trigger = (
-      <Dropdown
-        styleName="height-full"
-        icon={null}
-        trigger={
-          renderButton ? (
-            renderButton(() => {}, {open: dropdownOpen || popupState.open})
-          ) : (
-            <Button icon size="small">
-              <Icon name="calendar alternate outline" />
-              <Icon name="caret down" />
-            </Button>
-          )
-        }
-        pointing={dropdownPosition}
-        onOpen={() => {
-          setDropdownOpen(true);
-        }}
-        onClose={() => {
-          setDropdownOpen(false);
-        }}
-        {...restProps}
-      >
-        <Dropdown.Menu>
-          <Dropdown.Header>
-            <Translate>Export</Translate>
-          </Dropdown.Header>
-          <Dropdown.Divider />
-          {options.map(({key, text, extraParams}) => (
-            <Dropdown.Item
-              key={key}
-              text={text}
-              onClick={() => handleSetOption(text, extraParams)}
-            />
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
-    );
-  } else {
-    const {text, extraParams} = options[0];
-    trigger = renderButton ? (
-      renderButton(() => handleSetOption(text, extraParams), {open: popupState.open})
-    ) : (
-      <Button icon size="small" onClick={() => handleSetOption(text, extraParams)}>
-        <Icon name="calendar alternate outline" />
-        <Icon name="caret down" />
-      </Button>
-    );
-  }
-
   return (
     <Popup
-      trigger={trigger}
+      trigger={
+        renderButton ? (
+          renderButton({open: popupState.open})
+        ) : (
+          <Button icon size="small">
+            <Icon name="calendar alternate outline" />
+            <Icon name="caret down" />
+          </Button>
+        )
+      }
       position={popupPosition}
       open={popupState.open}
       popperDependencies={[copied]}
       on="click"
-      onOpen={() => {
+      onOpen={async () => {
+        const {key, extraParams} = options[0];
+        await handleSetOption(key, extraParams);
         setCopied(false);
       }}
       onClose={() => {
@@ -161,11 +101,23 @@ export default function ICSCalendarLink({
       }}
       wide
     >
-      <Header
-        styleName="export-header"
-        content={Translate.string('Export')}
-        subheader={<Label color="blue">{popupState.text}</Label>}
-      />
+      <Header styleName="export-header">
+        <Button.Group size="small">
+          {options.map(({key, text, extraParams}, idx) => (
+            <>
+              <Button
+                key={key}
+                content={text}
+                onClick={() => handleSetOption(key, extraParams)}
+                primary={key === popupState.key}
+                label={idx === 0 ? Translate.string('Export') : undefined}
+                labelPosition={idx === 0 ? 'left' : undefined}
+              />
+              {idx < options.length - 1 && <Button.Or />}
+            </>
+          ))}
+        </Button.Group>
+      </Header>
       <Popup.Content>
         <strong styleName="export-option">Synchronise with your calendar</strong>
         <p>
@@ -217,7 +169,6 @@ ICSCalendarLink.propTypes = {
   endpoint: PropTypes.string.isRequired,
   params: PropTypes.objectOf(PropTypes.string),
   renderButton: PropTypes.func,
-  dropdownPosition: PropTypes.string,
   popupPosition: PropTypes.string,
   options: PropTypes.arrayOf(
     PropTypes.shape({
@@ -231,7 +182,6 @@ ICSCalendarLink.propTypes = {
 ICSCalendarLink.defaultProps = {
   params: {},
   renderButton: null,
-  dropdownPosition: 'top right',
   popupPosition: 'left center',
   options: [],
 };

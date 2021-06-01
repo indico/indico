@@ -32,12 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     <ICSCalendarLink
       endpoint="events.export_event_ical"
       params={{event_id: eventId}}
-      renderButton={(onClick, classes) => (
+      renderButton={classes => (
         <IButton
           icon="calendar"
           dropdown
           classes={{'height-full': true, 'text-color': true, 'subtle': true, ...classes}}
-          onClick={onClick}
           title={Translate.string('Export')}
         />
       )}
