@@ -379,6 +379,15 @@ class SoftLength(Length):
     where surrounding whitespace is stripped before validation.
     """
 
+    def __call__(self, form, field):
+        orig_data = field.data
+        if field.data is not None:
+            field.data = re.sub(r'(\r\n|\r)', '\n', field.data)
+        try:
+            super().__call__(form, field)
+        finally:
+            field.data = orig_data
+
 
 class SecurePassword:
     """Validate that a string is a secure password."""
