@@ -45,13 +45,14 @@ class RHAPISearch(RH):
     @use_kwargs({
         'page': fields.Int(missing=None),
         'q': fields.String(required=True),
-        'type': fields.List(EnumField(SearchTarget), missing=None)
+        'type': fields.List(EnumField(SearchTarget), missing=None),
+        'allow_admin': fields.Bool(missing=False),
     }, location='query', unknown=INCLUDE)
-    def _process(self, page, q, type, **params):
+    def _process(self, page, q, type, allow_admin, **params):
         search_provider = get_search_provider()
         if type == [SearchTarget.category]:
             search_provider = InternalSearch
-        result = search_provider().search(q, session.user, page, type, **params)
+        result = search_provider().search(q, session.user, page, type, allow_admin, **params)
         return ResultSchema().dump(result)
 
 

@@ -18,3 +18,14 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.admin-search-checkbox:global(.ui.checkbox) {
+  margin-left: 1rem;
+}
+
+.admin-search-container {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}

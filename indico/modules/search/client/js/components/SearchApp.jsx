@@ -11,7 +11,7 @@ import searchPageURL from 'indico-url:search.search';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
-import {Dropdown, Grid, Loader, Menu, Message} from 'semantic-ui-react';
+import {Checkbox, Dropdown, Grid, Label, Loader, Menu, Message} from 'semantic-ui-react';
 
 import {useIndicoAxios, useQueryParams} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
@@ -132,7 +132,7 @@ function ResultHeader({query, hasResults, categoryTitle}) {
         </Message.Header>
         {isGlobal ? (
           <Translate>
-            Your search - <Param name="query" value={query} /> - did not match any results
+            Your search - <Param name="query" value={query} /> - did not match any results.
           </Translate>
         ) : (
           <Translate>
@@ -214,11 +214,12 @@ SearchOptions.defaultProps = {
   sortOptions: undefined,
 };
 
-export default function SearchApp({category, eventId}) {
+export default function SearchApp({category, eventId, isAdmin}) {
   const eventSearch = eventId !== null;
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
-  const {q, sort, ...filters} = query;
+  const {q, sort, allow_admin: allowAdminStr = false, ...filters} = query;
+  const allowAdmin = JSON.parse(allowAdminStr);
   const {data: options} = useIndicoAxios({
     url: searchOptionsURL(),
     trigger: 'once',
@@ -288,6 +289,23 @@ export default function SearchApp({category, eventId}) {
           searchTerm={q || ''}
           placeholders={eventSearch ? [] : options?.placeholders || []}
         />
+        {isAdmin && (
+          <div styleName="admin-search-container">
+            <Label content={Translate.string('ADMIN')} size="small" color="red" />
+            <Checkbox
+              label={Translate.string('Skip access checks')}
+              checked={allowAdmin}
+              onChange={(__, {checked}) => {
+                if (checked) {
+                  handleQuery(true, 'allow_admin');
+                } else {
+                  handleQuery(query.q);
+                }
+              }}
+              styleName="admin-search-checkbox"
+            />
+          </div>
+        )}
         <Menu pointing secondary styleName="menu">
           {searchMap.map(([label, _results], idx) => (
             <SearchTypeMenuItem
@@ -332,6 +350,7 @@ SearchApp.propTypes = {
     title: PropTypes.string.isRequired,
   }),
   eventId: PropTypes.number,
+  isAdmin: PropTypes.bool.isRequired,
 };
 
 SearchApp.defaultProps = {

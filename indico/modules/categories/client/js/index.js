@@ -26,17 +26,24 @@ import {LocaleContext} from './context.js';
 
     if (domContainer) {
       const category = JSON.parse(domContainer.dataset.category);
+      const isAdmin = JSON.parse(domContainer.dataset.isAdmin);
 
       ReactDOM.render(
         React.createElement(SearchBox, {
-          onSearch: (keyword, isGlobal) => {
+          onSearch: (keyword, isGlobal, allowAdmin) => {
+            const params = {q: keyword};
+            if (isAdmin && allowAdmin) {
+              params.allow_admin = true;
+            }
             if (isGlobal) {
-              window.location = searchUrl({q: keyword});
+              window.location = searchUrl(params);
             } else {
-              window.location = categorySearchUrl({category_id: category.id, q: keyword});
+              params.category_id = category.id;
+              window.location = categorySearchUrl(params);
             }
           },
           category,
+          isAdmin,
         }),
         domContainer
       );

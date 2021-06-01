@@ -7,5 +7,5 @@
 {% endblock %}
 
 {% block content %}
-    <div id="search-root"></div>
+    <div id="search-root" data-is-admin="{{ session.user.is_admin | tojson }}"></div>
 {% endblock %}
