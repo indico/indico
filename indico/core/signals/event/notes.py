@@ -22,3 +22,10 @@ Called when a note is modified. The `sender` is the note.
 note_deleted = _signals.signal('note-deleted', """
 Called when a note is deleted. The `sender` is the note.
 """)
+
+note_restored = _signals.signal('note-restored', """
+Called when a previously-deleted note is restored.
+The `sender` is the note. This is triggered when a "new" note
+is created on an object that previously already had a note
+which got deleted.
+""")

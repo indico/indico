@@ -10,8 +10,9 @@ import sys
 import click
 
 from indico.cli.core import cli_group
+from indico.core import signals
 from indico.core.db import db
-from indico.modules.events import Event, EventLogKind, EventLogRealm
+from indico.modules.events import Event
 from indico.modules.events.export import export_event, import_event
 from indico.modules.users.models.users import User
 
@@ -36,9 +37,8 @@ def restore(event_id, user_id, message):
     elif not event.is_deleted:
         click.secho('This event is not deleted', fg='yellow')
         sys.exit(1)
-    event.is_deleted = False
-    text = f'Event restored: {message}' if message else 'Event restored'
-    event.log(EventLogRealm.event, EventLogKind.positive, 'Event', text, user=user)
+    event.restore(message, user)
+    signals.after_process.send()
     db.session.commit()
     click.secho(f'Event undeleted: "{event.title}"', fg='green')
 

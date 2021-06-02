@@ -18,6 +18,12 @@ Called when an event is deleted. The *sender* is the event object.
 The `user` kwarg contains the user performing the deletion if available.
 """)
 
+restored = _signals.signal('restored', """
+Called when a previously-deleted event is restored. The *sender* is the event
+object. The `user` kwarg contains the user restoring the event if available,
+and the `reason` kwarg the reason if available.
+""")
+
 updated = _signals.signal('updated', """
 Called when basic data of an event is updated. The *sender* is the event.
 A dict of changes is passed in the `changes` kwarg, with ``(old, new)``

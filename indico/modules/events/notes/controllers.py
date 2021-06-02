@@ -65,13 +65,17 @@ class RHEditNote(RHManageNoteBase):
         if form.validate_on_submit():
             note = EventNote.get_or_create(self.object)
             is_new = note.id is None or note.is_deleted
+            is_restored = is_new and note.is_deleted
             # TODO: get render mode from form data once it can be selected
             note.create_revision(RenderMode.html, form.source.data, session.user)
             is_changed = attrs_changed(note, 'current_revision')
             db.session.add(note)
             db.session.flush()
             if is_new:
-                signals.event.notes.note_added.send(note)
+                if is_restored:
+                    signals.event.notes.note_restored.send(note)
+                else:
+                    signals.event.notes.note_added.send(note)
                 logger.info('Note %s created by %s', note, session.user)
                 self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes', 'Added minutes',
                                session.user, data=note.link_event_log_data)
