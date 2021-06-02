@@ -298,7 +298,7 @@ translitcodec==0.7.0
     # via -r requirements.in
 ua-parser==0.10.0
     # via -r requirements.in
-urllib3==1.26.4
+urllib3==1.26.5
     # via
     #   requests
     #   sentry-sdk
