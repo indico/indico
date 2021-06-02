@@ -9,6 +9,6 @@
 {% block content %}
     <div id="search-root"
          data-category="{{ {'id': category.id, 'title': category.title} | tojson | forceescape }}"
-         data-is-admin="{{ session.user.is_admin | tojson }}"
+         {% if session.user.is_admin %}data-is-admin{% endif %}
     ></div>
 {% endblock %}

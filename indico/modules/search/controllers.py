@@ -15,6 +15,7 @@ from indico.modules.search.base import SearchOptions, SearchTarget, get_search_p
 from indico.modules.search.internal import InternalSearch
 from indico.modules.search.result_schemas import ResultSchema
 from indico.modules.search.views import WPCategorySearch, WPEventSearch, WPSearch
+from indico.util.marshmallow import validate_with_message
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
 
@@ -46,7 +47,11 @@ class RHAPISearch(RH):
         'page': fields.Int(missing=None),
         'q': fields.String(required=True),
         'type': fields.List(EnumField(SearchTarget), missing=None),
-        'allow_admin': fields.Bool(missing=False),
+        'allow_admin': fields.Bool(missing=False,
+                                   validate=validate_with_message(
+                                       lambda value: session.user and session.user.is_admin,
+                                       'Restricted to admins'
+                                   )),
     }, location='query', unknown=INCLUDE)
     def _process(self, page, q, type, allow_admin, **params):
         search_provider = get_search_provider()

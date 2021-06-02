@@ -299,7 +299,7 @@ export default function SearchApp({category, eventId, isAdmin}) {
                 if (checked) {
                   handleQuery(true, 'allow_admin');
                 } else {
-                  handleQuery(query.q);
+                  handleQuery(undefined, 'allow_admin');
                 }
               }}
               styleName="admin-search-checkbox"

@@ -59,7 +59,7 @@ export default function SearchBox({onSearch, category, isAdmin}) {
             checked={allowAdmin}
             onChange={e => {
               e.stopPropagation();
-              setAllowAdmin(curAllowAdmin => !curAllowAdmin);
+              setAllowAdmin(!allowAdmin);
             }}
           />
         </div>
@@ -79,7 +79,7 @@ export default function SearchBox({onSearch, category, isAdmin}) {
 
   const handleResultSelect = (e, data) => {
     if (data.result.title === 'allowAdmin') {
-      setAllowAdmin(curAllowAdmin => !curAllowAdmin);
+      setAllowAdmin(!allowAdmin);
     } else if (keyword.trim()) {
       onSearch(keyword.trim(), data.result.value === 'global', allowAdmin);
     }

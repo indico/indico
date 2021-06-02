@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (root) {
     const category = root.dataset.category ? JSON.parse(root.dataset.category) : null;
     const eventId = root.dataset.eventId !== undefined ? parseInt(root.dataset.eventId, 10) : null;
-    const isAdmin = root.dataset.isAdmin ? JSON.parse(root.dataset.isAdmin) : null;
+    const isAdmin = root.dataset.isAdmin !== undefined;
 
     ReactDOM.render(
       <Router>

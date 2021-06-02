@@ -26,7 +26,7 @@ import {LocaleContext} from './context.js';
 
     if (domContainer) {
       const category = JSON.parse(domContainer.dataset.category);
-      const isAdmin = JSON.parse(domContainer.dataset.isAdmin);
+      const isAdmin = domContainer.dataset.isAdmin !== undefined;
 
       ReactDOM.render(
         React.createElement(SearchBox, {
