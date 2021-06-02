@@ -17,11 +17,15 @@ from indico.modules.search.schemas import DetailedCategorySchema, HTMLStrippingE
 
 
 class InternalSearch(IndicoSearchProvider):
-    def search(self, query, user=None, page=None, object_types=(), allow_admin=False, **params):
+    def search(self, query, user=None, page=None, object_types=(), *, admin_override_enabled=False,
+               **params):
+        category_id = params.get('category_id')
         if object_types == [SearchTarget.category]:
-            pagenav, results = self.search_categories(query, user, page, params.get('category_id'), allow_admin)
+            pagenav, results = self.search_categories(query, user, page, category_id,
+                                                      admin_override_enabled)
         elif object_types == [SearchTarget.event]:
-            pagenav, results = self.search_events(query, user, page, params.get('category_id'), allow_admin)
+            pagenav, results = self.search_events(query, user, page, category_id,
+                                                  admin_override_enabled)
         else:
             pagenav, results = {}, []
         return {
@@ -30,7 +34,7 @@ class InternalSearch(IndicoSearchProvider):
             'results': results,
         }
 
-    def _paginate(self, query, page, column, user, allow_admin):
+    def _paginate(self, query, page, column, user, admin_override_enabled):
         reverse = False
         pagenav = {'prev': None, 'next': None}
         if not page:
@@ -47,7 +51,7 @@ class InternalSearch(IndicoSearchProvider):
 
         def _can_access(obj):
             return (obj.effective_protection_mode == ProtectionMode.public or
-                    obj.can_access(user, allow_admin=allow_admin))
+                    obj.can_access(user, allow_admin=admin_override_enabled))
 
         res = get_n_matching(query, self.RESULTS_PER_PAGE + 1, _can_access, prefetch_factor=20)
 
@@ -64,7 +68,7 @@ class InternalSearch(IndicoSearchProvider):
 
         return res, pagenav
 
-    def search_categories(self, q, user, page, category_id, allow_admin):
+    def search_categories(self, q, user, page, category_id, admin_override_enabled):
         query = Category.query if not category_id else Category.get(category_id).deep_children_query
 
         query = (query
@@ -74,11 +78,11 @@ class InternalSearch(IndicoSearchProvider):
                           undefer(Category.effective_protection_mode),
                           subqueryload(Category.acl_entries)))
 
-        objs, pagenav = self._paginate(query, page, Category.id, user, allow_admin)
+        objs, pagenav = self._paginate(query, page, Category.id, user, admin_override_enabled)
         res = DetailedCategorySchema(many=True).dump(objs)
         return pagenav, CategoryResultSchema(many=True).load(res)
 
-    def search_events(self, q, user, page, category_id, allow_admin):
+    def search_events(self, q, user, page, category_id, admin_override_enabled):
         filters = [
             Event.title_matches(q),
             ~Event.is_deleted
@@ -90,6 +94,6 @@ class InternalSearch(IndicoSearchProvider):
         query = (Event.query
                  .filter(*filters)
                  .options(subqueryload(Event.acl_entries), undefer(Event.effective_protection_mode)))
-        objs, pagenav = self._paginate(query, page, Event.id, user, allow_admin)
+        objs, pagenav = self._paginate(query, page, Event.id, user, admin_override_enabled)
         res = HTMLStrippingEventSchema(many=True).dump(objs)
         return pagenav, EventResultSchema(many=True).load(res)

@@ -7,5 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <div id="search-root" {% if session.user.is_admin %}data-is-admin{% endif %}></div>
+    <div id="search-root"
+         {% if session.user and session.user.is_admin %}data-is-admin{% endif %}
+    ></div>
 {% endblock %}

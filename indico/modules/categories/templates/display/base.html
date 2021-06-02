@@ -25,7 +25,7 @@
                 <div class="group">
                     <div id="search-box" class="search-box"
                          data-category="{{ {'id': category.id, 'isRoot': category.is_root, 'title': category.title} | tojson | forceescape }}"
-                         {% if session.user.is_admin %}data-is-admin{% endif %}
+                         {% if session.user and session.user.is_admin %}data-is-admin{% endif %}
                     ></div>
                 </div>
                 <div class="group">

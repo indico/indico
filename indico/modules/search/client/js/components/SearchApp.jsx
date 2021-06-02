@@ -218,8 +218,8 @@ export default function SearchApp({category, eventId, isAdmin}) {
   const eventSearch = eventId !== null;
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
-  const {q, sort, allow_admin: allowAdminStr = false, ...filters} = query;
-  const allowAdmin = JSON.parse(allowAdminStr);
+  const {q, sort, admin_override_enabled: adminOverrideEnabledStr = false, ...filters} = query;
+  const adminOverrideEnabled = JSON.parse(adminOverrideEnabledStr);
   const {data: options} = useIndicoAxios({
     url: searchOptionsURL(),
     trigger: 'once',
@@ -294,13 +294,9 @@ export default function SearchApp({category, eventId, isAdmin}) {
             <Label content={Translate.string('ADMIN')} size="small" color="red" />
             <Checkbox
               label={Translate.string('Skip access checks')}
-              checked={allowAdmin}
+              checked={adminOverrideEnabled}
               onChange={(__, {checked}) => {
-                if (checked) {
-                  handleQuery(true, 'allow_admin');
-                } else {
-                  handleQuery(undefined, 'allow_admin');
-                }
+                handleQuery(checked ? true : undefined, 'admin_override_enabled');
               }}
               styleName="admin-search-checkbox"
             />

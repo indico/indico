@@ -47,17 +47,17 @@ class RHAPISearch(RH):
         'page': fields.Int(missing=None),
         'q': fields.String(required=True),
         'type': fields.List(EnumField(SearchTarget), missing=None),
-        'allow_admin': fields.Bool(missing=False,
-                                   validate=validate_with_message(
-                                       lambda value: session.user and session.user.is_admin,
-                                       'Restricted to admins'
-                                   )),
+        'admin_override_enabled': fields.Bool(
+            missing=False,
+            validate=validate_with_message(lambda value: session.user and session.user.is_admin,
+                                           'Restricted to admins')
+        ),
     }, location='query', unknown=INCLUDE)
-    def _process(self, page, q, type, allow_admin, **params):
+    def _process(self, page, q, type, **params):
         search_provider = get_search_provider()
         if type == [SearchTarget.category]:
             search_provider = InternalSearch
-        result = search_provider().search(q, session.user, page, type, allow_admin, **params)
+        result = search_provider().search(q, session.user, page, type, **params)
         return ResultSchema().dump(result)
 
 

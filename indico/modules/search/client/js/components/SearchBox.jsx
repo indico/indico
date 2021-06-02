@@ -25,7 +25,7 @@ const renderResult = ({label}, keyword) => (
 
 export default function SearchBox({onSearch, category, isAdmin}) {
   const [keyword, setKeyword] = useState('');
-  const [allowAdmin, setAllowAdmin] = useState(false);
+  const [adminOverrideEnabled, setAdminOverrideEnabled] = useState(false);
   const options =
     category && !category.isRoot
       ? [
@@ -46,20 +46,20 @@ export default function SearchBox({onSearch, category, isAdmin}) {
   if (isAdmin) {
     options.push({
       value: 'global',
-      title: 'allowAdmin',
+      title: 'enableAdminOverride',
       className: 'cursor-default',
       onClick: () => {},
-      // eslint-disable-next-line
+      // eslint-disable-next-line react/display-name
       renderer: () => (
         <div styleName="option">
           <Label content={Translate.string('ADMIN')} size="small" color="red" />
           <Checkbox
             styleName="checkbox-admin-search"
             label={Translate.string('Skip access checks')}
-            checked={allowAdmin}
+            checked={adminOverrideEnabled}
             onChange={e => {
               e.stopPropagation();
-              setAllowAdmin(!allowAdmin);
+              setAdminOverrideEnabled(!adminOverrideEnabled);
             }}
           />
         </div>
@@ -73,15 +73,15 @@ export default function SearchBox({onSearch, category, isAdmin}) {
 
   const handleSubmit = () => {
     if (keyword.trim()) {
-      onSearch(keyword.trim(), category ? category.isRoot : true, allowAdmin);
+      onSearch(keyword.trim(), category ? category.isRoot : true, adminOverrideEnabled);
     }
   };
 
   const handleResultSelect = (e, data) => {
-    if (data.result.title === 'allowAdmin') {
-      setAllowAdmin(!allowAdmin);
+    if (data.result.title === 'enableAdminOverride') {
+      setAdminOverrideEnabled(!adminOverrideEnabled);
     } else if (keyword.trim()) {
-      onSearch(keyword.trim(), data.result.value === 'global', allowAdmin);
+      onSearch(keyword.trim(), data.result.value === 'global', adminOverrideEnabled);
     }
   };
 
@@ -93,7 +93,7 @@ export default function SearchBox({onSearch, category, isAdmin}) {
         results={options}
         value={keyword}
         showNoResults={false}
-        open={!!keyword.length}
+        open={!!keyword}
         onResultSelect={handleResultSelect}
         onSearchChange={handleSearchChange}
         fluid

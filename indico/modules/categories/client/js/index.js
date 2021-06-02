@@ -30,10 +30,10 @@ import {LocaleContext} from './context.js';
 
       ReactDOM.render(
         React.createElement(SearchBox, {
-          onSearch: (keyword, isGlobal, allowAdmin) => {
+          onSearch: (keyword, isGlobal, adminOverrideEnabled) => {
             const params = {q: keyword};
-            if (isAdmin && allowAdmin) {
-              params.allow_admin = true;
+            if (isAdmin && adminOverrideEnabled) {
+              params.admin_override_enabled = true;
             }
             if (isGlobal) {
               window.location = searchUrl(params);
