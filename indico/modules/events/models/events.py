@@ -921,6 +921,17 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         logger.info('Event %r deleted [%s]', self, reason)
         self.log(EventLogRealm.event, EventLogKind.negative, 'Event', 'Event deleted', user, data={'Reason': reason})
 
+    def restore(self, reason=None, user=None):
+        from indico.modules.events import EventLogKind, EventLogRealm, logger
+        if not self.is_deleted:
+            return
+        self.is_deleted = False
+        signals.event.restored.send(self, user=user, reason=reason)
+        db.session.flush()
+        logger.info('Event %r restored [%s]', self, reason)
+        data = {'reason': reason} if reason else None
+        self.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Event restored', user=user, data=data)
+
     def refresh_event_persons(self, *, notify=True):
         """Update the data for all EventPersons based on the linked Users.
 

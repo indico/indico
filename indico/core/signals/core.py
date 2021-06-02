@@ -23,8 +23,9 @@ only ``import`` these modules and do nothing else.
 """)
 
 after_process = _signals.signal('after-process', """
-Called after an Indico request has been processed.  This signal is
-executed for both RH classes and legacy JSON-RPC services.
+Called after an Indico request has been processed.  This signal should
+also be triggered by CLI utilities that result in other signals being
+triggered.
 """)
 
 after_commit = _signals.signal('after-commit', """
