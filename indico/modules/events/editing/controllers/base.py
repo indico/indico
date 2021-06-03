@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from flask import request, session
+from marshmallow import EXCLUDE
 from werkzeug.exceptions import NotFound, Unauthorized
 
 from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
@@ -130,4 +131,4 @@ class RHEditablesBase(RHEditingManagementBase):
         self.editables = parser.parse({
             'editables': EditableList(required=True, event=self.event, editable_type=self.editable_type,
                                       validate=not_empty)
-        })['editables']
+        }, unknown=EXCLUDE)['editables']
