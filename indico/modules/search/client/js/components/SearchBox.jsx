@@ -45,8 +45,8 @@ export default function SearchBox({onSearch, category, isAdmin}) {
       : [];
   if (isAdmin) {
     options.push({
-      value: 'global',
-      title: 'enableAdminOverride',
+      value: 'enableAdminOverride',
+      title: 'Enable admin override',
       className: 'cursor-default',
       onClick: () => {},
       // eslint-disable-next-line react/display-name
@@ -78,7 +78,7 @@ export default function SearchBox({onSearch, category, isAdmin}) {
   };
 
   const handleResultSelect = (e, data) => {
-    if (data.result.title === 'enableAdminOverride') {
+    if (data.result.value === 'enableAdminOverride') {
       setAdminOverrideEnabled(!adminOverrideEnabled);
     } else if (keyword.trim()) {
       onSearch(keyword.trim(), data.result.value === 'global', adminOverrideEnabled);

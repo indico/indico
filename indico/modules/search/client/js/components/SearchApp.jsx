@@ -218,7 +218,7 @@ export default function SearchApp({category, eventId, isAdmin}) {
   const eventSearch = eventId !== null;
   const [query, setQuery] = useQueryParams();
   const [activeMenuItem, setActiveMenuItem] = useState(undefined);
-  const {q, sort, admin_override_enabled: adminOverrideEnabledStr = false, ...filters} = query;
+  const {q, sort, admin_override_enabled: adminOverrideEnabledStr = 'false', ...filters} = query;
   const adminOverrideEnabled = JSON.parse(adminOverrideEnabledStr);
   const {data: options} = useIndicoAxios({
     url: searchOptionsURL(),
