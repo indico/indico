@@ -17,6 +17,13 @@ import {snakifyKeys} from 'indico/utils/case';
 
 import './ICSCalendarLink.module.scss';
 
+const initialState = {
+  open: false,
+  url: null,
+  text: null,
+  source: null,
+};
+
 function popupReducer(state, action) {
   switch (action.type) {
     case 'CLOSE':
@@ -31,7 +38,7 @@ function popupReducer(state, action) {
 }
 
 export default function ICSCalendarLink({endpoint, params, renderButton, popupPosition, options}) {
-  const [popupState, dispatch] = useReducer(popupReducer, {open: false});
+  const [popupState, dispatch] = useReducer(popupReducer, initialState);
   const [copied, setCopied] = useState(false);
 
   const copyButton = (
@@ -104,7 +111,7 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
       <Header styleName="export-header">
         <Button.Group size="small">
           {options.map(({key, text, extraParams}, idx) => (
-            <>
+            <React.Fragment key={key}>
               <Button
                 key={key}
                 content={text}
@@ -113,8 +120,8 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
                 label={idx === 0 ? Translate.string('Export') : undefined}
                 labelPosition={idx === 0 ? 'left' : undefined}
               />
-              {idx < options.length - 1 && <Button.Or />}
-            </>
+              {idx < options.length - 1 && <Button.Or text={Translate.string('or')} />}
+            </React.Fragment>
           ))}
         </Button.Group>
       </Header>
