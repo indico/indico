@@ -443,6 +443,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         Create a filter that checks whether the event has any of the
         provided category ids in its parent chain.
 
+        Warning: This method cannot be used in a negated filter.
+
         :param category_ids: A list of category ids or a single
                              category id
         """
