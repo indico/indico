@@ -202,7 +202,7 @@
                 {% endif %}
 
                 <div id="event-calendar-link" data-event-id="{{ event.id }}"
-                     data-event-contrib-count="{{ event.contributions|length }}"
+                     data-event-contrib-count="{{ event.contributions_count }}"
                      data-event-session-block-count="{{ event.session_block_count }}"></div>
 
                 {% if event.type == 'meeting' %}

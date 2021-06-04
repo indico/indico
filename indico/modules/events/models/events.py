@@ -1037,6 +1037,14 @@ def _mappers_configured():
              .scalar_subquery())
     Event.series_count = column_property(query, group='series', deferred=True)
 
+    # Event.contributions_count -- the number of contributions in the event
+    from indico.modules.events.contributions.models.contributions import Contribution
+    query = (db.select([db.func.count(Contribution.id)])
+             .where((Contribution.event_id == Event.id) & ~Contribution.is_deleted)
+             .correlate_except(Contribution)
+             .scalar_subquery())
+    Event.contributions_count = db.column_property(query, deferred=True)
+
 
 @listens_for(Event.start_dt, 'set')
 @listens_for(Event.end_dt, 'set')
