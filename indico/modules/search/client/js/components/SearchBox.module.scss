@@ -20,3 +20,18 @@
     width: 50%;
   }
 }
+
+.checkbox-admin-search:global(.ui.checkbox) {
+  display: flex;
+  justify-content: space-between;
+
+  label {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: $dark-gray;
+  }
+}
+
+:global(.ui.search > .results > .result.cursor-default) {
+  cursor: default;
+}

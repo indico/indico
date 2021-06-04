@@ -72,13 +72,15 @@ class IndicoSearchProvider:
         """
         return True
 
-    def search(self, query, user=None, page=None, object_types=(), **params):
+    def search(self, query, user=None, page=None, object_types=(), *, admin_override_enabled=False,
+               **params):
         """Search using a custom service across multiple targets.
 
         :param query: Keyword based query string
         :param user: The user performing the search (for access checks)
         :param page: The result page to show
         :param object_types: A filter for a specific `SearchTarget`
+        :param admin_override_enabled: Whether to ignore access restrictions
         :param params: Any additional search params such as filters
 
         :return: a dict with the `ResultSchema` structure

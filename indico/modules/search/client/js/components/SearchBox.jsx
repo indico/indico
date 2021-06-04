@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Form, Icon, Label, Search} from 'semantic-ui-react';
+import {Checkbox, Form, Icon, Label, Search} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -23,33 +23,66 @@ const renderResult = ({label}, keyword) => (
   </div>
 );
 
-export default function SearchBox({onSearch, category}) {
+export default function SearchBox({onSearch, category, isAdmin}) {
   const [keyword, setKeyword] = useState('');
+  const [adminOverrideEnabled, setAdminOverrideEnabled] = useState(false);
   const options =
     category && !category.isRoot
       ? [
           {
             value: 'category',
-            title: category.title,
             label: Translate.string('In this category ↵'),
+            title: category.title,
+            renderer: props => renderResult(props, keyword),
           },
-          {value: 'global', title: 'Global', label: Translate.string('All Indico ↵')},
+          {
+            value: 'global',
+            label: Translate.string('All Indico ↵'),
+            title: 'Global',
+            renderer: props => renderResult(props, keyword),
+          },
         ]
       : [];
+  if (isAdmin) {
+    options.push({
+      value: 'enableAdminOverride',
+      title: 'Enable admin override',
+      className: 'cursor-default',
+      onClick: () => {},
+      // eslint-disable-next-line react/display-name
+      renderer: () => (
+        <div styleName="option">
+          <Label content={Translate.string('ADMIN')} size="small" color="red" />
+          <Checkbox
+            styleName="checkbox-admin-search"
+            label={Translate.string('Skip access checks')}
+            checked={adminOverrideEnabled}
+            onChange={e => {
+              e.stopPropagation();
+              setAdminOverrideEnabled(!adminOverrideEnabled);
+            }}
+          />
+        </div>
+      ),
+    });
+  }
 
   const handleSearchChange = event => {
     setKeyword(event.target.value);
   };
 
-  // form submit happens when no option is selected in search (eg. in home category)
   const handleSubmit = () => {
     if (keyword.trim()) {
-      onSearch(keyword.trim(), category ? category.isRoot : true);
+      onSearch(keyword.trim(), category ? category.isRoot : true, adminOverrideEnabled);
     }
   };
 
   const handleResultSelect = (e, data) => {
-    onSearch(keyword.trim(), data.result.value === 'global');
+    if (data.result.value === 'enableAdminOverride') {
+      setAdminOverrideEnabled(!adminOverrideEnabled);
+    } else if (keyword.trim()) {
+      onSearch(keyword.trim(), data.result.value === 'global', adminOverrideEnabled);
+    }
   };
 
   return (
@@ -60,11 +93,12 @@ export default function SearchBox({onSearch, category}) {
         results={options}
         value={keyword}
         showNoResults={false}
+        open={!!keyword}
         onResultSelect={handleResultSelect}
         onSearchChange={handleSearchChange}
-        resultRenderer={results => renderResult(results, keyword)}
         fluid
-        selectFirstResult
+        // only select the first result if there is more than 1 (means we are in a category)
+        selectFirstResult={options.length > 1}
       />
     </Form>
   );
@@ -77,6 +111,7 @@ SearchBox.propTypes = {
     title: PropTypes.string.isRequired,
     isRoot: PropTypes.bool.isRequired,
   }),
+  isAdmin: PropTypes.bool.isRequired,
 };
 
 SearchBox.defaultProps = {
