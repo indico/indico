@@ -21,12 +21,6 @@ from indico.core.config import config
 from indico.core.plugins import plugin_engine
 from indico.legacy.pdfinterface.conference import ProgrammeToPDF
 from indico.legacy.pdfinterface.latex import AbstractBook, ContribsToPDF, ContribToPDF
-from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay,
-                                                     WPStaticConferenceProgram, WPStaticContributionDisplay,
-                                                     WPStaticContributionList, WPStaticCustomPage,
-                                                     WPStaticDisplayRegistrationParticipantList, WPStaticSessionDisplay,
-                                                     WPStaticSimpleEventDisplay, WPStaticSpeakerList,
-                                                     WPStaticSubcontributionDisplay, WPStaticTimetable)
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.controllers.display import (RHAuthorList, RHContributionAuthor,
@@ -41,6 +35,12 @@ from indico.modules.events.sessions.controllers.display import RHDisplaySession
 from indico.modules.events.sessions.ical import session_to_ical
 from indico.modules.events.sessions.util import get_session_timetable_pdf
 from indico.modules.events.static.util import collect_static_files, override_request_endpoint, rewrite_css_urls
+from indico.modules.events.static.views import (WPStaticAuthorList, WPStaticConferenceDisplay,
+                                                WPStaticConferenceProgram, WPStaticContributionDisplay,
+                                                WPStaticContributionList, WPStaticCustomPage,
+                                                WPStaticDisplayRegistrationParticipantList, WPStaticSessionDisplay,
+                                                WPStaticSimpleEventDisplay, WPStaticSpeakerList,
+                                                WPStaticSubcontributionDisplay, WPStaticTimetable)
 from indico.modules.events.timetable.controllers.display import RHTimetable
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
 from indico.modules.events.tracks.controllers import RHDisplayTracks
