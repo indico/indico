@@ -188,10 +188,10 @@ const searchFactory = config => {
     </List.Item>
   );
 
-  const SearchResults = ({results, total, onAdd, onRemove, isAdded, favorites}) =>
+  const SearchResults = ({results, total, onAdd, onRemove, isAdded, favorites, resultsText}) =>
     total !== 0 ? (
       <>
-        <Divider horizontal>{getResultsText(total)}</Divider>
+        <Divider horizontal>{resultsText(total)}</Divider>
         <List divided relaxed>
           {results.map(r => (
             <ResultItem
@@ -227,7 +227,8 @@ const searchFactory = config => {
     const pristine = useRef(true);
     const setResult = value => {
       lastResult.current = result;
-      pristine.current = false;
+      // pristine ignores initially unset values
+      pristine.current = pristine.current && !value;
       _setResult(value);
     };
     const handleSearch = async data => {
@@ -240,7 +241,7 @@ const searchFactory = config => {
     };
     const favoriteResults = favorites ? Object.values(favorites) : [];
     const resultDisplay = result ||
-      lastResult.current || {results: favoriteResults.total, total: favoriteResults.length};
+      lastResult.current || {results: favoriteResults, total: favoriteResults.length};
 
     return (
       <div styleName="search-content">
@@ -263,6 +264,11 @@ const searchFactory = config => {
               onAdd={onAdd}
               onRemove={onRemove}
               isAdded={isAdded}
+              resultsText={total =>
+                pristine.current
+                  ? Translate.string('{total} favorite users', {total})
+                  : getResultsText(total)
+              }
             />
           </div>
         )}
