@@ -31,23 +31,22 @@ indico.core.signals
         separators = ['+', '*', '^', '\'']
 
         def generate_signal_doc(module, nesting=0):
-
             sorted_attributes = sorted(
                 ((getattr(module, n), n) for n in dir(module)),
-                key=lambda (a, n): (isinstance(a, ModuleType), module.__name__, n)
+                key=lambda item: (isinstance(item[0], ModuleType), module.__name__, item[1])
             )
             for attr, name in sorted_attributes:
                 if isinstance(attr, Signal):
-                    print '.. autodata:: {}.{}'.format(module.__name__, name)
-                    print '   :annotation:'
+                    print(f'.. autodata:: {module.__name__}.{name}')
+                    print('   :annotation:')
 
                 # core is always imported in __init__.py and
                 # event.__init__.py always import its submodules directly so we
                 # don't recurse in those cases to avoid duplicate docs
                 elif (isinstance(attr, ModuleType) and
                         name != 'core' and module.__name__ != 'indico.core.signals.event'):
-                    print attr.__name__
-                    print separators[nesting] * len(attr.__name__)
+                    print(attr.__name__)
+                    print(separators[nesting] * len(attr.__name__))
                     generate_signal_doc(attr, nesting=(nesting + 1))
 
         generate_signal_doc(signals)
