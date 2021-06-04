@@ -59,7 +59,13 @@ class EditableStateSchema(mm.Schema):
 class EditingUserSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        fields = ('id', 'full_name', 'identifier', 'avatar_url')
+        fields = ('id', 'full_name', 'identifier', 'avatar_url', 'email')
+
+    @post_dump
+    def strip_emails(self, data, **kwargs):
+        if not self.context.get('include_emails'):
+            del data['email']
+        return data
 
 
 class EditingFileTypeSchema(mm.SQLAlchemyAutoSchema):

@@ -363,7 +363,7 @@ def generate_editables_zip(event, editable_type, editables):
 def generate_editables_json(event, editable_type, editables):
     file_types = EditingFileType.query.with_parent(event).filter_by(type=editable_type).all()
     file_types_dump = EditingFileTypeSchema(many=True).dump(file_types)
-    editables_dump = EditableDumpSchema(many=True).dump(editables)
+    editables_dump = EditableDumpSchema(many=True, context={'include_emails': True}).dump(editables)
     response = jsonify(version=1, file_types=file_types_dump, editables=editables_dump)
     response.headers['Content-Disposition'] = 'attachment; filename="editables.json"'
     return response
