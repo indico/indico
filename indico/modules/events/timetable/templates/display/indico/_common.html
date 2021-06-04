@@ -8,8 +8,8 @@
     </div>
 {% endmacro %}
 
-{% macro render_references(item) -%}
-    <ul class="reference-list">
+{% macro render_references(item, class='reference-list-meeting') -%}
+    <ul class="reference-list {{ class }}">
         {%- for reference in item.references -%}
             <li title="{% trans title=reference.reference_type.name %}External reference ({{ title }}){% endtrans %}"
                 class="icon-link">

@@ -3,6 +3,7 @@
 {% from 'events/display/common/_conferences.html' import render_attachments %}
 {% from 'events/display/indico/_common.html' import render_location, render_users, render_speakers %}
 {% from 'events/papers/_contributions.html' import render_paper_section, render_editables_section, render_proceedings_section %}
+{% from 'events/timetable/display/indico/_common.html' import render_references %}
 {% from 'message_box.html' import message_box %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
@@ -215,6 +216,17 @@
     {% endif %}
 
     {{ render_attachments(contribution) }}
+
+    {% if contribution.references -%}
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{% trans %}External references{% endtrans %}</h3>
+                </div>
+            </div>
+            {{ render_references(contribution, 'reference-list-conference') }}
+        </section>
+    {%- endif %}
 
     {% if contribution.subcontributions -%}
         <section>
