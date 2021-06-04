@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
     options.push({
       key: 'contributions',
       text: Translate.string('Detailed'),
-      description: Translate.string('A detailed timetable scoped to contributions.'),
+      description: Translate.string('A detailed timetable containing individual contributions.'),
       extraParams: {scope: 'contribution'},
     });
     options.push({
       key: 'sessions',
-      description: Translate.string('A detailed timetable scoped to sessions.'),
+      description: Translate.string('A detailed timetable containing individual session blocks.'),
       text: Translate.string('Compact'),
       extraParams: {scope: 'session'},
     });

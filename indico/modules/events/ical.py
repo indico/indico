@@ -106,7 +106,7 @@ def event_to_ical(event, user=None, scope=None):
 
     :param event: The event to serialize
     :param user: The user who needs to be able to access the events
-    :param scope: If True, iCal will include a detailed timetable up to this event scope
+    :param scope: If specified, use a more detailed timetable using the given scope
     """
     return events_to_ical([event], user, scope)
 
@@ -116,7 +116,7 @@ def events_to_ical(events, user=None, scope=None):
 
     :param events: A list of events to serialize
     :param user: The user who needs to be able to access the events
-    :param scope: If True, iCal will include a detailed timetable up to this event scope
+    :param scope: If specified, use a more detailed timetable using the given scope
     """
     calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
