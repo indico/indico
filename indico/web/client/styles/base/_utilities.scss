@@ -65,3 +65,15 @@
     @extend #{$class};
   }
 }
+
+@mixin ellipsis($no-wrap: true) {
+  @if $no-wrap {
+    white-space: nowrap;
+  }
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ellipsis {
+  @include ellipsis();
+}

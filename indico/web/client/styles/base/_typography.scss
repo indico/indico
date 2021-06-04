@@ -53,14 +53,6 @@
   font-size: 13px;
 }
 
-@mixin ellipsis($no-wrap: true) {
-  @if $no-wrap {
-    white-space: nowrap;
-  }
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 html,
 body {
   height: 100%;
@@ -287,8 +279,4 @@ textarea.log {
 
 .underline {
   text-decoration: underline;
-}
-
-.ellipsis {
-  @include ellipsis();
 }
