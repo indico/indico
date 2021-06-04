@@ -224,8 +224,10 @@ const searchFactory = config => {
     const [loading, setLoading] = useState(false);
     const [result, _setResult] = useState(null);
     const lastResult = useRef(null);
+    const pristine = useRef(true);
     const setResult = value => {
       lastResult.current = result;
+      pristine.current = false;
       _setResult(value);
     };
     const handleSearch = async data => {
@@ -238,7 +240,7 @@ const searchFactory = config => {
     };
     const favoriteResults = favorites ? Object.values(favorites) : [];
     const resultDisplay = result ||
-      lastResult.current || {results: favoriteResults, total: favoriteResults.length};
+      lastResult.current || {results: favoriteResults.total, total: favoriteResults.length};
 
     return (
       <div styleName="search-content">
@@ -252,16 +254,18 @@ const searchFactory = config => {
             single={single}
           />
         </div>
-        <div styleName="results" style={{opacity: loading ? 0.5 : 1}}>
-          <SearchResults
-            results={resultDisplay.results}
-            total={resultDisplay.total}
-            favorites={favorites}
-            onAdd={onAdd}
-            onRemove={onRemove}
-            isAdded={isAdded}
-          />
-        </div>
+        {(!pristine.current || resultDisplay.total > 0) && (
+          <div styleName="results" style={{opacity: loading ? 0.5 : 1}}>
+            <SearchResults
+              results={resultDisplay.results}
+              total={resultDisplay.total}
+              favorites={favorites}
+              onAdd={onAdd}
+              onRemove={onRemove}
+              isAdded={isAdded}
+            />
+          </div>
+        )}
       </div>
     );
   };
