@@ -1,3 +1,5 @@
+.. _plugins-getting-started:
+
 Getting started with Indico plugins
 ===================================
 
