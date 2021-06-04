@@ -165,10 +165,6 @@
 
 .reference-list-conference {
   li {
-    &::before {
-      content: '';
-    }
-
     padding: 0.2em 1em 0.2em 0;
     background-color: $white;
   }
