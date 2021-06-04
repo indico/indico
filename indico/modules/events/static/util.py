@@ -49,7 +49,7 @@ def _create_data_uri(url, filename):
     if response.status_code != 200:
         # couldn't access the file
         return url
-    data = base64.b64encode(response.content)
+    data = base64.b64encode(response.content).decode()
     content_type = (mimetypes.guess_type(filename)[0] or
                     response.headers.get('Content-Type', 'application/octet-stream'))
     return f'data:{content_type};base64,{data}'
