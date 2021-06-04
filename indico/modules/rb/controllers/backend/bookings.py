@@ -20,6 +20,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
+from indico.modules.events.util import track_location_changes
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.common import search_room_args
@@ -177,9 +178,10 @@ class RHCreateBooking(RHRoomBookingBase):
         try:
             resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook,
                                                 ignore_admin=(not admin_override))
-            if args.get('link_type') is not None and args.get('link_id') is not None:
-                self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
-            db.session.flush()
+            with track_location_changes():
+                if args.get('link_type') is not None and args.get('link_id') is not None:
+                    self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
+                db.session.flush()
         except NoReportError as e:
             db.session.rollback()
             raise ExpectedError(str(e))
