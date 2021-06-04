@@ -48,6 +48,7 @@ const ACLField = props => {
     favoriteUsersController,
     readAccessAllowed,
     fullAccessAllowed,
+    scrollOnOpen,
     permissionInfo,
     permissionManager,
   } = props;
@@ -99,6 +100,20 @@ const ACLField = props => {
       value: r.identifier,
       text: r.name,
     }));
+
+  const onDropdownOpen = event => {
+    // Fixes semantic dropdown cropping within constrained elements
+    // `defer` ensures the scroll is queued after all state updates
+    const target = event.currentTarget;
+    if (scrollOnOpen && target) {
+      _.defer(() =>
+        target.querySelector('.menu.visible')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
+        })
+      );
+    }
+  };
 
   return (
     <>
@@ -167,7 +182,8 @@ const ACLField = props => {
             <Dropdown
               text={Translate.string('Event Role')}
               button
-              upward
+              defaultUpward
+              scrolling
               floating
               disabled={eventRoleOptions.length === 0}
               options={eventRoleOptions}
@@ -175,6 +191,7 @@ const ACLField = props => {
               openOnFocus={false}
               selectOnBlur={false}
               selectOnNavigation={false}
+              onOpen={onDropdownOpen}
               onChange={(e, data) => handleAddItems([{identifier: data.value}])}
             />
           )}
@@ -182,7 +199,8 @@ const ACLField = props => {
             <Dropdown
               text={Translate.string('Category Role')}
               button
-              upward
+              defaultUpward
+              scrolling
               floating
               disabled={categoryRoleOptions.length === 0}
               options={categoryRoleOptions}
@@ -190,6 +208,7 @@ const ACLField = props => {
               openOnFocus={false}
               selectOnBlur={false}
               selectOnNavigation={false}
+              onOpen={onDropdownOpen}
               onChange={(e, data) => handleAddItems([{identifier: data.value}])}
             />
           )}
@@ -221,6 +240,8 @@ ACLField.propTypes = {
   /** Whether the 'full_access' permission is used/allowed */
   fullAccessAllowed: PropTypes.bool,
   /** The ID of the event used in case of event-scoped principals */
+  scrollOnOpen: PropTypes.bool,
+  /** Whether to adapt the scroll to the field dropdown positions */
   eventId: PropTypes.number,
   /** The event roles that are available for the specified eventId */
   eventRoles: PropTypes.array,
@@ -245,6 +266,7 @@ ACLField.defaultProps = {
   eventId: null,
   eventRoles: [],
   categoryRoles: [],
+  scrollOnOpen: false,
 };
 
 export default React.memo(ACLField);
