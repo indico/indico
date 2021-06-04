@@ -84,7 +84,10 @@
                 <ul class="participant-list">
                     {%- for participant in event.published_registrations|sort(attribute='display_full_name') -%}
                         <li class="ui image label meeting-participant {% if participant.checked_in and participant.registration_form.publish_checkin_enabled %} checked-in {% endif %}">
-                            <img src="{{ participant.avatar_url }}" alt="">{{ participant.display_full_name }}
+                            {%- if not g.static_site -%}
+                                <img src="{{ participant.avatar_url }}" alt="">
+                            {%- endif -%}
+                            {{ participant.display_full_name }}
                         </li>
                     {%- endfor -%}
                 </ul>
