@@ -37,6 +37,48 @@ function popupReducer(state, action) {
   }
 }
 
+const ICSExportOptions = ({options, selected, handleSetOption}) => (
+  <Button.Group size="small">
+    {options.map(({key, text, description, extraParams}, idx) => (
+      <React.Fragment key={key}>
+        <Popup
+          disabled={description === undefined}
+          content={description}
+          trigger={
+            <Button
+              key={key}
+              content={text}
+              onClick={() => handleSetOption(key, extraParams)}
+              primary={key === selected}
+              label={idx === 0 ? Translate.string('Export') : undefined}
+              labelPosition={idx === 0 ? 'left' : undefined}
+            />
+          }
+        />
+        {idx < options.length - 1 && <Button.Or text={Translate.string('or')} />}
+      </React.Fragment>
+    ))}
+  </Button.Group>
+);
+
+ICSExportOptions.propTypes = {
+  selected: PropTypes.string,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      extraParams: PropTypes.objectOf(PropTypes.string),
+    })
+  ),
+  handleSetOption: PropTypes.func.isRequired,
+};
+
+ICSExportOptions.defaultProps = {
+  selected: undefined,
+  options: [],
+};
+
 export default function ICSCalendarLink({endpoint, params, renderButton, popupPosition, options}) {
   const [popupState, dispatch] = useReducer(popupReducer, initialState);
   const [copied, setCopied] = useState(false);
@@ -109,21 +151,11 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
       wide
     >
       <Header styleName="export-header">
-        <Button.Group size="small">
-          {options.map(({key, text, extraParams}, idx) => (
-            <React.Fragment key={key}>
-              <Button
-                key={key}
-                content={text}
-                onClick={() => handleSetOption(key, extraParams)}
-                primary={key === popupState.key}
-                label={idx === 0 ? Translate.string('Export') : undefined}
-                labelPosition={idx === 0 ? 'left' : undefined}
-              />
-              {idx < options.length - 1 && <Button.Or text={Translate.string('or')} />}
-            </React.Fragment>
-          ))}
-        </Button.Group>
+        <ICSExportOptions
+          options={options}
+          selected={popupState.key}
+          handleSetOption={handleSetOption}
+        />
       </Header>
       <Popup.Content>
         <strong styleName="export-option">Synchronise with your calendar</strong>
@@ -177,18 +209,12 @@ ICSCalendarLink.propTypes = {
   params: PropTypes.objectOf(PropTypes.string),
   renderButton: PropTypes.func,
   popupPosition: PropTypes.string,
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
-      extraParams: PropTypes.objectOf(PropTypes.string),
-    })
-  ),
+  options: ICSExportOptions.propTypes.options,
 };
 
 ICSCalendarLink.defaultProps = {
   params: {},
   renderButton: null,
   popupPosition: 'left center',
-  options: [],
+  options: ICSExportOptions.defaultProps.options,
 };

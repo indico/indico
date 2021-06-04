@@ -23,8 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (parseInt(eventContribCount, 10) > 0) {
     options.push({
       key: 'contributions',
-      text: Translate.string('Detailed timetable'),
-      extraParams: {detail: 'contributions'},
+      text: Translate.string('Detailed'),
+      description: Translate.string('A detailed timetable scoped to contributions.'),
+      extraParams: {scope: 'contribution'},
+    });
+    options.push({
+      key: 'sessions',
+      description: Translate.string('A detailed timetable scoped to sessions.'),
+      text: Translate.string('Compact'),
+      extraParams: {scope: 'session'},
     });
   }
 
