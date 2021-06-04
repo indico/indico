@@ -130,3 +130,46 @@
     }
   }
 }
+
+.reference-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+
+  li {
+    display: inline-block;
+    margin: 0.2em 0.2em;
+    border-radius: 2px;
+
+    .type-name {
+      color: $light-black;
+    }
+  }
+}
+
+.reference-list-meeting {
+  li {
+    &::before {
+      color: $yellow;
+    }
+
+    padding: 0.2em 0.5em;
+    background-color: lighten($light-yellow, 5%);
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+.reference-list-conference {
+  li {
+    &::before {
+      content: '';
+    }
+
+    padding: 0.2em 1em 0.2em 0;
+    background-color: $white;
+  }
+}
