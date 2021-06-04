@@ -19,7 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const {eventId, eventContribCount} = calendarContainer.dataset;
-  const options = [{key: 'event', text: Translate.string('Event'), extraParams: {}}];
+  const options = [
+    {
+      key: 'event',
+      text: Translate.string('Basic'),
+      description: Translate.string('Just the event.'),
+      extraParams: {},
+    },
+  ];
   if (parseInt(eventContribCount, 10) > 0) {
     options.push({
       key: 'contributions',

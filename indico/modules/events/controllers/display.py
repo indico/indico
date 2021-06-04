@@ -9,6 +9,7 @@ from io import BytesIO
 
 from flask import jsonify, redirect, request, session
 from marshmallow_enum import EnumField
+from webargs import fields
 
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
 from indico.modules.events.ical import CalendarScope, event_to_ical
@@ -24,9 +25,12 @@ from indico.web.rh import allow_signed_url
 @allow_signed_url
 class RHExportEventICAL(RHDisplayEventBase):
     @use_kwargs({
-        'scope': EnumField(CalendarScope)
-    })
-    def _process(self, scope):
+        'scope': EnumField(CalendarScope, missing=None),
+        'detail': fields.String(missing=None)
+    }, location='query')
+    def _process(self, scope, detail):
+        if not scope and detail == 'contributions':
+            scope = CalendarScope.contribution
         event_ical = event_to_ical(self.event, session.user, scope)
         return send_file('event.ics', BytesIO(event_ical), 'text/calendar')
 

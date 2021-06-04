@@ -42,6 +42,7 @@ const ICSExportOptions = ({options, selected, handleSetOption}) => (
     {options.map(({key, text, description, extraParams}, idx) => (
       <React.Fragment key={key}>
         <Popup
+          position="top right"
           disabled={description === undefined}
           content={description}
           trigger={
