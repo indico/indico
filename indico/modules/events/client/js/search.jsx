@@ -17,12 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (domContainer) {
     const eventId = parseInt(domContainer.dataset.eventId, 10);
+    const isAdmin = domContainer.dataset.isAdmin !== undefined;
 
     ReactDOM.render(
       <SearchBox
-        onSearch={keyword => {
-          window.location = eventSearchUrl({event_id: eventId, q: keyword});
+        onSearch={(keyword, __, adminOverrideEnabled) => {
+          const params = {q: keyword, event_id: eventId};
+          if (isAdmin && adminOverrideEnabled) {
+            params.admin_override_enabled = true;
+          }
+          window.location = eventSearchUrl(params);
         }}
+        isAdmin={isAdmin}
       />,
       domContainer
     );

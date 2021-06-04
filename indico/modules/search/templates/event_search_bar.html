@@ -1,1 +1,5 @@
-<div id="event-search-box" class="search-box" data-event-id="{{ event.id }}"></div>
+<div id="event-search-box"
+     class="search-box"
+     data-event-id="{{ event.id }}"
+     {% if session.user and session.user.is_admin %}data-is-admin{% endif %}
+></div>

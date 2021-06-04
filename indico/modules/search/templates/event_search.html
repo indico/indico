@@ -5,5 +5,8 @@
 {% endblock %}
 
 {% block content %}
-    <div id="search-root" data-event-id="{{ event.id }}"></div>
+    <div id="search-root"
+         data-event-id="{{ event.id }}"
+         {% if session.user and session.user.is_admin %}data-is-admin{% endif %}
+    ></div>
 {% endblock %}
