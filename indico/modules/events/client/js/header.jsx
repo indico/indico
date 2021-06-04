@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const {eventId, eventContribCount} = calendarContainer.dataset;
+  const {eventId, eventContribCount, eventSessionBlockCount} = calendarContainer.dataset;
   const options = [
     {
       key: 'event',
@@ -27,18 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
       extraParams: {},
     },
   ];
+  if (parseInt(eventSessionBlockCount, 10) > 0) {
+    options.push({
+      key: 'sessions',
+      description: Translate.string('A detailed timetable containing individual session blocks.'),
+      text: Translate.string('Compact'),
+      extraParams: {scope: 'session'},
+    });
+  }
   if (parseInt(eventContribCount, 10) > 0) {
     options.push({
       key: 'contributions',
       text: Translate.string('Detailed'),
       description: Translate.string('A detailed timetable containing individual contributions.'),
       extraParams: {scope: 'contribution'},
-    });
-    options.push({
-      key: 'sessions',
-      description: Translate.string('A detailed timetable containing individual session blocks.'),
-      text: Translate.string('Compact'),
-      extraParams: {scope: 'session'},
     });
   }
 

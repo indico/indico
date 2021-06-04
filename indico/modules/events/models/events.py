@@ -962,6 +962,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def has_ended(self):
         return self.end_dt <= now_utc()
 
+    @property
+    def session_block_count(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        return (SessionBlock.query
+                .filter(SessionBlock.session.has(event=self, is_deleted=False),
+                        SessionBlock.timetable_entry != None)  # noqa
+                .count())
+
     def __repr__(self):
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
                            _text=text_to_repr(self.title, max_length=75))
