@@ -76,6 +76,7 @@ Bugfixes
 - Fix misleading message when cancelling a booking that already started and has past
   occurrences that won't be cancelled (:issue:`4719`, :pr:`4861`)
 - Correctly count line breaks in length-limited abstracts (:pr:`4918`)
+- Fix error when trying to access subcontributions while event is in draft mode
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

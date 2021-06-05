@@ -169,3 +169,10 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
 
     def can_manage(self, user, permission=None, **kwargs):
         return self.contribution.can_manage(user, permission=permission, **kwargs)
+
+    def is_user_associated(self, user):
+        if user is None:
+            return False
+        if self.contribution.is_user_associated(user):
+            return True
+        return any(pl.person.user == user for pl in self.person_links if pl.person.user)
