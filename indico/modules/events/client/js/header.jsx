@@ -30,7 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (parseInt(eventSessionBlockCount, 10) > 0) {
     options.push({
       key: 'sessions',
-      description: Translate.string('A detailed timetable containing individual session blocks.'),
+      description: Translate.string(
+        'A detailed timetable containing individual session blocks and top-level contributions.'
+      ),
       text: Translate.string('Compact'),
       extraParams: {scope: 'session'},
     });
@@ -39,7 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
     options.push({
       key: 'contributions',
       text: Translate.string('Detailed'),
-      description: Translate.string('A detailed timetable containing individual contributions.'),
+      description: Translate.string(
+        'A detailed timetable containing all individual contributions.'
+      ),
       extraParams: {scope: 'contribution'},
     });
   }
