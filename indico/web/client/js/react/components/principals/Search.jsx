@@ -13,7 +13,7 @@ import userSearchInfoURL from 'indico-url:users.user_search_info';
 import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {
@@ -118,6 +118,7 @@ const searchFactory = config => {
                 <Dropdown
                   floating
                   labeled
+                  scrolling
                   text={Translate.string('Select favorite')}
                   disabled={fprops.submitting}
                   open={dropdownOpen}
@@ -188,11 +189,22 @@ const searchFactory = config => {
     </List.Item>
   );
 
-  const SearchResults = ({results, total, onAdd, onRemove, isAdded, favorites}) =>
+  const SearchResults = ({
+    results,
+    total,
+    loading,
+    onAdd,
+    onRemove,
+    isAdded,
+    favorites,
+    // eslint-disable-next-line no-shadow
+    getResultsText,
+    ...rest
+  }) =>
     total !== 0 ? (
-      <>
+      <div styleName={`search-results ${loading ? 'disabled' : ''}`} {...rest}>
         <Divider horizontal>{getResultsText(total)}</Divider>
-        <List divided relaxed>
+        <List styleName="list" divided relaxed>
           {results.map(r => (
             <ResultItem
               key={r.identifier}
@@ -207,7 +219,7 @@ const searchFactory = config => {
           ))}
         </List>
         {total > results.length && <Message info>{tooManyText}</Message>}
-      </>
+      </div>
     ) : (
       <Divider horizontal>{noResultsText}</Divider>
     );
@@ -221,30 +233,98 @@ const searchFactory = config => {
     withEventPersons,
     eventId,
   }) => {
-    const [result, setResult] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [result, _setResult] = useState(null);
+    const lastResult = useRef(null);
+    const pristine = useRef(true);
+    const setResult = value => {
+      lastResult.current = result;
+      // pristine ignores initially unset values
+      pristine.current = pristine.current && !value;
+      _setResult(value);
+    };
+    const handleSearch = async data => {
+      setLoading(true);
+      try {
+        await runSearch(data, setResult, withEventPersons, eventId);
+      } finally {
+        setLoading(false);
+      }
+    };
+    const favoriteResults = favorites ? _.sortBy(Object.values(favorites), 'name') : [];
+    const resultDisplay = result ||
+      lastResult.current || {results: favoriteResults, total: favoriteResults.length};
 
-    const handleSearch = data => runSearch(data, setResult, withEventPersons, eventId);
     return (
-      <>
-        <SearchForm
-          onSearch={handleSearch}
-          onAdd={onAdd}
-          onRemove={onRemove}
-          isAdded={isAdded}
-          favorites={favorites}
-          single={single}
-        />
-        {result !== null && (
+      <div styleName="search-content">
+        <div styleName="form">
+          <SearchForm
+            onSearch={handleSearch}
+            onAdd={onAdd}
+            onRemove={onRemove}
+            isAdded={isAdded}
+            favorites={favorites}
+            single={single}
+          />
+        </div>
+        {(!pristine.current || resultDisplay.total > 0) && (
           <SearchResults
-            results={result.results}
-            total={result.total}
+            styleName="results"
+            loading={loading}
+            results={resultDisplay.results}
+            total={resultDisplay.total}
             favorites={favorites}
             onAdd={onAdd}
             onRemove={onRemove}
             isAdded={isAdded}
+            getResultsText={total =>
+              resultDisplay.results === favoriteResults
+                ? PluralTranslate.string('{total} favorite', '{total} favorites', total, {
+                    total,
+                  })
+                : getResultsText(total)
+            }
           />
         )}
-      </>
+      </div>
+    );
+  };
+
+  const SearchStaged = ({single, staged, onRemove}) => {
+    if (!staged || !staged.length) {
+      return null;
+    }
+
+    if (single) {
+      return (
+        <Label circular styleName="staged-label">
+          {staged[0].name}
+          <Icon name="delete" onClick={() => onRemove(staged[0])} />
+        </Label>
+      );
+    }
+
+    return (
+      <Popup
+        trigger={
+          <Label circular styleName="staged-label">
+            {staged.length}
+          </Label>
+        }
+        position="bottom left"
+        hoverable
+      >
+        <List>
+          {_.sortBy(staged, 'name').map(x => (
+            <List.Item key={x.identifier}>
+              <div styleName="staged-list-item">
+                {x.name}
+                <Icon styleName="button" name="delete" onClick={() => onRemove(x)} />
+              </div>
+            </List.Item>
+          ))}
+        </List>
+      </Popup>
     );
   };
   /* eslint-enable react/prop-types */
@@ -326,7 +406,6 @@ const searchFactory = config => {
     return (
       <Modal
         trigger={trigger}
-        size="tiny"
         dimmer="inverted"
         centered={false}
         open={open}
@@ -336,40 +415,14 @@ const searchFactory = config => {
         closeIcon
       >
         <Modal.Header>
-          {modalTitle(single)}
-          {!single && !!staged.length && (
-            <>
-              {' '}
-              <Popup
-                trigger={
-                  <Label circular styleName="staged-label">
-                    {staged.length}
-                  </Label>
-                }
-                position="bottom left"
-                hoverable
-              >
-                <List>
-                  {_.sortBy(staged, 'name').map(x => (
-                    <List.Item key={x.identifier}>
-                      <div styleName="staged-list-item">
-                        {x.name}
-                        <Icon styleName="button" name="delete" onClick={() => handleRemove(x)} />
-                      </div>
-                    </List.Item>
-                  ))}
-                </List>
-              </Popup>
-            </>
-          )}
-          {single && alwaysConfirm && !!staged.length && (
-            <>
-              {' '}
-              <Label circular styleName="staged-label">
-                {staged[0].name}
-                <Icon name="delete" onClick={() => handleRemove(staged[0])} />
-              </Label>
-            </>
+          {modalTitle(single)}{' '}
+          {(!single || alwaysConfirm) && (
+            <SearchStaged
+              single={single}
+              alwaysConfirm={alwaysConfirm}
+              staged={staged}
+              onRemove={handleRemove}
+            />
           )}
         </Modal.Header>
         <Modal.Content>
