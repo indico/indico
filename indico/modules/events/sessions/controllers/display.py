@@ -75,7 +75,7 @@ class RHExportSessionToICAL(RHDisplaySessionBase):
     def _process(self):
         detailed = request.args.get('detail') == 'contributions'
 
-        return send_file('session.ics', BytesIO(session_to_ical(self.session, detailed)),
+        return send_file('session.ics', BytesIO(session_to_ical(self.session, session.user, detailed)),
                          'text/calendar')
 
 

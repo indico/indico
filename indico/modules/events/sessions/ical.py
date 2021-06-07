@@ -26,7 +26,7 @@ def generate_session_component(session, related_to_uid=None):
     return component
 
 
-def session_to_ical(session, detailed=False):
+def session_to_ical(session, user=None, detailed=False):
     """Serialize a session into an iCal.
 
     :param session: The session to serialize
@@ -48,7 +48,8 @@ def session_to_ical(session, detailed=False):
                          .filter(Contribution.is_scheduled)
                          .all())
         components = [generate_contribution_component(contribution, related_event_uid)
-                      for contribution in contributions]
+                      for contribution in contributions
+                      if contribution.can_access(user)]
         for component in components:
             calendar.add_component(component)
 

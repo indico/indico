@@ -126,22 +126,25 @@ def events_to_ical(events, user=None, scope=None):
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
     for event in events:
+        if not event.can_access(user):
+            continue
+
         if scope == CalendarScope.contribution:
             components = [
                 generate_contribution_component(contrib)
                 for contrib in event.contributions
-                if contrib.start_dt
+                if contrib.start_dt and contrib.can_access(user)
             ]
         elif scope == CalendarScope.session:
             components = [
                 generate_session_component(session)
                 for session in event.sessions
-                if session.start_dt
+                if session.start_dt and session.can_access(user)
             ]
             components += [
                 generate_contribution_component(contrib)
                 for contrib in event.contributions
-                if contrib.start_dt and contrib.session_id is None
+                if contrib.start_dt and contrib.session_id is None and contrib.can_access(user)
             ]
         else:
             components = [generate_event_component(event, user)]
