@@ -188,12 +188,22 @@ const searchFactory = config => {
     </List.Item>
   );
 
-  // eslint-disable-next-line no-shadow
-  const SearchResults = ({results, total, onAdd, onRemove, isAdded, favorites, getResultsText}) =>
+  const SearchResults = ({
+    results,
+    total,
+    loading,
+    onAdd,
+    onRemove,
+    isAdded,
+    favorites,
+    // eslint-disable-next-line no-shadow
+    getResultsText,
+    ...rest
+  }) =>
     total !== 0 ? (
-      <>
+      <div styleName={`search-results ${loading ? 'disabled' : ''}`} {...rest}>
         <Divider horizontal>{getResultsText(total)}</Divider>
-        <List divided relaxed>
+        <List styleName="list" divided relaxed>
           {results.map(r => (
             <ResultItem
               key={r.identifier}
@@ -208,7 +218,7 @@ const searchFactory = config => {
           ))}
         </List>
         {total > results.length && <Message info>{tooManyText}</Message>}
-      </>
+      </div>
     ) : (
       <Divider horizontal>{noResultsText}</Divider>
     );
@@ -257,26 +267,23 @@ const searchFactory = config => {
           />
         </div>
         {(!pristine.current || resultDisplay.total > 0) && (
-          <div styleName={`results ${loading ? 'disabled' : ''}`}>
-            <SearchResults
-              results={resultDisplay.results}
-              total={resultDisplay.total}
-              favorites={favorites}
-              onAdd={onAdd}
-              onRemove={onRemove}
-              isAdded={isAdded}
-              getResultsText={total =>
-                resultDisplay.results === favoriteResults
-                  ? PluralTranslate.string(
-                      '{total} favorite user',
-                      '{total} favorite users',
-                      total,
-                      {total}
-                    )
-                  : getResultsText(total)
-              }
-            />
-          </div>
+          <SearchResults
+            styleName="results"
+            loading={loading}
+            results={resultDisplay.results}
+            total={resultDisplay.total}
+            favorites={favorites}
+            onAdd={onAdd}
+            onRemove={onRemove}
+            isAdded={isAdded}
+            getResultsText={total =>
+              resultDisplay.results === favoriteResults
+                ? PluralTranslate.string('{total} favorite user', '{total} favorite users', total, {
+                    total,
+                  })
+                : getResultsText(total)
+            }
+          />
         )}
       </div>
     );

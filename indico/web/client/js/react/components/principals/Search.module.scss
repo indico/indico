@@ -43,11 +43,13 @@
   flex: 1 1 60%;
 }
 
-.search-content .results.disabled {
+.search-results.disabled {
   opacity: 0.5;
   pointer-events: none;
+  user-select: none;
 }
 
-.search-content .results .placeholder {
-  text-align: center;
+.search-results .list {
+  max-height: 460px;
+  overflow-y: auto;
 }
