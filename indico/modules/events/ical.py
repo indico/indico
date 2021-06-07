@@ -118,24 +118,30 @@ def events_to_ical(events, user=None, scope=None):
     :param user: The user who needs to be able to access the events
     :param scope: If specified, use a more detailed timetable using the given scope
     """
+    from indico.modules.events.contributions.ical import generate_contribution_component
+    from indico.modules.events.sessions.ical import generate_session_component
+
     calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
     for event in events:
         if scope == CalendarScope.contribution:
-            from indico.modules.events.contributions.ical import generate_contribution_component
             components = [
                 generate_contribution_component(contrib)
                 for contrib in event.contributions
                 if contrib.start_dt
             ]
         elif scope == CalendarScope.session:
-            from indico.modules.events.sessions.ical import generate_session_component
             components = [
                 generate_session_component(session)
                 for session in event.sessions
                 if session.start_dt
+            ]
+            components += [
+                generate_contribution_component(contrib)
+                for contrib in event.contributions
+                if contrib.start_dt and contrib.session_id is None
             ]
         else:
             components = [generate_event_component(event, user)]
