@@ -8,7 +8,7 @@
 import signURL from 'indico-url:core.sign_url';
 
 import PropTypes from 'prop-types';
-import React, {useReducer, useState} from 'react';
+import React, {useReducer} from 'react';
 import {Button, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -18,20 +18,23 @@ import {snakifyKeys} from 'indico/utils/case';
 import './ICSCalendarLink.module.scss';
 
 const initialState = {
+  key: null,
   open: false,
   url: null,
-  text: null,
   source: null,
+  copied: false,
 };
 
 function popupReducer(state, action) {
   switch (action.type) {
     case 'CLOSE':
-      return {...state, url: null, open: false};
+      return initialState;
     case 'OPEN':
-      return {open: true, key: action.key, source: action.source};
+      return {...initialState, open: true, key: action.key, source: action.source};
     case 'LOADED':
       return {...state, url: action.url, source: null};
+    case 'COPIED':
+      return {...state, copied: true};
     default:
       return state;
   }
@@ -82,14 +85,13 @@ ICSExportOptions.defaultProps = {
 
 export default function ICSCalendarLink({endpoint, params, renderButton, popupPosition, options}) {
   const [popupState, dispatch] = useReducer(popupReducer, initialState);
-  const [copied, setCopied] = useState(false);
 
   const copyButton = (
     <Button
       icon="copy"
       onClick={async () => {
         await navigator.clipboard.writeText(popupState.url);
-        setCopied(true);
+        dispatch({type: 'COPIED'});
       }}
     />
   );
@@ -118,6 +120,9 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
 
   const handleSetOption = async (key, extraParams) => {
     if (!popupState.open || popupState.key !== key) {
+      if (popupState.source) {
+        popupState.source.cancel();
+      }
       const source = indicoAxios.CancelToken.source();
       dispatch({type: 'OPEN', key, source});
       const url = await fetchURL(extraParams, source);
@@ -139,12 +144,11 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
       }
       position={popupPosition}
       open={popupState.open}
-      popperDependencies={[copied]}
+      popperDependencies={[popupState.copied]}
       on="click"
       onOpen={async () => {
         const {key, extraParams} = options[0];
         await handleSetOption(key, extraParams);
-        setCopied(false);
       }}
       onClose={() => {
         handleClose();
@@ -175,7 +179,7 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
           value={popupState.url || ''}
           action={popupState.url && navigator.clipboard ? copyButton : null}
         />
-        {copied && (
+        {popupState.copied && (
           <Grid centered>
             <Grid.Row>
               <Label pointing="above" color="teal">
