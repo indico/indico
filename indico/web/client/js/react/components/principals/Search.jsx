@@ -279,7 +279,7 @@ const searchFactory = config => {
             isAdded={isAdded}
             getResultsText={total =>
               resultDisplay.results === favoriteResults
-                ? PluralTranslate.string('{total} favorite user', '{total} favorite users', total, {
+                ? PluralTranslate.string('{total} favorite', '{total} favorites', total, {
                     total,
                   })
                 : getResultsText(total)
