@@ -188,10 +188,11 @@ const searchFactory = config => {
     </List.Item>
   );
 
-  const SearchResults = ({results, total, onAdd, onRemove, isAdded, favorites, resultsText}) =>
+  // eslint-disable-next-line no-shadow
+  const SearchResults = ({results, total, onAdd, onRemove, isAdded, favorites, getResultsText}) =>
     total !== 0 ? (
       <>
-        <Divider horizontal>{resultsText(total)}</Divider>
+        <Divider horizontal>{getResultsText(total)}</Divider>
         <List divided relaxed>
           {results.map(r => (
             <ResultItem
@@ -256,7 +257,7 @@ const searchFactory = config => {
           />
         </div>
         {(!pristine.current || resultDisplay.total > 0) && (
-          <div styleName="results" style={{opacity: loading ? 0.5 : 1}}>
+          <div styleName={`results ${loading ? 'disabled' : ''}`}>
             <SearchResults
               results={resultDisplay.results}
               total={resultDisplay.total}
@@ -264,9 +265,14 @@ const searchFactory = config => {
               onAdd={onAdd}
               onRemove={onRemove}
               isAdded={isAdded}
-              resultsText={total =>
-                pristine.current
-                  ? Translate.string('{total} favorite users', {total})
+              getResultsText={total =>
+                resultDisplay.results === favoriteResults
+                  ? PluralTranslate.string(
+                      '{total} favorite user',
+                      '{total} favorite users',
+                      total,
+                      {total}
+                    )
                   : getResultsText(total)
               }
             />
