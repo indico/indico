@@ -8,22 +8,30 @@
 from io import BytesIO
 
 from flask import jsonify, redirect, request, session
+from marshmallow_enum import EnumField
+from webargs import fields
 
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
-from indico.modules.events.ical import event_to_ical
+from indico.modules.events.ical import CalendarScope, event_to_ical
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
+from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import allow_signed_url
 
 
 @allow_signed_url
 class RHExportEventICAL(RHDisplayEventBase):
-    def _process(self):
-        detailed = request.args.get('detail') == 'contributions'
-        event_ical = event_to_ical(self.event, session.user, detailed)
+    @use_kwargs({
+        'scope': EnumField(CalendarScope, missing=None),
+        'detail': fields.String(missing=None)
+    }, location='query')
+    def _process(self, scope, detail):
+        if not scope and detail == 'contributions':
+            scope = CalendarScope.contribution
+        event_ical = event_to_ical(self.event, session.user, scope)
         return send_file('event.ics', BytesIO(event_ical), 'text/calendar')
 
 

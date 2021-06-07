@@ -14,7 +14,13 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.util.date_time import now_utc
+from indico.util.enum import IndicoEnum
 from indico.util.signals import values_from_signal
+
+
+class CalendarScope(IndicoEnum):
+    contribution = 1
+    session = 2
 
 
 def generate_basic_component(entity, uid=None, url=None):
@@ -95,39 +101,52 @@ def generate_event_component(event, user=None):
     return component
 
 
-def event_to_ical(event, user=None, detailed=False):
+def event_to_ical(event, user=None, scope=None):
     """Serialize an event into an ical.
 
     :param event: The event to serialize
     :param user: The user who needs to be able to access the events
-    :param detailed: If True, iCal will include the event's contributions
+    :param scope: If specified, use a more detailed timetable using the given scope
     """
-    return events_to_ical([event], user, detailed)
+    return events_to_ical([event], user, scope)
 
 
-def events_to_ical(events, user=None, detailed=False):
+def events_to_ical(events, user=None, scope=None):
     """Serialize multiple events into an ical.
 
     :param events: A list of events to serialize
     :param user: The user who needs to be able to access the events
-    :param detailed: If True, iCal will include the event's contributions
+    :param scope: If specified, use a more detailed timetable using the given scope
     """
+    from indico.modules.events.contributions.ical import generate_contribution_component
+    from indico.modules.events.sessions.ical import generate_session_component
+
     calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
     for event in events:
-        if not detailed:
-            component = generate_event_component(event, user)
-            calendar.add_component(component)
-        else:
-            from indico.modules.events.contributions.ical import generate_contribution_component
+        if scope == CalendarScope.contribution:
             components = [
                 generate_contribution_component(contrib)
                 for contrib in event.contributions
                 if contrib.start_dt
             ]
-            for component in components:
-                calendar.add_component(component)
+        elif scope == CalendarScope.session:
+            components = [
+                generate_session_component(session)
+                for session in event.sessions
+                if session.start_dt
+            ]
+            components += [
+                generate_contribution_component(contrib)
+                for contrib in event.contributions
+                if contrib.start_dt and contrib.session_id is None
+            ]
+        else:
+            components = [generate_event_component(event, user)]
+
+        for component in components:
+            calendar.add_component(component)
 
     return calendar.to_ical()

@@ -18,13 +18,33 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const {eventId, eventContribCount} = calendarContainer.dataset;
-  const options = [{key: 'event', text: Translate.string('Event'), extraParams: {}}];
+  const {eventId, eventContribCount, eventSessionBlockCount} = calendarContainer.dataset;
+  const options = [
+    {
+      key: 'event',
+      text: Translate.string('Basic'),
+      description: Translate.string('Just the event.'),
+      extraParams: {},
+    },
+  ];
+  if (parseInt(eventSessionBlockCount, 10) > 0) {
+    options.push({
+      key: 'sessions',
+      description: Translate.string(
+        'A detailed timetable containing individual session blocks and top-level contributions.'
+      ),
+      text: Translate.string('Compact'),
+      extraParams: {scope: 'session'},
+    });
+  }
   if (parseInt(eventContribCount, 10) > 0) {
     options.push({
       key: 'contributions',
-      text: Translate.string('Detailed timetable'),
-      extraParams: {detail: 'contributions'},
+      text: Translate.string('Detailed'),
+      description: Translate.string(
+        'A detailed timetable containing all individual contributions.'
+      ),
+      extraParams: {scope: 'contribution'},
     });
   }
 
@@ -32,12 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
     <ICSCalendarLink
       endpoint="events.export_event_ical"
       params={{event_id: eventId}}
-      renderButton={(onClick, classes) => (
+      renderButton={classes => (
         <IButton
           icon="calendar"
           dropdown
           classes={{'height-full': true, 'text-color': true, 'subtle': true, ...classes}}
-          onClick={onClick}
           title={Translate.string('Export')}
         />
       )}

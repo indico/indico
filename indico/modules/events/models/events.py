@@ -962,6 +962,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def has_ended(self):
         return self.end_dt <= now_utc()
 
+    @property
+    def session_block_count(self):
+        from indico.modules.events.sessions.models.blocks import SessionBlock
+        return (SessionBlock.query
+                .filter(SessionBlock.session.has(event=self, is_deleted=False),
+                        SessionBlock.timetable_entry != None)  # noqa
+                .count())
+
     def __repr__(self):
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
                            _text=text_to_repr(self.title, max_length=75))
@@ -1028,6 +1036,14 @@ def _mappers_configured():
              .correlate_except(event_alias)
              .scalar_subquery())
     Event.series_count = column_property(query, group='series', deferred=True)
+
+    # Event.contributions_count -- the number of contributions in the event
+    from indico.modules.events.contributions.models.contributions import Contribution
+    query = (db.select([db.func.count(Contribution.id)])
+             .where((Contribution.event_id == Event.id) & ~Contribution.is_deleted)
+             .correlate_except(Contribution)
+             .scalar_subquery())
+    Event.contributions_count = db.column_property(query, deferred=True)
 
 
 @listens_for(Event.start_dt, 'set')

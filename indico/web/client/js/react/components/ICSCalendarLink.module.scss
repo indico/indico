@@ -13,8 +13,17 @@
 
 .export-header:global(.ui.header) {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 0;
+}
+
+.export-header:global(.ui.header):first-child {
+  margin-top: 0.5em;
+}
+
+.export-header :global(.ui.left.labeled.button) {
+  cursor: initial;
 }
 
 .export-option {
