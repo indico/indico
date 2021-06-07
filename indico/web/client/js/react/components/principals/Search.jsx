@@ -118,6 +118,7 @@ const searchFactory = config => {
                 <Dropdown
                   floating
                   labeled
+                  scrolling
                   text={Translate.string('Select favorite')}
                   disabled={fprops.submitting}
                   open={dropdownOpen}
@@ -250,7 +251,7 @@ const searchFactory = config => {
         setLoading(false);
       }
     };
-    const favoriteResults = favorites ? Object.values(favorites) : [];
+    const favoriteResults = favorites ? _.sortBy(Object.values(favorites), 'name') : [];
     const resultDisplay = result ||
       lastResult.current || {results: favoriteResults, total: favoriteResults.length};
 
