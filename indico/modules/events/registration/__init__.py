@@ -38,6 +38,14 @@ registration_settings = RegistrationSettingsProxy('registrations', {
 })
 
 
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    # registrations are unique per user, so we can only update the user
+    # if no registration for the merge target exists yet
+    from indico.modules.events.registration.models.registrations import Registration
+    Registration.merge_users(target, source)
+
+
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
     registration_section = 'organization' if event.type == 'conference' else 'advanced'

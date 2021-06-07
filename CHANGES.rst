@@ -77,6 +77,7 @@ Bugfixes
   occurrences that won't be cancelled (:issue:`4719`, :pr:`4861`)
 - Correctly count line breaks in length-limited abstracts (:pr:`4918`)
 - Fix error when trying to access subcontributions while event is in draft mode
+- Update the user link in registrations when merging two users (:pr:`4936`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
