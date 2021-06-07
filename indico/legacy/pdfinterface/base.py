@@ -27,7 +27,6 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import PageTemplate, SimpleDocTemplate
 from reportlab.platypus.frames import Frame
 
-from indico.legacy.common.utils import isStringHTML
 from indico.util.i18n import _
 from indico.util.string import sanitize_for_platypus
 
@@ -49,11 +48,19 @@ class PDFSizes:
         }
 
 
+def _is_string_html(s):
+    # yeah, this function is pretty ugly. it's legacy and should eventually be replaced :)
+    if not isinstance(s, str):
+        return False
+    s = s.lower()
+    return any(tag in s for tag in ('<p>', '<p ', '<br', '<li>'))
+
+
 def escape(text):
     if text is None:
         text = ""
     try:
-        if isStringHTML(text):
+        if _is_string_html(text):
             text = sanitize_for_platypus(text)
         else:
             text = cgi.escape(text)
