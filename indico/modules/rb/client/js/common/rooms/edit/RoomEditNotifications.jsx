@@ -13,7 +13,7 @@ import {FinalEmailList} from 'indico/react/components';
 import {FieldCondition, FinalCheckbox, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-export default function RoomEditNotifications({active}) {
+export default function RoomEditNotifications({active, roomNotificationSettings}) {
   return (
     <Tab.Pane active={active}>
       <Header>
@@ -35,6 +35,7 @@ export default function RoomEditNotifications({active}) {
           <FinalInput
             fluid
             name="notification_before_days"
+            placeholder={roomNotificationSettings.notification_before_days}
             label={Translate.string('Single/Daily')}
             type="number"
             min="1"
@@ -44,6 +45,7 @@ export default function RoomEditNotifications({active}) {
           <FinalInput
             fluid
             name="notification_before_days_weekly"
+            placeholder={roomNotificationSettings.notification_before_days_weekly}
             label={Translate.string('Weekly')}
             type="number"
             min="1"
@@ -53,6 +55,7 @@ export default function RoomEditNotifications({active}) {
           <FinalInput
             fluid
             name="notification_before_days_monthly"
+            placeholder={roomNotificationSettings.notification_before_days_monthly}
             label={Translate.string('Monthly')}
             type="number"
             min="1"
@@ -69,6 +72,7 @@ export default function RoomEditNotifications({active}) {
           <FinalInput
             fluid
             name="end_notification_daily"
+            placeholder={roomNotificationSettings.end_notification_daily}
             label={Translate.string('Daily')}
             type="number"
             min="1"
@@ -78,6 +82,7 @@ export default function RoomEditNotifications({active}) {
           <FinalInput
             fluid
             name="end_notification_weekly"
+            placeholder={roomNotificationSettings.end_notification_weekly}
             label={Translate.string('Weekly')}
             type="number"
             min="1"
@@ -87,6 +92,7 @@ export default function RoomEditNotifications({active}) {
           <FinalInput
             fluid
             name="end_notification_monthly"
+            placeholder={roomNotificationSettings.end_notification_monthly}
             label={Translate.string('Monthly')}
             type="number"
             min="1"
@@ -101,8 +107,24 @@ export default function RoomEditNotifications({active}) {
 
 RoomEditNotifications.propTypes = {
   active: PropTypes.bool,
+  roomNotificationSettings: PropTypes.shape({
+    notification_before_days: PropTypes.string,
+    notification_before_days_weekly: PropTypes.string,
+    notification_before_days_monthly: PropTypes.string,
+    end_notification_daily: PropTypes.string,
+    end_notification_weekly: PropTypes.string,
+    end_notification_monthly: PropTypes.string,
+  }),
 };
 
 RoomEditNotifications.defaultProps = {
   active: true,
+  roomNotificationSettings: PropTypes.shape({
+    notification_before_days: '',
+    notification_before_days_weekly: '',
+    notification_before_days_monthly: '',
+    end_notification_daily: '',
+    end_notification_weekly: '',
+    end_notification_monthly: '',
+  }),
 };

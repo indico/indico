@@ -13,6 +13,7 @@ import roomsURL from 'indico-url:rb.admin_rooms';
 import updateRoomAttributesURL from 'indico-url:rb.admin_update_room_attributes';
 import updateRoomAvailabilityURL from 'indico-url:rb.admin_update_room_availability';
 import updateRoomEquipmentURL from 'indico-url:rb.admin_update_room_equipment';
+import roomNotificationSettingsURL from 'indico-url:rb.notification_settings';
 
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
@@ -74,6 +75,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     bookable_hours: [],
     nonbookable_periods: [],
   });
+  const [roomNotificationSettings, setRoomNotificationSettings] = useState({});
 
   const isNewRoom = roomId === undefined;
 
@@ -93,8 +95,11 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       fetchData(roomURL({room_id: roomId})),
       fetchData(roomAttributesURL({room_id: roomId})),
       fetchData(roomAvailabilityURL({room_id: roomId})),
+      fetchData(roomNotificationSettingsURL()),
     ]);
-    [setRoomDetails, setRoomAttributes, setRoomAvailability].forEach((fn, i) => fn(resp[i]));
+    [setRoomDetails, setRoomAttributes, setRoomAvailability, setRoomNotificationSettings].forEach(
+      (fn, i) => fn(resp[i])
+    );
   }, [roomId]);
 
   const tabPanes = useMemo(
@@ -142,7 +147,12 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         {
           key: 'notifications',
           menuItem: <Translate>Notifications</Translate>,
-          pane: <RoomEditNotifications key="notifications" />,
+          pane: (
+            <RoomEditNotifications
+              key="notifications"
+              roomNotificationSettings={roomNotificationSettings}
+            />
+          ),
           fields: [
             'notification_emails',
             'notifications_enabled',
@@ -191,6 +201,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       permissionInfo,
       permissionManager,
       activeTab,
+      roomNotificationSettings,
     ]
   );
 

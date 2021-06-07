@@ -53,6 +53,16 @@ class RHConfig(RHRoomBookingBase):
                        privacy_policy_html=privacy_policy_html)
 
 
+class RHNotificationSettings(RHRoomBookingBase):
+    def _process(self):
+        return jsonify(notification_before_days=str(rb_settings.get('notification_before_days')),
+                       notification_before_days_weekly=str(rb_settings.get('notification_before_days_weekly')),
+                       notification_before_days_monthly=str(rb_settings.get('notification_before_days_monthly')),
+                       end_notification_daily=str(rb_settings.get('end_notification_daily')),
+                       end_notification_weekly=str(rb_settings.get('end_notification_weekly')),
+                       end_notification_monthly=str(rb_settings.get('end_notification_monthly')))
+
+
 class RHUserInfo(RHRoomBookingBase):
     def _process(self):
         data = rb_user_schema.dump(session.user)
