@@ -224,6 +224,6 @@
 
 {% macro _render_rating(rating_range, value) %}
     {%- for bullet in range(rating_range[0], rating_range[1] + 1) -%}
-        <span class="bullet {{ 'full' if bullet <= value else '' }}"></span>
+        <span class="bullet {{ 'full' if value is not none and bullet <= value else '' }}"></span>
     {%- endfor -%}
 {% endmacro %}
