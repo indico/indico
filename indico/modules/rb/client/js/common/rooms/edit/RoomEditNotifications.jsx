@@ -35,7 +35,11 @@ export default function RoomEditNotifications({active, defaults}) {
           <FinalInput
             fluid
             name="notification_before_days"
-            placeholder={defaults.notification_before_days}
+            placeholder={
+              defaults.notification_before_days === null
+                ? ''
+                : String(defaults.notification_before_days)
+            }
             label={Translate.string('Single/Daily')}
             type="number"
             min="1"
@@ -45,7 +49,11 @@ export default function RoomEditNotifications({active, defaults}) {
           <FinalInput
             fluid
             name="notification_before_days_weekly"
-            placeholder={defaults.notification_before_days_weekly}
+            placeholder={
+              defaults.notification_before_days_weekly === null
+                ? ''
+                : String(defaults.notification_before_days_weekly)
+            }
             label={Translate.string('Weekly')}
             type="number"
             min="1"
@@ -55,7 +63,11 @@ export default function RoomEditNotifications({active, defaults}) {
           <FinalInput
             fluid
             name="notification_before_days_monthly"
-            placeholder={defaults.notification_before_days_monthly}
+            placeholder={
+              defaults.notification_before_days_monthly === null
+                ? ''
+                : String(defaults.notification_before_days_monthly)
+            }
             label={Translate.string('Monthly')}
             type="number"
             min="1"
@@ -72,7 +84,11 @@ export default function RoomEditNotifications({active, defaults}) {
           <FinalInput
             fluid
             name="end_notification_daily"
-            placeholder={defaults.end_notification_daily}
+            placeholder={
+              defaults.end_notification_daily === null
+                ? ''
+                : String(defaults.end_notification_daily)
+            }
             label={Translate.string('Daily')}
             type="number"
             min="1"
@@ -82,7 +98,11 @@ export default function RoomEditNotifications({active, defaults}) {
           <FinalInput
             fluid
             name="end_notification_weekly"
-            placeholder={defaults.end_notification_weekly}
+            placeholder={
+              defaults.end_notification_weekly === null
+                ? ''
+                : String(defaults.end_notification_weekly)
+            }
             label={Translate.string('Weekly')}
             type="number"
             min="1"
@@ -92,7 +112,11 @@ export default function RoomEditNotifications({active, defaults}) {
           <FinalInput
             fluid
             name="end_notification_monthly"
-            placeholder={defaults.end_notification_monthly}
+            placeholder={
+              defaults.end_notification_monthly === null
+                ? ''
+                : String(defaults.end_notification_monthly)
+            }
             label={Translate.string('Monthly')}
             type="number"
             min="1"
@@ -108,23 +132,23 @@ export default function RoomEditNotifications({active, defaults}) {
 RoomEditNotifications.propTypes = {
   active: PropTypes.bool,
   defaults: PropTypes.shape({
-    notification_before_days: PropTypes.string,
-    notification_before_days_weekly: PropTypes.string,
-    notification_before_days_monthly: PropTypes.string,
-    end_notification_daily: PropTypes.string,
-    end_notification_weekly: PropTypes.string,
-    end_notification_monthly: PropTypes.string,
+    notification_before_days: PropTypes.number,
+    notification_before_days_weekly: PropTypes.number,
+    notification_before_days_monthly: PropTypes.number,
+    end_notification_daily: PropTypes.number,
+    end_notification_weekly: PropTypes.number,
+    end_notification_monthly: PropTypes.number,
   }),
 };
 
 RoomEditNotifications.defaultProps = {
   active: true,
   defaults: PropTypes.shape({
-    notification_before_days: '',
-    notification_before_days_weekly: '',
-    notification_before_days_monthly: '',
-    end_notification_daily: '',
-    end_notification_weekly: '',
-    end_notification_monthly: '',
+    notification_before_days: null,
+    notification_before_days_weekly: null,
+    notification_before_days_monthly: null,
+    end_notification_daily: null,
+    end_notification_weekly: null,
+    end_notification_monthly: null,
   }),
 };
