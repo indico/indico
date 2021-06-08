@@ -200,29 +200,32 @@ const searchFactory = config => {
     // eslint-disable-next-line no-shadow
     getResultsText,
     ...rest
-  }) =>
-    total !== 0 ? (
-      <div styleName={`search-results ${loading ? 'disabled' : ''}`} {...rest}>
-        <Divider horizontal>{getResultsText(total)}</Divider>
-        <List styleName="list" divided relaxed>
-          {results.map(r => (
-            <ResultItem
-              key={r.identifier}
-              name={r.name}
-              detail={r.detail}
-              added={isAdded(r)}
-              favorite={favorites && favoriteKey ? r[favoriteKey] in favorites : false}
-              onAdd={() => onAdd(r)}
-              onRemove={() => onRemove(r)}
-              existsInEvent={r.existsInEvent}
-            />
-          ))}
-        </List>
-        {total > results.length && <Message info>{tooManyText}</Message>}
-      </div>
-    ) : (
-      <Divider horizontal>{noResultsText}</Divider>
-    );
+  }) => (
+    <div styleName={`search-results ${loading ? 'disabled' : ''}`} {...rest}>
+      {total !== 0 ? (
+        <>
+          <Divider horizontal>{getResultsText(total)}</Divider>
+          <List styleName="list" divided relaxed>
+            {results.map(r => (
+              <ResultItem
+                key={r.identifier}
+                name={r.name}
+                detail={r.detail}
+                added={isAdded(r)}
+                favorite={favorites && favoriteKey ? r[favoriteKey] in favorites : false}
+                onAdd={() => onAdd(r)}
+                onRemove={() => onRemove(r)}
+                existsInEvent={r.existsInEvent}
+              />
+            ))}
+          </List>
+          {total > results.length && <Message info>{tooManyText}</Message>}
+        </>
+      ) : (
+        <Divider horizontal>{noResultsText}</Divider>
+      )}
+    </div>
+  );
 
   const SearchContent = ({
     onAdd,
