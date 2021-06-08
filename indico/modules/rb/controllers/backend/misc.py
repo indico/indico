@@ -22,7 +22,7 @@ from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.schemas import EquipmentTypeSchema, map_areas_schema, rb_user_schema
+from indico.modules.rb.schemas import EquipmentTypeSchema, SettingsSchema, map_areas_schema, rb_user_schema
 from indico.modules.rb.util import build_rooms_spritesheet
 from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
@@ -55,12 +55,14 @@ class RHConfig(RHRoomBookingBase):
 
 class RHNotificationSettings(RHRoomBookingBase):
     def _process(self):
-        return jsonify(notification_before_days=str(rb_settings.get('notification_before_days')),
-                       notification_before_days_weekly=str(rb_settings.get('notification_before_days_weekly')),
-                       notification_before_days_monthly=str(rb_settings.get('notification_before_days_monthly')),
-                       end_notification_daily=str(rb_settings.get('end_notification_daily')),
-                       end_notification_weekly=str(rb_settings.get('end_notification_weekly')),
-                       end_notification_monthly=str(rb_settings.get('end_notification_monthly')))
+        return SettingsSchema(only=[
+            'notification_before_days',
+            'notification_before_days_weekly',
+            'notification_before_days_monthly',
+            'end_notification_daily',
+            'end_notification_weekly',
+            'end_notification_monthly'
+        ]).jsonify(rb_settings.get_all())
 
 
 class RHUserInfo(RHRoomBookingBase):
