@@ -66,7 +66,7 @@ const searchFactory = config => {
       <Icon name={resultIcon} />
     );
 
-    const marginLeft = avatarURL ? 'margin-left' : '';
+    const hasAvatar = avatarURL ? 'has-avatar' : '';
 
     return (
       <Dropdown.Item
@@ -89,7 +89,7 @@ const searchFactory = config => {
               {added && <Icon name="check" color="green" corner />}
             </Icon.Group>
           </div>
-          <div styleName={`content ${marginLeft}`}>
+          <div styleName={`content ${hasAvatar}`}>
             <List.Content>{name}</List.Content>
             {detail && (
               <List.Description>
@@ -143,6 +143,7 @@ const searchFactory = config => {
                         name={x.name}
                         detail={x.detail}
                         added={isAdded(x)}
+                        avatarURL={x.avatarURL}
                         onAdd={() => {
                           onAdd(x);
                           if (single) {
@@ -152,7 +153,6 @@ const searchFactory = config => {
                         onRemove={() => {
                           onRemove(x);
                         }}
-                        avatarURL={x.avatarURL}
                       />
                     ))}
                   </Dropdown.Menu>
@@ -181,7 +181,7 @@ const searchFactory = config => {
       <Icon name={resultIcon} />
     );
 
-    const marginLeft = avatarURL ? 'margin-left' : '';
+    const hasAvatar = avatarURL ? 'has-avatar' : '';
 
     return (
       <List.Item>
@@ -200,7 +200,7 @@ const searchFactory = config => {
               )}
             </Icon.Group>
           </div>
-          <div styleName={`content ${marginLeft}`}>
+          <div styleName={`content ${hasAvatar}`}>
             <List.Content>{name}</List.Content>
             {detail && (
               <List.Description>
