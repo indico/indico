@@ -22,7 +22,7 @@ from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.schemas import EquipmentTypeSchema, map_areas_schema, rb_user_schema
+from indico.modules.rb.schemas import EquipmentTypeSchema, SettingsSchema, map_areas_schema, rb_user_schema
 from indico.modules.rb.util import build_rooms_spritesheet
 from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
@@ -51,6 +51,18 @@ class RHConfig(RHRoomBookingBase):
                        tos_html=tos_html,
                        has_privacy_policy=bool(privacy_policy_url or privacy_policy_html),
                        privacy_policy_html=privacy_policy_html)
+
+
+class RHNotificationSettings(RHRoomBookingBase):
+    def _process(self):
+        return SettingsSchema(only=[
+            'notification_before_days',
+            'notification_before_days_weekly',
+            'notification_before_days_monthly',
+            'end_notification_daily',
+            'end_notification_weekly',
+            'end_notification_monthly'
+        ]).jsonify(rb_settings.get_all())
 
 
 class RHUserInfo(RHRoomBookingBase):

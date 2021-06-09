@@ -29,6 +29,7 @@ _bp.add_url_rule('/rooms/<int:room_id>.jpg', 'room_photo', rooms.RHRoomPhoto)
 # General backend
 _bp.add_url_rule('/api/<path:path>', '404', lambda path: (jsonify(), 404))
 _bp.add_url_rule('/api/config', 'config', misc.RHConfig)
+_bp.add_url_rule('/api/config/notifications', 'notification_settings', misc.RHNotificationSettings)
 _bp.add_url_rule('/api/stats', 'stats', misc.RHStats)
 _bp.add_url_rule('/api/map-areas', 'map_areas', misc.RHMapAreas)
 _bp.add_url_rule('/api/equipment', 'equipment_types', misc.RHEquipmentTypes)
