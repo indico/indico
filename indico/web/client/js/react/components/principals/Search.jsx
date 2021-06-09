@@ -27,6 +27,7 @@ import {
   Message,
   Modal,
   Popup,
+  Image,
 } from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
@@ -58,38 +59,48 @@ const searchFactory = config => {
   } = config;
 
   /* eslint-disable react/prop-types */
-  const FavoriteItem = ({name, detail, added, onAdd, onRemove}) => (
-    <Dropdown.Item
-      disabled={added}
-      styleName="favorite"
-      style={{pointerEvents: 'all'}}
-      onClick={e => {
-        e.stopPropagation();
-        if (added) {
-          onRemove();
-        } else {
-          onAdd();
-        }
-      }}
-    >
-      <div styleName="item">
-        <div styleName="icon">
-          <Icon.Group size="large">
-            <Icon name={resultIcon} />
-            {added && <Icon name="check" color="green" corner />}
-          </Icon.Group>
+  const FavoriteItem = ({name, detail, added, onAdd, onRemove, avatarURL}) => {
+    const avatar = avatarURL ? (
+      <Image src={avatarURL} size="mini" avatar />
+    ) : (
+      <Icon name={resultIcon} />
+    );
+
+    const marginLeft = avatarURL ? 'margin-left' : '';
+
+    return (
+      <Dropdown.Item
+        disabled={added}
+        styleName="favorite"
+        style={{pointerEvents: 'all'}}
+        onClick={e => {
+          e.stopPropagation();
+          if (added) {
+            onRemove();
+          } else {
+            onAdd();
+          }
+        }}
+      >
+        <div styleName="item">
+          <div styleName="icon">
+            <Icon.Group size="large">
+              {avatar}
+              {added && <Icon name="check" color="green" corner />}
+            </Icon.Group>
+          </div>
+          <div styleName={`content ${marginLeft}`}>
+            <List.Content>{name}</List.Content>
+            {detail && (
+              <List.Description>
+                <small>{detail}</small>
+              </List.Description>
+            )}
+          </div>
         </div>
-        <div styleName="content">
-          <List.Content>{name}</List.Content>
-          {detail && (
-            <List.Description>
-              <small>{detail}</small>
-            </List.Description>
-          )}
-        </div>
-      </div>
-    </Dropdown.Item>
-  );
+      </Dropdown.Item>
+    );
+  };
 
   const SearchForm = ({onSearch, favorites, isAdded, onAdd, onRemove, single}) => {
     const initialFormValues = useContext(InitialFormValuesContext);
@@ -141,6 +152,7 @@ const searchFactory = config => {
                         onRemove={() => {
                           onRemove(x);
                         }}
+                        avatarURL={x.avatarURL}
                       />
                     ))}
                   </Dropdown.Menu>
@@ -153,41 +165,60 @@ const searchFactory = config => {
     );
   };
 
-  const ResultItem = ({name, detail, added, favorite, onAdd, onRemove, existsInEvent}) => (
-    <List.Item>
-      <div styleName="item">
-        <div styleName="icon">
-          <Icon.Group size="large">
-            <Icon name={resultIcon} />
-            {favorite && <Icon name="star" color="yellow" corner="bottom right" />}
-            {existsInEvent && (
-              <Popup
-                content={Translate.string('Person exists in event')}
-                trigger={<Icon name="ticket" styleName="event-person" corner="top right" />}
-                offset={[-15, 0]}
-                position="top left"
-              />
+  const ResultItem = ({
+    name,
+    detail,
+    added,
+    favorite,
+    onAdd,
+    onRemove,
+    existsInEvent,
+    avatarURL,
+  }) => {
+    const avatar = avatarURL ? (
+      <Image src={avatarURL} size="mini" avatar />
+    ) : (
+      <Icon name={resultIcon} />
+    );
+
+    const marginLeft = avatarURL ? 'margin-left' : '';
+
+    return (
+      <List.Item>
+        <div styleName="item">
+          <div styleName="icon">
+            <Icon.Group size="large">
+              {avatar}
+              {favorite && <Icon name="star" color="yellow" corner="bottom right" />}
+              {existsInEvent && (
+                <Popup
+                  content={Translate.string('Person exists in event')}
+                  trigger={<Icon name="ticket" styleName="event-person" corner="top right" />}
+                  offset={[-15, 0]}
+                  position="top left"
+                />
+              )}
+            </Icon.Group>
+          </div>
+          <div styleName={`content ${marginLeft}`}>
+            <List.Content>{name}</List.Content>
+            {detail && (
+              <List.Description>
+                <small>{detail}</small>
+              </List.Description>
             )}
-          </Icon.Group>
+          </div>
+          <div styleName="actions">
+            {added ? (
+              <Icon name="checkmark" size="large" color="green" onClick={onRemove} />
+            ) : (
+              <Icon styleName="button" name="add" size="large" onClick={onAdd} />
+            )}
+          </div>
         </div>
-        <div styleName="content">
-          <List.Content>{name}</List.Content>
-          {detail && (
-            <List.Description>
-              <small>{detail}</small>
-            </List.Description>
-          )}
-        </div>
-        <div styleName="actions">
-          {added ? (
-            <Icon name="checkmark" size="large" color="green" onClick={onRemove} />
-          ) : (
-            <Icon styleName="button" name="add" size="large" onClick={onAdd} />
-          )}
-        </div>
-      </div>
-    </List.Item>
-  );
+      </List.Item>
+    );
+  };
 
   const SearchResults = ({
     results,
@@ -216,6 +247,7 @@ const searchFactory = config => {
                 onAdd={() => onAdd(r)}
                 onRemove={() => onRemove(r)}
                 existsInEvent={r.existsInEvent}
+                avatarURL={r.avatarURL}
               />
             ))}
           </List>
@@ -546,7 +578,7 @@ const InnerUserSearch = searchFactory({
     }
     const resultData = camelizeKeys(response.data);
     resultData.results = resultData.users.map(
-      ({identifier, id, fullName, email, affiliation, firstName, lastName}) => ({
+      ({identifier, id, fullName, email, affiliation, firstName, lastName, avatarURL}) => ({
         identifier,
         type: PrincipalType.user,
         userId: id,
@@ -558,6 +590,7 @@ const InnerUserSearch = searchFactory({
         existsInEvent: false,
         email,
         affiliation,
+        avatarURL,
       })
     );
     delete resultData.users;
