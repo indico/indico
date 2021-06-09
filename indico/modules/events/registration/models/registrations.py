@@ -244,6 +244,13 @@ class Registration(db.Model):
                 .join(Registration.registration_form)
                 .all())
 
+    @classmethod
+    def merge_users(cls, target, source):
+        target_regforms_used = {r.registration_form for r in target.registrations if not r.is_deleted}
+        for r in source.registrations.all():
+            if r.registration_form not in target_regforms_used:
+                r.user = target
+
     @hybrid_property
     def is_active(self):
         return not self.is_cancelled and not self.is_deleted
