@@ -144,15 +144,39 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
         has_files = False
         for filename in files:
             filepath = os.path.join(root, filename)
-            if os.path.getmtime(filepath) >= min_mtime:
+
+            try:
+                # raises an exception for invalid symlinks
+                mtime = os.path.getmtime(filepath)
+            except OSError:
+                if is_broken_symlink(filepath):
+                    if dry_run or silentremove(filepath):
+                        deleted.add(os.path.relpath(filepath, path))
+                    else:
+                        has_files = True
+                else:
+                    has_files = True
+
+                continue
+
+            if mtime >= min_mtime:
                 has_files = True
             elif dry_run or silentremove(filepath):
                 deleted.add(os.path.relpath(filepath, path))
             else:
                 has_files = True  # deletion failed
+
         if not dry_run and not has_files and not dirs and relroot:
             removedirs(path, relroot)
     return deleted
+
+
+def is_broken_symlink(path):
+    """Checks whether a file is a broken symlink
+
+    :param path: The path to the file
+    """
+    return os.path.islink(path) and not os.path.exists(path)
 
 
 def chmod_umask(path, execute=False):
