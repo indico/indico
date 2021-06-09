@@ -42,9 +42,9 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
 from indico.modules.users.schemas import BasicCategorySchema
-from indico.modules.users.util import (get_gravatar_for_user, get_linked_events, get_related_categories,
-                                       get_suggested_categories, merge_users, search_users, send_avatar, serialize_user,
-                                       set_user_avatar)
+from indico.modules.users.util import (get_avatar_from_name, get_gravatar_for_user, get_linked_events,
+                                       get_related_categories, get_suggested_categories, merge_users, search_users,
+                                       send_avatar, serialize_user, set_user_avatar)
 from indico.modules.users.views import WPUser, WPUserDashboard, WPUserFavorites, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -680,7 +680,7 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name', 'first_name', 'last_name')
+        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name', 'first_name', 'last_name', 'avatar_url')
 
 
 search_result_schema = UserSearchResultSchema()
@@ -696,6 +696,8 @@ class RHUserSearch(RHProtected):
         affiliation = entry.data.get('affiliation') or ''
         email = entry.data['email'].lower()
         ext_id = f'{entry.provider.name}:{entry.identifier}'
+        avatar_url = entry.data.get('avatar_url') or get_avatar_from_name(first_name)
+
         # detailed data to put in redis to create a pending user if needed
         self.externals[ext_id] = {
             'first_name': first_name,
@@ -715,6 +717,7 @@ class RHUserSearch(RHProtected):
             'full_name': full_name,
             'first_name': first_name,
             'last_name': last_name,
+            'avatar_url': avatar_url
         }
 
     def _serialize_entry(self, entry):

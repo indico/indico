@@ -38,7 +38,7 @@ from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32, remove_accents
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 
 
 # colors for user-specific avatar bubbles
@@ -441,3 +441,8 @@ def send_avatar(user):
     return send_file('avatar.png', BytesIO(user.picture), mimetype=metadata['content_type'],
                      inline=True, conditional=True, last_modified=parse_date(metadata['lastmod']),
                      cache_timeout=(86400*7))
+
+
+def get_avatar_from_name(first_name):
+    first_char = first_name[0] if first_name else None
+    return url_for('assets.avatar', name=first_char)
