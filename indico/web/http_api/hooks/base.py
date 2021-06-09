@@ -17,6 +17,7 @@ from urllib.parse import unquote
 import pytz
 from flask import current_app, request
 
+from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
@@ -187,6 +188,7 @@ class HTTPAPIHook:
             try:
                 init_email_queue()
                 is_response, resultList, complete, extra = self._perform(user, func, extra_func)
+                signals.after_process.send()
                 db.session.commit()
                 flush_email_queue()
             except Exception:
