@@ -73,7 +73,8 @@ DEFAULT_CONFIG = {
     },
     TemplateType.badge: {
         'tpl_size': [425, 270],  # A4 50 px/cm
-        'zoom_factor': 1
+        'zoom_factor': 1,
+        'disallow_groups': ()
     }
 }
 
