@@ -42,7 +42,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
 from indico.modules.users.schemas import BasicCategorySchema
-from indico.modules.users.util import (get_avatar_from_name, get_gravatar_for_user, get_linked_events,
+from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, merge_users, search_users,
                                        send_avatar, serialize_user, set_user_avatar)
 from indico.modules.users.views import WPUser, WPUserDashboard, WPUserFavorites, WPUserProfilePic, WPUsersAdmin
@@ -696,7 +696,8 @@ class RHUserSearch(RHProtected):
         affiliation = entry.data.get('affiliation') or ''
         email = entry.data['email'].lower()
         ext_id = f'{entry.provider.name}:{entry.identifier}'
-        avatar_url = entry.data.get('avatar_url') or get_avatar_from_name(first_name)
+        # IdentityInfo from flask-multipass does not have `avatar_url`
+        avatar_url = get_avatar_url_from_name(first_name)
 
         # detailed data to put in redis to create a pending user if needed
         self.externals[ext_id] = {

@@ -443,6 +443,6 @@ def send_avatar(user):
                      cache_timeout=(86400*7))
 
 
-def get_avatar_from_name(first_name):
+def get_avatar_url_from_name(first_name):
     first_char = first_name[0] if first_name else None
     return url_for('assets.avatar', name=first_char)

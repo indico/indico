@@ -31,7 +31,6 @@ from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.legal import legal_settings
 from indico.modules.users.controllers import RHUserBase
-from indico.modules.users.util import get_avatar_from_name
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalDict, validate_with_message
 from indico.util.string import sanitize_html
@@ -200,8 +199,7 @@ class PrincipalsMixin:
                     'last_name': principal.last_name,
                     'email': principal.email,
                     'affiliation': principal.affiliation,
-                    'avatar_url': (principal.avatar_url
-                                   if principal.avatar_url else get_avatar_from_name(principal.first_name)),
+                    'avatar_url': principal.avatar_url,
                     'detail': (f'{principal.email} ({principal.affiliation})'
                                if principal.affiliation else principal.email)}
         elif principal.principal_type == PrincipalType.local_group:
