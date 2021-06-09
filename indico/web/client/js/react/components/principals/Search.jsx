@@ -66,7 +66,7 @@ const searchFactory = config => {
       <Icon name={resultIcon} />
     );
 
-    const hasAvatar = avatarURL ? 'has-avatar' : '';
+    const hasAvatarClass = avatarURL ? 'has-avatar' : '';
 
     return (
       <Dropdown.Item
@@ -89,7 +89,7 @@ const searchFactory = config => {
               {added && <Icon name="check" color="green" corner />}
             </Icon.Group>
           </div>
-          <div styleName={`content ${hasAvatar}`}>
+          <div styleName={`content ${hasAvatarClass}`}>
             <List.Content>{name}</List.Content>
             {detail && (
               <List.Description>
@@ -181,7 +181,7 @@ const searchFactory = config => {
       <Icon name={resultIcon} />
     );
 
-    const hasAvatar = avatarURL ? 'has-avatar' : '';
+    const hasAvatarClass = avatarURL ? 'has-avatar' : '';
 
     return (
       <List.Item>
@@ -200,7 +200,7 @@ const searchFactory = config => {
               )}
             </Icon.Group>
           </div>
-          <div styleName={`content ${hasAvatar}`}>
+          <div styleName={`content ${hasAvatarClass}`}>
             <List.Content>{name}</List.Content>
             {detail && (
               <List.Description>
