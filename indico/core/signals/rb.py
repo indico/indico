@@ -21,6 +21,11 @@ Executed after a booking has been cancelled/rejected/accepted. The *sender*
 is the `Reservation` object.
 """)
 
+booking_modified = _signals.signal('booking-modified', """
+Executed after a booking has been modified. The *sender* is the `Reservation` object and
+a dictionary of changed values is passed in the `changes` kwarg.
+""")
+
 booking_deleted = _signals.signal('booking-deleted', """
 Executed after a booking has been deleted. The *sender* is the `Reservation` object.
 """)

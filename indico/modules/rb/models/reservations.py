@@ -680,6 +680,8 @@ class Reservation(Serializer, db.Model):
         if not any(occ.is_valid for occ in self.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
 
+        signals.rb.booking_modified.send(self, changes=changes)
+
         notify_modification(self, changes)
         return True
 
