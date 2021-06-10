@@ -187,7 +187,7 @@ class RHLayoutLogoDelete(RHLayoutBase):
 class RHLayoutCSSUpload(RHLayoutBase):
     def _process(self):
         f = request.files['css_file']
-        self.event.stylesheet = str(f.read()).strip()
+        self.event.stylesheet = f.read().decode().strip()
         self.event.stylesheet_metadata = {
             'hash': crc32(self.event.stylesheet),
             'size': len(self.event.stylesheet),
