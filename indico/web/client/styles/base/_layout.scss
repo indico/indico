@@ -129,6 +129,11 @@ body > * {
     flex-grow: 1;
     width: 0;
   }
+
+  .side-menu-label {
+    @include ellipsis();
+    margin-right: 0.5rem;
+  }
 }
 
 @mixin clearfix() {

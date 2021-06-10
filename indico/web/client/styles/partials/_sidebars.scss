@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @import 'base/animation';
+@import 'base/utilities';
 
 .sideBar {
   float: right;
@@ -58,6 +59,7 @@
 
     .title-wrapper {
       @include icon-before('icon-arrow-down');
+      display: flex;
       cursor: pointer;
 
       &::before {
@@ -105,7 +107,8 @@
       }
 
       .title {
-        display: block;
+        display: flex;
+        align-items: center;
         min-height: 2.6em;
         line-height: 2.6em;
         color: $black;
@@ -126,6 +129,7 @@
         padding: 0;
 
         > li .title {
+          display: flex;
           min-height: 2em;
           line-height: 2em;
           padding-left: 51px;
