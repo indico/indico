@@ -155,6 +155,8 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
                     else:
                         has_files = True
                 else:
+                    from indico.core.logger import Logger
+                    Logger.get('fs').exception('Could not stat %s', filepath)
                     has_files = True
 
                 continue
@@ -172,7 +174,7 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
 
 
 def is_broken_symlink(path):
-    """Checks whether a file is a broken symlink
+    """Check whether a file is a broken symlink.
 
     :param path: The path to the file
     """
