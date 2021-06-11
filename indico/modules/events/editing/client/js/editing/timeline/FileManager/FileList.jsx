@@ -19,11 +19,11 @@ import {FileManagerContext, filePropTypes, uploadFiles, fileTypePropTypes} from 
 
 import './FileManager.module.scss';
 
-function FileAction({onClick, active, iconName, className, popupContent}) {
-  const icon = (
+function FileAction({onClick, active, icon, className, popupContent}) {
+  const trigger = (
     <Icon
       className={className}
-      name={active ? 'spinner' : iconName}
+      name={active ? 'spinner' : icon}
       loading={active}
       onClick={() => {
         if (!active) {
@@ -33,13 +33,13 @@ function FileAction({onClick, active, iconName, className, popupContent}) {
     />
   );
 
-  return <Popup position="bottom center" content={popupContent} trigger={icon} />;
+  return <Popup position="bottom center" content={popupContent} trigger={trigger} />;
 }
 
 FileAction.propTypes = {
   onClick: PropTypes.func.isRequired,
   active: PropTypes.bool.isRequired,
-  iconName: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
   className: PropTypes.string.isRequired,
   popupContent: PropTypes.string.isRequired,
 };
@@ -89,7 +89,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
         {!state && fileType.allowMultipleFiles && (
           <>
             <FileAction
-              iconName="exchange"
+              icon="exchange"
               styleName="exchange-icon"
               popupContent={Translate.string('Replace the existing file')}
               active={activeButton === 'replace'}
@@ -102,7 +102,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
         )}
         {state !== 'deleted' && state !== 'modified' ? (
           <FileAction
-            iconName="trash"
+            icon="trash"
             styleName="delete-icon"
             popupContent={Translate.string('Delete the existing file')}
             active={activeButton === 'delete'}
@@ -119,7 +119,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
           />
         ) : (
           <FileAction
-            iconName="undo"
+            icon="undo"
             styleName="undo-icon"
             popupContent={Translate.string('Revert to the existing file')}
             active={activeButton === 'undo'}
