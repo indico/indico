@@ -91,7 +91,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
             <FileAction
               iconName="exchange"
               styleName="exchange-icon"
-              popupContent={Translate.string('Replace')}
+              popupContent={Translate.string('Replace the existing file')}
               active={activeButton === 'replace'}
               onClick={open}
             />
@@ -104,7 +104,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
           <FileAction
             iconName="trash"
             styleName="delete-icon"
-            popupContent={Translate.string('Delete')}
+            popupContent={Translate.string('Delete the existing file')}
             active={activeButton === 'delete'}
             onClick={async () => {
               if (!claimed) {
@@ -121,7 +121,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
           <FileAction
             iconName="undo"
             styleName="undo-icon"
-            popupContent={Translate.string('Undo')}
+            popupContent={Translate.string('Revert to the existing file')}
             active={activeButton === 'undo'}
             onClick={async () => {
               if (!claimed) {
