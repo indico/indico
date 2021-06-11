@@ -132,7 +132,7 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
         abstracts_reviewing_settings.set(self.event, 'scale_lower', scale_min)
         abstracts_reviewing_settings.set(self.event, 'scale_upper', scale_max)
         for rating in self.ratings:
-            if not rating.value:
+            if rating.value is None:
                 continue
             value = (rating.value - prev_min) / (prev_max - prev_min)
             rating.value = round(value * (scale_max - scale_min) + scale_min)

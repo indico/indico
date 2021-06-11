@@ -41,6 +41,7 @@ def test_abstract_review_scale_ratings(db, dummy_abstract, dummy_event, dummy_us
     rating = AbstractReviewRating(question=question, value=value)
     review.ratings.append(rating)
     db.session.flush()
+
     rh = RHManageAbstractReviewing()
     rh.event = dummy_event
     rh._scale_ratings(scale_min, scale_max)
