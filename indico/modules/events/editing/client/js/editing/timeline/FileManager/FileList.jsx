@@ -19,31 +19,27 @@ import {FileManagerContext, filePropTypes, uploadFiles, fileTypePropTypes} from 
 
 import './FileManager.module.scss';
 
-function FileAction({onClick, active, icon, className, popupContent}) {
-  return (
-    <Popup
-      position="bottom center"
-      content={popupContent}
-      trigger={
-        <Icon
-          className={className}
-          name={active ? 'spinner' : icon}
-          loading={active}
-          onClick={() => {
-            if (!active) {
-              onClick();
-            }
-          }}
-        />
-      }
+function FileAction({onClick, active, iconName, className, popupContent}) {
+  const icon = (
+    <Icon
+      className={className}
+      name={active ? 'spinner' : iconName}
+      loading={active}
+      onClick={() => {
+        if (!active) {
+          onClick();
+        }
+      }}
     />
   );
+
+  return <Popup position="bottom center" content={popupContent} trigger={icon} />;
 }
 
 FileAction.propTypes = {
   onClick: PropTypes.func.isRequired,
   active: PropTypes.bool.isRequired,
-  icon: PropTypes.string.isRequired,
+  iconName: PropTypes.string.isRequired,
   className: PropTypes.string.isRequired,
   popupContent: PropTypes.string.isRequired,
 };
@@ -93,7 +89,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
         {!state && fileType.allowMultipleFiles && (
           <>
             <FileAction
-              icon="exchange"
+              iconName="exchange"
               styleName="exchange-icon"
               popupContent={Translate.string('Replace')}
               active={activeButton === 'replace'}
@@ -106,7 +102,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
         )}
         {state !== 'deleted' && state !== 'modified' ? (
           <FileAction
-            icon="trash"
+            iconName="trash"
             styleName="delete-icon"
             popupContent={Translate.string('Delete')}
             active={activeButton === 'delete'}
@@ -123,7 +119,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
           />
         ) : (
           <FileAction
-            icon="undo"
+            iconName="undo"
             styleName="undo-icon"
             popupContent={Translate.string('Undo')}
             active={activeButton === 'undo'}
