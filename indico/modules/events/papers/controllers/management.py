@@ -172,30 +172,47 @@ class RHCloseCFP(RHManagePapersBase):
 
 
 class RHManageReviewingSettings(RHManagePapersBase):
+    @property
+    def ratings(self):
+        return (PaperReviewRating.query
+                .join(PaperReviewRating.review)
+                .join(PaperReview.revision)
+                .join(PaperRevision._contribution)
+                .join(PaperReviewRating.question)
+                .filter(~Contribution.is_deleted,
+                        Contribution.event == self.event,
+                        PaperReviewQuestion.field_type == 'rating'))
+
+    def _scale_ratings(self, scale_min, scale_max):
+        prev_min = paper_reviewing_settings.get(self.event, 'scale_lower')
+        prev_max = paper_reviewing_settings.get(self.event, 'scale_upper')
+        if scale_min == prev_min and scale_max == prev_max:
+            return
+        assert scale_max > scale_min
+
+        paper_reviewing_settings.set(self.event, 'scale_lower', scale_min)
+        paper_reviewing_settings.set(self.event, 'scale_upper', scale_max)
+        for rating in self.ratings:
+            if rating.value is None:
+                continue
+            value = (rating.value - prev_min) / (prev_max - prev_min)
+            rating.value = round(value * (scale_max - scale_min) + scale_min)
+
     def _process(self):
-        has_ratings = (PaperReviewRating.query
-                       .join(PaperReviewRating.review)
-                       .join(PaperReview.revision)
-                       .join(PaperRevision._contribution)
-                       .join(PaperReviewRating.question)
-                       .filter(~Contribution.is_deleted,
-                               Contribution.event == self.event,
-                               PaperReviewQuestion.field_type == 'rating')
-                       .has_rows())
         defaults = FormDefaults(content_review_questions=self.event.cfp.content_review_questions,
                                 layout_review_questions=self.event.cfp.layout_review_questions,
                                 **paper_reviewing_settings.get_all(self.event))
-        form = PaperReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=has_ratings)
+        form = PaperReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=self.ratings.has_rows())
         if form.validate_on_submit():
             data = form.data
             data.update(data.pop('email_settings'))
+            self._scale_ratings(data['scale_lower'], data['scale_upper'])
             paper_reviewing_settings.set_multi(self.event, data)
             flash(_("The reviewing settings were saved successfully"), 'success')
             logger.info("Paper reviewing settings of %r updated by %r", self.event, session.user)
             return jsonify_data()
         self.commit = False
-        disabled_fields = form.RATING_FIELDS if has_ratings else ()
-        return jsonify_form(form, disabled_fields=disabled_fields)
+        return jsonify_form(form)
 
 
 class RHSetDeadline(RHManagePapersBase):

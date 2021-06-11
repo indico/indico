@@ -20,7 +20,7 @@ from indico.web.forms.fields import (EditableFileField, FileField, HiddenEnumFie
                                      IndicoDateTimeField, IndicoMarkdownField, IndicoTagListField)
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -86,8 +86,8 @@ class PaperReviewingSettingsForm(IndicoForm):
     RATING_FIELDS = ('scale_lower', 'scale_upper')
 
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
-    scale_lower = IntegerField(_("Scale (from)"), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
-    scale_upper = IntegerField(_("Scale (to)"), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
+    scale_lower = IntegerField(_("Scale (from)"), [InputRequired()])
+    scale_upper = IntegerField(_("Scale (to)"), [InputRequired()])
     email_settings = PaperEmailSettingsField(_("Email notifications"))
 
     def __init__(self, *args, **kwargs):
@@ -107,14 +107,6 @@ class PaperReviewingSettingsForm(IndicoForm):
             raise ValidationError(_("The scale's 'to' value must be greater than the 'from' value."))
         if upper - lower > 20:
             raise ValidationError(_("The difference between 'to' and' from' may not be greater than 20."))
-
-    @property
-    def data(self):
-        data = super().data
-        if self.has_ratings:
-            for key in self.RATING_FIELDS:
-                del data[key]
-        return data
 
 
 class PaperSubmissionForm(IndicoForm):
