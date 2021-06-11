@@ -31,7 +31,7 @@ def generate_session_block_component(block, related_to_uid=None):
     uid = f'indico-session-block-{block.id}@{url_parse(config.BASE_URL).host}'
     url = url_for('sessions.display_session', block.session, _external=True)
     component = generate_basic_component(
-        block, uid, url, title=block.title or block.session.title, description=block.session.description
+        block, uid, url, title=block.full_title, description=block.session.description
     )
 
     if related_to_uid:
