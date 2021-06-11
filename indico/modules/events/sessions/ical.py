@@ -26,6 +26,20 @@ def generate_session_component(session, related_to_uid=None):
     return component
 
 
+def generate_session_block_component(block, related_to_uid=None):
+    """Generate an Event iCalendar component for a session block in an Indico Session."""
+    uid = f'indico-session-block-{block.id}@{url_parse(config.BASE_URL).host}'
+    url = url_for('sessions.display_session', block.session, _external=True)
+    component = generate_basic_component(
+        block, uid, url, title=block.full_title, description=block.session.description
+    )
+
+    if related_to_uid:
+        component.add('related-to', related_to_uid)
+
+    return component
+
+
 def session_to_ical(session, user=None, detailed=False):
     """Serialize a session into an iCal.
 

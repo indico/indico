@@ -23,12 +23,14 @@ class CalendarScope(IndicoEnum):
     session = 2
 
 
-def generate_basic_component(entity, uid=None, url=None):
+def generate_basic_component(entity, uid=None, url=None, title=None, description=None):
     """Generate an iCalendar component with basic common properties.
 
     :param entity: Event/session/contribution where properties come from
     :param uid: UID for the component
     :param url: URL for the component (defaults to `entity.external_url`)
+    :param title: A title for the component
+    :param description: A text based description for the component
 
     :return: iCalendar event with basic properties
     """
@@ -37,7 +39,7 @@ def generate_basic_component(entity, uid=None, url=None):
     component.add('dtstamp', now_utc(False))
     component.add('dtstart', entity.start_dt)
     component.add('dtend', entity.end_dt)
-    component.add('summary', entity.title)
+    component.add('summary', title or entity.title)
 
     if uid:
         component.add('uid', uid)
@@ -54,22 +56,24 @@ def generate_basic_component(entity, uid=None, url=None):
         component.add('location', location)
 
     speaker_list = getattr(entity, 'person_links', [])
-    description = []
+    cal_description = []
     if speaker_list:
         speakers = [f'{x.full_name} ({x.affiliation})' if x.affiliation else x.full_name
                     for x in speaker_list]
-        description.append('Speakers: {}'.format(', '.join(speakers)))
-    if entity.description:
-        desc_text = str(entity.description) or '<p/>'  # get rid of RichMarkup
+        cal_description.append('Speakers: {}'.format(', '.join(speakers)))
+    if description is None:
+        description = getattr(entity, 'description', None)
+    if description:
+        desc_text = str(description) or '<p/>'  # get rid of RichMarkup
         try:
-            description.append(str(html.fromstring(desc_text).text_content()))
+            cal_description.append(str(html.fromstring(desc_text).text_content()))
         except ParserError:
             # this happens if desc_text only contains a html comment
             pass
     if url:
-        description.append(url)
-    if description:
-        component.add('description', '\n'.join(description))
+        cal_description.append(url)
+    if cal_description:
+        component.add('description', '\n'.join(cal_description))
 
     return component
 
@@ -119,7 +123,7 @@ def events_to_ical(events, user=None, scope=None):
     :param scope: If specified, use a more detailed timetable using the given scope
     """
     from indico.modules.events.contributions.ical import generate_contribution_component
-    from indico.modules.events.sessions.ical import generate_session_component
+    from indico.modules.events.sessions.ical import generate_session_block_component
 
     calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
@@ -137,9 +141,10 @@ def events_to_ical(events, user=None, scope=None):
             ]
         elif scope == CalendarScope.session:
             components = [
-                generate_session_component(session)
+                generate_session_block_component(block)
                 for session in event.sessions
                 if session.start_dt and session.can_access(user)
+                for block in session.blocks
             ]
             components += [
                 generate_contribution_component(contrib)
