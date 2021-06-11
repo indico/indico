@@ -23,7 +23,7 @@ function FileAction({onClick, active, icon, className, popupContent}) {
   return (
     <Popup
       position="bottom center"
-      content={<Translate>{popupContent}</Translate>}
+      content={popupContent}
       trigger={
         <Icon
           className={className}
@@ -95,7 +95,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
             <FileAction
               icon="exchange"
               styleName="exchange-icon"
-              popupContent="Replace"
+              popupContent={Translate.string('Replace')}
               active={activeButton === 'replace'}
               onClick={open}
             />
@@ -108,7 +108,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
           <FileAction
             icon="trash"
             styleName="delete-icon"
-            popupContent="Delete"
+            popupContent={Translate.string('Delete')}
             active={activeButton === 'delete'}
             onClick={async () => {
               if (!claimed) {
@@ -125,7 +125,7 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
           <FileAction
             icon="undo"
             styleName="undo-icon"
-            popupContent="Undo"
+            popupContent={Translate.string('Undo')}
             active={activeButton === 'undo'}
             onClick={async () => {
               if (!claimed) {
