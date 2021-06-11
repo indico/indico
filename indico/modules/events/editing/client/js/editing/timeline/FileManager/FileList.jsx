@@ -8,18 +8,19 @@
 import PropTypes from 'prop-types';
 import React, {useContext, useCallback, useState} from 'react';
 import {useDropzone} from 'react-dropzone';
-import {Icon} from 'semantic-ui-react';
+import {Icon, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {uploadFile, deleteFile} from 'indico/react/components/files/util';
+import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import {FileManagerContext, filePropTypes, uploadFiles, fileTypePropTypes} from './util';
 
 import './FileManager.module.scss';
 
-function FileAction({onClick, active, icon, className}) {
-  return (
+function FileAction({onClick, active, icon, className, popupContent}) {
+  const trigger = (
     <Icon
       className={className}
       name={active ? 'spinner' : icon}
@@ -31,6 +32,8 @@ function FileAction({onClick, active, icon, className}) {
       }}
     />
   );
+
+  return <Popup position="bottom center" content={popupContent} trigger={trigger} />;
 }
 
 FileAction.propTypes = {
@@ -38,6 +41,7 @@ FileAction.propTypes = {
   active: PropTypes.bool.isRequired,
   icon: PropTypes.string.isRequired,
   className: PropTypes.string.isRequired,
+  popupContent: PropTypes.string.isRequired,
 };
 
 function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, downloadURL}}) {
@@ -86,8 +90,9 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
           <>
             <FileAction
               icon="exchange"
-              active={activeButton === 'replace'}
               styleName="exchange-icon"
+              popupContent={Translate.string('Replace the existing file')}
+              active={activeButton === 'replace'}
               onClick={open}
             />
             <span {...getRootProps()}>
@@ -97,8 +102,9 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
         )}
         {state !== 'deleted' && state !== 'modified' ? (
           <FileAction
-            styleName="delete-icon"
             icon="trash"
+            styleName="delete-icon"
+            popupContent={Translate.string('Delete the existing file')}
             active={activeButton === 'delete'}
             onClick={async () => {
               if (!claimed) {
@@ -114,8 +120,9 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
         ) : (
           <FileAction
             icon="undo"
-            active={activeButton === 'undo'}
             styleName="undo-icon"
+            popupContent={Translate.string('Revert to the existing file')}
+            active={activeButton === 'undo'}
             onClick={async () => {
               if (!claimed) {
                 setActiveButton('undo');
