@@ -251,7 +251,9 @@
                         The abstract was merged into {{ link_start }}{{ other }}{{ link_end }}.
                     {%- endtrans %}
                 {% elif abstract.state.name == 'duplicate' %}
-                    {% trans url=url_for('.display_abstract', abstract.duplicate_of), other=abstract.duplicate_of.title -%}
+                    {% set link_start = '<a href="%s">'|safe|format(url_for('.display_abstract', abstract.duplicate_of)) %}
+                    {% set link_end = '</a>'|safe %}
+                    {% trans other=abstract.duplicate_of.title -%}
                         The abstract was marked as a duplicate of {{ link_start }}{{ other }}{{ link_end }}
                     {%- endtrans %}
                 {% endif %}
