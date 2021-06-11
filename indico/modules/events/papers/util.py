@@ -11,7 +11,7 @@ from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.contributions.models.persons import ContributionPersonLink
+from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
@@ -68,8 +68,10 @@ def get_contributions_with_paper_submitted_by_user(event, user):
 
 
 def _query_contributions_with_user_paper_submission_rights(event, user):
-    criteria = [Contribution.person_links.any(ContributionPersonLink.person.has(user=user)),
-                Contribution.abstract.has(Abstract.submitter_id == user.id)]
+    criteria = [
+        Contribution.abstract.has(Abstract.submitter_id == user.id),
+        Contribution.acl_entries.any(db.and_(ContributionPrincipal.user == user,
+                                             ContributionPrincipal.has_management_permission('submit')))]
     return Contribution.query.with_parent(event).filter(db.or_(*criteria))
 
 
