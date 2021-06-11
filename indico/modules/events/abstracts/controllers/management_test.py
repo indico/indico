@@ -7,7 +7,6 @@
 
 import pytest
 
-from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractReview
@@ -15,18 +14,7 @@ from indico.modules.events.abstracts.settings import abstracts_reviewing_setting
 from indico.modules.events.tracks import Track
 
 
-@pytest.fixture
-def dummy_abstract(db, dummy_event, dummy_user):
-    abstract = Abstract(friendly_id=314,
-                        title="Broken Symmetry and the Mass of Gauge Vector Mesons",
-                        event=dummy_event,
-                        submitter=dummy_user,
-                        locator={'event_id': -314, 'abstract_id': 1234},
-                        judgment_comment='Vague but interesting!')
-
-    db.session.add(abstract)
-    db.session.flush()
-    return abstract
+pytest_plugins = 'indico.modules.events.abstracts.testing.fixtures'
 
 
 @pytest.mark.parametrize(('value', 'scale_min', 'scale_max', 'expected'), (

@@ -125,7 +125,7 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
     def _scale_ratings(self, scale_min, scale_max):
         prev_min = abstracts_reviewing_settings.get(self.event, 'scale_lower')
         prev_max = abstracts_reviewing_settings.get(self.event, 'scale_upper')
-        if not (scale_min != prev_min or scale_max != prev_max):
+        if scale_min == prev_min and scale_max == prev_max:
             return
         assert scale_max > scale_min
 
