@@ -155,6 +155,14 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     def location_parent(self):
         return self.contribution
 
+    @property
+    def venue_name(self):
+        return self.location_parent.venue_name
+
+    @property
+    def room_name(self):
+        return self.location_parent.room_name
+
     def get_access_list(self):
         return self.contribution.get_access_list()
 
