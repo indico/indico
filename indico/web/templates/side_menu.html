@@ -9,11 +9,11 @@
     <li class="item {{ classes }}">
         {%- if item.disabled %}
             <span class="title">
-                <span>{{ item.title }}</span>
+                <span class="side-menu-label">{{ item.title }}</span>
             </span>
         {%- else -%}
             <a class="title {{ icon }}" href="{{ item.url }}">
-                <span>{{ item.title }}</span>
+                <span class="side-menu-label">{{ item.title }}</span>
             </a>
         {%- endif -%}
     </li>
@@ -23,7 +23,7 @@
     {% if section.items %}
         <li class="section {{ 'collapsed' if not section.active }}" data-section-name="{{ section.name }}">
             <div class="title-wrapper">
-                <span class="title {{ section.icon }}">{{ section.title }}</span>
+                <span class="title {{ section.icon }} side-menu-label">{{ section.title }}</span>
             </div>
             <ul class="{{ 'weak-hidden' if not section.active }}">
                 {% for item in section.items %}
@@ -72,6 +72,13 @@
             if (collapsed !== null && !section.find('.active').length) {
                 section.toggleClass('collapsed', collapsed === 'true');
                 section.children('ul').toggle(collapsed === 'false');
+            }
+        });
+
+        $('.side-menu-label').on('mouseenter', function() {
+            const $this = $(this);
+            if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+                $this.attr('title', $this.text());
             }
         });
     })();
