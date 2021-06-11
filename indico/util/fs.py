@@ -141,8 +141,10 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
         if exclude is not None and exclude(relroot):
             del dirs[:]  # avoid descending into subdirs
             continue
+        dirlinks = [dirname for dirname in dirs if os.path.islink(os.path.join(root, dirname))]
+        dirs[:] = [x for x in dirs if x not in dirlinks]
         has_files = False
-        for filename in files:
+        for filename in files + dirlinks:
             filepath = os.path.join(root, filename)
 
             try:
