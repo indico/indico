@@ -121,7 +121,7 @@
                                     </td>
                                 {% elif item.id == 'track' %}
                                     <td class="i-table track-column"
-                                        data-searchable="{{ contrib.track.title | lower }}">
+                                        data-searchable="{{ contrib.track.title|lower if contrib.track }}">
                                         <span class="vertical-aligner">
                                             {%- if contrib.track -%}
                                                 {{ contrib.track.title_with_group }}
@@ -132,7 +132,7 @@
                                     </td>
                                 {% elif item.id == 'session' %}
                                     <td class="i-table"
-                                        data-searchable="{{ contrib.session.title | lower }}">
+                                        data-searchable="{{ contrib.session.title|lower if contrib.session }}">
                                         <span class="vertical-aligner">
                                             {%- if contrib.session -%}
                                                 {% trans title=contrib.session.title -%}
@@ -145,7 +145,7 @@
                                     </td>
                                 {% elif item.id == 'type' %}
                                     <td class="i-table"
-                                        data-searchable="{{ contrib.type.name | lower }}">
+                                        data-searchable="{{ contrib.type.name|lower if contrib.type }}">
                                         <span class="vertical-aligner">
                                             {%- if contrib.type -%}
                                                 {{ contrib.type.name }}
