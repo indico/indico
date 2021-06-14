@@ -5,12 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from fnmatch import fnmatch
+
 from wtforms.fields import PasswordField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
 from indico.modules.auth import Identity
-from indico.modules.users import User
+from indico.modules.users import User, user_management_settings
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
 from indico.web.forms.validators import ConfirmPassword, SecurePassword, used_if_not_synced
@@ -29,6 +31,17 @@ def _check_existing_email(form, field):
 def _check_existing_username(form, field):
     if Identity.query.filter_by(provider='indico', identifier=field.data).has_rows():
         raise ValidationError(_('This username is already in use.'))
+
+
+def _check_not_blacklisted(form, field):
+    blacklist = user_management_settings.get('email_blacklist')
+    email_address = field.data
+    error_msg = _('This email address is blacklisted.')
+
+    for pattern in blacklist:
+        pattern = pattern.strip()
+        if fnmatch(email_address, pattern):
+            raise ValidationError(error_msg)
 
 
 class LocalLoginForm(IndicoForm):
@@ -77,7 +90,9 @@ class SelectEmailForm(IndicoForm):
 
 
 class RegistrationEmailForm(IndicoForm):
-    email = EmailField(_('Email address'), [DataRequired(), Email(), _check_existing_email], filters=[_tolower])
+    email = EmailField(_('Email address'),
+                       [DataRequired(), Email(), _check_not_blacklisted, _check_existing_email],
+                       filters=[_tolower])
 
 
 class RegistrationForm(IndicoForm):
