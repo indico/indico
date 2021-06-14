@@ -16,6 +16,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
 import './ICSCalendarLink.module.scss';
+import './ICSExportOptions.module.scss';
 
 const initialState = {
   key: null,
@@ -56,6 +57,7 @@ const ICSExportOptions = ({options, selected, handleSetOption}) => (
               primary={key === selected}
               label={idx === 0 ? Translate.string('Export') : undefined}
               labelPosition={idx === 0 ? 'left' : undefined}
+              styleName={idx === options.length - 1 ? 'final-button' : 'mid-button'}
             />
           }
         />
