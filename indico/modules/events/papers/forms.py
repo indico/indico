@@ -95,8 +95,7 @@ class PaperReviewingSettingsForm(IndicoForm):
         self.has_ratings = kwargs.pop('has_ratings', False)
         super().__init__(*args, **kwargs)
         if self.has_ratings:
-            self.scale_upper.warning = _("Some reviewers have already submitted ratings so the scale cannot be changed "
-                                         "anymore.")
+            self.scale_upper.warning = _("Changing the ratings scale will proportionally affect existing ratings.")
 
     def validate_scale_upper(self, field):
         lower = self.scale_lower.data

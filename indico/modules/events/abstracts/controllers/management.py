@@ -114,7 +114,7 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
     """Configure abstract reviewing."""
 
     @property
-    def ratings(self):
+    def ratings_query(self):
         return (AbstractReviewRating.query
                 .join(AbstractReviewRating.review)
                 .join(AbstractReview.abstract)
@@ -131,7 +131,7 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
 
         abstracts_reviewing_settings.set(self.event, 'scale_lower', scale_min)
         abstracts_reviewing_settings.set(self.event, 'scale_upper', scale_max)
-        for rating in self.ratings:
+        for rating in self.ratings_query:
             if rating.value is None:
                 continue
             value = (rating.value - prev_min) / (prev_max - prev_min)
@@ -139,7 +139,7 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
 
     def _process(self):
         defaults = FormDefaults(**abstracts_reviewing_settings.get_all(self.event))
-        form = AbstractReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=self.ratings.has_rows())
+        form = AbstractReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=self.ratings_query.has_rows())
         if form.validate_on_submit():
             data = form.data
             self._scale_ratings(data['scale_lower'], data['scale_upper'])

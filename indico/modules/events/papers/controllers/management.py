@@ -173,7 +173,7 @@ class RHCloseCFP(RHManagePapersBase):
 
 class RHManageReviewingSettings(RHManagePapersBase):
     @property
-    def ratings(self):
+    def ratings_query(self):
         return (PaperReviewRating.query
                 .join(PaperReviewRating.review)
                 .join(PaperReview.revision)
@@ -192,7 +192,7 @@ class RHManageReviewingSettings(RHManagePapersBase):
 
         paper_reviewing_settings.set(self.event, 'scale_lower', scale_min)
         paper_reviewing_settings.set(self.event, 'scale_upper', scale_max)
-        for rating in self.ratings:
+        for rating in self.ratings_query:
             if rating.value is None:
                 continue
             value = (rating.value - prev_min) / (prev_max - prev_min)
@@ -202,7 +202,7 @@ class RHManageReviewingSettings(RHManagePapersBase):
         defaults = FormDefaults(content_review_questions=self.event.cfp.content_review_questions,
                                 layout_review_questions=self.event.cfp.layout_review_questions,
                                 **paper_reviewing_settings.get_all(self.event))
-        form = PaperReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=self.ratings.has_rows())
+        form = PaperReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=self.ratings_query.has_rows())
         if form.validate_on_submit():
             data = form.data
             data.update(data.pop('email_settings'))
