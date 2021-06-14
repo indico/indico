@@ -190,8 +190,10 @@ class RHManageReviewingSettings(RHManagePapersBase):
             return
         assert scale_max > scale_min
 
-        paper_reviewing_settings.set(self.event, 'scale_lower', scale_min)
-        paper_reviewing_settings.set(self.event, 'scale_upper', scale_max)
+        paper_reviewing_settings.set_multi(self.event, {
+            'scale_lower': scale_min,
+            'scale_upper': scale_max,
+        })
         for rating in self.ratings_query:
             if rating.value is None:
                 continue
