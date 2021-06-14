@@ -56,3 +56,19 @@
   display: flex;
   align-items: center;
 }
+
+.popup:global(.ui.wide.popup) {
+  display: inline-flex;
+  min-width: 350px;
+  max-width: 450px;
+}
+
+.popup .content {
+  width: 0;
+  min-width: 100%;
+}
+
+.button-group :global(.ui.labeled.button) button:global(.ui.button):last-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
