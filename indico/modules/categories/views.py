@@ -92,7 +92,3 @@ class WPCategoryManagement(WPCategory):
             return ''
         return render_breadcrumbs(category=self.category, management=True,
                                   category_url_factory=self._get_parent_category_breadcrumb_url)
-
-
-class WPCategoryStatistics(WPCategory):
-    bundles = ('module_categories.css',)

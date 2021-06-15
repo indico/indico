@@ -30,7 +30,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
-from indico.modules.categories.views import WPCategory, WPCategoryCalendar, WPCategoryStatistics
+from indico.modules.categories.views import WPCategory, WPCategoryCalendar
 from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.news.util import get_recent_news
@@ -113,7 +113,7 @@ class RHCategoryStatistics(RHDisplayCategoryBase):
     def _process(self):
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
             return redirect(url_for('categories.statistics_json', category_id=self.category.id))
-        return WPCategoryStatistics.render_template('category_statistics.html', self.category)
+        return WPCategory.render_template('category_statistics.html', self.category)
 
 
 class RHCategoryInfo(RHDisplayCategoryBase):
