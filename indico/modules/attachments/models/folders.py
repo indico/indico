@@ -148,7 +148,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         user can manage attachments for the linked object.
         """
         return (super().can_access(user, *args, **kwargs) or
-                can_manage_attachments(self.object, user))
+                can_manage_attachments(self.object, user, allow_admin=kwargs.get('allow_admin', True)))
 
     def can_view(self, user):
         """Check if the user can see the folder.

@@ -10,24 +10,27 @@ from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import column_property, mapper
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
+from sqlalchemy.sql import select
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import RenderMode, SearchableDescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
-from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
+from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.management.util import get_non_inheriting_objects
+from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import AuthorsSpeakersMixin, PersonLinkDataMixin
 from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify
@@ -581,6 +584,26 @@ Contribution.register_protection_events()
 
 @listens_for(mapper, 'after_configured', once=True)
 def _mapper_configured():
+    # Contribution.effective_protection_mode -- the effective protection mode
+    # (public/protected) of the contribution, even if it's inheriting it from
+    # its event or session
+    protection_mode_case = db.case([
+        ((Contribution.protection_mode == ProtectionMode.inheriting) & Contribution.session_id.is_(None),
+         Event.effective_protection_mode),
+        ((Contribution.protection_mode == ProtectionMode.inheriting) & Contribution.session_id.isnot(None),
+         select([Session.effective_protection_mode])
+         .where(Session.id == Contribution.session_id)
+         .correlate(Contribution)
+         .scalar_subquery())
+    ], else_=Contribution.protection_mode)
+    query = (
+        select([protection_mode_case])
+        .where(Event.id == Contribution.event_id)
+        .correlate(Contribution)
+        .scalar_subquery()
+    )
+    Contribution.effective_protection_mode = column_property(query, deferred=True)
+
     Contribution.register_location_events()
 
     @listens_for(Contribution.session, 'set')

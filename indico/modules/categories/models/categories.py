@@ -63,6 +63,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
     allow_no_access_contact = True
+    allow_relationship_preloading = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'category_id'
 
     @strict_classproperty
@@ -572,6 +573,13 @@ def _mappers_configured():
     cte = Category.get_tree_cte('title')
     query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
     Category.chain_titles = column_property(query, deferred=True)
+
+    # Category.chain_ids -- a list of the ids in the parent chain,
+    # starting with the root category down to the current category.
+    # This is equivalent to the `category_chain` in the Event model.
+    cte = Category.get_tree_cte()
+    query = select([cte.c.path]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
+    Category.chain_ids = column_property(query, deferred=True)
 
     # Category.chain -- a list of the ids and titles in the parent
     # chain, starting with the root category down to the current

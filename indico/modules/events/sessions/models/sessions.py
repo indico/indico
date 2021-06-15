@@ -8,7 +8,10 @@
 from datetime import timedelta
 from operator import attrgetter
 
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import column_property, mapper
+from sqlalchemy.sql import select
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -16,10 +19,11 @@ from indico.core.db.sqlalchemy.colors import ColorMixin, ColorTuple
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
-from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
+from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.modules.events.management.util import get_non_inheriting_objects
+from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
@@ -245,5 +249,17 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
             return False
 
 
-Session.register_location_events()
-Session.register_protection_events()
+@listens_for(mapper, 'after_configured', once=True)
+def _mapper_configured():
+    # Session.effective_protection_mode -- the effective protection mode
+    # (public/protected) of the session, even if it's inheriting it from its
+    # parent event
+    query = (select([db.case({ProtectionMode.inheriting.value: Event.effective_protection_mode},
+                             else_=Session.protection_mode, value=Session.protection_mode)])
+             .where(Event.id == Session.event_id)
+             .correlate(Session)
+             .scalar_subquery())
+    Session.effective_protection_mode = column_property(query, deferred=True)
+
+    Session.register_location_events()
+    Session.register_protection_events()

@@ -254,7 +254,7 @@ class Attachment(SearchableTitleMixin, ProtectionMixin, VersionedResourceMixin, 
         or if the user can manage attachments for the linked object.
         """
         return (super().can_access(user, *args, **kwargs) or
-                can_manage_attachments(self.folder.object, user))
+                can_manage_attachments(self.folder.object, user, allow_admin=kwargs.get('allow_admin', True)))
 
     def __repr__(self):
         return '<Attachment({}, {}, {}{}, {}, {})>'.format(

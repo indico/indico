@@ -1018,6 +1018,7 @@ def _mappers_configured():
     query = (select([db.case({ProtectionMode.inheriting.value: Category.effective_protection_mode},
                              else_=Event.protection_mode, value=Event.protection_mode)])
              .where(Category.id == Event.category_id)
+             .correlate(Event)
              .scalar_subquery())
     Event.effective_protection_mode = column_property(query, deferred=True)
 

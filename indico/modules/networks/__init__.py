@@ -11,6 +11,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.attachments import Attachment, AttachmentFolder
 from indico.modules.networks.models.networks import IPNetworkGroup
+from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -32,5 +33,10 @@ def _can_access(cls, obj, user, authorized, **kwargs):
     if not has_request_context() or not request.remote_addr or authorized is not None:
         return
     ip = str(request.remote_addr)
-    if any(net.contains_ip(ip) for net in IPNetworkGroup.query.filter_by(attachment_access_override=True)):
+    if any(net.contains_ip(ip) for net in _get_attachment_access_networks()):
         return True
+
+
+@memoize_request
+def _get_attachment_access_networks():
+    return IPNetworkGroup.query.filter_by(attachment_access_override=True).all()

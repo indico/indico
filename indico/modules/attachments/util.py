@@ -59,18 +59,18 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
     }
 
 
-def can_manage_attachments(obj, user):
+def can_manage_attachments(obj, user, allow_admin=True):
     """Check if a user can manage attachments for the object."""
     if not user:
         return False
-    if obj.can_manage(user):
+    if obj.can_manage(user, allow_admin=allow_admin):
         return True
-    if isinstance(obj, db.m.Event) and obj.can_manage(user, 'submit'):
+    if isinstance(obj, db.m.Event) and obj.can_manage(user, 'submit', allow_admin=allow_admin):
         return True
-    if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit'):
+    if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit', allow_admin=allow_admin):
         return True
     if isinstance(obj, db.m.SubContribution):
-        return can_manage_attachments(obj.contribution, user)
+        return can_manage_attachments(obj.contribution, user, allow_admin=allow_admin)
     return False
 
 
