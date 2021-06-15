@@ -15,10 +15,11 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
+from indico.core.db.sqlalchemy.descriptions import RenderMode, SearchableDescriptionMixin
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
+from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -69,8 +70,9 @@ class CustomFieldsMixin:
         return old_value
 
 
-class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, AttachedItemsMixin, AttachedNotesMixin,
-                   PersonLinkDataMixin, AuthorsSpeakersMixin, CustomFieldsMixin, db.Model):
+class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionManagersMixin, LocationMixin,
+                   AttachedItemsMixin, AttachedNotesMixin, PersonLinkDataMixin, AuthorsSpeakersMixin, CustomFieldsMixin,
+                   db.Model):
     __tablename__ = 'contributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
                                   postgresql_where=db.text('NOT is_deleted')),
@@ -159,10 +161,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         db.ForeignKey('events.contribution_types.id'),
         index=True,
         nullable=True
-    )
-    title = db.Column(
-        db.String,
-        nullable=False
     )
     code = db.Column(
         db.String,

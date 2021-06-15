@@ -21,7 +21,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
-from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
+from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import get_display_tz
 from indico.util.decorators import strict_classproperty

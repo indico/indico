@@ -9,12 +9,15 @@ import posixpath
 
 from flask import g
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin
+from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.storage import StoredFileMixin, VersionedResourceMixin
 from indico.modules.attachments.models.principals import AttachmentPrincipal
@@ -111,9 +114,9 @@ class AttachmentFile(StoredFileMixin, db.Model):
         )
 
 
-class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
+class Attachment(SearchableTitleMixin, ProtectionMixin, VersionedResourceMixin, db.Model):
     __tablename__ = 'attachments'
-    __table_args__ = (
+    __auto_table_args = (
         # links: url but no file
         db.CheckConstraint(f'type != {AttachmentType.link.value} OR (link_url IS NOT NULL AND file_id IS NULL)',
                            'valid_link'),
@@ -126,6 +129,11 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
     stored_file_table = 'attachments.files'
     stored_file_class = AttachmentFile
     stored_file_fkey = 'attachment_id'
+    title_required = False
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls)
 
     #: The ID of the attachment
     id = db.Column(
@@ -152,11 +160,6 @@ class Attachment(ProtectionMixin, VersionedResourceMixin, db.Model):
         db.Boolean,
         nullable=False,
         default=False
-    )
-    #: The name of the attachment
-    title = db.Column(
-        db.String,
-        nullable=False
     )
     #: The description of the attachment
     description = db.Column(

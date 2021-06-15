@@ -29,7 +29,7 @@ from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
-from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
+from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
 from indico.modules.categories import Category

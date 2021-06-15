@@ -16,8 +16,10 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
+from indico.core.db.sqlalchemy.searchable import fts_matches, make_fts_index
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
+from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
 from indico.util.string import render_markdown, text_to_repr
 
@@ -29,9 +31,15 @@ class EventNote(LinkMixin, db.Model):
     events_backref_name = 'all_notes'
     link_backref_name = 'note'
 
+    @strict_classproperty
+    @classmethod
+    def __auto_table_args(cls):
+        return (make_fts_index(cls, 'html'),
+                {'schema': 'events'})
+
     @declared_attr
     def __table_args__(cls):
-        return auto_table_args(cls, schema='events')
+        return auto_table_args(cls)
 
     #: The ID of the note
     id = db.Column(
@@ -143,6 +151,17 @@ class EventNote(LinkMixin, db.Model):
             return current
         self.current_revision = EventNoteRevision(render_mode=render_mode, source=source, user=user)
         return self.current_revision
+
+    @classmethod
+    def html_matches(cls, search_string, exact=False):
+        """Check whether the html content matches a search string.
+
+        To be used in a SQLAlchemy `filter` call.
+
+        :param search_string: A string to search for
+        :param exact: Whether to search for the exact string
+        """
+        return fts_matches(cls.html, search_string, exact=exact)
 
     def __repr__(self):
         return '<EventNote({}, current_revision={}{}, {})>'.format(

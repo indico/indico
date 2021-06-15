@@ -12,6 +12,32 @@ from indico.core.db.sqlalchemy.util.queries import escape_like, preprocess_ts_st
 from indico.util.decorators import strict_classproperty
 
 
+def make_fts_index(model, column_name, db_column_name=None):
+    if db_column_name is None:
+        db_column_name = column_name
+    return db.Index(
+        f'ix_{model.__tablename__}_{db_column_name}_fts',
+        db.func.to_tsvector('simple', getattr(model, column_name)),
+        postgresql_using='gin'
+    )
+
+
+def fts_matches(column, search_string, *, exact=False):
+    """Check whether a fts-indexed column matches a search string.
+
+    To be used in a SQLAlchemy `filter` call.
+
+    :param column: The column to search in
+    :param search_string: A string to search for
+    :param exact: Whether to search for the exact string
+    """
+    crit = db.func.to_tsvector('simple', column).match(preprocess_ts_string(search_string),
+                                                       postgresql_regconfig='simple')
+    if exact:
+        crit = crit & column.ilike(escape_like(search_string))
+    return crit
+
+
 class SearchableTitleMixin:
     """Mixin to add a fulltext-searchable title column."""
 
@@ -21,10 +47,7 @@ class SearchableTitleMixin:
     @strict_classproperty
     @classmethod
     def __auto_table_args(cls):
-        args = [
-            db.Index(f'ix_{cls.__tablename__}_title_fts', db.func.to_tsvector('simple', cls.title),
-                     postgresql_using='gin')
-        ]
+        args = [make_fts_index(cls, 'title')]
         if cls.title_required:
             args.append(db.CheckConstraint("title != ''", 'valid_title'))
         return tuple(args)
@@ -45,8 +68,4 @@ class SearchableTitleMixin:
         :param search_string: A string to search for
         :param exact: Whether to search for the exact string
         """
-        crit = db.func.to_tsvector('simple', cls.title).match(preprocess_ts_string(search_string),
-                                                              postgresql_regconfig='simple')
-        if exact:
-            crit = crit & cls.title.ilike(f'%{escape_like(search_string)}%')
-        return crit
+        return fts_matches(cls.title, search_string, exact=exact)

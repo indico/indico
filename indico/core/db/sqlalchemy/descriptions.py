@@ -10,6 +10,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.db.sqlalchemy.searchable import fts_matches, make_fts_index
+from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
 from indico.util.string import MarkdownText, PlainText, RichMarkup
 
@@ -95,3 +97,21 @@ class DescriptionMixin(RenderModeMixin):
         )
 
     description = RenderModeMixin.create_hybrid_property('_description')
+
+
+class SearchableDescriptionMixin(DescriptionMixin):
+    @strict_classproperty
+    @classmethod
+    def __auto_table_args(cls):
+        return (make_fts_index(cls, '_description', 'description'),)
+
+    @classmethod
+    def description_matches(cls, search_string, exact=False):
+        """Check whether the description matches a search string.
+
+        To be used in a SQLAlchemy `filter` call.
+
+        :param search_string: A string to search for
+        :param exact: Whether to search for the exact string
+        """
+        return fts_matches(cls.description, search_string, exact=exact)

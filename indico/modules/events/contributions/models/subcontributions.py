@@ -5,10 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from sqlalchemy.ext.declarative import declared_attr
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
+from indico.core.db.sqlalchemy.descriptions import RenderMode, SearchableDescriptionMixin
 from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
+from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify
@@ -31,17 +35,22 @@ def _get_next_position(context):
     return (res[0] or 0) + 1
 
 
-class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, db.Model):
+class SubContribution(SearchableTitleMixin, SearchableDescriptionMixin, AttachedItemsMixin, AttachedNotesMixin,
+                      db.Model):
     __tablename__ = 'subcontributions'
-    __table_args__ = (db.Index(None, 'friendly_id', 'contribution_id', unique=True),
-                      db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
-                      {'schema': 'events'})
+    __auto_table_args = (db.Index(None, 'friendly_id', 'contribution_id', unique=True),
+                         db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
+                         {'schema': 'events'})
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_NOTES = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'subcontribution_id'
     possible_render_modes = {RenderMode.html, RenderMode.markdown}
     default_render_mode = RenderMode.markdown
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls)
 
     id = db.Column(
         db.Integer,
@@ -63,10 +72,6 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
         db.Integer,
         nullable=False,
         default=_get_next_position
-    )
-    title = db.Column(
-        db.String,
-        nullable=False
     )
     code = db.Column(
         db.String,
