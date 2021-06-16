@@ -51,7 +51,7 @@ class ContributionForm(IndicoForm):
     references = ReferencesField(_('External IDs'), reference_class=ContributionReference,
                                  description=_('Manage external resources for this contribution'))
     board_number = StringField(_('Board Number'))
-    code = StringField(_('Programme code'))
+    code = StringField(_('Program code'))
 
     @generated_data
     def render_mode(self):
@@ -118,7 +118,7 @@ class SubContributionForm(IndicoForm):
                                                   description=_('The speakers of the subcontribution'))
     references = ReferencesField(_('External IDs'), reference_class=SubContributionReference,
                                  description=_('Manage external resources for this sub-contribution'))
-    code = StringField(_('Programme code'))
+    code = StringField(_('Program code'))
 
     @generated_data
     def render_mode(self):

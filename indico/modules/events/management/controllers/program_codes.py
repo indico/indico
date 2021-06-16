@@ -86,9 +86,9 @@ class RHAssignProgramCodesBase(RHManageEventBase):
                     updates[obj] = (obj.code, code)
                     obj.code = code
             if updates:
-                flash(_('The programme codes have been successfully assigned'), 'success')
-                self.event.log(EventLogRealm.management, EventLogKind.change, 'Programme',
-                               'Programme codes assigned to {}'.format(self.object_type.replace('-', ' ')),
+                flash(_('The program codes have been successfully assigned'), 'success')
+                self.event.log(EventLogRealm.management, EventLogKind.change, 'Program',
+                               'Program codes assigned to {}'.format(self.object_type.replace('-', ' ')),
                                session.user, data=self._get_update_log_data(updates))
             else:
                 flash(_('No codes have been changed'), 'info')

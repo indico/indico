@@ -31,7 +31,7 @@ def _sidemenu_items(sender, event, **kwargs):
         yield SideMenuItem('protection', _('Protection'), url_for('event_management.protection', event),
                            70, icon='shield')
         if event.type_ == EventType.conference:
-            yield SideMenuItem('program_codes', _('Programme Codes'), url_for('event_management.program_codes', event),
+            yield SideMenuItem('program_codes', _('Program Codes'), url_for('event_management.program_codes', event),
                                section='advanced')
 
 

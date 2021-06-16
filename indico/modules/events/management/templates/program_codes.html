@@ -1,20 +1,20 @@
 {% extends 'events/management/base.html' %}
 
-{% block title %}{% trans %}Programme codes{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Program codes{% endtrans %}{% endblock %}
 
 {% block description %}
     {% trans -%}
-        You can automatically assign programme codes in your event to have more meaningful
+        You can automatically assign program codes in your event to have more meaningful
         ways of referencing e.g. certain contributions outside Indico.
     {%- endtrans %}
 {% endblock %}
 
 {% block content %}
     <h3>
-        {% trans %}Programme code templates{% endtrans %}
+        {% trans %}Program code templates{% endtrans %}
         <button class="icon-edit i-button i-button-small text-color borderless"
                 data-href="{{ url_for('.program_code_templates', event) }}"
-                data-title="{% trans %}Edit programme code templates{% endtrans %}"
+                data-title="{% trans %}Edit program code templates{% endtrans %}"
                 data-reload-after
                 data-ajax-dialog></button>
     </h3>
@@ -24,9 +24,9 @@
             {% if templates.session_template %}
                 <code>{{ templates.session_template }}</code>
                 <button class="icon-play i-button i-button-small text-color borderless inline"
-                        title="{% trans %}Assign programme codes to sessions{% endtrans %}"
+                        title="{% trans %}Assign program codes to sessions{% endtrans %}"
                         data-href="{{ url_for('.assign_program_codes_sessions', event) }}"
-                        data-title="{% trans %}Assign programme codes{% endtrans %}"
+                        data-title="{% trans %}Assign program codes{% endtrans %}"
                         data-ajax-dialog></button>
             {% else %}
                 <em>{% trans %}No template defined{% endtrans %}</em>
@@ -37,9 +37,9 @@
             {% if templates.session_block_template %}
                 <code>{{ templates.session_block_template }}</code>
                 <button class="icon-play i-button i-button-small text-color borderless inline"
-                        title="{% trans %}Assign programme codes to session blocks{% endtrans %}"
+                        title="{% trans %}Assign program codes to session blocks{% endtrans %}"
                         data-href="{{ url_for('.assign_program_codes_session_blocks', event) }}"
-                        data-title="{% trans %}Assign programme codes{% endtrans %}"
+                        data-title="{% trans %}Assign program codes{% endtrans %}"
                         data-ajax-dialog></button>
             {% else %}
                 <em>{% trans %}No template defined{% endtrans %}</em>
@@ -49,9 +49,9 @@
             {% if templates.contribution_template %}
                 <code>{{ templates.contribution_template }}</code>
                 <button class="icon-play i-button i-button-small text-color borderless inline"
-                        title="{% trans %}Assign programme codes to contributions{% endtrans %}"
+                        title="{% trans %}Assign program codes to contributions{% endtrans %}"
                         data-href="{{ url_for('.assign_program_codes_contributions', event) }}"
-                        data-title="{% trans %}Assign programme codes{% endtrans %}"
+                        data-title="{% trans %}Assign program codes{% endtrans %}"
                         data-ajax-dialog></button>
             {% else %}
                 <em>{% trans %}No template defined{% endtrans %}</em>
@@ -62,9 +62,9 @@
             {% if templates.subcontribution_template %}
                 <code>{{ templates.subcontribution_template }}</code>
                 <button class="icon-play i-button i-button-small text-color borderless inline"
-                        title="{% trans %}Assign programme codes to subcontributions{% endtrans %}"
+                        title="{% trans %}Assign program codes to subcontributions{% endtrans %}"
                         data-href="{{ url_for('.assign_program_codes_subcontributions', event) }}"
-                        data-title="{% trans %}Assign programme codes{% endtrans %}"
+                        data-title="{% trans %}Assign program codes{% endtrans %}"
                         data-ajax-dialog></button>
             {% else %}
                 <em>{% trans %}No template defined{% endtrans %}</em>

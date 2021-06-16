@@ -36,7 +36,7 @@ export const SUIPalette = {
   purple: Translate.string('Purple'),
   pink: Translate.string('Pink'),
   brown: Translate.string('Brown'),
-  gray: Translate.string('Gray'),
+  grey: Translate.string('Gray'),
   black: Translate.string('Black'),
 };
 export default Palette;

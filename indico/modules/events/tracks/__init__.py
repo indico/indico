@@ -25,7 +25,7 @@ logger = Logger.get('tracks')
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
     if event.type_ == EventType.conference and event.can_manage(session.user):
-        return SideMenuItem('program', _('Programme'), url_for('tracks.manage', event), section='organization')
+        return SideMenuItem('program', _('Program'), url_for('tracks.manage', event), section='organization')
 
 
 @signals.event.sidemenu.connect
@@ -36,7 +36,7 @@ def _extend_event_menu(sender, **kwargs):
     def _program_visible(event):
         return bool(track_settings.get(event, 'program').strip() or Track.query.with_parent(event).has_rows())
 
-    return MenuEntryData(title=_('Scientific Programme'), name='program', endpoint='tracks.program', position=1,
+    return MenuEntryData(title=_('Scientific Program'), name='program', endpoint='tracks.program', position=1,
                          visible=_program_visible, static_site=True)
 
 
