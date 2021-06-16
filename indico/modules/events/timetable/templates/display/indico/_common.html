@@ -54,8 +54,18 @@
     </div>
 {%- endmacro %}
 
-{% macro render_notes(item) -%}
+{% macro render_notes(item, for_event=none, anchor=none) -%}
     {% if item.has_note %}
-        {{ render_note(note=item.note, can_edit=item.can_edit_note(session.user)) }}
+        {# Check if url contains ?note=note_id and if so, expand the note #}
+        {% set req = request.args.get('note') %}
+        {% set note_id = item.note.id|string %}
+
+        {% if req == note_id %}
+            {{ render_note(note=item.note, hidden=false, can_edit=item.can_edit_note(session.user),
+                           for_event=for_event, anchor=anchor) }}
+        {% else %}
+            {{ render_note(note=item.note, can_edit=item.can_edit_note(session.user),
+                           for_event=for_event, anchor=anchor) }}
+        {% endif %}
     {% endif %}
 {%- endmacro %}

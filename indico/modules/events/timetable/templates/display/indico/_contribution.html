@@ -19,7 +19,7 @@
 
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
-                <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ contrib.slug }}">
+                <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ contrib.slug }}" data-anchor-strip-arg="note">
                     {{- contrib.title -}}
                 </span>
                 {% if contrib.duration and not theme_settings.hide_duration -%}
@@ -52,7 +52,7 @@
             {%- endif %}
             {{ render_attachments(contrib) }}
 
-            {{ render_notes(contrib) }}
+            {{ render_notes(contrib, anchor=contrib.slug) }}
 
             {% if contrib.subcontributions %}
                 <ul class="subcontrib-list">

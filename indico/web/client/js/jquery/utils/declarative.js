@@ -345,9 +345,18 @@ import {$T} from '../../utils/i18n';
       const $elem = $(this);
       const fragment = $elem.data('anchor');
       const permalink = $elem.data('permalink');
+      const stripArg = $elem.data('anchor-strip-arg');
+
+      // remove the field `stripArg` from the query string
+      const params = new URLSearchParams(window.location.search);
+      if (stripArg) {
+        params.delete(stripArg);
+      }
+      const url = window.location.pathname + params.toString();
+
       $('<a>', {
         class: 'anchor-link',
-        href: permalink || `#${fragment}`,
+        href: permalink || `${url}#${fragment}`,
         title: $elem.data('anchor-text') || $T.gettext('Direct link to this item'),
       })
         .html('&para;')

@@ -22,7 +22,7 @@
                     {% if multiple_days %}
                         {% block day_header scoped %}
                             <div class="day-header" style="width: 100%;">
-                                <div class="day-title" data-anchor="{{ anchor }}">
+                                <div class="day-title" data-anchor="{{ anchor }}" data-anchor-strip-arg="note">
                                     {{ item.start_dt | format_date(format='EEEE, d MMMM', timezone=timezone) }}
                                 </div>
                                 {% if days %}

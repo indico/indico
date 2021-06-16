@@ -11,9 +11,7 @@
     {% set session_ = block.session %}
     {% set entries = block.timetable_entry.children %}
 
-    {% set anchor = slugify('b', block.id, session_.title, block.title, maxlen=30) %}
-
-    <li class="timetable-item timetable-block" id="{{ anchor }}">
+    <li class="timetable-item timetable-block" id="{{ block.slug }}">
         <span class="timetable-time top-level">
             {% if not theme_settings.hide_session_block_time %}
                 {{ render_time(block, timezone=timezone) }}
@@ -21,7 +19,7 @@
         </span>
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
-                <span class="timetable-title top-level" data-anchor="{{ anchor }}">
+                <span class="timetable-title top-level" data-anchor="{{ block.slug }}" data-anchor-strip-arg="note">
                     {%- if block.title and block.title != session_.title -%}
                         {{- session_.title -}}: {{ block.title -}}
                     {%- else -%}
@@ -34,7 +32,7 @@
                 <div class="timetable-item-actions">
                     {{ render_manage_button(block, 'SESSION_BLOCK', show_notes=show_notes,
                                             show_button=(not event.is_locked and
-                                                         block.can_manage_attachments(session.user))) }}
+                                                         block.can_manage_attachments(session.user)), anchor=block.slug) }}
                     {{ template_hook('vc-actions', event=event, item=block) }}
                 </div>
             </div>
@@ -57,7 +55,7 @@
                 </tbody>
             </table>
 
-            {{ render_notes(session_) }}
+            {{ render_notes(session_, anchor=block.slug) }}
 
             {% if entries and not hide_contribs -%}
                 <ul class="meeting-sub-timetable">

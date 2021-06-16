@@ -199,6 +199,30 @@ class EventNoteResultSchema(ResultSchemaBase):
     event_path = fields.Method('_get_event_path', dump_only=True)
 
     def _get_url(self, data):
+        note_id = data['note_id']
+        event_id = data['event_id']
+        note = EventNote.get(note_id)
+        event = Event.get(data['event_id'])
+
+        # Keep the fallback URL for conferences
+        if not event or event.type_ == EventType.conference:
+            return self._get_fallback_url(data)
+
+        # Notes attached to the meeting itself don't have fragments to anchor to
+        if event.note and event.note.id == note_id:
+            return url_for('events.display', event_id=event_id, note=note_id)
+
+        # Find the parent of the note
+        if note.session and (block := note.session.blocks[0]):
+            return url_for('events.display', event_id=event_id, note=note_id, _anchor=block.slug)
+        elif (contrib := note.contribution):
+            return url_for('events.display', event_id=event_id, note=note_id, _anchor=contrib.slug)
+        elif (subcontrib := note.subcontribution):
+            return url_for('events.display', event_id=event_id, note=note_id, _anchor=subcontrib.slug)
+        else:
+            return self._get_fallback_url(data)
+
+    def _get_fallback_url(self, data):
         return url_for('event_notes.view', event_id=data['event_id'],
                        contrib_id=data['contribution_id'], subcontrib_id=data['subcontribution_id'])
 

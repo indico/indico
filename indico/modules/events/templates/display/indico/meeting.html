@@ -1,6 +1,7 @@
 {% from 'events/display/_event_header_message.html' import render_event_header_msg %}
 {% from 'events/display/common/_manage_button.html' import render_manage_button %}
 {% from 'events/display/indico/_common.html' import render_location, render_users, render_event_time %}
+{% from 'events/timetable/display/indico/_common.html' import render_notes %}
 {% from 'events/notes/_note.html' import render_note %}
 
 {{ render_event_header_msg(event) }}
@@ -60,10 +61,7 @@
             </div>
         {% endif %}
 
-        {% if event.has_note %}
-            {{ render_note(event.note, hidden=not theme_settings.show_notes, can_edit=event.can_manage(session.user),
-                           for_event=event) }}
-        {% endif %}
+        {{ render_notes(event, for_event=event) }}
 
         <div class="event-body {{ 'event-locked' if event.is_locked }}">
             {{ template_hook('meeting-body', event=event) }}

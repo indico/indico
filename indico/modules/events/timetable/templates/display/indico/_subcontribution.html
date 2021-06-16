@@ -7,7 +7,7 @@
     <li class="timetable-subcontrib timetable-item" id="{{ subcontrib.slug }}">
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
-                <span class="timetable-title" data-anchor="{{ subcontrib.slug }}">
+                <span class="timetable-title" data-anchor="{{ subcontrib.slug }}" data-anchor-strip-arg="note">
                     {% if theme_settings.number_contributions %}
                         {%- set n_scontrib = theme_context.num_subcontribution -%}
                         {{- 'abcdefghijklmnopqrstuvwxyz'[(n_scontrib - 1) % 26] * ((n_scontrib - 1) // 26 + 1) }})
@@ -44,7 +44,7 @@
                 </tbody>
             </table>
 
-            {{ render_notes(subcontrib) }}
+            {{ render_notes(subcontrib, anchor=subcontrib.slug) }}
         </div>
     </li>
 {% endmacro %}
