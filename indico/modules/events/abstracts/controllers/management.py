@@ -113,24 +113,43 @@ class RHManageAbstractSubmission(RHManageAbstractsBase):
 class RHManageAbstractReviewing(RHManageAbstractsBase):
     """Configure abstract reviewing."""
 
+    @property
+    def ratings_query(self):
+        return (AbstractReviewRating.query
+                .join(AbstractReviewRating.review)
+                .join(AbstractReview.abstract)
+                .join(AbstractReviewRating.question)
+                .filter(~Abstract.is_deleted, Abstract.event == self.event,
+                        AbstractReviewQuestion.field_type == 'rating'))
+
+    def _scale_ratings(self, scale_min, scale_max):
+        prev_min = abstracts_reviewing_settings.get(self.event, 'scale_lower')
+        prev_max = abstracts_reviewing_settings.get(self.event, 'scale_upper')
+        if scale_min == prev_min and scale_max == prev_max:
+            return
+        assert scale_max > scale_min
+
+        abstracts_reviewing_settings.set_multi(self.event, {
+            'scale_lower': scale_min,
+            'scale_upper': scale_max,
+        })
+        for rating in self.ratings_query:
+            if rating.value is None:
+                continue
+            value = (rating.value - prev_min) / (prev_max - prev_min)
+            rating.value = round(value * (scale_max - scale_min) + scale_min)
+
     def _process(self):
-        has_ratings = (AbstractReviewRating.query
-                       .join(AbstractReviewRating.review)
-                       .join(AbstractReview.abstract)
-                       .join(AbstractReviewRating.question)
-                       .filter(~Abstract.is_deleted, Abstract.event == self.event,
-                               AbstractReviewQuestion.field_type == 'rating')
-                       .has_rows())
         defaults = FormDefaults(**abstracts_reviewing_settings.get_all(self.event))
-        form = AbstractReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=has_ratings)
+        form = AbstractReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=self.ratings_query.has_rows())
         if form.validate_on_submit():
             data = form.data
+            self._scale_ratings(data['scale_lower'], data['scale_upper'])
             abstracts_reviewing_settings.set_multi(self.event, data)
             flash(_('Abstract reviewing settings have been saved'), 'success')
             return jsonify_data()
         self.commit = False
-        disabled_fields = form.RATING_FIELDS if has_ratings else ()
-        return jsonify_form(form, disabled_fields=disabled_fields)
+        return jsonify_form(form)
 
 
 class RHManageReviewingRoles(RHManageAbstractsBase):

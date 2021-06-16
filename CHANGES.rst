@@ -64,6 +64,7 @@ Improvements
   plugin) (:issue:`4900`, :pr:`4899`)
 - Support cloning surveys when cloning events (:issue:`2045`, :pr:`4910`)
 - Show external contribution references in conferences (:issue:`4928`, :pr:`4933`)
+- Allow changing the rating scale in abstract/paper reviewing even after reviewing started (:pr:`4942`)
 
 Bugfixes
 ^^^^^^^^

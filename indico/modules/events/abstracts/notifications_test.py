@@ -10,31 +10,19 @@ import re
 import pytest
 
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
-from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
 from indico.modules.events.abstracts.util import build_default_email_template
-from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.users.models.users import UserTitle
 from indico.util.date_time import now_utc
+
+
+pytest_plugins = 'indico.modules.events.abstracts.testing.fixtures'
 
 
 def assert_text_equal(v1, v2):
     """Compare two strings, ignoring white space and line breaks."""
     assert re.sub(r'\s', '', v1) == re.sub(r'\s', '', v2)
-
-
-@pytest.fixture
-def create_dummy_person(db, create_event_person):
-    def _create(abstract, first_name, last_name, email, affiliation, title, is_speaker, author_type):
-        person = create_event_person(abstract.event, first_name=first_name, last_name=last_name, email=email,
-                                     affiliation=affiliation, title=title)
-        link = AbstractPersonLink(abstract=abstract, person=person, is_speaker=is_speaker, author_type=author_type)
-        db.session.add(person)
-        db.session.flush()
-        return link
-    return _create
 
 
 @pytest.fixture
@@ -55,28 +43,6 @@ def create_dummy_contrib_type(db):
         db.session.flush()
         return contrib_type
     return _create
-
-
-@pytest.fixture
-def dummy_abstract(db, dummy_event, dummy_user, create_dummy_person):
-    abstract = Abstract(friendly_id=314,
-                        title="Broken Symmetry and the Mass of Gauge Vector Mesons",
-                        event=dummy_event,
-                        submitter=dummy_user,
-                        locator={'event_id': -314, 'abstract_id': 1234},
-                        judgment_comment='Vague but interesting!')
-
-    author1 = create_dummy_person(abstract, 'John', 'Doe', 'doe@example.com', 'ACME', UserTitle.mr, True,
-                                  AuthorType.primary)
-    author2 = create_dummy_person(abstract, 'Pocahontas', 'Silva', 'pocahontas@example.com', 'ACME', UserTitle.prof,
-                                  False, AuthorType.primary)
-    coauthor1 = create_dummy_person(abstract, 'John', 'Smith', 'smith@example.com', 'ACME', UserTitle.dr, False,
-                                    AuthorType.primary)
-
-    abstract.person_links = [author1, author2, coauthor1]
-    db.session.add(abstract)
-    db.session.flush()
-    return abstract
 
 
 @pytest.fixture
