@@ -148,10 +148,10 @@
           text() {
             const $this = $(this);
             if ($this.hasClass('enabled')) {
-              return $T.gettext('Remove from your favourites');
+              return $T.gettext('Remove from your favorites');
             } else {
               return '<h3>{0}</h3><p>{1}</p>'.format(
-                $T.gettext('Add to your favourites'),
+                $T.gettext('Add to your favorites'),
                 $T
                   .gettext(
                     'This will make events in this category visible on your <a href="{0}">Dashboard</a>.'

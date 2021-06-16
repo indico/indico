@@ -46,7 +46,7 @@ class CategorySettingsForm(IndicoForm):
                                            description=_('Default timetable theme used for meeting events'))
     suggestions_disabled = BooleanField(_('Disable Suggestions'), widget=SwitchWidget(),
                                         description=_("Enable this if you don't want Indico to suggest this category as"
-                                                      " a possible addition to a user's favourites."))
+                                                      " a possible addition to a user's favorites."))
     event_message_mode = IndicoEnumSelectField(_('Message Type'), enum=EventMessageMode,
                                                default=EventMessageMode.disabled,
                                                description=_('This message will show up at the top of every event page '

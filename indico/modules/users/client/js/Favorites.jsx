@@ -76,7 +76,7 @@ function FavoriteCatManager({userId}) {
       <div className="i-box just-group-list">
         <div className="i-box-header">
           <div className="i-box-title">
-            <Translate>Favourite Categories</Translate>
+            <Translate>Favorite Categories</Translate>
           </div>
         </div>
         <div className="i-box-content">
@@ -108,7 +108,7 @@ function FavoriteCatManager({userId}) {
                             link
                           />
                         }
-                        content={Translate.string('Remove from favourites')}
+                        content={Translate.string('Remove from favorites')}
                         position="bottom center"
                       />
                     </div>
@@ -118,7 +118,7 @@ function FavoriteCatManager({userId}) {
             </List>
           ) : (
             <div styleName="empty-favorites">
-              <Translate>You have not marked any category as favourite.</Translate>
+              <Translate>You have not marked any category as favorite.</Translate>
             </div>
           )}
         </div>
@@ -148,7 +148,7 @@ function FavoriteUserManager({userId}) {
       <div className="i-box just-group-list">
         <div className="i-box-header">
           <div className="i-box-title">
-            <Translate>Favourite Users</Translate>
+            <Translate>Favorite Users</Translate>
           </div>
         </div>
         <div className="i-box-content">
@@ -175,7 +175,7 @@ function FavoriteUserManager({userId}) {
                           link
                         />
                       }
-                      content={Translate.string('Remove from favourites')}
+                      content={Translate.string('Remove from favorites')}
                       position="bottom center"
                     />
                   </div>
@@ -184,7 +184,7 @@ function FavoriteUserManager({userId}) {
             </List>
           ) : (
             <div styleName="empty-favorites">
-              <Translate>You have not marked any user as favourite.</Translate>
+              <Translate>You have not marked any user as favorite.</Translate>
             </div>
           )}
         </div>
