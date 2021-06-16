@@ -83,8 +83,6 @@ class BulkPaperJudgmentForm(IndicoForm):
 class PaperReviewingSettingsForm(IndicoForm):
     """Settings form for paper reviewing."""
 
-    RATING_FIELDS = ('scale_lower', 'scale_upper')
-
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
     scale_lower = IntegerField(_("Scale (from)"), [InputRequired()])
     scale_upper = IntegerField(_("Scale (to)"), [InputRequired()])
