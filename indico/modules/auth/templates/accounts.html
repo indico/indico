@@ -114,7 +114,7 @@
                         {% for identity in user.external_identities | sort(attribute='safe_last_login_dt', reverse=True) %}
                             <li class="flexrow f-a-center">
                                 <span class="list-item-title">
-                                    {{ provider_titles[identity.provider] }}
+                                    {{ provider_titles.get(identity.provider, identity.provider) }}
                                 </span>
                                 <span>
                                     <small>
