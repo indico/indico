@@ -576,6 +576,17 @@ class User(PersonMixin, db.Model):
             if item not in done:
                 yield item
 
+    def get_identity(self, provider):
+        """Return the first user identity which matches the given provider.
+
+        :param provider: The id of the provider in question
+        :return: The requested identity, or `None` if none is found
+        """
+        return next(
+            (ident for ident in self.identities if ident.provider == provider),
+            None
+        )
+
     @property
     def can_get_all_multipass_groups(self):
         """
