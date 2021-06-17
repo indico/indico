@@ -34,6 +34,7 @@ import {TrackACLField} from 'indico/react/components';
         eventId: this.options.eventId,
         eventRoles: this.options.eventRoles,
         categoryRoles: this.options.categoryRoles,
+        scrollOnOpen: true,
         onChange,
       });
       ReactDOM.render(component, element);

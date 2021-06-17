@@ -18,6 +18,7 @@ export default function TrackACLField({
   eventId,
   eventRoles,
   categoryRoles,
+  scrollOnOpen,
   onChange,
 }) {
   const [currentValue, setCurrentValue] = useState(value);
@@ -42,6 +43,7 @@ export default function TrackACLField({
       eventId={eventId}
       eventRoles={eventRoles}
       categoryRoles={categoryRoles}
+      scrollOnOpen={scrollOnOpen}
     />
   );
 }
@@ -58,5 +60,10 @@ TrackACLField.propTypes = {
   eventId: PropTypes.number.isRequired,
   eventRoles: PropTypes.array.isRequired,
   categoryRoles: PropTypes.array.isRequired,
+  scrollOnOpen: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+};
+
+TrackACLField.defaultProps = {
+  scrollOnOpen: false,
 };
