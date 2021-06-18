@@ -30,7 +30,7 @@ def build_indico_request(path, params, api_key=None, secret_key=None, only_publi
     if secret_key:
         items.append(('timestamp', str(int(time.time()))))
         items = sorted(items, key=lambda x: x[0].lower())
-        url = '{}?{}'.format(path, urlencode(items))
+        url = f'{path}?{urlencode(items)}'
         signature = hmac.new(secret_key.encode(), url.encode(), hashlib.sha1).hexdigest()
         items.append(('signature', signature))
     return items

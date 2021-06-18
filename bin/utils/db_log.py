@@ -71,7 +71,7 @@ class LogRecordStreamHandler(StreamRequestHandler):
             with output_lock:
                 print('\n' * 5)
                 print_linesep(True, 10)
-                print('\x1b[38;5;70mBegin request\x1b[0m  {}'.format(self._format_request(obj)))
+                print(f'\x1b[38;5;70mBegin request\x1b[0m  {self._format_request(obj)}')
                 print_linesep()
             return
         elif sql_log_type == 'end_request':
