@@ -174,7 +174,6 @@ class EventReminder(db.Model):
         email = make_email(
             bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl, attachments=attachments
         )
-        logger.info(self.event.organizer_info)
         send_email(email, self.event, 'Reminder', self.creator)
 
     def __repr__(self):
