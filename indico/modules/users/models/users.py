@@ -536,8 +536,11 @@ class User(PersonMixin, db.Model):
 
     @property
     def avatar_url(self):
+        from indico.modules.users.util import get_avatar_url_from_name
         if self.is_system:
             return url_for('assets.image', filename='robot.svg')
+        elif self.id is None:
+            return get_avatar_url_from_name(self.first_name)
         slug = self.picture_metadata['hash'] if self.picture_metadata else 'default'
         return url_for('users.user_profile_picture_display', self, slug=slug)
 
