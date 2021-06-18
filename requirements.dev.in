@@ -14,6 +14,7 @@ pytest-localserver
 pytest-mock
 pytest-redis
 pytest
+pyquotes
 pyupgrade
 pywatchman
 sphinx-autobuild
