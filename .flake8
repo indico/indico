@@ -10,7 +10,7 @@ multiline-quotes = single
 docstring-quotes = double
 avoid-escape = true
 
-exclude =
+extend-exclude =
     build
     dist
     docs
@@ -20,9 +20,6 @@ exclude =
     node_modules
     .*/
     indico.conf
-    # TODO: remove the next two entries and use extend-exclude once flake8 3.8.0 is out
-    .git
-    __pycache__
 
 ignore =
     # allow omitting whitespace around arithmetic operators
@@ -32,10 +29,6 @@ ignore =
     W504
     # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
     E731
-    # while single quotes are nicer, we have double quotes in way too many places
-    Q000
-    # for non-docstring multiline strings we don't really enforce a quote style
-    Q001
 
 per-file-ignores =
     # signals use wildcard imports to expose everything in `indico.core.signals`
