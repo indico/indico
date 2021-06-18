@@ -111,9 +111,8 @@ class AdminUserSettingsForm(IndicoForm):
                                                          'registers a new local account.'))
     email_blacklist = MultiStringField(_('Email blacklist'), field=('email_blacklist', _('email')),
                                        unique=True, flat=True,
-                                       description=_('Disallow users from registering with these email addresses. '
-                                                     'Comma-separated list of addresses. '
-                                                     'Supports wildcards (*), e.g., *@gmail.com.'))
+                                       description=_('Prevent users from creating Indico accounts with these email '
+                                                     'addresses. Supports wildcards, e.g. *@gmail.com'))
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):
