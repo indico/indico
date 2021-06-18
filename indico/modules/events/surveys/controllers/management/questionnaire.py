@@ -61,7 +61,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
 
     def _import_data(self, data):
         if data['version'] != 1:
-            raise ValueError("Unsupported document format")
+            raise ValueError('Unsupported document format')
 
         # If the survey currently contains only one empty section, remove it.
         if len(self.survey.items) == 1 and isinstance(self.survey.items[0], SurveySection):
@@ -108,9 +108,9 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
             except ValueError as exc:
                 db.session.rollback()
                 logger.info('%s tried to import an invalid JSON file: %s', session.user, exc)
-                flash(_("Invalid file selected."), 'error')
+                flash(_('Invalid file selected.'), 'error')
             else:
-                flash(_("The questionnaire has been imported."), 'success')
+                flash(_('The questionnaire has been imported.'), 'success')
                 logger.info('Questionnaire imported from JSON document by %s', session.user)
             return jsonify_data(questionnaire=_render_questionnaire_preview(self.survey))
         return jsonify_form(form, form_header_kwargs={'action': request.relative_url})

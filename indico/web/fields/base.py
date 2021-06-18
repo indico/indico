@@ -16,10 +16,10 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class FieldConfigForm(IndicoForm):
-    title = StringField(_('Title'), [DataRequired()], description=_("The title of the field"))
-    description = TextAreaField(_('Description'), description=_("The description of the field"))
+    title = StringField(_('Title'), [DataRequired()], description=_('The title of the field'))
+    description = TextAreaField(_('Description'), description=_('The description of the field'))
     is_required = BooleanField(_('Required'), widget=SwitchWidget(),
-                               description=_("Whether the user has to fill out the field"))
+                               description=_('Whether the user has to fill out the field'))
 
 
 class BaseField:

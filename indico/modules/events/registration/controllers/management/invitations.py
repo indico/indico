@@ -70,8 +70,8 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
                 self._create_invitation(user, skip_moderation, form.email_from.data,
                                         form.email_subject.data, form.email_body.data)
             num = len(form.users.data)
-            flash(ngettext("The invitation has been sent.",
-                           "{n} invitations have been sent.",
+            flash(ngettext('The invitation has been sent.',
+                           '{n} invitations have been sent.',
                            num).format(n=num), 'success')
             return jsonify_data(invitation_list=_render_invitation_list(self.regform))
         return jsonify_template('events/registration/management/regform_invite.html', regform=self.regform, form=form)

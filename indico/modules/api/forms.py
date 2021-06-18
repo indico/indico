@@ -17,17 +17,17 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 security_mode_titles = {
-    APIMode.KEY: _("Key for authenticated requests only"),
-    APIMode.ONLYKEY: _("Key for all requests"),
-    APIMode.SIGNED: _("Key+signature for authenticated requests only"),
-    APIMode.ONLYKEY_SIGNED: _("Key for all requests. Signature for authenticated requests"),
-    APIMode.ALL_SIGNED: _("Key+signature for all requests")
+    APIMode.KEY: _('Key for authenticated requests only'),
+    APIMode.ONLYKEY: _('Key for all requests'),
+    APIMode.SIGNED: _('Key+signature for authenticated requests only'),
+    APIMode.ONLYKEY_SIGNED: _('Key for all requests. Signature for authenticated requests'),
+    APIMode.ALL_SIGNED: _('Key+signature for all requests')
 }
 
 
 class AdminSettingsForm(IndicoForm):
     allow_persistent = BooleanField(_('Persistent signatures'), widget=SwitchWidget(),
-                                    description=_("Allow users to enable persistent signatures (without timestamp)."))
+                                    description=_('Allow users to enable persistent signatures (without timestamp).'))
     security_mode = IndicoEnumSelectField(_('Security mode'), enum=APIMode, titles=security_mode_titles,
                                           description=_('Specify if/when people need to use an API key or a '
                                                         'signed request.'))

@@ -134,11 +134,11 @@ class PersonMixin:
 #: Fields which can be synced as keys and a mapping to a more human
 #: readable version, used for flashing messages
 syncable_fields = {
-    'first_name': _("first name"),
-    'last_name': _("family name"),
-    'affiliation': _("affiliation"),
-    'address': _("address"),
-    'phone': _("phone number")
+    'first_name': _('first name'),
+    'last_name': _('family name'),
+    'affiliation': _('affiliation'),
+    'address': _('address'),
+    'phone': _('phone number')
 }
 
 

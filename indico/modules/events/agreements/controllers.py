@@ -62,7 +62,7 @@ class RHAgreementForm(RHDisplayEventBase):
         # you need to be able to sign it no matter if you have access to the event
         # or not.  Speakers might not even have an Indico account...
         if self.agreement.uuid != request.view_args['uuid']:
-            raise Forbidden(_("The URL for this agreement is invalid."))
+            raise Forbidden(_('The URL for this agreement is invalid.'))
         if self.agreement.user:
             self._require_user()
 
@@ -175,7 +175,7 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
         agreements = self._get_agreements()
         for agreement in agreements:
             notify_agreement_reminder(agreement, email_body, form.cc_addresses.data, form.from_address.data)
-        flash(_("Reminders sent"), 'success')
+        flash(_('Reminders sent'), 'success')
 
 
 class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
@@ -221,7 +221,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
             if self.event != self.agreement.event:
                 raise NotFound
             if not self.agreement.pending:
-                raise NoReportError(_("The agreement is already signed"))
+                raise NoReportError(_('The agreement is already signed'))
         else:
             self.agreement = None
             identifier = request.args['identifier']
@@ -256,7 +256,7 @@ class RHAgreementManagerDetailsDownloadAgreement(RHAgreementManagerDetailsAgreem
     def _process_args(self):
         RHAgreementManagerDetailsAgreementBase._process_args(self)
         if self.agreement.state != AgreementState.accepted_on_behalf:
-            raise NoReportError("The agreement was not accepted manually by an admin")
+            raise NoReportError('The agreement was not accepted manually by an admin')
 
     def _process(self):
         io = BytesIO(self.agreement.attachment)

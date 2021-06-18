@@ -61,7 +61,7 @@ def _send_initial_heartbeat(*args, **kwargs):
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     if session.user.is_admin:
-        return SideMenuItem('celery', _("Tasks"), url_for('celery.index'), 20, icon='time')
+        return SideMenuItem('celery', _('Tasks'), url_for('celery.index'), 20, icon='time')
 
 
 @template_hook('global-announcement', priority=-100, markup=False)
@@ -73,10 +73,10 @@ def _inject_announcement_header(**kwargs):
     down = not last_ping or (now_utc() - last_ping) > timedelta(hours=1)
     mismatch = last_ping_version and last_ping_version != indico.__version__
     if down:
-        text = _("The Celery task scheduler does not seem to be running. This means that email sending and periodic "
-                 "tasks such as event reminders do not work.")
+        text = _('The Celery task scheduler does not seem to be running. This means that email sending and periodic '
+                 'tasks such as event reminders do not work.')
     elif mismatch:
-        text = _("The Celery task scheduler is running a different Indico version.")
+        text = _('The Celery task scheduler is running a different Indico version.')
     else:
         return
     return 'error', text, True

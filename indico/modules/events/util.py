@@ -441,12 +441,12 @@ def track_time_changes(auto_extend=False, user=None):
                 if isinstance(obj, Event):
                     if not obj.can_manage(user):
                         # TODO: raise Forbidden exceptions after adding protection check in the UI
-                        raise UserValueError(_("Your action requires modification of event boundaries, but you are "
-                                               "not authorized to manage the event."))
+                        raise UserValueError(_('Your action requires modification of event boundaries, but you are '
+                                               'not authorized to manage the event.'))
                 elif not obj.object.can_manage(user):
                     # TODO: raise Forbidden exceptions after adding protection check in the UI
-                    raise UserValueError(_("Your action requires modification of session block boundaries, but you are "
-                                           "not authorized to manage the session block."))
+                    raise UserValueError(_('Your action requires modification of session block boundaries, but you are '
+                                           'not authorized to manage the session block.'))
         old_times = g.pop('old_times')
         for obj, info in old_times.items():
             if isinstance(obj, TimetableEntry):

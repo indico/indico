@@ -15,7 +15,7 @@ from indico.web.flask.util import url_for
 
 class FirstNamePlaceholder(Placeholder):
     name = 'first_name'
-    description = _("First name of the person")
+    description = _('First name of the person')
 
     @classmethod
     def render(cls, regform, registration):
@@ -24,7 +24,7 @@ class FirstNamePlaceholder(Placeholder):
 
 class LastNamePlaceholder(Placeholder):
     name = 'last_name'
-    description = _("Last name of the person")
+    description = _('Last name of the person')
 
     @classmethod
     def render(cls, regform, registration):
@@ -33,7 +33,7 @@ class LastNamePlaceholder(Placeholder):
 
 class EventTitlePlaceholder(Placeholder):
     name = 'event_title'
-    description = _("The title of the event")
+    description = _('The title of the event')
 
     @classmethod
     def render(cls, regform, registration):
@@ -42,7 +42,7 @@ class EventTitlePlaceholder(Placeholder):
 
 class EventLinkPlaceholder(Placeholder):
     name = 'event_link'
-    description = _("Link to the event")
+    description = _('Link to the event')
 
     @classmethod
     def render(cls, regform, registration):
@@ -53,7 +53,7 @@ class EventLinkPlaceholder(Placeholder):
 
 class IDPlaceholder(Placeholder):
     name = 'id'
-    description = _("The ID of the registration")
+    description = _('The ID of the registration')
 
     @classmethod
     def render(cls, regform, registration):
@@ -62,7 +62,7 @@ class IDPlaceholder(Placeholder):
 
 class LinkPlaceholder(Placeholder):
     name = 'link'
-    description = _("The link to the registration details")
+    description = _('The link to the registration details')
 
     @classmethod
     def render(cls, regform, registration):
@@ -72,7 +72,7 @@ class LinkPlaceholder(Placeholder):
 
 class RejectionReasonPlaceholder(Placeholder):
     name = 'rejection_reason'
-    description = _("The reason why the registration was rejected")
+    description = _('The reason why the registration was rejected')
 
     @classmethod
     def render(cls, regform, registration):

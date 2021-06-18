@@ -114,7 +114,7 @@ class AdminUserSettingsForm(IndicoForm):
 class AdminAccountRegistrationForm(LocalRegistrationForm):
     email = EmailField(_('Email address'), [DataRequired(), Email(), _check_existing_email],
                        filters=[lambda s: s.lower() if s else s])
-    create_identity = BooleanField(_("Set login details"), widget=SwitchWidget(), default=True)
+    create_identity = BooleanField(_('Set login details'), widget=SwitchWidget(), default=True)
 
     def __init__(self, *args, **kwargs):
         if config.LOCAL_IDENTITIES:

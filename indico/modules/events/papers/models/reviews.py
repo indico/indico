@@ -16,7 +16,7 @@ from indico.util.string import format_repr
 
 
 class PaperAction(RichIntEnum):
-    __titles__ = [None, _("Accept"), _("Reject"), _("To be corrected")]
+    __titles__ = [None, _('Accept'), _('Reject'), _('To be corrected')]
     __css_classes__ = [None, 'success', 'error', 'warning']
     accept = 1
     reject = 2
@@ -24,7 +24,7 @@ class PaperAction(RichIntEnum):
 
 
 class PaperReviewType(RichIntEnum):
-    __titles__ = [None, _("Layout"), _("Content")]
+    __titles__ = [None, _('Layout'), _('Content')]
     layout = 1
     content = 2
 
@@ -54,10 +54,10 @@ class PaperJudgmentProxy:
 class PaperCommentVisibility(RichIntEnum):
     """Most to least restrictive visibility for paper comments."""
     __titles__ = [None,
-                  _("Visible only to judges"),
-                  _("Visible to reviewers and judges"),
-                  _("Visible to contributors, reviewers, and judges"),
-                  _("Visible to all users")]
+                  _('Visible only to judges'),
+                  _('Visible to reviewers and judges'),
+                  _('Visible to contributors, reviewers, and judges'),
+                  _('Visible to all users')]
     judges = 1
     reviewers = 2
     contributors = 3

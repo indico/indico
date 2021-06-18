@@ -66,9 +66,9 @@ class RHDisplayEventBase(RHProtectedEventBase):
             elif self.event.has_regform_in_acl and self.event.public_regform_access:
                 raise RegistrationRequired
 
-            msg = [_("You are not authorized to access this event.")]
+            msg = [_('You are not authorized to access this event.')]
             if self.event.no_access_contact:
-                msg.append(_("If you believe you should have access, please contact {}")
+                msg.append(_('If you believe you should have access, please contact {}')
                            .format(self.event.no_access_contact))
             raise Forbidden(' '.join(msg))
 

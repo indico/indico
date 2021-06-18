@@ -14,4 +14,4 @@ from indico.web.forms.widgets import CKEditorWidget
 
 class NoteForm(IndicoForm):
     # TODO: use something switchable
-    source = TextAreaField(_("Minutes"), widget=CKEditorWidget())
+    source = TextAreaField(_('Minutes'), widget=CKEditorWidget())

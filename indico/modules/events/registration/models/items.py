@@ -147,31 +147,31 @@ class RegistrationFormItem(db.Model):
 
     __tablename__ = 'form_items'
     __table_args__ = (
-        db.CheckConstraint("(input_type IS NULL) = (type NOT IN ({t.field}, {t.field_pd}))"
+        db.CheckConstraint('(input_type IS NULL) = (type NOT IN ({t.field}, {t.field_pd}))'
                            .format(t=RegistrationFormItemType),
                            name='valid_input'),
-        db.CheckConstraint(f"NOT is_manager_only OR type = {RegistrationFormItemType.section}",
+        db.CheckConstraint(f'NOT is_manager_only OR type = {RegistrationFormItemType.section}',
                            name='valid_manager_only'),
-        db.CheckConstraint("(type IN ({t.section}, {t.section_pd})) = (parent_id IS NULL)"
+        db.CheckConstraint('(type IN ({t.section}, {t.section_pd})) = (parent_id IS NULL)'
                            .format(t=RegistrationFormItemType),
                            name='top_level_sections'),
-        db.CheckConstraint("(type != {type}) = (personal_data_type IS NULL)"
+        db.CheckConstraint('(type != {type}) = (personal_data_type IS NULL)'
                            .format(type=RegistrationFormItemType.field_pd),
                            name='pd_field_type'),
-        db.CheckConstraint("NOT is_deleted OR (type NOT IN ({t.section_pd}, {t.field_pd}))"
+        db.CheckConstraint('NOT is_deleted OR (type NOT IN ({t.section_pd}, {t.field_pd}))'
                            .format(t=RegistrationFormItemType),
                            name='pd_not_deleted'),
-        db.CheckConstraint(f"is_enabled OR type != {RegistrationFormItemType.section_pd}",
+        db.CheckConstraint(f'is_enabled OR type != {RegistrationFormItemType.section_pd}',
                            name='pd_section_enabled'),
-        db.CheckConstraint("is_enabled OR type != {type} OR personal_data_type NOT IN "
-                           "({pt.email}, {pt.first_name}, {pt.last_name})"
+        db.CheckConstraint('is_enabled OR type != {type} OR personal_data_type NOT IN '
+                           '({pt.email}, {pt.first_name}, {pt.last_name})'
                            .format(type=RegistrationFormItemType.field_pd, pt=PersonalDataType),
                            name='pd_field_enabled'),
-        db.CheckConstraint("is_required OR type != {type} OR personal_data_type NOT IN "
-                           "({pt.email}, {pt.first_name}, {pt.last_name})"
+        db.CheckConstraint('is_required OR type != {type} OR personal_data_type NOT IN '
+                           '({pt.email}, {pt.first_name}, {pt.last_name})'
                            .format(type=RegistrationFormItemType.field_pd, pt=PersonalDataType),
                            name='pd_field_required'),
-        db.CheckConstraint("current_data_id IS NULL OR type IN ({t.field}, {t.field_pd})"
+        db.CheckConstraint('current_data_id IS NULL OR type IN ({t.field}, {t.field_pd})'
                            .format(t=RegistrationFormItemType),
                            name='current_data_id_only_field'),
         db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,

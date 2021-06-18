@@ -141,8 +141,8 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
         disabled_fields = set(self.application.system_app_type.enforced_data)
         if form.validate_on_submit():
             form.populate_obj(self.application)
-            logger.info("Application %s updated by %s", self.application, session.user)
-            flash(_("Application {} was modified").format(self.application.name), 'success')
+            logger.info('Application %s updated by %s', self.application, session.user)
+            flash(_('Application {} was modified').format(self.application.name), 'success')
             return redirect(url_for('.apps'))
         return WPOAuthAdmin.render_template('app_details.html', application=self.application, form=form,
                                             disabled_fields=disabled_fields)
@@ -158,8 +158,8 @@ class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
 
     def _process(self):
         db.session.delete(self.application)
-        logger.info("Application %s deleted by %s", self.application, session.user)
-        flash(_("Application deleted successfully"), 'success')
+        logger.info('Application %s deleted by %s', self.application, session.user)
+        flash(_('Application deleted successfully'), 'success')
         return redirect(url_for('.apps'))
 
 
@@ -173,8 +173,8 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
             form.populate_obj(application)
             db.session.add(application)
             db.session.flush()
-            logger.info("Application %s created by %s", application, session.user)
-            flash(_("Application {} registered successfully").format(application.name), 'success')
+            logger.info('Application %s created by %s', application, session.user)
+            flash(_('Application {} registered successfully').format(application.name), 'success')
             return redirect(url_for('.app_details', application))
         return WPOAuthAdmin.render_template('app_new.html', form=form)
 
@@ -184,8 +184,8 @@ class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
 
     def _process(self):
         self.application.reset_client_secret()
-        logger.info("Client secret of %s reset by %s", self.application, session.user)
-        flash(_("New client secret generated for the application"), 'success')
+        logger.info('Client secret of %s reset by %s', self.application, session.user)
+        flash(_('New client secret generated for the application'), 'success')
         return redirect(url_for('.app_details', self.application))
 
 
@@ -195,7 +195,7 @@ class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
     def _process(self):
         self.application.user_links.delete()
         logger.info('Deauthorizing app %r for all users', self.application)
-        flash(_("App authorization revoked for all users."), 'success')
+        flash(_('App authorization revoked for all users.'), 'success')
         return redirect(url_for('.app_details', self.application))
 
 

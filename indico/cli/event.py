@@ -24,9 +24,9 @@ def cli():
 
 @cli.command()
 @click.argument('event_id', type=int)
-@click.option('-u', '--user', 'user_id', type=int, default=None, metavar="USER_ID",
-              help="The user which will be shown on the log as having restored the event (default: no user).")
-@click.option('-m', '--message', 'message', metavar="MESSAGE", help="An additional message for the log")
+@click.option('-u', '--user', 'user_id', type=int, default=None, metavar='USER_ID',
+              help='The user which will be shown on the log as having restored the event (default: no user).')
+@click.option('-m', '--message', 'message', metavar='MESSAGE', help='An additional message for the log')
 def restore(event_id, user_id, message):
     """Restore a deleted event."""
     event = Event.get(event_id)

@@ -118,24 +118,24 @@ def create_mock_abstract(event):
             except KeyError:
                 raise AttributeError
 
-    englert = User(full_name="Fran\xe7ois Englert", first_name="Fran\xe7ois", last_name="Englert", title="Prof.")
-    brout = User(full_name="Robert Brout", first_name="Robert", last_name="Brout", title="Prof.")
-    guralnik = User(full_name="Gerald Guralnik", first_name="Gerald", last_name="Guralnik", title="Prof.")
-    hagen = User(full_name="Carl Hagen", first_name="Carl", last_name="Hagen", title="Prof.")
-    kibble = User(full_name="Tom Kibble", first_name="Tom", last_name="Kibble", title="Prof.")
-    higgs = User(full_name="Peter Higgs", first_name="Peter", last_name="Higgs", title="Prof.")
+    englert = User(full_name='Fran\xe7ois Englert', first_name='Fran\xe7ois', last_name='Englert', title='Prof.')
+    brout = User(full_name='Robert Brout', first_name='Robert', last_name='Brout', title='Prof.')
+    guralnik = User(full_name='Gerald Guralnik', first_name='Gerald', last_name='Guralnik', title='Prof.')
+    hagen = User(full_name='Carl Hagen', first_name='Carl', last_name='Hagen', title='Prof.')
+    kibble = User(full_name='Tom Kibble', first_name='Tom', last_name='Kibble', title='Prof.')
+    higgs = User(full_name='Peter Higgs', first_name='Peter', last_name='Higgs', title='Prof.')
 
-    track = Track(title="Higgs Fields")
-    session = Session(title="Higgs Fields Posters")
-    contribution_type = ContributionType(name="Poster")
-    contribution = Contribution(title="Broken Symmetry and the Mass of Gauge Vector Mesons",
+    track = Track(title='Higgs Fields')
+    session = Session(title='Higgs Fields Posters')
+    contribution_type = ContributionType(name='Poster')
+    contribution = Contribution(title='Broken Symmetry and the Mass of Gauge Vector Mesons',
                                 track=track,
                                 session=session,
                                 type=contribution_type,
                                 locator={'event_id': -314, 'contrib_id': 1234})
 
     target_abstract = Abstract(friendly_id=315,
-                               title="Broken Symmetry",
+                               title='Broken Symmetry',
                                accepted_track=track,
                                accepted_contrib_type=contribution_type,
                                event=event,
@@ -151,7 +151,7 @@ def create_mock_abstract(event):
                                merged_into=None)
 
     abstract = Abstract(friendly_id=314,
-                        title="Broken Symmetry and the Mass of Gauge Vector Mesons",
+                        title='Broken Symmetry and the Mass of Gauge Vector Mesons',
                         accepted_track=track,
                         accepted_contrib_type=contribution_type,
                         event=event,

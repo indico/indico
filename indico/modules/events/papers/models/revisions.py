@@ -21,7 +21,7 @@ from indico.util.string import format_repr
 
 
 class PaperRevisionState(RichIntEnum):
-    __titles__ = [None, _("Submitted"), _("Accepted"), _("Rejected"), _("To be corrected")]
+    __titles__ = [None, _('Submitted'), _('Accepted'), _('Rejected'), _('To be corrected')]
     __css_classes__ = [None, 'highlight', 'success', 'error', 'warning']
     submitted = 1
     accepted = 2

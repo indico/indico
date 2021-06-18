@@ -49,8 +49,8 @@ def _convert_email_principals(user, **kwargs):
     sessions = SessionPrincipal.replace_email_with_user(user, 'session')
     if sessions:
         num = len(sessions)
-        flash(ngettext("You have been granted manager/coordination privileges for a session.",
-                       "You have been granted manager/coordination privileges for {} sessions.", num).format(num),
+        flash(ngettext('You have been granted manager/coordination privileges for a session.',
+                       'You have been granted manager/coordination privileges for {} sessions.', num).format(num),
               'info')
 
 
@@ -92,5 +92,5 @@ def _extend_event_menu(sender, **kwargs):
     def _visible_my_sessions(event):
         return session.user and has_sessions_for_user(event, session.user)
 
-    yield MenuEntryData(title=_("My Sessions"), name='my_sessions', endpoint='sessions.my_sessions', position=1,
+    yield MenuEntryData(title=_('My Sessions'), name='my_sessions', endpoint='sessions.my_sessions', position=1,
                         parent='my_conference', visible=_visible_my_sessions)

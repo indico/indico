@@ -376,7 +376,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         elif value:
             attr = RoomAttribute.query.filter_by(name=name).first()
             if not attr:
-                raise ValueError(f"Attribute {name} does not exist")
+                raise ValueError(f'Attribute {name} does not exist')
             attr_assoc = RoomAttributeAssociation()
             attr_assoc.value = value
             attr_assoc.attribute = attr

@@ -21,9 +21,9 @@ from indico.web.flask.templating import get_template_module
 class EmailNotificationCondition(Condition):
     #: Override if you want to customize the text
     #: that shouls up for "Any"
-    any_caption = _("any")
+    any_caption = _('any')
     #: same for text that shows up for "none"
-    none_caption = _("none")
+    none_caption = _('none')
     #: Text that will show inline in rule descriptions
     label_text = None
 
@@ -44,10 +44,10 @@ class TrackCondition(EmailNotificationCondition):
     """A condition that matches a particular track."""
 
     name = 'track'
-    description = _("Destination Track")
-    any_caption = _("any track")
-    none_caption = _("no track")
-    label_text = _("in")
+    description = _('Destination Track')
+    any_caption = _('any track')
+    none_caption = _('no track')
+    label_text = _('in')
 
     @classmethod
     def _iter_available_values(cls, event, **kwargs):
@@ -73,7 +73,7 @@ class StateCondition(EmailNotificationCondition):
     """A condition that matches a particular abstract final state."""
 
     name = 'state'
-    description = _("Final State")
+    description = _('Final State')
     required = True
 
     compatible_with = {
@@ -103,10 +103,10 @@ class ContributionTypeCondition(EmailNotificationCondition):
     """A condition that matches a particular contribution type."""
 
     name = 'contribution_type'
-    description = _("Contribution Type")
-    any_caption = _("any type")
-    none_caption = _("no type")
-    label_text = _("as")
+    description = _('Contribution Type')
+    any_caption = _('any type')
+    none_caption = _('no type')
+    label_text = _('as')
 
     @classmethod
     def _iter_available_values(cls, event, **kwargs):

@@ -63,15 +63,15 @@ class VCPluginSettingsFormBase(IndicoForm):
 class VCRoomLinkFormBase(IndicoForm):
     conditional_fields = {'contribution', 'block'}
 
-    linking = IndicoRadioField(_("Link to"), [DataRequired()],
-                               choices=[('event', _("Event")),
-                                        ('contribution', _("Contribution")),
-                                        ('block', _("Session"))],
+    linking = IndicoRadioField(_('Link to'), [DataRequired()],
+                               choices=[('event', _('Event')),
+                                        ('contribution', _('Contribution')),
+                                        ('block', _('Session'))],
                                widget=LinkingWidget())
-    contribution = SelectField(_("Contribution"),
+    contribution = SelectField(_('Contribution'),
                                [UsedIf(lambda form, field: form.linking.data == 'contribution'), DataRequired()],
                                coerce=lambda x: int(x) if x else None)
-    block = SelectField(_("Session block"),
+    block = SelectField(_('Session block'),
                         [UsedIf(lambda form, field: form.linking.data == 'block'), DataRequired()],
                         coerce=lambda x: int(x) if x else None)
 
@@ -95,15 +95,15 @@ class VCRoomLinkFormBase(IndicoForm):
         block_choices = [(block.id, '{} ({})'.format(block.full_title,
                                                      format_datetime(block.start_dt, timezone=self.event.tzinfo)))
                          for block in sorted(blocks, key=attrgetter('full_title', 'start_dt'))]
-        self.contribution.choices = [('', _("Please select a contribution"))] + contrib_choices
-        self.block.choices = [('', _("Please select a session block"))] + block_choices
+        self.contribution.choices = [('', _('Please select a contribution'))] + contrib_choices
+        self.block.choices = [('', _('Please select a session block'))] + block_choices
 
 
 class VCRoomAttachFormBase(VCRoomLinkFormBase):
     room = VCRoomField(
-        _("Room to link"), [DataRequired()],
-        description=_("Please start writing the name of the room you would like to attach. "
-                      "Indico will suggest existing rooms. Only rooms created through Indico can be attached."))
+        _('Room to link'), [DataRequired()],
+        description=_('Please start writing the name of the room you would like to attach. '
+                      'Indico will suggest existing rooms. Only rooms created through Indico can be attached.'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -121,7 +121,7 @@ class VCRoomFormBase(VCRoomLinkFormBase):
             room = VCRoom.query.filter(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted,
                                        VCRoom.type == self.service_name).first()
             if room and room != self.vc_room:
-                raise ValidationError(_("There is already a room with this name"))
+                raise ValidationError(_('There is already a room with this name'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

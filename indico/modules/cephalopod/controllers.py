@@ -65,11 +65,11 @@ class RHCephalopod(RHCephalopodBase):
             elif enabled and not uuid:
                 register_instance(name, email)
         except HTTPError as err:
-            flash(_("Operation failed, the community hub returned: {err}").format(err=err), 'error')
+            flash(_('Operation failed, the community hub returned: {err}').format(err=err), 'error')
         except Timeout:
-            flash(_("The operation timed-out. Please try again in a while."), 'error')
+            flash(_('The operation timed-out. Please try again in a while.'), 'error')
         except RequestException as err:
-            flash(_("Unexpected exception while contacting the Community Hub: {err}").format(err=err))
+            flash(_('Unexpected exception while contacting the Community Hub: {err}').format(err=err))
 
         return redirect(url_for('.index'))
 
@@ -85,12 +85,12 @@ class RHCephalopodSync(RHCephalopodBase):
             try:
                 sync_instance(contact_name, contact_email)
             except HTTPError as err:
-                flash(_("Synchronization failed, the community hub returned: {err}").format(err=err),
+                flash(_('Synchronization failed, the community hub returned: {err}').format(err=err),
                       'error')
             except Timeout:
-                flash(_("Synchronization timed-out. Please try again in a while."), 'error')
+                flash(_('Synchronization timed-out. Please try again in a while.'), 'error')
             except RequestException as err:
-                flash(_("Unexpected exception while contacting the Community Hub: {err}").format(err=err))
+                flash(_('Unexpected exception while contacting the Community Hub: {err}').format(err=err))
 
             return redirect(url_for('.index'))
 

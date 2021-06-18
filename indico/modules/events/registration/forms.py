@@ -49,50 +49,50 @@ class RegistrationFormForm(IndicoForm):
     _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
     _special_fields = _price_fields + _registrant_notification_fields + _manager_notification_fields
 
-    title = StringField(_("Title"), [DataRequired()], description=_("The title of the registration form"))
-    introduction = TextAreaField(_("Introduction"),
-                                 description=_("Introduction to be displayed when filling out the registration form"))
-    contact_info = StringField(_("Contact info"),
-                               description=_("How registrants can get in touch with somebody for extra information"))
-    moderation_enabled = BooleanField(_("Moderated"), widget=SwitchWidget(),
-                                      description=_("If enabled, registrations require manager approval"))
-    require_login = BooleanField(_("Only logged-in users"), widget=SwitchWidget(),
-                                 description=_("Users must be logged in to register"))
-    require_user = BooleanField(_("Registrant must have account"), widget=SwitchWidget(),
-                                description=_("Registrations emails must be associated with an Indico account"))
-    limit_registrations = BooleanField(_("Limit registrations"), widget=SwitchWidget(),
-                                       description=_("Whether there is a limit of registrations"))
-    registration_limit = IntegerField(_("Capacity"), [HiddenUnless('limit_registrations'), DataRequired(),
+    title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
+    introduction = TextAreaField(_('Introduction'),
+                                 description=_('Introduction to be displayed when filling out the registration form'))
+    contact_info = StringField(_('Contact info'),
+                               description=_('How registrants can get in touch with somebody for extra information'))
+    moderation_enabled = BooleanField(_('Moderated'), widget=SwitchWidget(),
+                                      description=_('If enabled, registrations require manager approval'))
+    require_login = BooleanField(_('Only logged-in users'), widget=SwitchWidget(),
+                                 description=_('Users must be logged in to register'))
+    require_user = BooleanField(_('Registrant must have account'), widget=SwitchWidget(),
+                                description=_('Registrations emails must be associated with an Indico account'))
+    limit_registrations = BooleanField(_('Limit registrations'), widget=SwitchWidget(),
+                                       description=_('Whether there is a limit of registrations'))
+    registration_limit = IntegerField(_('Capacity'), [HiddenUnless('limit_registrations'), DataRequired(),
                                                       NumberRange(min=1)],
-                                      description=_("Maximum number of registrations"))
-    modification_mode = IndicoEnumSelectField(_("Modification allowed"), enum=ModificationMode,
-                                              description=_("Will users be able to modify their data? When?"))
+                                      description=_('Maximum number of registrations'))
+    modification_mode = IndicoEnumSelectField(_('Modification allowed'), enum=ModificationMode,
+                                              description=_('Will users be able to modify their data? When?'))
     publish_registrations_enabled = BooleanField(_('Publish registrations'), widget=SwitchWidget(),
-                                                 description=_("Registrations from this form will be displayed in the "
-                                                               "event page"))
-    publish_registration_count = BooleanField(_("Publish number of registrations"), widget=SwitchWidget(),
-                                              description=_("Number of registered participants will be displayed in "
-                                                            "the event page"))
+                                                 description=_('Registrations from this form will be displayed in the '
+                                                               'event page'))
+    publish_registration_count = BooleanField(_('Publish number of registrations'), widget=SwitchWidget(),
+                                              description=_('Number of registered participants will be displayed in '
+                                                            'the event page'))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
-                                           description=_("Check-in status will be shown publicly on the event page"))
+                                           description=_('Check-in status will be shown publicly on the event page'))
     base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999.99), Optional(),
                               _check_if_payment_required], filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
-                              description=_("A fixed fee all users have to pay when registering."))
+                              description=_('A fixed fee all users have to pay when registering.'))
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
     message_pending = TextAreaField(
-        _("Message for pending registrations"),
-        description=_("Text included in emails sent to pending registrations (Markdown syntax)")
+        _('Message for pending registrations'),
+        description=_('Text included in emails sent to pending registrations (Markdown syntax)')
     )
     message_unpaid = TextAreaField(
-        _("Message for unpaid registrations"),
-        description=_("Text included in emails sent to unpaid registrations (Markdown syntax)")
+        _('Message for unpaid registrations'),
+        description=_('Text included in emails sent to unpaid registrations (Markdown syntax)')
     )
     message_complete = TextAreaField(
-        _("Message for complete registrations"),
-        description=_("Text included in emails sent to complete registrations (Markdown syntax)")
+        _('Message for complete registrations'),
+        description=_('Text included in emails sent to complete registrations (Markdown syntax)')
     )
     attach_ical = BooleanField(
         _('Attach iCalendar file'),
@@ -100,11 +100,11 @@ class RegistrationFormForm(IndicoForm):
         description=_('Attach an iCalendar file to the mail sent once a registration is complete')
     )
     manager_notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
-                                                 description=_("Enable notifications to managers about registrations"))
+                                                 description=_('Enable notifications to managers about registrations'))
     manager_notification_recipients = EmailListField(_('List of recipients'),
                                                      [HiddenUnless('manager_notifications_enabled',
                                                                    preserve_data=True), DataRequired()],
-                                                     description=_("Email addresses that will receive notifications"))
+                                                     description=_('Email addresses that will receive notifications'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -120,14 +120,14 @@ class RegistrationFormForm(IndicoForm):
 
 
 class RegistrationFormScheduleForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), [Optional()], default_time=time(0, 0),
-                                   description=_("Moment when registrations will be open"))
-    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')], default_time=time(23, 59),
-                                 description=_("Moment when registrations will be closed"))
-    modification_end_dt = IndicoDateTimeField(_("Modification deadline"), [Optional(), LinkedDateTime('end_dt')],
+    start_dt = IndicoDateTimeField(_('Start'), [Optional()], default_time=time(0, 0),
+                                   description=_('Moment when registrations will be open'))
+    end_dt = IndicoDateTimeField(_('End'), [Optional(), LinkedDateTime('start_dt')], default_time=time(23, 59),
+                                 description=_('Moment when registrations will be closed'))
+    modification_end_dt = IndicoDateTimeField(_('Modification deadline'), [Optional(), LinkedDateTime('end_dt')],
                                               default_time=time(23, 59),
-                                              description=_("Deadline until which registration information can be "
-                                                            "modified (defaults to the end date if empty)"))
+                                              description=_('Deadline until which registration information can be '
+                                                            'modified (defaults to the end date if empty)'))
 
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')
@@ -139,9 +139,9 @@ class InvitationFormBase(IndicoForm):
     _invitation_fields = ('skip_moderation',)
     _email_fields = ('email_from', 'email_subject', 'email_body')
     email_from = SelectField(_('From'), [DataRequired()])
-    email_subject = StringField(_("Email subject"), [DataRequired()])
-    email_body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
-    skip_moderation = BooleanField(_("Skip moderation"), widget=SwitchWidget(),
+    email_subject = StringField(_('Email subject'), [DataRequired()])
+    email_body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    skip_moderation = BooleanField(_('Skip moderation'), widget=SwitchWidget(),
                                    description=_("If enabled, the user's registration will be approved automatically."))
 
     def __init__(self, *args, **kwargs):
@@ -162,13 +162,13 @@ class InvitationFormBase(IndicoForm):
 class InvitationFormNew(InvitationFormBase):
     _invitation_fields = ('first_name', 'last_name', 'email', 'affiliation') + InvitationFormBase._invitation_fields
     first_name = StringField(_('First name'), [DataRequired()],
-                             description=_("The first name of the user you are inviting."))
+                             description=_('The first name of the user you are inviting.'))
     last_name = StringField(_('Last name'), [DataRequired()],
-                            description=_("The last name of the user you are inviting."))
+                            description=_('The last name of the user you are inviting.'))
     email = EmailField(_('Email'), [DataRequired(), Email()], filters=[lambda x: x.lower() if x else x],
-                       description=_("The invitation will be sent to this address."))
+                       description=_('The invitation will be sent to this address.'))
     affiliation = StringField(_('Affiliation'),
-                              description=_("The affiliation of the user you are inviting."))
+                              description=_('The affiliation of the user you are inviting.'))
 
     @generated_data
     def users(self):
@@ -179,15 +179,15 @@ class InvitationFormNew(InvitationFormBase):
 
     def validate_email(self, field):
         if RegistrationInvitation.query.filter_by(email=field.data).with_parent(self.regform).has_rows():
-            raise ValidationError(_("There is already an invitation with this email address."))
+            raise ValidationError(_('There is already an invitation with this email address.'))
         if Registration.query.filter_by(email=field.data, is_active=True).with_parent(self.regform).has_rows():
-            raise ValidationError(_("There is already a registration with this email address."))
+            raise ValidationError(_('There is already a registration with this email address.'))
 
 
 class InvitationFormExisting(InvitationFormBase):
     _invitation_fields = ('users_field',) + InvitationFormBase._invitation_fields
     users_field = PrincipalListField(_('Users'), [DataRequired()], allow_external_users=True,
-                                     description=_("Select the users to invite."))
+                                     description=_('Select the users to invite.'))
 
     @generated_data
     def users(self):
@@ -202,22 +202,22 @@ class InvitationFormExisting(InvitationFormBase):
         # invitations
         existing = {x.email for x in self.regform.invitations} & emails
         if existing:
-            raise ValidationError(_("There are already invitations for the following email addresses: {emails}")
+            raise ValidationError(_('There are already invitations for the following email addresses: {emails}')
                                   .format(emails=', '.join(sorted(existing))))
         # registrations
         existing = {x.email for x in self.regform.registrations if x.is_active} & emails
         if existing:
-            raise ValidationError(_("There are already registrations with the following email addresses: {emails}")
+            raise ValidationError(_('There are already registrations with the following email addresses: {emails}')
                                   .format(emails=', '.join(sorted(existing))))
 
 
 class EmailRegistrantsForm(IndicoForm):
-    from_address = SelectField(_("From"), [DataRequired()])
-    cc_addresses = EmailListField(_("CC"),
-                                  description=_("Beware, addresses in this field will receive one mail per "
-                                                "registrant."))
-    subject = StringField(_("Subject"), [DataRequired()])
-    body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
+    from_address = SelectField(_('From'), [DataRequired()])
+    cc_addresses = EmailListField(_('CC'),
+                                  description=_('Beware, addresses in this field will receive one mail per '
+                                                'registrant.'))
+    subject = StringField(_('Subject'), [DataRequired()])
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
     recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
                                    description=_('Send copy of each email to my mailbox'))
@@ -344,10 +344,10 @@ class CreateMultipleRegistrationsForm(IndicoForm):
     Form to create multiple registrations of Indico users at the same time.
     """
 
-    user_principals = PrincipalListField(_("Indico users"), [DataRequired()], allow_external_users=True)
-    notify_users = BooleanField(_("Send e-mail notifications"),
+    user_principals = PrincipalListField(_('Indico users'), [DataRequired()], allow_external_users=True)
+    notify_users = BooleanField(_('Send e-mail notifications'),
                                 default=True,
-                                description=_("Notify the users about the registration."),
+                                description=_('Notify the users about the registration.'),
                                 widget=SwitchWidget())
 
     def __init__(self, *args, **kwargs):
@@ -359,17 +359,17 @@ class CreateMultipleRegistrationsForm(IndicoForm):
     def validate_user_principals(self, field):
         for user in field.data:
             if user in db.session and self._regform.get_registration(user=user):
-                raise ValidationError(_("A registration for {} already exists.").format(user.full_name))
+                raise ValidationError(_('A registration for {} already exists.').format(user.full_name))
             elif self._regform.get_registration(email=user.email):
-                raise ValidationError(_("A registration for {} already exists.").format(user.email))
+                raise ValidationError(_('A registration for {} already exists.').format(user.email))
 
 
 class BadgeSettingsForm(IndicoForm):
     template = SelectField(_('Template'))
-    save_values = BooleanField(_("Save values for next time"), widget=SwitchWidget(),
-                               description=_("Save these values in the event settings"))
-    dashed_border = BooleanField(_("Dashed border around each badge"), widget=SwitchWidget(),
-                                 description=_("Display a dashed border around each badge"))
+    save_values = BooleanField(_('Save values for next time'), widget=SwitchWidget(),
+                               description=_('Save these values in the event settings'))
+    dashed_border = BooleanField(_('Dashed border around each badge'), widget=SwitchWidget(),
+                                 description=_('Display a dashed border around each badge'))
     page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize, sorted=True)
     page_orientation = IndicoEnumSelectField(_('Page orientation'), enum=PageOrientation)
     page_layout = IndicoEnumSelectField(_('Page layout'), enum=PageLayout,
@@ -402,11 +402,11 @@ class BadgeSettingsForm(IndicoForm):
 
 
 class ImportRegistrationsForm(IndicoForm):
-    source_file = FileField(_("Source File"), [DataRequired()], accepted_file_types='.csv')
-    skip_moderation = BooleanField(_("Skip Moderation"), widget=SwitchWidget(), default=True,
-                                   description=_("If enabled, the registration will be immediately accepted"))
-    notify_users = BooleanField(_("E-mail users"), widget=SwitchWidget(),
-                                description=_("Whether the imported users should receive an e-mail notification"))
+    source_file = FileField(_('Source File'), [DataRequired()], accepted_file_types='.csv')
+    skip_moderation = BooleanField(_('Skip Moderation'), widget=SwitchWidget(), default=True,
+                                   description=_('If enabled, the registration will be immediately accepted'))
+    notify_users = BooleanField(_('E-mail users'), widget=SwitchWidget(),
+                                description=_('Whether the imported users should receive an e-mail notification'))
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
@@ -416,7 +416,7 @@ class ImportRegistrationsForm(IndicoForm):
 
 
 class RejectRegistrantsForm(IndicoForm):
-    rejection_reason = TextAreaField(_('Reason'), description=_("You can provide a reason for the rejection here."))
+    rejection_reason = TextAreaField(_('Reason'), description=_('You can provide a reason for the rejection here.'))
     attach_rejection_reason = BooleanField(_('Attach reason'), widget=SwitchWidget())
     registration_id = HiddenFieldList()
     submitted = HiddenField()

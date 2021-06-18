@@ -254,9 +254,9 @@ class IndicoDateTimeField(DateTimeField):
 
     def pre_validate(self, form):
         if self.date_missing:
-            raise StopValidation(_("Date must be specified"))
+            raise StopValidation(_('Date must be specified'))
         if self.time_missing:
-            raise StopValidation(_("Time must be specified"))
+            raise StopValidation(_('Time must be specified'))
         if self.object_data:
             # Normalize datetime resolution of passed data
             self.object_data = self.object_data.replace(second=0, microsecond=0)

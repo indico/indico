@@ -393,8 +393,8 @@ class RHUserEmails(RHUserBase):
         form = UserEmailsForm()
         if form.validate_on_submit():
             self._send_confirmation(form.email.data)
-            flash(_("We have sent an email to {email}. Please click the link in that email within 24 hours to "
-                    "confirm your new email address.").format(email=form.email.data), 'success')
+            flash(_('We have sent an email to {email}. Please click the link in that email within 24 hours to '
+                    'confirm your new email address.').format(email=form.email.data), 'success')
             return redirect(url_for('.user_emails'))
         return WPUser.render_template('emails.html', 'emails', user=self.user, form=form)
 
@@ -428,7 +428,7 @@ class RHUserEmailsVerify(RHUserBase):
             self.token_storage.delete(token)
 
             if existing and existing.is_pending:
-                logger.info("Found pending user %s to be merged into %s", existing, self.user)
+                logger.info('Found pending user %s to be merged into %s', existing, self.user)
 
                 # If the pending user has missing names, copy them from the active one
                 # to allow it to be marked as not pending and deleted during the merge.
@@ -580,26 +580,26 @@ def _get_merge_problems(source, target):
     errors = []
     warnings = []
     if source == target:
-        errors.append(_("Users are the same!"))
+        errors.append(_('Users are the same!'))
     if (source.first_name.strip().lower() != target.first_name.strip().lower() or
             source.last_name.strip().lower() != target.last_name.strip().lower()):
         warnings.append(_("Users' names seem to be different!"))
     if source.is_pending:
-        warnings.append(_("Source user has never logged in to Indico!"))
+        warnings.append(_('Source user has never logged in to Indico!'))
     if target.is_pending:
-        warnings.append(_("Target user has never logged in to Indico!"))
+        warnings.append(_('Target user has never logged in to Indico!'))
     if source.is_blocked:
-        warnings.append(_("Source user is blocked!"))
+        warnings.append(_('Source user is blocked!'))
     if target.is_blocked:
-        warnings.append(_("Target user is blocked!"))
+        warnings.append(_('Target user is blocked!'))
     if source.is_deleted:
-        errors.append(_("Source user has been deleted!"))
+        errors.append(_('Source user has been deleted!'))
     if target.is_deleted:
-        errors.append(_("Target user has been deleted!"))
+        errors.append(_('Target user has been deleted!'))
     if source.is_admin:
-        warnings.append(_("Source user is an administrator!"))
+        warnings.append(_('Source user is an administrator!'))
     if target.is_admin:
-        warnings.append(_("Target user is an administrator!"))
+        warnings.append(_('Target user is an administrator!'))
     if source.is_admin and not target.is_admin:
         errors.append(_("Source user is an administrator but target user isn't!"))
     return errors, warnings
@@ -617,10 +617,10 @@ class RHUsersAdminMerge(RHAdminBase):
             if errors:
                 raise BadRequest(_('Merge aborted due to failed sanity check'))
             if warnings:
-                logger.info("User %s initiated merge of %s into %s (with %d warnings)",
+                logger.info('User %s initiated merge of %s into %s (with %d warnings)',
                             session.user, source, target, len(warnings))
             else:
-                logger.info("User %s initiated merge of %s into %s", session.user, source, target)
+                logger.info('User %s initiated merge of %s into %s', session.user, source, target)
             merge_users(source, target)
             flash(_('The users have been successfully merged.'), 'success')
             return redirect(url_for('.user_profile', user_id=target.id))

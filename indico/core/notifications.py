@@ -145,7 +145,7 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     :param html: ``True`` if the email body is HTML
     """
     if template is not None and (subject is not None or body is not None):
-        raise ValueError("Only subject/body or template can be passed")
+        raise ValueError('Only subject/body or template can be passed')
 
     if template:
         subject = template.get_subject()

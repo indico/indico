@@ -34,7 +34,7 @@ class SurveySingleChoiceField(_AddUUIDMixin, SingleChoiceField, SurveyField):
         total = sum(counter.values())
         options = self.object.field_data['options']
         if counter[None]:
-            no_option = {'id': None, 'option': _("No selection")}
+            no_option = {'id': None, 'option': _('No selection')}
             options.append(no_option)
         return {'total': total,
                 'labels': [alpha_enum(val).upper() for val in range(len(options))],

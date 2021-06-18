@@ -81,7 +81,7 @@ class Rescheduler:
             self._reschedule_duration()
         db.session.flush()
         self.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
-                       "Entries rescheduled", session.user,
+                       'Entries rescheduled', session.user,
                        data={'Mode': self.mode.title,
                              'Day': format_date(self.day, locale='en_GB'),
                              'Fit Blocks': self.fit_blocks,
@@ -99,8 +99,8 @@ class Rescheduler:
         for entry, successor in window(self._entries):
             duration = successor.start_dt - entry.start_dt - self.gap
             if duration <= timedelta(0):
-                raise UserValueError(_("The chosen time gap would result in an entry with a duration of less than a "
-                                       "minute. Please choose a smaller gap between entries."))
+                raise UserValueError(_('The chosen time gap would result in an entry with a duration of less than a '
+                                       'minute. Please choose a smaller gap between entries.'))
             entry.object.duration = duration
 
     def _fit_blocks(self):

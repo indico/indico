@@ -119,8 +119,8 @@ class RHCloseSurvey(RHManageSurveyBase):
 
     def _process(self):
         self.survey.close()
-        flash(_("Survey is now closed"), 'success')
-        logger.info("Survey %s closed by %s", self.survey, session.user)
+        flash(_('Survey is now closed'), 'success')
+        logger.info('Survey %s closed by %s', self.survey, session.user)
         return redirect(url_for('.manage_survey', self.survey))
 
 
@@ -134,8 +134,8 @@ class RHOpenSurvey(RHManageSurveyBase):
         else:
             self.survey.open()
         self.survey.send_start_notification()
-        flash(_("Survey is now open"), 'success')
-        logger.info("Survey %s opened by %s", self.survey, session.user)
+        flash(_('Survey is now open'), 'success')
+        logger.info('Survey %s opened by %s', self.survey, session.user)
         return redirect(url_for('.manage_survey', self.survey))
 
 

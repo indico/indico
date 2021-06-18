@@ -135,7 +135,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
                 if not self.object_data or person_link not in self.object_data:
                     person_link.author_type = AuthorType.none
             if person_link.author_type == AuthorType.none and not person_link.is_speaker:
-                raise ValueError(_("{} has no role").format(person_link.full_name))
+                raise ValueError(_('{} has no role').format(person_link.full_name))
 
 
 class AbstractField(QuerySelectField):

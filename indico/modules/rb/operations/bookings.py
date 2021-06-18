@@ -332,7 +332,7 @@ def create_booking_for_event(room_id, event):
         booking.linked_object = event
         return booking
     except NoReportError:
-        flash(_("Booking could not be created. Probably somebody else booked the room in the meantime."), 'error')
+        flash(_('Booking could not be created. Probably somebody else booked the room in the meantime.'), 'error')
         return None
 
 

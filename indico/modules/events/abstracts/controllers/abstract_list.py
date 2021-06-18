@@ -71,12 +71,12 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
             num_judged_abstracts = len(submitted_abstracts)
             num_prejudged_abstracts = len(self.abstracts) - num_judged_abstracts
             if num_judged_abstracts:
-                flash(ngettext("One abstract has been judged.",
-                               "{num} abstracts have been judged.",
+                flash(ngettext('One abstract has been judged.',
+                               '{num} abstracts have been judged.',
                                num_judged_abstracts).format(num=num_judged_abstracts), 'success')
             if num_prejudged_abstracts:
-                flash(ngettext("One abstract has been skipped since it is already judged.",
-                               "{num} abstracts have been skipped since they are already judged.",
+                flash(ngettext('One abstract has been skipped since it is already judged.',
+                               '{num} abstracts have been skipped since they are already judged.',
                                num_prejudged_abstracts).format(num=num_prejudged_abstracts), 'warning')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form=form, fields=form._order, submit=_('Judge'), disabled_until_change=False)
@@ -144,7 +144,7 @@ class RHCreateAbstract(RHAbstractListBase):
             if tpl_components.get('hide_abstract'):
                 self.list_generator.flash_info_message(abstract)
             return jsonify_data(**tpl_components)
-        return jsonify_form(form, back=_("Cancel"), form_header_kwargs={'action': request.relative_url})
+        return jsonify_form(form, back=_('Cancel'), form_header_kwargs={'action': request.relative_url})
 
 
 class RHDeleteAbstracts(RHManageAbstractsActionsBase):
@@ -156,12 +156,12 @@ class RHDeleteAbstracts(RHManageAbstractsActionsBase):
                 deleted_contrib_count += 1
             delete_abstract(abstract, delete_contribs)
         deleted_abstract_count = len(self.abstracts)
-        flash(ngettext("The abstract has been deleted.",
-                       "{count} abstracts have been deleted.", deleted_abstract_count)
+        flash(ngettext('The abstract has been deleted.',
+                       '{count} abstracts have been deleted.', deleted_abstract_count)
               .format(count=deleted_abstract_count), 'success')
         if deleted_contrib_count:
-            flash(ngettext("The linked contribution has been deleted.",
-                           "{count} linked contributions have been deleted.", deleted_contrib_count)
+            flash(ngettext('The linked contribution has been deleted.',
+                           '{count} linked contributions have been deleted.', deleted_contrib_count)
                   .format(count=deleted_contrib_count), 'success')
         return jsonify_data(**self.list_generator.render_list())
 

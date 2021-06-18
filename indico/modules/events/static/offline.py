@@ -121,8 +121,8 @@ class StaticEventCreator:
     def _write_generated_js(self):
         global_js = generate_global_file()
         user_js = generate_user_file()
-        i18n_js = f"window.TRANSLATIONS = {generate_i18n_file(session.lang)};"
-        react_i18n_js = f"window.REACT_TRANSLATIONS = {generate_i18n_file(session.lang, react=True)};"
+        i18n_js = f'window.TRANSLATIONS = {generate_i18n_file(session.lang)};'
+        react_i18n_js = f'window.REACT_TRANSLATIONS = {generate_i18n_file(session.lang, react=True)};'
         gen_path = os.path.join(self._content_dir, 'assets')
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'global.js'), global_js)
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'user.js'), user_js)
@@ -191,13 +191,13 @@ class StaticEventCreator:
         for contrib in self.event.contributions:
             if not contrib.can_access(None):
                 continue
-            self._add_material(contrib, "%s-contribution" % contrib.friendly_id)
+            self._add_material(contrib, '%s-contribution' % contrib.friendly_id)
             for sc in contrib.subcontributions:
-                self._add_material(sc, "%s-subcontribution" % sc.friendly_id)
+                self._add_material(sc, '%s-subcontribution' % sc.friendly_id)
         for session_ in self.event.sessions:
             if not session_.can_access(None):
                 continue
-            self._add_material(session_, "%s-session" % session_.friendly_id)
+            self._add_material(session_, '%s-session' % session_.friendly_id)
 
     def _add_material(self, target, type_):
         for folder in AttachmentFolder.get_for_linked_object(target, preload_event=True):
@@ -205,8 +205,8 @@ class StaticEventCreator:
                 if not attachment.can_access(None):
                     continue
                 if attachment.type == AttachmentType.file:
-                    dst_path = posixpath.join(self._content_dir, "material", type_,
-                                              f"{attachment.id}-{attachment.file.filename}")
+                    dst_path = posixpath.join(self._content_dir, 'material', type_,
+                                              f'{attachment.id}-{attachment.file.filename}')
                     with attachment.file.get_local_path() as file_path:
                         self._copy_file(dst_path, file_path)
 

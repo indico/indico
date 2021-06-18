@@ -112,7 +112,7 @@ def _safe_downgrade(*args, **kwargs):
     else:
         skip_confirm = False
         print(cformat('%{yellow!}***%{reset} '
-                      "%{red!}Debug mode is NOT ACTIVE, so make sure you are on the right machine!"))
+                      '%{red!}Debug mode is NOT ACTIVE, so make sure you are on the right machine!'))
     if not skip_confirm and input(cformat('%{yellow!}***%{reset} '
                                           'To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
         print(cformat('%{green}Aborted%{reset}'))

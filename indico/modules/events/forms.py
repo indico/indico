@@ -30,11 +30,11 @@ from indico.web.forms.widgets import CKEditorWidget
 
 
 class ReferenceTypeForm(IndicoForm):
-    name = StringField(_("Name"), [DataRequired()], description=_("The name of the external ID type"))
-    url_template = URLField(_("URL template"),
+    name = StringField(_('Name'), [DataRequired()], description=_('The name of the external ID type'))
+    url_template = URLField(_('URL template'),
                             description=_("The URL template must contain the '{value}' placeholder."))
-    scheme = StringField(_("Scheme"), filters=[lambda x: x.rstrip(':') if x else x],
-                         description=_("The scheme/protocol of the external ID type"))
+    scheme = StringField(_('Scheme'), filters=[lambda x: x.rstrip(':') if x else x],
+                         description=_('The scheme/protocol of the external ID type'))
 
     def __init__(self, *args, **kwargs):
         self.reference_type = kwargs.pop('reference_type', None)
@@ -45,7 +45,7 @@ class ReferenceTypeForm(IndicoForm):
         if self.reference_type:
             query = query.filter(ReferenceType.id != self.reference_type.id)
         if query.count():
-            raise ValidationError(_("This name is already in use."))
+            raise ValidationError(_('This name is already in use.'))
 
     def validate_url_template(self, field):
         if field.data and '{value}' not in field.data:
@@ -84,8 +84,8 @@ class EventCreationFormBase(IndicoForm):
 class EventCreationForm(EventCreationFormBase):
     _field_order = ('title', 'start_dt', 'end_dt', 'timezone', 'location_data', 'protection_mode')
     _advanced_field_order = ()
-    start_dt = IndicoDateTimeField(_("Start"), [InputRequired()], default_time=time(8), allow_clear=False)
-    end_dt = IndicoDateTimeField(_("End"), [InputRequired(), LinkedDateTime('start_dt', not_equal=True)],
+    start_dt = IndicoDateTimeField(_('Start'), [InputRequired()], default_time=time(8), allow_clear=False)
+    end_dt = IndicoDateTimeField(_('End'), [InputRequired(), LinkedDateTime('start_dt', not_equal=True)],
                                  default_time=time(18), allow_clear=False)
 
 
@@ -93,7 +93,7 @@ class LectureCreationForm(EventCreationFormBase):
     _field_order = ('title', 'occurrences', 'timezone', 'location_data', 'person_link_data',
                     'protection_mode')
     _advanced_field_order = ('description', 'theme')
-    occurrences = OccurrencesField(_("Dates"), [DataRequired()])
+    occurrences = OccurrencesField(_('Dates'), [DataRequired()])
     person_link_data = EventPersonLinkListField(_('Speakers'))
     description = TextAreaField(_('Description'), widget=CKEditorWidget())
     theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)

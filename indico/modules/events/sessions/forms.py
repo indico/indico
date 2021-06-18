@@ -35,9 +35,9 @@ class SessionForm(IndicoForm):
                                                                       'this session will have by default.'),
                                                         default=timedelta(minutes=20))
 
-    type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
-    location_data = IndicoLocationField(_("Default location"),
-                                        description=_("Default location for blocks inside the session."))
+    type = QuerySelectField(_('Type'), get_label='name', allow_blank=True, blank_text=_('No type selected'))
+    location_data = IndicoLocationField(_('Default location'),
+                                        description=_('Default location for blocks inside the session.'))
     colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors())
 
     def __init__(self, *args, **kwargs):
@@ -53,7 +53,7 @@ class SessionForm(IndicoForm):
 
 
 class SessionProtectionForm(IndicoForm):
-    permissions = PermissionsField(_("Permissions"), object_type='session')
+    permissions = PermissionsField(_('Permissions'), object_type='session')
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object,
                                             acl_message_url=lambda form: url_for('sessions.acl_message',
                                                                                  form.protected_object))
@@ -101,9 +101,9 @@ class MeetingSessionBlockForm(IndicoForm):
 class SessionTypeForm(IndicoForm):
     """Form to create or edit a SessionType."""
 
-    name = StringField(_("Name"), [DataRequired()])
-    is_poster = BooleanField(_("Poster"), widget=SwitchWidget(),
-                             description=_("Whether the session is a poster session or contains normal presentations"))
+    name = StringField(_('Name'), [DataRequired()])
+    is_poster = BooleanField(_('Poster'), widget=SwitchWidget(),
+                             description=_('Whether the session is a poster session or contains normal presentations'))
     code = StringField(_('Programme code'))
 
     def __init__(self, *args, **kwargs):
@@ -116,4 +116,4 @@ class SessionTypeForm(IndicoForm):
         if self.session_type:
             query = query.filter(SessionType.id != self.session_type.id)
         if query.count():
-            raise ValidationError(_("A session type with this name already exists"))
+            raise ValidationError(_('A session type with this name already exists'))

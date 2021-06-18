@@ -112,7 +112,7 @@ def resend_email(paths):
 @click.option('--temp', is_flag=True, help='Delete old files in the temp dir')
 @click.option('--cache', is_flag=True, help='Delete old files in the cache dir')
 @click.option('--verbose', '-v', is_flag=True, help="Be verbose and show what's being deleted")
-@click.option('--dry-run', '-n', is_flag=True, help="Do not delete anything (implies --verbose)")
+@click.option('--dry-run', '-n', is_flag=True, help='Do not delete anything (implies --verbose)')
 @click.option('--min-age', type=click.IntRange(1), default=1, metavar='N',
               help='Delete files at least N days old (default: 1)')
 def cleanup(temp, cache, verbose, dry_run, min_age):

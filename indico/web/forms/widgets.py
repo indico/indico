@@ -92,11 +92,11 @@ class JinjaWidget:
         javascript = template_module.javascript()
         html = template_module.html()
         if self.inline_js:
-            html += "\n" + javascript
+            html += '\n' + javascript
         elif '<script' in javascript:
             inject_js(template_module.javascript())
         elif html_comment_re.sub('', javascript).strip():
-            raise ValueError("Template did not provide valid javascript")
+            raise ValueError('Template did not provide valid javascript')
         return HTMLString(html)
 
 

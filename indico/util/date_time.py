@@ -61,7 +61,7 @@ def now_utc(exact=True):
 def as_utc(dt):
     """Return the given naive datetime with tzinfo=UTC."""
     if dt.tzinfo and dt.tzinfo != pytz.utc:
-        raise ValueError(f"{dt} already contains non-UTC tzinfo data")
+        raise ValueError(f'{dt} already contains non-UTC tzinfo data')
     return pytz.utc.localize(dt) if dt.tzinfo is None else dt
 
 
@@ -205,11 +205,11 @@ def format_human_date(dt, format='medium', locale=None):
         locale = get_current_locale()
 
     if dt == today - oneday:
-        return _("yesterday")
+        return _('yesterday')
     elif dt == today:
-        return _("today")
+        return _('today')
     elif dt == today + oneday:
-        return _("tomorrow")
+        return _('tomorrow')
     else:
         return format_date(dt, format, locale=locale)
 
@@ -249,7 +249,7 @@ def format_pretty_date(dt, locale=None, tzinfo=None):
         'same_day': _("'Today'"),
         'next_day': _("'Tomorrow'"),
         'last_week': _("'Last' EEEE"),
-        'next_week': _("EEEE"),
+        'next_week': _('EEEE'),
         'other': '{date_fmt}'
     })
 
@@ -338,7 +338,7 @@ def get_day_start(day, tzinfo=None):
     """
     if isinstance(day, datetime):
         if day.tzinfo and tzinfo:
-            raise ValueError("datetime is not naive.")
+            raise ValueError('datetime is not naive.')
         tzinfo = day.tzinfo
         day = day.date()
     start_dt = datetime.combine(day, dt_time(0))
@@ -354,7 +354,7 @@ def get_day_end(day, tzinfo=None):
     """
     if isinstance(day, datetime):
         if day.tzinfo and tzinfo:
-            raise ValueError("datetime is not naive.")
+            raise ValueError('datetime is not naive.')
         tzinfo = day.tzinfo
         day = day.date()
     end_dt = datetime.combine(day, dt_time(23, 59))

@@ -352,7 +352,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
                     arrival_date = data['arrival_date']
                     departure_date = data['departure_date']
                 except KeyError:
-                    raise ValidationError(_("Arrival/departure date is missing"))
+                    raise ValidationError(_('Arrival/departure date is missing'))
                 if _to_date(arrival_date) > _to_date(departure_date):
                     raise ValidationError(_("Arrival date can't be set after the departure date."))
 

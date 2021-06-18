@@ -139,7 +139,7 @@ class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
         n_vertical = int(available_height / ((self.tpl_data.height_cm + config.margin_rows) * cm))
 
         if not n_horizontal or not n_vertical:
-            raise BadRequest(_("The template dimensions are too large for the page size you selected"))
+            raise BadRequest(_('The template dimensions are too large for the page size you selected'))
 
         per_page = n_horizontal * n_vertical
         # make batch of as many badges as we can fit into one page and add duplicates for printing back sides

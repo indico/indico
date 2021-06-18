@@ -358,13 +358,13 @@ def update_reviewing_question(question, form):
     question.field.update_object(form.data)
     form.populate_obj(question)
     db.session.flush()
-    logger.info("Reviewing question %r updated by %r", question, session.user)
+    logger.info('Reviewing question %r updated by %r', question, session.user)
 
 
 def delete_reviewing_question(question):
     question.is_deleted = True
     db.session.flush()
-    logger.info("Reviewing question %r deleted by %r", question, session.user)
+    logger.info('Reviewing question %r deleted by %r', question, session.user)
 
 
 def sort_reviewing_questions(questions, new_positions):
@@ -375,4 +375,4 @@ def sort_reviewing_questions(questions, new_positions):
     for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(new_positions)):
         field.position = index
     db.session.flush()
-    logger.info("Reviewing questions of %r reordered by %r", questions[0].event, session.user)
+    logger.info('Reviewing questions of %r reordered by %r', questions[0].event, session.user)

@@ -19,4 +19,4 @@ class AddTemplateForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     type = IndicoEnumSelectField(_('Template'), enum=TemplateType, default=TemplateType.poster)
     is_clonable = BooleanField(_('Allow cloning'), widget=SwitchWidget(), default=True,
-                               description=_("Allow cloning this template in subcategories and events"))
+                               description=_('Allow cloning this template in subcategories and events'))

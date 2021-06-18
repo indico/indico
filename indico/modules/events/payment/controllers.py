@@ -147,7 +147,7 @@ class RHPaymentForm(RHPaymentBase):
         except KeyError:
             raise NotFound
         if not self.plugin.supports_currency(self.registration.currency):
-            raise BadRequest("Payment method incompatible with registration currency {}"
+            raise BadRequest('Payment method incompatible with registration currency {}'
                              .format(self.registration.currency))
 
     def _process(self):

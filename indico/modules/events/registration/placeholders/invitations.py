@@ -14,7 +14,7 @@ from indico.web.flask.util import url_for
 
 class FirstNamePlaceholder(Placeholder):
     name = 'first_name'
-    description = _("First name of the person")
+    description = _('First name of the person')
 
     @classmethod
     def render(cls, invitation):
@@ -23,7 +23,7 @@ class FirstNamePlaceholder(Placeholder):
 
 class LastNamePlaceholder(Placeholder):
     name = 'last_name'
-    description = _("Last name of the person")
+    description = _('Last name of the person')
 
     @classmethod
     def render(cls, invitation):
@@ -32,7 +32,7 @@ class LastNamePlaceholder(Placeholder):
 
 class InvitationLinkPlaceholder(Placeholder):
     name = 'invitation_link'
-    description = _("Link to accept/decline the invitation")
+    description = _('Link to accept/decline the invitation')
     required = True
 
     @classmethod

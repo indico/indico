@@ -282,7 +282,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
     db.session.flush()
     # sanity check
     if billable_items_locked and old_price != registration.price:
-        raise Exception("There was an error while modifying your registration (price mismatch: %s / %s)",
+        raise Exception('There was an error while modifying your registration (price mismatch: %s / %s)',
                         old_price, registration.price)
     if personal_data_changes:
         signals.event.registration_personal_data_modified.send(registration, change=personal_data_changes)
@@ -325,7 +325,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
         data = registration.data_by_field
         registration_dict = {
             'ID': registration.friendly_id,
-            'Name': f"{registration.first_name} {registration.last_name}"
+            'Name': f'{registration.first_name} {registration.last_name}'
         }
         for item in regform_items:
             key = unique_col(item.title, item.id)
@@ -451,11 +451,11 @@ def generate_ticket_qr_code(registration):
         border=1
     )
     qr_data = {
-        "registrant_id": registration.id,
-        "checkin_secret": registration.ticket_uuid,
-        "event_id": str(registration.event.id),
-        "server_url": config.BASE_URL,
-        "version": 1
+        'registrant_id': registration.id,
+        'checkin_secret': registration.ticket_uuid,
+        'event_id': str(registration.event.id),
+        'server_url': config.BASE_URL,
+        'version': 1
     }
     signals.event.registration.generate_ticket_qr_code.send(registration, ticket_data=qr_data)
     json_qr_data = json.dumps(qr_data)

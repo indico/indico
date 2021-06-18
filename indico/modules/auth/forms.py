@@ -61,7 +61,7 @@ class EditLocalIdentityForm(IndicoForm):
 
     def validate_password(self, field):
         if field.data != self.identity.password:
-            raise ValidationError(_("Wrong current password"))
+            raise ValidationError(_('Wrong current password'))
 
     def validate_username(self, field):
         query = Identity.query.filter(Identity.provider == 'indico',
@@ -93,8 +93,8 @@ class MultipassRegistrationForm(SyncedInputsMixin, IndicoForm):
     email = SelectField(_('Email address'), [DataRequired(), _check_existing_email])
     address = StringField(_('Address'), widget=SyncedInputWidget(textarea=True))
     phone = StringField(_('Phone number'), widget=SyncedInputWidget())
-    comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
-                                                        "administrators who will review your registration."))
+    comment = TextAreaField(_('Comment'), description=_('You can provide additional information or a comment for the '
+                                                        'administrators who will review your registration.'))
 
 
 class LocalRegistrationForm(RegistrationForm):
@@ -105,8 +105,8 @@ class LocalRegistrationForm(RegistrationForm):
                              render_kw={'autocomplete': 'new-password'})
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')],
                                      render_kw={'autocomplete': 'new-password'})
-    comment = TextAreaField(_('Comment'), description=_("You can provide additional information or a comment for the "
-                                                        "administrators who will review your registration."))
+    comment = TextAreaField(_('Comment'), description=_('You can provide additional information or a comment for the '
+                                                        'administrators who will review your registration.'))
 
     @property
     def data(self):

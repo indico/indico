@@ -111,7 +111,7 @@ pygments_style = 'sphinx'
 #modindex_common_prefix = []
 
 # include __init__() as well
-autoclass_content = "both"
+autoclass_content = 'both'
 autodoc_default_flags = ['show-inheritance']
 
 # Intersphinx urls
@@ -229,7 +229,7 @@ latex_documents = [
 
 todo_include_todos = True
 
-indico_uml_prelude = """skinparam shadowing false
+indico_uml_prelude = '''skinparam shadowing false
 skinparam defaultFontColor motivation
 skinparam defaultFontName Helvetica
 skinparam class {
@@ -238,4 +238,4 @@ skinparam class {
     BorderColor moccasin
     ArrowColor slategray
 }
-skinparam classStereotypeFontSize 1"""
+skinparam classStereotypeFontSize 1'''

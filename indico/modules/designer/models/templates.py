@@ -24,7 +24,7 @@ TEMPLATE_DEFAULTS = {
 
 class DesignerTemplate(db.Model):
     __tablename__ = 'designer_templates'
-    __table_args__ = (db.CheckConstraint("(event_id IS NULL) != (category_id IS NULL)", 'event_xor_category_id_null'),
+    __table_args__ = (db.CheckConstraint('(event_id IS NULL) != (category_id IS NULL)', 'event_xor_category_id_null'),
                       {'schema': 'indico'})
 
     id = db.Column(

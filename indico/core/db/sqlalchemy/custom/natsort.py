@@ -23,11 +23,11 @@ SQL_FUNCTION_NATSORT = '''
 
 
 def _should_create_function(ddl, target, connection, **kw):
-    sql = """
+    sql = '''
         SELECT COUNT(*)
         FROM information_schema.routines
         WHERE routine_schema = 'indico' AND routine_name = 'natsort'
-    """
+    '''
     count = connection.execute(text(sql)).scalar()
     return not count
 

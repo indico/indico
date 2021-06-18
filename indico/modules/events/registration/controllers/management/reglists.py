@@ -179,7 +179,7 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
 
     def _process(self):
         if not self.registrations:
-            raise NoReportError.wrap_exc(BadRequest(_("The selected registrants have been removed.")))
+            raise NoReportError.wrap_exc(BadRequest(_('The selected registrants have been removed.')))
         registration = self.registrations[0]
         email_body = replace_placeholders('registration-email', request.form['body'], regform=self.regform,
                                           registration=registration)
@@ -222,8 +222,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
         if form.validate_on_submit():
             self._send_emails(form)
             num_emails_sent = len(self.registrations)
-            flash(ngettext("The email was sent.",
-                           "{num} emails were sent.", num_emails_sent).format(num=num_emails_sent), 'success')
+            flash(ngettext('The email was sent.',
+                           '{num} emails were sent.', num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
 
         registrations_without_ticket = [r for r in self.registrations if r.is_ticket_blocked]
@@ -244,8 +244,8 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
                              f'Registration deleted: {registration.full_name}',
                              session.user, data={'Email': registration.email})
         num_reg_deleted = len(self.registrations)
-        flash(ngettext("Registration was deleted.",
-                       "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')
+        flash(ngettext('Registration was deleted.',
+                       '{num} registrations were deleted.', num_reg_deleted).format(num=num_reg_deleted), 'success')
         return jsonify_data()
 
 
@@ -268,7 +268,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
             data = form.data
             session['registration_notify_user_default'] = notify_user = data.pop('notify_user', False)
             create_registration(self.regform, data, management=True, notify_user=notify_user)
-            flash(_("The registration was created."), 'success')
+            flash(_('The registration was created.'), 'success')
             return redirect(url_for('.manage_reglist', self.regform))
         elif form.is_submitted():
             # not very pretty but usually this never happens thanks to client-side validation
@@ -331,8 +331,8 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
         except Exception:
             if config.DEBUG:
                 raise
-            raise NoReportError(_("Text too large to generate a PDF with table style. "
-                                  "Please try again generating with book style."))
+            raise NoReportError(_('Text too large to generate a PDF with table style. '
+                                  'Please try again generating with book style.'))
         return send_file('RegistrantsList.pdf', BytesIO(data), 'application/pdf')
 
 
@@ -374,8 +374,8 @@ class RHRegistrationsImport(RHRegistrationsActionBase):
             registrations = import_registrations_from_csv(self.regform, form.source_file.data,
                                                           skip_moderation=skip_moderation,
                                                           notify_users=form.notify_users.data)
-            flash(ngettext("{} registration has been imported.",
-                           "{} registrations have been imported.",
+            flash(ngettext('{} registration has been imported.',
+                           '{} registrations have been imported.',
                            len(registrations)).format(len(registrations)), 'success')
             return jsonify_data(flash=False, redirect=url_for('.manage_reglist', self.regform),
                                 redirect_no_loading=True)
@@ -569,7 +569,7 @@ class RHRegistrationReject(RHManageRegistrationBase):
 
     def _process(self):
         form = RejectRegistrantsForm()
-        message = _("Rejecting this registration will trigger a notification email.")
+        message = _('Rejecting this registration will trigger a notification email.')
         if form.validate_on_submit():
             _modify_registration_status(self.registration, approve=False, rejection_reason=form.rejection_reason.data,
                                         attach_rejection_reason=form.attach_rejection_reason.data)
@@ -640,7 +640,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
             registration.checked_in = check_in
             signals.event.registration_checkin_updated.send(registration)
             logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
-        flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
+        flash(_('Selected registrations marked as {} successfully.').format(msg), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
 
@@ -650,7 +650,7 @@ class RHRegistrationsApprove(RHRegistrationsActionBase):
     def _process(self):
         for registration in self.registrations:
             _modify_registration_status(registration, approve=True)
-        flash(_("The selected registrations were successfully approved."), 'success')
+        flash(_('The selected registrations were successfully approved.'), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
 
@@ -659,12 +659,12 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
 
     def _process(self):
         form = RejectRegistrantsForm(registration_id=[r.id for r in self.registrations])
-        message = _("Rejecting these registrations will trigger a notification email for each registrant.")
+        message = _('Rejecting these registrations will trigger a notification email for each registrant.')
         if form.validate_on_submit():
             for registration in self.registrations:
                 _modify_registration_status(registration, approve=False, rejection_reason=form.rejection_reason.data,
                                             attach_rejection_reason=form.attach_rejection_reason.data)
-            flash(_("The selected registrations were successfully rejected."), 'success')
+            flash(_('The selected registrations were successfully rejected.'), 'success')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
@@ -675,9 +675,9 @@ class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMi
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration
         regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
-        registrant_name = secure_filename("{}_{}".format(registration.get_full_name(),
+        registrant_name = secure_filename('{}_{}'.format(registration.get_full_name(),
                                           str(registration.friendly_id)), registration.friendly_id)
-        file_name = secure_filename("{}_{}_{}".format(attachment.field_data.field.title, attachment.field_data.field_id,
+        file_name = secure_filename('{}_{}_{}'.format(attachment.field_data.field.title, attachment.field_data.field_id,
                                                       attachment.filename), attachment.filename)
         return os.path.join(*self._adjust_path_length([regform_title, registrant_name, file_name]))
 

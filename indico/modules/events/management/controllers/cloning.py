@@ -131,7 +131,7 @@ class RHClonePreview(RHManageEventBase):
         try:
             dates, last_day_of_month = clone_calculator.calculate(request.form)
             if len(dates) > 100:
-                raise ValueError(_("You can clone maximum of 100 times at once"))
+                raise ValueError(_('You can clone maximum of 100 times at once'))
         except ValueError as exc:
             return jsonify(error={'message': str(exc)})
         return jsonify_data(count=len(dates), dates=dates, last_day_of_month=last_day_of_month, flash=False)

@@ -42,7 +42,7 @@ def prompt_pass(prompt='Password', min_length=8, confirm=True):
             continue
         # Too short, tell the user about the fact
         if min_length and len(password) < min_length:
-            click.echo(f"Password is too short (must be at least {min_length} chars)")
+            click.echo(f'Password is too short (must be at least {min_length} chars)')
             continue
         return password
 

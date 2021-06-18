@@ -150,12 +150,12 @@ def _set_duration(target, value, oldvalue, *unused):
 
 @listens_for(SessionBlock.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
-    sql = """
+    sql = '''
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER INSERT OR UPDATE OF session_id, duration
         ON {}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('session_block');
-    """.format(target.fullname)
+    '''.format(target.fullname)
     DDL(sql).execute(conn)

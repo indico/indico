@@ -52,12 +52,12 @@ def category_cleanup():
     from indico.modules.events import Event
     janitor_user = User.get_system_user()
 
-    logger.debug("Checking whether any categories should be cleaned up")
+    logger.debug('Checking whether any categories should be cleaned up')
     for categ_id, days in config.CATEGORY_CLEANUP.items():
         try:
             category = Category.get(int(categ_id), is_deleted=False)
         except KeyError:
-            logger.warning("Category %s does not exist!", categ_id)
+            logger.warning('Category %s does not exist!', categ_id)
             continue
 
         now = now_utc()
@@ -65,10 +65,10 @@ def category_cleanup():
         if not to_delete:
             continue
 
-        logger.info("Category %s: %s events were created more than %s days ago and will be deleted", categ_id,
+        logger.info('Category %s: %s events were created more than %s days ago and will be deleted', categ_id,
                     len(to_delete), days)
         for i, event in enumerate(to_delete, 1):
-            logger.info("Deleting %s", event)
+            logger.info('Deleting %s', event)
             event.delete('Cleaning up category', janitor_user)
             if i % 100 == 0:
                 db.session.commit()

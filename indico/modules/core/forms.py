@@ -16,9 +16,9 @@ from indico.web.forms.widgets import SwitchWidget
 
 class SettingsForm(IndicoForm):
     # Core settings
-    core_site_title = StringField(_('Title'), [DataRequired()], description=_("The global title of this Indico site."))
+    core_site_title = StringField(_('Title'), [DataRequired()], description=_('The global title of this Indico site.'))
     core_site_organization = StringField(_('Organization'),
-                                         description=_("The organization that runs this Indico site."))
+                                         description=_('The organization that runs this Indico site.'))
 
     # Social settings
     social_enabled = BooleanField(_('Enabled'), widget=SwitchWidget())

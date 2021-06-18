@@ -143,7 +143,7 @@ def test_translation_plugins(app, tmpdir):
     app.extensions['pluginengine'].plugins['dummy'] = plugin
     plugin.root_path = tmpdir.strpath
     french_core_str = DICTIONARIES['fr_FR']['This is not a string']
-    french_plugin_str = "This is not le french string"
+    french_plugin_str = 'This is not le french string'
 
     trans_dir = os.path.join(plugin.root_path, 'translations', 'fr_FR', 'LC_MESSAGES')
     os.makedirs(trans_dir)
@@ -151,17 +151,17 @@ def test_translation_plugins(app, tmpdir):
     # Create proper *.mo file for plugin translation
     with open(os.path.join(trans_dir, 'messages.mo'), 'wb') as f:
         catalog = Catalog(locale='fr_FR', domain='plugin')
-        catalog.add("This is not a string", "This is not le french string")
+        catalog.add('This is not a string', 'This is not le french string')
         write_mo(f, catalog)
 
     gettext_plugin = make_bound_gettext('dummy')
 
     assert _('This is not a string') == french_core_str
-    assert gettext_context("This is not a string") == french_core_str
-    assert isinstance(gettext_context("This is not a string"), str)
-    assert gettext_plugin("This is not a string") == french_plugin_str
+    assert gettext_context('This is not a string') == french_core_str
+    assert isinstance(gettext_context('This is not a string'), str)
+    assert gettext_plugin('This is not a string') == french_plugin_str
 
     with plugin.plugin_context():
         assert _('This is not a string') == french_core_str
-        assert gettext_context("This is not a string") == french_plugin_str
-        assert gettext_plugin("This is not a string") == french_plugin_str
+        assert gettext_context('This is not a string') == french_plugin_str
+        assert gettext_plugin('This is not a string') == french_plugin_str

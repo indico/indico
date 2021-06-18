@@ -151,7 +151,7 @@ class LatexRunner:
                 cwd=self.source_dir,
                 env=dict(os.environ, TEXMFCNF=f'{os.path.dirname(__file__)}:')
             )
-            Logger.get('pdflatex').debug("PDF created successfully!")
+            Logger.get('pdflatex').debug('PDF created successfully!')
 
         except subprocess.CalledProcessError:
             Logger.get('pdflatex').debug('PDF creation possibly failed (non-zero exit code)!')
@@ -289,7 +289,7 @@ class AbstractsToPDF(PDFLaTeXBase):
             'event': event,
             'doc_type': 'abstract',
             'management': False,
-            'title': _("Report of Abstracts"),
+            'title': _('Report of Abstracts'),
             'get_track_classification': AbstractToPDF._get_track_classification,
             'get_contrib_type': AbstractToPDF._get_contrib_type,
             'items': abstracts,
@@ -314,9 +314,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
     def _get_status(abstract):
         state_title = abstract.state.title.upper()
         if abstract.state == AbstractState.duplicate:
-            return f"{state_title} (#{abstract.duplicate_of.friendly_id}: {abstract.duplicate_of.title})"
+            return f'{state_title} (#{abstract.duplicate_of.friendly_id}: {abstract.duplicate_of.title})'
         elif abstract.state == AbstractState.merged:
-            return f"{state_title} (#{abstract.merged_into.friendly_id}: {abstract.merged_into.title})"
+            return f'{state_title} (#{abstract.merged_into.friendly_id}: {abstract.merged_into.title})'
         else:
             return abstract.state.title.upper()
 
@@ -354,7 +354,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
                 if no_track_actions:
                     other_info.append(', '.join(str(a.title) for a in no_track_actions))
                 if other_tracks:
-                    other_info.append(_("Proposed for other tracks: {}").format(', '.join(other_tracks)))
+                    other_info.append(_('Proposed for other tracks: {}').format(', '.join(other_tracks)))
                 if other_info:
                     review_state = '{}: {}'.format(review_state, '; '.join(other_info))
 
@@ -407,7 +407,7 @@ class ContribsToPDF(PDFLaTeXBase):
 
         self._args.update({
             'doc_type': 'contribution',
-            'title': _("Report of Contributions"),
+            'title': _('Report of Contributions'),
             'event': event,
             'items': contribs,
             'url': event.short_external_url,
@@ -421,7 +421,7 @@ class ContribsToPDF(PDFLaTeXBase):
 class ContributionBook(PDFLaTeXBase):
     LATEX_TEMPLATE = 'contribution_list_book'
 
-    def __init__(self, event, user, contribs=None, tz=None, sort_by=""):
+    def __init__(self, event, user, contribs=None, tz=None, sort_by=''):
         super().__init__()
 
         tz = tz or event.timezone

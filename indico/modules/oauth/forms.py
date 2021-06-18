@@ -31,26 +31,26 @@ class RedirectURIField(TextListField):
 
 
 class ApplicationForm(IndicoForm):
-    name = StringField(_("Name"), [DataRequired()])
-    description = TextAreaField(_("Description"))
-    redirect_uris = RedirectURIField(_("Allowed authorization callback URLs"), [DataRequired()],
-                                     description=_("More than one URL can be specified adding new lines. The "
-                                                   "redirect_uri sent by the OAuth client must use the same protocol "
+    name = StringField(_('Name'), [DataRequired()])
+    description = TextAreaField(_('Description'))
+    redirect_uris = RedirectURIField(_('Allowed authorization callback URLs'), [DataRequired()],
+                                     description=_('More than one URL can be specified adding new lines. The '
+                                                   'redirect_uri sent by the OAuth client must use the same protocol '
                                                    "and host/port. If an entry contains a path, the redirect_uri's "
-                                                   "path must start with this path."))
+                                                   'path must start with this path.'))
     allowed_scopes = IndicoSelectMultipleCheckboxField('Allowed scopes', [DataRequired()],
                                                        choices=sorted(SCOPES.items(), key=itemgetter(1)),
                                                        description=_('Only scopes from this list may be requested by '
                                                                      'the app.'))
-    is_enabled = BooleanField(_("Enabled"), widget=SwitchWidget(),
-                              description=_("If an application is not enabled, its OAuth tokens cannot be used and "
-                                            "user cannot be prompted to authorize the application."))
+    is_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
+                              description=_('If an application is not enabled, its OAuth tokens cannot be used and '
+                                            'user cannot be prompted to authorize the application.'))
     allow_pkce_flow = BooleanField(_('Allow PKCE flow'), widget=SwitchWidget(),
                                    description=_('If enabled, the application can use the client-side PKCE flow which '
                                                  'does not require the use of the Client Secret to get a token.'))
-    is_trusted = BooleanField(_("Trusted"), widget=SwitchWidget(),
-                              description=_("Trusted applications will be granted authorization automatically and "
-                                            "no intermediate page will be displayed during the authorization process."))
+    is_trusted = BooleanField(_('Trusted'), widget=SwitchWidget(),
+                              description=_('Trusted applications will be granted authorization automatically and '
+                                            'no intermediate page will be displayed during the authorization process.'))
 
     def __init__(self, *args, **kwargs):
         self.application = kwargs.pop('application', None)
@@ -65,4 +65,4 @@ class ApplicationForm(IndicoForm):
         if self.application:
             query = query.filter(db.func.lower(OAuthApplication.name) != self.application.name.lower())
         if query.has_rows():
-            raise ValidationError(_("There is already an application with this name"))
+            raise ValidationError(_('There is already an application with this name'))

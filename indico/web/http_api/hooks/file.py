@@ -33,11 +33,11 @@ class FileHook(EventBaseHook):
         self._attachment = Attachment.get(int(self._pathParams['res']))
 
         if not self._attachment:
-            raise HTTPAPIError("File not found", 404)
+            raise HTTPAPIError('File not found', 404)
 
     def export_file(self, user):
         if self._attachment.type != AttachmentType.file:
-            raise HTTPAPIError("Resource is not a file", 404)
+            raise HTTPAPIError('Resource is not a file', 404)
 
         return self._attachment.file.send()
 

@@ -176,7 +176,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
         self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
     def _process(self):
-        title = f"{self.template.title} (copy)"
+        title = f'{self.template.title} (copy)'
         new_template = DesignerTemplate(title=title, type=self.template.type, data=self.template.data,
                                         **self.target_dict)
 
@@ -288,7 +288,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                         backside_template_id=request.json['backside_template_id'],
                         is_clonable=request.json['is_clonable'],
                         clear_background=request.json['clear_background'])
-        flash(_("Template successfully saved."), 'success')
+        flash(_('Template successfully saved.'), 'success')
         return jsonify_data()
 
 
@@ -318,15 +318,15 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
             image_type = Image.open(data).format.lower()
         except OSError:
             # Invalid image data
-            return jsonify(error="Invalid image data!")
+            return jsonify(error='Invalid image data!')
         data.seek(0)
         if image_type not in {'jpeg', 'gif', 'png'}:
-            return jsonify(error="File format not accepted!")
+            return jsonify(error='File format not accepted!')
         content_type = 'image/' + image_type
         image = DesignerImageFile(template=self.template, filename=filename, content_type=content_type)
         self.template.background_image = image
         image.save(data)
-        flash(_("The image has been uploaded"), 'success')
+        flash(_('The image has been uploaded'), 'success')
         return jsonify_data(image_url=image.download_url)
 
 

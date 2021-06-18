@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
     op.add_column('rooms', sa.Column('verbose_name', sa.String(), nullable=True), schema='roombooking')
     # set verbose_name only when the name is non-standard (B-F-N)
-    op.execute("UPDATE roombooking.rooms SET verbose_name = name "
+    op.execute('UPDATE roombooking.rooms SET verbose_name = name '
                "WHERE name != format('%s-%s-%s', building, floor, number)")
     op.create_check_constraint('verbose_name_not_empty', 'rooms', "verbose_name != ''", schema='roombooking')
     op.drop_column('rooms', 'name', schema='roombooking')
@@ -30,8 +30,8 @@ def downgrade():
                   sa.Column('name', sa.String(), nullable=True),
                   schema='roombooking')
     op.execute("UPDATE roombooking.rooms SET name = format('%s-%s-%s', building, floor, number) "
-               "WHERE verbose_name IS NULL")
-    op.execute("UPDATE roombooking.rooms SET name = verbose_name "
-               "WHERE verbose_name IS NOT NULL")
+               'WHERE verbose_name IS NULL')
+    op.execute('UPDATE roombooking.rooms SET name = verbose_name '
+               'WHERE verbose_name IS NOT NULL')
     op.alter_column('rooms', 'name', nullable=False, schema='roombooking')
     op.drop_column('rooms', 'verbose_name', schema='roombooking')

@@ -143,14 +143,14 @@ def cli():
 
 def _common_build_options(allow_watch=True):
     def decorator(fn):
-        fn = click.option('--dev', is_flag=True, default=False, help="Build in dev mode")(fn)
+        fn = click.option('--dev', is_flag=True, default=False, help='Build in dev mode')(fn)
         fn = click.option('--clean/--no-clean', default=None,
-                          help="Delete everything in dist. This is disabled by default for `--dev` builds.")(fn)
+                          help='Delete everything in dist. This is disabled by default for `--dev` builds.')(fn)
         fn = click.option('--url-root', default='/', metavar='PATH',
                           help='URL root from which the assets are loaded. '
                                'Defaults to / and should usually not be changed')(fn)
         if allow_watch:
-            fn = click.option('--watch', is_flag=True, default=False, help="Run the watcher to rebuild on changes")(fn)
+            fn = click.option('--watch', is_flag=True, default=False, help='Run the watcher to rebuild on changes')(fn)
         return fn
     return decorator
 

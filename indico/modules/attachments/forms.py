@@ -25,15 +25,15 @@ from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
 
 
 class AttachmentFormBase(IndicoForm):
-    protected = BooleanField(_("Protected"), widget=SwitchWidget())
-    folder = QuerySelectField(_("Folder"), allow_blank=True, blank_text=_("No folder selected"), get_label='title',
-                              description=_("Adding materials to folders allow grouping and easier permission "
-                                            "management."))
-    acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
+    protected = BooleanField(_('Protected'), widget=SwitchWidget())
+    folder = QuerySelectField(_('Folder'), allow_blank=True, blank_text=_('No folder selected'), get_label='title',
+                              description=_('Adding materials to folders allow grouping and easier permission '
+                                            'management.'))
+    acl = AccessControlListField(_('Access control list'), [UsedIf(lambda form, field: form.protected.data)],
                                  allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                  allow_category_roles=True, allow_registration_forms=True,
                                  event=lambda form: form.event,
-                                 description=_("The list of users and groups allowed to access the material"))
+                                 description=_('The list of users and groups allowed to access the material'))
 
     def __init__(self, *args, **kwargs):
         linked_object = kwargs.pop('linked_object')
@@ -49,12 +49,12 @@ class AttachmentFormBase(IndicoForm):
 
 
 class EditAttachmentFormBase(AttachmentFormBase):
-    title = StringField(_("Title"), [DataRequired()])
-    description = TextAreaField(_("Description"))
+    title = StringField(_('Title'), [DataRequired()])
+    description = TextAreaField(_('Description'))
 
 
 class AddAttachmentFilesForm(AttachmentFormBase):
-    files = FileField(_("Files"), multiple_files=True)
+    files = FileField(_('Files'), multiple_files=True)
 
 
 def _get_file_data(attachment):
@@ -68,13 +68,13 @@ def _get_file_data(attachment):
 
 
 class EditAttachmentFileForm(EditAttachmentFormBase):
-    file = EditableFileField(_("File"), add_remove_links=False, get_metadata=_get_file_data,
-                             description=_("Already uploaded file. Replace it by adding a new file."))
+    file = EditableFileField(_('File'), add_remove_links=False, get_metadata=_get_file_data,
+                             description=_('Already uploaded file. Replace it by adding a new file.'))
 
 
 class AttachmentLinkFormMixin:
-    title = StringField(_("Title"), [DataRequired()])
-    link_url = URLField(_("URL"), [DataRequired()])
+    title = StringField(_('Title'), [DataRequired()])
+    link_url = URLField(_('URL'), [DataRequired()])
 
 
 class AddAttachmentLinkForm(AttachmentLinkFormMixin, AttachmentFormBase):
@@ -86,27 +86,27 @@ class EditAttachmentLinkForm(AttachmentLinkFormMixin, EditAttachmentFormBase):
 
 
 class AttachmentFolderForm(IndicoForm):
-    title = HiddenField(_("Name"), [DataRequired()], widget=TypeaheadWidget(),
-                        description=_("The name of the folder."))
-    description = TextAreaField(_("Description"), description=_("Description of the folder and its content"))
-    protected = BooleanField(_("Protected"), widget=SwitchWidget())
-    acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
+    title = HiddenField(_('Name'), [DataRequired()], widget=TypeaheadWidget(),
+                        description=_('The name of the folder.'))
+    description = TextAreaField(_('Description'), description=_('Description of the folder and its content'))
+    protected = BooleanField(_('Protected'), widget=SwitchWidget())
+    acl = AccessControlListField(_('Access control list'), [UsedIf(lambda form, field: form.protected.data)],
                                  allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                  allow_category_roles=True, allow_registration_forms=True,
                                  event=lambda form: form.event,
-                                 description=_("The list of users and groups allowed to access the folder"))
-    is_always_visible = BooleanField(_("Always Visible"),
+                                 description=_('The list of users and groups allowed to access the folder'))
+    is_always_visible = BooleanField(_('Always Visible'),
                                      [HiddenUnless('is_hidden', value=False)],
                                      widget=SwitchWidget(),
-                                     description=_("By default, folders are always visible, even if a user cannot "
-                                                   "access them. You can disable this behavior here, hiding the folder "
-                                                   "for anyone who does not have permission to access it."))
-    is_hidden = BooleanField(_("Always hidden"),
+                                     description=_('By default, folders are always visible, even if a user cannot '
+                                                   'access them. You can disable this behavior here, hiding the folder '
+                                                   'for anyone who does not have permission to access it.'))
+    is_hidden = BooleanField(_('Always hidden'),
                              [HiddenUnless('is_always_visible', value=False)],
                              widget=SwitchWidget(),
-                             description=_("Always hide the folder and its contents from public display areas of "
-                                           "the event. You can use this for folders to store non-image files used "
-                                           "e.g. in download links. The access permissions still apply."))
+                             description=_('Always hide the folder and its contents from public display areas of '
+                                           'the event. You can use this for folders to store non-image files used '
+                                           'e.g. in download links. The access permissions still apply.'))
 
     def __init__(self, *args, **kwargs):
         self.linked_object = kwargs.pop('linked_object')

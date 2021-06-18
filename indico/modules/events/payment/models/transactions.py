@@ -79,7 +79,7 @@ class TransactionStatusTransition:
             if action == TransactionAction.complete:
                 return TransactionStatus.successful
             elif action == TransactionAction.cancel:
-                raise IgnoredTransactionAction("Ignored cancel action on initial status")
+                raise IgnoredTransactionAction('Ignored cancel action on initial status')
             else:
                 raise InvalidManualTransactionAction(action)
         elif action == TransactionAction.complete:
@@ -87,7 +87,7 @@ class TransactionStatusTransition:
         elif action == TransactionAction.pending:
             return TransactionStatus.pending
         elif action == TransactionAction.reject:
-            raise IgnoredTransactionAction("Ignored reject action on initial status")
+            raise IgnoredTransactionAction('Ignored reject action on initial status')
         else:
             raise InvalidTransactionAction(action)
 
@@ -95,7 +95,7 @@ class TransactionStatusTransition:
     def _next_from_successful(action, manual=False):
         if manual:
             if action == TransactionAction.complete:
-                raise IgnoredTransactionAction("Ignored complete action on successful status")
+                raise IgnoredTransactionAction('Ignored complete action on successful status')
             elif action == TransactionAction.cancel:
                 return TransactionStatus.cancelled
             else:
@@ -103,9 +103,9 @@ class TransactionStatusTransition:
         elif action == TransactionAction.complete:
             raise DoublePaymentTransaction
         elif action == TransactionAction.pending:
-            raise IgnoredTransactionAction("Ignored pending action on successful status")
+            raise IgnoredTransactionAction('Ignored pending action on successful status')
         elif action == TransactionAction.reject:
-            raise IgnoredTransactionAction("Ignored reject action on successful status")
+            raise IgnoredTransactionAction('Ignored reject action on successful status')
         else:
             raise InvalidTransactionAction(action)
 
@@ -113,7 +113,7 @@ class TransactionStatusTransition:
     def _next_from_pending(action, manual=False):
         if manual:
             if action == TransactionAction.complete:
-                raise IgnoredTransactionAction("Ignored complete action on pending status")
+                raise IgnoredTransactionAction('Ignored complete action on pending status')
             elif action == TransactionAction.cancel:
                 return TransactionStatus.cancelled
             else:
@@ -121,7 +121,7 @@ class TransactionStatusTransition:
         elif action == TransactionAction.complete:
             return TransactionStatus.successful
         elif action == TransactionAction.pending:
-            raise IgnoredTransactionAction("Ignored pending action on pending status")
+            raise IgnoredTransactionAction('Ignored pending action on pending status')
         elif action == TransactionAction.reject:
             return TransactionStatus.rejected
         else:
@@ -223,7 +223,7 @@ class PaymentTransaction(db.Model):
         try:
             next_status = TransactionStatusTransition.next(previous_transaction, action, provider)
         except InvalidTransactionStatus as e:
-            Logger.get('payment').exception("%s (data received: %r)", e, data)
+            Logger.get('payment').exception('%s (data received: %r)', e, data)
             return None
         except InvalidManualTransactionAction as e:
             Logger.get('payment').exception("Invalid manual action code '%s' on initial status (data received: %r)",
@@ -233,11 +233,11 @@ class PaymentTransaction(db.Model):
             Logger.get('payment').exception("Invalid action code '%s' on initial status (data received: %r)", e, data)
             return None
         except IgnoredTransactionAction as e:
-            Logger.get('payment').warning("%s (data received: %r)", e, data)
+            Logger.get('payment').warning('%s (data received: %r)', e, data)
             return None
         except DoublePaymentTransaction:
             next_status = TransactionStatus.successful
-            Logger.get('payment').info("Received successful payment for an already paid registration")
+            Logger.get('payment').info('Received successful payment for an already paid registration')
         registration.transaction = new_transaction
         new_transaction.status = next_status
         return new_transaction

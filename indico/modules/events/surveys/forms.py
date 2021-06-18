@@ -27,19 +27,19 @@ class SurveyForm(IndicoForm):
     _notification_fields = ('notifications_enabled', 'notify_participants', 'start_notification_emails',
                             'new_submission_emails')
 
-    title = StringField(_("Title"), [DataRequired()], description=_("The title of the survey"))
-    introduction = TextAreaField(_("Introduction"), description=_("An introduction to be displayed before the survey"))
-    anonymous = BooleanField(_("Anonymous submissions"), widget=SwitchWidget(),
-                             description=_("User information will not be attached to submissions"))
-    require_user = BooleanField(_("Only logged-in users"), [HiddenUnless('anonymous')], widget=SwitchWidget(),
-                                description=_("Require users to be logged in for submitting the survey"))
-    limit_submissions = BooleanField(_("Limit submissions"), widget=SwitchWidget(),
-                                     description=_("Whether there is a submission cap"))
-    submission_limit = IntegerField(_("Capacity"),
+    title = StringField(_('Title'), [DataRequired()], description=_('The title of the survey'))
+    introduction = TextAreaField(_('Introduction'), description=_('An introduction to be displayed before the survey'))
+    anonymous = BooleanField(_('Anonymous submissions'), widget=SwitchWidget(),
+                             description=_('User information will not be attached to submissions'))
+    require_user = BooleanField(_('Only logged-in users'), [HiddenUnless('anonymous')], widget=SwitchWidget(),
+                                description=_('Require users to be logged in for submitting the survey'))
+    limit_submissions = BooleanField(_('Limit submissions'), widget=SwitchWidget(),
+                                     description=_('Whether there is a submission cap'))
+    submission_limit = IntegerField(_('Capacity'),
                                     [HiddenUnless('limit_submissions'), DataRequired(), NumberRange(min=1)],
-                                    description=_("Maximum number of submissions accepted"))
-    private = BooleanField(_("Private survey"), widget=SwitchWidget(),
-                           description=_("Only selected people can answer the survey."))
+                                    description=_('Maximum number of submissions accepted'))
+    private = BooleanField(_('Private survey'), widget=SwitchWidget(),
+                           description=_('Only selected people can answer the survey.'))
     partial_completion = BooleanField(_('Partial completion'), widget=SwitchWidget(),
                                       description=_('Allow to save answers without submitting the survey.'))
     notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
@@ -73,14 +73,14 @@ class SurveyForm(IndicoForm):
 
 
 class ScheduleSurveyForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), [UsedIf(lambda form, field: form.allow_reschedule_start), Optional()],
+    start_dt = IndicoDateTimeField(_('Start'), [UsedIf(lambda form, field: form.allow_reschedule_start), Optional()],
                                    default_time=time(0, 0),
-                                   description=_("Moment when the survey will open for submissions"))
-    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],
+                                   description=_('Moment when the survey will open for submissions'))
+    end_dt = IndicoDateTimeField(_('End'), [Optional(), LinkedDateTime('start_dt')],
                                  default_time=time(23, 59),
-                                 description=_("Moment when the survey will close"))
+                                 description=_('Moment when the survey will close'))
     resend_start_notification = BooleanField(_('Resend start notification'), widget=SwitchWidget(),
-                                             description=_("Resend the survey start notification."))
+                                             description=_('Resend the survey start notification.'))
 
     def __init__(self, *args, **kwargs):
         survey = kwargs.pop('survey')
@@ -92,23 +92,23 @@ class ScheduleSurveyForm(IndicoForm):
 
 
 class SectionForm(IndicoForm):
-    display_as_section = BooleanField(_("Display as section"), widget=SwitchWidget(), default=True,
-                                      description=_("Whether this is going to be displayed as a section or standalone"))
+    display_as_section = BooleanField(_('Display as section'), widget=SwitchWidget(), default=True,
+                                      description=_('Whether this is going to be displayed as a section or standalone'))
     title = StringField(_('Title'), [HiddenUnless('display_as_section', preserve_data=True), DataRequired()],
-                        description=_("The title of the section."))
+                        description=_('The title of the section.'))
     description = TextAreaField(_('Description'), [HiddenUnless('display_as_section', preserve_data=True)],
-                                description=_("The description text of the section."))
+                                description=_('The description text of the section.'))
 
 
 class TextForm(IndicoForm):
     description = TextAreaField(_('Text'),
-                                description=_("The text that should be displayed."))
+                                description=_('The text that should be displayed.'))
 
 
 class ImportQuestionnaireForm(IndicoForm):
-    json_file = FileField(_('File'), accepted_file_types="application/json,.json",
-                          description=_("Choose a previously exported survey content to import. "
-                                        "Existing sections will be preserved."))
+    json_file = FileField(_('File'), accepted_file_types='application/json,.json',
+                          description=_('Choose a previously exported survey content to import. '
+                                        'Existing sections will be preserved.'))
 
 
 class InvitationForm(IndicoForm):

@@ -16,7 +16,7 @@ from indico.util.string import format_repr
 
 
 class AbstractAction(RichIntEnum):
-    __titles__ = [None, _("Accept"), _("Reject"), _("Change track"), _("Mark as duplicate"), _("Merge")]
+    __titles__ = [None, _('Accept'), _('Reject'), _('Change track'), _('Mark as duplicate'), _('Merge')]
     __css_classes__ = [None, 'success', 'error', 'warning', 'strong', 'visited']
     accept = 1
     reject = 2
@@ -38,9 +38,9 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 
     __tablename__ = 'abstract_reviews'
     __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
-                      db.CheckConstraint("proposed_action = {} OR (proposed_contribution_type_id IS NULL)"
+                      db.CheckConstraint('proposed_action = {} OR (proposed_contribution_type_id IS NULL)'
                                          .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
-                      db.CheckConstraint("(proposed_action IN ({}, {})) = (proposed_related_abstract_id IS NOT NULL)"
+                      db.CheckConstraint('(proposed_action IN ({}, {})) = (proposed_related_abstract_id IS NOT NULL)'
                                          .format(AbstractAction.mark_as_duplicate, AbstractAction.merge),
                                          name='prop_abstract_id_only_duplicate_merge'),
                       {'schema': 'event_abstracts'})
@@ -199,11 +199,11 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 class AbstractCommentVisibility(RichIntEnum):
     """Most to least restrictive visibility for abstract comments."""
     __titles__ = [None,
-                  _("Visible only to judges"),
-                  _("Visible to conveners and judges"),
-                  _("Visible to reviewers, conveners, and judges"),
-                  _("Visible to contributors, reviewers, conveners, and judges"),
-                  _("Visible to all users")]
+                  _('Visible only to judges'),
+                  _('Visible to conveners and judges'),
+                  _('Visible to reviewers, conveners, and judges'),
+                  _('Visible to contributors, reviewers, conveners, and judges'),
+                  _('Visible to all users')]
     judges = 1
     conveners = 2
     reviewers = 3

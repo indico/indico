@@ -19,7 +19,7 @@ from indico.util.i18n import _
 
 
 class AgreementState(RichIntEnum):
-    __titles__ = [_("Pending"), _("Accepted"), _("Rejected"), _("Accepted on behalf"), _("Rejected on behalf")]
+    __titles__ = [_('Pending'), _('Accepted'), _('Rejected'), _('Accepted on behalf'), _('Rejected on behalf')]
     pending = 0
     accepted = 1
     rejected = 2

@@ -32,6 +32,6 @@ class IndicoMarkdownField(TextAreaField):
             # WMD relies on this awful ID :/
             kwargs['id'] = 'wmd-input-f_' + orig_id
         else:
-            kwargs.setdefault('description', _("You can use Markdown or basic HTML formatting tags."))
+            kwargs.setdefault('description', _('You can use Markdown or basic HTML formatting tags.'))
         super().__init__(*args, **kwargs)
         self.orig_id = orig_id

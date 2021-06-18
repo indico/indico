@@ -76,17 +76,17 @@ def find_latest_entry_end_dt(obj, day=None):
     """
     if isinstance(obj, Event):
         if day is None:
-            raise ValueError("No day specified for event.")
+            raise ValueError('No day specified for event.')
         if not (obj.start_dt_local.date() <= day <= obj.end_dt_local.date()):
-            raise ValueError("Day out of event bounds.")
+            raise ValueError('Day out of event bounds.')
         entries = obj.timetable_entries.filter(TimetableEntry.parent_id.is_(None),
                                                cast(TimetableEntry.start_dt.astimezone(obj.tzinfo), Date) == day).all()
     elif isinstance(obj, SessionBlock):
         if day is not None:
-            raise ValueError("Day specified for session block.")
+            raise ValueError('Day specified for session block.')
         entries = obj.timetable_entry.children
     else:
-        raise ValueError(f"Invalid object type {type(obj)}")
+        raise ValueError(f'Invalid object type {type(obj)}')
     return max(entries, key=attrgetter('end_dt')).end_dt if entries else None
 
 
@@ -106,18 +106,18 @@ def find_next_start_dt(duration, obj, day=None, force=False):
     """
     if isinstance(obj, Event):
         if day is None:
-            raise ValueError("No day specified for event.")
+            raise ValueError('No day specified for event.')
         if not (obj.start_dt_local.date() <= day <= obj.end_dt_local.date()):
-            raise ValueError("Day out of event bounds.")
+            raise ValueError('Day out of event bounds.')
         earliest_dt = obj.start_dt if obj.start_dt_local.date() == day else obj.start_dt.replace(hour=8, minute=0)
         latest_dt = obj.end_dt if obj.start_dt.date() == day else get_day_end(day, tzinfo=obj.tzinfo)
     elif isinstance(obj, SessionBlock):
         if day is not None:
-            raise ValueError("Day specified for session block.")
+            raise ValueError('Day specified for session block.')
         earliest_dt = obj.timetable_entry.start_dt
         latest_dt = obj.timetable_entry.end_dt
     else:
-        raise ValueError(f"Invalid object type {type(obj)}")
+        raise ValueError(f'Invalid object type {type(obj)}')
     max_duration = latest_dt - earliest_dt
     if duration > max_duration:
         return earliest_dt if force else None
@@ -272,7 +272,7 @@ def render_entry_info_balloon(entry, editable=False, sess=None, is_session_timet
                                color_list=get_colors(), event_locked=entry.event.is_locked,
                                is_session_timetable=is_session_timetable)
     else:
-        raise ValueError("Invalid entry")
+        raise ValueError('Invalid entry')
 
 
 def render_session_timetable(session, timetable_layout=None, management=False):
@@ -326,21 +326,21 @@ def get_time_changes_notifications(changes, tzinfo, entry=None):
         if isinstance(obj, Event):
             if 'start_dt' in change:
                 new_time = change['start_dt'][1]
-                msg = _("Event start time changed to {}")
+                msg = _('Event start time changed to {}')
             elif 'end_dt' in change:
                 new_time = change['end_dt'][1]
-                msg = _("Event end time changed to {}")
+                msg = _('Event end time changed to {}')
             else:
-                raise ValueError("Invalid change in event.")
+                raise ValueError('Invalid change in event.')
         elif isinstance(obj, SessionBlock):
             if 'start_dt' in change:
                 new_time = change['start_dt'][1]
-                msg = _("Session block start time changed to {}")
+                msg = _('Session block start time changed to {}')
             elif 'end_dt' in change:
                 new_time = change['end_dt'][1]
-                msg = _("Session block end time changed to {}")
+                msg = _('Session block end time changed to {}')
             else:
-                raise ValueError("Invalid change in session block.")
+                raise ValueError('Invalid change in session block.')
         if msg:
             notifications.append(msg.format(format_time(new_time, timezone=tzinfo)))
     return notifications

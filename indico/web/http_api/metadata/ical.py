@@ -46,7 +46,7 @@ def _deserialize_date(date_dict):
     return timezone(date_dict['tz']).localize(dt).astimezone(utc)
 
 
-def serialize_event(cal, fossil, now, id_prefix="indico-event"):
+def serialize_event(cal, fossil, now, id_prefix='indico-event'):
     event = ical.Event()
     event.add('uid', '{}-{}@{}'.format(id_prefix, fossil['id'], url_parse(config.BASE_URL).host))
     event.add('dtstamp', now)
@@ -84,12 +84,12 @@ def serialize_contribs(cal, fossil, now):
     else:
         for sfossil in fossil['contributions']:
             if sfossil['startDate']:
-                sfossil['id'] = "{}-{}".format(fossil['id'], sfossil['id'])
-                serialize_event(cal, sfossil, now, id_prefix="indico-contribution")
+                sfossil['id'] = '{}-{}'.format(fossil['id'], sfossil['id'])
+                serialize_event(cal, sfossil, now, id_prefix='indico-contribution')
 
 
 def serialize_contrib(cal, fossil, now):
-    serialize_event(cal, fossil, now, id_prefix="indico-contribution")
+    serialize_event(cal, fossil, now, id_prefix='indico-contribution')
 
 
 def serialize_sessions(cal, fossil, now):
@@ -98,13 +98,13 @@ def serialize_sessions(cal, fossil, now):
     else:
         for sfossil in fossil['sessions']:
             if sfossil['startDate']:
-                serialize_session(cal, sfossil, now, fid="{}-{}".format(fossil['id'], sfossil['id']))
+                serialize_session(cal, sfossil, now, fid='{}-{}'.format(fossil['id'], sfossil['id']))
 
 
 def serialize_session(cal, fossil, now, fid=None):
     if fid:
         fossil['id'] = fid
-    serialize_event(cal, fossil, now, id_prefix="indico-session")
+    serialize_event(cal, fossil, now, id_prefix='indico-session')
 
 
 class ICalSerializer(Serializer):

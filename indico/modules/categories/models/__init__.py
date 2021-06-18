@@ -14,7 +14,7 @@ from indico.core import signals
 
 @signals.db_schema_created.connect_via('categories')
 def _create_check_consistency_deleted(sender, connection, **kwargs):
-    sql = textwrap.dedent("""
+    sql = textwrap.dedent('''
         CREATE FUNCTION categories.check_consistency_deleted() RETURNS trigger AS
         $BODY$
         DECLARE
@@ -67,13 +67,13 @@ def _create_check_consistency_deleted(sender, connection, **kwargs):
         END;
         $BODY$
         LANGUAGE plpgsql
-    """)
+    ''')
     DDL(sql).execute(connection)
 
 
 @signals.db_schema_created.connect_via('categories')
 def _create_check_cycles(sender, connection, **kwargs):
-    sql = textwrap.dedent("""
+    sql = textwrap.dedent('''
         CREATE FUNCTION categories.check_cycles() RETURNS trigger AS
         $BODY$
         DECLARE
@@ -104,5 +104,5 @@ def _create_check_cycles(sender, connection, **kwargs):
         END;
         $BODY$
         LANGUAGE plpgsql
-    """)
+    ''')
     DDL(sql).execute(connection)

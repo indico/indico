@@ -150,7 +150,7 @@ def _git_tag(version, message, sign, dry_run):
 
 
 def _build_wheel(no_assets, dry_run):
-    step("Building wheel", dry_run=dry_run)
+    step('Building wheel', dry_run=dry_run)
     if dry_run:
         return
     args = ['--no-assets'] if no_assets else []

@@ -65,8 +65,8 @@ def _convert_email_principals(user, **kwargs):
     events = EventPrincipal.replace_email_with_user(user, 'event')
     if events:
         num = len(events)
-        flash(ngettext("You have been granted manager/submission privileges for an event.",
-                       "You have been granted manager/submission privileges for {} events.", num).format(num), 'info')
+        flash(ngettext('You have been granted manager/submission privileges for an event.',
+                       'You have been granted manager/submission privileges for {} events.', num).format(num), 'info')
 
 
 @signals.users.registered.connect
@@ -217,8 +217,8 @@ def _extend_event_menu(sender, **kwargs):
         return session.user and (get_menu_entry_by_name('my_contributions', event).is_visible or
                                  get_menu_entry_by_name('my_sessions', event).is_visible)
 
-    yield MenuEntryData(_("Overview"), 'overview', 'events.display_overview', position=0, static_site=True)
-    yield MenuEntryData(_("My Conference"), 'my_conference', position=7, visible=_my_conference_visible)
+    yield MenuEntryData(_('Overview'), 'overview', 'events.display_overview', position=0, static_site=True)
+    yield MenuEntryData(_('My Conference'), 'my_conference', position=7, visible=_my_conference_visible)
 
 
 @signals.app_created.connect
