@@ -563,7 +563,7 @@ class TimeTablePlain(PDFWithTOC):
                         if not self._ttPDFFormat.showContribId():
                             title = 'title'
                         row = self._fontifyRow([title, 'presenter', 'board'], 11)
-                        widths = [None, 5 * cm, 1 * cm]
+                        widths = [None, 5 * cm, 1.1 * cm]
                         if self._useColors():
                             row.insert(0, '')
                             widths.insert(0, 0.2 * cm)
