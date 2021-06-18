@@ -338,6 +338,19 @@ class TimeTablePlain(PDFWithTOC):
         subContStyle.leftIndent = 15
         self._styles['subContrib'] = subContStyle
 
+        details_style = stylesheet['Normal']
+        details_style.fontSize = modifiedFontSize(9.0, self._fontsize)
+        details_style.leftIndent = 10
+        self._styles['details_style'] = details_style
+
+        color_tablestyle = TableStyle([('FONTNAME', (0, 0), (-1, -1), 'Sans'),
+                              ('LEFTPADDING', (0, 0), (-1, -1), 3),
+                              ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+                              ('TOPPADDING', (0, 0), (-1, -1), 0),
+                              ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+                              ('GRID', (0, 0), (0, -1), 1, colors.lightgrey)])
+        self._styles['color_tablestyle'] = color_tablestyle
+
     def _getSessionColor(self, block):
         session_color = f'#{block.session.colors.background}'
         return html_color_to_rgb(session_color)
@@ -360,8 +373,6 @@ class TimeTablePlain(PDFWithTOC):
             caption = escape(contrib.title)
         elif self._ttPDFFormat.showLengthContribs():
             caption = f'{caption} ({format_human_timedelta(contrib.timetable_entry.duration)})'
-        elif self._ttPDFFormat.showContribAbstract():
-            caption = f'<font face="Times-Bold"><b>{caption}</b></font>'
 
         color_cell = ''
         caption = f'<font size="{str(modifiedFontSize(10, self._fontsize))}">{caption}</font>'
@@ -369,31 +380,17 @@ class TimeTablePlain(PDFWithTOC):
 
         if self._useColors():
             color_cell = ' '
-        if self._ttPDFFormat.showContribAbstract():
-            speaker_list = [self._get_speaker_name(spk) for spk in contrib.speakers]
-            if speaker_list:
-                speaker_title = ' {}: '.format(ngettext('Presenter', 'Presenters', len(speaker_list)))
-                speaker_content = speaker_title + ', '.join(speaker_list)
-                speaker_content = f'<font name="Times-Italic"><i>{speaker_content}</i></font>'
-                lt.append([self._fontify(speaker_content, 9)])
-            caption = escape(str(contrib.description))
-            lt.append([self._fontify(caption, 9)])
-            caption_and_speakers = Table(lt, colWidths=None, style=self._tsSpk)
-            if color_cell:
-                l.append([color_cell, date, caption_and_speakers])
-            else:
-                l.append([date, caption_and_speakers])
+
+        caption = Table(lt, colWidths=None, style=self._tsSpk)
+        speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles['table_body'])]
+                        for spk in contrib.speakers]
+        if not speaker_list:
+            speaker_list = [['']]
+        speakers = Table(speaker_list, style=self._tsSpk)
+        if color_cell:
+            l.append([color_cell, date, caption, speakers])
         else:
-            caption = Table(lt, colWidths=None, style=self._tsSpk)
-            speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles['table_body'])]
-                            for spk in contrib.speakers]
-            if not speaker_list:
-                speaker_list = [['']]
-            speakers = Table(speaker_list, style=self._tsSpk)
-            if color_cell:
-                l.append([color_cell, date, caption, speakers])
-            else:
-                l.append([date, caption, speakers])
+            l.append([date, caption, speakers])
 
         for subc in contrib.subcontributions:
             if not subc.can_access(self._user):
@@ -408,29 +405,17 @@ class TimeTablePlain(PDFWithTOC):
 
             caption = f'<font size="{str(modifiedFontSize(10, self._fontsize))}">{caption}</font>'
             lt.append([Paragraph(caption, self._styles['subContrib'])])
-            if self._ttPDFFormat.showContribAbstract():
-                caption = '<font size="{}">{}</font>'.format(str(modifiedFontSize(9, self._fontsize)),
-                                                             escape(str(subc.description)))
-                lt.append([Paragraph(caption, self._styles['subContrib'])])
-
             speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles['table_body'])]
                             for spk in subc.speakers]
             if not speaker_list:
                 speaker_list = [['']]
-            if self._ttPDFFormat.showContribAbstract():
-                lt.extend(speaker_list)
-                caption_and_speakers = Table(lt, colWidths=None, style=self._tsSpk)
-                if color_cell:
-                    l.append([color_cell, '', caption_and_speakers])
-                else:
-                    l.append(['', caption_and_speakers])
+
+            caption = Table(lt, colWidths=None, style=self._tsSpk)
+            speakers = Table(speaker_list, style=self._tsSpk)
+            if color_cell:
+                l.append([color_cell, '', caption, speakers])
             else:
-                caption = Table(lt, colWidths=None, style=self._tsSpk)
-                speakers = Table(speaker_list, style=self._tsSpk)
-                if color_cell:
-                    l.append([color_cell, '', caption, speakers])
-                else:
-                    l.append(['', caption, speakers])
+                l.append(['', caption, speakers])
 
     def _processPosterContribution(self, contrib, l):
         if not contrib.can_access(self._user):
@@ -445,31 +430,16 @@ class TimeTablePlain(PDFWithTOC):
         caption_text = f'<font name="Times-Bold">{caption_text}</font>'
         lt.append([self._fontify(caption_text, 10)])
         board_number = contrib.board_number
-        if self._ttPDFFormat.showContribAbstract() and self._ttPDFFormat.showContribPosterAbstract():
-            speaker_list = [self._get_speaker_name(spk) for spk in contrib.speakers]
-            if speaker_list:
-                speaker_word = '{}: '.format(ngettext('Presenter', 'Presenters', len(speaker_list)))
-                speaker_text = speaker_word + ', '.join(speaker_list)
-                speaker_text = f'<font face="Times-Italic"><i>{speaker_text}</i></font>'
-                lt.append([self._fontify(speaker_text, 10)])
-            caption_text = escape(str(contrib.description))
-            lt.append([self._fontify(caption_text, 9)])
-            caption_and_speakers = Table(lt, colWidths=None, style=self._tsSpk)
-            if self._useColors():
-                l.append([' ', caption_and_speakers, board_number])
-            else:
-                l.append([caption_and_speakers, board_number])
+        caption = Table(lt, colWidths=None, style=self._tsSpk)
+        speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles['table_body'])]
+                        for spk in contrib.speakers]
+        if not speaker_list:
+            speaker_list = [['']]
+        speakers = Table(speaker_list, style=self._tsSpk)
+        if self._useColors():
+            l.append([' ', caption, speakers, board_number])
         else:
-            caption = Table(lt, colWidths=None, style=self._tsSpk)
-            speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles['table_body'])]
-                            for spk in contrib.speakers]
-            if not speaker_list:
-                speaker_list = [['']]
-            speakers = Table(speaker_list, style=self._tsSpk)
-            if self._useColors():
-                l.append([' ', caption, speakers, board_number])
-            else:
-                l.append([caption, speakers, board_number])
+            l.append([caption, speakers, board_number])
         for subc in contrib.subcontributions:
             if not subc.can_access(self._user):
                 return
@@ -481,10 +451,6 @@ class TimeTablePlain(PDFWithTOC):
             if self._ttPDFFormat.showLengthContribs():
                 caption_text = f'{caption_text} ({escape(format_human_timedelta(subc.duration))})'
             lt.append([Paragraph(caption_text, self._styles['subContrib'])])
-            if self._ttPDFFormat.showContribAbstract():
-                caption_text = '<font size="{}">{}</font>'.format(str(modifiedFontSize(9, self._fontsize)),
-                                                                   escape(str(subc.description)))
-                lt.append([Paragraph(caption_text, self._styles['subContrib'])])
             speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles['table_body'])]
                             for spk in subc.speakers]
             caption = Table(lt, colWidths=None, style=self._tsSpk)
@@ -520,12 +486,6 @@ class TimeTablePlain(PDFWithTOC):
                                   ('RIGHTPADDING', (0, 0), (0, -1), 0),
                                   ('TOPPADDING', (0, 0), (0, -1), 1),
                                   ('BOTTOMPADDING', (0, 0), (0, -1), 0)])
-        colorts = TableStyle([('FONTNAME', (0, 0), (-1, -1), 'Sans'),
-                              ('LEFTPADDING', (0, 0), (-1, -1), 3),
-                              ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-                              ('TOPPADDING', (0, 0), (-1, -1), 0),
-                              ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
-                              ('GRID', (0, 0), (0, -1), 1, colors.lightgrey)])
         entries = (self.event.timetable_entries
                    .filter(db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
                            TimetableEntry.parent_id.is_(None))
@@ -574,7 +534,7 @@ class TimeTablePlain(PDFWithTOC):
 
                 p1 = Paragraph(text, self._styles['session_title'])
                 if self._useColors():
-                    ts = deepcopy(colorts)
+                    ts = deepcopy(self._styles['color_tablestyle'])
                     ts.add('BACKGROUND', (0, 0), (0, -1), self._getSessionColor(sess_block))
                     p1 = Table([['', p1]], colWidths=[0.2 * cm, None], style=ts)
 
@@ -594,20 +554,16 @@ class TimeTablePlain(PDFWithTOC):
                 contribs = sorted(sess_block.contributions, key=attrgetter('timetable_entry.start_dt'))
                 if sess_block.session.is_poster:
                     for contrib in sorted(contribs, key=lambda x: natural_sort_key(x.board_number)):
-                        self._processPosterContribution(contrib, l)
-
+                        if self._ttPDFFormat.showContribAbstract() and self._ttPDFFormat.showContribPosterAbstract():
+                            self._print_contribution_with_abstract(res, contrib, sess_block)
+                        else:
+                            self._processPosterContribution(contrib, l)
                     if l:
                         title = '[id] title'
                         if not self._ttPDFFormat.showContribId():
                             title = 'title'
-                        if self._ttPDFFormat.showContribAbstract() and self._ttPDFFormat.showContribPosterAbstract():
-                            # presenter integrated in 1st column -> 2 columns only
-                            row = [title, 'board']
-                            widths = [None, 1 * cm]
-                        else:
-                            row = [title, 'presenter', 'board']
-                            widths = [None, 5 * cm, 1 * cm]
-                        row = self._fontifyRow(row, 11)
+                        row = self._fontifyRow([title, 'presenter', 'board'], 11)
+                        widths = [None, 5 * cm, 1 * cm]
                         if self._useColors():
                             row.insert(0, '')
                             widths.insert(0, 0.2 * cm)
@@ -619,7 +575,10 @@ class TimeTablePlain(PDFWithTOC):
                     for s_entry in sorted(sess_block.timetable_entry.children, key=attrgetter('start_dt')):
                         obj = s_entry.object
                         if s_entry.type == TimetableEntryType.CONTRIBUTION:
-                            self._processContribution(obj, l)
+                            if self._ttPDFFormat.showContribAbstract():
+                                self._print_contribution_with_abstract(res, obj, sess_block)
+                            else:
+                                self._processContribution(obj, l)
                         elif s_entry.type == TimetableEntryType.BREAK:
                             lt = []
                             date = self._fontify(format_time(s_entry.start_dt, timezone=self._tz))
@@ -631,11 +590,7 @@ class TimeTablePlain(PDFWithTOC):
 
                             lt.append([self._fontify(caption, 10)])
                             caption = Table(lt, colWidths=None, style=self._tsSpk)
-
-                            if self._ttPDFFormat.showContribAbstract():
-                                row = [date, caption]
-                            else:
-                                row = [date, caption, '']
+                            row = [date, caption, '']
                             if self._useColors():
                                 row.insert(0, '')
                             l.append(row)
@@ -643,14 +598,8 @@ class TimeTablePlain(PDFWithTOC):
                         title = '[id] title'
                         if not self._ttPDFFormat.showContribId():
                             title = 'title'
-                        if self._ttPDFFormat.showContribAbstract():
-                            # presenter integrated in 1st column -> 2 columns only
-                            row = ['time', title]
-                            widths = [0.95 * cm, None]
-                        else:
-                            row = ['time', title, 'presenter']
-                            widths = [1 * cm, None, 5 * cm]
-                        row = self._fontifyRow(row, 11)
+                        row = self._fontifyRow(['time', title, 'presenter'], 11)
+                        widths = [1 * cm, None, 5 * cm]
                         if self._useColors():
                             row.insert(0, '')
                             widths.insert(0, 0.2 * cm)
@@ -715,6 +664,43 @@ class TimeTablePlain(PDFWithTOC):
                     if self._ttPDFFormat.showNewPagePerSession():
                         res.append(PageBreak())
         return res
+
+    def _print_contribution_with_abstract(self, res, contribution, sess_block):
+        title_line = contribution.title
+        if self._ttPDFFormat.showContribId():
+            title_line = f'[{contribution.friendly_id}] {title_line}'
+        if sess_block.session.is_poster and contribution.board_number:
+            title_line += f' (board {contribution.board_number})'
+        if hasattr(contribution, 'start_dt') and not sess_block.session.is_poster:
+            title_line += f' ({format_time(contribution.start_dt, timezone=self._tz)}'
+            if self._ttPDFFormat.showLengthContribs():
+                title_line += f', {format_human_timedelta(contribution.timetable_entry.duration)})'
+            else:
+                title_line += ')'
+
+        title = Paragraph(title_line, self._styles['session_title'])
+        if self._useColors():
+            ts = deepcopy(self._styles['color_tablestyle'])
+            ts.add('BACKGROUND', (0, 0), (0, -1), self._getSessionColor(sess_block))
+            title = Table([['', title]], colWidths=[0.2 * cm, None], style=ts)
+
+        speaker_list = [self._get_speaker_name(spk) for spk in contribution.speakers]
+        speaker_content = ''
+        if speaker_list:
+            speaker_title = ' {}: '.format(ngettext('Presenter', 'Presenters', len(speaker_list)))
+            speaker_content = speaker_title + ', '.join(speaker_list)
+            speaker_content = f'<font name="Times-Italic"><i>{speaker_content}</i></font>'
+        speakers = Paragraph(speaker_content, self._styles['details_style'])
+        
+        abstract = Paragraph(escape(str(contribution.description)), self._styles['details_style'])
+
+        res.append(title)
+        res.append(speakers)
+        res.append(abstract)
+        res.append(Spacer(1, .33 * inch))
+
+        for subcontribution in getattr(contribution, 'subcontributions', []):
+            self._print_contribution_with_abstract(res, subcontribution, sess_block)
 
     def getBody(self, story=None):
         self._defineStyles()
