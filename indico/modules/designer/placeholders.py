@@ -30,8 +30,8 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
 
 
 GROUP_TITLES = {
-    'registrant': _("Registrant Data"),
-    'event': _("Event Data")
+    'registrant': _('Registrant Data'),
+    'event': _('Event Data')
 }
 
 
@@ -76,7 +76,7 @@ class FullNamePlaceholderBase(DesignerPlaceholder):
 class EventLogoPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_logo'
-    description = _("Event Logo")
+    description = _('Event Logo')
     is_image = True
 
     @classmethod
@@ -90,7 +90,7 @@ class EventLogoPlaceholder(DesignerPlaceholder):
 class EventDatesPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_dates'
-    description = _("Event Dates")
+    description = _('Event Dates')
 
     @classmethod
     def render(cls, event):
@@ -106,7 +106,7 @@ class EventDatesPlaceholder(DesignerPlaceholder):
 class EventTitlePlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_title'
-    description = _("Event Title")
+    description = _('Event Title')
 
     @classmethod
     def render(cls, event):
@@ -116,7 +116,7 @@ class EventTitlePlaceholder(DesignerPlaceholder):
 class EventDescriptionPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_description'
-    description = _("Event Description")
+    description = _('Event Description')
 
     @classmethod
     def render(cls, event):
@@ -126,7 +126,7 @@ class EventDescriptionPlaceholder(DesignerPlaceholder):
 class EventSpeakersPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_speakers'
-    description = _("Event Speakers/Chairs")
+    description = _('Event Speakers/Chairs')
 
     @classmethod
     def render(cls, event):
@@ -136,7 +136,7 @@ class EventSpeakersPlaceholder(DesignerPlaceholder):
 class EventVenuePlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_venue'
-    description = _("Event Venue")
+    description = _('Event Venue')
 
     @classmethod
     def render(cls, event):
@@ -146,7 +146,7 @@ class EventVenuePlaceholder(DesignerPlaceholder):
 class EventRoomPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_room'
-    description = _("Event Room")
+    description = _('Event Room')
 
     @classmethod
     def render(cls, event):
@@ -156,7 +156,7 @@ class EventRoomPlaceholder(DesignerPlaceholder):
 class EventOrgTextPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_organizers'
-    description = _("Event Organizers")
+    description = _('Event Organizers')
 
     @classmethod
     def render(cls, event):
@@ -166,7 +166,7 @@ class EventOrgTextPlaceholder(DesignerPlaceholder):
 class CategoryTitlePlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'category_title'
-    description = _("Category Title")
+    description = _('Category Title')
 
     @classmethod
     def render(cls, event):
@@ -175,87 +175,87 @@ class CategoryTitlePlaceholder(DesignerPlaceholder):
 
 class RegistrationFullNamePlaceholder(FullNamePlaceholderBase):
     name = 'full_name'
-    description = _("Full Name")
+    description = _('Full Name')
     with_title = True
     name_options = {}
 
 
 class RegistrationFullNameNoTitlePlaceholder(FullNamePlaceholderBase):
     name = 'full_name_no_title'
-    description = _("Full Name (no title)")
+    description = _('Full Name (no title)')
     with_title = False
     name_options = {}
 
 
 class RegistrationFullNamePlaceholderB(FullNamePlaceholderBase):
     name = 'full_name_b'
-    description = _("Full Name B")
+    description = _('Full Name B')
     with_title = True
     name_options = {'last_name_first': False}
 
 
 class RegistrationFullNameNoTitlePlaceholderB(FullNamePlaceholderBase):
     name = 'full_name_b_no_title'
-    description = _("Full Name B (no title)")
+    description = _('Full Name B (no title)')
     with_title = False
     name_options = {'last_name_first': False}
 
 
 class RegistrationFullNamePlaceholderC(FullNamePlaceholderBase):
     name = 'full_name_c'
-    description = _("Full Name C")
+    description = _('Full Name C')
     with_title = True
     name_options = {'last_name_first': False, 'last_name_upper': True}
 
 
 class RegistrationFullNameNoTitlePlaceholderC(FullNamePlaceholderBase):
     name = 'full_name_no_title_c'
-    description = _("Full Name C (no title)")
+    description = _('Full Name C (no title)')
     with_title = False
     name_options = {'last_name_upper': True}
 
 
 class RegistrationFullNamePlaceholderD(FullNamePlaceholderBase):
     name = 'full_name_d'
-    description = _("Full Name D (abbrev.)")
+    description = _('Full Name D (abbrev.)')
     with_title = True
     name_options = {'last_name_first': False, 'last_name_upper': True, 'abbrev_first_name': True}
 
 
 class RegistrationFullNameNoTitlePlaceholderD(FullNamePlaceholderBase):
     name = 'full_name_no_title_d'
-    description = _("Full Name D (abbrev., no title)")
+    description = _('Full Name D (abbrev., no title)')
     with_title = False
     name_options = {'last_name_upper': True, 'abbrev_first_name': True}
 
 
 class RegistrationTitlePlaceholder(RegistrationPDPlaceholder):
     name = 'title'
-    description = _("Title")
+    description = _('Title')
     field = 'title'
 
 
 class RegistrationFirstNamePlaceholder(RegistrationPlaceholder):
     name = 'first_name'
-    description = _("First Name")
+    description = _('First Name')
     field = 'first_name'
 
 
 class RegistrationLastNamePlaceholder(RegistrationPlaceholder):
     name = 'last_name'
-    description = _("Last Name")
+    description = _('Last Name')
     field = 'last_name'
 
 
 class RegistrationEmailPlaceholder(RegistrationPlaceholder):
     name = 'email'
-    description = _("E-mail")
+    description = _('E-mail')
     field = 'email'
 
 
 class RegistrationAmountPlaceholder(RegistrationPlaceholder):
     name = 'amount'
-    description = _("Price (no currency)")
+    description = _('Price (no currency)')
 
     @classmethod
     def render(cls, registration):
@@ -265,7 +265,7 @@ class RegistrationAmountPlaceholder(RegistrationPlaceholder):
 
 class RegistrationPricePlaceholder(RegistrationPlaceholder):
     name = 'price'
-    description = _("Price (with currency)")
+    description = _('Price (with currency)')
 
     @classmethod
     def render(cls, registration):
@@ -281,38 +281,38 @@ class RegistrationFriendlyIDPlaceholder(RegistrationPlaceholder):
 
 class RegistrationAffiliationPlaceholder(RegistrationPDPlaceholder):
     name = 'affiliation'
-    description = _("Institution")
+    description = _('Institution')
     field = 'affiliation'
 
 
 class RegistrationPositionPlaceholder(RegistrationPDPlaceholder):
     name = 'position'
-    description = _("Position")
+    description = _('Position')
     field = 'position'
 
 
 class RegistrationAddressPlaceholder(RegistrationPDPlaceholder):
     name = 'address'
-    description = _("Address")
+    description = _('Address')
     field = 'address'
 
 
 class RegistrationCountryPlaceholder(RegistrationPDPlaceholder):
     name = 'country'
-    description = _("Country")
+    description = _('Country')
     field = 'country'
 
 
 class RegistrationPhonePlaceholder(RegistrationPDPlaceholder):
     name = 'phone'
-    description = _("Phone")
+    description = _('Phone')
     field = 'phone'
 
 
 class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
     group = 'registrant'
     name = 'ticket_qr_code'
-    description = _("Ticket QR Code")
+    description = _('Ticket QR Code')
     is_ticket = True
     is_image = True
 

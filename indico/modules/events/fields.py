@@ -31,8 +31,8 @@ class ReferencesField(MultipleItemsField):
 
     def __init__(self, *args, **kwargs):
         self.reference_class = kwargs.pop('reference_class')
-        self.fields = [{'id': 'type', 'caption': _("Type"), 'type': 'select', 'required': True},
-                       {'id': 'value', 'caption': _("Value"), 'type': 'text', 'required': True}]
+        self.fields = [{'id': 'type', 'caption': _('Type'), 'type': 'select', 'required': True},
+                       {'id': 'value', 'caption': _('Value'), 'type': 'text', 'required': True}]
         self.choices = {'type': {str(r.id): r.name for r in ReferenceType.query}}
         super().__init__(*args, uuid_field='id', uuid_field_opaque=True, **kwargs)
 

@@ -31,12 +31,12 @@ def dummy_reg(db, dummy_event, dummy_regform, dummy_user):
     """Create a dummy registration for the dummy event."""
     reg = Registration(
         registration_form_id=dummy_regform.id,
-        first_name="Guinea",
-        last_name="Pig",
+        first_name='Guinea',
+        last_name='Pig',
         checked_in=True,
         state=RegistrationState.complete,
-        currency="USD",
-        email="1337@example.com",
+        currency='USD',
+        email='1337@example.com',
         user=dummy_user
     )
     dummy_event.registrations.append(reg)

@@ -271,7 +271,7 @@ def configure_db(app):
         app.config.setdefault('SQLALCHEMY_DATABASE_URI', 'sqlite:///:memory:')
     else:
         if config.SQLALCHEMY_DATABASE_URI is None:
-            raise Exception("No proper SQLAlchemy store has been configured. Please edit your indico.conf")
+            raise Exception('No proper SQLAlchemy store has been configured. Please edit your indico.conf')
 
         app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
         app.config['SQLALCHEMY_RECORD_QUERIES'] = False

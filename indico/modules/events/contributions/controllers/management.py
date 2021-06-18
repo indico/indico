@@ -220,8 +220,8 @@ class RHDeleteContributions(RHManageContributionsActionsBase):
         for contrib in self.contribs:
             delete_contribution(contrib)
         deleted_count = len(self.contribs)
-        flash(ngettext("The contribution has been deleted.",
-                       "{count} contributions have been deleted.", deleted_count)
+        flash(ngettext('The contribution has been deleted.',
+                       '{count} contributions have been deleted.', deleted_count)
               .format(count=deleted_count), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
@@ -515,11 +515,11 @@ class RHContributionsImportCSV(RHManageContributionsBase):
 
         if form.validate_on_submit():
             contributions, changes = import_contributions_from_csv(self.event, form.source_file.data)
-            flash(ngettext("{} contribution has been imported.",
-                           "{} contributions have been imported.",
+            flash(ngettext('{} contribution has been imported.',
+                           '{} contributions have been imported.',
                            len(contributions)).format(len(contributions)), 'success')
             if changes:
-                flash(_("Event dates/times adjusted due to imported data."), 'warning')
+                flash(_('Event dates/times adjusted due to imported data.'), 'warning')
             return jsonify_data(flash=False, redirect=url_for('.manage_contributions', self.event))
         return jsonify_template('events/contributions/management/import_contributions.html', form=form,
                                 event=self.event)
@@ -541,7 +541,7 @@ class RHManageDefaultContributionDuration(RHManageContributionsBase):
         form = ContributionDefaultDurationForm(duration=contribution_settings.get(self.event, 'default_duration'))
         if form.validate_on_submit():
             contribution_settings.set(self.event, 'default_duration', form.duration.data)
-            flash(_("Default contribution duration was changed successfully"))
+            flash(_('Default contribution duration was changed successfully'))
             return jsonify_data()
         return jsonify_form(form)
 

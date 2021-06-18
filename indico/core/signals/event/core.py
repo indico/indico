@@ -8,94 +8,94 @@
 from indico.core.signals.event import _signals
 
 
-sidemenu = _signals.signal('sidemenu', """
+sidemenu = _signals.signal('sidemenu', '''
 Expected to return ``MenuEntryData`` objects to be added to the event side menu.
 A single entry can be returned directly, multiple entries must be yielded.
-""")
+''')
 
-deleted = _signals.signal('deleted', """
+deleted = _signals.signal('deleted', '''
 Called when an event is deleted. The *sender* is the event object.
 The `user` kwarg contains the user performing the deletion if available.
-""")
+''')
 
-restored = _signals.signal('restored', """
+restored = _signals.signal('restored', '''
 Called when a previously-deleted event is restored. The *sender* is the event
 object. The `user` kwarg contains the user restoring the event if available,
 and the `reason` kwarg the reason if available.
-""")
+''')
 
-updated = _signals.signal('updated', """
+updated = _signals.signal('updated', '''
 Called when basic data of an event is updated. The *sender* is the event.
 A dict of changes is passed in the `changes` kwarg, with ``(old, new)``
 tuples for each change. Note than the `person_links` change may happen
 with `old` and `new` being the same lists for technical reasons. If the
 key is present, it should be assumed that something changed (usually
 the order or some data on the person link).
-""")
+''')
 
-cloned = _signals.signal('cloned', """
+cloned = _signals.signal('cloned', '''
 Called when an event is cloned. The *sender* is the `Event` object of
 the old event, the new event is passed in the `new_event` kwarg.
-""")
+''')
 
-imported = _signals.signal('imported', """
+imported = _signals.signal('imported', '''
 Called when data is imported to an event. The *sender* is the `Event`
 data was imported into, the source event is passed in the `source_event` kwarg.
-""")
+''')
 
-type_changed = _signals.signal('type-changed', """
+type_changed = _signals.signal('type-changed', '''
 Called when the type of an event is changed. The `sender` is the event,
 the old type is passed in the `old_type` kwarg.
-""")
+''')
 
-moved = _signals.signal('moved', """
+moved = _signals.signal('moved', '''
 Called when an event is moved to a different category. The `sender` is the event,
 the old category is in the `old_parent` kwarg.
-""")
+''')
 
-created = _signals.signal('created', """
+created = _signals.signal('created', '''
 Called when a new event is created. The `sender` is the new Event. The `cloning`
 kwarg indictates whether the event is a clone.
-""")
+''')
 
-location_changed = _signals.signal('location-changed', """
+location_changed = _signals.signal('location-changed', '''
 Called when the location of an object changed. The `sender` is the type
 of the object, the object itself is passed as `obj`. The changes are passed
 in the `changes` kwarg.
-""")
+''')
 
-session_updated = _signals.signal('session-updated', """
+session_updated = _signals.signal('session-updated', '''
 Called when a session is updated. The *sender* is the session.
-""")
+''')
 
-session_deleted = _signals.signal('session-deleted', """
+session_deleted = _signals.signal('session-deleted', '''
 Called when a session is deleted. The *sender* is the session.
-""")
+''')
 
-session_block_updated = _signals.signal('session-block-updated', """
+session_block_updated = _signals.signal('session-block-updated', '''
 Called when a session block is updated. The *sender* is the session block.
-""")
+''')
 
-session_block_deleted = _signals.signal('session-block-deleted', """
+session_block_deleted = _signals.signal('session-block-deleted', '''
 Called when a session block is deleted. The *sender* is the session block.
 This signal is called before the ``db.session.delete()`` on the block is
 executed.
-""")
+''')
 
-timetable_buttons = _signals.signal('timetable-buttons', """
+timetable_buttons = _signals.signal('timetable-buttons', '''
 Expected to return a list of tuples ('button_name', 'js-call-class').
 Called when building the timetable view.
-""")
+''')
 
-get_log_renderers = _signals.signal('get-log-renderers', """
+get_log_renderers = _signals.signal('get-log-renderers', '''
 Expected to return `EventLogRenderer` classes.
-""")
+''')
 
-get_feature_definitions = _signals.signal('get-feature-definitions', """
+get_feature_definitions = _signals.signal('get-feature-definitions', '''
 Expected to return `EventFeature` subclasses.
-""")
+''')
 
-metadata_postprocess = _signals.signal('metadata-postprocess', """
+metadata_postprocess = _signals.signal('metadata-postprocess', '''
 Called right after a dict-like representation of an event is created,
 so that plugins can add their own fields.
 
@@ -106,4 +106,4 @@ generated.
 
 The signal should return a dict that will be used to update the
 original representation (fields to add or override).
-""")
+''')

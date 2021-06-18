@@ -48,8 +48,8 @@ def _convert_email_principals(user, **kwargs):
     contributions = ContributionPrincipal.replace_email_with_user(user, 'contribution')
     if contributions:
         num = len(contributions)
-        flash(ngettext("You have been granted manager/submission privileges for a contribution.",
-                       "You have been granted manager/submission privileges for {} contributions.", num).format(num),
+        flash(ngettext('You have been granted manager/submission privileges for a contribution.',
+                       'You have been granted manager/submission privileges for {} contributions.', num).format(num),
               'info')
 
 
@@ -111,13 +111,13 @@ def _extend_event_menu(sender, **kwargs):
         published = contribution_settings.get(event, 'published')
         return published and Contribution.query.filter(Contribution.event == event).has_rows()
 
-    yield MenuEntryData(title=_("My Contributions"), name='my_contributions', visible=_visible_my_contributions,
+    yield MenuEntryData(title=_('My Contributions'), name='my_contributions', visible=_visible_my_contributions,
                         endpoint='contributions.my_contributions', position=2, parent='my_conference')
-    yield MenuEntryData(title=_("Contribution List"), name='contributions', endpoint='contributions.contribution_list',
+    yield MenuEntryData(title=_('Contribution List'), name='contributions', endpoint='contributions.contribution_list',
                         position=4, static_site=True, visible=_visible_list_of_contributions)
-    yield MenuEntryData(title=_("Author List"), name='author_index', endpoint='contributions.author_list', position=5,
+    yield MenuEntryData(title=_('Author List'), name='author_index', endpoint='contributions.author_list', position=5,
                         is_enabled=False, static_site=True)
-    yield MenuEntryData(title=_("Speaker List"), name='speaker_index', endpoint='contributions.speaker_list',
+    yield MenuEntryData(title=_('Speaker List'), name='speaker_index', endpoint='contributions.speaker_list',
                         position=6, is_enabled=False, static_site=True)
 
 

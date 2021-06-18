@@ -11,26 +11,26 @@ from blinker import Namespace
 _signals = Namespace()
 
 
-booking_created = _signals.signal('booking-created', """
+booking_created = _signals.signal('booking-created', '''
 Executed after a booking has been successfully created. The *sender*
 is the new `Reservation` object.
-""")
+''')
 
-booking_state_changed = _signals.signal('booking-state-changed', """
+booking_state_changed = _signals.signal('booking-state-changed', '''
 Executed after a booking has been cancelled/rejected/accepted. The *sender*
 is the `Reservation` object.
-""")
+''')
 
-booking_modified = _signals.signal('booking-modified', """
+booking_modified = _signals.signal('booking-modified', '''
 Executed after a booking has been modified. The *sender* is the `Reservation` object and
 a dictionary of changed values is passed in the `changes` kwarg.
-""")
+''')
 
-booking_deleted = _signals.signal('booking-deleted', """
+booking_deleted = _signals.signal('booking-deleted', '''
 Executed after a booking has been deleted. The *sender* is the `Reservation` object.
-""")
+''')
 
-booking_occurrence_state_changed = _signals.signal('booking-occurrence-state-changed', """
+booking_occurrence_state_changed = _signals.signal('booking-occurrence-state-changed', '''
 Executed after the state of a booking occurrence changed.
 The *sender* is the `ReservationOccurrence` object.
-""")
+''')

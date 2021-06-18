@@ -68,9 +68,9 @@ class RHScheduleCFA(RHManageAbstractsBase):
             rescheduled = self.event.cfa.start_dt is not None
             schedule_cfa(self.event, **form.data)
             if rescheduled:
-                flash(_("Call for abstracts has been rescheduled"), 'success')
+                flash(_('Call for abstracts has been rescheduled'), 'success')
             else:
-                flash(_("Call for abstracts has been scheduled"), 'success')
+                flash(_('Call for abstracts has been scheduled'), 'success')
             return jsonify_data(flash=False)
         return jsonify_form(form)
 
@@ -80,7 +80,7 @@ class RHOpenCFA(RHManageAbstractsBase):
 
     def _process(self):
         open_cfa(self.event)
-        flash(_("Call for abstracts is now open"), 'success')
+        flash(_('Call for abstracts is now open'), 'success')
         return redirect(url_for('.management', self.event))
 
 
@@ -89,7 +89,7 @@ class RHCloseCFA(RHManageAbstractsBase):
 
     def _process(self):
         close_cfa(self.event)
-        flash(_("Call for abstracts is now closed"), 'success')
+        flash(_('Call for abstracts is now closed'), 'success')
         return redirect(url_for('.management', self.event))
 
 
@@ -217,8 +217,8 @@ class RHManageReviewingRoles(RHManageAbstractsBase):
             update_object_principals(self.event, all_conveners, permission='track_convener')
             update_object_principals(self.event, all_reviewers, permission='abstract_reviewer')
 
-            flash(_("Abstract reviewing roles have been updated."), 'success')
-            logger.info("Abstract reviewing roles of %s have been updated by %s", self.event, session.user)
+            flash(_('Abstract reviewing roles have been updated.'), 'success')
+            logger.info('Abstract reviewing roles of %s have been updated by %s', self.event, session.user)
             return jsonify_data()
         return jsonify_form(form, skip_labels=True, form_header_kwargs={'id': 'reviewing-role-form'},
                             disabled_until_change=False)
@@ -247,7 +247,7 @@ class RHCreateAbstractReviewingQuestion(RHManageAbstractsBase):
         if form.validate_on_submit():
             new_question = create_reviewing_question(self.event, AbstractReviewQuestion, self.field_cls, form)
             self.event.abstract_review_questions.append(new_question)
-            logger.info("Abstract reviewing question %r created by %r", new_question, session.user)
+            logger.info('Abstract reviewing question %r created by %r', new_question, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
 

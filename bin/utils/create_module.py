@@ -65,7 +65,7 @@ def write(f, text=''):
 
 
 def write_header(f):
-    f.write(textwrap.dedent("""
+    f.write(textwrap.dedent('''
         # This file is part of Indico.
         # Copyright (C) 2002 - {year} CERN
         #
@@ -73,7 +73,7 @@ def write_header(f):
         # modify it under the terms of the MIT License; see the
         # LICENSE file for more details.
 
-    """).lstrip().format(year=date.today().year))
+    ''').lstrip().format(year=date.today().year))
 
 
 def write_model(f, class_name, event):
@@ -82,7 +82,7 @@ def write_model(f, class_name, event):
     if event and table_name.startswith('event_'):
         table_name = table_name[6:]
     f.write('\n\n')
-    f.write(textwrap.dedent("""
+    f.write(textwrap.dedent('''
         class {cls}(db.Model):
             __tablename__ = '{table}'
             __table_args__ = {{'schema': '{schema}'}}
@@ -95,7 +95,7 @@ def write_model(f, class_name, event):
 
             def __repr__(self):
                 return format_repr(self, 'id')
-    """).lstrip().format(cls=class_name, table=table_name, schema=schema))
+    ''').lstrip().format(cls=class_name, table=table_name, schema=schema))
 
 
 @click.command()

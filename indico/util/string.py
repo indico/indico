@@ -67,7 +67,7 @@ BLEACH_ALLOWED_STYLES_HTML = [
 ]
 
 
-LATEX_MATH_PLACEHOLDER = "\uE000"
+LATEX_MATH_PLACEHOLDER = '\uE000'
 
 
 def remove_accents(text):
@@ -539,7 +539,7 @@ def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mod
     from indico.core.db.sqlalchemy.descriptions import RenderMode
     from indico.util.i18n import _
     if get_render_mode(obj) == RenderMode.html:
-        field.warning = _("This text has been automatically converted from HTML to Markdown. "
+        field.warning = _('This text has been automatically converted from HTML to Markdown. '
                           "Please double-check that it's properly displayed.")
         ht = HTML2Text(bodywidth=0)
         desc = get_value(obj)

@@ -74,10 +74,10 @@ class RHManagePaperTeams(RHManagePapersBase):
             if cfp.layout_reviewing_enabled:
                 teams['layout_reviewers'] = form.layout_reviewers.data
             unassigned_contribs = update_team_members(self.event, **teams)
-            flash(_("The members of the teams were updated successfully"), 'success')
+            flash(_('The members of the teams were updated successfully'), 'success')
             if unassigned_contribs:
-                flash(ngettext("Users have been removed from 1 contribution",
-                               "Users have been removed from {} contributions",
+                flash(ngettext('Users have been removed from 1 contribution',
+                               'Users have been removed from {} contributions',
                                len(unassigned_contribs)).format(len(unassigned_contribs)),
                       'warning')
             return jsonify_data()
@@ -114,7 +114,7 @@ class RHManageCompetences(RHManagePapersBase):
                     update_competences(user_competences[user_id], competences)
                 elif competences:
                     create_competences(self.event, users[user_id], competences)
-            flash(_("Team competences were updated successfully"), 'success')
+            flash(_('Team competences were updated successfully'), 'success')
             return jsonify_data()
         return jsonify_template('events/papers/management/competences.html', event=self.event, form=form)
 
@@ -146,9 +146,9 @@ class RHScheduleCFP(RHManagePapersBase):
             rescheduled = self.event.cfp.start_dt is not None
             schedule_cfp(self.event, **form.data)
             if rescheduled:
-                flash(_("Call for papers has been rescheduled"), 'success')
+                flash(_('Call for papers has been rescheduled'), 'success')
             else:
-                flash(_("Call for papers has been scheduled"), 'success')
+                flash(_('Call for papers has been scheduled'), 'success')
             return jsonify_data(html=_render_paper_dashboard(self.event))
         return jsonify_form(form)
 
@@ -158,7 +158,7 @@ class RHOpenCFP(RHManagePapersBase):
 
     def _process(self):
         open_cfp(self.event)
-        flash(_("Call for papers is now open"), 'success')
+        flash(_('Call for papers is now open'), 'success')
         return jsonify_data(html=_render_paper_dashboard(self.event))
 
 
@@ -167,7 +167,7 @@ class RHCloseCFP(RHManagePapersBase):
 
     def _process(self):
         close_cfp(self.event)
-        flash(_("Call for papers is now closed"), 'success')
+        flash(_('Call for papers is now closed'), 'success')
         return jsonify_data(html=_render_paper_dashboard(self.event))
 
 
@@ -210,8 +210,8 @@ class RHManageReviewingSettings(RHManagePapersBase):
             data.update(data.pop('email_settings'))
             self._scale_ratings(data['scale_lower'], data['scale_upper'])
             paper_reviewing_settings.set_multi(self.event, data)
-            flash(_("The reviewing settings were saved successfully"), 'success')
-            logger.info("Paper reviewing settings of %r updated by %r", self.event, session.user)
+            flash(_('The reviewing settings were saved successfully'), 'success')
+            logger.info('Paper reviewing settings of %r updated by %r', self.event, session.user)
             return jsonify_data()
         self.commit = False
         return jsonify_form(form)
@@ -275,7 +275,7 @@ class RHCreateReviewingQuestion(RHReviewingQuestionsActionsBase):
             new_question = create_reviewing_question(self.event, PaperReviewQuestion, self.field_cls, form,
                                                      {'type': PaperReviewType[self.review_type]})
             self.event.paper_review_questions.append(new_question)
-            logger.info("Reviewing question %r created by %r", new_question, session.user)
+            logger.info('Reviewing question %r created by %r', new_question, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
 

@@ -8,6 +8,6 @@
 from indico.core.signals.event import _signals
 
 
-person_updated = _signals.signal('person-updated', """
+person_updated = _signals.signal('person-updated', '''
 Called when an EventPerson is modified. The *sender* is the EventPerson.
-""")
+''')

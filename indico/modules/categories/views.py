@@ -47,7 +47,7 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
     def _get_head_content(self):
         head_content = WPDecorated._get_head_content(self)
         if self.atom_feed_url:
-            title = self.atom_feed_title or _("Indico Atom feed")
+            title = self.atom_feed_title or _('Indico Atom feed')
             head_content += ('<link rel="alternate" type="application/atom+xml" title="{}" href="{}">'
                              .format(escape(title), self.atom_feed_url))
         if self._mathjax:

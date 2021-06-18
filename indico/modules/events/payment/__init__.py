@@ -21,10 +21,10 @@ from indico.web.menu import SideMenuItem
 __all__ = ('payment_settings', 'payment_event_settings', 'PaymentPluginMixin', 'PaymentPluginSettingsFormBase',
            'PaymentEventSettingsFormBase')
 
-CONDITIONS = ("CANCELLATION:\n"
-              "All refunds requests must be in writing by mail to the Conference Secretary as soon as possible.\n"
-              "The Conference committee reserves the right to refuse reimbursement of part or all of the fee in the "
-              "case of late cancellation. However, each case of cancellation would be considered individually.")
+CONDITIONS = ('CANCELLATION:\n'
+              'All refunds requests must be in writing by mail to the Conference Secretary as soon as possible.\n'
+              'The Conference committee reserves the right to refuse reimbursement of part or all of the fee in the '
+              'case of late cancellation. However, each case of cancellation would be considered individually.')
 
 
 payment_settings = SettingsProxy('payment', {
@@ -41,7 +41,7 @@ payment_event_settings = EventSettingsProxy('payment', {
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     if session.user.is_admin:
-        return SideMenuItem('payment', _("Payment"), url_for('payment.admin_settings'), section='customization')
+        return SideMenuItem('payment', _('Payment'), url_for('payment.admin_settings'), section='customization')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

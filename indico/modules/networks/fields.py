@@ -20,7 +20,7 @@ class MultiIPNetworkField(MultiStringField):
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, field=('subnet', _("subnet")), **kwargs)
+        super().__init__(*args, field=('subnet', _('subnet')), **kwargs)
         self._data_converted = False
         self.data = None
 

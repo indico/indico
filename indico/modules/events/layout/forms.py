@@ -62,41 +62,41 @@ class LoggedLayoutForm(IndicoForm):
 
 
 class ConferenceLayoutForm(LoggedLayoutForm):
-    is_searchable = BooleanField(_("Enable search"), widget=SwitchWidget(),
-                                 description=_("Enable search within the event"))
-    show_nav_bar = BooleanField(_("Show navigation bar"), widget=SwitchWidget(),
-                                description=_("Show the navigation bar at the top"))
-    show_banner = BooleanField(_("\"Now happening\""), widget=SwitchWidget(),
-                               description=_("Show a banner with the current entries from the timetable"))
-    show_social_badges = BooleanField(_("Show social badges"), widget=SwitchWidget())
+    is_searchable = BooleanField(_('Enable search'), widget=SwitchWidget(),
+                                 description=_('Enable search within the event'))
+    show_nav_bar = BooleanField(_('Show navigation bar'), widget=SwitchWidget(),
+                                description=_('Show the navigation bar at the top'))
+    show_banner = BooleanField(_('"Now happening"'), widget=SwitchWidget(),
+                               description=_('Show a banner with the current entries from the timetable'))
+    show_social_badges = BooleanField(_('Show social badges'), widget=SwitchWidget())
     name_format = IndicoEnumSelectField(_('Name format'), enum=NameFormat, none=_('Inherit from user preferences'),
                                         description=_('Format in which names are displayed'))
 
     # Style
-    header_text_color = StringField(_("Text colour"), widget=ColorPickerWidget())
-    header_background_color = StringField(_("Background colour"), widget=ColorPickerWidget())
+    header_text_color = StringField(_('Text colour'), widget=ColorPickerWidget())
+    header_background_color = StringField(_('Background colour'), widget=ColorPickerWidget())
 
     # Announcement
-    announcement = StringField(_("Announcement"),
+    announcement = StringField(_('Announcement'),
                                [UsedIf(lambda form, field: form.show_announcement.data)],
-                               description=_("Short message shown below the title"))
-    show_announcement = BooleanField(_("Show announcement"), widget=SwitchWidget(),
-                                     description=_("Show the announcement message"))
+                               description=_('Short message shown below the title'))
+    show_announcement = BooleanField(_('Show announcement'), widget=SwitchWidget(),
+                                     description=_('Show the announcement message'))
 
     # Timetable
-    timetable_by_room = BooleanField(_("Group by room"), widget=SwitchWidget(),
-                                     description=_("Group the entries of the timetable by room by default"))
-    timetable_detailed = BooleanField(_("Show detailed view"), widget=SwitchWidget(),
-                                      description=_("Show the detailed view of the timetable by default."))
+    timetable_by_room = BooleanField(_('Group by room'), widget=SwitchWidget(),
+                                     description=_('Group the entries of the timetable by room by default'))
+    timetable_detailed = BooleanField(_('Show detailed view'), widget=SwitchWidget(),
+                                      description=_('Show the detailed view of the timetable by default.'))
     timetable_theme = SelectField(_('Theme'), [Optional()], coerce=lambda x: x or None)
     # Themes
-    use_custom_css = BooleanField(_("Use custom CSS"), widget=SwitchWidget(),
-                                  description=_("Use a custom CSS file as a theme for the conference page. Deactivate "
-                                                "this option to reveal the available Indico themes."))
-    theme = SelectField(_("Theme"), [Optional(), HiddenUnless('use_custom_css', False)],
+    use_custom_css = BooleanField(_('Use custom CSS'), widget=SwitchWidget(),
+                                  description=_('Use a custom CSS file as a theme for the conference page. Deactivate '
+                                                'this option to reveal the available Indico themes.'))
+    theme = SelectField(_('Theme'), [Optional(), HiddenUnless('use_custom_css', False)],
                         coerce=lambda x: (x or None),
-                        description=_("Currently selected theme of the conference page. Click on the Preview button to "
-                                      "preview and select a different one."))
+                        description=_('Currently selected theme of the conference page. Click on the Preview button to '
+                                      'preview and select a different one.'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -121,33 +121,33 @@ class LectureMeetingLayoutForm(LoggedLayoutForm):
 
 
 class LogoForm(IndicoForm):
-    logo = EditableFileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+    logo = EditableFileField('Logo', accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
                              add_remove_links=False, handle_flashes=True, get_metadata=get_logo_data,
                              description=_("Logo to be displayed next to the event's title"))
 
 
 class CSSForm(IndicoForm):
-    css_file = EditableFileField(_("Custom CSS file"), accepted_file_types='.css', add_remove_links=False,
+    css_file = EditableFileField(_('Custom CSS file'), accepted_file_types='.css', add_remove_links=False,
                                  get_metadata=get_css_file_data, handle_flashes=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.css_file.description = _("If you want to fully customize your conference page you can create your own "
-                                      "stylesheet and upload it. An example stylesheet can be downloaded "
+        self.css_file.description = _('If you want to fully customize your conference page you can create your own '
+                                      'stylesheet and upload it. An example stylesheet can be downloaded '
                                       "<a href='{base_url}/standard.css' target='_blank'>here</a>."
                                       .format(base_url=config.CONFERENCE_CSS_TEMPLATES_BASE_URL))
 
 
 class MenuBuiltinEntryForm(IndicoForm):
-    custom_title = BooleanField(_("Custom title"), widget=SwitchWidget())
-    title = StringField(_("Title"), [HiddenUnless('custom_title'), DataRequired()])
-    is_enabled = BooleanField(_("Show"), widget=SwitchWidget())
+    custom_title = BooleanField(_('Custom title'), widget=SwitchWidget())
+    title = StringField(_('Title'), [HiddenUnless('custom_title'), DataRequired()])
+    is_enabled = BooleanField(_('Show'), widget=SwitchWidget())
 
     def __init__(self, *args, **kwargs):
         entry = kwargs.pop('entry')
         super().__init__(*args, **kwargs)
         self.custom_title.description = _("If you customize the title, that title is used regardless of the user's "
-                                          "language preference.  The default title <strong>{title}</strong> is "
+                                          'language preference.  The default title <strong>{title}</strong> is '
                                           "displayed in the user's language.").format(title=entry.default_data.title)
 
     def post_validate(self):
@@ -156,32 +156,32 @@ class MenuBuiltinEntryForm(IndicoForm):
 
 
 class MenuUserEntryFormBase(IndicoForm):
-    title = StringField(_("Title"), [DataRequired()])
-    is_enabled = BooleanField(_("Show"), widget=SwitchWidget())
-    new_tab = BooleanField(_("Open in a new tab"), widget=SwitchWidget())
-    registered_only = BooleanField(_("Restricted"), widget=SwitchWidget(),
-                                   description=_("Visible to registered users only."))
+    title = StringField(_('Title'), [DataRequired()])
+    is_enabled = BooleanField(_('Show'), widget=SwitchWidget())
+    new_tab = BooleanField(_('Open in a new tab'), widget=SwitchWidget())
+    registered_only = BooleanField(_('Restricted'), widget=SwitchWidget(),
+                                   description=_('Visible to registered users only.'))
 
 
 class MenuLinkForm(MenuUserEntryFormBase):
-    link_url = URLField(_("URL"), [DataRequired()])
+    link_url = URLField(_('URL'), [DataRequired()])
 
 
 class MenuPageForm(MenuUserEntryFormBase):
-    html = TextAreaField(_("Content"), [DataRequired()], widget=CKEditorWidget())
+    html = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget())
 
 
 class AddImagesForm(IndicoForm):
-    image = FileField("Image", multiple_files=True, accepted_file_types='image/jpeg,image/jpg,image/png,image/gif')
+    image = FileField('Image', multiple_files=True, accepted_file_types='image/jpeg,image/jpg,image/png,image/gif')
 
 
 class CSSSelectionForm(IndicoForm):
-    theme = SelectField(_("Theme"), [Optional()], coerce=lambda x: (x or None))
+    theme = SelectField(_('Theme'), [Optional()], coerce=lambda x: (x or None))
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
         self.theme.choices = _get_conference_theme_choices()
         if event.has_stylesheet:
-            custom = [('_custom', _("Custom CSS file ({name})").format(name=event.stylesheet_metadata['filename']))]
+            custom = [('_custom', _('Custom CSS file ({name})').format(name=event.stylesheet_metadata['filename']))]
             self.theme.choices += custom

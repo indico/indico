@@ -96,7 +96,7 @@ class XMLSerializer(Serializer):
     def _execute(self, fossil, xml_declaration=True):
         if isinstance(fossil, list):
             # collection of fossils
-            doc = etree.ElementTree(etree.Element("collection"))
+            doc = etree.ElementTree(etree.Element('collection'))
             for elem in fossil:
                 self._xmlForFossil(elem, doc)
             result = doc

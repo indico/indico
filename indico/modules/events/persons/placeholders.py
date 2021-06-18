@@ -22,7 +22,7 @@ from indico.web.flask.templating import get_template_module
 
 class FirstNamePlaceholder(Placeholder):
     name = 'first_name'
-    description = _("First name of the person")
+    description = _('First name of the person')
 
     @classmethod
     def render(cls, person, event, **kwargs):
@@ -31,7 +31,7 @@ class FirstNamePlaceholder(Placeholder):
 
 class LastNamePlaceholder(Placeholder):
     name = 'last_name'
-    description = _("Last name of the person")
+    description = _('Last name of the person')
 
     @classmethod
     def render(cls, person, event, **kwargs):
@@ -40,7 +40,7 @@ class LastNamePlaceholder(Placeholder):
 
 class EmailPlaceholder(Placeholder):
     name = 'email'
-    description = _("Email of the person")
+    description = _('Email of the person')
 
     @classmethod
     def render(cls, person, event, **kwargs):
@@ -49,7 +49,7 @@ class EmailPlaceholder(Placeholder):
 
 class EventTitlePlaceholder(Placeholder):
     name = 'event_title'
-    description = _("The title of the event")
+    description = _('The title of the event')
 
     @classmethod
     def render(cls, person, event, **kwargs):
@@ -58,7 +58,7 @@ class EventTitlePlaceholder(Placeholder):
 
 class EventLinkPlaceholder(Placeholder):
     name = 'event_link'
-    description = _("Link to the event")
+    description = _('Link to the event')
 
     @classmethod
     def render(cls, person, event, **kwargs):
@@ -92,7 +92,7 @@ class ContributionsPlaceholder(ParametrizedPlaceholder):
 
 class RegisterLinkPlaceholder(Placeholder):
     name = 'register_link'
-    description = _("The link for the registration page")
+    description = _('The link for the registration page')
 
     @classmethod
     def render(cls, person, event, **kwargs):

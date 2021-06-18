@@ -73,24 +73,24 @@ class EventDataForm(IndicoForm):
         if not shortcut:
             return
         if shortcut.isdigit():
-            raise ValidationError(_("The URL shortcut must contain at least one character that is not a digit."))
+            raise ValidationError(_('The URL shortcut must contain at least one character that is not a digit.'))
         if not re.match(r'^[a-zA-Z0-9/._-]+$', shortcut):
-            raise ValidationError(_("The URL shortcut contains an invalid character."))
+            raise ValidationError(_('The URL shortcut contains an invalid character.'))
         if '//' in shortcut:
-            raise ValidationError(_("The URL shortcut may not contain two consecutive slashes."))
+            raise ValidationError(_('The URL shortcut may not contain two consecutive slashes.'))
         if shortcut[0] == '/' or shortcut[-1] == '/':
-            raise ValidationError(_("The URL shortcut may not begin/end with a slash."))
+            raise ValidationError(_('The URL shortcut may not begin/end with a slash.'))
         conflict = (Event.query
                     .filter(db.func.lower(Event.url_shortcut) == shortcut.lower(),
                             ~Event.is_deleted,
                             Event.id != self.event.id)
                     .has_rows())
         if conflict:
-            raise ValidationError(_("The URL shortcut is already used in another event."))
+            raise ValidationError(_('The URL shortcut is already used in another event.'))
         if LegacyEventMapping.query.filter_by(legacy_event_id=shortcut).has_rows():
             # Reject existing event ids. It'd be EXTREMELY confusing and broken to allow such a shorturl
             # Non-legacy event IDs are already covered by the `isdigit` check above.
-            raise ValidationError(_("This URL shortcut is not available.") % shortcut)
+            raise ValidationError(_('This URL shortcut is not available.') % shortcut)
 
 
 class EventDatesForm(IndicoForm):
@@ -98,19 +98,19 @@ class EventDatesForm(IndicoForm):
     _override_date_fields = ('start_dt_override', 'end_dt_override')
 
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
-    start_dt = IndicoDateTimeField(_("Start"), [InputRequired()], allow_clear=False)
-    end_dt = IndicoDateTimeField(_("End"), [InputRequired(), LinkedDateTime('start_dt', not_equal=True)],
+    start_dt = IndicoDateTimeField(_('Start'), [InputRequired()], allow_clear=False)
+    end_dt = IndicoDateTimeField(_('End'), [InputRequired(), LinkedDateTime('start_dt', not_equal=True)],
                                  allow_clear=False)
     update_timetable = BooleanField(_('Update timetable'), widget=SwitchWidget(),
-                                    description=_("Move sessions/contributions/breaks in the timetable according "
-                                                  "to the new event start time."))
-    start_dt_override = IndicoDateTimeField(_("Start"), [Optional()], allow_clear=True,
-                                            description=_("Specifying this date overrides the start date displayed "
-                                                          "on the main conference page."))
-    end_dt_override = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt_override', not_equal=True)],
+                                    description=_('Move sessions/contributions/breaks in the timetable according '
+                                                  'to the new event start time.'))
+    start_dt_override = IndicoDateTimeField(_('Start'), [Optional()], allow_clear=True,
+                                            description=_('Specifying this date overrides the start date displayed '
+                                                          'on the main conference page.'))
+    end_dt_override = IndicoDateTimeField(_('End'), [Optional(), LinkedDateTime('start_dt_override', not_equal=True)],
                                           allow_clear=True,
-                                          description=_("Specifying this date overrides the end date displayed "
-                                                        "on the main conference page."))
+                                          description=_('Specifying this date overrides the end date displayed '
+                                                        'on the main conference page.'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -138,7 +138,7 @@ class EventDatesForm(IndicoForm):
         if not self.check_timetable_boundaries or self.update_timetable.data or field.object_data == field.data:
             return
         if field.data > min(self.toplevel_timetable_entries, key=attrgetter('start_dt')).start_dt:
-            raise ValidationError(_("To use this start date the timetable must be updated."))
+            raise ValidationError(_('To use this start date the timetable must be updated.'))
 
     def validate_end_dt(self, field):
         if not self.check_timetable_boundaries:
@@ -151,8 +151,8 @@ class EventDatesForm(IndicoForm):
             delta = max(timedelta(), start_dt_offset - end_buffer)
             if delta:
                 delta_str = format_human_timedelta(delta, 'minutes', True)
-                raise ValidationError(_("The event is too short to fit all timetable entries. "
-                                        "It must be at least {} longer.").format(delta_str))
+                raise ValidationError(_('The event is too short to fit all timetable entries. '
+                                        'It must be at least {} longer.').format(delta_str))
         else:
             # if we do not update timetable entries, only check that
             # the event does not end before its last timetable entry;
@@ -160,7 +160,7 @@ class EventDatesForm(IndicoForm):
             # field's validation method.
             max_end_dt = max(self.toplevel_timetable_entries, key=attrgetter('end_dt')).end_dt
             if field.data < max_end_dt:
-                raise ValidationError(_("The event cannot end before its last timetable entry, which is at {}.")
+                raise ValidationError(_('The event cannot end before its last timetable entry, which is at {}.')
                                       .format(format_datetime(max_end_dt, timezone=self.event.tzinfo)))
 
 
@@ -195,7 +195,7 @@ class EventContactInfoForm(IndicoForm):
     organizer_info = TextAreaField(_('Organizers'))
     additional_info = TextAreaField(_('Additional information'),
                                     widget=CKEditorWidget(simple=True, images=True, height=250),
-                                    description=_("This text is displayed on the main conference page."))
+                                    description=_('This text is displayed on the main conference page.'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -231,7 +231,7 @@ class EventClassificationForm(IndicoForm):
 
 
 class EventProtectionForm(IndicoForm):
-    permissions = PermissionsField(_("Permissions"), object_type='event')
+    permissions = PermissionsField(_('Permissions'), object_type='event')
     protection_mode = IndicoProtectionField(_('Protection mode'),
                                             protected_object=lambda form: form.protected_object,
                                             acl_message_url=lambda form: url_for('event_management.acl_message',
@@ -243,12 +243,12 @@ class EventProtectionForm(IndicoForm):
     own_no_access_contact = StringField(_('No access contact'),
                                         description=_('Contact information shown when someone lacks access to the '
                                                       'event'))
-    visibility = SelectField(_("Visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
-                             description=_("""From which point in the category tree this event will be visible from """
-                                           """(number of categories upwards). Applies to "Today's events", """
-                                           """Calendar. If the event is moved, this number will be preserved. """
-                                           """The "Invisible" option will also hide the event from the category's """
-                                           """event list except for managers."""))
+    visibility = SelectField(_('Visibility'), [Optional()], coerce=lambda x: None if x == '' else int(x),
+                             description=_('''From which point in the category tree this event will be visible from '''
+                                           '''(number of categories upwards). Applies to "Today's events", '''
+                                           '''Calendar. If the event is moved, this number will be preserved. '''
+                                           '''The "Invisible" option will also hide the event from the category's '''
+                                           '''event list except for managers.'''))
     public_regform_access = BooleanField(_('Public registration'), widget=SwitchWidget(),
                                          description=_('Allow users who cannot access the event to register. This will '
                                                        'expose open registration forms to anyone with a link to the '
@@ -342,7 +342,7 @@ class CloneCategorySelectForm(CloneContentsForm):
 
     def validate_category(self, field):
         if not field.data:
-            raise ValidationError(_("You have to select a category"))
+            raise ValidationError(_('You have to select a category'))
         elif not field.data.can_create_events(session.user):
             raise ValidationError(_("You can't create events in this category"))
 
@@ -380,7 +380,7 @@ class CloneRepeatUntilFormBase(CloneRepeatOnceForm):
     until_dt = IndicoDateField(_('Day'), [HiddenUnless('stop_criterion', 'day'), DataRequired()])
     num_times = IntegerField(_('Number of times'),
                              [HiddenUnless('stop_criterion', 'num_times'), DataRequired(),
-                              NumberRange(1, 100, message=_("You can clone a maximum of 100 times"))],
+                              NumberRange(1, 100, message=_('You can clone a maximum of 100 times'))],
                              default=2)
 
     def __init__(self, event, **kwargs):
@@ -395,13 +395,13 @@ class CloneRepeatIntervalForm(CloneRepeatUntilFormBase):
 
     def validate_recurrence(self, field):
         if field.data != abs(field.data):
-            raise ValidationError(_("The time period must be positive"))
+            raise ValidationError(_('The time period must be positive'))
 
 
 class CloneRepeatPatternForm(CloneRepeatUntilFormBase):
     week_day = IndicoWeekDayRepetitionField(_('Every'))
     num_months = IntegerField(_('Months'), [DataRequired(), NumberRange(min=1)], default=1,
-                              description=_("Number of months between repetitions"))
+                              description=_('Number of months between repetitions'))
 
 
 class ProgramCodesForm(IndicoForm):

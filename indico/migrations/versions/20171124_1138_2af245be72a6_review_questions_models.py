@@ -41,7 +41,7 @@ def upgrade():
 def downgrade():
     for schema, ratings_table, questions_table in tables:
         op.alter_column(questions_table, 'title', new_column_name='text', schema=schema)
-        op.execute("DELETE FROM {0}.{1} WHERE question_id IN(SELECT id FROM {0}.{2} "
+        op.execute('DELETE FROM {0}.{1} WHERE question_id IN(SELECT id FROM {0}.{2} '
                    "WHERE field_type != 'rating' OR NOT is_required)".format(schema, ratings_table, questions_table))
         op.execute(f"DELETE FROM {schema}.{questions_table} WHERE field_type != 'rating'")
         op.execute('ALTER TABLE {}.{} ALTER COLUMN "value" TYPE INT USING value::TEXT::INT'.format(schema,

@@ -109,7 +109,7 @@ class TimetableSerializer:
         elif entry.type == TimetableEntryType.BREAK:
             return self.serialize_break_entry(entry)
         else:
-            raise TypeError("Unknown timetable entry type.")
+            raise TypeError('Unknown timetable entry type.')
 
     def serialize_session_block_entry(self, entry, load_children=True):
         block = entry.session_block

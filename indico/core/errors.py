@@ -25,11 +25,11 @@ def get_error_description(exception):
     except AttributeError:
         return str(exception)
     if isinstance(exception, Forbidden) and description == Forbidden.description:
-        return _("You are not allowed to access this page.")
+        return _('You are not allowed to access this page.')
     elif isinstance(exception, NotFound) and description == NotFound.description:
         return _("The page you are looking for doesn't exist.")
     elif isinstance(exception, BadRequest) and description == BadRequest.description:
-        return _("The request was invalid or contained invalid arguments.")
+        return _('The request was invalid or contained invalid arguments.')
     else:
         return str(description)
 

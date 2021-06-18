@@ -138,7 +138,7 @@ class OAuthApplication(ClientMixin, db.Model):
 
     def reset_client_secret(self):
         self.client_secret = str(uuid4())
-        logger.info("Client secret for %s has been reset.", self)
+        logger.info('Client secret for %s has been reset.', self)
 
     def get_client_id(self):
         return self.client_id

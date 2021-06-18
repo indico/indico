@@ -15,12 +15,12 @@ from indico.web.menu import SideMenuItem, SideMenuSection
 
 @signals.menu.sections.connect_via('event-management-sidemenu')
 def _sidemenu_sections(sender, **kwargs):
-    yield SideMenuSection('organization', _("Organization"), 60, icon='list', active=True)
-    yield SideMenuSection('workflows', _("Workflows"), 55, icon="hammer")
-    yield SideMenuSection('services', _("Services"), 40, icon='broadcast')
-    yield SideMenuSection('reports', _("Reports"), 30, icon='stack')
-    yield SideMenuSection('customization', _("Customization"), 20, icon='image')
-    yield SideMenuSection('advanced', _("Advanced options"), 10, icon='lamp')
+    yield SideMenuSection('organization', _('Organization'), 60, icon='list', active=True)
+    yield SideMenuSection('workflows', _('Workflows'), 55, icon='hammer')
+    yield SideMenuSection('services', _('Services'), 40, icon='broadcast')
+    yield SideMenuSection('reports', _('Reports'), 30, icon='stack')
+    yield SideMenuSection('customization', _('Customization'), 20, icon='image')
+    yield SideMenuSection('advanced', _('Advanced options'), 10, icon='lamp')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

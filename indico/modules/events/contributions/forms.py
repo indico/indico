@@ -34,23 +34,23 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class ContributionForm(IndicoForm):
-    title = StringField(_("Title"), [DataRequired()])
-    description = TextAreaField(_("Description"))
-    start_dt = IndicoDateTimeField(_("Start date"),
+    title = StringField(_('Title'), [DataRequired()])
+    description = TextAreaField(_('Description'))
+    start_dt = IndicoDateTimeField(_('Start date'),
                                    [DataRequired(),
                                     DateTimeRange(earliest=lambda form, field: form._get_earliest_start_dt(),
                                                   latest=lambda form, field: form._get_latest_start_dt())],
                                    allow_clear=False,
-                                   description=_("Start date of the contribution"))
+                                   description=_('Start date of the contribution'))
     duration = IndicoDurationField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
                                    default=timedelta(minutes=20))
-    type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
-    person_link_data = ContributionPersonLinkListField(_("People"))
-    location_data = IndicoLocationField(_("Location"))
+    type = QuerySelectField(_('Type'), get_label='name', allow_blank=True, blank_text=_('No type selected'))
+    person_link_data = ContributionPersonLinkListField(_('People'))
+    location_data = IndicoLocationField(_('Location'))
     keywords = IndicoTagListField(_('Keywords'))
-    references = ReferencesField(_("External IDs"), reference_class=ContributionReference,
-                                 description=_("Manage external resources for this contribution"))
-    board_number = StringField(_("Board Number"))
+    references = ReferencesField(_('External IDs'), reference_class=ContributionReference,
+                                 description=_('Manage external resources for this contribution'))
+    board_number = StringField(_('Board Number'))
     code = StringField(_('Programme code'))
 
     @generated_data
@@ -66,7 +66,7 @@ class ContributionForm(IndicoForm):
         super().__init__(*args, **kwargs)
         self.type.query = self.event.contribution_types
         if self.event.type != 'conference':
-            self.person_link_data.label.text = _("Speakers")
+            self.person_link_data.label.text = _('Speakers')
         if not self.type.query.count():
             del self.type
         if not to_schedule and (self.contrib is None or not self.contrib.is_scheduled):
@@ -83,7 +83,7 @@ class ContributionForm(IndicoForm):
         if start_dt:
             end_dt = start_dt + field.data
             if self.session_block and end_dt > self.session_block.end_dt:
-                raise ValidationError(_("With the current duration the contribution exceeds the block end date"))
+                raise ValidationError(_('With the current duration the contribution exceeds the block end date'))
             if end_dt > self.event.end_dt:
                 raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
 
@@ -93,7 +93,7 @@ class ContributionForm(IndicoForm):
 
 
 class ContributionProtectionForm(IndicoForm):
-    permissions = PermissionsField(_("Permissions"), object_type='contribution')
+    permissions = PermissionsField(_('Permissions'), object_type='contribution')
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object,
                                             acl_message_url=lambda form: url_for('contributions.acl_message',
                                                                                  form.protected_object))
@@ -116,8 +116,8 @@ class SubContributionForm(IndicoForm):
                                    default=timedelta(minutes=20))
     speakers = SubContributionPersonLinkListField(_('Speakers'), allow_submitters=False, allow_authors=False,
                                                   description=_('The speakers of the subcontribution'))
-    references = ReferencesField(_("External IDs"), reference_class=SubContributionReference,
-                                 description=_("Manage external resources for this sub-contribution"))
+    references = ReferencesField(_('External IDs'), reference_class=SubContributionReference,
+                                 description=_('Manage external resources for this sub-contribution'))
     code = StringField(_('Programme code'))
 
     @generated_data
@@ -147,10 +147,10 @@ class ContributionStartDateForm(IndicoForm):
         day = self.contrib.start_dt.astimezone(event.tzinfo).date()
         if day == event.end_dt_local.date():
             latest_dt = event.end_dt
-            error_msg = _("With this time, the contribution would exceed the event end time.")
+            error_msg = _('With this time, the contribution would exceed the event end time.')
         else:
             latest_dt = get_day_end(day, tzinfo=event.tzinfo)
-            error_msg = _("With this time, the contribution would exceed the current day.")
+            error_msg = _('With this time, the contribution would exceed the current day.')
         if field.data + self.contrib.duration > latest_dt:
             raise ValidationError(error_msg)
 
@@ -171,10 +171,10 @@ class ContributionDurationForm(IndicoForm):
             day = self.contrib.start_dt.astimezone(event.tzinfo).date()
             if day == event.end_dt_local.date():
                 latest_dt = event.end_dt
-                error_msg = _("With this duration, the contribution would exceed the event end time.")
+                error_msg = _('With this duration, the contribution would exceed the event end time.')
             else:
                 latest_dt = get_day_end(day, tzinfo=event.tzinfo)
-                error_msg = _("With this duration, the contribution would exceed the current day.")
+                error_msg = _('With this duration, the contribution would exceed the current day.')
             if self.contrib.start_dt + field.data > latest_dt:
                 raise ValidationError(error_msg)
 
@@ -187,11 +187,11 @@ class ContributionDefaultDurationForm(IndicoForm):
 class ContributionTypeForm(IndicoForm):
     """Form to create or edit a ContributionType."""
 
-    name = StringField(_("Name"), [DataRequired()])
-    is_private = BooleanField(_("Private"), widget=SwitchWidget(),
-                              description=_("If selected, this contribution type cannot be chosen by users "
-                                            "submitting an abstract."))
-    description = TextAreaField(_("Description"))
+    name = StringField(_('Name'), [DataRequired()])
+    is_private = BooleanField(_('Private'), widget=SwitchWidget(),
+                              description=_('If selected, this contribution type cannot be chosen by users '
+                                            'submitting an abstract.'))
+    description = TextAreaField(_('Description'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -203,7 +203,7 @@ class ContributionTypeForm(IndicoForm):
         if self.contrib_type:
             query = query.filter(ContributionType.id != self.contrib_type.id)
         if query.count():
-            raise ValidationError(_("A contribution type with this name already exists"))
+            raise ValidationError(_('A contribution type with this name already exists'))
 
 
 class ContributionExportTeXForm(IndicoForm):

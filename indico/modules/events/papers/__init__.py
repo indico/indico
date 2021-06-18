@@ -141,12 +141,12 @@ def _extend_event_menu(sender, **kwargs):
         return (has_contributions_with_user_paper_submission_rights(event, session.user) or
                 event.cfp.is_staff(session.user))
 
-    yield MenuEntryData(title=_("Paper Peer Reviewing"), name='call_for_papers',
+    yield MenuEntryData(title=_('Paper Peer Reviewing'), name='call_for_papers',
                         endpoint='papers.call_for_papers', position=8,
                         visible=_call_for_papers_visible)
 
-    yield MenuEntryData(title=_("Reviewing Area"), name='paper_reviewing_area', parent='call_for_papers',
+    yield MenuEntryData(title=_('Reviewing Area'), name='paper_reviewing_area', parent='call_for_papers',
                         endpoint='papers.reviewing_area', position=0, visible=_reviewing_area_visible)
 
-    yield MenuEntryData(title=_("Judging Area"), name='paper_judging_area', parent='call_for_papers',
+    yield MenuEntryData(title=_('Judging Area'), name='paper_judging_area', parent='call_for_papers',
                         endpoint='papers.papers_list', position=1, visible=_judging_area_visible)

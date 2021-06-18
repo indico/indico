@@ -14,7 +14,7 @@ from indico.web.flask.util import url_for
 
 class EventTitlePlaceholder(Placeholder):
     name = 'event_title'
-    description = _("The title of the event")
+    description = _('The title of the event')
 
     @classmethod
     def render(cls, event, survey, **kwargs):
@@ -23,7 +23,7 @@ class EventTitlePlaceholder(Placeholder):
 
 class SurveyTitlePlaceholder(Placeholder):
     name = 'survey_title'
-    description = _("The title of the survey")
+    description = _('The title of the survey')
 
     @classmethod
     def render(cls, event, survey, **kwargs):
@@ -32,7 +32,7 @@ class SurveyTitlePlaceholder(Placeholder):
 
 class SurveyLinkPlaceholder(Placeholder):
     name = 'survey_link'
-    description = _("Link to the survey")
+    description = _('Link to the survey')
     required = True
 
     @classmethod

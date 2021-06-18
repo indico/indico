@@ -176,9 +176,9 @@ def prettify_source(source, traceback_frames):
     if not traceback_frames:
         return None
     msg = 'Traceback (most recent call last):\n'
-    frame_msg = textwrap.dedent("""
+    frame_msg = textwrap.dedent('''
     File "{}", line {}, in {}
-      {}\n""").strip()
+      {}\n''').strip()
     msg += indent('\n'.join(frame_msg.format(*frame) for frame in source[:traceback_frames]), 2)
     highlighted = highlight(msg, PythonTracebackLexer(), Terminal256Formatter(style='native'))
     # Remove first line (just needed for PythonTracebackLexer)

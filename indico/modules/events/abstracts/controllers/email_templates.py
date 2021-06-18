@@ -106,7 +106,7 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
 
         invalid_fields = request.json.keys() - {'stop_on_match'}
         if invalid_fields:
-            raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
+            raise BadRequest('Invalid fields: {}'.format(', '.join(invalid_fields)))
 
         if 'stop_on_match' in request.json:
             self.email_tpl.stop_on_match = request.json['stop_on_match']

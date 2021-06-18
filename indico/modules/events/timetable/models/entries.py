@@ -24,7 +24,7 @@ from indico.util.string import format_repr
 
 
 class TimetableEntryType(RichIntEnum):
-    __titles__ = [None, _("Session Block"), _("Contribution"), _("Break")]
+    __titles__ = [None, _('Session Block'), _('Contribution'), _('Break')]
     # entries are uppercase since `break` is a keyword...
     SESSION_BLOCK = 1
     CONTRIBUTION = 2
@@ -50,7 +50,7 @@ class TimetableEntry(db.Model):
                 _make_check(TimetableEntryType.SESSION_BLOCK, 'session_block_id'),
                 _make_check(TimetableEntryType.CONTRIBUTION, 'contribution_id'),
                 _make_check(TimetableEntryType.BREAK, 'break_id'),
-                db.CheckConstraint(f"type != {TimetableEntryType.SESSION_BLOCK} OR parent_id IS NULL",
+                db.CheckConstraint(f'type != {TimetableEntryType.SESSION_BLOCK} OR parent_id IS NULL',
                                    'valid_parent'),
                 {'schema': 'events'})
 
@@ -275,7 +275,7 @@ class TimetableEntry(db.Model):
     def extend_end_dt(self, end_dt):
         diff = end_dt - self.end_dt
         if diff < timedelta(0):
-            raise ValueError("New end_dt is before current end_dt.")
+            raise ValueError('New end_dt is before current end_dt.')
         self.duration += diff
 
     def extend_parent(self, by_start=True, by_end=True):
@@ -327,9 +327,9 @@ class TimetableEntry(db.Model):
 
     def move_next_to(self, sibling, position='before'):
         if sibling not in self.siblings:
-            raise ValueError("Not a sibling")
+            raise ValueError('Not a sibling')
         if position not in ('before', 'after'):
-            raise ValueError("Invalid position")
+            raise ValueError('Invalid position')
         if position == 'before':
             start_dt = sibling.start_dt - self.duration
         else:
@@ -339,14 +339,14 @@ class TimetableEntry(db.Model):
 
 @listens_for(TimetableEntry.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
-    sql = """
+    sql = '''
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER INSERT OR UPDATE
         ON {}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('timetable_entry');
-    """.format(target.fullname)
+    '''.format(target.fullname)
     DDL(sql).execute(conn)
 
 

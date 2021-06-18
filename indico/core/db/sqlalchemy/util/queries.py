@@ -63,7 +63,7 @@ def preprocess_ts_string(text, prefix=True):
 
 def has_extension(conn, name):
     """Check if the postgres database has a certain extension installed."""
-    return conn.execute("SELECT EXISTS(SELECT TRUE FROM pg_extension WHERE extname = %s)", (name,)).scalar()
+    return conn.execute('SELECT EXISTS(SELECT TRUE FROM pg_extension WHERE extname = %s)', (name,)).scalar()
 
 
 def get_postgres_version():

@@ -43,7 +43,7 @@ class EditingFeature(EventFeature):
             event.editing_file_types.append(ft)
 
         if types_without_filetypes and not cloning:
-            flash(_("A default publishable PDF file type has been created; if you want to use other file types in "
+            flash(_('A default publishable PDF file type has been created; if you want to use other file types in '
                     "your event's editing workflow, please configure them accordingly."))
 
 

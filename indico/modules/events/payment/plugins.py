@@ -23,7 +23,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 class PaymentPluginSettingsFormBase(IndicoForm):
     method_name = StringField(_('Name'), [DataRequired()],
-                              description=_("The name of the payment method displayed to the user."))
+                              description=_('The name of the payment method displayed to the user.'))
 
 
 class PaymentEventSettingsFormBase(IndicoForm):
@@ -31,7 +31,7 @@ class PaymentEventSettingsFormBase(IndicoForm):
                            widget=SwitchWidget(),
                            description=_('Only enabled payment methods can be selected by registrants.'))
     method_name = StringField(_('Name'), [DataRequired()],
-                              description=_("The name of the payment method displayed to the user."))
+                              description=_('The name of the payment method displayed to the user.'))
 
     def __init__(self, *args, **kwargs):
         # Provide the plugin settings in case a plugin needs them for more complex form fields.

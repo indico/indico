@@ -422,7 +422,7 @@ class RegistrationForm(db.Model):
     def get_registration(self, user=None, uuid=None, email=None):
         """Retrieve registrations for this registration form by user or uuid."""
         if (bool(user) + bool(uuid) + bool(email)) != 1:
-            raise ValueError("Exactly one of `user`, `uuid` and `email` must be specified")
+            raise ValueError('Exactly one of `user`, `uuid` and `email` must be specified')
         if user:
             return user.registrations.filter_by(registration_form=self).filter(~Registration.is_deleted).first()
         if uuid:

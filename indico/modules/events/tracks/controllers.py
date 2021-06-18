@@ -78,7 +78,7 @@ class RHEditProgram(RHManageTracksBase):
         form = ProgramForm(obj=FormDefaults(**settings))
         if form.validate_on_submit():
             update_program(self.event, form.data)
-            flash(_("The program has been updated."))
+            flash(_('The program has been updated.'))
             return jsonify_data()
         elif not form.is_submitted():
             handle_legacy_description(form.program, settings, get_render_mode=itemgetter('program_render_mode'),

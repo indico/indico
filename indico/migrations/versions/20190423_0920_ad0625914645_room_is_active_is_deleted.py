@@ -18,10 +18,10 @@ depends_on = None
 def upgrade():
     op.alter_column('rooms', 'is_active', new_column_name='is_deleted', schema='roombooking')
     op.drop_index('ix_rooms_is_active', table_name='rooms', schema='roombooking')
-    op.execute("UPDATE roombooking.rooms SET is_deleted = NOT is_deleted")
+    op.execute('UPDATE roombooking.rooms SET is_deleted = NOT is_deleted')
 
 
 def downgrade():
     op.alter_column('rooms', 'is_deleted', new_column_name='is_active', schema='roombooking')
     op.create_index(None, 'rooms', ['is_active'], schema='roombooking')
-    op.execute("UPDATE roombooking.rooms SET is_active = NOT is_active")
+    op.execute('UPDATE roombooking.rooms SET is_active = NOT is_active')

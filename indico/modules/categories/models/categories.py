@@ -70,9 +70,9 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def __auto_table_args(cls):
         return (db.CheckConstraint("(icon IS NULL) = (icon_metadata::text = 'null')", 'valid_icon'),
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
-                db.CheckConstraint("(parent_id IS NULL) = (id = 0)", 'valid_parent'),
-                db.CheckConstraint("(id != 0) OR NOT is_deleted", 'root_not_deleted'),
-                db.CheckConstraint(f"(id != 0) OR (protection_mode != {ProtectionMode.inheriting})",
+                db.CheckConstraint('(parent_id IS NULL) = (id = 0)', 'valid_parent'),
+                db.CheckConstraint('(id != 0) OR NOT is_deleted', 'root_not_deleted'),
+                db.CheckConstraint(f'(id != 0) OR (protection_mode != {ProtectionMode.inheriting})',
                                    'root_not_inheriting'),
                 db.CheckConstraint('visibility IS NULL OR visibility > 0', 'valid_visibility'),
                 {'schema': 'categories'})
@@ -424,7 +424,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         assert n_categs >= 0
         if n_categs > len(chain):
             if fail_on_overflow:
-                raise IndexError("Root category has no parent!")
+                raise IndexError('Root category has no parent!')
             else:
                 return None
         return chain[::-1][n_categs - 1]
@@ -601,25 +601,25 @@ def _mappers_configured():
 
 @listens_for(Category.__table__, 'after_create')
 def _add_deletion_consistency_trigger(target, conn, **kw):
-    sql = """
+    sql = '''
         CREATE CONSTRAINT TRIGGER consistent_deleted
         AFTER INSERT OR UPDATE OF parent_id, is_deleted
         ON {table}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE categories.check_consistency_deleted();
-    """.format(table=target.fullname)
+    '''.format(table=target.fullname)
     DDL(sql).execute(conn)
 
 
 @listens_for(Category.__table__, 'after_create')
 def _add_cycle_check_trigger(target, conn, **kw):
-    sql = """
+    sql = '''
         CREATE CONSTRAINT TRIGGER no_cycles
         AFTER INSERT OR UPDATE OF parent_id
         ON {table}
         NOT DEFERRABLE
         FOR EACH ROW
         EXECUTE PROCEDURE categories.check_cycles();
-    """.format(table=target.fullname)
+    '''.format(table=target.fullname)
     DDL(sql).execute(conn)

@@ -41,7 +41,7 @@ class generated_data(property):
         if obj is None:
             return self
         if self.fget is None:
-            raise AttributeError("unreadable attribute")
+            raise AttributeError('unreadable attribute')
         return _DataWrapper(self.fget(obj))
 
 

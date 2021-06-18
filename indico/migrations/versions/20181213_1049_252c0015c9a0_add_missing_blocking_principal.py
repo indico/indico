@@ -31,14 +31,14 @@ def upgrade():
                     ['user_id', 'blocking_id'],
                     unique=True, schema='roombooking', postgresql_where=sa.text('type = 1'))
     op.create_check_constraint('valid_user', 'blocking_principals',
-                               "((type != 1) OR ((local_group_id IS NULL) AND (mp_group_name IS NULL) AND "
-                               "(mp_group_provider IS NULL) AND (user_id IS NOT NULL)))", schema='roombooking')
+                               '((type != 1) OR ((local_group_id IS NULL) AND (mp_group_name IS NULL) AND '
+                               '(mp_group_provider IS NULL) AND (user_id IS NOT NULL)))', schema='roombooking')
     op.create_check_constraint('valid_local_group', 'blocking_principals',
-                               "((type != 2) OR ((mp_group_name IS NULL) AND (mp_group_provider IS NULL) AND "
-                               "(user_id IS NULL) AND (local_group_id IS NOT NULL)))", schema='roombooking')
+                               '((type != 2) OR ((mp_group_name IS NULL) AND (mp_group_provider IS NULL) AND '
+                               '(user_id IS NULL) AND (local_group_id IS NOT NULL)))', schema='roombooking')
     op.create_check_constraint('valid_multipass_group', 'blocking_principals',
-                               "((type <> 3) OR ((local_group_id IS NULL) AND (user_id IS NULL) AND "
-                               "(mp_group_name IS NOT NULL) AND (mp_group_provider IS NOT NULL)))",
+                               '((type <> 3) OR ((local_group_id IS NULL) AND (user_id IS NULL) AND '
+                               '(mp_group_name IS NOT NULL) AND (mp_group_provider IS NOT NULL)))',
                                schema='roombooking')
 
 

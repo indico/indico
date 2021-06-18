@@ -240,16 +240,16 @@ class DataFetcher:
 
             atoms = list(0 if a is None else int(a) * mod for a in m.groups()[1:])
             if atoms[1] > 23 or atoms[2] > 59:
-                raise ArgumentParseError("Invalid time!")
+                raise ArgumentParseError('Invalid time!')
             return ('ctx', timedelta(days=atoms[0], hours=atoms[1], minutes=atoms[2]))
         else:
             # iso 8601 subset
             try:
-                return ('abs', datetime.strptime(dateTime, "%Y-%m-%dT%H:%M"))
+                return ('abs', datetime.strptime(dateTime, '%Y-%m-%dT%H:%M'))
             except ValueError:
                 pass
             try:
-                return ('ctx', datetime.strptime(dateTime, "%Y-%m-%d"))
+                return ('ctx', datetime.strptime(dateTime, '%Y-%m-%d'))
             except ValueError:
                 raise ArgumentParseError("Impossible to parse '%s'" % dateTime)
 

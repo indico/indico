@@ -295,7 +295,7 @@ class OverviewStats(StatsBase):
     """Generic stats for a registration form."""
 
     def __init__(self, regform):
-        super().__init__(title=_("Overview"), subtitle="", type='overview')
+        super().__init__(title=_('Overview'), subtitle='', type='overview')
         self.regform = regform
         self.registrations = regform.active_registrations
         self.countries, self.num_countries = self._get_countries()
@@ -324,7 +324,7 @@ class OverviewStats(StatsBase):
 
 class AccommodationStats(FieldStats, StatsBase):
     def __init__(self, field):
-        super().__init__(title=_("Accommodation"), subtitle=field.title, field=field)
+        super().__init__(title=_('Accommodation'), subtitle=field.title, field=field)
         self.has_capacity = any(detail.capacity for acco_details in self._data.values()
                                 for detail in acco_details if detail.capacity)
 
@@ -375,16 +375,16 @@ class AccommodationStats(FieldStats, StatsBase):
         return DataItem(**data)
 
     def _get_table_head(self):
-        head = [Cell(type='str', data=_("Accommodation")), Cell(type='str', data=_("Registrants"))]
+        head = [Cell(type='str', data=_('Accommodation')), Cell(type='str', data=_('Registrants'))]
 
         if self.has_capacity:
-            head.append(Cell(type='str', data=_("Occupancy")))
+            head.append(Cell(type='str', data=_('Occupancy')))
 
         if self._show_billing_info:
-            head.extend([Cell(type='str', data=_("Price")),
-                         Cell(type='str', data=_("Accommodations paid")),
-                         Cell(type='str', data=_("Total paid (unpaid)"), colspan=2),
-                         Cell(type='str', data=_("Total"))])
+            head.extend([Cell(type='str', data=_('Price')),
+                         Cell(type='str', data=_('Accommodations paid')),
+                         Cell(type='str', data=_('Total paid (unpaid)'), colspan=2),
+                         Cell(type='str', data=_('Total'))])
 
         return head
 

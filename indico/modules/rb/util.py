@@ -250,7 +250,7 @@ def generate_spreadsheet_from_occurrences(occurrences):
 def _find_first_entry_start_dt(event, day):
     """Find the first timetable entry on a given day."""
     if not (event.start_dt_local.date() <= day <= event.end_dt_local.date()):
-        raise ValueError("Day out of event bounds.")
+        raise ValueError('Day out of event bounds.')
     entries = event.timetable_entries.filter(TimetableEntry.parent_id.is_(None),
                                              cast(TimetableEntry.start_dt.astimezone(event.tzinfo), Date) == day).all()
     return min(entries, key=attrgetter('start_dt')).start_dt.astimezone(event.tzinfo) if entries else None

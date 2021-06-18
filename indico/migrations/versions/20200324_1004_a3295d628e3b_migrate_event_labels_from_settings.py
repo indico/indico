@@ -28,7 +28,7 @@ def upgrade():
     res = conn.execute("SELECT name, value FROM indico.settings WHERE module = 'event_labels'")
     for uuid, data in res:
         assert uuid == data['id']
-        res2 = conn.execute("INSERT INTO events.labels (title, color) VALUES (%s, %s) RETURNING id",
+        res2 = conn.execute('INSERT INTO events.labels (title, color) VALUES (%s, %s) RETURNING id',
                             (data['title'], data['color']))
         mapping[uuid] = res2.fetchone()[0]
     # event label assignments
@@ -45,7 +45,7 @@ def upgrade():
             continue
         label_id = mapping[data['label']]
         label_message = data.get('message', '')
-        conn.execute("UPDATE events.events SET label_id = %s, label_message = %s WHERE id = %s",
+        conn.execute('UPDATE events.events SET label_id = %s, label_message = %s WHERE id = %s',
                      (label_id, label_message, event_id))
     # cleanup
     conn.execute("DELETE FROM indico.settings WHERE module = 'event_labels'")
@@ -58,14 +58,14 @@ def downgrade():
     conn = op.get_bind()
     # label definitions
     mapping = {}
-    res = conn.execute("SELECT id, title, color FROM events.labels")
+    res = conn.execute('SELECT id, title, color FROM events.labels')
     for label_id, title, color in res:
         uuid = str(uuid4())
         conn.execute("INSERT INTO indico.settings (module, name, value) VALUES ('event_labels', %s, %s)",
                      (uuid, json.dumps({'id': uuid, 'title': title, 'color': color})))
         mapping[label_id] = uuid
     # event label assignments
-    res = conn.execute("SELECT id, label_id, label_message FROM events.events WHERE label_id IS NOT NULL")
+    res = conn.execute('SELECT id, label_id, label_message FROM events.events WHERE label_id IS NOT NULL')
     for event_id, label_id, label_message in res:
         uuid = mapping[label_id]
         stmt = "INSERT INTO events.settings (event_id, module, name, value) VALUES (%s, 'label', %s, %s)"
@@ -74,4 +74,4 @@ def downgrade():
             conn.execute(stmt, (event_id, 'message', json.dumps(label_message)))
     # cleanup
     conn.execute("UPDATE events.events SET label_id = NULL, label_message = '' WHERE label_id IS NOT NULL")
-    conn.execute("DELETE FROM events.labels")
+    conn.execute('DELETE FROM events.labels')

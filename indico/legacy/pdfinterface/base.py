@@ -58,36 +58,36 @@ def _is_string_html(s):
 
 def escape(text):
     if text is None:
-        text = ""
+        text = ''
     try:
         if _is_string_html(text):
             text = sanitize_for_platypus(text)
         else:
             text = cgi.escape(text)
-            text = text.replace("\r\n", " <br/>")
-            text = text.replace("\n", " <br/>")
-            text = text.replace("\r", " <br/>")
+            text = text.replace('\r\n', ' <br/>')
+            text = text.replace('\n', ' <br/>')
+            text = text.replace('\r', ' <br/>')
         return text
     except Exception:
         return saxutils.escape(text)
 
 
 def modifiedFontSize(fontsize, lowerNormalHigher):
-    if lowerNormalHigher == "normal":
+    if lowerNormalHigher == 'normal':
         return fontsize
-    elif lowerNormalHigher == "small":
+    elif lowerNormalHigher == 'small':
         return fontsize / ratio
-    elif lowerNormalHigher == "large":
+    elif lowerNormalHigher == 'large':
         return fontsize * ratio
-    elif lowerNormalHigher == "smaller":
+    elif lowerNormalHigher == 'smaller':
         return (fontsize / ratio) / ratio
-    elif lowerNormalHigher == "x-small":
+    elif lowerNormalHigher == 'x-small':
         return ((fontsize / ratio) / ratio) / ratio
-    elif lowerNormalHigher == "xx-small":
+    elif lowerNormalHigher == 'xx-small':
         return (((fontsize / ratio) / ratio) / ratio) / ratio
-    elif lowerNormalHigher == "xxx-small":
+    elif lowerNormalHigher == 'xxx-small':
         return ((((fontsize / ratio) / ratio) / ratio) / ratio) / ratio
-    elif lowerNormalHigher == "larger":
+    elif lowerNormalHigher == 'larger':
         return fontsize * ratio * ratio
     else:
         return fontsize
@@ -140,10 +140,10 @@ def setTTFonts():
 def int_to_roman(value):
     """Convert an integer to Roman numerals."""
     if not 0 < value < 4000:
-        raise ValueError( _("Int to Roman Error: Argument must be between 1 and 3999"))
+        raise ValueError( _('Int to Roman Error: Argument must be between 1 and 3999'))
     ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
     nums = ('m',  'cm', 'd', 'cd','c', 'xc','l','xl','x','ix','v','iv','i')
-    result = ""
+    result = ''
     for i in range(len(ints)):
         count = int(value / ints[i])
         result += nums[i] * count
@@ -157,7 +157,7 @@ class Paragraph(platypus.Paragraph):
     on the laterPages function.
     """
 
-    def __init__(self, text, style, part="", bulletText=None, frags=None, caseSensitive=1):
+    def __init__(self, text, style, part='', bulletText=None, frags=None, caseSensitive=1):
         platypus.Paragraph.__init__(self, str(text), style, bulletText, frags, caseSensitive)
         self._part = part
 
@@ -183,7 +183,7 @@ class SimpleParagraph(platypus.Flowable):
         self.indent = indent
 
     def __repr__(self):
-        return ""
+        return ''
 
     def draw(self):
         #centre the text
@@ -196,7 +196,7 @@ class TableOfContentsEntry(Paragraph):
     Much faster than table of table of contents from platypus lib
     """
 
-    def __init__(self, text, pageNumber, style, part="", bulletText=None, frags=None, caseSensitive=1):
+    def __init__(self, text, pageNumber, style, part='', bulletText=None, frags=None, caseSensitive=1):
         Paragraph.__init__(self, str(text), style, part, bulletText, frags, caseSensitive)
         self._part = part
         self._pageNumber = pageNumber
@@ -213,7 +213,7 @@ class TableOfContentsEntry(Paragraph):
             freeSpace = int(self.blPara.lines[-1].extraSpace)
         while( freeSpace > 10 ):
             dot = self.beginText(self.width + 10 - freeSpace, self.style.leading - self.style.fontSize)
-            dot.textLine(".")
+            dot.textLine('.')
             self.canv.drawText(dot)
             freeSpace -= 3
 
@@ -226,7 +226,7 @@ class TableOfContentsEntry(Paragraph):
         self._drawDots()
 
 class Spacer(platypus.Spacer):
-    def __init__(self, width, height, part=""):
+    def __init__(self, width, height, part=''):
         platypus.Spacer.__init__(self, width, height)
         self._part = part
 
@@ -237,8 +237,8 @@ class Spacer(platypus.Spacer):
         return self._part
 
 class Image(platypus.Image):
-    def __init__(self, filename, part="", width=None, height=None, kind='direct', mask="auto", lazy=1):
-        platypus.Image.__init__(self, filename, width=None, height=None, kind='direct', mask="auto", lazy=1)
+    def __init__(self, filename, part='', width=None, height=None, kind='direct', mask='auto', lazy=1):
+        platypus.Image.__init__(self, filename, width=None, height=None, kind='direct', mask='auto', lazy=1)
         self._part = part
 
     def setPart(self, part):
@@ -249,7 +249,7 @@ class Image(platypus.Image):
 
 
 class PageBreak(platypus.PageBreak):
-    def __init__(self, part=""):
+    def __init__(self, part=''):
         platypus.PageBreak.__init__(self)
         self._part = part
 
@@ -260,7 +260,7 @@ class PageBreak(platypus.PageBreak):
         return self._part
 
 class Preformatted(platypus.Preformatted):
-    def __init__(self, text, style, part="", bulletText = None, dedent=0):
+    def __init__(self, text, style, part='', bulletText = None, dedent=0):
         platypus.Preformatted.__init__(self, text, style, bulletText = None, dedent=0)
         self._part = part
 
@@ -409,7 +409,7 @@ class PDFBase:
         #return the data from the fileDummy
         return self._fileDummy.getvalue()
 
-    def _drawWrappedString(self, c, text, font='Times-Bold', size=30, color=(0, 0, 0), align="center", width=None,
+    def _drawWrappedString(self, c, text, font='Times-Bold', size=30, color=(0, 0, 0), align='center', width=None,
                            height=None, measurement=cm, lineSpacing=1, maximumWidth=None):
         if maximumWidth is None:
             maximumWidth = self._PAGE_WIDTH-1*cm
@@ -418,16 +418,16 @@ class PDFBase:
         if height is None:
             height=self._PAGE_HEIGHT-10*measurement
         draw = c.drawCentredString
-        if align == "right":
+        if align == 'right':
             draw = c.drawRightString
-        elif align == "left":
+        elif align == 'left':
             draw = c.drawString
         c.setFont(font, size)
         c.setFillColorRGB(*color)
         titleWords = text.split()
-        line=""
+        line=''
         for word in titleWords:
-            lineAux = "%s %s"%(line, word)
+            lineAux = '%s %s'%(line, word)
             lsize = c.stringWidth(lineAux, font, size)
             if lsize < maximumWidth:
                 line = lineAux
@@ -435,14 +435,14 @@ class PDFBase:
                 draw(width,height, line)
                 height -= lineSpacing*measurement
                 line = word
-        if line.strip() != "":
+        if line.strip() != '':
             draw(width, height, line)
         return height
 
     def _drawLogo(self, c, drawTitle = True):
         from indico.modules.events.util import create_event_logo_tmp_file
         logo = self.event.logo
-        imagePath = ""
+        imagePath = ''
         if logo:
             imagePath = create_event_logo_tmp_file(self.event)
         if imagePath:
@@ -464,7 +464,7 @@ class PDFBase:
                 startHeight = startHeight - inch / 2 - height
 
                 # draw horizontally centered, with recalculated width and height
-                c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
+                c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask='auto')
                 return startHeight
             except OSError:
                 if drawTitle:
@@ -473,7 +473,7 @@ class PDFBase:
 
 
 def _doNothing(canvas, doc):
-    "Dummy callback for onPage."
+    'Dummy callback for onPage.'
 
 
 class DocTemplateWithTOC(SimpleDocTemplate):
@@ -489,7 +489,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self._tocStory = []
         self._indexedFlowable = indexedFlowable
         self._filename = filename
-        self._part = ""
+        self._part = ''
         self._firstPageNumber = firstPageNumber
         SimpleDocTemplate.__init__(self, filename, **kw)
         setTTFonts()
@@ -498,30 +498,30 @@ class DocTemplateWithTOC(SimpleDocTemplate):
 
     def afterFlowable(self, flowable):
         if flowable in self._indexedFlowable:
-            self._toc.append((self._indexedFlowable[flowable]["level"],self._indexedFlowable[flowable]["text"], self.page + self._firstPageNumber - 1))
+            self._toc.append((self._indexedFlowable[flowable]['level'],self._indexedFlowable[flowable]['text'], self.page + self._firstPageNumber - 1))
         try:
-            if flowable.getPart() != "":
+            if flowable.getPart() != '':
                 self._part = flowable.getPart()
         except Exception:
             pass
 
     def handle_documentBegin(self):
-        self._part = ""
+        self._part = ''
         SimpleDocTemplate.handle_documentBegin(self)
 
     def _prepareTOC(self):
         headerStyle = ParagraphStyle({})
-        headerStyle.fontName = "LinuxLibertine-Bold"
+        headerStyle.fontName = 'LinuxLibertine-Bold'
         headerStyle.fontSize = modifiedFontSize(18, 18)
         headerStyle.leading = modifiedFontSize(22, 22)
         headerStyle.alignment = TA_CENTER
         entryStyle = ParagraphStyle({})
-        entryStyle.fontName = "LinuxLibertine"
+        entryStyle.fontName = 'LinuxLibertine'
         entryStyle.spaceBefore = 8
         self._tocStory.append(PageBreak())
         if self.include_toc:
             self._tocStory.append(Spacer(inch, 1*cm))
-            self._tocStory.append(Paragraph(_("Table of contents"), headerStyle))
+            self._tocStory.append(Paragraph(_('Table of contents'), headerStyle))
             self._tocStory.append(Spacer(inch, 2*cm))
             for entry in self._toc:
                 indent = ((entry[0] - 1) * 50)
@@ -604,11 +604,11 @@ class PDFWithTOC(PDFBase):
         Not used, because table of contents is generated automatically inside DocTemplateWithTOC class.
         """
         style1 = ParagraphStyle({})
-        style1.fontName = "Times-Bold"
+        style1.fontName = 'Times-Bold'
         style1.fontSize = modifiedFontSize(18, self._fontsize)
         style1.leading = modifiedFontSize(22, self._fontsize)
         style1.alignment = TA_CENTER
-        p = Paragraph(_("Table of contents"), style1)
+        p = Paragraph(_('Table of contents'), style1)
         self._story.append(Spacer(inch, 1*cm))
         self._story.append(p)
         self._story.append(Spacer(inch, 2*cm))

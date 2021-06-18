@@ -26,9 +26,9 @@ def upgrade():
             nullable=False,
             # give every user a 'signing_secret' column with a random UUID
             # thanks to the author of https://stackoverflow.com/a/21327318
-            server_default=sa.text("""
+            server_default=sa.text('''
                 uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13)
-                placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)""")
+                placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)''')
         ),
         schema='users'
     )

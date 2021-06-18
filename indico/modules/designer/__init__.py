@@ -17,7 +17,7 @@ from indico.web.menu import SideMenuItem
 
 
 class TemplateType(RichIntEnum):
-    __titles__ = [None, _("Badge"), _("Poster")]
+    __titles__ = [None, _('Badge'), _('Poster')]
     badge = 1
     poster = 2
 
@@ -59,7 +59,7 @@ class PageSize(RichIntEnum):
 
 
 class PageLayout(RichIntEnum):
-    __titles__ = [None, _("Single sided (foldable)"), _("Double sided"), _("Only front side")]
+    __titles__ = [None, _('Single sided (foldable)'), _('Double sided'), _('Only front side')]
     foldable = 1
     double_sided = 2
     front_only = 3

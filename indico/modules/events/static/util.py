@@ -23,7 +23,7 @@ from indico.modules.events.layout.models.images import ImageFile
 from indico.web.flask.util import endpoint_for_url
 
 
-_css_url_pattern = r"""url\((['"]?)({}|https?:)?([^)'"]+)\1\)"""
+_css_url_pattern = r'''url\((['"]?)({}|https?:)?([^)'"]+)\1\)'''
 _url_has_extension_re = re.compile(r'.*\.([^/]+)$')
 _plugin_url_pattern = r'(?:{})?/static/plugins/([^/]+)/(.*?)(?:__v[0-9a-f]+)?\.([^.]+)$'
 _static_url_pattern = r'(?:{})?/(images|dist|fonts)(.*)/(.+?)(?:__v[0-9a-f]+)?\.([^.]+)$'

@@ -68,10 +68,10 @@ class PyIntEnum(TypeDecorator, SchemaType):
     def alembic_render_type(self, autogen_context, toplevel_code):
         name = f'_{self.enum.__name__}'
         members = '\n'.join(f'    {x.name} = {x.value!r}' for x in self.enum)
-        enum_tpl = textwrap.dedent("""
+        enum_tpl = textwrap.dedent('''
             class {name}(int, Enum):
             {members}
-        """)
+        ''')
         toplevel_code.add(enum_tpl.format(name=name, members=members))
         autogen_context.imports.add('from enum import Enum')
         autogen_context.imports.add('from indico.core.db.sqlalchemy import PyIntEnum')

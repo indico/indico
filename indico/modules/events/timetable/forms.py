@@ -34,7 +34,7 @@ class EntryFormMixin:
     _default_duration = None
     _display_fields = None
 
-    time = IndicoTimeField(_("Start time"), [InputRequired()])
+    time = IndicoTimeField(_('Start time'), [InputRequired()])
     duration = IndicoDurationField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
                                    default=timedelta(minutes=20))
 
@@ -70,7 +70,7 @@ class EntryFormMixin:
             return
         end_dt = self.start_dt.data + field.data
         if end_dt.astimezone(self.event.tzinfo).date() > self.event.end_dt_local.date():
-            raise ValidationError(_("{} exceeds current day. Adjust start time or duration.")
+            raise ValidationError(_('{} exceeds current day. Adjust start time or duration.')
                                   .format(self._entry_type.title.capitalize()))
 
     def _get_default_time(self):
@@ -92,9 +92,9 @@ class BreakEntryForm(EntryFormMixin, IndicoForm):
     _default_duration = timedelta(minutes=20)
     _display_fields = ('title', 'description', 'time', 'duration', 'location_data', 'colors')
 
-    title = StringField(_("Title"), [DataRequired()])
-    description = TextAreaField(_("Description"))
-    location_data = IndicoLocationField(_("Location"))
+    title = StringField(_('Title'), [DataRequired()])
+    description = TextAreaField(_('Description'))
+    location_data = IndicoLocationField(_('Location'))
     colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors())
 
 
@@ -122,7 +122,7 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
         if entry.children and start_dt.data is not None:
             end_dt = start_dt.data + field.data
             if end_dt < max(x.end_dt for x in entry.children):
-                raise ValidationError(_("This duration is too short to fit the entries within."))
+                raise ValidationError(_('This duration is too short to fit the entries within.'))
 
     def validate_duration(self, field):
         super().validate_duration(field)
@@ -132,7 +132,7 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
 
 class BaseEntryForm(EntryFormMixin, IndicoForm):
     shift_later = BooleanField(_('Shift down'), widget=SwitchWidget(),
-                               description=_("Shift down everything else that starts after this"))
+                               description=_('Shift down everything else that starts after this'))
 
     def __init__(self, *args, **kwargs):
         self.entry = kwargs.pop('entry')
@@ -165,8 +165,8 @@ _OTHER_CHOICES = [('showSpeakerTitle', _('Show speaker title')),
 class TimetablePDFExportForm(IndicoForm):
     _pdf_options_fields = {'pagesize', 'firstPageNumber'}
 
-    advanced = BooleanField(_("Advanced timetable"), widget=SwitchWidget(),
-                            description=_("Advanced customization options"))
+    advanced = BooleanField(_('Advanced timetable'), widget=SwitchWidget(),
+                            description=_('Advanced customization options'))
     document_settings = IndicoSelectMultipleCheckboxBooleanField(_('Document settings'), [HiddenUnless('advanced')],
                                                                  choices=_DOCUMENT_SETTINGS_CHOICES)
     contribution_info = IndicoSelectMultipleCheckboxBooleanField(_('Contributions related info'),
@@ -201,4 +201,4 @@ class TimetablePDFExportForm(IndicoForm):
 
 
 class ImportContributionsForm(IndicoForm):
-    source_file = FileField(_("Source File"), [DataRequired()], accepted_file_types='.csv')
+    source_file = FileField(_('Source File'), [DataRequired()], accepted_file_types='.csv')

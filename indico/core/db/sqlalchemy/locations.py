@@ -38,10 +38,10 @@ class LocationMixin:
                                      'no_custom_location_if_room'),
                   db.CheckConstraint("(venue_id IS NULL) OR (venue_name = '')",
                                      'no_venue_name_if_venue_id'),
-                  db.CheckConstraint("(room_id IS NULL) OR (venue_id IS NOT NULL)",
+                  db.CheckConstraint('(room_id IS NULL) OR (venue_id IS NOT NULL)',
                                      'venue_id_if_room_id')]
         if cls.allow_location_inheritance:
-            checks.append(db.CheckConstraint("NOT inherit_location OR (venue_id IS NULL AND room_id IS NULL AND "
+            checks.append(db.CheckConstraint('NOT inherit_location OR (venue_id IS NULL AND room_id IS NULL AND '
                                              "venue_name = '' AND room_name = '' AND address = '')",
                                              'inherited_location'))
         fkeys = [db.ForeignKeyConstraint(['venue_id', 'room_id'],

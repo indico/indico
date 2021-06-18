@@ -13,12 +13,12 @@ from indico.web.forms.base import IndicoForm
 
 
 class BookingListForm(IndicoForm):
-    contribution = ContributionField(_("Contribution"), [DataRequired()],
+    contribution = ContributionField(_('Contribution'), [DataRequired()],
                                      ajax_endpoint='rb.event_linkable_contributions',
-                                     description=_("Enter the contribution name."))
-    session_block = SessionBlockField(_("Session block"), [DataRequired()],
+                                     description=_('Enter the contribution name.'))
+    session_block = SessionBlockField(_('Session block'), [DataRequired()],
                                       ajax_endpoint='rb.event_linkable_session_blocks',
-                                      description=_("Enter the session block name."))
+                                      description=_('Enter the session block name.'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

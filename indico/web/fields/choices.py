@@ -89,10 +89,10 @@ class SingleChoiceField(_ChoiceFieldBase):
 class MultiSelectConfigForm:
     options = MultiStringField(_('Options'), [DataRequired()], field=('option', _('option')), unique=True,
                                uuid_field='id', sortable=True, description=_('Specify the answers the user can select'))
-    min_choices = IntegerField(_("Minimum choices"), [HiddenUnless('is_required'), Optional(), NumberRange(min=0)],
-                               description=_("The minimum amount of options the user has to choose."))
-    max_choices = IntegerField(_("Maximum choices"), [HiddenUnless('is_required'), Optional(), NumberRange(min=1)],
-                               description=_("The maximum amount of options the user may choose."))
+    min_choices = IntegerField(_('Minimum choices'), [HiddenUnless('is_required'), Optional(), NumberRange(min=0)],
+                               description=_('The minimum amount of options the user has to choose.'))
+    max_choices = IntegerField(_('Maximum choices'), [HiddenUnless('is_required'), Optional(), NumberRange(min=1)],
+                               description=_('The maximum amount of options the user may choose.'))
 
     def _validate_min_max_choices(self):
         if (self.min_choices.data is not None and self.max_choices.data is not None and
@@ -103,14 +103,14 @@ class MultiSelectConfigForm:
         if field.data is None:
             return
         if field.data >= len(self.options.data):
-            raise ValidationError(_("Minimum choices must be fewer than the total number of options."))
+            raise ValidationError(_('Minimum choices must be fewer than the total number of options.'))
 
     def validate_max_choices(self, field):
         if field.data is None:
             return
         self._validate_min_max_choices()
         if field.data > len(self.options.data):
-            raise ValidationError(_("Maximum choices must be fewer or equal than the total number of options."))
+            raise ValidationError(_('Maximum choices must be fewer or equal than the total number of options.'))
 
 
 class MultiSelectField(_ChoiceFieldBase):

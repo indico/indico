@@ -52,8 +52,8 @@ def _category_deleted(category, **kwargs):
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     if session.user.is_admin:
-        yield SideMenuItem('admins', _("Admins"), url_for('users.admins'), section='user_management')
-        yield SideMenuItem('users', _("Users"), url_for('users.users_admin'), section='user_management')
+        yield SideMenuItem('admins', _('Admins'), url_for('users.admins'), section='user_management')
+        yield SideMenuItem('users', _('Users'), url_for('users.users_admin'), section='user_management')
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')

@@ -62,7 +62,7 @@ class HiddenUnless:
         if not active:
             field.errors[:] = []
             if field.raw_data:
-                raise ValidationError("Received data for disabled field")
+                raise ValidationError('Received data for disabled field')
             if not self.preserve_data:
                 # Clear existing data and use field default empty value
                 field.data = None
@@ -218,7 +218,7 @@ class LinkedDate:
 
     def __init__(self, field, not_before=True, not_after=False, not_equal=False):
         if not not_before and not not_after:
-            raise ValueError("Invalid validation")
+            raise ValueError('Invalid validation')
         self.not_before = not_before
         self.not_after = not_after
         self.not_equal = not_equal
@@ -251,7 +251,7 @@ class LinkedDateTime:
 
     def __init__(self, field, not_before=True, not_after=False, not_equal=False):
         if not not_before and not not_after:
-            raise ValueError("Invalid validation")
+            raise ValueError('Invalid validation')
         self.not_before = not_before
         self.not_after = not_after
         self.not_equal = not_equal
@@ -309,9 +309,9 @@ class TimeRange:
     """Validate the time lies within boundaries."""
 
     def __init__(self, earliest=None, latest=None):
-        assert earliest is not None or latest is not None, "At least one of `earliest` or `latest` must be specified."
+        assert earliest is not None or latest is not None, 'At least one of `earliest` or `latest` must be specified.'
         if earliest is not None and latest is not None:
-            assert earliest <= latest, "`earliest` cannot be later than `latest`."
+            assert earliest <= latest, '`earliest` cannot be later than `latest`.'
         self.earliest = earliest
         self.latest = latest
 
@@ -320,11 +320,11 @@ class TimeRange:
             return format_time(value) if value else None
         if self.earliest and field.data < self.earliest or self.latest and field.data > self.latest:
             if self.earliest is not None and self.latest is not None:
-                message = _("Must be between {earliest} and {latest}.")
+                message = _('Must be between {earliest} and {latest}.')
             elif self.latest is None:
-                message = _("Must be later than {earliest}.")
+                message = _('Must be later than {earliest}.')
             else:
-                message = _("Must be earlier than {latest}.")
+                message = _('Must be earlier than {latest}.')
         raise ValidationError(message.format(earliest=_format_time(self.earliest), latest=_format_time(self.latest)))
 
 

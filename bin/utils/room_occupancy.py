@@ -30,13 +30,13 @@ def _main(location):
     print('Month\tYear\tPublic?\tRoom')
     for room in rooms:
         print('{2:.2f}%\t{3:.2f}%\t{1}\t{0}'.format(room.full_name,
-                                                    "Y" if room.is_public else "N",
+                                                    'Y' if room.is_public else 'N',
                                                     calculate_rooms_occupancy([room], past_month, yesterday) * 100,
                                                     calculate_rooms_occupancy([room], past_year, yesterday) * 100))
 
 
 @click.command()
-@click.option('--location', '-l', multiple=True, help="Filter by given location")
+@click.option('--location', '-l', multiple=True, help='Filter by given location')
 def main(location):
     with make_app().app_context():
         _main(location)

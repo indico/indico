@@ -58,7 +58,7 @@ class RHEventLogsJSON(RHManageEventBase):
                 db.or_(_contains(EventLogEntry.module, text),
                        _contains(EventLogEntry.type, text),
                        _contains(EventLogEntry.summary, text),
-                       _contains(db.m.User.first_name + " " + db.m.User.last_name, text),
+                       _contains(db.m.User.first_name + ' ' + db.m.User.last_name, text),
                        _contains(EventLogEntry.data['body'].astext, text),
                        _contains(EventLogEntry.data['subject'].astext, text),
                        _contains(EventLogEntry.data['from'].astext, text),

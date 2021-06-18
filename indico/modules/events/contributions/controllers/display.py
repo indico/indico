@@ -67,7 +67,7 @@ class RHContributionDisplayBase(RHDisplayEventBase):
             raise Forbidden
         published = contribution_settings.get(self.event, 'published')
         if not published and not self._can_view_unpublished():
-            raise NotFound(_("The contributions of this event have not been published yet."))
+            raise NotFound(_('The contributions of this event have not been published yet.'))
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
@@ -79,7 +79,7 @@ class RHDisplayProtectionBase(RHDisplayEventBase):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
         if not published and not has_contributions_with_user_as_submitter(self.event, session.user):
-            raise NotFound(_("The contributions of this event have not been published yet."))
+            raise NotFound(_('The contributions of this event have not been published yet.'))
 
         if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event):
             self._forbidden_if_not_admin()
@@ -261,7 +261,7 @@ class RHSubcontributionDisplay(RHDisplayEventBase):
         published = contribution_settings.get(self.event, 'published')
         if (not published and not self.event.can_manage(session.user)
                 and not self.subcontrib.is_user_associated(session.user)):
-            raise NotFound(_("The contributions of this event have not been published yet."))
+            raise NotFound(_('The contributions of this event have not been published yet.'))
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)

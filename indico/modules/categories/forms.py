@@ -35,60 +35,60 @@ class CategorySettingsForm(IndicoForm):
                     'suggestions_disabled', 'event_creation_notification_emails', 'notify_managers')
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
-    title = StringField(_("Title"), [DataRequired()])
-    description = IndicoMarkdownField(_("Description"))
-    timezone = IndicoTimezoneSelectField(_("Timezone"), [DataRequired()],
-                                         description=_("Default timezone event lists will show up in. It will also be "
-                                                       "used as a default for new events."))
-    lecture_theme = IndicoThemeSelectField(_("Theme for Lectures"), [DataRequired()], event_type=EventType.lecture,
-                                           description=_("Default timetable theme used for lecture events"))
-    meeting_theme = IndicoThemeSelectField(_("Theme for Meetings"), [DataRequired()], event_type=EventType.meeting,
-                                           description=_("Default timetable theme used for meeting events"))
+    title = StringField(_('Title'), [DataRequired()])
+    description = IndicoMarkdownField(_('Description'))
+    timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()],
+                                         description=_('Default timezone event lists will show up in. It will also be '
+                                                       'used as a default for new events.'))
+    lecture_theme = IndicoThemeSelectField(_('Theme for Lectures'), [DataRequired()], event_type=EventType.lecture,
+                                           description=_('Default timetable theme used for lecture events'))
+    meeting_theme = IndicoThemeSelectField(_('Theme for Meetings'), [DataRequired()], event_type=EventType.meeting,
+                                           description=_('Default timetable theme used for meeting events'))
     suggestions_disabled = BooleanField(_('Disable Suggestions'), widget=SwitchWidget(),
                                         description=_("Enable this if you don't want Indico to suggest this category as"
                                                       " a possible addition to a user's favourites."))
-    event_message_mode = IndicoEnumSelectField(_("Message Type"), enum=EventMessageMode,
+    event_message_mode = IndicoEnumSelectField(_('Message Type'), enum=EventMessageMode,
                                                default=EventMessageMode.disabled,
-                                               description=_("This message will show up at the top of every event page "
-                                                             "in this category"))
-    event_message = IndicoMarkdownField(_("Content"))
-    notify_managers = BooleanField(_("Notify managers"), widget=SwitchWidget(),
-                                   description=_("Whether to send email notifications to all managers of this category "
-                                                 "when an event is created inside it or in any of its subcategories."))
-    event_creation_notification_emails = EmailListField(_("Notification E-mails"),
-                                                        description=_("List of emails that will receive a notification "
-                                                                      "every time a new event is created inside the "
-                                                                      "category or one of its subcategories. "
-                                                                      "One email address per line."))
+                                               description=_('This message will show up at the top of every event page '
+                                                             'in this category'))
+    event_message = IndicoMarkdownField(_('Content'))
+    notify_managers = BooleanField(_('Notify managers'), widget=SwitchWidget(),
+                                   description=_('Whether to send email notifications to all managers of this category '
+                                                 'when an event is created inside it or in any of its subcategories.'))
+    event_creation_notification_emails = EmailListField(_('Notification E-mails'),
+                                                        description=_('List of emails that will receive a notification '
+                                                                      'every time a new event is created inside the '
+                                                                      'category or one of its subcategories. '
+                                                                      'One email address per line.'))
 
 
 class CategoryIconForm(IndicoForm):
-    icon = EditableFileField("Icon", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+    icon = EditableFileField('Icon', accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
                              add_remove_links=False, handle_flashes=True, get_metadata=partial(get_image_data, 'icon'),
-                             description=_("Small icon that will show up next to category names in overview pages. "
-                                           "Will be automatically resized to 16x16 pixels. This may involve loss of "
-                                           "image quality, so try to upload images as close as possible to those "
-                                           "dimensions."))
+                             description=_('Small icon that will show up next to category names in overview pages. '
+                                           'Will be automatically resized to 16x16 pixels. This may involve loss of '
+                                           'image quality, so try to upload images as close as possible to those '
+                                           'dimensions.'))
 
 
 class CategoryLogoForm(IndicoForm):
-    logo = EditableFileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+    logo = EditableFileField('Logo', accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
                              add_remove_links=False, handle_flashes=True, get_metadata=partial(get_image_data, 'logo'),
-                             description=_("Logo that will show up next to the category description. Will be "
-                                           "automatically resized to at most 200x200 pixels."))
+                             description=_('Logo that will show up next to the category description. Will be '
+                                           'automatically resized to at most 200x200 pixels.'))
 
 
 class CategoryProtectionForm(IndicoForm):
     _event_creation_fields = ('event_creation_restricted', 'event_creation_notification_emails')
-    permissions = PermissionsField(_("Permissions"), object_type='category')
+    permissions = PermissionsField(_('Permissions'), object_type='category')
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
     own_no_access_contact = StringField(_('No access contact'),
                                         description=_('Contact information shown when someone lacks access to the '
                                                       'category'))
-    visibility = SelectField(_("Event visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
-                             description=_("""From which point in the category tree contents will be visible from """
-                                           """(number of categories upwards). Applies to "Today's events" and """
-                                           """Calendar. If the category is moved, this number will be preserved."""))
+    visibility = SelectField(_('Event visibility'), [Optional()], coerce=lambda x: None if x == '' else int(x),
+                             description=_('''From which point in the category tree contents will be visible from '''
+                                           '''(number of categories upwards). Applies to "Today's events" and '''
+                                           '''Calendar. If the category is moved, this number will be preserved.'''))
     event_creation_restricted = BooleanField(_('Restricted event creation'), widget=SwitchWidget(),
                                              description=_('Whether the event creation should be restricted '
                                                            'to a list of specific persons'))
@@ -125,8 +125,8 @@ class CategoryProtectionForm(IndicoForm):
 class CreateCategoryForm(IndicoForm):
     """Form to create a new Category."""
 
-    title = StringField(_("Title"), [DataRequired()])
-    description = IndicoMarkdownField(_("Description"))
+    title = StringField(_('Title'), [DataRequired()])
+    description = IndicoMarkdownField(_('Description'))
 
 
 class SplitCategoryForm(IndicoForm):
@@ -155,22 +155,22 @@ class SplitCategoryForm(IndicoForm):
 
 class UpcomingEventsForm(IndicoForm):
     max_entries = IntegerField(_('Max. events'), [InputRequired(), NumberRange(min=0)],
-                               description=_("The maximum number of upcoming events to show. Events are sorted by "
-                                             "weight so events with a lower weight are more likely to be omitted if "
-                                             "there are too many events to show."))
+                               description=_('The maximum number of upcoming events to show. Events are sorted by '
+                                             'weight so events with a lower weight are more likely to be omitted if '
+                                             'there are too many events to show.'))
     entries = MultipleItemsField(_('Upcoming events'),
-                                 fields=[{'id': 'type', 'caption': _("Type"), 'required': True, 'type': 'select'},
-                                         {'id': 'id', 'caption': _("ID"), 'required': True, 'type': 'number',
+                                 fields=[{'id': 'type', 'caption': _('Type'), 'required': True, 'type': 'select'},
+                                         {'id': 'id', 'caption': _('ID'), 'required': True, 'type': 'number',
                                           'step': 1, 'coerce': int},
-                                         {'id': 'days', 'caption': _("Days"), 'required': True, 'type': 'number',
+                                         {'id': 'days', 'caption': _('Days'), 'required': True, 'type': 'number',
                                           'step': 1, 'coerce': int},
-                                         {'id': 'weight', 'caption': _("Weight"), 'required': True, 'type': 'number',
+                                         {'id': 'weight', 'caption': _('Weight'), 'required': True, 'type': 'number',
                                           'coerce': float}],
                                  choices={'type': {'category': _('Category'),
                                                    'category_tree': _('Category & Subcategories'),
                                                    'event': _('Event')}},
                                  description=_("Specify categories/events shown in the 'upcoming events' list on the "
-                                               "home page."))
+                                               'home page.'))
 
     def validate_entries(self, field):
         if field.errors:

@@ -14,7 +14,7 @@ from indico.web.flask.util import url_for
 
 class PersonNamePlaceholder(Placeholder):
     name = 'person_name'
-    description = _("Name of the person")
+    description = _('Name of the person')
 
     @classmethod
     def render(cls, definition, agreement):
@@ -23,7 +23,7 @@ class PersonNamePlaceholder(Placeholder):
 
 class AgreementLinkPlaceholder(Placeholder):
     name = 'agreement_link'
-    description = _("Link to the agreement page")
+    description = _('Link to the agreement page')
     required = True
 
     @classmethod

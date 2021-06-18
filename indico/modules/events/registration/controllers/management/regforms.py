@@ -59,7 +59,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
             for regform in regforms:
                 regform.publish_registrations_enabled = regform.id in data['participant_list_forms']
-            flash(_("The participants display settings have been saved."), 'success')
+            flash(_('The participants display settings have been saved.'), 'success')
             return redirect(url_for('.manage_regforms_display', self.event))
 
         available_columns = {field[0].name: field[1]['title'] for field in PersonalDataType.FIELD_DATA}
@@ -136,7 +136,7 @@ class RHManageParticipants(RHManageRegFormsBase):
         regform = self.event.participation_regform
         set_feature_enabled(self.event, 'registration', True)
         if not regform:
-            regform = RegistrationForm(event=self.event, title="Participants", is_participation=True,
+            regform = RegistrationForm(event=self.event, title='Participants', is_participation=True,
                                        currency=payment_settings.get('currency'))
             create_personal_data_fields(regform)
             db.session.add(regform)
@@ -207,8 +207,8 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
     def _process(self):
         self.regform.is_deleted = True
         signals.event.registration_form_deleted.send(self.regform)
-        flash(_("Registration form deleted"), 'success')
-        logger.info("Registration form %s deleted by %s", self.regform, session.user)
+        flash(_('Registration form deleted'), 'success')
+        logger.info('Registration form %s deleted by %s', self.regform, session.user)
         return redirect(url_for('.manage_regform_list', self.event))
 
 
@@ -221,8 +221,8 @@ class RHRegistrationFormOpen(RHManageRegFormBase):
             self.regform.end_dt = None
         else:
             self.regform.start_dt = now_utc()
-        logger.info("Registrations for %s opened by %s", self.regform, session.user)
-        flash(_("Registrations for {} are now open").format(self.regform.title), 'success')
+        logger.info('Registrations for %s opened by %s', self.regform, session.user)
+        flash(_('Registrations for {} are now open').format(self.regform.title), 'success')
         new_dts = (self.regform.start_dt, self.regform.end_dt)
         if new_dts != old_dts:
             if not old_dts[1]:
@@ -240,8 +240,8 @@ class RHRegistrationFormClose(RHManageRegFormBase):
         self.regform.end_dt = now_utc()
         if not self.regform.has_started:
             self.regform.start_dt = self.regform.end_dt
-        flash(_("Registrations for {} are now closed").format(self.regform.title), 'success')
-        logger.info("Registrations for %s closed by %s", self.regform, session.user)
+        flash(_('Registrations for {} are now closed').format(self.regform.title), 'success')
+        logger.info('Registrations for %s closed by %s', self.regform, session.user)
         log_text = f'Registration form "{self.regform.title}" was closed'
         self.event.log(EventLogRealm.event, EventLogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
@@ -256,8 +256,8 @@ class RHRegistrationFormSchedule(RHManageRegFormBase):
             self.regform.start_dt = form.start_dt.data
             self.regform.end_dt = form.end_dt.data
             self.regform.modification_end_dt = form.modification_end_dt.data
-            flash(_("Registrations for {} have been scheduled").format(self.regform.title), 'success')
-            logger.info("Registrations for %s scheduled by %s", self.regform, session.user)
+            flash(_('Registrations for {} have been scheduled').format(self.regform.title), 'success')
+            logger.info('Registrations for %s scheduled by %s', self.regform, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form, submit=_('Schedule'))
 

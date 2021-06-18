@@ -93,7 +93,7 @@ class AddAttachmentFilesMixin:
                 db.session.flush()
                 logger.info('Attachment %s uploaded by %s', attachment, session.user)
                 signals.attachments.attachment_created.send(attachment, user=session.user)
-            flash(ngettext("The attachment has been uploaded", "{count} attachments have been uploaded", len(files))
+            flash(ngettext('The attachment has been uploaded', '{count} attachments have been uploaded', len(files))
                   .format(count=len(files)), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object),
@@ -109,7 +109,7 @@ class AddAttachmentLinkMixin:
         form = AddAttachmentLinkForm(linked_object=self.object)
         if form.validate_on_submit():
             add_attachment_link(form.data, self.object)
-            flash(_("The link has been added"), 'success')
+            flash(_('The link has been added'), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/add_link.html', form=form,
                                 protection_message=_render_protection_message(self.object),
@@ -144,7 +144,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
                     self.attachment.file.save(file.stream)
 
             signals.attachments.attachment_updated.send(self.attachment, user=session.user)
-            flash(_("The attachment \"{name}\" has been updated").format(name=self.attachment.title), 'success')
+            flash(_('The attachment "{name}" has been updated').format(name=self.attachment.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
 
         template = ('attachments/upload.html' if self.attachment.type == AttachmentType.file else
@@ -168,7 +168,7 @@ class CreateFolderMixin:
             db.session.add(folder)
             logger.info('Folder %s created by %s', folder, session.user)
             signals.attachments.folder_created.send(folder, user=session.user)
-            flash(_("Folder \"{name}\" created").format(name=folder.title), 'success')
+            flash(_('Folder "{name}" created').format(name=folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/create_folder.html', form=form,
                                 protection_message=_render_protection_message(self.object))
@@ -188,7 +188,7 @@ class EditFolderMixin(SpecificFolderMixin):
                 self.folder.acl &= form.acl.data
             logger.info('Folder %s edited by %s', self.folder, session.user)
             signals.attachments.folder_updated.send(self.folder, user=session.user)
-            flash(_("Folder \"{name}\" updated").format(name=self.folder.title), 'success')
+            flash(_('Folder "{name}" updated').format(name=self.folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/create_folder.html', form=form,
                                 protection_message=_render_protection_message(self.object))
@@ -201,7 +201,7 @@ class DeleteFolderMixin(SpecificFolderMixin):
         self.folder.is_deleted = True
         logger.info('Folder %s deleted by %s', self.folder, session.user)
         signals.attachments.folder_deleted.send(self.folder, user=session.user)
-        flash(_("Folder \"{name}\" deleted").format(name=self.folder.title), 'success')
+        flash(_('Folder "{name}" deleted').format(name=self.folder.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self.object))
 
 
@@ -212,5 +212,5 @@ class DeleteAttachmentMixin(SpecificAttachmentMixin):
         self.attachment.is_deleted = True
         logger.info('Attachment %s deleted by %s', self.attachment, session.user)
         signals.attachments.attachment_deleted.send(self.attachment, user=session.user)
-        flash(_("Attachment \"{name}\" deleted").format(name=self.attachment.title), 'success')
+        flash(_('Attachment "{name}" deleted').format(name=self.attachment.title), 'success')
         return jsonify_data(attachment_list=_render_attachment_list(self.object))

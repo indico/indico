@@ -32,17 +32,17 @@ class AttachmentsExportHook(HTTPAPIHook):
         if session_id:
             self._obj = Session.query.with_parent(event).filter_by(id=session_id).first()
             if self._obj is None:
-                raise HTTPAPIError("No such session", 404)
+                raise HTTPAPIError('No such session', 404)
         contribution_id = self._pathParams.get('contribution_id')
         if contribution_id:
             contribution = self._obj = Contribution.query.with_parent(event).filter_by(id=contribution_id).first()
             if contribution is None:
-                raise HTTPAPIError("No such contribution", 404)
+                raise HTTPAPIError('No such contribution', 404)
             subcontribution_id = self._pathParams.get('subcontribution_id')
             if subcontribution_id:
                 self._obj = SubContribution.query.with_parent(contribution).filter_by(id=subcontribution_id).first()
                 if self._obj is None:
-                    raise HTTPAPIError("No such subcontribution", 404)
+                    raise HTTPAPIError('No such subcontribution', 404)
 
     def _has_access(self, user):
         return self._obj.can_access(user)

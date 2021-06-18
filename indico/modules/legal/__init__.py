@@ -15,12 +15,12 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-_DEFAULT_RESTRICTED_DISCLAIMER = ("Circulation to people other than the intended audience is not authorized. "
-                                  "You are obliged to treat the information with the appropriate level of "
-                                  "confidentiality.")
-_DEFAULT_PROTECTED_DISCLAIMER = ("As such, this information is intended for an internal audience only. "
-                                 "You are obliged to treat the information with the appropriate level of "
-                                 "confidentiality.")
+_DEFAULT_RESTRICTED_DISCLAIMER = ('Circulation to people other than the intended audience is not authorized. '
+                                  'You are obliged to treat the information with the appropriate level of '
+                                  'confidentiality.')
+_DEFAULT_PROTECTED_DISCLAIMER = ('As such, this information is intended for an internal audience only. '
+                                 'You are obliged to treat the information with the appropriate level of '
+                                 'confidentiality.')
 
 
 legal_settings = SettingsProxy('legal', {

@@ -52,7 +52,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not event.can_manage(session.user, 'registration'):
         return
     if event.type != 'conference':
-        yield SideMenuItem('participants', _("Participants"), url_for('event_participation.manage', event),
+        yield SideMenuItem('participants', _('Participants'), url_for('event_participation.manage', event),
                            section='organization')
     if event.has_feature('registration'):
         yield SideMenuItem('registration', _('Registration'), url_for('event_registration.manage_regform_list', event),
@@ -140,8 +140,8 @@ def _associate_registrations(user, **kwargs):
         done.add(registration.registration_form_id)
     db.session.flush()
     num = len(done)
-    flash(ngettext("A registration has been linked to your account.",
-                   "{n} registrations have been linked to your account.", num).format(n=num), 'info')
+    flash(ngettext('A registration has been linked to your account.',
+                   '{n} registrations have been linked to your account.', num).format(n=num), 'info')
 
 
 @signals.event_management.management_url.connect

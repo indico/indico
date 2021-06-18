@@ -157,12 +157,12 @@ def _extend_event_menu(sender, **kwargs):
             return False
         return has_user_tracks(event, session.user)
 
-    yield MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
+    yield MenuEntryData(title=_('Book of Abstracts'), name='abstracts_book', endpoint='abstracts.export_boa',
                         position=9, visible=_boa_visible, static_site=True)
-    yield MenuEntryData(title=_("Call for Abstracts"), name='call_for_abstracts',
+    yield MenuEntryData(title=_('Call for Abstracts'), name='call_for_abstracts',
                         endpoint='abstracts.call_for_abstracts', position=2,
                         visible=lambda event: event.has_feature('abstracts'))
-    yield MenuEntryData(title=_("Reviewing Area"), name='abstract_reviewing_area',
+    yield MenuEntryData(title=_('Reviewing Area'), name='abstract_reviewing_area',
                         endpoint='abstracts.display_reviewable_tracks', position=0, parent='call_for_abstracts',
                         visible=_reviewing_area_visible)
 

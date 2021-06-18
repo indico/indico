@@ -95,13 +95,13 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                          cls.is_deleted, cls.category_id, cls.start_dt, cls.end_dt),
                 db.Index('ix_uq_events_url_shortcut', db.func.lower(cls.url_shortcut), unique=True,
                          postgresql_where=db.text('NOT is_deleted')),
-                db.CheckConstraint("category_id IS NOT NULL OR is_deleted", 'category_data_set'),
+                db.CheckConstraint('category_id IS NOT NULL OR is_deleted', 'category_data_set'),
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                    'valid_stylesheet'),
-                db.CheckConstraint("end_dt >= start_dt", 'valid_dates'),
+                db.CheckConstraint('end_dt >= start_dt', 'valid_dates'),
                 db.CheckConstraint("url_shortcut != ''", 'url_shortcut_not_empty'),
-                db.CheckConstraint("cloned_from_id != id", 'not_cloned_from_self'),
+                db.CheckConstraint('cloned_from_id != id', 'not_cloned_from_self'),
                 db.CheckConstraint('visibility IS NULL OR visibility >= 0', 'valid_visibility'),
                 {'schema': 'events'})
 
@@ -1064,25 +1064,25 @@ def _set_label(target, value, oldvalue, *unused):
 
 @listens_for(Event.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
-    sql = """
+    sql = '''
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER UPDATE OF start_dt, end_dt
         ON {table}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('event');
-    """.format(table=target.fullname)
+    '''.format(table=target.fullname)
     DDL(sql).execute(conn)
 
 
 @listens_for(Event.__table__, 'after_create')
 def _add_deletion_consistency_trigger(target, conn, **kw):
-    sql = """
+    sql = '''
         CREATE CONSTRAINT TRIGGER consistent_deleted
         AFTER INSERT OR UPDATE OF category_id, is_deleted
         ON {table}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE categories.check_consistency_deleted();
-    """.format(table=target.fullname)
+    '''.format(table=target.fullname)
     DDL(sql).execute(conn)

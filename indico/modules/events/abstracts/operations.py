@@ -295,7 +295,7 @@ def create_abstract_comment(abstract, comment_data):
     comment.populate_from_dict(comment_data)
     comment.abstract = abstract
     db.session.flush()
-    logger.info("Abstract %s received a comment from %s", abstract, session.user)
+    logger.info('Abstract %s received a comment from %s', abstract, session.user)
     abstract.log(EventLogRealm.reviewing, EventLogKind.positive, 'Abstracts',
                  f'Abstract {abstract.verbose_title} received a comment', session.user)
 
@@ -305,7 +305,7 @@ def update_abstract_comment(comment, comment_data):
     comment.modified_by = session.user
     comment.modified_dt = now_utc()
     db.session.flush()
-    logger.info("Abstract comment %s modified by %s", comment, session.user)
+    logger.info('Abstract comment %s modified by %s', comment, session.user)
     comment.abstract.log(EventLogRealm.reviewing, EventLogKind.change, 'Abstracts',
                          f'Comment on abstract {comment.abstract.verbose_title} modified',
                          session.user,
@@ -315,7 +315,7 @@ def update_abstract_comment(comment, comment_data):
 def delete_abstract_comment(comment):
     comment.is_deleted = True
     db.session.flush()
-    logger.info("Abstract comment %s deleted by %s", comment, session.user)
+    logger.info('Abstract comment %s deleted by %s', comment, session.user)
     comment.abstract.log(EventLogRealm.reviewing, EventLogKind.negative, 'Abstracts',
                          f'Comment on abstract {comment.abstract.verbose_title} removed', session.user)
 
@@ -329,7 +329,7 @@ def create_abstract_review(abstract, track, user, review_data, questions_data):
         review.ratings.append(AbstractReviewRating(question=question, value=value))
         log_data[question.title] = question.field.get_friendly_value(value)
     db.session.flush()
-    logger.info("Abstract %s received a review by %s for track %s", abstract, user, track)
+    logger.info('Abstract %s received a review by %s for track %s', abstract, user, track)
     log_data.update({
         'Track': track.title,
         'Action': orig_string(review.proposed_action.title),
@@ -367,7 +367,7 @@ def update_abstract_review(review, review_data, questions_data):
             }
 
     db.session.flush()
-    logger.info("Abstract review %s modified", review)
+    logger.info('Abstract review %s modified', review)
     log_fields.update({
         'proposed_action': 'Action',
         'comment': 'Comment'
@@ -396,7 +396,7 @@ def update_abstract_review(review, review_data, questions_data):
 
 def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
     event.cfa.schedule(start_dt, end_dt, modification_end_dt)
-    logger.info("Call for abstracts for %s scheduled by %s", event, session.user)
+    logger.info('Call for abstracts for %s scheduled by %s', event, session.user)
     log_data = {}
     if start_dt:
         log_data['Start'] = start_dt.isoformat()
@@ -410,11 +410,11 @@ def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
 
 def open_cfa(event):
     event.cfa.open()
-    logger.info("Call for abstracts for %s opened by %s", event, session.user)
+    logger.info('Call for abstracts for %s opened by %s', event, session.user)
     event.log(EventLogRealm.reviewing, EventLogKind.positive, 'Abstracts', 'Call for abstracts opened', session.user)
 
 
 def close_cfa(event):
     event.cfa.close()
-    logger.info("Call for abstracts for %s closed by %s", event, session.user)
+    logger.info('Call for abstracts for %s closed by %s', event, session.user)
     event.log(EventLogRealm.reviewing, EventLogKind.negative, 'Abstracts', 'Call for abstracts closed', session.user)

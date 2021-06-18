@@ -84,7 +84,7 @@ class RHExportBOA(RHAbstractsBase):
         RHAbstractsBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
         if not published:
-            raise NotFound(_("The contributions of this event have not been published yet"))
+            raise NotFound(_('The contributions of this event have not been published yet'))
 
     def _process(self):
         if request.args.get('latex') == '1' and config.LATEX_ENABLED and self.event.can_manage(session.user):

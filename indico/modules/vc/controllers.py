@@ -59,7 +59,7 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
         return None
     elif event_vc_room.link_type == VCRoomLinkType.event and vc_room in existing:
         db.session.rollback()
-        flash(_("This {plugin_name} room is already attached to the event.").format(plugin_name=plugin.friendly_name),
+        flash(_('This {plugin_name} room is already attached to the event.').format(plugin_name=plugin.friendly_name),
               'error')
         return None
     else:
@@ -198,7 +198,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             try:
                 self.plugin.update_room(self.vc_room, self.event)
             except VCRoomNotFoundError as err:
-                Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
+                Logger.get('modules.vc').warning('VC room %r not found. Setting it as deleted.', self.vc_room)
                 self.vc_room.status = VCRoomStatus.deleted
                 flash(str(err), 'error')
                 return jsonify_data(flash=False)
@@ -232,12 +232,12 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
                 plugin_name=self.plugin.friendly_name), 'error')
             raise Forbidden
 
-        Logger.get('modules.vc').info("Refreshing VC room %r from event %r", self.vc_room, self.event)
+        Logger.get('modules.vc').info('Refreshing VC room %r from event %r', self.vc_room, self.event)
 
         try:
             self.plugin.refresh_room(self.vc_room, self.event)
         except VCRoomNotFoundError as err:
-            Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
+            Logger.get('modules.vc').warning('VC room %r not found. Setting it as deleted.', self.vc_room)
             self.vc_room.status = VCRoomStatus.deleted
             flash(str(err), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
@@ -290,14 +290,14 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
         if form.validate_on_submit():
             vc_room = form.data['room']
             if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-                flash(_("You are not allowed to attach {plugin_name} rooms to this event.").format(
+                flash(_('You are not allowed to attach {plugin_name} rooms to this event.').format(
                     plugin_name=self.plugin.friendly_name), 'error')
             elif not self.plugin.can_manage_vc_room(session.user, vc_room):
                 flash(_("You are not authorized to attach the room '{0}'").format(vc_room.name), 'error')
             else:
                 event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
                 if event_vc_room:
-                    flash(_("The room has been attached to the event."), 'success')
+                    flash(_('The room has been attached to the event.'), 'success')
                     db.session.add(event_vc_room)
             return jsonify_data(flash=False)
 
@@ -314,7 +314,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
 
         self.query = request.args.get('q', '')
         if len(self.query) < 3:
-            raise BadRequest("A query has to be provided, with at least 3 characters")
+            raise BadRequest('A query has to be provided, with at least 3 characters')
 
     def _iter_allowed_rooms(self):
         query = (db.session.query(VCRoom, func.count(VCRoomEventAssociation.id).label('event_count'))

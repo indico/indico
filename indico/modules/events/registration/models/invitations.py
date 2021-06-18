@@ -27,7 +27,7 @@ class InvitationState(RichIntEnum):
 class RegistrationInvitation(db.Model):
     """An invitation for someone to register."""
     __tablename__ = 'invitations'
-    __table_args__ = (db.CheckConstraint("(state = {state}) OR (registration_id IS NULL)"
+    __table_args__ = (db.CheckConstraint('(state = {state}) OR (registration_id IS NULL)'
                                          .format(state=InvitationState.accepted), name='registration_state'),
                       db.UniqueConstraint('registration_form_id', 'email'),
                       {'schema': 'event_registration'})

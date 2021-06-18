@@ -33,7 +33,7 @@ class RHCategoryBase(RH):
         category_id = request.view_args['category_id']
         self.category = self._get_category(category_id)
         if self.category is None:
-            raise NotFound(_("This category does not exist or has been deleted."))
+            raise NotFound(_('This category does not exist or has been deleted.'))
 
 
 class RHDisplayCategoryBase(RHCategoryBase):
@@ -41,9 +41,9 @@ class RHDisplayCategoryBase(RHCategoryBase):
 
     def _check_access(self):
         if not self.category.can_access(session.user):
-            msg = [_("You are not authorized to access this category.")]
+            msg = [_('You are not authorized to access this category.')]
             if self.category.no_access_contact:
-                msg.append(_("If you believe you should have access, please contact {}")
+                msg.append(_('If you believe you should have access, please contact {}')
                            .format(self.category.no_access_contact))
             raise Forbidden(' '.join(msg))
 

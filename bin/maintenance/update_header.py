@@ -52,7 +52,7 @@ SUPPORTED_FILES = {
 SUBSTRING = 'This file is part of'
 
 
-USAGE = """
+USAGE = '''
 Updates all the headers in the supported files ({supported_files}).
 By default, all the files tracked by git in the current repository are updated
 to the current year.
@@ -61,7 +61,7 @@ You can specify a year to update to as well as a file or directory.
 This will update all the supported files in the scope including those not tracked
 by git. If the directory does not contain any supported files (or if the file
 specified is not supported) nothing will be updated.
-""".format(supported_files=', '.join(SUPPORTED_FILES)).strip()
+'''.format(supported_files=', '.join(SUPPORTED_FILES)).strip()
 
 
 def _walk_to_root(path):
@@ -174,8 +174,8 @@ def main(ctx, ci, year, path):
     error = False
     if path and os.path.isdir(path):
         if not ci:
-            print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all the files in "
-                          "%{yellow!}{path}%{reset}...").format(year=year, path=path))
+            print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all the files in '
+                          '%{yellow!}{path}%{reset}...').format(year=year, path=path))
         for root, _, filenames in os.walk(path):
             for filename in filenames:
                 if not blacklisted(path, root):
@@ -183,14 +183,14 @@ def main(ctx, ci, year, path):
                         error = True
     elif path and os.path.isfile(path):
         if not ci:
-            print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for the file "
-                          "%{yellow!}{file}%{reset}...").format(year=year, file=path))
+            print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for the file '
+                          '%{yellow!}{file}%{reset}...').format(year=year, file=path))
         if update_header(path, year, ci):
             error = True
     else:
         if not ci:
-            print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
-                          "git-tracked files...").format(year=year))
+            print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all '
+                          'git-tracked files...').format(year=year))
         try:
             for filepath in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
                 filepath = os.path.abspath(filepath)

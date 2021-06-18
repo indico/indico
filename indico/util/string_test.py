@@ -198,14 +198,14 @@ def test_html_to_plaintext(input, output):
     ('[Python](http://www.google.com/search?q=holy+grail&ln=fr)',
      '<p><a href="http://www.google.com/search?q=holy+grail&amp;ln=fr">Python</a></p>'),
     ("<script>alert('I'm evil!')</script>", "&lt;script&gt;alert('I'm evil!')&lt;/script&gt;"),
-    ("Name|Colour\n---|---\nLancelot|Blue",
+    ('Name|Colour\n---|---\nLancelot|Blue',
      '<table>\n<thead>\n<tr>\n<th>Name</th>\n<th>Colour</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Lancelot</td>\n'
      '<td>Blue</td>\n</tr>\n</tbody>\n</table>'),
-    ("**$2 * 2 * 2 > 7$**", "<p><strong>$2 * 2 * 2 > 7$</strong></p>"),
-    ("Escaping works just fine! $ *a* $", "<p>Escaping works just fine! $ *a* $</p>"),
+    ('**$2 * 2 * 2 > 7$**', '<p><strong>$2 * 2 * 2 > 7$</strong></p>'),
+    ('Escaping works just fine! $ *a* $', '<p>Escaping works just fine! $ *a* $</p>'),
     ('![Just a cat](http://myserver.example.com/cat.png)', '<p><img alt="Just a cat" '
      'src="http://myserver.example.com/cat.png"></p>'),
-    ("<https://getindico.io>", '<p><a href="https://getindico.io">https://getindico.io</a></p>')
+    ('<https://getindico.io>', '<p><a href="https://getindico.io">https://getindico.io</a></p>')
 ))
 def test_markdown(input, output):
     assert render_markdown(input,  extensions=('tables',)) == output

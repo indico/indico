@@ -25,8 +25,8 @@ class AdminSettingsForm(IndicoForm):
                                     fields=[{'id': 'code', 'caption': _('Code')},
                                             {'id': 'name', 'caption': _('Name')}],
                                     unique_field='code',
-                                    description=_("List of currencies that can be selected for an event. When deleting "
-                                                  "a currency, existing events will keep using it. The currency code "
+                                    description=_('List of currencies that can be selected for an event. When deleting '
+                                                  'a currency, existing events will keep using it. The currency code '
                                                   "must be a valid <a href='{0}'>ISO-4217</a> code such "
                                                   "as 'EUR' or 'CHF'.").format(CURRENCY_CODE_LINK))
     currency = SelectField(_('Currency'), [DataRequired()],

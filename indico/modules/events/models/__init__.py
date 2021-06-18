@@ -14,7 +14,7 @@ from indico.core import signals
 
 @signals.db_schema_created.connect_via('events')
 def _create_check_timetable_consistency(sender, connection, **kwargs):
-    sql = textwrap.dedent("""
+    sql = textwrap.dedent('''
         CREATE FUNCTION events.check_timetable_consistency() RETURNS trigger AS
         $BODY$
         DECLARE
@@ -126,5 +126,5 @@ def _create_check_timetable_consistency(sender, connection, **kwargs):
         END;
         $BODY$
         LANGUAGE plpgsql
-    """)
+    ''')
     DDL(sql).execute(connection)

@@ -488,7 +488,7 @@ class EventPersonLink(PersonLinkBase):
     @property
     def is_submitter(self):
         if not self.event:
-            raise Exception("No event to check submission rights against")
+            raise Exception('No event to check submission rights against')
         return self.person.has_role('submit', self.event)
 
     def __repr__(self):

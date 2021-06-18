@@ -96,8 +96,8 @@ def prepare_db(empty=False, root_path=None, verbose=True):
         stamp(directory=os.path.join(root_path, 'migrations'), revision='heads')
         PluginScriptDirectory.dir = os.path.join(root_path, 'core', 'plugins', 'alembic')
         alembic.command.ScriptDirectory = PluginScriptDirectory
-        plugin_msg = cformat("%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} "
-                             "plugin to HEAD%{reset}")
+        plugin_msg = cformat('%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} '
+                             'plugin to HEAD%{reset}')
         for plugin in plugin_engine.get_active_plugins().values():
             if not os.path.exists(plugin.alembic_versions_path):
                 continue

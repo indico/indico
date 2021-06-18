@@ -18,16 +18,16 @@ from indico.web.forms.widgets import CKEditorWidget
 
 
 class AgreementForm(IndicoForm):
-    agreed = IndicoRadioField(_("Do you agree with the stated above?"), [InputRequired()],
-                              coerce=lambda x: bool(int(x)), choices=[(1, _("I agree")), (0, _("I disagree"))])
-    reason = TextAreaField(_("Reason"))
+    agreed = IndicoRadioField(_('Do you agree with the stated above?'), [InputRequired()],
+                              coerce=lambda x: bool(int(x)), choices=[(1, _('I agree')), (0, _('I disagree'))])
+    reason = TextAreaField(_('Reason'))
 
 
 class AgreementEmailForm(IndicoForm):
-    from_address = SelectField(_("From"), [DataRequired()])
-    cc_addresses = EmailField(_("CC"), [Optional(), Email()],
-                              description=_("Warning: this email address will be able to sign the agreement!"))
-    body = TextAreaField(_("Email body"), widget=CKEditorWidget(simple=True))
+    from_address = SelectField(_('From'), [DataRequired()])
+    cc_addresses = EmailField(_('CC'), [Optional(), Email()],
+                              description=_('Warning: this email address will be able to sign the agreement!'))
+    body = TextAreaField(_('Email body'), widget=CKEditorWidget(simple=True))
 
     def __init__(self, *args, **kwargs):
         self._definition = kwargs.pop('definition')
@@ -43,11 +43,11 @@ class AgreementEmailForm(IndicoForm):
 
 
 class AgreementAnswerSubmissionForm(IndicoForm):
-    answer = IndicoRadioField(_("Answer"), [InputRequired()], coerce=lambda x: bool(int(x)),
-                              choices=[(1, _("Agreement")), (0, _("Disagreement"))])
-    document = FileField(_("Document"), [UsedIf(lambda form, field: form.answer.data), DataRequired()])
+    answer = IndicoRadioField(_('Answer'), [InputRequired()], coerce=lambda x: bool(int(x)),
+                              choices=[(1, _('Agreement')), (0, _('Disagreement'))])
+    document = FileField(_('Document'), [UsedIf(lambda form, field: form.answer.data), DataRequired()])
     upload_confirm = BooleanField(_("I confirm that I'm uploading a document that clearly shows this person's answer"),
                                   [UsedIf(lambda form, field: form.answer.data), DataRequired()])
     understand = BooleanField(_("I understand that I'm answering the agreement on behalf of this person"),
                               [DataRequired()], description=_("This answer is legally binding and can't be changed "
-                                                              "afterwards."))
+                                                              'afterwards.'))

@@ -84,9 +84,9 @@ DEFAULT_OPTIONS = {
 }
 
 
-def find_packages(path, prefix=""):
+def find_packages(path, prefix=''):
     yield prefix
-    prefix = prefix + "."
+    prefix = prefix + '.'
     for _, name, ispkg in walk_packages(path, prefix):
         if ispkg:
             yield name

@@ -170,14 +170,14 @@ class RHJudgePapers(RHPapersActionBase):
             num_submitted_papers = len(submitted_papers)
             num_not_submitted_papers = len(self.contributions) - num_submitted_papers
             if num_submitted_papers:
-                flash(ngettext("One paper has been judged.",
-                               "{num} papers have been judged.",
+                flash(ngettext('One paper has been judged.',
+                               '{num} papers have been judged.',
                                num_submitted_papers).format(num=num_submitted_papers), 'success')
             if num_not_submitted_papers:
-                flash(ngettext("One contribution has been skipped since it has no paper submitted yet or it is in "
-                               "a final state.",
-                               "{num} contributions have been skipped since they have no paper submitted yet or they "
-                               "are in a final state.",
+                flash(ngettext('One contribution has been skipped since it has no paper submitted yet or it is in '
+                               'a final state.',
+                               '{num} contributions have been skipped since they have no paper submitted yet or they '
+                               'are in a final state.',
                                num_not_submitted_papers).format(num=num_not_submitted_papers), 'warning')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
@@ -203,9 +203,9 @@ class RHAssignPapersBase(RHPapersActionBase):
     def _process_assignment(self, assign):
         update_reviewing_roles(self.event, self.users, self.contributions, self.role, assign)
         if assign:
-            flash(_("Paper reviewing roles have been assigned."), 'success')
+            flash(_('Paper reviewing roles have been assigned.'), 'success')
         else:
-            flash(_("Paper reviewing roles have been unassigned."), 'success')
+            flash(_('Paper reviewing roles have been unassigned.'), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
     def _get_conflicts(self, users):

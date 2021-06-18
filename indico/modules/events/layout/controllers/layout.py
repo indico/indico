@@ -180,7 +180,7 @@ class RHLayoutLogoDelete(RHLayoutBase):
         self.event.logo = None
         self.event.logo_metadata = None
         flash(_('Logo deleted'), 'success')
-        logger.info("Logo of %s deleted by %s", self.event, session.user)
+        logger.info('Logo of %s deleted by %s', self.event, session.user)
         return jsonify_data(content=None)
 
 
@@ -206,7 +206,7 @@ class RHLayoutCSSDelete(RHLayoutBase):
         self.event.stylesheet_metadata = None
         layout_settings.set(self.event, 'use_custom_css', False)
         flash(_('CSS file deleted'), 'success')
-        logger.info("CSS file for %s deleted by %s", self.event, session.user)
+        logger.info('CSS file for %s deleted by %s', self.event, session.user)
         return jsonify_data(content=None)
 
 

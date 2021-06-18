@@ -24,19 +24,19 @@ def get_contrib_field_types():
 
 
 class ContribFieldConfigForm(IndicoForm):
-    title = StringField(_('Title'), [DataRequired()], description=_("The title of the field"))
-    description = TextAreaField(_('Description'), description=_("The description of the field"))
+    title = StringField(_('Title'), [DataRequired()], description=_('The title of the field'))
+    description = TextAreaField(_('Description'), description=_('The description of the field'))
     is_required = BooleanField(_('Required'), widget=SwitchWidget(),
-                               description=_("Whether the field has to be filled out"))
+                               description=_('Whether the field has to be filled out'))
     is_active = BooleanField(_('Active'), widget=SwitchWidget(),
-                             description=_("Whether the field is available."),
+                             description=_('Whether the field is available.'),
                              default=True)
     visibility = IndicoEnumRadioField(_('Visibility'), [DataRequired()], default=ContributionFieldVisibility.public,
                                       enum=ContributionFieldVisibility,
                                       description=_('Who will be able to see the field'))
     is_user_editable = BooleanField(_('User editable'), widget=SwitchWidget(),
-                                    description=_("Whether the submitter/author can fill out the field during abstract "
-                                                  "submission."),
+                                    description=_('Whether the submitter/author can fill out the field during abstract '
+                                                  'submission.'),
                                     default=True)
 
 

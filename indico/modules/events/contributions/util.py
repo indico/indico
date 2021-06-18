@@ -272,7 +272,7 @@ def import_contributions_from_csv(event, f):
         try:
             parsed_start_dt = event.tzinfo.localize(dateutil.parser.parse(start_dt)) if start_dt else None
         except ValueError:
-            raise UserValueError(_("Row {row}: can't parse date: \"{date}\"").format(row=num_row, date=start_dt))
+            raise UserValueError(_('Row {row}: can\'t parse date: "{date}"').format(row=num_row, date=start_dt))
 
         try:
             parsed_duration = timedelta(minutes=int(duration)) if duration else None
@@ -281,10 +281,10 @@ def import_contributions_from_csv(event, f):
                                                                                          duration=duration))
 
         if not title:
-            raise UserValueError(_("Row {}: contribution title is required").format(num_row))
+            raise UserValueError(_('Row {}: contribution title is required').format(num_row))
 
         if email and not validate_email(email):
-            raise UserValueError(_("Row {row}: invalid email address: {email}").format(row=num_row, email=email))
+            raise UserValueError(_('Row {row}: invalid email address: {email}').format(row=num_row, email=email))
 
         contrib_data.append({
             'start_dt': parsed_start_dt,

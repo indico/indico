@@ -517,7 +517,7 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
                 update_timetable_entry(self.entry, {'start_dt': new_start_dt})
         if is_session_block and self.entry.children:
             if new_end_dt < max(self.entry.children, key=attrgetter('end_dt')).end_dt:
-                raise UserValueError(_("Session block cannot be shortened this much because contributions contained "
+                raise UserValueError(_('Session block cannot be shortened this much because contributions contained '
                                        "wouldn't fit."))
         notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo, entry=self.entry)
         return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),

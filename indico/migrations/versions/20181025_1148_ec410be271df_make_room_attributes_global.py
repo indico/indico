@@ -32,7 +32,7 @@ def _make_names_unique():
         WHERE attr.location_id != %s
     ''', (default_location_id,))
     for row in res:
-        conflict = conn.execute("SELECT COUNT(*) FROM roombooking.room_attributes WHERE id != %s AND name = %s",
+        conflict = conn.execute('SELECT COUNT(*) FROM roombooking.room_attributes WHERE id != %s AND name = %s',
                                 (row.id, row.name)).scalar()
         if conflict:
             new_name = f'{row.name} ({row.location})'

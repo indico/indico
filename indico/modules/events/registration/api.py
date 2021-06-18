@@ -42,7 +42,7 @@ class RHAPIRegistrant(RH):
 
         invalid_fields = request.json.keys() - {'checked_in'}
         if invalid_fields:
-            raise BadRequest("Invalid fields: {}".format(', '.join(invalid_fields)))
+            raise BadRequest('Invalid fields: {}'.format(', '.join(invalid_fields)))
 
         if 'checked_in' in request.json:
             if self._registration.state not in (RegistrationState.complete, RegistrationState.unpaid):

@@ -77,7 +77,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
                          db.Index(None, 'event_id', 'track_id'),
                          db.Index(None, 'event_id', 'abstract_id'),
                          db.Index(None, 'abstract_id', unique=True, postgresql_where=db.text('NOT is_deleted')),
-                         db.CheckConstraint("session_block_id IS NULL OR session_id IS NOT NULL",
+                         db.CheckConstraint('session_block_id IS NULL OR session_id IS NOT NULL',
                                             'session_block_if_session'),
                          db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
                          db.ForeignKeyConstraint(['session_block_id', 'session_id'],
@@ -610,12 +610,12 @@ def _mapper_configured():
 
 @listens_for(Contribution.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
-    sql = """
+    sql = '''
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER INSERT OR UPDATE OF event_id, session_id, session_block_id, duration
         ON {}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('contribution');
-    """.format(target.fullname)
+    '''.format(target.fullname)
     DDL(sql).execute(conn)

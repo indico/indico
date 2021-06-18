@@ -273,15 +273,15 @@ def _offline_download_url(attachment):
     # Legacy offline download link generation
     if attachment.type == AttachmentType.file:
         if isinstance(attachment.folder.object, db.m.Event):
-            path = ""
+            path = ''
         elif isinstance(attachment.folder.object, db.m.Session):
-            path = f"{attachment.folder.session.friendly_id}-session"
+            path = f'{attachment.folder.session.friendly_id}-session'
         elif isinstance(attachment.folder.object, db.m.Contribution):
-            path = f"{attachment.folder.contribution.friendly_id}-contribution"
+            path = f'{attachment.folder.contribution.friendly_id}-contribution'
         elif isinstance(attachment.folder.object, db.m.SubContribution):
-            path = f"{attachment.folder.subcontribution.friendly_id}-subcontribution"
+            path = f'{attachment.folder.subcontribution.friendly_id}-subcontribution'
         else:
             return ''
-        return posixpath.join("material", path, str(attachment.id) + "-" + attachment.file.filename)
+        return posixpath.join('material', path, str(attachment.id) + '-' + attachment.file.filename)
     else:
         return attachment.link_url

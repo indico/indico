@@ -22,10 +22,10 @@ class WPStaticSites(WPEventManagement):
 
 class WPStaticEventBase:
     def _get_header(self):
-        return ""
+        return ''
 
     def _get_footer(self):
-        return ""
+        return ''
 
 
 class WPStaticSimpleEventDisplay(WPStaticEventBase, WPSimpleEventDisplay):

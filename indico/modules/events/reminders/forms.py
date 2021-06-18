@@ -23,8 +23,8 @@ class ReminderForm(IndicoForm):
 
     # Schedule
     schedule_type = IndicoRadioField(_('Type'), [DataRequired()],
-                                     choices=[('relative', _("Relative to the event start time")),
-                                              ('absolute', _("Fixed date/time")),
+                                     choices=[('relative', _('Relative to the event start time')),
+                                              ('absolute', _('Fixed date/time')),
                                               ('now', _('Send immediately'))])
     relative_delta = TimeDeltaField(_('Offset'), [HiddenUnless('schedule_type', 'relative'), DataRequired()])
     absolute_dt = IndicoDateTimeField(_('Date'), [HiddenUnless('schedule_type', 'absolute'), DataRequired(),

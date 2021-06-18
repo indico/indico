@@ -55,10 +55,10 @@ class PaperTeamsForm(IndicoForm):
 
 
 class PapersScheduleForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), [Optional()], default_time=time(0, 0),
-                                   description=_("The moment users can start submitting papers"))
-    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')], default_time=time(23, 59),
-                                 description=_("The moment the submission process ends"))
+    start_dt = IndicoDateTimeField(_('Start'), [Optional()], default_time=time(0, 0),
+                                   description=_('The moment users can start submitting papers'))
+    end_dt = IndicoDateTimeField(_('End'), [Optional(), LinkedDateTime('start_dt')], default_time=time(23, 59),
+                                 description=_('The moment the submission process ends'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -69,7 +69,7 @@ class BulkPaperJudgmentForm(IndicoForm):
     judgment = HiddenEnumField(enum=PaperAction)
     contribution_id = HiddenFieldList()
     submitted = HiddenField()
-    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter..."),
+    judgment_comment = TextAreaField(_('Comment'), render_kw={'placeholder': _('Leave a comment for the submitter...'),
                                                               'class': 'grow'})
 
     def __init__(self, *args, **kwargs):
@@ -84,16 +84,16 @@ class PaperReviewingSettingsForm(IndicoForm):
     """Settings form for paper reviewing."""
 
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
-    scale_lower = IntegerField(_("Scale (from)"), [InputRequired()])
-    scale_upper = IntegerField(_("Scale (to)"), [InputRequired()])
-    email_settings = PaperEmailSettingsField(_("Email notifications"))
+    scale_lower = IntegerField(_('Scale (from)'), [InputRequired()])
+    scale_upper = IntegerField(_('Scale (to)'), [InputRequired()])
+    email_settings = PaperEmailSettingsField(_('Email notifications'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.has_ratings = kwargs.pop('has_ratings', False)
         super().__init__(*args, **kwargs)
         if self.has_ratings:
-            self.scale_upper.warning = _("Changing the ratings scale will proportionally affect existing ratings.")
+            self.scale_upper.warning = _('Changing the ratings scale will proportionally affect existing ratings.')
 
     def validate_scale_upper(self, field):
         lower = self.scale_lower.data
@@ -107,7 +107,7 @@ class PaperReviewingSettingsForm(IndicoForm):
 
 
 class PaperSubmissionForm(IndicoForm):
-    files = FileField(_("Files"), [DataRequired()], multiple_files=True)
+    files = FileField(_('Files'), [DataRequired()], multiple_files=True)
 
 
 def _get_template_data(tpl):
@@ -120,9 +120,9 @@ def _get_template_data(tpl):
 
 
 class PaperTemplateForm(IndicoForm):
-    name = StringField(_("Name"), [DataRequired()])
-    description = TextAreaField(_("Description"))
-    template = EditableFileField(_("Template"), add_remove_links=False, added_only=True,
+    name = StringField(_('Name'), [DataRequired()])
+    description = TextAreaField(_('Description'))
+    template = EditableFileField(_('Template'), add_remove_links=False, added_only=True,
                                  get_metadata=_get_template_data)
 
     def __init__(self, *args, **kwargs):
@@ -133,8 +133,8 @@ class PaperTemplateForm(IndicoForm):
 
 
 class DeadlineForm(IndicoForm):
-    deadline = IndicoDateTimeField(_("Deadline"), [Optional()], default_time=time(23, 59))
-    enforce = BooleanField(_("Enforce deadline"), [HiddenUnless('deadline')], widget=SwitchWidget())
+    deadline = IndicoDateTimeField(_('Deadline'), [Optional()], default_time=time(23, 59))
+    enforce = BooleanField(_('Enforce deadline'), [HiddenUnless('deadline')], widget=SwitchWidget())
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

@@ -157,22 +157,22 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
         return ''
 
     chars = {
-        "#": r"\#",
-        "$": r"\$",
-        "%": r"\%",
-        "&": r"\&",
-        "~": r"\~{}",
-        "_": r"\_",
-        "^": r"\^{}",
-        "\\": r"\textbackslash{}",
-        "\x0c": "",
-        "\x0b": ""
+        '#': r'\#',
+        '$': r'\$',
+        '%': r'\%',
+        '&': r'\&',
+        '~': r'\~{}',
+        '_': r'\_',
+        '^': r'\^{}',
+        '\\': r'\textbackslash{}',
+        '\x0c': '',
+        '\x0b': ''
     }
 
     if not ignore_braces:
         chars.update({
-            "{": r"\{",
-            "}": r"\}"})
+            '{': r'\{',
+            '}': r'\}'})
 
     math_segments = []
 
@@ -195,7 +195,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
     if ignore_math:
         # Sanitize math-mode segments and put them back in place
         math_segments = list(map(sanitize_mathmode, math_segments))
-        res = re.sub(re.escape(math_placeholder), lambda _: "\\protect " + math_segments.pop(0), res)
+        res = re.sub(re.escape(math_placeholder), lambda _: '\\protect ' + math_segments.pop(0), res)
 
     return res
 
@@ -234,10 +234,10 @@ def latex_render_error(message):
     :param message: The error message
     :returns: LaTeX code for error box
     """
-    return textwrap.dedent(r"""
+    return textwrap.dedent(r'''
        \begin{tcolorbox}[width=\textwidth,colback=red!5!white,colframe=red!75!black,title={Indico rendering error}]
           \begin{verbatim}%s\end{verbatim}
-       \end{tcolorbox}""" % latex_escape(message))
+       \end{tcolorbox}''' % latex_escape(message))
 
 
 def latex_render_image(src, alt, tmpdir, strict=False):
@@ -257,20 +257,20 @@ def latex_render_image(src, alt, tmpdir, strict=False):
     """
     try:
         if urlparse(src).scheme not in ('http', 'https'):
-            raise ImageURLException(f"URL scheme not supported: {src}")
+            raise ImageURLException(f'URL scheme not supported: {src}')
         else:
             try:
                 resp = requests.get(src, verify=False, timeout=5)
             except InvalidURL:
                 raise ImageURLException(f"Cannot understand URL '{src}'")
             except (requests.Timeout, ConnectionError):
-                raise ImageURLException(f"Problem downloading image ({src})")
+                raise ImageURLException(f'Problem downloading image ({src})')
             except requests.TooManyRedirects:
-                raise ImageURLException(f"Too many redirects downloading image ({src})")
+                raise ImageURLException(f'Too many redirects downloading image ({src})')
             extension = None
 
             if resp.status_code != 200:
-                raise ImageURLException(f"[{resp.status_code}] Error fetching image")
+                raise ImageURLException(f'[{resp.status_code}] Error fetching image')
 
             if resp.headers.get('content-type'):
                 extension = guess_extension(resp.headers['content-type'])
@@ -284,7 +284,7 @@ def latex_render_image(src, alt, tmpdir, strict=False):
                     # Worst case scenario, assume it's PNG
                     extension = IMAGE_FORMAT_EXTENSIONS.get(image.format, '.png')
                 except OSError:
-                    raise ImageURLException("Cannot read image data. Maybe not an image file?")
+                    raise ImageURLException('Cannot read image data. Maybe not an image file?')
             with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, dir=tmpdir, delete=False) as tempfile:
                 tempfile.write(resp.content)
     except ImageURLException as exc:
@@ -294,13 +294,13 @@ def latex_render_image(src, alt, tmpdir, strict=False):
             return latex_render_error(f'Could not include image: {exc}'), None
 
     # Using graphicx and ajustbox package for *max width*
-    return (textwrap.dedent(r"""
+    return (textwrap.dedent(r'''
         \begin{figure}[H]
           \centering
           \includegraphics[max width=\linewidth]{%s}
           \caption{%s}
         \end{figure}
-        """ % (os.path.basename(tempfile.name), latex_escape(alt))), tempfile.name)
+        ''' % (os.path.basename(tempfile.name), latex_escape(alt))), tempfile.name)
 
 
 def makeExtension(configs=None):
@@ -362,8 +362,8 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         doc.text = latex_text
 
     def tolatex(self, ournode):
-        buffer = ""
-        subcontent = ""
+        buffer = ''
+        subcontent = ''
 
         if ournode.text:
             subcontent += escape_latex_entities(ournode.text)
@@ -383,35 +383,35 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
             buffer += r'\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}'
         elif ournode.tag == 'ul':
             # no need for leading \n as one will be provided by li
-            buffer += """
+            buffer += '''
 \\begin{itemize}%s
 \\end{itemize}
-""" % subcontent
+''' % subcontent
         elif ournode.tag == 'ol':
             # no need for leading \n as one will be provided by li
-            buffer += """
+            buffer += '''
 \\begin{enumerate}%s
 \\end{enumerate}
-""" % subcontent
+''' % subcontent
         elif ournode.tag == 'li':
-            buffer += """
-  \\item %s""" % subcontent.strip()
+            buffer += '''
+  \\item %s''' % subcontent.strip()
         elif ournode.tag == 'blockquote':
             # use quotation rather than quote as quotation can support multiple
             # paragraphs
-            buffer += """
+            buffer += '''
 \\begin{quotation}
 %s
 \\end{quotation}
-""" % subcontent.strip()
+''' % subcontent.strip()
         # ignore 'code' when inside pre tags
         # (mkdn produces <pre><code></code></pre>)
         elif (ournode.tag == 'pre' or (ournode.tag == 'pre' and ournode.parentNode.tag != 'pre')):
-            buffer += """
+            buffer += '''
 \\begin{verbatim}
 %s
 \\end{verbatim}
-""" % subcontent.strip()
+''' % subcontent.strip()
         elif ournode.tag == 'q':
             buffer += "`%s'" % subcontent.strip()
         elif ournode.tag == 'p':
@@ -489,7 +489,7 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
 class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
     def run(self, instr):
         new_blocks = [re.sub(r'<a[^>]*>([^<]+)</a>', lambda m: convert_link_to_latex(m.group(0)).strip(), block)
-                      for block in instr.split("\n\n")]
+                      for block in instr.split('\n\n')]
         return '\n\n'.join(new_blocks)
 
 

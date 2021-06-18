@@ -23,15 +23,15 @@ attachment_access_override_warning = _('Do you really want to grant everyone wit
 class IPNetworkGroupForm(IndicoForm):
     """Form to create or edit an IPNetworkGroup."""
 
-    name = StringField(_("Name"), [DataRequired()])
-    description = TextAreaField(_("Description"))
-    networks = MultiIPNetworkField(_('Subnets'), description=_("IPv4 or IPv6 subnets in CIDR notation"))
+    name = StringField(_('Name'), [DataRequired()])
+    description = TextAreaField(_('Description'))
+    networks = MultiIPNetworkField(_('Subnets'), description=_('IPv4 or IPv6 subnets in CIDR notation'))
     hidden = BooleanField(_('Hidden'), widget=SwitchWidget(),
-                          description=_("Hidden IP networks cannot be added to ACLs by users"))
+                          description=_('Hidden IP networks cannot be added to ACLs by users'))
     attachment_access_override = BooleanField(_('Full attachment access'),
                                               widget=SwitchWidget(confirm_enable=attachment_access_override_warning),
-                                              description=_("If enabled, these IPs have unrestricted access to all "
-                                                            "attachments without having to be logged in."))
+                                              description=_('If enabled, these IPs have unrestricted access to all '
+                                                            'attachments without having to be logged in.'))
 
     def __init__(self, *args, **kwargs):
         self._network_group_id = kwargs['obj'].id if 'obj' in kwargs else None
@@ -42,4 +42,4 @@ class IPNetworkGroupForm(IndicoForm):
         if self._network_group_id is not None:
             query = query.filter(IPNetworkGroup.id != self._network_group_id)
         if query.has_rows():
-            raise ValueError(_("An IP network with this name already exists."))
+            raise ValueError(_('An IP network with this name already exists.'))

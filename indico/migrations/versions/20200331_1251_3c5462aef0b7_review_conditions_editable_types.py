@@ -16,20 +16,20 @@ depends_on = None
 
 
 def upgrade():
-    op.execute("""
+    op.execute('''
         UPDATE events.settings
         SET name = 'paper_review_conditions'
         WHERE module = 'editing' AND name = 'review_conditions'
-    """)
+    ''')
 
 
 def downgrade():
-    op.execute("""
+    op.execute('''
         UPDATE events.settings
         SET name = 'review_conditions'
         WHERE module = 'editing' AND name = 'paper_review_conditions'
-    """)
-    op.execute("""
+    ''')
+    op.execute('''
         DELETE FROM events.settings
         WHERE module = 'editing' AND name IN ('slides_review_conditions', 'poster_review_conditions')
-    """)
+    ''')

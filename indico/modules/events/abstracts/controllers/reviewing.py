@@ -93,7 +93,7 @@ class RHResetAbstractState(RHAbstractBase):
     def _process(self):
         if self.abstract.state != AbstractState.submitted:
             reset_abstract_state(self.abstract)
-            flash(_("Abstract judgment has been reset"), 'success')
+            flash(_('Abstract judgment has been reset'), 'success')
         return jsonify_data(html=render_abstract_page(self.abstract, management=self.management))
 
 
@@ -104,7 +104,7 @@ class RHWithdrawAbstract(RHAbstractBase):
     def _process(self):
         if self.abstract.state != AbstractState.withdrawn:
             withdraw_abstract(self.abstract)
-            flash(_("Abstract has been withdrawn"), 'success')
+            flash(_('Abstract has been withdrawn'), 'success')
         return jsonify_data(html=render_abstract_page(self.abstract, management=self.management))
 
 

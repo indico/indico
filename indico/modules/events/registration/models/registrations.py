@@ -497,7 +497,7 @@ class Registration(db.Model):
         action occured and ``False`` that it was reverted.
         """
         if sum(action is not None for action in (approved, paid, rejected, withdrawn)) > 1:
-            raise Exception("More than one action specified")
+            raise Exception('More than one action specified')
         initial_state = self.state
         regform = self.registration_form
         invitation = self.invitation

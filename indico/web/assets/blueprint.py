@@ -108,7 +108,7 @@ def _get_i18n_locale(locale_name, react=False):
         if i18n_data is None:
             raise NotFound
         with open(cache_file, 'w') as f:
-            f.write("window.{} = {};".format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
+            f.write('window.{} = {};'.format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
 
     return send_file(f'{locale_name}{react_suffix}.js', cache_file, mimetype='application/javascript',
                      conditional=True)

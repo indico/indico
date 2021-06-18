@@ -40,7 +40,7 @@ def create_session_block(session_, data):
                        'Session block "{}" for session "{}" has been created'
                        .format(block.title, session_.title), session.user,
                        meta={'session_block_id': block.id})
-    logger.info("Session block %s created by %s", block, session.user)
+    logger.info('Session block %s created by %s', block, session.user)
     return block
 
 

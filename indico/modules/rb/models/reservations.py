@@ -585,13 +585,13 @@ class Reservation(Serializer, db.Model):
         repetition_fields = {'repeat_frequency', 'repeat_interval'}
         # pretty names for logging
         field_names = {
-            'start_dt/date': "start date",
-            'end_dt/date': "end date",
-            'start_dt/time': "start time",
-            'end_dt/time': "end time",
-            'repetition': "booking type",
+            'start_dt/date': 'start date',
+            'end_dt/date': 'end date',
+            'start_dt/time': 'start time',
+            'end_dt/time': 'end time',
+            'repetition': 'booking type',
             'booked_for_user': "'Booked for' user",
-            'booking_reason': "booking reason",
+            'booking_reason': 'booking reason',
         }
 
         self.room.check_advance_days(data['end_dt'].date(), user)
@@ -647,7 +647,7 @@ class Reservation(Serializer, db.Model):
             if not old:
                 log.append(f"The {field_title} was set to '{new}'")
             elif not new:
-                log.append(f"The {field_title} was cleared")
+                log.append(f'The {field_title} was cleared')
             else:
                 log.append(f"The {field_title} was changed from '{old}' to '{new}'")
 

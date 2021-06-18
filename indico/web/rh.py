@@ -211,7 +211,7 @@ class RH:
             token = next((v for k, v in request.form.items() if k.endswith('-csrf_token')), None)
         if self.CSRF_ENABLED and request.method != 'GET' and token != session.csrf_token:
             msg = _("It looks like there was a problem with your current session. Please use your browser's back "
-                    "button, reload the page and try again.")
+                    'button, reload the page and try again.')
             raise BadRequest(msg)
 
     def _check_event_feature(self):

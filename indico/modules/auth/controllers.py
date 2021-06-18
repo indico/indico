@@ -250,7 +250,7 @@ class RHRegister(RH):
         if verified_email is not None:
             handler.email_verified(verified_email)
             if prevalidated:
-                flash(_("You may change your email address after finishing the registration process."), 'info')
+                flash(_('You may change your email address after finishing the registration process.'), 'info')
             else:
                 flash(_('You have successfully validated your email address and can now proceed with the '
                         'registration.'), 'success')
@@ -278,8 +278,8 @@ class RHRegister(RH):
                 if value and not field.data:
                     field.data = value
         if pending:
-            flash(_("There is already some information in Indico that concerns you. "
-                    "We are going to link it automatically."), 'info')
+            flash(_('There is already some information in Indico that concerns you. '
+                    'We are going to link it automatically.'), 'info')
         return WPAuth.render_template('register.html', form=form, local=(not self.identity_info),
                                       must_verify_email=handler.must_verify_email, widget_attrs=handler.widget_attrs,
                                       email_sent=session.pop('register_verification_email_sent', False),
@@ -342,7 +342,7 @@ class RHAccounts(RHUserBase):
         identity = Identity(provider='indico', identifier=form.data['username'], password=form.data['password'])
         self.user.identities.add(identity)
         logger.info('User %s added a local account (%s)', self.user, identity.identifier)
-        flash(_("Local account added successfully"), 'success')
+        flash(_('Local account added successfully'), 'success')
 
     def _handle_edit_local_account(self, form):
         self.user.local_identity.identifier = form.data['username']
@@ -350,7 +350,7 @@ class RHAccounts(RHUserBase):
             self.user.local_identity.password = form.data['new_password']
             session.pop('insecure_password_error', None)
             logger.info('User %s (%s) changed their password', self.user, self.user.local_identity.identifier)
-        flash(_("Your local account credentials have been updated successfully"), 'success')
+        flash(_('Your local account credentials have been updated successfully'), 'success')
 
     def _process(self):
         insecure_login_password_error = session.get('insecure_password_error')
@@ -387,7 +387,7 @@ class RHRemoveAccount(RHUserBase):
             provider_title = multipass.identity_providers[self.identity.provider].title
         except KeyError:
             provider_title = self.identity.provider.title()
-        flash(_("{provider} ({identifier}) successfully removed from your accounts"
+        flash(_('{provider} ({identifier}) successfully removed from your accounts'
               .format(provider=provider_title, identifier=self.identity.identifier)), 'success')
         return redirect(url_for('.accounts'))
 
@@ -603,7 +603,7 @@ class RHResetPassword(RH):
         form = ResetPasswordForm()
         if form.validate_on_submit():
             identity.password = form.password.data
-            flash(_("Your password has been changed successfully."), 'success')
+            flash(_('Your password has been changed successfully.'), 'success')
             login_user(identity.user, identity)
             logger.info('Password reset confirmed for user %s', identity.user)
             # We usually come here from a multipass login page so we should have a target url

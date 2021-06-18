@@ -74,8 +74,8 @@ class EmailBackend(BaseEmailBackend):
         )
         if self.use_ssl and self.use_tls:
             raise ValueError(
-                "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
-                "one of those settings to True."
+                'EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set '
+                'one of those settings to True.'
             )
         self.connection = None
         self._lock = threading.RLock()

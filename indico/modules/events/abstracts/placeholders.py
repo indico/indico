@@ -23,7 +23,7 @@ __all__ = ('EventTitlePlaceholder', 'EventURLPlaceholder', 'AbstractIDPlaceholde
 
 class EventTitlePlaceholder(Placeholder):
     name = 'event_title'
-    description = _("The title of the event")
+    description = _('The title of the event')
 
     @classmethod
     def render(cls, abstract):
@@ -32,7 +32,7 @@ class EventTitlePlaceholder(Placeholder):
 
 class EventURLPlaceholder(Placeholder):
     name = 'event_url'
-    description = _("The URL of the event")
+    description = _('The URL of the event')
 
     @classmethod
     def render(cls, abstract):
@@ -41,7 +41,7 @@ class EventURLPlaceholder(Placeholder):
 
 class AbstractIDPlaceholder(Placeholder):
     name = 'abstract_id'
-    description = _("The ID of the abstract")
+    description = _('The ID of the abstract')
 
     @classmethod
     def render(cls, abstract):
@@ -50,7 +50,7 @@ class AbstractIDPlaceholder(Placeholder):
 
 class AbstractTitlePlaceholder(Placeholder):
     name = 'abstract_title'
-    description = _("The title of the abstract")
+    description = _('The title of the abstract')
 
     @classmethod
     def render(cls, abstract):
@@ -60,7 +60,7 @@ class AbstractTitlePlaceholder(Placeholder):
 class AbstractURLPlaceholder(Placeholder):
     advanced = True
     name = 'abstract_url'
-    description = _("The direct URL of the abstract")
+    description = _('The direct URL of the abstract')
 
     @classmethod
     def render(cls, abstract):
@@ -69,7 +69,7 @@ class AbstractURLPlaceholder(Placeholder):
 
 class AbstractInvitationURLPlaceholder(Placeholder):
     name = 'invitation_url'
-    description = _("The link to submit an invited abstract")
+    description = _('The link to submit an invited abstract')
 
     @classmethod
     def render(cls, abstract):
@@ -78,7 +78,7 @@ class AbstractInvitationURLPlaceholder(Placeholder):
 
 class AbstractTrackPlaceholder(Placeholder):
     name = 'abstract_track'
-    description = _("The name of the destination track")
+    description = _('The name of the destination track')
 
     @classmethod
     def render(cls, abstract):
@@ -89,7 +89,7 @@ class AbstractTrackPlaceholder(Placeholder):
 
 class AbstractSessionPlaceholder(Placeholder):
     name = 'abstract_session'
-    description = _("The name of the destination session")
+    description = _('The name of the destination session')
 
     @classmethod
     def render(cls, abstract):
@@ -100,7 +100,7 @@ class AbstractSessionPlaceholder(Placeholder):
 
 class ContributionTypePlaceholder(Placeholder):
     name = 'contribution_type'
-    description = _("The contribution type that is associated to the abstract")
+    description = _('The contribution type that is associated to the abstract')
 
     @classmethod
     def render(cls, abstract):
@@ -183,7 +183,7 @@ class ContributionURLPlaceholder(Placeholder):
 
 class TargetAbstractIDPlaceholder(Placeholder):
     name = 'target_abstract_id'
-    description = _("The ID of the target abstract (merge or duplicate)")
+    description = _('The ID of the target abstract (merge or duplicate)')
 
     @classmethod
     def render(cls, abstract):
@@ -193,7 +193,7 @@ class TargetAbstractIDPlaceholder(Placeholder):
 
 class TargetAbstractTitlePlaceholder(Placeholder):
     name = 'target_abstract_title'
-    description = _("The title of the target abstract (merge or duplicate)")
+    description = _('The title of the target abstract (merge or duplicate)')
 
     @classmethod
     def render(cls, abstract):

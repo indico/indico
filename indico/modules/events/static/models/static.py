@@ -18,7 +18,7 @@ from indico.util.string import format_repr, strict_str
 
 
 class StaticSiteState(RichIntEnum):
-    __titles__ = [_("Pending"), _("Running"), _("Success"), _("Failed"), _("Expired")]
+    __titles__ = [_('Pending'), _('Running'), _('Success'), _('Failed'), _('Expired')]
     pending = 0
     running = 1
     success = 2

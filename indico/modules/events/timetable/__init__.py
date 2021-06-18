@@ -28,7 +28,7 @@ def _extend_event_menu(sender, **kwargs):
     def _visible_timetable(event):
         return contribution_settings.get(event, 'published')
 
-    yield MenuEntryData(title=_("Timetable"), name='timetable', endpoint='timetable.timetable', position=3,
+    yield MenuEntryData(title=_('Timetable'), name='timetable', endpoint='timetable.timetable', position=3,
                         visible=_visible_timetable, static_site=True)
 
 

@@ -19,8 +19,8 @@ class TextConfigForm:
     max_length = IntegerField(_('Max length'), [Optional(), NumberRange(min=1)])
     max_words = IntegerField(_('Max words'), [Optional(), NumberRange(min=1)])
     multiline = BooleanField(_('Multiline'), widget=SwitchWidget(),
-                             description=_("If the field should be rendered as a textarea instead of a single-line "
-                                           "text field."))
+                             description=_('If the field should be rendered as a textarea instead of a single-line '
+                                           'text field.'))
 
 
 class TextField:

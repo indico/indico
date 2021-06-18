@@ -231,11 +231,11 @@ class InvitationMixin:
         try:
             UUID(hex=token)
         except ValueError:
-            flash(_("Your invitation code is not valid."), 'warning')
+            flash(_('Your invitation code is not valid.'), 'warning')
             return
         self.invitation = RegistrationInvitation.query.filter_by(uuid=token).with_parent(self.regform).first()
         if self.invitation is None:
-            flash(_("This invitation does not exist or has been withdrawn."), 'warning')
+            flash(_('This invitation does not exist or has been withdrawn.'), 'warning')
 
 
 class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
@@ -332,12 +332,12 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
         RHRegistrationFormRegistrationBase._process_args(self)
         if self.registration is None:
             if session.user:
-                flash(_("We could not find a registration for you.  If have already registered, please use the "
-                        "direct access link from the email you received after registering."), 'warning')
+                flash(_('We could not find a registration for you.  If have already registered, please use the '
+                        'direct access link from the email you received after registering.'), 'warning')
             else:
-                flash(_("We could not find a registration for you.  If have already registered, please use the "
-                        "direct access link from the email you received after registering or log in to your Indico "
-                        "account."), 'warning')
+                flash(_('We could not find a registration for you.  If have already registered, please use the '
+                        'direct access link from the email you received after registering or log in to your Indico '
+                        'account.'), 'warning')
             return redirect(url_for('.display_regform', self.regform))
 
     @property
@@ -371,7 +371,7 @@ class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBas
     def _process(self):
         if self.invitation.state == InvitationState.pending:
             self.invitation.state = InvitationState.declined
-            flash(_("You declined the invitation to register."))
+            flash(_('You declined the invitation to register.'))
         return redirect(self.event.url)
 
 

@@ -19,7 +19,7 @@ class TestCondition(Condition):
 
 class ActionCondition(TestCondition):
     name = 'action'
-    description = "The action performed"
+    description = 'The action performed'
     required = True
 
     @classmethod
@@ -33,7 +33,7 @@ class ActionCondition(TestCondition):
 
 class FooCondition(TestCondition):
     name = 'foo'
-    description = "The foo value"
+    description = 'The foo value'
     required = False
 
     @classmethod
@@ -51,7 +51,7 @@ class FooCondition(TestCondition):
 
 class BarCondition(TestCondition):
     name = 'bar'
-    description = "The bar value"
+    description = 'The bar value'
     required = False
 
     @classmethod

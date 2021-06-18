@@ -192,7 +192,7 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
         assert event == ev
         assert module == 'Abstracts'
         assert email['subject'] == '[Indico] Abstract Acceptance notification (#314)'
-        assert_text_equal(email['body'], """
+        assert_text_equal(email['body'], '''
             Dear Guinea Pig,
 
             We're pleased to announce that your abstract "Broken Symmetry and the Mass of Gauge Vector Mesons" with ID
@@ -216,7 +216,7 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
             --
             Indico :: Call for Abstracts
             http://localhost/event/{event.id}/
-        """.format(event=ev))
+        '''.format(event=ev))
 
     ev, abstract, track, contrib_type = abstract_objects
     monkeypatch.setattr('indico.modules.events.abstracts.notifications.send_email', _mock_send_email)

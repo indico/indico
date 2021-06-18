@@ -127,7 +127,7 @@ def fit_session_block_entry(entry, log=True):
     db.session.flush()
     if log:
         entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
-                        "Session block fitted to contents", session.user,
+                        'Session block fitted to contents', session.user,
                         data={'Session block': entry.session_block.full_title})
 
 
@@ -141,7 +141,7 @@ def move_timetable_entry(entry, parent=None, day=None):
                         top-level timetable on this day
     """
     if bool(parent) + bool(day) != 1:
-        raise TypeError("Wrong number of arguments")
+        raise TypeError('Wrong number of arguments')
 
     from indico.modules.events.contributions.operations import update_contribution
 

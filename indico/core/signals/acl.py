@@ -11,7 +11,7 @@ from blinker import Namespace
 _signals = Namespace()
 
 
-can_access = _signals.signal('can-access', """
+can_access = _signals.signal('can-access', '''
 Called when `ProtectionMixin.can_access` is used to determine if a
 user can access something or not.
 
@@ -29,10 +29,10 @@ access check is likely to be cheaper (due to ACLs being preloaded etc).
 If the signal returns ``True`` or ``False``, the access check succeeds
 or fails immediately.  If multiple subscribers to the signal return
 contradictory results, ``False`` wins and access is denied.
-""")
+''')
 
 
-can_manage = _signals.signal('can-manage', """
+can_manage = _signals.signal('can-manage', '''
 Called when `ProtectionMixin.can_manage` is used to determine if a
 user can manage something or not.
 
@@ -45,10 +45,10 @@ If the signal returns ``True`` or ``False``, the access check succeeds
 or fails without any further checks.  If multiple subscribers to the
 signal return contradictory results, ``False`` wins and access is
 denied.
-""")
+''')
 
 
-entry_changed = _signals.signal('entry-changed', """
+entry_changed = _signals.signal('entry-changed', '''
 Called when an ACL entry is changed.
 
 The `sender` is the type of the object that's using the mixin.  The
@@ -62,22 +62,22 @@ sending emails related to the change.
 
 If the ACL uses permissions, `old_data` will contain a dictionary of the
 previous permissions (see `PrincipalPermissionsMixin.current_data`).
-""")
+''')
 
 
-protection_changed = _signals.signal('protection-changed', """
+protection_changed = _signals.signal('protection-changed', '''
 Called when the protection mode of an object is changed.
 
 The `sender` is the type of the object that's using the mixin.  The
 actual instance is passed as `obj`.  The old protection mode is passed
 as `old_mode`, the new mode as `mode`.
-""")
+''')
 
 
-get_management_permissions = _signals.signal('get-management-permissions', """
+get_management_permissions = _signals.signal('get-management-permissions', '''
 Expected to return `ManagementPermission` subclasses.  The `sender` is the
 type of the object the permissions may be used for.  Functions subscribing
 to this signal **MUST** check the sender by specifying it using the
 first argument of `connect_via()` or by comparing it inside the
 function.
-""")
+''')

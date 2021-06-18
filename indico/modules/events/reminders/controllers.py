@@ -56,7 +56,7 @@ class RHDeleteReminder(RHSpecificReminderBase):
         else:
             db.session.delete(self.reminder)
             logger.info('Reminder deleted by %s: %s', session.user, self.reminder)
-            flash(_("The reminder at {} has been deleted.")
+            flash(_('The reminder at {} has been deleted.')
                   .format(format_datetime(self.reminder.scheduled_dt)), 'success')
         return redirect(url_for('.list', self.event))
 
@@ -86,14 +86,14 @@ class RHEditReminder(RHSpecificReminderBase):
         form = ReminderForm(obj=self._get_defaults(), event=self.event)
         if form.validate_on_submit():
             if reminder.is_sent:
-                flash(_("This reminder has already been sent and cannot be modified anymore."), 'error')
+                flash(_('This reminder has already been sent and cannot be modified anymore.'), 'error')
                 return redirect(url_for('.edit', reminder))
             form.populate_obj(reminder, existing_only=True)
             if form.schedule_type.data == 'now':
                 _send_reminder(reminder)
             else:
                 logger.info('Reminder modified by %s: %s', session.user, reminder)
-                flash(_("The reminder at {} has been modified.")
+                flash(_('The reminder at {} has been modified.')
                       .format(format_datetime(reminder.scheduled_dt)), 'success')
             return jsonify_data(flash=False)
 
@@ -115,7 +115,7 @@ class RHAddReminder(RHRemindersBase):
                 _send_reminder(reminder)
             else:
                 logger.info('Reminder created by %s: %s', session.user, reminder)
-                flash(_("A reminder at {} has been created.")
+                flash(_('A reminder at {} has been created.')
                       .format(format_datetime(reminder.scheduled_dt)), 'success')
             return jsonify_data(flash=False)
 

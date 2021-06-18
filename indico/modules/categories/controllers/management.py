@@ -106,7 +106,7 @@ class RHManageCategorySettings(RHManageCategoryBase):
                 'meeting': form.meeting_theme.data,
                 'lecture': form.lecture_theme.data
             }
-            flash(_("Category settings saved!"), 'success')
+            flash(_('Category settings saved!'), 'success')
             return redirect(url_for('.manage_settings', self.category))
         else:
             if self.category.icon_metadata:
@@ -161,7 +161,7 @@ class RHCategoryImageUploadBase(RHManageCategoryBase):
     def _process_DELETE(self):
         self._set_image(None, None)
         flash(self.DELETED_FLASH_MSG, 'success')
-        logger.info(f"{self.IMAGE_TYPE.title()} of %s deleted by %s", self.category, session.user)
+        logger.info(f'{self.IMAGE_TYPE.title()} of %s deleted by %s', self.category, session.user)
         return jsonify_data(content=None)
 
 
@@ -267,7 +267,7 @@ class RHMoveCategoryBase(RHManageCategoryBase):
         else:
             self.target_category = Category.get_or_404(int(target_category_id), is_deleted=False)
             if not self.target_category.can_manage(session.user):
-                raise Forbidden(_("You are not allowed to manage the selected destination."))
+                raise Forbidden(_('You are not allowed to manage the selected destination.'))
 
 
 class RHMoveCategory(RHMoveCategoryBase):
@@ -276,12 +276,12 @@ class RHMoveCategory(RHMoveCategoryBase):
     def _process_args(self):
         RHMoveCategoryBase._process_args(self)
         if self.category.is_root:
-            raise BadRequest(_("Cannot move the root category."))
+            raise BadRequest(_('Cannot move the root category.'))
         if self.target_category is not None:
             if self.target_category == self.category:
-                raise BadRequest(_("Cannot move the category inside itself."))
+                raise BadRequest(_('Cannot move the category inside itself.'))
             if self.target_category.parent_chain_query.filter(Category.id == self.category.id).count():
-                raise BadRequest(_("Cannot move the category in a descendant of itself."))
+                raise BadRequest(_('Cannot move the category in a descendant of itself.'))
 
     def _process(self):
         move_category(self.category, self.target_category)
@@ -322,9 +322,9 @@ class RHMoveSubcategories(RHMoveCategoryBase):
                               .all())
         if self.target_category is not None:
             if self.target_category.id in subcategory_ids:
-                raise BadRequest(_("Cannot move a category inside itself."))
+                raise BadRequest(_('Cannot move a category inside itself.'))
             if self.target_category.parent_chain_query.filter(Category.id.in_(subcategory_ids)).count():
-                raise BadRequest(_("Cannot move a category in a descendant of itself."))
+                raise BadRequest(_('Cannot move a category in a descendant of itself.'))
 
     def _process(self):
         for subcategory in self.subcategories:
@@ -410,7 +410,7 @@ class RHMoveEvents(RHManageCategorySelectedEventsBase):
         RHManageCategorySelectedEventsBase._process_args(self)
         self.target_category = Category.get_or_404(int(request.form['target_category_id']), is_deleted=False)
         if not self.target_category.can_create_events(session.user):
-            raise Forbidden(_("You may only move events to categories where you are allowed to create events."))
+            raise Forbidden(_('You may only move events to categories where you are allowed to create events.'))
 
     def _process(self):
         for event in self.events:

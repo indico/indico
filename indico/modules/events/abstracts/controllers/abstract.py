@@ -54,7 +54,7 @@ class RHEditAbstract(RHAbstractBase):
         if form.validate_on_submit():
             fields, custom_fields = get_field_values(form.data)
             update_abstract(self.abstract, fields, custom_fields)
-            flash(_("Abstract modified successfully"), 'success')
+            flash(_('Abstract modified successfully'), 'success')
             return jsonify_data(flash=False)
         self.commit = False
         disabled_fields = ('submitted_for_tracks',) if form.track_field_disabled else ()
