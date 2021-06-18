@@ -20,7 +20,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat, UserTitle
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
-from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField, PrincipalListField
+from indico.web.forms.fields import IndicoEnumSelectField, MultiStringField, PrincipalField, PrincipalListField
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, used_if_not_synced
 from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
@@ -109,6 +109,10 @@ class AdminUserSettingsForm(IndicoForm):
     notify_account_creation = BooleanField(_('Registration notifications'), widget=SwitchWidget(),
                                            description=_('Send an email to all administrators whenever someone '
                                                          'registers a new local account.'))
+    email_blacklist = MultiStringField(_('Email blacklist'), field=('email_blacklist', _('email')),
+                                       unique=True, flat=True,
+                                       description=_('Prevent users from creating Indico accounts with these email '
+                                                     'addresses. Supports wildcards, e.g. *@gmail.com'))
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):
