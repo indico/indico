@@ -80,6 +80,8 @@ Bugfixes
 - Correctly count line breaks in length-limited abstracts (:pr:`4918`)
 - Fix error when trying to access subcontributions while event is in draft mode
 - Update the user link in registrations when merging two users (:pr:`4936`)
+- Fix error when exporting a conference timetable PDF with the option "Print abstract content of all
+  contributions" and one of the abstracts is too big to fit in a page (:issue:`4881`, :pr:`4955`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
