@@ -13,6 +13,7 @@ from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.search.base import SearchTarget
 from indico.modules.users.models.users import User
@@ -92,6 +93,25 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
     category_id = fields.Int(attribute='event.category_id')
     category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
     url = fields.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=False))
+    duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
+
+
+class SubContributionSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = SubContribution
+        fields = ('subcontribution_id', 'type', 'title', 'description', 'event_id', 'contribution_id', 'persons',
+                  'location', 'url', 'category_id', 'category_path', 'start_dt', 'end_dt', 'duration')
+
+    subcontribution_id = fields.Int(attribute='id')
+    type = fields.Constant(SearchTarget.subcontribution.name)
+    event_id = fields.Int(attribute='contribution.event_id')
+    persons = NoneRemovingList(fields.Nested(PersonSchema), attribute='person_links')
+    location = fields.Function(lambda subc: LocationSchema().dump(subc.contribution))
+    category_id = fields.Int(attribute='event.category_id')
+    category_path = fields.List(fields.Nested(CategorySchema), attribute='event.detailed_category_chain')
+    url = fields.Function(lambda subc: url_for('contributions.display_subcontribution', subc, _external=False))
+    start_dt = fields.DateTime(attribute='contribution.start_dt')
+    end_dt = fields.DateTime(attribute='contribution.end_dt')
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
 
 
