@@ -374,12 +374,8 @@ class TimeTablePlain(PDFWithTOC):
         elif self._ttPDFFormat.showLengthContribs():
             caption = f'{caption} ({format_human_timedelta(contrib.timetable_entry.duration)})'
 
-        color_cell = ''
         caption = f'<font size="{str(modifiedFontSize(10, self._fontsize))}">{caption}</font>'
         lt.append([self._fontify(caption, 10)])
-
-        if self._useColors():
-            color_cell = ' '
 
         caption = Table(lt, colWidths=None, style=self._tsSpk)
         speaker_list = [[Paragraph(escape(self._get_speaker_name(spk)), self._styles['table_body'])]
@@ -387,8 +383,8 @@ class TimeTablePlain(PDFWithTOC):
         if not speaker_list:
             speaker_list = [['']]
         speakers = Table(speaker_list, style=self._tsSpk)
-        if color_cell:
-            l.append([color_cell, date, caption, speakers])
+        if self._useColors():
+            l.append([' ', date, caption, speakers])
         else:
             l.append([date, caption, speakers])
 
@@ -412,8 +408,8 @@ class TimeTablePlain(PDFWithTOC):
 
             caption = Table(lt, colWidths=None, style=self._tsSpk)
             speakers = Table(speaker_list, style=self._tsSpk)
-            if color_cell:
-                l.append([color_cell, '', caption, speakers])
+            if self._useColors():
+                l.append([' ', '', caption, speakers])
             else:
                 l.append(['', caption, speakers])
 
