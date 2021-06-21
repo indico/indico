@@ -663,43 +663,62 @@ class TimeTablePlain(PDFWithTOC):
                         res.append(PageBreak())
         return res
 
-    def _print_contribution_with_abstract(self, res, contribution, sess_block):
-        title_list = [contribution.title]
-        if self._ttPDFFormat.showContribId():
-            title_list.insert(0, f'[{contribution.friendly_id}] ')
-        if sess_block.session.is_poster and contribution.board_number:
-            title_list.append(f' (board {contribution.board_number})')
-        if hasattr(contribution, 'start_dt'):
-            title_list.append(f' ({format_time(contribution.start_dt, timezone=self._tz)}')
-            if self._ttPDFFormat.showLengthContribs():
-                title_list.append(f', {format_human_timedelta(contribution.timetable_entry.duration)})')
-            else:
-                title_list.append(')')
-
-
-        title = Paragraph(''.join(title_list), self._styles['session_title'])
-        if self._useColors():
-            ts = deepcopy(self._styles['color_tablestyle'])
-            ts.add('BACKGROUND', (0, 0), (0, -1), self._getSessionColor(sess_block))
-            title = Table([['', title]], colWidths=[0.2 * cm, None], style=ts)
-
+    def _get_speakers_flowable(self, contribution):
         speaker_list = [self._get_speaker_name(spk) for spk in contribution.speakers]
         speaker_content = ''
         if speaker_list:
             speaker_title = ' {}: '.format(ngettext('Presenter', 'Presenters', len(speaker_list)))
             speaker_content = speaker_title + ', '.join(speaker_list)
             speaker_content = f'<font name="Times-Italic"><i>{speaker_content}</i></font>'
-        speakers = Paragraph(speaker_content, self._styles['details_style'])
+        return Paragraph(speaker_content, self._styles['details_style'])
 
-        abstract = Paragraph(escape(str(contribution.description)), self._styles['details_style'])
+    def _get_title_flowable(self, title_list, session_color):
+        title = Paragraph(''.join(title_list), self._styles['session_title'])
+        if self._useColors():
+            ts = deepcopy(self._styles['color_tablestyle'])
+            ts.add('BACKGROUND', (0, 0), (0, -1), session_color)
+            title = Table([['', title]], colWidths=[0.2 * cm, None], style=ts)
+        return title
 
-        res.append(title)
-        res.append(speakers)
-        res.append(abstract)
+    def _print_subcontribution_with_abstract(self, res, subcontribution, session_block):
+        title_list = [subcontribution.title]
+        if self._ttPDFFormat.showContribId():
+            title_list.insert(0, f'[{subcontribution.friendly_id}] ')
+
+        title_flowable = self._get_title_flowable(title_list, self._getSessionColor(session_block))
+        speakers_flowable = self._get_speakers_flowable(subcontribution)
+        abstract_flowable = Paragraph(escape(str(subcontribution.description)), self._styles['details_style'])
+        res.append(title_flowable)
+        res.append(speakers_flowable)
+        res.append(abstract_flowable)
         res.append(Spacer(1, .33 * inch))
 
-        for subcontribution in getattr(contribution, 'subcontributions', []):
-            self._print_contribution_with_abstract(res, subcontribution, sess_block)
+    def _print_contribution_with_abstract(self, res, contribution, session_block):
+        if not contribution.can_access(self._user) or not contribution.start_dt:
+            return
+
+        title_list = [contribution.title]
+        if self._ttPDFFormat.showContribId():
+            title_list.insert(0, f'[{contribution.friendly_id}] ')
+        if session_block.session.is_poster and contribution.board_number:
+            title_list.append(f' (board {contribution.board_number})')
+        else:
+            title_list.append(f' ({format_time(contribution.start_dt, timezone=self._tz)}')
+            if self._ttPDFFormat.showLengthContribs():
+                title_list.append(f', {format_human_timedelta(contribution.timetable_entry.duration)})')
+            else:
+                title_list.append(')')
+
+        title_flowable = self._get_title_flowable(title_list, self._getSessionColor(session_block))
+        speakers_flowable = self._get_speakers_flowable(contribution)
+        abstract_flowable = Paragraph(escape(str(contribution.description)), self._styles['details_style'])
+        res.append(title_flowable)
+        res.append(speakers_flowable)
+        res.append(abstract_flowable)
+        res.append(Spacer(1, .33 * inch))
+
+        for subcontribution in contribution.subcontributions:
+            self._print_subcontribution_with_abstract(res, subcontribution, session_block)
 
     def getBody(self, story=None):
         self._defineStyles()
