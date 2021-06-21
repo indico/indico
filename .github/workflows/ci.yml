@@ -286,9 +286,8 @@ jobs:
         run: pip install -e .
       # END common steps
 
-      # XXX: enzyme is not yet compatible with react 17 - https://github.com/enzymejs/enzyme/issues/2429
-      # - name: Run jest tests
-      #   run: npm test
+      - name: Run jest tests
+        run: npm test
 
       - name: Try building assets
         run: python bin/maintenance/build-assets.py indico --dev
