@@ -41,7 +41,7 @@ function popupReducer(state, action) {
 }
 
 const ICSExportOptions = ({options, selected, handleSetOption}) => (
-  <Button.Group size="small">
+  <Button.Group size="small" styleName="button-group">
     {options.map(({key, text, description, extraParams}, idx) => (
       <React.Fragment key={key}>
         <Popup
@@ -132,6 +132,7 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
 
   return (
     <Popup
+      styleName="popup"
       trigger={
         renderButton ? (
           renderButton({open: popupState.open})
@@ -162,7 +163,7 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
           handleSetOption={handleSetOption}
         />
       </Header>
-      <Popup.Content>
+      <Popup.Content styleName="content">
         <strong styleName="export-option">Synchronise with your calendar</strong>
         <p>
           <Translate>
