@@ -1,7 +1,7 @@
 API Reference
 *************
 
-The ``IndicoSearchProvider`` interface allows an abstract service to integrate with Indico's search module.
+The :class:`IndicoSearchProvider` interface allows an abstract service to integrate with Indico's search module.
 
 .. automodule:: indico.modules.search.base
     :members:

@@ -5,13 +5,16 @@ The Internal Search is a default SQL based engine implementation, created to sup
 While the performance and range of features might not be the same, depending on your instance, if your volume of
 records is small and retrieval needs are simple, this module should be enough.
 
-It supports the two types of records from a total of six targets where each query is made upon the respective title:
+It supports the two types of records from a total of six targets:
 
 - Events
 - Categories
+- Contributions
+- Attachments
+- Notes
 
 .. note::
-    The Internal Search does not yet support: contributions, sub-contributions, event notes and attachments.
+    The Internal Search only supports text-based search on titles, description and notes content.
 
 External Search Service
 =======================
@@ -61,7 +64,7 @@ Placeholders
 ------------
 
 Placeholders are a special type of filters specifically designed to be part of the user-facing text based search query.
-Examples of valid placeholders would be: `affiliation:CERN` or `person:John Doe`.
+Examples of valid placeholders would be: `affiliation:CERN` or `person:"John Doe"`.
 
 .. image:: ../images/search_features_placeholders.png
 

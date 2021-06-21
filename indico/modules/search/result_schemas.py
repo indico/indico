@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import typing as t
+
 from marshmallow import EXCLUDE, ValidationError, fields
 from marshmallow_enum import EnumField
 from marshmallow_oneofschema import OneOfSchema
@@ -215,7 +217,7 @@ class EventNoteResultSchema(ResultSchemaBase):
 
 
 class BucketSchema(_ResultSchemaBase):
-    """Represents an individual aggregation bucket element"""
+    """Represents an individual aggregation bucket element."""
 
     #: The aggregation key.
     key: str = fields.String(required=True)
@@ -226,12 +228,12 @@ class BucketSchema(_ResultSchemaBase):
 
 
 class AggregationSchema(_ResultSchemaBase):
-    """Represents an aggregation list"""
+    """Represents an aggregation list."""
 
     #: The name of the aggregation.
     label: str = fields.String(required=True)
     #: A bucket list representing each group.
-    buckets: [BucketSchema] = fields.List(fields.Nested(BucketSchema), required=True)
+    buckets: t.List[BucketSchema] = fields.List(fields.Nested(BucketSchema), required=True)
 
 
 class ResultItemSchema(OneOfSchema):
