@@ -141,7 +141,7 @@ class InternalSearch(IndicoSearchProvider):
             preloaded_categories |= set(query)
 
         def _can_access(obj, allow_effective_protection_mode=True):
-            if isinstance(obj, (Category, Event, Contribution)):
+            if isinstance(obj, (Category, Event, Session, Contribution)):
                 # more efficient for events/categories/contribs since it avoids climbing up the chain
                 protection_mode = (obj.effective_protection_mode if allow_effective_protection_mode
                                    else obj.protection_mode)
