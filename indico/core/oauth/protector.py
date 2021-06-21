@@ -36,8 +36,8 @@ class IndicoBearerTokenValidator(BearerTokenValidator):
     def authenticate_token(self, token_string):
         return query_token(token_string)
 
-    def validate_token(self, token, scopes):
-        super().validate_token(token, scopes)
+    def validate_token(self, token, scopes, request):
+        super().validate_token(token, scopes, request)
 
         # if we get here, the token is valid so we can mark it as used at the end of the request
 

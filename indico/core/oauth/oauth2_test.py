@@ -48,6 +48,9 @@ class CallableJsonWrapper:
     def json(self):
         return self.resp.json
 
+    def raise_for_status(self):
+        pass
+
     def __getattr__(self, attr):
         return getattr(self.resp, attr)
 
