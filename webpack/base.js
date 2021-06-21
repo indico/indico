@@ -175,7 +175,6 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       {
         loader: 'resolve-url-loader',
         options: {
-          keepQuery: true,
           root: config.isPlugin ? false : config.build.staticPath,
         },
       },

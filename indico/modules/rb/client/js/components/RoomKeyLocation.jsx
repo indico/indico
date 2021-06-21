@@ -19,7 +19,7 @@ export default function RoomKeyLocation({room}) {
       <Message styleName="message-icon" icon>
         <Icon name="key" />
         <Message.Content>
-          <Markdown source={room.keyLocation} targetBlank />
+          <Markdown targetBlank>{room.keyLocation}</Markdown>
         </Message.Content>
       </Message>
     )

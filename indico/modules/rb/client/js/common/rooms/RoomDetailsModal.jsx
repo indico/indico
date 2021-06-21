@@ -328,7 +328,7 @@ function RoomCommentsBox({room}) {
       <Message styleName="message-icon" icon info>
         <Icon name="info" />
         <Message.Content>
-          <Markdown source={room.comments} targetBlank />
+          <Markdown targetBlank>{room.comments}</Markdown>
         </Message.Content>
       </Message>
     )

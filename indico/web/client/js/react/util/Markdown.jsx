@@ -22,21 +22,21 @@ const ExternalLink = ({href, children}) => (
 const Markdown = ({targetBlank, ...props}) => {
   if (targetBlank) {
     // XXX: not using linkTarget since that doesn't set noopener
-    props.renderers = {link: ExternalLink, linkReference: ExternalLink, ...props.renderers};
+    props.components = {a: ExternalLink, ...props.components};
   }
   return <ReactMarkdown {...props} />;
 };
 
 Markdown.propTypes = {
-  source: PropTypes.string.isRequired,
-  renderers: PropTypes.object,
+  children: PropTypes.string.isRequired,
+  components: PropTypes.object,
   targetBlank: PropTypes.bool,
   // see https://github.com/rexxars/react-markdown#options for more props
 };
 
 Markdown.defaultProps = {
   targetBlank: false,
-  renderers: {},
+  components: {},
 };
 
 export default Markdown;

@@ -166,11 +166,9 @@ class Room extends React.Component {
             {room.comments && (
               <TooltipIfTruncated>
                 <div styleName="room-comments">
-                  <Markdown
-                    source={room.comments}
-                    allowedTypes={['text', 'break']}
-                    unwrapDisallowed
-                  />
+                  <Markdown allowedElements={['br']} unwrapDisallowed>
+                    {room.comments}
+                  </Markdown>
                 </div>
               </TooltipIfTruncated>
             )}
