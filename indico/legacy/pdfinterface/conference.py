@@ -343,12 +343,14 @@ class TimeTablePlain(PDFWithTOC):
         details_style.leftIndent = 10
         self._styles['details_style'] = details_style
 
-        color_tablestyle = TableStyle([('FONTNAME', (0, 0), (-1, -1), 'Sans'),
-                              ('LEFTPADDING', (0, 0), (-1, -1), 3),
-                              ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-                              ('TOPPADDING', (0, 0), (-1, -1), 0),
-                              ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
-                              ('GRID', (0, 0), (0, -1), 1, colors.lightgrey)])
+        color_tablestyle = TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Sans'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 3),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+            ('GRID', (0, 0), (0, -1), 1, colors.lightgrey)
+        ])
         self._styles['color_tablestyle'] = color_tablestyle
 
     def _getSessionColor(self, block):
@@ -662,19 +664,20 @@ class TimeTablePlain(PDFWithTOC):
         return res
 
     def _print_contribution_with_abstract(self, res, contribution, sess_block):
-        title_line = contribution.title
+        title_list = [contribution.title]
         if self._ttPDFFormat.showContribId():
-            title_line = f'[{contribution.friendly_id}] {title_line}'
+            title_list.insert(0, f'[{contribution.friendly_id}] ')
         if sess_block.session.is_poster and contribution.board_number:
-            title_line += f' (board {contribution.board_number})'
-        if hasattr(contribution, 'start_dt') and not sess_block.session.is_poster:
-            title_line += f' ({format_time(contribution.start_dt, timezone=self._tz)}'
+            title_list.append(f' (board {contribution.board_number})')
+        if hasattr(contribution, 'start_dt'):
+            title_list.append(f' ({format_time(contribution.start_dt, timezone=self._tz)}')
             if self._ttPDFFormat.showLengthContribs():
-                title_line += f', {format_human_timedelta(contribution.timetable_entry.duration)})'
+                title_list.append(f', {format_human_timedelta(contribution.timetable_entry.duration)})')
             else:
-                title_line += ')'
+                title_list.append(')')
 
-        title = Paragraph(title_line, self._styles['session_title'])
+
+        title = Paragraph(''.join(title_list), self._styles['session_title'])
         if self._useColors():
             ts = deepcopy(self._styles['color_tablestyle'])
             ts.add('BACKGROUND', (0, 0), (0, -1), self._getSessionColor(sess_block))
@@ -687,7 +690,7 @@ class TimeTablePlain(PDFWithTOC):
             speaker_content = speaker_title + ', '.join(speaker_list)
             speaker_content = f'<font name="Times-Italic"><i>{speaker_content}</i></font>'
         speakers = Paragraph(speaker_content, self._styles['details_style'])
-        
+
         abstract = Paragraph(escape(str(contribution.description)), self._styles['details_style'])
 
         res.append(title)
