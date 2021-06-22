@@ -78,7 +78,9 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         default=''
     )
     division = db.Column(
-        db.String
+        db.String,
+        nullable=False,
+        default=''
     )
     building = db.Column(
         db.String,
