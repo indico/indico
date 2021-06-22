@@ -114,7 +114,7 @@
         {% endif %}
         <div class="survey-{{ chart_type }}-chart"
             data-labels="{{ (summary.labels if short_labels else summary.absolute|list)|tojson|forceescape }}"
-            data-series-absolute="{{ summary.absolute.values() }}"
-            data-series-relative="{{ summary.relative.values() }}"></div>
+            data-series-absolute="{{ summary.absolute.values()|list|tojson|forceescape }}"
+            data-series-relative="{{ summary.relative.values()|list|tojson|forceescape }}"></div>
     </div>
 {% endmacro %}
