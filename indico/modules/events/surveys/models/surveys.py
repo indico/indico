@@ -201,7 +201,7 @@ class Survey(db.Model):
 
     @has_ended.expression
     def has_ended(cls):
-        return (cls.end_dt != None) & (cls.end_dt <= now_utc())  # noqa
+        return cls.end_dt.isnot(None) & (cls.end_dt <= now_utc())
 
     @hybrid_property
     def has_started(self):
@@ -209,7 +209,7 @@ class Survey(db.Model):
 
     @has_started.expression
     def has_started(cls):
-        return (cls.start_dt != None) & (cls.start_dt <= now_utc())  # noqa
+        return cls.start_dt.isnot(None) & (cls.start_dt <= now_utc())
 
     @locator_property
     def locator(self):

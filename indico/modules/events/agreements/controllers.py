@@ -167,7 +167,7 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
         ids = set(request.form.getlist('references'))
         return (self.event.agreements
                 .filter(Agreement.id.in_(ids),
-                        Agreement.person_email != None)  # noqa
+                        Agreement.person_email.isnot(None))
                 .all())
 
     def _success_handler(self, form):
