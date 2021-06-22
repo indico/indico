@@ -110,7 +110,7 @@ parso==0.8.2
     #   pyquotes
 pep517==0.10.0
     # via pip-tools
-pip-tools==6.1.0
+pip-tools==6.2.0
     # via -r requirements.dev.in
 plantweb==1.2.1
     # via -r requirements.dev.in
@@ -247,6 +247,8 @@ werkzeug==2.0.1
     #   -c requirements.txt
     #   flask
     #   pytest-localserver
+wheel==0.36.2
+    # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
