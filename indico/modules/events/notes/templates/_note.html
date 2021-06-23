@@ -54,12 +54,19 @@
 {% endmacro %}
 
 
+{% macro _note_link(note, anchor) -%}
+    {%- set url_kw = dict(request.view_args, **request.args.to_dict(false)) -%}
+    {%- set __ = url_kw.pop('note', none) -%}
+    {{- url_for(request.endpoint, note=note.id, _anchor=anchor, **url_kw) -}}
+{%- endmacro %}
+
+
 {% macro _render_note_actions(note, event=none, hidden=true, can_edit=false, anchor=none) %}
     <div class="note-actions {% if event %}{{ _togglable_classes(hidden) }}{% endif %}">
         {% if event %}
             <a href="#" class="js-show-note-toggle">{% trans %}Hide{% endtrans %}</a>
         {% endif %}
-        <a href="?note={{ note.id }}{% if anchor %}#{{ anchor }}{% endif %}" target="_blank"
+        <a href="{{ _note_link(note, anchor) }}" target="_blank"
            class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
         {% if can_edit %}
             <a href="#" class="icon-edit js-note-editor hide-if-locked"
