@@ -172,12 +172,7 @@
         {% if toggle_notes and item.has_note %}
             {% set req = request.args.get('note') %}
             {% set note_id = item.note.id|string %}
-
-            {% if req == note_id %}
-                {{ render_toggle_button(note=item.note, note_is_hidden=false, anchor=anchor) }}
-            {% else %}
-                {{ render_toggle_button(note=item.note, note_is_hidden=(not show_notes), anchor=anchor) }}
-            {% endif %}
+            {{ render_toggle_button(item.note, note_is_hidden=(req != note_id and not show_notes), anchor=anchor) }}
         {% endif %}
         {% if show_button %}
             <div class="group manage-button">
