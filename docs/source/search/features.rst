@@ -62,9 +62,6 @@ The combination of `key` and `filter` from :class:`AggregationSchema` can be use
 human-readable label to an attribute. A corresponding filter acting upon the same key in the example above
 would be ``affiliation=cern``.
 
-.. todo::
-    Remove unused get_filters method
-
 Placeholders
 ------------
 
