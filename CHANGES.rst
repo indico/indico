@@ -82,6 +82,7 @@ Bugfixes
 - Update the user link in registrations when merging two users (:pr:`4936`)
 - Fix error when exporting a conference timetable PDF with the option "Print abstract content of all
   contributions" and one of the abstracts is too big to fit in a page (:issue:`4881`, :pr:`4955`)
+- Emails sent via the Editing module are now logged to the event log (:pr:`4960`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

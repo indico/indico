@@ -21,7 +21,8 @@ def _get_commenting_users(revision, check_internal_access=False):
 def notify_comment(comment):
     """Notify about a new comments on a revision."""
     revision = comment.revision
-    editor = revision.editable.editor
+    editable = revision.editable
+    editor = editable.editor
     author = comment.user
     if comment.internal:
         # internal comments notify the editor and anyone who commented + can see internal comments
@@ -29,7 +30,7 @@ def notify_comment(comment):
     elif author == editor:
         # editor comments notify the submitter and anyone else who commented
         recipients = _get_commenting_users(revision) | {revision.submitter}
-    elif revision.editable.can_perform_submitter_actions(author):
+    elif editable.can_perform_submitter_actions(author):
         # submitter comments notify the editor and anyone else who commented
         recipients = _get_commenting_users(revision) | {editor}
     else:
@@ -39,36 +40,41 @@ def notify_comment(comment):
     recipients.discard(None)  # in case there's no editor assigned
     recipients.discard(author)  # never bother people about their own comments
     for recipient in recipients:
-        author_name = author.first_name if revision.editable.can_see_editor_names(recipient, author) else None
+        author_name = author.first_name if editable.can_see_editor_names(recipient, author) else None
         tpl = get_template_module('events/editing/emails/comment_notification.txt',
                                   author_name=author_name,
-                                  timeline_url=revision.editable.external_timeline_url,
+                                  timeline_url=editable.external_timeline_url,
                                   recipient_name=recipient.first_name)
-        send_email(make_email(recipient.email, template=tpl))
+        send_email(make_email(recipient.email, template=tpl), editable.event, 'Editing',
+                   log_metadata={'editable_id': editable.id})
 
 
 def notify_editor_judgment(revision, editor):
     """Notify the submitter about a judgment made by an editor."""
     submitter = revision.submitter
-    editor_name = editor.first_name if revision.editable.can_see_editor_names(submitter) else None
+    editable = revision.editable
+    editor_name = editor.first_name if editable.can_see_editor_names(submitter) else None
     tpl = get_template_module('events/editing/emails/editor_judgment_notification.txt',
                               editor_name=editor_name,
-                              timeline_url=revision.editable.external_timeline_url,
+                              timeline_url=editable.external_timeline_url,
                               recipient_name=submitter.first_name)
-    send_email(make_email(submitter.email, template=tpl))
+    send_email(make_email(submitter.email, template=tpl), editable.event, 'Editing',
+               log_metadata={'editable_id': editable.id})
 
 
 def notify_submitter_upload(revision):
     """Notify the editor about the submitter uploading a new revision."""
+    editable = revision.editable
     submitter = revision.submitter
     editor = revision.editable.editor
     if not editor:
         return
     tpl = get_template_module('events/editing/emails/submitter_upload_notification.txt',
                               submitter_name=submitter.first_name,
-                              timeline_url=revision.editable.external_timeline_url,
+                              timeline_url=editable.external_timeline_url,
                               recipient_name=editor.first_name)
-    send_email(make_email(editor.email, template=tpl))
+    send_email(make_email(editor.email, template=tpl), editable.event, 'Editing',
+               log_metadata={'editable_id': editable.id})
 
 
 def notify_submitter_confirmation(revision, submitter, action):
@@ -87,4 +93,5 @@ def notify_submitter_confirmation(revision, submitter, action):
                                   submitter_name=submitter.first_name,
                                   timeline_url=revision.editable.external_timeline_url,
                                   recipient_name=recipient.first_name)
-        send_email(make_email(recipient.email, template=tpl))
+        send_email(make_email(recipient.email, template=tpl), editable.event, 'Editing',
+                   log_metadata={'editable_id': editable.id})
