@@ -1,0 +1,1777 @@
+# Translations template for indico.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the indico project.
+# 
+# Translators:
+# Emre JILTA <jilta.e@gmail.com>, 2018
+# İNFOYED TERCÜME <infoyed@gmail.com>, 2021
+# selcuk bilmis <selcukbilmis@gmail.com>, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-06-24 17:51+0200\n"
+"PO-Revision-Date: 2021-06-24 14:14+0000\n"
+"Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>\n"
+"Language-Team: Turkish (Turkey) (http://www.transifex.com/indico/indico/language/tr_TR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+"Language: tr_TR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: indico/modules/attachments/client/js/legacy.js:152
+msgid "This file no longer exists. Please reload the page."
+msgstr "Bu sayfa artık mevcut değildir. Lütfen sayfayı tekrar yükleyiniz."
+
+#: indico/modules/attachments/client/js/legacy.js:158
+msgid "You are not authorized to access this file."
+msgstr "Bu dosyaya erişim hakkınız bulunmamaktadır."
+
+#: indico/modules/attachments/client/js/legacy.js:158
+#: indico/modules/attachments/client/js/legacy.js:161
+msgid "Access Denied"
+msgstr "Erişim Reddedildi"
+
+#: indico/modules/attachments/client/js/legacy.js:160
+msgid "This file is protected. You will be redirected to the login page."
+msgstr "Bu dosya korumalıdır. Oturum açma sayfasına yönlendirileceksiniz"
+
+#: indico/modules/attachments/client/js/legacy.js:228
+msgid "Manage material"
+msgstr "Malzemeyi yönet"
+
+#: indico/modules/attachments/client/js/package.js:49
+msgid "Building package"
+msgstr "Paket oluşturuluyor"
+
+#: indico/modules/categories/client/js/calendar.js:24
+msgid "Today"
+msgstr "Bugün"
+
+#: indico/modules/categories/client/js/calendar.js:50
+msgid "Events happening on {0}"
+msgstr "{0} tarihinde gerçekleşen etkinlikler"
+
+#: indico/modules/categories/client/js/calendar.js:62
+msgid "{0} long-lasting event not shown"
+msgid_plural "{0} long-lasting events not shown"
+msgstr[0] "{0} gösterilmeyen uzun süren olaylar "
+msgstr[1] "{0} gösterilmeyen uzun süren etkinlikler"
+
+#: indico/modules/categories/client/js/calendar.js:72
+msgid "Long lasting events"
+msgstr "Uzun süren etkinlikler"
+
+#: indico/modules/categories/client/js/display.js:21
+msgid "empty"
+msgstr "boş"
+
+#: indico/modules/categories/client/js/display.js:22
+msgid "{0} event"
+msgid_plural "{0} events"
+msgstr[0] "{0} olaylar"
+msgstr[1] "{0} etkinlikler"
+
+#: indico/modules/categories/client/js/display.js:151
+msgid "Remove from your favorites"
+msgstr "Favorilerinden çıkar"
+
+#: indico/modules/categories/client/js/display.js:154
+msgid "Add to your favorites"
+msgstr "Favorilerine ekle"
+
+#: indico/modules/categories/client/js/display.js:156
+msgid ""
+"This will make events in this category visible on your <a "
+"href=\"{0}\">Dashboard</a>."
+msgstr "Bu, bu kategorideki etkinlikleri <a href=\"{0}\">Gösterge Paneliniz</a>  üzerinde görünür hale getirecektir."
+
+#: indico/modules/categories/client/js/management.js:53
+#: indico/modules/events/management/client/js/index.js:301
+msgid "Undo"
+msgstr "Geri al"
+
+#: indico/modules/categories/client/js/management.js:55
+msgid "The category order has been restored."
+msgstr "Kategori düzeni geri yüklendi."
+
+#: indico/modules/categories/client/js/management.js:57
+msgid "The category list has been sorted."
+msgstr "Kategori listesi sıralandı"
+
+#: indico/modules/categories/client/js/management.js:175
+msgid "Delete category"
+msgstr "Kategoriyi sil"
+
+#: indico/modules/categories/client/js/management.js:179
+msgid "This category cannot be deleted because it is not empty."
+msgstr "Bu kategori, boş olmadığı için silinemez."
+
+#: indico/modules/categories/client/js/management.js:187
+msgid ""
+"At least one selected category cannot be deleted because it is not empty."
+msgstr "En az bir seçili kategori, boş olmadığı için silinemez."
+
+#: indico/modules/categories/client/js/management.js:192
+msgid "Delete the selected category"
+msgid_plural "Delete {0} selected categories"
+msgstr[0] "Seçili {0} kategorileri sil"
+msgstr[1] "Seçili {0} Kategorileri Sil"
+
+#: indico/modules/categories/client/js/management.js:200
+msgid "Select the categories to delete first."
+msgstr "İlk önce silinecek kategorileri seçin."
+
+#: indico/modules/categories/client/js/management.js:209
+msgid "Delete categories"
+msgstr "Kategorileri sil"
+
+#: indico/modules/categories/client/js/management.js:229
+msgid "Move the selected category"
+msgid_plural "Move the {0} selected categories"
+msgstr[0] "{0} seçili kategorileri taşı"
+msgstr[1] "{0} seçili kategorileri taşı"
+
+#: indico/modules/categories/client/js/management.js:236
+msgid "Select the categories to move first."
+msgstr "İlk önce taşınacak kategorileri seçin."
+
+#: indico/modules/categories/client/js/management.js:297
+#: indico/modules/vc/client/js/index.js:54
+#: indico/web/client/js/jquery/utils/forms.js:401
+msgid "*"
+msgid_plural "All {0} events in this category are currently selected."
+msgstr[0] "Bu kategorideki tüm {0} olayları şu anda seçili durumdadır."
+msgstr[1] "Bu kategorideki tüm {0} etkinlikler şu anda seçili durumdadır."
+
+#: indico/modules/categories/client/js/management.js:302
+msgid "Only {0} out of {1} events is currently selected."
+msgid_plural "Only {0} out of {1} events are currently selected."
+msgstr[0] "Şu anda yalnızca {1} olaydan {0} tanesi seçilidir."
+msgstr[1] "Şu anda yalnızca {1} etkinlikten {0} tanesi seçilidir."
+
+#: indico/modules/categories/client/js/management.js:340
+#: indico/modules/categories/client/js/management.js:404
+msgid "Move here"
+msgstr "Buraya taşı"
+
+#: indico/modules/categories/client/js/management.js:341
+msgid "Move category"
+msgid_plural "Move categories"
+msgstr[0] "Kategorileri taşı"
+msgstr[1] "Kategorileri taşı"
+
+#: indico/modules/categories/client/js/management.js:343
+msgid "Select new category parent for the category"
+msgid_plural "Select new category parent for {0} selected categories"
+msgstr[0] "{0} seçili kategori için yeni kategori üst öğesini seç"
+msgstr[1] "{0} seçili kategori için yeni kategori üst öğesini seç"
+
+#: indico/modules/categories/client/js/management.js:359
+msgid "The category is already here"
+msgid_plural "The selected categories are already here"
+msgstr[0] "Seçilen kategoriler zaten buradalar"
+msgstr[1] "Seçilen kategoriler zaten buradalar"
+
+#: indico/modules/categories/client/js/management.js:367
+msgid "This is the category you are trying to move"
+msgid_plural "This is one of the categories you are trying to move"
+msgstr[0] "Bu, taşımaya çalıştığınız kategorilerden biridir"
+msgstr[1] "Bu, taşımaya çalıştığınız kategorilerden biridir"
+
+#: indico/modules/categories/client/js/management.js:405
+#: indico/modules/events/management/client/js/index.js:42
+msgid "Move event"
+msgid_plural "Move events"
+msgstr[0] "Olayları taşı"
+msgstr[1] "Etkinlikleri taşı"
+
+#: indico/modules/categories/client/js/management.js:408
+msgid "Select category destination for the event"
+msgid_plural "Select category destination for {0} selected events"
+msgstr[0] "{0} seçili olay için kategori varış adresini seç"
+msgstr[1] "{0} seçili etkinlik için kategori varış adresini seç"
+
+#: indico/modules/categories/client/js/management.js:418
+msgid "The event is already here"
+msgid_plural "The selected events are already here"
+msgstr[0] "Seçilen olaylar zaten buradalar"
+msgstr[1] "Seçilen etkinlikler zaten buradalar"
+
+#: indico/modules/cephalopod/client/js/index.js:40
+msgid "Unknown error while contacting the Community Hub"
+msgstr "Topluluk Merkezi ile iletişim kurarken bilinmeyen hata"
+
+#: indico/modules/cephalopod/client/js/index.js:42
+msgid "Internal error: Parse error on the reply of the Community Hub."
+msgstr "İç hata: Topluluk Merkezinin yanıtında ayrıştırma hatası"
+
+#: indico/modules/cephalopod/client/js/index.js:44
+msgid "Unable to contact the Community Hub."
+msgstr "Topluluk Merkezi ile iletişim kurulamıyor."
+
+#: indico/modules/cephalopod/client/js/index.js:46
+msgid "The connection to the Community Hub timed out."
+msgstr "Topluluk Merkezi ile iletişim zaman aşımına uğradı."
+
+#: indico/modules/cephalopod/client/js/index.js:51
+msgid "Your server is not registered with the Community Hub."
+msgstr "Sunucunuz Topluluk Merkezinde kayıtlı değildir."
+
+#: indico/modules/cephalopod/client/js/index.js:86
+msgid "Disabled"
+msgstr "Devre dışı"
+
+#: indico/modules/cephalopod/client/js/index.js:87
+msgid "This server is not registered as part of the community."
+msgstr "Bu sunucu topluluğun bir parçası olarak kayıtlı değildir."
+
+#: indico/modules/cephalopod/client/js/index.js:108
+msgid "Synchronized"
+msgstr "Senkronize edilmiş"
+
+#: indico/modules/cephalopod/client/js/index.js:109
+msgid "This server is registered as part of the community and is up to date."
+msgstr "Bu sunucu topluluğun bir parçası olarak kayıtlıdır ve günceldir."
+
+#: indico/modules/cephalopod/client/js/index.js:118
+msgid "Out of sync"
+msgstr "Senkronize değil"
+
+#: indico/modules/cephalopod/client/js/index.js:119
+msgid ""
+"Your Indico server is out of sync. Synchronize it with the button on the "
+"right."
+msgstr "Indico sunucunuz senkronize değildir. Sağdaki düğme ile sunucunuzu senkronize hale getirin."
+
+#: indico/modules/cephalopod/client/js/index.js:129
+msgid "Error!"
+msgstr "Hata!"
+
+#: indico/modules/cephalopod/client/js/index.js:147
+msgid ""
+"Your Indico server is not synchronized with the Community Hub! You can solve"
+" this <a href=\"{0}\">here</a>."
+msgstr "Indico sunucunuz Topluluk Merkezi ile eş zamanlı değildir! Bu sorunu <a href=\"{0}\">buradan</a> çözebilirsiniz."
+
+#: indico/modules/designer/client/js/index.js:31
+#: indico/modules/designer/client/js/index.js:707
+msgid ""
+"The back side of the templates that use this one as the back side will be "
+"removed."
+msgstr "Arka taraf olarak bunu kullanan şablonların arka tarafı kaldırılacaktır."
+
+#: indico/modules/designer/client/js/index.js:34
+#: indico/modules/designer/client/js/index.js:710
+msgid "Disassociate back sides"
+msgstr "Arka tarafları ilişkisizlendir"
+
+#: indico/modules/designer/client/js/index.js:90
+#: indico/modules/designer/client/js/index.js:233
+msgid "Fixed text"
+msgstr "Sabit metin"
+
+#: indico/modules/designer/client/js/index.js:497
+msgid "Please choose a name for the template"
+msgstr "Lütfen şablon için bir isim seçin"
+
+#: indico/modules/designer/client/js/index.js:497
+#: indico/modules/designer/client/js/index.js:503
+#: indico/web/client/js/jquery/widgets/principalfield.js:114
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:165
+msgid "Warning"
+msgstr "Uyarı"
+
+#: indico/modules/designer/client/js/index.js:502
+msgid "The template cannot be empty. Add some elements or a background image."
+msgstr "Şablon boş olamaz. Bazı öğeler veya bir arka plan görüntüsü ekleyin."
+
+#: indico/modules/designer/client/js/index.js:529
+msgid "Are you sure you want to change the dimensions of this template?"
+msgstr "Bu şablonun boyutlarını değiştirmek istediğinizden emin misiniz?"
+
+#: indico/modules/designer/client/js/index.js:698
+msgid "This back side template will be removed"
+msgstr "Arka taraf şablonu kaldırılacak"
+
+#: indico/modules/designer/client/js/index.js:700
+msgid "The back side of this template will be removed"
+msgstr "Bu şablonun arka tarafı kaldırılacak"
+
+#: indico/modules/designer/client/js/index.js:701
+msgid "Disassociate back side"
+msgstr "Arka tarafı ilişkisizlendir"
+
+#: indico/modules/designer/client/js/index.js:705
+msgid "The back side is empty."
+msgstr "Arka taraf boştur."
+
+#: indico/modules/designer/client/js/index.js:820
+msgid "Error"
+msgstr "Hata"
+
+#: indico/modules/designer/client/js/index.js:937
+msgid "Choose a file"
+msgstr "Bir dosya seç"
+
+#: indico/modules/events/abstracts/client/js/index.js:76
+#: indico/modules/events/abstracts/client/js/index.js:89
+msgid "Show preview"
+msgstr "Ön izlemeyi göster"
+
+#: indico/modules/events/abstracts/client/js/index.js:80
+msgid "Hide preview"
+msgstr "Ön izlemeyi gizle"
+
+#: indico/modules/events/client/js/display.js:174
+msgid "Edit minutes"
+msgstr "Tutanakları düzenle"
+
+#: indico/modules/events/client/js/layout.js:165
+msgid "Menu Entry Settings"
+msgstr "Giri Özellikleri Menüsü"
+
+#: indico/modules/events/client/js/util/static_filters.js:19
+msgid "{0} out of {1} displayed"
+msgstr " {1} taneden {0} tanesi görüntülendi"
+
+#: indico/modules/events/client/js/util/static_filters.js:59
+msgid "There are no entries that match your search criteria."
+msgstr "Arama kriterlerinizle eşleşen hiçbir giriş yok."
+
+#: indico/modules/events/management/client/js/index.js:38
+msgid ""
+"You are about to move the event to the category \"{0}\". Are you sure you "
+"want to proceed?"
+msgstr "Bu etkinliği \"{0}\" kategorisine taşımak üzeresiniz. İlerlemek istediğinizden emin misiniz?"
+
+#: indico/modules/events/management/client/js/index.js:299
+msgid "Undoing previous operation..."
+msgstr "Önceki işlemi geri alıyor..."
+
+#: indico/modules/events/registration/client/js/index.js:52
+#: indico/modules/events/registration/client/js/registration.js:39
+msgid "Terms and Conditions"
+msgstr "Hüküm ve Koşullar"
+
+#: indico/modules/events/registration/client/js/reglists.js:35
+msgid "Email Preview"
+msgstr "E-Posta Ön İzleme"
+
+#: indico/modules/events/registration/client/js/reglists.js:52
+msgid "Do you really want to delete the selected registration?"
+msgid_plural "Do you really want to delete the {0} selected registrations?"
+msgstr[0] "Seçili kaydı silmek istiyor musunuz?"
+msgstr[1] "Gerçekten seçili  {0}  kaydı silmek istiyor musunuz?"
+
+#: indico/modules/events/registration/client/js/form/field.js:144
+msgid "New Field"
+msgstr "Yeni Alan"
+
+#: indico/modules/events/registration/client/js/form/field.js:144
+msgid "Edit Field"
+msgstr "Alanı Düzenle"
+
+#: indico/modules/events/registration/client/js/form/field.js:147
+msgid "Add"
+msgstr "Ekle"
+
+#: indico/modules/events/registration/client/js/form/field.js:147
+msgid "Update"
+msgstr "Güncelle"
+
+#: indico/modules/events/registration/client/js/form/field.js:181
+msgid "There is already a registration with this email address."
+msgstr "Bu e-posta adresiyle bir kayıt mevcut."
+
+#: indico/modules/events/registration/client/js/form/field.js:183
+msgid "The user associated with this email address is already registered."
+msgstr "Bu e-posta adresi ile ilişkilendirilmiş kullanıcı zaten kayıtlı."
+
+#: indico/modules/events/registration/client/js/form/field.js:185
+msgid "There is no Indico user associated with this email address."
+msgstr "Bu e-posta adresi ile ilişkilendirilmiş hiçbir Indico kullanıcısı yoktur."
+
+#: indico/modules/events/registration/client/js/form/field.js:190
+msgid "This email address is not associated with your Indico account."
+msgstr "Bu e-posta adresi Indico hesabınız ile ilişkilendirilmiş değildir."
+
+#: indico/modules/events/registration/client/js/form/field.js:193
+msgid ""
+"The registration will be re-associated to a different user "
+"(<strong>{0}</strong>)."
+msgstr "Bu kayıt, farklı bir kullanıcı ile ilişkilendirilecektir (<strong>{0}</strong>)."
+
+#: indico/modules/events/registration/client/js/form/field.js:199
+msgid ""
+"The registration will be disassociated from the current user "
+"(<strong>{0}</strong>)."
+msgstr "Bu kayıt, mevcut kullanıcı ile ilişkisizlendirilecektir (<strong>{0}</strong>)."
+
+#: indico/modules/events/registration/client/js/form/field.js:205
+msgid "The domain used in the email address does not exist."
+msgstr "E-posta adresinde kullanılan alan adı mevcut değildir."
+
+#: indico/modules/events/registration/client/js/form/field.js:207
+msgid "This email address is invalid."
+msgstr "E-posta adresi geçersizdir."
+
+#: indico/modules/events/registration/client/js/form/field.js:210
+msgid "The registration will not be associated with any Indico account."
+msgstr "Bu kayıt, hiçbir Indico hesabı ile ilişkilendirilmeyecektir."
+
+#: indico/modules/events/registration/client/js/form/field.js:212
+msgid "The registration will be associated with your Indico account."
+msgstr "Bu kayıt, Indico hesabınız ile ilişkilendirilecektir."
+
+#: indico/modules/events/registration/client/js/form/field.js:215
+msgid ""
+"The registration will remain associated with the Indico account "
+"<strong>{0}</strong>."
+msgstr "Bu kayıt, Indico hesabı <strong>{0}</strong> ile ilişkili kalacaktır."
+
+#: indico/modules/events/registration/client/js/form/field.js:221
+msgid ""
+"The registration will be associated with the Indico account "
+"<strong>{0}</strong>."
+msgstr "Bu kayıt, Indico hesabı <strong>{0}</strong> ile ilişkilendirilecektir."
+
+#: indico/modules/events/registration/client/js/form/field.js:242
+msgid "Checking email address..."
+msgstr "E-posta adresini kontrol ediyor..."
+
+#: indico/modules/events/registration/client/js/form/field.js:398
+msgid "Checkbox"
+msgstr "Onay kutusu"
+
+#: indico/modules/events/registration/client/js/form/field.js:421
+msgid "Country"
+msgstr "Ülke"
+
+#: indico/modules/events/registration/client/js/form/field.js:453
+msgid "Date"
+msgstr "Tarih"
+
+#: indico/modules/events/registration/client/js/form/field.js:469
+msgid "File"
+msgstr "Dosya"
+
+#: indico/modules/events/registration/client/js/form/field.js:485
+msgid "Free Text"
+msgstr "Serbest metin"
+
+#: indico/modules/events/registration/client/js/form/field.js:501
+msgid "Number"
+msgstr "Sayı"
+
+#: indico/modules/events/registration/client/js/form/field.js:640
+msgid "Choice"
+msgstr "Seçim"
+
+#: indico/modules/events/registration/client/js/form/field.js:700
+#: indico/modules/events/registration/client/js/form/field.js:1155
+msgid "Caption"
+msgstr "Başlık"
+
+#: indico/modules/events/registration/client/js/form/field.js:701
+#: indico/modules/events/registration/client/js/form/field.js:1078
+#: indico/modules/events/registration/client/js/form/field.js:1156
+msgid "Billable"
+msgstr "Faturalandırabilir"
+
+#: indico/modules/events/registration/client/js/form/field.js:702
+#: indico/modules/events/registration/client/js/form/field.js:1079
+#: indico/modules/events/registration/client/js/form/field.js:1157
+msgid "Price"
+msgstr "Fiyat"
+
+#: indico/modules/events/registration/client/js/form/field.js:703
+#: indico/modules/events/registration/client/js/form/field.js:1080
+#: indico/modules/events/registration/client/js/form/field.js:1158
+msgid "Places limit"
+msgstr "Yer sınırı"
+
+#: indico/modules/events/registration/client/js/form/field.js:704
+#: indico/modules/events/registration/client/js/form/field.js:1159
+msgid "Max. extra slots"
+msgstr "Azami ek yuva"
+
+#: indico/modules/events/registration/client/js/form/field.js:705
+#: indico/modules/events/registration/client/js/form/field.js:1160
+msgid "Extra slots pay"
+msgstr "Ek yuva ödemesi"
+
+#: indico/modules/events/registration/client/js/form/field.js:706
+#: indico/modules/events/registration/client/js/form/field.js:1081
+#: indico/modules/events/registration/client/js/form/field.js:1161
+msgid "Enabled"
+msgstr "Etkinlenmiş"
+
+#: indico/modules/events/registration/client/js/form/field.js:803
+msgid "Phone"
+msgstr "Telefon"
+
+#: indico/modules/events/registration/client/js/form/field.js:817
+msgid "Text"
+msgstr "Metin"
+
+#: indico/modules/events/registration/client/js/form/field.js:834
+msgid "Textarea"
+msgstr "Metin alanı"
+
+#: indico/modules/events/registration/client/js/form/field.js:850
+msgid "Yes/No"
+msgstr "Evet/Hayır"
+
+#: indico/modules/events/registration/client/js/form/field.js:853
+msgid "yes"
+msgstr "evet"
+
+#: indico/modules/events/registration/client/js/form/field.js:853
+msgid "no"
+msgstr "hayır"
+
+#: indico/modules/events/registration/client/js/form/field.js:869
+msgid "Email address"
+msgstr "E-posta adresi"
+
+#: indico/modules/events/registration/client/js/form/field.js:992
+msgid "Title of the \"None\" option"
+msgstr "\"Hiçbiri\" seçeneğinin başlığı"
+
+#: indico/modules/events/registration/client/js/form/field.js:999
+msgid "Accommodation"
+msgstr "Konaklama"
+
+#: indico/modules/events/registration/client/js/form/field.js:1077
+msgid "Accommodation option"
+msgstr "Yer sağlama seçeneği"
+
+#: indico/modules/events/registration/client/js/form/field.js:1144
+msgid "Multi choice"
+msgstr "Çoklu seçenek"
+
+#: indico/modules/events/registration/client/js/form/sectiontoolbar.js:44
+msgid "Add new field"
+msgstr "Yeni alan ekle"
+
+#: indico/modules/events/sessions/client/js/index.js:118
+msgid "Filter types"
+msgstr "Süzgeç türleri"
+
+#: indico/modules/events/sessions/client/js/index.js:123
+#: indico/modules/events/sessions/client/js/index.js:126
+msgid "Add new type"
+msgstr "Yeni tür ekle"
+
+#: indico/modules/events/sessions/client/js/index.js:150
+msgid "No type"
+msgstr "Tür Yok"
+
+#: indico/modules/vc/client/js/index.js:83
+msgid ""
+"This room has been deleted and cannot be used. You can detach it from the "
+"event, however."
+msgstr "Bu oda silinmiştir ve kullanılamaz. Ancak onu etkinlikten ayırabilirsiniz."
+
+#: indico/modules/vc/client/js/index.js:112
+msgid "Click to toggle collapse status"
+msgstr "Çökme statüsü arasında geçiş yapmak için tıklayın"
+
+#: indico/web/client/js/jquery/extensions/clipboard.js:49
+msgid "Copied to clipboard"
+msgstr "Panoya kopyalanmıştır"
+
+#: indico/web/client/js/jquery/extensions/clipboard.js:57
+msgid "Press {0} to copy"
+msgstr "Kopyalamak için {0} basın"
+
+#: indico/web/client/js/jquery/extensions/global.js:256
+msgid "Create new lecture"
+msgstr "Yeni ders oluştur"
+
+#: indico/web/client/js/jquery/extensions/global.js:257
+msgid "Create new meeting"
+msgstr "Yeni toplantı oluştur"
+
+#: indico/web/client/js/jquery/extensions/global.js:258
+msgid "Create new conference"
+msgstr "Yeni konferans oluştur"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:79
+msgid ""
+"You have unsaved changes. Do you really want to close the dialog without "
+"saving?"
+msgstr "Kaydedilmemiş değişiklikleriniz var. Gerçekten kaydetmeden bu iletişim kutusunu kapatmak ister misiniz?"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:149
+#: indico/web/client/js/jquery/utils/ajaxform.js:134
+#: indico/web/client/js/jquery/utils/ajaxform.js:283
+msgid "Unsaved changes"
+msgstr "Kaydedilmemiş değişiklikler"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:181
+#: indico/web/client/js/jquery/utils/misc.js:87
+#: indico/web/client/js/legacy/libs/timetable/Management.js:247
+msgid "Close"
+msgstr "Kapat"
+
+#: indico/web/client/js/jquery/utils/ajaxform.js:266
+msgid "You have unsaved changes that will be lost."
+msgstr "Kaybedilecek kaydedilmemiş değişiklikleriniz var."
+
+#: indico/web/client/js/jquery/utils/declarative.js:251
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:696
+msgid "Confirm action"
+msgstr "Eylemi onayla"
+
+#: indico/web/client/js/jquery/utils/declarative.js:360
+msgid "Direct link to this item"
+msgstr "Bu öğeye doğrudan bağlantı"
+
+#: indico/web/client/js/jquery/utils/defaults.js:19
+msgid "Next"
+msgstr "Sonraki"
+
+#: indico/web/client/js/jquery/utils/defaults.js:20
+msgid "Previous"
+msgstr "Önceki"
+
+#: indico/web/client/js/jquery/utils/errors.js:31
+#: indico/web/client/js/utils/axios.js:45
+msgid "Something went wrong"
+msgstr "Bir şeyler ters gitti"
+
+#: indico/web/client/js/jquery/utils/forms.js:16
+msgid "The passwords do not match."
+msgstr "Parolalar eşleşmiyor."
+
+#: indico/web/client/js/jquery/utils/forms.js:74
+msgid "Field must be at least {0} character long."
+msgid_plural "Field must be at least {0} characters long."
+msgstr[0] "Alan en az {0} karakter uzunluğunda olmalıdır."
+msgstr[1] "Alan en az {0} karakter uzunluğunda olmalıdır."
+
+#: indico/web/client/js/jquery/utils/forms.js:82
+msgid "Field cannot be longer than {0} character."
+msgid_plural "Field cannot be longer than {0} characters."
+msgstr[0] "Alan {0} karakterden uzun olamaz."
+msgstr[1] "Alan {0} karakterden uzun olamaz."
+
+#: indico/web/client/js/jquery/utils/forms.js:90
+msgid "Field must be between {0} and {1} characters long."
+msgstr "Alan {0} ile {1} karakter arasında bir uzunluğa sahip olmalıdır."
+
+#: indico/web/client/js/jquery/utils/forms.js:96
+msgid "Field must contain at least {0} word."
+msgid_plural "Field must contain at least {0} words."
+msgstr[0] "Alan en az {0} kelime içermelidir."
+msgstr[1] "Alan en az {0} kelime içermelidir."
+
+#: indico/web/client/js/jquery/utils/forms.js:104
+msgid "Field cannot contain more than {0} word."
+msgid_plural "Field cannot contain more than {0} words."
+msgstr[0] "Alan {0} kelimeden fazlasını içeremez."
+msgstr[1] "Alan {0} kelimeden fazlasını içeremez."
+
+#: indico/web/client/js/jquery/utils/forms.js:112
+msgid "Field must contain between {0} and {1} words."
+msgstr "Alan {0} ile {1} arasında kelime içermelidir."
+
+#: indico/web/client/js/jquery/utils/forms.js:130
+msgid "Save now"
+msgstr "Şimdi kaydet"
+
+#: indico/web/client/js/jquery/utils/forms.js:131
+#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
+msgid "Saving..."
+msgstr "Kaydediyor..."
+
+#: indico/web/client/js/jquery/utils/forms.js:132
+msgid "Do not forget to save your changes!"
+msgstr "Değişikliklerinizi kaydetmeyi unutmayın."
+
+#: indico/web/client/js/jquery/utils/forms.js:407
+msgid "Only {0} out of {1} rows is currently selected"
+msgid_plural "Only {0} out of {1} rows are currently selected."
+msgstr[0] "Şu an yalnızca {1} satırdan {0} tanesi seçilidir."
+msgstr[1] "Şu an yalnızca {1} satırdan  {0} "
+
+#: indico/web/client/js/jquery/utils/forms.js:446
+msgid "Select only the current page."
+msgstr "Yalnızca mevcut sayfayı seç."
+
+#: indico/web/client/js/jquery/utils/forms.js:460
+msgid "Click here to select them all."
+msgstr "Hepsini seçmek için buraya tıklayın."
+
+#: indico/web/client/js/jquery/utils/misc.js:16
+#: indico/web/client/js/jquery/utils/misc.js:30
+msgid "Please confirm"
+msgstr "Lütfen onaylayın"
+
+#: indico/web/client/js/jquery/utils/misc.js:101
+msgid "Executing operation..."
+msgstr "İşlem yürütüyor..."
+
+#: indico/web/client/js/jquery/utils/misc.js:103
+msgid "Operation done!"
+msgstr "İşlem tamamlandı!"
+
+#: indico/web/client/js/jquery/utils/misc.js:168
+msgid "Operation failed!"
+msgstr "İşlem başarısız oldu!"
+
+#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:300
+msgid "Saved"
+msgstr "Kaydedildi"
+
+#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:161
+msgid "Save"
+msgstr "Kaydet"
+
+#: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:672
+msgid "Loading..."
+msgstr "Yükleniyor..."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:20
+msgid "Select"
+msgstr "Seç"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:24
+msgid "This category doesn't contain any subcategory"
+msgstr "Bu kategori, herhangi bir alt kategori içermez"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:28
+msgid "Select a category"
+msgstr "Bir kategori seç"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:35
+msgid "Not possible for categories where you cannot create events"
+msgstr "Etkinlik oluşturamayacağınız kategoriler için mümkün değildir"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:41
+msgid "Not possible for categories descending from category \"{0}\""
+msgstr "\"{0}\" kategorisinden aşağıdaki kategoriler için mümkün değildir"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:45
+msgid "Not possible for this category"
+msgstr "Bu kategori için mümkün değildir"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:134
+msgid "Search"
+msgstr "Ara"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:191
+msgid "Go to: {0}"
+msgstr "Git: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:228
+msgid "This category is protected"
+msgstr "Bu kategori korunmaktadır"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:276
+msgid "Go to parent: {0}"
+msgstr "Üste git: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:325
+msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
+msgstr "Bunu yalnızca <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> yapabilirsiniz."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:330
+msgid ""
+"You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
+" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a class"
+"=\"js-search\">search</a>."
+msgstr "Bunu <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> yapabilir, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">gezebilir</a> veya<a class=\"js-search\">arayabilirsiniz</a>."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+msgid ""
+"You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
+"or <a class=\"js-search\">search</a>."
+msgstr "<a class=\"js-navigate-up\" data-parent-id=\"{2}\">Yukarıda gezebilir</a> veya<a class=\"js-search\">arayabilirsiniz</a>."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:353
+msgid "Your search doesn't match any category"
+msgstr "Aramanız hiçbir kategori ile eşleşmiyor."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:358
+msgid ""
+"You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
+"search\">clear</a> your search."
+msgstr "Aramanızı <a class=\"js-search\">değiştirebilir</a> veya<a class=\"js-clear-search\">temizleyebilirsiniz</a>."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:432
+msgid "In favorite categories"
+msgstr "Favori kategorilerde"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:439
+msgid "Search result"
+msgstr "Arama sonucu"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:460
+msgid "Displaying {0} out of {1} results."
+msgstr "{1} sonuçtan {0} tanesini görüntülüyor."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:461
+msgid "There are no results."
+msgstr "Hiçbir sonuç yok."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
+msgid "Clear search"
+msgstr "Aramayı temizle"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:694
+msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
+msgstr "Seçili kategoriniz <em>{0}</em>. İlerlemek istediğinize emin misiniz?"
+
+#: indico/web/client/js/jquery/widgets/itempicker.js:21
+msgid "Type to filter..."
+msgstr "Süzgeçlenecek tür..."
+
+#: indico/web/client/js/jquery/widgets/misc.js:89
+msgid "You can copy the URL below using CTRL + C (&#8984; + C on OSX):"
+msgstr "Aşağıdaki URL'yi CTRL + C ile kopyalayabilirsiniz (&#8984; + C on OSX):"
+
+#: indico/web/client/js/jquery/widgets/multitextfield.js:254
+msgid "Type to add {0}"
+msgstr "Eklenecek tür {0}"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
+#: indico/web/client/js/jquery/widgets/multitextfield.js:278
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
+msgid "Delete"
+msgstr "Sil"
+
+#: indico/web/client/js/jquery/widgets/multitextfield.js:353
+msgid "Empty values are not allowed."
+msgstr "Boş değerlere izin verilmez."
+
+#: indico/web/client/js/jquery/widgets/principalfield.js:113
+msgid "There is already another person with this email address."
+msgstr "Bu e-posta adresi ile zaten başka biri kayıtlı."
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:193
+#: indico/web/client/js/jquery/widgets/principalfield.js:121
+msgid "Edit information"
+msgstr "Bilgi düzenle"
+
+#: indico/web/client/js/jquery/widgets/principalfield.js:140
+msgid "Enter person"
+msgstr "Kişi gir"
+
+#: indico/web/client/js/jquery/widgets/rulelistwidget.js:60
+msgid "Select an option"
+msgstr "Bir seçeneği seçin"
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:68
+msgid "Using default location from: {0} ({1})"
+msgstr "Varsayılan konumu kullanma: {0} ({1})"
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:70
+msgid "Using custom location"
+msgstr "Özel konum kullanma"
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:166
+msgid "Just use \"{0}\""
+msgstr "Yalnızca \"{0}\" kullan"
+
+#: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:29
+msgid "<strong>1</strong> char left"
+msgid_plural "<strong>{0}</strong> chars left"
+msgstr[0] "<strong>1</strong> karakter kaldı"
+msgstr[1] "<strong>{0}</strong> karakter kaldı"
+
+#: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:39
+msgid "<strong>1</strong> word left"
+msgid_plural "<strong>{0}</strong> words left"
+msgstr[0] "<strong>{0}</strong> kelime kaldı"
+msgstr[1] "<strong>{0}</strong> kelime kaldı"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
+msgid "Edit"
+msgstr "Düzenle"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:49
+#: indico/web/client/js/legacy/angular/directives.js:68
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:413
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:186
+#: indico/web/client/js/legacy/libs/timetable/Management.js:670
+msgid "Cancel"
+msgstr "İptal"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:296
+msgid "Must be between {0} and {1}"
+msgstr "{0} ile {1} arasında olmalı"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:298
+msgid "Must be above {0}"
+msgstr "{0} üzerinde olmalı"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:300
+msgid "Must be below {0}"
+msgstr "{0} altında olmalı"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:319
+msgid "Please fill in the required fields."
+msgstr "Lütfen gereken boşlukları doldurun."
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:171
+msgid "IP networks cannot have management permissions"
+msgstr "IP ağları yönetim izinleri sahip olamaz"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
+msgid "Registrants cannot have management permissions"
+msgstr "Kaydettirenler yönetim izinlerine sahip olamaz"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:184
+msgid "Assign Permissions"
+msgstr "İzinleri Ata"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:201
+msgid "Delete entry '{0}'"
+msgstr "'{0}' girisini sil"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+msgid "Are you sure you want to remove yourself from the list?"
+msgstr "Kendinizi listeden çıkarmak istediğinize emin misiniz?"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:286
+msgid "All options have been added"
+msgstr "Tüm seçenekler eklendi"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:317
+msgid "This entry was already added"
+msgstr "Bu giri zaten eklendi"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:350
+msgid "Anonymous"
+msgstr "Adsız"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:359
+msgid "Additional users"
+msgstr "İlave kullanıcılar"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:363
+msgid "{0} user has implicit read access due to other roles"
+msgid_plural "{0} users have implicit read access due to other roles"
+msgstr[0] "Diğer roller yüzünden {0} kullanıcı örtük okuma erişimine sahiptir"
+msgstr[1] "Diğer roller yüzünden {0} kullanıcı örtük okuma erişimine sahiptir"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:379
+msgid "Category Managers"
+msgstr "Kategori Yöneticileri"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:381
+msgid "Parent Category Managers"
+msgstr "Üst Kategori Yöneticileri"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:383
+msgid "Event Managers"
+msgstr "Etkinlik Yöneticileri"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:400
+msgid "Registrants in \"{0}\""
+msgstr "\"{0}\" içindeki kaydettirenler "
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:179
+msgid "Speaker"
+msgstr "Konuşmacı"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:190
+msgid "Remove person"
+msgstr "Kişiyi kaldır"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:196
+msgid "Configure roles"
+msgstr "Rolleri yapılandır"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:211
+msgid "Submitter"
+msgstr "Sunan kişi"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:259
+msgid "or"
+msgstr "veya"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:280
+msgid "Move to authors"
+msgstr "Yazarlara taşı"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:286
+msgid "Move to co-authors"
+msgstr "Eş yazarlara taşı"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:293
+msgid "Move to others"
+msgstr "Diğerlerine taşı"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:299
+msgid "Not a speaker anymore"
+msgstr "Artık bir konuşmacı değil"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
+msgid "Make a speaker"
+msgstr "Bir konuşmacı yap"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:311
+msgid "People in the 'Others' section <strong>must</strong> be speakers."
+msgstr "'Diğerleri' bölümündeki insanlar konuşmacı<strong>olmalıdır</strong>."
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:331
+msgid "Revoke submission rights"
+msgstr "Sunma haklarını iptal et"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:332
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:32
+msgid "Grant submission rights"
+msgstr "Sunma hakları tanı"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:398
+msgid "Custom sorting has been applied. Click to restore alphabetical order."
+msgstr "Özel sıralama uygulandı. Alfabetik sıraya dönmek için tıklayın."
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:400
+msgid "Alphabetical sorting is ON. Click to turn it off."
+msgstr "Alfabetik sıralama AÇIK. Kapatmak için tıklayın."
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
+msgid "You must add at least one speaker"
+msgstr "En az bir konuşmacı eklemelisiniz"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
+msgid "You must add at least one submitter"
+msgstr "En az bir sunan kişi eklemelisiniz"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:451
+msgid "You must add at least one co-author"
+msgstr "En az bir eş yazar eklemelisiniz"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:454
+msgid "You must add at least one author"
+msgstr "En az bir yazar eklemelisiniz"
+
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:459
+msgid ""
+"You cannot have users in the Other section, please make them authors or co-"
+"authors"
+msgstr "Diğer bölümünde kullanıcılarınız olamaz, lütfen onları yazar veya eş yazar yapın"
+
+#: indico/web/client/js/legacy/angular/directives.js:67
+msgid "Ok"
+msgstr "Tamam"
+
+#: indico/web/client/js/legacy/angular/directives.js:115
+msgid "The content of this dialog is currently unavailable."
+msgstr "Bu iletişim kutusunun içeriği şu anda kullanılamaz."
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:243
+msgid "OK"
+msgstr "Tamam"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:367
+msgid "Reason: "
+msgstr "Neden:"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:38
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:57
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:77
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:92
+msgid "Note:"
+msgstr "Not:"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:39
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:58
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:78
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:93
+msgid " If this person does not already have an Indico account, "
+msgstr "Bu kişi bir Indico hesabına sahip değilse"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:41
+msgid "he or she will be sent an email asking to register as a user."
+msgstr "Bir kullanıcı olarak kaydolması için ona bir e-posta gönderilecektir."
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:43
+msgid " After the registration the user will automatically be given"
+msgstr "Kayıt sonrasında, kullanıcıya otomatik olarak"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:45
+msgid " submission rights."
+msgstr "sunma hakları verilecektir."
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:51
+msgid "Give management rights"
+msgstr "Yönetim hakları ver"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:60
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:80
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:95
+msgid "he or she will be sent an email asking to create an account."
+msgstr "Ona bir hesap oluşturmasının istendiği bir e-posta gönderilecektir."
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:62
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:82
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:97
+msgid " After the account creation the user will automatically be"
+msgstr "Hesap oluşturulduktan sonra, kullanıcıya otomatik olarak"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:64
+msgid " given management rights."
+msgstr "yönetici hakları verilecektir."
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:71
+msgid "Give coordination rights"
+msgstr "Eşgüdüm hakları ver"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:84
+msgid " given coordination rights."
+msgstr "Eşgüdüm hakları verilmiş."
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:99
+msgid " given the rights."
+msgstr "Haklar verilmiş."
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:106
+#: indico/web/client/js/legacy/libs/timetable/Management.js:21
+msgid "Title"
+msgstr "Başlık"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:111
+msgid "Mr"
+msgstr "Bay"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:112
+msgid "Mrs"
+msgstr "Bayan"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:113
+msgid "Ms"
+msgstr "Bayan"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:114
+msgid "Dr"
+msgstr "Dr"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:115
+msgid "Prof."
+msgstr "Prof"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:121
+msgid "Family Name"
+msgstr "Soyadı"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:128
+msgid "First Name"
+msgstr "Adı"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:132
+msgid "Affiliation"
+msgstr "Üyeliği"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:136
+msgid "Email"
+msgstr "E-posta"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:146
+msgid "Address"
+msgstr "Adres"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:147
+msgid "Telephone"
+msgstr "Telefon"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:166
+msgid ""
+"It is not possible to grant submission rights to a participant without an "
+"email address. Please set an email address."
+msgstr "Bir e-posta adresi olmadan bir katılımcıya sunma hakları vermek mümkün değildir.\nLütfen bir e-posta ayarlayın."
+
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:465
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:473
+msgid "Previous tab"
+msgstr "Önceki sekme"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:485
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:492
+msgid "Next tab"
+msgstr "Sonraki sekme"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/RichText.js:212
+msgid "switch to plain text"
+msgstr "Düz metine geç"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/RichText.js:213
+msgid "switch to rich text"
+msgstr "Zengin metine geç"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:309
+msgid "At least one must be selected"
+msgstr "En az biri seçilmelidir"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:313
+msgid "Please enable the checkbox"
+msgstr "Lütfen onay kutusunu etkinleştirin"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:317
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:321
+msgid "Please choose an option"
+msgstr "Lütfen bir seçenek seçin"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:328
+msgid "Field must be a number"
+msgstr "Alan bir sayı olmalıdır"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:340
+msgid "Field must be a positive number"
+msgstr "Alan pozitif bir sayı olmalıdır"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:346
+msgid "Date format is not valid. It should be dd/mm/yyyy hh:mm"
+msgstr "Tarih formatı geçersizdir. gg/aa/yyyy ss:dd şeklinde olmalıdır."
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:352
+msgid "Invalid e-mail address"
+msgstr "Geçersiz e-posta adresi"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:358
+msgid "Invalid URL"
+msgstr "Geçersiz URL"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:360
+msgid "Time format is not valid. It should be hh:mm"
+msgstr "Zaman formatı geçersizdir. ss:dd şeklinde olmalıdır"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:366
+msgid "Field is mandatory"
+msgstr "Alan zorunludur"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:225
+msgid "Add break"
+msgstr "Ara ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:241
+msgid "Add session"
+msgstr "Oturum ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:269
+msgid "Add session block"
+msgstr "Oturum öbeği ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:43
+msgid "Session"
+msgstr "Oturum"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:44
+msgid "Room"
+msgstr "Oda"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:131
+msgid "Updating the timetable..."
+msgstr "Zaman çizelgesini güncelliyor..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:182
+#: indico/web/client/js/legacy/libs/timetable/Base.js:421
+msgid "Filter"
+msgstr "Süzgeç"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:200
+msgid "Printable version"
+msgstr "Yazdırılabilir sürüm"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:221
+msgid "Go back"
+msgstr "Geriye dön"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:228
+#: indico/web/client/js/legacy/libs/timetable/Base.js:387
+msgid "Print"
+msgstr "Yazdır"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:272
+msgid "Export to PDF"
+msgstr "PDF'ye aktar"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:280
+msgid "Switching to full screen mode..."
+msgstr "Tam ekran moduna geçiyor..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:317
+msgid "Exit Full Screen"
+msgstr "Tam Ekrandan Çık"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:394
+msgid "PDF"
+msgstr "PDF"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:401
+msgid "Full screen"
+msgstr "Tam ekran"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:408
+msgid "Link"
+msgstr "Bağlantı"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:413
+msgid "Detailed view"
+msgstr "Detaylı görünüm"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:476
+msgid "All days"
+msgstr "Tüm günler"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:689
+msgid "You are viewing the contents of the session block:"
+msgstr "Oturum öbeği içeriklerini görüntülüyorsunuz:"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:778
+msgid "Your changes triggered the automatic modification of some settings:"
+msgstr "Değişiklikleriniz bazı ayarlarda otomatik değişimi tetikledi:"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:786
+#: indico/web/client/js/legacy/libs/timetable/Base.js:790
+msgid "The <strong>starting time</strong> of the session interval <strong>"
+msgstr "<strong>Oturum arasının</strong> başlangıç zamanı <strong>"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:788
+#: indico/web/client/js/legacy/libs/timetable/Base.js:792
+#: indico/web/client/js/legacy/libs/timetable/Base.js:801
+#: indico/web/client/js/legacy/libs/timetable/Base.js:805
+msgid "</strong> was moved from "
+msgstr "</strong> taşındı"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:793
+msgid ""
+"The <strong>starting time</strong> of the <strong>Event</strong> was moved "
+"from "
+msgstr "<strong>Etkinliğin</strong>  <strong>başlangıç zamanı</strong> taşındı"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:799
+#: indico/web/client/js/legacy/libs/timetable/Base.js:803
+msgid "The <strong>ending time</strong> of the session interval <strong>"
+msgstr "<strong>Oturum aralığının</strong> bitiş zamanı <strong>"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:806
+msgid ""
+"The <strong>ending time</strong> of the <strong>Event</strong> was moved "
+"from "
+msgstr "<strong>Etkinliğin</strong><strong>bitiş zamanı</strong> taşındı"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:812
+msgid "The contents of the interval <strong>"
+msgstr "Aralığın içerikleri <strong>"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:814
+msgid "</strong> were moved from "
+msgstr "</strong> taşındı"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:824
+msgid " to "
+msgstr "Taşınan yer"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1017
+msgid "Session block"
+msgstr "Oturum öbeği"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1035
+msgid "Contribution"
+msgstr "Katkı"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1049
+msgid "Break"
+msgstr "Ara"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
+msgid "Add poster"
+msgstr "Gönderi sahibi ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1076
+msgid "Add new"
+msgstr "Yeni ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1080
+#: indico/web/client/js/legacy/libs/timetable/Management.js:664
+msgid "Reschedule"
+msgstr "Yeniden zamanla"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1090
+msgid "Fit to content"
+msgstr "İçeriğe sığdır"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1099
+msgid "Add new block"
+msgstr "Yeni öbek ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1143
+msgid "Add one hour"
+msgstr "Bir saat ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1212
+msgid "Session legend"
+msgstr "Oturum göstergesi"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
+msgid "see more..."
+msgstr "daha fazla bilgi..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1253
+msgid "less..."
+msgstr "daha az..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1567
+msgid "Go to event timetable"
+msgstr "Etkinlik zaman çizelgesine git"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1737
+msgid "Up to timetable"
+msgstr "Zaman çizelgesine bağlı"
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:42
+msgid "move to resize"
+msgstr "Yeniden boyutlandırmak için taşı"
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:420
+msgid ""
+"<span class=\"key light\">Shift</span> is currently pressed. Changes will be"
+" applied to blocks after."
+msgstr "Şu anda <span class=\"key light\">Shift</span> tuşuna basılıdır. Değişiklikler, öbeklere daha sonra uygulanacaktır."
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
+msgid "Drop to move block inside session"
+msgstr "Öbeği oturumun içine taşımak için sürükle"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:113
+msgid "Show materials"
+msgstr "Malzemeler göster"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:215
+msgid "et al."
+msgstr "vd."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
+msgid "This poster session has "
+msgstr "Bu gönderi sahibinin oturumda"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
+msgid " contribution(s)."
+msgstr "katkıları vardır."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:319
+msgid "Please click for more information."
+msgstr "Lütfen daha fazla bilgi için tıklayın."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:622
+msgid "Move entry"
+msgstr "Giriyi taşı"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:666
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:677
+msgid "This timetable entry does not exist anymore. Please refresh the page."
+msgstr "Bu zaman çizelgesi artık mevcut değildir. Lütfen sayfayı yenileyin."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:678
+msgid "Refresh"
+msgstr "Yenile"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
+msgid "Move up"
+msgstr "Yukarı taşı"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:790
+msgid "Move down"
+msgstr "Aşağı taşı"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1478
+msgid "Edit poster"
+msgstr "Gönderi sahibini düzenle"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
+msgid "Manage protection"
+msgstr "Korumayı yönet"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1512
+msgid "Manage poster protection"
+msgstr "Gönderi sahibi korumasını yönet"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
+msgid "Unschedule"
+msgstr "Zamanlamadan çıkar"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1541
+msgid "Unschedule poster"
+msgstr "Gönderi sahibini zamanlamadan çıkar"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
+msgid "Are you sure you want to unschedule the poster?"
+msgstr "Gönderi sahibini zamanlamadan çıkarmak istediğinizden emin misiniz?"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1545
+msgid "Delete poster"
+msgstr "Gönderi sahibini sil"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1546
+msgid "Are you sure you want to delete the poster?"
+msgstr "Gönderi sahibini silmek istediğinizden emin misiniz?"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:219
+msgid "Sessions"
+msgstr "Oturumlar"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:224
+msgid "No sessions in the timetable"
+msgstr "Zaman çizelgesinde oturum yok"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:228
+msgid "Rooms"
+msgstr "Odalar"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:233
+msgid "No rooms found in the timetable"
+msgstr "Zaman çizelgesinde hiçbir oda bulunamadı"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:238
+msgid "Filter options"
+msgstr "Süzgeç seçenekleri"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:244
+msgid "Reset filter"
+msgstr "Süzgeci sıfırla"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:15
+msgid "All"
+msgstr "Hepsi"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:16
+msgid "None"
+msgstr "Hiçbiri"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:19
+msgid "ID"
+msgstr "Kimlik"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:24
+msgid "Sort by: "
+msgstr "Sırala:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:29
+msgid "Select: "
+msgstr "Seç:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:188
+msgid "Add Contribution"
+msgstr "Katkı Ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:238
+msgid "Add selected"
+msgstr "Seçili ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:273
+msgid "Create a new one"
+msgstr "Yeni bir tane oluştur"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:280
+msgid "You may choose to:"
+msgstr "Şunları seçebilirsiniz:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:286
+msgid "Choose one (or more) unscheduled"
+msgstr "Bir (veya daha fazla) zamanlanmamış seç"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:294
+msgid "To add an unscheduled contribution, please select at least one"
+msgstr "Zamanlanmamış bir katkı eklemek için, lütfen en az bir tane seçin"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:334
+msgid "Add contribution"
+msgstr "Katkı ekle"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:387
+msgid "Step 1: Choose type of rescheduling"
+msgstr "Adım 1: Yeniden çizelgeleme türü seç"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:397
+#: indico/web/client/js/legacy/libs/timetable/Management.js:434
+msgid "See an example"
+msgstr "Bir örneğe bak"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:402
+msgid "Adjust starting time of all entries"
+msgstr "Tüm girilerin başlangıç zamanını ayarla"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:406
+msgid "Move the entries of "
+msgstr "Girileri taşı"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:406
+#: indico/web/client/js/legacy/libs/timetable/Management.js:409
+msgid " by changing their"
+msgstr "Değiştirerek"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:407
+msgid "Move the entries of the interval "
+msgstr "Aralık başlangıç zamanları"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:410
+msgid " starting times. "
+msgstr "girilerini taşı."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:412
+msgid "The first entry will start when the event starts ("
+msgstr "İlk giri etkinlik başladığında başlayacak  ("
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:415
+msgid "The first entry will start when the interval starts ("
+msgstr "İlk giri aralık başladığında başlayacak ("
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:418
+msgid ""
+"and the other entries will follow consecutively after it. The durations of "
+"the entries will not change. "
+msgstr "ve diğer giriler de art arda onu takip edecektir. Girilerin süresi değişmeyecektir."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:439
+msgid "Adjust duration of all entries"
+msgstr "Tüm girilerin süresini ayarla"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:442
+msgid "Adjust the "
+msgstr "Aralık"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:443
+msgid " duration "
+msgstr "girilerinin"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:444
+msgid "of the entries of "
+msgstr "süresini"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:447
+msgid "the interval "
+msgstr "ayarla"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:448
+msgid ""
+" to fill the gaps between them, so that their starting time don't change. If"
+" a time gap is specified, the duration will be extended up to the value of "
+"this time gap before the starting time of the next entry. "
+msgstr "Bu sayede onların arasındaki boşluklar doldurulur ve onların başlama zamanları değişmez. Bir zaman boşluğunun belirtilmesi durumunda, süre, bir sonraki girinin başlama zamanından önce bu zaman aralığının değeri kadar uzatılacaktır."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:531
+msgid "Step 2: Choose time gap between entries"
+msgstr "Adım 2: Giriler arasındaki zaman aralığını seç"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:568
+msgid "Step 3: Choose to fit sessions to their content"
+msgstr "Adım 3: Oturumları içeriğine sığdırmak için seç"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:617
+msgid "There will be no gaps between consecutive entries."
+msgstr "Ardışık giriler arasında herhangi bir boşluk olmayacaktır."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:622
+msgid "Entries will be separated by gaps of "
+msgstr "Giriler, şu boşluklarla birbirinden ayrılacaktır:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:624
+msgid "1 hour "
+msgstr "1 saat"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:626
+msgid " hours "
+msgstr "saatler"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:630
+msgid "and "
+msgstr "ve"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:634
+msgid "1 minute."
+msgstr "1 dakika."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:636
+msgid " minutes."
+msgstr "dakikalar"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:717
+msgid "Rescheduling..."
+msgstr "Yeniden çizelgeliyor..."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:733
+msgid "Are you sure you want to reschedule entries ?"
+msgstr "Girileri yeniden zamanlamak istediğinizden emin misiniz?"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:740
+msgid "The entries that are part of a session will"
+msgstr "Oturumun parçası olan girileri"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:745
+msgid " first"
+msgstr "öncelikli olarak"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:747
+msgid " be fitted to their content."
+msgstr "içeriklerine sığdırılacaktır."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
+msgid "Then, all entries "
+msgstr "Daha sonra, tüm giriler"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
+msgid "All entries "
+msgstr "Tüm girilerin"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:754
+msgid " will have their "
+msgstr "başlangıç zamanları"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+msgid "starting times"
+msgstr "ve süreleri"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+msgid "duration"
+msgstr "değiştirilmiş"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:756
+msgid " changed."
+msgstr "olacaktır."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:763
+msgid "Please review your choice"
+msgstr "Lütfen seçiminizi gözden geçirin."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:779
+msgid "Please select the rescheduling type"
+msgstr "Lütfen yeniden çizelgeleme türünü seçin"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:809
+msgid "Reschedule Entries"
+msgstr "Girileri Yeniden Zamanla"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:845
+msgid ""
+"This will change the starting and ending times of the session block {0} so "
+"that it encompasses all entries defined in its timetable."
+msgstr "Bu işlem, kendi zaman çizelgesinde tanımlanan tüm girileri kapsayabilmesi için öbek {0} başlangıç ve bitiş zamanlarını değiştirecektir."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:852
+msgid "Are you sure you want to proceed?"
+msgstr "İlerlemek istediğinizden emin misiniz?"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:874
+msgid "Fitting..."
+msgstr "Sığdırıyor..."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:888
+msgid "Fit timetable to content"
+msgstr "Zaman çizelgesini içeriğe sığdır"
+
+#: indico/web/client/js/legacy/libs/timetable/Undo.js:13
+msgid "Undo last operation"
+msgstr "Son işlemi geri al"
