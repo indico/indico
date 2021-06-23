@@ -5,21 +5,24 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import redirect, render_template, session
+from flask import redirect, render_template, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.models import attrs_changed
 from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.modules.events.models.events import EventType
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import check_event_locked, get_object_from_args
 from indico.util.string import sanitize_html
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.rh import RHProtected
+from indico.web.rh import RH, RHProtected
 from indico.web.util import jsonify_template
 
 
@@ -128,3 +131,26 @@ class RHViewNote(RHNoteBase):
         if not note:
             raise NotFound
         return sanitize_html(note.html)
+
+
+class RHGotoNote(RH):
+    def _get_embed_url(self, note):
+        if note.event.type_ == EventType.conference:
+            # we have no pretty note pages for conferences
+            return None
+        elif note.link_type == LinkType.event:
+            return url_for('events.display', note.event, note=note.id)
+        elif note.link_type == LinkType.session:
+            try:
+                block = note.session.blocks[0]
+            except IndexError:
+                return None
+            return url_for('events.display', note.event, note=note.id, _anchor=block.slug)
+        elif note.link_type in (LinkType.contribution, LinkType.subcontribution):
+            return url_for('events.display', note.event, note=note.id, _anchor=note.object.slug)
+
+    def _process(self):
+        note = EventNote.get_or_404(request.view_args['note_id'])
+        if embed_url := self._get_embed_url(note):
+            return redirect(embed_url)
+        return redirect(url_for('.view', note))

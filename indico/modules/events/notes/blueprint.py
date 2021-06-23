@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from indico.modules.events import event_object_url_prefixes
-from indico.modules.events.notes.controllers import RHCompileNotes, RHDeleteNote, RHEditNote, RHViewNote
+from indico.modules.events.notes.controllers import RHCompileNotes, RHDeleteNote, RHEditNote, RHGotoNote, RHViewNote
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -23,3 +23,5 @@ for object_type, prefixes in event_object_url_prefixes.items():
                          defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/note/delete', 'delete', RHDeleteNote, methods=('POST',),
                          defaults={'object_type': object_type})
+
+_bp.add_url_rule('/note/<int:note_id>', 'goto', RHGotoNote)
