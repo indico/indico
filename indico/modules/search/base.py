@@ -96,15 +96,6 @@ class IndicoSearchProvider:
         """
         return []
 
-    def get_filters(self):
-        """
-        Retrieve the list of search filters available as aggregations to
-        each query result.
-
-        :return: a list of `SearchFilter` instances
-        """
-        return []
-
     def get_sort_options(self):
         """
         Retrieve the list of search sortable options.
