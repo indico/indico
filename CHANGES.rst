@@ -7,6 +7,11 @@ Version 3.0
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Turkish
+
 Major Features
 ^^^^^^^^^^^^^^
 
