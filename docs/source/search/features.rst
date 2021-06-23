@@ -2,8 +2,9 @@ Internal Search
 ===============
 
 The Internal Search is a default SQL based engine implementation, created to support the most basic queries.
-While the performance and range of features might not be the same, depending on your instance, if your volume of
-records is small and retrieval needs are simple, this module should be enough.
+While not as fast and less feature rich (no filters or aggregations) compared to specialized search engines,
+this search engine provides a decent option for smaller Indico instances which may not want to spend
+additional time on deploying a separate service just for search.
 
 It supports the two types of records from a total of six targets:
 
@@ -19,13 +20,13 @@ It supports the two types of records from a total of six targets:
 External Search Service
 =======================
 
-Indico supports several powerful features for aggregation, filtering and retrieval of information natively
-covered by the out-of-the-box `Citadel`_ service.
+Indico provides several powerful features for aggregation and filtering when combined with an external
+search service supporting them, such as `Citadel`_.
 
 Aggregations
 ------------
 
-Aggregations, `as seen in Elastic Search <https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html>`_,
+Aggregations, as seen in `Elastic Search <https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html>`_,
 provide a way to combine information in groups according to a certain metric, such as a field value, sum or average.
 
 .. image:: ../images/search_features_aggregation.png
@@ -41,24 +42,28 @@ Indico supports any bucket or metric group, composed of a key, count and filter 
 Filters
 -------
 
-Filters act combined upon a certain aggregation on structured data. Considering a bucket group composed of a
-single affiliation:
+Filters act combined upon a certain aggregation on structured data. Consider the following bucket group
+composed of a single affiliation:
 
 .. code-block:: json
 
     {
-        "affiliation": "CERN",
-        "count": 5,
-        "filter": "affiliation"
+        "affiliation": {
+            "label": "Affiliation",
+            "buckets": {
+                "key": "CERN",
+                "count": 5,
+                "filter": "cern"
+            }
+        }
     }
 
-A corresponding filter acting upon the same key would be ``affiliation=CERN``.
+The combination of `key` and `filter` from :class:`AggregationSchema` can be used as a way to define a
+human-readable label to an attribute. A corresponding filter acting upon the same key in the example above
+would be ``affiliation=cern``.
 
 .. todo::
     Remove unused get_filters method
-
-.. autoclass:: indico.modules.search.base.IndicoSearchProvider
-    :members: get_filters
 
 Placeholders
 ------------
