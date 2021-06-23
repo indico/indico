@@ -67,5 +67,5 @@ class NoteCloner(EventCloner):
 
     def _clone_note(self, old_note, new_object):
         revision = old_note.current_revision
-        new_object.note = EventNote()
-        new_object.note.create_revision(render_mode=revision.render_mode, source=revision.source, user=revision.user)
+        note = EventNote.get_or_create(new_object)
+        note.create_revision(render_mode=revision.render_mode, source=revision.source, user=revision.user)
