@@ -92,7 +92,7 @@ class IndicoSearchProvider:
         Retrieve the list of search shortcuts that will be shown to users
         when typing a search query.
 
-        :return: a list of `SearchFilter` instances
+        :return: a list of :class:`SearchOption` instances
         """
         return []
 
@@ -100,6 +100,6 @@ class IndicoSearchProvider:
         """
         Retrieve the list of search sortable options.
 
-        :return: a list of `SearchFilter` instances
+        :return: a list of :class:`SearchOption` instances
         """
         return []
