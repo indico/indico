@@ -116,7 +116,7 @@ autodoc_default_flags = ['show-inheritance']
 
 # Intersphinx urls
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/2.7/', None),
+    'python': ('https://docs.python.org/3.9/', None),
     'celery': ('http://docs.celeryproject.org/en/stable/', None),
 }
 
