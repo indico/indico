@@ -19,7 +19,7 @@
                     {{ languages[session.lang][0] }}
                 </a>
                 <ul class="i-dropdown">
-                    {% for name, (title, territory) in languages|dictsort(by='value') %}
+                    {% for name, (title, territory, __) in languages|dictsort(by='value') %}
                         <li>
                             {% if name == session.lang %}
                                 <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">

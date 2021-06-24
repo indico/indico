@@ -7,6 +7,7 @@
 
 import ast
 import re
+from collections import Counter
 from contextlib import contextmanager
 
 from babel import negotiate_locale
@@ -227,9 +228,11 @@ def get_all_locales():
         return {}
     else:
         missing = object()
-        return {str(t): config.CUSTOM_LANGUAGES.get(str(t), (t.language_name.title(), t.territory_name))
-                for t in babel.list_translations()
-                if config.CUSTOM_LANGUAGES.get(str(t), missing) is not None}
+        languages = {str(t): config.CUSTOM_LANGUAGES.get(str(t), (t.language_name.title(), t.territory_name))
+                     for t in babel.list_translations()
+                     if config.CUSTOM_LANGUAGES.get(str(t), missing) is not None}
+        counts = Counter(x[0] for x in languages.values())
+        return {code: (name, territory, counts[name] > 1) for code, (name, territory) in languages.items()}
 
 
 def set_session_lang(lang):

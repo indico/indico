@@ -83,7 +83,7 @@ class IndicoSession(BaseSession):
         parts = self.lang.lower().split('_')  # e.g. `en_GB` or `zh_Hans_CN`
         lang = parts[0]
         territory = parts[-1]
-        if lang == territory or lang == 'uk':
+        if lang == territory or lang == 'uk' or self.lang == 'en_US':
             # TODO we should add some metadata that stores the canonical locale name and
             # the name of the moment locale to avoid hacks like the one here. for example,
             # fr_FR is handled somewhat nicely, but ukrainian (uk_UA) needs an explicit check

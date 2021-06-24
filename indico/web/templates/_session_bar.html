@@ -161,18 +161,22 @@
 
 
 {% macro _render_language_selector(languages, lightweight=false) %}
-    {% set lang = languages[session.lang][0] if session.lang in languages else 'English' %}
+    {% set name, territory, ambiguous = languages.get(session.lang, ('English', '', false)) %}
+    {% set language -%}
+        {{- name -}}
+        {%- if ambiguous and territory %} ({{ territory }}){% endif -%}
+    {%- endset %}
     {% if lightweight %}
         <a id="language-selector-link" class="arrow js-dropdown" data-toggle="dropdown">
-            {% trans %}My language ({{ lang }}){% endtrans %}
+            {%- trans %}My language ({{ language }}){% endtrans %}
         </a>
     {% else %}
         <a id="language-selector-link" class="arrow icon-earth i-button js-dropdown" data-toggle="dropdown">
-            {{ lang }}
+            {{- language -}}
         </a>
     {% endif %}
     <ul class="i-dropdown">
-        {% for name, (title, territory) in languages|dictsort(by='value') %}
+        {% for name, (title, territory, __) in languages|dictsort(by='value') %}
             <li>
                 {% if name == session.lang %}
                     <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">

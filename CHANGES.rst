@@ -23,6 +23,11 @@ Major Features
   URI (RFC 8414) and also has endpoints to introspect or revoke a token. (:issue:`4685`,
   :pr:`4798`)
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New locale: English (United States)
+
 Improvements
 ^^^^^^^^^^^^
 
