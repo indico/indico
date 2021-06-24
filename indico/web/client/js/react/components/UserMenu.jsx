@@ -91,7 +91,7 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
     </div>
   );
 
-  const langInfo = languages[language] || [language, null];
+  const [langName, langTerritory] = languages[language] || [language, null, false];
   return (
     <Dropdown trigger={avatar} pointing="top right">
       <Dropdown.Menu>
@@ -106,7 +106,7 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
         <Dropdown.Header>
           {languageSelector(
             <>
-              <Icon name="globe" /> {langInfo[1] ? `${langInfo[0]} (${langInfo[1]})` : langInfo[0]}
+              <Icon name="globe" /> {langTerritory ? `${langName} (${langTerritory})` : langName}
             </>
           )}
         </Dropdown.Header>
