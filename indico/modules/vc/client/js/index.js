@@ -35,8 +35,8 @@ import {$T} from 'indico/utils/i18n';
       }
 
       if ($this.data('numEvents') === 1) {
-        title = $t('Delete videoconference room');
-        msg = `${$t('Do you really want to remove this videoconference room from the event?')} ${$t(
+        title = $t('Delete videoconference');
+        msg = `${$t('Do you really want to remove this videoconference from the event?')} ${$t(
           'Since it is only used in this event, it will be deleted from the server, too!'
         )}`;
         msg += $this.data('extraMsg');
@@ -44,11 +44,11 @@ import {$T} from 'indico/utils/i18n';
           execute($this.data('href'));
         });
       } else {
-        title = $t('Detach videoconference room');
+        title = $t('Detach videoconference');
         msg = $t
           .ngettext(
             '*',
-            'This videoconference room is used in other Indico events.<br>Do you want to \
+            'This videoconference is used in other Indico events.<br>Do you want to \
             <strong>delete</strong> it from all {0} events or just <strong>detach</strong> \
             it from this event?',
             $this.data('numEvents')

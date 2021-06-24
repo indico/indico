@@ -54,7 +54,7 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
     if event_vc_room.link_type != VCRoomLinkType.event and existing:
         db.session.rollback()
-        flash(_("There is already a VC room attached to '{link_object_title}'.").format(
+        flash(_("There is already a videoconference attached to '{link_object_title}'.").format(
             link_object_title=resolve_title(event_vc_room.link_object)), 'error')
         return None
     elif event_vc_room.link_type == VCRoomLinkType.event and vc_room in existing:
@@ -198,7 +198,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             try:
                 self.plugin.update_room(self.vc_room, self.event)
             except VCRoomNotFoundError as err:
-                Logger.get('modules.vc').warning('VC room %r not found. Setting it as deleted.', self.vc_room)
+                Logger.get('modules.vc').warning('Videoconference %r not found. Setting it as deleted.', self.vc_room)
                 self.vc_room.status = VCRoomStatus.deleted
                 flash(str(err), 'error')
                 return jsonify_data(flash=False)
@@ -232,12 +232,12 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
                 plugin_name=self.plugin.friendly_name), 'error')
             raise Forbidden
 
-        Logger.get('modules.vc').info('Refreshing VC room %r from event %r', self.vc_room, self.event)
+        Logger.get('modules.vc').info('Refreshing videoconference %r from event %r', self.vc_room, self.event)
 
         try:
             self.plugin.refresh_room(self.vc_room, self.event)
         except VCRoomNotFoundError as err:
-            Logger.get('modules.vc').warning('VC room %r not found. Setting it as deleted.', self.vc_room)
+            Logger.get('modules.vc').warning('Videoconference %r not found. Setting it as deleted.', self.vc_room)
             self.vc_room.status = VCRoomStatus.deleted
             flash(str(err), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
