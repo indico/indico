@@ -63,8 +63,8 @@ definitions:
       page_is_dark: false
     user_settings:
       colors:
-        caption: Contribution Colours
-        description: 'Colours used for different types of timetable entries'
+        caption: Contribution Colors
+        description: 'Colors used for different types of timetable entries'
         type: MultipleItemsField
         required: false
         kwargs:
@@ -72,7 +72,7 @@ definitions:
             - id: entry
               caption: Keyword
             - id: color
-              caption: Colour
+              caption: Color
           unique_field: entry
         defaults:
           - entry: foo

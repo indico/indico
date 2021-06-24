@@ -73,8 +73,8 @@ class ConferenceLayoutForm(LoggedLayoutForm):
                                         description=_('Format in which names are displayed'))
 
     # Style
-    header_text_color = StringField(_('Text colour'), widget=ColorPickerWidget())
-    header_background_color = StringField(_('Background colour'), widget=ColorPickerWidget())
+    header_text_color = StringField(_('Text color'), widget=ColorPickerWidget())
+    header_background_color = StringField(_('Background color'), widget=ColorPickerWidget())
 
     # Announcement
     announcement = StringField(_('Announcement'),

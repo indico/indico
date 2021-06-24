@@ -35,7 +35,7 @@ class TrackForm(IndicoForm):
 
 
 class ProgramForm(IndicoForm):
-    program = IndicoMarkdownField(_('Programme'), editor=True, mathjax=True)
+    program = IndicoMarkdownField(_('Program'), editor=True, mathjax=True)
 
     @generated_data
     def program_render_mode(self):

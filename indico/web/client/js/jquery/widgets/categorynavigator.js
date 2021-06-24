@@ -429,7 +429,7 @@ import Palette from '../../utils/palette';
           $result.find('.icon-wrapper').append(
             $('<i>', {
               class: 'icon-star',
-              title: $T.gettext('In favourite categories'),
+              title: $T.gettext('In favorite categories'),
             })
           );
         } else {

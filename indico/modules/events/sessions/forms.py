@@ -38,7 +38,7 @@ class SessionForm(IndicoForm):
     type = QuerySelectField(_('Type'), get_label='name', allow_blank=True, blank_text=_('No type selected'))
     location_data = IndicoLocationField(_('Default location'),
                                         description=_('Default location for blocks inside the session.'))
-    colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors())
+    colors = IndicoPalettePickerField(_('Colors'), color_list=get_colors())
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
@@ -69,7 +69,7 @@ class SessionProtectionForm(IndicoForm):
 
 class SessionBlockForm(IndicoForm):
     title = StringField(_('Title'), description=_('Title of the session block'))
-    code = StringField(_('Programme code'))
+    code = StringField(_('Program code'))
     person_links = SessionBlockPersonLinkListField(_('Conveners'))
     location_data = IndicoLocationField(_('Location'))
 
@@ -104,7 +104,7 @@ class SessionTypeForm(IndicoForm):
     name = StringField(_('Name'), [DataRequired()])
     is_poster = BooleanField(_('Poster'), widget=SwitchWidget(),
                              description=_('Whether the session is a poster session or contains normal presentations'))
-    code = StringField(_('Programme code'))
+    code = StringField(_('Program code'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

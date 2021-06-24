@@ -34,7 +34,7 @@
                   class="category-action right icon-medal active">
             </span>
         {% else %}
-            <span title="{% trans %}You have favourited this category{% endtrans %}"
+            <span title="{% trans %}You have favorited this category{% endtrans %}"
                   class="category-action right icon-star active">
             </span>
         {% endif %}
@@ -48,7 +48,7 @@
                data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"
                title="{% trans %}Click here to add this category to your favorites.{% endtrans %}"
                class="icon-star active suggestion-favorite">
-                <span>{% trans %}Add to favourites{% endtrans %}</span>
+                <span>{% trans %}Add to favorites{% endtrans %}</span>
             </a>
         </div>
     {% endset %}

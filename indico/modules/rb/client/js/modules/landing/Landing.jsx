@@ -153,7 +153,7 @@ export class Landing extends React.Component {
                     {userHasFavorites && (
                       <Form.Field>
                         <Checkbox
-                          label={Translate.string('Search only my favourites')}
+                          label={Translate.string('Search only my favorites')}
                           onClick={this.toggleFavorites}
                         />
                       </Form.Field>

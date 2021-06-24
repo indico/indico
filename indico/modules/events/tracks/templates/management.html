@@ -3,13 +3,13 @@
 {% from 'events/tracks/_track_list.html' import render_list %}
 
 {% block title %}
-    {%- trans %}Programme{% endtrans -%}
+    {%- trans %}Program{% endtrans -%}
 {% endblock %}
 
 {% block description %}
     {%- trans -%}
         Tracks represent the subject matter of the conference.
-        They represent both the basis for the Scientific Programme and a taxonomy that can be used to classify
+        They represent both the basis for the Scientific Program and a taxonomy that can be used to classify
         submissions during the Call for Abstracts process.
     {%- endtrans -%}
 {% endblock %}
@@ -20,15 +20,15 @@
             <div class="icon icon-file-text"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}Programme{% endtrans %}
+                    {% trans %}Program{% endtrans %}
                 </div>
-                {% trans -%}Configure the conference page displaying the scientific programme.{%- endtrans %}
+                {% trans -%}Configure the conference page displaying the scientific program.{%- endtrans %}
             </div>
             <div class="toolbar">
                 <div class="group">
                     <a href="#" class="i-button icon-settings"
                        data-href="{{ url_for('.edit_program', event) }}"
-                       data-title="{% trans %}Configure programme{% endtrans %}"
+                       data-title="{% trans %}Configure program{% endtrans %}"
                        data-qtip-position="right"
                        data-reload-after
                        data-ajax-dialog>

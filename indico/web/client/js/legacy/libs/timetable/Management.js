@@ -587,7 +587,7 @@ type(
       });
       this.fitInnerExplanationDiv.set(
         $T(
-          'This changes the start and end times of the session blocks occuring on ' +
+          'This changes the start and end times of the session blocks occurring on ' +
             this.__getCurrentDayText() +
             ' in order to fit their respective content '
         ),

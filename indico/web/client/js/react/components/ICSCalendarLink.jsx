@@ -164,11 +164,11 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
         />
       </Header>
       <Popup.Content styleName="content">
-        <strong styleName="export-option">Synchronise with your calendar</strong>
+        <strong styleName="export-option">Synchronize with your calendar</strong>
         <p>
           <Translate>
             You may copy-paste the following URL into your scheduling application. Contents will be
-            automatically synchronised.
+            automatically synchronized.
           </Translate>
         </p>
         <Input

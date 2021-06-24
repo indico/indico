@@ -46,7 +46,7 @@ class CategorySettingsForm(IndicoForm):
                                            description=_('Default timetable theme used for meeting events'))
     suggestions_disabled = BooleanField(_('Disable Suggestions'), widget=SwitchWidget(),
                                         description=_("Enable this if you don't want Indico to suggest this category as"
-                                                      " a possible addition to a user's favourites."))
+                                                      " a possible addition to a user's favorites."))
     event_message_mode = IndicoEnumSelectField(_('Message Type'), enum=EventMessageMode,
                                                default=EventMessageMode.disabled,
                                                description=_('This message will show up at the top of every event page '
@@ -192,8 +192,8 @@ class CategoryRoleForm(IndicoForm):
     code = StringField(_('Code'), [DataRequired(), Length(max=3)], filters=[lambda x: x.upper() if x else ''],
                        render_kw={'style': 'width:60px; text-align:center; text-transform:uppercase;'},
                        description=_('A shortcut (max. 3 characters) for the role'))
-    color = IndicoSinglePalettePickerField(_('Colour'), color_list=get_role_colors(), text_color='ffffff',
-                                           description=_('The colour used when displaying the role'))
+    color = IndicoSinglePalettePickerField(_('Color'), color_list=get_role_colors(), text_color='ffffff',
+                                           description=_('The color used when displaying the role'))
 
     def __init__(self, *args, **kwargs):
         self.role = kwargs.get('obj')

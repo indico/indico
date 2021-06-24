@@ -232,7 +232,7 @@ class TimeTablePlain(PDFWithTOC):
         story = None if self._ttPDFFormat.showCoverPage() else []
         PDFWithTOC.__init__(self, story=story, pagesize=pagesize, fontsize=fontsize, firstPageNumber=firstPageNumber,
                             include_toc=self._ttPDFFormat.showTableContents())
-        self._title = _('Programme')
+        self._title = _('Program')
         self._doc.leftMargin = 1 * cm
         self._doc.rightMargin = 1 * cm
         self._doc.topMargin = 1 * cm
@@ -766,7 +766,7 @@ class SimplifiedTimeTablePlain(PDFBase):
         self._showSessions = showSessions
         self._showDays = showDays
         PDFBase.__init__(self, story=[], pagesize=pagesize)
-        self._title = _('Simplified Programme')
+        self._title = _('Simplified Program')
         self._doc.leftMargin = 1 * cm
         self._doc.rightMargin = 1 * cm
         self._doc.topMargin = 1 * cm
@@ -907,7 +907,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                 text = f'{text}, {escape(self.event.venue_name)}.'
             p = Paragraph(text, self._styles['title'])
             story.append(p)
-            text2 = '{}: {}'.format(_('Daily Programme'), escape(current_day.strftime('%A %d %B %Y')))
+            text2 = '{}: {}'.format(_('Daily Program'), escape(current_day.strftime('%A %d %B %Y')))
             p2 = Paragraph(text2, self._styles['day'])
             story.append(p2)
             story.append(Spacer(1, 0.4 * inch))

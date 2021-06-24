@@ -75,7 +75,7 @@ export default function FileTypeModal({onClose, onSubmit, fileType, header}) {
                     (e.g. <Param name="example" value="*_paper" wrapper={<code />} />
                     ). No dots allowed. It is possible to use{' '}
                     <Param name="placeholder" value="{code}" wrapper={<code />} /> as a placeholder
-                    for the contribution programme code.
+                    for the contribution program code.
                   </Translate>
                 }
                 pattern="^[^.]*$"

@@ -68,8 +68,8 @@ class Room extends React.Component {
       />
     );
     const tooltip = isFavorite
-      ? Translate.string('Remove from favourites')
-      : Translate.string('Add to favourites');
+      ? Translate.string('Remove from favorites')
+      : Translate.string('Add to favorites');
     return <ResponsivePopup trigger={button} content={tooltip} position="top center" />;
   }
 
