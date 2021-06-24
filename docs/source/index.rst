@@ -48,6 +48,15 @@ Building
     building/index.rst
 
 
+Search
+++++++
+
+.. toctree::
+    :maxdepth: 2
+
+    search/index.rst
+
+
 Plugins
 +++++++
 

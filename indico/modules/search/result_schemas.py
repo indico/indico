@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import typing as t
+
 from marshmallow import EXCLUDE, ValidationError, fields
 from marshmallow_enum import EnumField
 from marshmallow_oneofschema import OneOfSchema
@@ -36,17 +38,22 @@ class CategoryPathSchema(_ResultSchemaBase):
 
 
 class PersonSchema(_ResultSchemaBase):
+    #: The person's name
     name = fields.String(required=True)
+    #: The person's affiliation
     affiliation = fields.String(missing=None)
 
 
 class HighlightSchema(_ResultSchemaBase):
+    #: The field's content to highlight
     content = fields.List(fields.String())
+    #: The field's description to highlight
     description = fields.List(fields.String())
 
 
 class ResultSchemaBase(_ResultSchemaBase):
-    category_path = fields.List(fields.Nested(CategoryPathSchema), required=True)
+    #: The parent category chain
+    category_path: CategoryPathSchema = fields.List(fields.Nested(CategoryPathSchema), required=True)
 
 
 def require_search_target(target):
@@ -68,21 +75,34 @@ class CategoryResultSchema(ResultSchemaBase):
 
 
 class LocationResultSchema(mm.Schema):
+    #: The venue name
     venue_name = fields.String(required=True)
+    #: The room name
     room_name = fields.String(required=True)
+    #: The address
     address = fields.String(required=True)
 
 
 class EventResultSchema(ResultSchemaBase):
-    type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.event))
+    #: The record type
+    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.event))
+    #: The event id
     event_id = fields.Int(required=True)
+    #: The event title
     title = fields.String(required=True)
+    #: The event description
     description = fields.String(required=True)
+    #: The event type
     event_type = EnumField(EventType, required=True)
+    #: The event start date time
     start_dt = fields.DateTime(required=True)
+    #: The event end date time
     end_dt = fields.DateTime(required=True)
-    persons = fields.List(fields.Nested(PersonSchema), required=True)
-    location = fields.Nested(LocationResultSchema, required=True)
+    #: The event associated persons
+    persons: PersonSchema = fields.List(fields.Nested(PersonSchema), required=True)
+    #: The event location
+    location: LocationResultSchema = fields.Nested(LocationResultSchema, required=True)
+    #: The event content to highlight
     highlight = fields.Nested(HighlightSchema, missing={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
@@ -92,16 +112,27 @@ class EventResultSchema(ResultSchemaBase):
 
 
 class ContributionResultSchema(ResultSchemaBase):
-    type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.contribution))
-    event_id = fields.Int(required=True)
+    #: The record type
+    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.contribution))
+    #: The contribution id
     contribution_id = fields.Int(required=True)
+    #: The contribution event id
+    event_id = fields.Int(required=True)
+    #: The contribution title
     title = fields.String(required=True)
+    #: The contribution description
     description = fields.String(required=True)
+    #: The contribution start date time
     start_dt = fields.DateTime(missing=None)
+    #: The contribution end date time
     end_dt = fields.DateTime(missing=None)
-    persons = fields.List(fields.Nested(PersonSchema), required=True)
-    location = fields.Nested(LocationResultSchema, required=True)
+    #: The contribution associated persons
+    persons: PersonSchema = fields.List(fields.Nested(PersonSchema), required=True)
+    #: The contribution location
+    location: LocationResultSchema = fields.Nested(LocationResultSchema, required=True)
+    #: The contribution duration
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
+    #: The contribution content to highlight
     highlight = fields.Nested(HighlightSchema, missing={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
@@ -120,7 +151,9 @@ class ContributionResultSchema(ResultSchemaBase):
 
 
 class SubContributionResultSchema(ContributionResultSchema):
-    type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.subcontribution))
+    #: The record type
+    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.subcontribution))
+    #: The sub-contribution id
     subcontribution_id = fields.Int(required=True)
 
     def _get_url(self, data):
@@ -156,16 +189,27 @@ def _get_event_path(obj):
 
 
 class AttachmentResultSchema(ResultSchemaBase):
-    type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.attachment))
+    #: The record type
+    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.attachment))
+    #: The attachment id
     attachment_id = fields.Int(required=True)
+    #: The attachment folder id
     folder_id = fields.Int(required=True)
+    #: The attachment event id
     event_id = fields.Int(required=True)
+    #: The attachment contribution id
     contribution_id = fields.Int(missing=None)
+    #: The attachment sub-contribution id
     subcontribution_id = fields.Int(missing=None)
+    #: The attachment title
     title = fields.String(required=True)
+    #: The attachment filename
     filename = fields.String(missing=None)
-    user = fields.Nested(PersonSchema, missing=None)
-    attachment_type = EnumField(AttachmentType, required=True)
+    #: The attachment author
+    user: PersonSchema = fields.Nested(PersonSchema, missing=None)
+    #: The attachment type
+    attachment_type: AttachmentType = EnumField(AttachmentType, required=True)
+    #: The attachment last modified date time
     modified_dt = fields.DateTime(required=True)
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
@@ -184,16 +228,26 @@ class AttachmentResultSchema(ResultSchemaBase):
 
 
 class EventNoteResultSchema(ResultSchemaBase):
-    type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.event_note))
+    #: The record type
+    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.event_note))
+    #: The note id
     note_id = fields.Int(required=True)
+    #: The note event id
     event_id = fields.Int(required=True)
+    #: The note contribution id
     contribution_id = fields.Int(missing=None)
+    #: The note sub-contribution id
     subcontribution_id = fields.Int(missing=None)
+    #: The note title
     title = fields.String(required=True)
-    user = fields.Nested(PersonSchema, missing=None)
+    #: The note author
+    user: PersonSchema = fields.Nested(PersonSchema, missing=None)
+    #: The note last modification date time
     modified_dt = fields.DateTime(required=True)
+    #: The note content
     content = fields.String(required=True)
-    highlight = fields.Nested(HighlightSchema, missing={})
+    #: The note content to highlight
+    highlight: HighlightSchema = fields.Nested(HighlightSchema, missing={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
     event_path = fields.Method('_get_event_path', dump_only=True)
@@ -208,14 +262,23 @@ class EventNoteResultSchema(ResultSchemaBase):
 
 
 class BucketSchema(_ResultSchemaBase):
-    key = fields.String(required=True)
-    count = fields.Int(required=True)
-    filter = fields.String(required=True)
+    """Represents an individual aggregation bucket element."""
+
+    #: The aggregation key.
+    key: str = fields.String(required=True)
+    #: The number of elements.
+    count: int = fields.Int(required=True)
+    #: The key that identifies the element's filter.
+    filter: str = fields.String(required=True)
 
 
 class AggregationSchema(_ResultSchemaBase):
-    label = fields.String(required=True)
-    buckets = fields.List(fields.Nested(BucketSchema), required=True)
+    """Represents an aggregation list."""
+
+    #: The name of the aggregation.
+    label: str = fields.String(required=True)
+    #: A bucket list representing each group.
+    buckets: t.List[BucketSchema] = fields.List(fields.Nested(BucketSchema), required=True)
 
 
 class ResultItemSchema(OneOfSchema):
