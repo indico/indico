@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-26 17:30+0200\n"
+"POT-Creation-Date: 2021-06-24 11:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,11 +70,11 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/categories/client/js/display.js:151
-msgid "Remove from your favourites"
+msgid "Remove from your favorites"
 msgstr ""
 
 #: indico/modules/categories/client/js/display.js:154
-msgid "Add to your favourites"
+msgid "Add to your favorites"
 msgstr ""
 
 #: indico/modules/categories/client/js/display.js:156
@@ -585,7 +585,7 @@ msgstr ""
 msgid "Confirm action"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/declarative.js:351
+#: indico/web/client/js/jquery/utils/declarative.js:360
 msgid "Direct link to this item"
 msgstr ""
 
@@ -757,7 +757,7 @@ msgid "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-search\"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:432
-msgid "In favourite categories"
+msgid "In favorite categories"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:439
@@ -805,7 +805,7 @@ msgstr ""
 msgid "There is already another person with this email address."
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:191
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:193
 #: indico/web/client/js/jquery/widgets/principalfield.js:121
 msgid "Edit information"
 msgstr ""
@@ -928,84 +928,84 @@ msgstr ""
 msgid "Registrants in \"{0}\""
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:177
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:179
 msgid "Speaker"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:188
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:190
 msgid "Remove person"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:194
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:196
 msgid "Configure roles"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:209
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:211
 msgid "Submitter"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:256
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:259
 msgid "or"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:277
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:280
 msgid "Move to authors"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:283
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:286
 msgid "Move to co-authors"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:290
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:293
 msgid "Move to others"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:296
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:299
 msgid "Not a speaker anymore"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:297
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
 msgid "Make a speaker"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:308
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:311
 msgid "People in the 'Others' section <strong>must</strong> be speakers."
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:328
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:331
 msgid "Revoke submission rights"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:329
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:332
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:32
 msgid "Grant submission rights"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:394
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:398
 msgid "Custom sorting has been applied. Click to restore alphabetical order."
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:396
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:400
 msgid "Alphabetical sorting is ON. Click to turn it off."
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:441
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
 msgid "You must add at least one speaker"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:444
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
 msgid "You must add at least one submitter"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:447
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:451
 msgid "You must add at least one co-author"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:450
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:454
 msgid "You must add at least one author"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:455
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:459
 msgid "You cannot have users in the Other section, please make them authors or co-authors"
 msgstr ""
 
@@ -1596,7 +1596,7 @@ msgid "Step 3: Choose to fit sessions to their content"
 msgstr ""
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:591
-msgid "This changes the start and end times of the session blocks occuring on  in order to fit their respective content "
+msgid "This changes the start and end times of the session blocks occurring on  in order to fit their respective content "
 msgstr ""
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:594
