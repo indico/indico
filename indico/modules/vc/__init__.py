@@ -54,7 +54,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 def _extend_event_menu(sender, **kwargs):
     def _visible(event):
         return bool(get_vc_plugins()) and VCRoomEventAssociation.find_for_event(event).has_rows()
-    return MenuEntryData(_('Videoconferences'), 'videoconference_rooms', 'vc.event_videoconference',
+    return MenuEntryData(_('Videoconference'), 'videoconference_rooms', 'vc.event_videoconference',
                          position=14, visible=_visible)
 
 
