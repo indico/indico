@@ -2,7 +2,7 @@
 
 {% from 'forms/_form.html' import form_header, form_row, form_footer  %}
 
-{% block title %}{% trans %}Current videoconference rooms{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Current videoconferences{% endtrans %}{% endblock %}
 {% block content %}
     <div class="module-vc vc-management" id="vc-info-container">
         {% if plugins %}
@@ -40,7 +40,7 @@
                                         <div class="group">
                                             {% if vc_room.status.name != 'deleted' %}
                                                 <a class="i-button icon-loop js-vcroom-refresh hide-if-locked"
-                                                   title="{% trans %}Check videoconference room status{% endtrans %}"
+                                                   title="{% trans %}Check videoconference status{% endtrans %}"
                                                    data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}">
                                                 </a>
                                                 <a href="#" class="i-button icon-edit js-vcroom-edit hide-if-locked"
@@ -75,7 +75,7 @@
                 </table>
             {% else %}
                 <div class="info-message-box">
-                    <div class="message-text">{% trans %}No videoconference rooms have been added yet.{% endtrans %}</div>
+                    <div class="message-text">{% trans %}No videoconferences have been added yet.{% endtrans %}</div>
                 </div>
             {% endif %}
             <div class="add-room-options right hide-if-locked">
@@ -92,7 +92,7 @@
                 {% elif plugins|length > 1 %}
                     <a class="i-button icon-plus js-create-room" href="#"
                        data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create', attach=False) }}"
-                       data-title="{% trans %}Create videoconference room{% endtrans %}"
+                       data-title="{% trans %}Create videoconference{% endtrans %}"
                        data-ajax-dialog
                        data-reload-after>
                         {%- trans %}Create new room{% endtrans -%}
@@ -106,7 +106,7 @@
                            data-title="{% trans plugin_name=plugins[0].friendly_name %}Attach {{ plugin_name }} room{% endtrans %}"
                        {% else %}
                            data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_search_form', attach=True)}}"
-                           data-title="{% trans %}Attach videoconference room{% endtrans %}"
+                           data-title="{% trans %}Attach videoconference{% endtrans %}"
                        {% endif %}
                        data-ajax-dialog
                        data-reload-after>
