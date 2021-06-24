@@ -55,4 +55,4 @@ in ``indico.conf``.
     you need to use e.g. the LDAP identity provider and use the
     information received via SSO to retrieve the user details from LDAP.
     If you need assistance with this, feel free to ask us on IRC
-    (#indico @ Freenode) or via e-mail (indico-team@cern.ch).
+    (#indico @ Libera.Chat) or `the forum <https://talk.getindico.io>`_.

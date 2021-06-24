@@ -69,7 +69,7 @@ The full roadmap is [available on the project site](https://getindico.io/roadmap
 The main meeting points for the community are:
  * the [Project Forum](https://talk.getindico.io);
  * the Chat Room
-([#indico on Freenode](https://webchat.freenode.net/?channels=indico) or on [Matrix](https://riot.im/app/#/room/#indico:matrix.org)).
+([#indico on Libera.Chat](https://web.libera.chat/gamja/?channels=#indico) or on [Matrix](https://app.element.io/#/room/#indico:matrix.org)).
 
 We follow [CERN's Values](https://hr.web.cern.ch/cerns-values) and the principles established by
 [CERN's Code of Conduct](https://hr.web.cern.ch/codeofconduct).
