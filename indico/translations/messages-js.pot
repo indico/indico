@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-24 11:13+0200\n"
+"POT-Creation-Date: 2021-06-24 17:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -573,7 +573,7 @@ msgid "Unsaved changes"
 msgstr ""
 
 #: indico/web/client/js/jquery/utils/ajaxdialog.js:181 indico/web/client/js/jquery/utils/misc.js:87
-#: indico/web/client/js/legacy/libs/timetable/Management.js:249
+#: indico/web/client/js/legacy/libs/timetable/Management.js:247
 msgid "Close"
 msgstr ""
 
@@ -850,7 +850,7 @@ msgstr ""
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:49
 #: indico/web/client/js/legacy/angular/directives.js:68 indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:413
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:186
-#: indico/web/client/js/legacy/libs/timetable/Management.js:672
+#: indico/web/client/js/legacy/libs/timetable/Management.js:670
 msgid "Cancel"
 msgstr ""
 
@@ -1084,7 +1084,7 @@ msgid " given the rights."
 msgstr ""
 
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:106
-#: indico/web/client/js/legacy/libs/timetable/Management.js:23
+#: indico/web/client/js/legacy/libs/timetable/Management.js:21
 msgid "Title"
 msgstr ""
 
@@ -1327,7 +1327,7 @@ msgstr ""
 msgid "Add new"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1080 indico/web/client/js/legacy/libs/timetable/Management.js:666
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1080 indico/web/client/js/legacy/libs/timetable/Management.js:664
 msgid "Reschedule"
 msgstr ""
 
@@ -1471,229 +1471,229 @@ msgstr ""
 msgid "Reset filter"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:17
+#: indico/web/client/js/legacy/libs/timetable/Management.js:15
 msgid "All"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:18
+#: indico/web/client/js/legacy/libs/timetable/Management.js:16
 msgid "None"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:21
+#: indico/web/client/js/legacy/libs/timetable/Management.js:19
 msgid "ID"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:26
+#: indico/web/client/js/legacy/libs/timetable/Management.js:24
 msgid "Sort by: "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:31
+#: indico/web/client/js/legacy/libs/timetable/Management.js:29
 msgid "Select: "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:190
+#: indico/web/client/js/legacy/libs/timetable/Management.js:188
 msgid "Add Contribution"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:240
+#: indico/web/client/js/legacy/libs/timetable/Management.js:238
 msgid "Add selected"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:275
+#: indico/web/client/js/legacy/libs/timetable/Management.js:273
 msgid "Create a new one"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:282
+#: indico/web/client/js/legacy/libs/timetable/Management.js:280
 msgid "You may choose to:"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:288
+#: indico/web/client/js/legacy/libs/timetable/Management.js:286
 msgid "Choose one (or more) unscheduled"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:296
+#: indico/web/client/js/legacy/libs/timetable/Management.js:294
 msgid "To add an unscheduled contribution, please select at least one"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:336
+#: indico/web/client/js/legacy/libs/timetable/Management.js:334
 msgid "Add contribution"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:389
+#: indico/web/client/js/legacy/libs/timetable/Management.js:387
 msgid "Step 1: Choose type of rescheduling"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:399
-#: indico/web/client/js/legacy/libs/timetable/Management.js:436
+#: indico/web/client/js/legacy/libs/timetable/Management.js:397
+#: indico/web/client/js/legacy/libs/timetable/Management.js:434
 msgid "See an example"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:404
+#: indico/web/client/js/legacy/libs/timetable/Management.js:402
 msgid "Adjust starting time of all entries"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:408
+#: indico/web/client/js/legacy/libs/timetable/Management.js:406
 msgid "Move the entries of "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:408
-#: indico/web/client/js/legacy/libs/timetable/Management.js:411
+#: indico/web/client/js/legacy/libs/timetable/Management.js:406
+#: indico/web/client/js/legacy/libs/timetable/Management.js:409
 msgid " by changing their"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:409
+#: indico/web/client/js/legacy/libs/timetable/Management.js:407
 msgid "Move the entries of the interval "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:412
+#: indico/web/client/js/legacy/libs/timetable/Management.js:410
 msgid " starting times. "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:414
+#: indico/web/client/js/legacy/libs/timetable/Management.js:412
 msgid "The first entry will start when the event starts ("
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:417
+#: indico/web/client/js/legacy/libs/timetable/Management.js:415
 msgid "The first entry will start when the interval starts ("
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:420
+#: indico/web/client/js/legacy/libs/timetable/Management.js:418
 msgid "and the other entries will follow consecutively after it. The durations of the entries will not change. "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:441
+#: indico/web/client/js/legacy/libs/timetable/Management.js:439
 msgid "Adjust duration of all entries"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:444
+#: indico/web/client/js/legacy/libs/timetable/Management.js:442
 msgid "Adjust the "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:445
+#: indico/web/client/js/legacy/libs/timetable/Management.js:443
 msgid " duration "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:446
+#: indico/web/client/js/legacy/libs/timetable/Management.js:444
 msgid "of the entries of "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:449
+#: indico/web/client/js/legacy/libs/timetable/Management.js:447
 msgid "the interval "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:450
+#: indico/web/client/js/legacy/libs/timetable/Management.js:448
 msgid ""
 " to fill the gaps between them, so that their starting time don't change. If a time gap is specified, the duration "
 "will be extended up to the value of this time gap before the starting time of the next entry. "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:533
+#: indico/web/client/js/legacy/libs/timetable/Management.js:531
 msgid "Step 2: Choose time gap between entries"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:570
+#: indico/web/client/js/legacy/libs/timetable/Management.js:568
 msgid "Step 3: Choose to fit sessions to their content"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:619
+#: indico/web/client/js/legacy/libs/timetable/Management.js:617
 msgid "There will be no gaps between consecutive entries."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:624
+#: indico/web/client/js/legacy/libs/timetable/Management.js:622
 msgid "Entries will be separated by gaps of "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:626
+#: indico/web/client/js/legacy/libs/timetable/Management.js:624
 msgid "1 hour "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:628
+#: indico/web/client/js/legacy/libs/timetable/Management.js:626
 msgid " hours "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:632
+#: indico/web/client/js/legacy/libs/timetable/Management.js:630
 msgid "and "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:636
+#: indico/web/client/js/legacy/libs/timetable/Management.js:634
 msgid "1 minute."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:638
+#: indico/web/client/js/legacy/libs/timetable/Management.js:636
 msgid " minutes."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:719
+#: indico/web/client/js/legacy/libs/timetable/Management.js:717
 msgid "Rescheduling..."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:735
+#: indico/web/client/js/legacy/libs/timetable/Management.js:733
 msgid "Are you sure you want to reschedule entries ?"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:742
+#: indico/web/client/js/legacy/libs/timetable/Management.js:740
 msgid "The entries that are part of a session will"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:747
+#: indico/web/client/js/legacy/libs/timetable/Management.js:745
 msgid " first"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:749
+#: indico/web/client/js/legacy/libs/timetable/Management.js:747
 msgid " be fitted to their content."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
 msgid "Then, all entries "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
 msgid "All entries "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:756
+#: indico/web/client/js/legacy/libs/timetable/Management.js:754
 msgid " will have their "
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:757
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
 msgid "starting times"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:757
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
 msgid "duration"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:758
+#: indico/web/client/js/legacy/libs/timetable/Management.js:756
 msgid " changed."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:765
+#: indico/web/client/js/legacy/libs/timetable/Management.js:763
 msgid "Please review your choice"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:781
+#: indico/web/client/js/legacy/libs/timetable/Management.js:779
 msgid "Please select the rescheduling type"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:811
+#: indico/web/client/js/legacy/libs/timetable/Management.js:809
 msgid "Reschedule Entries"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:847
+#: indico/web/client/js/legacy/libs/timetable/Management.js:845
 msgid ""
 "This will change the starting and ending times of the session block {0} so that it encompasses all entries defined in"
 " its timetable."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:854
+#: indico/web/client/js/legacy/libs/timetable/Management.js:852
 msgid "Are you sure you want to proceed?"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:876
+#: indico/web/client/js/legacy/libs/timetable/Management.js:874
 msgid "Fitting..."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:890
+#: indico/web/client/js/legacy/libs/timetable/Management.js:888
 msgid "Fit timetable to content"
 msgstr ""
 

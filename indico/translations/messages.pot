@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-24 11:05+0200\n"
+"POT-Creation-Date: 2021-06-24 17:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -254,7 +254,8 @@ msgstr ""
 msgid "Importers"
 msgstr ""
 
-#: indico/core/plugins/__init__.py:41 indico/modules/vc/__init__.py:49 indico/modules/vc/__init__.py:85
+#: indico/core/plugins/__init__.py:41 indico/modules/vc/__init__.py:49 indico/modules/vc/__init__.py:57
+#: indico/modules/vc/__init__.py:85 indico/modules/vc/clone.py:18 indico/modules/vc/templates/event_header.html:4
 #: indico/modules/vc/views.py:31
 msgid "Videoconference"
 msgstr ""
@@ -1737,7 +1738,7 @@ msgstr ""
 msgid "Indico needs just a little bit more data from you..."
 msgstr ""
 
-#: indico/modules/bootstrap/templates/bootstrap.html:25 indico/web/templates/_session_bar.html:178
+#: indico/modules/bootstrap/templates/bootstrap.html:25 indico/web/templates/_session_bar.html:182
 msgid "This is your current language."
 msgstr ""
 
@@ -14945,16 +14946,8 @@ msgid ""
 "Please click the following link to confirm this action."
 msgstr ""
 
-#: indico/modules/vc/__init__.py:57 indico/modules/vc/templates/event_header.html:4
-msgid "Videoconference Rooms"
-msgstr ""
-
-#: indico/modules/vc/clone.py:18
-msgid "Videoconference rooms"
-msgstr ""
-
 #: indico/modules/vc/controllers.py:57
-msgid "There is already a VC room attached to '{link_object_title}'."
+msgid "There is already a videoconference attached to '{link_object_title}'."
 msgstr ""
 
 #: indico/modules/vc/controllers.py:62
@@ -15014,7 +15007,7 @@ msgid "ACL"
 msgstr ""
 
 #: indico/modules/vc/forms.py:57
-msgid "Users and Groups authorized to create videoconference rooms"
+msgid "Users and Groups authorized to create videoconferences"
 msgstr ""
 
 #: indico/modules/vc/forms.py:58
@@ -15022,7 +15015,7 @@ msgid "Notification email addresses"
 msgstr ""
 
 #: indico/modules/vc/forms.py:59
-msgid "Notifications about videoconference rooms are sent to these email addresses (one per line)."
+msgid "Notifications about videoconferences are sent to these email addresses (one per line)."
 msgstr ""
 
 #: indico/modules/vc/forms.py:66
@@ -15112,11 +15105,11 @@ msgid "More info"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:5
-msgid "Current videoconference rooms"
+msgid "Current videoconferences"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:43
-msgid "Check videoconference room status"
+msgid "Check videoconference status"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:49
@@ -15128,7 +15121,7 @@ msgid "Detach"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:78
-msgid "No videoconference rooms have been added yet."
+msgid "No videoconferences have been added yet."
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:86 indico/modules/vc/templates/manage_event.html:90
@@ -15137,7 +15130,7 @@ msgid "Create %(plugin_name)s room"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:95
-msgid "Create videoconference room"
+msgid "Create videoconference"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:98
@@ -15150,7 +15143,7 @@ msgid "Attach %(plugin_name)s room"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:109
-msgid "Attach videoconference room"
+msgid "Attach videoconference"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html:113
@@ -15179,7 +15172,7 @@ msgid "%(action)s %(plugin_name)s room"
 msgstr ""
 
 #: indico/modules/vc/templates/vc_room_list.html:20
-msgid "VC room"
+msgid "Videoconferences"
 msgstr ""
 
 #: indico/modules/vc/templates/vc_room_list.html:58
@@ -15804,12 +15797,12 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-#: indico/web/templates/_session_bar.html:167
+#: indico/web/templates/_session_bar.html:171
 #, python-format
-msgid "My language (%(lang)s)"
+msgid "My language (%(language)s)"
 msgstr ""
 
-#: indico/web/templates/_session_bar.html:228
+#: indico/web/templates/_session_bar.html:232
 msgid "Login"
 msgstr ""
 
