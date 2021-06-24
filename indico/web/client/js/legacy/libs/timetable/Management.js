@@ -586,13 +586,11 @@ type(
         style: {paddingLeft: pixels(30), paddingTop: pixels(8)},
       });
       this.fitInnerExplanationDiv.set(
-        $T(
-          'This changes the start and end times of the session blocks occurring on ' +
-            this.__getCurrentDayText() +
-            ' in order to fit their respective content '
-        ),
-        Html.strong({}, $T('before')),
-        $T(' performing the rescheduling.')
+        'This changes the start and end times of the session blocks occurring on ' +
+          this.__getCurrentDayText() +
+          ' in order to fit their respective content ',
+        Html.strong({}, 'before'),
+        ' performing the rescheduling.'
       );
 
       this.fitInnerCheckBox.observeEvent('change', function(event) {
