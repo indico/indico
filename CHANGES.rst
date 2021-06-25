@@ -14,6 +14,11 @@ Major Features
   of the box, and for more advanced needs (such as full text search in uploaded files)
   plugins can provide their own search functionality (e.g. using ElasticSearch).
   (:pr:`4841`)
+- Categories may now contain both events and subcategories at the same time. During the
+  upgrade to 3.0 event creation is automatically set to restricted in all categories
+  containing subcategories in order to avoid any negative surprises which would suddenly
+  allow random Indico users to create events in places where they couldn't do so previously.
+  (:issue:`4679`, :pr:`4725`, :pr:`4757`)
 - The OAuth provider module has been re-implemented based on a more modern
   library (authlib). Support for the somewhat insecure *implicit flow* has been
   removed in favor of the code-with-PKCE flow. Tokens are now stored more securely
@@ -22,6 +27,9 @@ Major Features
   will be discarded. The OAuth provider now exposes its metadata via a well-known
   URI (RFC 8414) and also has endpoints to introspect or revoke a token. (:issue:`4685`,
   :pr:`4798`)
+- User profile pictures (avatars) are now shown in many more places throughout Indico,
+  such as user search results, meeting participant lists and reviewing timelines.
+  (:issue:`4625`, :pr:`4747`, :pr:`4939`)
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -32,9 +40,6 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
-- Categories may now contain both events and subcategories at the same time
-  (:issue:`4679`, :pr:`4725`, :pr:`4757`)
-- Show the user's profile picture in many more places (:issue:`4625`, :pr:`4747`)
 - Use a more modern search dialog when searching for users (:issue:`4674`, :pr:`4743`)
 - Add an option to refresh event person data from the underlying user when cloning an
   event (:issue:`4750`, :pr:`4760`)
