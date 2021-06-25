@@ -7,11 +7,6 @@ Version 3.0
 
 *Unreleased*
 
-Internationalization
-^^^^^^^^^^^^^^^^^^^^
-
-- New translation: Turkish
-
 Major Features
 ^^^^^^^^^^^^^^
 
@@ -32,6 +27,7 @@ Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
 - New locale: English (United States)
+- New translation: Turkish
 
 Improvements
 ^^^^^^^^^^^^
