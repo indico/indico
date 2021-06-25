@@ -9,44 +9,44 @@
 # Jean-René Rouet <rouet@in2p3.fr>, 2017
 # Thomas Baron <thomas.baron@cern.ch>, 2013-2015
 # Thomas Baron <thomas.baron@cern.ch>, 2011, 2012
-# Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2020
+# Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-10 16:36+0200\n"
-"PO-Revision-Date: 2020-12-15 16:11+0000\n"
+"POT-Creation-Date: 2021-06-24 17:51+0200\n"
+"PO-Revision-Date: 2021-06-25 08:43+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.9.1\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: indico/modules/attachments/client/js/legacy.js:154
+#: indico/modules/attachments/client/js/legacy.js:152
 msgid "This file no longer exists. Please reload the page."
 msgstr "Ce fichier n'existe plus. Veuillez rafraichir la page."
 
-#: indico/modules/attachments/client/js/legacy.js:160
+#: indico/modules/attachments/client/js/legacy.js:158
 msgid "You are not authorized to access this file."
 msgstr "Vous n'êtes pas autorisé.e à accéder à ce fichier."
 
-#: indico/modules/attachments/client/js/legacy.js:160
-#: indico/modules/attachments/client/js/legacy.js:163
+#: indico/modules/attachments/client/js/legacy.js:158
+#: indico/modules/attachments/client/js/legacy.js:161
 msgid "Access Denied"
 msgstr "Accès refusé"
 
-#: indico/modules/attachments/client/js/legacy.js:162
+#: indico/modules/attachments/client/js/legacy.js:160
 msgid "This file is protected. You will be redirected to the login page."
 msgstr "L'accès à ce fichier est restreint. Vous allez être redirigé vers la page d'authentification."
 
-#: indico/modules/attachments/client/js/legacy.js:230
+#: indico/modules/attachments/client/js/legacy.js:228
 msgid "Manage material"
 msgstr "Gérer les documents"
 
-#: indico/modules/attachments/client/js/package.js:48
+#: indico/modules/attachments/client/js/package.js:49
 msgid "Building package"
 msgstr "Fichier ZIP en cours de création"
 
@@ -68,82 +68,81 @@ msgstr[1] "{0} événements de longue durée ne sont pas montrés"
 msgid "Long lasting events"
 msgstr "Evénements de longue durée"
 
-#: indico/modules/categories/client/js/display.js:23
+#: indico/modules/categories/client/js/display.js:21
 msgid "empty"
 msgstr "vide"
 
-#: indico/modules/categories/client/js/display.js:24
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:298
+#: indico/modules/categories/client/js/display.js:22
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} événement"
 msgstr[1] "{0} événements"
 
-#: indico/modules/categories/client/js/display.js:155
-msgid "Remove from your favourites"
+#: indico/modules/categories/client/js/display.js:151
+msgid "Remove from your favorites"
 msgstr "Supprimer de vos favoris"
 
-#: indico/modules/categories/client/js/display.js:158
-msgid "Add to your favourites"
+#: indico/modules/categories/client/js/display.js:154
+msgid "Add to your favorites"
 msgstr "Ajouter à vos favoris"
 
-#: indico/modules/categories/client/js/display.js:160
+#: indico/modules/categories/client/js/display.js:156
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
 msgstr "Ceci fera apparaître les événements de cette catégorie sur votre <a href=\"{0}\">tableau de bord</a>."
 
-#: indico/modules/categories/client/js/management.js:49
-#: indico/modules/events/management/client/js/index.js:280
+#: indico/modules/categories/client/js/management.js:53
+#: indico/modules/events/management/client/js/index.js:301
 msgid "Undo"
 msgstr "Annuler"
 
-#: indico/modules/categories/client/js/management.js:51
+#: indico/modules/categories/client/js/management.js:55
 msgid "The category order has been restored."
 msgstr "L'ordre de la catégorie a été restauré."
 
-#: indico/modules/categories/client/js/management.js:53
+#: indico/modules/categories/client/js/management.js:57
 msgid "The category list has been sorted."
 msgstr "La liste des catégories a été triée."
 
-#: indico/modules/categories/client/js/management.js:171
+#: indico/modules/categories/client/js/management.js:175
 msgid "Delete category"
 msgstr "Supprimer la catégorie"
 
-#: indico/modules/categories/client/js/management.js:175
+#: indico/modules/categories/client/js/management.js:179
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Cette catégorie ne peut pas être supprimée car elle n'est pas vide."
 
-#: indico/modules/categories/client/js/management.js:183
+#: indico/modules/categories/client/js/management.js:187
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "Au moins une des catégories sélectionnée ne peut pas être supprimée car elle n'est pas vide."
 
-#: indico/modules/categories/client/js/management.js:188
+#: indico/modules/categories/client/js/management.js:192
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "Supprimer la catégorie sélectionnée"
 msgstr[1] "Supprimer les {0} catégories sélectionnées"
 
-#: indico/modules/categories/client/js/management.js:196
+#: indico/modules/categories/client/js/management.js:200
 msgid "Select the categories to delete first."
 msgstr "Commencez par sélectionner les catégories à supprimer."
 
-#: indico/modules/categories/client/js/management.js:205
+#: indico/modules/categories/client/js/management.js:209
 msgid "Delete categories"
 msgstr "Supprimer les catégories"
 
-#: indico/modules/categories/client/js/management.js:225
+#: indico/modules/categories/client/js/management.js:229
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "Transférer la catégorie sélectionnée"
 msgstr[1] "Transférer les {0} catégories sélectionnées"
 
-#: indico/modules/categories/client/js/management.js:232
+#: indico/modules/categories/client/js/management.js:236
 msgid "Select the categories to move first."
 msgstr "Commencez par sélectionner les catégories à transférer."
 
-#: indico/modules/categories/client/js/management.js:291
+#: indico/modules/categories/client/js/management.js:297
 #: indico/modules/vc/client/js/index.js:54
 #: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
@@ -151,177 +150,173 @@ msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "*"
 msgstr[1] "Tous les {0} événements de cette catégorie sont actuellement sélectionnés."
 
-#: indico/modules/categories/client/js/management.js:296
+#: indico/modules/categories/client/js/management.js:302
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "Seuls {0} événement sur {1} est actuellement sélectionné."
 msgstr[1] "Seuls {0} événements sur {1} sont actuellement sélectionnés."
 
-#: indico/modules/categories/client/js/management.js:334
-#: indico/modules/categories/client/js/management.js:399
+#: indico/modules/categories/client/js/management.js:340
+#: indico/modules/categories/client/js/management.js:404
 msgid "Move here"
 msgstr "Déplacer ici"
 
-#: indico/modules/categories/client/js/management.js:335
+#: indico/modules/categories/client/js/management.js:341
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "Transférer la catégorie"
 msgstr[1] "Déplacer les catégories"
 
-#: indico/modules/categories/client/js/management.js:337
+#: indico/modules/categories/client/js/management.js:343
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Sélectionnez la nouvelle catégorie mère pour la catégorie sélectionnée"
 msgstr[1] "Sélectionnez la nouvelle catégorie mère pour les {0} catégories sélectionnées"
 
-#: indico/modules/categories/client/js/management.js:354
+#: indico/modules/categories/client/js/management.js:359
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "La catégorie sélectionnée se trouve déjà à cet endroit"
 msgstr[1] "Les catégories sélectionnées se trouvent déjà à cet endroit"
 
-#: indico/modules/categories/client/js/management.js:362
+#: indico/modules/categories/client/js/management.js:367
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Ceci est la catégorie que vous essayez de transférer"
 msgstr[1] "Ceci est une des catégories que vous essayez de transférer"
 
-#: indico/modules/categories/client/js/management.js:400
-#: indico/modules/events/management/client/js/index.js:45
+#: indico/modules/categories/client/js/management.js:405
+#: indico/modules/events/management/client/js/index.js:42
 msgid "Move event"
 msgid_plural "Move events"
 msgstr[0] "Transférer l'événement"
 msgstr[1] "Transférer les événements"
 
-#: indico/modules/categories/client/js/management.js:403
+#: indico/modules/categories/client/js/management.js:408
 msgid "Select category destination for the event"
 msgid_plural "Select category destination for {0} selected events"
 msgstr[0] "Sélectionnez la nouvelle catégorie mère pour l'événement sélectionné"
 msgstr[1] "Sélectionnez la nouvelle catégorie mère pour les {0} événements sélectionnés"
 
-#: indico/modules/categories/client/js/management.js:416
+#: indico/modules/categories/client/js/management.js:418
 msgid "The event is already here"
 msgid_plural "The selected events are already here"
 msgstr[0] "L'événement sélectionné se trouve déjà à cet endroit"
 msgstr[1] "Les événements sélectionnés se trouvent déjà à cet endroit"
 
-#: indico/modules/cephalopod/client/js/index.js:42
+#: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
 msgstr "Erreur inconnue en contactant la plateforme communautaire"
 
-#: indico/modules/cephalopod/client/js/index.js:44
+#: indico/modules/cephalopod/client/js/index.js:42
 msgid "Internal error: Parse error on the reply of the Community Hub."
 msgstr "Erreur interne: Erreur d'analyse de la réponse de la plateforme communautaire."
 
-#: indico/modules/cephalopod/client/js/index.js:46
+#: indico/modules/cephalopod/client/js/index.js:44
 msgid "Unable to contact the Community Hub."
 msgstr "Impossible de contacter la plateforme communautaire."
 
-#: indico/modules/cephalopod/client/js/index.js:48
+#: indico/modules/cephalopod/client/js/index.js:46
 msgid "The connection to the Community Hub timed out."
 msgstr "La connexion avec la plateforme communautaire a expiré."
 
-#: indico/modules/cephalopod/client/js/index.js:53
+#: indico/modules/cephalopod/client/js/index.js:51
 msgid "Your server is not registered with the Community Hub."
 msgstr "Votre serveur n'est pas enregistré sur la plateforme communautaire."
 
-#: indico/modules/cephalopod/client/js/index.js:88
+#: indico/modules/cephalopod/client/js/index.js:86
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: indico/modules/cephalopod/client/js/index.js:89
+#: indico/modules/cephalopod/client/js/index.js:87
 msgid "This server is not registered as part of the community."
 msgstr "Ce serveur n'est pas enregistré sur la plateforme communautaire."
 
-#: indico/modules/cephalopod/client/js/index.js:110
+#: indico/modules/cephalopod/client/js/index.js:108
 msgid "Synchronized"
 msgstr "Synchronisé"
 
-#: indico/modules/cephalopod/client/js/index.js:111
+#: indico/modules/cephalopod/client/js/index.js:109
 msgid "This server is registered as part of the community and is up to date."
 msgstr "Ce serveur est enregistré sur la plateforme communautaire et est à jour."
 
-#: indico/modules/cephalopod/client/js/index.js:120
+#: indico/modules/cephalopod/client/js/index.js:118
 msgid "Out of sync"
 msgstr "Non synchronisé"
 
-#: indico/modules/cephalopod/client/js/index.js:121
+#: indico/modules/cephalopod/client/js/index.js:119
 msgid ""
 "Your Indico server is out of sync. Synchronize it with the button on the "
 "right."
 msgstr "Votre serveur Indico n'est pas synchronisé. Veuillez le synchroniser en utilisant le bouton de droite."
 
-#: indico/modules/cephalopod/client/js/index.js:131
+#: indico/modules/cephalopod/client/js/index.js:129
 msgid "Error!"
 msgstr "Erreur!"
 
-#: indico/modules/cephalopod/client/js/index.js:149
+#: indico/modules/cephalopod/client/js/index.js:147
 msgid ""
 "Your Indico server is not synchronized with the Community Hub! You can solve"
 " this <a href=\"{0}\">here</a>."
 msgstr "Votre serveur Indico n'est pas synchronisé avec la plateforme communautaire. Vous pouvez résoudre ce problème <a href=\"{0}\">ici</a>."
 
-#: indico/modules/core/client/js/impersonation.js:35
-msgid "Select user to impersonate"
-msgstr "Sélectionnez l'identité à usurper"
-
-#: indico/modules/designer/client/js/index.js:30
-#: indico/modules/designer/client/js/index.js:706
+#: indico/modules/designer/client/js/index.js:31
+#: indico/modules/designer/client/js/index.js:707
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "Les versos des modèles qui utilisent celui-ci seront supprimés."
 
-#: indico/modules/designer/client/js/index.js:33
-#: indico/modules/designer/client/js/index.js:709
+#: indico/modules/designer/client/js/index.js:34
+#: indico/modules/designer/client/js/index.js:710
 msgid "Disassociate back sides"
 msgstr "Dé-lier les versos"
 
-#: indico/modules/designer/client/js/index.js:89
-#: indico/modules/designer/client/js/index.js:232
+#: indico/modules/designer/client/js/index.js:90
+#: indico/modules/designer/client/js/index.js:233
 msgid "Fixed text"
 msgstr "Texte statique"
 
-#: indico/modules/designer/client/js/index.js:496
+#: indico/modules/designer/client/js/index.js:497
 msgid "Please choose a name for the template"
 msgstr "Choisissez un nom pour le modèle"
 
-#: indico/modules/designer/client/js/index.js:496
-#: indico/modules/designer/client/js/index.js:502
-#: indico/web/client/js/jquery/widgets/principalfield.js:136
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1119
+#: indico/modules/designer/client/js/index.js:497
+#: indico/modules/designer/client/js/index.js:503
+#: indico/web/client/js/jquery/widgets/principalfield.js:114
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:165
 msgid "Warning"
 msgstr "Avertissement"
 
-#: indico/modules/designer/client/js/index.js:501
+#: indico/modules/designer/client/js/index.js:502
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "Le modèle ne peut pas être vide. Veuillez ajouter des éléments ou une image de fond."
 
-#: indico/modules/designer/client/js/index.js:528
+#: indico/modules/designer/client/js/index.js:529
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Voulez-vous vraiment modifier les dimensions de ce modèle?"
 
-#: indico/modules/designer/client/js/index.js:697
+#: indico/modules/designer/client/js/index.js:698
 msgid "This back side template will be removed"
 msgstr "Le modèle du verso sera supprimé"
 
-#: indico/modules/designer/client/js/index.js:699
+#: indico/modules/designer/client/js/index.js:700
 msgid "The back side of this template will be removed"
 msgstr "Le verso de ce modèle sera supprimé"
 
-#: indico/modules/designer/client/js/index.js:700
+#: indico/modules/designer/client/js/index.js:701
 msgid "Disassociate back side"
 msgstr "Dé-lier le verso"
 
-#: indico/modules/designer/client/js/index.js:704
+#: indico/modules/designer/client/js/index.js:705
 msgid "The back side is empty."
 msgstr "La face arrière est vide."
 
-#: indico/modules/designer/client/js/index.js:819
+#: indico/modules/designer/client/js/index.js:820
 msgid "Error"
 msgstr "Erreur"
 
-#: indico/modules/designer/client/js/index.js:936
+#: indico/modules/designer/client/js/index.js:937
 msgid "Choose a file"
 msgstr "Choisissez un fichier"
 
@@ -338,38 +333,38 @@ msgstr "Cacher l'aperçu"
 msgid "Edit minutes"
 msgstr "Modifier le compte-rendu"
 
-#: indico/modules/events/client/js/layout.js:169
+#: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
 msgstr "Paramètres de l'entrée du menu"
 
-#: indico/modules/events/client/js/util/static_filters.js:21
+#: indico/modules/events/client/js/util/static_filters.js:19
 msgid "{0} out of {1} displayed"
 msgstr "{0} sur {1} sont affichés"
 
-#: indico/modules/events/client/js/util/static_filters.js:61
+#: indico/modules/events/client/js/util/static_filters.js:59
 msgid "There are no entries that match your search criteria."
 msgstr "Aucune entrée ne correspond à vos critères de recherche."
 
-#: indico/modules/events/management/client/js/index.js:41
+#: indico/modules/events/management/client/js/index.js:38
 msgid ""
 "You are about to move the event to the category \"{0}\". Are you sure you "
 "want to proceed?"
 msgstr "Vous êtes sur le point de déplacer l'événement vers la catégorie \"{0}\". Etes-vous sûr de vouloir continuer?"
 
-#: indico/modules/events/management/client/js/index.js:278
+#: indico/modules/events/management/client/js/index.js:299
 msgid "Undoing previous operation..."
 msgstr "Annulation en cours de la dernière opération..."
 
 #: indico/modules/events/registration/client/js/index.js:52
-#: indico/modules/events/registration/client/js/registration.js:41
+#: indico/modules/events/registration/client/js/registration.js:39
 msgid "Terms and Conditions"
 msgstr "Conditions générales"
 
-#: indico/modules/events/registration/client/js/reglists.js:29
+#: indico/modules/events/registration/client/js/reglists.js:35
 msgid "Email Preview"
 msgstr "Aperçu du courriel"
 
-#: indico/modules/events/registration/client/js/reglists.js:46
+#: indico/modules/events/registration/client/js/reglists.js:52
 msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
 msgstr[0] "Voulez-vous vraiment supprimer l'inscription sélectionnée?"
@@ -384,7 +379,6 @@ msgid "Edit Field"
 msgstr "Modifier le champ"
 
 #: indico/modules/events/registration/client/js/form/field.js:147
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:876
 msgid "Add"
 msgstr "Ajouter"
 
@@ -598,15 +592,15 @@ msgstr "Copié dans le presse-papier"
 msgid "Press {0} to copy"
 msgstr "Appuyer sur {0} pour copier"
 
-#: indico/web/client/js/jquery/extensions/global.js:255
+#: indico/web/client/js/jquery/extensions/global.js:256
 msgid "Create new lecture"
 msgstr "Créer une nouvelle présentation"
 
-#: indico/web/client/js/jquery/extensions/global.js:256
+#: indico/web/client/js/jquery/extensions/global.js:257
 msgid "Create new meeting"
 msgstr "Créer une nouvelle réunion"
 
-#: indico/web/client/js/jquery/extensions/global.js:257
+#: indico/web/client/js/jquery/extensions/global.js:258
 msgid "Create new conference"
 msgstr "Créer une nouvelle conférence"
 
@@ -633,12 +627,11 @@ msgid "You have unsaved changes that will be lost."
 msgstr "Vous avez des modifications non enregistrées qui seront perdues."
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1345
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:696
 msgid "Confirm action"
 msgstr "Confirmer l'action"
 
-#: indico/web/client/js/jquery/utils/declarative.js:351
+#: indico/web/client/js/jquery/utils/declarative.js:360
 msgid "Direct link to this item"
 msgstr "Lien direct vers cet élément"
 
@@ -651,7 +644,6 @@ msgid "Previous"
 msgstr "Précédent"
 
 #: indico/web/client/js/jquery/utils/errors.js:31
-#: indico/web/client/js/legacy/libs/presentation/Data/Remote.js:117
 #: indico/web/client/js/utils/axios.js:45
 msgid "Something went wrong"
 msgstr "Une erreur s'est produite"
@@ -742,127 +734,104 @@ msgstr "Sauvé"
 
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1115
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:161
 msgid "Save"
 msgstr "Sauver"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:670
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:672
 msgid "Loading..."
 msgstr "Chargement en cours..."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:19
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:20
 msgid "Select"
 msgstr "Sélectionner"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:23
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:24
 msgid "This category doesn't contain any subcategory"
 msgstr "Cette catégorie ne contient aucune sous-catégorie"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:27
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:28
 msgid "Select a category"
 msgstr "Choisir une catégorie"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:34
-msgid "Not possible for categories containing subcategories"
-msgstr "Impossible pour les catégories contenant des sous-catégories"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:38
-msgid "Not possible for categories containing events"
-msgstr "Impossible pour les catégories contenant des événements"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:42
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:35
 msgid "Not possible for categories where you cannot create events"
 msgstr "Impossible pour les catégories où vous ne pouvez pas créer d'événements"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:48
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:41
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "Impossible pour les catégories descendant de la catégorie \"{0}\""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:52
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:45
 msgid "Not possible for this category"
 msgstr "Impossible pour cette catégorie"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:141
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:217
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:134
 msgid "Search"
 msgstr "Rechercher"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:194
-msgid "in"
-msgstr "dans"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:198
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:191
 msgid "Go to: {0}"
 msgstr "Aller à: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:235
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:228
 msgid "This category is protected"
 msgstr "Cette catégorie est protégée"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:283
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:276
 msgid "Go to parent: {0}"
 msgstr "Aller au parent: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:294
-msgid "{0} category"
-msgid_plural "{0} categories"
-msgstr[0] "{0} catégorie"
-msgstr[1] "{0} catégories"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:335
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:325
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "Vous pouvez uniquement <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> celle-ci."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:340
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:330
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
 " class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a class"
 "=\"js-search\">search</a>."
 msgstr "Vous pouvez <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> celle-ci, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">remonter dans l'arborescence</a> ou <a class=\"js-search\">rechercher</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:348
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "Vous pouvez <a class=\"js-navigate-up\" data-parent-id=\"{2}\">remonter dans l'arborescence</a> ou <a class=\"js-search\">rechercher</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:363
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:353
 msgid "Your search doesn't match any category"
 msgstr "Votre recherche ne retourne aucune catégorie"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:368
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:358
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "Vous pouvez <a class=\"js-search\">modifier</a> ou <a class=\"js-clear-search\">vider</a> votre recherche."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:442
-msgid "In favourite categories"
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:432
+msgid "In favorite categories"
 msgstr "Dans vos catégories favorites"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:449
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:439
 msgid "Search result"
 msgstr "Résultat de la recherche"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:460
 msgid "Displaying {0} out of {1} results."
 msgstr "Affichage de {0} résultats sur {1}."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:471
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:461
 msgid "There are no results."
 msgstr "Aucun résultat."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:475
-msgid "Make the search more specific for more accurate results"
-msgstr "Entrer des critères de recherche plus spécifiques pour des résultats plus précis"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:480
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
 msgid "Clear search"
 msgstr "Vider la recherche"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:694
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Vous avez sélectionné la catégorie <em>{0}</em>. Etes-vous sûr de vouloir continuer?"
 
@@ -880,7 +849,7 @@ msgstr "Tapez pour ajouter {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -888,20 +857,16 @@ msgstr "Supprimer"
 msgid "Empty values are not allowed."
 msgstr "Les champs vides ne sont pas acceptés."
 
-#: indico/web/client/js/jquery/widgets/principalfield.js:106
-msgid "Choose person"
-msgstr "Choisissez une personne"
-
-#: indico/web/client/js/jquery/widgets/principalfield.js:135
+#: indico/web/client/js/jquery/widgets/principalfield.js:113
 msgid "There is already another person with this email address."
 msgstr "Il existe déjà une personne avec cette adresse électronique"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:183
-#: indico/web/client/js/jquery/widgets/principalfield.js:143
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:193
+#: indico/web/client/js/jquery/widgets/principalfield.js:121
 msgid "Edit information"
 msgstr "Modifier l'information"
 
-#: indico/web/client/js/jquery/widgets/principalfield.js:162
+#: indico/web/client/js/jquery/widgets/principalfield.js:140
 msgid "Enter person"
 msgstr "Choisissez une personne"
 
@@ -934,16 +899,15 @@ msgstr[0] "<strong>{0}</strong> mot restant"
 msgstr[1] "<strong>{0}</strong> mots restants"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1474
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
 msgid "Edit"
 msgstr "Modifier"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:49
 #: indico/web/client/js/legacy/angular/directives.js:68
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:413
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:883
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1140
-#: indico/web/client/js/legacy/libs/timetable/Management.js:672
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:186
+#: indico/web/client/js/legacy/libs/timetable/Management.js:670
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -963,147 +927,142 @@ msgstr "Doit être inférieur à {0}"
 msgid "Please fill in the required fields."
 msgstr "Veuillez renseigner les champs obligatoires."
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:166
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:171
 msgid "IP networks cannot have management permissions"
 msgstr "Les réseaux IP n'ont pas de droit d'administration"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:167
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
 msgid "Registrants cannot have management permissions"
 msgstr "Les participants ne peuvent pas avoir de droit d'administration"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:179
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:184
 msgid "Assign Permissions"
 msgstr "Assigner les permissions"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:196
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:201
 msgid "Delete entry '{0}'"
 msgstr "Effacer l'entrée '{0}'"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1344
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Êtes-vous sûr de vouloir vous retirer de la liste ?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:281
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:286
 msgid "All options have been added"
 msgstr "Toutes les options ont été ajoutées"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:312
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:317
 msgid "This entry was already added"
 msgstr "Cette entrée existait déjà"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:345
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:350
 msgid "Anonymous"
 msgstr "Anonyme"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:359
 msgid "Additional users"
 msgstr "Utilisateurs additionnels"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:358
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:363
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} utilisateur a des droit d'accès implicites dus à d'autres rôles"
 msgstr[1] "{0} utilisateurs ont des droits d'accès implicites dus à d'autres rôles"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:374
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:379
 msgid "Category Managers"
 msgstr "Administrateurs de catégorie"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:376
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:381
 msgid "Parent Category Managers"
 msgstr "Administrateurs de la catégorie mère"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:378
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:383
 msgid "Event Managers"
 msgstr "Administrateurs de l'événement"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:395
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:400
 msgid "Registrants in \"{0}\""
 msgstr "Participants dans \"{0}\""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:443
-msgid "Select a user or group to add"
-msgstr "Veuillez choisir un utilisateur ou un groupe à ajouter"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:169
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:179
 msgid "Speaker"
 msgstr "Orateur"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:180
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:190
 msgid "Remove person"
 msgstr "Enlever la personne"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:186
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:196
 msgid "Configure roles"
 msgstr "Configurer les roles"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:201
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:211
 msgid "Submitter"
 msgstr "Déposant"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:248
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:259
 msgid "or"
 msgstr "ou"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:269
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:280
 msgid "Move to authors"
 msgstr "Déplacer vers les auteurs"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:275
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:286
 msgid "Move to co-authors"
 msgstr "Déplacer vers les co-auteurs"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:282
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:293
 msgid "Move to others"
 msgstr "Déplacer vers d'autres"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:288
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:299
 msgid "Not a speaker anymore"
 msgstr "N'est plus un orateur"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:289
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
 msgid "Make a speaker"
 msgstr "Transformer en orateur"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:311
 msgid "People in the 'Others' section <strong>must</strong> be speakers."
 msgstr "Les personnes dans la section \"Autres\" <strong>doivent</strong> être orateurs."
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:320
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:331
 msgid "Revoke submission rights"
 msgstr "Révoquer les droits de dépôt"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:321
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:986
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:332
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:32
 msgid "Grant submission rights"
 msgstr "Donner les droits de dépôt"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:392
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:398
 msgid "Custom sorting has been applied. Click to restore alphabetical order."
 msgstr "Le tri personnalisé a été appliqué. Cliquez pour restaurer le tri alphabétique."
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:394
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:400
 msgid "Alphabetical sorting is ON. Click to turn it off."
 msgstr "Le tri alphabétique est activé. Cliquez pour le désactiver."
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:439
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
 msgid "You must add at least one speaker"
 msgstr "Vous devez ajouter au moins un orateur"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:442
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
 msgid "You must add at least one submitter"
 msgstr "Vous devez ajouter au moins un déposant"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:451
 msgid "You must add at least one co-author"
 msgstr "Vous devez ajouter au moins un co-auteur"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:454
 msgid "You must add at least one author"
 msgstr "Vous devez ajouter au moins un auteur"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:456
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:459
 msgid ""
 "You cannot have users in the Other section, please make them authors or co-"
 "authors"
@@ -1117,16 +1076,6 @@ msgstr "Ok"
 msgid "The content of this dialog is currently unavailable."
 msgstr "Le contenu de ce dialogue n'est actuellement pas disponible."
 
-#: indico/web/client/js/legacy/libs/indico/Common/Export.js:82
-msgid "Would you like to export private information to your calendar?"
-msgstr "Voulez-vous exporter les données protégées vers votre calendrier?"
-
-#: indico/web/client/js/legacy/libs/indico/Common/Export.js:245
-msgid ""
-"Would you like to create a persistent URL for use with your calendaring "
-"application?"
-msgstr "Voulez-vous créer un URL persistant pour utiliser dans votre application de gestion de calendrier?"
-
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:243
 msgid "OK"
 msgstr "OK"
@@ -1135,266 +1084,118 @@ msgstr "OK"
 msgid "Reason: "
 msgstr "Motif:"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:26
-msgid "Remove from your list of favorite users"
-msgstr "Retirer de votre liste d'utilisateurs favoris"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:27
-msgid "Add to your list of favorite users"
-msgstr "Ajouter à votre liste d'utilisateurs favoris"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:122
-msgid "This person exists in the event"
-msgstr "Cette personne existe dans l'événement"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:191
-msgid "Users with no Indico account"
-msgstr "Utilisateurs sans compte Indico"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:239
-msgid "Grant all selected users submission rights"
-msgstr "Donner les droits de dépôt aux utilisateurs sélectionnés"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:273
-msgid "You can use the form above to search for users..."
-msgstr "Vous pouvez utiliser le formulaire ci-dessus pour chercher des utilisateurs..."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:321
-msgid "Family name"
-msgstr "Nom de famille"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:322
-msgid "First name"
-msgstr "Prénom"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:323
-msgid "E-mail"
-msgstr "Adresse électronique"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:324
-msgid "Organisation"
-msgstr "Organisation"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:325
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:437
-msgid "Exact Match"
-msgstr "Correspondance exacte"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:355
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:456
-msgid "No results for this search..."
-msgstr "Aucun résultat pour cette recherche..."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:437
-msgid "Group name"
-msgstr "Nom du groupe"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:543
-msgid "Users"
-msgstr "Utilisateurs "
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:544
-msgid "Groups"
-msgstr "Groupes"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:620
-msgid "Suggested users"
-msgstr "Utilisateurs suggérés"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:625
-msgid "There are no suggested users for you at the moment. Why not add some "
-msgstr "Il n'y a aucun utilisateur suggéré pour l'instant. Pourquoi ne pas en ajouter"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:626
-msgid "favourites"
-msgstr "favoris"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:846
-msgid "Please select at least one item"
-msgstr "Veuillez  sélectionner au moins un article"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:876
-msgid "Choose"
-msgstr "Choisissez"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:992
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1011
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1031
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1046
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:38
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:57
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:77
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:92
 msgid "Note:"
 msgstr "Note:"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:993
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1012
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1032
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1047
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:39
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:58
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:78
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:93
 msgid " If this person does not already have an Indico account, "
 msgstr " Si cette personne n'a pas encore de compte Indico, "
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:995
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:41
 msgid "he or she will be sent an email asking to register as a user."
 msgstr "elle recevra un courriel lui demandant de s'enregistrer."
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:997
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:43
 msgid " After the registration the user will automatically be given"
 msgstr " Après enregistrement l'utilisateur recevra automatiquement"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:999
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:45
 msgid " submission rights."
 msgstr " les droits de dépôt."
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1005
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:51
 msgid "Give management rights"
 msgstr "Donner les droits d'administration"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1014
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1034
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1049
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:60
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:80
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:95
 msgid "he or she will be sent an email asking to create an account."
 msgstr "elle recevra un courriel lui demandant de créer un compte."
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1016
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1036
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1051
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:62
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:82
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:97
 msgid " After the account creation the user will automatically be"
 msgstr " Après création du compte, la personne recevra automatiquement"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1018
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:64
 msgid " given management rights."
 msgstr " les droits d'administration."
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1025
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:71
 msgid "Give coordination rights"
 msgstr "Donner les droits de coordination"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1038
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:84
 msgid " given coordination rights."
 msgstr " les droits de coordination"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1053
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:99
 msgid " given the rights."
 msgstr " les droits"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1060
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:106
 #: indico/web/client/js/legacy/libs/timetable/Management.js:21
 msgid "Title"
 msgstr "Titre"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1065
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:111
 msgid "Mr"
 msgstr "M."
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1066
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:112
 msgid "Mrs"
 msgstr "Mme"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1067
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:113
 msgid "Ms"
 msgstr "Mlle"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1068
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:114
 msgid "Dr"
 msgstr "Dr"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1069
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:115
 msgid "Prof."
 msgstr "Prof. "
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1075
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:121
 msgid "Family Name"
 msgstr "Nom de Famille"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1082
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:128
 msgid "First Name"
 msgstr "Prénom "
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1086
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:132
 msgid "Affiliation"
 msgstr "Affiliation"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1090
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:136
 msgid "Email"
 msgstr "Adresse électronique"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1100
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:146
 msgid "Address"
 msgstr "Adresse "
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1101
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:147
 msgid "Telephone"
 msgstr "Téléphone"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1120
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:166
 msgid ""
 "It is not possible to grant submission rights to a participant without an "
 "email address. Please set an email address."
 msgstr "Impossible d'assigner des droits de dépôt à un participant sans adresse électronique. veuillez entrer une adresse électronique."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1194
-msgid "User privileges"
-msgstr "Priviléges de l'utilisateur"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1239
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1240
-msgid "User rights"
-msgstr "Droits de l'utilisateur"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1261
-msgid "Submission rights"
-msgstr "Droits de dépôt"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1445
-msgid ""
-"Please note that you have added a user that does not exist in Indico.\n"
-"                                    Non existing users will be asked via email to create an account so\n"
-"                                    that they will be able to use the privileges below."
-msgstr "Vous avez ajouté un utilisateur inconnu d'Indico.\nUn courriel sera envoyé aux utilisateurs inconnus pour leur demander de se créer un compte afin qu'ils puissent bénéficier des privilèges ci-dessous."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1450
-msgid ""
-"Please note that you have added a user without an email address. Users without \n"
-"                                    email will not be able to use the privileges below."
-msgstr "Vous avez ajouté un utilisateur sans adresse électronique. Cet utilisateur ne pourra donc pas bénéficier des privilèges ci-dessous."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1528
-msgid "Add User / Group"
-msgstr "Ajouter Utilisateurs / Groupes"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1528
-msgid "Add user"
-msgstr "Ajouter un utilisateur"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1537
-msgid "Add IP Network"
-msgstr "Ajouter un réseau IP"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1561
-msgid "Add Users and Groups"
-msgstr "Ajouter Utilisateurs et Groupes"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1561
-msgid "Add Users"
-msgstr "Ajouter Utilisateurs"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1563
-msgid "Search Users and Groups"
-msgstr "Rechercher Utilisateurs et Groupes"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1563
-msgid "Search Users"
-msgstr "Rechercher Utilisateurs"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1648
-msgid "Add New"
-msgstr "Ajouter Nouveau"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1654
-msgid "New user"
-msgstr "Nouvel utilisateur"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1680
-msgid "Grant all these users with privileges: "
-msgstr "Accorder à tous ces utilisateurs les privilèges suivants:"
 
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:465
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:473
@@ -1599,7 +1400,7 @@ msgid "Add new"
 msgstr "Ajouter un nouveau"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:1080
-#: indico/web/client/js/legacy/libs/timetable/Management.js:666
+#: indico/web/client/js/legacy/libs/timetable/Management.js:664
 msgid "Reschedule"
 msgstr "Reprogrammer"
 
@@ -1649,76 +1450,76 @@ msgstr "<span class=\"key light\">Shift</span> est enfoncée. Les changements se
 msgid "Drop to move block inside session"
 msgstr "Relacher pour transférer le bloc dans la session"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:111
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:113
 msgid "Show materials"
 msgstr "Afficher les documents"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:213
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:215
 msgid "et al."
 msgstr "et al."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:313
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
 msgid "This poster session has "
 msgstr "Cette session poster a"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
 msgid " contribution(s)."
 msgstr "contribution(s)."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:319
 msgid "Please click for more information."
 msgstr "Veuillez cliquer pour plus d'informations. "
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:620
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:622
 msgid "Move entry"
 msgstr "Déplacer l'entrée"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:664
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:675
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:666
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:677
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr "Cette entrée de l'ordre du jour n'existe plus. Veuiller rafraichir la page."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:676
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:678
 msgid "Refresh"
 msgstr "Rafraichir"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:779
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
 msgid "Move up"
 msgstr "Déplacer vers le haut"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:788
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:790
 msgid "Move down"
 msgstr "Déplacer vers le bas "
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1478
 msgid "Edit poster"
 msgstr "Modifier le poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1508
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
 msgid "Manage protection"
 msgstr "Gérer la protection"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1512
 msgid "Manage poster protection"
 msgstr "Gérer la protection du poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1538
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
 msgid "Unschedule"
 msgstr "Déprogrammer"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1539
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1541
 msgid "Unschedule poster"
 msgstr "Déprogrammer le poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "Êtes-vous sûr de vouloir déprogrammer le poster?"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1543
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1545
 msgid "Delete poster"
 msgstr "Supprimer le poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1546
 msgid "Are you sure you want to delete the poster?"
 msgstr "Êtes-vous sur de vouloir supprimer ce poster?"
 
@@ -1873,119 +1674,105 @@ msgstr "Étape 2: Choisir l'intervalle de temps entre les entrées "
 msgid "Step 3: Choose to fit sessions to their content"
 msgstr "Étape 3: Choisir d'adapter les horaires des sessions à leur contenu"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:591
-msgid ""
-"This changes the start and end times of the session blocks occuring on  in "
-"order to fit their respective content "
-msgstr "Ceci change les horaires de début et de fin des blocs de session afin de les ajuster a leur contenu"
-
-#: indico/web/client/js/legacy/libs/timetable/Management.js:594
-msgid "before"
-msgstr "avant"
-
-#: indico/web/client/js/legacy/libs/timetable/Management.js:595
-msgid " performing the rescheduling."
-msgstr "de procéder à la reprogrammation. "
-
-#: indico/web/client/js/legacy/libs/timetable/Management.js:619
+#: indico/web/client/js/legacy/libs/timetable/Management.js:617
 msgid "There will be no gaps between consecutive entries."
 msgstr "Il n'y aura pas de vide entre deux entrées consécutives."
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:624
+#: indico/web/client/js/legacy/libs/timetable/Management.js:622
 msgid "Entries will be separated by gaps of "
 msgstr "Les entrées seront séparées par des intervalles de temps de"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:626
+#: indico/web/client/js/legacy/libs/timetable/Management.js:624
 msgid "1 hour "
 msgstr "1 heure"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:628
+#: indico/web/client/js/legacy/libs/timetable/Management.js:626
 msgid " hours "
 msgstr "heures"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:632
+#: indico/web/client/js/legacy/libs/timetable/Management.js:630
 msgid "and "
 msgstr "et"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:636
+#: indico/web/client/js/legacy/libs/timetable/Management.js:634
 msgid "1 minute."
 msgstr "1 minute. "
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:638
+#: indico/web/client/js/legacy/libs/timetable/Management.js:636
 msgid " minutes."
 msgstr "minutes."
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:719
+#: indico/web/client/js/legacy/libs/timetable/Management.js:717
 msgid "Rescheduling..."
 msgstr "Reprogrammation..."
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:735
+#: indico/web/client/js/legacy/libs/timetable/Management.js:733
 msgid "Are you sure you want to reschedule entries ?"
 msgstr "Êtes-vous sûr de vouloir reprogrammer les entrées?"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:742
+#: indico/web/client/js/legacy/libs/timetable/Management.js:740
 msgid "The entries that are part of a session will"
 msgstr "Les entrées qui font partie de cette session seront"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:747
+#: indico/web/client/js/legacy/libs/timetable/Management.js:745
 msgid " first"
 msgstr "premier"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:749
+#: indico/web/client/js/legacy/libs/timetable/Management.js:747
 msgid " be fitted to their content."
 msgstr "ajustées à leur contenu."
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
 msgid "Then, all entries "
 msgstr "Puis, toutes les entrées "
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
 msgid "All entries "
 msgstr "Toutes les entrées "
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:756
+#: indico/web/client/js/legacy/libs/timetable/Management.js:754
 msgid " will have their "
 msgstr "auront leurs "
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:757
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
 msgid "starting times"
 msgstr "horaires de début"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:757
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
 msgid "duration"
 msgstr "durée"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:758
+#: indico/web/client/js/legacy/libs/timetable/Management.js:756
 msgid " changed."
 msgstr "changés."
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:765
+#: indico/web/client/js/legacy/libs/timetable/Management.js:763
 msgid "Please review your choice"
 msgstr "Veuillez revoir vos choix"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:781
+#: indico/web/client/js/legacy/libs/timetable/Management.js:779
 msgid "Please select the rescheduling type"
 msgstr "Sélectionnez le type de reprogrammation"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:811
+#: indico/web/client/js/legacy/libs/timetable/Management.js:809
 msgid "Reschedule Entries"
 msgstr "Reprogrammer les Entrées "
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:847
+#: indico/web/client/js/legacy/libs/timetable/Management.js:845
 msgid ""
 "This will change the starting and ending times of the session block {0} so "
 "that it encompasses all entries defined in its timetable."
 msgstr "Ceci changera les horaires de début et de fin du bloc de session {0} afin que toutes les entrées définies dans son ordre du jour soient englobées. "
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:854
+#: indico/web/client/js/legacy/libs/timetable/Management.js:852
 msgid "Are you sure you want to proceed?"
 msgstr "Êtes-vous sûr de vouloir continuer?"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:876
+#: indico/web/client/js/legacy/libs/timetable/Management.js:874
 msgid "Fitting..."
 msgstr "Ajustement en cours..."
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:890
+#: indico/web/client/js/legacy/libs/timetable/Management.js:888
 msgid "Fit timetable to content"
 msgstr "Adapter l'horaire au contenu"
 
