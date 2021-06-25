@@ -168,7 +168,7 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 
     @property
     def visibility(self):
-        return AbstractCommentVisibility.reviewers
+        return AbstractCommentVisibility.conveners
 
     @property
     def score(self):
