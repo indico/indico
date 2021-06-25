@@ -61,7 +61,7 @@
             </div>
         {% endif %}
 
-        {{ render_notes(event, for_event=event) }}
+        {{ render_notes(event, for_event=event, hidden=(not theme_settings.show_notes)) }}
 
         <div class="event-body {{ 'event-locked' if event.is_locked }}">
             {{ template_hook('meeting-body', event=event) }}

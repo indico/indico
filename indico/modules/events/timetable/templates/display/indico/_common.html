@@ -54,11 +54,11 @@
     </div>
 {%- endmacro %}
 
-{% macro render_notes(item, for_event=none, anchor=none) -%}
+{% macro render_notes(item, for_event=none, anchor=none, hidden=true) -%}
     {% if item.has_note %}
         {% set req = request.args.get('note') %}
         {% set note_id = item.note.id|string %}
-        {{ render_note(item.note, hidden=(req != note_id), can_edit=item.can_edit_note(session.user),
+        {{ render_note(item.note, hidden=(hidden and req != note_id), can_edit=item.can_edit_note(session.user),
                        for_event=for_event, anchor=anchor) }}
     {% endif %}
 {%- endmacro %}
