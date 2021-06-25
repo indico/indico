@@ -247,7 +247,9 @@
                 {% elif abstract.state.name == 'rejected' %}
                     {% trans %}The abstract was rejected.{% endtrans %}
                 {% elif abstract.state.name == 'merged' %}
-                    {% trans url=url_for('.display_abstract', abstract.merged_into), other=abstract.merged_into.title -%}
+                    {% set link_start = '<a href="%s">'|safe|format(url_for('.display_abstract', abstract.merged_into)) %}
+                    {% set link_end = '</a>'|safe %}
+                    {% trans other=abstract.merged_into.title -%}
                         The abstract was merged into {{ link_start }}{{ other }}{{ link_end }}.
                     {%- endtrans %}
                 {% elif abstract.state.name == 'duplicate' %}
