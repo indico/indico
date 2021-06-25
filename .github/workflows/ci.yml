@@ -148,6 +148,10 @@ jobs:
           FORCE_COLOR=1 npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ > /dev/null
           echo "::remove-matcher owner=react-jsx-i18n::"
 
+      - name: Check i18n format strings
+        if: success() || failure()
+        run: indico i18n check-format-strings
+
       - name: Run eslint
         if: success() || failure()
         run: npx eslint --ext .js --ext .jsx
