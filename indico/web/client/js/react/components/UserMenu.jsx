@@ -11,6 +11,7 @@ import changeLanguage from 'indico-url:core.change_lang';
 import userDashboard from 'indico-url:users.user_dashboard';
 import userPreferences from 'indico-url:users.user_preferences';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import qs from 'qs';
 import React from 'react';
@@ -69,16 +70,18 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
         trigger={trigger}
         value={language}
         selectOnBlur={false}
-        onChange={(_, {value}) => {
+        onChange={(__, {value}) => {
           if (value !== language) {
             postAndReload(value);
           }
         }}
-        options={Object.entries(languages).map(([key, [name, territory]]) => ({
-          key,
-          text: territory ? `${name} (${territory})` : name,
-          value: key,
-        }))}
+        options={_.sortBy(Object.entries(languages), x => x[1][0]).map(
+          ([key, [name, territory]]) => ({
+            key,
+            text: territory ? `${name} (${territory})` : name,
+            value: key,
+          })
+        )}
       />
     );
   };
