@@ -2,8 +2,8 @@ Changelog
 =========
 
 
-Version 3.0
------------
+Version 3.0rc1
+--------------
 
 *Unreleased*
 
