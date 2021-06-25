@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+Version 3.0rc2
+--------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
 Version 3.0rc1
 --------------
 
