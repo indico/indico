@@ -28,6 +28,7 @@ Improvements
 - Improve reviewing state display for paper reviewers (:issue:`4979`, :pr:`4984`)
 - Make it clearer if the contributions/timetable of a conference are still in draft mode
   (:issue:`4977`, :pr:`4986`)
+- Add "send to speakers" option in Reminders. (:issue:`4958`, :pr:`4966`, thanks :user:`Naveenaidu`)
 
 Bugfixes
 ^^^^^^^^

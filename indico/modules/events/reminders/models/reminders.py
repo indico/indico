@@ -11,7 +11,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.ical import event_to_ical
+from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import make_reminder_email
@@ -80,6 +83,12 @@ class EventReminder(db.Model):
         nullable=False,
         default=False
     )
+    #: If the notification should also be sent to all event speaker
+    send_to_speakers = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: If the notification should include a summary of the event's schedule.
     include_summary = db.Column(
         db.Boolean,
@@ -143,6 +152,38 @@ class EventReminder(db.Model):
         recipients = set(self.recipients)
         if self.send_to_participants:
             recipients.update(reg.email for reg in Registration.get_all_for_event(self.event))
+
+        if self.send_to_speakers:
+            recipients.update(person_link.email for person_link in self.event.person_links)
+
+            # contribution/sub-contribution speakers are present only in meetings and conferences
+            if self.event.type != EventType.lecture:
+                contrib_speakers = (
+                    ContributionPersonLink.query
+                    .filter(
+                        ContributionPersonLink.is_speaker,
+                        ContributionPersonLink.contribution.has(is_deleted=False, event=self.event)
+                    )
+                    .all()
+                )
+
+                subcontrib_speakers = (
+                    SubContributionPersonLink.query
+                    .filter(
+                        SubContributionPersonLink.is_speaker,
+                        SubContributionPersonLink.subcontribution.has(
+                            db.and_(
+                                ~SubContribution.is_deleted,
+                                SubContribution.contribution.has(is_deleted=False, event=self.event)
+                            )
+                        )
+                    )
+                    .all()
+                )
+
+                recipients.update(speaker.email for speaker in contrib_speakers)
+                recipients.update(speaker.email for speaker in subcontrib_speakers)
+
         recipients.discard('')  # just in case there was an empty email address somewhere
         return recipients
 
