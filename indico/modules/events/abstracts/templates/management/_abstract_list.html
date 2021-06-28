@@ -236,6 +236,16 @@
                                     {% endif %}
                                 </td>
                             </tr>
+                            {% for item in static_columns %}
+                                {% if item.id == 'description' %}
+                                    <tr class="i-table-inner i-table-bottom">
+                                        <td></td>
+                                        <td colspan="{{ 3 + static_columns|length + dynamic_columns|length }}">
+                                            {{ abstract.description }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
                         {% endfor %}
                     </tbody>
                 </table>

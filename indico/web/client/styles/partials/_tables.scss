@@ -77,7 +77,6 @@ table.i-table {
 }
 
 tr.i-table {
-  border-bottom: 1px solid $pastel-gray;
   border-top: 1px solid $pastel-gray;
 
   &.selected {
@@ -88,6 +87,15 @@ tr.i-table {
     @include transition(background-color 0.2s);
     background-color: $light-blue;
   }
+}
+
+tr.i-table:last-child,
+tr.i-table-bottom {
+  border-bottom: 1px solid $pastel-gray;
+}
+
+tr.i-table-inner {
+  background: $light-gray;
 }
 
 td.i-table,
