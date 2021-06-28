@@ -50,6 +50,7 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
+- Add abstract content to the abstract list customization options (:pr:`4968`)
 - Use a more modern search dialog when searching for users (:issue:`4674`, :pr:`4743`)
 - Add an option to refresh event person data from the underlying user when cloning an
   event (:issue:`4750`, :pr:`4760`)
