@@ -33,8 +33,15 @@ class TimetableCloner(EventCloner):
     def is_visible(self):
         return self.old_event.type_ in {EventType.meeting, EventType.conference}
 
-    def has_conflicts(self, target_event):
-        return self._has_content(target_event) or self.old_event.duration > target_event.duration
+    def get_conflicts(self, target_event):
+        conflicts = []
+        if self._has_content(target_event):
+            conflicts.append(_('The target event already has a timetable'))
+
+        if self.old_event.duration > target_event.duration:
+            conflicts.append(_('The source event is longer than the target event'))
+
+        return conflicts
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._session_block_map = shared_data['sessions']['session_block_map']

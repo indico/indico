@@ -382,6 +382,14 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     display: inline-block;
     margin-left: 0.5em;
   }
+
+  i.icon-padding {
+    padding-left: 5px;
+  }
+
+  span.checkbox-label {
+    white-space: nowrap;
+  }
 }
 
 %tilted-strips-bg {

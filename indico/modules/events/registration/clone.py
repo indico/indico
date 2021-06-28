@@ -31,8 +31,9 @@ class RegistrationFormCloner(EventCloner):
     def is_available(self):
         return self._has_content(self.old_event)
 
-    def has_conflicts(self, target_event):
-        return self._has_content(target_event)
+    def get_conflicts(self, target_event):
+        if self._has_content(target_event):
+            return [_('The target event already has registration forms')]
 
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):
@@ -100,8 +101,9 @@ class RegistrationCloner(EventCloner):
     def is_default(self):
         return self.old_event.type_ == EventType.meeting
 
-    def has_conflicts(self, target_event):
-        return self._has_content(target_event)
+    def get_conflicts(self, target_event):
+        if self._has_content(target_event):
+            return [_('The target event already has registrations')]
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         form_map = shared_data['registration_forms']['form_map']

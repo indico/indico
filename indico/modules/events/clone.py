@@ -26,8 +26,9 @@ class EventLocationCloner(EventCloner):
     def is_available(self):
         return self._has_content(self.old_event)
 
-    def has_conflicts(self, target_event):
-        return self._has_content(target_event)
+    def get_conflicts(self, target_event):
+        if self._has_content(target_event):
+            return [_('The target event already has a venue/room')]
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         with db.session.no_autoflush:
@@ -52,8 +53,9 @@ class EventPersonCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def has_conflicts(self, target_event):
-        return target_event.persons.has_rows()
+    def get_conflicts(self, target_event):
+        if target_event.persons.has_rows():
+            return [_('The target event already has persons')]
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._person_map = {}
@@ -87,8 +89,12 @@ class EventPersonLinkCloner(EventCloner):
     def is_available(self):
         return self._has_content(self.old_event)
 
-    def has_conflicts(self, target_event):
-        return self._has_content(target_event)
+    def get_conflicts(self, target_event):
+        if self._has_content(target_event):
+            if self.old_event.type_ == EventType.lecture:
+                return [_('The target event already has speakers')]
+            else:
+                return [_('The target event already has chairpersons')]
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._person_map = shared_data['event_persons']['person_map']
@@ -114,11 +120,17 @@ class EventProtectionCloner(EventCloner):
     is_default = True
     uses = {'event_roles', 'registration_forms'}
 
-    def has_conflicts(self, target_event):
+    def get_conflicts(self, target_event):
+        conflicts = []
+
         if target_event.access_key != '':
-            return True
+            conflicts.append(_('The target event already has an access key'))
+
         entries = list(target_event.acl_entries)
-        return len(entries) != 1 or entries[0].user != target_event.creator
+        if len(entries) != 1 or entries[0].user != target_event.creator:
+            conflicts.append(_('The target event already has a custom ACL'))
+
+        return conflicts
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
