@@ -31,8 +31,9 @@ class VCCloner(EventCloner):
             return True
         return self._has_content(self.old_event)
 
-    def has_conflicts(self, target_event):
-        return self._has_content(target_event)
+    def get_conflicts(self, target_event):
+        if self._has_content(target_event):
+            return [_('The target event already has videoconference rooms')]
 
     def _has_content(self, event):
         return VCRoomEventAssociation.find_for_event(event, include_hidden=True).has_rows()

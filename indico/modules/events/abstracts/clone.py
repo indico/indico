@@ -25,8 +25,16 @@ class AbstractSettingsCloner(EventCloner):
     def is_visible(self):
         return self.old_event.type_ == EventType.conference
 
-    def has_conflicts(self, target_event):
-        return bool(target_event.abstract_review_questions) or bool(target_event.abstract_email_templates)
+    def get_conflicts(self, target_event):
+        conflicts = []
+
+        if target_event.abstract_review_questions:
+            conflicts.append(_('The target event already has review questions'))
+
+        if target_event.abstract_email_templates:
+            conflicts.append(_('The target event already has email templates'))
+
+        return conflicts
 
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):

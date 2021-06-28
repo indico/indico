@@ -57,13 +57,6 @@
 
             {% elif step == 2 %}
                 {% call form_fieldset(_("What should be imported?")) %}
-                    {% call message_box('info') %}
-                        {% trans %}Some options might not be available because:{% endtrans %}
-                        <ul>
-                            <li>{% trans %}target event already has data in the module{% endtrans %}</li>
-                            <li>{% trans %}source event does not have any data in the module{% endtrans %}</li>
-                        </ul>
-                    {% endcall %}
                     {{ form_rows(form, skip=('source_event_url',), skip_labels=true) }}
                     {{ invisible_field(form.source_event_url) }}
                 {% endcall %}

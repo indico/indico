@@ -421,7 +421,8 @@ class ImportContentsForm(ImportSourceEventForm):
     def __init__(self, source_event, target_event, set_defaults=False, **kwargs):
         cloners = EventCloner.get_cloners(source_event)
         visible_options = [cloner for cloner in cloners if cloner.is_visible and not cloner.new_event_only]
-        conflicts = {cloner.name: cloner.has_conflicts(target_event) for cloner in cloners}
+        conflicts = {cloner.name: cloner.get_conflicts(target_event) for cloner in cloners}
+        cloners_with_conflicts = {name for name in conflicts if conflicts[name]}
 
         if set_defaults:
             form_params = {
@@ -434,7 +435,19 @@ class ImportContentsForm(ImportSourceEventForm):
         super().__init__(**kwargs)
         self.selected_items.choices = [(option.name, option.friendly_name) for option in visible_options]
         # We disable all cloners that are not available, handle only cloning to new events,
-        # have conflicts with target_event or any of their dependencies has conflicts with target_event
-        self.selected_items.disabled_choices = [option.name for option in visible_options if not option.is_available
-                                                or conflicts[option.name]
-                                                or any(conflicts[dep] for dep in option.requires)]
+        # have conflicts with target_event or any of their dependencies have conflicts with target_event
+        disabled_choices = []
+        reasons = {}
+        for option in visible_options:
+            if not option.is_available:
+                disabled_choices.append(option.name)
+                reasons[option.name] = _('There is nothing to import')
+            elif conflict := conflicts[option.name]:
+                disabled_choices.append(option.name)
+                reasons[option.name] = '\n'.join(conflict)
+            elif cloners_with_conflicts & option.requires_deep:
+                disabled_choices.append(option.name)
+                reasons[option.name] = _('This option depends on other options which are unavailable')
+
+        self.selected_items.disabled_choices = disabled_choices
+        self.selected_items.disabled_choices_reasons = reasons

@@ -37,8 +37,9 @@ class ContributionTypeCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def has_conflicts(self, target_event):
-        return target_event.contribution_types.has_rows()
+    def get_conflicts(self, target_event):
+        if target_event.contribution_types.has_rows():
+            return [_('The target event already has contribution types')]
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_type_map = {}
@@ -63,8 +64,9 @@ class ContributionFieldCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def has_conflicts(self, target_event):
-        return target_event.contribution_fields.has_rows()
+    def get_conflicts(self, target_event):
+        if target_event.contribution_fields.has_rows():
+            return [_('The target event already has contribution fields')]
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._contrib_field_map = {}
@@ -92,8 +94,9 @@ class ContributionCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def has_conflicts(self, target_event):
-        return bool(target_event.contributions)
+    def get_conflicts(self, target_event):
+        if target_event.contributions:
+            return [_('The target event already has contributions')]
 
     @classmethod
     @no_autoflush

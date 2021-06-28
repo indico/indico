@@ -10,6 +10,7 @@ from operator import attrgetter
 from indico.core import signals
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
+from indico.util.i18n import _
 from indico.util.signals import named_objects_from_signal
 
 
@@ -75,7 +76,7 @@ class EventCloner:
         if event_exists:
             if any(cloner.new_event_only for name, cloner in all_cloners.items() if name in cloners):
                 raise Exception('A new event only cloner was selected')
-            if any(cloner.has_conflicts(new_event) for name, cloner in all_cloners.items() if name in cloners):
+            if any(cloner.get_conflicts(new_event) for name, cloner in all_cloners.items() if name in cloners):
                 raise Exception('Cloner target is not empty')
 
         # enable internal cloners that are enabled by default or required by another cloner
@@ -173,13 +174,16 @@ class EventCloner:
         """
         return True
 
-    def has_conflicts(self, target_event):
-        """Check for conflicts between source event and target event.
+    def get_conflicts(self, target_event):
+        """Return conflicts between source event and target event.
 
         Use this when cloning into an existing event to disable options
         where ``target_event`` data would conflict with cloned data.
+
+        Returns a dummy conflict it not overridden as cloners
+        do not support importing by default.
         """
-        return True
+        return [_('Importing data is not supported')]
 
     def _prepare_shared_data(self, shared_data):
         linked = self.uses | self.requires

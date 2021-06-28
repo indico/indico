@@ -27,8 +27,9 @@ class ImageCloner(EventCloner):
     def is_available(self):
         return self._find_images(self.old_event).has_rows()
 
-    def has_conflicts(self, target_event):
-        return self._find_images(target_event).has_rows()
+    def get_conflicts(self, target_event):
+        if self._find_images(target_event).has_rows():
+            return [_('The target event already has images')]
 
     def _find_images(self, event):
         return event.layout_images
