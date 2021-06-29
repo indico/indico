@@ -63,7 +63,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
 
     def get_all_contribution_fields(self):
         """Return the list of contribution fields for the event."""
-        return self.event.contribution_fields if self.show_contribution_fields else []
+        return self.event.contribution_fields.all() if self.show_contribution_fields else []
 
     def _get_sorted_contribution_fields(self, item_ids):
         """
