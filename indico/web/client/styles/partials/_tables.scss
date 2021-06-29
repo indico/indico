@@ -90,7 +90,8 @@ tr.i-table {
   }
 }
 
-tr.i-table:last-child {
+tr.i-table:last-child,
+tr.details-row:last-child {
   border-bottom: 1px solid $pastel-gray;
 }
 
