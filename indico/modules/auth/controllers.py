@@ -558,7 +558,7 @@ class LocalRegistrationHandler(RegistrationHandler):
     def get_identity_data(self, form):
         del session['register_verified_email']
         return {'provider': 'indico', 'identifier': form.username.data,
-                'password_hash': Identity.password.backend.hash(form.password.data)}
+                'password_hash': Identity.password.backend.create_hash(form.password.data)}
 
     def redirect_success(self):
         return redirect(session.pop('register_next_url', url_for_index()))

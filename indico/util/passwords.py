@@ -39,7 +39,7 @@ class BCryptPassword:
         return f'<BCryptPassword({self.hash})>'
 
     @staticmethod
-    def hash(value):
+    def create_hash(value):
         return bcrypt.hashpw(value.encode(), bcrypt.gensalt()).decode()
 
 
@@ -70,7 +70,7 @@ class SHA256Token:
         raise RuntimeError('Hashed tokens have no string representation')
 
     @staticmethod
-    def hash(value):
+    def create_hash(value):
         return hashlib.sha256(value.encode()).hexdigest()
 
 
@@ -98,7 +98,7 @@ class PasswordProperty:
     def __set__(self, instance, value):
         if not value:
             raise ValueError('Password may not be empty')
-        setattr(instance, self.attr, self.backend.hash(value))
+        setattr(instance, self.attr, self.backend.create_hash(value))
 
     def __delete__(self, instance):
         setattr(instance, self.attr, None)
