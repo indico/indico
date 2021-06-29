@@ -14,6 +14,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.export import export_event, import_event
+from indico.modules.events.models.series import EventSeries
 from indico.modules.users.models.users import User
 
 
@@ -85,3 +86,40 @@ def import_(source_file, create_users, force, verbose, yes, category_id):
         sys.exit(1)
     db.session.commit()
     click.secho(event.external_url, fg='green', bold=True)
+
+
+@cli.command('create-series')
+@click.option('--title-sequence/--no-title-sequence', 'show_sequence_in_title', default=True,
+              help='Whether to show the series sequence in the event titles (lectures only); enabled by default')
+@click.option('--links/--no-links', 'show_links', default=True,
+              help='Whether to show links to other events in the series on the event page; enabled by default')
+@click.argument('event_ids', nargs=-1, type=int, metavar='EVENT_ID...')
+def create_series(show_sequence_in_title, show_links, event_ids):
+    """Create a series from a list of events."""
+    events = Event.query.filter(Event.id.in_(event_ids), ~Event.is_deleted).all()
+
+    if missing := (set(event_ids) - {e.id for e in events}):
+        click.secho('Events not found:', fg='red', bold=True)
+        for event_id in missing:
+            click.echo(f'- {event_id}')
+        sys.exit(1)
+    elif conflict := [e for e in events if e.series]:
+        click.secho('Events already assigned to a series:', fg='red', bold=True)
+        for event in conflict:
+            click.echo(format_event(event))
+        sys.exit(1)
+
+    click.echo('Selected events:')
+    for event in events:
+        click.echo(format_event(event))
+
+    click.confirm('Create series?', default=True, abort=True)
+
+    series = EventSeries(events=events, show_sequence_in_title=show_sequence_in_title, show_links=show_links)
+    db.session.commit()
+
+    click.secho(f'Series successfully created (id={series.id}).', fg='green', bold=True)
+
+
+def format_event(event):
+    return f'- {event.id}: [{event.start_dt_local.date()}] {event.title} ({event.external_url})'
