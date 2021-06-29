@@ -11,7 +11,6 @@ from flask import after_this_request, jsonify
 from werkzeug.exceptions import HTTPException
 
 from indico.core.db import db
-from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.util import query_token
 from indico.util.date_time import now_utc
 
@@ -34,7 +33,7 @@ class IndicoResourceProtector(ResourceProtector):
 
 class IndicoBearerTokenValidator(BearerTokenValidator):
     def authenticate_token(self, token_string):
-        return query_token(token_string)
+        return query_token(token_string, allow_personal=True)
 
     def validate_token(self, token, scopes, request):
         super().validate_token(token, scopes, request)
@@ -46,11 +45,12 @@ class IndicoBearerTokenValidator(BearerTokenValidator):
         # expected to do something with it...
 
         token_id = token.id  # avoid DetachedInstanceError in the callback
+        token_cls = type(token)
 
         @after_this_request
         def _update_last_use(response):
             with db.tmp_session() as sess:
                 # do not modify `token` directly, it's attached to a different session!
-                sess.query(OAuthToken).filter_by(id=token_id).update({OAuthToken.last_used_dt: now_utc()})
+                sess.query(token_cls).filter_by(id=token_id).update({token_cls.last_used_dt: now_utc()})
                 sess.commit()
             return response

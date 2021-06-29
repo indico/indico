@@ -366,7 +366,7 @@ def test_get_request_user_check_failure(dummy_user, mocker):
     _check_request_user.assert_called_once()
 
 
-def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, create_user):
+def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, dummy_personal_token, create_user):
     class RHTest(RH):
         def _process(self):
             user, source = get_request_user()
@@ -404,6 +404,28 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, cr
     resp = test_client.get(signed_url_for_user(dummy_user, 'test_scope'))
     assert resp.status_code == 400
     assert b'Signature auth is not allowed for this URL' in resp.data
+
+    # personal oauth-like token - token with read:user scope
+    personal_oauth_headers = {'Authorization': f'Bearer {dummy_personal_token._plaintext_token}'}
+    resp = test_client.get('/test/default', headers=personal_oauth_headers)
+    assert resp.status_code == 403
+    assert b'insufficient_scope' in resp.data
+
+    resp = test_client.post('/test/default', headers=personal_oauth_headers)
+    assert resp.status_code == 403
+    assert b'insufficient_scope' in resp.data
+
+    resp = test_client.get('/test/signed', headers=personal_oauth_headers)
+    assert resp.status_code == 403
+    assert b'insufficient_scope' in resp.data
+
+    resp = test_client.get('/test/scope', headers=personal_oauth_headers)
+    assert resp.status_code == 200
+    assert resp.data == b'1337|oauth'
+
+    resp = test_client.post('/test/scope', headers=personal_oauth_headers)
+    assert resp.status_code == 200
+    assert resp.data == b'1337|oauth'
 
     # oauth - token with read:user scope
     oauth_headers = {'Authorization': f'Bearer {dummy_token._plaintext_token}'}
@@ -463,6 +485,12 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, cr
     assert resp.status_code == 200
     assert resp.data == b'1337|oauth'
 
+    # personal token + signature is not allowed
+    dummy_personal_token._scopes.append('read:everything')
+    resp = test_client.get(signed_url_for_user(dummy_user, 'test_signed'), headers=personal_oauth_headers)
+    assert resp.status_code == 400
+    assert b'OAuth tokens and signed URLs cannot be mixed' in resp.data
+
     # oauth + signature is not allowed
     resp = test_client.get(signed_url_for_user(dummy_user, 'test_signed'), headers=oauth_headers)
     assert resp.status_code == 400
@@ -475,6 +503,11 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, cr
     assert test_client.get('/test/default').data == b'123|session'
     assert test_client.get('/test/signed').data == b'123|session'
     assert test_client.get('/test/scope').data == b'123|session'
+
+    # personal token + session is not allowed
+    resp = test_client.get('/test/default', headers=personal_oauth_headers)
+    assert resp.status_code == 400
+    assert b'OAuth tokens and session cookies cannot be mixed' in resp.data
 
     # oauth + session is not allowed
     resp = test_client.get('/test/default', headers=oauth_headers)

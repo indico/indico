@@ -18,20 +18,12 @@ from indico.util.date_time import now_utc
 from indico.util.passwords import TokenProperty
 
 
-class OAuthToken(TokenMixin, db.Model):
-    """OAuth tokens."""
-
-    __tablename__ = 'tokens'
-    __table_args__ = {'schema': 'oauth'}
+class TokenModelBase(TokenMixin, db.Model):
+    __abstract__ = True
 
     id = db.Column(
         db.Integer,
         primary_key=True
-    )
-    app_user_link_id = db.Column(
-        db.ForeignKey('oauth.application_user_links.id', ondelete='CASCADE'),
-        nullable=False,
-        index=True
     )
     access_token_hash = db.Column(
         db.String,
@@ -41,7 +33,9 @@ class OAuthToken(TokenMixin, db.Model):
     )
     _scopes = db.Column(
         'scopes',
-        ARRAY(db.String)
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
     )
     created_dt = db.Column(
         UTCDateTime,
@@ -54,6 +48,34 @@ class OAuthToken(TokenMixin, db.Model):
     )
 
     access_token = TokenProperty('access_token_hash')
+
+    @property
+    def scopes(self):
+        """The set of scopes this token has access to."""
+        return set(self._scopes)
+
+    @scopes.setter
+    def scopes(self, value):
+        self._scopes = sorted(value)
+
+    def get_expires_in(self):
+        return 0
+
+    def is_expired(self):
+        return False
+
+
+class OAuthToken(TokenModelBase):
+    """OAuth tokens."""
+
+    __tablename__ = 'tokens'
+    __table_args__ = {'schema': 'oauth'}
+
+    app_user_link_id = db.Column(
+        db.ForeignKey('oauth.application_user_links.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True
+    )
 
     app_user_link = db.relationship(
         'OAuthApplicationUserLink',
@@ -78,15 +100,6 @@ class OAuthToken(TokenMixin, db.Model):
     def locator(self):
         return {'id': self.id}
 
-    @property
-    def scopes(self):
-        """The set of scopes the linked application has access to."""
-        return set(self._scopes)
-
-    @scopes.setter
-    def scopes(self, value):
-        self._scopes = sorted(value)
-
     def __repr__(self):  # pragma: no cover
         return f'<OAuthToken({self.id}, {self.app_user_link_id}, {self.scopes})>'
 
@@ -97,12 +110,6 @@ class OAuthToken(TokenMixin, db.Model):
         # scopes are restricted by what's authorized for the particular user and what's whitelisted for the app
         scopes = self.scopes & set(self.app_user_link.scopes) & set(self.application.allowed_scopes)
         return list_to_scope(sorted(scopes))
-
-    def get_expires_in(self):
-        return 0
-
-    def is_expired(self):
-        return False
 
     def is_revoked(self):
         return self.user.is_blocked or self.user.is_deleted or not self.application.is_enabled

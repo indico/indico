@@ -310,6 +310,16 @@ def test_introspection_wrong_app(create_application, dummy_token, test_client):
     assert resp.json == {'active': False}
 
 
+def test_introspection_personal(dummy_application, dummy_personal_token, test_client):
+    data = {
+        'token': dummy_personal_token._plaintext_token,
+        'client_id': dummy_application.client_id,
+        'client_secret': dummy_application.client_secret
+    }
+    resp = test_client.post('/oauth/introspect', data=data)
+    assert resp.json == {'active': False}
+
+
 @pytest.mark.parametrize('endpoint_auth', ('client_secret_post', 'client_secret_basic'))
 def test_revocation(db, dummy_application, dummy_token, test_client, endpoint_auth):
     data = {'token': dummy_token._plaintext_token}
@@ -342,6 +352,21 @@ def test_revocation_wrong_app(db, create_application, dummy_token, test_client):
     assert dummy_token in db.session
     # make sure we can still use the token
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
+    assert resp.status_code == 200
+
+
+def test_revocation_personal(db, dummy_application, dummy_personal_token, test_client):
+    data = {
+        'token': dummy_personal_token._plaintext_token,
+        'client_id': dummy_application.client_id,
+        'client_secret': dummy_application.client_secret
+    }
+    resp = test_client.post('/oauth/revoke', data=data)
+    assert resp.status_code == 200
+    assert resp.json == {}
+    assert dummy_personal_token in db.session
+    # make sure we can still use the token
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_personal_token._plaintext_token}'})
     assert resp.status_code == 200
 
 
@@ -460,3 +485,19 @@ def test_merge_users(create_user, dummy_user, dummy_application, dummy_token, cr
         resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {token}'})
         assert resp.status_code == 200
         assert resp.json['id'] == dummy_user.id
+
+
+def test_oauth_token_last_used_dt(dummy_token, dummy_personal_token, test_client):
+    assert dummy_token.last_used_dt is None
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
+    assert resp.status_code == 200
+    assert dummy_token.last_used_dt is not None
+    assert dummy_personal_token.last_used_dt is None
+
+
+def test_personal_token_last_used_dt(dummy_personal_token, dummy_token, test_client):
+    assert dummy_personal_token.last_used_dt is None
+    resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_personal_token._plaintext_token}'})
+    assert resp.status_code == 200
+    assert dummy_personal_token.last_used_dt is not None
+    assert dummy_token.last_used_dt is None

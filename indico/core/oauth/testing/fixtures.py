@@ -11,6 +11,7 @@ import pytest
 from authlib.common.security import generate_token
 
 from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
+from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.util import TOKEN_PREFIX_OAUTH
 
@@ -54,6 +55,16 @@ def dummy_token(db, dummy_app_link):
     token_string = TOKEN_PREFIX_OAUTH + generate_token()
     token = OAuthToken(access_token=token_string, app_user_link=dummy_app_link, scopes=['read:legacy_api', 'read:user'])
     token._plaintext_token = token_string
+    db.session.add(token)
+    db.session.flush()
+    return token
+
+
+@pytest.fixture
+def dummy_personal_token(db, dummy_user):
+    """Return a personal token for the dummy user."""
+    token = PersonalToken(name='dummy', user=dummy_user, scopes=['read:legacy_api', 'read:user'])
+    token._plaintext_token = token.generate_token()
     db.session.add(token)
     db.session.flush()
     return token

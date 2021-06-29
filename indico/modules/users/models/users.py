@@ -431,6 +431,7 @@ class User(PersonMixin, db.Model):
     # - paper_competences (PaperCompetence.user)
     # - paper_reviews (PaperReview.user)
     # - paper_revisions (PaperRevision.submitter)
+    # - personal_tokens (PersonalToken.user)
     # - registrations (Registration.user)
     # - requests_created (Request.created_by_user)
     # - requests_processed (Request.processed_by_user)

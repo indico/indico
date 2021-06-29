@@ -15,6 +15,7 @@ from sqlalchemy.orm import joinedload
 from indico.core.db import db
 from indico.core.oauth.logger import logger
 from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
+from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.core.oauth.models.tokens import OAuthToken
 
 
@@ -22,10 +23,19 @@ from indico.core.oauth.models.tokens import OAuthToken
 MAX_TOKENS_PER_SCOPE = 50
 # The prefix for OAuth tokens
 TOKEN_PREFIX_OAUTH = 'indo_'
+# The prefix for personal tokens
+TOKEN_PREFIX_PERSONAL = 'indp_'
 
 
-def query_token(token_string):
+def query_token(token_string, allow_personal=False):
     token_hash = hashlib.sha256(token_string.encode()).hexdigest()
+
+    if token_string.startswith(TOKEN_PREFIX_PERSONAL):
+        if not allow_personal:
+            return None
+        return (PersonalToken.query
+                .filter_by(access_token_hash=token_hash)
+                .first())
 
     # XXX: oauth tokens may be from pre-3.0 and thus not use a token prefix, so we simply
     # assume that any token without another known prefix is an oauth token
