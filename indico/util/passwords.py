@@ -55,7 +55,7 @@ class SHA256Token:
             return False
         if not isinstance(value, str):
             raise TypeError(f'password must be str, not {type(value)}')
-        return value == self.hash
+        return hashlib.sha256(value.encode()).hexdigest() == self.hash
 
     def __ne__(self, other):
         return not (self == other)

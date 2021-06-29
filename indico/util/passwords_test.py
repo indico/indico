@@ -10,13 +10,19 @@ import hashlib
 import pytest
 
 from indico.core import signals
-from indico.util.passwords import BCryptPassword, PasswordProperty, validate_secure_password
+from indico.util.passwords import BCryptPassword, PasswordProperty, SHA256Token, validate_secure_password
 
 
 def md5(s):
     if isinstance(s, str):
         s = s.encode()
     return hashlib.md5(s).hexdigest()
+
+
+def sha256(s):
+    if isinstance(s, str):
+        s = s.encode()
+    return hashlib.sha256(s).hexdigest()
 
 
 class Foo:
@@ -84,6 +90,14 @@ def test_passwordproperty_get():
 def test_bcryptpassword_check(password):
     password_hash = md5(password)
     pw = BCryptPassword(password_hash)
+    assert pw == password
+    assert pw != 'notthepassword'
+
+
+@pytest.mark.parametrize('password', ('moep', 'möp'))
+def test_sha256token_check(password):
+    password_hash = sha256(password)
+    pw = SHA256Token(password_hash)
     assert pw == password
     assert pw != 'notthepassword'
 
