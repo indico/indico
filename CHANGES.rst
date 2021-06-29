@@ -11,6 +11,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Add abstract content to the abstract list customization options (:pr:`4968`)
+- Add CLI option to create a series (:pr:`4969`)
 
 Bugfixes
 ^^^^^^^^
