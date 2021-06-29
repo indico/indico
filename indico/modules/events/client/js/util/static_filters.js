@@ -59,8 +59,11 @@
         .text($T.gettext('There are no entries that match your search criteria.'))
         .show();
       $state.addClass('active');
-    } else if ($visibleEntries.length !== $items.length) {
-      $state.addClass('active');
+    } else {
+      $filterPlaceholder.hide();
+      if ($visibleEntries.length !== $items.length) {
+        $state.addClass('active');
+      }
     }
 
     setState($state, $visibleEntries, $items);
