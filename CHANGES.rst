@@ -7,6 +7,11 @@ Version 3.0rc2
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Add abstract content to the abstract list customization options (:pr:`4968`)
+
 Bugfixes
 ^^^^^^^^
 

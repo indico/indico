@@ -82,7 +82,7 @@
                             <th class="i-table thin-column" data-sorter="false"></th>
                             <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
                             <th class="i-table">{% trans %}Title{% endtrans %}</th>
-                            {% for item in static_columns %}
+                            {% for item in static_columns if item.id != 'description' %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
                             {% endfor %}
                             {% for item in dynamic_columns %}
@@ -236,6 +236,14 @@
                                     {% endif %}
                                 </td>
                             </tr>
+                            {% for item in static_columns if item.id == 'description' %}
+                                <tr class="details-row">
+                                    <td></td>
+                                    <td colspan="{{ 3 + static_columns|length + dynamic_columns|length - 1 }}">
+                                        {{ abstract.description }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
                         {% endfor %}
                     </tbody>
                 </table>

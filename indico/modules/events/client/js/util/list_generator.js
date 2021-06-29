@@ -58,6 +58,7 @@
       headers: {
         0: {sorter: false},
       },
+      cssChildRow: 'details-row',
     });
   };
 
