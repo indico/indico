@@ -20,10 +20,16 @@ from indico.core.oauth.models.tokens import OAuthToken
 
 # The maximum number of tokens to keep for any given app/user and scope combination
 MAX_TOKENS_PER_SCOPE = 50
+# The prefix for OAuth tokens
+TOKEN_PREFIX_OAUTH = 'indo_'
 
 
 def query_token(token_string):
     token_hash = hashlib.sha256(token_string.encode()).hexdigest()
+
+    # XXX: oauth tokens may be from pre-3.0 and thus not use a token prefix, so we simply
+    # assume that any token without another known prefix is an oauth token
+
     # we always need the app link (which already loads the application) and the user
     # since we need those to check if the token is still valid
     return (OAuthToken.query

@@ -18,7 +18,7 @@ from werkzeug.urls import url_parse
 from indico.core.oauth.models.applications import OAuthApplicationUserLink
 from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.scopes import SCOPES
-from indico.core.oauth.util import MAX_TOKENS_PER_SCOPE, save_token
+from indico.core.oauth.util import MAX_TOKENS_PER_SCOPE, TOKEN_PREFIX_OAUTH, save_token
 from indico.modules.users.util import merge_users
 from indico.web.flask.util import url_for
 
@@ -201,7 +201,9 @@ def test_oauth_scopes(create_application, test_client, dummy_user, app):
     # get a token and make sure it looks fine
     token1 = oauth_client.fetch_token(authorization_response=target_url)
     assert token1 == {'access_token': token1['access_token'], 'token_type': 'Bearer', 'scope': 'read:legacy_api'}
-    assert len(token1['access_token']) == 42  # longer would be fine but we don't expect this to change
+    assert len(token1['access_token']) == 47  # longer would be fine but we don't expect this to change
+    assert token1['access_token'].startswith(TOKEN_PREFIX_OAUTH)
+
     app_link = oauth_app.user_links.one()
     assert app_link.user == dummy_user
     assert app_link.scopes == ['read:legacy_api']

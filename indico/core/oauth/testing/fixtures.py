@@ -12,6 +12,7 @@ from authlib.common.security import generate_token
 
 from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
 from indico.core.oauth.models.tokens import OAuthToken
+from indico.core.oauth.util import TOKEN_PREFIX_OAUTH
 
 
 @pytest.fixture
@@ -50,7 +51,7 @@ def dummy_app_link(db, dummy_application, dummy_user):
 @pytest.fixture
 def dummy_token(db, dummy_app_link):
     """Return a token for the dummy app/user."""
-    token_string = generate_token()
+    token_string = TOKEN_PREFIX_OAUTH + generate_token()
     token = OAuthToken(access_token=token_string, app_user_link=dummy_app_link, scopes=['read:legacy_api', 'read:user'])
     token._plaintext_token = token_string
     db.session.add(token)
