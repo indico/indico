@@ -79,7 +79,8 @@ table.i-table {
 tr.i-table {
   border-top: 1px solid $pastel-gray;
 
-  &.selected {
+  &.selected,
+  &.selected + tr.details-row {
     background-color: $pastel-blue !important;
   }
 
@@ -89,12 +90,11 @@ tr.i-table {
   }
 }
 
-tr.i-table:last-child,
-tr.i-table-bottom {
+tr.i-table:last-child {
   border-bottom: 1px solid $pastel-gray;
 }
 
-tr.i-table-inner {
+tr.details-row {
   background: $light-gray;
 }
 
