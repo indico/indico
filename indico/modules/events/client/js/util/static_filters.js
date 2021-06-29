@@ -67,6 +67,7 @@
 
     $items.hide();
     $visibleEntries.show();
+    $visibleEntries.next(searchBoxConfig.childHandle || '.details-row').show();
 
     // Needed because $(window).scroll() is not called when hiding elements
     // causing scrolling elements to be out of place.
