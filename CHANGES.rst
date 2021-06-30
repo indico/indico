@@ -20,7 +20,6 @@ Bugfixes
 
 - None so far :)
 
-
 Version 3.0rc1
 --------------
 

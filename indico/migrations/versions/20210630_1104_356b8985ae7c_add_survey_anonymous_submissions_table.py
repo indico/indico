@@ -21,8 +21,8 @@ def upgrade():
         'anonymous_submissions',
         sa.Column('survey_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=False, index=True),
-        sa.ForeignKeyConstraint(['survey_id'], ['event_surveys.surveys.id']),
-        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.ForeignKeyConstraint(['survey_id'], ['event_surveys.surveys.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('survey_id', 'user_id'),
         schema='event_surveys'
     )
