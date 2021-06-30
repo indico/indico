@@ -49,3 +49,13 @@ class AnonymousSurveySubmission(db.Model):
 
     def __repr__(self):
         return f'<AnonymousSurveySubmission({self.survey_id}, {self.user_id})>'
+
+    @classmethod
+    def merge_users(cls, target, source):
+        target_ids = [anonymous_submission.survey_id for anonymous_submission in target.anonymous_survey_submissions]
+
+        for source_anonymous_submission in source.anonymous_survey_submissions.all():
+            if source_anonymous_submission.survey_id not in target_ids:
+                source_anonymous_submission.user = target
+            else:
+                db.session.delete(source_anonymous_submission)
