@@ -16,7 +16,9 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Users cannot submit multiple anonymous surveys anymore by logging out and in again.
+  (:issue:`4693`, :pr:`4970`)
+
 
 Version 3.0rc1
 --------------
