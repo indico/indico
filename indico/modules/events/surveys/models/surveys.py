@@ -195,6 +195,9 @@ class Survey(db.Model):
         )
     )
 
+    # relationship backrefs:
+    # - anonymous_submissions (AnonymousSurveySubmission.survey)
+
     @hybrid_property
     def has_ended(self):
         return self.end_dt is not None and self.end_dt <= now_utc()

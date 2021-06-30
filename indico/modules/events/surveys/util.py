@@ -54,6 +54,11 @@ def was_survey_submitted(survey):
     user_submitted_surveys = set(query)
     if session.user and survey in user_submitted_surveys:
         return True
+
+    # anonymous survey: check anonymous submission table
+    if survey.anonymous and session.user:
+        return session.user.anonymous_survey_submissions.filter_by(survey=survey).has_rows()
+
     submission_id = session.get('submitted_surveys', {}).get(survey.id)
     if submission_id is None:
         return False
