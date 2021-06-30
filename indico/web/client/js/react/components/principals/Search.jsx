@@ -184,7 +184,7 @@ const searchFactory = config => {
     const hasAvatarClass = avatarURL ? 'has-avatar' : '';
 
     return (
-      <List.Item>
+      <List.Item styleName="result-item" onClick={added ? onRemove : onAdd}>
         <div styleName="item">
           <div styleName="icon">
             <Icon.Group size="large">
@@ -210,9 +210,9 @@ const searchFactory = config => {
           </div>
           <div styleName="actions">
             {added ? (
-              <Icon name="checkmark" size="large" color="green" onClick={onRemove} />
+              <Icon name="checkmark" size="large" color="green" />
             ) : (
-              <Icon styleName="button" name="add" size="large" onClick={onAdd} />
+              <Icon styleName="button" name="add" size="large" />
             )}
           </div>
         </div>
