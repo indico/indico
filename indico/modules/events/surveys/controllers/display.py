@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.models.events import EventType
-from indico.modules.events.surveys.models.anonymous_submissions import SurveyAnonymousSubmission
+from indico.modules.events.surveys.models.anonymous_submissions import AnonymousSurveySubmission
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.util import (is_submission_in_progress, make_survey_form, query_active_surveys,
@@ -95,8 +95,7 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
             submission = self._save_answers(form)
             if submission.is_anonymous and submission.user:
                 submission.user = None
-                anonymous_submission = SurveyAnonymousSubmission(survey_id=self.survey.id, user_id=session.user.id)
-                db.session.add(anonymous_submission)
+                AnonymousSurveySubmission(survey=self.survey, user=session.user)
             submission.submitted_dt = now_utc()
             submission.is_submitted = True
             submission.pending_answers = {}

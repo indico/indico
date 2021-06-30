@@ -12,7 +12,6 @@ from sqlalchemy.orm import joinedload, load_only
 
 from indico.core.db import db
 from indico.modules.events import Event
-from indico.modules.events.surveys.models.anonymous_submissions import SurveyAnonymousSubmission
 from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.util.caching import memoize_request
 from indico.util.spreadsheets import unique_col
@@ -58,9 +57,7 @@ def was_survey_submitted(survey):
 
     # anonymous survey: check anonymous submission table
     if session.user:
-        return (SurveyAnonymousSubmission.query
-                .filter_by(survey_id=survey.id, user_id=session.user.id)
-                .has_rows())
+        return session.user.anonymous_survey_submissions.filter_by(survey=survey).has_rows()
 
     submission_id = session.get('submitted_surveys', {}).get(survey.id)
     if submission_id is None:
