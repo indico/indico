@@ -487,17 +487,29 @@ def test_merge_users(create_user, dummy_user, dummy_application, dummy_token, cr
         assert resp.json['id'] == dummy_user.id
 
 
-def test_oauth_token_last_used_dt(dummy_token, dummy_personal_token, test_client):
+def test_oauth_token_last_used_info(dummy_token, dummy_personal_token, test_client):
     assert dummy_token.last_used_dt is None
+    assert dummy_token.last_used_ip is None
+    assert dummy_token.use_count == 0
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
     assert resp.status_code == 200
     assert dummy_token.last_used_dt is not None
+    assert dummy_token.last_used_ip == '127.0.0.1'
+    assert dummy_token.use_count == 1
     assert dummy_personal_token.last_used_dt is None
+    assert dummy_personal_token.last_used_ip is None
+    assert dummy_personal_token.use_count == 0
 
 
-def test_personal_token_last_used_dt(dummy_personal_token, dummy_token, test_client):
+def test_personal_token_last_used_info(dummy_personal_token, dummy_token, test_client):
     assert dummy_personal_token.last_used_dt is None
+    assert dummy_personal_token.last_used_ip is None
+    assert dummy_personal_token.use_count == 0
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_personal_token._plaintext_token}'})
     assert resp.status_code == 200
     assert dummy_personal_token.last_used_dt is not None
+    assert dummy_personal_token.last_used_ip == '127.0.0.1'
+    assert dummy_personal_token.use_count == 1
     assert dummy_token.last_used_dt is None
+    assert dummy_token.last_used_ip is None
+    assert dummy_token.use_count == 0

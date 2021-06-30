@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 from authlib.oauth2.rfc6749 import list_to_scope
 from authlib.oauth2.rfc6749.models import AuthorizationCodeMixin, TokenMixin
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, INET
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -45,6 +45,15 @@ class TokenModelBase(TokenMixin, db.Model):
     last_used_dt = db.Column(
         UTCDateTime,
         nullable=True
+    )
+    last_used_ip = db.Column(
+        INET,
+        nullable=True
+    )
+    use_count = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0
     )
 
     access_token = TokenProperty('access_token_hash')

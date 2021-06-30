@@ -7,7 +7,8 @@
 
 from authlib.integrations.flask_oauth2 import ResourceProtector
 from authlib.oauth2.rfc6750.validator import BearerTokenValidator
-from flask import after_this_request, jsonify
+from flask import after_this_request, g, jsonify
+from flask import request as flask_request
 from werkzeug.exceptions import HTTPException
 
 from indico.core.db import db
@@ -40,6 +41,10 @@ class IndicoBearerTokenValidator(BearerTokenValidator):
 
         # if we get here, the token is valid so we can mark it as used at the end of the request
 
+        if g.get('_bearer_token_usage_logged'):
+            return
+        g._bearer_token_usage_logged = True
+
         # XXX: should we wait or do it just now? even if the request failed for some reason, the
         # token could be considered used, since it was valid and most likely used by a client who
         # expected to do something with it...
@@ -51,6 +56,10 @@ class IndicoBearerTokenValidator(BearerTokenValidator):
         def _update_last_use(response):
             with db.tmp_session() as sess:
                 # do not modify `token` directly, it's attached to a different session!
-                sess.query(token_cls).filter_by(id=token_id).update({token_cls.last_used_dt: now_utc()})
+                sess.query(token_cls).filter_by(id=token_id).update({
+                    token_cls.last_used_dt: now_utc(),
+                    token_cls.last_used_ip: flask_request.remote_addr,
+                    token_cls.use_count: token_cls.use_count + 1,
+                })
                 sess.commit()
             return response

@@ -36,7 +36,6 @@ def _print_user_info(user):
         flags.append('%{red!}deleted%{reset}')
     if user.is_pending:
         flags.append('%{cyan}pending%{reset}')
-    print()
     print('User info:')
     print(f'  ID: {user.id}')
     print(f'  First name: {user.first_name}')
@@ -225,28 +224,46 @@ def token_cli():
 
 @token_cli.command('list')
 @click.argument('user_id', type=int)
-def token_list(user_id):
+@click.option('--verbose', '-v', is_flag=True, help='Show more verbose information and include revoked tokens')
+def token_list(user_id, verbose):
     """List the tokens of the user."""
     user = User.get(user_id)
     if user is None:
         click.echo(cformat('%{red!}This user does not exist'))
         return
     _print_user_info(user)
-    tokens = user.personal_tokens.order_by(PersonalToken.revoked_dt.isnot(None),
-                                           db.func.lower(PersonalToken.name)).all()
+    query = (
+        user.personal_tokens
+        .order_by(
+            PersonalToken.revoked_dt.isnot(None),
+            db.func.lower(PersonalToken.name)
+        )
+    )
+    if not verbose:
+        query = query.filter_by(revoked_dt=None)
 
+    tokens = query.all()
     if not tokens:
         click.echo(cformat('%{yellow}This user has no tokens'))
         return
 
-    table_data = [['Name', 'Scope', 'Created', 'Last used', 'Status']]
+    verbose_cols = ('Last IP', 'Use count', 'Status', 'ID') if verbose else ()
+    table_data = [['Name', 'Scope', 'Created', 'Last used', *verbose_cols]]
     for token in tokens:
+        verbose_data = ()
+        if verbose:
+            verbose_data = (
+                token.last_used_ip,
+                token.use_count,
+                'Revoked' if token.revoked_dt else 'Active',
+                token.id,
+            )
         table_data.append([
             token.name,
             token.get_scope(),
             _format_dt(token.created_dt),
             _format_dt(token.last_used_dt) or 'Never',
-            'Revoked' if token.revoked_dt else 'Active'
+            *verbose_data,
         ])
     click.echo(AsciiTable(table_data, cformat('%{white!}Tokens%{reset}')).table)
 
