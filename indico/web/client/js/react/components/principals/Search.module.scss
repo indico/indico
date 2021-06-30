@@ -57,3 +57,16 @@
 .has-avatar {
   margin-left: 8px;
 }
+
+:global(.ui.list .item).result-item:first-child {
+  padding-top: 0.6em;
+}
+
+:global(.ui.list .item).result-item:last-child {
+  padding-bottom: 0.6em;
+}
+
+:global(.ui.list .item).result-item:hover {
+  cursor: pointer;
+  background: $light-gray;
+}
