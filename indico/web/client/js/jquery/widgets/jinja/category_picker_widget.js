@@ -21,6 +21,7 @@
 
     const $field = $(`#${options.fieldId}`);
     const $categoryTitle = $(`#category-title-${options.fieldId}`);
+    const $categoryWarning = $(`#category-warning-${options.fieldId}`);
     const $dialogTrigger = $(`#categorynav-button-${options.fieldId}`);
     let hiddenData = $field.val() ? JSON.parse($field.val()) : {};
     let navigatorCategory = options.navigatorCategoryId;
@@ -51,6 +52,8 @@
         openInDialog: true,
         actionOn,
         onAction(category) {
+          $categoryWarning.toggleClass('hidden', !category.has_children || category.has_events);
+
           const event = $.Event('indico:categorySelected');
           const dfd = $.Deferred();
           $categoryTitle.text(category.title);

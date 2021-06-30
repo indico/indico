@@ -46,16 +46,24 @@ class RHCreateEvent(RHProtected):
     def _process_args(self):
         self.event_type = EventType[request.view_args['event_type']]
         self.root_category = Category.get_root()
-        self.single_category = not self.root_category.children
+        self.single_category = not self.root_category.has_children
+
+    def _has_only_subcategories(self, category):
+        return category.has_children and not category.has_events
 
     @cached_property
     def _default_category(self):
         try:
             category_id = int(request.args['category_id'])
         except (ValueError, KeyError):
-            return self.root_category if self.single_category else None
+            return None if self._has_only_subcategories(self.root_category) else self.root_category
+
+        category = Category.get(category_id, is_deleted=False)
+        if (category and self._has_only_subcategories(category) and
+                (category.is_root or category.can_create_events(session.user))):
+            return None
         else:
-            return Category.get(category_id, is_deleted=False)
+            return category
 
     def _get_prepared_data(self):
         try:

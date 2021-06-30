@@ -101,6 +101,7 @@ def serialize_category(category, with_favorite=False, with_path=False, parent_pa
         'title': category.title,
         'is_protected': category.is_protected,
         'has_events': category.has_events,
+        'has_children': category.has_children,
         'deep_category_count': category.deep_children_count,
         'deep_event_count': category.deep_events_count,
         'can_access': category.can_access(session.user),
