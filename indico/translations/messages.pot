@@ -8895,7 +8895,7 @@ msgid "Paper not yet submitted"
 msgstr ""
 
 #: indico/modules/events/papers/templates/_paper_list.html:118
-msgid "No submission"
+msgid "Not submitted"
 msgstr ""
 
 #: indico/modules/events/papers/templates/_paper_list.html:232

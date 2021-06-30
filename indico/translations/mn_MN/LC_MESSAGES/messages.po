@@ -9660,7 +9660,7 @@ msgid "Paper not yet submitted"
 msgstr "Өгүүллийг хүргүүлээгүй байна"
 
 #: indico/modules/events/papers/templates/_paper_list.html:117
-msgid "No submission"
+msgid "Not submitted"
 msgstr "Хүргэлт байхгүй"
 
 #: indico/modules/events/papers/templates/_paper_list.html:231

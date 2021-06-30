@@ -1,7 +1,7 @@
 # Translations template for indico.
 # Copyright (C) 2021 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# 
+#
 # Translators:
 # Adrian Mönnich, 2017-2018,2021
 # Adrian Mönnich, 2017
@@ -9660,8 +9660,8 @@ msgstr "Révision"
 msgid "Paper not yet submitted"
 msgstr "L'article n'est pas encore déposé"
 
-#: indico/modules/events/papers/templates/_paper_list.html:118
-msgid "No submission"
+#: indico/modules/events/papers/templates/_paper_list.html:117
+msgid "Not submitted"
 msgstr "Aucun dépôt"
 
 #: indico/modules/events/papers/templates/_paper_list.html:232

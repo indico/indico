@@ -9766,7 +9766,7 @@ msgid "Paper not yet submitted"
 msgstr "Artykułu jeszcze nie dostarczono"
 
 #: indico/modules/events/papers/templates/_paper_list.html:117
-msgid "No submission"
+msgid "Not submitted"
 msgstr "Brak zgłoszenia"
 
 #: indico/modules/events/papers/templates/_paper_list.html:231

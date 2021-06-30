@@ -9608,7 +9608,7 @@ msgid "Paper not yet submitted"
 msgstr "还没有提交的论文"
 
 #: indico/modules/events/papers/templates/_paper_list.html:117
-msgid "No submission"
+msgid "Not submitted"
 msgstr "没有提交"
 
 #: indico/modules/events/papers/templates/_paper_list.html:231

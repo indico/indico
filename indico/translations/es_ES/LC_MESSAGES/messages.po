@@ -9667,7 +9667,7 @@ msgid "Paper not yet submitted"
 msgstr "La ponencia todavía no se ha enviado"
 
 #: indico/modules/events/papers/templates/_paper_list.html:117
-msgid "No submission"
+msgid "Not submitted"
 msgstr ""
 
 #: indico/modules/events/papers/templates/_paper_list.html:231

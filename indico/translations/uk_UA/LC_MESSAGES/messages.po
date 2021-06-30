@@ -9763,7 +9763,7 @@ msgid "Paper not yet submitted"
 msgstr "Роботу не підтверджено"
 
 #: indico/modules/events/papers/templates/_paper_list.html:117
-msgid "No submission"
+msgid "Not submitted"
 msgstr "Немає поданих матеріалів"
 
 #: indico/modules/events/papers/templates/_paper_list.html:231
