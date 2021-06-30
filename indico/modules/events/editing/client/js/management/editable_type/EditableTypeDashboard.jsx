@@ -170,7 +170,7 @@ export default function EditableTypeDashboard() {
                 label={Translate.string('Allow editors to self-assign editables')}
               />
               <Link
-                className="i-button icon-settings"
+                className="i-button icon-list"
                 to={manageEditableTypeListURL({event_id: eventId, type})}
               >
                 <Translate>List</Translate>
