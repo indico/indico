@@ -449,7 +449,7 @@ const searchFactory = config => {
         onFocus={stopPropagation}
         closeIcon
       >
-        <Modal.Header>
+        <Modal.Header styleName="header">
           {modalTitle(single)}{' '}
           {(!single || alwaysConfirm) && (
             <SearchStaged

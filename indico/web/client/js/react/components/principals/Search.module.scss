@@ -7,6 +7,10 @@
 
 @import 'base/palette';
 
+.header {
+  min-height: 4.55rem;
+}
+
 .search-buttons :global(.dropdown) {
   margin-left: 1em;
 }
