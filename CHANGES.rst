@@ -12,12 +12,13 @@ Improvements
 
 - Add abstract content to the abstract list customization options (:pr:`4968`)
 - Add CLI option to create a series (:pr:`4969`)
+- Users cannot submit multiple anonymous surveys anymore by logging out and in again
+  (:issue:`4693`, :pr:`4970`)
 
 Bugfixes
 ^^^^^^^^
 
-- Users cannot submit multiple anonymous surveys anymore by logging out and in again.
-  (:issue:`4693`, :pr:`4970`)
+- None so far :)
 
 
 Version 3.0rc1

@@ -95,7 +95,7 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
             submission = self._save_answers(form)
             if submission.is_anonymous and submission.user:
                 submission.user = None
-                AnonymousSurveySubmission(survey=self.survey, user=session.user)
+                self.survey.anonymous_submissions.append(AnonymousSurveySubmission(user=session.user))
             submission.submitted_dt = now_utc()
             submission.is_submitted = True
             submission.pending_answers = {}
