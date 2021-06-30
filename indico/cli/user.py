@@ -11,11 +11,14 @@ from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
 from indico.core.db import db
+from indico.core.oauth.models.personal_tokens import PersonalToken
+from indico.core.oauth.scopes import SCOPES
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
+from indico.util.date_time import utc_to_server
 
 
 @cli_group()
@@ -47,6 +50,10 @@ def _print_user_info(user):
 
 def _safe_lower(s):
     return (s or '').lower()
+
+
+def _format_dt(dt):
+    return utc_to_server(dt.replace(second=0, microsecond=0)).replace(tzinfo=None).isoformat(' ') if dt else None
 
 
 @cli.command()
@@ -209,3 +216,140 @@ def unblock(user_id):
         user.is_blocked = False
         db.session.commit()
         print(cformat('%{green}Successfully unblocked user'))
+
+
+@cli.group('token')
+def token_cli():
+    """Manage personal user tokens."""
+
+
+@token_cli.command('list')
+@click.argument('user_id', type=int)
+def token_list(user_id):
+    """List the tokens of the user."""
+    user = User.get(user_id)
+    if user is None:
+        click.echo(cformat('%{red!}This user does not exist'))
+        return
+    _print_user_info(user)
+    tokens = user.personal_tokens.order_by(PersonalToken.revoked_dt.isnot(None),
+                                           db.func.lower(PersonalToken.name)).all()
+
+    if not tokens:
+        click.echo(cformat('%{yellow}This user has no tokens'))
+        return
+
+    table_data = [['Name', 'Scope', 'Created', 'Last used', 'Status']]
+    for token in tokens:
+        table_data.append([
+            token.name,
+            token.get_scope(),
+            _format_dt(token.created_dt),
+            _format_dt(token.last_used_dt) or 'Never',
+            'Revoked' if token.revoked_dt else 'Active'
+        ])
+    click.echo(AsciiTable(table_data, cformat('%{white!}Tokens%{reset}')).table)
+
+
+def _show_available_scopes(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    table_data = [['Name', 'Description']] + sorted(SCOPES.items())
+    click.echo(AsciiTable(table_data, cformat('%{white!}Available scopes%{reset}')).table)
+    ctx.exit()
+
+
+@token_cli.command('create')
+@click.argument('user_id', type=int)
+@click.argument('token_name')
+@click.option('--scope', '-s', 'scopes', multiple=True, metavar='SCOPE', type=click.Choice(SCOPES),
+              help='Include the specified scope; repeat for multiple scopes')
+@click.option('--list-scopes', is_flag=True, callback=_show_available_scopes, expose_value=False, is_eager=True,
+              help='Show a list of available scopes and exit')
+def token_create(user_id, token_name, scopes):
+    """Create a personal token for a user."""
+    user = User.get(user_id)
+    if user is None:
+        click.echo(cformat('%{red!}This user does not exist'))
+        return
+    token = user.personal_tokens.filter(PersonalToken.revoked_dt.is_(None),
+                                        db.func.lower(PersonalToken.name) == token_name.lower()).first()
+    if token:
+        click.echo(cformat('%{red!}A token with this name already exists'))
+        return
+    token = PersonalToken(user=user, name=token_name, scopes=scopes)
+    access_token = token.generate_token()
+    db.session.commit()
+    click.echo(cformat("%{green}Token '{}' created: %{white!}{}").format(token.name, access_token))
+    click.echo(f'Scopes: {token.get_scope() or "-"}')
+
+
+@token_cli.command('update')
+@click.argument('user_id', type=int)
+@click.argument('token_name')
+@click.option('--name', '-n', 'new_token_name', metavar='NAME', help='Rename the token')
+@click.option('--reset', '-r', 'reset_token', is_flag=True, help='Reset the access token')
+@click.option('--add-scope', '-A', 'add_scopes', multiple=True, metavar='SCOPE', type=click.Choice(SCOPES),
+              help='Add the specified scope; repeat for multiple scopes')
+@click.option('--del-scope', '-D', 'del_scopes', multiple=True, metavar='SCOPE', type=click.Choice(SCOPES),
+              help='Remove the specified scope; repeat for multiple scopes')
+@click.option('--list-scopes', is_flag=True, callback=_show_available_scopes, expose_value=False, is_eager=True,
+              help='Show a list of available scopes and exit')
+def token_update(user_id, token_name, add_scopes, del_scopes, new_token_name, reset_token):
+    """Update a personal token of a user."""
+    if not add_scopes and not del_scopes and not new_token_name and not reset_token:
+        click.echo('Nothing to do')
+        return
+    user = User.get(user_id)
+    if user is None:
+        click.echo(cformat('%{red!}This user does not exist'))
+        return
+    token = user.personal_tokens.filter(PersonalToken.revoked_dt.is_(None),
+                                        db.func.lower(PersonalToken.name) == token_name.lower()).first()
+    if not token:
+        click.echo(cformat('%{red!}This token does not exist or has been revoked'))
+        return
+    old_scopes = set(token.scopes)
+    old_name = token.name
+    new_access_token = None
+    if add_scopes or del_scopes:
+        token.scopes = (token.scopes | set(add_scopes)) - set(del_scopes)
+    if new_token_name:
+        conflict = user.personal_tokens.filter(PersonalToken.revoked_dt.is_(None),
+                                               PersonalToken.id != token.id,
+                                               db.func.lower(PersonalToken.name) == new_token_name.lower()).has_rows()
+        if conflict:
+            click.echo(cformat('%{red!}A token with this name already exists'))
+            return
+        token.name = new_token_name
+    if reset_token:
+        new_access_token = token.generate_token()
+    db.session.commit()
+    click.echo(cformat("%{green}Token '{}' updated").format(old_name))
+    if token.name != old_name:
+        click.echo(cformat('Name: %{white!}{}').format(token.name))
+    if new_access_token:
+        click.echo(cformat('Token: %{white!}{}').format(new_access_token))
+    if token.scopes != old_scopes:
+        click.echo(f'Scopes: {token.get_scope() or "-"}')
+
+
+@token_cli.command('revoke')
+@click.argument('user_id', type=int)
+@click.argument('token_name')
+def token_revoke(user_id, token_name):
+    """Revoke a user's personal token."""
+    user = User.get(user_id)
+    if user is None:
+        click.echo(cformat('%{red!}This user does not exist'))
+        return
+    token = user.personal_tokens.filter(db.func.lower(PersonalToken.name) == token_name.lower()).first()
+    if not token:
+        click.echo(cformat('%{red!}This token does not exist or has been revoked'))
+        return
+    elif token.revoked_dt:
+        click.echo(cformat('%{yellow}This token is already revoked'))
+        return
+    token.revoke()
+    db.session.commit()
+    click.echo(cformat("%{green}Token '{}' revoked").format(token.name))
