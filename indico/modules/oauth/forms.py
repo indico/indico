@@ -61,8 +61,8 @@ class ApplicationForm(IndicoForm):
                 self[field].data = self[field].object_data
 
     def validate_name(self, field):
-        query = OAuthApplication.query.filter_by(name=field.data)
+        query = OAuthApplication.query.filter(db.func.lower(OAuthApplication.name) == field.data.lower())
         if self.application:
-            query = query.filter(db.func.lower(OAuthApplication.name) != self.application.name.lower())
+            query = query.filter(OAuthApplication.id != self.application.id)
         if query.has_rows():
             raise ValidationError(_('There is already an application with this name'))
