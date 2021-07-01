@@ -205,7 +205,7 @@ class RHOAuthUserProfile(RHUserBase):
     def _process(self):
         authorizations = (
             db.session.query(OAuthApplicationUserLink, db.func.max(OAuthToken.last_used_dt))
-            .with_parent(session.user)
+            .with_parent(self.user)
             .join(OAuthToken, OAuthToken.app_user_link_id == OAuthApplicationUserLink.id)
             .join(OAuthApplication)
             .options(contains_eager('application'))
