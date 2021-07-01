@@ -230,4 +230,4 @@ class RHOAuthUserAppRevoke(RHUserBase):
             logger.info('Deauthorizing app %r for user %r (scopes: %r)', self.application, self.user, link.scopes)
             db.session.delete(link)
         flash(_("Access for '{}' has been successfully revoked.").format(self.application.name), 'success')
-        return redirect(url_for('.user_profile'))
+        return redirect(url_for('.user_apps'))

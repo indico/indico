@@ -34,12 +34,12 @@ _bp.add_url_rule('/admin/apps/<int:id>/revoke', 'app_revoke', RHOAuthAdminApplic
 
 # User profile
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
-    _bp.add_url_rule('/applications/', 'user_profile', RHOAuthUserProfile)
+    _bp.add_url_rule('/applications/', 'user_apps', RHOAuthUserProfile)
     _bp.add_url_rule('/applications/<int:id>/revoke', 'user_app_revoke', RHOAuthUserAppRevoke, methods=('POST',))
 
 
 @_bp.url_defaults
 def _add_user_id(endpoint, values):
-    if endpoint in {'oauth.user_profile', 'oauth.user_token_revoke'} and 'user_id' not in values:
+    if endpoint.startswith('oauth.user_') and 'user_id' not in values:
         # Inject user id if it's present in the url
         values['user_id'] = request.view_args.get('user_id')

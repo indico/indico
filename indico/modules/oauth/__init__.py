@@ -21,4 +21,4 @@ def _extend_admin_menu(sender, **kwargs):
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
 def _extend_profile_sidemenu(sender, user, **kwargs):
-    yield SideMenuItem('applications', _('Applications'), url_for('oauth.user_profile'), 40, disabled=user.is_system)
+    yield SideMenuItem('applications', _('Applications'), url_for('oauth.user_apps'), 40, disabled=user.is_system)
