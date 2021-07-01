@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 /* eslint-disable import/unambiguous */
+/* global build_url:false, handleAjaxError:false */
 
 (function(global) {
   global.setupCategoryPickerWidget = function setupCategoryPickerWidget(options) {
@@ -42,6 +43,8 @@
       error: handleAjaxError,
       success(data) {
         navigatorCategory = data;
+        const {category} = navigatorCategory;
+        $categoryWarning.toggleClass('hidden', !category.has_children || category.has_events);
       },
     });
 
@@ -52,10 +55,9 @@
         openInDialog: true,
         actionOn,
         onAction(category) {
-          $categoryWarning.toggleClass('hidden', !category.has_children || category.has_events);
-
           const event = $.Event('indico:categorySelected');
           const dfd = $.Deferred();
+          $categoryWarning.toggleClass('hidden', !category.has_children || category.has_events);
           $categoryTitle.text(category.title);
           hiddenData = {id: category.id, title: category.title};
           navigatorCategory = category.id;

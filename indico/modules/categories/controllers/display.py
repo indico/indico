@@ -125,8 +125,8 @@ class RHCategoryInfo(RHDisplayCategoryBase):
         children_strategy.subqueryload('acl_entries')
         children_strategy.undefer('deep_children_count')
         children_strategy.undefer('deep_events_count')
-        children_strategy.undefer('has_events'),
-        children_strategy.undefer('has_children'),
+        children_strategy.undefer('has_events')
+        children_strategy.undefer('has_children')
         return (children_strategy,
                 load_only('id', 'parent_id', 'title', 'protection_mode'),
                 subqueryload('acl_entries'),
