@@ -199,7 +199,7 @@ class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
         return redirect(url_for('.app_details', self.application))
 
 
-class RHOAuthUserProfile(RHUserBase):
+class RHOAuthUserApps(RHUserBase):
     """OAuth overview (user)."""
 
     def _process(self):
@@ -213,7 +213,7 @@ class RHOAuthUserProfile(RHUserBase):
             .order_by(OAuthApplication.name)
             .all()
         )
-        return WPOAuthUserProfile.render_template('user_profile.html', 'applications', user=self.user,
+        return WPOAuthUserProfile.render_template('user_apps.html', 'applications', user=self.user,
                                                   authorizations=authorizations)
 
 
