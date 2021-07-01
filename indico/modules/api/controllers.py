@@ -14,6 +14,7 @@ from indico.modules.api import APIMode, api_settings
 from indico.modules.api.forms import AdminSettingsForm
 from indico.modules.api.models.keys import APIKey
 from indico.modules.api.views import WPAPIAdmin, WPAPIUserProfile
+from indico.modules.oauth.util import can_manage_personal_tokens
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import redirect_or_jsonify, url_for
@@ -59,7 +60,8 @@ class RHAPIUserProfile(RHUserAPIBase):
         return WPAPIUserProfile.render_template('user_profile.html', 'api',
                                                 user=self.user, key=key, old_keys=old_keys,
                                                 use_signatures=use_signatures, allow_persistent=allow_persistent,
-                                                can_modify=(not key or not key.is_blocked or session.user.is_admin))
+                                                can_modify=(not key or not key.is_blocked or session.user.is_admin),
+                                                can_create_personal_tokens=can_manage_personal_tokens())
 
 
 class RHAPICreateKey(RHUserAPIBase):

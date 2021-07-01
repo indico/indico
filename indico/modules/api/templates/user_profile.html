@@ -1,8 +1,37 @@
 {% extends 'users/base.html' %}
 {% from '_switch.html' import switch %}
+{% from 'message_box.html' import message_box %}
 {% from 'api/_messages.html' import get_enable_persistent_msg, get_disable_persistent_msg %}
 
 {% block user_content %}
+    {% if can_create_personal_tokens %}
+        {% call message_box('warning') %}
+            {%- set link_start -%}
+                <a href="{{ url_for('oauth.user_tokens') }}">
+            {%- endset -%}
+            {%- set link_end -%}
+                </a>
+            {%- endset -%}
+            <p>
+                <strong>
+                    {% trans -%}
+                        API keys are deprecated and may be removed in a future Indico version.
+                    {%- endtrans %}
+                </strong>
+            </p>
+            <p>
+                {% trans -%}
+                    Please create {{ link_start }}API tokens{{ link_end }} instead.
+                    They use a more standard way of authenticating (Bearer token authentication
+                    instead of an HMAC signature) and you can (and should!) create one token for
+                    each script/application where you need to access the Indico API. To reduce
+                    the risk from a leaked token they also let you specify more fine-grained
+                    scopes.
+                {%- endtrans %}
+            </p>
+        {% endcall %}
+    {% endif %}
+
     <div class="i-box-group vert">
         <div class="i-box">
             <div class="i-box-header">
