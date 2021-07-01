@@ -22,6 +22,6 @@ def _extend_admin_menu(sender, **kwargs):
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
 def _extend_profile_sidemenu(sender, user, **kwargs):
-    yield SideMenuItem('applications', _('Applications'), url_for('oauth.user_apps'), 40, disabled=user.is_system)
-    if can_manage_personal_tokens() or user.personal_tokens.filter_by(revoked_dt=None).has_rows():
-        yield SideMenuItem('tokens', _('API tokens'), url_for('oauth.user_tokens'), 41)
+    yield SideMenuItem('applications', _('Applications'), url_for('oauth.user_apps'), 41, disabled=user.is_system)
+    if can_manage_personal_tokens() or user.query_personal_tokens().has_rows():
+        yield SideMenuItem('tokens', _('API tokens'), url_for('oauth.user_tokens'), 40)

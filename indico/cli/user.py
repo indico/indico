@@ -233,14 +233,12 @@ def token_list(user_id, verbose):
         return
     _print_user_info(user)
     query = (
-        user.personal_tokens
+        user.query_personal_tokens(include_revoked=verbose)
         .order_by(
             PersonalToken.revoked_dt.isnot(None),
             db.func.lower(PersonalToken.name)
         )
     )
-    if not verbose:
-        query = query.filter_by(revoked_dt=None)
 
     tokens = query.all()
     if not tokens:
@@ -289,8 +287,7 @@ def token_create(user_id, token_name, scopes):
     if user is None:
         click.echo(cformat('%{red!}This user does not exist'))
         return
-    token = user.personal_tokens.filter(PersonalToken.revoked_dt.is_(None),
-                                        db.func.lower(PersonalToken.name) == token_name.lower()).first()
+    token = user.query_personal_tokens().filter(db.func.lower(PersonalToken.name) == token_name.lower()).first()
     if token:
         click.echo(cformat('%{red!}A token with this name already exists'))
         return
@@ -321,8 +318,7 @@ def token_update(user_id, token_name, add_scopes, del_scopes, new_token_name, re
     if user is None:
         click.echo(cformat('%{red!}This user does not exist'))
         return
-    token = user.personal_tokens.filter(PersonalToken.revoked_dt.is_(None),
-                                        db.func.lower(PersonalToken.name) == token_name.lower()).first()
+    token = user.query_personal_tokens().filter(db.func.lower(PersonalToken.name) == token_name.lower()).first()
     if not token:
         click.echo(cformat('%{red!}This token does not exist or has been revoked'))
         return
@@ -332,9 +328,14 @@ def token_update(user_id, token_name, add_scopes, del_scopes, new_token_name, re
     if add_scopes or del_scopes:
         token.scopes = (token.scopes | set(add_scopes)) - set(del_scopes)
     if new_token_name:
-        conflict = user.personal_tokens.filter(PersonalToken.revoked_dt.is_(None),
-                                               PersonalToken.id != token.id,
-                                               db.func.lower(PersonalToken.name) == new_token_name.lower()).has_rows()
+        conflict = (
+            user.query_personal_tokens()
+            .filter(
+                PersonalToken.id != token.id,
+                db.func.lower(PersonalToken.name) == new_token_name.lower()
+            )
+            .has_rows()
+        )
         if conflict:
             click.echo(cformat('%{red!}A token with this name already exists'))
             return
@@ -360,7 +361,7 @@ def token_revoke(user_id, token_name):
     if user is None:
         click.echo(cformat('%{red!}This user does not exist'))
         return
-    token = user.personal_tokens.filter(db.func.lower(PersonalToken.name) == token_name.lower()).first()
+    token = user.query_personal_tokens().filter(db.func.lower(PersonalToken.name) == token_name.lower()).first()
     if not token:
         click.echo(cformat('%{red!}This token does not exist or has been revoked'))
         return

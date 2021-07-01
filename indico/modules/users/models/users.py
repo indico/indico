@@ -629,6 +629,16 @@ class User(PersonMixin, db.Model):
     def reset_signing_secret(self):
         self.signing_secret = str(uuid4())
 
+    def query_personal_tokens(self, *, include_revoked=False):
+        """Query the personal tokens of the user.
+
+        :param include_revoked: whether to query revoked tokens as well
+        """
+        query = self.personal_tokens
+        if not include_revoked:
+            query = query.filter_by(revoked_dt=None)
+        return query
+
     def synchronize_data(self, refresh=False):
         """Synchronize the fields of the user from the sync identity.
 

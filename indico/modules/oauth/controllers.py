@@ -246,12 +246,7 @@ class RHPersonalTokens(RHPersonalTokensUserBase):
     """Personal tokens page for a user."""
 
     def _process(self):
-        tokens = (
-            self.user.personal_tokens
-            .filter_by(revoked_dt=None)
-            .order_by(db.func.lower(PersonalToken.name))
-            .all()
-        )
+        tokens = self.user.query_personal_tokens().order_by(db.func.lower(PersonalToken.name)).all()
         created_token = session.pop('personal_token_created', None)
         return WPOAuthUserProfile.render_template('user_tokens.html', 'tokens', user=self.user, tokens=tokens,
                                                   created_token=created_token, can_manage=can_manage_personal_tokens())
