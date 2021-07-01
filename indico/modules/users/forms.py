@@ -113,6 +113,10 @@ class AdminUserSettingsForm(IndicoForm):
                                        unique=True, flat=True,
                                        description=_('Prevent users from creating Indico accounts with these email '
                                                      'addresses. Supports wildcards, e.g. *@gmail.com'))
+    allow_personal_tokens = BooleanField(_('Personal API tokens'), widget=SwitchWidget(),
+                                         description=_('Whether users are allowed to generate personal API tokens. '
+                                                       'If disabled, only admins can create them, but users will '
+                                                       'still be able to regenerate the tokens assigned to them.'))
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):

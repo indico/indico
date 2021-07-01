@@ -18,17 +18,20 @@ from indico.core.oauth.endpoints import IndicoIntrospectionEndpoint, IndicoRevoc
 from indico.core.oauth.grants import IndicoAuthorizationCodeGrant, IndicoCodeChallenge
 from indico.core.oauth.logger import logger
 from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
+from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.oauth2 import auth_server
 from indico.core.oauth.scopes import SCOPES
 from indico.modules.admin import RHAdminBase
-from indico.modules.oauth.forms import ApplicationForm
+from indico.modules.oauth.forms import ApplicationForm, PersonalTokenForm
+from indico.modules.oauth.util import can_manage_personal_tokens
 from indico.modules.oauth.views import WPOAuthAdmin, WPOAuthUserProfile
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
+from indico.web.util import jsonify_data, jsonify_form
 
 
 class RHOAuthMetadata(RH):
@@ -231,3 +234,97 @@ class RHOAuthUserAppRevoke(RHUserBase):
             db.session.delete(link)
         flash(_("Access for '{}' has been successfully revoked.").format(self.application.name), 'success')
         return redirect(url_for('.user_apps'))
+
+
+class RHPersonalTokensUserBase(RHUserBase):
+    """Base class for personal token management"""
+
+    allow_system_user = True
+
+
+class RHPersonalTokens(RHPersonalTokensUserBase):
+    """Personal tokens page for a user."""
+
+    def _process(self):
+        tokens = (
+            self.user.personal_tokens
+            .filter_by(revoked_dt=None)
+            .order_by(db.func.lower(PersonalToken.name))
+            .all()
+        )
+        created_token = session.pop('personal_token_created', None)
+        return WPOAuthUserProfile.render_template('user_tokens.html', 'tokens', user=self.user, tokens=tokens,
+                                                  created_token=created_token, can_manage=can_manage_personal_tokens())
+
+
+class RHPersonalTokenBase(RHPersonalTokensUserBase):
+    """Base class for actions involving a specific personal token of a user."""
+
+    def _process_args(self):
+        RHPersonalTokensUserBase._process_args(self)
+        self.token: PersonalToken = (
+            PersonalToken.query
+            .with_parent(self.user)
+            .filter_by(id=request.view_args['id'], revoked_dt=None)
+            .first_or_404()
+        )
+
+
+class RHEditPersonalToken(RHPersonalTokenBase):
+    """Edit a personal access token of a user."""
+
+    def _check_access(self):
+        RHPersonalTokenBase._check_access(self)
+        if not can_manage_personal_tokens():
+            raise Forbidden(_('You cannot manage API tokens'))
+
+    def _process(self):
+        form = PersonalTokenForm(user=self.user, token=self.token, obj=self.token)
+        if form.validate_on_submit():
+            old_name = self.token.name
+            form.populate_obj(self.token)
+            logger.info('Updated token %r', self.token)
+            flash(_("Token '{}' updated").format(old_name), 'success')
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+
+class RHCreatePersonalToken(RHPersonalTokensUserBase):
+    """Create a personal access token for a user."""
+
+    def _check_access(self):
+        RHPersonalTokensUserBase._check_access(self)
+        if not can_manage_personal_tokens():
+            raise Forbidden(_('You cannot manage API tokens'))
+
+    def _process(self):
+        form = PersonalTokenForm(user=self.user)
+        if form.validate_on_submit():
+            token = PersonalToken(user=self.user)
+            form.populate_obj(token)
+            access_token = token.generate_token()
+            db.session.flush()
+            logger.info('Created token %r', token)
+            session['personal_token_created'] = (token.id, access_token)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+
+class RHRevokePersonalToken(RHPersonalTokenBase):
+    """Revoke a personal access token of a user."""
+
+    def _process(self):
+        self.token.revoke()
+        logger.info('Revoked token %r', self.token)
+        flash(_("The token '{}' has been successfully revoked.").format(self.token.name), 'success')
+        return redirect(url_for('.user_tokens'))
+
+
+class RHResetPersonalToken(RHPersonalTokenBase):
+    """Reset a personal access token of a user."""
+
+    def _process(self):
+        access_token = self.token.generate_token()
+        logger.info('Regenerated token %r', self.token)
+        session['personal_token_created'] = (self.token.id, access_token)
+        return redirect(url_for('.user_tokens'))

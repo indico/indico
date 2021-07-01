@@ -7,11 +7,13 @@
 
 from flask import request
 
-from indico.modules.oauth.controllers import (RHOAuthAdmin, RHOAuthAdminApplication, RHOAuthAdminApplicationDelete,
+from indico.modules.oauth.controllers import (RHCreatePersonalToken, RHEditPersonalToken, RHOAuthAdmin,
+                                              RHOAuthAdminApplication, RHOAuthAdminApplicationDelete,
                                               RHOAuthAdminApplicationNew, RHOAuthAdminApplicationReset,
                                               RHOAuthAdminApplicationRevoke, RHOAuthAuthorize, RHOAuthIntrospect,
                                               RHOAuthMetadata, RHOAuthRevoke, RHOAuthToken, RHOAuthUserAppRevoke,
-                                              RHOAuthUserApps)
+                                              RHOAuthUserApps, RHPersonalTokens, RHResetPersonalToken,
+                                              RHRevokePersonalToken)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -34,8 +36,15 @@ _bp.add_url_rule('/admin/apps/<int:id>/revoke', 'app_revoke', RHOAuthAdminApplic
 
 # User profile
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
+    # OAuth app authorizations
     _bp.add_url_rule('/applications/', 'user_apps', RHOAuthUserApps)
     _bp.add_url_rule('/applications/<int:id>/revoke', 'user_app_revoke', RHOAuthUserAppRevoke, methods=('POST',))
+    # Personal tokens
+    _bp.add_url_rule('/tokens/', 'user_tokens', RHPersonalTokens)
+    _bp.add_url_rule('/tokens/new', 'user_token_new', RHCreatePersonalToken, methods=('GET', 'POST'))
+    _bp.add_url_rule('/tokens/<int:id>/', 'user_token_edit', RHEditPersonalToken, methods=('GET', 'POST'))
+    _bp.add_url_rule('/tokens/<int:id>/revoke', 'user_token_revoke', RHRevokePersonalToken, methods=('POST',))
+    _bp.add_url_rule('/tokens/<int:id>/reset', 'user_token_reset', RHResetPersonalToken, methods=('POST',))
 
 
 @_bp.url_defaults

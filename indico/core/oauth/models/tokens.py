@@ -59,6 +59,10 @@ class TokenModelBase(TokenMixin, db.Model):
     access_token = TokenProperty('access_token_hash')
 
     @property
+    def locator(self):
+        return {'id': self.id}
+
+    @property
     def scopes(self):
         """The set of scopes this token has access to."""
         return set(self._scopes)
@@ -104,10 +108,6 @@ class OAuthToken(TokenModelBase):
     @property
     def application(self):
         return self.app_user_link.application
-
-    @property
-    def locator(self):
-        return {'id': self.id}
 
     def __repr__(self):  # pragma: no cover
         return f'<OAuthToken({self.id}, {self.app_user_link_id}, {self.scopes})>'

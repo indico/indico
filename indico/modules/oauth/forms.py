@@ -14,6 +14,7 @@ from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
 from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.core.oauth.scopes import SCOPES
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -66,3 +67,28 @@ class ApplicationForm(IndicoForm):
             query = query.filter(OAuthApplication.id != self.application.id)
         if query.has_rows():
             raise ValidationError(_('There is already an application with this name'))
+
+
+class PersonalTokenForm(IndicoForm):
+    name = StringField(_('Name'), [DataRequired()], description=_("What's this token used for?"))
+    scopes = IndicoSelectMultipleCheckboxField('Scopes', [DataRequired()],
+                                               choices=sorted(SCOPES.items(), key=itemgetter(1)),
+                                               description=_('Scopes define what kind of access the token has.'))
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        self.token = kwargs.pop('token', None)
+        super().__init__(*args, **kwargs)
+
+    def validate_name(self, field):
+        query = (
+            PersonalToken.query
+            .filter(
+                PersonalToken.revoked_dt.is_(None),
+                db.func.lower(PersonalToken.name) == field.data.lower()
+            )
+        )
+        if self.token:
+            query = query.filter(PersonalToken.id != self.token.id)
+        if query.has_rows():
+            raise ValidationError(_('There is already a token with this name'))

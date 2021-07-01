@@ -1,0 +1,131 @@
+{% extends 'users/base.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block user_content %}
+    <div class="i-box-group vert">
+        <div class="i-box">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}API tokens{% endtrans -%}
+                </div>
+                {% if can_manage %}
+                    <div class="i-box-buttons toolbar">
+                        <div class="group">
+                            <button type="button"
+                                    class="ui primary small button"
+                                    data-href="{{ url_for('.user_token_new') }}"
+                                    data-title="{% trans %}Create new token{% endtrans %}"
+                                    data-ajax-dialog
+                                    data-reload-after>
+                                <i aria-hidden="true" class="icon plus"></i>
+                                {%- trans %}Create new token{% endtrans -%}
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="i-box-content">
+                <p>{% trans %}Tokens you generated to access the Indico APIs.{% endtrans %}</p>
+                {% if created_token %}
+                    {% call message_box('warning') %}
+                        {% trans -%}
+                            Make sure to copy your API token now.
+                            You won't be able to see it again!
+                        {%- endtrans %}
+                    {% endcall %}
+                {% endif %}
+                <ul class="group-list with-buttons">
+                    {% if not tokens %}
+                        <li class="italic">
+                            {%- trans %}No tokens have been generated.{% endtrans -%}
+                        </li>
+                    {% endif %}
+                    {% for token in tokens %}
+                        {% set new_token = created_token[1] if created_token and created_token[0] == token.id else none %}
+                        <li class="flexrow f-a-center">
+                            <span class="list-item-title"
+                                {% if not new_token %}
+                                    title="{% trans %}Authorized scopes:{% endtrans %} {{ token.scopes|join(', ') }}"
+                                {% endif %}>
+                                {% if new_token %}
+                                    <code class="semantic-text success">{{ new_token }}</code>
+                                    <span class="icon-clipboard js-copy-to-clipboard"
+                                          title="{% trans %}Copy to clipboard{% endtrans %}"
+                                          style="cursor: pointer"
+                                          data-clipboard-text="{{ new_token }}"
+                                          data-clipboard-action="copy"></span>
+                                {% elif can_manage %}
+                                    <a href="#"
+                                       data-href="{{ url_for('.user_token_edit', token) }}"
+                                       data-title="{% trans token_name=token.name %}Edit token '{{ token_name }}'{% endtrans %}"
+                                       data-ajax-dialog
+                                       data-reload-after>
+                                        {{- token.name -}}
+                                    </a>
+                                {% else %}
+                                    {{- token.name -}}
+                                {% endif %}
+                            </span>
+                            <span class="right">
+                                {% if not new_token or token.last_used_dt %}
+                                    <span class="list-item-info">
+                                        <span class="label">{% trans %}Last used:{% endtrans %}</span>
+                                        <span class="content">
+                                            {% if token.last_used_dt %}
+                                                <span title="{% trans ip=token.last_used_ip, count=token.use_count %}
+                                                    Last used from {{ ip }}
+                                                    Total uses: {{ count }}
+                                                    {% endtrans %}">
+                                                    {{- token.last_used_dt | format_datetime('short') -}}
+                                                </span>
+                                            {% else %}
+                                                {% trans %}Never{% endtrans %}
+                                            {% endif %}
+                                        </span>
+                                    </span>
+                                {% endif %}
+                                <div class="ui icon buttons small">
+                                    <button class="ui orange button ui-qtip"
+                                            title="{% trans %}Regenerate token{% endtrans %}"
+                                            data-href="{{ url_for('.user_token_reset', token) }}"
+                                            data-method="POST"
+                                            data-title="{% trans token_name=token.name %}Regenerate token '{{ token_name }}'{% endtrans %}"
+                                            data-confirm="{% trans token_name=token.name %}
+                                            If you've lost/forgotten this token, you can regenerate it, but be aware
+                                            that any applications or scripts using this token will need to be updated.
+                                            You cannot undo this action.
+                                            {% endtrans %}"
+                                            {{ 'disabled' if new_token }}>
+                                        <i aria-hidden="true" class="refresh icon"></i>
+                                    </button>
+                                    <button class="ui red button ui-qtip"
+                                            title="{% trans %}Revoke token{% endtrans %}"
+                                            data-href="{{ url_for('.user_token_revoke', token) }}"
+                                            data-method="POST"
+                                            data-title="{% trans token_name=token.name %}Revoke token '{{ token_name }}'{% endtrans %}"
+                                            data-confirm="{% trans token_name=token.name %}
+                                            Any applications or scripts using this token will no longer be able to access
+                                            the Indico API.
+                                            You cannot undo this action.
+                                            {% endtrans %}
+                                            {% if not can_manage %}
+                                                <br><br>
+                                                <strong>
+                                                {% trans %}
+                                                Warning: You will not be able to create a new API token since only Indico
+                                                admins can create API tokens.
+                                                {% endtrans %}
+                                                </strong>
+                                            {% endif %}
+                                            ">
+                                        <i aria-hidden="true" class="trash icon"></i>
+                                    </button>
+                                </div>
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

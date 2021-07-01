@@ -14,8 +14,8 @@ Major Features
   associated with a specific user and generated manually without the need of
   doing the OAuth flow. They can be used like API keys but with better granularity
   using the same scopes OAuth applications have, and a single user can have multiple
-  tokens using various scopes. Currently this feature is not directly exposed to
-  users, but the tokens can be created using the ``indico user`` command-line tool.
+  tokens using various scopes. By default any user can create such tokens, but admins
+  can restrict their creation.
   (:issue:`1934`, :pr:`4976`)
 
 Improvements
