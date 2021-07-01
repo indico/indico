@@ -46,16 +46,22 @@ class RHCreateEvent(RHProtected):
     def _process_args(self):
         self.event_type = EventType[request.view_args['event_type']]
         self.root_category = Category.get_root()
-        self.single_category = not self.root_category.children
+
+    def _has_only_subcategories(self, category):
+        return category.has_children and not category.has_events
 
     @cached_property
     def _default_category(self):
         try:
             category_id = int(request.args['category_id'])
         except (ValueError, KeyError):
-            return self.root_category if self.single_category else None
+            return None if self._has_only_subcategories(self.root_category) else self.root_category
+
+        category = Category.get(category_id, is_deleted=False)
+        if category and category.is_root and self._has_only_subcategories(category):
+            return None
         else:
-            return Category.get(category_id, is_deleted=False)
+            return category
 
     def _get_prepared_data(self):
         try:
@@ -144,7 +150,7 @@ class RHCreateEvent(RHProtected):
         check_room_availability = rb_check_user_access(session.user) and config.ENABLE_ROOMBOOKING
         rb_excluded_categories = [c.id for c in rb_settings.get('excluded_categories')]
         return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
-                                event_type=self.event_type.name, single_category=self.single_category,
+                                event_type=self.event_type.name, single_category=(not self.root_category.has_children),
                                 check_room_availability=check_room_availability,
                                 rb_excluded_categories=rb_excluded_categories)
 

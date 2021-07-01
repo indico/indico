@@ -568,6 +568,14 @@ def _mappers_configured():
              .correlate_except(Event))
     Category.has_events = column_property(query, deferred=True)
 
+    # Category.has_children -- whether the category contains any
+    # non-deleted subcategories
+    cat_alias = db.aliased(Category)
+    query = (exists([1])
+             .where((cat_alias.parent_id == Category.id) & ~cat_alias.is_deleted)
+             .correlate_except(cat_alias))
+    Category.has_children = column_property(query, deferred=True)
+
     # Category.chain_titles -- a list of the titles in the parent chain,
     # starting with the root category down to the current category.
     cte = Category.get_tree_cte('title')

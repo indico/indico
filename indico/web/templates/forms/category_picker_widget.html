@@ -1,9 +1,18 @@
 {% extends 'forms/base_widget.html' %}
+{% from 'message_box.html' import message_box %}
 
 
 {% block html %}
     <div class="i-form-field-fixed-width">
         <div id="category-title-{{ field.id }}" class="text-holder-box flexrow f-a-center" data-tooltip-anchor></div>
+        <div id="category-warning-{{ field.id }}" class="hidden">
+            {% call message_box('warning') %}
+                {% trans %}
+                    The selected category does not contain any events, only subcategories.
+                    Please make sure that you really want to create an event there.
+                {% endtrans %}
+            {% endcall %}
+        </div>
         <a class="i-button" id="categorynav-button-{{ field.id }}"
            data-title='{% trans %}Choose category{% endtrans %}'>
             {%- trans %}Choose category{% endtrans -%}

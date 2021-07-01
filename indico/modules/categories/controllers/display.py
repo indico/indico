@@ -126,12 +126,14 @@ class RHCategoryInfo(RHDisplayCategoryBase):
         children_strategy.undefer('deep_children_count')
         children_strategy.undefer('deep_events_count')
         children_strategy.undefer('has_events')
+        children_strategy.undefer('has_children')
         return (children_strategy,
                 load_only('id', 'parent_id', 'title', 'protection_mode'),
                 subqueryload('acl_entries'),
                 undefer('deep_children_count'),
                 undefer('deep_events_count'),
                 undefer('has_events'),
+                undefer('has_children'),
                 undefer('chain'))
 
     def _process(self):
@@ -163,7 +165,7 @@ class RHCategorySearch(RH):
         query = (Category.query
                  .filter(Category.title_matches(q))
                  .options(undefer('deep_children_count'), undefer('deep_events_count'), undefer('has_events'),
-                          joinedload('acl_entries')))
+                          undefer('has_children'), joinedload('acl_entries')))
         if session.user:
             # Prefer favorite categories
             query = query.order_by(Category.favorite_of.any(favorite_category_table.c.user_id == session.user.id)

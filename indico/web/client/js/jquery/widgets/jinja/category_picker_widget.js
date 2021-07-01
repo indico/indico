@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 /* eslint-disable import/unambiguous */
+/* global build_url:false, handleAjaxError:false */
 
 (function(global) {
   global.setupCategoryPickerWidget = function setupCategoryPickerWidget(options) {
@@ -21,6 +22,7 @@
 
     const $field = $(`#${options.fieldId}`);
     const $categoryTitle = $(`#category-title-${options.fieldId}`);
+    const $categoryWarning = $(`#category-warning-${options.fieldId}`);
     const $dialogTrigger = $(`#categorynav-button-${options.fieldId}`);
     let hiddenData = $field.val() ? JSON.parse($field.val()) : {};
     let navigatorCategory = options.navigatorCategoryId;
@@ -41,6 +43,8 @@
       error: handleAjaxError,
       success(data) {
         navigatorCategory = data;
+        const {category} = navigatorCategory;
+        $categoryWarning.toggleClass('hidden', !category.has_children || category.has_events);
       },
     });
 
@@ -53,6 +57,7 @@
         onAction(category) {
           const event = $.Event('indico:categorySelected');
           const dfd = $.Deferred();
+          $categoryWarning.toggleClass('hidden', !category.has_children || category.has_events);
           $categoryTitle.text(category.title);
           hiddenData = {id: category.id, title: category.title};
           navigatorCategory = category.id;
