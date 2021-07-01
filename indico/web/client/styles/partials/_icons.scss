@@ -231,6 +231,9 @@ i[class^='icon-']::before {
 .icon-file-excel::before {
   content: '\25';
 }
+.icon-file-eye::before {
+  content: '\e9ab';
+}
 .icon-file-filled::before {
   content: '\e99e';
 }
@@ -305,6 +308,9 @@ i[class^='icon-']::before {
 }
 .icon-home::before {
   content: '\e904';
+}
+.icon-hour-glass2::before {
+  content: '\eb20';
 }
 .icon-image::before {
   content: '\31';

@@ -15,38 +15,66 @@
                     <div class="contribution-row" data-friendly-id="{{ contribution.friendly_id }}">
                         <li>
                             <div class="row-title">
-                                <a href="{{ url_for('.paper_timeline', contribution) }}" data-searchable="{{ contribution.title|lower }}">
+                                <a href="{{ url_for('.paper_timeline', contribution) }}"
+                                   data-searchable="{{ contribution.title|lower }}">
                                     #{{ contribution.friendly_id }}: {{ contribution.title }}
                                 </a>
                             </div>
                             <div class="row-content flexrow f-j-space-between">
                                 <div>
                                     {% if reviewed or to_review -%}
-                                        <div class="submitter icon-user" data-searchable="{{ latest_revision.submitter.display_full_name|lower }}">
-                                            {{ latest_revision.submitter.display_full_name }}
+                                        <div class="submitter icon-user align-icon"
+                                             data-searchable="{{ latest_revision.submitter.display_full_name|lower }}">
+                                            {{- latest_revision.submitter.display_full_name -}}
                                         </div>
-                                        <div>
-                                            {% if session.user in contribution.paper_layout_reviewers %}
-                                                <div class="label i-tag layout-reviewer review-role">
-                                                    {%- trans %}Layout{% endtrans -%}
-                                                    {% if latest_revision.has_user_reviewed(session.user, 'layout') %}
-                                                        <i class="icon-circle-small" title="{% trans %}Already reviewed{% endtrans %}"></i>
+                                        {% set state_icon_map = {'submitted': 'icon-file-eye',
+                                                                 'accepted': 'icon-checkmark',
+                                                                 'rejected': 'icon-cross',
+                                                                 'to_be_corrected': 'icon-tilde'} %}
+                                        <div class="{{ state_icon_map[latest_revision.state.name] }} align-icon semantic-text {{ latest_revision.state.css_class }}">
+                                            {{- latest_revision.state.title -}}
+                                            {% if latest_revision.state.name == 'submitted' %}
+                                                {% set review_type %}
+                                                    {% if session.user in contribution.paper_layout_reviewers and session.user in contribution.paper_content_reviewers %}
+                                                        {% trans %}for content and layout review{% endtrans %}
+                                                    {% elif session.user in contribution.paper_content_reviewers %}
+                                                        {% trans %}for content review{% endtrans %}
+                                                    {% elif session.user in contribution.paper_layout_reviewers %}
+                                                        {% trans %}for layout review{% endtrans %}
                                                     {% endif %}
+                                                {% endset %}
+                                                {{ review_type }}
+                                            {% endif %}
+                                        </div>
+                                        {% if session.user in contribution.paper_content_reviewers %}
+                                            {% if latest_revision.has_user_reviewed(session.user, 'content') %}
+                                                <div class="icon-checkmark align-icon semantic-text success">
+                                                    {%- trans -%}You have submitted a content review{%- endtrans -%}
+                                                </div>
+                                            {% else %}
+                                                <div class="icon-hour-glass2 align-icon semantic-text warning">
+                                                    <a href="{{ url_for('.paper_timeline', contribution) }}"
+                                                       class="submission-link">
+                                                        {%- trans -%}Your content review is pending{%- endtrans -%}
+                                                    </a>
                                                 </div>
                                             {% endif %}
-                                            {% if session.user in contribution.paper_content_reviewers %}
-                                                <div class="label i-tag content-reviewer review-role">
-                                                    {%- trans %}Content{% endtrans -%}
-                                                    {% if latest_revision.has_user_reviewed(session.user, 'content') %}
-                                                        <i class="icon-circle-small" title="{% trans %}Already reviewed{% endtrans %}"></i>
-                                                    {% endif %}
+                                        {% endif %}
+                                        {% if session.user in contribution.paper_layout_reviewers %}
+                                            {% if latest_revision.has_user_reviewed(session.user, 'layout') %}
+                                                <div class="icon-checkmark align-icon semantic-text success">
+                                                    {%- trans -%}You have submitted a layout review{%- endtrans -%}
+                                                </div>
+                                            {% else %}
+                                                <div class="icon-hour-glass2 align-icon semantic-text warning">
+                                                    <a href="{{ url_for('.paper_timeline', contribution) }}"
+                                                       class="submission-link">
+                                                        {%- trans -%}Your layout review is pending{%- endtrans -%}
+                                                    </a>
                                                 </div>
                                             {% endif %}
-                                        </div>
+                                        {% endif %}
                                     {% endif %}
-                                    <div class="label i-tag semantic-background {{ latest_revision.state.css_class }}">
-                                        {{ latest_revision.state.title }}
-                                    </div>
                                 </div>
                                 <ul>
                                     {% for file in latest_revision.files %}

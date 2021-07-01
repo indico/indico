@@ -93,22 +93,15 @@
       margin-top: 7px;
     }
 
-    .label {
-      border: none;
-      margin-top: 7px;
+    .submission-link {
+      color: inherit;
+      margin-left: -3px;
+    }
+
+    .align-icon::before {
       display: inline-block;
-      padding: 5px 7px;
-
-      &.review-role {
-        @include border-all($gray);
-        margin-right: 10px;
-        background-color: white;
-        color: $light-black;
-
-        i {
-          color: $blue;
-        }
-      }
+      width: 1.33rem;
+      text-align: center;
     }
   }
 
