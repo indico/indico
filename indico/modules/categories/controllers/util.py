@@ -64,37 +64,43 @@ def make_is_recent_func(now):
     return lambda dt: dt > now - relativedelta(weeks=1)
 
 
-def get_category_view_params(category, now):
+def get_category_view_params(category, now, is_flat=False):
     from .display import RHDisplayCategoryEventsBase
+
+    event_query_filter = Event.is_visible_in(category.id) if is_flat else (Event.category_id == category.id)
 
     # Current events, which are always shown by default are events of this month and of the previous month.
     # If there are no events in this range, it will include the last and next month containing events.
     past_threshold = now - relativedelta(months=1, day=1, hour=0, minute=0)
     future_threshold = now + relativedelta(months=1, day=1, hour=0, minute=0)
-    hidden_event_ids = {e.id for e in category.get_hidden_events(user=session.user)}
+
+    hidden_event_ids = {e.id for e in category.get_hidden_events(user=session.user, deep=is_flat)}
     next_event_start_dt = (db.session.query(Event.start_dt)
-                           .filter(Event.start_dt >= now, Event.category_id == category.id,
+                           .filter(event_query_filter,
+                                   Event.start_dt >= now,
                                    Event.id.notin_(hidden_event_ids))
                            .order_by(Event.start_dt.asc(), Event.id.asc())
-                           .first() or (None,))[0]
+                           .limit(1).scalar())
     previous_event_start_dt = (db.session.query(Event.start_dt)
-                               .filter(Event.start_dt < now, Event.category_id == category.id,
+                               .filter(event_query_filter,
+                                       Event.start_dt < now,
                                        Event.id.notin_(hidden_event_ids))
                                .order_by(Event.start_dt.desc(), Event.id.desc())
-                               .first() or (None,))[0]
+                               .limit(1).scalar())
     if next_event_start_dt is not None and next_event_start_dt > future_threshold:
         future_threshold = next_event_start_dt + relativedelta(months=1, day=1, hour=0, minute=0)
     if previous_event_start_dt is not None and previous_event_start_dt < past_threshold:
         past_threshold = previous_event_start_dt.replace(day=1, hour=0, minute=0)
-    event_query = (Event.query.with_parent(category)
+    event_query = (Event.query
                    .options(*RHDisplayCategoryEventsBase._event_query_options)
-                   .filter(Event.id.notin_(hidden_event_ids))
+                   .filter(event_query_filter,
+                           Event.id.notin_(hidden_event_ids))
                    .order_by(Event.start_dt.desc(), Event.id.desc()))
     past_event_query = event_query.filter(Event.start_dt < past_threshold)
     future_event_query = event_query.filter(Event.start_dt >= future_threshold)
     current_event_query = event_query.filter(Event.start_dt >= past_threshold,
                                              Event.start_dt < future_threshold)
-    json_ld_events = events = current_event_query.filter(Event.start_dt < future_threshold).all()
+    json_ld_events = events = current_event_query.all()
 
     future_event_count = future_event_query.count()
     past_event_count = past_event_query.count()
@@ -120,6 +126,7 @@ def get_category_view_params(category, now):
         'future_threshold': future_threshold.strftime(threshold_format),
         'happening_now': make_happening_now_func(now),
         'is_recent': make_is_recent_func(now),
+        'is_flat': is_flat,
         'managers': managers,
         'past_event_count': past_event_count,
         'show_past_events': show_past_events,

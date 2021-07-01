@@ -29,11 +29,16 @@
   global.setupCategoryDisplayEventList = function setupCategoryDisplayEventList(
     showFutureEvents,
     showPastEvents,
+    isFlat,
     requestParams
   ) {
     const $eventList = $('.event-list');
     const $futureEvents = $eventList.find('.future-events');
     const $pastEvents = $eventList.find('.past-events');
+
+    if (isFlat) {
+      requestParams.flat = 1;
+    }
 
     setupToggleEventListButton($futureEvents, onToggleFutureEvents);
     setupToggleEventListButton($pastEvents, onTogglePastEvents);

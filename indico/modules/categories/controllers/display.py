@@ -220,13 +220,14 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
         self.now = now_utc(exact=False).astimezone(self.category.display_tzinfo)
+        self.is_flat = request.args.get('flat') == '1' and self.category.is_flat_view_enabled
 
 
 class RHDisplayCategory(RHDisplayCategoryEventsBase):
     """Show the contents of a category (events/subcategories)"""
 
     def _process(self):
-        params = get_category_view_params(self.category, self.now)
+        params = get_category_view_params(self.category, self.now, is_flat=self.is_flat)
         if not self.category.is_root:
             return WPCategory.render_template('display/category.html', self.category, **params)
 
@@ -252,10 +253,12 @@ class RHEventList(RHDisplayCategoryEventsBase):
         after = self._parse_year_month(request.args.get('after'))
         if before is None and after is None:
             raise BadRequest('"before" or "after" parameter must be specified')
-        hidden_event_ids = {e.id for e in self.category.get_hidden_events(user=session.user)}
-        event_query = (Event.query.with_parent(self.category)
+        hidden_event_ids = {e.id for e in self.category.get_hidden_events(user=session.user, deep=self.is_flat)}
+        event_query_filter = (Event.category_chain_overlaps(self.category.id) if self.is_flat
+                              else (Event.category_id == self.category.id))
+        event_query = (Event.query
                        .options(*self._event_query_options)
-                       .filter(Event.id.notin_(hidden_event_ids))
+                       .filter(event_query_filter, Event.id.notin_(hidden_event_ids))
                        .order_by(Event.start_dt.desc(), Event.id.desc()))
         if before:
             event_query = event_query.filter(Event.start_dt < before)

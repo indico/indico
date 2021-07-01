@@ -32,7 +32,8 @@ from indico.web.forms.widgets import HiddenCheckbox, SwitchWidget
 
 class CategorySettingsForm(IndicoForm):
     BASIC_FIELDS = ('title', 'description', 'timezone', 'lecture_theme', 'meeting_theme', 'visibility',
-                    'suggestions_disabled', 'event_creation_notification_emails', 'notify_managers')
+                    'suggestions_disabled', 'is_flat_view_enabled', 'event_creation_notification_emails',
+                    'notify_managers')
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_('Title'), [DataRequired()])
@@ -47,6 +48,10 @@ class CategorySettingsForm(IndicoForm):
     suggestions_disabled = BooleanField(_('Disable Suggestions'), widget=SwitchWidget(),
                                         description=_("Enable this if you don't want Indico to suggest this category as"
                                                       " a possible addition to a user's favorites."))
+    is_flat_view_enabled = BooleanField(_('Allow flat view'), widget=SwitchWidget(),
+                                        description=_('Allow users to view all the events descending from this '
+                                                      'category in one single page. This is not recommended on large '
+                                                      'categories with thousands of events.'))
     event_message_mode = IndicoEnumSelectField(_('Message Type'), enum=EventMessageMode,
                                                default=EventMessageMode.disabled,
                                                description=_('This message will show up at the top of every event page '

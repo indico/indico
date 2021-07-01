@@ -57,6 +57,11 @@
                            title="{% trans %}View{% endtrans %}"
                            data-toggle="dropdown"></a>
                         <ul class="i-dropdown">
+                            {% if category.is_flat_view_enabled and category.children %}
+                                <li>
+                                    <a href="{{ url_for('.display', category, flat=1) }}">{% trans %}All category events{% endtrans %}</a>
+                                </li>
+                            {% endif %}
                             <li>
                                 <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
                             </li>

@@ -166,6 +166,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=False
     )
+    is_flat_view_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     default_ticket_template_id = db.Column(
         db.ForeignKey('indico.designer_templates.id'),
         nullable=True,
@@ -497,10 +502,16 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         cte_query = Category.get_visible_categories_cte(self.id)
         return Category.query.join(cte_query, Category.id == cte_query.c.id)
 
-    def get_hidden_events(self, user=None):
-        """Get all hidden events within the given category and user."""
+    def get_hidden_events(self, user=None, deep=False):
+        """Get all hidden events within the given category and user.
+
+        :param deep: Whether to return events from all descending subcategories.
+        """
         from indico.modules.events import Event
-        hidden_events = Event.query.with_parent(self).filter_by(visibility=0).all()
+        event_query_filter = (Event.category_id == self.id) if not deep else Event.category_chain_overlaps(self.id)
+        hidden_events = Event.query.filter(event_query_filter,
+                                           Event.visibility == 0,
+                                           ~Event.is_deleted).all()
         return [event for event in hidden_events if not event.can_display(user)]
 
     @property
