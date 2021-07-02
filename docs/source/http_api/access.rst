@@ -10,7 +10,11 @@ rooms and room bookings through a web service, the HTTP Export API.
 
 The basic URL looks like:
 
-http://my.indico.server/export/WHAT/[LOC/]ID.TYPE?PARAMS&ak=KEY&timestamp=TS&signature=SIG
+``https://my.indico.server/export/WHAT/[LOC/]ID.TYPE?PARAMS``
+
+or when using legacy API keys:
+
+``https://my.indico.server/export/WHAT/[LOC/]ID.TYPE?PARAMS&ak=KEY&timestamp=TS&signature=SIG``
 
 where:
 
@@ -21,23 +25,98 @@ where:
 * *TYPE* is the output format (one of *json*, *jsonp*, *xml*, *html*, *ics*, *atom*, *bin*)
 * *PARAMS* are various parameters affecting (filtering, sorting, ...) the
   result list
-* *KEY*, *TS*, *SIG* are part of the :ref:`api-authentication`.
+* *KEY*, *TS*, *SIG* are part of the :ref:`api-authentication-legacy`
 
 
 Some examples could be:
 
- * Export data about events in a category: https://my.indico/export/categ/2.json?from=today&to=today&pretty=yes
- * Export data about a event: https://indico.server/export/event/137346.json?occ=yes&pretty=yes
- * Export data about rooms: https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes
- * Export your reservations: https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&bookedfor=USERNAME&pretty=yes
+ * Export data about events in a category: ``/export/categ/2.json?from=today&to=today&pretty=yes``
+ * Export data about a event: ``/export/event/137346.json?occ=yes&pretty=yes``
+ * Export data about rooms: ``/export/room/CERN/120.json?pretty=yes``
+ * Export your reservations: ``/export/reservation/CERN.json?detail=reservations&from=today&to=today&bookedfor=USERNAME&pretty=yes``
 
 
 See more details about querying in `Exporters <exporters/index.html>`_.
 
 .. _api-authentication:
 
-API Authentication
-------------------
+API Token Authentication
+------------------------
+
+.. versionadded:: 3.0
+
+Indico users may create API tokens with a custom name and scope. They can then be used to authenticate
+requests to the Indico API using the standard ``Authorization: Bearer <token>`` HTTP header.
+
+Compared to the legacy API key authentication (see below), they have various advantages:
+
+- no need to generate signatures and deal with expiring links - nowadays with HTTPS being widespread,
+  the risk of leaking a link (but not the secrets used to generate it) is very low
+- authentication using a HTTP header avoids including sensitive information in the query string
+- each application/script can get its own token, which can have only the scopes assigned that are actually
+  needed
+- they behave exactly like OAuth tokens, except that no OAuth application or OAuth flow is required, which
+  makes them perfect for use in custom scripts
+
+These personal API tokens always have the format ``indp_<42 random chars>`` - tokens generated during a regular
+OAuth flow have the ``indo_`` prefix instead.
+
+.. note::
+
+    Indico administrators have the ability to restrict the creation of API tokens; in that case only
+    admins can create tokens or manage their scopes, but users who have a token can still reset it in
+    order to use the API once authorized by an admin.
+
+Scopes
+~~~~~~
+
+API tokens can have one of these scopes:
+
+.. exec::
+    def main():
+        from indico.core.oauth.scopes import SCOPES
+        for name, desc in sorted(SCOPES.items(), key=lambda x: x[0].split(':')[::-1]):
+            print(f'- ``{name}`` - {desc}')
+
+    main()
+
+The ``everything`` scopes are special because they can be used with *any* Indico endpoint, i.e. they are
+not restricted to official APIs. This has the advantage that even Indico actions which do not have a corresponding
+API can be scripted.
+Endpoints covered by the ``legacy_api`` scopes are *not* included; these scopes need to be granted explicitly.
+
+.. warning::
+
+    We make absolutely no promises of backwards compatibility on endpoints that are not part of documented APIs.
+    You use them at your own risk.
+
+The ``legacy_api`` scopes grant access to the API this documentation is about, i.e. ``/export/`` for retrieving
+data and some ``/api/`` paths for modifying data.
+
+The ``read:user`` scope grants access to basic information about the current user via the ``/api/user/`` endpoint:
+
+.. code-block:: json
+
+    {
+        "admin": false,
+        "email": "guinea.pig@example.com",
+        "first_name": "Guinea",
+        "id": 1337,
+        "last_name": "Pig"
+    }
+
+The ``registrants`` scope is mainly used by the mobile check-in app and grants access to (currently) undocumented
+APIs that allow retrieving the list of registrants in an event and and updating their check-in state.
+
+
+.. _api-authentication-legacy:
+
+API Key Authentication (Deprecated)
+-----------------------------------
+
+.. deprecated:: 3.0
+
+    Use :ref:`api-authentication` instead. This authentication method may be removed in a future version.
 
 General
 ~~~~~~~
