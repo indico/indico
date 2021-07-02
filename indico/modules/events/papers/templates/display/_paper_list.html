@@ -22,7 +22,7 @@
                             </div>
                             <div class="row-content flexrow f-j-space-between">
                                 <div>
-                                    {% if reviewed or to_review -%}
+                                    {% if reviewed or to_review %}
                                         <div class="submitter icon-user align-icon"
                                              data-searchable="{{ latest_revision.submitter.display_full_name|lower }}">
                                             {{- latest_revision.submitter.display_full_name -}}
@@ -32,19 +32,17 @@
                                                                  'rejected': 'icon-cross',
                                                                  'to_be_corrected': 'icon-tilde'} %}
                                         <div class="{{ state_icon_map[latest_revision.state.name] }} align-icon semantic-text {{ latest_revision.state.css_class }}">
-                                            {{- latest_revision.state.title -}}
-                                            {% if latest_revision.state.name == 'submitted' %}
-                                                {% set review_type %}
-                                                    {% if session.user in contribution.paper_layout_reviewers and session.user in contribution.paper_content_reviewers %}
-                                                        {% trans %}for content and layout review{% endtrans %}
-                                                    {% elif session.user in contribution.paper_content_reviewers %}
-                                                        {% trans %}for content review{% endtrans %}
-                                                    {% elif session.user in contribution.paper_layout_reviewers %}
-                                                        {% trans %}for layout review{% endtrans %}
-                                                    {% endif %}
-                                                {% endset %}
-                                                {{ review_type }}
-                                            {% endif %}
+                                            {%- if latest_revision.state.name == 'submitted' -%}
+                                                {%- if session.user in contribution.paper_layout_reviewers and session.user in contribution.paper_content_reviewers -%}
+                                                    {% trans %}Submitted for content and layout review{% endtrans %}
+                                                {%- elif session.user in contribution.paper_content_reviewers -%}
+                                                    {% trans %}Submmitted for content review{% endtrans %}
+                                                {%- elif session.user in contribution.paper_layout_reviewers -%}
+                                                    {% trans %}Submmitted for layout review{% endtrans %}
+                                                {%- endif -%}
+                                            {%- else -%}
+                                                {{ latest_revision.state.title }}
+                                            {%- endif -%}
                                         </div>
                                         {% if session.user in contribution.paper_content_reviewers %}
                                             {% if latest_revision.has_user_reviewed(session.user, 'content') %}
