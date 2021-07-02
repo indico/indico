@@ -25,6 +25,7 @@ Improvements
 - Add CLI option to create a series (:pr:`4969`)
 - Users cannot submit multiple anonymous surveys anymore by logging out and in again
   (:issue:`4693`, :pr:`4970`)
+- Improve reviewing state display for paper reviewers (:issue:`4979`, :pr:`4984`)
 
 Bugfixes
 ^^^^^^^^
