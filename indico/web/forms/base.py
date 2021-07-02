@@ -8,7 +8,7 @@
 import weakref
 from collections.abc import Mapping
 
-from flask import flash, g, request, session
+from flask import flash, g, has_request_context, request, session
 from flask_wtf import FlaskForm
 from wtforms import ValidationError
 from wtforms.csrf.core import CSRF
@@ -23,6 +23,7 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.string import strip_whitespace
 from indico.web.flask.util import url_for
+from indico.web.util import get_request_user
 
 
 class _DataWrapper:
@@ -102,6 +103,11 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
 
     def __init__(self, *args, **kwargs):
         csrf_enabled = kwargs.pop('csrf_enabled', None)
+        if has_request_context() and get_request_user()[1] in ('oauth', 'signed_url'):
+            # no csrf checks needed since oauth/token/signature auth requires a secret that's not available
+            # to a malicious site, and even if it was, they wouldn't have to use CSRF to abuse it.
+            csrf_enabled = False
+
         if csrf_enabled is not None:
             # This is exactly what FlaskForm already does, but without
             # a deprecation warning.
