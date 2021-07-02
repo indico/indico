@@ -14,13 +14,14 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_event_cloners
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
+from indico.util.i18n import orig_string
 
 
 def create_reference_type(data):
@@ -206,6 +207,10 @@ def clone_into_event(source_event, target_event, cloners):
     EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)
     del g.importing_event
     signals.event.imported.send(target_event, source_event=source_event)
+    cloner_classes = {c.name: c for c in get_event_cloners().values()}
+    target_event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Data imported', session.user,
+                     data={'Modules': ', '.join(orig_string(cloner_classes[c].friendly_name)
+                                                for c in cloners if not cloner_classes[c].is_internal)})
 
     return target_event
 
