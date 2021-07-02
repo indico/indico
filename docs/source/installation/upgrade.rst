@@ -91,7 +91,7 @@ Python 3. We also strongly recommend upgrading your database to PostgreSQL 13.
 
     There are no changes that require the newer Postgres version immediately,
     but we no longer test on versions older than Postgres 12, and thus can
-    give you no guarantees that things will keep working older versions such
+    give you no guarantees that things will keep working on older versions such
     as 9.6.
 
 .. warning::
