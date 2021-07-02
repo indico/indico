@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import sys
+import typing as t
 from contextlib import contextmanager
 from functools import partial
 
@@ -63,6 +64,8 @@ def _after_commit(*args, **kwargs):
 
 
 class IndicoSQLAlchemy(SQLAlchemy):
+    Model: t.Type[IndicoModel]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.m = type('_Models', (object,), {})

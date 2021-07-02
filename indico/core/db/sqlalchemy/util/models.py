@@ -60,6 +60,8 @@ class IndicoBaseQuery(BaseQuery):
 class IndicoModel(Model):
     """Indico DB model."""
 
+    query: IndicoBaseQuery
+
     #: Whether relationship preloading is allowed.  If disabled,
     #: the on-load event that populates relationship from the preload
     #: cache is not registered.
