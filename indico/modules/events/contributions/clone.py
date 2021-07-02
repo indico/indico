@@ -153,6 +153,11 @@ class ContributionCloner(EventCloner):
         with db.session.no_autoflush:
             self._clone_contribs(new_event, event_exists=event_exists)
         self._synchronize_friendly_id(new_event)
+        if event_exists:
+            for contrib in self._contrib_map.values():
+                signals.event.contribution_created.send(contrib)
+            for subcontrib in self._subcontrib_map.values():
+                signals.event.subcontribution_created.send(subcontrib)
         db.session.flush()
         return {'contrib_map': self._contrib_map, 'subcontrib_map': self._subcontrib_map}
 

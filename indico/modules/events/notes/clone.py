@@ -7,6 +7,7 @@
 
 from sqlalchemy.orm import joinedload
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.events.cloning import EventCloner
@@ -35,9 +36,17 @@ class NoteCloner(EventCloner):
             self._session_map = shared_data['sessions']['session_map']
             self._contrib_map = shared_data['contributions']['contrib_map']
             self._subcontrib_map = shared_data['contributions']['subcontrib_map']
+        self._note_map = {}
+        self._restored_notes = set()
         with db.session.no_autoflush:
             self._clone_notes(new_event)
         db.session.flush()
+        if event_exists:
+            for note in self._note_map.values():
+                if note in self._restored_notes:
+                    signals.event.notes.note_restored.send(note)
+                else:
+                    signals.event.notes.note_added.send(note)
 
     def _has_content(self, event):
         return event.all_notes.filter_by(is_deleted=False).has_rows()
@@ -68,5 +77,7 @@ class NoteCloner(EventCloner):
 
     def _clone_note(self, old_note, new_object):
         revision = old_note.current_revision
-        note = EventNote.get_or_create(new_object)
+        self._note_map[old_note] = note = EventNote.get_or_create(new_object)
+        if note.is_deleted:
+            self._restored_notes.add(note)
         note.create_revision(render_mode=revision.render_mode, source=revision.source, user=revision.user)

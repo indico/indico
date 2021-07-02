@@ -7,6 +7,7 @@
 
 from functools import wraps
 
+from flask import g
 from jinja2.filters import do_filesizeformat
 
 from indico.core import signals
@@ -82,6 +83,8 @@ def _log_folder_updated(folder, user, **kwargs):
 
 @_ignore_non_loggable
 def _log_attachment_created(attachment, user, **kwargs):
+    if g.get('importing_event'):
+        return
     event = attachment.folder.object.event
     _log(event, EventLogKind.positive, f'Added material "{attachment.title}"', user,
          _get_attachment_data(attachment))

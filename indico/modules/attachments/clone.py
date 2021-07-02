@@ -7,6 +7,7 @@
 
 from sqlalchemy.orm import joinedload, subqueryload
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.principals import clone_principals
@@ -43,9 +44,13 @@ class AttachmentCloner(EventCloner):
             self._event_role_map = shared_data['event_roles']['event_role_map']
         if 'registration_forms' in cloners:
             self._regform_map = shared_data['registration_forms']['form_map']
+        self._attachment_map = {}
         with db.session.no_autoflush:
             self._clone_attachments(new_event)
         db.session.flush()
+        if event_exists:
+            for attachment in self._attachment_map.values():
+                signals.attachments.attachment_created.send(attachment, user=attachment.user)
 
     def _has_content(self, event):
         return (event.all_attachment_folders
@@ -90,7 +95,7 @@ class AttachmentCloner(EventCloner):
         folder.acl_entries = clone_principals(AttachmentFolderPrincipal, old_folder.acl_entries,
                                               self._event_role_map, self._regform_map)
         for old_attachment in old_folder.attachments:
-            attachment = Attachment(folder=folder)
+            self._attachment_map[old_attachment] = attachment = Attachment(folder=folder)
             attachment.populate_from_attrs(old_attachment, attachment_attrs)
             attachment.acl_entries = clone_principals(AttachmentPrincipal, old_attachment.acl_entries,
                                                       self._event_role_map, self._regform_map)

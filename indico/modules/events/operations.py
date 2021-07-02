@@ -7,7 +7,7 @@
 
 from operator import attrgetter
 
-from flask import session
+from flask import g, session
 
 from indico.core import signals
 from indico.core.db import db
@@ -202,7 +202,9 @@ def clone_into_event(source_event, target_event, cloners):
     """
 
     # Run the modular cloning system
+    g.importing_event = True
     EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)
+    del g.importing_event
     signals.event.imported.send(target_event, source_event=source_event)
 
     return target_event

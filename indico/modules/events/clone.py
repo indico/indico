@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
@@ -141,6 +142,9 @@ class EventProtectionCloner(EventCloner):
             self._clone_acl(new_event, event_exists)
             self._clone_visibility(new_event)
         db.session.flush()
+        if event_exists:
+            signals.acl.protection_changed.send(type(new_event), obj=new_event, mode=new_event.protection_mode,
+                                                old_mode=None)
 
     def _clone_protection(self, new_event):
         new_event.protection_mode = self.old_event.protection_mode
