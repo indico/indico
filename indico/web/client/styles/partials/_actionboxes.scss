@@ -149,6 +149,10 @@
     background-color: transparent;
   }
 
+  &.draft-mode {
+    max-width: 800px;
+  }
+
   ul:not(.i-dropdown) {
     margin: 0;
     padding-left: 1.5em;

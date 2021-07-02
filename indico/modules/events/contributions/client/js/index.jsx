@@ -25,6 +25,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
+import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -416,5 +417,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const applySearchFilters = setupSearchBox(filterConfig);
     applySearchFilters();
+  };
+
+  global.setupDraftModeWarning = function setupDraftModeWarning() {
+    const warning = document.querySelector('#draft-mode-warning');
+    const button = document.querySelector('#draft-mode-warning-button');
+    if (warning && button) {
+      ReactDOM.render(
+        <PublicationButton
+          eventId={button.dataset.eventId}
+          onSuccess={() => warning.classList.add('hidden')}
+        />,
+        button
+      );
+    }
   };
 })(window);
