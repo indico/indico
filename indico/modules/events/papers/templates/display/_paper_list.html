@@ -36,9 +36,11 @@
                                                 {%- if session.user in contribution.paper_layout_reviewers and session.user in contribution.paper_content_reviewers -%}
                                                     {% trans %}Submitted for content and layout review{% endtrans %}
                                                 {%- elif session.user in contribution.paper_content_reviewers -%}
-                                                    {% trans %}Submmitted for content review{% endtrans %}
+                                                    {% trans %}Submitted for content review{% endtrans %}
                                                 {%- elif session.user in contribution.paper_layout_reviewers -%}
-                                                    {% trans %}Submmitted for layout review{% endtrans %}
+                                                    {% trans %}Submitted for layout review{% endtrans %}
+                                                {%- else -%}
+                                                    {{ latest_revision.state.title }}
                                                 {%- endif -%}
                                             {%- else -%}
                                                 {{ latest_revision.state.title }}
