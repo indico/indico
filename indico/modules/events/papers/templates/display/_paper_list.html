@@ -33,15 +33,7 @@
                                                                  'to_be_corrected': 'icon-tilde'} %}
                                         <div class="{{ state_icon_map[latest_revision.state.name] }} align-icon semantic-text {{ latest_revision.state.css_class }}">
                                             {%- if latest_revision.state.name == 'submitted' -%}
-                                                {%- if session.user in contribution.paper_layout_reviewers and session.user in contribution.paper_content_reviewers -%}
-                                                    {% trans %}Submitted for content and layout review{% endtrans %}
-                                                {%- elif session.user in contribution.paper_content_reviewers -%}
-                                                    {% trans %}Submitted for content review{% endtrans %}
-                                                {%- elif session.user in contribution.paper_layout_reviewers -%}
-                                                    {% trans %}Submitted for layout review{% endtrans %}
-                                                {%- else -%}
-                                                    {{ latest_revision.state.title }}
-                                                {%- endif -%}
+                                                {% trans %}Submitted for reviewing{% endtrans %}
                                             {%- else -%}
                                                 {{ latest_revision.state.title }}
                                             {%- endif -%}
