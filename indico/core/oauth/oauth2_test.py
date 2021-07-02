@@ -189,7 +189,7 @@ def test_oauth_scopes(create_application, test_client, dummy_user, app):
     resp = test_client.get(auth_url)
     assert resp.status_code == 200
     assert b'is requesting the following permissions' in resp.data
-    assert b'Legacy API (read only)' in resp.data
+    assert b'Classic API (read only)' in resp.data
     assert b'User information (read only)' not in resp.data
 
     # give consent
