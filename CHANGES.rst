@@ -26,6 +26,8 @@ Improvements
 - Users cannot submit multiple anonymous surveys anymore by logging out and in again
   (:issue:`4693`, :pr:`4970`)
 - Improve reviewing state display for paper reviewers (:issue:`4979`, :pr:`4984`)
+- Make it clearer if the contributions/timetable of a conference are still in draft mode
+  (:issue:`4977`, :pr:`4986`)
 
 Bugfixes
 ^^^^^^^^
