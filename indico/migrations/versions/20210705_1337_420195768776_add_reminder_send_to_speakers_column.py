@@ -1,7 +1,7 @@
 """Add reminder send_to_speakers column
 
 Revision ID: 420195768776
-Revises: 90384b9b3d22
+Revises: 5cbb0eb12eb3
 Create Date: 2021-06-27 23:17:44.458327
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '420195768776'
-down_revision = '90384b9b3d22'
+down_revision = '5cbb0eb12eb3'
 branch_labels = None
 depends_on = None
 
