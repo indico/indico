@@ -278,7 +278,7 @@ class RHDisplayAbstractsExportExcel(AbstractsExportExcel, RHDisplayAbstractsActi
 
 class RHEditReviewedForTrackList(RHAbstractBase):
     def _check_abstract_protection(self):
-        return self.abstract.can_judge(session.user, check_state=True)
+        return self.abstract.can_convene(session.user) and not self.abstract.is_in_final_state
 
     def _process(self):
         form = AbstractReviewedForTracksForm(event=self.event, obj=self.abstract)
