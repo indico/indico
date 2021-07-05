@@ -520,18 +520,17 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return True
         return self.can_judge(user) or self.can_convene(user) or self.can_review(user)
 
-    def can_convene(self, user):
+    def can_convene(self, user, check_state=False):
         if not user:
             return False
-        elif not self.event.can_manage(user, permission='track_convener', explicit_permission=True):
+        if check_state and self.is_in_final_state:
             return False
-        elif self.event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True):
-            return True
-        elif any(track.can_manage(user, permission='convene', explicit_permission=True)
-                 for track in self.reviewed_for_tracks):
-            return True
-        else:
+        if not self.event.can_manage(user, permission='track_convener', explicit_permission=True):
             return False
+        if self.event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True):
+            return True
+        return any(track.can_manage(user, permission='convene', explicit_permission=True)
+                   for track in self.reviewed_for_tracks)
 
     def can_review(self, user, check_state=False):
         # The total number of tracks/events a user is a reviewer for (indico-wide)

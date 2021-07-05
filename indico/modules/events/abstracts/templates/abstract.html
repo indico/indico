@@ -32,7 +32,8 @@
     {% endcall %}
 
     <div class="i-timeline">
-        {% if abstract.can_convene(session.user) and abstract.event.tracks and not abstract.is_in_final_state %}
+        {% if abstract.event.cfa.allow_convener_track_change and abstract.can_convene(session.user, check_state=True)
+            and abstract.event.tracks %}
             {{ render_reviewed_for_tracks_box(abstract, review_track_list_form) }}
         {% endif %}
 
