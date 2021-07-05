@@ -61,6 +61,8 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
 
 class WPEventSettings(WPEventManagement):
     template_prefix = 'events/management/'
+    # PublicationButton React component for the draft mode warning
+    bundles = ('module_events.contributions.js',)
 
 
 class WPEventProtection(WPEventManagement):

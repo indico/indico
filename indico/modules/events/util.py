@@ -29,6 +29,7 @@ from indico.core.errors import NoReportError, UserValueError
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events import Event
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.layout import theme_settings
@@ -741,3 +742,10 @@ def get_all_user_roles(event, user):
         .filter(CategoryRole.members.any(User.id == user.id))
     )
     return event_roles, category_roles
+
+
+def should_show_draft_warning(event):
+    return (event.type_ == EventType.conference and
+            not contribution_settings.get(event, 'published') and
+            (TimetableEntry.query.with_parent(event).has_rows() or
+             Contribution.query.with_parent(event).has_rows()))

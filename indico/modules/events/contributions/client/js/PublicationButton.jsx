@@ -9,32 +9,31 @@ import publicationURL from 'indico-url:contributions.manage_publication';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Checkbox} from 'semantic-ui-react';
 
-import {useTogglableValue} from 'indico/react/hooks';
+import {IButton} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 import PublicationModal from './PublicationModal';
 
-export default function PublicationSwitch({eventId}) {
+export default function PublicationButton({eventId, onSuccess}) {
+  const url = publicationURL({event_id: eventId});
   const [modalOpen, setModalOpen] = useState(false);
 
-  const [published, togglePublished, loading, saving] = useTogglableValue(
-    publicationURL({event_id: eventId})
-  );
-
-  if (loading) {
-    return null;
-  }
+  const onClick = async () => {
+    try {
+      await indicoAxios.put(url);
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+    onSuccess();
+    setModalOpen(false);
+  };
 
   const trigger = (
-    <Checkbox
-      label={published ? Translate.string('Published') : Translate.string('Draft')}
-      toggle
-      onClick={() => setModalOpen(true)}
-      checked={published}
-      disabled={saving}
-    />
+    <IButton onClick={() => setModalOpen(true)}>
+      <Translate>Publish now</Translate>
+    </IButton>
   );
 
   return (
@@ -42,15 +41,13 @@ export default function PublicationSwitch({eventId}) {
       open={modalOpen}
       setModalOpen={setModalOpen}
       trigger={trigger}
-      published={published}
-      onClick={() => {
-        togglePublished();
-        setModalOpen(false);
-      }}
+      published={false}
+      onClick={onClick}
     />
   );
 }
 
-PublicationSwitch.propTypes = {
+PublicationButton.propTypes = {
   eventId: PropTypes.string.isRequired,
+  onSuccess: PropTypes.func.isRequired,
 };

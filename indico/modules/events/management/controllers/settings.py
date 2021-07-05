@@ -12,18 +12,15 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
-from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
                                                     EventDatesForm, EventLocationForm, EventPersonsForm)
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
-from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import update_event
-from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.modules.events.util import track_location_changes, track_time_changes
+from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
@@ -50,8 +47,6 @@ class RHEventSettings(RHManageEventBase):
         RHManageEventBase._check_access(self)  # mainly to trigger the legacy "event locked" check
 
     def _process(self):
-        from indico.modules.events.contributions import contribution_settings
-
         show_booking_warning = False
         if (config.ENABLE_ROOMBOOKING and not self.event.has_ended and self.event.room
                 and not self.event.room_reservation_links):
@@ -72,13 +67,9 @@ class RHEventSettings(RHManageEventBase):
             show_booking_warning = not has_overlap
         has_reference_types = ReferenceType.query.has_rows()
         has_event_labels = EventLabel.query.has_rows()
-        show_draft_warning = (self.event.type_ == EventType.conference and
-                              not contribution_settings.get(self.event, 'published') and
-                              (TimetableEntry.query.with_parent(self.event).has_rows() or
-                               Contribution.query.with_parent(self.event).has_rows()))
         return WPEventSettings.render_template('settings.html', self.event, 'settings',
                                                show_booking_warning=show_booking_warning,
-                                               show_draft_warning=show_draft_warning,
+                                               show_draft_warning=should_show_draft_warning(self.event),
                                                has_reference_types=has_reference_types,
                                                has_event_labels=has_event_labels)
 
