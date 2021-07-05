@@ -83,7 +83,7 @@ class EventReminder(db.Model):
         nullable=False,
         default=False
     )
-    #: If the notification should also be sent to all event speaker
+    #: If the notification should also be sent to all event speakers
     send_to_speakers = db.Column(
         db.Boolean,
         nullable=False,
@@ -147,7 +147,7 @@ class EventReminder(db.Model):
         """Return all recipients of the notifications.
 
         This includes both explicit recipients and, if enabled,
-        participants of the event.
+        participants/speakers of the event.
         """
         recipients = set(self.recipients)
         if self.send_to_participants:
