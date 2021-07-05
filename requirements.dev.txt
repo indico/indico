@@ -98,7 +98,7 @@ migra==3.0.1621480950
     # via -r requirements.dev.in
 mirakuru==2.4.1
     # via pytest-redis
-packaging==20.9
+packaging==21.0
     # via
     #   -c requirements.txt
     #   pytest
@@ -161,7 +161,7 @@ pytz==2021.1
     # via
     #   -c requirements.txt
     #   babel
-pyupgrade==2.19.4
+pyupgrade==2.20.0
     # via -r requirements.dev.in
 pywatchman==1.4.1
     # via -r requirements.dev.in
@@ -215,7 +215,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-sqlalchemy==1.4.18
+sqlalchemy==1.4.20
     # via
     #   -c requirements.txt
     #   schemainspect
@@ -235,9 +235,9 @@ toml==0.10.2
     #   pytest-cov
 tornado==6.1
     # via livereload
-transifex-client==0.14.2
+transifex-client==0.14.3
     # via -r requirements.dev.in
-urllib3==1.26.5
+urllib3==1.26.6
     # via
     #   -c requirements.txt
     #   requests
