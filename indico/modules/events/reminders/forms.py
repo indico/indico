@@ -17,9 +17,9 @@ from indico.web.forms.validators import DateTimeRange, HiddenUnless
 
 
 class ReminderForm(IndicoForm):
-    recipient_fields = {'recipients', 'send_to_participants', 'send_to_speakers'}
-    schedule_fields = {'schedule_type', 'absolute_dt', 'relative_delta'}
-    schedule_recipient_fields = recipient_fields | schedule_fields
+    recipient_fields = ['recipients', 'send_to_participants', 'send_to_speakers']
+    schedule_fields = ['schedule_type', 'absolute_dt', 'relative_delta']
+    schedule_recipient_fields = recipient_fields + schedule_fields
 
     # Schedule
     schedule_type = IndicoRadioField(_('Type'), [DataRequired()],
