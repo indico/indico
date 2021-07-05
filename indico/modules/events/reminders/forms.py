@@ -17,9 +17,9 @@ from indico.web.forms.validators import DateTimeRange, HiddenUnless
 
 
 class ReminderForm(IndicoForm):
-    recipient_fields = {'recipients', 'send_to_participants'}
-    schedule_fields = {'schedule_type', 'absolute_dt', 'relative_delta'}
-    schedule_recipient_fields = recipient_fields | schedule_fields
+    recipient_fields = ['recipients', 'send_to_participants', 'send_to_speakers']
+    schedule_fields = ['schedule_type', 'absolute_dt', 'relative_delta']
+    schedule_recipient_fields = recipient_fields + schedule_fields
 
     # Schedule
     schedule_type = IndicoRadioField(_('Type'), [DataRequired()],
@@ -34,6 +34,8 @@ class ReminderForm(IndicoForm):
     send_to_participants = BooleanField(_('Participants'),
                                         description=_('Send the reminder to all participants/registrants '
                                                       'of the event.'))
+    send_to_speakers = BooleanField(_('Speakers'),
+                                    description=_('Send the reminder to all speakers/chairpersons of the event.'))
     # Misc
     reply_to_address = SelectField(_('Sender'), [DataRequired()],
                                    description=_('The email address that will show up as the sender.'))
@@ -55,12 +57,16 @@ class ReminderForm(IndicoForm):
             del self.include_summary
 
     def validate_recipients(self, field):
-        if not field.data and not self.send_to_participants.data:
-            raise ValidationError(_('If participants are not included you need to specify recipients.'))
+        if not field.data and not self.send_to_participants.data and not self.send_to_speakers.data:
+            raise ValidationError(_('If participants or speakers are not included you need to specify recipients.'))
 
     def validate_send_to_participants(self, field):
-        if not field.data and not self.recipients.data:
-            raise ValidationError(_('If no recipients are specified you need to include participants.'))
+        if not field.data and not self.recipients.data and not self.send_to_speakers.data:
+            raise ValidationError(_('If no recipients or speakers are specified you need to include participants.'))
+
+    def validate_send_to_speakers(self, field):
+        if not field.data and not self.recipients.data and not self.send_to_participants.data:
+            raise ValidationError(_('If no participants or recipients are specified you need to include speakers.'))
 
     def validate_schedule_type(self, field):
         # Be graceful and allow a reminder that's in the past but on the same day.
