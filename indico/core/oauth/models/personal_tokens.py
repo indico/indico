@@ -52,7 +52,7 @@ class PersonalToken(TokenModelBase):
     )
 
     def __repr__(self):  # pragma: no cover
-        return f'<PersonalToken({self.id}, {self.user_id}, {self.scopes})>'
+        return f'<PersonalToken({self.id}, {self.user_id}, {self.name}, {self.scopes})>'
 
     def check_client(self, client):
         # we do not belong to any client, so API-based introspection or revocation is not allowed
