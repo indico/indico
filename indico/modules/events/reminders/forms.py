@@ -58,15 +58,15 @@ class ReminderForm(IndicoForm):
 
     def validate_recipients(self, field):
         if not field.data and not self.send_to_participants.data and not self.send_to_speakers.data:
-            raise ValidationError(_('If participants or speakers are not included you need to specify recipients.'))
+            raise ValidationError(_('At least one type of recipient is required.'))
 
     def validate_send_to_participants(self, field):
         if not field.data and not self.recipients.data and not self.send_to_speakers.data:
-            raise ValidationError(_('If no recipients or speakers are specified you need to include participants.'))
+            raise ValidationError(_('At least one type of recipient is required.'))
 
     def validate_send_to_speakers(self, field):
         if not field.data and not self.recipients.data and not self.send_to_participants.data:
-            raise ValidationError(_('If no participants or recipients are specified you need to include speakers.'))
+            raise ValidationError(_('At least one type of recipient is required.'))
 
     def validate_schedule_type(self, field):
         # Be graceful and allow a reminder that's in the past but on the same day.
