@@ -265,7 +265,8 @@ def _serializable_room(room_data, reservations=None):
     :param room_data: Room data
     :param reservations: MultiDict mapping for room id => reservations
     """
-    data = room_data['room'].to_serializable('__api_public__')
+    from indico.modules.rb.schemas import RoomLegacyAPISchema
+    data = RoomLegacyAPISchema().dump(room_data['room'])
     data['_type'] = 'Room'
     if reservations is not None:
         data['reservations'] = reservations.getlist(room_data['room'].id)
@@ -277,7 +278,8 @@ def _serializable_room_minimal(room):
 
     :param room: A `Room`
     """
-    data = room.to_serializable('__api_minimal_public__')
+    from indico.modules.rb.schemas import RoomLegacyMinimalAPISchema
+    data = RoomLegacyMinimalAPISchema().dump(room)
     data['_type'] = 'Room'
     return data
 
@@ -288,8 +290,9 @@ def _serializable_reservation(reservation_data, include_room=False):
     :param reservation_data: Reservation data
     :param include_room: Include minimal room information
     """
+    from indico.modules.rb.schemas import ReservationLegacyAPISchema, ReservationOccurrenceLegacyAPISchema
     reservation = reservation_data['reservation']
-    data = reservation.to_serializable('__api_public__', converters={datetime: _add_server_tz})
+    data = ReservationLegacyAPISchema().dump(reservation)
     data['_type'] = 'Reservation'
     data['repeatability'] = None
     if reservation.repeat_frequency:
@@ -297,8 +300,7 @@ def _serializable_reservation(reservation_data, include_room=False):
     if include_room:
         data['room'] = _serializable_room_minimal(reservation_data['reservation'].room)
     if 'occurrences' in reservation_data:
-        data['occurrences'] = [o.to_serializable('__api_public__', converters={datetime: _add_server_tz})
-                               for o in reservation_data['occurrences']]
+        data['occurrences'] = ReservationOccurrenceLegacyAPISchema(many=True).dump(reservation_data['occurrences'])
     return data
 
 

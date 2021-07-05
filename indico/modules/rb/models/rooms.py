@@ -31,12 +31,11 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
-from indico.util.serializer import Serializer
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
 
-class Room(ProtectionManagersMixin, db.Model, Serializer):
+class Room(ProtectionManagersMixin, db.Model):
     __tablename__ = 'rooms'
     __table_args__ = (db.UniqueConstraint('id', 'location_id'),  # useless but needed for the LocationMixin fkey
                       db.CheckConstraint("verbose_name != ''", 'verbose_name_not_empty'),
@@ -44,15 +43,6 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
 
     default_protection_mode = ProtectionMode.public
     disallowed_protection_modes = frozenset({ProtectionMode.inheriting})
-
-    __api_public__ = (
-        'id', 'building', 'name', 'floor', 'longitude', 'latitude', ('number', 'roomNr'), ('location_name', 'location'),
-        ('full_name', 'fullName')
-    )
-
-    __api_minimal_public__ = (
-        'id', ('full_name', 'fullName')
-    )
 
     id = db.Column(
         db.Integer,

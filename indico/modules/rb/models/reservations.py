@@ -33,7 +33,6 @@ from indico.modules.rb.util import get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.enum import IndicoEnum
 from indico.util.i18n import _
-from indico.util.serializer import Serializer
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
@@ -115,15 +114,8 @@ class ReservationLink(LinkMixin, db.Model):
 ReservationLink.register_link_events()
 
 
-class Reservation(Serializer, db.Model):
+class Reservation(db.Model):
     __tablename__ = 'reservations'
-
-    __api_public__ = [
-        'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_frequency', 'repeat_interval',
-        ('booked_for_name', 'bookedForName'), ('external_details_url', 'bookingUrl'), ('booking_reason', 'reason'),
-        ('is_accepted', 'isConfirmed'), ('is_accepted', 'isValid'), 'is_cancelled',
-        'is_rejected', ('location_name', 'location'), ('contact_email', 'booked_for_user_email')
-    ]
 
     @declared_attr
     def __table_args__(cls):

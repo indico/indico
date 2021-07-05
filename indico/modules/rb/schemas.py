@@ -7,12 +7,14 @@
 
 from operator import itemgetter
 
+from babel.dates import get_timezone
 from flask import session
 from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
 from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
 from sqlalchemy import func
 
+from indico.core.config import config
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.marshmallow import mm
@@ -503,3 +505,67 @@ admin_locations_schema = AdminLocationsSchema(many=True)
 admin_equipment_type_schema = AdminEquipmentTypeSchema()
 room_feature_schema = RoomFeatureSchema()
 room_attribute_schema = RoomAttributeSchema()
+
+
+# legacy api schemas
+
+def _add_server_tz(dt):
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=get_timezone(config.DEFAULT_TIMEZONE))
+    return dt
+
+
+class RoomLegacyAPISchema(RoomSchema):
+    # XXX: this schema is legacy due to its camelCased keys; do not use it in any new code
+    class Meta(RoomSchema.Meta):
+        fields = ('id', 'building', 'name', 'floor', 'longitude', 'latitude', 'number', 'location_name', 'full_name')
+
+    @post_dump
+    def _rename_keys(self, data, **kwargs):
+        data['fullName'] = data.pop('full_name')
+        data['location'] = data.pop('location_name')
+        data['roomNr'] = data.pop('number')
+        return data
+
+
+class RoomLegacyMinimalAPISchema(RoomSchema):
+    # XXX: this schema is legacy due to its camelCased keys; do not use it in any new code
+    class Meta(RoomSchema.Meta):
+        fields = ('id', 'full_name')
+
+    @post_dump
+    def _rename_keys(self, data, **kwargs):
+        data['fullName'] = data.pop('full_name')
+        return data
+
+
+class ReservationLegacyAPISchema(ReservationSchema):
+    # XXX: this schema is legacy due to its camelCased keys; do not use it in any new code
+    class Meta(ReservationSchema.Meta):
+        fields = ('id', 'repeat_frequency', 'repeat_interval', 'booked_for_name',
+                  'external_details_url', 'booking_reason', 'is_accepted', 'is_cancelled', 'is_rejected',
+                  'location_name', 'contact_email')
+
+    @post_dump(pass_original=True)
+    def _rename_keys(self, data, orig, **kwargs):
+        data['startDT'] = _add_server_tz(orig.start_dt)
+        data['endDT'] = _add_server_tz(orig.end_dt)
+        data['bookedForName'] = data.pop('booked_for_name')
+        data['bookingUrl'] = data.pop('external_details_url')
+        data['reason'] = data.pop('booking_reason')
+        data['isConfirmed'] = data['isValid'] = data.pop('is_accepted')
+        data['location'] = data.pop('location_name')
+        data['booked_for_user_email'] = data.pop('contact_email')
+        return data
+
+
+class ReservationOccurrenceLegacyAPISchema(ReservationOccurrenceSchema):
+    # XXX: this schema is legacy due to its camelCased keys; do not use it in any new code
+    class Meta(ReservationOccurrenceSchema.Meta):
+        fields = ('is_cancelled', 'is_rejected')
+
+    @post_dump(pass_original=True)
+    def _rename_keys(self, data, orig, **kwargs):
+        data['startDT'] = _add_server_tz(orig.start_dt)
+        data['endDT'] = _add_server_tz(orig.end_dt)
+        return data

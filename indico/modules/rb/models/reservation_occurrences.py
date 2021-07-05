@@ -25,7 +25,6 @@ from indico.modules.rb.util import rb_is_admin
 from indico.util import date_time
 from indico.util.date_time import format_date
 from indico.util.enum import IndicoEnum
-from indico.util.serializer import Serializer
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
@@ -37,11 +36,10 @@ class ReservationOccurrenceState(int, IndicoEnum):
     rejected = 4
 
 
-class ReservationOccurrence(db.Model, Serializer):
+class ReservationOccurrence(db.Model):
     __tablename__ = 'reservation_occurrences'
     __table_args__ = (db.CheckConstraint("rejection_reason != ''", 'rejection_reason_not_empty'),
                       {'schema': 'roombooking'})
-    __api_public__ = (('start_dt', 'startDT'), ('end_dt', 'endDT'), 'is_cancelled', 'is_rejected')
 
     #: A relationship loading strategy that will avoid loading the
     #: users linked to a reservation.  You want to use this in pretty
