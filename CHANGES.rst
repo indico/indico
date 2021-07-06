@@ -21,6 +21,7 @@ Major Features
 Improvements
 ^^^^^^^^^^^^
 
+- Add an option to allow non-judge conveners to update an abstract track (:pr:`4989`)
 - Add abstract content to the abstract list customization options (:pr:`4968`)
 - Add CLI option to create a series (:pr:`4969`)
 - Users cannot submit multiple anonymous surveys anymore by logging out and in again
