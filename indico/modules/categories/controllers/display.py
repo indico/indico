@@ -23,9 +23,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
-from indico.modules.categories.controllers.util import (get_category_view_params, group_by_month,
-                                                        make_format_event_date_func, make_happening_now_func,
-                                                        make_is_recent_func)
+from indico.modules.categories.controllers.util import (get_category_view_params, get_event_query_filter,
+                                                        group_by_month, make_format_event_date_func,
+                                                        make_happening_now_func, make_is_recent_func)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
@@ -254,11 +254,11 @@ class RHEventList(RHDisplayCategoryEventsBase):
         if before is None and after is None:
             raise BadRequest('"before" or "after" parameter must be specified')
         hidden_event_ids = {e.id for e in self.category.get_hidden_events(user=session.user, deep=self.is_flat)}
-        event_query_filter = (Event.category_chain_overlaps(self.category.id) if self.is_flat
-                              else (Event.category_id == self.category.id))
+        event_query_filter = get_event_query_filter(self.category, is_flat=self.is_flat,
+                                                    hidden_event_ids=hidden_event_ids)
         event_query = (Event.query
                        .options(*self._event_query_options)
-                       .filter(event_query_filter, Event.id.notin_(hidden_event_ids))
+                       .filter(event_query_filter)
                        .order_by(Event.start_dt.desc(), Event.id.desc()))
         if before:
             event_query = event_query.filter(Event.start_dt < before)
