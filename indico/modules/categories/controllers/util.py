@@ -65,10 +65,17 @@ def make_is_recent_func(now):
 
 
 def get_event_query_filter(category, is_flat=False, hidden_event_ids=None):
-    criteria = [
-        Event.is_visible_in(category.id) if is_flat else (Event.category_id == category.id),
-        ~Event.is_deleted,
-    ]
+    criteria = [~Event.is_deleted]
+    if is_flat:
+        # Hidden events (visibility == 0) are excluded here, but we can't include an OR criterion
+        # checking for a direct category id match as this completely destroys the performance of
+        # the query.
+        # This should be OK though since showing hidden events in the flattened event list isn't
+        # important - they would only be shown to category managers and when using the non-flat
+        # view they still see them anyway.
+        criteria.append(Event.is_visible_in(category.id))
+    else:
+        criteria.append(Event.category_id == category.id)
     if hidden_event_ids:
         criteria.append(Event.id.notin_(hidden_event_ids))
     return db.and_(*criteria)
@@ -82,7 +89,7 @@ def get_category_view_params(category, now, is_flat=False):
     past_threshold = now - relativedelta(months=1, day=1, hour=0, minute=0)
     future_threshold = now + relativedelta(months=1, day=1, hour=0, minute=0)
 
-    hidden_event_ids = {e.id for e in category.get_hidden_events(user=session.user, deep=is_flat)}
+    hidden_event_ids = {e.id for e in category.get_hidden_events(user=session.user)} if not is_flat else set()
     event_query_filter = get_event_query_filter(category, is_flat=is_flat, hidden_event_ids=hidden_event_ids)
     next_event_start_dt = (db.session.query(Event.start_dt)
                            .filter(event_query_filter, Event.start_dt >= now)

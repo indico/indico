@@ -253,7 +253,8 @@ class RHEventList(RHDisplayCategoryEventsBase):
         after = self._parse_year_month(request.args.get('after'))
         if before is None and after is None:
             raise BadRequest('"before" or "after" parameter must be specified')
-        hidden_event_ids = {e.id for e in self.category.get_hidden_events(user=session.user, deep=self.is_flat)}
+        hidden_event_ids = ({e.id for e in self.category.get_hidden_events(user=session.user)}
+                            if not self.is_flat else set())
         event_query_filter = get_event_query_filter(self.category, is_flat=self.is_flat,
                                                     hidden_event_ids=hidden_event_ids)
         event_query = (Event.query
