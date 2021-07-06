@@ -47,14 +47,14 @@ import {$T} from 'indico/utils/i18n';
     setupToggleEventListButton($futureEvents, onToggleFutureEvents);
     setupToggleEventListButton($pastEvents, onTogglePastEvents);
 
-    if (showFutureEvents) {
+    if (showFutureEvents && !isFlat) {
       $futureEvents
         .find('.js-toggle-list')
         .first()
         .trigger('click', true);
     }
 
-    if (showPastEvents) {
+    if (showPastEvents && !isFlat) {
       $pastEvents
         .find('.js-toggle-list')
         .first()
@@ -62,6 +62,9 @@ import {$T} from 'indico/utils/i18n';
     }
 
     function onToggleFutureEvents(shown) {
+      if (isFlat) {
+        return;
+      }
       $.ajax({
         url: $eventList.data('show-future-events-url'),
         method: shown ? 'PUT' : 'DELETE',
@@ -70,6 +73,9 @@ import {$T} from 'indico/utils/i18n';
     }
 
     function onTogglePastEvents(shown) {
+      if (isFlat) {
+        return;
+      }
       $.ajax({
         url: $eventList.data('show-past-events-url'),
         method: shown ? 'PUT' : 'DELETE',
