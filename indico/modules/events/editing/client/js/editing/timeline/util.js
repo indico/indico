@@ -35,12 +35,12 @@ export function processRevisions(revisions) {
 }
 
 export function commentFromState(revision, state, user) {
-  const {finalState, id, createdDt, submitter} = revision;
+  const {finalState, id, reviewedDt, submitter} = revision;
   return {
-    id: `custom-item-${id}-${createdDt}-${finalState.name}`,
+    id: `custom-item-${id}-${reviewedDt}-${finalState.name}`,
     revisionId: id,
     header: state,
-    createdDt,
+    reviewedDt,
     user: user || submitter,
     custom: true,
     html: revision.commentHtml,
