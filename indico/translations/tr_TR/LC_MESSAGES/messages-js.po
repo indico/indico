@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-24 17:51+0200\n"
-"PO-Revision-Date: 2021-06-24 14:14+0000\n"
+"POT-Creation-Date: 2021-07-05 17:54+0200\n"
+"PO-Revision-Date: 2021-06-25 21:24+0000\n"
 "Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/indico/indico/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -117,7 +117,7 @@ msgstr "En az bir seçili kategori, boş olmadığı için silinemez."
 #: indico/modules/categories/client/js/management.js:192
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
-msgstr[0] "Seçili {0} kategorileri sil"
+msgstr[0] "Seçili kategoriyi sil"
 msgstr[1] "Seçili {0} Kategorileri Sil"
 
 #: indico/modules/categories/client/js/management.js:200
@@ -131,7 +131,7 @@ msgstr "Kategorileri sil"
 #: indico/modules/categories/client/js/management.js:229
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
-msgstr[0] "{0} seçili kategorileri taşı"
+msgstr[0] "Seçili kategoriyi taşı"
 msgstr[1] "{0} seçili kategorileri taşı"
 
 #: indico/modules/categories/client/js/management.js:236
@@ -143,7 +143,7 @@ msgstr "İlk önce taşınacak kategorileri seçin."
 #: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
-msgstr[0] "Bu kategorideki tüm {0} olayları şu anda seçili durumdadır."
+msgstr[0] "*"
 msgstr[1] "Bu kategorideki tüm {0} etkinlikler şu anda seçili durumdadır."
 
 #: indico/modules/categories/client/js/management.js:302
@@ -166,7 +166,7 @@ msgstr[1] "Kategorileri taşı"
 #: indico/modules/categories/client/js/management.js:343
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
-msgstr[0] "{0} seçili kategori için yeni kategori üst öğesini seç"
+msgstr[0] "Kategori için yeni kategori üst öğesi seçin"
 msgstr[1] "{0} seçili kategori için yeni kategori üst öğesini seç"
 
 #: indico/modules/categories/client/js/management.js:359
@@ -191,7 +191,7 @@ msgstr[1] "Etkinlikleri taşı"
 #: indico/modules/categories/client/js/management.js:408
 msgid "Select category destination for the event"
 msgid_plural "Select category destination for {0} selected events"
-msgstr[0] "{0} seçili olay için kategori varış adresini seç"
+msgstr[0] "Etkinlik için kategoriyi seçin"
 msgstr[1] "{0} seçili etkinlik için kategori varış adresini seç"
 
 #: indico/modules/categories/client/js/management.js:418
@@ -891,7 +891,7 @@ msgstr[1] "<strong>{0}</strong> karakter kaldı"
 #: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:39
 msgid "<strong>1</strong> word left"
 msgid_plural "<strong>{0}</strong> words left"
-msgstr[0] "<strong>{0}</strong> kelime kaldı"
+msgstr[0] "<strong>1</strong> kelime kaldı"
 msgstr[1] "<strong>{0}</strong> kelime kaldı"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
@@ -1460,7 +1460,7 @@ msgstr "Bu gönderi sahibinin oturumda"
 
 #: indico/web/client/js/legacy/libs/timetable/Draw.js:317
 msgid " contribution(s)."
-msgstr "katkıları vardır."
+msgstr "katkı(lar)."
 
 #: indico/web/client/js/legacy/libs/timetable/Draw.js:319
 msgid "Please click for more information."

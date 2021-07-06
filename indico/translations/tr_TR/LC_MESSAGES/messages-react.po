@@ -1,13 +1,13 @@
 # 
 # Translators:
 # İNFOYED TERCÜME <infoyed@gmail.com>, 2021
-# selcuk bilmis <selcukbilmis@gmail.com>, 2021
 # Adrian Mönnich, 2021
+# selcuk bilmis <selcukbilmis@gmail.com>, 2021
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-06-21 17:51+0200\n"
-"Last-Translator: Adrian Mönnich, 2021\n"
+"POT-Creation-Date: 2021-07-21 17:54+0200\n"
+"Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/indico/teams/6478/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -223,65 +223,61 @@ msgstr "Tüm bireysel katkıları içeren ayrıntılı bir zaman çizelgesi."
 msgid "Export"
 msgstr "Dışa aktar"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:35
-msgid "Published"
-msgstr "Yayımlandı"
+#: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
+msgid "Publish now"
+msgstr "Şimdi yayınla"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:35
-msgid "Draft"
-msgstr "Taslak"
-
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:47
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:20
 msgid "Set contribution list in draft mode"
 msgstr "Taslak modunda katkı listesi ayarla"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:48
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:21
 msgid "Publish contributions"
 msgstr "Katkıları yayımla"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:55
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:28
 msgid ""
 "Are you sure you want to change the contribution list back to draft mode?"
 msgstr ""
 "Katkı listesini tekrar taslak moda dönüştürmek istediğinizden emin misiniz?"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:60
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:33
 msgid "By doing so the following menu items won't be accessible:"
 msgstr "Böyle yaparsanız aşağıdaki menü öğelerine erişemezsiniz:"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:66
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:39
 msgid "Are you sure you want to publish the contribution list?"
 msgstr "Katkı listesini yayımlamak istediğinizden emin misiniz?"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:69
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:42
 msgid "By doing so the following menu items will be accessible:"
 msgstr "Böyle yaparsanız aşağıdaki menü öğelerine erişemezsiniz:"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:75
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:48
 msgid "Contribution List"
 msgstr "Katkı Listesi"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:78
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:51
 msgid "My Contributions"
 msgstr "Katkılarım"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:81
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:54
 msgid "Author List"
 msgstr "Yazar Listesi"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:84
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:57
 msgid "Speaker List"
 msgstr "Konuşmacı Listesi"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:87
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:60
 msgid "Timetable"
 msgstr "Zaman Çizelgesi"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:90
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:63
 msgid "Book of Abstracts"
 msgstr "Özet Defteri"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:96
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:69
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:67
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:218
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:95
@@ -291,7 +287,7 @@ msgstr "Özet Defteri"
 msgid "No"
 msgstr "Hayır"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:105
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:72
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:66
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:217
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:94
@@ -301,7 +297,15 @@ msgstr "Hayır"
 msgid "Yes"
 msgstr "Evet"
 
-#: indico/modules/events/contributions/client/js/index.jsx:44
+#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:32
+msgid "Published"
+msgstr "Yayımlandı"
+
+#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:32
+msgid "Draft"
+msgstr "Taslak"
+
+#: indico/modules/events/contributions/client/js/index.jsx:45
 msgid "Contribution"
 msgstr "Katkı"
 
@@ -1577,7 +1581,7 @@ msgstr "Yine de kabul et"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:215
 msgid "There is no occurrence on this date ({date})."
-msgstr "Bu tarihte ({date}) herhangi bir olay meydana gelmemiştir."
+msgstr "Bu tarihte ({date}) herhangi bir etkinlik gerçekleşmemiştir."
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:222
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:239
@@ -1766,8 +1770,7 @@ msgstr "Yeni rezervasyon ile çakışmalar"
 msgid "Your new booking conflicts with another one."
 msgid_plural ""
 "{count} occurrences of your booking are unavailable due to conflicts."
-msgstr[0] ""
-"{count} çakışmalar nedeniyle yer ayırtma olaylarınız kullanılamamaktadır."
+msgstr[0] "Yeni rezervasyonunuz bir diğeriyle çakışıyor."
 msgstr[1] ""
 "{count} çakışmalar nedeniyle rezervasyon oluşlarınız kullanılamamaktadır."
 
@@ -2026,7 +2029,7 @@ msgstr "İstatistikler"
 #: indico/modules/rb/client/js/common/rooms/RoomStats.jsx:102
 msgid "Last day"
 msgid_plural "Last {days} days"
-msgstr[0] "Son {days} gün"
+msgstr[0] "Son gün"
 msgstr[1] "Son {days} gün"
 
 #: indico/modules/rb/client/js/common/rooms/edit/DailyAvailability.jsx:79
@@ -2467,7 +2470,7 @@ msgstr "Telefon numarası"
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:172
 msgid "1 {label}seat{/label}"
 msgid_plural "{count} {label}seats{/label}"
-msgstr[0] "{count} {label}koltuklar{/label}"
+msgstr[0] "1 {label}koltuk{/label}"
 msgstr[1] "{count} {label}koltuklar{/label}"
 
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:192
@@ -2523,7 +2526,7 @@ msgid "My Blockings"
 msgstr "Engellemelerim"
 
 #: indico/modules/rb/client/js/components/SidebarMenu.jsx:91
-#: indico/web/client/js/react/components/UserMenu.jsx:117
+#: indico/web/client/js/react/components/UserMenu.jsx:120
 msgid "Administration"
 msgstr "Yönetim"
 
@@ -2615,7 +2618,7 @@ msgstr "Şu anda kullanılmamakta"
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:56
 msgid "Used in {count}1{/count} room"
 msgid_plural "Used in {count} rooms"
-msgstr[0] "{count} odada kullanılmakta"
+msgstr[0] "{count}1{/count} odada kullanılmakta"
 msgstr[1] "{count} odada kullanılmakta"
 
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:84
@@ -2629,7 +2632,7 @@ msgstr "Özniteliği {name} silmek istediğinizden emin misiniz?"
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:98
 msgid "It is currently used in {count}1{/count} room."
 msgid_plural "It is currently used in {count} rooms."
-msgstr[0] "Şu anda {count} odada kullanılmaktadır."
+msgstr[0] "Şu anda {count}1{/count}  odada kullanılmaktadır."
 msgstr[1] "Şu anda {count} odada kullanılmaktadır."
 
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:127
@@ -2657,7 +2660,7 @@ msgstr "Bu donatım türü, {name} özelliği sağlar."
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:52
 msgid "Available in {count}1{/count} room"
 msgid_plural "Available in {count} rooms"
-msgstr[0] "{count} odada mevcut"
+msgstr[0] "{count}1{/count} odada mevcut"
 msgstr[1] "{count} odada mevcut"
 
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:89
@@ -2672,7 +2675,7 @@ msgstr "Bu donatım türünü {name} silmek istediğinizden emin misiniz?"
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:105
 msgid "It is currently used by {count}1{/count} room."
 msgid_plural "It is currently used by {count} rooms."
-msgstr[0] "Şu anda {count} oda tarafından kullanılmaktadır."
+msgstr[0] "Şu anda {count}1{/count}  oda tarafından kullanılmaktadır."
 msgstr[1] "Şu anda {count} oda tarafından kullanılmaktadır."
 
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:132
@@ -2698,7 +2701,7 @@ msgstr "Oda yok"
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:87
 msgid "{count}1{/count} room"
 msgid_plural "{count} rooms"
-msgstr[0] "{count} oda"
+msgstr[0] "{count}1{/count} oda"
 msgstr[1] "{count} oda"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:109
@@ -2787,7 +2790,7 @@ msgstr "Güncelle"
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:48
 msgid "Provided by {count}1{/count} equipment type"
 msgid_plural "Provided by {count} equipment types"
-msgstr[0] " {count} donatım türü tarafından sağlanmıştır"
+msgstr[0] " {count}1{/count} donatım türü tarafından sağlanmıştır"
 msgstr[1] " {count} donatım türü tarafından sağlanmıştır"
 
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:91
@@ -2801,7 +2804,7 @@ msgstr "Özelliği {name} silmek istediğinizden emin misiniz?"
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:109
 msgid "It is currently provided by {count}1{/count} equipment type."
 msgid_plural "It is currently provided by {count} equipment types."
-msgstr[0] "Şu anda {count} donatım türü tarafından sağlanmaktadır."
+msgstr[0] "Şu anda {count}1{/count}  donatım türü tarafından sağlanmaktadır."
 msgstr[1] "Şu anda {count} donatım türü tarafından sağlanmaktadır."
 
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:139
@@ -3112,7 +3115,7 @@ msgstr "Engellemenizi {link}buradan{/link} danışabilirsiniz."
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:34
 msgid "The space will be free on the selected time slot(s)"
-msgstr "Seçili zaman dilimlerinde alan boş olacaktır"
+msgstr "Seçili zaman dilim(ler)inde alan boş olacaktır"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:39
 msgid "The space won't be available on one or more days"
@@ -3232,10 +3235,9 @@ msgstr "Rezervasyon çakışmaları"
 msgid "Your booking conflicts with another existing one."
 msgid_plural ""
 "{count} occurrences of your booking conflict with existing bookings."
-msgstr[0] ""
-"{count} rezervasyonunuzun var olan rezervasyonlarla çakıştığı durumlar."
+msgstr[0] "Rezervasyonunuz mevcut başka bir rezervasyonla çakışıyor."
 msgstr[1] ""
-"{count} rezervasyonunuzun var olan rezervasyonlarla çakıştığı oluşlar"
+"rezervasyonunuzun var olan rezervasyonlarla çakıştığı {count} durum var"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:296
 msgid "You are creating a {highlight}Pre-Booking{/highlight}"
@@ -3320,13 +3322,13 @@ msgstr "Saat"
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:69
 msgid "One minute earlier"
 msgid_plural "{count} minutes earlier"
-msgstr[0] "{count} dakika erken"
+msgstr[0] "Bir dakika erken"
 msgstr[1] "{count} dakika erken"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:76
 msgid "One minute later"
 msgid_plural "{count} minutes later"
-msgstr[0] "{count} minutes later"
+msgstr[0] "Bir dakika sonra"
 msgstr[1] "{count} dakika sonra"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:95
@@ -3337,7 +3339,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:110
 msgid "One minute shorter"
 msgid_plural "{duration} minutes shorter"
-msgstr[0] "{duration} dakika daha kısa"
+msgstr[0] "Bir dakika daha kısa"
 msgstr[1] "{duration} dakika daha kısa"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:116
@@ -3347,19 +3349,19 @@ msgstr "Uygun hale gelmesi için rezervasyonunuzu kısaltacağız"
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:123
 msgid "Skip one day"
 msgid_plural "Skip {skip} days"
-msgstr[0] "Gün atla {skip} "
-msgstr[1] "Günleri atla {skip} "
+msgstr[0] "Günü atla "
+msgstr[1] "{skip} günü atla "
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:124
 msgid "We'll skip one occurrence to avoid any conflicts"
 msgid_plural "We'll skip {skip} occurrences to avoid any conflicts"
-msgstr[0] "Herhangi bir çalışmayı önlemek için oluşları atlayacağız {skip}"
-msgstr[1] "Herhangi bir çalışmayı önlemek için oluşları atlayacağız {skip}"
+msgstr[0] "Herhangi bir çalışmayı önlemek için bir oluşu atlayacağız."
+msgstr[1] "Herhangi bir çakışmayı önlemek için {skip} oluşu atlayacağız "
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:137
 msgid "Shorten by one day"
 msgid_plural "Shorten by {shorten} days"
-msgstr[0] "{shorten} gün kısalt"
+msgstr[0] "Bir gün kısalt"
 msgstr[1] "{shorten} gün kısalt"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:143
@@ -3762,19 +3764,19 @@ msgstr ""
 msgid "Back to top"
 msgstr "En başa dön"
 
-#: indico/web/client/js/react/components/UserMenu.jsx:44
+#: indico/web/client/js/react/components/UserMenu.jsx:45
 msgid "Impersonate user"
 msgstr "Kullanıcıyı taklit et"
 
-#: indico/web/client/js/react/components/UserMenu.jsx:101
+#: indico/web/client/js/react/components/UserMenu.jsx:104
 msgid "My Profile"
 msgstr "Profilim"
 
-#: indico/web/client/js/react/components/UserMenu.jsx:104
+#: indico/web/client/js/react/components/UserMenu.jsx:107
 msgid "My Preferences"
 msgstr "Tercihlerim"
 
-#: indico/web/client/js/react/components/UserMenu.jsx:123
+#: indico/web/client/js/react/components/UserMenu.jsx:126
 msgid "Logout"
 msgstr "Oturumu kapat"
 
@@ -3812,7 +3814,7 @@ msgstr "{size} MB"
 
 #: indico/web/client/js/react/components/files/FileArea.jsx:157
 msgid "Drag file(s) here"
-msgstr "Dosyaları buraya sürükle"
+msgstr "Dosya(ları) buraya sürükle"
 
 #: indico/web/client/js/react/components/files/FileArea.jsx:158
 #: indico/web/client/js/react/components/files/FileArea.jsx:170
@@ -4140,14 +4142,14 @@ msgstr "D"
 msgctxt "repetition"
 msgid "Weekly"
 msgid_plural "Every {number} weeks"
-msgstr[0] "Her {number} hafta"
+msgstr[0] "Her hafta"
 msgstr[1] "Her {number} hafta"
 
 #: indico/modules/rb/client/js/util.jsx:194
 msgctxt "repetition"
 msgid "Monthly"
 msgid_plural "Every {number} months"
-msgstr[0] "Her {number} ay"
+msgstr[0] "Her ay"
 msgstr[1] "Her {number} ay"
 
 #: indico/modules/rb/client/js/util.jsx:184

@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-24 17:51+0200\n"
-"PO-Revision-Date: 2021-06-25 11:24+0000\n"
+"POT-Creation-Date: 2021-07-05 17:53+0200\n"
+"PO-Revision-Date: 2021-07-06 12:28+0000\n"
 "Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/indico/indico/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -134,7 +134,8 @@ msgstr "Periyodik görevler"
 #: indico/modules/groups/templates/groups.html:10
 #: indico/modules/networks/forms.py:26
 #: indico/modules/networks/templates/networks.html:90
-#: indico/modules/oauth/forms.py:34 indico/modules/vc/forms.py:117
+#: indico/modules/oauth/forms.py:35 indico/modules/oauth/forms.py:73
+#: indico/modules/vc/forms.py:117
 #: indico/modules/vc/templates/manage_event.html:16
 msgid "Name"
 msgstr "Ad"
@@ -262,12 +263,12 @@ msgid "User information (read only)"
 msgstr "Kullanıcı bilgileri (salt okunur)"
 
 #: indico/core/oauth/scopes.py:13
-msgid "Legacy API (read only)"
-msgstr "Eski API (salt okunur)"
+msgid "Classic API (read only)"
+msgstr "Klasik API (salt okunur)"
 
 #: indico/core/oauth/scopes.py:14
-msgid "Legacy API (write only)"
-msgstr "Eski API (salt yazılır)"
+msgid "Classic API (write only)"
+msgstr "Klasik API (yalnızca yazma)"
 
 #: indico/core/oauth/scopes.py:15
 msgid "Event registrants"
@@ -625,7 +626,7 @@ msgid "Homepage"
 msgstr "Anasayfa"
 
 #: indico/modules/admin/__init__.py:32 indico/modules/admin/views.py:24
-#: indico/modules/api/templates/user_profile.html:146 indico/web/views.py:252
+#: indico/modules/api/templates/user_profile.html:175 indico/web/views.py:252
 #: indico/web/views.py:309
 msgid "Administration"
 msgstr "Yönetim"
@@ -652,7 +653,7 @@ msgstr "Ayarlar kaydedildi"
 #: indico/modules/announcement/forms.py:18 indico/modules/core/forms.py:24
 #: indico/modules/events/payment/plugins.py:30
 #: indico/modules/events/registration/forms.py:102
-#: indico/modules/events/surveys/forms.py:45 indico/modules/oauth/forms.py:45
+#: indico/modules/events/surveys/forms.py:45 indico/modules/oauth/forms.py:46
 msgid "Enabled"
 msgstr "Etkinleştirildi"
 
@@ -672,7 +673,7 @@ msgstr "API"
 msgid "HTTP API"
 msgstr "HTTP API"
 
-#: indico/modules/api/controllers.py:30
+#: indico/modules/api/controllers.py:31
 #: indico/modules/events/layout/controllers/layout.py:115
 #: indico/modules/events/layout/controllers/layout.py:135
 #: indico/modules/events/layout/controllers/layout.py:229
@@ -681,35 +682,35 @@ msgstr "HTTP API"
 msgid "Settings saved"
 msgstr "Ayarlar kaydedildi"
 
-#: indico/modules/api/controllers.py:88
+#: indico/modules/api/controllers.py:90
 msgid "Your API key has been successfully replaced."
 msgstr "API anahtarınız başarıyla değiştirilmiştir."
 
-#: indico/modules/api/controllers.py:90
+#: indico/modules/api/controllers.py:92
 msgid "Please update any applications which use old key."
 msgstr "Lütfen eski anahtarı kullanan tüm uygulamaları güncelleyin."
 
-#: indico/modules/api/controllers.py:92
+#: indico/modules/api/controllers.py:94
 msgid "Your API key has been successfully created."
 msgstr "API anahtarınız başarıyla oluşturulmuştur."
 
-#: indico/modules/api/controllers.py:104
+#: indico/modules/api/controllers.py:106
 msgid "Your API key has been deleted."
 msgstr "API anahtarınız silinmiştir."
 
-#: indico/modules/api/controllers.py:117
+#: indico/modules/api/controllers.py:119
 msgid "You can now use persistent signatures."
 msgstr "Artık kalıcı imzaları kullanabilirsiniz."
 
-#: indico/modules/api/controllers.py:119
+#: indico/modules/api/controllers.py:121
 msgid "Persistent signatures have been disabled for your API key."
 msgstr "Kalıcı imzalar, API anahtarınız için devre dışı bırakılmıştır."
 
-#: indico/modules/api/controllers.py:135
+#: indico/modules/api/controllers.py:137
 msgid "The API key has been blocked."
 msgstr "API anahtarınız engellenmiştir."
 
-#: indico/modules/api/controllers.py:137
+#: indico/modules/api/controllers.py:139
 msgid "The API key has been unblocked."
 msgstr "API anahtarınızın engeli kaldırılmıştır"
 
@@ -734,7 +735,7 @@ msgid "Key+signature for all requests"
 msgstr "Tüm talepler için anahtar+imza"
 
 #: indico/modules/api/forms.py:29
-#: indico/modules/api/templates/user_profile.html:98
+#: indico/modules/api/templates/user_profile.html:127
 msgid "Persistent signatures"
 msgstr "Kalıcı imzalar"
 
@@ -804,7 +805,7 @@ msgid "Last use"
 msgstr "Son Kullanım"
 
 #: indico/modules/api/templates/admin_keys.html:12
-#: indico/modules/api/templates/user_profile.html:56
+#: indico/modules/api/templates/user_profile.html:85
 msgid "Token"
 msgstr "Jeton"
 
@@ -846,99 +847,113 @@ msgid_plural ""
 msgstr[0] "Şu anda sistemde <strong><a href=\"%(url)s\"> aktif API anahtarı</a></strong> mevcuttur."
 msgstr[1] "Şu anda sistemde <strong><a href=\"%(url)s\"> '%(count)s' aktif API anahtarı</a></strong> mevcuttur."
 
-#: indico/modules/api/templates/user_profile.html:10
+#: indico/modules/api/templates/user_profile.html:17
+msgid "API keys are deprecated and may be removed in a future Indico version."
+msgstr "API anahtarları artık kullanılmamaktadır ve gelecekteki Indico sürümünden tamamen kaldırılabilir."
+
+#: indico/modules/api/templates/user_profile.html:23
+#, python-format
+msgid ""
+"Please create %(link_start)sAPI tokens%(link_end)s instead. They use a more "
+"standard way of authenticating (Bearer token authentication instead of an "
+"HMAC signature) and you can (and should!) create one token for each "
+"script/application where you need to access the Indico API. To reduce the "
+"risk from a leaked token they also let you specify more fine-grained scopes."
+msgstr "Lütfen %(link_start)s API jetonlarını%(link_end)s API jetonlarının yerine oluşturun. Bunlar daha standart bir kimlik doğrulama yöntemi kullanırlar (HMAC imzası yerine Taşıyıcı jeton kimlik doğrulaması) ve Indico API'sine erişmeniz gereken her komut dosyası/uygulama için bir jeton oluşturabilirsiniz (ve oluşturmalısınız!). Sızan bir jetondan kaynaklanan riski azaltmak için daha ayrıntılı kapsamlar belirlemenize de izin verirler."
+
+#: indico/modules/api/templates/user_profile.html:39
 msgid "API Key"
 msgstr "API Anahtarı"
 
-#: indico/modules/api/templates/user_profile.html:20
-#: indico/modules/api/templates/user_profile.html:24
+#: indico/modules/api/templates/user_profile.html:49
+#: indico/modules/api/templates/user_profile.html:53
 msgid "Create new API key"
 msgstr "Yeni API anahtarı oluştur"
 
-#: indico/modules/api/templates/user_profile.html:21
+#: indico/modules/api/templates/user_profile.html:50
 msgid ""
 "Do you really want to create a new API key? Your old key will stop working "
 "immediately!"
 msgstr "Gerçekten yeni bir API anahtarı oluşturmak ister misiniz? Eski anahtarınız derhal devre dışı kalacaktır!"
 
-#: indico/modules/api/templates/user_profile.html:30
-#: indico/modules/api/templates/user_profile.html:33
+#: indico/modules/api/templates/user_profile.html:59
+#: indico/modules/api/templates/user_profile.html:62
 msgid "Delete API key"
 msgstr "API anahtarı sil"
 
-#: indico/modules/api/templates/user_profile.html:31
+#: indico/modules/api/templates/user_profile.html:60
 msgid "Do you really want to delete your API key?"
 msgstr "API anahtarını gerçekten silmek istiyor musunuz?"
 
-#: indico/modules/api/templates/user_profile.html:42
+#: indico/modules/api/templates/user_profile.html:71
 msgid ""
 "You do not have an API key at the moment. If you would like to use our API, "
 "please create an API key using the button below."
 msgstr "Şu anda bir API anahtarınız yok. API'mızı kullanmak isterseniz lütfen aşağıdaki düğmeyi kullanarak bir API anahtarı oluşturun."
 
-#: indico/modules/api/templates/user_profile.html:52
+#: indico/modules/api/templates/user_profile.html:81
 msgid "Create API key"
 msgstr "API anahtarı oluştur"
 
-#: indico/modules/api/templates/user_profile.html:61
+#: indico/modules/api/templates/user_profile.html:90
 msgid ""
 "Your API key has been blocked. Please contact an administrator for further "
 "details."
 msgstr "API anahtarınız engellendi. Lüften daha fazla bilgi için bir sistem yönetici ile temasa geçin."
 
-#: indico/modules/api/templates/user_profile.html:67
+#: indico/modules/api/templates/user_profile.html:96
 msgid "Secret"
 msgstr "Gizli"
 
-#: indico/modules/api/templates/user_profile.html:70
+#: indico/modules/api/templates/user_profile.html:99
 msgid "Created"
 msgstr "Oluşuturulmuş"
 
-#: indico/modules/api/templates/user_profile.html:72
+#: indico/modules/api/templates/user_profile.html:101
 msgid "Total uses"
 msgstr "Toplam kullanım"
 
-#: indico/modules/api/templates/user_profile.html:75
+#: indico/modules/api/templates/user_profile.html:104
 msgid "Last used"
 msgstr "Son kullanılan"
 
-#: indico/modules/api/templates/user_profile.html:79
+#: indico/modules/api/templates/user_profile.html:108
 msgid "Last IP"
 msgstr "Son IP"
 
-#: indico/modules/api/templates/user_profile.html:83
+#: indico/modules/api/templates/user_profile.html:112
 msgid "Last request"
 msgstr "Son istek"
 
-#: indico/modules/api/templates/user_profile.html:88
+#: indico/modules/api/templates/user_profile.html:117
 msgid "Last request could access private data."
 msgstr "Son istek kişisel verilere erişebilir."
 
-#: indico/modules/api/templates/user_profile.html:92
+#: indico/modules/api/templates/user_profile.html:121
 msgid "Last request could only access public data."
 msgstr "Son istek yalnızca açık verilere erişebilir."
 
-#: indico/modules/api/templates/user_profile.html:101
+#: indico/modules/api/templates/user_profile.html:130
 msgid "On"
 msgstr "Aç"
 
-#: indico/modules/api/templates/user_profile.html:101
+#: indico/modules/api/templates/user_profile.html:130
 msgid "Off"
 msgstr "Kapat"
 
-#: indico/modules/api/templates/user_profile.html:116
+#: indico/modules/api/templates/user_profile.html:145
 msgid "Token-based links"
 msgstr "Jeton temelli bağlantılar"
 
-#: indico/modules/api/templates/user_profile.html:124
+#: indico/modules/api/templates/user_profile.html:153
 msgid "Are you sure you'd like to invalidate all your token-based links?"
 msgstr "Tüm jeton temelli bağlantılarınızı geçersiz kılmak istediğinizden emin misiniz?"
 
-#: indico/modules/api/templates/user_profile.html:127
+#: indico/modules/api/templates/user_profile.html:156
 msgid "Invalidate all links"
 msgstr "Tüm bağlantıları geçersiz kıl"
 
-#: indico/modules/api/templates/user_profile.html:133
+#: indico/modules/api/templates/user_profile.html:162
 msgid ""
 "Token-based unique links are secret URLs which Indico uses to allow you to "
 "easily fetch data from within other applications (e.g. calendar schedulers "
@@ -948,41 +963,41 @@ msgid ""
 "invalidated."
 msgstr "Jeton temelli benzersiz bağlantılar, Indico'nun diğer uygulamalardan (örneğin iCalendar üzerinden takvim zamanlayıcıları) getirmenize olanak tanımak için kullandığı gizli URL'lerdir. Bu bağlantılar, her Indico kullanıcısı için benzersiz olan bir sır anahtarı temelli bir dijital imza üzerinden üretilir. Bağlantılarınızdan biri üzerinde mutabakata varılması durumunda, bu düğmeye tıklamalısınız. Diğer tüm bağlantılar geçersiz kılınacaktır."
 
-#: indico/modules/api/templates/user_profile.html:156
+#: indico/modules/api/templates/user_profile.html:185
 msgid "Unblock API key"
 msgstr "API anahtarının engelini kaldır"
 
-#: indico/modules/api/templates/user_profile.html:164
+#: indico/modules/api/templates/user_profile.html:193
 msgid "Block API key"
 msgstr "API anahtarını engelle"
 
-#: indico/modules/api/templates/user_profile.html:172
+#: indico/modules/api/templates/user_profile.html:201
 msgid "This is the list of old keys associated with this user."
 msgstr "Bu liste, bu kullanıcı ile ilişkilendirilmiş eski anahtarları gösterir."
 
-#: indico/modules/api/templates/user_profile.html:180
+#: indico/modules/api/templates/user_profile.html:209
 msgid "never used"
 msgstr "hiçbir zaman kullanılmadı"
 
-#: indico/modules/api/templates/user_profile.html:182
+#: indico/modules/api/templates/user_profile.html:211
 #, python-format
 msgid "used once"
 msgid_plural "used <strong>%(n)s times</strong>"
 msgstr[0] "bir kez kullanıldı"
 msgstr[1] "<strong>%(n)s kez</strong> kullanıldı"
 
-#: indico/modules/api/templates/user_profile.html:188
+#: indico/modules/api/templates/user_profile.html:217
 #, python-format
 msgid "last used on %(date)s"
 msgstr "en son %(date)s tarihinde kullanıldı"
 
-#: indico/modules/api/templates/user_profile.html:198
+#: indico/modules/api/templates/user_profile.html:227
 msgid "There are no old keys."
 msgstr "Hiçbir eski anahtar yoktur."
 
 #: indico/modules/attachments/__init__.py:41
 #: indico/modules/attachments/__init__.py:53
-#: indico/modules/attachments/clone.py:23
+#: indico/modules/attachments/clone.py:24
 #: indico/modules/attachments/templates/attachments.html:4
 #: indico/modules/attachments/templates/generate_package.html:14
 #: indico/modules/categories/templates/display/sidebar.html:7
@@ -990,6 +1005,10 @@ msgstr "Hiçbir eski anahtar yoktur."
 #: indico/modules/events/templates/display/conference.html:86
 msgid "Materials"
 msgstr "Materyaller"
+
+#: indico/modules/attachments/clone.py:33
+msgid "The target event already has materials"
+msgstr "Hedef etkinlikte zaten materyal var"
 
 #: indico/modules/attachments/forms.py:29
 #: indico/modules/events/management/util.py:40
@@ -1082,7 +1101,7 @@ msgstr "Başlık"
 #: indico/modules/events/tracks/forms.py:47
 #: indico/modules/networks/forms.py:27
 #: indico/modules/networks/templates/networks.html:91
-#: indico/modules/oauth/forms.py:35 indico/web/fields/base.py:20
+#: indico/modules/oauth/forms.py:36 indico/web/fields/base.py:20
 msgid "Description"
 msgstr "Açıklama"
 
@@ -1171,7 +1190,7 @@ msgstr "Seçili oturumlardan materyaller ekle"
 
 #: indico/modules/attachments/forms.py:148
 #: indico/modules/events/contributions/__init__.py:34
-#: indico/modules/events/contributions/clone.py:87
+#: indico/modules/events/contributions/clone.py:89
 #: indico/modules/events/contributions/templates/management/contributions.html:6
 #: indico/modules/events/management/forms.py:410
 #: indico/modules/events/management/templates/program_codes.html:47
@@ -1605,7 +1624,7 @@ msgstr "Mevcut Parola Yanlış"
 #: indico/modules/auth/forms.py:108 indico/modules/auth/forms.py:116
 #: indico/modules/auth/forms.py:134 indico/modules/bootstrap/forms.py:21
 #: indico/modules/events/abstracts/forms.py:612
-#: indico/modules/users/forms.py:119
+#: indico/modules/users/forms.py:123
 msgid "Email address"
 msgstr "E-Posta Adresi"
 
@@ -1664,8 +1683,8 @@ msgstr "Telefon Numarası"
 #: indico/modules/events/abstracts/forms.py:220
 #: indico/modules/events/abstracts/forms.py:279
 #: indico/modules/events/abstracts/forms.py:648
-#: indico/modules/events/abstracts/templates/reviewing/public.html:262
-#: indico/modules/events/abstracts/templates/reviewing/public.html:380
+#: indico/modules/events/abstracts/templates/reviewing/public.html:264
+#: indico/modules/events/abstracts/templates/reviewing/public.html:382
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75
 #: indico/modules/events/papers/forms.py:72
@@ -1753,7 +1772,8 @@ msgstr "Son Giriş:"
 
 #: indico/modules/auth/templates/accounts.html:81
 #: indico/modules/auth/templates/accounts.html:133
-#: indico/modules/oauth/templates/user_profile.html:32
+#: indico/modules/oauth/templates/user_apps.html:32
+#: indico/modules/oauth/templates/user_tokens.html:82
 #: indico/modules/users/templates/dashboard.html:59
 msgid "Never"
 msgstr "Asla"
@@ -2161,9 +2181,9 @@ msgstr "Sunucuyu Topluluk Merkezine kaydederken beklenmeyen bir istisna oluştu:
 #: indico/modules/categories/forms.py:54
 #: indico/modules/categories/templates/management/content.html:110
 #: indico/modules/events/abstracts/forms.py:453
+#: indico/modules/events/abstracts/lists.py:52
 #: indico/modules/events/layout/forms.py:171
 #: indico/modules/events/papers/models/reviews.py:27
-#: indico/modules/events/papers/templates/display/_paper_list.html:39
 #: indico/modules/news/forms.py:32
 msgid "Content"
 msgstr "İçerik"
@@ -2174,7 +2194,7 @@ msgstr "İçerik"
 #: indico/modules/events/abstracts/templates/management/overview.html:80
 #: indico/modules/events/contributions/templates/management/contributions.html:13
 #: indico/modules/events/management/__init__.py:30
-#: indico/modules/events/management/templates/settings.html:4
+#: indico/modules/events/management/templates/settings.html:5
 #: indico/modules/events/papers/templates/management/overview.html:173
 #: indico/modules/events/sessions/templates/management/session_list.html:14
 #: indico/modules/news/templates/admin/news.html:16
@@ -2342,7 +2362,7 @@ msgstr "Etkinlik oluşturmanın belirli bir kişiler listesi ile kısıtlı olup
 msgid "This category's visibility is currently limited by that of '{}'."
 msgstr "Bu kategorinin görünürlüğü şu anda '{}' ile sınırlandırılmıştır."
 
-#: indico/modules/categories/forms.py:118 indico/modules/events/util.py:651
+#: indico/modules/categories/forms.py:118 indico/modules/events/util.py:652
 msgid "IP networks cannot have management permissions: {}"
 msgstr "IP ağları yönetim izinlerine sahip olamaz: {}"
 
@@ -2468,8 +2488,8 @@ msgstr "Bu kodla bir rol zaten mevcuttur."
 #: indico/modules/categories/util.py:177
 msgid "From the category above"
 msgid_plural "From {} categories above"
-msgstr[0] "{} yukarıdaki kategorilerden"
-msgstr[1] "{}  yukarıdaki kategorilerden"
+msgstr[0] "yukarıdaki kategoriden"
+msgstr[1] "yukarıdaki {} kategoriden"
 
 #: indico/modules/categories/util.py:182
 msgid "From this category only"
@@ -2512,7 +2532,7 @@ msgstr "Bu kategoriye erişim izniniz yok."
 msgid "If you believe you should have access, please contact {}"
 msgstr "Erişime sahip olmanız gerektiğine inanıyorsanız lütfen {} ile iletişime geçin"
 
-#: indico/modules/categories/controllers/display.py:566
+#: indico/modules/categories/controllers/display.py:568
 msgid "There are no upcoming events for this category"
 msgstr "Bu kategori için yaklaşan hiçbir etkinlik yok"
 
@@ -2603,7 +2623,7 @@ msgstr[1] "{0} kategori \"{1}\" konumuna taşındı."
 #: indico/modules/categories/controllers/management.py:375
 msgid "You have deleted one event"
 msgid_plural "You have deleted {} events"
-msgstr[0] "{} etkinlik silinmiştir"
+msgstr[0] "Etkinlik silinmiştir"
 msgstr[1] "{} etkinlik silinmiştir"
 
 #: indico/modules/categories/controllers/management.py:393
@@ -2628,8 +2648,8 @@ msgstr "Etkinlikleri, yalnızca onları oluşturma izniniz olan kategorilere ta�
 #: indico/modules/categories/controllers/management.py:419
 msgid "You have moved one event to the category \"{cat}\""
 msgid_plural "You have moved {count} events to the category \"{cat}\""
-msgstr[0] "{count} etkinliği \"{cat}\" kategorisine taşıdınız"
-msgstr[1] "{count} etkinliği \"{cat}\""
+msgstr[0] "Etkinliği \"{cat}\" kategorisine taşıdınız"
+msgstr[1] "{count} etkinliği \"{cat}\" kategorisine taşıdınız."
 
 #: indico/modules/categories/controllers/util.py:24
 msgctxt "babel date format for category event list headers (month/year only)"
@@ -2735,7 +2755,7 @@ msgstr "Kategori Sayfasına Dön"
 
 #: indico/modules/categories/templates/display/category.html:25
 msgid "Some events in this category have been hidden."
-msgstr "Bu kategorideki bazı olaylar gizlenmiştir"
+msgstr "Bu kategorideki bazı etkinlikler gizlenmiştir"
 
 #: indico/modules/categories/templates/display/category.html:31
 msgid "This category is empty."
@@ -2749,8 +2769,8 @@ msgstr "Aşağıdaki listede bazı etkinlikler gizlenmiştir."
 #, python-format
 msgid "There is one event in the future."
 msgid_plural "There are %(count)s events in the future."
-msgstr[0] "Gelecekte olay vardır."
-msgstr[1] "Gelecekte '%(count)s' olay vardır."
+msgstr[0] "Gelecek bir etkinlik var."
+msgstr[1] "Gelecek '%(count)s' etkinlik var"
 
 #: indico/modules/categories/templates/display/event_list.html:78
 #, python-format
@@ -3369,7 +3389,7 @@ msgstr "Şablon başarıyla kaydedilmiştir"
 #: indico/modules/events/layout/controllers/images.py:72
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
-msgstr[0] "{count} görüntü yüklendi"
+msgstr[0] "Görüntü yüklendi"
 msgstr[1] "{count} görüntü yüklendi"
 
 #: indico/modules/designer/controllers.py:350
@@ -3916,8 +3936,8 @@ msgstr "%(link_start)sSelect an existing template%(link_end)s to be used as the 
 msgid "You have been granted manager/submission privileges for an event."
 msgid_plural ""
 "You have been granted manager/submission privileges for {} events."
-msgstr[0] "{} etkinlikleri için size yönetici/sunma ayrıcalıkları tanındı."
-msgstr[1] "{} etkinlikleri için size yönetici/gönderim ayrıcalıkları tanındı."
+msgstr[0] "Etkinlik için size yönetici/sunma ayrıcalıkları tanındı."
+msgstr[1] "{} etkinlik için size yönetici/gönderim ayrıcalıkları tanındı."
 
 #: indico/modules/events/__init__.py:186
 #: indico/modules/events/abstracts/templates/management/overview.html:17
@@ -3958,17 +3978,25 @@ msgstr "Genel Görünüm"
 msgid "My Conference"
 msgstr "Konferansım"
 
-#: indico/modules/events/clone.py:22
+#: indico/modules/events/clone.py:23
 msgid "Venue/Room"
 msgstr "Yer/Oda"
 
-#: indico/modules/events/clone.py:48
+#: indico/modules/events/clone.py:32
+msgid "The target event already has a venue/room"
+msgstr "Hedef etkinlikte zaten bir mekan/oda var"
+
+#: indico/modules/events/clone.py:50
 msgid "Persons"
 msgstr "Kişiler"
 
+#: indico/modules/events/clone.py:59
+msgid "The target event already has persons"
+msgstr "Hedef etkinlikte zaten kişiler var"
+
 #: indico/modules/events/abstracts/settings.py:74
 #: indico/modules/events/abstracts/settings.py:91
-#: indico/modules/events/clone.py:82
+#: indico/modules/events/clone.py:85
 #: indico/modules/events/contributions/forms.py:69
 #: indico/modules/events/contributions/forms.py:117
 #: indico/modules/events/contributions/lists.py:51
@@ -3978,10 +4006,11 @@ msgstr "Kişiler"
 #: indico/modules/events/management/templates/_settings.html:130
 #: indico/modules/events/persons/templates/management/person_list.html:132
 #: indico/modules/events/persons/templates/management/person_list.html:143
+#: indico/modules/events/reminders/forms.py:37
 msgid "Speakers"
 msgstr "Konuşmacılar"
 
-#: indico/modules/events/clone.py:84
+#: indico/modules/events/clone.py:87
 #: indico/modules/events/management/forms.py:179
 #: indico/modules/events/management/templates/_settings.html:132
 #: indico/modules/events/persons/templates/management/person_list.html:134
@@ -3989,9 +4018,29 @@ msgstr "Konuşmacılar"
 msgid "Chairpersons"
 msgstr "Başkanlar"
 
-#: indico/modules/events/clone.py:113
+#: indico/modules/events/clone.py:96
+msgid "The target event already has speakers"
+msgstr "Hedef etkinlikte zaten konuşmacılar var"
+
+#: indico/modules/events/clone.py:98
+msgid "The target event already has chairpersons"
+msgstr "Hedef etkinliğin zaten başkanları var"
+
+#: indico/modules/events/clone.py:120
 msgid "ACLs and protection settings"
 msgstr "Erişim kontrol listeleri ve koruma ayarları"
+
+#: indico/modules/events/clone.py:128
+msgid "The target event already has an access key"
+msgstr "Hedef etkinliğin zaten bir erişim anahtarı var"
+
+#: indico/modules/events/clone.py:132
+msgid "The target event already has a custom ACL"
+msgstr "Hedef etkinliğin zaten özel bir ACL'i var "
+
+#: indico/modules/events/cloning.py:186
+msgid "Importing data is not supported"
+msgstr "Verileri içe aktarma desteklenmiyor"
 
 #: indico/modules/events/fields.py:35
 #: indico/modules/events/registration/templates/display/_registration_summary_blocks.html:117
@@ -4102,39 +4151,39 @@ msgstr "Puandan hariç tut"
 msgid "Rating"
 msgstr "Puanlama"
 
-#: indico/modules/events/util.py:57
+#: indico/modules/events/util.py:58
 msgid "This event has been locked so no modifications are possible."
 msgstr "Bu etkinlik kilitlenmiştir; dolayısıyla herhangi bir değişiklik yapmak mümkün değildir."
 
-#: indico/modules/events/util.py:121
+#: indico/modules/events/util.py:122
 msgid "The theme '{}' is not valid for this event."
 msgstr "'{}' teması bu etkinlik için geçerli değildir."
 
-#: indico/modules/events/util.py:123
+#: indico/modules/events/util.py:124
 msgid "The theme '{}' does not exist."
 msgstr "'{}' teması mevcut değildir."
 
-#: indico/modules/events/util.py:444
+#: indico/modules/events/util.py:445
 msgid ""
 "Your action requires modification of event boundaries, but you are not "
 "authorized to manage the event."
 msgstr "Eyleminiz etkinlik sınırlarında değişiklik yapılmasını gerektirmektedir ancak bu etkinliği yönetme izniniz bulunmamaktadır."
 
-#: indico/modules/events/util.py:448
+#: indico/modules/events/util.py:449
 msgid ""
 "Your action requires modification of session block boundaries, but you are "
 "not authorized to manage the session block."
 msgstr "Eyleminiz oturum öbeği sınırlarının değiştirilmesini gerektirmektedir ancak oturum öbeği yönetme yetkiniz yoktur."
 
-#: indico/modules/events/util.py:654
+#: indico/modules/events/util.py:655
 msgid "Registrants cannot have management permissions: {}"
 msgstr "Kaydettirenler yönetim izinlerine sahip olamaz: {}"
 
-#: indico/modules/events/util.py:664 indico/modules/events/util.py:667
+#: indico/modules/events/util.py:665 indico/modules/events/util.py:668
 msgid "Invalid event URL"
 msgstr "Geçersiz etkinlik URL'si "
 
-#: indico/modules/events/util.py:671
+#: indico/modules/events/util.py:672
 msgid "This event does not exist"
 msgstr "Etkinlik mevcut değil"
 
@@ -4193,6 +4242,14 @@ msgstr "Gözden Geçirme Alanı"
 #: indico/modules/events/abstracts/clone.py:21
 msgid "Call for Abstracts (settings, email templates, review questions)"
 msgstr "Özet Çağrısı (ayarlar, e-posta şablonları, gözden geçirme soruları)"
+
+#: indico/modules/events/abstracts/clone.py:32
+msgid "The target event already has review questions"
+msgstr "Hedef etkinlikte zaten değerlendirme soruları var"
+
+#: indico/modules/events/abstracts/clone.py:35
+msgid "The target event already has email templates"
+msgstr "Hedef etkinlikte zaten e-posta şablonları var"
 
 #: indico/modules/events/abstracts/fields.py:84
 msgid "Rules may not be empty"
@@ -4835,16 +4892,16 @@ msgstr "Gönderim tarihi"
 msgid "Modification date"
 msgstr "Değişiklik tarihi"
 
-#: indico/modules/events/abstracts/lists.py:200
+#: indico/modules/events/abstracts/lists.py:201
 msgid ""
 "The abstract '{}' is not displayed in the list due to the enabled filters"
 msgstr "Etkinleştirilen süzgeçler nedeniyle '{}' özeti listede görüntülenmemektedir"
 
-#: indico/modules/events/abstracts/lists.py:219
+#: indico/modules/events/abstracts/lists.py:220
 msgid "Proposed for multiple tracks"
 msgstr "Birden çok grup için önerilmiştir"
 
-#: indico/modules/events/abstracts/lists.py:220
+#: indico/modules/events/abstracts/lists.py:221
 msgid "Must have comments"
 msgstr "Yorumlar olmalı"
 
@@ -5051,15 +5108,15 @@ msgstr "Özet başarılı biçimde değiştirildi"
 #: indico/modules/events/abstracts/controllers/abstract_list.py:74
 msgid "One abstract has been judged."
 msgid_plural "{num} abstracts have been judged."
-msgstr[0] "{num} özetler hakem kontrolünden geçti."
-msgstr[1] "{num} özetler hakem kontrolünden geçti"
+msgstr[0] "Özet hakem kontrolünden geçti."
+msgstr[1] "{num} özet hakem kontrolünden geçti"
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py:78
 msgid "One abstract has been skipped since it is already judged."
 msgid_plural ""
 "{num} abstracts have been skipped since they are already judged."
-msgstr[0] "{num} özetler, önceden hakem kontrolünden geçtiklerinden atlanmıştır."
-msgstr[1] "{num} özetler, önceden hakem kontrolünden geçtiklerinden atlanmıştır."
+msgstr[0] "Bir özet, önceden hakem kontrolünden geçtiklerinden atlanmıştır."
+msgstr[1] "{num} özet, önceden hakem kontrolünden geçtiklerinden atlanmıştır."
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py:82
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:110
@@ -5079,13 +5136,13 @@ msgstr "'{}' özeti başarılı biçimde oluşturuldu"
 #: indico/modules/events/abstracts/controllers/abstract_list.py:159
 msgid "The abstract has been deleted."
 msgid_plural "{count} abstracts have been deleted."
-msgstr[0] "{count} özet silindi."
+msgstr[0] "Özet silindi."
 msgstr[1] "{count} özet silindi."
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py:163
 msgid "The linked contribution has been deleted."
 msgid_plural "{count} linked contributions have been deleted."
-msgstr[0] "{count} bağlantılı katkı silinmiştir."
+msgstr[0] "Bağlantılı katkı silinmiştir."
 msgstr[1] "{count} bağlantılı katkı silinmiştir."
 
 #: indico/modules/events/abstracts/controllers/boa.py:37
@@ -5521,17 +5578,17 @@ msgid "You have reviewed this abstract"
 msgstr "Bu özeti gözden geçirdiniz"
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:235
-#: indico/modules/events/abstracts/templates/reviewing/public.html:448
+#: indico/modules/events/abstracts/templates/reviewing/public.html:450
 msgid "Go to contribution"
 msgstr "Katkıya git"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:247
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:255
 msgid ""
 "The filtering criteria do not match with any of the existing abstracts. Try "
 "to clear the filters."
 msgstr "Süzgeçleme kriterleri var olan özetlerden hiçbiri ile eşleşmiyor. Süzgeçleri kaldırmayı deneyin."
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:251
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:259
 msgid "There are no abstracts yet."
 msgstr "Henüz hiçbir özet yoktur."
 
@@ -6169,14 +6226,14 @@ msgid "Download abstract submission in PDF"
 msgstr "Özet gönderisini PDF olarak indir"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:121
-#: indico/modules/events/abstracts/templates/reviewing/public.html:296
+#: indico/modules/events/abstracts/templates/reviewing/public.html:298
 msgid "Author:"
 msgid_plural "Authors:"
 msgstr[0] "Ortak yazarlar:"
 msgstr[1] "Yazarlar:"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:134
-#: indico/modules/events/abstracts/templates/reviewing/public.html:321
+#: indico/modules/events/abstracts/templates/reviewing/public.html:323
 msgid "Co-author:"
 msgid_plural "Co-authors:"
 msgstr[0] "Ortak yazarlar:"
@@ -6188,7 +6245,7 @@ msgid "<strong>%(name)s</strong> was invited to submit an abstract"
 msgstr "<strong>%(name)s</strong> bir özet göndermesi için davet edilmiştir"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:164
-#: indico/modules/events/abstracts/templates/reviewing/public.html:402
+#: indico/modules/events/abstracts/templates/reviewing/public.html:404
 #, python-format
 msgid "<strong>%(name)s</strong> submitted this abstract"
 msgstr "<strong>%(name)s</strong> bu özeti göndermiştir"
@@ -6237,47 +6294,47 @@ msgstr "Özet kabul edilmiştir ve %(link_start)s etkinlikte bir katkı %(link_e
 msgid "The abstract was rejected."
 msgstr "Özet reddedilmiştir."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:250
+#: indico/modules/events/abstracts/templates/reviewing/public.html:252
 #, python-format
 msgid "The abstract was merged into %(link_start)s%(other)s%(link_end)s."
 msgstr "Özet %(link_start)s%(other)s%(link_end)s ile birleştirilmiştir."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:256
+#: indico/modules/events/abstracts/templates/reviewing/public.html:258
 #, python-format
 msgid ""
 "The abstract was marked as a duplicate of "
 "%(link_start)s%(other)s%(link_end)s"
 msgstr "Özet %(link_start)s%(other)s%(link_end)s bir kopyası olarak işaretlendi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:276
+#: indico/modules/events/abstracts/templates/reviewing/public.html:278
 msgid "As contribution type:"
 msgstr "Katkı türü olarak:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:284
-#: indico/modules/events/abstracts/templates/reviewing/public.html:409
+#: indico/modules/events/abstracts/templates/reviewing/public.html:286
+#: indico/modules/events/abstracts/templates/reviewing/public.html:411
 msgid "For track:"
 msgid_plural "For tracks:"
 msgstr[0] "Gruplar için:"
 msgstr[1] "Gruplar için:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:346
+#: indico/modules/events/abstracts/templates/reviewing/public.html:348
 msgid "Speaker:"
 msgid_plural "Speakers:"
 msgstr[0] "Konuşmacı Listesi"
 msgstr[1] "Konuşmacılar:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:370
+#: indico/modules/events/abstracts/templates/reviewing/public.html:372
 msgid "More information"
 msgstr "Daha fazla bildi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:398
+#: indico/modules/events/abstracts/templates/reviewing/public.html:400
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this <span class=\"abstract-"
 "contribution-type\">%(type)s</span>"
 msgstr "<strong>%(name)s</strong> bu <span class=\"abstract-contribution-type\">%(type)s</span> özet türünü gönderdi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:420
+#: indico/modules/events/abstracts/templates/reviewing/public.html:422
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
@@ -6285,94 +6342,94 @@ msgid ""
 "type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> bu özeti gönderdi ve özet en sonunda %(track)s grubu için<span class=\"abstract-contribution-type\">%(type)s</span> olarak kabul edildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:428
+#: indico/modules/events/abstracts/templates/reviewing/public.html:430
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted as <span class=\"abstract-contribution-type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> bu özeti gönderdi ve özet en sonunda <span class=\"abstract-contribution-type\">%(type)s</span> türü olarak kabul edildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:434
+#: indico/modules/events/abstracts/templates/reviewing/public.html:436
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s."
 msgstr "<strong>%(name)s</strong>bu özeti gönderdi ve özet en sonunda %(track)s grubu için kabul edildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:440
+#: indico/modules/events/abstracts/templates/reviewing/public.html:442
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted."
 msgstr "<strong>%(name)s</strong> bu özeti gönderdi ve özet en sonunda kabul edildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:454
+#: indico/modules/events/abstracts/templates/reviewing/public.html:456
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was merged into "
 "another."
 msgstr "<strong>%(name)s</strong>  bu özeti gönderdi ancak özet başka bir özetle birleştirildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:460
-#: indico/modules/events/abstracts/templates/reviewing/public.html:471
+#: indico/modules/events/abstracts/templates/reviewing/public.html:462
+#: indico/modules/events/abstracts/templates/reviewing/public.html:473
 #, python-format
 msgid "<a href=\"%(url)s\">Go to abstract</a>"
 msgstr "<a href=\"%(url)s\">Özete git</a>"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:466
+#: indico/modules/events/abstracts/templates/reviewing/public.html:468
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was marked as "
 "duplicate of another."
 msgstr "<strong>%(name)s</strong>  bu özeti gönderdi ancak özet başka bir özetin kopyası olarak işaretlendi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:477
+#: indico/modules/events/abstracts/templates/reviewing/public.html:479
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit this abstract"
 msgstr "<strong>%(name)s</strong>bu özeti göndermesi için davet edildi "
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:513
+#: indico/modules/events/abstracts/templates/reviewing/public.html:515
 msgid "No answer"
 msgstr "Cevap yok"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:522
+#: indico/modules/events/abstracts/templates/reviewing/public.html:524
 #, python-format
 msgid "<strong>%(name)s</strong> withdrew this abstract"
 msgstr "<strong>%(name)s</strong> bu özeti geri çekti"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:527
+#: indico/modules/events/abstracts/templates/reviewing/public.html:529
 #, python-format
 msgid "<strong>%(name)s</strong> accepted this abstract"
 msgstr "<strong>%(name)s</strong> bu özeti kabul etti"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:531
+#: indico/modules/events/abstracts/templates/reviewing/public.html:533
 #, python-format
 msgid "<strong>%(name)s</strong> rejected this abstract"
 msgstr "<strong>%(name)s</strong> bu özeti reddetti"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:535
+#: indico/modules/events/abstracts/templates/reviewing/public.html:537
 #, python-format
 msgid "<strong>%(name)s</strong> merged this abstract into another"
 msgstr "<strong>%(name)s</strong> bu özeti başka bir özetle birleştirdi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:539
+#: indico/modules/events/abstracts/templates/reviewing/public.html:541
 #, python-format
 msgid "<strong>%(name)s</strong> marked this abstract as duplicate of another"
 msgstr "<strong>%(name)s</strong> bu özeti başka bir özetin kopyası olarak işaretledi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:545
+#: indico/modules/events/abstracts/templates/reviewing/public.html:547
 msgid "This abstract was accepted"
 msgstr "Bu özet kabul edildi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:547
+#: indico/modules/events/abstracts/templates/reviewing/public.html:549
 msgid "This abstract was rejected"
 msgstr "Bu özet reddedildi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:549
+#: indico/modules/events/abstracts/templates/reviewing/public.html:551
 msgid "This abstract was merged"
 msgstr "Bu özet birleştirildi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:551
+#: indico/modules/events/abstracts/templates/reviewing/public.html:553
 msgid "This abstract was marked as duplicate"
 msgstr "Bu özet kopya olarak işaretlendi"
 
@@ -6749,7 +6806,7 @@ msgid ""
 "You have been granted manager/submission privileges for a contribution."
 msgid_plural ""
 "You have been granted manager/submission privileges for {} contributions."
-msgstr[0] " {} katkıları için size yönetici/sunan ayrıcalıkları tanındı."
+msgstr[0] " Katkı için size yönetici/gönderim ayrıcalıkları tanındı."
 msgstr[1] " {} katkıları için size yönetici/gönderim ayrıcalıkları tanındı."
 
 #: indico/modules/events/contributions/__init__.py:96
@@ -6772,9 +6829,21 @@ msgstr "Yazar Listesi"
 msgid "Speaker List"
 msgstr "Konuşmacı Listesi"
 
-#: indico/modules/events/contributions/clone.py:60
+#: indico/modules/events/contributions/clone.py:42
+msgid "The target event already has contribution types"
+msgstr "Hedef etkinliğin zaten katkı türleri mevcut"
+
+#: indico/modules/events/contributions/clone.py:61
 msgid "Contribution fields"
 msgstr "Katkı alanları"
+
+#: indico/modules/events/contributions/clone.py:69
+msgid "The target event already has contribution fields"
+msgstr "Hedef etkinliğin zaten katkı alanları mevcut"
+
+#: indico/modules/events/contributions/clone.py:99
+msgid "The target event already has contributions"
+msgstr "Hedef etkinliğin zaten katkıları var"
 
 #: indico/modules/events/contributions/contrib_fields.py:27
 #: indico/web/fields/base.py:19
@@ -6992,8 +7061,8 @@ msgstr "'{}' Katkısı başarıyla güncellendi"
 #: indico/modules/events/contributions/controllers/management.py:223
 msgid "The contribution has been deleted."
 msgid_plural "{count} contributions have been deleted."
-msgstr[0] "{count} katkıları silinmiştir."
-msgstr[1] "{count} katkıları silinmiştir."
+msgstr[0] "Katkı silinmiştir."
+msgstr[1] "{count} katkı silinmiştir."
 
 #: indico/modules/events/contributions/controllers/management.py:248
 msgid "Contribution '{}' successfully deleted"
@@ -7310,6 +7379,16 @@ msgstr "'%(title)s' katkısını sil?"
 msgid "Are you sure you want to completely delete contribution '%(title)s'?"
 msgstr "'%(title)s' katkısını tamamen silmek istediğinizden emin misiniz?"
 
+#: indico/modules/events/contributions/templates/management/_draft_mode_warning.html:6
+msgid "Contributions are in draft mode"
+msgstr "Katkılar taslak modunda"
+
+#: indico/modules/events/contributions/templates/management/_draft_mode_warning.html:7
+msgid ""
+"While in draft mode, regular users cannot see the contributions and "
+"timetable."
+msgstr "Taslak modundayken, normal kullanıcılar katkıları ve zaman çizelgesini görememektedir."
+
 #: indico/modules/events/contributions/templates/management/_subcontribution_list.html:23
 #: indico/modules/events/contributions/templates/management/_subcontribution_list.html:27
 msgid "Add new subcontribution"
@@ -7452,7 +7531,7 @@ msgstr "CSV Dosyasından katkıları içe aktar"
 
 #: indico/modules/events/contributions/templates/management/contributions.html:147
 #: indico/modules/events/management/templates/_action_menu.html:102
-#: indico/modules/events/management/templates/import_event.html:75
+#: indico/modules/events/management/templates/import_event.html:68
 #: indico/modules/events/registration/templates/management/regform_reglist.html:97
 #: indico/modules/events/surveys/templates/management/survey_questionnaire.html:22
 msgid "Import"
@@ -7682,8 +7761,8 @@ msgid "Tag code must be unique"
 msgstr "Etiket kodu benzersiz olmalıdır"
 
 #: indico/modules/events/editing/schemas.py:358
-#: indico/modules/rb/schemas.py:393 indico/modules/rb/schemas.py:418
-#: indico/modules/rb/schemas.py:435 indico/modules/rb/schemas.py:453
+#: indico/modules/rb/schemas.py:395 indico/modules/rb/schemas.py:420
+#: indico/modules/rb/schemas.py:437 indico/modules/rb/schemas.py:455
 msgid "Name must be unique"
 msgstr "Ad eşsiz olmalıdır"
 
@@ -7861,7 +7940,6 @@ msgstr "Etkinliğiniz için çeşitli özellikleri etkinleştirebilirsiniz / dev
 #: indico/modules/events/layout/templates/layout_conference.html:6
 #: indico/modules/events/layout/templates/layout_meeting_lecture.html:6
 #: indico/modules/events/papers/models/reviews.py:27
-#: indico/modules/events/papers/templates/display/_paper_list.html:31
 msgid "Layout"
 msgstr "Düzen"
 
@@ -7887,7 +7965,11 @@ msgid ""
 "pages."
 msgstr "Etkinlik yöneticilerinin etkinliğe daha sonra HTML kodundan kullanılabilecek görüntüler eklemesine olanak tanır. Örneğin sponsor logoları ve özel konferans sayfaları için çok yararlı bir özelliktir."
 
-#: indico/modules/events/layout/clone.py:48
+#: indico/modules/events/layout/clone.py:32
+msgid "The target event already has images"
+msgstr "Hedef etkinlikte zaten resimler var"
+
+#: indico/modules/events/layout/clone.py:49
 msgid "Layout settings and menu customization"
 msgstr "Düzen ayarları ve menü özelleştirme"
 
@@ -8188,7 +8270,7 @@ msgstr "Başlık Stili"
 #: indico/modules/events/timetable/__init__.py:31
 #: indico/modules/events/timetable/__init__.py:41
 #: indico/modules/events/timetable/clone.py:21
-#: indico/modules/events/timetable/templates/management.html:5
+#: indico/modules/events/timetable/templates/management.html:6
 msgid "Timetable"
 msgstr "Zaman çizelgesi"
 
@@ -8288,7 +8370,7 @@ msgstr "Katılımcılar"
 
 #: indico/modules/events/logs/models/entries.py:18
 #: indico/modules/events/management/forms.py:192
-#: indico/modules/users/__init__.py:66
+#: indico/modules/users/__init__.py:67
 #: indico/modules/users/templates/emails.html:9
 msgid "Emails"
 msgstr "E-postalar"
@@ -8595,6 +8677,14 @@ msgstr "Oturum öbekleri"
 msgid "Event URL"
 msgstr "Etkinlik URL'si"
 
+#: indico/modules/events/management/forms.py:444
+msgid "There is nothing to import"
+msgstr "İçe aktaracak bir şey yok"
+
+#: indico/modules/events/management/forms.py:450
+msgid "This option depends on other options which are unavailable"
+msgstr "Bu seçenek kullanılamayan diğer seçeneklere bağlıdır"
+
 #: indico/modules/events/management/program_codes.py:50
 msgid ""
 "The ID of the contribution (optionally padded with zeros, e.g. {id:2} for "
@@ -8692,7 +8782,7 @@ msgstr " \"{name}\" ekini düzenle"
 #: indico/modules/events/management/util.py:185
 msgid "You have added a user with no Indico account."
 msgid_plural "You have added {} users with no Indico account."
-msgstr[0] "Indico hesabı olmayan {} kullanıcı eklediniz."
+msgstr[0] "Indico hesabı olmayan bir kullanıcı eklediniz."
 msgstr[1] "Indico hesabı olmayan {} kullanıcı eklediniz."
 
 #: indico/modules/events/management/util.py:187
@@ -9080,12 +9170,12 @@ msgid ""
 msgstr "%(count)syeni etkinlik oluşturulacak. %(lastday)s<strong>Eşlemlenen tüm etkinlikler ayın son gününde gerçekleşecektir.</strong>%(endlastday)s %(link)sNe zaman?%(endlink)s"
 
 #: indico/modules/events/management/templates/clone_event.html:113
-#: indico/modules/events/management/templates/import_event.html:77
+#: indico/modules/events/management/templates/import_event.html:70
 msgid "Next"
 msgstr "Sonraki"
 
 #: indico/modules/events/management/templates/clone_event.html:123
-#: indico/modules/events/management/templates/import_event.html:87
+#: indico/modules/events/management/templates/import_event.html:80
 msgid "Previous"
 msgstr "Önceki"
 
@@ -9095,7 +9185,7 @@ msgid ""
 "Please note that if you delete the event you will lose all the information "
 "contained in it, %(strong)sincluding %(num_bookings)s Room "
 "Booking(s)%(endstrong)s linked to it. This operation is irreversible!"
-msgstr "Lütfen etkinliği silmeniz halinde içindeki %(strong)sona bağlanan %(num_bookings)s Oda Rezervasyonları%(endstrong)s da dahil tüm bilgileri kaybedeceğinize dikkat edin. Bu işlem geri döndürülemez!"
+msgstr "Lütfen etkinliği silmeniz halinde içindeki %(strong)sona bağlanan %(num_bookings)s Oda Rezervasyon(ları)%(endstrong)s da dahil tüm bilgileri kaybedeceğinize dikkat edin. Bu işlem geri döndürülemez!"
 
 #: indico/modules/events/management/templates/delete_event.html:12
 msgid ""
@@ -9120,7 +9210,7 @@ msgid ""
 "Please note that if you delete the events you will lose all the information "
 "contained in them, %(strong)sincluding %(num_bookings)s Room "
 "Booking(s)%(endstrong)s. This operation is irreversible!"
-msgstr "Lütfen etkinlikleri silmeniz halinde içindeki %(strong)sonlara bağlanan %(num_bookings)s Oda Rezervasyonları%(endstrong)s da dahil tüm bilgileri kaybedeceğinize dikkat edin. Bu işlem geri döndürülemez!"
+msgstr "Lütfen etkinlikleri silmeniz halinde içindeki %(strong)sonlara bağlanan %(num_bookings)s Oda Rezervasyon(ları)%(endstrong)s da dahil tüm bilgileri kaybedeceğinize dikkat edin. Bu işlem geri döndürülemez!"
 
 #: indico/modules/events/management/templates/delete_events.html:13
 msgid ""
@@ -9186,18 +9276,6 @@ msgstr "Aşağıdaki etkinlikten içe veri aktaracaksınız:"
 msgid "What should be imported?"
 msgstr "Ne içe aktarılmalıdır?"
 
-#: indico/modules/events/management/templates/import_event.html:61
-msgid "Some options might not be available because:"
-msgstr "Bazı seçenekler aşağıdaki nedenlerden ötürü mevcut olmayabilir:"
-
-#: indico/modules/events/management/templates/import_event.html:63
-msgid "target event already has data in the module"
-msgstr "hedef etkinliğin verileri modülde zaten mevcut"
-
-#: indico/modules/events/management/templates/import_event.html:64
-msgid "source event does not have any data in the module"
-msgstr "kaynak etkinliğin modülde herhangi bir verisi yok"
-
 #: indico/modules/events/management/templates/lock_event.html:4
 msgid ""
 "Please note that if you lock this event, you will not be able to change it "
@@ -9256,31 +9334,17 @@ msgstr "Katkılara program kodları ata"
 msgid "Assign program codes to subcontributions"
 msgstr "Alt katkılara program kodları ata"
 
-#: indico/modules/events/management/templates/settings.html:13
+#: indico/modules/events/management/templates/settings.html:14
 msgid "Book the event location"
 msgstr "Etkinlik konumunu rezerve edin"
 
-#: indico/modules/events/management/templates/settings.html:14
+#: indico/modules/events/management/templates/settings.html:15
 msgid "There is no active booking linked to this event."
 msgstr "Bu etkinliğe bağlı herhangi bir aktif rezervasyon yoktur."
 
-#: indico/modules/events/management/templates/settings.html:22
+#: indico/modules/events/management/templates/settings.html:23
 msgid "Book the room"
 msgstr "Odayı rezerve et"
-
-#: indico/modules/events/management/templates/settings.html:34
-msgid "Contributions are in draft mode"
-msgstr "Katkılar taslak modunda"
-
-#: indico/modules/events/management/templates/settings.html:35
-msgid ""
-"While in draft mode, regular users cannot see the contributions and "
-"timetable."
-msgstr "Taslak modundayken, normal kullanıcılar katkıları ve zaman çizelgesini görememektedir."
-
-#: indico/modules/events/management/templates/settings.html:43
-msgid "Manage Contributions"
-msgstr "Katkıları Yönet"
 
 #: indico/modules/events/models/events.py:51
 #: indico/modules/events/templates/management/_create_event_button.html:8
@@ -9297,11 +9361,15 @@ msgstr "Toplantı"
 msgid "Conference"
 msgstr "Konferans"
 
-#: indico/modules/events/notes/clone.py:19
+#: indico/modules/events/notes/clone.py:20
 #: indico/modules/events/notes/forms.py:17
 #: indico/modules/events/notes/templates/_note.html:23
 msgid "Minutes"
 msgstr "Tutanaklar"
+
+#: indico/modules/events/notes/clone.py:29
+msgid "The target event already has minutes"
+msgstr "Hedef etkinliğin zaten tutanakları var"
 
 #: indico/modules/events/notes/templates/_note.html:38
 msgid "There are minutes attached to this event."
@@ -9483,8 +9551,8 @@ msgstr "Ekibin üyeleri başarıyla güncellendi"
 #: indico/modules/events/papers/controllers/management.py:81
 msgid "Users have been removed from 1 contribution"
 msgid_plural "Users have been removed from {} contributions"
-msgstr[0] "Kullanıcılar {} katkıdan kaldırılmıştır"
-msgstr[1] "Kullanıcılar {} katkılarından kaldırılmıştır"
+msgstr[0] "Kullanıcılar 1 katkıdan kaldırılmıştır"
+msgstr[1] "Kullanıcılar {} katkıdan kaldırılmıştır"
 
 #: indico/modules/events/papers/controllers/management.py:117
 msgid "Team competences were updated successfully"
@@ -9525,8 +9593,8 @@ msgstr "Hakemlik son tarihi ayarlandı."
 #: indico/modules/events/papers/controllers/paper.py:173
 msgid "One paper has been judged."
 msgid_plural "{num} papers have been judged."
-msgstr[0] "{num} makale hakemlerce değerlendirildi"
-msgstr[1] "{num} makale hakemlerce değerlendirildi"
+msgstr[0] "Makale hakemlerce değerlendirildi"
+msgstr[1] "{num} makale hakemlerce değerlendirildi."
 
 #: indico/modules/events/papers/controllers/paper.py:177
 msgid ""
@@ -9535,8 +9603,8 @@ msgid ""
 msgid_plural ""
 "{num} contributions have been skipped since they have no paper submitted yet"
 " or they are in a final state."
-msgstr[0] "Henüz sunulan hiçbir makaleleri olmadığı veya nihai durumda oldukları oldukları için {num} katkı atlanmıştır."
-msgstr[1] "Henüz gönderilen hiçbir makaleleri olmadığı veya nihai durumda oldukları oldukları için {num} katkı atlanmıştır."
+msgstr[0] "Henüz sunulan hiçbir makaleleri olmadığı veya nihai durumda oldukları oldukları için katkı atlanmıştır."
+msgstr[1] "Henüz gönderilen hiçbir makale olmadığı veya nihai durumda oldukları oldukları için {num} katkı atlanmıştır."
 
 #: indico/modules/events/papers/controllers/paper.py:206
 msgid "Paper reviewing roles have been assigned."
@@ -9657,8 +9725,8 @@ msgid "Paper not yet submitted"
 msgstr "Makaleler henüz gönderilmedi"
 
 #: indico/modules/events/papers/templates/_paper_list.html:118
-msgid "No submission"
-msgstr "Gönderim yok"
+msgid "Not submitted"
+msgstr "Gönderilmedi"
 
 #: indico/modules/events/papers/templates/_paper_list.html:232
 msgid "Assign judges to selected contributions"
@@ -9782,11 +9850,25 @@ msgstr "Yeni makale gönder"
 msgid "Select contribution"
 msgstr "Katkı seç"
 
-#: indico/modules/events/papers/templates/display/_paper_list.html:33
-#: indico/modules/events/papers/templates/display/_paper_list.html:41
-#: indico/modules/events/templates/reviews/_omnibox.html:76
-msgid "Already reviewed"
-msgstr "Önceden gözden geçirildi"
+#: indico/modules/events/papers/templates/display/_paper_list.html:36
+msgid "Submitted for reviewing"
+msgstr "İncelenmek üzere gönderildi"
+
+#: indico/modules/events/papers/templates/display/_paper_list.html:44
+msgid "You have submitted a content review"
+msgstr "İçerik incelemesi gönderdiniz"
+
+#: indico/modules/events/papers/templates/display/_paper_list.html:50
+msgid "Your content review is pending"
+msgstr "İçerik incelemeniz beklemede"
+
+#: indico/modules/events/papers/templates/display/_paper_list.html:58
+msgid "You have submitted a layout review"
+msgstr "Düzen incelemesi gönderdiniz"
+
+#: indico/modules/events/papers/templates/display/_paper_list.html:64
+msgid "Your layout review is pending"
+msgstr "Düzen incelemeniz beklemede"
 
 #: indico/modules/events/papers/templates/display/call_for_papers.html:29
 #: indico/modules/events/papers/templates/management/overview.html:149
@@ -10351,13 +10433,13 @@ msgstr "Katılımcı Rolleri"
 #: indico/modules/events/surveys/controllers/management/survey.py:151
 msgid "Your email has been sent."
 msgid_plural "{} emails have been sent."
-msgstr[0] "{} e-posta gönderildi"
+msgstr[0] "e-postanız gönderildi"
 msgstr[1] "{} e-posta gönderildi"
 
 #: indico/modules/events/persons/controllers.py:321
 msgid "Submission rights have been granted to one speaker"
 msgid_plural "Submission rights have been granted to {} speakers"
-msgstr[0] " {} konuşmacılara sunma hakları tanındı"
+msgstr[0] " Konuşmacıya gönderim hakkı tanındı"
 msgstr[1] " {} konuşmacılara gönderim hakları tanındı"
 
 #: indico/modules/events/persons/controllers.py:339
@@ -10370,8 +10452,8 @@ msgstr[1] "{} oturum organizatörlerine oturum değişiklik hakları tanındı"
 #: indico/modules/events/persons/controllers.py:358
 msgid "Submission rights have been revoked from one user"
 msgid_plural "Submission rights have been revoked from {} users"
-msgstr[0] " {} kullanıcıların sunma hakları iptal edildi"
-msgstr[1] " {} kullanıcıların gönderim hakları iptal edildi"
+msgstr[0] " Kullanıcının sunma hakları iptal edildi"
+msgstr[1] " {} kullanıcının gönderim hakları iptal edildi"
 
 #: indico/modules/events/persons/forms.py:24
 #: indico/modules/events/registration/forms.py:221
@@ -10568,7 +10650,7 @@ msgstr "Katılımcı Listesi"
 #: indico/modules/events/registration/__init__.py:143
 msgid "A registration has been linked to your account."
 msgid_plural "{n} registrations have been linked to your account."
-msgstr[0] "{n} kayıt hesabınıza bağlanmıştır."
+msgstr[0] "Kayıt hesabınıza bağlanmıştır."
 msgstr[1] "{n} kayıt hesabınıza bağlanmıştır."
 
 #: indico/modules/events/registration/__init__.py:200
@@ -10590,11 +10672,19 @@ msgstr "Şablon boyutları seçtiğiniz sayfa için çok büyüktür"
 msgid "Registration forms"
 msgstr "Kayıt formları"
 
-#: indico/modules/events/registration/clone.py:88
+#: indico/modules/events/registration/clone.py:36
+msgid "The target event already has registration forms"
+msgstr "Hedef etkinlikte zaten kayıt formları var"
+
+#: indico/modules/events/registration/clone.py:89
 #: indico/modules/events/registration/templates/management/regform_list.html:84
 #: indico/modules/events/registration/templates/management/regform_stats.html:37
 msgid "Registrations"
 msgstr "Kayıtlar"
+
+#: indico/modules/events/registration/clone.py:106
+msgid "The target event already has registrations"
+msgstr "Hedef etkinlikte zaten kayıtlar var"
 
 #: indico/modules/events/registration/forms.py:42
 msgid ""
@@ -10742,7 +10832,7 @@ msgid ""
 msgstr "Kayıtları tamamlamak için gönderilen e-postalardaki metin (Markdown sözdizimi)"
 
 #: indico/modules/events/registration/forms.py:98
-#: indico/modules/events/reminders/forms.py:45
+#: indico/modules/events/reminders/forms.py:47
 msgid "Attach iCalendar file"
 msgstr "iCalendar dosyası ekle"
 
@@ -10825,7 +10915,7 @@ msgid "There is already a registration with this email address."
 msgstr "Bu e-posta adresinde zaten bir kayıt mevcuttur."
 
 #: indico/modules/events/registration/forms.py:189
-#: indico/modules/users/__init__.py:57
+#: indico/modules/users/__init__.py:58
 #: indico/modules/users/templates/users_admin.html:5
 msgid "Users"
 msgstr "Kullanıcılar"
@@ -11108,7 +11198,7 @@ msgstr "Kaydolma davetini reddetdiniz."
 #: indico/modules/events/registration/controllers/management/invitations.py:73
 msgid "The invitation has been sent."
 msgid_plural "{n} invitations have been sent."
-msgstr[0] "{n} davetiye gönderilmiştir."
+msgstr[0] "Davetiye gönderilmiştir."
 msgstr[1] "{n} davetiye gönderilmiştir."
 
 #: indico/modules/events/registration/controllers/management/regforms.py:62
@@ -11150,7 +11240,7 @@ msgstr "Seçili kaydettirenler kaldırıldı."
 #: indico/modules/events/registration/controllers/management/reglists.py:225
 msgid "The email was sent."
 msgid_plural "{num} emails were sent."
-msgstr[0] "{num} e-posta gönderildi."
+msgstr[0] "e-posta gönderildi."
 msgstr[1] "{num} e-posta gönderildi."
 
 #: indico/modules/events/registration/controllers/management/reglists.py:247
@@ -12400,6 +12490,10 @@ msgstr "Kayıtları yeniden zamanla"
 msgid "Reminders"
 msgstr "Anımsatıcılar"
 
+#: indico/modules/events/reminders/__init__.py:70
+msgid "The target event already has reminders"
+msgstr "Hedef etkinlikte zaten hatırlatıcılar var"
+
 #: indico/modules/events/reminders/controllers.py:55
 msgid "Sent reminders cannot be deleted."
 msgstr "Gönderilen anımsatıcılar silinemez."
@@ -12454,50 +12548,52 @@ msgid "Send the reminder to all participants/registrants of the event."
 msgstr "Etkinliğin tüm katılımcılarına / kaydettirenlerine hatırlatma mesajı gönderin."
 
 #: indico/modules/events/reminders/forms.py:38
+msgid "Send the reminder to all speakers/chairpersons of the event."
+msgstr "Hatırlatıcıyı etkinliğin tüm konuşmacılarına/başkanlarına gönderin."
+
+#: indico/modules/events/reminders/forms.py:40
 msgid "Sender"
 msgstr "Gönderici"
 
-#: indico/modules/events/reminders/forms.py:39
+#: indico/modules/events/reminders/forms.py:41
 msgid "The email address that will show up as the sender."
 msgstr "Gönderici olarak görünecek e-posta adresi"
 
-#: indico/modules/events/reminders/forms.py:40
+#: indico/modules/events/reminders/forms.py:42
 msgid "Note"
 msgstr "Not"
 
-#: indico/modules/events/reminders/forms.py:40
+#: indico/modules/events/reminders/forms.py:42
 msgid "A custom message to include in the email."
 msgstr "E-postada yer alacak özel bir iletidir."
 
-#: indico/modules/events/reminders/forms.py:41
+#: indico/modules/events/reminders/forms.py:43
 msgid "Include agenda"
 msgstr "Gündemi dahil et"
 
-#: indico/modules/events/reminders/forms.py:42
+#: indico/modules/events/reminders/forms.py:44
 msgid "Includes a simple text version of the event's agenda in the email."
 msgstr "E-postaya etkinliğin gündeminin bir basit metin versiyonunu dahil eder."
 
-#: indico/modules/events/reminders/forms.py:43
+#: indico/modules/events/reminders/forms.py:45
 msgid "Include description"
 msgstr "Tasviri dahil et"
 
-#: indico/modules/events/reminders/forms.py:44
+#: indico/modules/events/reminders/forms.py:46
 msgid "Includes the event's description in the email."
 msgstr "E-postaya etkinliğin tasvirini dahil eder."
 
-#: indico/modules/events/reminders/forms.py:46
+#: indico/modules/events/reminders/forms.py:48
 msgid "Attach an iCalendar file to the event reminder."
 msgstr "Etkinlik hatırlatıcısına iCalendar dosyası ekleyin."
 
-#: indico/modules/events/reminders/forms.py:59
-msgid "If participants are not included you need to specify recipients."
-msgstr "Katılımcılar dahil edilmezse alıcıları belirtmeniz gerekir."
+#: indico/modules/events/reminders/forms.py:61
+#: indico/modules/events/reminders/forms.py:65
+#: indico/modules/events/reminders/forms.py:69
+msgid "At least one type of recipient is required."
+msgstr "En az bir tür alıcı gereklidir."
 
-#: indico/modules/events/reminders/forms.py:63
-msgid "If no recipients are specified you need to include participants."
-msgstr "Hiçbir alıcı belirtilmezse katılımcıları dahil etmeniz gerekir."
-
-#: indico/modules/events/reminders/forms.py:72
+#: indico/modules/events/reminders/forms.py:78
 msgid "The specified date is in the past"
 msgstr "Belirtilen tarih geçmiştedir"
 
@@ -12670,6 +12766,10 @@ msgstr "Etkinliğiniz için ilave hizmetler isteyebilirsiniz. Bir istek gönderm
 msgid "Event roles"
 msgstr "Etkinlik rolleri"
 
+#: indico/modules/events/roles/clone.py:32
+msgid "The target event already has event roles"
+msgstr "Hedef etkinliğin etkinlik rolleri zaten mevcut. "
+
 #: indico/modules/events/roles/forms.py:43
 msgid "Remove existing members"
 msgstr "Var olan üyeleri kaldır"
@@ -12728,8 +12828,8 @@ msgstr "Koordinatörlerin kendi oturumlarının oturum öbeklerini yönetmesine 
 msgid "You have been granted manager/coordination privileges for a session."
 msgid_plural ""
 "You have been granted manager/coordination privileges for {} sessions."
-msgstr[0] "{} oturumları için size yönetici/koordinasyon ayrıcalıkları tanınmıştır."
-msgstr[1] "{} oturumları için size yönetici/koordinasyon ayrıcalıkları tanınmıştır."
+msgstr[0] "Bir oturum için size yönetici/koordinasyon ayrıcalıkları tanınmıştır."
+msgstr[1] "{} oturum için size yönetici/koordinasyon ayrıcalıkları tanınmıştır."
 
 #: indico/modules/events/sessions/__init__.py:83
 msgid "Coordination"
@@ -12742,6 +12842,10 @@ msgstr "Oturuma koordinasyon erişimi tanır"
 #: indico/modules/events/sessions/__init__.py:95
 msgid "My Sessions"
 msgstr "Oturumlarım"
+
+#: indico/modules/events/sessions/clone.py:33
+msgid "The target event already has sessions"
+msgstr "Hedef etkinliğin zaten oturumları var"
 
 #: indico/modules/events/sessions/forms.py:30
 msgid "Session code"
@@ -13007,10 +13111,10 @@ msgstr "İstek tarihi"
 msgid "There are no offline copies of this event."
 msgstr "Bu etkinliğin hiçbir çevrim dışı kopyası yoktur."
 
-#: indico/modules/events/surveys/__init__.py:36
-#: indico/modules/events/surveys/__init__.py:44
-#: indico/modules/events/surveys/__init__.py:88
-#: indico/modules/events/surveys/__init__.py:98
+#: indico/modules/events/surveys/__init__.py:38
+#: indico/modules/events/surveys/__init__.py:46
+#: indico/modules/events/surveys/__init__.py:90
+#: indico/modules/events/surveys/__init__.py:100
 #: indico/modules/events/surveys/clone.py:17
 #: indico/modules/events/surveys/templates/display/conference_home.html:6
 #: indico/modules/events/surveys/templates/display/event_header.html:2
@@ -13018,13 +13122,17 @@ msgstr "Bu etkinliğin hiçbir çevrim dışı kopyası yoktur."
 msgid "Surveys"
 msgstr "Anketler"
 
-#: indico/modules/events/surveys/__init__.py:89
+#: indico/modules/events/surveys/__init__.py:91
 msgid "Gives event managers the opportunity to create surveys."
 msgstr "Etkinlik yöneticilerine anketler oluşturma fırsatı verir."
 
-#: indico/modules/events/surveys/__init__.py:99
+#: indico/modules/events/surveys/__init__.py:101
 msgid "Grants management access to surveys."
 msgstr "Anketlere yönetim erişim tanır."
+
+#: indico/modules/events/surveys/clone.py:26
+msgid "The target event already has surveys"
+msgstr "Hedef etkinlikte zaten anketler var"
 
 #: indico/modules/events/surveys/forms.py:30
 #: indico/modules/events/surveys/placeholders.py:26
@@ -13154,19 +13262,19 @@ msgstr "İçe aktarmak için daha önce dışa aktarılmış bir anket içeriği
 msgid "Link to the survey"
 msgstr "Ankete bağla"
 
-#: indico/modules/events/surveys/controllers/display.py:63
+#: indico/modules/events/surveys/controllers/display.py:68
 msgid "You are trying to answer a survey that requires you to be logged in"
 msgstr "Oturum açmanızı gerektiren bir anketi yanıtlamaya çalışıyorsunuz."
 
-#: indico/modules/events/surveys/controllers/display.py:79
+#: indico/modules/events/surveys/controllers/display.py:84
 msgid "This survey is not active"
 msgstr "Bu anket aktif değildir"
 
-#: indico/modules/events/surveys/controllers/display.py:82
+#: indico/modules/events/surveys/controllers/display.py:87
 msgid "You have already answered this survey"
 msgstr "Bu ankete zaten cevap verdiniz"
 
-#: indico/modules/events/surveys/controllers/display.py:99
+#: indico/modules/events/surveys/controllers/display.py:105
 msgid "The survey has been submitted"
 msgstr "Anket gönderildi"
 
@@ -13474,13 +13582,19 @@ msgstr "Henüz herhangi bir gönderi yoktur."
 msgid "Anonymous"
 msgstr "Adsız"
 
-#: indico/modules/events/surveys/templates/management/survey.html:196
-msgid "Remove submission?"
-msgstr "Gönderiyi kaldır?"
-
-#: indico/modules/events/surveys/templates/management/survey.html:197
+#: indico/modules/events/surveys/templates/management/survey.html:194
 msgid "Are you sure you want to remove this submission?"
 msgstr "Bu gönderiyi kaldırmak istediğinizden emin misiniz?"
+
+#: indico/modules/events/surveys/templates/management/survey.html:197
+msgid ""
+"Note: Authenticated users will not be able to submit an anonymous survey "
+"again even if you delete their submission."
+msgstr "Not: Kimliği doğrulanmış kullanıcılar, gönderilerini silseniz bile anonim bir anketi tekrar gönderemez."
+
+#: indico/modules/events/surveys/templates/management/survey.html:203
+msgid "Remove submission?"
+msgstr "Gönderiyi kaldır?"
 
 #: indico/modules/events/surveys/templates/management/survey_list.html:11
 msgid ""
@@ -14139,6 +14253,10 @@ msgstr "Gözden geçirmeyi değiştir"
 msgid "Change reviews"
 msgstr "Gözden geçirmeleri değiştir"
 
+#: indico/modules/events/templates/reviews/_omnibox.html:76
+msgid "Already reviewed"
+msgstr "Önceden gözden geçirildi"
+
 #: indico/modules/events/templates/reviews/forms.html:23
 msgid "Reviewing instructions"
 msgstr "Gözden geçirme yönergeleri"
@@ -14214,6 +14332,14 @@ msgstr "puanlamaları gizle"
 #: indico/modules/events/templates/reviews/timeline.html:159
 msgid "Edit review"
 msgstr "Gözden geçirmeyi düzenle"
+
+#: indico/modules/events/timetable/clone.py:39
+msgid "The target event already has a timetable"
+msgstr "Hedef etkinliğin zaten bir zaman çizelgesi var"
+
+#: indico/modules/events/timetable/clone.py:42
+msgid "The source event is longer than the target event"
+msgstr "Kaynak etkinlik, hedef etkinlikten daha uzun"
 
 #: indico/modules/events/timetable/forms.py:37
 msgid "Start time"
@@ -14573,6 +14699,10 @@ msgstr "Grup organizatörü"
 #: indico/modules/events/tracks/__init__.py:82
 msgid "Grants track convener rights in an event."
 msgstr "Bir etkinlik içerisinde grup organizatörü hakları tanır."
+
+#: indico/modules/events/tracks/clone.py:35
+msgid "The target event already has tracks"
+msgstr "Hedef etkinliğin zaten izleri var"
 
 #: indico/modules/events/tracks/controllers.py:81
 msgid "The program has been updated."
@@ -15055,86 +15185,116 @@ msgstr "Haberleri sil"
 msgid "Do you really want to delete the news '%(title)s'?"
 msgstr "'%(title)s' haberlerini gerçekten silmek istiyor musunuz?"
 
-#: indico/modules/oauth/__init__.py:19 indico/modules/oauth/__init__.py:24
+#: indico/modules/oauth/__init__.py:20 indico/modules/oauth/__init__.py:25
 #: indico/modules/oauth/templates/apps.html:9
 #: indico/modules/oauth/templates/apps_base.html:4
 msgid "Applications"
 msgstr "Uygulamalar"
 
-#: indico/modules/oauth/controllers.py:145
+#: indico/modules/oauth/__init__.py:27
+#: indico/modules/oauth/templates/user_tokens.html:9
+msgid "API tokens"
+msgstr "API jetonları"
+
+#: indico/modules/oauth/controllers.py:148
 msgid "Application {} was modified"
 msgstr "{} uygulamasında değişiklik yapıldı"
 
-#: indico/modules/oauth/controllers.py:162
+#: indico/modules/oauth/controllers.py:165
 msgid "Application deleted successfully"
 msgstr "Uygulama başarıyla silindi"
 
-#: indico/modules/oauth/controllers.py:177
+#: indico/modules/oauth/controllers.py:180
 msgid "Application {} registered successfully"
 msgstr "{} uygulaması başarıyla silindi"
 
-#: indico/modules/oauth/controllers.py:188
+#: indico/modules/oauth/controllers.py:191
 msgid "New client secret generated for the application"
 msgstr "Uygulama için yeni istemci sırrı oluşturulmuştur"
 
-#: indico/modules/oauth/controllers.py:198
+#: indico/modules/oauth/controllers.py:201
 msgid "App authorization revoked for all users."
 msgstr "Uygulama yetkilendirmesi tüm kullanıcılar için iptal edildi."
 
-#: indico/modules/oauth/controllers.py:232
+#: indico/modules/oauth/controllers.py:235
 msgid "Access for '{}' has been successfully revoked."
 msgstr "'{}' için erişim başarıyla iptal edildi."
 
-#: indico/modules/oauth/forms.py:28
+#: indico/modules/oauth/controllers.py:274
+#: indico/modules/oauth/controllers.py:293
+msgid "You cannot manage API tokens"
+msgstr "API jetonlarını yönetemezsiniz"
+
+#: indico/modules/oauth/controllers.py:282
+msgid "Token '{}' updated"
+msgstr "Jeton '{}' güncellendi"
+
+#: indico/modules/oauth/controllers.py:314
+msgid "The token '{}' has been successfully revoked."
+msgstr "'{}' jetonu başarıyla iptal edildi."
+
+#: indico/modules/oauth/forms.py:29
 msgid ""
 "Invalid URI: {}.<br>It must use http or https and may not contain a query "
 "string."
 msgstr "Geçersiz URI: {}.<br>http veya https kullanılmalıdır ve bir sorgu dizgesi içermeyebilir."
 
-#: indico/modules/oauth/forms.py:36
+#: indico/modules/oauth/forms.py:37
 msgid "Allowed authorization callback URLs"
 msgstr "URL'leri geri çağırmak için yetkilendirmeye izin verildi"
 
-#: indico/modules/oauth/forms.py:37
+#: indico/modules/oauth/forms.py:38
 msgid ""
 "More than one URL can be specified adding new lines. The redirect_uri sent "
 "by the OAuth client must use the same protocol and host/port. If an entry "
 "contains a path, the redirect_uri's path must start with this path."
 msgstr "Yeni satırlar eklenerek birden fazla URL belirtilebilir. OAuth istemcisi tarafından gönderilen redirect_uri aynı protokol ve konağı/kapıyı kullanmalıdır. Bir girişin bir yol içermesi durumunda, redirect_uri'nin yolu bu yolla başlamalıdır."
 
-#: indico/modules/oauth/forms.py:43
+#: indico/modules/oauth/forms.py:44
 msgid "Only scopes from this list may be requested by the app."
 msgstr "Yalnızca bu listedeki kapsamlar uygulama tarafından  talep edilebilir."
 
-#: indico/modules/oauth/forms.py:46
+#: indico/modules/oauth/forms.py:47
 msgid ""
 "If an application is not enabled, its OAuth tokens cannot be used and user "
 "cannot be prompted to authorize the application."
 msgstr "Bir uygulamanın etkinleştirilmesi durumunda, onun OAuth jetonları kullanılamaz ve kullanıcıdan bu uygulamaya izin vermesi istenemez."
 
-#: indico/modules/oauth/forms.py:48
+#: indico/modules/oauth/forms.py:49
 msgid "Allow PKCE flow"
 msgstr "PKCE akışına izin ver"
 
-#: indico/modules/oauth/forms.py:49
+#: indico/modules/oauth/forms.py:50
 msgid ""
 "If enabled, the application can use the client-side PKCE flow which does not"
 " require the use of the Client Secret to get a token."
 msgstr "Bu özellik etkin olduğunda uygulama, belirteç almak için İstemci Sırrı gerektirmeden istemci tarafında PKCE akışını kullanabilir."
 
-#: indico/modules/oauth/forms.py:51
+#: indico/modules/oauth/forms.py:52
 msgid "Trusted"
 msgstr "Güvenildi"
 
-#: indico/modules/oauth/forms.py:52
+#: indico/modules/oauth/forms.py:53
 msgid ""
 "Trusted applications will be granted authorization automatically and no "
 "intermediate page will be displayed during the authorization process."
 msgstr "Güvenilen uygulamalara otomatik olarak yetki tanınacak ve yetkilendirme süreci boyunca hiçbir ara sayfa görüntülenmeyecektir."
 
-#: indico/modules/oauth/forms.py:68
+#: indico/modules/oauth/forms.py:69
 msgid "There is already an application with this name"
 msgstr "Bu ada sahip bir uygulama zaten var"
+
+#: indico/modules/oauth/forms.py:73
+msgid "What's this token used for?"
+msgstr "Bu jeton ne için kullanılıyor?"
+
+#: indico/modules/oauth/forms.py:76
+msgid "Scopes define what kind of access the token has."
+msgstr "Kapsamlar, jetonların ne tür bir erişime sahip olduğunu tanımlar."
+
+#: indico/modules/oauth/forms.py:94
+msgid "There is already a token with this name"
+msgstr "Bu isme sahip bir jeton zaten var"
 
 #: indico/modules/oauth/templates/app_details.html:24
 #, python-format
@@ -15172,6 +15332,7 @@ msgid "Update application"
 msgstr "Uygulamayı güncelle"
 
 #: indico/modules/oauth/templates/app_details.html:96
+#: indico/modules/oauth/templates/user_tokens.html:53
 msgid "Copy to clipboard"
 msgstr "Panoya kopyala"
 
@@ -15206,37 +15367,104 @@ msgstr "Yetkilendir"
 msgid "There was an error during the OAuth authorization process:"
 msgstr "OAuth yetkilendirme sürecinde bir hata meydana geldi:"
 
-#: indico/modules/oauth/templates/user_profile.html:8
+#: indico/modules/oauth/templates/user_apps.html:8
 msgid "Authorized applications"
 msgstr "Yetkilendirilmiş uygulamalar"
 
-#: indico/modules/oauth/templates/user_profile.html:12
+#: indico/modules/oauth/templates/user_apps.html:12
 msgid ""
 "This is the list of applications you authorized to access your Indico data."
 msgstr "Indico verilerinize erişmesi için yetkilendirdiğiniz uygulamaların listesi"
 
-#: indico/modules/oauth/templates/user_profile.html:16
+#: indico/modules/oauth/templates/user_apps.html:16
 msgid "No third party applications have been authorized."
 msgstr "Hiçbir üçüncü taraf uygulama yetkilendirilmemiştir."
 
-#: indico/modules/oauth/templates/user_profile.html:22
+#: indico/modules/oauth/templates/user_apps.html:22
+#: indico/modules/oauth/templates/user_tokens.html:48
 msgid "Authorized scopes:"
 msgstr "Yetkilinin kapsamı:"
 
-#: indico/modules/oauth/templates/user_profile.html:27
+#: indico/modules/oauth/templates/user_apps.html:27
+#: indico/modules/oauth/templates/user_tokens.html:72
 msgid "Last used:"
 msgstr "Son kullanma tarihi:"
 
-#: indico/modules/oauth/templates/user_profile.html:39
+#: indico/modules/oauth/templates/user_apps.html:39
 #, python-format
 msgid ""
 "%(app_name)s will no longer have access to your Indico data.<br> Are you "
 "sure you want to revoke its access?"
 msgstr "%(app_name)s artık Indico verilerinize erişemeyecek<br> Onun erişimini iptal etmek istediğinizden emin misiniz?"
 
-#: indico/modules/oauth/templates/user_profile.html:41
+#: indico/modules/oauth/templates/user_apps.html:41
 msgid "Revoke"
 msgstr "İptal et"
+
+#: indico/modules/oauth/templates/user_tokens.html:17
+#: indico/modules/oauth/templates/user_tokens.html:21
+msgid "Create new token"
+msgstr "Yeni jeton oluştur"
+
+#: indico/modules/oauth/templates/user_tokens.html:28
+msgid "Tokens you generated to access the Indico APIs."
+msgstr "Indico API'lerine erişmek için oluşturduğunuz jetonlar."
+
+#: indico/modules/oauth/templates/user_tokens.html:31
+msgid ""
+"Make sure to copy your API token now. You won't be able to see it again!"
+msgstr "API simgenizi kopyaladığınızdan emin olun şimdi. Bir daha göremeyeceksiniz!"
+
+#: indico/modules/oauth/templates/user_tokens.html:40
+msgid "No tokens have been generated."
+msgstr "Hiç jeton oluşturulmadı."
+
+#: indico/modules/oauth/templates/user_tokens.html:60
+#, python-format
+msgid "Edit token '%(token_name)s'"
+msgstr "'%(token_name)s' jetonu düzenle"
+
+#: indico/modules/oauth/templates/user_tokens.html:75
+#, python-format
+msgid "Last used from %(ip)s Total uses: %(count)s"
+msgstr "En son kullanım %(ip)s Toplam kullanım: %(count)s"
+
+#: indico/modules/oauth/templates/user_tokens.html:89
+msgid "Regenerate token"
+msgstr "Jetonu yeniden oluştur"
+
+#: indico/modules/oauth/templates/user_tokens.html:92
+#, python-format
+msgid "Regenerate token '%(token_name)s'"
+msgstr "%(token_name)s jetonu yeniden oluştur"
+
+#: indico/modules/oauth/templates/user_tokens.html:93
+msgid ""
+"If you've lost/forgotten this token, you can regenerate it, but be aware "
+"that any applications or scripts using this token will need to be updated. "
+"You cannot undo this action."
+msgstr "Bu jetonu kaybettiyseniz/unuttuysanız, onu yeniden oluşturabilirsiniz, ancak bu jetonu kullanan tüm uygulamaların veya komut dosyalarının güncellenmesi gerekeceğini unutmayın. Bu işlemi geri alamazsınız."
+
+#: indico/modules/oauth/templates/user_tokens.html:102
+msgid "Revoke token"
+msgstr "Jetonu iptal et"
+
+#: indico/modules/oauth/templates/user_tokens.html:105
+#, python-format
+msgid "Revoke token '%(token_name)s'"
+msgstr "'%(token_name)s' jetonu iptal et"
+
+#: indico/modules/oauth/templates/user_tokens.html:106
+msgid ""
+"Any applications or scripts using this token will no longer be able to "
+"access the Indico API. You cannot undo this action."
+msgstr "Bu jetonu kullanan herhangi bir uygulama veya komut dosyası artık Indico API'sine erişemez. Bu işlemi geri alamazsınız."
+
+#: indico/modules/oauth/templates/user_tokens.html:114
+msgid ""
+"Warning: You will not be able to create a new API token since only Indico "
+"admins can create API tokens."
+msgstr "Uyarı: Yalnızca Indico yöneticileri API jetonu oluşturabileceğinden yeni bir API jetonu oluşturamazsınız."
 
 #: indico/modules/rb/__init__.py:66 indico/modules/rb/__init__.py:72
 #: indico/modules/rb/__init__.py:78
@@ -15279,7 +15507,7 @@ msgstr "Aracılık et"
 msgid "Allows moderating bookings (approving/rejecting/editing)"
 msgstr "Rezervasyonlarda aracılık yapılmasına izin verir (onaylama/reddetme/düzenleme)"
 
-#: indico/modules/rb/schemas.py:346
+#: indico/modules/rb/schemas.py:348
 msgid "Booking cannot end before it starts"
 msgstr "Rezervasyon başlamadan sona eremez"
 
@@ -15372,13 +15600,13 @@ msgstr "Katkı adını girin."
 msgid "Enter the session block name."
 msgstr "Oturum öbeği adı girin."
 
-#: indico/modules/rb/models/reservations.py:352
-#: indico/modules/rb/models/reservations.py:555
-#: indico/modules/rb/models/reservations.py:681
+#: indico/modules/rb/models/reservations.py:344
+#: indico/modules/rb/models/reservations.py:547
+#: indico/modules/rb/models/reservations.py:673
 msgid "Reservation has no valid occurrences"
 msgstr "Rezervasyonun hiçbir geçerli oluşu yok"
 
-#: indico/modules/rb/models/rooms.py:641
+#: indico/modules/rb/models/rooms.py:631
 msgid "You cannot book this room more than {} days in advance"
 msgstr "Bu odayı en fazla {} gün önceden rezerve edebilirsiniz"
 
@@ -15421,35 +15649,35 @@ msgstr "yineleniyor"
 msgid "Searching within \"%(cat)s\""
 msgstr "\"%(cat)s\" içinde arıyor"
 
-#: indico/modules/users/__init__.py:56 indico/modules/users/forms.py:137
+#: indico/modules/users/__init__.py:57 indico/modules/users/forms.py:141
 #: indico/modules/users/templates/admins.html:5
 msgid "Admins"
 msgstr "Sistem yöneticileri"
 
-#: indico/modules/users/__init__.py:62
+#: indico/modules/users/__init__.py:63
 #: indico/modules/users/templates/dashboard.html:27
 msgid "Dashboard"
 msgstr "Gösterge Bölümü"
 
-#: indico/modules/users/__init__.py:63
+#: indico/modules/users/__init__.py:64
 msgid "Personal data"
 msgstr "Kişisel veriler"
 
-#: indico/modules/users/__init__.py:64
+#: indico/modules/users/__init__.py:65
 #: indico/modules/users/templates/profile_picture.html:8
 msgid "Profile picture"
 msgstr "Profil fotoğrafı"
 
-#: indico/modules/users/__init__.py:67
+#: indico/modules/users/__init__.py:68
 #: indico/modules/users/templates/preferences.html:9
 msgid "Preferences"
 msgstr "Tercihler"
 
-#: indico/modules/users/__init__.py:68
+#: indico/modules/users/__init__.py:69
 msgid "Favorites"
 msgstr "Favoriler"
 
-#: indico/modules/users/__init__.py:74
+#: indico/modules/users/__init__.py:75
 #: indico/web/templates/_session_bar.html:124
 msgid "My profile"
 msgstr "Profilim"
@@ -15484,7 +15712,7 @@ msgstr "Tercihler kaydedildi"
 msgid ""
 "We have sent an email to {email}. Please click the link in that email within"
 " 24 hours to confirm your new email address."
-msgstr "{email} adresine bir e-posta gönderdik. Lütfen yeni e-posta adresinizi doğrulamak için aşağıdaki e-postaya tıklayın."
+msgstr "{email} adresine bir e-posta gönderdik. Lütfen yeni e-posta adresinizi doğrulamak için 24 saat içinde aşağıdaki e-postaya tıklayın."
 
 #: indico/modules/users/controllers.py:408
 msgid "The verification token is invalid or expired."
@@ -15699,7 +15927,18 @@ msgid ""
 "Supports wildcards, e.g. *@gmail.com"
 msgstr "Kullanıcıların bu e-posta adresleriyle Indico hesapları oluşturmasını önleyin. Joker karakterleri destekler, ör. *@gmail.com"
 
-#: indico/modules/users/forms.py:121
+#: indico/modules/users/forms.py:116
+msgid "Personal API tokens"
+msgstr "Kişisel API jetonları"
+
+#: indico/modules/users/forms.py:117
+msgid ""
+"Whether users are allowed to generate personal API tokens. If disabled, only"
+" admins can create them, but users will still be able to regenerate the "
+"tokens assigned to them."
+msgstr "Kullanıcıların kişisel API jetonları oluşturmasına izin verilip verilmediği. Devre dışı bırakılırsa, yalnızca yöneticiler bunları oluşturabilir, fakat kullanıcılar kendilerine atanan jetonları yine de yeniden oluşturabilir."
+
+#: indico/modules/users/forms.py:125
 msgid "Set login details"
 msgstr "Oturum açma bilgilerini ayarla"
 
@@ -15791,7 +16030,7 @@ msgstr "adresi"
 msgid "phone number"
 msgstr "telefon numarası"
 
-#: indico/modules/users/models/users.py:650
+#: indico/modules/users/models/users.py:662
 msgid ""
 "Your {field_name} has been synchronized from '{old_value}' to '{new_value}'."
 msgstr "Alan adınız {field_name} '{old_value}' değerinden '{new_value}' değerine senkronize edildi."
@@ -15982,6 +16221,10 @@ msgid ""
 "You recently added the e-mail address %(email)s to your Indico account.\n"
 "Please click the following link to confirm this action."
 msgstr "Kısa süre önce bu e-posta adresini %(email)s Indico hesabınıza eklediniz.\nOnaylamak için lütfen aşağıdaki bağlantıyı tıklayın."
+
+#: indico/modules/vc/clone.py:36
+msgid "The target event already has a videoconference"
+msgstr "Hedef etkinlikte zaten bir video konferans var"
 
 #: indico/modules/vc/controllers.py:57
 msgid "There is already a videoconference attached to '{link_object_title}'."
@@ -16592,13 +16835,13 @@ msgstr "Bir sorun oluştu"
 msgid "There was a database error while processing your request."
 msgstr "İsteğiniz işlenirken bir veritabanı hatası oluştu."
 
-#: indico/web/forms/base.py:81
+#: indico/web/forms/base.py:82
 msgid ""
 "It looks like there was a problem with your current session. Please submit "
 "the form again."
 msgstr "Mevcut oturumunuzda bir sorun varmış gibi görünüyor. Lütfen formu tekrar gönderin."
 
-#: indico/web/forms/base.py:84
+#: indico/web/forms/base.py:85
 msgid "Invalid CSRF token"
 msgstr "Geçersiz CSRF jetonu"
 
@@ -16993,8 +17236,14 @@ msgstr "Kişi bilgilerini elle giriniz"
 msgid "Enter manually"
 msgstr "Elle giriniz"
 
-#: indico/web/templates/forms/category_picker_widget.html:8
-#: indico/web/templates/forms/category_picker_widget.html:9
+#: indico/web/templates/forms/category_picker_widget.html:10
+msgid ""
+"The selected category does not contain any events, only subcategories. "
+"Please make sure that you really want to create an event there."
+msgstr "Seçilen kategori herhangi bir etkinlik içermiyor, sadece alt kategoriler içeriyor. Lütfen burada gerçekten bir etkinlik oluşturmak istediğinizden emin olun."
+
+#: indico/web/templates/forms/category_picker_widget.html:17
+#: indico/web/templates/forms/category_picker_widget.html:18
 msgid "Choose category"
 msgstr "Kategori seç"
 
