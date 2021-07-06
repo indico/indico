@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-06-21 17:51+0200\n"
+"POT-Creation-Date: 2021-07-21 17:54+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2021\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -225,65 +225,61 @@ msgstr ""
 msgid "Export"
 msgstr "Exporter"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:35
-msgid "Published"
-msgstr "Publié"
+#: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
+msgid "Publish now"
+msgstr "Publier maintenant"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:35
-msgid "Draft"
-msgstr "Brouillon"
-
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:47
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:20
 msgid "Set contribution list in draft mode"
 msgstr "Positionner la liste des contributions en mode brouillon"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:48
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:21
 msgid "Publish contributions"
 msgstr "Publier les contributions"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:55
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:28
 msgid ""
 "Are you sure you want to change the contribution list back to draft mode?"
 msgstr ""
 "Voulez-vous vraiment changer la liste des contributions en mode brouillon?"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:60
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:33
 msgid "By doing so the following menu items won't be accessible:"
 msgstr "Cette action rendra inaccessibles les entrées de menu suivantes: "
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:66
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:39
 msgid "Are you sure you want to publish the contribution list?"
 msgstr "Voulez-vous vraiment publier la liste des contributions?"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:69
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:42
 msgid "By doing so the following menu items will be accessible:"
 msgstr "Avec cette action, les entrées de menu suivantes seront accessibles:"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:75
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:48
 msgid "Contribution List"
 msgstr "Liste des Contributions"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:78
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:51
 msgid "My Contributions"
 msgstr "Mes Contributions"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:81
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:54
 msgid "Author List"
 msgstr "Liste des Auteurs"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:84
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:57
 msgid "Speaker List"
 msgstr "Liste des orateurs"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:87
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:60
 msgid "Timetable"
 msgstr "Ordre du jour"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:90
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:63
 msgid "Book of Abstracts"
 msgstr "Livre des Résumés"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:96
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:69
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:67
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:218
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:95
@@ -293,7 +289,7 @@ msgstr "Livre des Résumés"
 msgid "No"
 msgstr "Non"
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:105
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:72
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:66
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:217
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:94
@@ -303,7 +299,15 @@ msgstr "Non"
 msgid "Yes"
 msgstr "Oui"
 
-#: indico/modules/events/contributions/client/js/index.jsx:44
+#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:32
+msgid "Published"
+msgstr "Publié"
+
+#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:32
+msgid "Draft"
+msgstr "Brouillon"
+
+#: indico/modules/events/contributions/client/js/index.jsx:45
 msgid "Contribution"
 msgstr "Contribution"
 
@@ -2544,7 +2548,7 @@ msgid "My Blockings"
 msgstr "Mes Blocages"
 
 #: indico/modules/rb/client/js/components/SidebarMenu.jsx:91
-#: indico/web/client/js/react/components/UserMenu.jsx:117
+#: indico/web/client/js/react/components/UserMenu.jsx:120
 msgid "Administration"
 msgstr "Administration"
 
@@ -3784,19 +3788,19 @@ msgstr ""
 msgid "Back to top"
 msgstr "Haut de la page"
 
-#: indico/web/client/js/react/components/UserMenu.jsx:44
+#: indico/web/client/js/react/components/UserMenu.jsx:45
 msgid "Impersonate user"
 msgstr "Prendre l'identité de l'utilisateur"
 
-#: indico/web/client/js/react/components/UserMenu.jsx:101
+#: indico/web/client/js/react/components/UserMenu.jsx:104
 msgid "My Profile"
 msgstr "Mon profil"
 
-#: indico/web/client/js/react/components/UserMenu.jsx:104
+#: indico/web/client/js/react/components/UserMenu.jsx:107
 msgid "My Preferences"
 msgstr "Mes Préférences"
 
-#: indico/web/client/js/react/components/UserMenu.jsx:123
+#: indico/web/client/js/react/components/UserMenu.jsx:126
 msgid "Logout"
 msgstr "Déconnexion"
 
