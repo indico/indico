@@ -71,12 +71,12 @@ Plugins
 HTTP API
 ++++++++
 
-.. include:: http_api/_intro.rst
+.. include:: http-api/_intro.rst
 
 .. toctree::
     :maxdepth: 2
 
-    HTTP API <http_api/index.rst>
+    HTTP API <http-api/index.rst>
 
 
 API reference
