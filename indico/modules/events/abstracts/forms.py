@@ -157,7 +157,10 @@ class AbstractReviewingSettingsForm(IndicoForm):
     allow_convener_judgment = BooleanField(_('Allow track conveners to judge'), widget=SwitchWidget(),
                                            description=_('Enabling this allows track conveners to make a judgment '
                                                          'such as accepting or rejecting an abstract.'))
-    allow_convener_track_change = BooleanField(_('Allow conveners to change tracks'), widget=SwitchWidget(),
+    allow_convener_track_change = BooleanField(_('Allow conveners to change tracks'),
+                                               [HiddenUnless('allow_convener_judgment',
+                                                             value=False, preserve_data=True)],
+                                               widget=SwitchWidget(),
                                                description=_('Enabling this allows track conveners to update the track '
                                                              'an abstract is part of.'))
     allow_comments = BooleanField(_('Allow comments'), widget=SwitchWidget(),

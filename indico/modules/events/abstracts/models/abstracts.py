@@ -563,6 +563,13 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         else:
             return False
 
+    def can_change_tracks(self, user, check_state=False):
+        if check_state and self.is_in_final_state:
+            return False
+        if self.event.cfa.allow_convener_track_change and self.can_convene(user):
+            return True
+        return self.can_judge(user)
+
     def can_edit(self, user):
         if not user:
             return False
