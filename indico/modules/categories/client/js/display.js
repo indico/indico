@@ -5,6 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global handleAjaxError:false */
+
+import {$T} from 'indico/utils/i18n';
+
 (function(global) {
   global.setupCategoryDisplaySubcatList = function setupCategoryDisplaySubcatList() {
     const url = $('.category-list').data('subcat-info-url');
@@ -16,7 +20,7 @@
       url,
       dataType: 'json',
       success(data) {
-        _.each(data.event_counts, function(count, id) {
+        Object.entries(data.event_counts).forEach(([id, count]) => {
           const text = !count.value
             ? $T.gettext('empty')
             : $T.ngettext('{0} event', '{0} events', count.value).format(count.pretty);
@@ -29,23 +33,28 @@
   global.setupCategoryDisplayEventList = function setupCategoryDisplayEventList(
     showFutureEvents,
     showPastEvents,
+    isFlat,
     requestParams
   ) {
     const $eventList = $('.event-list');
     const $futureEvents = $eventList.find('.future-events');
     const $pastEvents = $eventList.find('.past-events');
 
+    if (isFlat) {
+      requestParams.flat = 1;
+    }
+
     setupToggleEventListButton($futureEvents, onToggleFutureEvents);
     setupToggleEventListButton($pastEvents, onTogglePastEvents);
 
-    if (showFutureEvents) {
+    if (showFutureEvents && !isFlat) {
       $futureEvents
         .find('.js-toggle-list')
         .first()
         .trigger('click', true);
     }
 
-    if (showPastEvents) {
+    if (showPastEvents && !isFlat) {
       $pastEvents
         .find('.js-toggle-list')
         .first()
@@ -53,6 +62,9 @@
     }
 
     function onToggleFutureEvents(shown) {
+      if (isFlat) {
+        return;
+      }
       $.ajax({
         url: $eventList.data('show-future-events-url'),
         method: shown ? 'PUT' : 'DELETE',
@@ -61,6 +73,9 @@
     }
 
     function onTogglePastEvents(shown) {
+      if (isFlat) {
+        return;
+      }
       $.ajax({
         url: $eventList.data('show-past-events-url'),
         method: shown ? 'PUT' : 'DELETE',

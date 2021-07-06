@@ -23,9 +23,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
-from indico.modules.categories.controllers.util import (get_category_view_params, group_by_month,
-                                                        make_format_event_date_func, make_happening_now_func,
-                                                        make_is_recent_func)
+from indico.modules.categories.controllers.util import (get_category_view_params, get_event_query_filter,
+                                                        group_by_month, make_format_event_date_func,
+                                                        make_happening_now_func, make_is_recent_func)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
@@ -220,13 +220,14 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
         self.now = now_utc(exact=False).astimezone(self.category.display_tzinfo)
+        self.is_flat = request.args.get('flat') == '1' and self.category.is_flat_view_enabled
 
 
 class RHDisplayCategory(RHDisplayCategoryEventsBase):
     """Show the contents of a category (events/subcategories)"""
 
     def _process(self):
-        params = get_category_view_params(self.category, self.now)
+        params = get_category_view_params(self.category, self.now, is_flat=self.is_flat)
         if not self.category.is_root:
             return WPCategory.render_template('display/category.html', self.category, **params)
 
@@ -252,10 +253,13 @@ class RHEventList(RHDisplayCategoryEventsBase):
         after = self._parse_year_month(request.args.get('after'))
         if before is None and after is None:
             raise BadRequest('"before" or "after" parameter must be specified')
-        hidden_event_ids = {e.id for e in self.category.get_hidden_events(user=session.user)}
-        event_query = (Event.query.with_parent(self.category)
+        hidden_event_ids = ({e.id for e in self.category.get_hidden_events(user=session.user)}
+                            if not self.is_flat else set())
+        event_query_filter = get_event_query_filter(self.category, is_flat=self.is_flat,
+                                                    hidden_event_ids=hidden_event_ids)
+        event_query = (Event.query
                        .options(*self._event_query_options)
-                       .filter(Event.id.notin_(hidden_event_ids))
+                       .filter(event_query_filter)
                        .order_by(Event.start_dt.desc(), Event.id.desc()))
         if before:
             event_query = event_query.filter(Event.start_dt < before)

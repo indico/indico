@@ -166,6 +166,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=False
     )
+    is_flat_view_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     default_ticket_template_id = db.Column(
         db.ForeignKey('indico.designer_templates.id'),
         nullable=True,

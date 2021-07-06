@@ -30,6 +30,8 @@ Improvements
   (:issue:`4977`, :pr:`4986`)
 - Add "send to speakers" option in event reminders (:issue:`4958`, :pr:`4966`, thanks
   :user:`Naveenaidu`)
+- Allow displaying all events descending from a category (:issue:`4982`,
+  :pr:`4983`, thanks :user:`omegak` and :user:`openprojects`).
 
 Bugfixes
 ^^^^^^^^
