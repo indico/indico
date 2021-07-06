@@ -110,6 +110,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
     _ensure_state(revision, initial=InitialRevisionState.ready_for_review, final=FinalRevisionState.none)
     revision.editor = editor
     revision.comment = comment
+    revision.reviewed_dt = now_utc()
     revision.tags = tags
     revision.final_state = {
         EditingReviewAction.accept: FinalRevisionState.accepted,
@@ -153,6 +154,7 @@ def confirm_editable_changes(revision, submitter, action, comment):
     }[action]
     if comment:
         revision.comment = comment
+    revision.reviewed_dt = now_utc()
     db.session.flush()
     if action == EditingConfirmationAction.accept:
         _ensure_publishable_files(revision)
@@ -168,6 +170,7 @@ def replace_revision(revision, user, comment, files, tags, initial_state=None):
                   initial=(InitialRevisionState.new, InitialRevisionState.ready_for_review),
                   final=FinalRevisionState.none)
     revision.comment = comment
+    revision.reviewed_dt = now_utc()
     revision.tags = tags
     revision.final_state = FinalRevisionState.replaced
     revision.editor = user
@@ -222,6 +225,7 @@ def undo_review(revision):
     db.session.flush()
     revision.final_state = FinalRevisionState.none
     revision.comment = ''
+    revision.reviewed_dt = None
     db.session.flush()
     logger.info('Revision %r review undone', revision)
 
