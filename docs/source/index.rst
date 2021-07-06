@@ -54,7 +54,7 @@ Search
 .. toctree::
     :maxdepth: 2
 
-    search/index.rst
+    search-engine/index.rst
 
 
 Plugins
