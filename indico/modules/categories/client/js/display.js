@@ -5,6 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global handleAjaxError:false */
+
+import {$T} from 'indico/utils/i18n';
+
 (function(global) {
   global.setupCategoryDisplaySubcatList = function setupCategoryDisplaySubcatList() {
     const url = $('.category-list').data('subcat-info-url');
@@ -16,7 +20,7 @@
       url,
       dataType: 'json',
       success(data) {
-        _.each(data.event_counts, function(count, id) {
+        Object.entries(data.event_counts).forEach(([id, count]) => {
           const text = !count.value
             ? $T.gettext('empty')
             : $T.ngettext('{0} event', '{0} events', count.value).format(count.pretty);
