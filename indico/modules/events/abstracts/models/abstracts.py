@@ -523,15 +523,12 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def can_convene(self, user):
         if not user:
             return False
-        elif not self.event.can_manage(user, permission='track_convener', explicit_permission=True):
+        if not self.event.can_manage(user, permission='track_convener', explicit_permission=True):
             return False
-        elif self.event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True):
+        if self.event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True):
             return True
-        elif any(track.can_manage(user, permission='convene', explicit_permission=True)
-                 for track in self.reviewed_for_tracks):
-            return True
-        else:
-            return False
+        return any(track.can_manage(user, permission='convene', explicit_permission=True)
+                   for track in self.reviewed_for_tracks)
 
     def can_review(self, user, check_state=False):
         # The total number of tracks/events a user is a reviewer for (indico-wide)
@@ -540,17 +537,14 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         # repeating it when performing this check on many abstracts.
         if not user:
             return False
-        elif check_state and self.public_state not in (AbstractPublicState.under_review, AbstractPublicState.awaiting):
+        if check_state and self.public_state not in (AbstractPublicState.under_review, AbstractPublicState.awaiting):
             return False
-        elif not self.event.can_manage(user, permission='abstract_reviewer', explicit_permission=True):
+        if not self.event.can_manage(user, permission='abstract_reviewer', explicit_permission=True):
             return False
-        elif self.event.can_manage(user, permission='review_all_abstracts', explicit_permission=True):
+        if self.event.can_manage(user, permission='review_all_abstracts', explicit_permission=True):
             return True
-        elif any(track.can_manage(user, permission='review', explicit_permission=True)
-                 for track in self.reviewed_for_tracks):
-            return True
-        else:
-            return False
+        return any(track.can_manage(user, permission='review', explicit_permission=True)
+                   for track in self.reviewed_for_tracks)
 
     def can_judge(self, user, check_state=False):
         if not user:
@@ -563,6 +557,13 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return True
         else:
             return False
+
+    def can_change_tracks(self, user, check_state=False):
+        if check_state and self.is_in_final_state:
+            return False
+        if self.event.cfa.allow_convener_track_change and self.can_convene(user):
+            return True
+        return self.can_judge(user)
 
     def can_edit(self, user):
         if not user:

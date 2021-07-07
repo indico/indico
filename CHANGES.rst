@@ -32,6 +32,7 @@ Improvements
   :user:`Naveenaidu`)
 - Allow displaying all events descending from a category (:issue:`4982`,
   :pr:`4983`, thanks :user:`omegak` and :user:`openprojects`).
+- Add an option to allow non-judge conveners to update an abstract track (:pr:`4989`)
 
 Bugfixes
 ^^^^^^^^

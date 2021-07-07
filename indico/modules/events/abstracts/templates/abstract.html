@@ -32,7 +32,7 @@
     {% endcall %}
 
     <div class="i-timeline">
-        {% if abstract.can_judge(session.user, check_state=true) and abstract.event.tracks %}
+        {% if abstract.can_change_tracks(session.user, check_state=true) and abstract.event.tracks %}
             {{ render_reviewed_for_tracks_box(abstract, review_track_list_form) }}
         {% endif %}
 
