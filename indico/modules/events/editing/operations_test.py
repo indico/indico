@@ -56,10 +56,10 @@ def test_can_undo_review(db, dummy_contribution, dummy_user, is1, fs1, ok1, is2,
     from indico.modules.events.editing.operations import InvalidEditableState, undo_review
     editable = Editable(contribution=dummy_contribution, type=EditableType.paper)
     rev1 = EditingRevision(editable=editable, submitter=dummy_user, initial_state=is1,
-                           final_state=fs1, reviewed_dt=None if fs1 == FinalRevisionState.none else now_utc())
+                           final_state=fs1, reviewed_dt=(None if fs1 == FinalRevisionState.none else now_utc()))
     if is2 is not None:
         rev2 = EditingRevision(editable=editable, submitter=dummy_user, initial_state=is2,
-                               final_state=fs2, reviewed_dt=None if fs2 == FinalRevisionState.none else now_utc())
+                               final_state=fs2, reviewed_dt=(None if fs2 == FinalRevisionState.none else now_utc()))
     db.session.flush()
 
     if ok1:
