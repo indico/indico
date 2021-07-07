@@ -15,6 +15,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets import Select
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.abstracts.fields import (AbstractField, AbstractPersonLinkListField, EmailRuleListField,
@@ -419,7 +420,7 @@ class EditEmailTemplateRuleForm(IndicoForm):
 class EditEmailTemplateTextForm(IndicoForm):
     """Form for editing the text of a new e-mail template."""
 
-    reply_to_address = SelectField(_('"Reply to" address'), [DataRequired()])
+    reply_to_address = SelectField(_('"Reply to" address'))
     include_submitter = BooleanField(_('Send to submitter'), widget=SwitchWidget())
     include_authors = BooleanField(_('Send to primary authors'), widget=SwitchWidget())
     include_coauthors = BooleanField(_('Send to co-authors'), widget=SwitchWidget())
@@ -430,8 +431,9 @@ class EditEmailTemplateTextForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
-        self.reply_to_address.choices = (list(self.event
-                                         .get_allowed_sender_emails(extra=self.reply_to_address.object_data).items()))
+        choices = [('', config.NO_REPLY_EMAIL)]
+        choices += list(self.event.get_allowed_sender_emails(extra=self.reply_to_address.object_data).items())
+        self.reply_to_address.choices = choices
         self.body.description = render_placeholder_info('abstract-notification-email', event=self.event)
 
 
