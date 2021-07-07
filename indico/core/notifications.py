@@ -162,7 +162,7 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     to_list = {to_list} if isinstance(to_list, str) else to_list
     cc_list = {cc_list} if isinstance(cc_list, str) else cc_list
     bcc_list = {bcc_list} if isinstance(bcc_list, str) else bcc_list
-    reply_address = {reply_address} if isinstance(reply_address, str) else (reply_address or set())
+    reply_address = {reply_address} if (isinstance(reply_address, str) and reply_address) else (reply_address or set())
     return {
         'to': set(to_list),
         'cc': set(cc_list),
