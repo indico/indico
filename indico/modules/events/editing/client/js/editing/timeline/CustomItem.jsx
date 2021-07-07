@@ -18,7 +18,7 @@ import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
 import {blockItemPropTypes} from './util';
 
-export default function CustomItem({item: {header, user, createdDt, html, revisionId}, state}) {
+export default function CustomItem({item: {header, user, reviewedDt, html, revisionId}, state}) {
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
 
   return (
@@ -32,8 +32,8 @@ export default function CustomItem({item: {header, user, createdDt, html, revisi
           >
             <div className="f-self-stretch">
               {header}{' '}
-              <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
-                {serializeDate(createdDt, 'LL')}
+              <time dateTime={serializeDate(reviewedDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+                {serializeDate(reviewedDt, 'LL')}
               </time>
             </div>
             {revisionId === lastRevertableRevisionId && <ResetReview revisionId={revisionId} />}

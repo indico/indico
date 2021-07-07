@@ -35,12 +35,12 @@ export function processRevisions(revisions) {
 }
 
 export function commentFromState(revision, state, user) {
-  const {finalState, id, createdDt, submitter} = revision;
+  const {finalState, id, reviewedDt, submitter} = revision;
   return {
-    id: `custom-item-${id}-${createdDt}-${finalState.name}`,
+    id: `custom-item-${id}-${reviewedDt}-${finalState.name}`,
     revisionId: id,
     header: state,
-    createdDt,
+    reviewedDt,
     user: user || submitter,
     custom: true,
     html: revision.commentHtml,
@@ -98,8 +98,9 @@ const statePropTypes = {
 export const blockItemPropTypes = {
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   revisionId: PropTypes.number.isRequired,
-  createdDt: PropTypes.string.isRequired,
+  createdDt: PropTypes.string,
   modifiedDt: PropTypes.string,
+  reviewedDt: PropTypes.string,
   canModify: PropTypes.bool,
   user: PropTypes.shape(userPropTypes),
   header: PropTypes.string,

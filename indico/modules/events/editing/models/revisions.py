@@ -60,9 +60,14 @@ def _make_state_check():
                f_accepted=FinalRevisionState.accepted)).strip()
 
 
+def _make_reviewed_dt_check():
+    return f'((final_state = {FinalRevisionState.none}) OR (reviewed_dt IS NOT NULL))'
+
+
 class EditingRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
     __table_args__ = (db.CheckConstraint(_make_state_check(), name='valid_state_combination'),
+                      db.CheckConstraint(_make_reviewed_dt_check(), name='reviewed_dt_set_when_final_state'),
                       {'schema': 'event_editing'})
 
     possible_render_modes = {RenderMode.markdown}
@@ -91,6 +96,10 @@ class EditingRevision(RenderModeMixin, db.Model):
         UTCDateTime,
         nullable=False,
         default=now_utc
+    )
+    reviewed_dt = db.Column(
+        UTCDateTime,
+        nullable=True
     )
     initial_state = db.Column(
         PyIntEnum(InitialRevisionState),

@@ -9,6 +9,7 @@ import pytest
 
 from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
+from indico.util.date_time import now_utc
 
 
 def test_cannot_undo_review_old_rev(dummy_contribution, dummy_user):
@@ -16,10 +17,10 @@ def test_cannot_undo_review_old_rev(dummy_contribution, dummy_user):
     editable = Editable(contribution=dummy_contribution, type=EditableType.paper)
     rev1 = EditingRevision(editable=editable, submitter=dummy_user,
                            initial_state=InitialRevisionState.ready_for_review,
-                           final_state=FinalRevisionState.needs_submitter_confirmation)
+                           final_state=FinalRevisionState.needs_submitter_confirmation, reviewed_dt=now_utc())
     rev2 = EditingRevision(editable=editable, submitter=dummy_user,
                            initial_state=InitialRevisionState.needs_submitter_confirmation,
-                           final_state=FinalRevisionState.needs_submitter_changes)
+                           final_state=FinalRevisionState.needs_submitter_changes, reviewed_dt=now_utc())
     rev3 = EditingRevision(editable=editable, submitter=dummy_user,
                            initial_state=InitialRevisionState.ready_for_review)
     with pytest.raises(InvalidEditableState):
@@ -54,9 +55,11 @@ def test_cannot_undo_review_old_rev(dummy_contribution, dummy_user):
 def test_can_undo_review(db, dummy_contribution, dummy_user, is1, fs1, ok1, is2, fs2, ok2):
     from indico.modules.events.editing.operations import InvalidEditableState, undo_review
     editable = Editable(contribution=dummy_contribution, type=EditableType.paper)
-    rev1 = EditingRevision(editable=editable, submitter=dummy_user, initial_state=is1, final_state=fs1)
+    rev1 = EditingRevision(editable=editable, submitter=dummy_user, initial_state=is1,
+                           final_state=fs1, reviewed_dt=(None if fs1 == FinalRevisionState.none else now_utc()))
     if is2 is not None:
-        rev2 = EditingRevision(editable=editable, submitter=dummy_user, initial_state=is2, final_state=fs2)
+        rev2 = EditingRevision(editable=editable, submitter=dummy_user, initial_state=is2,
+                               final_state=fs2, reviewed_dt=(None if fs2 == FinalRevisionState.none else now_utc()))
     db.session.flush()
 
     if ok1:
