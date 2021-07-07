@@ -9,39 +9,39 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-10 16:36+0200\n"
-"PO-Revision-Date: 2021-01-15 07:43+0000\n"
+"POT-Creation-Date: 2021-07-05 17:54+0200\n"
+"PO-Revision-Date: 2021-07-01 07:40+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.9.1\n"
 "Language: zh_CN.GB2312\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: indico/modules/attachments/client/js/legacy.js:154
+#: indico/modules/attachments/client/js/legacy.js:152
 msgid "This file no longer exists. Please reload the page."
 msgstr "这个文件不再存在，请重新加载这个页面。"
 
-#: indico/modules/attachments/client/js/legacy.js:160
+#: indico/modules/attachments/client/js/legacy.js:158
 msgid "You are not authorized to access this file."
 msgstr "您无权访问此文件。"
 
-#: indico/modules/attachments/client/js/legacy.js:160
-#: indico/modules/attachments/client/js/legacy.js:163
+#: indico/modules/attachments/client/js/legacy.js:158
+#: indico/modules/attachments/client/js/legacy.js:161
 msgid "Access Denied"
 msgstr "拒绝访问"
 
-#: indico/modules/attachments/client/js/legacy.js:162
+#: indico/modules/attachments/client/js/legacy.js:160
 msgid "This file is protected. You will be redirected to the login page."
 msgstr "此文件受保护。你将被重定向到登录页面。"
 
-#: indico/modules/attachments/client/js/legacy.js:230
+#: indico/modules/attachments/client/js/legacy.js:228
 msgid "Manage material"
 msgstr "管理材料"
 
-#: indico/modules/attachments/client/js/package.js:48
+#: indico/modules/attachments/client/js/package.js:49
 msgid "Building package"
 msgstr "生成包"
 
@@ -62,248 +62,243 @@ msgstr[0] "{0} 个持久事件未显示"
 msgid "Long lasting events"
 msgstr "持久事件"
 
-#: indico/modules/categories/client/js/display.js:23
+#: indico/modules/categories/client/js/display.js:21
 msgid "empty"
 msgstr "空"
 
-#: indico/modules/categories/client/js/display.js:24
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:298
+#: indico/modules/categories/client/js/display.js:22
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} 个事件"
 
-#: indico/modules/categories/client/js/display.js:155
-msgid "Remove from your favourites"
-msgstr "从收藏中删除"
+#: indico/modules/categories/client/js/display.js:151
+msgid "Remove from your favorites"
+msgstr "从收藏夹中删除"
 
-#: indico/modules/categories/client/js/display.js:158
-msgid "Add to your favourites"
-msgstr "添加到收藏"
+#: indico/modules/categories/client/js/display.js:154
+msgid "Add to your favorites"
+msgstr "添加到您的收藏夹"
 
-#: indico/modules/categories/client/js/display.js:160
+#: indico/modules/categories/client/js/display.js:156
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
 msgstr "这将使此类别中的事件在您的 <a href=\"{0}\"> 面板 </a> 上可见。"
 
-#: indico/modules/categories/client/js/management.js:49
-#: indico/modules/events/management/client/js/index.js:280
+#: indico/modules/categories/client/js/management.js:53
+#: indico/modules/events/management/client/js/index.js:301
 msgid "Undo"
 msgstr "撤销"
 
-#: indico/modules/categories/client/js/management.js:51
+#: indico/modules/categories/client/js/management.js:55
 msgid "The category order has been restored."
 msgstr "类别的次序已还原。"
 
-#: indico/modules/categories/client/js/management.js:53
+#: indico/modules/categories/client/js/management.js:57
 msgid "The category list has been sorted."
 msgstr "类别列表已排序。"
 
-#: indico/modules/categories/client/js/management.js:171
+#: indico/modules/categories/client/js/management.js:175
 msgid "Delete category"
 msgstr "删除类别"
 
-#: indico/modules/categories/client/js/management.js:175
+#: indico/modules/categories/client/js/management.js:179
 msgid "This category cannot be deleted because it is not empty."
 msgstr "这个类别不能删除因为它不为空。"
 
-#: indico/modules/categories/client/js/management.js:183
+#: indico/modules/categories/client/js/management.js:187
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "至少一个已选类别不能被删除因为它不为空。"
 
-#: indico/modules/categories/client/js/management.js:188
+#: indico/modules/categories/client/js/management.js:192
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "删除{0}个已选类别"
 
-#: indico/modules/categories/client/js/management.js:196
+#: indico/modules/categories/client/js/management.js:200
 msgid "Select the categories to delete first."
 msgstr "先选择要删除的类别。"
 
-#: indico/modules/categories/client/js/management.js:205
+#: indico/modules/categories/client/js/management.js:209
 msgid "Delete categories"
 msgstr "删除类别"
 
-#: indico/modules/categories/client/js/management.js:225
+#: indico/modules/categories/client/js/management.js:229
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "移动 {0} 个已选类别"
 
-#: indico/modules/categories/client/js/management.js:232
+#: indico/modules/categories/client/js/management.js:236
 msgid "Select the categories to move first."
 msgstr "先选择要移动的类别"
 
-#: indico/modules/categories/client/js/management.js:291
+#: indico/modules/categories/client/js/management.js:297
 #: indico/modules/vc/client/js/index.js:54
 #: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "当前已选择此类别中的所有{0}个事件。"
 
-#: indico/modules/categories/client/js/management.js:296
+#: indico/modules/categories/client/js/management.js:302
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "当前只选择了{1}个事件中的{0}个。"
 
-#: indico/modules/categories/client/js/management.js:334
-#: indico/modules/categories/client/js/management.js:399
+#: indico/modules/categories/client/js/management.js:340
+#: indico/modules/categories/client/js/management.js:404
 msgid "Move here"
 msgstr "移到这里"
 
-#: indico/modules/categories/client/js/management.js:335
+#: indico/modules/categories/client/js/management.js:341
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "移动类别"
 
-#: indico/modules/categories/client/js/management.js:337
+#: indico/modules/categories/client/js/management.js:343
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "为选出的{0}个类别选择新的父类别"
 
-#: indico/modules/categories/client/js/management.js:354
+#: indico/modules/categories/client/js/management.js:359
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "所选类别已在此处"
 
-#: indico/modules/categories/client/js/management.js:362
+#: indico/modules/categories/client/js/management.js:367
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "这是您试图移动的类别中的一个"
 
-#: indico/modules/categories/client/js/management.js:400
-#: indico/modules/events/management/client/js/index.js:45
+#: indico/modules/categories/client/js/management.js:405
+#: indico/modules/events/management/client/js/index.js:42
 msgid "Move event"
 msgid_plural "Move events"
 msgstr[0] "移动事件"
 
-#: indico/modules/categories/client/js/management.js:403
+#: indico/modules/categories/client/js/management.js:408
 msgid "Select category destination for the event"
 msgid_plural "Select category destination for {0} selected events"
 msgstr[0] "为 {0} 个选中事件选择类别目的地"
 
-#: indico/modules/categories/client/js/management.js:416
+#: indico/modules/categories/client/js/management.js:418
 msgid "The event is already here"
 msgid_plural "The selected events are already here"
 msgstr[0] "选中事件已经在这儿了"
 
-#: indico/modules/cephalopod/client/js/index.js:42
+#: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
 msgstr "连接社区中心时出现未知错误"
 
-#: indico/modules/cephalopod/client/js/index.js:44
+#: indico/modules/cephalopod/client/js/index.js:42
 msgid "Internal error: Parse error on the reply of the Community Hub."
 msgstr "内部错误：社区中心的回应出现解析错误。"
 
-#: indico/modules/cephalopod/client/js/index.js:46
+#: indico/modules/cephalopod/client/js/index.js:44
 msgid "Unable to contact the Community Hub."
 msgstr "不能连接社区中心。"
 
-#: indico/modules/cephalopod/client/js/index.js:48
+#: indico/modules/cephalopod/client/js/index.js:46
 msgid "The connection to the Community Hub timed out."
 msgstr "连接社区中心超时。"
 
-#: indico/modules/cephalopod/client/js/index.js:53
+#: indico/modules/cephalopod/client/js/index.js:51
 msgid "Your server is not registered with the Community Hub."
 msgstr "您的服务器没有在社区中心注册。"
 
-#: indico/modules/cephalopod/client/js/index.js:88
+#: indico/modules/cephalopod/client/js/index.js:86
 msgid "Disabled"
 msgstr "禁用"
 
-#: indico/modules/cephalopod/client/js/index.js:89
+#: indico/modules/cephalopod/client/js/index.js:87
 msgid "This server is not registered as part of the community."
 msgstr "此服务器没有注册成为社区的一部分。"
 
-#: indico/modules/cephalopod/client/js/index.js:110
+#: indico/modules/cephalopod/client/js/index.js:108
 msgid "Synchronized"
 msgstr "已同步"
 
-#: indico/modules/cephalopod/client/js/index.js:111
+#: indico/modules/cephalopod/client/js/index.js:109
 msgid "This server is registered as part of the community and is up to date."
 msgstr "此服务器已注册为社区的一部分，并且是最新的。"
 
-#: indico/modules/cephalopod/client/js/index.js:120
+#: indico/modules/cephalopod/client/js/index.js:118
 msgid "Out of sync"
 msgstr "不同步"
 
-#: indico/modules/cephalopod/client/js/index.js:121
+#: indico/modules/cephalopod/client/js/index.js:119
 msgid ""
 "Your Indico server is out of sync. Synchronize it with the button on the "
 "right."
 msgstr "您的 indico 服务没有同步。用右边的按钮去同步。"
 
-#: indico/modules/cephalopod/client/js/index.js:131
+#: indico/modules/cephalopod/client/js/index.js:129
 msgid "Error!"
 msgstr "错误！"
 
-#: indico/modules/cephalopod/client/js/index.js:149
+#: indico/modules/cephalopod/client/js/index.js:147
 msgid ""
 "Your Indico server is not synchronized with the Community Hub! You can solve"
 " this <a href=\"{0}\">here</a>."
 msgstr "您的 Indico 服务器没有和社区网络同步！您可以在 <a href=\"{0}\"> 这儿 </a> 解决这个问题。  "
 
-#: indico/modules/core/client/js/impersonation.js:35
-msgid "Select user to impersonate"
-msgstr "选择要模拟的用户"
-
-#: indico/modules/designer/client/js/index.js:30
-#: indico/modules/designer/client/js/index.js:706
+#: indico/modules/designer/client/js/index.js:31
+#: indico/modules/designer/client/js/index.js:707
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "用这个做背面的模板背面将被删除。"
 
-#: indico/modules/designer/client/js/index.js:33
-#: indico/modules/designer/client/js/index.js:709
+#: indico/modules/designer/client/js/index.js:34
+#: indico/modules/designer/client/js/index.js:710
 msgid "Disassociate back sides"
 msgstr "解除背面关联"
 
-#: indico/modules/designer/client/js/index.js:89
-#: indico/modules/designer/client/js/index.js:232
+#: indico/modules/designer/client/js/index.js:90
+#: indico/modules/designer/client/js/index.js:233
 msgid "Fixed text"
 msgstr "固定文本"
 
-#: indico/modules/designer/client/js/index.js:496
+#: indico/modules/designer/client/js/index.js:497
 msgid "Please choose a name for the template"
 msgstr "请为这个模板选择名字"
 
-#: indico/modules/designer/client/js/index.js:496
-#: indico/modules/designer/client/js/index.js:502
-#: indico/web/client/js/jquery/widgets/principalfield.js:136
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1119
+#: indico/modules/designer/client/js/index.js:497
+#: indico/modules/designer/client/js/index.js:503
+#: indico/web/client/js/jquery/widgets/principalfield.js:114
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:165
 msgid "Warning"
 msgstr "告警"
 
-#: indico/modules/designer/client/js/index.js:501
+#: indico/modules/designer/client/js/index.js:502
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "模板不能为空。添加一些元素或背景图片。"
 
-#: indico/modules/designer/client/js/index.js:528
+#: indico/modules/designer/client/js/index.js:529
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "您确定要更改此模板的尺寸？"
 
-#: indico/modules/designer/client/js/index.js:697
+#: indico/modules/designer/client/js/index.js:698
 msgid "This back side template will be removed"
 msgstr "此背面模板将被删除"
 
-#: indico/modules/designer/client/js/index.js:699
+#: indico/modules/designer/client/js/index.js:700
 msgid "The back side of this template will be removed"
 msgstr "此模板的背面将被删除"
 
-#: indico/modules/designer/client/js/index.js:700
+#: indico/modules/designer/client/js/index.js:701
 msgid "Disassociate back side"
 msgstr "解除背面关联"
 
-#: indico/modules/designer/client/js/index.js:704
+#: indico/modules/designer/client/js/index.js:705
 msgid "The back side is empty."
 msgstr "背面是空的。"
 
-#: indico/modules/designer/client/js/index.js:819
+#: indico/modules/designer/client/js/index.js:820
 msgid "Error"
 msgstr "错误"
 
-#: indico/modules/designer/client/js/index.js:936
+#: indico/modules/designer/client/js/index.js:937
 msgid "Choose a file"
 msgstr "选择文件"
 
@@ -320,38 +315,38 @@ msgstr "隐藏预览"
 msgid "Edit minutes"
 msgstr "编辑纪要"
 
-#: indico/modules/events/client/js/layout.js:169
+#: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
 msgstr "菜单条目设置"
 
-#: indico/modules/events/client/js/util/static_filters.js:21
+#: indico/modules/events/client/js/util/static_filters.js:19
 msgid "{0} out of {1} displayed"
 msgstr "显示 {0} 个 共 {1} 个"
 
-#: indico/modules/events/client/js/util/static_filters.js:61
+#: indico/modules/events/client/js/util/static_filters.js:59
 msgid "There are no entries that match your search criteria."
 msgstr "没有符合查询条件的条目。"
 
-#: indico/modules/events/management/client/js/index.js:41
+#: indico/modules/events/management/client/js/index.js:38
 msgid ""
 "You are about to move the event to the category \"{0}\". Are you sure you "
 "want to proceed?"
 msgstr "您将要移动事件到类别 \"{0}\"。您确定要继续吗？"
 
-#: indico/modules/events/management/client/js/index.js:278
+#: indico/modules/events/management/client/js/index.js:299
 msgid "Undoing previous operation..."
 msgstr "撤销前面的操作..."
 
 #: indico/modules/events/registration/client/js/index.js:52
-#: indico/modules/events/registration/client/js/registration.js:41
+#: indico/modules/events/registration/client/js/registration.js:39
 msgid "Terms and Conditions"
 msgstr "条款和条件"
 
-#: indico/modules/events/registration/client/js/reglists.js:29
+#: indico/modules/events/registration/client/js/reglists.js:35
 msgid "Email Preview"
 msgstr "邮件预览"
 
-#: indico/modules/events/registration/client/js/reglists.js:46
+#: indico/modules/events/registration/client/js/reglists.js:52
 msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
 msgstr[0] "您确实要删除选中的{0}个注册吗？"
@@ -365,7 +360,6 @@ msgid "Edit Field"
 msgstr "编辑字段"
 
 #: indico/modules/events/registration/client/js/form/field.js:147
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:876
 msgid "Add"
 msgstr "添加"
 
@@ -579,15 +573,15 @@ msgstr "已复制到剪贴板"
 msgid "Press {0} to copy"
 msgstr "按 {0} 去拷贝"
 
-#: indico/web/client/js/jquery/extensions/global.js:255
+#: indico/web/client/js/jquery/extensions/global.js:256
 msgid "Create new lecture"
 msgstr "创建新讲座"
 
-#: indico/web/client/js/jquery/extensions/global.js:256
+#: indico/web/client/js/jquery/extensions/global.js:257
 msgid "Create new meeting"
 msgstr "创建新会议"
 
-#: indico/web/client/js/jquery/extensions/global.js:257
+#: indico/web/client/js/jquery/extensions/global.js:258
 msgid "Create new conference"
 msgstr "创建新大会"
 
@@ -614,12 +608,11 @@ msgid "You have unsaved changes that will be lost."
 msgstr "您尚未保存的更改将丢失。"
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1345
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:696
 msgid "Confirm action"
 msgstr "确认操作"
 
-#: indico/web/client/js/jquery/utils/declarative.js:351
+#: indico/web/client/js/jquery/utils/declarative.js:360
 msgid "Direct link to this item"
 msgstr "直接连接到此项"
 
@@ -632,7 +625,6 @@ msgid "Previous"
 msgstr "前一个"
 
 #: indico/web/client/js/jquery/utils/errors.js:31
-#: indico/web/client/js/legacy/libs/presentation/Data/Remote.js:117
 #: indico/web/client/js/utils/axios.js:45
 msgid "Something went wrong"
 msgstr "出了问题"
@@ -718,126 +710,104 @@ msgstr "已保存"
 
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1115
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:161
 msgid "Save"
 msgstr "保存"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:670
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:672
 msgid "Loading..."
 msgstr "加载..."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:19
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:20
 msgid "Select"
 msgstr "选择"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:23
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:24
 msgid "This category doesn't contain any subcategory"
 msgstr "此类别不包含任何子类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:27
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:28
 msgid "Select a category"
 msgstr "选择类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:34
-msgid "Not possible for categories containing subcategories"
-msgstr "不适用于包含子类别的类别"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:38
-msgid "Not possible for categories containing events"
-msgstr "不适用于包含事件的类别"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:42
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:35
 msgid "Not possible for categories where you cannot create events"
 msgstr "不适用于不能建立事件的类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:48
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:41
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "不适用于从类别 \"{0}\" 降序的类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:52
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:45
 msgid "Not possible for this category"
 msgstr "不适用此类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:141
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:217
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:134
 msgid "Search"
 msgstr "查询"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:194
-msgid "in"
-msgstr "在类别"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:198
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:191
 msgid "Go to: {0}"
 msgstr "转到：{0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:235
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:228
 msgid "This category is protected"
 msgstr "此类别是受保护的"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:283
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:276
 msgid "Go to parent: {0}"
 msgstr "转到父级: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:294
-msgid "{0} category"
-msgid_plural "{0} categories"
-msgstr[0] "{0} 个类别"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:335
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:325
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "您只可以 <a class=\"js-action\" data-category-id=\"{0}\"> {1} </a> 这个。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:340
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:330
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
 " class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a class"
 "=\"js-search\">search</a>."
 msgstr "您可以 <a class=\"js-action\" data-category-id=\"{0}\"> {1} </a> 此类别，<a class=\"js-navigate-up\" data-parent-id=\"{2}\"> 向上导航 </a> 或 <a class=\"js-search\"> 搜索 </a>。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:348
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "你可以 <a class=\"js-navigate-up\" data-parent-id=\"{2}\"> 向上导航 </a> 或 <a class=\"js-search\"> 搜索 </a>。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:363
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:353
 msgid "Your search doesn't match any category"
 msgstr "你的搜索与任何类别都不匹配"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:368
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:358
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "你可以 <a class=\"js-search\"> 修改 </a> 或 <a class=\"js-clear-search\"> 清除 </a> 你的搜索。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:442
-msgid "In favourite categories"
-msgstr "在收藏类别里"
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:432
+msgid "In favorite categories"
+msgstr "在收藏的类别中"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:449
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:439
 msgid "Search result"
 msgstr "查询结果"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:460
 msgid "Displaying {0} out of {1} results."
 msgstr "显示 {1} 个结果中的 {0}个。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:471
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:461
 msgid "There are no results."
 msgstr "无结果。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:475
-msgid "Make the search more specific for more accurate results"
-msgstr "使搜索更具体以获得更准确的结果"
-
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:480
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
 msgid "Clear search"
 msgstr "清空查询"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:694
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "你选择了类别 <em> {0} </em>。 你确定要继续吗？"
 
@@ -855,7 +825,7 @@ msgstr "输入以添加 {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
 msgid "Delete"
 msgstr "删除"
 
@@ -863,20 +833,16 @@ msgstr "删除"
 msgid "Empty values are not allowed."
 msgstr "不允许空值。"
 
-#: indico/web/client/js/jquery/widgets/principalfield.js:106
-msgid "Choose person"
-msgstr "选择人"
-
-#: indico/web/client/js/jquery/widgets/principalfield.js:135
+#: indico/web/client/js/jquery/widgets/principalfield.js:113
 msgid "There is already another person with this email address."
 msgstr "已经有其他人使用此电子邮件地址。"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:183
-#: indico/web/client/js/jquery/widgets/principalfield.js:143
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:193
+#: indico/web/client/js/jquery/widgets/principalfield.js:121
 msgid "Edit information"
 msgstr "编辑信息"
 
-#: indico/web/client/js/jquery/widgets/principalfield.js:162
+#: indico/web/client/js/jquery/widgets/principalfield.js:140
 msgid "Enter person"
 msgstr "输入人员"
 
@@ -907,16 +873,15 @@ msgid_plural "<strong>{0}</strong> words left"
 msgstr[0] "<strong> {0} </strong> 剩余单词"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1474
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
 msgid "Edit"
 msgstr "编辑"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:49
 #: indico/web/client/js/legacy/angular/directives.js:68
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:413
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:883
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1140
-#: indico/web/client/js/legacy/libs/timetable/Management.js:672
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:186
+#: indico/web/client/js/legacy/libs/timetable/Management.js:670
 msgid "Cancel"
 msgstr "取消"
 
@@ -936,146 +901,141 @@ msgstr "必须是 {0} 以下"
 msgid "Please fill in the required fields."
 msgstr "请填写所需字段。"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:166
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:171
 msgid "IP networks cannot have management permissions"
 msgstr "IP 网络不能有管理权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:167
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
 msgid "Registrants cannot have management permissions"
 msgstr "注册人不能具有管理权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:179
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:184
 msgid "Assign Permissions"
 msgstr "赋予权限   "
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:196
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:201
 msgid "Delete entry '{0}'"
 msgstr "删除第 '{0}' 条"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1344
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "您确定要从列表中删除你自己？"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:281
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:286
 msgid "All options have been added"
 msgstr "所有选项已添加"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:312
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:317
 msgid "This entry was already added"
 msgstr "此条目已被添加"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:345
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:350
 msgid "Anonymous"
 msgstr "匿名"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:359
 msgid "Additional users"
 msgstr "其他用户"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:358
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:363
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} 个用户由于其他角色具有隐式读取权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:374
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:379
 msgid "Category Managers"
 msgstr "类别管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:376
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:381
 msgid "Parent Category Managers"
 msgstr "父类别管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:378
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:383
 msgid "Event Managers"
 msgstr "事件管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:395
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:400
 msgid "Registrants in \"{0}\""
 msgstr "\"{0}\" 中的注册人"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:443
-msgid "Select a user or group to add"
-msgstr "选择用户或组去添加"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:169
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:179
 msgid "Speaker"
 msgstr "发言人"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:180
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:190
 msgid "Remove person"
 msgstr "删除人员"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:186
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:196
 msgid "Configure roles"
 msgstr "配置角色"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:201
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:211
 msgid "Submitter"
 msgstr "提交人"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:248
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:259
 msgid "or"
 msgstr "或者"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:269
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:280
 msgid "Move to authors"
 msgstr "移动到作者"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:275
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:286
 msgid "Move to co-authors"
 msgstr "移动到合作者"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:282
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:293
 msgid "Move to others"
 msgstr "转移到其他人"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:288
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:299
 msgid "Not a speaker anymore"
 msgstr "不再是发言人"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:289
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
 msgid "Make a speaker"
 msgstr "产生发言人"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:311
 msgid "People in the 'Others' section <strong>must</strong> be speakers."
 msgstr "“其他” 部分的人 <strong> 必须 </strong> 是发言人。"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:320
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:331
 msgid "Revoke submission rights"
 msgstr "撤销提交权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:321
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:986
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:332
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:32
 msgid "Grant submission rights"
 msgstr "授予提交权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:392
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:398
 msgid "Custom sorting has been applied. Click to restore alphabetical order."
 msgstr "已应用自定义排序。单击以恢复字母顺序。"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:394
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:400
 msgid "Alphabetical sorting is ON. Click to turn it off."
 msgstr "字母排序已打开。单击可将其关闭. "
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:439
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
 msgid "You must add at least one speaker"
 msgstr "您必须添加至少一个发言者"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:442
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
 msgid "You must add at least one submitter"
 msgstr "您必须添加至少一个提交人"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:451
 msgid "You must add at least one co-author"
 msgstr "您必须添加至少一个合作作者"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:454
 msgid "You must add at least one author"
 msgstr "您必须添加至少一个作者"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:456
+#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:459
 msgid ""
 "You cannot have users in the Other section, please make them authors or co-"
 "authors"
@@ -1089,16 +1049,6 @@ msgstr "好"
 msgid "The content of this dialog is currently unavailable."
 msgstr "此对话框的内容当前不可用。"
 
-#: indico/web/client/js/legacy/libs/indico/Common/Export.js:82
-msgid "Would you like to export private information to your calendar?"
-msgstr "是否将私密信息导出到日历中？"
-
-#: indico/web/client/js/legacy/libs/indico/Common/Export.js:245
-msgid ""
-"Would you like to create a persistent URL for use with your calendaring "
-"application?"
-msgstr "是否创建用于日历应用程序的持久URL？"
-
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:243
 msgid "OK"
 msgstr "确定"
@@ -1107,266 +1057,118 @@ msgstr "确定"
 msgid "Reason: "
 msgstr "原因："
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:26
-msgid "Remove from your list of favorite users"
-msgstr "从你喜爱的用户列表中删除"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:27
-msgid "Add to your list of favorite users"
-msgstr "添加到您喜爱的用户列表中"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:122
-msgid "This person exists in the event"
-msgstr "此人在事件中已存在"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:191
-msgid "Users with no Indico account"
-msgstr "没有indico帐号的用户"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:239
-msgid "Grant all selected users submission rights"
-msgstr "授与所有选中的用户提交权限"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:273
-msgid "You can use the form above to search for users..."
-msgstr "你可以使用上面的表查询用户..."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:321
-msgid "Family name"
-msgstr "姓"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:322
-msgid "First name"
-msgstr "名"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:323
-msgid "E-mail"
-msgstr "电子邮件"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:324
-msgid "Organisation"
-msgstr "组织"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:325
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:437
-msgid "Exact Match"
-msgstr "精确匹配"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:355
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:456
-msgid "No results for this search..."
-msgstr "没有查询结果..."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:437
-msgid "Group name"
-msgstr "组名"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:543
-msgid "Users"
-msgstr "用户"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:544
-msgid "Groups"
-msgstr "组"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:620
-msgid "Suggested users"
-msgstr "推荐的用户"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:625
-msgid "There are no suggested users for you at the moment. Why not add some "
-msgstr "目前没有为您推荐的用户。为什么不加一些呢? "
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:626
-msgid "favourites"
-msgstr "喜爱的"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:846
-msgid "Please select at least one item"
-msgstr "请选择至少一项"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:876
-msgid "Choose"
-msgstr "选择"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:992
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1011
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1031
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1046
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:38
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:57
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:77
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:92
 msgid "Note:"
 msgstr "提示："
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:993
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1012
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1032
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1047
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:39
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:58
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:78
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:93
 msgid " If this person does not already have an Indico account, "
 msgstr "如果这个人还没有Indico帐号，"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:995
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:41
 msgid "he or she will be sent an email asking to register as a user."
 msgstr "他或她将收到要求注册成为用户的邮件。"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:997
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:43
 msgid " After the registration the user will automatically be given"
 msgstr "注册后用户将自动获得"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:999
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:45
 msgid " submission rights."
 msgstr "提交权限。"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1005
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:51
 msgid "Give management rights"
 msgstr "授予管理权限"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1014
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1034
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1049
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:60
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:80
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:95
 msgid "he or she will be sent an email asking to create an account."
 msgstr "他或她会收到要求建立帐号的邮件。"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1016
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1036
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1051
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:62
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:82
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:97
 msgid " After the account creation the user will automatically be"
 msgstr "创建帐户后用户将自动是"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1018
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:64
 msgid " given management rights."
 msgstr "具有管理权限"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1025
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:71
 msgid "Give coordination rights"
 msgstr "给予协调权限"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1038
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:84
 msgid " given coordination rights."
 msgstr "具有协调权限。"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1053
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:99
 msgid " given the rights."
 msgstr "被赋予权限"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1060
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:106
 #: indico/web/client/js/legacy/libs/timetable/Management.js:21
 msgid "Title"
 msgstr "称谓"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1065
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:111
 msgid "Mr"
 msgstr "先生"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1066
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:112
 msgid "Mrs"
 msgstr "夫人"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1067
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:113
 msgid "Ms"
 msgstr "女士"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1068
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:114
 msgid "Dr"
 msgstr "博士"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1069
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:115
 msgid "Prof."
 msgstr "教授"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1075
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:121
 msgid "Family Name"
 msgstr "姓"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1082
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:128
 msgid "First Name"
 msgstr "名"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1086
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:132
 msgid "Affiliation"
 msgstr "工作单位"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1090
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:136
 msgid "Email"
 msgstr "电子邮件"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1100
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:146
 msgid "Address"
 msgstr "地址"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1101
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:147
 msgid "Telephone"
 msgstr "电话"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1120
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:166
 msgid ""
 "It is not possible to grant submission rights to a participant without an "
 "email address. Please set an email address."
 msgstr "如果没有电子邮件地址，则无法授予参与者提交权限。请设置电子邮件地址。"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1194
-msgid "User privileges"
-msgstr "用户权限"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1239
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1240
-msgid "User rights"
-msgstr "用户权限"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1261
-msgid "Submission rights"
-msgstr "提交权限"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1445
-msgid ""
-"Please note that you have added a user that does not exist in Indico.\n"
-"                                    Non existing users will be asked via email to create an account so\n"
-"                                    that they will be able to use the privileges below."
-msgstr "请注意，您添加了一个Indico中不存在的用户。\n不存在用户将被要求通过电子邮件创建一个帐户\n以便他们能够使用下面的权限。"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1450
-msgid ""
-"Please note that you have added a user without an email address. Users without \n"
-"                                    email will not be able to use the privileges below."
-msgstr "请注意，您添加了一个没有电子邮件地址的用户。\n没有电子邮件地址的用户将不能使用下面的权限。"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1528
-msgid "Add User / Group"
-msgstr "添加 用户/组"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1528
-msgid "Add user"
-msgstr "添加用户"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1537
-msgid "Add IP Network"
-msgstr "添加 IP 网络"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1561
-msgid "Add Users and Groups"
-msgstr "添加用户和组"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1561
-msgid "Add Users"
-msgstr "添加用户"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1563
-msgid "Search Users and Groups"
-msgstr "查询用户和组"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1563
-msgid "Search Users"
-msgstr "查询用户"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1648
-msgid "Add New"
-msgstr "添加新的"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1654
-msgid "New user"
-msgstr "新用户"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:1680
-msgid "Grant all these users with privileges: "
-msgstr "为所有这些用户赋予权限"
 
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:465
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:473
@@ -1571,7 +1373,7 @@ msgid "Add new"
 msgstr "添加新的"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:1080
-#: indico/web/client/js/legacy/libs/timetable/Management.js:666
+#: indico/web/client/js/legacy/libs/timetable/Management.js:664
 msgid "Reschedule"
 msgstr "重新规划"
 
@@ -1621,76 +1423,76 @@ msgstr "当前按下了 <span class=\"key light\"> Shift </span>。更改将应�
 msgid "Drop to move block inside session"
 msgstr "下拉移动分会里的块"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:111
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:113
 msgid "Show materials"
 msgstr "显示资料"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:213
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:215
 msgid "et al."
 msgstr "等"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:313
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
 msgid "This poster session has "
 msgstr "此海报分会有"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
 msgid " contribution(s)."
 msgstr "贡献(s)。"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:319
 msgid "Please click for more information."
 msgstr "请点击以得到更多信息。"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:620
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:622
 msgid "Move entry"
 msgstr "移动条目"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:664
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:675
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:666
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:677
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr "此日程表条目不存在了。请刷新页面。"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:676
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:678
 msgid "Refresh"
 msgstr "刷新"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:779
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
 msgid "Move up"
 msgstr "上移"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:788
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:790
 msgid "Move down"
 msgstr "下移"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1478
 msgid "Edit poster"
 msgstr "编辑海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1508
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
 msgid "Manage protection"
 msgstr "管理保护"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1512
 msgid "Manage poster protection"
 msgstr "管理海报保护"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1538
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
 msgid "Unschedule"
 msgstr "计划外的"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1539
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1541
 msgid "Unschedule poster"
 msgstr "计划外的海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "您确定要取消海报吗？"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1543
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1545
 msgid "Delete poster"
 msgstr "删除海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1546
 msgid "Are you sure you want to delete the poster?"
 msgstr "您确定要删除这个海报？"
 
@@ -1845,119 +1647,105 @@ msgstr "步骤2：选择条目间的时间间隙"
 msgid "Step 3: Choose to fit sessions to their content"
 msgstr "步骤3：选择适合其内容的分会"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:591
-msgid ""
-"This changes the start and end times of the session blocks occuring on  in "
-"order to fit their respective content "
-msgstr "这将更改正在发生的分会块的开始和结束时间，以适应它们各自的内容"
-
-#: indico/web/client/js/legacy/libs/timetable/Management.js:594
-msgid "before"
-msgstr "之前"
-
-#: indico/web/client/js/legacy/libs/timetable/Management.js:595
-msgid " performing the rescheduling."
-msgstr "执行重新安排。"
-
-#: indico/web/client/js/legacy/libs/timetable/Management.js:619
+#: indico/web/client/js/legacy/libs/timetable/Management.js:617
 msgid "There will be no gaps between consecutive entries."
 msgstr "连续条目之间不存在间隙。"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:624
+#: indico/web/client/js/legacy/libs/timetable/Management.js:622
 msgid "Entries will be separated by gaps of "
 msgstr "条目将被间隔分开"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:626
+#: indico/web/client/js/legacy/libs/timetable/Management.js:624
 msgid "1 hour "
 msgstr "1 小时"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:628
+#: indico/web/client/js/legacy/libs/timetable/Management.js:626
 msgid " hours "
 msgstr "小时"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:632
+#: indico/web/client/js/legacy/libs/timetable/Management.js:630
 msgid "and "
 msgstr "和"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:636
+#: indico/web/client/js/legacy/libs/timetable/Management.js:634
 msgid "1 minute."
 msgstr "1 分钟 。"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:638
+#: indico/web/client/js/legacy/libs/timetable/Management.js:636
 msgid " minutes."
 msgstr "分钟。"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:719
+#: indico/web/client/js/legacy/libs/timetable/Management.js:717
 msgid "Rescheduling..."
 msgstr "重新规划..."
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:735
+#: indico/web/client/js/legacy/libs/timetable/Management.js:733
 msgid "Are you sure you want to reschedule entries ?"
 msgstr "你确定要重新规划条目？"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:742
+#: indico/web/client/js/legacy/libs/timetable/Management.js:740
 msgid "The entries that are part of a session will"
 msgstr "分会中的条目将"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:747
+#: indico/web/client/js/legacy/libs/timetable/Management.js:745
 msgid " first"
 msgstr "第一"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:749
+#: indico/web/client/js/legacy/libs/timetable/Management.js:747
 msgid " be fitted to their content."
 msgstr "适合其内容。"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
 msgid "Then, all entries "
 msgstr "然后，所有条目"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
 msgid "All entries "
 msgstr "所有条目"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:756
+#: indico/web/client/js/legacy/libs/timetable/Management.js:754
 msgid " will have their "
 msgstr "将有他们的"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:757
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
 msgid "starting times"
 msgstr "开始时间"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:757
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
 msgid "duration"
 msgstr "持续时间"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:758
+#: indico/web/client/js/legacy/libs/timetable/Management.js:756
 msgid " changed."
 msgstr "改变了。"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:765
+#: indico/web/client/js/legacy/libs/timetable/Management.js:763
 msgid "Please review your choice"
 msgstr "请检查您的选择"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:781
+#: indico/web/client/js/legacy/libs/timetable/Management.js:779
 msgid "Please select the rescheduling type"
 msgstr "请选择重新规划类型"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:811
+#: indico/web/client/js/legacy/libs/timetable/Management.js:809
 msgid "Reschedule Entries"
 msgstr "重新规划条目"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:847
+#: indico/web/client/js/legacy/libs/timetable/Management.js:845
 msgid ""
 "This will change the starting and ending times of the session block {0} so "
 "that it encompasses all entries defined in its timetable."
 msgstr "这将更改分会块 {0} 的开始和结束时间，以便它包含其时间表中定义的所有条目。"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:854
+#: indico/web/client/js/legacy/libs/timetable/Management.js:852
 msgid "Are you sure you want to proceed?"
 msgstr "您确定要处理吗？"
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:876
+#: indico/web/client/js/legacy/libs/timetable/Management.js:874
 msgid "Fitting..."
 msgstr "调整..."
 
-#: indico/web/client/js/legacy/libs/timetable/Management.js:890
+#: indico/web/client/js/legacy/libs/timetable/Management.js:888
 msgid "Fit timetable to content"
 msgstr "根据内容调整时间表"
 
