@@ -537,17 +537,14 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         # repeating it when performing this check on many abstracts.
         if not user:
             return False
-        elif check_state and self.public_state not in (AbstractPublicState.under_review, AbstractPublicState.awaiting):
+        if check_state and self.public_state not in (AbstractPublicState.under_review, AbstractPublicState.awaiting):
             return False
-        elif not self.event.can_manage(user, permission='abstract_reviewer', explicit_permission=True):
+        if not self.event.can_manage(user, permission='abstract_reviewer', explicit_permission=True):
             return False
-        elif self.event.can_manage(user, permission='review_all_abstracts', explicit_permission=True):
+        if self.event.can_manage(user, permission='review_all_abstracts', explicit_permission=True):
             return True
-        elif any(track.can_manage(user, permission='review', explicit_permission=True)
-                 for track in self.reviewed_for_tracks):
-            return True
-        else:
-            return False
+        return any(track.can_manage(user, permission='review', explicit_permission=True)
+                   for track in self.reviewed_for_tracks)
 
     def can_judge(self, user, check_state=False):
         if not user:
