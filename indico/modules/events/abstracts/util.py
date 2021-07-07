@@ -10,7 +10,7 @@ import os
 import shutil
 from collections import defaultdict, namedtuple
 
-from sqlalchemy.orm import joinedload, load_only, noload
+from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
 from indico.core.config import config
 from indico.core.db import db
@@ -342,9 +342,11 @@ def get_events_with_abstract_reviewer_convener(user, dt=None):
             roles.add('track_convener')
 
     query = (user.in_track_acls
+             .join(TrackPrincipal.track)
+             .join(Track.event)
              .options(load_only('track_id', 'permissions'))
              .options(noload('*'))
-             .options(joinedload(TrackPrincipal.track).load_only('event_id'))
+             .options(contains_eager(TrackPrincipal.track).load_only('event_id'))
              .filter(Event.ends_after(dt), ~Event.is_deleted))
     for principal in query:
         roles = data[principal.track.event_id]
