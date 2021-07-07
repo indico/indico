@@ -18,7 +18,7 @@
                 <ul class="i-box-group vert"
                     data-url="{{ url_for('.email_tpl_sort', event) }}">
                     {% for tpl in event.abstract_email_templates|sort(attribute='position') %}
-                        <li class="i-box" data-id="{{ tpl.id }}">
+                        <li class="i-box js-email-template" data-id="{{ tpl.id }}">
                             <div class="ui-i-box-sortable-handle hide-if-locked"></div>
                             <div class="i-box-header">
                                 <span class="i-box-title">{{ tpl.title }}</span>

@@ -38,6 +38,7 @@ Bugfixes
 
 - Fix errors when importing events containing abstracts or event roles from a YAML dump
   (:pr:`4995`)
+- Fix sorting abstract notification rules (:pr:`4998`)
 
 Version 3.0rc1
 --------------

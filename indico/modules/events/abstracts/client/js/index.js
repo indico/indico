@@ -5,11 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global setupListGenerator:false, setupSearchBox:false */
+/* global setupListGenerator:false, setupSearchBox:false, handleAjaxError:false */
+
+import _ from 'lodash';
 
 import 'selectize';
 import 'selectize/dist/css/selectize.css';
 import 'selectize/dist/css/selectize.default.css';
+
+import {$T} from 'indico/utils/i18n';
 
 import 'indico/modules/events/reviews';
 import 'indico/modules/events/util/types_dialog';
@@ -51,10 +55,8 @@ import './boa';
       update() {
         const $elem = $('.email-templates > ul');
         const sortedList = $elem
-          .find('li.email-template')
-          .map(function(i, elem) {
-            return $(elem).data('id');
-          })
+          .find('li.js-email-template')
+          .map((i, elem) => $(elem).data('id'))
           .get();
 
         $.ajax({
