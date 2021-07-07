@@ -36,7 +36,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix errors when importing events containing abstracts or event roles from a YAML dump
+  (:pr:`4995`)
 
 Version 3.0rc1
 --------------

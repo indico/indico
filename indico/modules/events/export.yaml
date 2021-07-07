@@ -175,6 +175,7 @@ export:
   events.role_members: {}
 
   EventRole:
+    allow_duplicates: true
     fks:
       - EventRole.members.prop.secondary.c.role_id
 
@@ -184,32 +185,41 @@ export:
     skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
     fks_out:
       - registration_form_id
+      - event_role_id
 
   EventSettingPrincipal:
     skipif: ROW.type.name not in ('user', 'event_role')
+    fks_out:
+      - event_role_id
 
   ContributionPrincipal:
     skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
     fks_out:
       - registration_form_id
+      - event_role_id
 
   SessionPrincipal:
     skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
     fks_out:
       - registration_form_id
+      - event_role_id
 
   AttachmentPrincipal:
     skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
     fks_out:
       - registration_form_id
+      - event_role_id
 
   AttachmentFolderPrincipal:
     skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
     fks_out:
       - registration_form_id
+      - event_role_id
 
   TrackPrincipal:
     skipif: ROW.type.name not in ('user', 'event_role')
+    fks_out:
+      - event_role_id
 
   # misc stuff
   EventLogEntry: {}
@@ -426,7 +436,7 @@ import:
     Abstract:
       uuid: |
         from uuid import uuid4 as _uuid4
-        uuid = unicode(_uuid4())
+        uuid = str(_uuid4())
 
 
   # How user references should be handled if the user does not exist.
