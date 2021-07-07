@@ -86,6 +86,10 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
         if self.REGISTRATION_REQUIRED and not self.registration:
             raise Forbidden
 
+    def _check_access(self):
+        if not self.token and self.registration:
+            RHRegistrationFormBase._check_access(self)
+
 
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event."""

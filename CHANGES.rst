@@ -42,6 +42,8 @@ Bugfixes
 - No longer silently fall back to the first event contact email address when sending
   registration emails where no explicit sender address has been configured (:issue:`4992`,
   :pr:`4996`, thanks :user:`vasantvohra`)
+- No longer requires login on protected events to show the registration details with tokenized manage url.
+  (:issue:`4991`, :pr:`4997`, thanks :user:`vasantvohra`)
 
 Version 3.0rc1
 --------------
