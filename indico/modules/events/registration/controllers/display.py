@@ -86,6 +86,10 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
         if self.REGISTRATION_REQUIRED and not self.registration:
             raise Forbidden
 
+    def _check_access(self):
+        if not self.token and self.registration:
+            RHRegistrationFormBase._check_access(self)
+
 
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event."""
@@ -243,14 +247,22 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
 
     ALLOW_PROTECTED_EVENT = True
 
+    def _process_args(self):
+        RHRegistrationFormBase._process_args(self)
+        self.update = request.args.get('update')
+        self.existing_registration = self.regform.get_registration(uuid=self.update) if self.update else None
+
+    def _check_access(self):
+        if not self.existing_registration:
+            RHRegistrationFormBase._check_access(self)
+
     def _process(self):
         email = request.args['email'].lower().strip()
-        update = request.args.get('update')
         management = request.args.get('management') == '1'
 
-        if update:
-            existing = self.regform.get_registration(uuid=update)
-            return jsonify(check_registration_email(self.regform, email, existing, management=management))
+        if self.update:
+            return jsonify(check_registration_email(self.regform, email, self.existing_registration,
+                                                    management=management))
         else:
             return jsonify(check_registration_email(self.regform, email, management=management))
 
