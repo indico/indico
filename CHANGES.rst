@@ -39,6 +39,9 @@ Bugfixes
 - Fix errors when importing events containing abstracts or event roles from a YAML dump
   (:pr:`4995`)
 - Fix sorting abstract notification rules (:pr:`4998`)
+- No longer silently fall back to the first event contact email address when sending
+  registration emails where no explicit sender address has been configured (:issue:`4992`,
+  :pr:`4996`, thanks :user:`vasantvohra`)
 
 Version 3.0rc1
 --------------

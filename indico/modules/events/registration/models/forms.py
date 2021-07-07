@@ -394,11 +394,6 @@ class RegistrationForm(db.Model):
                 .options(subqueryload('data'))
                 .all())
 
-    @property
-    def sender_address(self):
-        contact_email = self.event.contact_emails[0] if self.event.contact_emails else None
-        return self.notification_sender_address or contact_email
-
     def __repr__(self):
         return f'<RegistrationForm({self.id}, {self.event_id}, {self.title})>'
 
