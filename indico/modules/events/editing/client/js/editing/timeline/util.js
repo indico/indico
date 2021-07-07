@@ -98,8 +98,9 @@ const statePropTypes = {
 export const blockItemPropTypes = {
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   revisionId: PropTypes.number.isRequired,
-  createdDt: PropTypes.string.isRequired,
+  createdDt: PropTypes.string,
   modifiedDt: PropTypes.string,
+  reviewedDt: PropTypes.string,
   canModify: PropTypes.bool,
   user: PropTypes.shape(userPropTypes),
   header: PropTypes.string,
