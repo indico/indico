@@ -32,7 +32,7 @@ export default function CustomItem({item: {header, user, reviewedDt, html, revis
           >
             <div className="f-self-stretch">
               {header}{' '}
-              <time dateTime={serializeDate(reviewedDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+              <time dateTime={serializeDate(reviewedDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
                 {serializeDate(reviewedDt, 'LL')}
               </time>
             </div>

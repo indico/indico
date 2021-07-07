@@ -76,7 +76,9 @@ export default function RevisionReview({review, revision}) {
               content={review.visibility.title}
               position="bottom center"
             />{' '}
-            <time dateTime={serializeDate(review.createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+            <time
+              dateTime={serializeDate(review.createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}
+            >
               {serializeDate(review.createdDt, 'LL')}
             </time>
             {review.modifiedDt && (

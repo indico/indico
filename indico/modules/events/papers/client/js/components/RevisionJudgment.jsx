@@ -54,7 +54,7 @@ export default function RevisionJudgment({revision}) {
                 changes.
               </Translate>
             )}{' '}
-            <time dateTime={serializeDate(judgmentDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+            <time dateTime={serializeDate(judgmentDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
               {serializeDate(judgmentDt, 'LL')}
             </time>
           </div>

@@ -66,7 +66,7 @@ export default function Comment({
                   title={Translate.string('Visible only to editors')}
                 />
               )}
-              <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+              <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
                 {serializeDate(createdDt, 'LL')}
               </time>
               {modifiedDt && (

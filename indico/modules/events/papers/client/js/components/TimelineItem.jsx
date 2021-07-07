@@ -47,7 +47,9 @@ export default function TimelineItem({block}) {
                   <Param name="submitterName" value={submitterName} wrapper={<strong />} />{' '}
                   submitted paper revision <Param name="revisionNumber" value={`#${number}`} />
                 </Translate>{' '}
-                <time dateTime={serializeDate(submittedDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+                <time
+                  dateTime={serializeDate(submittedDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}
+                >
                   {serializeDate(submittedDt, 'LL')}
                 </time>
               </div>

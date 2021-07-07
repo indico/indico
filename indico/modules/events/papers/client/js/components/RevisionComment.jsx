@@ -67,7 +67,9 @@ export default function RevisionComment({comment, revision}) {
                   position="bottom center"
                 />
               )}{' '}
-              <time dateTime={serializeDate(comment.createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+              <time
+                dateTime={serializeDate(comment.createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}
+              >
                 {serializeDate(comment.createdDt, 'LL')}
               </time>
               {comment.modifiedDt && (

@@ -68,7 +68,7 @@ export default function TimelineItem({block, index}) {
                     </Translate>
                   )}
                 </span>{' '}
-                <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+                <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
                   {serializeDate(createdDt, 'LL')}
                 </time>
               </div>
