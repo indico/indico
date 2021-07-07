@@ -61,11 +61,13 @@ _bp.add_url_rule('/event/<int:event_id>/key-access', 'key_access', RHEventAccess
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_events', __name__)
-_compat_bp.add_url_rule('/conferenceDisplay.py', 'display_modpython', make_compat_redirect_func(_bp, 'display'))
+_compat_bp.add_url_rule('/conferenceDisplay.py', 'display_modpython',
+                        make_compat_redirect_func(_bp, 'display', view_args_conv={'confId': 'event_id'}))
 _compat_bp.add_url_rule('/conferenceOtherViews.py', 'display_other_modpython',
-                        make_compat_redirect_func(_bp, 'display_other'))
+                        make_compat_redirect_func(_bp, 'display_other', view_args_conv={'confId': 'event_id'}))
 _compat_bp.add_url_rule('/conferenceDisplay.py/overview', 'display_overview_modpython',
-                        make_compat_redirect_func(_bp, 'display_overview'))
+                        make_compat_redirect_func(_bp, 'display_overview', view_args_conv={'confId': 'event_id'}))
 _compat_bp.add_url_rule('/event/<int:event_id>/my-conference/', 'display_mystuff',
-                        make_compat_redirect_func(_bp, 'display'))
-_compat_bp.add_url_rule('/myconference.py', 'display_mystuff_modpython', make_compat_redirect_func(_bp, 'display'))
+                        make_compat_redirect_func(_bp, 'display', view_args_conv={'confId': 'event_id'}))
+_compat_bp.add_url_rule('/myconference.py', 'display_mystuff_modpython',
+                        make_compat_redirect_func(_bp, 'display', view_args_conv={'confId': 'event_id'}))
