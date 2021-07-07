@@ -44,7 +44,7 @@ def _notify_registration(registration, template_name, to_managers=False, attach_
     tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
                               attach_rejection_reason=attach_rejection_reason)
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
-    from_address = registration.registration_form.sender_address if not to_managers else None
+    from_address = registration.registration_form.notification_sender_address if not to_managers else None
     mail = make_email(to_list=to_list, template=tpl, html=True, from_address=from_address, attachments=attachments)
     user = session.user if session else None
     signals.core.before_notification_send.send('notify-registration', email=mail, registration=registration,
