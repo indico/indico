@@ -21,7 +21,6 @@ Major Features
 Improvements
 ^^^^^^^^^^^^
 
-- Add an option to allow non-judge conveners to update an abstract track (:pr:`4989`)
 - Add abstract content to the abstract list customization options (:pr:`4968`)
 - Add CLI option to create a series (:pr:`4969`)
 - Users cannot submit multiple anonymous surveys anymore by logging out and in again
@@ -33,6 +32,7 @@ Improvements
   :user:`Naveenaidu`)
 - Allow displaying all events descending from a category (:issue:`4982`,
   :pr:`4983`, thanks :user:`omegak` and :user:`openprojects`).
+- Add an option to allow non-judge conveners to update an abstract track (:pr:`4989`)
 
 Bugfixes
 ^^^^^^^^

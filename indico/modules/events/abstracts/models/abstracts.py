@@ -520,10 +520,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return True
         return self.can_judge(user) or self.can_convene(user) or self.can_review(user)
 
-    def can_convene(self, user, check_state=False):
+    def can_convene(self, user):
         if not user:
-            return False
-        if check_state and self.is_in_final_state:
             return False
         if not self.event.can_manage(user, permission='track_convener', explicit_permission=True):
             return False

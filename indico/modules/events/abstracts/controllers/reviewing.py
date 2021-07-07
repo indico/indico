@@ -278,7 +278,7 @@ class RHDisplayAbstractsExportExcel(AbstractsExportExcel, RHDisplayAbstractsActi
 
 class RHEditReviewedForTrackList(RHAbstractBase):
     def _check_abstract_protection(self):
-        return self.event.cfa.allow_convener_judgment and self.abstract.can_convene(session.user, check_state=True)
+        return self.abstract.can_change_tracks(session.user, check_state=True)
 
     def _process(self):
         form = AbstractReviewedForTracksForm(event=self.event, obj=self.abstract)
