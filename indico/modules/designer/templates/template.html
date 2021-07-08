@@ -176,15 +176,14 @@
                     <div class="subtool">
                         <select id='font-selector' class="js-font-tool" data-attr="font">
                             <optgroup label="{% trans %}Normal Fonts{% endtrans %}">
-                                <option value="serif">Serif</option>
-                                <option value="courier">Courier</option>
-                                <option value="sans-serif">Sans Serif</option>
+                                {% for font_name in normal_font_size %}
+                                    <option value="{{ font_name }}"> {{ font_name | replace('-', ' ') | capitalize  }}</option>
+                                {% endfor %}
                             </optgroup>
                             <optgroup label="{% trans %}Special Character Fonts{% endtrans %}">
-                                <option>LinuxLibertine</option>
-                                <option>Kochi-Mincho</option>
-                                <option>Kochi-Gothic</option>
-                                <option>Uming-CN</option>
+                                {% for font_name in special_character_fonts %}
+                                    <option value="{{ font_name }}"> {{ font_name }}</option>
+                                {% endfor %}
                             </optgroup>
                         </select>
                     </div>

@@ -15,6 +15,7 @@ from io import BytesIO
 
 import pkg_resources
 from PIL import Image as PILImage
+from indico.core import signals
 from reportlab import platypus
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.fonts import addMapping
@@ -134,6 +135,7 @@ def setTTFonts():
         addMapping('LinuxLibertine', 1, 1, 'LinuxLibertine-Bold-Italic')
         pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(font_dir, 'kochi-mincho-subst.ttf')))
         pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(font_dir, 'kochi-gothic-subst.ttf')))
+        signals.legacy.register_additional_fonts.send()
         alreadyRegistered = True
 
 

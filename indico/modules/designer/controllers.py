@@ -23,6 +23,7 @@ from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
+from indico.modules.designer.pdf import NORMAL_FONT_STYLES, SPECIAL_CHARACTER_FONTS
 from indico.modules.designer.util import (get_all_templates, get_default_badge_on_category,
                                           get_default_ticket_on_category, get_image_placeholder_types,
                                           get_inherited_templates, get_nested_placeholder_options,
@@ -272,6 +273,8 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         for bs_tpl in backside_templates:
             related_tpls_per_owner[bs_tpl.owner].append(bs_tpl)
         return self._render_template('template.html', template=self.template,
+                                     normal_font_size=NORMAL_FONT_STYLES.keys(),
+                                     special_character_fonts=SPECIAL_CHARACTER_FONTS.keys(),
                                      placeholders=get_nested_placeholder_options(),
                                      image_types=get_image_placeholder_types(),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target,

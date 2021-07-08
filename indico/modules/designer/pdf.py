@@ -23,10 +23,13 @@ from indico.modules.designer import PageOrientation
 from indico.util.string import strip_tags
 
 
-FONT_STYLES = {
+NORMAL_FONT_STYLES = {
     'serif': ['Times-Roman', 'Times-Bold', 'Times-Italic', 'Times-Bold-Italic'],
     'courier': ['Courier', 'Courier-Bold', 'Courier-Italic', 'Courier-Bold-Italic'],
     'sans-serif': ['Sans', 'Sans-Bold', 'Sans-Italic', 'Sans-Bold-Italic'],
+}
+
+SPECIAL_CHARACTER_FONTS = {
     'LinuxLibertine': ['LinuxLibertine', 'LinuxLibertine-Bold', 'LinuxLibertine-Italic', 'LinuxLibertine-Bold-Italic'],
     'Kochi-Mincho': ['Kochi-Mincho', 'Kochi-Mincho', 'Kochi-Mincho', 'Kochi-Mincho'],
     'Kochi-Gothic': ['Kochi-Gothic', 'Kochi-Gothic', 'Kochi-Gothic', 'Kochi-Gothic'],
@@ -100,14 +103,17 @@ class DesignerPDFBase:
         style.fontSize = _extract_font_size(item['font_size'])
         style.leading = style.fontSize
 
+        font_styles = dict(NORMAL_FONT_STYLES)
+        font_styles.update(SPECIAL_CHARACTER_FONTS)
+
         if item['bold'] and item['italic']:
-            style.fontName = FONT_STYLES[item['font_family']][3]
+            style.fontName = font_styles[item['font_family']][3]
         elif item['italic']:
-            style.fontName = FONT_STYLES[item['font_family']][2]
+            style.fontName = font_styles[item['font_family']][2]
         elif item['bold']:
-            style.fontName = FONT_STYLES[item['font_family']][1]
+            style.fontName = font_styles[item['font_family']][1]
         else:
-            style.fontName = FONT_STYLES[item['font_family']][0]
+            style.fontName = font_styles[item['font_family']][0]
 
         item_x = float(item['x']) / PIXELS_CM * cm
         item_y = float(item['y']) / PIXELS_CM * cm
