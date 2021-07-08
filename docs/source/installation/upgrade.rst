@@ -46,6 +46,12 @@ If you installed the official plugins, update them too:
 
     pip install -U indico-plugins
 
+It is a good idea to ensure you are using the latest recommended Python version:
+
+.. code-block:: shell
+
+    indico setup upgrade-python
+
 Some versions may include database schema upgrades.  Make sure to
 perform them immediately after upgrading.  If there are no schema
 changes, the command will simply do nothing.
