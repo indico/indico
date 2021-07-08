@@ -457,8 +457,8 @@ class User(PersonMixin, db.Model):
 
     @property
     def avatar_bg_color(self):
-        from indico.modules.users.util import get_color_for_username
-        return get_color_for_username(self.full_name)
+        from indico.modules.users.util import get_color_for_user_id
+        return get_color_for_user_id(self.id)
 
     @property
     def external_identities(self):
