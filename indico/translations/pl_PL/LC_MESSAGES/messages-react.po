@@ -4,11 +4,12 @@
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
 # Marcin Miłek, 2021
 # Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021
+# Adrian Mönnich, 2021
 # 
 msgid ""
 msgstr ""
 "POT-Creation-Date: 2021-07-21 17:54+0200\n"
-"Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021\n"
+"Last-Translator: Adrian Mönnich, 2021\n"
 "Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1718,6 +1719,22 @@ msgstr[0] "Anuluj rezerwację"
 msgstr[1] "Anuluj wszystkie wystąpienia"
 msgstr[2] "Anuluj wszystkie wystąpienia"
 msgstr[3] "Anuluj wszystkie wystąpienia"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:717
+msgid "Are you sure you want to cancel this booking?"
+msgid_plural ""
+"Are you sure you want to cancel this booking? This will cancel {count} "
+"upcoming occurrences."
+msgstr[0] "Czy na pewno chcesz anulować tę rezerwację?"
+msgstr[1] ""
+"Czy na pewno chcesz anulować tę rezerwację? Spowoduje to anulowanie {count} "
+"nadchodzących wydarzeń."
+msgstr[2] ""
+"Czy na pewno chcesz anulować tę rezerwację? Spowoduje to anulowanie {count} "
+"nadchodzących wydarzeń."
+msgstr[3] ""
+"Czy na pewno chcesz anulować tę rezerwację? Spowoduje to anulowanie {count} "
+"nadchodzących wydarzeń."
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:728
 msgid "Single occurrences can be cancelled via the timeline view."
