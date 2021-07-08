@@ -9,6 +9,8 @@ import json
 
 from wtforms.fields.simple import HiddenField
 
+from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
+from indico.util.marshmallow import ModelList
 from indico.web.forms.widgets import JinjaWidget
 
 
@@ -49,3 +51,13 @@ class CategoryField(HiddenField):
 
     def _get_data(self):
         return self.data
+
+
+class EventRequestList(ModelList):
+    def __init__(self, category, **kwargs):
+        def _get_query(m):
+            return m.query.filter(
+                EventMoveRequest.category == category,
+                EventMoveRequest.state == MoveRequestState.pending
+            )
+        super().__init__(model=EventMoveRequest, get_query=_get_query, collection_class=set, **kwargs)

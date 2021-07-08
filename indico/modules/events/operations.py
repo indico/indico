@@ -12,6 +12,7 @@ from flask import g, session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.categories.models.event_move_request import EventMoveRequest
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
 from indico.modules.events.cloning import EventCloner, get_event_cloners
@@ -383,3 +384,12 @@ def sort_reviewing_questions(questions, new_positions):
         field.position = index
     db.session.flush()
     logger.info('Reviewing questions of %r reordered by %r', questions[0].event, session.user)
+
+
+def create_event_request(category, event, user):
+    rq = EventMoveRequest(event=event, category=category, submitter=user)
+    db.session.add(rq)
+    db.session.flush()
+    logger.info('Category move request %s to %s created by %s', rq, category, session.user)
+    event.log(EventLogRealm.event, EventLogKind.change, 'Event', f'Move request to {category.title} created', user=user)
+    return rq

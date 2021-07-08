@@ -181,6 +181,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=True,
         index=True
     )
+    event_requires_approval = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     children = db.relationship(
         'Category',
@@ -225,6 +230,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - roles (CategoryRole.category)
     # - settings (CategorySetting.category)
     # - suggestions (SuggestedCategory.category)
+    # - event_move_requests (EventMoveRequest.category)
 
     @hybrid_property
     def event_message(self):
@@ -290,6 +296,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def display_tzinfo(self):
         """The tzinfo of the category or the one specified by the user."""
         return get_display_tz(self, as_timezone=True)
+
+    def can_propose_events(self, user):
+        """Check whether the user can propose move requests to the category."""
+        return self.event_requires_approval or (
+            user and self.can_manage(user, permission='event_move_request')) or self.can_create_events(user)
 
     def can_create_events(self, user):
         """Check whether the user can create events in the category."""

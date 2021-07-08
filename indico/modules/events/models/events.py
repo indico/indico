@@ -33,6 +33,7 @@ from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
 from indico.modules.categories import Category
+from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixin
@@ -427,6 +428,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - track_groups (TrackGroup.event)
     # - tracks (Track.event)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
+    # - move_requests (EventMoveRequest.event)
 
     start_dt_override = _EventSettingProperty(event_core_settings, 'start_dt_override')
     end_dt_override = _EventSettingProperty(event_core_settings, 'end_dt_override')
@@ -612,6 +614,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def has_custom_boa(self):
         return self.custom_boa_id is not None
+
+    @property
+    def pending_move_request(self):
+        return self.move_requests.filter(EventMoveRequest.state == MoveRequestState.pending).first()
 
     @property
     @contextmanager

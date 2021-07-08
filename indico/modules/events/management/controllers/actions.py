@@ -9,6 +9,7 @@ from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.categories.models.categories import Category
+from indico.modules.categories.operations import create_event_request
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import lock_event, unlock_event, update_event_type
@@ -86,7 +87,12 @@ class RHMoveEvent(RHManageEventBase):
             raise Forbidden(_('You may only move events to categories where you are allowed to create events.'))
 
     def _process(self):
-        self.event.move(self.target_category)
-        flash(_('Event "{}" has been moved to category "{}"').format(self.event.title, self.target_category.title),
-              'success')
+        if self.target_category.requires_approval:
+            create_event_request(self.target_category, self.event, session.user)
+            flash(_('A request to move "{}" to "{}" has been submitted')
+                  .format(self.event.title, self.target_category.title), 'success')
+        else:
+            self.event.move(self.target_category)
+            flash(_('Event "{}" has been moved to category "{}"')
+                  .format(self.event.title, self.target_category.title), 'success')
         return jsonify_data(flash=False)
