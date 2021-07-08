@@ -749,7 +749,7 @@ class RHUserSearch(RHProtected):
     def _process(self, exact, external, favorites_first, **criteria):
         matches = search_users(exact=exact, include_pending=True, external=external, **criteria)
         self.externals = {}
-        results = sorted((self._serialize_entry(entry) for entry in matches), key=itemgetter('full_name'))
+        results = sorted((self._serialize_entry(entry) for entry in matches), key=itemgetter('full_name', 'email'))
         if favorites_first:
             favorites = {u.id for u in session.user.favorite_users}
             results.sort(key=lambda x: x['id'] not in favorites)
