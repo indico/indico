@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import socket
+import subprocess
 import sys
 from operator import attrgetter
 from pathlib import Path
@@ -17,6 +18,8 @@ from smtplib import SMTP
 import click
 from click import wrap_text
 from flask.helpers import get_root_path
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 from pkg_resources import iter_entry_points
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import PathCompleter, WordCompleter
@@ -29,6 +32,7 @@ from sqlalchemy.pool import NullPool
 from terminaltables import AsciiTable
 from werkzeug.urls import url_parse
 
+import indico
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
 from indico.util.string import validate_email
@@ -209,6 +213,97 @@ def create_logging_config(target_dir):
     """
     root_dir, target_dir = _get_dirs(target_dir)
     _copy(os.path.normpath(os.path.join(root_dir, 'logging.yaml.sample')), os.path.join(target_dir, 'logging.yaml'))
+
+
+@cli.command()
+@click.option('--check', is_flag=True, help='Only check for updates but do not actually update.')
+@click.option('--no-pyenv-update', is_flag=True, help='Do not update pyenv')
+@click.option('--local', is_flag=True,
+              help='Set the local pyenv version instead of the global one. Do not use this in a standard Indico '
+                   'deployment; it is only meant for development where you do not have a dedicated indico user.')
+@click.option('--force-version',
+              help='Force using a custom python version, regardless of the preferred version this Indico version has. '
+                   'Only use this when explicitly asked to, either by a developer or in the upgrade instructions.')
+@click.option('--venv', required=True, metavar='PATH', envvar='VIRTUAL_ENV',
+              type=click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True),
+              help='The path of the Python venv; defaults to the active one.')
+def upgrade_python(check, no_pyenv_update, local, force_version, venv):
+    """Upgrade the Python version used in the Indico virtualenv.
+
+    When using `--check`, only Python versions currently available in pyenv will
+    be used; make sure to `pyenv update` first (this is done automatically when
+    you run this command without `--check`).
+
+    Be careful when using `--force-version` with a custom version; you may end up
+    using an unsupported version where this command will no longer work.
+    """
+
+    if not check and not no_pyenv_update:
+        click.echo('updating pyenv')
+        proc = subprocess.run(['pyenv', 'update'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if proc.returncode:
+            click.echo(proc.stdout)
+            click.confirm('pyenv update failed - continue anyway?', abort=True)
+
+    pyenv_mode = 'local' if local else 'global'
+    pyenv_version_list = subprocess.run(['pyenv', 'install', '--list'], capture_output=True,
+                                        encoding='utf-8').stdout.splitlines()
+    pyenv_versions = [Version(x) for line in pyenv_version_list
+                      if (x := line.strip()) and re.match(r'^\d+\.\d+\.\d+$', x)]
+    preferred_version_spec = SpecifierSet(indico.PREFERRED_PYTHON_VERSION_SPEC)
+    current_version = Version('.'.join(map(str, sys.version_info[:3])))
+
+    if force_version:
+        preferred_version = Version(force_version)
+        if preferred_version not in preferred_version_spec:
+            click.echo(f'Warning: {preferred_version} is not within {preferred_version_spec} spec')
+            click.confirm('Continue anyway?', abort=True)
+    else:
+        if not (available_versions := preferred_version_spec.filter(pyenv_versions)):
+            click.echo(f'Found no qualifying versions for {preferred_version_spec}')
+            sys.exit(1)
+        preferred_version = max(available_versions)
+
+    if current_version == preferred_version:
+        click.echo(f'Already running on preferred version ({preferred_version})')
+        sys.exit(0)
+
+    if (preferred_version.major, preferred_version.minor) != (current_version.major, current_version.minor):
+        old = f'{current_version.major}.{current_version.minor}'
+        new = f'{preferred_version.major}.{preferred_version.minor}'
+        click.echo(f'WARNING: You are upgrading from {old} to {new}. This upgrade CANNOT be done in-place.')
+        click.echo('You will need to `pip install indico` (and any other packages such as plugins)\n'
+                   'again after this upgrade! Do not perform this update, unless you are updating to\n'
+                   'a new major Indico release which is documented to require this Python version!')
+        click.confirm('Continue?', abort=True)
+
+    pyenv_local_version = Version(subprocess.run(['pyenv', 'version-name'], capture_output=True,
+                                                 encoding='utf-8').stdout.strip())
+    if pyenv_local_version != preferred_version:
+        click.echo(f'Currently selected version {pyenv_local_version} does not match '
+                   f'preferred version {preferred_version}')
+        if not check:
+            click.echo(f'Installing python {preferred_version} (may take some time)')
+            proc = subprocess.run(['pyenv', 'install', '--skip-existing', '--verbose', str(preferred_version)],
+                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if proc.returncode:
+                click.echo(proc.stdout)
+                click.echo(f'Installing python {preferred_version} update failed')
+                sys.exit(1)
+            click.echo(f'Setting {pyenv_mode} pyenv version to {preferred_version}')
+            subprocess.run(['pyenv', pyenv_mode, str(preferred_version)], check=True)
+        else:
+            click.echo(f'Would set {pyenv_mode} pyenv version to {preferred_version} (skipping due to --check)')
+
+    # Upgrade the virtualenv in-place
+    from . import python_upgrader
+    args = [venv]
+    if check:
+        args.append('--check')
+    # we need to run the upgrade script in an isolated environment to avoid any
+    # of the currently-installed packages or PYTHONPATH info leaking into the
+    # environment in case the venv builder needs to upgrade pip
+    subprocess.run([sys.executable, '-I', python_upgrader.__file__, *args], check=True)
 
 
 @cli.command()
