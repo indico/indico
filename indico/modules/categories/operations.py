@@ -62,7 +62,7 @@ def update_category(category, data, skip=()):
 
 
 def update_category_protection(category, data):
-    assert set(data) <= {'protection_mode', 'own_no_access_contact', 'event_creation_restricted', 'visibility'}
+    assert set(data) <= {'protection_mode', 'own_no_access_contact', 'event_creation_restricted', 'visibility', 'event_requires_approval'}
     changes = category.populate_from_dict(data)
     db.session.flush()
     signals.category.updated.send(category, changes=changes)
@@ -72,7 +72,8 @@ def update_category_protection(category, data):
                       'own_no_access_contact': 'No access contact',
                       'visibility': {'title': 'Visibility', 'type': 'string',
                                      'convert': lambda changes: [format_visibility(category, x) for x in changes]},
-                      'event_creation_restricted': 'Event creation restricted'}
+                      'event_creation_restricted': 'Event creation restricted',
+                      'event_requires_approval': 'Event requires approval'}
         category.log(CategoryLogRealm.category, LogKind.change, 'Category', 'Protection updated', session.user,
                      data={'Changes': make_diff_log(changes, log_fields)})
 

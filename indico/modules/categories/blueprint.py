@@ -17,14 +17,16 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
                                                            RHShowPastEventsInCategory, RHSubcatInfo)
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
-                                                              RHCategoryRoleMembersImportCSV, RHCategoryRoles,
-                                                              RHCreateCategory, RHDeleteCategory, RHDeleteCategoryRole,
-                                                              RHDeleteEvents, RHDeleteSubcategories, RHEditCategoryRole,
+                                                              RHAPIEventMoveRequests, RHCategoryRoleMembersImportCSV,
+                                                              RHCategoryRoles, RHCreateCategory, RHDeleteCategory,
+                                                              RHDeleteCategoryRole, RHDeleteEvents,
+                                                              RHDeleteSubcategories, RHEditCategoryRole,
                                                               RHManageCategoryContent, RHManageCategoryIcon,
-                                                              RHManageCategoryLogo, RHManageCategoryProtection,
-                                                              RHManageCategorySettings, RHMoveCategory, RHMoveEvents,
-                                                              RHMoveSubcategories, RHRemoveCategoryRoleMember,
-                                                              RHSortSubcategories, RHSplitCategory)
+                                                              RHManageCategoryLogo, RHManageCategoryModeration,
+                                                              RHManageCategoryProtection, RHManageCategorySettings,
+                                                              RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
+                                                              RHRemoveCategoryRoleMember, RHSortSubcategories,
+                                                              RHSplitCategory)
 from indico.modules.users import User
 from indico.web.flask.util import make_compat_redirect_func, redirect_view, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -46,6 +48,7 @@ _bp.add_url_rule('/manage/logo', 'manage_logo', RHManageCategoryLogo, methods=('
 _bp.add_url_rule('/manage/move', 'move', RHMoveCategory, methods=('POST',))
 _bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
+_bp.add_url_rule('/manage/moderation', 'manage_moderation', RHManageCategoryModeration, methods=('POST', 'GET'))
 
 # Role management
 _bp.add_url_rule('/manage/roles', 'manage_roles', RHCategoryRoles, methods=('POST', 'GET'))
@@ -98,6 +101,7 @@ _bp.add_url_rule('!/c/<int:category_id>', view_func=redirect_view('.display'), s
 
 # Internal API
 _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
+_bp.add_url_rule('/api/event-move-requests', 'api_event_move_requests', RHAPIEventMoveRequests, methods=('GET', 'POST'))
 
 # Administration
 _bp.add_url_rule('!/admin/upcoming-events', 'manage_upcoming', RHManageUpcomingEvents, methods=('GET', 'POST'))

@@ -17,6 +17,7 @@ import './base';
 import SearchBox from 'indico/modules/search/components/SearchBox';
 import {setMomentLocale} from 'indico/utils/date';
 
+import CategoryModeration from './components/CategoryModeration';
 import CategoryStatistics from './components/CategoryStatistics';
 import {LocaleContext} from './context.js';
 
@@ -47,6 +48,13 @@ import {LocaleContext} from './context.js';
         }),
         domContainer
       );
+    }
+  });
+  document.addEventListener('DOMContentLoaded', () => {
+    const rootElement = document.querySelector('#category-moderation');
+    if (rootElement) {
+      const categoryId = parseInt(rootElement.dataset.categoryId, 10);
+      ReactDOM.render(<CategoryModeration categoryId={categoryId} />, rootElement);
     }
   });
   global.setupCategoryStats = function setupCategoryStats() {

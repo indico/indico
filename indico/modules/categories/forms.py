@@ -84,7 +84,8 @@ class CategoryLogoForm(IndicoForm):
 
 
 class CategoryProtectionForm(IndicoForm):
-    _event_creation_fields = ('event_creation_restricted', 'event_creation_notification_emails')
+    _event_creation_fields = ('event_creation_restricted', 'event_creation_notification_emails',
+                              'event_requires_approval')
     permissions = PermissionsField(_('Permissions'), object_type='category')
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
     own_no_access_contact = StringField(_('No access contact'),
@@ -97,6 +98,9 @@ class CategoryProtectionForm(IndicoForm):
     event_creation_restricted = BooleanField(_('Restricted event creation'), widget=SwitchWidget(),
                                              description=_('Whether the event creation should be restricted '
                                                            'to a list of specific persons'))
+    event_requires_approval = BooleanField(_('Moderated event move'), widget=SwitchWidget(),
+                                           description=_('Whether moving an event to this category should be subject '
+                                                         'to a prior approval'))
 
     def __init__(self, *args, **kwargs):
         self.protected_object = self.category = kwargs.pop('category')

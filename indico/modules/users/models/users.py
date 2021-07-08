@@ -443,6 +443,7 @@ class User(PersonMixin, db.Model):
     # - static_sites (StaticSite.creator)
     # - survey_submissions (SurveySubmission.user)
     # - vc_rooms (VCRoom.created_by_user)
+    # - event_move_requests (EventMoveRequest.user)
 
     @staticmethod
     def get_system_user():

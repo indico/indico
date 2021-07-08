@@ -53,6 +53,8 @@ def _sidemenu_items(sender, category, **kwargs):
                        50, icon='users')
     yield SideMenuItem('logs', _('Logs'), url_for('logs.category', category),
                        0, icon='stack')
+    yield SideMenuItem('moderation', _('Moderation'), url_for('categories.manage_moderation', category),
+                       50, icon='users')
 
 
 @signals.menu.items.connect_via('admin-sidemenu')
