@@ -7,6 +7,7 @@
 
 import hashlib
 import os
+import typing as t
 from datetime import datetime
 from io import BytesIO
 from operator import itemgetter
@@ -44,7 +45,7 @@ from indico.web.flask.util import send_file, url_for
 # colors for user-specific avatar bubbles
 user_colors = ['#e06055', '#ff8a65', '#e91e63', '#f06292', '#673ab7', '#ba68c8', '#7986cb', '#3f51b5', '#5e97f6',
                '#00a4e4', '#4dd0e1', '#0097a7', '#d4e157', '#aed581', '#57bb8a', '#4db6ac', '#607d8b', '#795548',
-               '#a1887f', '#fdd835', '#a3a3a3']
+               '#a1887f', '#fdd835', '#a3a3a3', '#556c60', '#605264', '#923035', '#915a30', '#55526f', '#67635a']
 
 
 def get_admin_emails():
@@ -379,8 +380,15 @@ def merge_users(source, target, force=False):
     logger.info('Successfully merged %s into %s', source, target)
 
 
-def get_color_for_username(username):
-    return user_colors[crc32(username) % len(user_colors)]
+def get_color_for_user_id(user_id: t.Union[int, str]):
+    """Calculate a unique color for a user based on their id.
+
+    :param user_id: the user ID (int), or otherwise a string (external search results)
+    """
+    if isinstance(user_id, int):
+        return user_colors[user_id % len(user_colors)]
+    else:
+        return user_colors[crc32(user_id) % len(user_colors)]
 
 
 def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
@@ -421,10 +429,17 @@ def set_user_avatar(user, avatar, filename, lastmod=None):
     }
 
 
-def send_default_avatar(name=None):
-    if name:
-        text = name[0].upper()
-        color = get_color_for_username(name)
+def send_default_avatar(user: t.Union[User, str, None]):
+    """Send a user's default avatar as an SVG.
+
+    :param user: A `User` object, string (external search results, registrations) or `None` (blank avatar)
+    """
+    if isinstance(user, str):
+        text = user[0].upper()
+        color = get_color_for_user_id(user)
+    elif user and user.full_name:
+        text = user.full_name[0].upper()
+        color = get_color_for_user_id(user.id)
     else:
         text = ''
         color = '#cccccc'
@@ -435,7 +450,7 @@ def send_default_avatar(name=None):
 
 def send_avatar(user):
     if user.picture_source == ProfilePictureSource.standard:
-        return send_default_avatar(user.full_name)
+        return send_default_avatar(user)
 
     metadata = user.picture_metadata
     return send_file('avatar.png', BytesIO(user.picture), mimetype=metadata['content_type'],
