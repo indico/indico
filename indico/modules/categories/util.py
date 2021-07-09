@@ -176,13 +176,16 @@ def get_visibility_options(category_or_event, allow_invisible=True):
     def _category_above_message(number):
         return ngettext('From the category above', 'From {} categories above', number).format(number)
 
-    options = [(n + 1, ('{} \N{RIGHTWARDS ARROW} "{}"'.format(_category_above_message(n).format(n), title)))
-               for n, title in enumerate(category.chain_titles[::-1])]
-    if event is None:
-        options[0] = (1, _('From this category only'))
-    else:
-        options[0] = (1, '{} \N{RIGHTWARDS ARROW} "{}"'.format(_('From the current category only'), category.title))
-    options[-1] = ('', _('From everywhere'))
+    options = []
+
+    if category is not None:
+        options = [(n + 1, ('{} \N{RIGHTWARDS ARROW} "{}"'.format(_category_above_message(n).format(n), title)))
+                   for n, title in enumerate(category.chain_titles[::-1])]
+        if event is None:
+            options[0] = (1, _('From this category only'))
+        else:
+            options[0] = (1, '{} \N{RIGHTWARDS ARROW} "{}"'.format(_('From the current category only'), category.title))
+        options[-1] = ('', _('From everywhere'))
 
     if allow_invisible:
         options.insert(0, (0, _('Invisible')))
