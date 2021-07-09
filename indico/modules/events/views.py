@@ -214,7 +214,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
 
         return render_template(tpl,
                                event=self.event,
-                               category=self.event.category.title,
+                               category=self.event.category.title if self.event.category else None,
                                timezone=self.event.display_tzinfo,
                                theme_settings=self.theme.get('settings', {}),
                                theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),

@@ -19,8 +19,10 @@
            title="{% trans %}Older event{% endtrans %}"></a>
     {% endif %}
 
-    <a class="i-button text-color subtle icon-collapse" href="{{ event.category.url }}"
-       title="{% trans %}Up to category{% endtrans %}"></a>
+    {% if event.category %}
+        <a class="i-button text-color subtle icon-collapse" href="{{ event.category.url }}"
+           title="{% trans %}Up to category{% endtrans %}"></a>
+    {% endif %}
 
     {% if rel.next is not none %}
         <a class="i-button text-color subtle icon-next" href="{{ url_for('events.display', event_id=rel.next) }}"
@@ -32,7 +34,9 @@
            title="{% trans %}Newest event{% endtrans %}"></a>
     {% endif %}
 
-    <span class="separator"></span>
+    {% if event.category or ( (rel['first'], rel['prev'], rel['next'], rel['last'])|any ) %}
+        <span class="separator"></span>
+    {% endif %}
 {%- endmacro -%}
 
 
