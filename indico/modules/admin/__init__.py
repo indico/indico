@@ -30,3 +30,8 @@ def _sidemenu_sections(sender, **kwargs):
 def _topmenu_items(sender, **kwargs):
     if session.user and session.user.is_admin:
         yield TopMenuItem('admin', _('Administration'), url_for('core.admin_dashboard'), 70)
+
+
+@signals.import_tasks.connect
+def _import_tasks(sender, **kwargs):
+    import indico.modules.admin.notices  # noqa: F401

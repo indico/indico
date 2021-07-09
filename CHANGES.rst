@@ -7,6 +7,15 @@ Version 3.0
 
 *Unreleased*
 
+Major Features
+^^^^^^^^^^^^^^
+
+- Add system notices which inform administrators about important things such as security
+  problems or outdated Python/Postgres versions. These notices are retrieved once a day
+  without sending any data related to the Indico instance, but if necessary, this feature
+  can be disabled by setting :data:`SYSTEM_NOTICES_URL` to ``None`` in ``indico.conf``
+  (:pr:`5004`)
+
 Bugfixes
 ^^^^^^^^
 

@@ -89,6 +89,7 @@ DEFAULTS = {
     'STORAGE_BACKENDS': {'default': 'fs:/opt/indico/archive'},
     'STRICT_LATEX': False,
     'SUPPORT_EMAIL': None,
+    'SYSTEM_NOTICES_URL': 'https://getindico.io/notices.yml',
     'TEMP_DIR': '/opt/indico/tmp',
     'USE_PROXY': False,
     'WORKER_NAME': socket.getfqdn(),
