@@ -97,7 +97,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                          cls.is_deleted, cls.category_id, cls.start_dt, cls.end_dt),
                 db.Index('ix_uq_events_url_shortcut', db.func.lower(cls.url_shortcut), unique=True,
                          postgresql_where=db.text('NOT is_deleted')),
-                db.CheckConstraint('category_id IS NOT NULL OR is_deleted', 'category_data_set'),
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                    'valid_stylesheet'),
