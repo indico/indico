@@ -317,6 +317,9 @@ class ProtectionMixin:
             self.acl_entries.remove(entry)
 
     def get_inherited_acl(self):
+        if self.protection_parent is None:
+            return []
+
         own_acl = {entry.principal for entry in self.acl_entries}
         parent_acl = self.protection_parent.get_access_list(skip_managers=True)
         return [x for x in parent_acl if x not in own_acl]
