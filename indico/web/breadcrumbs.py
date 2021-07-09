@@ -31,6 +31,11 @@ def render_breadcrumbs(*titles, category=None, event=None, management=False, cat
     assert titles or event or category
     if not category and not event:
         items = [(_('Home'), url_for_index())]
+    elif event and not category and not event.category:
+        items = []
+        # TODO: add link to unlisted events view
+        items.append((_('My unlisted events'), None))
+        items.append((event.title, url_for('event_management.settings', event) if management else event.url))
     else:
         items = []
         if event:
