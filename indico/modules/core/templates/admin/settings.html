@@ -34,6 +34,10 @@
         {%- endcall %}
     {% endif %}
 
+    {% for severity, message in template_hook('admin-system-notices', as_list=true) %}
+        {{ message_box(severity, message) }}
+    {% endfor %}
+
     {% call message_box('highlight', classes='js-indico-version-message', style='display: none;') -%}
         {% trans -%}
             A new Indico version (<strong id="new-indico-version"></strong>) is available!

@@ -90,6 +90,19 @@ div.announcement-bar {
     cursor: pointer;
   }
 
+  &.highlight {
+    background-color: $light-blue;
+    color: $dark-black;
+
+    .icon {
+      color: $blue;
+    }
+
+    .close-button {
+      color: $dark-blue;
+    }
+  }
+
   &.warning {
     background-color: lighten($light-yellow, 5%);
     color: $dark-black;

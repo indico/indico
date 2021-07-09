@@ -419,6 +419,14 @@ Development
 
     Default: ``'https://hub.getindico.io'``
 
+.. data:: SYSTEM_NOTICES_URL
+
+    The URL of a YAML file with system notices. This should only be changed during
+    development (to test custom notices) or set to ``None`` to opt-out from ever
+    fetching or displaying system notices.
+
+    Default: ``'https://getindico.io/notices.yml'``
+
 .. data:: DISABLE_CELERY_CHECK
 
     Disables the warning about Celery not running or being outdated. When set to

@@ -174,18 +174,25 @@ marshmallow==3.9.1
     # via
     #   -r requirements.in
     #   flask-marshmallow
+    #   marshmallow-dataclass
     #   marshmallow-enum
     #   marshmallow-oneofschema
     #   marshmallow-sqlalchemy
     #   webargs
-marshmallow-enum==1.5.1
+marshmallow-dataclass[enum]==8.4.1
     # via -r requirements.in
+marshmallow-enum==1.5.1
+    # via
+    #   -r requirements.in
+    #   marshmallow-dataclass
 marshmallow-oneofschema==2.1.0
     # via -r requirements.in
 marshmallow-sqlalchemy==0.26.1
     # via -r requirements.in
 matplotlib-inline==0.1.2
     # via ipython
+mypy-extensions==0.4.3
+    # via typing-inspect
 node-semver==0.8.0
     # via pywebpack
 packaging==21.0
@@ -295,6 +302,10 @@ traitlets==5.0.5
     #   matplotlib-inline
 translitcodec==0.7.0
     # via -r requirements.in
+typing-extensions==3.10.0.0
+    # via typing-inspect
+typing-inspect==0.7.1
+    # via marshmallow-dataclass
 ua-parser==0.10.0
     # via -r requirements.in
 urllib3==1.26.6

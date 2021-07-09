@@ -177,6 +177,11 @@ a {
 .announcement-bar {
   @extend %banner-bar;
 
+  &.highlight {
+    background-color: $light-blue;
+    color: $dark-blue;
+  }
+
   &.warning {
     background-color: lighten($light-yellow, 5%);
     color: $dark-yellow;

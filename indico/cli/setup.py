@@ -334,6 +334,7 @@ class SetupWizard:
         self.default_locale = None
         self.default_timezone = None
         self.rb_active = None
+        self.system_notices = True
 
     def run(self, dev):
         self._check_root()
@@ -378,7 +379,7 @@ class SetupWizard:
                                  help='Enter the base directory where Indico will be installed.')
         # The root needs to exist (ideally created during `useradd`)
         if not os.path.isdir(self.root_path):
-            _error('The specified self.root_path path does not exist.')
+            _error('The specified root path path does not exist.')
             raise click.Abort
         # There is no harm in having the virtualenv somewhere else but it
         # is cleaner to keep everything within the root path
@@ -598,6 +599,11 @@ class SetupWizard:
                                   help='Indico contains a room booking system. If you do not plan to maintain a list '
                                        'of rooms available in your organization in Indico and use it to book them, it '
                                        'is recommended to leave the room booking system disabled.')
+        self.system_notices = _confirm('Enable system notices?', default=True,
+                                       help='Indico can show important system notices (e.g. about security issues) to '
+                                            'administrators. They are retrieved once a day without sending any data '
+                                            'related to your Indico instance. It is strongly recommended to enable '
+                                            'them.')
 
     def _setup(self, dev=False):
         storage_backends = {'default': 'fs:' + os.path.join(self.data_root_path, 'archive')}
@@ -645,6 +651,13 @@ class SetupWizard:
                 'DB_LOG = True',
                 'DEBUG = True',
                 'SMTP_USE_CELERY = False'
+            ]
+
+        if not self.system_notices:
+            config_data += [
+                '',
+                '# Disable system notices',
+                'SYSTEM_NOTICES_URL = None'
             ]
 
         config = '\n'.join(x for x in config_data if x is not None)
