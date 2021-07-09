@@ -706,7 +706,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     def can_lock(self, user):
         """Check whether the user can lock/unlock the event."""
-        return user and (user.is_admin or user == self.creator or self.category.can_manage(user))
+        return user and (user.is_admin or user == self.creator or (self.category and self.category.can_manage(user)))
 
     def can_display(self, user):
         """Check whether the user can display the event in the category."""
