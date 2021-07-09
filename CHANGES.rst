@@ -5,7 +5,7 @@ Changelog
 Version 3.0rc2
 --------------
 
-*Unreleased*
+*Released on July 09, 2021*
 
 Major Features
 ^^^^^^^^^^^^^^
