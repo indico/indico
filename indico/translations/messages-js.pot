@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0rc1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-05 17:54+0200\n"
+"POT-Creation-Date: 2021-07-09 11:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,25 +59,25 @@ msgstr[1] ""
 msgid "Long lasting events"
 msgstr ""
 
-#: indico/modules/categories/client/js/display.js:21
+#: indico/modules/categories/client/js/display.js:25
 msgid "empty"
 msgstr ""
 
-#: indico/modules/categories/client/js/display.js:22
+#: indico/modules/categories/client/js/display.js:26
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/display.js:151
+#: indico/modules/categories/client/js/display.js:166
 msgid "Remove from your favorites"
 msgstr ""
 
-#: indico/modules/categories/client/js/display.js:154
+#: indico/modules/categories/client/js/display.js:169
 msgid "Add to your favorites"
 msgstr ""
 
-#: indico/modules/categories/client/js/display.js:156
+#: indico/modules/categories/client/js/display.js:171
 msgid "This will make events in this category visible on your <a href=\"{0}\">Dashboard</a>."
 msgstr ""
 
@@ -294,11 +294,11 @@ msgstr ""
 msgid "Choose a file"
 msgstr ""
 
-#: indico/modules/events/abstracts/client/js/index.js:76 indico/modules/events/abstracts/client/js/index.js:89
+#: indico/modules/events/abstracts/client/js/index.js:78 indico/modules/events/abstracts/client/js/index.js:91
 msgid "Show preview"
 msgstr ""
 
-#: indico/modules/events/abstracts/client/js/index.js:80
+#: indico/modules/events/abstracts/client/js/index.js:82
 msgid "Hide preview"
 msgstr ""
 
