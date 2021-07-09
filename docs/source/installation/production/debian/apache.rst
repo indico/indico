@@ -8,7 +8,7 @@ PostgreSQL is installed from its upstream repos to get a much more recent versio
 
 .. code-block:: shell
 
-    apt install -y lsb-release wget gnupg
+    apt install -y lsb-release wget curl gnupg
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
     apt update
