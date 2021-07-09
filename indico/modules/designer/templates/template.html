@@ -174,19 +174,21 @@
                 <div class="tool font-tools">
                     <i class="icon-font-size" title="{% trans %}Font dimensions{% endtrans %}"></i>
                     <div class="subtool">
-                        <select id='font-selector' class="js-font-tool" data-attr="font">
-                            <optgroup label="{% trans %}Normal Fonts{% endtrans %}">
-                                <option value="serif">Serif</option>
-                                <option value="courier">Courier</option>
-                                <option value="sans-serif">Sans Serif</option>
-                            </optgroup>
-                            <optgroup label="{% trans %}Special Character Fonts{% endtrans %}">
-                                <option>LinuxLibertine</option>
-                                <option>Kochi-Mincho</option>
-                                <option>Kochi-Gothic</option>
-                                <option>Uming-CN</option>
-                            </optgroup>
-                        </select>
+                        {% block fonts %}
+                            <select id='font-selector' class="js-font-tool" data-attr="font">
+                                <optgroup label="{% trans %}Normal Fonts{% endtrans %}">
+                                    <option value="serif">Serif</option>
+                                    <option value="courier">Courier</option>
+                                    <option value="sans-serif">Sans Serif</option>
+                                </optgroup>
+                                <optgroup label="{% trans %}Special Character Fonts{% endtrans %}">
+                                    <option>LinuxLibertine</option>
+                                    <option>Kochi-Mincho</option>
+                                    <option>Kochi-Gothic</option>
+                                    <option>Uming-CN</option>
+                                </optgroup>
+                            </select>
+                        {% endblock %}
                     </div>
                     <div class="subtool">
                         <select id='color-selector' class="js-font-tool" data-attr="color">
