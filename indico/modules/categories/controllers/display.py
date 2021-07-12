@@ -19,6 +19,7 @@ from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from werkzeug.exceptions import BadRequest, NotFound
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
@@ -40,6 +41,7 @@ from indico.util.date_time import format_date, format_number, now_utc
 from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import RH, allow_signed_url
@@ -257,9 +259,15 @@ class RHEventList(RHDisplayCategoryEventsBase):
                             if not self.is_flat else set())
         event_query_filter = get_event_query_filter(self.category, is_flat=self.is_flat,
                                                     hidden_event_ids=hidden_event_ids)
+
+        extra_event_ids = values_from_signal(signals.category.extra_events.send(self.category, is_flat=self.is_flat,
+                                                                                before=before, after=after))
+        extra_events_queries = [Event.query.filter(Event.id.in_(extra_event_ids))] if extra_event_ids else []
+
         event_query = (Event.query
                        .options(*self._event_query_options)
                        .filter(event_query_filter)
+                       .union(*extra_events_queries)
                        .order_by(Event.start_dt.desc(), Event.id.desc()))
         if before:
             event_query = event_query.filter(Event.start_dt < before)
