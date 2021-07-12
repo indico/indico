@@ -12,11 +12,13 @@ from operator import attrgetter
 from dateutil.relativedelta import relativedelta
 from flask import session
 
+from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.date_time import format_date
 from indico.util.i18n import _, pgettext
+from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 
 
@@ -91,12 +93,26 @@ def get_category_view_params(category, now, is_flat=False):
 
     hidden_event_ids = {e.id for e in category.get_hidden_events(user=session.user)} if not is_flat else set()
     event_query_filter = get_event_query_filter(category, is_flat=is_flat, hidden_event_ids=hidden_event_ids)
-    next_event_start_dt = (db.session.query(Event.start_dt)
+
+    extra_events_queries = extra_events_start_dt_queries = ()
+    extra_event_ids = values_from_signal(signals.category.extra_events.send(category, is_flat=is_flat,
+                                                                            past_threshold=past_threshold,
+                                                                            future_threshold=future_threshold))
+    if extra_event_ids:
+        extra_events_start_dt_queries = [db.session.query(Event.id, Event.start_dt)
+                                         .filter(Event.id.in_(extra_event_ids))]
+        extra_events_queries = [Event.query.filter(Event.id.in_(extra_event_ids))]
+
+    next_event_start_dt = (db.session.query(Event.id, Event.start_dt)
                            .filter(event_query_filter, Event.start_dt >= now)
+                           .union(*extra_events_start_dt_queries)
+                           .with_entities(Event.start_dt)
                            .order_by(Event.start_dt.asc(), Event.id.asc())
                            .limit(1).scalar())
-    previous_event_start_dt = (db.session.query(Event.start_dt)
+    previous_event_start_dt = (db.session.query(Event.id, Event.start_dt)
                                .filter(event_query_filter, Event.start_dt < now)
+                               .union(*extra_events_start_dt_queries)
+                               .with_entities(Event.start_dt)
                                .order_by(Event.start_dt.desc(), Event.id.desc())
                                .limit(1).scalar())
     if next_event_start_dt is not None and next_event_start_dt > future_threshold:
@@ -106,6 +122,7 @@ def get_category_view_params(category, now, is_flat=False):
     event_query = (Event.query
                    .options(*RHDisplayCategoryEventsBase._event_query_options)
                    .filter(event_query_filter)
+                   .union(*extra_events_queries)
                    .order_by(Event.start_dt.desc(), Event.id.desc()))
     past_event_query = event_query.filter(Event.start_dt < past_threshold)
     future_event_query = event_query.filter(Event.start_dt >= future_threshold)

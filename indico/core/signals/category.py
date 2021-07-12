@@ -28,3 +28,9 @@ Called when a category is modified. The `sender` is the updated category.
 deleted = _signals.signal('deleted', '''
 Called when a category is deleted. The `sender` is the category.
 ''')
+
+extra_events = _signals.signal('extra-events', '''
+Called when a category is displayed.  The `sender` is the category.  `is_flat`
+is passed as kwarg with the same name.  The additional kwargs passed to this
+signal depend on the context.
+''')
