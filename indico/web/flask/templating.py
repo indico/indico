@@ -8,6 +8,7 @@
 import itertools
 import posixpath
 import re
+from types import GeneratorType
 
 from dateutil.relativedelta import relativedelta
 from flask import current_app
@@ -154,7 +155,9 @@ def register_template_hook(name, receiver, priority=50, markup=True, plugin=None
     :param markup: If the returned data is HTML
     """
     def _func(_, **kw):
-        return markup, priority, receiver(**kw)
+        res = receiver(**kw)
+        res = tuple(res) if isinstance(res, GeneratorType) else (res,)
+        return markup, priority, res
 
     if plugin is None:
         signals.plugin.template_hook.connect(_func, sender=str(name), weak=False)
@@ -183,9 +186,11 @@ def call_template_hook(*name, **kwargs):
     name = name[0]
     as_list = kwargs.pop('as_list', False)
     values = []
-    for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(str(name), **kwargs),
-                                                         single_value=True, as_list=as_list):
-        if value:
+    for is_markup, priority, sigvalues in values_from_signal(signals.plugin.template_hook.send(str(name), **kwargs),
+                                                             single_value=True):
+        for value in sigvalues:
+            if not value:
+                continue
             if is_markup:
                 value = Markup(value)
             values.append((priority, value))

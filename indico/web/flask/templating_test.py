@@ -163,3 +163,43 @@ def test_template_hooks():
         _register_template_hook_cleanup('test-hook', _make_tpl_hook(3), priority=30),
     ):
         assert call_template_hook('test-hook') == 'test3\ntest2\ntest1@dummy'
+
+
+def test_template_hooks_yielding():
+    def _make_tpl_hook(name='', yielding=False):
+        if yielding:
+            def _hook():
+                yield f'test{name}@{current_plugin.name}' if current_plugin else f'test{name}'
+                yield f'test{name}@{current_plugin.name}' if current_plugin else f'test{name}'
+            return _hook
+        else:
+            return lambda: f'test{name}@{current_plugin.name}' if current_plugin else f'test{name}'
+
+    # single receiver
+    with _register_template_hook_cleanup('test-hook', _make_tpl_hook(yielding=True)):
+        assert call_template_hook('test-hook') == 'test\ntest'
+
+    # single receiver - plugin
+    with _register_template_hook_cleanup('test-hook', _make_tpl_hook(yielding=True), plugin=_DummyPlugin()):
+        assert call_template_hook('test-hook') == 'test@dummy\ntest@dummy'
+
+    # multiple receivers
+    with (
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(1)),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(2, yielding=True)),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(3, yielding=True)),
+    ):
+        assert call_template_hook('test-hook') == 'test1\ntest2\ntest2\ntest3\ntest3'
+        assert call_template_hook('test-hook', as_list=True) == ['test1', 'test2', 'test2', 'test3', 'test3']
+
+    # multiple receivers - plugin
+    with (
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(1), plugin=_DummyPlugin()),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(2, yielding=True), plugin=_DummyPlugin()),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(3)),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(4, yielding=True)),
+    ):
+        assert call_template_hook('test-hook') == 'test1@dummy\ntest2@dummy\ntest2@dummy\ntest3\ntest4\ntest4'
+        assert call_template_hook('test-hook', as_list=True) == [
+            'test1@dummy', 'test2@dummy', 'test2@dummy', 'test3', 'test4', 'test4'
+        ]
