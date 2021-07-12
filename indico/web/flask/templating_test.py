@@ -16,8 +16,8 @@ from markupsafe import Markup
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin
-from indico.web.flask.templating import (call_template_hook, dedent, get_overridable_template_name, markdown,
-                                         register_template_hook, underline)
+from indico.web.flask.templating import (TemplateSnippet, call_template_hook, dedent, get_overridable_template_name,
+                                         markdown, register_template_hook, underline)
 
 
 def test_underline():
@@ -202,4 +202,48 @@ def test_template_hooks_yielding():
         assert call_template_hook('test-hook') == 'test1@dummy\ntest2@dummy\ntest2@dummy\ntest3\ntest4\ntest4'
         assert call_template_hook('test-hook', as_list=True) == [
             'test1@dummy', 'test2@dummy', 'test2@dummy', 'test3', 'test4', 'test4'
+        ]
+
+
+def test_template_hooks_snippets():
+    def _make_tpl_hook(name='', yielding=False, snippet=None):
+        if yielding:
+            def _hook():
+                text = f'&test{name}@{current_plugin.name}' if current_plugin else f'&test{name}'
+                if snippet:
+                    yield TemplateSnippet(text, **snippet)
+                    yield TemplateSnippet(text, **snippet)
+                else:
+                    yield text
+                    yield text
+            return _hook
+        elif snippet:
+            return lambda: TemplateSnippet(f'&test{name}@{current_plugin.name}' if current_plugin else f'&test{name}',
+                                           **snippet)
+        else:
+            return lambda: f'&test{name}@{current_plugin.name}' if current_plugin else f'&test{name}'
+
+    with (
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(1)),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(2, snippet={'markup': False, 'priority': 60})),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(3, snippet={'markup': False, 'priority': 30},
+                                                                    yielding=True)),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(4, snippet={'priority': 70}),
+                                        plugin=_DummyPlugin()),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(5, snippet={'priority': 10}, yielding=True),
+                                        plugin=_DummyPlugin()),
+    ):
+        assert call_template_hook('test-hook') == '\n'.join([
+            '&test5@dummy', '&test5@dummy',
+            '&amp;test3', '&amp;test3',
+            '&test1',
+            '&amp;test2',
+            '&test4@dummy',
+        ])
+        assert call_template_hook('test-hook', as_list=True) == [
+            Markup('&test5@dummy'), Markup('&test5@dummy'),
+            '&test3', '&test3',
+            Markup('&test1'),
+            '&test2',
+            Markup('&test4@dummy'),
         ]
