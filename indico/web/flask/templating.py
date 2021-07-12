@@ -8,6 +8,8 @@
 import itertools
 import posixpath
 import re
+import typing as t
+from dataclasses import dataclass
 from types import GeneratorType
 
 from dateutil.relativedelta import relativedelta
@@ -134,6 +136,23 @@ def get_template_module(template_name_or_list, **context):
     return tpl.make_module(context)
 
 
+@dataclass(frozen=True)
+class TemplateSnippet:
+    """A snippet to be returned by a template hook.
+
+    The `content` is typically string or Markup object, but in some special cases
+    it may also be a different object.
+
+    Typically this class does not need to be used when registering a template hook
+    unless you need the ability to specify priority or disable markup wrapping at
+    execution time, or yield multiple snippets with different settings.
+    """
+
+    content: t.Any
+    markup: bool = True
+    priority: int = 50
+
+
 def register_template_hook(name, receiver, priority=50, markup=True, plugin=None):
     """Register a function to be called when a template hook is invoked.
 
@@ -157,7 +176,7 @@ def register_template_hook(name, receiver, priority=50, markup=True, plugin=None
     def _func(_, **kw):
         res = receiver(**kw)
         res = tuple(res) if isinstance(res, GeneratorType) else (res,)
-        return markup, priority, res
+        return tuple(x if isinstance(x, TemplateSnippet) else TemplateSnippet(x, markup, priority) for x in res)
 
     if plugin is None:
         signals.plugin.template_hook.connect(_func, sender=str(name), weak=False)
@@ -186,14 +205,13 @@ def call_template_hook(*name, **kwargs):
     name = name[0]
     as_list = kwargs.pop('as_list', False)
     values = []
-    for is_markup, priority, sigvalues in values_from_signal(signals.plugin.template_hook.send(str(name), **kwargs),
-                                                             single_value=True):
-        for value in sigvalues:
-            if not value:
-                continue
-            if is_markup:
-                value = Markup(value)
-            values.append((priority, value))
+    for snippet in values_from_signal(signals.plugin.template_hook.send(str(name), **kwargs),
+                                      multi_value_types=tuple, as_list=True):
+        if not (value := snippet.content):
+            continue
+        if snippet.markup:
+            value = Markup(value)
+        values.append((snippet.priority, value))
     values.sort()
     if as_list:
         return [x[1] for x in values]
