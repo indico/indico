@@ -5,13 +5,19 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from contextlib import contextmanager
 from unittest.mock import MagicMock
 
 import pytest
 from flask import render_template_string
+from flask_pluginengine import current_plugin
 from jinja2 import UndefinedError
+from markupsafe import Markup
 
-from indico.web.flask.templating import dedent, get_overridable_template_name, markdown, underline
+from indico.core import signals
+from indico.core.plugins import IndicoPlugin
+from indico.web.flask.templating import (call_template_hook, dedent, get_overridable_template_name, markdown,
+                                         register_template_hook, underline)
 
 
 def test_underline():
@@ -85,3 +91,75 @@ def test_undefined_raising(template):
 ))
 def test_undefined_silent(template):
     assert render_template_string(template, d={'bar': {}}) == 'ok'
+
+
+@contextmanager
+def _register_template_hook_cleanup(name, *args, **kwargs):
+    old_recvs = set(signals.plugin.template_hook.receivers_for(name))
+    register_template_hook(name, *args, **kwargs)
+    try:
+        yield
+    finally:
+        for recv in signals.plugin.template_hook.receivers_for(name):
+            if recv not in old_recvs:
+                signals.plugin.template_hook.disconnect(recv)
+
+
+class _DummyPlugin(IndicoPlugin):
+    name = 'dummy'
+
+    def __init__(self):
+        pass
+
+
+def test_template_hooks_markup():
+    def _make_tpl_hook(name=''):
+        return lambda: (f'&test{name}@{current_plugin.name}' if current_plugin else f'&test{name}')
+
+    with (
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(1)),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(2), markup=False),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(3), plugin=_DummyPlugin()),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(4), plugin=_DummyPlugin(), markup=False),
+    ):
+        rv = call_template_hook('test-hook')
+        assert isinstance(rv, Markup)
+        assert rv == ('&test1\n&amp;test2\n&test3@dummy\n&amp;test4@dummy')
+
+
+def test_template_hooks():
+    def _make_tpl_hook(name=''):
+        return lambda: f'test{name}@{current_plugin.name}' if current_plugin else f'test{name}'
+
+    # single receiver
+    with _register_template_hook_cleanup('test-hook', _make_tpl_hook()):
+        assert call_template_hook('test-hook') == 'test'
+
+    # single receiver - plugin
+    with _register_template_hook_cleanup('test-hook', _make_tpl_hook(), plugin=_DummyPlugin()):
+        assert call_template_hook('test-hook') == 'test@dummy'
+
+    # multiple receivers
+    with (
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(1)),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(2)),
+    ):
+        assert call_template_hook('test-hook') == 'test1\ntest2'
+        assert call_template_hook('test-hook', as_list=True) == ['test1', 'test2']
+
+    # multiple receivers - plugin
+    with (
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(1), plugin=_DummyPlugin()),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(2), plugin=_DummyPlugin()),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(3)),
+    ):
+        assert call_template_hook('test-hook') == 'test1@dummy\ntest2@dummy\ntest3'
+        assert call_template_hook('test-hook', as_list=True) == ['test1@dummy', 'test2@dummy', 'test3']
+
+    # custom priority
+    with (
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(1), plugin=_DummyPlugin(), priority=60),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(2)),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook(3), priority=30),
+    ):
+        assert call_template_hook('test-hook') == 'test3\ntest2\ntest1@dummy'
