@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-05 17:54+0200\n"
+"POT-Creation-Date: 2021-07-09 11:36+0200\n"
 "PO-Revision-Date: 2021-06-25 08:43+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -68,25 +68,25 @@ msgstr[1] "{0} événements de longue durée ne sont pas montrés"
 msgid "Long lasting events"
 msgstr "Evénements de longue durée"
 
-#: indico/modules/categories/client/js/display.js:21
+#: indico/modules/categories/client/js/display.js:25
 msgid "empty"
 msgstr "vide"
 
-#: indico/modules/categories/client/js/display.js:22
+#: indico/modules/categories/client/js/display.js:26
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} événement"
 msgstr[1] "{0} événements"
 
-#: indico/modules/categories/client/js/display.js:151
+#: indico/modules/categories/client/js/display.js:166
 msgid "Remove from your favorites"
 msgstr "Supprimer de vos favoris"
 
-#: indico/modules/categories/client/js/display.js:154
+#: indico/modules/categories/client/js/display.js:169
 msgid "Add to your favorites"
 msgstr "Ajouter à vos favoris"
 
-#: indico/modules/categories/client/js/display.js:156
+#: indico/modules/categories/client/js/display.js:171
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
@@ -320,12 +320,12 @@ msgstr "Erreur"
 msgid "Choose a file"
 msgstr "Choisissez un fichier"
 
-#: indico/modules/events/abstracts/client/js/index.js:76
-#: indico/modules/events/abstracts/client/js/index.js:89
+#: indico/modules/events/abstracts/client/js/index.js:78
+#: indico/modules/events/abstracts/client/js/index.js:91
 msgid "Show preview"
 msgstr "Montrer l'aperçu"
 
-#: indico/modules/events/abstracts/client/js/index.js:80
+#: indico/modules/events/abstracts/client/js/index.js:82
 msgid "Hide preview"
 msgstr "Cacher l'aperçu"
 

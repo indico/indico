@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-07-21 17:54+0200\n"
+"POT-Creation-Date: 2021-07-21 11:36+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2021\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -137,7 +137,7 @@ msgstr "Supprimer le PDF actuel"
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:121
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:89
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:512
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:170
@@ -407,7 +407,7 @@ msgstr "Restreindre la visibilité de ce commentaire pour les autres éditeurs"
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:211
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -425,27 +425,27 @@ msgid "On {modificationDate}"
 msgstr "Le {modificationDate}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:80
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:78
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:89
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:80
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:91
 msgid "edited"
 msgstr "modifié"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:89
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:93
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:95
 msgid "Edit comment"
 msgstr "Modifier le commentaire"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:94
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:98
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:119
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:105
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:127
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:102
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:129
 msgid "Remove comment"
 msgstr "Supprimer le commentaire"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:109
 msgid "Are you sure you want to remove this comment?"
 msgstr "Voulez-vous vraiment effacer ce commentaire?"
 
@@ -603,12 +603,12 @@ msgid "{submitterName} submitted a revision"
 msgstr "{submitterName} a déposé une révision"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:57
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
 msgid "Hide old revision"
 msgstr "Cacher l'ancienne révision"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
 msgid "Show old revision"
 msgstr "Montrer l'ancienne révision"
 
@@ -1466,7 +1466,7 @@ msgstr "Relecture"
 msgid "Change reviews"
 msgstr "Modifier les évaluations"
 
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:81
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:83
 msgid "On {modificationDate} by {modifiedBy}"
 msgstr "Le {modificationDate} par {modifiedBy}"
 
@@ -1514,35 +1514,35 @@ msgstr "Modifications requises pour le papier"
 msgid "{reviewerName} left a review"
 msgstr "{reviewerName} a laissé une évaluation"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:112
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:114
 msgid "Proposed to {actionName}accept{/actionName}"
 msgstr "Proposé pour {actionName}acceptation{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:120
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:122
 msgid "Proposed to {actionName}reject{/actionName}"
 msgstr "Proposition de {actionName}refuser{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:128
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:130
 msgid "Proposed to {actionName}correct{/actionName}"
 msgstr "Proposé de {actionName}corriger{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:138
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:140
 msgid "· score {prettyScore}"
 msgstr "· score {prettyScore}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:146
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:148
 msgid "Score: {score} / {maxScore}"
 msgstr "Score: {score} / {maxScore}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:159
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
 msgid "hide ratings"
 msgstr "Cacher les scores"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:163
 msgid "show ratings"
 msgstr "montrer les scores"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:173
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:175
 msgid "Edit review"
 msgstr "Modifier l'évaluation"
 
