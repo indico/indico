@@ -79,7 +79,7 @@ DEFAULT_CONFIG = {
 }
 
 
-@signals.get_placeholders.connect_via('designer-fields')
+@signals.core.get_placeholders.connect_via('designer-fields')
 def _get_notification_placeholders(sender, **kwargs):
     from indico.modules.designer import placeholders
     for name in placeholders.__all__:

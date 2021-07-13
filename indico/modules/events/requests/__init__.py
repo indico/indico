@@ -18,7 +18,7 @@ from indico.web.menu import SideMenuItem
 __all__ = ('RequestDefinitionBase', 'RequestFormBase')
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_request_definitions(app, **kwargs):
     # This will raise RuntimeError if the request type names are not unique
     get_request_definitions()

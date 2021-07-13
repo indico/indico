@@ -176,7 +176,7 @@ class ParametrizedPlaceholder(Placeholder):
 
 
 def get_placeholders(context, **kwargs):
-    return named_objects_from_signal(signals.get_placeholders.send(context, **kwargs))
+    return named_objects_from_signal(signals.core.get_placeholders.send(context, **kwargs))
 
 
 def replace_placeholders(context, text, escape_html=True, **kwargs):

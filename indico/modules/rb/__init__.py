@@ -47,7 +47,7 @@ rb_settings = SettingsProxy('roombooking', {
 })
 
 
-@signals.import_tasks.connect
+@signals.core.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.rb.tasks  # noqa: F401
 
@@ -146,6 +146,6 @@ def _get_management_permissions(sender, **kwargs):
     yield ModeratePermission
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_permissions(app, **kwargs):
     check_permissions(Room)

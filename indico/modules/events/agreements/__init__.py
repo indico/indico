@@ -23,7 +23,7 @@ __all__ = ('AgreementPersonInfo', 'AgreementDefinitionBase')
 logger = Logger.get('agreements')
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_agreement_definitions(app, **kwargs):
     # This will raise RuntimeError if the agreement definition types are not unique
     get_agreement_definitions()
@@ -44,7 +44,7 @@ def _merge_users(target, source, **kwargs):
     Agreement.query.filter_by(user_id=source.id).update({Agreement.user_id: target.id})
 
 
-@signals.get_placeholders.connect_via('agreement-email')
+@signals.core.get_placeholders.connect_via('agreement-email')
 def _get_placeholders(sender, agreement, definition, **kwargs):
     yield PersonNamePlaceholder
     yield AgreementLinkPlaceholder

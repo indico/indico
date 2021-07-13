@@ -21,7 +21,7 @@ def get_search_provider(only_active=True):
                         provider will be used.
     """
     from indico.modules.search.controllers import InternalSearch
-    providers = values_from_signal(signals.get_search_providers.send(), as_list=True)
+    providers = values_from_signal(signals.core.get_search_providers.send(), as_list=True)
 
     if not providers:
         return InternalSearch

@@ -178,7 +178,8 @@ def validate_secure_password(context, password, *, username='', fast=False):
     # there's a good chance that single dictionary words are already included in the pwned password
     # list.
 
-    if errors := values_from_signal(signals.check_password_secure.send(context, username=username, password=password),
+    if errors := values_from_signal(signals.core.check_password_secure.send(context, username=username,
+                                                                            password=password),
                                     as_list=True):
         return errors[0]
 

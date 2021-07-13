@@ -44,7 +44,7 @@ indico.core.signals
                 # event.__init__.py always import its submodules directly so we
                 # don't recurse in those cases to avoid duplicate docs
                 elif (isinstance(attr, ModuleType) and
-                        name != 'core' and module.__name__ != 'indico.core.signals.event'):
+                        module.__name__ != 'indico.core.signals.event'):
                     print(attr.__name__)
                     print(separators[nesting] * len(attr.__name__))
                     generate_signal_doc(attr, nesting=(nesting + 1))

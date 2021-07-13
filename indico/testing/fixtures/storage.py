@@ -16,7 +16,7 @@ from indico.modules.attachments.models.attachments import Attachment, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 
 
-@signals.get_storage_backends.connect
+@signals.core.get_storage_backends.connect
 def _get_storage_backends(sender, **kwargs):
     return MemoryStorage
 

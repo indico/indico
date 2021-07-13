@@ -71,7 +71,7 @@ def _get_test_conditions(sender, **kwargs):
 
 @pytest.fixture(autouse=True)
 def _register_test_rules():
-    with signals.get_conditions.connected_to(_get_test_conditions, sender='test'):
+    with signals.core.get_conditions.connected_to(_get_test_conditions, sender='test'):
         yield
 
 

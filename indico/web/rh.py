@@ -279,7 +279,7 @@ class RH:
             init_email_queue()
             self._check_csrf()
             res = self._do_process()
-            signals.after_process.send()
+            signals.core.after_process.send()
 
             if self.commit:
                 db.session.commit()

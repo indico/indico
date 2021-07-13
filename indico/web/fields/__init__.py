@@ -19,4 +19,4 @@ def get_field_definitions(for_):
     :param for_: The identifier/object passed to the `get_fields`
                  signal to identify which fields to get.
     """
-    return named_objects_from_signal(signals.get_fields.send(for_), plugin_attr='plugin')
+    return named_objects_from_signal(signals.core.get_fields.send(for_), plugin_attr='plugin')

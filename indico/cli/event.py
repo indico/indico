@@ -39,7 +39,7 @@ def restore(event_id, user_id, message):
         click.secho('This event is not deleted', fg='yellow')
         sys.exit(1)
     event.restore(message, user)
-    signals.after_process.send()
+    signals.core.after_process.send()
     db.session.commit()
     click.secho(f'Event undeleted: "{event.title}"', fg='green')
 

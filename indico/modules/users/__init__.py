@@ -92,6 +92,6 @@ def _registered(user, identity, from_moderation, **kwargs):
     send_email(make_email(get_admin_emails(), template=tpl))
 
 
-@signals.import_tasks.connect
+@signals.core.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.users.tasks  # noqa: F401

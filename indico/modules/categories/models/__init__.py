@@ -12,7 +12,7 @@ from sqlalchemy import DDL
 from indico.core import signals
 
 
-@signals.db_schema_created.connect_via('categories')
+@signals.core.db_schema_created.connect_via('categories')
 def _create_check_consistency_deleted(sender, connection, **kwargs):
     sql = textwrap.dedent('''
         CREATE FUNCTION categories.check_consistency_deleted() RETURNS trigger AS
@@ -71,7 +71,7 @@ def _create_check_consistency_deleted(sender, connection, **kwargs):
     DDL(sql).execute(connection)
 
 
-@signals.db_schema_created.connect_via('categories')
+@signals.core.db_schema_created.connect_via('categories')
 def _create_check_cycles(sender, connection, **kwargs):
     sql = textwrap.dedent('''
         CREATE FUNCTION categories.check_cycles() RETURNS trigger AS

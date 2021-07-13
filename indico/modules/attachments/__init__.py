@@ -59,6 +59,6 @@ def _get_attachment_cloner(sender, **kwargs):
     return AttachmentCloner
 
 
-@signals.import_tasks.connect
+@signals.core.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.attachments.tasks  # noqa: F401

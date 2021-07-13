@@ -41,7 +41,7 @@ celery_settings = SettingsProxy('celery', {
 })
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _load_default_modules(app, **kwargs):
     celery.loader.import_default_modules()  # load all tasks
 
@@ -50,7 +50,7 @@ def _load_default_modules(app, **kwargs):
 def _import_modules(*args, **kwargs):
     import indico.core.emails  # noqa: F401
     import indico.util.tasks  # noqa: F401
-    signals.import_tasks.send()
+    signals.core.import_tasks.send()
 
 
 @beat_init.connect

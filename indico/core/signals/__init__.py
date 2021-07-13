@@ -5,10 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.core.signals import (acl, agreements, attachments, category, event, event_management, menu, plugin, rb, rh,
-                                 users)
-from indico.core.signals.core import *
+from indico.core.signals import (acl, agreements, attachments, category, core, event, event_management, menu, plugin,
+                                 rb, rh, users)
 
 
-__all__ = ('acl', 'agreements', 'attachments', 'category', 'event', 'event_management', 'menu', 'plugin', 'rb', 'rh',
-           'users')
+__all__ = ('acl', 'agreements', 'attachments', 'category', 'core', 'event', 'event_management', 'menu', 'plugin', 'rb',
+           'rh', 'users')

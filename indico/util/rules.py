@@ -88,7 +88,7 @@ def get_conditions(context, **kwargs):
     :param context: the context where the conditions are used
     :param kwargs: arguments specific to the context
     """
-    return named_objects_from_signal(signals.get_conditions.send(context, **kwargs))
+    return named_objects_from_signal(signals.core.get_conditions.send(context, **kwargs))
 
 
 def check_rule(context, rule, **kwargs):

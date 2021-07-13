@@ -68,7 +68,7 @@ def _get_session_cloner(sender, **kwargs):
     return SessionCloner
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_permissions(app, **kwargs):
     check_permissions(Session)
 

@@ -188,7 +188,7 @@ class HTTPAPIHook:
             try:
                 init_email_queue()
                 is_response, resultList, complete, extra = self._perform(user, func, extra_func)
-                signals.after_process.send()
+                signals.core.after_process.send()
                 db.session.commit()
                 flush_email_queue()
             except Exception:

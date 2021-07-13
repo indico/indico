@@ -54,7 +54,7 @@ class IndicoFormMeta(FormMeta):
         # if the signal receiver didn't specify a sender.
         if kwargs.pop('__extended', False):
             return super().__call__(*args, **kwargs)
-        extra_fields = values_from_signal(signals.add_form_fields.send(cls))
+        extra_fields = values_from_signal(signals.core.add_form_fields.send(cls))
         # If there are no extra fields, we don't need any custom logic
         # and simply create an instance of the original form.
         if not extra_fields:
@@ -143,7 +143,7 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
         valid = super().validate()
         if not valid:
             return False
-        if not all(values_from_signal(signals.form_validated.send(self), single_value=True)):
+        if not all(values_from_signal(signals.core.form_validated.send(self), single_value=True)):
             return False
         self.post_validate()
         return True

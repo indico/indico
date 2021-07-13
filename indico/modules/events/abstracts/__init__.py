@@ -77,7 +77,7 @@ def _merge_users(target, source, **kwargs):
     abstracts_settings.acls.merge_users(target, source)
 
 
-@signals.get_conditions.connect_via('abstract-notifications')
+@signals.core.get_conditions.connect_via('abstract-notifications')
 def _get_abstract_notification_rules(sender, **kwargs):
     yield StateCondition
     yield TrackCondition
@@ -127,7 +127,7 @@ class AbstractReviewerPermission(ManagementPermission):
     description = _('Grants abstract reviewing rights on an event.')
 
 
-@signals.get_placeholders.connect_via('abstract-notification-email')
+@signals.core.get_placeholders.connect_via('abstract-notification-email')
 def _get_notification_placeholders(sender, **kwargs):
     from indico.modules.events.abstracts import placeholders
     for name in placeholders.__all__:

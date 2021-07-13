@@ -150,7 +150,7 @@ def _get_event_management_url(event, **kwargs):
         return url_for('event_registration.manage_regform_list', event)
 
 
-@signals.get_placeholders.connect_via('registration-invitation-email')
+@signals.core.get_placeholders.connect_via('registration-invitation-email')
 def _get_invitation_placeholders(sender, invitation, **kwargs):
     from indico.modules.events.registration.placeholders.invitations import (FirstNamePlaceholder,
                                                                              InvitationLinkPlaceholder,
@@ -160,7 +160,7 @@ def _get_invitation_placeholders(sender, invitation, **kwargs):
     yield InvitationLinkPlaceholder
 
 
-@signals.get_placeholders.connect_via('registration-email')
+@signals.core.get_placeholders.connect_via('registration-email')
 def _get_registration_placeholders(sender, regform, registration, **kwargs):
     from indico.modules.events.registration.placeholders.registrations import (EventLinkPlaceholder,
                                                                                EventTitlePlaceholder, FieldPlaceholder,

@@ -53,14 +53,14 @@ def _convert_email_principals(user, **kwargs):
               'info')
 
 
-@signals.get_fields.connect_via(ContributionField)
+@signals.core.get_fields.connect_via(ContributionField)
 def _get_fields(sender, **kwargs):
     from . import contrib_fields
     yield contrib_fields.ContribTextField
     yield contrib_fields.ContribSingleChoiceField
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_field_definitions(app, **kwargs):
     # This will raise RuntimeError if the field names are not unique
     get_contrib_field_types()
@@ -80,7 +80,7 @@ def _get_contribution_cloner(sender, **kwargs):
     yield clone.ContributionCloner
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_permissions(app, **kwargs):
     check_permissions(Contribution)
 

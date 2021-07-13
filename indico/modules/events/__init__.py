@@ -130,7 +130,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
         obj.log(EventLogRealm.management, EventLogKind.change, 'Protection', 'ACL entry changed', user, data=data)
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _handle_legacy_ids(app, **kwargs):
     """
     Handle the redirect from broken legacy event ids such as a12345
@@ -171,7 +171,7 @@ def _handle_legacy_ids(app, **kwargs):
         return redirect(new_url, 302 if app.debug else 301)
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_permissions(app, **kwargs):
     check_permissions(Event)
 
@@ -221,7 +221,7 @@ def _extend_event_menu(sender, **kwargs):
     yield MenuEntryData(_('My Conference'), 'my_conference', position=7, visible=_my_conference_visible)
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_cloners(app, **kwargs):
     # This will raise RuntimeError if the cloner names are not unique
     get_event_cloners()

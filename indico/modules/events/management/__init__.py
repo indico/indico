@@ -35,7 +35,7 @@ def _sidemenu_items(sender, event, **kwargs):
                                section='advanced')
 
 
-@signals.get_placeholders.connect_via('program-codes-contribution')
+@signals.core.get_placeholders.connect_via('program-codes-contribution')
 def _get_placeholders(sender, contribution, **kwargs):
     from . import program_codes as pc
     yield pc.ContributionIDPlaceholder
@@ -49,21 +49,21 @@ def _get_placeholders(sender, contribution, **kwargs):
     yield pc.ContributionWeekday3Placeholder
 
 
-@signals.get_placeholders.connect_via('program-codes-subcontribution')
+@signals.core.get_placeholders.connect_via('program-codes-subcontribution')
 def _get_subcontribution_program_codes_placeholders(sender, subcontribution, **kwargs):
     from . import program_codes as pc
     yield pc.SubContributionIDPlaceholder
     yield pc.SubContributionContributionCodePlaceholder
 
 
-@signals.get_placeholders.connect_via('program-codes-session')
+@signals.core.get_placeholders.connect_via('program-codes-session')
 def _get_program_codes_session_placeholders(sender, session, **kwargs):
     from . import program_codes as pc
     yield pc.SessionIDPlaceholder
     yield pc.SessionSessionTypeCodePlaceholder
 
 
-@signals.get_placeholders.connect_via('program-codes-session-block')
+@signals.core.get_placeholders.connect_via('program-codes-session-block')
 def _get_program_codes_session_block_placeholders(sender, session_block, **kwargs):
     from . import program_codes as pc
     yield pc.SessionBlockSessionCodePlaceholder

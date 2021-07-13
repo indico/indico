@@ -422,7 +422,7 @@ def make_app(testing=False, config_override=None):
         # Below this points plugins are available, i.e. sending signals makes sense
         add_plugin_blueprints(app)
         # themes can be provided by plugins
-        signals.app_created.send(app)
+        signals.core.app_created.send(app)
         config.validate()
         check_db()
 

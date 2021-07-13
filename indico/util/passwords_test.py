@@ -150,7 +150,7 @@ def test_validate_secure_password(monkeypatch, password, username, expected):
             return 'signalfail'
 
     monkeypatch.setattr('indico.util.passwords.check_password_pwned', _mock_pwned)
-    with signals.check_password_secure.connected_to(_signal_fn):
+    with signals.core.check_password_secure.connected_to(_signal_fn):
         rv = validate_secure_password('test', password, username=username)
     assert signal_called
     if expected is None:

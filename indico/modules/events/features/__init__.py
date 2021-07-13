@@ -28,7 +28,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
     return SideMenuItem('features', _('Features'), url_for('event_features.index', event), section='advanced')
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_feature_definitions(app, **kwargs):
     # This will raise RuntimeError if the feature names are not unique
     from indico.modules.events.features.util import get_feature_definitions

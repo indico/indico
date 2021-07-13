@@ -37,7 +37,7 @@ def _get_log_renderers(sender, **kwargs):
     yield EmailRenderer
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_agreement_definitions(app, **kwargs):
     # This will raise RuntimeError if the log renderer types are not unique
     get_log_renderers()

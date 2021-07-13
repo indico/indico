@@ -15,7 +15,7 @@ def get_field_types():
     return get_field_definitions(SurveyField)
 
 
-@signals.get_fields.connect_via(SurveyField)
+@signals.core.get_fields.connect_via(SurveyField)
 def _get_fields(sender, **kwargs):
     from .choices import SurveyMultiSelectField, SurveySingleChoiceField
     from .simple import SurveyBoolField, SurveyNumberField, SurveyTextField
@@ -26,7 +26,7 @@ def _get_fields(sender, **kwargs):
     yield SurveyMultiSelectField
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_field_definitions(app, **kwargs):
     # This will raise RuntimeError if the field names are not unique
     get_field_types()

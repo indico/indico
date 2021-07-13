@@ -80,7 +80,7 @@ def _get_management_permissions(sender, **kwargs):
     return SurveysPermission
 
 
-@signals.import_tasks.connect
+@signals.core.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.events.surveys.tasks  # noqa: F401
 
@@ -102,7 +102,7 @@ class SurveysPermission(ManagementPermission):
     user_selectable = True
 
 
-@signals.get_placeholders.connect_via('survey-link-email')
+@signals.core.get_placeholders.connect_via('survey-link-email')
 def _get_placeholders(sender, event, survey, **kwargs):
     from indico.modules.events.surveys import placeholders
     yield placeholders.EventTitlePlaceholder

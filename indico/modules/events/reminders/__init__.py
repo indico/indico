@@ -22,7 +22,7 @@ from indico.web.menu import SideMenuItem
 logger = Logger.get('events.reminders')
 
 
-@signals.import_tasks.connect
+@signals.core.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.events.reminders.tasks  # noqa: F401
 

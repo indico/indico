@@ -17,7 +17,7 @@ from .oauth2 import require_oauth
 __all__ = ['require_oauth']
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _no_ssl_required_on_debug(app, **kwargs):
     if app.debug or app.testing:
         os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'

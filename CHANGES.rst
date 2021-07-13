@@ -21,6 +21,12 @@ Bugfixes
 
 - None so far :)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Signals previously exposed direcly via ``signals.foo`` now need to be accessed using their
+  explicit name, i.e. ``signals.core.foo`` (:pr:`5007`)
+
 Version 3.0rc2
 --------------
 

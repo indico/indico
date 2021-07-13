@@ -58,7 +58,7 @@ def handle_sqlalchemy_database_error():
 
 
 def _after_commit(*args, **kwargs):
-    signals.after_commit.send()
+    signals.core.after_commit.send()
     if hasattr(g, 'memoize_cache'):
         del g.memoize_cache
 
@@ -134,7 +134,7 @@ def _before_create(target, connection, **kw):
     for schema in schemas:
         if not _schema_exists(connection, schema):
             CreateSchema(schema).execute(connection)
-            signals.db_schema_created.send(str(schema), connection=connection)
+            signals.core.db_schema_created.send(str(schema), connection=connection)
     # Create our custom functions
     create_unaccent_function(connection)
     create_natsort_function(connection)

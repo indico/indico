@@ -116,7 +116,7 @@ def _delete_requests(user, **kwargs):
     db.session.flush()
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _handle_insecure_password_logins(app, **kwargs):
     @app.before_request
     def _redirect_if_insecure():

@@ -43,7 +43,7 @@ def get_storage(backend_name):
 
 
 def get_storage_backends():
-    return named_objects_from_signal(signals.get_storage_backends.send(), plugin_attr='plugin')
+    return named_objects_from_signal(signals.core.get_storage_backends.send(), plugin_attr='plugin')
 
 
 class StorageError(Exception):
@@ -280,13 +280,13 @@ class ReadOnlyFileSystemStorage(ReadOnlyStorageMixin, FileSystemStorage):
         return f'<ReadOnlyFileSystemStorage: {self.path}>'
 
 
-@signals.get_storage_backends.connect
+@signals.core.get_storage_backends.connect
 def _get_storage_backends(sender, **kwargs):
     yield FileSystemStorage
     yield ReadOnlyFileSystemStorage
 
 
-@signals.app_created.connect
+@signals.core.app_created.connect
 def _check_storage_backends(app, **kwargs):
     # This will raise RuntimeError if the backend names are not unique
     get_storage_backends()

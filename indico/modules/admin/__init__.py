@@ -32,6 +32,6 @@ def _topmenu_items(sender, **kwargs):
         yield TopMenuItem('admin', _('Administration'), url_for('core.admin_dashboard'), 70)
 
 
-@signals.import_tasks.connect
+@signals.core.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.admin.notices  # noqa: F401
