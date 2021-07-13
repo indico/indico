@@ -123,19 +123,15 @@
                 <div id="person-filters" class="group list-filter">
                     <a class="i-button arrow highlight js-dropdown" data-toggle="dropdown">Filter role</a>
                     <ul class="i-dropdown">
-                        <li class="enabled">
-                            <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
-                            <i class="icon-checkmark"></i>
-                            <i class="icon-stop colored-square" style="color: #{{ builtin_roles.chairperson.color }};"></i>
-                            <label for="filter-chairpersons">
-                                {%- if event.type == 'lecture' -%}
-                                    {%- trans %}Speakers{% endtrans -%}
-                                {%- else -%}
-                                    {%- trans %}Chairpersons{% endtrans -%}
-                                {%- endif -%}
-                            </label>
-                        </li>
                         {% if event.type != 'lecture' %}
+                            <li class="enabled">
+                                <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
+                                <i class="icon-checkmark"></i>
+                                <i class="icon-stop colored-square" style="color: #{{ builtin_roles.chairperson.color }};"></i>
+                                <label for="filter-chairpersons">
+                                    {%- trans %}Chairpersons{% endtrans -%}
+                                </label>
+                            </li>
                             <li class="enabled">
                                 <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
                                 <i class="icon-checkmark"></i>
@@ -158,6 +154,13 @@
                                     </label>
                                 </li>
                             {% endif %}
+                        {% else %}
+                            <li class="enabled">
+                                <input type="checkbox" id="filter-lecture-speakers" data-filter="lecture_speaker" checked>
+                                <i class="icon-checkmark"></i>
+                                <i class="icon-stop colored-square" style="color: #{{ builtin_roles.lecture_speaker.color }};"></i>
+                                <label for="filter-lecture-speakers">{% trans %}Speakers{% endtrans %}</label>
+                            </li>
                         {% endif %}
                         {% for role_id, role_data in custom_roles.items() %}
                             <li class="enabled">
