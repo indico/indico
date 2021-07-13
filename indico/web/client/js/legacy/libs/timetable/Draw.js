@@ -885,43 +885,6 @@ type(
   }
 );
 
-/*
- * An exclusive popup for showing the timetable of a session.
- * Is functional but needs more work in order to be useful.
- */
-type(
-  'TimetablePopup',
-  ['ExclusivePopup'],
-  {
-    draw: function() {
-      var self = this;
-
-      var div = Html.div({style: {padding: pixels(30)}});
-
-      var timetable = new TimeTable(
-        {'20090617': {s420: this.eventData}},
-        710,
-        div,
-        'contribution',
-        false
-      );
-      div.set(timetable.draw());
-      timetable.postDraw();
-
-      return this.ExclusivePopup.prototype.draw.call(
-        this,
-        Html.div({style: {marginBottom: pixels(10)}}, div)
-      );
-    },
-  },
-  function(eventData, contributions, closeHandler) {
-    this.contributions = contributions;
-    this.eventData = eventData;
-    this.width = 500;
-
-    this.ExclusivePopup('Session timetable', closeHandler);
-  }
-);
 
 type(
   'TimetableDrawer',
