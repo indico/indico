@@ -126,7 +126,10 @@ class RHPersonsBase(RHManageEventBase):
                 data['registrations'].append(registration)
             data['person'] = event_person
             if event_person in chairpersons:
-                data['roles']['chairperson'] = BUILTIN_ROLES['chairperson'].copy()
+                if self.event.type != 'lecture':
+                    data['roles']['chairperson'] = BUILTIN_ROLES['chairperson'].copy()
+                else:
+                    data['roles']['speaker'] = BUILTIN_ROLES['speaker'].copy()
 
             if self.event.type == 'lecture':
                 continue
