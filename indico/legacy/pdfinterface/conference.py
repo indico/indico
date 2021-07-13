@@ -80,7 +80,8 @@ class ProgrammeToPDF(PDFBase):
         height -= 2 * cm
 
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, '{} - {}'.format(
-            self.event.start_dt_local.strftime('%A %d %B %Y'), self.event.end_dt_local.strftime('%A %d %B %Y')))
+            format_date(self.event.start_dt, format='full', timezone=self._tz),
+            format_date(self.event.end_dt, format='full', timezone=self._tz)))
         if self.event.venue_name:
             height-=1*cm
             c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self.event.venue_name))
@@ -89,7 +90,8 @@ class ProgrammeToPDF(PDFBase):
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, self._title)
         self._drawWrappedString(c, f'{strip_tags(self.event.title)} / {self._title}',
                                 width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align='left', maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
-        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, now_utc().strftime('%A %d %B %Y'))
+        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch,
+                          format_date(now_utc(), format='full', timezone=self._tz))
         c.restoreState()
 
     def laterPages(self, c, doc):
@@ -98,8 +100,9 @@ class ProgrammeToPDF(PDFBase):
                                 width=inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9,
                                 color=(0.5, 0.5, 0.5), align='left', maximumWidth=self._PAGE_WIDTH - 3.5*inch,
                                 measurement=inch, lineSpacing=0.15)
-        c.drawCentredString(self._PAGE_WIDTH/2.0, 0.75 * inch, 'Page %d '%doc.page)
-        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, now_utc().strftime('%A %d %B %Y'))
+        c.drawCentredString(self._PAGE_WIDTH/2.0, 0.75 * inch, _('Page {}').format(doc.page))
+        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch,
+                          format_date(now_utc(), format='full', timezone=self._tz))
         c.restoreState()
 
     def getBody(self, story=None):
@@ -288,7 +291,8 @@ class TimeTablePlain(PDFWithTOC):
                                     height=0.75 * inch, font='Times-Roman', size=modifiedFontSize(9, self._fontsize),
                                     color=(0.5, 0.5, 0.5), align='left', maximumWidth=self._PAGE_WIDTH - 3.5 * inch,
                                     measurement=inch, lineSpacing=0.15)
-            c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, now_utc().strftime('%A %d %B %Y'))
+            c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch,
+                              format_date(now_utc(), format='full', timezone=self._tz))
             c.restoreState()
 
     def laterPages(self, c, doc):
@@ -525,7 +529,7 @@ class TimeTablePlain(PDFWithTOC):
                     start_dt = format_time(sess_block.timetable_entry.start_dt, timezone=self._tz)
 
                 sess_caption = f'<font face="Times-Bold">{escape(session_caption)}</font>'
-                text = '<u>{}</u>{} ({}-{})'.format(
+                text = '<u>{}</u>{} ({} - {})'.format(
                     sess_caption, room, start_dt,
                     format_time(sess_block.timetable_entry.end_dt, timezone=self._tz)
                 )
@@ -624,9 +628,9 @@ class TimeTablePlain(PDFWithTOC):
                     speaker_word = ngettext('Presenter', 'Presenters', len(contrib.speakers))
                     speakers = f'<font face="Times-Bold"><b>- {speaker_word}: {speakers}</b></font>'
 
-                text = '<u>{}</u>{} ({}-{})'.format(escape(contrib.title), room,
-                                                    format_time(entry.start_dt, timezone=self._tz),
-                                                    format_time(entry.end_dt, timezone=self._tz))
+                text = '<u>{}</u>{} ({} - {})'.format(escape(contrib.title), room,
+                                                      format_time(entry.start_dt, timezone=self._tz),
+                                                      format_time(entry.end_dt, timezone=self._tz))
                 p1 = Paragraph(text, self._styles['session_title'])
                 res.append(p1)
                 if self._ttPDFFormat.showTitleSessionTOC():
@@ -648,9 +652,9 @@ class TimeTablePlain(PDFWithTOC):
                 if break_.room_name:
                     room = f' - {escape(break_.room_name)}'
 
-                text = '<u>{}</u>{} ({}-{})'.format(escape(break_.title), room,
-                                                    format_time(break_entry.start_dt, timezone=self._tz),
-                                                    format_time(break_entry.end_dt, timezone=self._tz))
+                text = '<u>{}</u>{} ({} - {})'.format(escape(break_.title), room,
+                                                      format_time(break_entry.start_dt, timezone=self._tz),
+                                                      format_time(break_entry.end_dt, timezone=self._tz))
 
                 p1 = Paragraph(text, self._styles['session_title'])
                 res.append(p1)
@@ -746,10 +750,10 @@ class TimeTablePlain(PDFWithTOC):
                 current_day += timedelta(days=1)
                 continue
 
-            text = escape(current_day.strftime('%A %d %B %Y'))
-            p = Paragraph(text, self._styles['day'], part=current_day.strftime('%A %d %B %Y'))
+            text = format_date(current_day, format='full', timezone=self._tz)
+            p = Paragraph(escape(text), self._styles['day'], part=text)
             story.append(p)
-            self._indexedFlowable[p] = {'text': current_day.strftime('%A %d %B %Y'), 'level': 1}
+            self._indexedFlowable[p] = {'text': text, 'level': 1}
             for entry in day_entries:
                 story.append(entry)
             if not self._ttPDFFormat.showNewPagePerSession():
@@ -835,7 +839,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                                      .format(_('Session'), escape(title)),
                                      self._styles['normal']))
                 room_time = escape(session_slot.room_name) if session_slot.room_name else ''
-                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
+                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {} ({} - {})'
                              .format(_('Time and Place'), room_time,
                                      format_time(entry.start_dt, timezone=self._tz),
                                      format_time(entry.end_dt, timezone=self._tz)))
@@ -856,7 +860,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                                      .format(_('Contribution'), escape(contrib.title)), self._styles['normal']))
 
                 room_time = escape(contrib.room_name) if contrib.room_name else ''
-                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
+                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {} ({} - {})'
                              .format(_('Time and Place'), room_time,
                                      format_date(entry.start_dt, timezone=self._tz),
                                      format_date(entry.end_dt, timezone=self._tz)))
@@ -873,7 +877,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                 res.append(Paragraph('<font face="Times-Bold"><b> {}:</b></font> {}'
                                      .format(_('Break'), escape(title)), self._styles['normal']))
                 room_time = escape(break_.room_name) if break_.room_name else ''
-                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
+                room_time = ('<font face="Times-Bold"><b> {}:</b></font> {} ({} - {})'
                              .format(_('Time and Place'), room_time,
                                      format_date(entry.start_dt, timezone=self._tz),
                                      format_date(entry.end_dt, timezone=self._tz)))
@@ -898,7 +902,7 @@ class SimplifiedTimeTablePlain(PDFBase):
             if not day_entries:
                 current_day += timedelta(days=1)
                 continue
-            text = '{} - {}-{}'.format(
+            text = '{} - {} - {}'.format(
                 escape(self.event.title),
                 escape(format_date(self.event.start_dt, timezone=self._tz)),
                 escape(format_date(self.event.end_dt, timezone=self._tz))
@@ -907,7 +911,8 @@ class SimplifiedTimeTablePlain(PDFBase):
                 text = f'{text}, {escape(self.event.venue_name)}.'
             p = Paragraph(text, self._styles['title'])
             story.append(p)
-            text2 = '{}: {}'.format(_('Daily Program'), escape(current_day.strftime('%A %d %B %Y')))
+            text2 = '{}: {}'.format(_('Daily Program'), escape(format_date(current_day, format='full',
+                                                                           timezone=self._tz)))
             p2 = Paragraph(text2, self._styles['day'])
             story.append(p2)
             story.append(Spacer(1, 0.4 * inch))
@@ -1070,7 +1075,7 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         title = truncate(doc.getCurrentPart(), 50)
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, '%s'%title)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, ' {} {} '.format(_('Page'), doc.page))
-        c.drawString(inch,  0.75 * inch, now_utc().strftime('%A %d %B %Y'))
+        c.drawString(inch,  0.75 * inch, format_date(now_utc(), format='full', timezone=self.event.tzinfo))
         c.restoreState()
 
     def getBody(self):
@@ -1111,7 +1116,8 @@ class RegistrantsListToPDF(PDFBase):
         c.setLineWidth(3)
         c.setStrokeGray(0.7)
         c.setFont('Times-Roman', 10)
-        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 1*cm, now_utc().strftime('%d %B %Y, %H:%M'))
+        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 1*cm,
+                          format_date(now_utc(), format='full', timezone=self.event.tzinfo))
         c.restoreState()
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):

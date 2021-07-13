@@ -19,7 +19,7 @@ Major Features
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix formatting and datetime localization issues in various PDF exports (:pr:`5009`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
