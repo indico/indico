@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* eslint-disable import/unambiguous */
+/* eslint-disable import/unambiguous, object-shorthand */
 
 type(
   'TimetableBlockBase',
@@ -1248,13 +1248,9 @@ type(
           headerStyle.marginTop = '0';
         }
 
-        var nDate = Util.parseJSDateTime(day, IndicoDateTimeFormats.Ordinal);
-        var dayStr =
-          Indico.Data.WeekDays[nDate.getDay()].substring(0, 3) +
-          ' ' +
-          nDate.getDate() +
-          '/' +
-          (nDate.getMonth() + 1);
+        const dayStr = moment(day).format(
+          $T.pgettext('momentjs date format for timetable tab headers', 'ddd DD/MM')
+        );
 
         header = Html.div({className: 'timetableHeader', style: headerStyle}, dayStr);
         div.append(header);

@@ -19,7 +19,8 @@ Major Features
 Bugfixes
 ^^^^^^^^
 
-- Fix formatting and datetime localization issues in various PDF exports (:pr:`5009`)
+- Fix formatting and datetime localization in various PDF exports and timetable tab headers
+  (:pr:`5009`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

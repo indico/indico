@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous, object-shorthand */
+
 var TimetableDefaults = {
   topMargin: 30,
   bottomMargin: 40,
@@ -476,16 +478,9 @@ type(
         return $T('All days');
       }
 
-      var day = text.substring(6, 8);
-      var month = text.substring(4, 6);
-
-      var strDate = day + '/' + month + '/' + text.substring(0, 4);
-
-      //var nDate = new Date();
-      var delements = parseDate(strDate);
-      var nDate = new Date(delements[2], delements[1] - 1, delements[0]);
-
-      return Indico.Data.WeekDays[nDate.getDay()].substring(0, 3) + ' ' + day + '/' + month;
+      return moment(text).format(
+        $T.pgettext('momentjs date format for timetable tab headers', 'ddd DD/MM')
+      );
     },
 
     _parseDayInterval: function(hash) {
