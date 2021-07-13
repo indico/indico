@@ -21,6 +21,8 @@ Bugfixes
 
 - Fix formatting and datetime localization in various PDF exports and timetable tab headers
   (:pr:`5009`)
+- Show lecture speakers as speakers instead of chairpersons on the participant roles page
+  (:pr:`5008`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

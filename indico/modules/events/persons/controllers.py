@@ -49,14 +49,16 @@ from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form
 
 
-BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': 'f7b076',
+BUILTIN_ROLES = {'chairperson': {'name': _('Chairperson'), 'code': 'CHR', 'color': 'f7b076',
                                  'css': 'background-color: #f7b076 !important; border-color: #f7b076 !important'},
-                 'author': {'name': 'Author', 'code': 'AUT', 'color': '6582e8',
+                 'author': {'name': _('Author'), 'code': 'AUT', 'color': '6582e8',
                             'css': 'background-color: #6582e8 !important; border-color: #6582e8 !important'},
-                 'convener': {'name': 'Convener', 'code': 'CON', 'color': 'ce69e0',
+                 'convener': {'name': _('Convener'), 'code': 'CON', 'color': 'ce69e0',
                               'css': 'background-color: #ce69e0 !important; border-color: #ce69e0 !important'},
-                 'speaker': {'name': 'Speaker', 'code': 'SPK', 'color': '53c7ad',
-                             'css': 'background-color: #53c7ad !important; border-color: #53c7ad !important'}}
+                 'speaker': {'name': _('Speaker'), 'code': 'SPK', 'color': '53c7ad',
+                             'css': 'background-color: #53c7ad !important; border-color: #53c7ad !important'},
+                 'lecture_speaker': {'name': _('Speaker'), 'code': 'SPK', 'color': '53c7ad',
+                                     'css': 'background-color: #53c7ad !important; border-color: #53c7ad !important'}}
 
 
 class RHPersonsBase(RHManageEventBase):
@@ -126,7 +128,10 @@ class RHPersonsBase(RHManageEventBase):
                 data['registrations'].append(registration)
             data['person'] = event_person
             if event_person in chairpersons:
-                data['roles']['chairperson'] = BUILTIN_ROLES['chairperson'].copy()
+                if self.event.type != 'lecture':
+                    data['roles']['chairperson'] = BUILTIN_ROLES['chairperson'].copy()
+                else:
+                    data['roles']['lecture_speaker'] = BUILTIN_ROLES['lecture_speaker'].copy()
 
             if self.event.type == 'lecture':
                 continue
