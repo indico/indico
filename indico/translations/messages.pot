@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0rc2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-13 18:34+0200\n"
+"POT-Creation-Date: 2021-07-14 13:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16148,6 +16148,15 @@ msgstr ""
 
 #: indico/web/templates/placeholder_info.html:23
 msgid "toggle"
+msgstr ""
+
+#: indico/web/templates/emails/base_i18n.txt:3
+msgctxt "greeting"
+msgid "Dear"
+msgstr ""
+
+#: indico/web/templates/emails/base_i18n.txt:7
+msgid "Email Notifier"
 msgstr ""
 
 #: indico/web/templates/forms/_form.html:79

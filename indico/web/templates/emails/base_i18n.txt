@@ -1,0 +1,7 @@
+{% extends 'emails/base.txt' %}
+
+{%- block header %}{{ pgettext('greeting', 'Dear') }} {% block header_recipient %}{% endblock %},
+
+{% endblock -%}
+
+{% block footer_title %}{% trans %}Email Notifier{% endtrans %}{% endblock %}
