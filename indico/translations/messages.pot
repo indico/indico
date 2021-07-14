@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0rc2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-14 13:12+0200\n"
+"POT-Creation-Date: 2021-07-14 17:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -237,7 +237,7 @@ msgstr ""
 #: indico/core/plugins/__init__.py:37 indico/modules/groups/templates/groups.html:87
 #: indico/modules/search/templates/event_search.html:4 indico/modules/search/templates/search.html:6
 #: indico/modules/search/views.py:22 indico/modules/search/views.py:34 indico/modules/users/templates/users_admin.html:67
-#: indico/web/templates/overview/base.html:21
+#: indico/web/templates/overview/base.html:56
 msgid "Search"
 msgstr ""
 
@@ -8322,6 +8322,7 @@ msgstr ""
 
 #: indico/modules/events/management/templates/_settings.html:53
 #: indico/modules/events/surveys/templates/management/survey.html:17 indico/modules/events/templates/footer.html:12
+#: indico/web/templates/overview/base.html:37
 msgid "Copy link to clipboard"
 msgstr ""
 
@@ -15567,15 +15568,15 @@ msgstr ""
 msgid "This is not a string"
 msgstr ""
 
-#: indico/util/marshmallow.py:49
+#: indico/util/marshmallow.py:52
 msgid "This field cannot be empty."
 msgstr ""
 
-#: indico/util/marshmallow.py:62
+#: indico/util/marshmallow.py:65
 msgid "Invalid file extension"
 msgstr ""
 
-#: indico/util/marshmallow.py:71
+#: indico/util/marshmallow.py:74
 msgid "This field has more than {} words"
 msgstr ""
 
@@ -16335,7 +16336,16 @@ msgstr ""
 msgid "Click to toggle synchronization (%(provider_name)s)."
 msgstr ""
 
-#: indico/web/templates/overview/base.html:31
+#: indico/web/templates/overview/base.html:22 indico/web/templates/overview/base.html:24
+msgid "Generate iCalendar link"
+msgstr ""
+
+#: indico/web/templates/overview/base.html:45
+#, python-format
+msgid "Your %(link_start)scalendar link%(link_end)s has been generated."
+msgstr ""
+
+#: indico/web/templates/overview/base.html:66
 msgid "No results found"
 msgstr ""
 
