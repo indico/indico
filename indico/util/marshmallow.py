@@ -7,14 +7,17 @@
 
 import os
 import re
+from datetime import datetime, time, timedelta
 from uuid import UUID
 
 from dateutil import parser, relativedelta
 from marshmallow import ValidationError
-from marshmallow.fields import DateTime, Field, List
+from marshmallow.fields import Date, DateTime, Field, List
 from marshmallow.utils import from_iso_datetime
+from pytz import timezone
 from sqlalchemy import inspect
 
+from indico.core.config import config
 from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -92,6 +95,53 @@ class NaiveDateTime(DateTime):
     DESERIALIZATION_FUNCS = {
         'iso': _naive_from_iso,
     }
+
+
+class RelativeDayDateTime(Date):
+    """
+    A field that accepts a date or relative date offset and deserializes to
+    a datetime object at the start/end of that date.
+
+    The datetime objects returned by this field are always using Indico's
+    default timezone.
+    """
+
+    # Currently this field always uses the default timezone; for typical API
+    # endpoints that use a day granularity this should usually be fine, but if
+    # any use cases come up where this is not sufficient we may need to add a
+    # kwarg to switch the field to UTC or get the timezone from a different field
+    # (via ``data`` in ``_deserialize``)
+
+    DELTAS = {
+        'today': timedelta(),
+        'yesterday': timedelta(days=-1),
+        'tomorrow': timedelta(days=1),
+    }
+
+    def __init__(self, day_end=False, **kwargs):
+        self.day_end = day_end
+        super().__init__(**kwargs)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        date_value = None
+        if value:
+            today = now_utc(False).astimezone(timezone(config.DEFAULT_TIMEZONE)).date()
+            # yesterday/today/tomorrow
+            if (delta := self.DELTAS.get(value)) is not None:
+                date_value = today + delta
+            # something like -14d or +7d
+            elif (match := re.match(r'^([+-])?(\d{1,3})d$', value)) is not None:
+                mod = -1 if match.group(1) == '-' else 1
+                offset = int(match.group(2))
+                date_value = today + timedelta(days=mod*offset)
+        # fall back to the normal date parsing
+        if date_value is None:
+            date_value = super()._deserialize(value, attr, data, **kwargs)
+        # attach time information for the day start/end
+        if self.day_end:
+            return timezone(config.DEFAULT_TIMEZONE).localize(datetime.combine(date_value, time(23, 59, 59)))
+        else:
+            return timezone(config.DEFAULT_TIMEZONE).localize(datetime.combine(date_value, time(0, 0, 0)))
 
 
 class ModelField(Field):
