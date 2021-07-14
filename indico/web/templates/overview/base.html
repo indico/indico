@@ -1,5 +1,6 @@
 {% extends 'layout/base.html' %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
+{% from 'message_box.html' import message_box %}
 
 {# Implement this macro in child templates
     {% macro result_group_entries(items) %}
@@ -12,7 +13,41 @@
 #}
 
 {% block page_class %}fixed-width-standalone-page{% endblock %}
+
+{% block page_actions -%}
+    {% if calendar_link_supported|default(false) -%}
+        <div class="toolbar">
+            <a href="#"
+               class="i-button icon-calendar"
+               title="{% trans %}Generate iCalendar link{% endtrans %}"
+               data-href="{{ url_for('.request_calendar_link') }}"
+               data-title="{% trans %}Generate iCalendar link{% endtrans %}"
+               data-ajax-dialog
+               data-reload-after></a>
+        </div>
+    {%- endif -%}
+{%- endblock %}
+
 {% block content %}
+    {% if calendar_link_supported|default(false) and calendar_link %}
+        {% call message_box('success') %}
+            {%- set link_start -%}
+                <a href="{{ calendar_link }}"
+                   class="js-copy-to-clipboard"
+                   title="{% trans %}Copy link to clipboard{% endtrans %}"
+                   data-clipboard-text="{{ calendar_link }}"
+                   data-clipboard-action="copy">
+            {%- endset -%}
+            {%- set link_end -%}
+                </a>
+            {%- endset -%}
+
+            {% trans %}
+                Your {{ link_start }}calendar link{{ link_end }} has been generated.
+            {% endtrans %}
+        {% endcall %}
+    {% endif %}
+
     <div class="i-box-group vert">
         <div class="i-box">
             {{ form_header(form, method='get', action=action|default('')) }}
