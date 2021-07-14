@@ -31,6 +31,7 @@ _bp.add_url_rule('/change-type', 'change_type', actions.RHChangeEventType, metho
 _bp.add_url_rule('/lock', 'lock', actions.RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', actions.RHUnlockEvent, methods=('POST',))
 _bp.add_url_rule('/move', 'move', actions.RHMoveEvent, methods=('POST',))
+_bp.add_url_rule('/withdraw-move-request', 'withdraw_move_request', actions.RHWithdrawMoveRequest, methods=('POST',))
 # Protection
 _bp.add_url_rule('/api/principals', 'api_principals', protection.RHEventPrincipals, methods=('POST',))
 _bp.add_url_rule('/api/event-roles', 'api_event_roles', protection.RHEventRolesJSON)
