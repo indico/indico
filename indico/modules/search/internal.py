@@ -64,6 +64,7 @@ class InternalSearch(IndicoSearchProvider):
     def search(self, query, user=None, page=None, object_types=(), *, admin_override_enabled=False,
                **params):
         category_id = params.get('category_id')
+        event_id = params.get('event_id')
         if object_types == [SearchTarget.category]:
             pagenav, results = self.search_categories(query, user, page, category_id,
                                                       admin_override_enabled)
@@ -71,13 +72,13 @@ class InternalSearch(IndicoSearchProvider):
             pagenav, results = self.search_events(query, user, page, category_id,
                                                   admin_override_enabled)
         elif set(object_types) == {SearchTarget.contribution, SearchTarget.subcontribution}:
-            pagenav, results = self.search_contribs(query, user, page, category_id,
+            pagenav, results = self.search_contribs(query, user, page, category_id, event_id,
                                                     admin_override_enabled)
         elif object_types == [SearchTarget.attachment]:
-            pagenav, results = self.search_attachments(query, user, page, category_id,
+            pagenav, results = self.search_attachments(query, user, page, category_id, event_id,
                                                        admin_override_enabled)
         elif object_types == [SearchTarget.event_note]:
-            pagenav, results = self.search_notes(query, user, page, category_id,
+            pagenav, results = self.search_notes(query, user, page, category_id, event_id,
                                                  admin_override_enabled)
         else:
             pagenav, results = {}, []
@@ -226,7 +227,7 @@ class InternalSearch(IndicoSearchProvider):
         res = HTMLStrippingEventSchema(many=True).dump(events)
         return pagenav, EventResultSchema(many=True).load(res)
 
-    def search_contribs(self, q, user, page, category_id, admin_override_enabled):
+    def search_contribs(self, q, user, page, category_id, event_id, admin_override_enabled):
         # XXX: Ideally we would search in subcontributions as well, but our pagination
         # does not really work when we do not have a single unique ID
 
@@ -238,6 +239,8 @@ class InternalSearch(IndicoSearchProvider):
 
         if category_id is not None:
             contrib_filters.append(Event.category_chain_overlaps(category_id))
+        if event_id is not None:
+            contrib_filters.append(Contribution.event_id == event_id)
 
         query = (
             Contribution.query
@@ -295,7 +298,7 @@ class InternalSearch(IndicoSearchProvider):
         res = HTMLStrippingContributionSchema(many=True).dump(contribs)
         return pagenav, ContributionResultSchema(many=True).load(res)
 
-    def search_attachments(self, q, user, page, category_id, admin_override_enabled):
+    def search_attachments(self, q, user, page, category_id, event_id, admin_override_enabled):
         contrib_event = db.aliased(Event)
         contrib_session = db.aliased(Session)
         subcontrib_contrib = db.aliased(Contribution)
@@ -379,6 +382,8 @@ class InternalSearch(IndicoSearchProvider):
 
         if category_id is not None:
             attachment_filters.append(AttachmentFolder.event.has(Event.category_chain_overlaps(category_id)))
+        if event_id is not None:
+            attachment_filters.append(AttachmentFolder.event_id == event_id)
 
         query = (
             Attachment.query
@@ -417,7 +422,7 @@ class InternalSearch(IndicoSearchProvider):
         res = AttachmentSchema(many=True).dump(attachments)
         return pagenav, AttachmentResultSchema(many=True).load(res)
 
-    def search_notes(self, q, user, page, category_id, admin_override_enabled):
+    def search_notes(self, q, user, page, category_id, event_id, admin_override_enabled):
         contrib_event = db.aliased(Event)
         contrib_session = db.aliased(Session)
         subcontrib_contrib = db.aliased(Contribution)
@@ -496,6 +501,8 @@ class InternalSearch(IndicoSearchProvider):
 
         if category_id is not None:
             note_filters.append(EventNote.event.has(Event.category_chain_overlaps(category_id)))
+        if event_id is not None:
+            note_filters.append(EventNote.event_id == event_id)
 
         query = (
             EventNote.query
