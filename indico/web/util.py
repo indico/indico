@@ -205,7 +205,7 @@ def is_legacy_signed_url_valid(user, url):
         '',
         '',
         parsed.path,
-        url_encode(sorted(params.items()), sort=True),
+        url_encode(params, sort=False),
         parsed.fragment
     ))
     signer = Signer(user.signing_secret, salt='url-signing')
@@ -269,7 +269,7 @@ def verify_signed_user_url(url, method):
         '',
         '',
         parsed.path,
-        url_encode(sorted(params.items()), sort=True),
+        url_encode(params, sort=False),
         parsed.fragment
     ))
 

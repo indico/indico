@@ -87,6 +87,13 @@ def test_verify_signed_user_url(dummy_user, url):
     assert 'The persistent link you used is invalid' in str(exc_info.value)
 
 
+@pytest.mark.parametrize('args', ([1, 2], [2, 1]))
+def test_verify_signed_user_url_lists(dummy_user, args):
+    dummy_user.signing_secret = 'sixtynine'
+    url = signed_url_for_user(dummy_user, 'core.contact', foo=args)
+    assert verify_signed_user_url(url, 'GET') == dummy_user
+
+
 def test_verify_signed_user_url_no_token():
     assert verify_signed_user_url('/contact', 'GET') is None
 
