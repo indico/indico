@@ -386,10 +386,12 @@ def sort_reviewing_questions(questions, new_positions):
     logger.info('Reviewing questions of %r reordered by %r', questions[0].event, session.user)
 
 
-def create_event_request(category, event, user):
-    rq = EventMoveRequest(event=event, category=category, submitter=user)
+def create_event_request(event, category):
+    assert event.id != category.id
+    rq = EventMoveRequest(event=event, category=category, submitter=session.user)
     db.session.add(rq)
     db.session.flush()
     logger.info('Category move request %s to %s created by %s', rq, category, session.user)
-    event.log(EventLogRealm.event, EventLogKind.change, 'Event', f'Move request to {category.title} created', user=user)
+    event.log(EventLogRealm.event, EventLogKind.change, 'Event', f'Move request to {category.title} created',
+              user=session.user)
     return rq
