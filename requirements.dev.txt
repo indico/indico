@@ -18,7 +18,7 @@ certifi==2021.5.30
     # via
     #   -c requirements.txt
     #   requests
-chardet==4.0.0
+charset-normalizer==2.0.2
     # via
     #   -c requirements.txt
     #   requests
@@ -67,7 +67,7 @@ hiredis==2.0.0
     # via
     #   -c requirements.txt
     #   redis
-idna==2.10
+idna==3.2
     # via
     #   -c requirements.txt
     #   requests
@@ -75,7 +75,7 @@ imagesize==1.2.0
     # via sphinx
 iniconfig==1.1.1
     # via pytest
-isort==5.9.1
+isort==5.9.2
     # via -r requirements.dev.in
 itsdangerous==2.0.1
     # via
@@ -151,7 +151,7 @@ pytest-mock==3.6.1
     # via -r requirements.dev.in
 pytest-redis==2.1.1
     # via -r requirements.dev.in
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   -c requirements.txt
     #   freezegun
@@ -161,7 +161,7 @@ pytz==2021.1
     # via
     #   -c requirements.txt
     #   babel
-pyupgrade==2.20.0
+pyupgrade==2.21.0
     # via -r requirements.dev.in
 pywatchman==1.4.1
     # via -r requirements.dev.in
@@ -169,7 +169,7 @@ redis[hiredis]==3.5.3
     # via
     #   -c requirements.txt
     #   pytest-redis
-requests==2.25.1
+requests==2.26.0
     # via
     #   -c requirements.txt
     #   plantweb
@@ -191,7 +191,7 @@ smmap==4.0.0
     # via gitdb
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==3.5.4
+sphinx==4.1.1
     # via
     #   -r requirements.dev.in
     #   sphinx-autobuild
@@ -215,7 +215,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-sqlalchemy==1.4.20
+sqlalchemy==1.4.21
     # via
     #   -c requirements.txt
     #   schemainspect
