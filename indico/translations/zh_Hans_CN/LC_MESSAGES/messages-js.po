@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-05 17:54+0200\n"
-"PO-Revision-Date: 2021-07-01 07:40+0000\n"
+"POT-Creation-Date: 2021-07-13 18:34+0200\n"
+"PO-Revision-Date: 2021-07-14 07:00+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -62,24 +62,24 @@ msgstr[0] "{0} 个持久事件未显示"
 msgid "Long lasting events"
 msgstr "持久事件"
 
-#: indico/modules/categories/client/js/display.js:21
+#: indico/modules/categories/client/js/display.js:25
 msgid "empty"
 msgstr "空"
 
-#: indico/modules/categories/client/js/display.js:22
+#: indico/modules/categories/client/js/display.js:26
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} 个事件"
 
-#: indico/modules/categories/client/js/display.js:151
+#: indico/modules/categories/client/js/display.js:166
 msgid "Remove from your favorites"
 msgstr "从收藏夹中删除"
 
-#: indico/modules/categories/client/js/display.js:154
+#: indico/modules/categories/client/js/display.js:169
 msgid "Add to your favorites"
 msgstr "添加到您的收藏夹"
 
-#: indico/modules/categories/client/js/display.js:156
+#: indico/modules/categories/client/js/display.js:171
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
@@ -302,12 +302,12 @@ msgstr "错误"
 msgid "Choose a file"
 msgstr "选择文件"
 
-#: indico/modules/events/abstracts/client/js/index.js:76
-#: indico/modules/events/abstracts/client/js/index.js:89
+#: indico/modules/events/abstracts/client/js/index.js:78
+#: indico/modules/events/abstracts/client/js/index.js:91
 msgid "Show preview"
 msgstr "显示预览"
 
-#: indico/modules/events/abstracts/client/js/index.js:80
+#: indico/modules/events/abstracts/client/js/index.js:82
 msgid "Hide preview"
 msgstr "隐藏预览"
 
@@ -825,7 +825,7 @@ msgstr "输入以添加 {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
 msgid "Delete"
 msgstr "删除"
 
@@ -873,7 +873,7 @@ msgid_plural "<strong>{0}</strong> words left"
 msgstr[0] "<strong> {0} </strong> 剩余单词"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1435
 msgid "Edit"
 msgstr "编辑"
 
@@ -1241,171 +1241,177 @@ msgstr "添加分会"
 msgid "Add session block"
 msgstr "添加分会块"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:43
+#: indico/web/client/js/legacy/libs/timetable/Base.js:45
 msgid "Session"
 msgstr "分会"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:44
+#: indico/web/client/js/legacy/libs/timetable/Base.js:46
 msgid "Room"
 msgstr "会议室"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:131
+#: indico/web/client/js/legacy/libs/timetable/Base.js:133
 msgid "Updating the timetable..."
 msgstr "更新日程表..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:182
-#: indico/web/client/js/legacy/libs/timetable/Base.js:421
+#: indico/web/client/js/legacy/libs/timetable/Base.js:184
+#: indico/web/client/js/legacy/libs/timetable/Base.js:423
 msgid "Filter"
 msgstr "过滤"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:200
+#: indico/web/client/js/legacy/libs/timetable/Base.js:202
 msgid "Printable version"
 msgstr "可打印版本"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:221
+#: indico/web/client/js/legacy/libs/timetable/Base.js:223
 msgid "Go back"
 msgstr "回退"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:228
-#: indico/web/client/js/legacy/libs/timetable/Base.js:387
+#: indico/web/client/js/legacy/libs/timetable/Base.js:230
+#: indico/web/client/js/legacy/libs/timetable/Base.js:389
 msgid "Print"
 msgstr "打印"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:272
+#: indico/web/client/js/legacy/libs/timetable/Base.js:274
 msgid "Export to PDF"
 msgstr "输出到 PDF"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:280
+#: indico/web/client/js/legacy/libs/timetable/Base.js:282
 msgid "Switching to full screen mode..."
 msgstr "转到全屏幕模式..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:317
+#: indico/web/client/js/legacy/libs/timetable/Base.js:319
 msgid "Exit Full Screen"
 msgstr "退出全屏模式"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:394
+#: indico/web/client/js/legacy/libs/timetable/Base.js:396
 msgid "PDF"
 msgstr "PDF"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:401
+#: indico/web/client/js/legacy/libs/timetable/Base.js:403
 msgid "Full screen"
 msgstr "全屏"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:408
+#: indico/web/client/js/legacy/libs/timetable/Base.js:410
 msgid "Link"
 msgstr "链接"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:413
+#: indico/web/client/js/legacy/libs/timetable/Base.js:415
 msgid "Detailed view"
 msgstr "详细视图"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:476
+#: indico/web/client/js/legacy/libs/timetable/Base.js:478
 msgid "All days"
 msgstr "全天"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:689
+#: indico/web/client/js/legacy/libs/timetable/Base.js:482
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1215
+msgctxt "momentjs date format for timetable tab headers"
+msgid "ddd DD/MM"
+msgstr "ddd DD/MM"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:684
 msgid "You are viewing the contents of the session block:"
 msgstr "您正在看分会块的内容："
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:778
+#: indico/web/client/js/legacy/libs/timetable/Base.js:773
 msgid "Your changes triggered the automatic modification of some settings:"
 msgstr "您的更改触发了某些设置的自动修改："
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:786
-#: indico/web/client/js/legacy/libs/timetable/Base.js:790
+#: indico/web/client/js/legacy/libs/timetable/Base.js:781
+#: indico/web/client/js/legacy/libs/timetable/Base.js:785
 msgid "The <strong>starting time</strong> of the session interval <strong>"
 msgstr "分会间隔 <strong> 的 </strong> 开始时间 <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:788
-#: indico/web/client/js/legacy/libs/timetable/Base.js:792
-#: indico/web/client/js/legacy/libs/timetable/Base.js:801
-#: indico/web/client/js/legacy/libs/timetable/Base.js:805
+#: indico/web/client/js/legacy/libs/timetable/Base.js:783
+#: indico/web/client/js/legacy/libs/timetable/Base.js:787
+#: indico/web/client/js/legacy/libs/timetable/Base.js:796
+#: indico/web/client/js/legacy/libs/timetable/Base.js:800
 msgid "</strong> was moved from "
 msgstr "</strong> 被移动了从"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:793
+#: indico/web/client/js/legacy/libs/timetable/Base.js:788
 msgid ""
 "The <strong>starting time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong> 事件 </strong> 的 <strong> 开始时间 </strong> 被移动了从"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:799
-#: indico/web/client/js/legacy/libs/timetable/Base.js:803
+#: indico/web/client/js/legacy/libs/timetable/Base.js:794
+#: indico/web/client/js/legacy/libs/timetable/Base.js:798
 msgid "The <strong>ending time</strong> of the session interval <strong>"
 msgstr "分会间隔 <strong> 的 <strong> 结束时间 </strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:806
+#: indico/web/client/js/legacy/libs/timetable/Base.js:801
 msgid ""
 "The <strong>ending time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong> 事件 </strong> <strong> 结束时间 </strong> 被移动了从"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:812
+#: indico/web/client/js/legacy/libs/timetable/Base.js:807
 msgid "The contents of the interval <strong>"
 msgstr "间隔 <strong> 的内容"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:814
+#: indico/web/client/js/legacy/libs/timetable/Base.js:809
 msgid "</strong> were moved from "
 msgstr "</strong> 被移动了从"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:824
+#: indico/web/client/js/legacy/libs/timetable/Base.js:819
 msgid " to "
 msgstr "到"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1017
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1012
 msgid "Session block"
 msgstr "分会块"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1035
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1030
 msgid "Contribution"
 msgstr "报告"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1049
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1044
 msgid "Break"
 msgstr "间歇"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1066
 msgid "Add poster"
 msgstr "添加海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1076
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
 msgid "Add new"
 msgstr "添加新的"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1080
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1075
 #: indico/web/client/js/legacy/libs/timetable/Management.js:664
 msgid "Reschedule"
 msgstr "重新规划"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1090
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1085
 msgid "Fit to content"
 msgstr "适合内容"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1099
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1094
 msgid "Add new block"
 msgstr "添加新的块"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1143
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1138
 msgid "Add one hour"
 msgstr "加一小时"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1212
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1207
 msgid "Session legend"
 msgstr "分会图例"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1243
 msgid "see more..."
 msgstr "查看更多..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1253
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
 msgid "less..."
 msgstr "较少的..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1567
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1562
 msgid "Go to event timetable"
 msgstr "去事件日程表"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1737
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1732
 msgid "Up to timetable"
 msgstr "到日程表"
 
@@ -1464,35 +1470,35 @@ msgstr "上移"
 msgid "Move down"
 msgstr "下移"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1478
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1437
 msgid "Edit poster"
 msgstr "编辑海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1469
 msgid "Manage protection"
 msgstr "管理保护"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1512
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1471
 msgid "Manage poster protection"
 msgstr "管理海报保护"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1499
 msgid "Unschedule"
 msgstr "计划外的"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1541
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1500
 msgid "Unschedule poster"
 msgstr "计划外的海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1501
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "您确定要取消海报吗？"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1545
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
 msgid "Delete poster"
 msgstr "删除海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1546
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1505
 msgid "Are you sure you want to delete the poster?"
 msgstr "您确定要删除这个海报？"
 

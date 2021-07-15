@@ -6,7 +6,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-07-21 17:54+0200\n"
+"POT-Creation-Date: 2021-07-21 18:34+0200\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2021\n"
 "Language-Team: Chinese (China) (GB2312) (https://www.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -133,7 +133,7 @@ msgstr "删除当前PDF"
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:121
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:89
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:512
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:170
@@ -184,7 +184,7 @@ msgstr "删除"
 
 #: indico/modules/events/client/js/header.jsx:25
 msgid "Basic"
-msgstr "Basic"
+msgstr "基本的"
 
 #: indico/modules/events/client/js/header.jsx:26
 msgid "Just the event."
@@ -194,7 +194,7 @@ msgstr "只这事件。"
 msgid ""
 "A detailed timetable containing individual session blocks and top-level "
 "contributions."
-msgstr "包含单个会话块和顶级贡献的详细时间表。"
+msgstr "包含单个会话块和顶层报告的详细时间表。"
 
 #: indico/modules/events/client/js/header.jsx:36
 msgid "Compact"
@@ -216,7 +216,7 @@ msgstr "导出"
 
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
 msgid "Publish now"
-msgstr ""
+msgstr "立即发布"
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:20
 msgid "Set contribution list in draft mode"
@@ -353,7 +353,7 @@ msgid ""
 "Editor uploaded changes to your paper. Please download the updated files and"
 " verify their changes. If you reject them, you can upload a new version "
 "afterwards."
-msgstr "编辑已将更改上载到您的论文中。请下载更新的文件并验证其更改。如果你拒绝，你可以上传一个新版本。"
+msgstr "编辑已将更改上载到您的论文中。请下载更新的文件并验证其更改。如果您拒绝，您可以上传一个新版本。"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:55
 msgid "You can leave a comment if you wish"
@@ -392,7 +392,7 @@ msgstr "将此注释的可见性限制为其他编辑人"
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:211
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
 msgid "Comment"
 msgstr "注释"
 
@@ -410,34 +410,34 @@ msgid "On {modificationDate}"
 msgstr "于  {modificationDate}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:80
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:78
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:89
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:80
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:91
 msgid "edited"
 msgstr "已编辑"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:89
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:93
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:95
 msgid "Edit comment"
 msgstr "编辑评论"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:94
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:98
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:119
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:105
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:127
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:102
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:129
 msgid "Remove comment"
 msgstr "删除评论"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:109
 msgid "Are you sure you want to remove this comment?"
 msgstr "您确定要删除此评论？"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:57
 #: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:196
 msgid "Actions"
-msgstr "动作"
+msgstr "操作"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:77
 msgid "Confirm action: {action}"
@@ -537,7 +537,7 @@ msgstr "评判"
 #: indico/modules/events/editing/client/js/editing/timeline/SubmitRevision.jsx:68
 #: indico/modules/events/papers/client/js/components/SubmitRevision.jsx:74
 msgid "Upload corrected revision"
-msgstr "上传更正的修订"
+msgstr "上传更正的修订版"
 
 #: indico/modules/events/editing/client/js/editing/timeline/SubmitRevision.jsx:82
 #: indico/modules/events/papers/client/js/components/SubmitRevision.jsx:80
@@ -586,12 +586,12 @@ msgid "{submitterName} submitted a revision"
 msgstr "{submitterName} 提交了修订"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:57
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
 msgid "Hide old revision"
 msgstr "隐藏旧修订"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
 msgid "Show old revision"
 msgstr "显示旧修订"
 
@@ -765,7 +765,7 @@ msgid ""
 "current error with the workflow service is most likely temporary. Attempting"
 " to disconnect and reconnect will most likely not fix it.{/strong}"
 msgstr ""
-"在不可用时断开编辑工作流程服务的连接可能会使您的编辑过程处于不一致的状态。 如果您打算以后继续使用工作流服务，请不要执行此操作。 {strong} "
+"在编辑工作流程服务不可用时断开连接可能会使您的编辑过程处于不一致的状态。 如果您打算以后继续使用工作流服务，请不要执行此操作。 {strong} "
 "工作流程服务当前的错误很可能是暂时的。 尝试断开连接并重新连接很可能无法解决。{/strong}"
 
 #: indico/modules/events/editing/client/js/management/ManageService.jsx:142
@@ -1382,7 +1382,7 @@ msgstr "提交编辑"
 
 #: indico/modules/events/papers/client/js/components/Paper.jsx:162
 msgid "The paper was {url}submitted{/url} for editing"
-msgstr "论文已{url}提交{/url}进行编辑"
+msgstr "论文已 {url}提交{/url} 进行编辑"
 
 #: indico/modules/events/papers/client/js/components/PaperContent.jsx:53
 msgid "Paper files"
@@ -1405,7 +1405,7 @@ msgstr "审核"
 msgid "Change reviews"
 msgstr "更改审核"
 
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:81
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:83
 msgid "On {modificationDate} by {modifiedBy}"
 msgstr "在 {modificationDate} 由 {modifiedBy} 修改"
 
@@ -1451,35 +1451,35 @@ msgstr "论文被要求更改。"
 msgid "{reviewerName} left a review"
 msgstr "{reviewerName}发表了评论"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:112
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:114
 msgid "Proposed to {actionName}accept{/actionName}"
 msgstr "提议 {actionName}接收{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:120
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:122
 msgid "Proposed to {actionName}reject{/actionName}"
 msgstr "提议{actionName}拒绝{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:128
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:130
 msgid "Proposed to {actionName}correct{/actionName}"
 msgstr "提议 {actionName}更正{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:138
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:140
 msgid "· score {prettyScore}"
-msgstr ".得分{prettyScore}"
+msgstr ".`得分{prettyScore}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:146
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:148
 msgid "Score: {score} / {maxScore}"
 msgstr "得分: {score} / {maxScore}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:159
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
 msgid "hide ratings"
 msgstr "隐藏评分"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:163
 msgid "show ratings"
 msgstr "显示评分"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:173
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:175
 msgid "Edit review"
 msgstr "编辑审核"
 
@@ -1519,7 +1519,7 @@ msgstr "在此期间，有多个预订请求。 接受此预订将自动拒绝�
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:183
 msgid "Close without accepting"
-msgstr "关闭不接受"
+msgstr "关闭而不接受"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:194
 msgid "Accept anyway"
@@ -1595,7 +1595,7 @@ msgstr "等待确认"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:442
 msgid "This booking is subject to acceptance by the room owner"
-msgstr "此预订须会议室拥有着同意"
+msgstr "此预订须会议室拥有者同意"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:446
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:219
@@ -1619,11 +1619,11 @@ msgstr "预订被拒绝。"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:483
 msgid "The booking was accepted"
-msgstr "此预订已接收"
+msgstr "此预订已接受"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:510
 msgid "Are you sure you want to delete this booking?"
-msgstr "您确定要删除这个预订吗？"
+msgstr "您确定要删除此预订吗？"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:611
 msgid "Reject booking"
@@ -2531,7 +2531,7 @@ msgstr "地点"
 
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:52
 msgid "Are you sure you want to delete this room?"
-msgstr "您确定要删除这个会议室吗？"
+msgstr "您确定要删除此会议室吗？"
 
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:48
 msgid "This attribute is not shown in the public room details."
@@ -2595,7 +2595,7 @@ msgstr "功能"
 
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:98
 msgid "Are you sure you want to delete the equipment type {name}?"
-msgstr "您确定要删除这个设备类型{name}?"
+msgstr "您确定要删除这个设备类型 {name}?"
 
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:105
 msgid "It is currently used by {count}1{/count} room."
@@ -2714,7 +2714,7 @@ msgstr "图标"
 
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:102
 msgid "Are you sure you want to delete the feature {name}?"
-msgstr "您取得要删除功能 {name} 吗？"
+msgstr "您确定要删除功能 {name} 吗？"
 
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:109
 msgid "It is currently provided by {count}1{/count} equipment type."
@@ -3138,7 +3138,7 @@ msgstr "如果您创建此预先预订，您的一些预订天数可能会被拒
 msgid ""
 "If you create this booking, the following overlapping days of existing pre-"
 "bookings will automatically be rejected:"
-msgstr "如果您常创建此预订，下面已存在的预先预订重叠的天数将自动被拒绝："
+msgstr "如果您创建此预订，下面已存在的预先预订重叠的天数将自动被拒绝："
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:487
 msgid "Assign the room {room} to this event"
@@ -3793,7 +3793,7 @@ msgstr "组名"
 msgid ""
 "Your query matched too many groups. Please try more specific search "
 "criteria."
-msgstr "您的查询匹配太多用户。请尝试更严格查询条件。"
+msgstr "您的查询匹配太多组。请尝试更严格查询条件。"
 
 #: indico/web/client/js/react/components/principals/Search.jsx:731
 msgid "No groups found"
