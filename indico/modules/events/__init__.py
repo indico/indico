@@ -194,3 +194,9 @@ def _event_cloned(old_event, new_event, **kwargs):
     new_event.contact_title = old_event.contact_title
     new_event.contact_emails = old_event.contact_emails
     new_event.contact_phones = old_event.contact_phones
+
+
+@signals.event.moved.connect
+def _event_request_moved(event, old_parent):
+    if event.pending_move_request and event.pending_move_request.category == event.category:
+        event.pending_move_request.withdraw()
