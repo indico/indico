@@ -20,8 +20,10 @@ import './badges';
   global.setupEventManagementActionMenu = function setupEventManagementActionMenu() {
     $('#event-action-move-to-category').on('click', function(evt) {
       evt.preventDefault();
-
       const $this = $(this);
+      if ($this.hasClass('disabled')) {
+        return;
+      }
       $('<div>').categorynavigator({
         openInDialog: true,
         actionOn: {
