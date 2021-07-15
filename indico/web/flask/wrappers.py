@@ -130,7 +130,7 @@ class IndicoFlask(PluginFlaskMixin, Flask):
         # logic to get the autocommit logic and error handling for code
         # running inside the identity handler.
         if endpoint is not None and endpoint.startswith('_flaskmultipass'):
-            view_func = RHSimple.wrap_function(view_func)
+            view_func = RHSimple.wrap_function(view_func, disable_csrf_check=True)
         return super().add_url_rule(rule, endpoint=endpoint, view_func=view_func, **options)
 
     @property

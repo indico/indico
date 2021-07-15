@@ -323,11 +323,14 @@ class RHSimple(RH):
         return rv
 
     @classmethod
-    def wrap_function(cls, func):
+    def wrap_function(cls, func, *, disable_csrf_check=False):
         """Decorates a function to run within the RH's framework"""
         @wraps(func)
         def wrapper(*args, **kwargs):
-            return cls(partial(func, *args, **kwargs)).process()
+            rh = cls(partial(func, *args, **kwargs))
+            if disable_csrf_check:
+                rh.CSRF_ENABLED = False
+            return rh.process()
 
         return wrapper
 
