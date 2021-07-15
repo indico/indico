@@ -15,6 +15,8 @@ Major Features
   without sending any data related to the Indico instance, but if necessary, this feature
   can be disabled by setting :data:`SYSTEM_NOTICES_URL` to ``None`` in ``indico.conf``
   (:pr:`5004`)
+- It is now possible to use :ref:`SAML SSO <saml>` for authentication without the need for
+  Shibboleth and Apache (:pr:`5014`)
 
 Bugfixes
 ^^^^^^^^

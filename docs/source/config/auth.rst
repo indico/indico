@@ -273,8 +273,140 @@ The LDAP-specific config uses the following keys:
   Default: ``False``
 
 
-SAML / Shibboleth
-^^^^^^^^^^^^^^^^^
+.. _saml:
+
+SAML
+^^^^
+
+The ``saml`` authentication/identity providers are available by default,
+but to use them you need to install the ``python3-saml`` library using
+``pip install python3-saml``.
+
+.. note::
+
+    ``python3-saml`` has some extra system dependencies (``xmlsec``).
+    How to install them (apt, yum, etc.) depends on your linux
+    distribution.  The package name is usually ``libxmlsec1-dev``
+    (or ``xmlsec1-devel`` on RPM-based distros). If this library is
+    missing, ``pip`` will fail when installing ``python3-saml``.
+    Simply re-run the command after installing the missing library.
+
+Once everything is installed, you can add the SAML-related settings to
+your ``indico.conf``. Below is an example you can copy to have a good
+starting point for your own config and then adapt it to your own
+environment:
+
+.. code-block:: python
+
+    _saml_config = {
+        'sp': {
+            'entityId': 'indico-saml',
+            # Depending on your security config below you may need to generate
+            # a certificate and private key.
+            # You can use https://www.samltool.com/self_signed_certs.php or
+            # use openssl for it (which is more secure as it ensures the
+            # key never leaves your machine)
+            'x509cert': '',
+            'privateKey': '',
+        },
+        'idp': {
+            # This metadata is provided by your SAML IdP. You can omit (or
+            # leave empty) the whole 'idp' section in case you need SP
+            # metadata to register your app and get the IdP metadata from
+            # https://indico.example.com/multipass/saml/{auth-provider-name}/metadata
+            # and then fill in the IdP metadata afterwards.
+            'entityId': 'https://my-idp.example.com',
+            'singleSignOnService': {
+                'url': 'https://my-idp.example.com/saml',
+                'binding': 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
+            },
+            'singleLogoutService': {
+                'url': 'https://my-idp.example.com/saml',
+                'binding': 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
+            },
+            'x509cert': ''
+        },
+        # These advanced settings allow you to tune the SAML security options.
+        # Please see the documentation on https://github.com/onelogin/python3-saml
+        # for details on how they behave. Note that by requiring signatures,
+        # you usually need to set a cert and key on your SP config.
+        'security': {
+            'nameIdEncrypted': False,
+            'authnRequestsSigned': True,
+            'logoutRequestSigned': True,
+            'logoutResponseSigned': True,
+            'signMetadata': True,
+            'wantMessagesSigned': True,
+            'wantAssertionsSigned': True,
+            'wantNameId' : True,
+            'wantNameIdEncrypted': False,
+            'wantAssertionsEncrypted': False,
+            'allowSingleLabelDomains': False,
+            'signatureAlgorithm': 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
+            'digestAlgorithm': 'http://www.w3.org/2001/04/xmlenc#sha256'
+        }
+    }
+
+    AUTH_PROVIDERS = {
+        'saml': {
+            'type': 'saml',
+            'title': 'SAML SSO',
+            'saml_config': _saml_config,
+            # If your IdP is using ADFS you may need to uncomment this. For details, see
+            # https://github.com/onelogin/python-saml/pull/144
+            # 'lowercase_urlencoding': True
+        }
+    }
+    IDENTITY_PROVIDERS = {
+        'saml': {
+            'type': 'saml',
+            'title': 'SSO',
+            'mapping': {
+                'first_name': 'Firstname',
+                'last_name': 'Lastname',
+                'email': 'EmailAddress',
+                'affiliation': 'HomeInstitute',
+            },
+            'trusted_email': True,
+            # You can use a different field as the unique identifier.
+            # By default the qualified NameID from SAML is used, but in
+            # case you want to use something else, any SAML attribute can
+            # be used.
+            # 'identifier_field': 'Username'
+        }
+    }
+
+
+If you also have an LDAP server, it may be a good idea to use the
+``saml`` authentication provider and connect it to an ``ldap``
+identity provider. This way the user information is retrieved from LDAP
+based on a unique identifier of the user that comes from SAML, and you
+can still use the search and group functionality provided by LDAP.
+
+To use this, use the ``AUTH_PROVIDERS`` config from above together with
+the ``IDENTITY_PROVIDERS`` config from the LDAP section on this page,
+and set up a ``PROVIDER_MAP`` that passes the identifier from SAML to
+LDAP. The example below assumes that the LDAP username is passed in a
+SAML attribute named ``UPN``.
+
+.. code-block:: python
+
+    PROVIDER_MAP = {
+        'saml': {'identity_provider': 'ldap', 'mapping': {'identifier': 'UPN'}},
+    }
+
+
+Shibboleth
+^^^^^^^^^^
+
+.. versionchanged:: 3.0
+   SAML is now supported without the need for Apache.
+
+.. note::
+
+    Note that since Indico 3.0 there is a new ``saml`` auth/identity provider
+    available which does not require Apache/shibd and is thus the recommended
+    option to use regardless of the web server in use.
 
 The ``shibboleth`` authentication/identity providers are available by
 default, but due to how the protocol works you need to use the Apache
