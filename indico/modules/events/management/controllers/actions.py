@@ -89,7 +89,7 @@ class RHMoveEvent(RHManageEventBase):
 
     def _process(self):
         if self.target_category.requires_approval:
-            create_event_request(self.target_category, self.event, session.user)
+            create_event_request(self.event, self.target_category)
             flash(_('A request to move "{}" to "{}" has been submitted')
                   .format(self.event.title, self.target_category.title), 'success')
         else:
