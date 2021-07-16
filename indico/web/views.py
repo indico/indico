@@ -241,11 +241,15 @@ class WPBase(WPBundleMixin):
     def _display(self, params):
         raise NotImplementedError
 
+    @property
+    def _extra_title_parts(self):
+        return ()
+
     def display(self, **params):
         from indico.modules.admin import RHAdminBase
         from indico.modules.core.settings import core_settings, social_settings
 
-        title_parts = [self.title]
+        title_parts = [*self._extra_title_parts, self.title]
         if self.MANAGEMENT:
             title_parts.insert(0, _('Management'))
         elif isinstance(self._rh, RHAdminBase):

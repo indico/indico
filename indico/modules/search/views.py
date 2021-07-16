@@ -18,6 +18,8 @@ class WPSearchMixin:
 
 
 class WPSearch(WPSearchMixin, WPJinjaMixin, WPDecorated):
+    title = _('Search')
+
     def _get_breadcrumbs(self):
         return render_breadcrumbs(_('Search'))
 
@@ -28,6 +30,10 @@ class WPSearch(WPSearchMixin, WPJinjaMixin, WPDecorated):
 class WPCategorySearch(WPSearchMixin, WPCategory):
     """WP for category-scoped search."""
 
+    @property
+    def _extra_title_parts(self):
+        return [_('Search')]
+
     def _get_breadcrumbs(self):
         if not self.category or self.category.is_root:
             return ''
@@ -35,4 +41,6 @@ class WPCategorySearch(WPSearchMixin, WPCategory):
 
 
 class WPEventSearch(WPSearchMixin, WPConferenceDisplayBase):
-    pass
+    @property
+    def _extra_title_parts(self):
+        return [_('Search')]

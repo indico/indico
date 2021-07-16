@@ -29,13 +29,19 @@ class WPUser(WPJinjaMixin, WPDecorated):
         kwargs['active_menu_item'] = active_menu_item
         WPDecorated.__init__(self, rh, **kwargs)
 
-    def _get_breadcrumbs(self):
+    def _get_user_page_title(self):
         if 'user_id' in request.view_args:
             user = User.get(request.view_args['user_id'])
-            profile_breadcrumb = _('Profile of {name}').format(name=user.full_name)
+            return _('Profile of {name}').format(name=user.full_name)
         else:
-            profile_breadcrumb = _('My Profile')
-        return render_breadcrumbs(profile_breadcrumb)
+            return _('My Profile')
+
+    @property
+    def _extra_title_parts(self):
+        return [self._get_user_page_title()]
+
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(self._get_user_page_title())
 
     def _get_body(self, params):
         return self._get_page_content(params)
