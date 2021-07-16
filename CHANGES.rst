@@ -40,7 +40,7 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Signals previously exposed direcly via ``signals.foo`` now need to be accessed using their
+- Signals previously exposed directly via ``signals.foo`` now need to be accessed using their
   explicit name, i.e. ``signals.core.foo`` (:pr:`5007`)
 - Add ``category.extra_events`` signal (:pr:`5005`, thanks :user:`omegak`)
 
