@@ -33,6 +33,7 @@ Internal Changes
   explicit name, i.e. ``signals.core.foo`` (:pr:`5007`)
 - Add ``category.extra_events`` signal (:pr:`5005`, thanks :user:`omegak`)
 
+
 Version 3.0rc2
 --------------
 
@@ -76,6 +77,7 @@ Bugfixes
   :pr:`4996`, thanks :user:`vasantvohra`)
 - Do not check for event access when using a registration link with a registration token
   (:issue:`4991`, :pr:`4997`, thanks :user:`vasantvohra`)
+
 
 Version 3.0rc1
 --------------
@@ -192,6 +194,7 @@ Internal Changes
 
 ----
 
+
 Version 2.3.6
 -------------
 
@@ -201,6 +204,7 @@ Bugfixes
 ^^^^^^^^
 
 - None so far :)
+
 
 Version 2.3.5
 -------------
@@ -252,6 +256,7 @@ Internal Changes
 
 - Add ``before_notification_send`` signal (:pr:`4874`, thanks :user:`omegak`)
 
+
 Version 2.3.4
 -------------
 
@@ -301,6 +306,7 @@ Internal Changes
 - Also trigger the ``ical-export`` metadata signal when exporting events for a whole category
 - Add ``primary_email_changed`` signal (:pr:`4802`, thanks :user:`openprojects`)
 
+
 Version 2.3.3
 -------------
 
@@ -345,6 +351,7 @@ Internal Changes
 - Videoconference plugins may now override the behavior when cloning an event with
   attached videoconference rooms (:pr:`4732`)
 
+
 Version 2.3.2
 -------------
 
@@ -377,6 +384,7 @@ Bugfixes
 - Clone custom abstract/contribution fields when cloning abstract settings (:pr:`4724`,
   thanks :user:`bpedersen2`)
 - Fix error when rescheduling a survey that already has submissions (:issue:`4730`)
+
 
 Version 2.3.1
 -------------
@@ -615,6 +623,7 @@ Internal Changes
 
 ----
 
+
 Version 2.2.9
 -------------
 
@@ -628,6 +637,7 @@ Bugfixes
 - Disallow storing invalid timezones in user settings and reduce risk of sending
   wrong timezone names when people automatically translate their UI (:issue:`4529`)
 
+
 Version 2.2.8
 -------------
 
@@ -640,6 +650,7 @@ Security fixes
   denial of service vulnerability
 - Update `Pillow <https://github.com/python-pillow/Pillow>`_ to fix a buffer overflow
   vulnerability
+
 
 Version 2.2.7
 -------------
@@ -657,6 +668,7 @@ Bugfixes
 
 - Allow slashes in roomName export API
 - Show names instead of IDs of local groups in ACLs (:issue:`3700`)
+
 
 Version 2.2.6
 -------------
@@ -678,6 +690,7 @@ Bugfixes
 - Fix error when viewing abstract with reviews that have no scores
 - Update requests and pin idna to avoid installing incompatible dependency versions
   (:issue:`4327`)
+
 
 Version 2.2.5
 -------------
@@ -715,6 +728,7 @@ Bugfixes
 - Allow single arrival/departure date in accommodation field (:issue:`4164`,
   thanks :user:`bpedersen2`)
 
+
 Version 2.2.4
 -------------
 
@@ -727,6 +741,7 @@ Security fixes
   security impact (reading local files) has already been mitigated when fixing the
   initial vulnerability in the previous release, it is still strongly recommended
   to update.
+
 
 Version 2.2.3
 -------------
@@ -775,6 +790,7 @@ Bugfixes
   after updating to fix any affected ACLs (:issue:`4090`)
 - Fix validation issues in coordinates fields when editing rooms (:issue:`4103`)
 
+
 Version 2.2.2
 -------------
 
@@ -784,6 +800,7 @@ Bugfixes
 ^^^^^^^^
 
 - Remove dependency on ``pyatom``, which has vanished from PyPI
+
 
 Version 2.2.1
 -------------
@@ -805,6 +822,7 @@ Bugfixes
 - Fix timetable theme when set to "indico weeks view" before 2.2 (:issue:`4027`)
 - Avoid flickering of booking edit details tooltip
 - Fix outdated browser check on iOS (:issue:`4033`)
+
 
 Version 2.2
 -----------
@@ -891,6 +909,7 @@ Internal Changes
 
 ----
 
+
 Version 2.1.11
 --------------
 
@@ -903,6 +922,7 @@ Security fixes
   security impact (reading local files) has already been mitigated when fixing the
   initial vulnerability in the previous release, it is still strongly recommended
   to update.
+
 
 Version 2.1.10
 --------------
@@ -920,6 +940,7 @@ Security fixes
   through specially crafted abstracts or contribution descriptions, which could lead to
   the disclosure of local file contents
 
+
 Version 2.1.9
 -------------
 
@@ -930,6 +951,7 @@ Bugfixes
 
 - Fix bug in calendar view, due to timezones (:issue:`3903`)
 - Remove dependency on ``pyatom``, which has vanished from PyPI (:issue:`4045`)
+
 
 Version 2.1.8
 -------------
@@ -945,6 +967,7 @@ Bugfixes
 ^^^^^^^^
 
 - Fix celery/redis dependency issue (:issue:`3809`)
+
 
 Version 2.1.7
 -------------
@@ -964,6 +987,7 @@ Bugfixes
 
 - Really fix the oauthlib conflict (was still breaking in some cases)
 
+
 Version 2.1.6
 -------------
 
@@ -975,6 +999,7 @@ Bugfixes
 - Allow adding external users as speakers/chairpersons (:issue:`3562`)
 - Allow adding external users to event ACLs (:issue:`3562`)
 - Pin requests-oauthlib version to avoid dependency conflict
+
 
 Version 2.1.5
 -------------
@@ -996,6 +1021,7 @@ Bugfixes
 - Fix check on whether registering for an event is possible
 - Show static text while editing registrations (:issue:`3682`)
 
+
 Version 2.1.4
 -------------
 
@@ -1012,6 +1038,7 @@ Bugfixes
 - Fix importing event archives containing registrations with attachments
 - Fix display issue in participants table after editing data (:issue:`3511`)
 - Fix errors when booking rooms via API
+
 
 Version 2.1.3
 -------------
@@ -1051,6 +1078,7 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 - Add some new signals and template hooks to the registration module
 
+
 Version 2.1.2
 -------------
 
@@ -1070,6 +1098,7 @@ Bugfixes
 - Fix error when not providing a URL for privacy policy or terms
 - Use consistent order for privacy/terms links in the footer
 - Fix cloning of locked events
+
 
 Version 2.1.1
 -------------
