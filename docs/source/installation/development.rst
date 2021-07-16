@@ -58,6 +58,7 @@ We recommend that you use `Homebrew <https://brew.sh/>`_::
 
     brew install redis libjpeg libffi pcre libyaml postgresql
     brew services start postgresql
+    brew services start redis
 
 
 Creating the directory structure
