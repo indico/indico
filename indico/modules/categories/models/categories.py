@@ -223,6 +223,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.category)
     # - designer_templates (DesignerTemplate.category)
+    # - event_move_requests (EventMoveRequest.category)
     # - events (Event.category)
     # - favorite_of (User.favorite_categories)
     # - legacy_mapping (LegacyCategoryMapping.category)
@@ -230,7 +231,6 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - roles (CategoryRole.category)
     # - settings (CategorySetting.category)
     # - suggestions (SuggestedCategory.category)
-    # - event_move_requests (EventMoveRequest.category)
 
     @hybrid_property
     def event_message(self):
