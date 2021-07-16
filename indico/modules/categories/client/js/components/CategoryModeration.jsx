@@ -48,10 +48,10 @@ function EventRequestList({requests, onApprove, onReject}) {
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell />
-            <Table.HeaderCell>User</Table.HeaderCell>
-            <Table.HeaderCell>Event</Table.HeaderCell>
-            <Table.HeaderCell>State</Table.HeaderCell>
-            <Table.HeaderCell>Submitted Date</Table.HeaderCell>
+            <Translate as={Table.HeaderCell}>User</Translate>
+            <Translate as={Table.HeaderCell}>Event</Translate>
+            <Translate as={Table.HeaderCell}>State</Translate>
+            <Translate as={Table.HeaderCell}>Submitted Date</Translate>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -80,12 +80,22 @@ function EventRequestList({requests, onApprove, onReject}) {
           <Table.Row>
             <Table.HeaderCell />
             <Table.HeaderCell colSpan="4">
-              <Button size="small" onClick={() => submit(onApprove)} disabled={!isAnySelected}>
+              <Translate
+                as={Button}
+                size="small"
+                onClick={() => submit(onApprove)}
+                disabled={!isAnySelected}
+              >
                 Approve
-              </Button>
-              <Button size="small" onClick={() => submit(onReject)} disabled={!isAnySelected}>
+              </Translate>
+              <Translate
+                as={Button}
+                size="small"
+                onClick={() => submit(onReject)}
+                disabled={!isAnySelected}
+              >
                 Reject
-              </Button>
+              </Translate>
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>
