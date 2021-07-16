@@ -407,6 +407,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - legacy_subcontribution_mappings (LegacySubContributionMapping.event)
     # - log_entries (EventLogEntry.event)
     # - menu_entries (MenuEntry.event)
+    # - move_requests (EventMoveRequest.event)
     # - note (EventNote.linked_event)
     # - paper_competences (PaperCompetence.event)
     # - paper_review_questions (PaperReviewQuestion.event)
@@ -429,7 +430,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - track_groups (TrackGroup.event)
     # - tracks (Track.event)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
-    # - move_requests (EventMoveRequest.event)
 
     start_dt_override = _EventSettingProperty(event_core_settings, 'start_dt_override')
     end_dt_override = _EventSettingProperty(event_core_settings, 'end_dt_override')

@@ -402,6 +402,7 @@ class User(PersonMixin, db.Model):
     # - editor_for_editables (Editable.editor)
     # - editor_for_revisions (EditingRevision.editor)
     # - event_log_entries (EventLogEntry.user)
+    # - event_move_requests (EventMoveRequest.submitter)
     # - event_notes_revisions (EventNoteRevision.user)
     # - event_persons (EventPerson.user)
     # - event_reminders (EventReminder.creator)
@@ -443,7 +444,6 @@ class User(PersonMixin, db.Model):
     # - static_sites (StaticSite.creator)
     # - survey_submissions (SurveySubmission.user)
     # - vc_rooms (VCRoom.created_by_user)
-    # - event_move_requests (EventMoveRequest.user)
 
     @staticmethod
     def get_system_user():
