@@ -64,11 +64,19 @@ def _check_permissions(app, **kwargs):
 
 @signals.acl.get_management_permissions.connect_via(Category)
 def _get_management_permissions(sender, **kwargs):
-    return CreatorPermission
+    yield CreatorPermission
+    yield EventMoveRequestPermission
 
 
 class CreatorPermission(ManagementPermission):
     name = 'create'
     friendly_name = _('Event creation')
     description = _('Allows creating events in the category')
+    user_selectable = True
+
+
+class EventMoveRequestPermission(ManagementPermission):
+    name = 'event_move_request'
+    friendly_name = _('Request event move')
+    description = _('Allows requesting for an event to be moved to this category')
     user_selectable = True
