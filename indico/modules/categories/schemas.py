@@ -20,9 +20,7 @@ class CategoryEventSchema(mm.SQLAlchemyAutoSchema):
 class CategoryUserSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        fields = ('id', 'name', 'first_name', 'last_name', 'title', 'affiliation', 'avatar_url')
-
-    name = fields.Function(lambda p: p.get_full_name(abbrev_first_name=False))
+        fields = ('id', 'full_name', 'first_name', 'last_name', 'title', 'affiliation', 'avatar_url')
 
 
 class EventMoveRequestSchema(mm.SQLAlchemyAutoSchema):

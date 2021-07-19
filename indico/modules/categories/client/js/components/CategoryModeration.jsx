@@ -42,65 +42,62 @@ function EventRequestList({requests, onApprove, onReject}) {
   }
 
   return (
-    <>
-      {/* TODO: check if module is enabled */}
-      <Table celled>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell />
-            <Translate as={Table.HeaderCell}>User</Translate>
-            <Translate as={Table.HeaderCell}>Event</Translate>
-            <Translate as={Table.HeaderCell}>State</Translate>
-            <Translate as={Table.HeaderCell}>Submitted Date</Translate>
+    <Table celled>
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell />
+          <Translate as={Table.HeaderCell}>User</Translate>
+          <Translate as={Table.HeaderCell}>Event</Translate>
+          <Translate as={Table.HeaderCell}>State</Translate>
+          <Translate as={Table.HeaderCell}>Submitted Date</Translate>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {requests.map(({id, submitter, event, state, submittedDt}) => (
+          <Table.Row key={id}>
+            <Table.Cell collapsing>
+              <Checkbox
+                checked={selected.has(id)}
+                onChange={() => select(id)}
+                disabled={state !== 'pending'}
+              />
+            </Table.Cell>
+            <Table.Cell styleName="user">
+              <Image styleName="avatar" src={submitter.avatarURL} size="mini" avatar />
+              {submitter.fullName} {submitter.affiliation && `(${submitter.affiliation})`}
+            </Table.Cell>
+            <Table.Cell>
+              <a href={eventURL({event_id: event.id})}>{event.title}</a>
+            </Table.Cell>
+            <Table.Cell>{state}</Table.Cell>
+            <Table.Cell>{serializeDate(submittedDt)}</Table.Cell>
           </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {requests.map(({id, submitter, event, state, submittedDt}) => (
-            <Table.Row key={id}>
-              <Table.Cell collapsing>
-                <Checkbox
-                  checked={selected.has(id)}
-                  onChange={() => select(id)}
-                  disabled={state !== 'pending'}
-                />
-              </Table.Cell>
-              <Table.Cell styleName="user">
-                <Image styleName="avatar" src={submitter.avatarURL} size="mini" avatar />
-                {submitter.name} {submitter.affiliation && `(${submitter.affiliation})`}
-              </Table.Cell>
-              <Table.Cell>
-                <a href={eventURL({event_id: event.id})}>{event.title}</a>
-              </Table.Cell>
-              <Table.Cell>{state}</Table.Cell>
-              <Table.Cell>{serializeDate(submittedDt)}</Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-        <Table.Footer fullWidth>
-          <Table.Row>
-            <Table.HeaderCell />
-            <Table.HeaderCell colSpan="4">
-              <Translate
-                as={Button}
-                size="small"
-                onClick={() => submit(onApprove)}
-                disabled={!isAnySelected}
-              >
-                Approve
-              </Translate>
-              <Translate
-                as={Button}
-                size="small"
-                onClick={() => submit(onReject)}
-                disabled={!isAnySelected}
-              >
-                Reject
-              </Translate>
-            </Table.HeaderCell>
-          </Table.Row>
-        </Table.Footer>
-      </Table>
-    </>
+        ))}
+      </Table.Body>
+      <Table.Footer fullWidth>
+        <Table.Row>
+          <Table.HeaderCell />
+          <Table.HeaderCell colSpan="4">
+            <Translate
+              as={Button}
+              size="small"
+              onClick={() => submit(onApprove)}
+              disabled={!isAnySelected}
+            >
+              Approve
+            </Translate>
+            <Translate
+              as={Button}
+              size="small"
+              onClick={() => submit(onReject)}
+              disabled={!isAnySelected}
+            >
+              Reject
+            </Translate>
+          </Table.HeaderCell>
+        </Table.Row>
+      </Table.Footer>
+    </Table>
   );
 }
 
