@@ -124,13 +124,6 @@ class RHManageCategorySettings(RHManageCategoryBase):
 
 
 class RHAPIEventMoveRequests(RHManageCategoryBase):
-    def _process_args(self):
-        RHManageCategoryBase._process_args(self)
-        if request.method != 'GET':
-            self.move_requests = parser.parse({
-                'requests': EventRequestList(required=True, category=self.category, validate=not_empty)
-            }, unknown=EXCLUDE)['requests']
-
     def _process_GET(self):
         return EventMoveRequestSchema(many=True).jsonify(self.category.event_move_requests)
 
@@ -138,9 +131,13 @@ class RHAPIEventMoveRequests(RHManageCategoryBase):
         'state': EnumField(MoveRequestState, required=True)
     })
     def _process_POST(self, state):
+        move_requests = parser.parse({
+            'requests': EventRequestList(required=True, category=self.category, validate=not_empty)
+        }, unknown=EXCLUDE)['requests']
+
         if state not in (MoveRequestState.accepted, MoveRequestState.rejected):
             raise Forbidden
-        for rq in self.move_requests:
+        for rq in move_requests:
             rq.state = state
             rq.moderator = session.user
             if state == MoveRequestState.accepted:
