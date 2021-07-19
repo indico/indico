@@ -30,6 +30,10 @@ import Palette from '../../utils/palette';
       dialogSubtitle: null,
       // Disallow action on specific categories
       actionOn: {
+        categoriesWithoutEventProposalRights: {
+          disabled: false,
+          message: $T.gettext('Not possible for categories where you cannot propose events'),
+        },
         categoriesWithoutEventCreationRights: {
           disabled: false,
           message: $T.gettext('Not possible for categories where you cannot create events'),
@@ -711,6 +715,10 @@ import Palette from '../../utils/palette';
         category,
         true
       );
+      const canActOnCategoriesWithoutEventProposalRights = self._canActOnCategoriesWithoutEventProposalRights(
+        category,
+        true
+      );
 
       if (!canActOnCategories.allowed) {
         result = canActOnCategories;
@@ -718,6 +726,8 @@ import Palette from '../../utils/palette';
         result = canActOnCategoriesDescendingFrom;
       } else if (!canActOnCategoriesWithoutEventCreationRights.allowed) {
         result = canActOnCategoriesWithoutEventCreationRights;
+      } else if (!canActOnCategoriesWithoutEventProposalRights.allowed) {
+        result = canActOnCategoriesWithoutEventProposalRights;
       }
 
       return withMessage ? result : result.allowed;
@@ -731,6 +741,18 @@ import Palette from '../../utils/palette';
       if (categoriesWithoutEventCreationRights.disabled && !category.can_create_events) {
         result.allowed = false;
         result.message = categoriesWithoutEventCreationRights.message;
+      }
+      return withMessage ? result : result.allowed;
+    },
+
+    _canActOnCategoriesWithoutEventProposalRights(category, withMessage) {
+      const self = this;
+      const result = {allowed: true, message: ''};
+      const categoriesWithoutEventProposalRights =
+        self.options.actionOn.categoriesWithoutEventProposalRights;
+      if (categoriesWithoutEventProposalRights.disabled && !category.can_propose_events) {
+        result.allowed = false;
+        result.message = categoriesWithoutEventProposalRights.message;
       }
       return withMessage ? result : result.allowed;
     },

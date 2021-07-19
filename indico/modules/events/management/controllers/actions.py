@@ -82,19 +82,19 @@ class RHMoveEvent(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.target_category = Category.get_or_404(int(request.form['target_category_id']), is_deleted=False)
-        if not self.target_category.can_create_events(session.user):
-            raise Forbidden(_('You may only move events to categories where you are allowed to create events.'))
-        if self.target_category.requires_approval and self.event.pending_move_request:
+        if not self.target_category.can_propose_events(session.user):
+            raise Forbidden(_('You may only move events to categories where you are allowed to propose events.'))
+        if self.event.pending_move_request:
             raise BadRequest(_('There is already a move request pending review.'))
 
     def _process(self):
-        if self.target_category.requires_approval:
-            create_event_request(self.event, self.target_category)
-            flash(_('A request to move "{}" to "{}" has been submitted')
-                  .format(self.event.title, self.target_category.title), 'success')
-        else:
+        if self.target_category.can_create_events(session.user):
             self.event.move(self.target_category)
             flash(_('Event "{}" has been moved to category "{}"')
+                  .format(self.event.title, self.target_category.title), 'success')
+        else:
+            create_event_request(self.event, self.target_category)
+            flash(_('A request to move "{}" to "{}" has been submitted')
                   .format(self.event.title, self.target_category.title), 'success')
         return jsonify_data(flash=False)
 
