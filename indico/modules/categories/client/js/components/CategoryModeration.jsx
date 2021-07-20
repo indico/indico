@@ -64,7 +64,9 @@ function EventRequestList({requests, onApprove, onReject}) {
             </Table.Cell>
             <Table.Cell styleName="user">
               <Image styleName="avatar" src={submitter.avatarURL} size="mini" avatar />
-              {submitter.fullName} {submitter.affiliation && `(${submitter.affiliation})`}
+              <span>
+                {submitter.fullName} {submitter.affiliation && `(${submitter.affiliation})`}
+              </span>
             </Table.Cell>
             <Table.Cell>
               <a href={eventURL({event_id: event.id})}>{event.title}</a>
