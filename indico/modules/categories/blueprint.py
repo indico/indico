@@ -48,7 +48,7 @@ _bp.add_url_rule('/manage/logo', 'manage_logo', RHManageCategoryLogo, methods=('
 _bp.add_url_rule('/manage/move', 'move', RHMoveCategory, methods=('POST',))
 _bp.add_url_rule('/manage/protection', 'manage_protection', RHManageCategoryProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/settings', 'manage_settings', RHManageCategorySettings, methods=('POST', 'GET'))
-_bp.add_url_rule('/manage/moderation', 'manage_moderation', RHManageCategoryModeration, methods=('POST', 'GET'))
+_bp.add_url_rule('/manage/moderation', 'manage_moderation', RHManageCategoryModeration)
 
 # Role management
 _bp.add_url_rule('/manage/roles', 'manage_roles', RHCategoryRoles, methods=('POST', 'GET'))
