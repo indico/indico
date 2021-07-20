@@ -5,6 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+.user {
+  display: flex;
+  align-items: center;
+}
+
 .user .avatar:global(.ui.avatar) {
   margin-right: 1em;
 }
