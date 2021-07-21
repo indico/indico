@@ -34,7 +34,7 @@
            title="{% trans %}Newest event{% endtrans %}"></a>
     {% endif %}
 
-    {% if event.category or ( (rel['first'], rel['prev'], rel['next'], rel['last'])|any ) %}
+    {% if event.category or rel.first or rel.prev or rel.next or rel.last %}
         <span class="separator"></span>
     {% endif %}
 {%- endmacro -%}
