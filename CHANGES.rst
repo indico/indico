@@ -2,6 +2,42 @@ Changelog
 =========
 
 
+Version 3.1
+-----------
+
+*Unreleased*
+
+Major Features
+^^^^^^^^^^^^^^
+
+- TODO write something about unlisted events
+- TODO write something about moderated categories
+- TODO write something about the category log
+
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- Nothing so far
+
+Improvements
+^^^^^^^^^^^^
+
+- Nothing so far
+
+Bugfixes
+^^^^^^^^
+
+- Nothing so far
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Nothing so far
+
+
+----
+
+
 Version 3.0.1
 -------------
 
