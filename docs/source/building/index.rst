@@ -12,7 +12,7 @@ Before starting Indico compilation, this guide assumes you've previously
 
 .. note::
     The ``master`` branch on Git is usually the next version under (heavy) development. Check if there
-    is a ``2.x-maintenance`` branch for your version and if yes, use that branch instead of ``master``.
+    is a ``3.*.x`` branch for your version and if yes, use that branch instead of ``master``.
 
 The first step is to generate a local distribution archive. Navigate to the Indico source folder
 (by default, it is ``~/dev/indico/src``) and run the following command::
