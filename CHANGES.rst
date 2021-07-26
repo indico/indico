@@ -12,6 +12,11 @@ Bugfixes
 
 - None so far :)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``event.before_check_registration_email`` signal (:pr:`5021`, thanks :user:`omegak`)
+
 
 Version 3.0
 -----------
