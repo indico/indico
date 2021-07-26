@@ -89,14 +89,17 @@ class EventMoveRequest(db.Model):
         foreign_keys=submitter_id,
         backref=db.backref(
             'event_move_requests',
-            cascade_backrefs=False,
             lazy='dynamic'
         )
     )
     moderator = db.relationship(
         'User',
+        lazy=False,
         foreign_keys=moderator_id,
-        lazy=False
+        backref=db.backref(
+            'moderated_event_move_requests',
+            lazy='dynamic'
+        )
     )
 
     @locator_property
