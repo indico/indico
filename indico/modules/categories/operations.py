@@ -14,6 +14,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.util import format_visibility
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
+from indico.modules.categories.models.event_move_request import MoveRequestState
 
 
 def create_category(parent, data):
@@ -98,3 +99,13 @@ def _log_category_update(category, changes):
                 what = what['title']
         category.log(CategoryLogRealm.category, LogKind.change, 'Category', f'{what} updated', session.user,
                      data={'Changes': make_diff_log(changes, log_fields)})
+    logger.info('Category %s updated by %s', category, session.user)
+
+
+def update_event_move_request(request, accept):
+    request.state = MoveRequestState.rejected
+    request.moderator = session.user
+    if accept:
+        request.state = MoveRequestState.accepted
+        request.event.move(request.category)
+    db.session.flush()
