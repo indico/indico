@@ -19,13 +19,13 @@ import {indicoAxios} from 'indico/utils/axios';
 import {serializeDate} from 'indico/utils/date';
 import './CategoryModeration.module.scss';
 
-function EventRequestList({requests, onApprove, onReject}) {
+function EventRequestList({requests, onSubmit}) {
   const [selected, _setSelected] = useState(new Set());
   const isAnySelected = selected.size > 0;
 
-  const submit = event => {
+  const submit = accept => {
     _setSelected(new Set());
-    event(Array.from(selected));
+    onSubmit(Array.from(selected), accept);
   };
 
   const select = id =>
@@ -83,7 +83,7 @@ function EventRequestList({requests, onApprove, onReject}) {
             <Translate
               as={Button}
               size="small"
-              onClick={() => submit(onApprove)}
+              onClick={() => submit(true)}
               disabled={!isAnySelected}
             >
               Approve
@@ -91,7 +91,7 @@ function EventRequestList({requests, onApprove, onReject}) {
             <Translate
               as={Button}
               size="small"
-              onClick={() => submit(onReject)}
+              onClick={() => submit(false)}
               disabled={!isAnySelected}
             >
               Reject
@@ -105,8 +105,7 @@ function EventRequestList({requests, onApprove, onReject}) {
 
 EventRequestList.propTypes = {
   requests: PropTypes.array.isRequired,
-  onApprove: PropTypes.func.isRequired,
-  onReject: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default function CategoryModeration({categoryId}) {
@@ -116,23 +115,17 @@ export default function CategoryModeration({categoryId}) {
     camelize: true,
   });
 
-  const setRequestsState = async (requests, state) => {
+  const setRequestsState = async (requests, accept) => {
     const url = eventRequestsURL({category_id: categoryId});
     try {
-      await indicoAxios.post(url, {requests, state});
+      await indicoAxios.post(url, {requests, accept});
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
     }
   };
 
-  return (
-    <EventRequestList
-      requests={data || []}
-      onApprove={ids => setRequestsState(ids, 'accepted')}
-      onReject={ids => setRequestsState(ids, 'rejected')}
-    />
-  );
+  return <EventRequestList requests={data || []} onSubmit={setRequestsState} />;
 }
 
 CategoryModeration.propTypes = {

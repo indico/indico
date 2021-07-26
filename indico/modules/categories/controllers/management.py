@@ -11,9 +11,9 @@ from io import BytesIO
 
 from flask import flash, redirect, request, session
 from marshmallow import EXCLUDE
-from marshmallow_enum import EnumField
 from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, undefer_group
+from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db
@@ -127,21 +127,21 @@ class RHAPIEventMoveRequests(RHManageCategoryBase):
         return EventMoveRequestSchema(many=True).jsonify(self.category.event_move_requests)
 
     @use_kwargs({
-        'state': EnumField(MoveRequestState, required=True)
+        'accept': fields.Bool(required=True)
     })
-    def _process_POST(self, state):
+    def _process_POST(self, accept):
         move_requests = parser.parse({
             'requests': EventRequestList(required=True, category=self.category, validate=not_empty)
         }, unknown=EXCLUDE)['requests']
 
-        if state not in (MoveRequestState.accepted, MoveRequestState.rejected):
-            raise Forbidden
         for rq in move_requests:
-            rq.state = state
+            rq.state = MoveRequestState.rejected
             rq.moderator = session.user
-            if state == MoveRequestState.accepted:
+            if accept:
+                rq.state = MoveRequestState.accepted
                 rq.event.move(rq.category)
         db.session.flush()
+        return '', 204
 
 
 class RHManageCategoryModeration(RHManageCategoryBase):
