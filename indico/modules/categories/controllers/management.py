@@ -25,9 +25,9 @@ from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm,
                                              CategoryRoleForm, CategorySettingsForm, CreateCategoryForm,
                                              SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.categories.models.roles import CategoryRole
-from indico.modules.categories.operations import create_category, delete_category, move_category, update_category
+from indico.modules.categories.operations import (create_category, delete_category, move_category, update_category,
+                                                  update_event_move_request)
 from indico.modules.categories.schemas import EventMoveRequestSchema
 from indico.modules.categories.util import get_image_data, serialize_category_role
 from indico.modules.categories.views import WPCategoryManagement
@@ -135,12 +135,7 @@ class RHAPIEventMoveRequests(RHManageCategoryBase):
         }, unknown=EXCLUDE)['requests']
 
         for rq in move_requests:
-            rq.state = MoveRequestState.rejected
-            rq.moderator = session.user
-            if accept:
-                rq.state = MoveRequestState.accepted
-                rq.event.move(rq.category)
-        db.session.flush()
+            update_event_move_request(rq, accept)
         return '', 204
 
 

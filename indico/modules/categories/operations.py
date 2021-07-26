@@ -11,6 +11,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.models.categories import Category
+from indico.modules.categories.models.event_move_request import MoveRequestState
 
 
 def create_category(parent, data):
@@ -42,3 +43,12 @@ def update_category(category, data, skip=()):
     db.session.flush()
     signals.category.updated.send(category)
     logger.info('Category %s updated by %s', category, session.user)
+
+
+def update_event_move_request(request, accept):
+    request.state = MoveRequestState.rejected
+    request.moderator = session.user
+    if accept:
+        request.state = MoveRequestState.accepted
+        request.event.move(request.category)
+    db.session.flush()
