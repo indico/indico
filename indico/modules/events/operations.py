@@ -388,9 +388,8 @@ def sort_reviewing_questions(questions, new_positions):
 
 
 def create_event_request(event, category):
-    assert event.id != category.id
+    assert event.category != category
     rq = EventMoveRequest(event=event, category=category, submitter=session.user)
-    db.session.add(rq)
     db.session.flush()
     logger.info('Category move request %s to %s created by %s', rq, category, session.user)
     event.log(EventLogRealm.event, EventLogKind.change, 'Event', f'Move request to {category.title} created',
