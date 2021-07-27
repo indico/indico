@@ -174,7 +174,7 @@ export default function WTFDateTimeField({
         id=""
         date={date}
         onDateChange={updateDate}
-        placeholder="DD/MM/YYYY"
+        placeholder={moment.localeData().longDateFormat('L')}
         isOutsideRange={isOutsideRange}
         required={!!time || required}
         verticalSpacing={10}

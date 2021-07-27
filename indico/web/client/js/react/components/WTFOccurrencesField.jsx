@@ -117,7 +117,7 @@ function Occurrence({occurrence, uses24HourFormat, changeOccurrence, removeOccur
         id=""
         date={occurrence.date}
         onDateChange={updateDate}
-        placeholder="DD/MM/YYYY"
+        placeholder={moment.localeData().longDateFormat('L')}
         verticalSpacing={10}
         showDefaultInputIcon={false}
         isOutsideRange={() => false}

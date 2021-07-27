@@ -10,7 +10,7 @@ Version 3.0.1
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Show correct placeholders in date picker fields (:pr:`5022`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
