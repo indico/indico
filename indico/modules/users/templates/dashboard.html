@@ -82,6 +82,36 @@
                         </a>
                     </div>
                 </div>
+                <div id="happeningCategories" class="dashboard-box">
+                    <h3>{% trans %}Your unlisted events{% endtrans %}</h3>
+                    <ol>
+                        {% if not unlisted_events %}
+                            <li class="no-event">
+                                <span class="event-title italic text-superfluous">
+                                    {% trans %}You have no unlisted events.{% endtrans %}
+                                </span>
+                            </li>
+                        {% else %}
+                            {% for event in unlisted_events %}
+                                <li class="flexrow">
+                                    <span class="event-date f-self-no-shrink"
+                                          title="{{ _format_event_times(event) }}">
+                                        {{ _format_event_time(event) }}
+                                    </span>
+                                    <span class="event-title ellipsis f-self-stretch">
+                                        <a href="{{ event.url }}">
+                                            {{ event.get_verbose_title(show_series_pos=true) }}
+                                        </a>
+                                        {{ event.get_label_markup('mini') }}
+                                    </span>
+                                    <a href="{{ url_for('event_management.settings', event) }}">
+                                        <span class="unlisted-events-action icon-edit active"></span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ol>
+                </div>
                 <div class="dashboard-box">
                     <h3>
                         {% trans %}Your events at hand{% endtrans %}

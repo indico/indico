@@ -43,8 +43,8 @@ from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.operations import create_user
 from indico.modules.users.schemas import BasicCategorySchema
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
-                                       get_related_categories, get_suggested_categories, merge_users, search_users,
-                                       send_avatar, serialize_user, set_user_avatar)
+                                       get_related_categories, get_suggested_categories, get_unlisted_events,
+                                       merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
 from indico.modules.users.views import WPUser, WPUserDashboard, WPUserFavorites, WPUserProfilePic, WPUsersAdmin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -142,7 +142,8 @@ class RHUserDashboard(RHUserBase):
                                                categories=categories,
                                                categories_events=categories_events,
                                                suggested_categories=get_suggested_categories(self.user),
-                                               linked_events=linked_events)
+                                               linked_events=linked_events,
+                                               unlisted_events=get_unlisted_events(self.user))
 
 
 @allow_signed_url
