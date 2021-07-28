@@ -25,6 +25,7 @@ from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm,
                                              CategoryRoleForm, CategorySettingsForm, CreateCategoryForm,
                                              SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
+from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.operations import create_category, delete_category, move_category, update_category, update_category_protection, update_event_move_request
 from indico.modules.categories.schemas import EventMoveRequestSchema
@@ -124,7 +125,8 @@ class RHManageCategorySettings(RHManageCategoryBase):
 
 class RHAPIEventMoveRequests(RHManageCategoryBase):
     def _process_GET(self):
-        return EventMoveRequestSchema(many=True).jsonify(self.category.event_move_requests)
+        move_requests = self.category.event_move_requests.filter(EventMoveRequest.state == MoveRequestState.pending)
+        return EventMoveRequestSchema(many=True).jsonify(move_requests)
 
     @use_kwargs({
         'accept': fields.Bool(required=True)
