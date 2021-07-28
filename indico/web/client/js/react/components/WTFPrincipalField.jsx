@@ -19,6 +19,8 @@ export default function WTFPrincipalField({
   required,
   disabled,
   withExternalUsers,
+  eventId,
+  categoryId,
 }) {
   const favoriteUsersController = useFavoriteUsers();
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
@@ -44,6 +46,8 @@ export default function WTFPrincipalField({
       onBlur={() => {}}
       value={value}
       styleName="fixed-width"
+      eventId={eventId}
+      categoryId={categoryId}
     />
   );
 }
@@ -54,6 +58,8 @@ WTFPrincipalField.propTypes = {
   withExternalUsers: PropTypes.bool,
   required: PropTypes.bool,
   disabled: PropTypes.bool,
+  eventId: PropTypes.number,
+  categoryId: PropTypes.number,
 };
 
 WTFPrincipalField.defaultProps = {
@@ -61,4 +67,6 @@ WTFPrincipalField.defaultProps = {
   withExternalUsers: false,
   required: false,
   disabled: false,
+  eventId: null,
+  categoryId: null,
 };

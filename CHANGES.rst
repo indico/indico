@@ -43,6 +43,9 @@ Improvements
   with the same email address (:pr:`5066`)
 - Show program codes in additional places (:pr:`5075`)
 - Display localized country names (:issue:`5070`, :pr:`5076`)
+- Searching existing Indico users can be restricted to managers by setting
+  :data:`ALLOW_PUBLIC_USER_SEARCH` to ``False``. This also limits the verbosity of email
+  status checks while registering for events. (:pr:`5024`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

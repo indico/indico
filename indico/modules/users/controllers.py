@@ -23,6 +23,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.cache import make_scoped_cache
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.errors import UserValueError
@@ -312,7 +313,9 @@ class RHUserPreferences(RHUserBase):
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        return WPUserFavorites.render_template('favorites.html', 'favorites', user=self.user)
+        user_search_disabled = not config.ALLOW_PUBLIC_USER_SEARCH and not session.user.is_admin
+        return WPUserFavorites.render_template('favorites.html', 'favorites', user=self.user,
+                                               user_search_disabled=user_search_disabled)
 
 
 class RHUserFavoritesAPI(RHUserBase):
@@ -737,6 +740,23 @@ class RHUserSearch(RHProtected):
             ext_id = entry.pop('_ext_id', None)
             if ext_id is not None:
                 cache.set(ext_id, self.externals[ext_id], timeout=86400)
+
+    @use_kwargs({
+        'category_id': fields.Int(),
+        'event_id': fields.Int()
+    }, location='query')
+    def _process_args(self, event_id=None, category_id=None):
+        RHProtected._process_args(self)
+        self.event = Event.get(event_id, is_deleted=False) if event_id else None
+        self.category = Category.get(category_id, is_deleted=False) if category_id else None
+
+    def _check_access(self):
+        RHProtected._check_access(self)
+        if not config.ALLOW_PUBLIC_USER_SEARCH:
+            if (not (self.event and self.event.can_manage(session.user)) and
+                    not (self.category and self.category.can_manage(session.user)) and
+                    not session.user.is_admin):
+                raise Forbidden
 
     @use_kwargs({
         'first_name': fields.Str(validate=validate.Length(min=1)),

@@ -59,7 +59,9 @@
             objectType: {{ field.object_type|tojson }},
             permissionsInfo: {{ field.permissions_info|tojson }},
             hiddenPermissions: {{ field.hidden_permissions|default([])|tojson }},
-            hiddenPermissionsInfo: {{ field.hidden_permissions_info|tojson }}
+            hiddenPermissionsInfo: {{ field.hidden_permissions_info|tojson }},
+            eventId: {{ (field.event.id if field.event else none)|tojson }},
+            categoryId: {{ (field.category.id if field.category else none)|tojson }},
         });
     </script>
 {% endblock %}

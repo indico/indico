@@ -76,8 +76,11 @@ class PrincipalListField(HiddenField):
         self.allow_category_roles = kwargs.pop('allow_category_roles', False)
         self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
         self.allow_emails = kwargs.pop('allow_emails', False)
-        self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
         super().__init__(*args, **kwargs)
+
+    @property
+    def event(self):
+        return self.get_form().event
 
     def _convert_principal(self, principal):
         event_id = self._event.id if self._event else None
@@ -125,6 +128,10 @@ class PrincipalField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.allow_external_users = kwargs.pop('allow_external_users', False)
         super().__init__(*args, **kwargs)
+
+    @property
+    def event(self):
+        return self.get_form().event
 
     def process_formdata(self, valuelist):
         if valuelist:

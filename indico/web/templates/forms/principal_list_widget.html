@@ -16,7 +16,7 @@
     <script>
         setupPrincipalListWidget({
             fieldId: {{ field.id | tojson }},
-            eventId: {{ (field._event.id if field._event else none) | tojson }},
+            eventId: {{ (field.event.id if field.event else none) | tojson }},
             withGroups: {{  field.allow_groups | tojson }},
             withExternalUsers: {{ field.allow_external_users | tojson }},
             withEventRoles: {{ field.allow_event_roles | tojson }},

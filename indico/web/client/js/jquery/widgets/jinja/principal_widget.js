@@ -14,6 +14,8 @@ window.setupPrincipalWidget = function setupPrincipalWidget({
   required,
   withExternalUsers,
   disabled,
+  eventId,
+  categoryId
 }) {
   const field = document.getElementById(fieldId);
 
@@ -24,6 +26,8 @@ window.setupPrincipalWidget = function setupPrincipalWidget({
       required={required}
       withExternalUsers={withExternalUsers}
       disabled={disabled}
+      eventId={eventId}
+      categoryId={categoryId}
     />,
     document.getElementById(`principalField-${fieldId}`)
   );

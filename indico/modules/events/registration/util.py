@@ -116,6 +116,8 @@ def check_registration_email(regform, email, registration=None, management=False
         as_list=True)
     if extra_checks:
         return sorted(extra_checks, key=lambda x: ['error', 'warning', 'ok'].index(x['status']))[0]
+    if user != session.user and not management and not config.ALLOW_PUBLIC_USER_SEARCH:
+        return dict(status='error', conflict='email-other-user')
     if registration is not None:
         if email_registration and email_registration != registration:
             return dict(status='error', conflict='email-already-registered')

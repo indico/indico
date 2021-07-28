@@ -13,6 +13,7 @@ from wtforms.fields.core import SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories.fields import CategoryField
@@ -97,3 +98,7 @@ class LectureCreationForm(EventCreationFormBase):
     person_link_data = EventPersonLinkListField(_('Speakers'))
     description = TextAreaField(_('Description'), widget=CKEditorWidget())
     theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.person_link_data.disable_user_search = not config.ALLOW_PUBLIC_USER_SEARCH and not session.user.is_admin

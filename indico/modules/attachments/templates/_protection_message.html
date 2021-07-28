@@ -3,7 +3,7 @@
 <div class="form-group">
     <div class="form-label"></div>
     <div class="form-field">
-        {{ render_protected_protection_message() }}
+        {{ render_protected_protection_message(users_allowed=users_allowed) }}
         {{ render_inherited_protection_message(parent, parent.type) }}
 
         <div class="action-box for-form folder-protection-message warning">
