@@ -299,8 +299,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     def can_propose_events(self, user):
         """Check whether the user can propose move requests to the category."""
-        return user and (self.can_manage(user, permission='event_move_request')
-                         or self.event_requires_approval) and not self.can_create_events(user)
+        return user and (self.can_manage(user, permission='event_move_request') or self.event_requires_approval)
 
     def can_create_events(self, user):
         """Check whether the user can create events in the category."""
