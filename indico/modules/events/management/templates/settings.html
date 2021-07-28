@@ -6,14 +6,16 @@
 
 {% block content %}
     {{ template_hook('event-actions', event=event) }}
-    {%- if event.pending_move_request -%}
+    {% set move_request = event.pending_move_request %}
+    {%- if move_request -%}
         <div class="action-box highlight">
             <div class="section">
                 <div class="icon icon-bookmark"></div>
                 <div class="text">
                     <div class="label">{% trans %}Pending event moderation{% endtrans %}</div>
-                    {% trans %}
-                        There is an on-going request to move this event to another category.
+                    {% trans url=move_request.category, category=move_request.category.title %}
+                        There is an ongoing request to move this event to
+                        <a href="{{ url }}">{{ category }}</a>.
                     {% endtrans %}
                 </div>
                 <div class="toolbar">
