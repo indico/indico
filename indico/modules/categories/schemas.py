@@ -14,7 +14,7 @@ from indico.modules.users import User
 class CategoryEventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
-        fields = ('title', 'id')
+        fields = ('id', 'title')
 
 
 class CategoryUserSchema(mm.SQLAlchemyAutoSchema):
