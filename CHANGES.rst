@@ -11,6 +11,7 @@ Bugfixes
 ^^^^^^^^
 
 - Show correct placeholders in date picker fields (:pr:`5022`)
+- Correctly preselect the default currency when creating a registration form
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -159,7 +159,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
     """Create a new registration form."""
 
     def _process(self):
-        form = RegistrationFormForm(event=self.event,
+        form = RegistrationFormForm(event=self.event, currency=payment_settings.get('currency'),
                                     publish_registrations_enabled=(self.event.type_ != EventType.conference))
         if form.validate_on_submit():
             regform = RegistrationForm(event=self.event)
