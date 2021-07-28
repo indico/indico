@@ -17,7 +17,7 @@ def target_category(create_category):
 
 
 @pytest.mark.parametrize(('requires_approval', 'permissions'), ((True, {}), (False, {'event_move_request'})))
-def test_move_event_request(app, requires_approval, permissions, dummy_user, dummy_event,
+def test_move_event_request(db, app, requires_approval, permissions, dummy_user, dummy_event,
                             dummy_category, target_category):
     dummy_event.category = dummy_category
     target_category.event_requires_approval = requires_approval
@@ -30,6 +30,7 @@ def test_move_event_request(app, requires_approval, permissions, dummy_user, dum
         session.set_session_user(dummy_user)
         rh._check_access()
         rh._process()
+        db.session.expire(dummy_event, ['pending_move_request'])
         assert dummy_event.category == dummy_category
         assert dummy_event.pending_move_request is not None
         assert dummy_event.pending_move_request.category == target_category
