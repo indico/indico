@@ -14,6 +14,7 @@ from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
 from indico.modules.categories.models.categories import Category
 from indico.modules.logs.models.entries import CategoryLogRealm
+from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -41,6 +42,11 @@ def _merge_users(target, source, **kwargs):
     CategoryPrincipal.merge_users(target, source, 'category')
 
 
+def _is_moderation_visible(category):
+    return category.event_requires_approval and category.event_move_requests.filter(
+        EventMoveRequest.state == MoveRequestState.pending)
+
+
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _sidemenu_items(sender, category, **kwargs):
     yield SideMenuItem('content', _('Content'), url_for('categories.manage_content', category),
@@ -53,8 +59,9 @@ def _sidemenu_items(sender, category, **kwargs):
                        50, icon='users')
     yield SideMenuItem('logs', _('Logs'), url_for('logs.category', category),
                        0, icon='stack')
-    yield SideMenuItem('moderation', _('Moderation'), url_for('categories.manage_moderation', category),
-                       50, icon='users')
+    if _is_moderation_visible(category):
+        yield SideMenuItem('moderation', _('Moderation'), url_for('categories.manage_moderation', category),
+                           50, icon='users')
 
 
 @signals.menu.items.connect_via('admin-sidemenu')
