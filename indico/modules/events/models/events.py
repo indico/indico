@@ -377,6 +377,15 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             lazy=True
         )
     )
+    #: The current pending move request
+    pending_move_request = db.relationship(
+        'EventMoveRequest',
+        lazy=True,
+        viewonly=True,
+        uselist=False,
+        primaryjoin=lambda: (EventMoveRequest.event_id == Event.id) &
+                            (EventMoveRequest.state == MoveRequestState.pending)
+    )
 
     # relationship backrefs:
     # - abstract_email_templates (AbstractEmailTemplate.event)
@@ -615,10 +624,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def has_custom_boa(self):
         return self.custom_boa_id is not None
-
-    @property
-    def pending_move_request(self):
-        return self.move_requests.filter(EventMoveRequest.state == MoveRequestState.pending).first()
 
     @property
     @contextmanager
