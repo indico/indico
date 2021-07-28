@@ -105,6 +105,9 @@ def check_registration_email(regform, email, registration=None, management=False
     user = get_user_by_email(email)
     email_registration = regform.get_registration(email=email)
     user_registration = regform.get_registration(user=user) if user else None
+    if not registration or registration.email != email:
+        if email_err := validate_email_verbose(email):
+            return dict(status='error', conflict='email-invalid', email_error=email_err)
     extra_checks = values_from_signal(
         signals.event.before_check_registration_email.send(
             regform,
@@ -126,9 +129,6 @@ def check_registration_email(regform, email, registration=None, management=False
         elif user:
             return dict(status='ok', user=user.full_name, self=(not management and user == session.user),
                         same=(user == registration.user))
-        email_err = validate_email_verbose(email)
-        if email_err:
-            return dict(status='error', conflict='email-invalid', email_error=email_err)
         if regform.require_user and (management or email != registration.email):
             return dict(status='warning' if management else 'error', conflict='no-user')
         else:
@@ -140,9 +140,6 @@ def check_registration_email(regform, email, registration=None, management=False
             return dict(status='error', conflict='user-already-registered')
         elif user:
             return dict(status='ok', user=user.full_name, self=(not management and user == session.user), same=False)
-        email_err = validate_email_verbose(email)
-        if email_err:
-            return dict(status='error', conflict='email-invalid', email_error=email_err)
         if regform.require_user:
             return dict(status='warning' if management else 'error', conflict='no-user')
         else:
