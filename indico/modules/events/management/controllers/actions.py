@@ -86,7 +86,7 @@ class RHMoveEvent(RHManageEventBase):
     def _check_access(self):
         if (not self.target_category.can_create_events(session.user)
                 and not self.target_category.can_propose_events(session.user)):
-            raise Forbidden(_('You may only move events to categories you are allowed to.'))
+            raise Forbidden(_('You may not move events to this category.'))
         if self.event.pending_move_request:
             raise BadRequest(_('There is already a move request pending review.'))
 
