@@ -48,7 +48,8 @@ def register_transaction(registration, amount, currency, action, provider=None, 
         db.session.flush()
         if new_transaction.status == TransactionStatus.successful:
             registration.update_state(paid=True)
+            notify_registration_state_update(registration)
         elif new_transaction.status == TransactionStatus.cancelled:
             registration.update_state(paid=False)
-        notify_registration_state_update(registration)
+            notify_registration_state_update(registration)
         return new_transaction
