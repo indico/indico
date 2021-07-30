@@ -45,10 +45,12 @@ def update_category(category, data, skip=()):
     logger.info('Category %s updated by %s', category, session.user)
 
 
-def update_event_move_request(request, accept):
+def update_event_move_request(request, accept, reason=None):
     request.state = MoveRequestState.rejected
+    request.state_reason = reason
     request.moderator = session.user
     if accept:
         request.state = MoveRequestState.accepted
+        request.state_reason = None
         request.event.move(request.category)
     db.session.flush()

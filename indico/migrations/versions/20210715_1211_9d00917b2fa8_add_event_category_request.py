@@ -34,6 +34,7 @@ def upgrade():
         sa.Column('category_id', sa.Integer(), nullable=True, index=True),
         sa.Column('submitter_id', sa.Integer(), nullable=True, index=True),
         sa.Column('state', PyIntEnum(_MoveRequestState), nullable=False),
+        sa.Column('state_reason', sa.String(), nullable=True),
         sa.Column('moderator_id', sa.Integer(), nullable=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
         sa.CheckConstraint('state in (1, 2) AND moderator_id IS NOT NULL OR moderator_id IS NULL',

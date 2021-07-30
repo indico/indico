@@ -129,15 +129,16 @@ class RHAPIEventMoveRequests(RHManageCategoryBase):
         return EventMoveRequestSchema(many=True).jsonify(move_requests)
 
     @use_kwargs({
-        'accept': fields.Bool(required=True)
+        'accept': fields.Bool(required=True),
+        'reason': fields.String()
     })
-    def _process_POST(self, accept):
+    def _process_POST(self, accept, reason):
         move_requests = parser.parse({
             'requests': EventRequestList(required=True, category=self.category, validate=not_empty)
         }, unknown=EXCLUDE)['requests']
 
         for rq in move_requests:
-            update_event_move_request(rq, accept)
+            update_event_move_request(rq, accept, reason)
         return '', 204
 
 

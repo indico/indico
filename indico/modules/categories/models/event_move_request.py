@@ -54,6 +54,10 @@ class EventMoveRequest(db.Model):
         default=MoveRequestState.pending,
         nullable=False
     )
+    state_reason = db.Column(
+        db.String,
+        nullable=True
+    )
     moderator_id = db.Column(
         db.ForeignKey('users.users.id'),
         nullable=True
