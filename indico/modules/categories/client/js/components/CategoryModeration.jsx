@@ -87,12 +87,13 @@ const judgmentOptions = [
 function RequestList({requests, onSubmit, loading}) {
   const [selected, _setSelected] = useState(new Set());
   const [judgeValue, setJudgeValue] = useState(judgmentOptions[0].value);
+  const [reason, setReason] = useState(undefined);
   const isAnySelected = selected.size > 0;
   const judgeOption = judgmentOptions.find(x => x.value === judgeValue);
 
   const submit = accept => {
     _setSelected(new Set());
-    onSubmit(Array.from(selected), accept);
+    onSubmit(Array.from(selected), accept, reason);
   };
 
   const select = id =>
@@ -159,6 +160,8 @@ function RequestList({requests, onSubmit, loading}) {
                   <Input
                     size="small"
                     placeholder={Translate.string('Provide the rejection reason')}
+                    value={reason}
+                    onChange={(_, {value}) => setReason(value)}
                   />
                 </>
               )}
@@ -187,10 +190,10 @@ export default function CategoryModeration({categoryId}) {
     camelize: true,
   });
 
-  const setRequestsState = async (requests, accept) => {
+  const setRequestsState = async (requests, accept, reason) => {
     const url = eventRequestsURL({category_id: categoryId});
     try {
-      await indicoAxios.post(url, {requests, accept});
+      await indicoAxios.post(url, {requests, accept, reason});
       reFetch();
     } catch (e) {
       return handleSubmitError(e);
