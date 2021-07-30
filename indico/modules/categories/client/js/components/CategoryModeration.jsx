@@ -10,7 +10,7 @@ import eventURL from 'indico-url:events.display';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Button, Checkbox, Dropdown, Image, Input, Placeholder, Table} from 'semantic-ui-react';
+import {Button, Checkbox, Image, Input, Placeholder, Table} from 'semantic-ui-react';
 
 import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -79,17 +79,10 @@ RequestTableRow.defaultProps = {
   selected: false,
 };
 
-const judgmentOptions = [
-  {icon: 'checkmark', text: Translate.string('Approve'), value: true},
-  {icon: 'close', text: Translate.string('Reject'), value: false},
-];
-
 function RequestList({requests, onSubmit, loading}) {
   const [selected, _setSelected] = useState(new Set());
-  const [judgeValue, setJudgeValue] = useState(judgmentOptions[0].value);
   const [reason, setReason] = useState(undefined);
   const isAnySelected = selected.size > 0;
-  const judgeOption = judgmentOptions.find(x => x.value === judgeValue);
 
   const submit = accept => {
     _setSelected(new Set());
@@ -141,30 +134,24 @@ function RequestList({requests, onSubmit, loading}) {
           <Table.HeaderCell />
           <Table.HeaderCell colSpan="4">
             <div styleName={`table-footer ${!isAnySelected ? 'disabled' : ''}`}>
-              <Button.Group className="small" color={judgeValue ? 'teal' : 'red'}>
-                <Button onClick={() => submit(judgeValue)}>{judgeOption.text}</Button>
-                <Dropdown
-                  className="button icon small"
-                  floating
-                  value={judgeValue}
-                  options={judgmentOptions}
-                  trigger={<></>}
-                  onChange={(_, {value}) => setJudgeValue(value)}
-                />
-              </Button.Group>
-              {!judgeValue && (
-                <>
-                  <Translate as="span" styleName="text-separator">
-                    and
-                  </Translate>
-                  <Input
-                    size="small"
-                    placeholder={Translate.string('Provide the rejection reason')}
-                    value={reason}
-                    onChange={(_, {value}) => setReason(value)}
-                  />
-                </>
-              )}
+              <Translate as={Button} onClick={() => submit(true)} color="teal">
+                Approve
+              </Translate>
+              <Translate as="span" styleName="text-separator">
+                or
+              </Translate>
+              <Input
+                size="small"
+                placeholder={Translate.string('Provide the rejection reason')}
+                value={reason}
+                onChange={(_, {value}) => setReason(value)}
+              />
+              <Translate as="span" styleName="text-separator">
+                and
+              </Translate>
+              <Translate as={Button} onClick={() => submit(false, reason)} color="red">
+                Reject
+              </Translate>
             </div>
           </Table.HeaderCell>
         </Table.Row>
