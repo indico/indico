@@ -6,12 +6,16 @@
 # LICENSE file for more details.
 
 from sqlalchemy.dialects.postgresql import JSON, JSONB
+from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
+from indico.util.decorators import strict_classproperty
 from indico.util.enum import IndicoEnum, RichIntEnum
 from indico.util.i18n import _
+from indico.util.string import format_repr
 
 
 class EventLogRealm(RichIntEnum):
@@ -30,41 +34,33 @@ class LogKind(int, IndicoEnum):
     negative = 4
 
 
-class EventLogEntry(db.Model):
-    """Log entries for events."""
+class LogEntryBase(db.Model):
+    """Base model for log entries."""
+    __abstract__ = True
     __tablename__ = 'logs'
-    __table_args__ = (db.Index(None, 'meta', postgresql_using='gin'),
-                      {'schema': 'events'})
+
+    @strict_classproperty
+    @classmethod
+    def __auto_table_args(cls):
+        return (db.Index(None, 'meta', postgresql_using='gin'),)
+
+    user_backref_name = None
+    link_fk_name = None
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls)
 
     #: The ID of the log entry
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    #: The ID of the event
-    event_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.events.id'),
-        index=True,
-        nullable=False
-    )
-    #: The ID of the user associated with the entry
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.users.id'),
-        index=True,
-        nullable=True
-    )
     #: The date/time when the reminder was created
     logged_dt = db.Column(
         UTCDateTime,
         nullable=False,
         default=now_utc
-    )
-    #: The general area of the event the entry comes from
-    realm = db.Column(
-        PyIntEnum(EventLogRealm),
-        nullable=False
     )
     #: The general kind of operation that was performed
     kind = db.Column(
@@ -100,24 +96,27 @@ class EventLogEntry(db.Model):
         nullable=False
     )
 
-    #: The user associated with the log entry
-    user = db.relationship(
-        'User',
-        lazy=False,
-        backref=db.backref(
-            'event_log_entries',
-            lazy='dynamic'
+    @declared_attr
+    def user_id(cls):
+        """The ID of the user associated with the entry."""
+        return db.Column(
+            db.Integer,
+            db.ForeignKey('users.users.id'),
+            index=True,
+            nullable=True
         )
-    )
-    #: The Event this log entry is associated with
-    event = db.relationship(
-        'Event',
-        lazy=True,
-        backref=db.backref(
-            'log_entries',
-            lazy='dynamic'
+
+    @declared_attr
+    def user(cls):
+        """The user associated with the log entry."""
+        return db.relationship(
+            'User',
+            lazy=False,
+            backref=db.backref(
+                cls.user_backref_name,
+                lazy='dynamic'
+            )
         )
-    )
 
     @property
     def logged_date(self):
@@ -138,6 +137,35 @@ class EventLogEntry(db.Model):
         return renderer.render_entry(self) if renderer else None
 
     def __repr__(self):
-        realm = self.realm.name if self.realm is not None else None
-        return '<EventLogEntry({}, {}, {}, {}, {}): {}>'.format(self.id, self.event_id, self.logged_dt, realm,
-                                                                self.module, self.summary)
+        return format_repr(self, 'id', type(self).link_fk_name, 'logged_dt', 'realm', 'module', _text=self.summary)
+
+
+class EventLogEntry(LogEntryBase):
+    """Log entries for events."""
+
+    __auto_table_args = {'schema': 'events'}
+    user_backref_name = 'event_log_entries'
+    link_fk_name = 'event_id'
+
+    #: The ID of the event
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
+        nullable=False
+    )
+    #: The general area of the event the entry comes from
+    realm = db.Column(
+        PyIntEnum(EventLogRealm),
+        nullable=False
+    )
+
+    #: The Event this log entry is associated with
+    event = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'log_entries',
+            lazy='dynamic'
+        )
+    )
