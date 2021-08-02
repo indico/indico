@@ -50,7 +50,7 @@ export default function Paper({eventId, contributionId}) {
       type: EditableType.paper,
     }),
     trigger: [eventId, contributionId],
-    unhandledErrors: [404], // if there is no editable yet
+    unhandledErrors: [404, 403], // if there is no editable yet (404) or viewed by a paper reviewer (403)
     camelize: true,
   });
 
