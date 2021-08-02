@@ -1,4 +1,4 @@
-{% extends 'events/management/base.html' %}
+{% extends 'categories/management/base.html' if category|default(none) else 'events/management/base.html' %}
 
 {% block title %}
     {%- trans %}Logs{% endtrans -%}
@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="event-log"
-         data-fetch-logs-url="{{ url_for('.api_event_logs', event) }}"
+         data-fetch-logs-url="{{ logs_api_url }}"
          data-realms="{{ realms|tojson|forceescape }}"
          data-metadata-query="{{ metadata_query|tojson|forceescape }}">
     </div>

@@ -99,4 +99,4 @@ def _event_sidemenu_items(sender, event, **kwargs):
 def _category_sidemenu_items(sender, category, **kwargs):
     if category.can_manage(session.user):
         return SideMenuItem('designer', _('Posters/Badges'), url_for('designer.template_list', category),
-                            icon='palette')
+                            icon='palette', weight=30)

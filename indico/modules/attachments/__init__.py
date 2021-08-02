@@ -50,7 +50,8 @@ def _get_event_management_url(event, **kwargs):
 
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _extend_category_management_menu(sender, category, **kwargs):
-    return SideMenuItem('attachments', _('Materials'), url_for('attachments.management', category), icon='upload')
+    return SideMenuItem('attachments', _('Materials'), url_for('attachments.management', category), icon='upload',
+                        weight=40)
 
 
 @signals.event_management.get_cloners.connect

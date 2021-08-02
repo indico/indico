@@ -13,13 +13,7 @@ const initialState = {
   currentPage: 1,
   isFetching: false,
   metadataQuery: {},
-  filters: {
-    event: true,
-    management: true,
-    emails: true,
-    participants: true,
-    reviewing: true,
-  },
+  filters: {},
   pages: [],
   totalPageCount: 0,
   currentViewIndex: null,
@@ -27,6 +21,8 @@ const initialState = {
 
 export default function logReducer(state = initialState, action) {
   switch (action.type) {
+    case actions.SET_INITIAL_REALMS:
+      return {...state, filters: Object.fromEntries(action.initialRealms.map(r => [r, true]))};
     case actions.SET_KEYWORD:
       return {...state, keyword: action.keyword};
     case actions.SET_FILTER:
