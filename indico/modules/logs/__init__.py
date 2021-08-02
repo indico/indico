@@ -38,6 +38,6 @@ def _get_log_renderers(sender, **kwargs):
 
 
 @signals.core.app_created.connect
-def _check_agreement_definitions(app, **kwargs):
+def _check_log_renderers(app, **kwargs):
     # This will raise RuntimeError if the log renderer types are not unique
     get_log_renderers()
