@@ -392,6 +392,7 @@ class User(PersonMixin, db.Model):
     # - attachment_files (AttachmentFile.user)
     # - attachments (Attachment.user)
     # - blockings (Blocking.created_by_user)
+    # - category_log_entries (CategoryLogEntry.user)
     # - category_roles (CategoryRole.members)
     # - content_reviewer_for_contributions (Contribution.paper_content_reviewers)
     # - created_events (Event.creator)

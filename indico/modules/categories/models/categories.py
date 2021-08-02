@@ -23,6 +23,7 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.modules.logs.models.entries import CategoryLogEntry
 from indico.util.date_time import get_display_tz
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
@@ -221,6 +222,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - events (Event.category)
     # - favorite_of (User.favorite_categories)
     # - legacy_mapping (LegacyCategoryMapping.category)
+    # - log_entries (CategoryLogEntry.event)
     # - parent (Category.children)
     # - roles (CategoryRole.category)
     # - settings (CategorySetting.category)
@@ -290,6 +292,34 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def display_tzinfo(self):
         """The tzinfo of the category or the one specified by the user."""
         return get_display_tz(self, as_timezone=True)
+
+    def log(self, realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
+        """Create a new log entry for the category.
+
+        :param realm: A value from :class:`.CategoryLogRealm` indicating
+                      the realm of the action.
+        :param kind: A value from :class:`.LogKind` indicating
+                     the kind of the action that was performed.
+        :param module: A human-friendly string describing the module
+                       related to the action.
+        :param summary: A one-line summary describing the logged action.
+        :param user: The user who performed the action.
+        :param type_: The type of the log entry. This is used for custom
+                      rendering of the log message/data
+        :param data: JSON-serializable data specific to the log type.
+        :param meta: JSON-serializable data that won't be displayed.
+        :return: The newly created `EventLogEntry`
+
+        In most cases the ``simple`` log type is fine. For this type,
+        any items from data will be shown in the detailed view of the
+        log entry.  You may either use a dict (which will be sorted)
+        alphabetically or a list of ``key, value`` pairs which will
+        be displayed in the given order.
+        """
+        entry = CategoryLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
+                                 data=(data or {}), meta=(meta or {}))
+        self.log_entries.append(entry)
+        return entry
 
     def can_create_events(self, user):
         """Check whether the user can create events in the category."""

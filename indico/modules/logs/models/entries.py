@@ -27,6 +27,12 @@ class EventLogRealm(RichIntEnum):
     emails = 5
 
 
+class CategoryLogRealm(RichIntEnum):
+    __titles__ = (None, _('Category'), _('Events'))
+    category = 1
+    events = 2
+
+
 class LogKind(int, IndicoEnum):
     other = 1
     positive = 2
@@ -163,6 +169,37 @@ class EventLogEntry(LogEntryBase):
     #: The Event this log entry is associated with
     event = db.relationship(
         'Event',
+        lazy=True,
+        backref=db.backref(
+            'log_entries',
+            lazy='dynamic'
+        )
+    )
+
+
+class CategoryLogEntry(LogEntryBase):
+    """Log entries for categories."""
+
+    __auto_table_args = {'schema': 'categories'}
+    user_backref_name = 'category_log_entries'
+    link_fk_name = 'category_id'
+
+    #: The ID of the category
+    category_id = db.Column(
+        db.Integer,
+        db.ForeignKey('categories.categories.id'),
+        index=True,
+        nullable=False
+    )
+    #: The general area of the event the entry comes from
+    realm = db.Column(
+        PyIntEnum(CategoryLogRealm),
+        nullable=False
+    )
+
+    #: The Category this log entry is associated with
+    event = db.relationship(
+        'Category',
         lazy=True,
         backref=db.backref(
             'log_entries',
