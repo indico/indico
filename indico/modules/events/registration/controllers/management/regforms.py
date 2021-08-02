@@ -13,7 +13,6 @@ from sqlalchemy.orm import undefer
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.features.util import set_feature_enabled
-from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
@@ -28,6 +27,7 @@ from indico.modules.events.registration.util import create_personal_data_fields,
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
                                                       WPManageRegistrationStats)
 from indico.modules.events.util import update_object_principals
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -142,7 +142,7 @@ class RHManageParticipants(RHManageRegFormsBase):
             db.session.add(regform)
             db.session.flush()
             signals.event.registration_form_created.send(regform)
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
                            f'Registration form "{regform.title}" has been created', session.user)
         return redirect(url_for('event_registration.manage_regform', regform))
 
@@ -169,7 +169,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             db.session.flush()
             signals.event.registration_form_created.send(regform)
             flash(_('Registration form has been successfully created'), 'success')
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
                            f'Registration form "{regform.title}" has been created', session.user)
             return redirect(url_for('.manage_regform', regform))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event,
@@ -229,7 +229,7 @@ class RHRegistrationFormOpen(RHManageRegFormBase):
                 log_text = f'Registration form "{self.regform.title}" was opened'
             else:
                 log_text = f'Registration form "{self.regform.title}" was reopened'
-            self.event.log(EventLogRealm.event, EventLogKind.change, 'Registration', log_text, session.user)
+            self.event.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 
 
@@ -243,7 +243,7 @@ class RHRegistrationFormClose(RHManageRegFormBase):
         flash(_('Registrations for {} are now closed').format(self.regform.title), 'success')
         logger.info('Registrations for %s closed by %s', self.regform, session.user)
         log_text = f'Registration form "{self.regform.title}" was closed'
-        self.event.log(EventLogRealm.event, EventLogKind.change, 'Registration', log_text, session.user)
+        self.event.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 
 

@@ -15,9 +15,9 @@ from werkzeug.utils import cached_property
 from indico.core.db import db
 from indico.core.errors import NoReportError, UserValueError
 from indico.modules.events import EventLogRealm
-from indico.modules.events.logs.models.entries import EventLogKind
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.operations import fit_session_block_entry
+from indico.modules.logs.models.entries import LogKind
 from indico.util.date_time import format_date, format_human_timedelta
 from indico.util.enum import RichEnum
 from indico.util.i18n import _
@@ -80,7 +80,7 @@ class Rescheduler:
         elif self.mode == RescheduleMode.duration:
             self._reschedule_duration()
         db.session.flush()
-        self.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
+        self.event.log(EventLogRealm.management, LogKind.change, 'Timetable',
                        'Entries rescheduled', session.user,
                        data={'Mode': self.mode.title,
                              'Day': format_date(self.day, locale='en_GB'),

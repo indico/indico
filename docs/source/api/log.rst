@@ -4,13 +4,13 @@ Log
 .. todo::
     Docstrings (module, models, utilities)
 
-.. automodule:: indico.modules.events.logs
+.. automodule:: indico.modules.logs
 
 
 Models
 ++++++
 
-.. automodule:: indico.modules.events.logs.models.entries
+.. automodule:: indico.modules.logs.models.entries
     :members:
     :undoc-members:
 
@@ -18,10 +18,10 @@ Models
 Utilities
 +++++++++
 
-.. automodule:: indico.modules.events.logs.util
+.. automodule:: indico.modules.logs.util
     :members:
     :undoc-members:
 
-.. automodule:: indico.modules.events.logs.renderers
+.. automodule:: indico.modules.logs.renderers
     :members:
     :undoc-members:

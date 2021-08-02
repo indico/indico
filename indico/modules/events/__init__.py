@@ -15,9 +15,9 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions, get_available_permissions
 from indico.modules.events.cloning import get_event_cloners
-from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
@@ -108,13 +108,13 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
         data['Read Access'] = old_data['read_access']
         data['Manager'] = old_data['full_access']
         data['Permissions'] = _format_permissions(old_data['permissions'])
-        obj.log(EventLogRealm.management, EventLogKind.negative, 'Protection', 'ACL entry removed', user, data=data)
+        obj.log(EventLogRealm.management, LogKind.negative, 'Protection', 'ACL entry removed', user, data=data)
     elif is_new:
         data['Read Access'] = entry.read_access
         data['Manager'] = entry.full_access
         if entry.permissions:
             data['Permissions'] = _format_permissions(entry.permissions)
-        obj.log(EventLogRealm.management, EventLogKind.positive, 'Protection', 'ACL entry added', user, data=data)
+        obj.log(EventLogRealm.management, LogKind.positive, 'Protection', 'ACL entry added', user, data=data)
     elif entry.current_data != old_data:
         data['Read Access'] = entry.read_access
         data['Manager'] = entry.full_access
@@ -127,7 +127,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
             data['Permissions (removed)'] = _format_permissions(removed_permissions)
         if current_permissions:
             data['Permissions'] = _format_permissions(current_permissions)
-        obj.log(EventLogRealm.management, EventLogKind.change, 'Protection', 'ACL entry changed', user, data=data)
+        obj.log(EventLogRealm.management, LogKind.change, 'Protection', 'ACL entry changed', user, data=data)
 
 
 @signals.core.app_created.connect

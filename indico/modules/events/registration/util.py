@@ -21,7 +21,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
@@ -38,6 +38,7 @@ from indico.modules.events.registration.models.items import (PersonalDataType, R
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import (notify_registration_creation,
                                                               notify_registration_modification)
+from indico.modules.logs import LogKind
 from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
@@ -248,7 +249,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
-                     EventLogKind.positive, 'Registration',
+                     LogKind.positive, 'Registration',
                      f'New registration: {registration.full_name}', user, data={'Email': registration.email})
     return registration
 
@@ -299,7 +300,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
-                     EventLogKind.change, 'Registration',
+                     LogKind.change, 'Registration',
                      f'Registration modified: {registration.full_name}',
                      session.user, data={'Email': registration.email})
 

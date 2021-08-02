@@ -18,7 +18,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import make_email, send_email
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -37,6 +37,7 @@ from indico.modules.events.persons.views import WPManagePersons
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.logs import LogKind
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
@@ -321,7 +322,7 @@ class RHGrantSubmissionRights(RHManageEventBase):
                 if principal:
                     cont.update_principal(principal, add_permissions={'submit'})
                     count += 1
-        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
+        self.event.log(EventLogRealm.management, LogKind.positive, 'Protection',
                        'Contribution speakers have been granted with submission rights', session.user)
         flash(ngettext('Submission rights have been granted to one speaker',
                        'Submission rights have been granted to {} speakers', count).format(count))
@@ -339,7 +340,7 @@ class RHGrantModificationRights(RHManageEventBase):
                 if principal:
                     sess.update_principal(principal, full_access=True)
                     count += 1
-        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
+        self.event.log(EventLogRealm.management, LogKind.positive, 'Protection',
                        'Modification rights have been granted to all session conveners', session.user)
         flash(ngettext('Session modification rights have been granted to one session convener',
                        'Session modification rights have been granted to {} session conveners', count).format(count))
@@ -358,7 +359,7 @@ class RHRevokeSubmissionRights(RHManageEventBase):
         for entry in set(self.event.acl_entries):
             self.event.update_principal(entry.principal, del_permissions={'submit'})
             count += 1
-        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Protection',
+        self.event.log(EventLogRealm.management, LogKind.negative, 'Protection',
                        'Submission privileges have been revoked from event submitters', session.user)
         flash(ngettext('Submission rights have been revoked from one user',
                        'Submission rights have been revoked from {} users', count).format(count))

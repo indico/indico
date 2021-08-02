@@ -5,12 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.events.logs.controllers import RHEventLogs, RHEventLogsJSON
+from indico.modules.logs.controllers import RHEventLogs, RHEventLogsJSON
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('event_logs', __name__, template_folder='templates', virtual_template_folder='events/logs',
+_bp = IndicoBlueprint('logs', __name__, template_folder='templates', virtual_template_folder='logs',
                       url_prefix='/event/<int:event_id>/manage/logs')
 
-_bp.add_url_rule('/', 'index', RHEventLogs)
-_bp.add_url_rule('/api/logs', 'logs', RHEventLogsJSON)
+_bp.add_url_rule('/', 'event', RHEventLogs)
+_bp.add_url_rule('/api/logs', 'api_event_logs', RHEventLogsJSON)

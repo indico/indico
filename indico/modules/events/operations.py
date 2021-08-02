@@ -13,14 +13,15 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.categories.util import get_visibility_options
-from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
+from indico.modules.events import Event, EventLogRealm, logger
 from indico.modules.events.cloning import EventCloner, get_event_cloners
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.logs.models.entries import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import orig_string
 
 
@@ -107,7 +108,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     db.session.flush()
     signals.event.created.send(event, cloning=cloning)
     logger.info('Event %r created in %r by %r ', event, category, session.user)
-    event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Event created', session.user)
+    event.log(EventLogRealm.event, LogKind.positive, 'Event', 'Event created', session.user)
     db.session.flush()
     if create_booking:
         room_id = data['location_data'].pop('room_id', None)
@@ -119,7 +120,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
                             'Date': booking.start_dt.strftime('%d/%m/%Y'),
                             'Times': '{} - {}'.format(booking.start_dt.strftime('%H:%M'),
                                                       booking.end_dt.strftime('%H:%M'))}
-                event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Room booked for the event',
+                event.log(EventLogRealm.event, LogKind.positive, 'Event', 'Room booked for the event',
                           session.user, data=log_data)
                 db.session.flush()
     return event
@@ -208,7 +209,7 @@ def clone_into_event(source_event, target_event, cloners):
     del g.importing_event
     signals.event.imported.send(target_event, source_event=source_event)
     cloner_classes = {c.name: c for c in get_event_cloners().values()}
-    target_event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Data imported', session.user,
+    target_event.log(EventLogRealm.event, LogKind.change, 'Event', 'Data imported', session.user,
                      data={'Modules': ', '.join(orig_string(cloner_classes[c].friendly_name)
                                                 for c in cloners if not cloner_classes[c].is_internal)})
 
@@ -262,7 +263,7 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
                 what = what['title']
         else:
             what = 'Data'
-        event.log(EventLogRealm.management, EventLogKind.change, 'Event', f'{what} updated', session.user,
+        event.log(EventLogRealm.management, LogKind.change, 'Event', f'{what} updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
 
 
@@ -316,7 +317,7 @@ def update_event_protection(event, data):
                       'visibility': {'title': 'Visibility', 'type': 'string',
                                      'convert': lambda changes: [_format_visibility(event, x) for x in changes]},
                       'public_regform_access': 'Public registration form access'}
-        event.log(EventLogRealm.management, EventLogKind.change, 'Event', 'Protection updated', session.user,
+        event.log(EventLogRealm.management, LogKind.change, 'Event', 'Protection updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
 
 
@@ -330,21 +331,21 @@ def update_event_type(event, type_):
         return
     event.type_ = type_
     logger.info('Event %r type changed to %s by %r', event, type_.name, session.user)
-    event.log(EventLogRealm.event, EventLogKind.change, 'Event', f'Type changed to {type_.title}', session.user)
+    event.log(EventLogRealm.event, LogKind.change, 'Event', f'Type changed to {type_.title}', session.user)
 
 
 def lock_event(event):
     event.is_locked = True
     db.session.flush()
     logger.info('Event %r locked by %r', event, session.user)
-    event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Event locked', session.user)
+    event.log(EventLogRealm.event, LogKind.change, 'Event', 'Event locked', session.user)
 
 
 def unlock_event(event):
     event.is_locked = False
     db.session.flush()
     logger.info('Event %r unlocked by %r', event, session.user)
-    event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Event unlocked', session.user)
+    event.log(EventLogRealm.event, LogKind.change, 'Event', 'Event unlocked', session.user)
 
 
 def create_reviewing_question(event, question_model, wtf_field_cls, form, data=None):

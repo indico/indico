@@ -9,10 +9,10 @@ from flask import jsonify, request
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
-from indico.modules.events.logs.models.entries import EventLogEntry, EventLogRealm
-from indico.modules.events.logs.util import serialize_log_entry
-from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.logs.models.entries import EventLogEntry, EventLogRealm
+from indico.modules.logs.util import serialize_log_entry
+from indico.modules.logs.views import WPEventLogs
 
 
 LOG_PAGE_SIZE = 15

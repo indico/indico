@@ -8,7 +8,8 @@
 from flask import session
 
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
+from indico.modules.logs import LogKind
 
 
 def update_template(template, title, data, is_clonable, backside_template_id=None, clear_background=False):
@@ -27,7 +28,7 @@ def update_template(template, title, data, is_clonable, backside_template_id=Non
         for tpl in query:
             tpl.backside_template = None
             if tpl.event:
-                tpl.event.log(EventLogRealm.event, EventLogKind.negative, 'Designer', 'Backside removed',
+                tpl.event.log(EventLogRealm.event, LogKind.negative, 'Designer', 'Backside removed',
                               session.user, data={'Template': tpl.title,
                                                   'Reason': 'Dimensions of backside changed',
                                                   'Backside': template.title})
@@ -40,5 +41,5 @@ def update_template(template, title, data, is_clonable, backside_template_id=Non
         template.background_image = None
 
     if template.event:
-        template.event.log(EventLogRealm.event, EventLogKind.positive, 'Designer', 'Badge template updated',
+        template.event.log(EventLogRealm.event, LogKind.positive, 'Designer', 'Badge template updated',
                            session.user, data={'Template': template.title})

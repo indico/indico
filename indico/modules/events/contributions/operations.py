@@ -17,10 +17,10 @@ from indico.modules.events.contributions import contribution_settings, logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.timetable.operations import (delete_timetable_entry, schedule_contribution,
                                                         update_timetable_entry)
 from indico.modules.events.util import set_custom_fields
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
 
 
 def _ensure_consistency(contrib):
@@ -63,7 +63,7 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
         schedule_contribution(contrib, start_dt=start_dt, session_block=session_block, extend_parent=extend_parent)
     signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, user)
-    contrib.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+    contrib.log(EventLogRealm.management, LogKind.positive, 'Contributions',
                 f'Contribution {contrib.verbose_title} has been created', user)
     # Note: If you ever add more stuff here that should run for any new contribution, make sure
     # to also add it to ContributionCloner.clone_single_contribution
@@ -105,7 +105,7 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
     if changes:
         signals.event.contribution_updated.send(contrib, changes=changes)
         logger.info('Contribution %s updated by %s', contrib, session.user)
-        contrib.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+        contrib.log(EventLogRealm.management, LogKind.change, 'Contributions',
                     f'Contribution "{contrib.title}" has been updated', session.user)
     return rv
 
@@ -117,7 +117,7 @@ def delete_contribution(contrib):
     db.session.flush()
     signals.event.contribution_deleted.send(contrib)
     logger.info('Contribution %s deleted by %s', contrib, session.user)
-    contrib.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+    contrib.log(EventLogRealm.management, LogKind.negative, 'Contributions',
                 f'Contribution "{contrib.title}" has been deleted', session.user)
 
 
@@ -128,7 +128,7 @@ def create_subcontribution(contrib, data):
     db.session.flush()
     signals.event.subcontribution_created.send(subcontrib)
     logger.info('Subcontribution %s created by %s', subcontrib, session.user)
-    subcontrib.event.log(EventLogRealm.management, EventLogKind.positive, 'Subcontributions',
+    subcontrib.event.log(EventLogRealm.management, LogKind.positive, 'Subcontributions',
                          f'Subcontribution "{subcontrib.title}" has been created', session.user,
                          meta={'subcontribution_id': subcontrib.id})
     return subcontrib
@@ -139,7 +139,7 @@ def update_subcontribution(subcontrib, data):
     db.session.flush()
     signals.event.subcontribution_updated.send(subcontrib)
     logger.info('Subcontribution %s updated by %s', subcontrib, session.user)
-    subcontrib.event.log(EventLogRealm.management, EventLogKind.change, 'Subcontributions',
+    subcontrib.event.log(EventLogRealm.management, LogKind.change, 'Subcontributions',
                          f'Subcontribution "{subcontrib.title}" has been updated', session.user,
                          meta={'subcontribution_id': subcontrib.id})
 
@@ -149,7 +149,7 @@ def delete_subcontribution(subcontrib):
     db.session.flush()
     signals.event.subcontribution_deleted.send(subcontrib)
     logger.info('Subcontribution %s deleted by %s', subcontrib, session.user)
-    subcontrib.event.log(EventLogRealm.management, EventLogKind.negative, 'Subcontributions',
+    subcontrib.event.log(EventLogRealm.management, LogKind.negative, 'Subcontributions',
                          f'Subcontribution "{subcontrib.title}" has been deleted', session.user,
                          meta={'subcontribution_id': subcontrib.id})
 

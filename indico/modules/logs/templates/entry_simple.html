@@ -1,4 +1,4 @@
-{% extends 'events/logs/entry_base.html' %}
+{% extends 'logs/entry_base.html' %}
 
 {% macro render_diff(data) %}
     {% for key, values in data.items() if key != '_diff' %}

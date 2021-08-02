@@ -61,7 +61,7 @@ def send_email(email, event=None, module=None, user=None, log_metadata=None):
 
 
 def _log_email(email, event, module, user, meta=None):
-    from indico.modules.events.logs import EventLogKind, EventLogRealm
+    from indico.modules.logs import EventLogRealm, LogKind
     if not event:
         return None
     log_data = {
@@ -75,7 +75,7 @@ def _log_email(email, event, module, user, meta=None):
         'state': 'pending',
         'sent_dt': None,
     }
-    return event.log(EventLogRealm.emails, EventLogKind.other, module or 'Unknown', log_data['subject'],
+    return event.log(EventLogRealm.emails, LogKind.other, module or 'Unknown', log_data['subject'],
                      user, type_='email', data=log_data, meta=meta)
 
 

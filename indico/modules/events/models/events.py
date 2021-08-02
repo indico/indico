@@ -33,11 +33,11 @@ from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
 from indico.modules.categories import Category
-from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixin
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.logs import EventLogEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
@@ -851,7 +851,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
         :param realm: A value from :class:`.EventLogRealm` indicating
                       the realm of the action.
-        :param kind: A value from :class:`.EventLogKind` indicating
+        :param kind: A value from :class:`.LogKind` indicating
                      the kind of the action that was performed.
         :param module: A human-friendly string describing the module
                        related to the action.
@@ -904,7 +904,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Session.preload_acl_entries(self)
 
     def move(self, category):
-        from indico.modules.events import EventLogKind, EventLogRealm
+        from indico.modules.events import EventLogRealm
+        from indico.modules.logs import LogKind
         old_category = self.category
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
@@ -912,19 +913,21 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         new_path = sep.join(self.category.chain_titles)
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
-        self.log(EventLogRealm.management, EventLogKind.change, 'Category', 'Event moved', session.user,
+        self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
                  data={'From': old_path, 'To': new_path})
 
     def delete(self, reason, user=None):
-        from indico.modules.events import EventLogKind, EventLogRealm, logger
+        from indico.modules.events import EventLogRealm, logger
+        from indico.modules.logs import LogKind
         self.is_deleted = True
         signals.event.deleted.send(self, user=user)
         db.session.flush()
         logger.info('Event %r deleted [%s]', self, reason)
-        self.log(EventLogRealm.event, EventLogKind.negative, 'Event', 'Event deleted', user, data={'Reason': reason})
+        self.log(EventLogRealm.event, LogKind.negative, 'Event', 'Event deleted', user, data={'Reason': reason})
 
     def restore(self, reason=None, user=None):
-        from indico.modules.events import EventLogKind, EventLogRealm, logger
+        from indico.modules.events import EventLogRealm, logger
+        from indico.modules.logs import LogKind
         if not self.is_deleted:
             return
         self.is_deleted = False
@@ -932,7 +935,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.session.flush()
         logger.info('Event %r restored [%s]', self, reason)
         data = {'reason': reason} if reason else None
-        self.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Event restored', user=user, data=data)
+        self.log(EventLogRealm.event, LogKind.positive, 'Event', 'Event restored', user=user, data=data)
 
     def refresh_event_persons(self, *, notify=True):
         """Update the data for all EventPersons based on the linked Users.

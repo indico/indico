@@ -7,7 +7,7 @@
 
 from flask import render_template
 
-from indico.modules.events.logs.util import render_changes
+from indico.modules.logs.util import render_changes
 
 
 class EventLogRendererBase:
@@ -45,7 +45,7 @@ class EventLogRendererBase:
 
 class SimpleRenderer(EventLogRendererBase):
     name = 'simple'
-    template_name = 'events/logs/entry_simple.html'
+    template_name = 'logs/entry_simple.html'
     template_kwargs = {'compare': render_changes}
 
     @classmethod
@@ -58,4 +58,4 @@ class SimpleRenderer(EventLogRendererBase):
 
 class EmailRenderer(EventLogRendererBase):
     name = 'email'
-    template_name = 'events/logs/entry_email.html'
+    template_name = 'logs/entry_email.html'

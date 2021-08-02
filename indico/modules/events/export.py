@@ -28,7 +28,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_all_models
 from indico.core.storage.backend import get_storage
-from indico.modules.events import Event, EventLogKind, EventLogRealm
+from indico.modules.events import Event, EventLogRealm
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.models.persons import EventPerson
@@ -36,6 +36,7 @@ from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
+from indico.modules.logs.models.entries import LogKind
 from indico.modules.users import User
 from indico.modules.users.util import get_user_by_email
 from indico.util.console import cformat
@@ -493,7 +494,7 @@ class EventImporter:
                     click.secho(f'  - {table.fullname}.{col} ({pk_value})', fg='yellow')
             raise Exception('Not all deferred idrefs have been consumed')
         event = Event.get(self.event_id)
-        event.log(EventLogRealm.event, EventLogKind.other, 'Event', 'Event imported from another Indico instance')
+        event.log(EventLogRealm.event, LogKind.other, 'Event', 'Event imported from another Indico instance')
         self._associate_users_by_email(event)
         db.session.flush()
         return event

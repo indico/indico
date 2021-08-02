@@ -8,10 +8,9 @@
 from flask import flash, request, session
 
 from indico.core.db import db
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.forms import ProgramCodesForm
 from indico.modules.events.management.program_codes import generate_program_codes
@@ -20,6 +19,8 @@ from indico.modules.events.management.views import WPEventProgramCodes
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.timetable import TimetableEntry
+from indico.modules.logs import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import FormDefaults
@@ -87,7 +88,7 @@ class RHAssignProgramCodesBase(RHManageEventBase):
                     obj.code = code
             if updates:
                 flash(_('The program codes have been successfully assigned'), 'success')
-                self.event.log(EventLogRealm.management, EventLogKind.change, 'Program',
+                self.event.log(EventLogRealm.management, LogKind.change, 'Program',
                                'Program codes assigned to {}'.format(self.object_type.replace('-', ' ')),
                                session.user, data=self._get_update_log_data(updates))
             else:

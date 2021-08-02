@@ -12,13 +12,13 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.models import attrs_changed
-from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import check_event_locked, get_object_from_args
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.string import sanitize_html
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -80,12 +80,12 @@ class RHEditNote(RHManageNoteBase):
                 else:
                     signals.event.notes.note_added.send(note)
                 logger.info('Note %s created by %s', note, session.user)
-                self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes', 'Added minutes',
+                self.event.log(EventLogRealm.participants, LogKind.positive, 'Minutes', 'Added minutes',
                                session.user, data=note.link_event_log_data)
             elif is_changed:
                 signals.event.notes.note_modified.send(note)
                 logger.info('Note %s modified by %s', note, session.user)
-                self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes', 'Updated minutes',
+                self.event.log(EventLogRealm.participants, LogKind.change, 'Minutes', 'Updated minutes',
                                session.user, data=note.link_event_log_data)
             saved = is_new or is_changed
         return jsonify_template('events/notes/edit_note.html', form=form, object_type=self.object_type,
@@ -114,7 +114,7 @@ class RHDeleteNote(RHManageNoteBase):
             note.delete(session.user)
             signals.event.notes.note_deleted.send(note)
             logger.info('Note %s deleted by %s', note, session.user)
-            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes', 'Removed minutes',
+            self.event.log(EventLogRealm.participants, LogKind.negative, 'Minutes', 'Removed minutes',
                            session.user, data=note.link_event_log_data)
         return redirect(self.event.url)
 

@@ -24,8 +24,8 @@ from indico.modules.events.contributions.models.principals import ContributionPr
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
-from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.timetable.operations import schedule_contribution
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.util.i18n import _
 
 
@@ -125,7 +125,7 @@ class ContributionCloner(EventCloner):
         contributions_logger.info('Contribution %s created by %s (from %s)', new_contribution, session.user,
                                   contribution)
         new_contribution.log(
-            EventLogRealm.management, EventLogKind.positive, 'Contributions',
+            EventLogRealm.management, LogKind.positive, 'Contributions',
             f'Contribution {new_contribution.verbose_title} has been cloned from #{contribution.friendly_id}',
             session.user
         )

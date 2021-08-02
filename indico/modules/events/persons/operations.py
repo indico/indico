@@ -9,8 +9,8 @@ from flask import session
 
 from indico.core import signals
 from indico.core.db import db
-from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.persons import logger
+from indico.modules.logs import EventLogRealm, LogKind
 
 
 def update_person(person, data):
@@ -18,5 +18,5 @@ def update_person(person, data):
     db.session.flush()
     signals.event.person_updated.send(person)
     logger.info('Person %s updated by %s', person, session.user)
-    person.event.log(EventLogRealm.management, EventLogKind.change, 'Persons',
+    person.event.log(EventLogRealm.management, LogKind.change, 'Persons',
                      f"Person with email '{person.email}' has been updated", session.user)

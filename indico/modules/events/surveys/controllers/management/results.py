@@ -8,7 +8,6 @@
 from flask import flash, jsonify, redirect, request
 from sqlalchemy.orm import defaultload, joinedload
 
-from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
 from indico.modules.events.surveys.models.items import SurveySection
@@ -16,6 +15,7 @@ from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.util import generate_spreadsheet_from_survey
 from indico.modules.events.surveys.views import WPManageSurvey, WPSurveyResults
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import url_for
@@ -97,7 +97,7 @@ class RHDeleteSubmissions(RHManageSurveyBase):
             if submission.id in submission_ids:
                 self.survey.submissions.remove(submission)
                 logger.info('Submission %s deleted from survey %s', submission, self.survey)
-                self.event.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
+                self.event.log(EventLogRealm.management, LogKind.negative, 'Surveys',
                                f'Submission removed from survey "{self.survey.title}"',
                                data={'Submitter': submission.user.full_name
                                      if not submission.is_anonymous else 'Anonymous'})

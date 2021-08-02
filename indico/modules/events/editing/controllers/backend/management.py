@@ -23,7 +23,7 @@ from indico.modules.events.editing.schemas import (EditableFileTypeArgs, Editabl
                                                    EditingReviewConditionArgs, EditingTagSchema, EditingUserSchema)
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.modules.events.editing.util import get_editors
-from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _, orig_string
 from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
 from indico.web.util import jsonify_template
@@ -220,13 +220,13 @@ class RHEditableSetSubmission(RHEditableTypeManagementBase):
         return jsonify(editable_type_settings[self.editable_type].get(self.event, 'submission_enabled'))
 
     def _process_PUT(self):
-        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Editing',
+        self.event.log(EventLogRealm.management, LogKind.positive, 'Editing',
                        f'Opened {orig_string(self.editable_type.title)} submission', session.user)
         editable_type_settings[self.editable_type].set(self.event, 'submission_enabled', True)
         return '', 204
 
     def _process_DELETE(self):
-        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Editing',
+        self.event.log(EventLogRealm.management, LogKind.negative, 'Editing',
                        f'Closed {orig_string(self.editable_type.title)} submission', session.user)
         editable_type_settings[self.editable_type].set(self.event, 'submission_enabled', False)
         return '', 204
@@ -237,13 +237,13 @@ class RHEditableSetEditing(RHEditableTypeManagementBase):
         return jsonify(editable_type_settings[self.editable_type].get(self.event, 'editing_enabled'))
 
     def _process_PUT(self):
-        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Editing',
+        self.event.log(EventLogRealm.management, LogKind.positive, 'Editing',
                        f'Opened {orig_string(self.editable_type.title)} editing', session.user)
         editable_type_settings[self.editable_type].set(self.event, 'editing_enabled', True)
         return '', 204
 
     def _process_DELETE(self):
-        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Editing',
+        self.event.log(EventLogRealm.management, LogKind.negative, 'Editing',
                        f'Closed {orig_string(self.editable_type.title)} editing', session.user)
         editable_type_settings[self.editable_type].set(self.event, 'editing_enabled', False)
         return '', 204

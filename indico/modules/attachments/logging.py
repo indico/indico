@@ -13,7 +13,7 @@ from jinja2.filters import do_filesizeformat
 from indico.core import signals
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments.models.attachments import AttachmentType
-from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.modules.logs import EventLogRealm, LogKind
 
 
 def connect_log_signals():
@@ -66,19 +66,19 @@ def _log(event, kind, msg, user, data):
 @_ignore_non_loggable
 def _log_folder_created(folder, user, **kwargs):
     event = folder.object.event
-    _log(event, EventLogKind.positive, f'Created folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(event, LogKind.positive, f'Created folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_folder_deleted(folder, user, **kwargs):
     event = folder.object.event
-    _log(event, EventLogKind.negative, f'Deleted folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(event, LogKind.negative, f'Deleted folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_folder_updated(folder, user, **kwargs):
     event = folder.object.event
-    _log(event, EventLogKind.change, f'Updated folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(event, LogKind.change, f'Updated folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
@@ -86,19 +86,19 @@ def _log_attachment_created(attachment, user, **kwargs):
     if g.get('importing_event'):
         return
     event = attachment.folder.object.event
-    _log(event, EventLogKind.positive, f'Added material "{attachment.title}"', user,
+    _log(event, LogKind.positive, f'Added material "{attachment.title}"', user,
          _get_attachment_data(attachment))
 
 
 @_ignore_non_loggable
 def _log_attachment_deleted(attachment, user, **kwargs):
     event = attachment.folder.object.event
-    _log(event, EventLogKind.negative, f'Deleted material "{attachment.title}"', user,
+    _log(event, LogKind.negative, f'Deleted material "{attachment.title}"', user,
          _get_attachment_data(attachment))
 
 
 @_ignore_non_loggable
 def _log_attachment_updated(attachment, user, **kwargs):
     event = attachment.folder.object.event
-    _log(event, EventLogKind.change, f'Updated material "{attachment.title}"', user,
+    _log(event, LogKind.change, f'Updated material "{attachment.title}"', user,
          _get_attachment_data(attachment))

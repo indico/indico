@@ -41,7 +41,6 @@ from indico.modules.events.contributions.util import (contribution_type_row, gen
                                                       get_boa_export_formats, import_contributions_from_csv,
                                                       make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
-from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.management.util import flash_if_unregistered
@@ -51,6 +50,7 @@ from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import check_event_locked, get_field_values, track_location_changes, track_time_changes
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -554,13 +554,13 @@ class RHManageContributionPublicationREST(RHManageContributionsBase):
 
     def _process_PUT(self):
         contribution_settings.set(self.event, 'published', True)
-        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+        self.event.log(EventLogRealm.management, LogKind.positive, 'Contributions',
                        'Contributions published', session.user)
         return '', 204
 
     def _process_DELETE(self):
         contribution_settings.set(self.event, 'published', False)
-        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+        self.event.log(EventLogRealm.management, LogKind.negative, 'Contributions',
                        'Contributions unpublished', session.user)
         return '', 204
 
@@ -588,7 +588,7 @@ class RHEditContributionType(RHManageContributionTypeBase):
             old_name = self.contrib_type.name
             form.populate_obj(self.contrib_type)
             db.session.flush()
-            self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+            self.event.log(EventLogRealm.management, LogKind.change, 'Contributions',
                            f'Updated type: {old_name}', session.user)
             return contribution_type_row(self.contrib_type)
         return jsonify_form(form)
@@ -604,7 +604,7 @@ class RHCreateContributionType(RHManageContributionsBase):
             form.populate_obj(contrib_type)
             self.event.contribution_types.append(contrib_type)
             db.session.flush()
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Contributions',
                            f'Added type: {contrib_type.name}', session.user)
             return contribution_type_row(contrib_type)
         return jsonify_form(form)
@@ -616,7 +616,7 @@ class RHDeleteContributionType(RHManageContributionTypeBase):
     def _process(self):
         db.session.delete(self.contrib_type)
         db.session.flush()
-        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+        self.event.log(EventLogRealm.management, LogKind.negative, 'Contributions',
                        f'Deleted type: {self.contrib_type.name}', session.user)
         return jsonify_data(flash=False)
 
@@ -643,7 +643,7 @@ class RHSortContributionFields(RHManageContributionsBase):
         for index, field in enumerate(sorted(list(field_by_id.values()), key=attrgetter('position')), len(field_ids)):
             field.position = index
         db.session.flush()
-        self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+        self.event.log(EventLogRealm.management, LogKind.change, 'Contributions',
                        'Custom fields reordered', session.user)
         return jsonify_data(flash=False)
 
@@ -667,7 +667,7 @@ class RHCreateContributionField(RHManageContributionsBase):
             field.update_object(form.data)
             self.event.contribution_fields.append(contrib_field)
             db.session.flush()
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Contributions',
                            f'Added field: {contrib_field.title}', session.user)
 
             return jsonify_data(flash=False)
@@ -698,7 +698,7 @@ class RHEditContributionField(RHManageContributionFieldBase):
             old_title = self.contrib_field.title
             self.contrib_field.mgmt_field.update_object(form.data)
             db.session.flush()
-            self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+            self.event.log(EventLogRealm.management, LogKind.change, 'Contributions',
                            f'Modified field: {old_title}', session.user)
             return jsonify_data(flash=False)
         return jsonify_template('events/contributions/forms/contribution_field_form.html', form=form)
@@ -710,7 +710,7 @@ class RHDeleteContributionField(RHManageContributionFieldBase):
     def _process(self):
         db.session.delete(self.contrib_field)
         db.session.flush()
-        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+        self.event.log(EventLogRealm.management, LogKind.negative, 'Contributions',
                        f'Deleted field: {self.contrib_field.title}', session.user)
 
 

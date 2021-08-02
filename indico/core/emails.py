@@ -116,7 +116,7 @@ def store_failed_email(email, log_entry=None):
 
 def resend_failed_email(path):
     """Try re-sending an email that previously failed."""
-    from indico.modules.events.logs import EventLogEntry
+    from indico.modules.logs import EventLogEntry
     with open(path, 'rb') as f:
         email, log_entry_id = pickle.load(f)
     log_entry = EventLogEntry.get(log_entry_id) if log_entry_id is not None else None

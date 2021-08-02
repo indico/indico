@@ -13,7 +13,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import get_principal_permissions, update_permissions
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
@@ -30,6 +30,7 @@ from indico.modules.events.sessions.util import (generate_pdf_from_sessions, gen
                                                  render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.modules.events.util import get_random_color, track_location_changes
+from indico.modules.logs import LogKind
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
@@ -288,7 +289,7 @@ class RHEditSessionType(RHManageSessionTypeBase):
             old_name = self.session_type.name
             form.populate_obj(self.session_type)
             db.session.flush()
-            self.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
+            self.event.log(EventLogRealm.management, LogKind.change, 'Sessions',
                            f'Updated type: {old_name}', session.user)
             return jsonify_data(html_row=render_session_type_row(self.session_type), flash=False)
         return jsonify_form(form)
@@ -304,7 +305,7 @@ class RHCreateSessionType(RHManageSessionsBase):
             form.populate_obj(session_type)
             self.event.session_types.append(session_type)
             db.session.flush()
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Sessions',
                            f'Added type: {session_type.name}', session.user)
             types = [{'id': t.id, 'title': t.name} for t in self.event.session_types]
             return jsonify_data(types=types, new_type_id=session_type.id,
@@ -318,6 +319,6 @@ class RHDeleteSessionType(RHManageSessionTypeBase):
     def _process(self):
         db.session.delete(self.session_type)
         db.session.flush()
-        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
+        self.event.log(EventLogRealm.management, LogKind.negative, 'Sessions',
                        f'Deleted type: {self.session_type.name}', session.user)
         return jsonify_data(flash=False)

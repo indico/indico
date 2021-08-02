@@ -15,17 +15,18 @@ from wtforms import fields as wtforms_fields
 from wtforms.validators import DataRequired
 
 from indico.core.db import db
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
 from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
 from indico.modules.events.layout import layout_settings, logger, theme_settings
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
                                                 LectureMeetingLayoutForm, LogoForm)
 from indico.modules.events.layout.util import get_css_file_data, get_css_url, get_logo_data
 from indico.modules.events.layout.views import WPLayoutEdit
-from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.views import WPConferenceDisplay
+from indico.modules.logs import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32
@@ -93,7 +94,7 @@ class RHLayoutEdit(RHLayoutBase):
         if changes:
             form_cls = ConferenceLayoutForm if self.event.type_ == EventType.conference else LectureMeetingLayoutForm
             form = form_cls(event=self.event)
-            self.event.log(EventLogRealm.participants, EventLogKind.change, 'Layout', summary='Layout was updated',
+            self.event.log(EventLogRealm.participants, LogKind.change, 'Layout', summary='Layout was updated',
                            user=session.user, data={'Changes': make_diff_log(changes, form.log_fields_metadata)})
         return ret
 

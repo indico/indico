@@ -11,13 +11,14 @@ from flask import request, session
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.roles import logger
 from indico.modules.events.roles.forms import EventRoleForm
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.roles.views import WPEventRoles
+from indico.modules.logs import LogKind
 from indico.modules.users import User
 from indico.util.marshmallow import PrincipalList
 from indico.util.roles import ImportRoleMembersMixin
@@ -60,7 +61,7 @@ class RHAddEventRole(RHManageEventBase):
             form.populate_obj(role)
             db.session.flush()
             logger.info('Event role %r created by %r', role, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Roles',
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Roles',
                            f'Added role: "{role.name}"', session.user)
             return jsonify_data(html=_render_roles(self.event), role=serialize_event_role(role))
         return jsonify_form(form)
@@ -94,7 +95,7 @@ class RHEditEventRole(RHManageEventRole):
             form.populate_obj(self.role)
             db.session.flush()
             logger.info('Event role %r updated by %r', self.role, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.change, 'Roles',
+            self.event.log(EventLogRealm.management, LogKind.change, 'Roles',
                            f'Updated role: "{self.role.name}"', session.user)
             return jsonify_data(html=_render_role(self.role))
         return jsonify_form(form)
@@ -106,7 +107,7 @@ class RHDeleteEventRole(RHManageEventRole):
     def _process(self):
         db.session.delete(self.role)
         logger.info('Event role %r deleted by %r', self.role, session.user)
-        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Roles',
+        self.event.log(EventLogRealm.management, LogKind.negative, 'Roles',
                        f'Deleted role: "{self.role.name}"', session.user)
         return jsonify_data(html=_render_roles(self.event))
 
@@ -124,7 +125,7 @@ class RHRemoveEventRoleMember(RHManageEventRole):
         if self.user in self.role.members:
             self.role.members.remove(self.user)
             logger.info('User %r removed from role %r by %r', self.user, self.role, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.negative, 'Roles',
+            self.event.log(EventLogRealm.management, LogKind.negative, 'Roles',
                            f'Removed user from role "{self.role.name}"', session.user,
                            data={'Name': self.user.full_name,
                                  'Email': self.user.email})
@@ -141,7 +142,7 @@ class RHAddEventRoleMembers(RHManageEventRole):
         for user in users - self.role.members:
             self.role.members.add(user)
             logger.info('User %r added to role %r by %r', user, self.role, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Roles',
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Roles',
                            f'Added user to role "{self.role.name}"', session.user,
                            data={'Name': user.full_name, 'Email': user.email})
         return jsonify_data(html=_render_role(self.role, collapsed=False))

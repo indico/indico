@@ -23,7 +23,7 @@ class EventLogRealm(RichIntEnum):
     emails = 5
 
 
-class EventLogKind(int, IndicoEnum):
+class LogKind(int, IndicoEnum):
     other = 1
     positive = 2
     change = 3
@@ -68,7 +68,7 @@ class EventLogEntry(db.Model):
     )
     #: The general kind of operation that was performed
     kind = db.Column(
-        PyIntEnum(EventLogKind),
+        PyIntEnum(LogKind),
         nullable=False
     )
     #: The module the operation was related to (does not need to match
@@ -125,7 +125,7 @@ class EventLogEntry(db.Model):
 
     @property
     def renderer(self):
-        from indico.modules.events.logs.util import get_log_renderers
+        from indico.modules.logs.util import get_log_renderers
         return get_log_renderers().get(self.type)
 
     def render(self):

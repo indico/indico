@@ -26,7 +26,7 @@ from indico.modules.events.editing.notifications import (notify_comment, notify_
                                                          notify_submitter_confirmation, notify_submitter_upload)
 from indico.modules.events.editing.schemas import (EditableDumpSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction)
-from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, orig_string
@@ -331,7 +331,7 @@ def assign_editor(editable, editor):
     log_msg = '"{}" ({}) assigned to {}'.format(editable.contribution.title,
                                                 orig_string(editable.type.title),
                                                 editor.full_name)
-    editable.log(EventLogRealm.management, EventLogKind.positive, 'Editing', log_msg, session.user, data=log_data)
+    editable.log(EventLogRealm.management, LogKind.positive, 'Editing', log_msg, session.user, data=log_data)
     db.session.flush()
 
 
@@ -347,7 +347,7 @@ def unassign_editor(editable):
     log_msg = '"{}" ({}) unassigned from {}'.format(editable.contribution.title,
                                                     orig_string(editable.type.title),
                                                     editor.full_name)
-    editable.log(EventLogRealm.management, EventLogKind.negative, 'Editing', log_msg, session.user, data=log_data)
+    editable.log(EventLogRealm.management, LogKind.negative, 'Editing', log_msg, session.user, data=log_data)
     db.session.flush()
 
 

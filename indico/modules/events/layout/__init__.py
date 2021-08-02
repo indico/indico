@@ -12,9 +12,9 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.settings.converters import EnumConverter
 from indico.modules.events.features.base import EventFeature
-from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.settings import EventSettingsProxy, ThemeSettingsProxy
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.users import NameFormat
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -97,7 +97,7 @@ def _get_feature_definitions(sender, **kwargs):
 
 @signals.event_management.image_created.connect
 def _log_image_created(image, user, **kwargs):
-    image.event.log(EventLogRealm.management, EventLogKind.positive, 'Layout',
+    image.event.log(EventLogRealm.management, LogKind.positive, 'Layout',
                     f'Added image "{image.filename}"', user, data={
                         'File name': image.filename,
                         'File type': image.content_type,
@@ -107,7 +107,7 @@ def _log_image_created(image, user, **kwargs):
 
 @signals.event_management.image_deleted.connect
 def _log_image_deleted(image, user, **kwargs):
-    image.event.log(EventLogRealm.management, EventLogKind.negative, 'Layout',
+    image.event.log(EventLogRealm.management, LogKind.negative, 'Layout',
                     f'Deleted image "{image.filename}"', user, data={
                         'File name': image.filename
                     })

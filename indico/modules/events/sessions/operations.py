@@ -9,12 +9,12 @@ from flask import session
 
 from indico.core import signals
 from indico.core.db import db
-from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
-from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES, logger, session_settings
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import orig_string
 
 
@@ -25,7 +25,7 @@ def create_session(event, data):
     event_session = Session(event=event)
     event_session.populate_from_dict(data)
     db.session.flush()
-    event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
+    event.log(EventLogRealm.management, LogKind.positive, 'Sessions',
               f'Session "{event_session.title}" has been created', session.user,
               meta={'session_id': event_session.id})
     logger.info('Session %s created by %s', event_session, session.user)
@@ -36,7 +36,7 @@ def create_session_block(session_, data):
     block = SessionBlock(session=session_)
     block.populate_from_dict(data)
     db.session.flush()
-    session_.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
+    session_.event.log(EventLogRealm.management, LogKind.positive, 'Sessions',
                        'Session block "{}" for session "{}" has been created'
                        .format(block.title, session_.title), session.user,
                        meta={'session_block_id': block.id})
@@ -49,7 +49,7 @@ def update_session(event_session, data):
     event_session.populate_from_dict(data)
     db.session.flush()
     signals.event.session_updated.send(event_session)
-    event_session.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
+    event_session.event.log(EventLogRealm.management, LogKind.change, 'Sessions',
                             f'Session "{event_session.title}" has been updated', session.user,
                             meta={'session_id': event_session.id})
     logger.info('Session %s modified by %s', event_session, session.user)
@@ -74,7 +74,7 @@ def delete_session(event_session):
         contribution.session = None
     _delete_session_timetable_entries(event_session)
     signals.event.session_deleted.send(event_session)
-    event_session.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
+    event_session.event.log(EventLogRealm.management, LogKind.negative, 'Sessions',
                             f'Session "{event_session.title}" has been deleted', session.user,
                             meta={'session_id': event_session.id})
     logger.info('Session %s deleted by %s', event_session, session.user)
@@ -91,7 +91,7 @@ def update_session_block(session_block, data):
     session_block.populate_from_dict(data)
     db.session.flush()
     signals.event.session_block_updated.send(session_block)
-    session_block.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
+    session_block.event.log(EventLogRealm.management, LogKind.change, 'Sessions',
                             f'Session block "{session_block.title}" has been updated', session.user,
                             meta={'session_block_id': session_block.id})
     logger.info('Session block %s modified by %s', session_block, session.user)
@@ -118,7 +118,7 @@ def delete_session_block(session_block):
     if not session_.blocks and session_.event.type != 'conference':
         delete_session(session_)
     db.session.flush()
-    event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
+    event.log(EventLogRealm.management, LogKind.negative, 'Sessions',
               f'Session block "{session_block.title}" has been deleted', session.user,
               meta={'session_block_id': session_block.id})
     logger.info('Session block %s deleted by %s', session_block, session.user)
@@ -136,5 +136,5 @@ def update_session_coordinator_privs(event, data):
     logger.info('Session coordinator privs of event %r updated with %r by %r', event, data, session.user)
     if changes:
         log_fields = {priv: orig_string(title) for priv, title in COORDINATOR_PRIV_TITLES.items()}
-        event.log(EventLogRealm.management, EventLogKind.change, 'Sessions', 'Coordinator privileges updated',
+        event.log(EventLogRealm.management, LogKind.change, 'Sessions', 'Coordinator privileges updated',
                   session.user, data={'Changes': make_diff_log(changes, log_fields)})

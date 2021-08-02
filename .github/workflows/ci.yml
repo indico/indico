@@ -156,7 +156,7 @@ jobs:
         if: success() || failure()
         run: npx eslint --ext .js --ext .jsx
              indico/modules/rb/
-             indico/modules/events/logs/
+             indico/modules/logs/
              indico/modules/events/editing/
              indico/modules/events/client/js/reviewing/
              indico/modules/events/papers/client/js/

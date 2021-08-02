@@ -23,7 +23,7 @@ from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, Regi
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.util import get_inherited_templates
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration import logger
@@ -45,6 +45,7 @@ from indico.modules.events.registration.util import (create_registration, genera
                                                      import_registrations_from_csv, make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
+from indico.modules.logs import LogKind
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
@@ -240,7 +241,7 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration)
             logger.info('Registration %s deleted by %s', registration, session.user)
-            registration.log(EventLogRealm.management, EventLogKind.negative, 'Registration',
+            registration.log(EventLogRealm.management, LogKind.negative, 'Registration',
                              f'Registration deleted: {registration.full_name}',
                              session.user, data={'Email': registration.email})
         num_reg_deleted = len(self.registrations)

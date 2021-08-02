@@ -12,12 +12,13 @@ from flask import session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.errors import UserValueError
-from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events import EventLogRealm
 from indico.modules.events.sessions.operations import update_session_block
 from indico.modules.events.timetable import logger
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.timetable.util import find_latest_entry_end_dt
+from indico.modules.logs import LogKind
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
 
@@ -73,7 +74,7 @@ def create_timetable_entry(event, data, parent=None, extend_parent=False):
     db.session.flush()
     signals.event.timetable_entry_created.send(entry)
     logger.info('Timetable entry %s created by %s', entry, user)
-    entry.event.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
+    entry.event.log(EventLogRealm.management, LogKind.positive, 'Timetable',
                     f"Entry for {object_type} '{object_title}' created", user,
                     data={'Time': format_datetime(entry.start_dt, timezone=event.tzinfo)})
     if extend_parent:
@@ -99,7 +100,7 @@ def update_timetable_entry(entry, data):
     if changes:
         signals.event.timetable_entry_updated.send(entry, changes=changes)
         logger.info('Timetable entry %s updated by %s', entry, session.user)
-        entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
+        entry.event.log(EventLogRealm.management, LogKind.change, 'Timetable',
                         f"Entry for {object_type} '{object_title}' modified", session.user,
                         data={'Time': format_datetime(entry.start_dt)})
 
@@ -111,7 +112,7 @@ def delete_timetable_entry(entry, log=True):
     db.session.flush()
     if log:
         logger.info('Timetable entry %s deleted by %s', entry, session.user)
-        entry.event.log(EventLogRealm.management, EventLogKind.negative, 'Timetable',
+        entry.event.log(EventLogRealm.management, LogKind.negative, 'Timetable',
                         f"Entry for {object_type} '{object_title}' deleted", session.user,
                         data={'Time': format_datetime(entry.start_dt)})
 
@@ -126,7 +127,7 @@ def fit_session_block_entry(entry, log=True):
     entry.session_block.duration = end_dt - entry.start_dt
     db.session.flush()
     if log:
-        entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
+        entry.event.log(EventLogRealm.management, LogKind.change, 'Timetable',
                         'Session block fitted to contents', session.user,
                         data={'Session block': entry.session_block.full_title})
 

@@ -9,6 +9,6 @@ from indico.modules.events.management.views import WPEventManagement
 
 
 class WPEventLogs(WPEventManagement):
-    bundles = ('module_events.logs.js', 'module_events.logs.css')
-    template_prefix = 'events/logs/'
+    bundles = ('module_logs.js', 'module_logs.css')
+    template_prefix = 'logs/'
     sidemenu_option = 'logs'

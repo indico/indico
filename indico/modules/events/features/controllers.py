@@ -13,8 +13,8 @@ from indico.modules.events.features import logger
 from indico.modules.events.features.util import (format_feature_names, get_disallowed_features, get_enabled_features,
                                                  get_feature_definition, get_feature_definitions, set_feature_enabled)
 from indico.modules.events.features.views import WPFeatures
-from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import ngettext
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.widgets import SwitchWidget
@@ -65,7 +65,7 @@ class RHSwitchFeature(RHFeaturesBase):
             flash(ngettext('Feature enabled: {features}', 'Features enabled: {features}', len(changed))
                   .format(features=format_feature_names(changed)), 'success')
             logger.info("Feature '%s' for event %s enabled by %s", feature.name, self.event, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Features',
+            self.event.log(EventLogRealm.management, LogKind.positive, 'Features',
                            f'Enabled {feature.friendly_name}', session.user)
         return jsonify_data(enabled=True, event_menu=self.render_event_menu(), changed=list(changed))
 
@@ -79,6 +79,6 @@ class RHSwitchFeature(RHFeaturesBase):
             flash(ngettext('Feature disabled: {features}', 'Features disabled: {features}', len(changed))
                   .format(features=format_feature_names(changed)), 'warning')
             logger.info("Feature '%s' for event %s disabled by %s", feature.name, self.event, session.user)
-            self.event.log(EventLogRealm.management, EventLogKind.negative, 'Features',
+            self.event.log(EventLogRealm.management, LogKind.negative, 'Features',
                            f'Disabled {feature.friendly_name}', session.user)
         return jsonify_data(enabled=False, event_menu=self.render_event_menu(), changed=list(changed))
