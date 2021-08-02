@@ -11,6 +11,9 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.models.categories import Category
+from indico.modules.categories.util import format_visibility
+from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 
 
 def create_category(parent, data):
@@ -38,7 +41,51 @@ def move_category(category, target_category):
 
 
 def update_category(category, data, skip=()):
-    category.populate_from_dict(data, skip=skip)
+    assert set(data) <= {
+        'title', 'description', 'timezone', 'suggestions_disabled', 'is_flat_view_enabled',
+        'event_message_mode', 'event_message', 'notify_managers', 'event_creation_notification_emails',
+        *skip
+    }
+    changes = category.populate_from_dict(data, skip=skip)
     db.session.flush()
     signals.category.updated.send(category)
-    logger.info('Category %s updated by %s', category, session.user)
+    logger.info('Category %s updated with %r by %s', category, data, session.user)
+    _log_category_update(category, changes)
+
+
+def update_category_protection(category, data):
+    assert set(data) <= {'protection_mode', 'own_no_access_contact', 'event_creation_restricted', 'visibility'}
+    changes = category.populate_from_dict(data)
+    db.session.flush()
+    signals.category.updated.send(category, changes=changes)
+    logger.info('Protection of category %r updated with %r by %r', category, data, session.user)
+    if changes:
+        log_fields = {'protection_mode': 'Protection mode',
+                      'own_no_access_contact': 'No access contact',
+                      'visibility': {'title': 'Visibility', 'type': 'string',
+                                     'convert': lambda changes: [format_visibility(category, x) for x in changes]},
+                      'event_creation_restricted': 'Event creation restricted'}
+        category.log(CategoryLogRealm.category, LogKind.change, 'Category', 'Protection updated', session.user,
+                     data={'Changes': make_diff_log(changes, log_fields)})
+
+
+def _log_category_update(category, changes):
+    log_fields = {
+        'title': {'title': 'Title', 'type': 'string'},
+        'description': 'Description',
+        'timezone': {'title': 'Timezone', 'type': 'string'},
+        'suggestions_disabled': 'Disable suggestions',
+        'is_flat_view_enabled': 'Allow flat view',
+        'event_message_mode': 'Event header message type',
+        'event_message': 'Event header message',
+        'notify_managers': 'Notify managers about event creation',
+        'event_creation_notification_emails': 'Event creation notification emails'
+    }
+    if changes:
+        what = 'Settings'
+        if len(changes) == 1:
+            what = log_fields[list(changes)[0]]
+            if isinstance(what, dict):
+                what = what['title']
+        category.log(CategoryLogRealm.category, LogKind.change, 'Category', f'{what} updated', session.user,
+                     data={'Changes': make_diff_log(changes, log_fields)})

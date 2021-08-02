@@ -59,6 +59,8 @@ def make_diff_log(changes, fields):
             change = [orig_string(getattr(x, 'title', x.name))
                       if x is not None else default
                       for x in change]
+        elif all(isinstance(x, bool) for x in change):
+            type_ = 'bool'
         elif all(isinstance(x, (int, float)) for x in change):
             type_ = 'number'
         elif all(isinstance(x, (list, tuple)) for x in change):
@@ -66,8 +68,6 @@ def make_diff_log(changes, fields):
         elif all(isinstance(x, set) for x in change):
             type_ = 'list'
             change = list(map(sorted, change))
-        elif all(isinstance(x, bool) for x in change):
-            type_ = 'bool'
         elif all(isinstance(x, datetime) for x in change):
             type_ = 'datetime'
             change = [x.isoformat() for x in change]

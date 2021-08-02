@@ -12,7 +12,7 @@ from flask import g, session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.categories.util import get_visibility_options
+from indico.modules.categories.util import format_visibility
 from indico.modules.events import Event, EventLogRealm, logger
 from indico.modules.events.cloning import EventCloner, get_event_cloners
 from indico.modules.events.features import features_event_settings
@@ -315,15 +315,10 @@ def update_event_protection(event, data):
                       'own_no_access_contact': 'No access contact',
                       'access_key': {'title': 'Access key', 'type': 'string'},
                       'visibility': {'title': 'Visibility', 'type': 'string',
-                                     'convert': lambda changes: [_format_visibility(event, x) for x in changes]},
+                                     'convert': lambda changes: [format_visibility(event, x) for x in changes]},
                       'public_regform_access': 'Public registration form access'}
         event.log(EventLogRealm.management, LogKind.change, 'Event', 'Protection updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
-
-
-def _format_visibility(event, visibility):
-    options = dict(get_visibility_options(event, allow_invisible=True))
-    return options[visibility if visibility is not None else '']
 
 
 def update_event_type(event, type_):

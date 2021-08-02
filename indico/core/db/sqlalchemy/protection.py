@@ -21,7 +21,7 @@ from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.core.permissions import get_available_permissions
 from indico.util.caching import memoize_request
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, orig_string
 from indico.util.signals import values_from_signal
 from indico.util.user import iter_acl
 from indico.web.util import jsonify_template
@@ -540,3 +540,61 @@ def _resolve_principal(principal):
 
 def render_acl(obj):
     return jsonify_template('_access_list.html', acl=obj.get_inherited_acl())
+
+
+def make_acl_log_fn(obj_type, log_realm):
+    def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **kwargs):
+        from indico.modules.logs.models.entries import LogKind
+
+        if quiet:
+            return
+
+        user = session.user if session else None  # allow acl changes outside request context
+        available_permissions = get_available_permissions(obj_type)
+
+        def _format_permissions(permissions):
+            permissions = set(permissions)
+            return ', '.join(sorted(orig_string(p.friendly_name) for p in available_permissions.values()
+                                    if p.name in permissions))
+
+        data = {}
+        if principal.principal_type == PrincipalType.user:
+            data['User'] = principal.full_name
+        elif principal.principal_type == PrincipalType.email:
+            data['Email'] = principal.email
+        elif principal.principal_type == PrincipalType.local_group:
+            data['Group'] = principal.name
+        elif principal.principal_type == PrincipalType.multipass_group:
+            data['Group'] = f'{principal.name} ({principal.provider_title})'
+        elif principal.principal_type == PrincipalType.network:
+            data['IP Network'] = principal.name
+        elif principal.principal_type == PrincipalType.registration_form:
+            data['Registration Form'] = principal.title
+        elif principal.principal_type == PrincipalType.event_role:
+            data['Event Role'] = principal.name
+        if entry is None:
+            data['Read Access'] = old_data['read_access']
+            data['Manager'] = old_data['full_access']
+            data['Permissions'] = _format_permissions(old_data['permissions'])
+            obj.log(log_realm, LogKind.negative, 'Protection', 'ACL entry removed', user, data=data)
+        elif is_new:
+            data['Read Access'] = entry.read_access
+            data['Manager'] = entry.full_access
+            if entry.permissions:
+                data['Permissions'] = _format_permissions(entry.permissions)
+            obj.log(log_realm, LogKind.positive, 'Protection', 'ACL entry added', user, data=data)
+        elif entry.current_data != old_data:
+            data['Read Access'] = entry.read_access
+            data['Manager'] = entry.full_access
+            current_permissions = set(entry.permissions)
+            added_permissions = current_permissions - old_data['permissions']
+            removed_permissions = old_data['permissions'] - current_permissions
+            if added_permissions:
+                data['Permissions (added)'] = _format_permissions(added_permissions)
+            if removed_permissions:
+                data['Permissions (removed)'] = _format_permissions(removed_permissions)
+            if current_permissions:
+                data['Permissions'] = _format_permissions(current_permissions)
+            obj.log(log_realm, LogKind.change, 'Protection', 'ACL entry changed', user, data=data)
+
+    return _log_acl_changes

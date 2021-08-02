@@ -21,9 +21,7 @@ from indico.testing.util import bool_matrix
 
 @pytest.fixture(autouse=True)
 def _mock_available_permissions(mocker):
-    # The code we are testing only cares about the keys so we don't
-    # need to actually create permissions for now.
-    permissions = dict(get_available_permissions(Event), foo=None, bar=None, foobar=None)
+    permissions = dict(get_available_permissions(Event), foo=MagicMock(), bar=MagicMock(), foobar=MagicMock())
     mocker.patch('indico.core.db.sqlalchemy.protection.get_available_permissions', return_value=permissions)
     mocker.patch('indico.core.db.sqlalchemy.principals.get_available_permissions', return_value=permissions)
 

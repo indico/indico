@@ -8,10 +8,12 @@
 from flask import session
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
 from indico.modules.categories.models.categories import Category
+from indico.modules.logs.models.entries import CategoryLogRealm
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -23,6 +25,9 @@ upcoming_events_settings = SettingsProxy('upcoming_events', {
     'entries': [],
     'max_entries': 10
 })
+
+# Log ACL changes
+signals.acl.entry_changed.connect(make_acl_log_fn(Category, CategoryLogRealm.category), sender=Category, weak=False)
 
 
 @signals.core.import_tasks.connect

@@ -23,7 +23,8 @@ from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm,
                                              SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.roles import CategoryRole
-from indico.modules.categories.operations import create_category, delete_category, move_category, update_category
+from indico.modules.categories.operations import (create_category, delete_category, move_category, update_category,
+                                                  update_category_protection)
 from indico.modules.categories.util import get_image_data, serialize_category_role
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
@@ -210,11 +211,11 @@ class RHManageCategoryProtection(RHManageCategoryBase):
         form = CategoryProtectionForm(obj=self._get_defaults(), category=self.category)
         if form.validate_on_submit():
             update_permissions(self.category, form)
-            update_category(self.category,
-                            {'protection_mode': form.protection_mode.data,
-                             'own_no_access_contact': form.own_no_access_contact.data,
-                             'event_creation_restricted': form.event_creation_restricted.data,
-                             'visibility': form.visibility.data})
+            update_category_protection(self.category,
+                                       {'protection_mode': form.protection_mode.data,
+                                        'own_no_access_contact': form.own_no_access_contact.data,
+                                        'event_creation_restricted': form.event_creation_restricted.data,
+                                        'visibility': form.visibility.data})
             flash(_('Protection settings of the category have been updated'), 'success')
             return redirect(url_for('.manage_protection', self.category))
         return WPCategoryManagement.render_template('management/category_protection.html', self.category, 'protection',

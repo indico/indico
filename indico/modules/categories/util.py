@@ -195,6 +195,11 @@ def get_visibility_options(category_or_event, allow_invisible=True):
     return options
 
 
+def format_visibility(category_or_event, visibility):
+    options = dict(get_visibility_options(category_or_event, allow_invisible=True))
+    return options[visibility if visibility is not None else '']
+
+
 def get_image_data(image_type, category):
     url = getattr(category, image_type + '_url')
     metadata = getattr(category, image_type + '_metadata')

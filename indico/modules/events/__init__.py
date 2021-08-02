@@ -11,14 +11,14 @@ from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
-from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
-from indico.core.permissions import ManagementPermission, check_permissions, get_available_permissions
+from indico.core.permissions import ManagementPermission, check_permissions
 from indico.modules.events.cloning import get_event_cloners
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.logs import EventLogRealm, LogKind
-from indico.util.i18n import _, ngettext, orig_string
+from indico.modules.logs import EventLogRealm
+from indico.util.i18n import _, ngettext
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem, TopMenuSection
@@ -47,6 +47,9 @@ event_management_object_url_prefixes = {
     'subcontribution': ['/manage/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>']
 }
 
+# Log ACL changes
+signals.acl.entry_changed.connect(make_acl_log_fn(Event, EventLogRealm.management), sender=Event, weak=False)
+
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
@@ -74,60 +77,6 @@ def _convert_email_principals(user, **kwargs):
 def _convert_email_person_links(user, **kwargs):
     from indico.modules.events.models.persons import EventPerson
     EventPerson.link_user_by_email(user)
-
-
-@signals.acl.entry_changed.connect_via(Event)
-def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **kwargs):
-    if quiet:
-        return
-
-    user = session.user if session else None  # allow acl changes outside request context
-    available_permissions = get_available_permissions(Event)
-
-    def _format_permissions(permissions):
-        permissions = set(permissions)
-        return ', '.join(sorted(orig_string(p.friendly_name) for p in available_permissions.values()
-                                if p.name in permissions))
-
-    data = {}
-    if principal.principal_type == PrincipalType.user:
-        data['User'] = principal.full_name
-    elif principal.principal_type == PrincipalType.email:
-        data['Email'] = principal.email
-    elif principal.principal_type == PrincipalType.local_group:
-        data['Group'] = principal.name
-    elif principal.principal_type == PrincipalType.multipass_group:
-        data['Group'] = f'{principal.name} ({principal.provider_title})'
-    elif principal.principal_type == PrincipalType.network:
-        data['IP Network'] = principal.name
-    elif principal.principal_type == PrincipalType.registration_form:
-        data['Registration Form'] = principal.title
-    elif principal.principal_type == PrincipalType.event_role:
-        data['Event Role'] = principal.name
-    if entry is None:
-        data['Read Access'] = old_data['read_access']
-        data['Manager'] = old_data['full_access']
-        data['Permissions'] = _format_permissions(old_data['permissions'])
-        obj.log(EventLogRealm.management, LogKind.negative, 'Protection', 'ACL entry removed', user, data=data)
-    elif is_new:
-        data['Read Access'] = entry.read_access
-        data['Manager'] = entry.full_access
-        if entry.permissions:
-            data['Permissions'] = _format_permissions(entry.permissions)
-        obj.log(EventLogRealm.management, LogKind.positive, 'Protection', 'ACL entry added', user, data=data)
-    elif entry.current_data != old_data:
-        data['Read Access'] = entry.read_access
-        data['Manager'] = entry.full_access
-        current_permissions = set(entry.permissions)
-        added_permissions = current_permissions - old_data['permissions']
-        removed_permissions = old_data['permissions'] - current_permissions
-        if added_permissions:
-            data['Permissions (added)'] = _format_permissions(added_permissions)
-        if removed_permissions:
-            data['Permissions (removed)'] = _format_permissions(removed_permissions)
-        if current_permissions:
-            data['Permissions'] = _format_permissions(current_permissions)
-        obj.log(EventLogRealm.management, LogKind.change, 'Protection', 'ACL entry changed', user, data=data)
 
 
 @signals.core.app_created.connect
