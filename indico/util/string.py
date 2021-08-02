@@ -49,7 +49,7 @@ BLEACH_ALLOWED_ATTRIBUTES_HTML = BLEACH_ALLOWED_ATTRIBUTES | {'*': [
     'id', 'ismap', 'lang', 'name', 'noshade', 'nowrap', 'rel', 'rev', 'rowspan', 'rules', 'size', 'scope', 'shape',
     'span', 'src', 'start', 'style', 'summary', 'tabindex', 'target', 'title', 'type', 'valign', 'value', 'vspace',
     'width', 'wrap'
-]}
+], 'img': [*BLEACH_ALLOWED_ATTRIBUTES['img'], 'usemap'], 'area': ['coords']}
 BLEACH_ALLOWED_STYLES_HTML = [
     'background-color', 'border-top-color', 'border-top-style', 'border-top-width', 'border-top', 'border-right-color',
     'border-right-style', 'border-right-width', 'border-right', 'border-bottom-color', 'border-bottom-style',
