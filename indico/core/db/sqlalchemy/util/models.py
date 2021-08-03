@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import os
+import typing as t
 from copy import copy
 from importlib import import_module
 
@@ -19,6 +20,9 @@ from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.util.packaging import get_package_root_path
+
+
+_ModelT = t.TypeVar('_ModelT', bound='IndicoModel')
 
 
 class IndicoBaseQuery(BaseQuery):
@@ -69,7 +73,7 @@ class IndicoModel(Model):
     query_class = IndicoBaseQuery
 
     @classmethod
-    def get(cls, oid, is_deleted=None):
+    def get(cls: t.Type[_ModelT], oid, is_deleted=None) -> _ModelT:
         """Get an object based on its primary key.
 
         :param oid: The primary key of the object
