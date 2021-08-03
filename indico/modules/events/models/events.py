@@ -38,6 +38,7 @@ from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixi
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.logs import EventLogEntry
+from indico.modules.logs.models.entries import CategoryLogRealm
 from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
@@ -915,6 +916,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         signals.event.moved.send(self, old_parent=old_category)
         self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
                  data={'From': old_path, 'To': new_path})
+        old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
+                         session.user, data={'ID': self.id, 'To': new_path})
+        category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
+                     session.user, data={'From': old_path})
 
     def delete(self, reason, user=None):
         from indico.modules.events import EventLogRealm, logger
@@ -924,6 +929,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.session.flush()
         logger.info('Event %r deleted [%s]', self, reason)
         self.log(EventLogRealm.event, LogKind.negative, 'Event', 'Event deleted', user, data={'Reason': reason})
+        if self.category:
+            self.category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event deleted: "{self.title}"',
+                              user, data={'ID': self.id, 'Reason': reason})
 
     def restore(self, reason=None, user=None):
         from indico.modules.events import EventLogRealm, logger
@@ -934,8 +942,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         signals.event.restored.send(self, user=user, reason=reason)
         db.session.flush()
         logger.info('Event %r restored [%s]', self, reason)
-        data = {'reason': reason} if reason else None
+        data = {'Reason': reason} if reason else None
         self.log(EventLogRealm.event, LogKind.positive, 'Event', 'Event restored', user=user, data=data)
+        if self.category:
+            self.category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event restored: "{self.title}"',
+                              user, data={'ID': self.id, 'Reason': reason})
 
     def refresh_event_persons(self, *, notify=True):
         """Update the data for all EventPersons based on the linked Users.

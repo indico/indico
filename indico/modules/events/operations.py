@@ -20,7 +20,7 @@ from indico.modules.events.layout import layout_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.logs.models.entries import LogKind
+from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import orig_string
 
@@ -108,7 +108,12 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     db.session.flush()
     signals.event.created.send(event, cloning=cloning)
     logger.info('Event %r created in %r by %r ', event, category, session.user)
-    event.log(EventLogRealm.event, LogKind.positive, 'Event', 'Event created', session.user)
+    sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+    event.log(EventLogRealm.event, LogKind.positive, 'Event', 'Event created', session.user,
+              data={'Category': sep.join(category.chain_titles) if category else None})
+    if category:
+        category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event created: "{event.title}"',
+                     session.user, data={'ID': event.id, 'Type': orig_string(event.type_.title)})
     db.session.flush()
     if create_booking:
         room_id = data['location_data'].pop('room_id', None)
