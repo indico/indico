@@ -10,9 +10,12 @@ Version 3.1
 Major Features
 ^^^^^^^^^^^^^^
 
+- Category managers now see a log of all changes made to their category in a
+  category log (similar to the event log). This log includes information about
+  all events being created, deleted or moved in the category (:issue:`2809`,
+  :pr:`5029`)
 - TODO write something about unlisted events
 - TODO write something about moderated categories
-- TODO write something about the category log
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
