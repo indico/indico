@@ -28,6 +28,7 @@ from indico.modules.categories.operations import (create_category, delete_catego
 from indico.modules.categories.util import get_image_data, serialize_category_role
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
+from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
@@ -440,6 +441,8 @@ class RHAddCategoryRole(RHManageCategoryBase):
             form.populate_obj(role)
             db.session.flush()
             logger.info('Category role %r created by %r', role, session.user)
+            self.category.log(CategoryLogRealm.category, LogKind.positive, 'Roles',
+                              f'Added role: "{role.name}"', session.user)
             return jsonify_data(html=_render_roles(self.category), role=serialize_category_role(role))
         return jsonify_form(form)
 
@@ -472,6 +475,8 @@ class RHEditCategoryRole(RHManageCategoryRole):
             form.populate_obj(self.role)
             db.session.flush()
             logger.info('Category role %r updated by %r', self.role, session.user)
+            self.category.log(CategoryLogRealm.category, LogKind.change, 'Roles',
+                              f'Updated role: "{self.role.name}"', session.user)
             return jsonify_data(html=_render_role(self.role))
         return jsonify_form(form)
 
@@ -482,6 +487,8 @@ class RHDeleteCategoryRole(RHManageCategoryRole):
     def _process(self):
         db.session.delete(self.role)
         logger.info('Category role %r deleted by %r', self.role, session.user)
+        self.category.log(CategoryLogRealm.category, LogKind.negative, 'Roles',
+                          f'Deleted role: "{self.role.name}"', session.user)
         return jsonify_data(html=_render_roles(self.category))
 
 
@@ -498,6 +505,9 @@ class RHRemoveCategoryRoleMember(RHManageCategoryRole):
         if self.user in self.role.members:
             self.role.members.remove(self.user)
             logger.info('User %r removed from role %r by %r', self.user, self.role, session.user)
+            self.category.log(CategoryLogRealm.category, LogKind.negative, 'Roles',
+                              f'Removed user from role "{self.role.name}"', session.user,
+                              data={'Name': self.user.full_name, 'Email': self.user.email})
         return jsonify_data(html=_render_role(self.role, collapsed=False))
 
 
@@ -511,6 +521,9 @@ class RHAddCategoryRoleMembers(RHManageCategoryRole):
         for user in users - self.role.members:
             self.role.members.add(user)
             logger.info('User %r added to role %r by %r', user, self.role, session.user)
+            self.category.log(CategoryLogRealm.category, LogKind.positive, 'Roles',
+                              f'Added user to role "{self.role.name}"', session.user,
+                              data={'Name': user.full_name, 'Email': user.email})
         return jsonify_data(html=_render_role(self.role, collapsed=False))
 
 
