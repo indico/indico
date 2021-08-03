@@ -10,6 +10,7 @@ from flask import session
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events import EventLogRealm
 from indico.modules.logs import LogKind
+from indico.modules.logs.models.entries import CategoryLogRealm
 
 
 def update_template(template, title, data, is_clonable, backside_template_id=None, clear_background=False):
@@ -41,5 +42,8 @@ def update_template(template, title, data, is_clonable, backside_template_id=Non
         template.background_image = None
 
     if template.event:
-        template.event.log(EventLogRealm.event, LogKind.positive, 'Designer', 'Badge template updated',
+        template.event.log(EventLogRealm.event, LogKind.change, 'Designer', 'Badge template updated',
                            session.user, data={'Template': template.title})
+    else:
+        template.category.log(CategoryLogRealm.category, LogKind.change, 'Designer', 'Badge template updated',
+                              session.user, data={'Template': template.title})
