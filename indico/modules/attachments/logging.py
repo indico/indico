@@ -14,6 +14,7 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.logs import EventLogRealm, LogKind
+from indico.modules.logs.models.entries import CategoryLogRealm
 
 
 def connect_log_signals():
@@ -27,13 +28,12 @@ def connect_log_signals():
 
 def _ignore_non_loggable(f):
     """
-    Only call the decorated function if the attachment/folder is not
-    linked to a category.
+    Only call the decorated function if the attachment/folder change
+    should be logged.
     """
     @wraps(f)
     def wrapper(sender, **kwargs):
-        folder = getattr(sender, 'folder', sender)  # sender may be a folder or attachment here
-        if folder.link_type != LinkType.category and not kwargs.get('internal'):
+        if not kwargs.get('internal'):
             f(sender, **kwargs)
 
     return wrapper
@@ -59,46 +59,43 @@ def _get_attachment_data(attachment):
     return data
 
 
-def _log(event, kind, msg, user, data):
-    event.log(EventLogRealm.management, kind, 'Materials', msg, user, data=data)
+def _log(folder, kind, msg, user, data):
+    if folder.link_type == LinkType.category:
+        folder.category.log(CategoryLogRealm.category, kind, 'Materials', msg, user, data=data)
+    else:
+        folder.event.log(EventLogRealm.management, kind, 'Materials', msg, user, data=data)
 
 
 @_ignore_non_loggable
 def _log_folder_created(folder, user, **kwargs):
-    event = folder.object.event
-    _log(event, LogKind.positive, f'Created folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(folder, LogKind.positive, f'Created folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_folder_deleted(folder, user, **kwargs):
-    event = folder.object.event
-    _log(event, LogKind.negative, f'Deleted folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(folder, LogKind.negative, f'Deleted folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_folder_updated(folder, user, **kwargs):
-    event = folder.object.event
-    _log(event, LogKind.change, f'Updated folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(folder, LogKind.change, f'Updated folder "{folder.title}"', user, _get_folder_data(folder))
 
 
 @_ignore_non_loggable
 def _log_attachment_created(attachment, user, **kwargs):
     if g.get('importing_event'):
         return
-    event = attachment.folder.object.event
-    _log(event, LogKind.positive, f'Added material "{attachment.title}"', user,
+    _log(attachment.folder, LogKind.positive, f'Added material "{attachment.title}"', user,
          _get_attachment_data(attachment))
 
 
 @_ignore_non_loggable
 def _log_attachment_deleted(attachment, user, **kwargs):
-    event = attachment.folder.object.event
-    _log(event, LogKind.negative, f'Deleted material "{attachment.title}"', user,
+    _log(attachment.folder, LogKind.negative, f'Deleted material "{attachment.title}"', user,
          _get_attachment_data(attachment))
 
 
 @_ignore_non_loggable
 def _log_attachment_updated(attachment, user, **kwargs):
-    event = attachment.folder.object.event
-    _log(event, LogKind.change, f'Updated material "{attachment.title}"', user,
+    _log(attachment.folder, LogKind.change, f'Updated material "{attachment.title}"', user,
          _get_attachment_data(attachment))
