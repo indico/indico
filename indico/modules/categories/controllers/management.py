@@ -341,6 +341,7 @@ class RHSortSubcategories(RHManageCategoryBase):
         subcategories = {category.id: category for category in self.category.children}
         for position, id_ in enumerate(request.json['categories'], 1):
             subcategories[id_].position = position
+        self.category.log(CategoryLogRealm.category, LogKind.change, 'Content', 'Subcategories sorted', session.user)
         return jsonify_data(flash=False)
 
 

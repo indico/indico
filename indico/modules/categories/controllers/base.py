@@ -23,7 +23,7 @@ class RHCategoryBase(RH):
             query = query.options(*self._category_query_options)
         return query
 
-    def _get_category(self, category_id):
+    def _get_category(self, category_id) -> Category:
         category = self._category_query.filter_by(id=category_id, is_deleted=False).one_or_none()
         if category is None and category_id == 0:
             category = Category.get_root()

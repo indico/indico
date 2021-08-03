@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import pytz
+from flask import session
 from sqlalchemy import DDL, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, array
 from sqlalchemy.event import listens_for
@@ -23,7 +24,7 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.modules.logs.models.entries import CategoryLogEntry
+from indico.modules.logs.models.entries import CategoryLogEntry, CategoryLogRealm, LogKind
 from indico.util.date_time import get_display_tz
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
@@ -329,7 +330,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return user and ((not self.event_creation_restricted and self.can_access(user)) or
                          self.can_manage(user, permission='create'))
 
-    def move(self, target):
+    def move(self, target: 'Category'):
         """Move the category into another category."""
         assert not self.is_root
         old_parent = self.parent
@@ -337,6 +338,15 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         self.parent = target
         db.session.flush()
         signals.category.moved.send(self, old_parent=old_parent)
+        sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+        self.log(CategoryLogRealm.category, LogKind.change, 'Category', 'Category moved', session.user,
+                 data={'From': sep.join(old_parent.chain_titles),
+                       'To': sep.join(target.chain_titles)})
+        old_parent.log(CategoryLogRealm.category, LogKind.negative, 'Content', f'Subcategory moved out: "{self.title}"',
+                       session.user, data={'To': sep.join(target.chain_titles)})
+        target.log(CategoryLogRealm.category, LogKind.positive, 'Content',
+                   f'Subcategory moved in: "{self.title}"', session.user,
+                   data={'From': sep.join(old_parent.chain_titles)})
 
     @classmethod
     def get_tree_cte(cls, col='id'):

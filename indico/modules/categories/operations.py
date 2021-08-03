@@ -25,6 +25,11 @@ def create_category(parent, data):
     db.session.flush()
     signals.category.created.send(category)
     logger.info('Category %s created by %s', category, session.user)
+    sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+    category.log(CategoryLogRealm.category, LogKind.positive, 'Category', 'Category created', session.user,
+                 data={'Location': sep.join(category.chain_titles[:-1])})
+    parent.log(CategoryLogRealm.category, LogKind.positive, 'Content', f'Subcategory created: "{category.title}"',
+               session.user)
     return category
 
 
@@ -33,6 +38,9 @@ def delete_category(category):
     db.session.flush()
     signals.category.deleted.send(category)
     logger.info('Category %s deleted by %s', category, session.user)
+    category.log(CategoryLogRealm.category, LogKind.negative, 'Category', 'Category deleted', session.user)
+    category.parent.log(CategoryLogRealm.category, LogKind.negative, 'Content',
+                        f'Subcategory deleted: "{category.title}"', session.user)
 
 
 def move_category(category, target_category):
