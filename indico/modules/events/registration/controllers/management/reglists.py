@@ -22,7 +22,7 @@ from indico.core.notifications import make_email, send_email
 from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.designer.util import get_inherited_templates
+from indico.modules.designer.util import get_badge_format, get_inherited_templates
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
@@ -40,9 +40,8 @@ from indico.modules.events.registration.models.items import PersonalDataType, Re
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
-from indico.modules.events.registration.util import (BadgeFormatMixin, create_registration,
-                                                     generate_spreadsheet_from_registrations, get_event_section_data,
-                                                     get_ticket_attachments, get_title_uuid,
+from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
+                                                     get_event_section_data, get_ticket_attachments, get_title_uuid,
                                                      import_registrations_from_csv, make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
@@ -428,7 +427,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         return send_file(f'Badges-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
 
 
-class RHRegistrationsConfigBadges(BadgeFormatMixin, RHRegistrationsActionBase):
+class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     """Print badges for the selected registrations."""
 
     ALLOW_LOCKED = True
@@ -457,7 +456,7 @@ class RHRegistrationsConfigBadges(BadgeFormatMixin, RHRegistrationsActionBase):
             'data': tpl.data,
             'backside_tpl_id': tpl.backside_template_id,
             'orientation': 'landscape' if tpl.data['width'] > tpl.data['height'] else 'portrait',
-            'format': self._get_format(tpl)
+            'format': get_badge_format(tpl)
         } for tpl in all_templates if tpl.type.name == 'badge'}
         settings = event_badge_settings.get_all(self.event.id)
         form = BadgeSettingsForm(self.event, template=self.template_id, tickets=self.TICKET_BADGES, **settings)
