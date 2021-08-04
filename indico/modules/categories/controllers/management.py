@@ -27,7 +27,8 @@ from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm,
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.categories.models.roles import CategoryRole
-from indico.modules.categories.operations import create_category, delete_category, move_category, update_category, update_category_protection, update_event_move_request
+from indico.modules.categories.operations import (create_category, delete_category, move_category, update_category,
+                                                  update_category_protection, update_event_move_request)
 from indico.modules.categories.schemas import EventMoveRequestSchema
 from indico.modules.categories.util import get_image_data, serialize_category_role
 from indico.modules.categories.views import WPCategoryManagement

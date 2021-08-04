@@ -11,10 +11,10 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.models.categories import Category
+from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.categories.util import format_visibility
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
-from indico.modules.categories.models.event_move_request import MoveRequestState
 
 
 def create_category(parent, data):
@@ -63,7 +63,10 @@ def update_category(category, data, skip=()):
 
 
 def update_category_protection(category, data):
-    assert set(data) <= {'protection_mode', 'own_no_access_contact', 'event_creation_restricted', 'visibility', 'event_requires_approval'}
+    assert set(data) <= {
+        'protection_mode', 'own_no_access_contact', 'event_creation_restricted',
+        'visibility', 'event_requires_approval'
+    }
     changes = category.populate_from_dict(data)
     db.session.flush()
     signals.category.updated.send(category, changes=changes)

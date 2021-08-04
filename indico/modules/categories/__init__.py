@@ -13,8 +13,8 @@ from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
 from indico.modules.categories.models.categories import Category
-from indico.modules.logs.models.entries import CategoryLogRealm
 from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
+from indico.modules.logs.models.entries import CategoryLogRealm
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
