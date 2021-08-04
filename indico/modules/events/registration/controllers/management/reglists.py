@@ -40,8 +40,9 @@ from indico.modules.events.registration.models.items import PersonalDataType, Re
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
-from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
-                                                     get_event_section_data, get_ticket_attachments, get_title_uuid,
+from indico.modules.events.registration.util import (BadgeFormatMixin, create_registration,
+                                                     generate_spreadsheet_from_registrations, get_event_section_data,
+                                                     get_ticket_attachments, get_title_uuid,
                                                      import_registrations_from_csv, make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
@@ -427,25 +428,11 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         return send_file(f'Badges-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
 
 
-class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
+class RHRegistrationsConfigBadges(BadgeFormatMixin, RHRegistrationsActionBase):
     """Print badges for the selected registrations."""
 
     ALLOW_LOCKED = True
     TICKET_BADGES = False
-
-    format_map_portrait = {
-        'A0': (84.1, 118.9),
-        'A1': (59.4, 84.1),
-        'A2': (42.0, 59.4),
-        'A3': (29.7, 42.0),
-        'A4': (21.0, 29.7),
-        'A5': (14.8, 21.0),
-        'A6': (10.5, 14.8),
-        'A7': (7.4, 10.5),
-        'A8': (5.2, 7.4),
-    }
-
-    format_map_landscape = {name: (h, w) for name, (w, h) in format_map_portrait.items()}
 
     def _process_args(self):
         RHManageRegFormBase._process_args(self)
@@ -456,13 +443,6 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
                               .order_by(*Registration.order_by_name)
                               .all()) if ids else []
         self.template_id = request.args.get('template_id', self._default_template_id)
-
-    def _get_format(self, tpl):
-        from indico.modules.designer.pdf import PIXELS_CM
-        format_map = self.format_map_landscape if tpl.data['width'] > tpl.data['height'] else self.format_map_portrait
-        return next((frm for frm, frm_size in format_map.items()
-                     if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM and
-                         frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
 
     @property
     def _default_template_id(self):

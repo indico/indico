@@ -630,3 +630,28 @@ def serialize_registration_form(regform):
         'identifier': f'RegistrationForm:{regform.id}',
         '_type': 'RegistrationForm'
     }
+
+
+class BadgeFormatMixin(object):
+    """Mixin for RHs that generate badge PDF files."""
+
+    format_map_portrait = {
+        'A0': (84.1, 118.9),
+        'A1': (59.4, 84.1),
+        'A2': (42.0, 59.4),
+        'A3': (29.7, 42.0),
+        'A4': (21.0, 29.7),
+        'A5': (14.8, 21.0),
+        'A6': (10.5, 14.8),
+        'A7': (7.4, 10.5),
+        'A8': (5.2, 7.4),
+    }
+
+    format_map_landscape = {name: (h, w) for name, (w, h) in format_map_portrait.items()}
+
+    def _get_format(self, tpl):
+        from indico.modules.designer.pdf import PIXELS_CM
+        format_map = self.format_map_landscape if tpl.data['width'] > tpl.data['height'] else self.format_map_portrait
+        return next((frm for frm, frm_size in format_map.items()
+                     if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM and
+                         frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
