@@ -1,7 +1,7 @@
 """Add event category request
 
 Revision ID: 9d00917b2fa8
-Revises: 1cec32e42f65
+Revises: 4b097412a8d9
 Create Date: 2021-07-15 12:11:28.157824
 """
 from enum import Enum
@@ -14,7 +14,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = '9d00917b2fa8'
-down_revision = '1cec32e42f65'
+down_revision = '4b097412a8d9'
 branch_labels = None
 depends_on = None
 
