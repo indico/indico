@@ -131,7 +131,7 @@ class RHAPIEventMoveRequests(RHManageCategoryBase):
 
     @use_kwargs({
         'accept': fields.Bool(required=True),
-        'reason': fields.String()
+        'reason': fields.String(missing=None)
     })
     def _process_POST(self, accept, reason):
         move_requests = parser.parse({
