@@ -110,8 +110,9 @@ class EventMoveRequest(db.Model):
         return dict(self.event.locator, request_id=self.id)
 
     def withdraw(self, user=None):
-        from indico.modules.events import EventLogKind, EventLogRealm
+        from indico.modules.events import EventLogRealm
+        from indico.modules.logs import LogKind
         assert self.state == MoveRequestState.pending
         self.state = MoveRequestState.withdrawn
         db.session.flush()
-        self.event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Move request withdrawn', user=user)
+        self.event.log(EventLogRealm.event, LogKind.change, 'Event', 'Move request withdrawn', user=user)

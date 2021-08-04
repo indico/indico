@@ -14,7 +14,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.categories.models.event_move_request import EventMoveRequest
 from indico.modules.categories.util import format_visibility
-from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
+from indico.modules.events import Event, EventLogRealm, logger
 from indico.modules.events.cloning import EventCloner, get_event_cloners
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
@@ -392,6 +392,6 @@ def create_event_request(event, category):
     rq = EventMoveRequest(event=event, category=category, submitter=session.user)
     db.session.flush()
     logger.info('Category move request %s to %s created by %s', rq, category, session.user)
-    event.log(EventLogRealm.event, EventLogKind.change, 'Event', f'Move request to {category.title} created',
+    event.log(EventLogRealm.event, LogKind.change, 'Event', f'Move request to {category.title} created',
               user=session.user)
     return rq
