@@ -112,4 +112,9 @@ def update_event_move_request(request, accept, reason=None):
     if accept:
         request.state = MoveRequestState.accepted
         request.event.move(request.category)
+    else:
+        category = request.category
+        sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+        category.log(CategoryLogRealm.category, LogKind.negative, 'Category', 'Move request rejected', session.user,
+                     data={'Location': sep.join(category.chain_titles), 'Reason': reason})
     db.session.flush()
