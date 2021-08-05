@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import sys
 from collections import Counter
 from copy import deepcopy
 from datetime import date, datetime
@@ -197,15 +198,28 @@ class MultiChoiceField(ChoiceBaseField):
     def default_value(self):
         return {}
 
+    def _get_display_index(self, choice_order, uuid):
+        try:
+            return choice_order.index(uuid)
+        except ValueError:
+            return sys.maxsize
+
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         def _format_item(uuid, number_of_slots):
             caption = self.form_item.data['captions'][uuid]
             return f'{caption} (+{number_of_slots - 1})' if number_of_slots > 1 else caption
 
         reg_data = registration_data.data
+
         if not reg_data:
             return ''
-        choices = sorted(_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.items())
+
+        # Preserve the original multi choice field order given by
+        # the field when getting the selected choices.
+        field_choice_order = [x['id'] for x in registration_data.field_data.field.view_data['choices']]
+        reg_data = dict(sorted(reg_data.items(), key=lambda x: self._get_display_index(field_choice_order, x[0])))
+        choices = [_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.items()]
+
         return ', '.join(choices) if for_humans or for_search else choices
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False, new_data_version=None):
