@@ -84,7 +84,10 @@ i[class^='icon-']::before {
  *      - icomoon.zip/selection.json to indico/web/static/fonts/icomoon/
  *      - Replace the icon definitions between the comments below with the ones found in icomoon.zip/style.css
           (pay attention to the indentation!)
-        - Replace any underscores with dashes in the css
+        - Replace any underscores with dashes in the css (icon-drag_indicator -> icon-drag-indicator)
+        - Run stylelint `npx stylelint --fix indico/web/client/styles/partials/_icons.scss` or add
+          another colon to all pseudo-element selectors:
+          .icon-agreement:before should be .icon-agreement::before
  */
 
 /* Icomoon's icon definitions */
@@ -159,6 +162,9 @@ i[class^='icon-']::before {
 }
 .icon-close::before {
   content: '\3b';
+}
+.icon-cloud2::before {
+  content: '\ec79';
 }
 .icon-code::before {
   content: '\e480';
