@@ -131,7 +131,9 @@ class ContributionField(db.Model):
 
     @property
     def filter_choices(self):
-        return {x['id']: x['option'] for x in self.field_data.get('options', {})}
+        choices = {x['id']: x['option'] for x in self.field_data.get('options', {})}
+        choices['_None'] = _('No selection')
+        return choices
 
     def __repr__(self):
         return format_repr(self, 'id', 'field_type', is_required=False, is_active=True, _text=self.title)

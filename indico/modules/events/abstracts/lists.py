@@ -115,10 +115,37 @@ class AbstractListGeneratorBase(ListGeneratorBase):
 
         if field_filters:
             for contribution_type_id, field_values in field_filters.items():
-                criteria.append(Abstract.field_values.any(db.and_(
+
+                field_value_criteria = db.and_(
                     AbstractFieldValue.contribution_field_id == contribution_type_id,
                     AbstractFieldValue.data.op('#>>')('{}').in_(field_values)
-                )))
+                )
+
+                # Support filtering by 'No selection' in single-choice abstract fields.
+                if '_None' in field_values:
+                    field_value_criteria = db.or_(
+                        field_value_criteria,
+                        db.and_(
+                            AbstractFieldValue.contribution_field_id == contribution_type_id,
+                            AbstractFieldValue.data.op('#>>')('{}').is_(None)
+                        )
+                    )
+
+                    # Handle the case when there is no value in
+                    # 'Abstract.field_values' matching the 'contribution_type_id'.
+                    # This can happen when custom fields are added after the
+                    # abstract had already been submitted or when submitting as a regular
+                    # user who cannot see a field that is only editable by managers.
+                    # In these cases, we still want to show the abstracts.
+                    criteria.append(
+                        db.or_(
+                            Abstract.field_values.any(field_value_criteria),
+                            ~(Abstract.field_values.any(
+                              AbstractFieldValue.contribution_field_id == contribution_type_id))
+                        )
+                    )
+                else:
+                    criteria.append(Abstract.field_values.any(field_value_criteria))
 
         if item_filters:
             static_filters = {

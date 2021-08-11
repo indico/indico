@@ -7,6 +7,11 @@ Version 3.0.1
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Allow filtering abstracts by custom fields having no value (:issue:`5033`, :pr:`5034`)
+
 Bugfixes
 ^^^^^^^^
 
