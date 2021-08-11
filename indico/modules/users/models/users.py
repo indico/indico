@@ -402,7 +402,7 @@ class User(PersonMixin, db.Model):
     # - editor_for_editables (Editable.editor)
     # - editor_for_revisions (EditingRevision.editor)
     # - event_log_entries (EventLogEntry.user)
-    # - event_move_requests (EventMoveRequest.submitter)
+    # - event_move_requests (EventMoveRequest.requestor)
     # - event_notes_revisions (EventNoteRevision.user)
     # - event_persons (EventPerson.user)
     # - event_reminders (EventReminder.creator)

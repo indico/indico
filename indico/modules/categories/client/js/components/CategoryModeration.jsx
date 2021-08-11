@@ -39,8 +39,8 @@ function PlaceholderTableRow() {
   );
 }
 
-function RequestTableRow({submitter, event, submittedDt, selected, onSelect}) {
-  const {fullName, avatarURL, affiliation} = submitter;
+function RequestTableRow({requestor, event, requestedDt, selected, onSelect}) {
+  const {fullName, avatarURL, affiliation} = requestor;
   return (
     <Table.Row>
       <Table.Cell collapsing>
@@ -55,13 +55,13 @@ function RequestTableRow({submitter, event, submittedDt, selected, onSelect}) {
       <Table.Cell>
         <a href={eventURL({event_id: event.id})}>{event.title}</a>
       </Table.Cell>
-      <Table.Cell>{serializeDate(submittedDt)}</Table.Cell>
+      <Table.Cell>{serializeDate(requestedDt)}</Table.Cell>
     </Table.Row>
   );
 }
 
 RequestTableRow.propTypes = {
-  submitter: PropTypes.shape({
+  requestor: PropTypes.shape({
     fullName: PropTypes.string,
     avatarURL: PropTypes.string,
     affiliation: PropTypes.string,
@@ -70,7 +70,7 @@ RequestTableRow.propTypes = {
     id: PropTypes.number,
     title: PropTypes.string,
   }).isRequired,
-  submittedDt: PropTypes.string.isRequired,
+  requestedDt: PropTypes.string.isRequired,
   selected: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
 };
@@ -109,20 +109,20 @@ function RequestList({requests, onSubmit, loading}) {
           <Table.HeaderCell />
           <Translate as={Table.HeaderCell}>User</Translate>
           <Translate as={Table.HeaderCell}>Event</Translate>
-          <Translate as={Table.HeaderCell}>Submitted Date</Translate>
+          <Translate as={Table.HeaderCell}>Requested Date</Translate>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {loading ? (
           <PlaceholderTableRow />
         ) : (
-          requests.map(({id, submitter, event, submittedDt}) => (
+          requests.map(({id, requestor, event, requestedDt}) => (
             <RequestTableRow
               key={id}
               id={id}
               event={event}
-              submitter={submitter}
-              submittedDt={submittedDt}
+              requestor={requestor}
+              requestedDt={requestedDt}
               selected={selected.has(id)}
               onSelect={() => select(id)}
             />

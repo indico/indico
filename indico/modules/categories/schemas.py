@@ -26,7 +26,7 @@ class CategoryUserSchema(mm.SQLAlchemyAutoSchema):
 class EventMoveRequestSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventMoveRequest
-        fields = ('id', 'event', 'category_id', 'submitter', 'state', 'submitted_dt')
+        fields = ('id', 'event', 'category_id', 'requestor', 'state', 'requested_dt')
 
     event = fields.Nested(CategoryEventSchema)
-    submitter = fields.Nested(CategoryUserSchema)
+    requestor = fields.Nested(CategoryUserSchema)

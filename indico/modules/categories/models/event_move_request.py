@@ -25,8 +25,8 @@ class EventMoveRequest(db.Model):
     __tablename__ = 'event_move_requests'
     __table_args__ = (db.Index(None, 'event_id', unique=True,
                                postgresql_where=db.text(f'state = {MoveRequestState.pending}')),
-                      db.CheckConstraint(f'state in ({MoveRequestState.accepted}, {MoveRequestState.rejected}) '
-                                         f'AND moderator_id IS NOT NULL OR moderator_id IS NULL',
+                      db.CheckConstraint(f'(state in ({MoveRequestState.accepted}, {MoveRequestState.rejected}) '
+                                         f'AND moderator_id IS NOT NULL) OR moderator_id IS NULL',
                                          'moderator_state'),
                       {'schema': 'categories'})
 
@@ -41,12 +41,12 @@ class EventMoveRequest(db.Model):
     )
     category_id = db.Column(
         db.ForeignKey('categories.categories.id'),
-        nullable=True,
+        nullable=False,
         index=True
     )
-    submitter_id = db.Column(
+    requestor_id = db.Column(
         db.ForeignKey('users.users.id'),
-        nullable=True,
+        nullable=False,
         index=True
     )
     state = db.Column(
@@ -63,7 +63,7 @@ class EventMoveRequest(db.Model):
         db.ForeignKey('users.users.id'),
         nullable=True
     )
-    submitted_dt = db.Column(
+    requested_dt = db.Column(
         UTCDateTime,
         nullable=False,
         default=now_utc
@@ -87,10 +87,10 @@ class EventMoveRequest(db.Model):
             lazy='dynamic'
         )
     )
-    submitter = db.relationship(
+    requestor = db.relationship(
         'User',
         lazy=True,
-        foreign_keys=submitter_id,
+        foreign_keys=requestor_id,
         backref=db.backref(
             'event_move_requests',
             lazy='dynamic'
