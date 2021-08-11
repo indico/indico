@@ -11,6 +11,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Allow filtering abstracts by custom fields having no value (:issue:`5033`, :pr:`5034`)
+- Add support for syncing email addresses when logging in using external accounts
+  (:pr:`5035`)
 
 Bugfixes
 ^^^^^^^^

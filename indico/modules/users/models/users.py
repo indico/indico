@@ -138,7 +138,8 @@ syncable_fields = {
     'last_name': _('family name'),
     'affiliation': _('affiliation'),
     'address': _('address'),
-    'phone': _('phone number')
+    'phone': _('phone number'),
+    'email': _('primary email address'),
 }
 
 
@@ -639,7 +640,7 @@ class User(PersonMixin, db.Model):
             query = query.filter_by(revoked_dt=None)
         return query
 
-    def synchronize_data(self, refresh=False):
+    def synchronize_data(self, refresh=False, silent=False):
         """Synchronize the fields of the user from the sync identity.
 
         This will take only into account :attr:`synced_fields`.
@@ -648,20 +649,56 @@ class User(PersonMixin, db.Model):
                         with the sync provider before instead of using
                         the stored data. (Only if the sync provider
                         supports refresh.)
+        :param silent: bool -- Whether to just synchronize but not flash
+                       any messages
         """
+        from indico.modules.users import logger
         identity = self._get_synced_identity(refresh=refresh)
         if identity is None:
+            return
+        if not any(identity.data.values()):
+            # refuse to sync with empty identities, just in case - if there is no
+            # data at all there's a good chance something is wrong!
             return
         for field in self.synced_fields:
             old_value = getattr(self, field)
             new_value = identity.data.get(field) or ''
-            if field in ('first_name', 'last_name') and not new_value:
+            if field == 'email':
+                new_value = new_value.lower()
+            if field in ('first_name', 'last_name', 'email') and not new_value:
                 continue
             if old_value == new_value:
                 continue
-            flash(_("Your {field_name} has been synchronized from '{old_value}' to '{new_value}'.").format(
-                  field_name=syncable_fields[field], old_value=old_value, new_value=new_value))
-            setattr(self, field, new_value)
+            logger.info('Syncing %s for %r from %r to %r', field, self, old_value, new_value)
+            if field == 'email':
+                if not self._synchronize_email(new_value):
+                    if not silent:
+                        flash(_("Your email address could not be synchronized from '{old_value}' to "
+                                "'{new_value}' due to a conflict with another Indico profile.")
+                              .format(old_value=old_value, new_value=new_value), 'warning')
+                    continue
+            else:
+                setattr(self, field, new_value)
+            if not silent:
+                flash(_("Your {field_name} has been synchronized from '{old_value}' to '{new_value}'.").format(
+                    field_name=syncable_fields[field], old_value=old_value, new_value=new_value))
+
+    def _synchronize_email(self, email):
+        from indico.modules.users import logger
+        from indico.modules.users.tasks import update_gravatars
+        from indico.modules.users.util import get_user_by_email
+
+        if email not in self.secondary_emails:
+            if other := get_user_by_email(email):
+                logger.warning('Cannot sync email for %r to %r; already used by %r', self, email, other)
+                return False
+            self.secondary_emails.add(email)
+            signals.users.email_added.send(self, email=email)
+
+        self.make_email_primary(email)
+        if self.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon):
+            update_gravatars.delay(self)
+        return True
 
     def _get_synced_identity(self, refresh=False):
         sync_provider = multipass.sync_provider

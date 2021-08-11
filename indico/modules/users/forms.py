@@ -19,6 +19,7 @@ from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat, UserTitle
 from indico.util.i18n import _, get_all_locales
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
 from indico.web.forms.fields import IndicoEnumSelectField, MultiStringField, PrincipalField, PrincipalListField
 from indico.web.forms.util import inject_validators
@@ -33,6 +34,14 @@ class UserDetailsForm(SyncedInputsMixin, IndicoForm):
     affiliation = StringField(_('Affiliation'), widget=SyncedInputWidget())
     address = TextAreaField(_('Address'), widget=SyncedInputWidget(textarea=True))
     phone = StringField(_('Phone number'), widget=SyncedInputWidget())
+    email = StringField(_('Email address'), widget=SyncedInputWidget(), render_kw={'disabled': True})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.email.description = (
+            _('You can manage your email addresses {link}here{endlink}.')
+            .format(link=f'<a href="{url_for(".user_emails")}">', endlink='</a>')
+        )
 
 
 class UserPreferencesForm(IndicoForm):
