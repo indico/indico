@@ -81,7 +81,7 @@ RequestTableRow.defaultProps = {
 
 function RequestList({requests, onSubmit, loading}) {
   const [selected, _setSelected] = useState(new Set());
-  const [reason, setReason] = useState(undefined);
+  const [reason, setReason] = useState('');
   const isAnySelected = selected.size > 0;
 
   const submit = accept => {
