@@ -278,7 +278,7 @@ function initializeEditor(
       format_tags: 'p;h1;h2;h3;pre',
       removeDialogTabs: 'image:advanced;link:advanced',
       // Note: *(*) => allow additional classes on any allowed element
-      extraAllowedContent: 'dl dt dd div span pre; *(*)',
+      extraAllowedContent: 'dl dt dd div span pre; *(*); img[usemap]; area[*]; map[*]',
     };
 
     if (simple) {

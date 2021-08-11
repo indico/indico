@@ -46,17 +46,25 @@ Version 3.0.1
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Allow filtering abstracts by custom fields having no value (:issue:`5033`, :pr:`5034`)
+
 Bugfixes
 ^^^^^^^^
 
 - Show correct placeholders in date picker fields (:pr:`5022`)
 - Correctly preselect the default currency when creating a registration form
 - Do not notify registrants when a payment transaction is created in "pending" state
+- Keep the order of multi-choice options in registration summary (:issue:`5020`, :pr:`5032`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Add ``event.before_check_registration_email`` signal (:pr:`5021`, thanks :user:`omegak`)
+- Do not strip image maps in places where HTML is allowed (:pr:`5026`, thanks
+  :user:`bpedersen2`)
 
 
 Version 3.0
