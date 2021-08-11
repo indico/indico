@@ -13,7 +13,7 @@ from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
+from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.logs.models.entries import CategoryLogRealm
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -43,9 +43,11 @@ def _merge_users(target, source, **kwargs):
 
 
 def _is_moderation_visible(category):
-    return category.event_requires_approval or category.event_move_requests.filter(
-        EventMoveRequest.state == MoveRequestState.pending).first() or any(
-        ['event_move_request' in e.permissions for e in category.acl_entries])
+    return (
+        category.event_requires_approval or
+        category.event_move_requests.filter_by(state=MoveRequestState.pending).has_rows() or
+        any('event_move_request' in entry.permissions for entry in category.acl_entries)
+    )
 
 
 @signals.menu.items.connect_via('category-management-sidemenu')
