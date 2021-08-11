@@ -105,7 +105,7 @@ def _log_category_update(category, changes):
     logger.info('Category %s updated by %s', category, session.user)
 
 
-def update_event_move_request(request, accept, reason=None):
+def update_event_move_request(request, accept, reason=''):
     request.state = MoveRequestState.rejected
     request.moderator_comment = reason
     request.moderator = session.user
