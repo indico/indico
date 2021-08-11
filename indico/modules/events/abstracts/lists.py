@@ -84,7 +84,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         filters = super()._get_filters_from_request()
         for field in self.event.contribution_fields:
             if field.field_type == 'single_choice':
-                options = request.form.getlist(f'field_{field.id}')
+                options = [x if x != 'None' else None for x in request.form.getlist(f'field_{field.id}')]
                 if options:
                     filters['fields'][str(field.id)] = options
         return filters
@@ -114,38 +114,33 @@ class AbstractListGeneratorBase(ListGeneratorBase):
             return query
 
         if field_filters:
-            for contribution_type_id, field_values in field_filters.items():
-
-                field_value_criteria = db.and_(
-                    AbstractFieldValue.contribution_field_id == contribution_type_id,
-                    AbstractFieldValue.data.op('#>>')('{}').in_(field_values)
-                )
+            for field_id, field_values in field_filters.items():
+                field_values = set(field_values)
 
                 # Support filtering by 'No selection' in single-choice abstract fields.
-                if '_None' in field_values:
-                    field_value_criteria = db.or_(
-                        field_value_criteria,
-                        db.and_(
-                            AbstractFieldValue.contribution_field_id == contribution_type_id,
-                            AbstractFieldValue.data.op('#>>')('{}').is_(None)
-                        )
-                    )
-
+                field_criteria = []
+                if None in field_values:
                     # Handle the case when there is no value in
-                    # 'Abstract.field_values' matching the 'contribution_type_id'.
+                    # 'Abstract.field_values' matching the 'field_id'.
                     # This can happen when custom fields are added after the
                     # abstract had already been submitted or when submitting as a regular
                     # user who cannot see a field that is only editable by managers.
                     # In these cases, we still want to show the abstracts.
-                    criteria.append(
-                        db.or_(
-                            Abstract.field_values.any(field_value_criteria),
-                            ~(Abstract.field_values.any(
-                              AbstractFieldValue.contribution_field_id == contribution_type_id))
-                        )
-                    )
-                else:
-                    criteria.append(Abstract.field_values.any(field_value_criteria))
+                    field_values.discard(None)
+                    field_criteria += [
+                        ~Abstract.field_values.any(AbstractFieldValue.contribution_field_id == field_id),
+                        Abstract.field_values.any(db.and_(
+                            AbstractFieldValue.contribution_field_id == field_id,
+                            AbstractFieldValue.data.op('#>>')('{}').is_(None)
+                        ))
+                    ]
+                if field_values:
+                    field_criteria.append(Abstract.field_values.any(db.and_(
+                        AbstractFieldValue.contribution_field_id == field_id,
+                        AbstractFieldValue.data.op('#>>')('{}').in_(field_values)
+                    )))
+
+                criteria.append(db.or_(*field_criteria))
 
         if item_filters:
             static_filters = {
