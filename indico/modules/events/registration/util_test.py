@@ -9,12 +9,14 @@ from datetime import datetime
 from io import BytesIO
 
 import pytest
+from flask import session
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
-                                                     get_registered_event_persons, import_registrations_from_csv)
+from indico.modules.events.registration.util import (check_registration_email, create_registration,
+                                                     get_event_regforms_registrations, get_registered_event_persons,
+                                                     import_registrations_from_csv)
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -221,3 +223,152 @@ def test_get_registered_event_persons(dummy_event, dummy_user, dummy_regform):
 
     registered_persons = get_registered_event_persons(dummy_event)
     assert registered_persons == {user_person, no_user_person}
+
+
+def test_check_registration_email_invalid(request_context, dummy_regform):
+    email = 'notanemailaddress'
+    check = check_registration_email(dummy_regform, email)
+    assert check['status'] == 'error'
+    assert check['conflict'] == 'email-invalid'
+
+    registration = create_registration(dummy_regform, {
+        'email': email, 'first_name': 'Guinea', 'last_name': 'Pig'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email, registration=registration)
+    assert check['status'] == 'ok'
+
+    check = check_registration_email(dummy_regform, 'anotherinvalidaddress', registration=registration)
+    assert check['status'] == 'error'
+    assert check['conflict'] == 'email-invalid'
+
+
+def test_check_registration_email_ok(request_context, create_user, dummy_regform):
+    email = 'foo@bar.com'
+    check = check_registration_email(dummy_regform, email)
+    assert check['status'] == 'ok'
+
+    user = create_user(123, email=email)
+    check = check_registration_email(dummy_regform, email)
+    assert check['status'] == 'ok'
+    assert check['user'] == user.full_name
+
+    email = 'john@doe.com'
+    registration = create_registration(dummy_regform, {
+        'email': email, 'first_name': 'Guinea', 'last_name': 'Pig'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email, registration=registration)
+    assert check['status'] == 'ok'
+
+    user = create_user(456, email=email)
+    check = check_registration_email(dummy_regform, email, registration=registration)
+    assert check['status'] == 'ok'
+    assert check['user'] == user.full_name
+
+
+def test_check_registration_email_email_already_registered(request_context, dummy_regform):
+    email = 'foo@bar.com'
+    create_registration(dummy_regform, {
+        'email': email, 'first_name': 'Guinea', 'last_name': 'Pig'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email)
+    assert check['status'] == 'error'
+    assert check['conflict'] == 'email-already-registered'
+
+    registration = create_registration(dummy_regform, {
+        'email': 'john@doe.com', 'first_name': 'John', 'last_name': 'Doe'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email, registration=registration)
+    assert check['status'] == 'error'
+    assert check['conflict'] == 'email-already-registered'
+
+
+def test_check_registration_email_user_already_registered(request_context, dummy_regform, create_user):
+    email = 'foo@bar.com'
+    other_email = 'bar@foo.com'
+    user = create_user(123, email=email)
+    user.secondary_emails.add(other_email)
+    db.session.flush()
+    create_registration(dummy_regform, {
+        'email': other_email, 'first_name': 'Guinea', 'last_name': 'Pig'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email)
+    assert check['status'] == 'error'
+    assert check['conflict'] == 'user-already-registered'
+
+    registration = create_registration(dummy_regform, {
+        'email': 'john@doe.com', 'first_name': 'John', 'last_name': 'Doe'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email, registration=registration)
+    assert check['status'] == 'error'
+    assert check['conflict'] == 'user-already-registered'
+
+
+@pytest.mark.parametrize(('management', 'expected_status'), (
+    (False, 'error'),
+    (True, 'warning')
+))
+def test_check_registration_email_email_other_user(request_context, dummy_regform, create_user,
+                                                   management, expected_status):
+    email = 'foo@bar.com'
+    user = create_user(123, email=email)
+    other_email = 'john@doe.com'
+    create_user(456, email=other_email)
+    registration = create_registration(dummy_regform, {
+        'email': other_email, 'first_name': 'John', 'last_name': 'Doe'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email, registration=registration, management=management)
+    assert check['status'] == expected_status
+    assert check['conflict'] == 'email-other-user'
+    assert check['user'] == user.full_name
+
+
+@pytest.mark.parametrize(('management', 'expected_status'), (
+    (False, 'error'),
+    (True, 'warning')
+))
+def test_check_registration_email_email_no_user(request_context, dummy_regform, create_user,
+                                                management, expected_status):
+    email = 'foo@bar.com'
+    other_email = 'john@doe.com'
+    other_user = create_user(123, email=other_email)
+    registration = create_registration(dummy_regform, {
+        'email': other_email, 'first_name': 'John', 'last_name': 'Doe'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email, registration=registration, management=management)
+    assert check['status'] == expected_status
+    assert check['conflict'] == 'email-no-user'
+    assert check['user'] == other_user.full_name
+
+
+@pytest.mark.parametrize(('management', 'expected_status'), (
+    (False, 'error'),
+    (True, 'warning')
+))
+def test_check_registration_email_no_user(request_context, dummy_regform, management, expected_status):
+    email = 'foo@bar.com'
+    dummy_regform.require_user = True
+    check = check_registration_email(dummy_regform, email, management=management)
+    assert check['status'] == expected_status
+    assert check['conflict'] == 'no-user'
+
+    registration = create_registration(dummy_regform, {
+        'email': 'john@doe.com', 'first_name': 'Guinea', 'last_name': 'Pig'
+    }, notify_user=False)
+    check = check_registration_email(dummy_regform, email, registration=registration, management=management)
+    assert check['status'] == expected_status
+    assert check['conflict'] == 'no-user'
+
+
+def test_check_registration_email_public_search_disabled(request_context, mocker, dummy_regform, create_user):
+    class MockConfig:
+        def __init__(self):
+            self.ALLOW_PUBLIC_USER_SEARCH = False
+    mocker.patch('indico.modules.events.registration.util.config', MockConfig())
+    email = 'foo@bar.com'
+    create_user(123, email=email)
+    other_email = 'john@doe.com'
+    other_user = create_user(456, email=other_email)
+    session.set_session_user(other_user)
+    check = check_registration_email(dummy_regform, email, management=False)
+    assert check['status'] == 'error'
+    assert check['conflict'] == 'email-other-user'
