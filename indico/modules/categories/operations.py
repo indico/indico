@@ -13,7 +13,7 @@ from indico.modules.categories import logger
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.categories.util import format_visibility
-from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
+from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 
 
@@ -114,7 +114,13 @@ def update_event_move_request(request, accept, reason=None):
         request.event.move(request.category)
     else:
         category = request.category
+        event = request.event
+
+        category.log(CategoryLogRealm.events, LogKind.negative, 'Moderation', 'Move request rejected', session.user,
+                     data={'Event ID': event.id, 'Event title': event.title, 'Reason': reason})
+
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
-        category.log(CategoryLogRealm.category, LogKind.negative, 'Category', 'Move request rejected', session.user,
-                     data={'Location': sep.join(category.chain_titles), 'Reason': reason})
+        event.log(EventLogRealm.event, LogKind.negative, 'Moderation', 'Move request rejected', session.user,
+                  data={'Category ID': category.id, 'Category': sep.join(category.chain_titles), 'Reason': reason})
+
     db.session.flush()

@@ -392,6 +392,7 @@ def create_event_request(event, category):
     rq = EventMoveRequest(event=event, category=category, requestor=session.user)
     db.session.flush()
     logger.info('Category move request %s to %s created by %s', rq, category, session.user)
+    sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
     event.log(EventLogRealm.event, LogKind.change, 'Event', f'Move request to {category.title} created',
-              user=session.user)
+              user=session.user, data={'Category ID': category.id, 'Category': sep.join(category.chain_titles)})
     return rq
