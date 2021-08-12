@@ -104,3 +104,9 @@ the ``RegistrationForm`` object.  The signal handler is expected to return
 dictionary.  ``'status'`` is expected to be either ``'error'``, ``'warning'`` or
 ``ok``.
 ''')
+
+after_registration_form_clone = _signals.signal('after-registration-form-clone', '''
+Executed after a registration form is cloned. The sender is the old ``RegistrationForm``
+object being cloned. The new ``RegistrationForm`` object is passed in the ``new_form``
+kwarg.
+''')
