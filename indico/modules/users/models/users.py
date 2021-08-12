@@ -671,7 +671,7 @@ class User(PersonMixin, db.Model):
                 continue
             logger.info('Syncing %s for %r from %r to %r', field, self, old_value, new_value)
             if field == 'email':
-                if not self._synchronize_email(new_value):
+                if not self._synchronize_email(new_value, silent=silent):
                     if not silent:
                         flash(_("Your email address could not be synchronized from '{old_value}' to "
                                 "'{new_value}' due to a conflict with another Indico profile.")
@@ -683,7 +683,7 @@ class User(PersonMixin, db.Model):
                 flash(_("Your {field_name} has been synchronized from '{old_value}' to '{new_value}'.").format(
                     field_name=syncable_fields[field], old_value=old_value, new_value=new_value))
 
-    def _synchronize_email(self, email):
+    def _synchronize_email(self, email, silent=False):
         from indico.modules.users import logger
         from indico.modules.users.tasks import update_gravatars
         from indico.modules.users.util import get_user_by_email
@@ -693,7 +693,7 @@ class User(PersonMixin, db.Model):
                 logger.warning('Cannot sync email for %r to %r; already used by %r', self, email, other)
                 return False
             self.secondary_emails.add(email)
-            signals.users.email_added.send(self, email=email)
+            signals.users.email_added.send(self, email=email, silent=silent)
 
         self.make_email_primary(email)
         if self.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon):

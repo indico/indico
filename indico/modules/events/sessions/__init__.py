@@ -44,10 +44,10 @@ def _merge_users(target, source, **kwargs):
 
 @signals.users.registered.connect
 @signals.users.email_added.connect
-def _convert_email_principals(user, **kwargs):
+def _convert_email_principals(user, silent=False, **kwargs):
     from indico.modules.events.sessions.models.principals import SessionPrincipal
     sessions = SessionPrincipal.replace_email_with_user(user, 'session')
-    if sessions:
+    if sessions and not silent:
         num = len(sessions)
         flash(ngettext('You have been granted manager/coordination privileges for a session.',
                        'You have been granted manager/coordination privileges for {} sessions.', num).format(num),

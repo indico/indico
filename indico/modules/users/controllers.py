@@ -440,7 +440,7 @@ class RHUserEmailsVerify(RHUserBase):
                 existing.is_pending = False
 
             self.user.secondary_emails.add(data['email'])
-            signals.users.email_added.send(self.user, email=data['email'])
+            signals.users.email_added.send(self.user, email=data['email'], silent=False)
             flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
         return redirect(url_for('.user_emails'))
 
