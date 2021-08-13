@@ -92,12 +92,14 @@ class RHMoveEvent(RHManageEventBase):
     def _process(self):
         if self.target_category.can_create_events(session.user):
             self.event.move(self.target_category)
-            flash(_('Event "{}" has been moved to category "{}"')
-                  .format(self.event.title, self.target_category.title), 'success')
+            flash(_('Event "{event}" has been moved to category "{category}"')
+                  .format(event=self.event.title, category=self.target_category.title),
+                  'success')
         else:
             create_event_request(self.event, self.target_category)
-            flash(_('Moving the event "{}" to "{}" has been requested and is pending approval')
-                  .format(self.event.title, self.target_category.title), 'success')
+            flash(_('Moving the event "{event}" to "{category}" has been requested and is pending approval')
+                  .format(event=self.event.title, category=self.target_category.title),
+                  'success')
         return jsonify_data(flash=False)
 
 
