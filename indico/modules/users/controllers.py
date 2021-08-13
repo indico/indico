@@ -200,7 +200,7 @@ class RHPersonalData(RHUserBase):
                                synced_fields=self.user.synced_fields, synced_values=self.user.synced_values)
         if form.validate_on_submit():
             self.user.synced_fields = form.synced_fields
-            form.populate_obj(self.user, skip=self.user.synced_fields)
+            form.populate_obj(self.user, skip=(self.user.synced_fields | {'email'}))
             self.user.synchronize_data(refresh=True)
             flash(_('Your personal data was successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
@@ -440,7 +440,7 @@ class RHUserEmailsVerify(RHUserBase):
                 existing.is_pending = False
 
             self.user.secondary_emails.add(data['email'])
-            signals.users.email_added.send(self.user, email=data['email'])
+            signals.users.email_added.send(self.user, email=data['email'], silent=False)
             flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
         return redirect(url_for('.user_emails'))
 
@@ -464,6 +464,10 @@ class RHUserEmailsSetPrimary(RHUserBase):
             if self.user.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon):
                 update_gravatars.delay(self.user)
             flash(_('Your primary email was updated successfully.'), 'success')
+            if 'email' in self.user.synced_fields:
+                self.user.synced_fields = self.user.synced_fields - {'email'}
+                flash(_('Email address synchronization has been disabled since you manually changed your primary'
+                        ' email address.'), 'warning')
         return redirect(url_for('.user_emails'))
 
 

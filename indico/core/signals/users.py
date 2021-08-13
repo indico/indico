@@ -39,6 +39,9 @@ user (i.e. the one being deleted in the merge) is passed via the *source* kwarg.
 email_added = _signals.signal('email-added', '''
 Called when a new email address is added to a user.  The *sender* is
 the user object and the email address is passed in the `email` kwarg.
+The `silent` kwarg indicates whether the email was added during some
+automated process where no messages should be flashed (e.g. because the sync
+was in a background task or triggered during a request from another user).
 ''')
 
 preferences = _signals.signal('preferences', '''

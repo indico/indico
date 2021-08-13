@@ -47,7 +47,6 @@ class IndicoMultipass(Multipass):
             return set()
         synced_fields = set(provider.settings.get('synced_fields'))
         synced_fields &= set(current_app.config['MULTIPASS_IDENTITY_INFO_KEYS'])
-        synced_fields.discard('email')
         return synced_fields
 
     def init_app(self, app):

@@ -194,14 +194,14 @@ def is_valid_mail(emails_string, multi=True):
     return validate_emails(emails_string) if multi else validate_email(emails_string)
 
 
-def validate_email(email):
+def validate_email(email, *, check_dns=True):
     """Validate the given email address.
 
     This checks both if it looks valid and if it has valid
     MX (or A/AAAA) records.
     """
     try:
-        email_validator.validate_email(email)
+        email_validator.validate_email(email, check_deliverability=check_dns)
     except email_validator.EmailNotValidError:
         return False
     else:

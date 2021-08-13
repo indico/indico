@@ -50,6 +50,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Allow filtering abstracts by custom fields having no value (:issue:`5033`, :pr:`5034`)
+- Add support for syncing email addresses when logging in using external accounts
+  (:pr:`5035`)
 
 Bugfixes
 ^^^^^^^^
@@ -65,6 +67,8 @@ Internal Changes
 - Add ``event.before_check_registration_email`` signal (:pr:`5021`, thanks :user:`omegak`)
 - Do not strip image maps in places where HTML is allowed (:pr:`5026`, thanks
   :user:`bpedersen2`)
+- Add ``event.registration.after_registration_form_clone`` signal (:pr:`5037`, thanks
+  :user:`vasantvohra`)
 
 
 Version 3.0

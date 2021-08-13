@@ -116,7 +116,7 @@ def _extend_event_menu(sender, **kwargs):
 
 @signals.users.registered.connect
 @signals.users.email_added.connect
-def _associate_registrations(user, **kwargs):
+def _associate_registrations(user, silent=False, **kwargs):
     from indico.modules.events.registration.models.registrations import Registration
     reg_alias = db.aliased(Registration)
     subquery = db.session.query(reg_alias).filter(reg_alias.user_id == user.id,
@@ -139,9 +139,10 @@ def _associate_registrations(user, **kwargs):
         registration.user = user
         done.add(registration.registration_form_id)
     db.session.flush()
-    num = len(done)
-    flash(ngettext('A registration has been linked to your account.',
-                   '{n} registrations have been linked to your account.', num).format(n=num), 'info')
+    if not silent:
+        num = len(done)
+        flash(ngettext('A registration has been linked to your account.',
+                       '{n} registrations have been linked to your account.', num).format(n=num), 'info')
 
 
 @signals.event_management.management_url.connect

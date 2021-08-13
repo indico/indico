@@ -81,9 +81,18 @@ The following keys are available in the provider data:
 - ``synced_fields`` -- This may be set in no more than once identity
   provider and enables user data synchronization.  Its value should
   be a set of user attributes that can be synchronized during login.
-  Indico does not support synchronizing email addresses; only the
-  following attributes can be synchronized:
-  ``first_name``, ``last_name``, ``affiliation``, ``phone``, ``address``
+  The following attributes can be synchronized:
+  ``email``, ``first_name``, ``last_name``, ``affiliation``, ``phone``,
+  ``address``
+  Due to the unique nature of email addresses, synchronizing them may
+  fail; in that case a warning is displayed and the old email address
+  remains - an Indico admin could merge the users if they are indeed
+  the same person, but this needs to be done manually since merging
+  users is a potentially destructive operation that cannot be undone.
+  It is also strongly recommended to ONLY sync emails if the provider
+  has validated emails (ie ``trusted_email`` set to ``True``); otherwise
+  users would get unvalidated (possibly even invalid) emails set on their
+  account during sync.
 - ``mapping`` -- A dictionary that maps between keys given by the
   identity provider and keys expected by Indico for user information.
   The key of each entry is the Indico-side attribute name; the value
