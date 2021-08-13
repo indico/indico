@@ -919,17 +919,18 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from indico.modules.logs import LogKind
         if self.pending_move_request:
             self.pending_move_request.withdraw(user=session.user)
-        old_category = self.category
+        old_category = getattr(self, 'category', None)
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
-        old_path = sep.join(old_category.chain_titles)
+        old_path = sep.join(old_category.chain_titles if old_category else [_('Unlisted')])
         new_path = sep.join(self.category.chain_titles)
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
         self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
                  data={'From': old_path, 'To': new_path}, meta=log_meta)
-        old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
-                         session.user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
+        if old_category:
+            old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
+                             session.user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
         category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
                      session.user, data={'From': old_path}, meta=log_meta)
 
