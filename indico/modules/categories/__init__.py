@@ -58,13 +58,13 @@ def _sidemenu_items(sender, category, **kwargs):
                        90, icon='settings')
     yield SideMenuItem('protection', _('Protection'), url_for('categories.manage_protection', category),
                        70, icon='shield')
+    if _is_moderation_visible(category):
+        yield SideMenuItem('moderation', _('Moderation'), url_for('categories.manage_moderation', category),
+                           60, icon='user-reading')
     yield SideMenuItem('roles', _('Roles'), url_for('categories.manage_roles', category),
                        50, icon='users')
     yield SideMenuItem('logs', _('Logs'), url_for('logs.category', category),
                        0, icon='stack')
-    if _is_moderation_visible(category):
-        yield SideMenuItem('moderation', _('Moderation'), url_for('categories.manage_moderation', category),
-                           50, icon='users')
 
 
 @signals.menu.items.connect_via('admin-sidemenu')
