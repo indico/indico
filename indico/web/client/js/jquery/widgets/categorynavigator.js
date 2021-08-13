@@ -34,6 +34,10 @@ import Palette from '../../utils/palette';
           disabled: false,
           message: $T.gettext('Not possible for categories where you cannot propose events'),
         },
+        categoriesWithoutEventProposalOrCreationRights: {
+          disabled: false,
+          message: $T.gettext('Not possible for categories where you cannot propose/create events'),
+        },
         categoriesWithoutEventCreationRights: {
           disabled: false,
           message: $T.gettext('Not possible for categories where you cannot create events'),
@@ -719,6 +723,10 @@ import Palette from '../../utils/palette';
         category,
         true
       );
+      const canActOnCategoriesWithoutEventProposalOrCreationRights = self._canActOnCategoriesWithoutEventProposalOrCreationRights(
+        category,
+        true
+      );
 
       if (!canActOnCategories.allowed) {
         result = canActOnCategories;
@@ -728,6 +736,8 @@ import Palette from '../../utils/palette';
         result = canActOnCategoriesWithoutEventCreationRights;
       } else if (!canActOnCategoriesWithoutEventProposalRights.allowed) {
         result = canActOnCategoriesWithoutEventProposalRights;
+      } else if (!canActOnCategoriesWithoutEventProposalOrCreationRights.allowed) {
+        result = canActOnCategoriesWithoutEventProposalOrCreationRights;
       }
 
       return withMessage ? result : result.allowed;
@@ -753,6 +763,22 @@ import Palette from '../../utils/palette';
       if (categoriesWithoutEventProposalRights.disabled && !category.can_propose_events) {
         result.allowed = false;
         result.message = categoriesWithoutEventProposalRights.message;
+      }
+      return withMessage ? result : result.allowed;
+    },
+
+    _canActOnCategoriesWithoutEventProposalOrCreationRights(category, withMessage) {
+      const self = this;
+      const result = {allowed: true, message: ''};
+      const categoriesWithoutEventProposalOrCreationRights =
+        self.options.actionOn.categoriesWithoutEventProposalOrCreationRights;
+      if (
+        categoriesWithoutEventProposalOrCreationRights.disabled &&
+        !category.can_propose_events &&
+        !category.can_create_events
+      ) {
+        result.allowed = false;
+        result.message = categoriesWithoutEventProposalOrCreationRights.message;
       }
       return withMessage ? result : result.allowed;
     },
