@@ -105,18 +105,18 @@ def update_event_move_request(request, accept, reason=''):
     request.state = MoveRequestState.rejected
     request.moderator_comment = reason
     request.moderator = session.user
+    log_meta = {'event_move_request_id': request.id}
     if accept:
         request.state = MoveRequestState.accepted
-        request.event.move(request.category)
+        request.event.move(request.category, log_meta=log_meta)
     else:
         category = request.category
         event = request.event
-
-        category.log(CategoryLogRealm.events, LogKind.negative, 'Moderation', 'Move request rejected', session.user,
-                     data={'Event ID': event.id, 'Event title': event.title, 'Reason': reason})
-
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
-        event.log(EventLogRealm.event, LogKind.negative, 'Moderation', 'Move request rejected', session.user,
-                  data={'Category ID': category.id, 'Category': sep.join(category.chain_titles), 'Reason': reason})
+        event.log(EventLogRealm.event, LogKind.negative, 'Category', 'Move request rejected', session.user,
+                  data={'Category ID': category.id, 'Category': sep.join(category.chain_titles), 'Reason': reason},
+                  meta=log_meta)
+        category.log(CategoryLogRealm.events, LogKind.negative, 'Moderation', 'Event move rejected', session.user,
+                     data={'Event ID': event.id, 'Event title': event.title, 'Reason': reason}, meta=log_meta)
 
     db.session.flush()

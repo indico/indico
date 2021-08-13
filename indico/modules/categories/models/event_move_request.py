@@ -7,6 +7,7 @@
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.logs.models.entries import CategoryLogRealm
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.locators import locator_property
@@ -116,4 +117,8 @@ class EventMoveRequest(db.Model):
         assert self.state == MoveRequestState.pending
         self.state = MoveRequestState.withdrawn
         db.session.flush()
-        self.event.log(EventLogRealm.event, LogKind.change, 'Event', 'Move request withdrawn', user=user)
+        self.event.log(EventLogRealm.event, LogKind.change, 'Category', 'Move request withdrawn', user=user,
+                       meta={'event_move_request_id': self.id})
+        self.category.log(CategoryLogRealm.events, LogKind.change, 'Moderation',
+                          f'Event move request withdrawn: "{self.event.title}"', user,
+                          data={'Event ID': self.event.id}, meta={'event_move_request_id': self.id})

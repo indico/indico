@@ -915,7 +915,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Contribution.preload_acl_entries(self)
         db.m.Session.preload_acl_entries(self)
 
-    def move(self, category):
+    def move(self, category, *, log_meta=None):
         from indico.modules.events import EventLogRealm
         from indico.modules.logs import LogKind
         old_category = self.category
@@ -926,11 +926,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
         self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
-                 data={'From': old_path, 'To': new_path})
+                 data={'From': old_path, 'To': new_path}, meta=log_meta)
         old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
-                         session.user, data={'ID': self.id, 'To': new_path})
+                         session.user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
         category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
-                     session.user, data={'From': old_path})
+                     session.user, data={'From': old_path}, meta=log_meta)
 
     def delete(self, reason, user=None):
         from indico.modules.events import EventLogRealm, logger
