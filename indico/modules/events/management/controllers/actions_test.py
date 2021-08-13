@@ -8,6 +8,7 @@
 import pytest
 from flask import session
 
+from indico.modules.categories.models.categories import EventCreationMode
 from indico.modules.events.management.controllers.actions import RHMoveEvent
 
 
@@ -16,11 +17,14 @@ def target_category(create_category):
     return create_category(25, title='Target')
 
 
-@pytest.mark.parametrize(('requires_approval', 'permissions'), ((True, {}), (False, {'event_move_request'})))
-def test_move_event_request(db, app, requires_approval, permissions, dummy_user, dummy_event,
+@pytest.mark.parametrize(('creation_mode', 'permissions'), (
+    (EventCreationMode.moderated, set()),
+    (EventCreationMode.restricted, {'event_move_request'})
+))
+def test_move_event_request(db, app, creation_mode, permissions, dummy_user, dummy_event,
                             dummy_category, target_category):
     dummy_event.category = dummy_category
-    target_category.event_requires_approval = requires_approval
+    target_category.event_creation_mode = creation_mode
     target_category.update_principal(dummy_user, read_access=True, permissions=permissions)
     assert dummy_event.pending_move_request is None
     rh = RHMoveEvent()
@@ -38,7 +42,7 @@ def test_move_event_request(db, app, requires_approval, permissions, dummy_user,
 
 def test_move_event(app, dummy_event, dummy_user, dummy_category, target_category):
     dummy_event.category = dummy_category
-    target_category.event_requires_approval = False
+    target_category.event_creation_mode = EventCreationMode.open
     target_category.update_principal(dummy_user, read_access=True, permissions={'create'})
     assert dummy_event.pending_move_request is None
     rh = RHMoveEvent()

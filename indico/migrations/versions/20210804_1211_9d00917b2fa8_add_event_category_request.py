@@ -26,6 +26,12 @@ class _MoveRequestState(int, Enum):
     withdrawn = 3
 
 
+class _EventCreationMode(int, Enum):
+    restricted = 1
+    moderated = 2
+    open = 3
+
+
 def upgrade():
     op.create_table(
         'event_move_requests',
@@ -48,12 +54,20 @@ def upgrade():
     )
     op.create_index(None, 'event_move_requests', ['event_id'], unique=True,
                     schema='categories', postgresql_where=sa.text('state = 0'))
+
     op.add_column('categories',
-                  sa.Column('event_requires_approval', sa.Boolean(), nullable=False, server_default='false'),
+                  sa.Column('event_creation_mode', PyIntEnum(_EventCreationMode), nullable=False, server_default='1'),
                   schema='categories')
-    op.alter_column('categories', 'event_requires_approval', server_default=None, schema='categories')
+    op.alter_column('categories', 'event_creation_mode', server_default=None, schema='categories')
+    op.execute('UPDATE categories.categories SET event_creation_mode = 3 WHERE NOT event_creation_restricted')
+    op.drop_column('categories', 'event_creation_restricted', schema='categories')
 
 
 def downgrade():
-    op.drop_column('categories', 'event_requires_approval', schema='categories')
+    op.add_column('categories',
+                  sa.Column('event_creation_restricted', sa.Boolean(), nullable=False, server_default='true'),
+                  schema='categories')
+    op.alter_column('categories', 'event_creation_restricted', server_default=None, schema='categories')
+    op.execute('UPDATE categories.categories SET event_creation_restricted = false WHERE event_creation_mode = 3')
+    op.drop_column('categories', 'event_creation_mode', schema='categories')
     op.drop_table('event_move_requests', schema='categories')

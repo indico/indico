@@ -244,9 +244,8 @@ class RHManageCategoryProtection(RHManageCategoryBase):
             update_category_protection(self.category,
                                        {'protection_mode': form.protection_mode.data,
                                         'own_no_access_contact': form.own_no_access_contact.data,
-                                        'event_creation_restricted': form.event_creation_restricted.data,
-                                        'visibility': form.visibility.data,
-                                        'event_requires_approval': form.event_requires_approval.data})
+                                        'event_creation_mode': form.event_creation_mode.data,
+                                        'visibility': form.visibility.data})
             flash(_('Protection settings of the category have been updated'), 'success')
             return redirect(url_for('.manage_protection', self.category))
         return WPCategoryManagement.render_template('management/category_protection.html', self.category, 'protection',
