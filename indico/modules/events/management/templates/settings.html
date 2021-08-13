@@ -12,10 +12,9 @@
             <div class="section">
                 <div class="icon icon-bookmark"></div>
                 <div class="text">
-                    <div class="label">{% trans %}Pending event moderation{% endtrans %}</div>
+                    <div class="label">{% trans %}Awaiting moderation{% endtrans %}</div>
                     {% trans url=move_request.category.url, category=move_request.category.title %}
-                        There is an ongoing request to move this event to
-                        <a href="{{ url }}">{{ category }}</a>.
+                        There is a pending request to move this event to <a href="{{ url }}">{{ category }}</a>.
                     {% endtrans %}
                 </div>
                 <div class="toolbar">

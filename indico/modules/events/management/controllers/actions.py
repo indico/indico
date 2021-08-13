@@ -96,7 +96,7 @@ class RHMoveEvent(RHManageEventBase):
                   .format(self.event.title, self.target_category.title), 'success')
         else:
             create_event_request(self.event, self.target_category)
-            flash(_('A request to move "{}" to "{}" has been submitted')
+            flash(_('Moving the event "{}" to "{}" has been requested and is pending approval')
                   .format(self.event.title, self.target_category.title), 'success')
         return jsonify_data(flash=False)
 
