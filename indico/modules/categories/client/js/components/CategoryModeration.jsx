@@ -19,8 +19,6 @@ import {indicoAxios} from 'indico/utils/axios';
 import {serializeDate} from 'indico/utils/date';
 import './CategoryModeration.module.scss';
 
-/* eslint-disable react/jsx-no-useless-fragment */
-
 function PlaceholderTableRow() {
   return (
     <Table.Row>
