@@ -713,7 +713,7 @@ class User(PersonMixin, db.Model):
         if sync_provider is None:
             return None
         identities = sorted((x for x in self.identities if x.provider == sync_provider.name),
-                            key=attrgetter('safe_last_login_dt'), reverse=True)
+                            key=attrgetter('safe_last_login_dt', 'id'), reverse=True)
         if not identities:
             return None
         identity = identities[0]
