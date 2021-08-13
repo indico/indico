@@ -6,6 +6,30 @@
 
 {% block content %}
     {{ template_hook('event-actions', event=event) }}
+    {% set move_request = event.pending_move_request %}
+    {%- if move_request -%}
+        <div class="action-box highlight">
+            <div class="section">
+                <div class="icon icon-bookmark"></div>
+                <div class="text">
+                    <div class="label">{% trans %}Awaiting moderation{% endtrans %}</div>
+                    {% trans url=move_request.category.url, category=move_request.category.title %}
+                        There is a pending request to move this event to <a href="{{ url }}">{{ category }}</a>.
+                    {% endtrans %}
+                </div>
+                <div class="toolbar">
+                    <div class="group">
+                        <button class="i-button icon-arrow-left hide-if-locked"
+                                data-href="{{ url_for('event_management.withdraw_move_request', event) }}"
+                                data-method="POST"
+                                data-reload-after>
+                            {% trans %}Withdraw{% endtrans %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
     {%- if show_booking_warning -%}
         <div class="action-box warning">
             <div class="section">

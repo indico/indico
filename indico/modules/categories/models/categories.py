@@ -56,6 +56,13 @@ class EventMessageMode(RichIntEnum):
     danger = 3
 
 
+class EventCreationMode(RichIntEnum):
+    __titles__ = [None, _('Restricted to authorized users'), _('Moderated unless authorized'), _('Unrestricted')]
+    restricted = 1
+    moderated = 2
+    open = 3
+
+
 class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, AttachedItemsMixin, db.Model):
     """An Indico category."""
 
@@ -137,10 +144,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=_get_default_event_themes
     )
-    event_creation_restricted = db.Column(
-        db.Boolean,
+    event_creation_mode = db.Column(
+        PyIntEnum(EventCreationMode),
         nullable=False,
-        default=True
+        default=EventCreationMode.restricted
     )
     event_creation_notification_emails = db.Column(
         ARRAY(db.String),
@@ -220,6 +227,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.category)
     # - designer_templates (DesignerTemplate.category)
+    # - event_move_requests (EventMoveRequest.category)
     # - events (Event.category)
     # - favorite_of (User.favorite_categories)
     # - legacy_mapping (LegacyCategoryMapping.category)
@@ -322,12 +330,17 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         self.log_entries.append(entry)
         return entry
 
+    def can_propose_events(self, user):
+        """Check whether the user can propose move requests to the category."""
+        return user and ((self.event_creation_mode == EventCreationMode.moderated and self.can_access(user)) or
+                         self.can_manage(user, permission='event_move_request'))
+
     def can_create_events(self, user):
         """Check whether the user can create events in the category."""
         # if creation is not restricted anyone who can access the category
         # can also create events in it, otherwise only people with the
         # creation role can
-        return user and ((not self.event_creation_restricted and self.can_access(user)) or
+        return user and ((self.event_creation_mode == EventCreationMode.open and self.can_access(user)) or
                          self.can_manage(user, permission='create'))
 
     def move(self, target: 'Category'):

@@ -72,7 +72,7 @@
 
 
 {% macro _render_move_event(event) %}
-    <button class="i-button borderless icon-transmission hide-if-locked"
+    <button class="i-button borderless icon-transmission hide-if-locked {{ 'disabled' if event.pending_move_request is not none }}"
             id="event-action-move-to-category"
             title="{% trans %}Move event to another category{% endtrans %}"
             data-href="{{ url_for('event_management.move', event) }}"

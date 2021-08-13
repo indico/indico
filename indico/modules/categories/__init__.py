@@ -12,7 +12,8 @@ from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
-from indico.modules.categories.models.categories import Category
+from indico.modules.categories.models.categories import Category, EventCreationMode
+from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.logs.models.entries import CategoryLogRealm
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -41,6 +42,14 @@ def _merge_users(target, source, **kwargs):
     CategoryPrincipal.merge_users(target, source, 'category')
 
 
+def _is_moderation_visible(category):
+    return (
+        category.event_creation_mode == EventCreationMode.moderated or
+        category.event_move_requests.filter_by(state=MoveRequestState.pending).has_rows() or
+        any('event_move_request' in entry.permissions for entry in category.acl_entries)
+    )
+
+
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _sidemenu_items(sender, category, **kwargs):
     yield SideMenuItem('content', _('Content'), url_for('categories.manage_content', category),
@@ -49,6 +58,9 @@ def _sidemenu_items(sender, category, **kwargs):
                        90, icon='settings')
     yield SideMenuItem('protection', _('Protection'), url_for('categories.manage_protection', category),
                        70, icon='shield')
+    if _is_moderation_visible(category):
+        yield SideMenuItem('moderation', _('Moderation'), url_for('categories.manage_moderation', category),
+                           60, icon='user-reading')
     yield SideMenuItem('roles', _('Roles'), url_for('categories.manage_roles', category),
                        50, icon='users')
     yield SideMenuItem('logs', _('Logs'), url_for('logs.category', category),
@@ -69,11 +81,19 @@ def _check_permissions(app, **kwargs):
 
 @signals.acl.get_management_permissions.connect_via(Category)
 def _get_management_permissions(sender, **kwargs):
-    return CreatorPermission
+    yield CreatorPermission
+    yield EventMoveRequestPermission
 
 
 class CreatorPermission(ManagementPermission):
     name = 'create'
     friendly_name = _('Event creation')
     description = _('Allows creating events in the category')
+    user_selectable = True
+
+
+class EventMoveRequestPermission(ManagementPermission):
+    name = 'event_move_request'
+    friendly_name = _('Request event move')
+    description = _('Allows requesting for an event to be moved to this category')
     user_selectable = True

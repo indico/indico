@@ -10,24 +10,25 @@ from sqlalchemy.orm import undefer
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories import Category
+from indico.modules.categories.models.categories import EventCreationMode
 
 
-@pytest.mark.parametrize(('protection_mode', 'creation_restricted', 'acl', 'allowed'), (
+@pytest.mark.parametrize(('protection_mode', 'creation_mode', 'acl', 'allowed'), (
     # not restricted
-    (ProtectionMode.public, False, None, True),
-    (ProtectionMode.protected, False, None, False),
-    (ProtectionMode.protected, False, {'read_access': True}, True),
+    (ProtectionMode.public, EventCreationMode.open, None, True),
+    (ProtectionMode.protected, EventCreationMode.open, None, False),
+    (ProtectionMode.protected, EventCreationMode.open, {'read_access': True}, True),
     # restricted - authorized
-    (ProtectionMode.protected, True, {'full_access': True}, True),
-    (ProtectionMode.protected, True, {'permissions': {'create'}}, True),
+    (ProtectionMode.protected, EventCreationMode.restricted, {'full_access': True}, True),
+    (ProtectionMode.protected, EventCreationMode.restricted, {'permissions': {'create'}}, True),
     # restricted - not authorized
-    (ProtectionMode.public, True, None, False),
-    (ProtectionMode.protected, True, None, False),
-    (ProtectionMode.protected, True, {'read_access': True}, False)
+    (ProtectionMode.public, EventCreationMode.restricted, None, False),
+    (ProtectionMode.protected, EventCreationMode.restricted, None, False),
+    (ProtectionMode.protected, EventCreationMode.restricted, {'read_access': True}, False)
 ))
-def test_can_create_events(dummy_category, dummy_user, protection_mode, creation_restricted, acl, allowed):
+def test_can_create_events(dummy_category, dummy_user, protection_mode, creation_mode, acl, allowed):
     dummy_category.protection_mode = protection_mode
-    dummy_category.event_creation_restricted = creation_restricted
+    dummy_category.event_creation_mode = creation_mode
     if acl:
         dummy_category.update_principal(dummy_user, **acl)
     assert dummy_category.can_create_events(dummy_user) == allowed

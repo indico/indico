@@ -10,21 +10,26 @@ import random
 from io import BytesIO
 
 from flask import flash, redirect, request, session
+from marshmallow import EXCLUDE
 from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, undefer_group
+from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db
 from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
+from indico.modules.categories.fields import EventRequestList
 from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm, CategoryProtectionForm,
                                              CategoryRoleForm, CategorySettingsForm, CreateCategoryForm,
                                              SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
+from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.operations import (create_category, delete_category, move_category, update_category,
-                                                  update_category_protection)
+                                                  update_category_protection, update_event_move_request)
+from indico.modules.categories.schemas import EventMoveRequestSchema
 from indico.modules.categories.util import get_image_data, serialize_category_role
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
@@ -33,10 +38,10 @@ from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import PrincipalList
+from indico.util.marshmallow import PrincipalList, not_empty
 from indico.util.roles import ImportRoleMembersMixin
 from indico.util.string import crc32
-from indico.web.args import use_kwargs
+from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -117,6 +122,30 @@ class RHManageCategorySettings(RHManageCategoryBase):
                 logo_form.logo.data = self.category
         return WPCategoryManagement.render_template('management/settings.html', self.category, 'settings', form=form,
                                                     icon_form=icon_form, logo_form=logo_form)
+
+
+class RHAPIEventMoveRequests(RHManageCategoryBase):
+    def _process_GET(self):
+        move_requests = self.category.event_move_requests.filter(EventMoveRequest.state == MoveRequestState.pending)
+        return EventMoveRequestSchema(many=True).jsonify(move_requests)
+
+    @use_kwargs({
+        'accept': fields.Bool(required=True),
+        'reason': fields.String(missing=None)
+    })
+    def _process_POST(self, accept, reason):
+        move_requests = parser.parse({
+            'requests': EventRequestList(required=True, category=self.category, validate=not_empty)
+        }, unknown=EXCLUDE)['requests']
+
+        for rq in move_requests:
+            update_event_move_request(rq, accept, reason)
+        return '', 204
+
+
+class RHManageCategoryModeration(RHManageCategoryBase):
+    def _process(self):
+        return WPCategoryManagement.render_template('management/moderation.html', self.category, 'moderation')
 
 
 class RHCategoryImageUploadBase(RHManageCategoryBase):
@@ -215,7 +244,7 @@ class RHManageCategoryProtection(RHManageCategoryBase):
             update_category_protection(self.category,
                                        {'protection_mode': form.protection_mode.data,
                                         'own_no_access_contact': form.own_no_access_contact.data,
-                                        'event_creation_restricted': form.event_creation_restricted.data,
+                                        'event_creation_mode': form.event_creation_mode.data,
                                         'visibility': form.visibility.data})
             flash(_('Protection settings of the category have been updated'), 'success')
             return redirect(url_for('.manage_protection', self.category))

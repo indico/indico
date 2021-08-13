@@ -11,8 +11,9 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.models.categories import Category
+from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.categories.util import format_visibility
-from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
+from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 
 
@@ -62,7 +63,7 @@ def update_category(category, data, skip=()):
 
 
 def update_category_protection(category, data):
-    assert set(data) <= {'protection_mode', 'own_no_access_contact', 'event_creation_restricted', 'visibility'}
+    assert set(data) <= {'protection_mode', 'own_no_access_contact', 'event_creation_mode', 'visibility'}
     changes = category.populate_from_dict(data)
     db.session.flush()
     signals.category.updated.send(category, changes=changes)
@@ -72,7 +73,7 @@ def update_category_protection(category, data):
                       'own_no_access_contact': 'No access contact',
                       'visibility': {'title': 'Visibility', 'type': 'string',
                                      'convert': lambda changes: [format_visibility(category, x) for x in changes]},
-                      'event_creation_restricted': 'Event creation restricted'}
+                      'event_creation_mode': 'Event creation mode'}
         category.log(CategoryLogRealm.category, LogKind.change, 'Category', 'Protection updated', session.user,
                      data={'Changes': make_diff_log(changes, log_fields)})
 
@@ -97,3 +98,25 @@ def _log_category_update(category, changes):
                 what = what['title']
         category.log(CategoryLogRealm.category, LogKind.change, 'Category', f'{what} updated', session.user,
                      data={'Changes': make_diff_log(changes, log_fields)})
+    logger.info('Category %s updated by %s', category, session.user)
+
+
+def update_event_move_request(request, accept, reason=''):
+    request.state = MoveRequestState.rejected
+    request.moderator_comment = reason
+    request.moderator = session.user
+    log_meta = {'event_move_request_id': request.id}
+    if accept:
+        request.state = MoveRequestState.accepted
+        request.event.move(request.category, log_meta=log_meta)
+    else:
+        category = request.category
+        event = request.event
+        sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+        event.log(EventLogRealm.event, LogKind.negative, 'Category', 'Move request rejected', session.user,
+                  data={'Category ID': category.id, 'Category': sep.join(category.chain_titles), 'Reason': reason},
+                  meta=log_meta)
+        category.log(CategoryLogRealm.events, LogKind.negative, 'Moderation', 'Event move rejected', session.user,
+                     data={'Event ID': event.id, 'Event title': event.title, 'Reason': reason}, meta=log_meta)
+
+    db.session.flush()

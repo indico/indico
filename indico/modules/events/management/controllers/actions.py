@@ -6,12 +6,12 @@
 # LICENSE file for more details.
 
 from flask import flash, request, session
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.events import EventType
-from indico.modules.events.operations import lock_event, unlock_event, update_event_type
+from indico.modules.events.operations import create_event_request, lock_event, unlock_event, update_event_type
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template, url_for_index
@@ -82,11 +82,37 @@ class RHMoveEvent(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.target_category = Category.get_or_404(int(request.form['target_category_id']), is_deleted=False)
-        if not self.target_category.can_create_events(session.user):
-            raise Forbidden(_('You may only move events to categories where you are allowed to create events.'))
+
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
+        if (not self.target_category.can_create_events(session.user)
+                and not self.target_category.can_propose_events(session.user)):
+            raise Forbidden(_('You may not move events to this category.'))
 
     def _process(self):
-        self.event.move(self.target_category)
-        flash(_('Event "{}" has been moved to category "{}"').format(self.event.title, self.target_category.title),
-              'success')
+        if self.target_category.can_create_events(session.user):
+            self.event.move(self.target_category)
+            flash(_('Event "{event}" has been moved to category "{category}"')
+                  .format(event=self.event.title, category=self.target_category.title),
+                  'success')
+        else:
+            create_event_request(self.event, self.target_category)
+            flash(_('Moving the event "{event}" to "{category}" has been requested and is pending approval')
+                  .format(event=self.event.title, category=self.target_category.title),
+                  'success')
+        return jsonify_data(flash=False)
+
+
+class RHWithdrawMoveRequest(RHManageEventBase):
+    """Move event to a different category."""
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.request = self.event.pending_move_request
+        if not self.request:
+            raise NotFound
+
+    def _process(self):
+        self.request.withdraw(user=session.user)
+        flash(_('The move request has been withdrawn'), 'success')
         return jsonify_data(flash=False)

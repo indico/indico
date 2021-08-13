@@ -33,6 +33,7 @@ from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
 from indico.modules.categories import Category
+from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixin
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
@@ -376,6 +377,15 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             lazy=True
         )
     )
+    #: The current pending move request
+    pending_move_request = db.relationship(
+        'EventMoveRequest',
+        lazy=True,
+        viewonly=True,
+        uselist=False,
+        primaryjoin=lambda: db.and_(EventMoveRequest.event_id == Event.id,
+                                    EventMoveRequest.state == MoveRequestState.pending)
+    )
 
     # relationship backrefs:
     # - abstract_email_templates (AbstractEmailTemplate.event)
@@ -406,6 +416,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - legacy_subcontribution_mappings (LegacySubContributionMapping.event)
     # - log_entries (EventLogEntry.event)
     # - menu_entries (MenuEntry.event)
+    # - move_requests (EventMoveRequest.event)
     # - note (EventNote.linked_event)
     # - paper_competences (PaperCompetence.event)
     # - paper_review_questions (PaperReviewQuestion.event)
@@ -904,9 +915,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.m.Contribution.preload_acl_entries(self)
         db.m.Session.preload_acl_entries(self)
 
-    def move(self, category):
+    def move(self, category, *, log_meta=None):
         from indico.modules.events import EventLogRealm
         from indico.modules.logs import LogKind
+        if self.pending_move_request:
+            self.pending_move_request.withdraw(user=session.user)
         old_category = self.category
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
@@ -915,11 +928,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
         self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
-                 data={'From': old_path, 'To': new_path})
+                 data={'From': old_path, 'To': new_path}, meta=log_meta)
         old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
-                         session.user, data={'ID': self.id, 'To': new_path})
+                         session.user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
         category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
-                     session.user, data={'From': old_path})
+                     session.user, data={'From': old_path}, meta=log_meta)
 
     def delete(self, reason, user=None):
         from indico.modules.events import EventLogRealm, logger

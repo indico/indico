@@ -12,7 +12,7 @@ from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField,
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
-from indico.modules.categories.models.categories import Category, EventMessageMode
+from indico.modules.categories.models.categories import Category, EventCreationMode, EventMessageMode
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.util import get_image_data, get_visibility_options
 from indico.modules.events import Event
@@ -84,7 +84,6 @@ class CategoryLogoForm(IndicoForm):
 
 
 class CategoryProtectionForm(IndicoForm):
-    _event_creation_fields = ('event_creation_restricted', 'event_creation_notification_emails')
     permissions = PermissionsField(_('Permissions'), object_type='category')
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
     own_no_access_contact = StringField(_('No access contact'),
@@ -94,9 +93,12 @@ class CategoryProtectionForm(IndicoForm):
                              description=_('''From which point in the category tree contents will be visible from '''
                                            '''(number of categories upwards). Applies to "Today's events" and '''
                                            '''Calendar. If the category is moved, this number will be preserved.'''))
-    event_creation_restricted = BooleanField(_('Restricted event creation'), widget=SwitchWidget(),
-                                             description=_('Whether the event creation should be restricted '
-                                                           'to a list of specific persons'))
+    event_creation_mode = IndicoEnumSelectField(_('Event creation mode'), enum=EventCreationMode,
+                                                default=EventCreationMode.restricted,
+                                                description=_('Specify who can create events in the category and '
+                                                              'whether they need to be approved. Regardless of this '
+                                                              'setting, users cannot create/propose events unless they '
+                                                              'have at least read access to the category.'))
 
     def __init__(self, *args, **kwargs):
         self.protected_object = self.category = kwargs.pop('category')

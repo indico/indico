@@ -12,6 +12,7 @@ from flask import g, session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.categories.models.event_move_request import EventMoveRequest
 from indico.modules.categories.util import format_visibility
 from indico.modules.events import Event, EventLogRealm, logger
 from indico.modules.events.cloning import EventCloner, get_event_cloners
@@ -384,3 +385,18 @@ def sort_reviewing_questions(questions, new_positions):
         field.position = index
     db.session.flush()
     logger.info('Reviewing questions of %r reordered by %r', questions[0].event, session.user)
+
+
+def create_event_request(event, category):
+    assert event.category != category
+    req = EventMoveRequest(event=event, category=category, requestor=session.user)
+    db.session.flush()
+    logger.info('Category move request %r to %r created by %r', req, category, session.user)
+    sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+    event.log(EventLogRealm.event, LogKind.change, 'Category', f'Move to "{category.title}" requested',
+              user=session.user, data={'Category ID': category.id, 'Category': sep.join(category.chain_titles)},
+              meta={'event_move_request_id': req.id})
+    category.log(CategoryLogRealm.events, LogKind.positive, 'Moderation', f'Event move requested: "{event.title}"',
+                 session.user, data={'Event ID': event.id, 'From': sep.join(event.category.chain_titles)},
+                 meta={'event_move_request_id': req.id})
+    return req
