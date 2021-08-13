@@ -169,7 +169,7 @@ RequestList.defaultProps = {
 };
 
 export default function CategoryModeration({categoryId}) {
-  const {data, loading, reFetch} = useIndicoAxios({
+  const {data, lastData, loading, reFetch} = useIndicoAxios({
     url: eventRequestsURL({category_id: categoryId}),
     trigger: categoryId,
     camelize: true,
@@ -184,6 +184,10 @@ export default function CategoryModeration({categoryId}) {
       return handleSubmitError(e);
     }
   };
+
+  if (!lastData) {
+    return null;
+  }
 
   return (
     <RequestList requests={data || []} onSubmit={setRequestsState} loading={!data || loading} />
