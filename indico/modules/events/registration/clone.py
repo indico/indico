@@ -47,6 +47,7 @@ class RegistrationFormCloner(EventCloner):
             new_form = RegistrationForm(**{attr: getattr(old_form, attr) for attr in attrs})
             self._clone_form_items(old_form, new_form, clone_all_revisions)
             new_event.registration_forms.append(new_form)
+            signals.event.registration.after_registration_form_clone.send(old_form, new_form=new_form)
             db.session.flush()
             self._form_map[old_form] = new_form
         return {'form_map': self._form_map,
