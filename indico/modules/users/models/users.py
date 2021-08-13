@@ -33,7 +33,7 @@ from indico.modules.users.models.favorites import favorite_category_table, favor
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_full_name, format_repr
+from indico.util.string import format_full_name, format_repr, validate_email
 from indico.web.flask.util import url_for
 
 
@@ -672,10 +672,6 @@ class User(PersonMixin, db.Model):
             logger.info('Syncing %s for %r from %r to %r', field, self, old_value, new_value)
             if field == 'email':
                 if not self._synchronize_email(new_value, silent=silent):
-                    if not silent:
-                        flash(_("Your email address could not be synchronized from '{old_value}' to "
-                                "'{new_value}' due to a conflict with another Indico profile.")
-                              .format(old_value=old_value, new_value=new_value), 'warning')
                     continue
             else:
                 setattr(self, field, new_value)
@@ -688,9 +684,21 @@ class User(PersonMixin, db.Model):
         from indico.modules.users.tasks import update_gravatars
         from indico.modules.users.util import get_user_by_email
 
+        if not validate_email(email, check_dns=False):
+            logger.warning('Cannot sync email for %r to %r; address is invalid', self, email)
+            if not silent:
+                flash(_("Your email address could not be synchronized from '{old_value}' to "
+                        "'{new_value}' since the new email address is not valid.")
+                      .format(old_value=self.email, new_value=email), 'warning')
+            return False
+
         if email not in self.secondary_emails:
             if other := get_user_by_email(email):
                 logger.warning('Cannot sync email for %r to %r; already used by %r', self, email, other)
+                if not silent:
+                    flash(_("Your email address could not be synchronized from '{old_value}' to "
+                            "'{new_value}' due to a conflict with another Indico profile.")
+                          .format(old_value=self.email, new_value=email), 'warning')
                 return False
             self.secondary_emails.add(email)
             signals.users.email_added.send(self, email=email, silent=silent)
