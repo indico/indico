@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask import flash, request, session
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.management.controllers.base import RHManageEventBase
@@ -87,8 +87,6 @@ class RHMoveEvent(RHManageEventBase):
         if (not self.target_category.can_create_events(session.user)
                 and not self.target_category.can_propose_events(session.user)):
             raise Forbidden(_('You may not move events to this category.'))
-        if self.event.pending_move_request:
-            raise BadRequest(_('There is already a move request pending review.'))
 
     def _process(self):
         if self.target_category.can_create_events(session.user):

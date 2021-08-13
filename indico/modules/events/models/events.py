@@ -918,6 +918,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def move(self, category, *, log_meta=None):
         from indico.modules.events import EventLogRealm
         from indico.modules.logs import LogKind
+        if self.pending_move_request:
+            self.pending_move_request.withdraw(user=session.user)
         old_category = self.category
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
