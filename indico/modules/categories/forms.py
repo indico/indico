@@ -84,7 +84,6 @@ class CategoryLogoForm(IndicoForm):
 
 
 class CategoryProtectionForm(IndicoForm):
-    _event_creation_fields = ('event_creation_mode', 'event_creation_notification_emails')
     permissions = PermissionsField(_('Permissions'), object_type='category')
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
     own_no_access_contact = StringField(_('No access contact'),
