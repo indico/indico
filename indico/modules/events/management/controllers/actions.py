@@ -84,6 +84,7 @@ class RHMoveEvent(RHManageEventBase):
         self.target_category = Category.get_or_404(int(request.form['target_category_id']), is_deleted=False)
 
     def _check_access(self):
+        RHManageEventBase._check_access(self)
         if (not self.target_category.can_create_events(session.user)
                 and not self.target_category.can_propose_events(session.user)):
             raise Forbidden(_('You may not move events to this category.'))

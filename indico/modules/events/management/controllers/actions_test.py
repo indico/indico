@@ -24,6 +24,7 @@ def target_category(create_category):
 def test_move_event_request(db, app, creation_mode, permissions, dummy_user, dummy_event,
                             dummy_category, target_category):
     dummy_event.category = dummy_category
+    dummy_event.update_principal(dummy_user, full_access=True)
     target_category.event_creation_mode = creation_mode
     target_category.update_principal(dummy_user, read_access=True, permissions=permissions)
     assert dummy_event.pending_move_request is None
@@ -42,6 +43,7 @@ def test_move_event_request(db, app, creation_mode, permissions, dummy_user, dum
 
 def test_move_event(app, dummy_event, dummy_user, dummy_category, target_category):
     dummy_event.category = dummy_category
+    dummy_event.update_principal(dummy_user, full_access=True)
     target_category.event_creation_mode = EventCreationMode.open
     target_category.update_principal(dummy_user, read_access=True, permissions={'create'})
     assert dummy_event.pending_move_request is None
