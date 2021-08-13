@@ -400,7 +400,9 @@ def create_event_request(event, category, comment=''):
                                        'Comment': comment},
               meta={'event_move_request_id': req.id})
     category.log(CategoryLogRealm.events, LogKind.positive, 'Moderation', f'Event move requested: "{event.title}"',
-                 session.user, data={'Event ID': event.id, 'From': sep.join(event.category.chain_titles),
-                                     'Comment': comment},
+                 session.user, data={
+                     'Event ID': event.id,
+                     'From': sep.join(event.category.chain_titles if event.category else 'Unlisted')
+                 },
                  meta={'event_move_request_id': req.id})
     return req
