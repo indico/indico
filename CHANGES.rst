@@ -14,8 +14,11 @@ Major Features
   category log (similar to the event log). This log includes information about
   all events being created, deleted or moved in the category (:issue:`2809`,
   :pr:`5029`)
+- Besides letting everyone create events in a category or restricting it to
+  specific users, categories now also support a moderation workflow which allows
+  event managers to request moving an event to a category. Only once a category
+  manager approves this request, the event is actually moved (:issue:`2057`, :pr:`5013`)
 - TODO write something about unlisted events
-- TODO write something about moderated categories
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
