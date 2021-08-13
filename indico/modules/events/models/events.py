@@ -383,8 +383,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         lazy=True,
         viewonly=True,
         uselist=False,
-        primaryjoin=lambda: (EventMoveRequest.event_id == Event.id) &
-                            (EventMoveRequest.state == MoveRequestState.pending)
+        primaryjoin=lambda: db.and_(EventMoveRequest.event_id == Event.id,
+                                    EventMoveRequest.state == MoveRequestState.pending)
     )
 
     # relationship backrefs:
