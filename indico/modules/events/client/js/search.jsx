@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import eventSearchUrl from 'indico-url:search.event_search';
+import eventSearchURL from 'indico-url:search.event_search';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (isAdmin && adminOverrideEnabled) {
             params.admin_override_enabled = true;
           }
-          window.location = eventSearchUrl(params);
+          window.location = eventSearchURL(params);
         }}
         isAdmin={isAdmin}
       />,

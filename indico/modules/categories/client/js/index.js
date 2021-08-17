@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import categorySearchUrl from 'indico-url:search.category_search';
-import searchUrl from 'indico-url:search.search';
+import categorySearchURL from 'indico-url:search.category_search';
+import searchURL from 'indico-url:search.search';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -37,10 +37,10 @@ import {LocaleContext} from './context.js';
               params.admin_override_enabled = true;
             }
             if (isGlobal) {
-              window.location = searchUrl(params);
+              window.location = searchURL(params);
             } else {
               params.category_id = category.id;
-              window.location = categorySearchUrl(params);
+              window.location = categorySearchURL(params);
             }
           },
           category,
