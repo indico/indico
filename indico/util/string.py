@@ -172,6 +172,7 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
 
 def sanitize_for_platypus(text):
     """Sanitize HTML to be used in platypus."""
+    from indico.core.config import config
     tags = ['b', 'br', 'em', 'font', 'i', 'img', 'strike', 'strong', 'sub', 'sup', 'u', 'span', 'div', 'p']
     attrs = {
         'font': ['size', 'face', 'color'],
@@ -182,6 +183,7 @@ def sanitize_for_platypus(text):
         return ''
     # Convert to XHTML
     doc = html.fromstring(res)
+    doc.make_links_absolute(config.BASE_URL, resolve_base_href=False)
     return etree.tostring(doc).decode()
 
 
