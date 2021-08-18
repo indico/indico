@@ -5,8 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global setupSearchBox:false, strnatcmp:false */
+/* global setupSearchBox:false, strnatcmp:false, cornerMessage:false, handleAjaxError:false,
+          enableIfChecked:false */
 
+import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -18,6 +20,8 @@ import 'indico/modules/events/util/list_generator';
 import 'indico/modules/events/util/static_filters';
 
 import './badges';
+
+import {$T} from 'indico/utils/i18n';
 
 import EventMove from './EventMove';
 
