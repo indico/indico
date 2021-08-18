@@ -105,6 +105,16 @@ class ProgrammeToPDF(PDFBase):
                           format_date(now_utc(), format='full', timezone=self._tz))
         c.restoreState()
 
+    def _markdown_to_reportlab(self, markdown):
+        html = sanitize_for_platypus(render_markdown(markdown))
+        parts = []
+        for i, part in enumerate(re.split(r'\n+', html)):
+            if i > 0 and re.match(r'<(p|ul|ol)\b[^>]*>', part):
+                # extra spacing before a block-level element
+                parts.append('<br/>')
+            parts.append(part)
+        return '\n<br/>\n'.join(parts)
+
     def getBody(self, story=None):
         if not story:
             story = self._story
@@ -113,32 +123,17 @@ class ProgrammeToPDF(PDFBase):
         style.alignment = TA_JUSTIFY
         styles['Heading2'].leftIndent = 20
 
-        event_program = sanitize_for_platypus(render_markdown(track_settings.get(self.event, 'program')))
-        parts = []
-        for i, part in enumerate(re.split(r'\n+', event_program)):
-            if i > 0 and re.match(r'<(p|ul|ol)\b[^>]*>', part):
-                # extra spacing before a block-level element
-                parts.append('<br/>')
-            parts.append(part)
-        story.append(Paragraph('\n<br/>\n'.join(parts), style))
+        story.append(Paragraph(self._markdown_to_reportlab(track_settings.get(self.event, 'program')), style))
 
         story.append(Spacer(1, 0.4*inch))
         items = self.event.get_sorted_tracks()
         for item in items:
-            bogustext = item.title
-            p = Paragraph(escape(bogustext), styles['Heading1'])
-            self._story.append(p)
-            bogustext = item.description
-            p = Paragraph(escape(bogustext), style)
-            story.append(p)
+            self._story.append(Paragraph(escape(item.title), styles['Heading1']))
+            story.append(Paragraph(self._markdown_to_reportlab(item.description), style))
             if isinstance(item, TrackGroup) and item.tracks:
                 for track in item.tracks:
-                    bogustext = track.title
-                    p = Paragraph(escape(bogustext), styles['Heading2'])
-                    self._story.append(p)
-                    bogustext = track.description
-                    p = Paragraph(escape(bogustext), style)
-                    story.append(p)
+                    self._story.append(Paragraph(escape(track.title), styles['Heading2']))
+                    story.append(Paragraph(self._markdown_to_reportlab(track.description), style))
             story.append(Spacer(1, 0.4*inch))
 
 

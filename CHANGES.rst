@@ -22,6 +22,7 @@ Bugfixes
 - Do not notify registrants when a payment transaction is created in "pending" state
 - Keep the order of multi-choice options in registration summary (:issue:`5020`, :pr:`5032`)
 - Correctly handle relative URLs in PDF generation (:issue:`5042`, :pr:`5044`)
+- Render markdown in track descriptions in PDF generation (:issue:`5043`, :pr:`5044`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
