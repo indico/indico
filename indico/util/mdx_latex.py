@@ -78,7 +78,7 @@ import uuid
 from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 from xml.etree import ElementTree as etree
 
 import markdown
@@ -255,7 +255,12 @@ def latex_render_image(src, alt, tmpdir, strict=False):
     :returns: a ``(latex_code, file_path)`` tuple, containing the LaTeX code
               and path to the temporary image file.
     """
+    from indico.core.config import config
     try:
+        info = urlparse(src)
+        if not info.scheme and not info.netloc and info.path.startswith('/'):
+            # make relative links absolute
+            src = urljoin(config.BASE_URL, src)
         if urlparse(src).scheme not in ('http', 'https'):
             raise ImageURLException(f'URL scheme not supported: {src}')
         else:
