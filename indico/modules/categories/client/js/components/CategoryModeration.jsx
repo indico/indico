@@ -37,7 +37,7 @@ function PlaceholderTableRow() {
   );
 }
 
-function RequestTableRow({requestor, event, requestedDt, selected, onSelect}) {
+function RequestTableRow({requestor, requestorComment, event, requestedDt, selected, onSelect}) {
   const {fullName, avatarURL, affiliation} = requestor;
   return (
     <Table.Row>
@@ -54,6 +54,7 @@ function RequestTableRow({requestor, event, requestedDt, selected, onSelect}) {
         <a href={eventURL({event_id: event.id})}>{event.title}</a>
       </Table.Cell>
       <Table.Cell>{serializeDate(requestedDt)}</Table.Cell>
+      <Table.Cell>{requestorComment}</Table.Cell>
     </Table.Row>
   );
 }
@@ -69,6 +70,7 @@ RequestTableRow.propTypes = {
     title: PropTypes.string,
   }).isRequired,
   requestedDt: PropTypes.string.isRequired,
+  requestorComment: PropTypes.string.isRequired,
   selected: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
 };
@@ -108,18 +110,20 @@ function RequestList({requests, onSubmit, loading}) {
           <Translate as={Table.HeaderCell}>User</Translate>
           <Translate as={Table.HeaderCell}>Event</Translate>
           <Translate as={Table.HeaderCell}>Requested Date</Translate>
+          <Translate as={Table.HeaderCell}>Comment</Translate>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {loading ? (
           <PlaceholderTableRow />
         ) : (
-          requests.map(({id, requestor, event, requestedDt}) => (
+          requests.map(({id, requestor, requestorComment, event, requestedDt}) => (
             <RequestTableRow
               key={id}
               id={id}
               event={event}
               requestor={requestor}
+              requestorComment={requestorComment}
               requestedDt={requestedDt}
               selected={selected.has(id)}
               onSelect={() => select(id)}

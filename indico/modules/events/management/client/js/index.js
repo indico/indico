@@ -7,6 +7,9 @@
 
 /* global setupSearchBox:false, strnatcmp:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import 'selectize';
 import 'selectize/dist/css/selectize.css';
 import 'selectize/dist/css/selectize.default.css';
@@ -16,47 +19,19 @@ import 'indico/modules/events/util/static_filters';
 
 import './badges';
 
+import EventMove from './EventMove';
+
 (function(global) {
   global.setupEventManagementActionMenu = function setupEventManagementActionMenu() {
-    $('#event-action-move-to-category').on('click', function(evt) {
-      evt.preventDefault();
-      const $this = $(this);
-      if ($this.hasClass('disabled')) {
-        return;
-      }
-      $('<div>').categorynavigator({
-        openInDialog: true,
-        actionOn: {
-          categoriesWithoutEventProposalOrCreationRights: {
-            disabled: true,
-          },
-          categories: {
-            disabled: true,
-            ids: [$this.data('category-id')],
-          },
-        },
-        onAction(category) {
-          const msg = $T
-            .gettext(
-              'You are about to move the event to the category "{0}". Are you sure you want to proceed?'
-            )
-            .format(category.title);
-          confirmPrompt(msg, $T.gettext('Move event')).then(function() {
-            $.ajax({
-              url: $this.data('href'),
-              type: 'POST',
-              data: {target_category_id: category.id},
-              error: handleAjaxError,
-              success(data) {
-                if (data.success) {
-                  location.reload();
-                }
-              },
-            });
-          });
-        },
-      });
-    });
+    const moveContainer = document.querySelector('#event-action-move-container');
+    ReactDOM.render(
+      React.createElement(EventMove, {
+        eventId: +moveContainer.dataset.eventId,
+        currentCategoryId: +moveContainer.dataset.categoryId,
+        hasPendingMoveRequest: moveContainer.dataset.pendingRequest !== undefined,
+      }),
+      moveContainer
+    );
 
     $('#event-action-menu-clones-target').qbubble({
       content: {

@@ -40,6 +40,7 @@ def upgrade():
         sa.Column('category_id', sa.Integer(), nullable=False, index=True),
         sa.Column('requestor_id', sa.Integer(), nullable=False, index=True),
         sa.Column('state', PyIntEnum(_MoveRequestState), nullable=False),
+        sa.Column('requestor_comment', sa.String(), nullable=False, default=''),
         sa.Column('moderator_comment', sa.String(), nullable=False, default=''),
         sa.Column('moderator_id', sa.Integer(), nullable=True),
         sa.Column('requested_dt', UTCDateTime, nullable=False),

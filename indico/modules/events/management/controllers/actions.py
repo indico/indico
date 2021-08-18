@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from flask import flash, request, session
+from webargs import fields
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.categories.models.categories import Category
@@ -13,6 +14,8 @@ from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import create_event_request, lock_event, unlock_event, update_event_type
 from indico.util.i18n import _
+from indico.util.marshmallow import ModelField
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template, url_for_index
 
@@ -79,9 +82,14 @@ class RHUnlockEvent(RHManageEventBase):
 class RHMoveEvent(RHManageEventBase):
     """Move event to a different category."""
 
-    def _process_args(self):
+    @use_kwargs({
+        'target_category': ModelField(Category, filter_deleted=True, required=True, data_key='target_category_id'),
+        'comment': fields.String(missing=''),
+    })
+    def _process_args(self, target_category, comment):
         RHManageEventBase._process_args(self)
-        self.target_category = Category.get_or_404(int(request.form['target_category_id']), is_deleted=False)
+        self.target_category = target_category
+        self.comment = comment
 
     def _check_access(self):
         RHManageEventBase._check_access(self)
@@ -96,7 +104,7 @@ class RHMoveEvent(RHManageEventBase):
                   .format(event=self.event.title, category=self.target_category.title),
                   'success')
         else:
-            create_event_request(self.event, self.target_category)
+            create_event_request(self.event, self.target_category, self.comment)
             flash(_('Moving the event "{event}" to "{category}" has been requested and is pending approval')
                   .format(event=self.event.title, category=self.target_category.title),
                   'success')
