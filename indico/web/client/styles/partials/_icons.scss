@@ -601,3 +601,8 @@ i[class^='icon-']::before {
   @extend .icon-lock;
   color: $red;
 }
+
+.icon-unlisted-event {
+  @extend .icon-eye-blocked;
+  color: $red;
+}
