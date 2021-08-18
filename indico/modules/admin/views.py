@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from indico.util.i18n import _
-from indico.web.breadcrumbs import render_breadcrumbs
+from indico.web.breadcrumbs import Breadcrumb, render_breadcrumbs
 from indico.web.flask.util import url_for
 from indico.web.menu import get_menu_item
 from indico.web.views import WPDecorated, WPJinjaMixin
@@ -21,7 +21,7 @@ class WPAdmin(WPJinjaMixin, WPDecorated):
 
     def _get_breadcrumbs(self):
         menu_item = get_menu_item('admin-sidemenu', self._kwargs['active_menu_item'])
-        items = [(_('Administration'), url_for('core.admin_dashboard'))]
+        items = [Breadcrumb(_('Administration'), url_for('core.admin_dashboard'))]
         if menu_item:
             items.append(menu_item.title)
         return render_breadcrumbs(*items)
