@@ -55,6 +55,11 @@ class EventMoveRequest(db.Model):
         default=MoveRequestState.pending,
         nullable=False
     )
+    requestor_comment = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     moderator_comment = db.Column(
         db.String,
         nullable=False,

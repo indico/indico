@@ -387,16 +387,18 @@ def sort_reviewing_questions(questions, new_positions):
     logger.info('Reviewing questions of %r reordered by %r', questions[0].event, session.user)
 
 
-def create_event_request(event, category):
+def create_event_request(event, category, comment=''):
     assert event.category != category
-    req = EventMoveRequest(event=event, category=category, requestor=session.user)
+    req = EventMoveRequest(event=event, category=category, requestor=session.user, requestor_comment=comment)
     db.session.flush()
     logger.info('Category move request %r to %r created by %r', req, category, session.user)
     sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
     event.log(EventLogRealm.event, LogKind.change, 'Category', f'Move to "{category.title}" requested',
-              user=session.user, data={'Category ID': category.id, 'Category': sep.join(category.chain_titles)},
+              user=session.user, data={'Category ID': category.id, 'Category': sep.join(category.chain_titles),
+                                       'Comment': comment},
               meta={'event_move_request_id': req.id})
     category.log(CategoryLogRealm.events, LogKind.positive, 'Moderation', f'Event move requested: "{event.title}"',
-                 session.user, data={'Event ID': event.id, 'From': sep.join(event.category.chain_titles)},
+                 session.user, data={'Event ID': event.id, 'From': sep.join(event.category.chain_titles),
+                                     'Comment': comment},
                  meta={'event_move_request_id': req.id})
     return req
