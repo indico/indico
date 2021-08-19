@@ -9,7 +9,10 @@
           enableIfChecked:false, build_url:false, ajaxDialog:false, updateHtml:false */
 
 import _ from 'lodash';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
+import {SingleEventMove, BulkEventMove} from 'indico/modules/events/management/EventMove';
 import {showUserSearch} from 'indico/react/components/principals/imperative';
 import {$T} from 'indico/utils/i18n';
 
@@ -253,39 +256,7 @@ import {$T} from 'indico/utils/i18n';
   };
 
   global.setupCategoryEventList = function setupCategoryEventList(categoryId) {
-    let isEverythingSelected = false;
-
-    _fetchSourceCategory(categoryId);
-    enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
-
-    $('.event-management .js-move-event-to-subcategory').on('click', function(evt) {
-      evt.preventDefault();
-      _moveEvents(_categories[categoryId], $(this).data('href'));
-    });
-
-    $('.js-event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
-      evt.preventDefault();
-
-      if ($(this).hasClass('disabled')) {
-        return;
-      }
-
-      const data = {};
-      if (isEverythingSelected()) {
-        data.all_selected = 1; // do NOT change this to true - the code on the server expects '1'
-      } else {
-        data.event_id = _.map(
-          $('#event-management input[name=event_id]:checkbox:checked'),
-          function(obj) {
-            return obj.value;
-          }
-        );
-      }
-
-      _moveEvents(_categories[categoryId], $(this).data('href'), data);
-    });
-
-    isEverythingSelected = paginatedSelectAll({
+    const isEverythingSelected = paginatedSelectAll({
       containerSelector: '#event-management',
       checkboxSelector: 'input:checkbox[name=event_id]',
       allSelectedSelector: 'input:checkbox[name=all_selected]',
@@ -308,6 +279,47 @@ import {$T} from 'indico/utils/i18n';
         },
       },
     }).isEverythingSelected;
+
+    _fetchSourceCategory(categoryId);
+
+    [].forEach.call(
+      document.querySelectorAll('.js-move-event-to-subcategory-container'),
+      moveContainer => {
+        ReactDOM.render(
+          React.createElement(SingleEventMove, {
+            eventId: +moveContainer.dataset.eventId,
+            currentCategoryId: categoryId,
+            hasPendingMoveRequest: moveContainer.dataset.pendingRequest !== undefined,
+            inCategoryManagement: true,
+          }),
+          moveContainer
+        );
+      }
+    );
+
+    const bulkMoveContainer = document.querySelector('#js-move-events-to-subcategory-container');
+    ReactDOM.render(
+      React.createElement(BulkEventMove, {
+        currentCategoryId: categoryId,
+        getEventData: () => {
+          const allSelected = isEverythingSelected();
+          const eventIds = [].map.call(
+            document.querySelectorAll(
+              '#event-management input[name=event_id][type=checkbox]:checked'
+            ),
+            o => o.value
+          );
+          return {
+            allSelected,
+            eventIds: allSelected ? null : eventIds,
+            eventCount: allSelected ? $('#event-management').data('total') : eventIds.length,
+          };
+        },
+      }),
+      bulkMoveContainer
+    );
+
+    enableIfChecked('#event-management', 'input[name=event_id]', '.js-enabled-if-checked');
   };
 
   function _fetchSourceCategory(categoryId) {
@@ -378,55 +390,6 @@ import {$T} from 'indico/utils/i18n';
           url: endpoint,
           type: 'POST',
           data: $.extend({target_category_id: category.id}, data),
-          error: handleAjaxError,
-          success(data) {
-            if (data.success) {
-              location.reload();
-            }
-          },
-        });
-      },
-    });
-  }
-
-  function _moveEvents(source, endpoint, data) {
-    const sourceId = _.isObject(source) ? source.category.id : source;
-    const eventCount = data
-      ? data.all_selected
-        ? $('#event-management').data('total')
-        : data.event_id.length
-      : 1;
-
-    $('<div>').categorynavigator({
-      category: source,
-      confirmation: true,
-      openInDialog: true,
-      actionButtonText: $T.gettext('Move here'),
-      dialogTitle: $T.ngettext('Move event', 'Move events', eventCount),
-      dialogSubtitle: $T.ngettext(
-        'Select category destination for the event',
-        'Select category destination for {0} selected events'.format(eventCount),
-        eventCount
-      ),
-      actionOn: {
-        categoriesWithoutEventCreationRights: {
-          disabled: true,
-        },
-        categories: {
-          disabled: true,
-          ids: [sourceId],
-          message: $T.ngettext(
-            'The event is already here',
-            'The selected events are already here',
-            eventCount
-          ),
-        },
-      },
-      onAction(category) {
-        $.ajax({
-          url: endpoint,
-          type: 'POST',
-          data: $.extend({target_category_id: category.id}, data || {}),
           error: handleAjaxError,
           success(data) {
             if (data.success) {

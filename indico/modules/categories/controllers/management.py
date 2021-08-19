@@ -33,12 +33,13 @@ from indico.modules.categories.schemas import EventMoveRequestSchema
 from indico.modules.categories.util import get_image_data, serialize_category_role
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
+from indico.modules.events.operations import create_event_request
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import PrincipalList, not_empty
+from indico.util.marshmallow import ModelField, PrincipalList, not_empty
 from indico.util.roles import ImportRoleMembersMixin
 from indico.util.string import crc32
 from indico.web.args import parser, use_kwargs
@@ -82,7 +83,7 @@ class RHManageCategoryContent(RHManageCategoryBase):
         direction = 'desc' if request.args.get('desc', '1') == '1' else 'asc'
         order_column = order_columns[request.args.get('order', 'start_dt')]
         query = (Event.query.with_parent(self.category)
-                 .options(joinedload('series'), undefer_group('series'),
+                 .options(joinedload('series'), undefer_group('series'), joinedload('pending_move_request'),
                           load_only('id', 'category_id', 'created_dt', 'end_dt', 'protection_mode', 'start_dt',
                                     'title', 'type_', 'series_pos', 'series_count', 'visibility'))
                  .order_by(getattr(order_column, direction)())
@@ -377,13 +378,17 @@ class RHSortSubcategories(RHManageCategoryBase):
 class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
     """Base RH to manage selected events in a category."""
 
-    def _process_args(self):
+    @use_kwargs({
+        'all_selected': fields.Bool(missing=False),
+        'event_ids': fields.List(fields.Int(), data_key='event_id', missing=[]),
+    })
+    def _process_args(self, all_selected, event_ids):
         RHManageCategoryBase._process_args(self)
         query = (Event.query
                  .with_parent(self.category)
                  .order_by(Event.start_dt.desc()))
-        if request.form.get('all_selected') != '1':
-            query = query.filter(Event.id.in_(map(int, request.form.getlist('event_id'))))
+        if not all_selected:
+            query = query.filter(Event.id.in_(event_ids))
         self.events = query.all()
 
 
@@ -438,18 +443,34 @@ class RHSplitCategory(RHManageCategorySelectedEventsBase):
 
 
 class RHMoveEvents(RHManageCategorySelectedEventsBase):
-    def _process_args(self):
+    @use_kwargs({
+        'target_category': ModelField(Category, filter_deleted=True, required=True, data_key='target_category_id'),
+        'comment': fields.String(missing=''),
+    })
+    def _process_args(self, target_category, comment):
         RHManageCategorySelectedEventsBase._process_args(self)
-        self.target_category = Category.get_or_404(int(request.form['target_category_id']), is_deleted=False)
-        if not self.target_category.can_create_events(session.user):
-            raise Forbidden(_('You may only move events to categories where you are allowed to create events.'))
+        self.target_category = target_category
+        self.comment = comment
+
+    def _check_access(self):
+        RHManageCategorySelectedEventsBase._check_access(self)
+        if (not self.target_category.can_create_events(session.user)
+                and not self.target_category.can_propose_events(session.user)):
+            raise Forbidden(_('You may not move events to this category.'))
 
     def _process(self):
-        for event in self.events:
-            event.move(self.target_category)
-        flash(ngettext('You have moved one event to the category "{cat}"',
-                       'You have moved {count} events to the category "{cat}"', len(self.events))
-              .format(count=len(self.events), cat=self.target_category.title), 'success')
+        if self.target_category.can_create_events(session.user):
+            for event in self.events:
+                event.move(self.target_category)
+            flash(ngettext('You have moved {count} event to the category "{cat}"',
+                           'You have moved {count} events to the category "{cat}"', len(self.events))
+                  .format(count=len(self.events), cat=self.target_category.title), 'success')
+        else:
+            for event in self.events:
+                create_event_request(event, self.target_category, self.comment)
+            flash(ngettext('You have requested the move of {count} event to the category "{cat}"',
+                           'You have requested the move of {count} events to the category "{cat}"', len(self.events))
+                  .format(count=len(self.events), cat=self.target_category.title), 'success')
         return jsonify_data(flash=False)
 
 

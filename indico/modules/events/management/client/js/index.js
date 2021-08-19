@@ -23,13 +23,13 @@ import './badges';
 
 import {$T} from 'indico/utils/i18n';
 
-import EventMove from './EventMove';
+import {SingleEventMove} from './EventMove';
 
 (function(global) {
   global.setupEventManagementActionMenu = function setupEventManagementActionMenu() {
     const moveContainer = document.querySelector('#event-action-move-container');
     ReactDOM.render(
-      React.createElement(EventMove, {
+      React.createElement(SingleEventMove, {
         eventId: +moveContainer.dataset.eventId,
         currentCategoryId: +moveContainer.dataset.categoryId,
         hasPendingMoveRequest: moveContainer.dataset.pendingRequest !== undefined,

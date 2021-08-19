@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import bulkEventMoveURL from 'indico-url:categories.move_events';
 import eventMoveURL from 'indico-url:event_management.move';
 
 import PropTypes from 'prop-types';
@@ -14,23 +15,27 @@ import {Button, Form, Modal} from 'semantic-ui-react';
 
 import {IButton} from 'indico/react/components';
 import {FinalSubmitButton, FinalTextArea, handleSubmitError} from 'indico/react/forms';
-import {Param, Translate} from 'indico/react/i18n';
+import {Param, Translate, PluralTranslate, Singular, Plural} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
-export default function EventMove({eventId, currentCategoryId, hasPendingMoveRequest}) {
+function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount, bulk}) {
   const [targetCategory, setTargetCategory] = useState(null);
 
   const selectCategoryForMove = initialCategoryId => {
     $('<div>').categorynavigator({
       category: initialCategoryId,
       openInDialog: true,
+      dialogTitle: bulk ? Translate.string('Move events') : Translate.string('Move event'),
+      dialogSubtitle: bulk
+        ? Translate.string('Select destination category for the selected events')
+        : Translate.string('Select destination category for the event'),
       actionOn: {
         categoriesWithoutEventProposalOrCreationRights: {
           disabled: true,
         },
         categories: {
           disabled: true,
-          ids: [currentCategoryId],
+          ids: currentCategoryId ? [currentCategoryId] : [],
           message: Translate.string('The event is already in this category'),
         },
       },
@@ -44,37 +49,19 @@ export default function EventMove({eventId, currentCategoryId, hasPendingMoveReq
     });
   };
 
+  const eventCount = bulk ? getEventCount() : 1;
   const closeModal = () => setTargetCategory(null);
   const changeCategory = () => {
     closeModal();
     selectCategoryForMove(targetCategory.id);
   };
-  const submitMove = async ({comment}) => {
-    const data = {target_category_id: targetCategory.id, comment};
-    try {
-      await indicoAxios.post(eventMoveURL({event_id: eventId}), data);
-    } catch (e) {
-      return handleSubmitError(e);
-    }
-    location.reload();
-    // never finish submitting to avoid fields being re-enabled
-    await new Promise(() => {});
-  };
 
   return (
     <>
-      <IButton
-        borderless
-        icon="transmission"
-        title={Translate.string('Move event to another category')}
-        disabled={hasPendingMoveRequest}
-        onClick={() => selectCategoryForMove(currentCategoryId)}
-      >
-        <Translate>Move</Translate>
-      </IButton>
+      {renderTrigger(() => selectCategoryForMove(currentCategoryId))}
       {targetCategory && (
         <FinalForm
-          onSubmit={submitMove}
+          onSubmit={data => submitMove(targetCategory.id, data)}
           initialValues={{comment: ''}}
           subscription={{submitting: true}}
         >
@@ -93,26 +80,47 @@ export default function EventMove({eventId, currentCategoryId, hasPendingMoveReq
               </Modal.Header>
               <Modal.Content>
                 <Form onSubmit={fprops.handleSubmit} id="move-event-form">
-                  <Translate>
-                    You are about to move this event to{' '}
-                    <Param
-                      name="target"
-                      value={targetCategory.path.join(' » ')}
-                      wrapper={<strong />}
-                    />
-                    .
-                  </Translate>
+                  <PluralTranslate count={eventCount}>
+                    <Singular>
+                      You are about to move this event to{' '}
+                      <Param
+                        name="target"
+                        value={targetCategory.path.join(' » ')}
+                        wrapper={<strong />}
+                      />
+                      .
+                    </Singular>
+                    <Plural>
+                      You are about to move <Param name="count" value={eventCount} /> events to{' '}
+                      <Param
+                        name="target"
+                        value={targetCategory.path.join(' » ')}
+                        wrapper={<strong />}
+                      />
+                      .
+                    </Plural>
+                  </PluralTranslate>
                   {targetCategory.moderated && (
                     <>
                       <p>
-                        <Translate>
-                          Moving an event there{' '}
-                          <Param name="strong" wrapper={<strong />}>
-                            requires approval
-                          </Param>{' '}
-                          by a category manager. Until approved, the event will remain in its
-                          current category.
-                        </Translate>
+                        <PluralTranslate count={eventCount}>
+                          <Singular>
+                            Moving an event there{' '}
+                            <Param name="strong" wrapper={<strong />}>
+                              requires approval
+                            </Param>{' '}
+                            by a category manager. Until approved, the event will remain in its
+                            current category.
+                          </Singular>
+                          <Plural>
+                            Moving events there{' '}
+                            <Param name="strong" wrapper={<strong />}>
+                              requires approval
+                            </Param>{' '}
+                            by a category manager. Until approved, the events will remain in its
+                            current category.
+                          </Plural>
+                        </PluralTranslate>
                       </p>
                       <FinalTextArea
                         name="comment"
@@ -150,7 +158,122 @@ export default function EventMove({eventId, currentCategoryId, hasPendingMoveReq
 }
 
 EventMove.propTypes = {
+  bulk: PropTypes.bool,
+  submitMove: PropTypes.func.isRequired,
+  renderTrigger: PropTypes.func.isRequired,
+  getEventCount: PropTypes.func,
+  currentCategoryId: PropTypes.number,
+};
+
+EventMove.defaultProps = {
+  bulk: false,
+  currentCategoryId: null,
+  getEventCount: null,
+};
+
+export function SingleEventMove({
+  eventId,
+  currentCategoryId,
+  hasPendingMoveRequest,
+  inCategoryManagement,
+}) {
+  const submitMove = async (targetCategoryId, {comment}) => {
+    const data = {target_category_id: targetCategoryId, comment};
+    try {
+      await indicoAxios.post(eventMoveURL({event_id: eventId}), data);
+    } catch (e) {
+      return handleSubmitError(e);
+    }
+    location.reload();
+    // never finish submitting to avoid fields being re-enabled
+    await new Promise(() => {});
+  };
+
+  const renderTrigger = inCategoryManagement
+    ? fn => (
+        <a
+          className={`i-link icon-transmission ${hasPendingMoveRequest ? 'disabled' : ''}`}
+          title={
+            hasPendingMoveRequest
+              ? Translate.string('Event has a pending move request')
+              : Translate.string('Move event to another category')
+          }
+          onClick={!hasPendingMoveRequest ? fn : undefined}
+        />
+      )
+    : fn => (
+        <IButton
+          borderless
+          icon="transmission"
+          title={Translate.string('Move event to another category')}
+          disabled={hasPendingMoveRequest}
+          onClick={fn}
+        >
+          <Translate>Move</Translate>
+        </IButton>
+      );
+
+  return (
+    <EventMove
+      submitMove={submitMove}
+      renderTrigger={renderTrigger}
+      currentCategoryId={currentCategoryId}
+    />
+  );
+}
+
+SingleEventMove.propTypes = {
   eventId: PropTypes.number.isRequired,
   currentCategoryId: PropTypes.number.isRequired,
   hasPendingMoveRequest: PropTypes.bool.isRequired,
+  inCategoryManagement: PropTypes.bool,
+};
+
+SingleEventMove.defaultProps = {
+  inCategoryManagement: false,
+};
+
+export function BulkEventMove({currentCategoryId, getEventData}) {
+  const submitMove = async (targetCategoryId, {comment}) => {
+    const selectedEventData = getEventData();
+    const data = {
+      target_category_id: targetCategoryId,
+      all_selected: selectedEventData.allSelected,
+      event_id: selectedEventData.allSelected ? [] : selectedEventData.eventIds,
+      comment,
+    };
+    try {
+      await indicoAxios.post(bulkEventMoveURL({category_id: currentCategoryId}), data);
+    } catch (e) {
+      return handleSubmitError(e);
+    }
+    location.reload();
+    // never finish submitting to avoid fields being re-enabled
+    await new Promise(() => {});
+  };
+
+  const renderTrigger = fn => (
+    <IButton
+      href="#"
+      icon="transmission"
+      classes={{'js-enabled-if-checked': true}}
+      title={Translate.string('Move selected events to another category')}
+      onClick={fn}
+    />
+  );
+
+  return (
+    <EventMove
+      submitMove={submitMove}
+      renderTrigger={renderTrigger}
+      currentCategoryId={currentCategoryId}
+      getEventCount={() => getEventData().eventCount}
+      bulk
+    />
+  );
+}
+
+BulkEventMove.propTypes = {
+  currentCategoryId: PropTypes.number.isRequired,
+  getEventData: PropTypes.func.isRequired,
 };
