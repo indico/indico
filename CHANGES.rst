@@ -74,6 +74,7 @@ Internal Changes
   :user:`bpedersen2`)
 - Add ``event.registration.after_registration_form_clone`` signal (:pr:`5037`, thanks
   :user:`vasantvohra`)
+- Add ``registration-invite-options`` template hook (:pr:`5045`, thanks :user:`vasantvohra`)
 
 
 Version 3.0

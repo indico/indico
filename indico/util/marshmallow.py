@@ -156,9 +156,11 @@ class ModelField(Field):
         'type': 'Invalid input type.'
     }
 
-    def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, **kwargs):
+    def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, filter_deleted=False,
+                 **kwargs):
         self.model = model
         self.get_query = get_query
+        self.filter_deleted = filter_deleted
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -181,7 +183,10 @@ class ModelField(Field):
             value = self.column_type(value)
         except (TypeError, ValueError):
             self.fail('type')
-        obj = self.get_query(self.model).filter(self.column == value).one_or_none()
+        query = self.get_query(self.model).filter(self.column == value)
+        if self.filter_deleted:
+            query = query.filter(~self.model.is_deleted)
+        obj = query.one_or_none()
         if obj is None:
             self.fail('not_found', value=value)
         return obj
@@ -201,9 +206,10 @@ class ModelList(Field):
     }
 
     def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, collection_class=list,
-                 **kwargs):
+                 filter_deleted=False, **kwargs):
         self.model = model
         self.get_query = get_query
+        self.filter_deleted = filter_deleted
         self.collection_class = collection_class
         if column:
             self.column = getattr(model, column)
@@ -228,7 +234,10 @@ class ModelList(Field):
         except (TypeError, ValueError):
             self.fail('type')
         requested = set(value)
-        objs = self.get_query(self.model).filter(self.column.in_(value)).all()
+        query = self.get_query(self.model).filter(self.column.in_(value))
+        if self.filter_deleted:
+            query = query.filter(~self.model.is_deleted)
+        objs = query.all()
         found = {getattr(x, self.column.key) for x in objs}
         invalid = requested - found
         if invalid:
