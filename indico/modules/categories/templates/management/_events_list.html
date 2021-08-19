@@ -19,6 +19,12 @@
                 <span class="icon-unlocked icon-protection-public"></span>
             {% endif %}
         </td>
+        <td class="i-table column-icon">
+            {% if event.pending_move_request %}
+                <span class="icon-transmission"
+                      title="{% trans %}Event has a pending move request to another category{% endtrans %}"></span>
+            {% endif %}
+        </td>
         <td class="i-table">
             <a href="{{ url_for('event_management.settings', event) }}">
                 {{ event.get_verbose_title(show_series_pos=(event.type == 'lecture')) | striptags }}
@@ -32,9 +38,9 @@
                data-href="{{ url_for('event_management.delete', event) }}"
                data-ajax-dialog
                data-reload-after></a>
-            <a class="i-link icon-transmission js-move-event-to-subcategory"
-               title="{% trans %}Move to different category{% endtrans %}"
-               data-href="{{ url_for('event_management.move', event) }}"></a>
+            <span class="js-move-event-to-subcategory-container"
+                  data-event-id="{{ event.id }}"
+                  {{ 'data-pending-request' if event.pending_move_request }}></span>
             <a href="{{ event.url }}"
                class="i-link icon-arrow-right-sparse"
                title="{% trans %}Go to the event display page{% endtrans %}"></a>
@@ -46,6 +52,7 @@
     <table class="i-table event-management">
         <thead>
             <tr class="i-table">
+                <th class="i-table column-icon"></th>
                 <th class="i-table column-icon"></th>
                 <th class="i-table column-icon"></th>
                 <th class="i-table column-icon"></th>
@@ -114,10 +121,7 @@
                        data-ajax-dialog></a>
                 </div>
                 <div class="group">
-                    <a href="#"
-                       class="i-button icon-transmission js-enabled-if-checked js-move-events-to-subcategory"
-                       title="{% trans %}Move selected events to a different category{% endtrans %}"
-                       data-href="{{ url_for('.move_events', category) }}"></a>
+                    <span id="js-move-events-to-subcategory-container"></span>
                     <a href="#" class="i-button icon-remove js-enabled-if-checked"
                        title="{% trans %}Delete selected events{% endtrans %}"
                        data-href="{{ url_for('.delete_events', category) }}"

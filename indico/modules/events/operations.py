@@ -389,6 +389,8 @@ def sort_reviewing_questions(questions, new_positions):
 
 def create_event_request(event, category, comment=''):
     assert event.category != category
+    if event.pending_move_request:
+        event.pending_move_request.withdraw()
     req = EventMoveRequest(event=event, category=category, requestor=session.user, requestor_comment=comment)
     db.session.flush()
     logger.info('Category move request %r to %r created by %r', req, category, session.user)
