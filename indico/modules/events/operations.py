@@ -204,12 +204,12 @@ def clone_into_event(source_event, target_event, cloners):
 
     # Run the modular cloning system
     g.importing_event = True
-    EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)
+    used_cloners = EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)
     del g.importing_event
     signals.event.imported.send(target_event, source_event=source_event)
     cloner_classes = {c.name: c for c in get_event_cloners().values()}
     target_event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Data imported', session.user,
-                     data={'Modules': ', '.join(orig_string(cloner_classes[c].friendly_name)
+                     data={'Modules': ', '.join(orig_string(used_cloners[c].friendly_name)
                                                 for c in cloners if not cloner_classes[c].is_internal)})
 
     return target_event
