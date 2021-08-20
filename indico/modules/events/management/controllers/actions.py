@@ -31,9 +31,10 @@ class RHDeleteEvent(RHManageEventBase):
         self.event.delete('Deleted by user', session.user)
         flash(_('Event "{}" successfully deleted.').format(self.event.title), 'success')
         category = self.event.category
-        if category.can_manage(session.user):
+
+        if category and category.can_manage(session.user):
             redirect_url = url_for('categories.manage_content', category)
-        elif category.can_access(session.user):
+        elif category and category.can_access(session.user):
             redirect_url = url_for('categories.display', category)
         else:
             redirect_url = url_for_index()
