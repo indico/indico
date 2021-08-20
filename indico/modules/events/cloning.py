@@ -101,6 +101,7 @@ class EventCloner:
         for name, cloner in active_cloners.items():
             shared_data[name] = cloner.run(new_event, cloner_names, cloner._prepare_shared_data(shared_data),
                                            event_exists=event_exists)
+        return active_cloners
 
     @cached_classproperty
     @classmethod
