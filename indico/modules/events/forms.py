@@ -9,7 +9,7 @@ from datetime import time
 
 from flask import session
 from wtforms.fields import StringField, TextAreaField
-from wtforms.fields.core import SelectField
+from wtforms.fields.core import BooleanField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
@@ -26,7 +26,7 @@ from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
 from indico.web.forms.validators import LinkedDateTime
-from indico.web.forms.widgets import CKEditorWidget
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -69,7 +69,8 @@ class EventLabelForm(IndicoForm):
 
 
 class EventCreationFormBase(IndicoForm):
-    category = CategoryField(_('Category'), [DataRequired()], require_event_creation_rights=True)
+    listing = BooleanField(_('Listing'), default=True, widget=SwitchWidget())
+    category = CategoryField(_('Category'), require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)
@@ -77,7 +78,7 @@ class EventCreationFormBase(IndicoForm):
     create_booking = JSONField()
 
     def validate_category(self, field):
-        if not field.data.can_create_events(session.user):
+        if self._fields['listing'].data and not field.data.can_create_events(session.user):
             raise ValidationError(_('You are not allowed to create events in this category.'))
 
 

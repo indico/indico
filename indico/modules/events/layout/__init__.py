@@ -49,7 +49,7 @@ theme_settings = ThemeSettingsProxy()
 @signals.event.created.connect
 def _event_created(event, **kwargs):
     defaults = event.category.default_event_themes if event.category else None
-    if not layout_settings.get(event, 'timetable_theme') and event.type_.name in defaults:
+    if not layout_settings.get(event, 'timetable_theme') and defaults and event.type_.name in defaults:
         layout_settings.set(event, 'timetable_theme', defaults[event.type_.name])
 
 

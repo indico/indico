@@ -38,6 +38,9 @@ def notify_event_creation(event, occurrences=None):
                         and dates/times are only taken from the
                         events in this list.
     """
+    if not event.category:
+        return
+
     emails = set()
     query = (event.category.chain_query.
              filter(Category.notify_managers | (Category.event_creation_notification_emails != []))
