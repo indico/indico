@@ -4,6 +4,7 @@
                    'title': form.category.data.title} if form.category.data else none %}
 
 {{ form_header(form, action=url_for('events.create', event_type=event_type)) }}
+{{ form_row(form.listing) }}
 {{ form_row(form.category, orientation=('hidden' if single_category else '')) }}
 {{ form_rows(form, fields=form._field_order) }}
 {% if form._advanced_field_order %}
@@ -91,6 +92,7 @@ purely client-side and are worded for event creation instead of being generic.
 <script>
     setupEventCreationDialog({
         categoryField: $('#{{ form.category.id }}'),
+        listingField: $('#{{ form.listing.id }}'),
         protectionModeFields: $('input[name="{{ form.protection_mode.name }}"][id^="{{ form.protection_mode.id }}"]'),
         initialCategory: {{ category | tojson }},
         checkAvailability: {{ check_room_availability | tojson }},

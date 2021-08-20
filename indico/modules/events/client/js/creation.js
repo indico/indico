@@ -20,6 +20,8 @@ import {camelizeKeys} from 'indico/utils/case';
     options = $.extend(
       {
         categoryField: null,
+        listingField: null,
+        listingValue: null,
         protectionModeFields: null,
         initialCategory: null,
         checkAvailability: false,
@@ -58,18 +60,37 @@ import {camelizeKeys} from 'indico/utils/case';
       if (mode === 'inheriting') {
         mode = currentCategory.is_protected ? 'inheriting-protected' : 'inheriting-public';
       }
-      const elem = messages.filter('.{0}-protection-message'.format(mode));
-      elem.find('.js-category-title').text(currentCategory.title);
+      const elem = messages.filter(`.${mode}-protection-message`);
+      elem.find('.js-category-title').text(currentCategory && currentCategory.title);
       protectionMessage.html(elem);
     }
 
     options.categoryField.on('indico:categorySelected', (evt, cat) => {
-      if (!currentCategory) {
+      if (!options.listingField.prop('checked')) {
+        options.protectionModeFields.filter('[value=inheriting]').prop('disabled', true);
+        options.protectionModeFields.filter('[value=public]').prop('checked', true);
+      } else if (!currentCategory) {
         options.protectionModeFields.prop('disabled', false);
         options.protectionModeFields.filter('[value=inheriting]').prop('checked', true);
       }
       currentCategory = cat;
       updateProtectionMessage();
+    });
+
+    options.listingField.on('change', evt => {
+      if (evt.target.checked) {
+        $('#form-group-event-creation-category').show();
+        options.categoryField.val(JSON.stringify(options.initialCategory));
+        options.categoryField.prop('disabled', false);
+        $('#category-title-event-creation-category').text(options.initialCategory.title);
+        options.categoryField.trigger('indico:categorySelected', [options.initialCategory]);
+      } else {
+        $('#form-group-event-creation-category').hide();
+        $('#event-creation-protection_mode-1').prop('disabled', true);
+        options.categoryField.val('');
+        options.categoryField.prop('disabled', true);
+        options.categoryField.trigger('indico:categorySelected', []);
+      }
     });
 
     options.protectionModeFields.on('change', function() {
