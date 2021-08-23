@@ -66,6 +66,7 @@ Bugfixes
 - Correctly handle relative URLs in PDF generation (:issue:`5042`, :pr:`5044`)
 - Render markdown in track descriptions in PDF generation (:issue:`5043`, :pr:`5044`)
 - Fix error when importing chairpersons from an existing event (:pr:`5047`)
+- Fix broken timetable entry permalinks when query string args are present (:pr:`5049`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
