@@ -352,7 +352,8 @@ import {$T} from '../../utils/i18n';
       if (stripArg) {
         params.delete(stripArg);
       }
-      const url = window.location.pathname + params.toString();
+      const newQueryString = params.toString();
+      const url = window.location.pathname + (newQueryString ? `?${newQueryString}` : '');
 
       $('<a>', {
         class: 'anchor-link',
