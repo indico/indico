@@ -89,10 +89,29 @@ purely client-side and are worded for event creation instead of being generic.
     </div>
 </script>
 
+<script type="text/html" id="event-listing-message">
+    <div class="form-group">
+        <div class="action-box mid-form for-form listing-message unlisted-message info">
+            <div class="section">
+                <div class="icon icon-eye-blocked"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Unlisted event{% endtrans %}
+                    </div>
+                    <div>
+                        {% trans -%}
+                            Users will not see this event yet. You can publish the event in a category once it is ready.
+                        {%- endtrans %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script>
     setupEventCreationDialog({
         categoryField: $('#{{ form.category.id }}'),
-        listingField: $('#{{ form.listing.id }}'),
         protectionModeFields: $('input[name="{{ form.protection_mode.name }}"][id^="{{ form.protection_mode.id }}"]'),
         initialCategory: {{ category | tojson }},
         checkAvailability: {{ check_room_availability | tojson }},

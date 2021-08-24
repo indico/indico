@@ -20,7 +20,6 @@ import {camelizeKeys} from 'indico/utils/case';
     options = $.extend(
       {
         categoryField: null,
-        listingField: null,
         listingValue: null,
         protectionModeFields: null,
         initialCategory: null,
@@ -33,6 +32,7 @@ import {camelizeKeys} from 'indico/utils/case';
 
     const messages = $($.parseHTML($('#event-creation-protection-messages').html()));
     const protectionMessage = $('<div>', {class: 'form-group', css: {marginTop: '5px'}});
+    const listingMessage = $($.parseHTML($('#event-listing-message').html()));
 
     const $createBooking = $('#event-creation-create_booking');
     const $availableMessage = $('#room-available');
@@ -48,15 +48,18 @@ import {camelizeKeys} from 'indico/utils/case';
     const $prebookingSwitch = $('#create-prebooking');
     const $bookingSwitchPrebooking = $('#create-booking-over-prebooking');
     const $prebookingSwitchPrebooking = $('#create-prebooking-over-prebooking');
+    const $listingField = $('#event-creation-listing-checkbox');
 
     let currentCategory = null;
     let previousRoomId, $currentMessage, startDt, endDt, category, roomData, timezone;
     let multipleOccurrences = false;
 
     protectionMessage.appendTo(options.protectionModeFields.closest('.form-field'));
+    listingMessage.appendTo($listingField.closest('.form-field'));
+    listingMessage.hide();
 
     function updateProtectionMessage() {
-      if (!options.listingField.checked) {
+      if (!currentCategory) {
         return;
       }
       let mode = options.protectionModeFields.filter(':checked').val();
@@ -68,6 +71,11 @@ import {camelizeKeys} from 'indico/utils/case';
       protectionMessage.html(elem);
     }
 
+    function updateListingMessage() {
+      const listingValue = JSON.parse($listingField.val());
+      listingMessage.toggle(!listingValue);
+    }
+
     options.categoryField.on('indico:categorySelected', (evt, cat) => {
       if (!currentCategory) {
         options.protectionModeFields.filter('[value=inheriting]').prop('checked', true);
@@ -76,12 +84,12 @@ import {camelizeKeys} from 'indico/utils/case';
       updateProtectionMessage();
     });
 
-    options.listingField.on('change', evt => {
-      if (evt.target.checked) {
+    $listingField.on('change', evt => {
+      const value = JSON.parse(evt.target.value);
+      if (value) {
         $('#form-group-event-creation-category').show();
         $('#form-group-event-creation-protection_mode').show();
         options.categoryField.val(JSON.stringify(options.initialCategory));
-        options.categoryField.prop('disabled', false);
         if (options.initialCategory) {
           $('#category-title-event-creation-category').text(options.initialCategory.title);
         }
@@ -90,10 +98,9 @@ import {camelizeKeys} from 'indico/utils/case';
       } else {
         $('#form-group-event-creation-category').hide();
         $('#form-group-event-creation-protection_mode').hide();
-        options.categoryField.val('');
-        options.categoryField.prop('disabled', true);
         options.categoryField.trigger('indico:categorySelected', []);
       }
+      updateListingMessage();
     });
 
     options.protectionModeFields.on('change', function() {
