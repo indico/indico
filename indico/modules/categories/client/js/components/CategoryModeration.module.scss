@@ -7,6 +7,19 @@
 
 @import 'base/palette';
 
+:global(.ui.table).table {
+  // fix to allow the table to be wider than
+  // 800px set by .page-content
+  @media (min-width: 1500px) {
+    max-width: 1200px;
+    width: max-content;
+  }
+}
+
+:global(.ui.table) tr td.no-border {
+  border-top: none;
+}
+
 .user {
   display: flex;
   align-items: center;

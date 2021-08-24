@@ -8,6 +8,7 @@
 import eventRequestsURL from 'indico-url:categories.api_event_move_requests';
 import eventURL from 'indico-url:events.display';
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Button, Checkbox, Image, Input, Placeholder, Table} from 'semantic-ui-react';
@@ -16,8 +17,18 @@ import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {serializeDate} from 'indico/utils/date';
 import './CategoryModeration.module.scss';
+
+function getEventTime({startDt, endDt}) {
+  startDt = moment(startDt);
+  endDt = moment(endDt);
+
+  if (startDt.isSame(endDt, 'day')) {
+    return `${startDt.format('L LT')} → ${endDt.format('LT')}`;
+  } else {
+    return `${startDt.format('L LT')} → ${endDt.format('L LT')}`;
+  }
+}
 
 function PlaceholderTableRow() {
   return (
@@ -25,7 +36,7 @@ function PlaceholderTableRow() {
       <Table.Cell collapsing>
         <Checkbox />
       </Table.Cell>
-      <Table.Cell colSpan="4">
+      <Table.Cell colSpan="5">
         <Placeholder fluid>
           <Placeholder.Header image>
             <Placeholder.Line />
@@ -37,37 +48,64 @@ function PlaceholderTableRow() {
   );
 }
 
-function RequestTableRow({requestor, requestorComment, event, requestedDt, selected, onSelect}) {
+function MoveRequest({
+  requestor,
+  event,
+  category,
+  requestorComment,
+  requestedDt,
+  selected,
+  onSelect,
+}) {
   const {fullName, avatarURL, affiliation} = requestor;
   return (
-    <Table.Row>
-      <Table.Cell collapsing>
-        <Checkbox checked={selected} onChange={onSelect} />
-      </Table.Cell>
-      <Table.Cell styleName="user">
-        <Image styleName="avatar" src={avatarURL} size="mini" avatar />
-        <span>
-          {fullName} {affiliation && `(${affiliation})`}
-        </span>
-      </Table.Cell>
-      <Table.Cell>
-        <a href={eventURL({event_id: event.id})}>{event.title}</a>
-      </Table.Cell>
-      <Table.Cell>{serializeDate(requestedDt)}</Table.Cell>
-      <Table.Cell>{requestorComment}</Table.Cell>
-    </Table.Row>
+    <>
+      <Table.Row>
+        <Table.Cell collapsing>
+          <Checkbox checked={selected} onChange={onSelect} />
+        </Table.Cell>
+        <Table.Cell styleName="user">
+          <Image styleName="avatar" src={avatarURL} size="mini" avatar />
+          <span>
+            {fullName} {affiliation && `(${affiliation})`}
+          </span>
+        </Table.Cell>
+        <Table.Cell>
+          <a href={eventURL({event_id: event.id})}>{event.title}</a>
+        </Table.Cell>
+        <Table.Cell>{category.chainTitles.join(' » ')}</Table.Cell>
+        <Table.Cell>{getEventTime(event)}</Table.Cell>
+        <Table.Cell>
+          <span title={moment(requestedDt).format('L LT')}>{moment(requestedDt).fromNow()}</span>
+        </Table.Cell>
+      </Table.Row>
+      {requestorComment ? (
+        <Table.Row>
+          <Table.Cell styleName="no-border" />
+          <Table.Cell colSpan="5" styleName="no-border">
+            {requestorComment}
+          </Table.Cell>
+        </Table.Row>
+      ) : null}
+    </>
   );
 }
 
-RequestTableRow.propTypes = {
+MoveRequest.propTypes = {
   requestor: PropTypes.shape({
     fullName: PropTypes.string,
     avatarURL: PropTypes.string,
     affiliation: PropTypes.string,
   }).isRequired,
   event: PropTypes.shape({
-    id: PropTypes.number,
-    title: PropTypes.string,
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    startDt: PropTypes.string.isRequired,
+    endDt: PropTypes.string.isRequired,
+  }).isRequired,
+  category: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    chainTitles: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   requestedDt: PropTypes.string.isRequired,
   requestorComment: PropTypes.string.isRequired,
@@ -75,7 +113,7 @@ RequestTableRow.propTypes = {
   onSelect: PropTypes.func.isRequired,
 };
 
-RequestTableRow.defaultProps = {
+MoveRequest.defaultProps = {
   selected: false,
 };
 
@@ -103,28 +141,30 @@ function RequestList({requests, onSubmit, loading}) {
   }
 
   return (
-    <Table celled>
+    <Table styleName="table">
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell />
           <Translate as={Table.HeaderCell}>User</Translate>
           <Translate as={Table.HeaderCell}>Event</Translate>
+          <Translate as={Table.HeaderCell}>Event Path</Translate>
+          <Translate as={Table.HeaderCell}>Event Date</Translate>
           <Translate as={Table.HeaderCell}>Requested Date</Translate>
-          <Translate as={Table.HeaderCell}>Comment</Translate>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {loading ? (
           <PlaceholderTableRow />
         ) : (
-          requests.map(({id, requestor, requestorComment, event, requestedDt}) => (
-            <RequestTableRow
+          requests.map(({id, requestor, requestorComment, event, category, requestedDt}) => (
+            <MoveRequest
               key={id}
               id={id}
               event={event}
+              category={category}
               requestor={requestor}
-              requestorComment={requestorComment}
               requestedDt={requestedDt}
+              requestorComment={requestorComment}
               selected={selected.has(id)}
               onSelect={() => select(id)}
             />
@@ -134,7 +174,7 @@ function RequestList({requests, onSubmit, loading}) {
       <Table.Footer fullWidth>
         <Table.Row>
           <Table.HeaderCell />
-          <Table.HeaderCell colSpan="4">
+          <Table.HeaderCell colSpan="5">
             <div styleName={`table-footer ${!isAnySelected ? 'disabled' : ''}`}>
               <Translate as={Button} onClick={() => submit(true)} color="teal">
                 Approve

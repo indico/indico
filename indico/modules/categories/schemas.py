@@ -6,15 +6,22 @@
 # LICENSE file for more details.
 
 from indico.core.marshmallow import fields, mm
+from indico.modules.categories import Category
 from indico.modules.categories.models.event_move_request import EventMoveRequest
 from indico.modules.events import Event
 from indico.modules.users import User
 
 
-class CategoryEventSchema(mm.SQLAlchemyAutoSchema):
+class MoveRequestEventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
-        fields = ('id', 'title')
+        fields = ('id', 'title', 'start_dt', 'end_dt')
+
+
+class MoveRequestCategorySchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Category
+        fields = ('id', 'chain_titles')
 
 
 class CategoryUserSchema(mm.SQLAlchemyAutoSchema):
@@ -26,7 +33,8 @@ class CategoryUserSchema(mm.SQLAlchemyAutoSchema):
 class EventMoveRequestSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventMoveRequest
-        fields = ('id', 'event', 'category_id', 'requestor', 'requestor_comment', 'state', 'requested_dt')
+        fields = ('id', 'event', 'category', 'requestor', 'requestor_comment', 'state', 'requested_dt')
 
-    event = fields.Nested(CategoryEventSchema)
+    event = fields.Nested(MoveRequestEventSchema)
+    category = fields.Nested(MoveRequestCategorySchema, attribute='event.category')
     requestor = fields.Nested(CategoryUserSchema)
