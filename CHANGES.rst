@@ -14,6 +14,8 @@ Improvements
 - Add support for syncing email addresses when logging in using external accounts
   (:pr:`5035`)
 - Use more space-efficient QR code version in registration tickets (:pr:`5052`)
+- Improve user experience when accessing an event restricted to registered participants
+  while not logged in (:pr:`5053`)
 
 Bugfixes
 ^^^^^^^^

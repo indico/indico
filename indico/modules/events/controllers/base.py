@@ -77,6 +77,10 @@ class RHDisplayEventBase(RHProtectedEventBase):
 
     def _show_registration_form(self):
         displayed_regforms, user_registrations = get_event_regforms_registrations(self.event, session.user)
+        if displayed_regforms and all(r.require_login for r in displayed_regforms) and not session.user:
+            # force the user to log in first. like this they will go back to the page they tried to
+            # originally access in case they are already registered for the event
+            raise Forbidden
         if len(displayed_regforms) == 1:
             return redirect(url_for('event_registration.display_regform', displayed_regforms[0]))
         return redirect(url_for('event_registration.display_regform_list', self.event))
