@@ -25,8 +25,6 @@ Bugfixes
 - Render markdown in track descriptions in PDF generation (:issue:`5043`, :pr:`5044`)
 - Fix error when importing chairpersons from an existing event (:pr:`5047`)
 - Fix broken timetable entry permalinks when query string args are present (:pr:`5049`)
-- Fix Typeahead widget not working with extra validators (:issue:`5048`, :pr:`5050`,
-  thanks :user:`jbtwist`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -37,6 +35,8 @@ Internal Changes
 - Add ``event.registration.after_registration_form_clone`` signal (:pr:`5037`, thanks
   :user:`vasantvohra`)
 - Add ``registration-invite-options`` template hook (:pr:`5045`, thanks :user:`vasantvohra`)
+- Fix Typeahead widget not working with extra validators (:issue:`5048`, :pr:`5050`,
+  thanks :user:`jbtwist`)
 
 
 Version 3.0
