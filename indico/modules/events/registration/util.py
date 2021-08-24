@@ -454,8 +454,8 @@ def generate_ticket_qr_code(registration):
     :param registration: corresponding `Registration` object
     """
     qr = QRCode(
-        version=17,
-        error_correction=constants.ERROR_CORRECT_Q,
+        version=None,
+        error_correction=constants.ERROR_CORRECT_M,
         box_size=3,
         border=1
     )
