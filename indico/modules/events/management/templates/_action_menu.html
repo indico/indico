@@ -111,7 +111,7 @@
         <div class="toolbar">
             {% if event.can_manage(session.user) %}
                 {% if event.category is none %}
-                    <span class="hide-if-locked"
+                    <span class="hide-if-locked group"
                         id="event-action-publish-container"
                         data-event-id="{{ event.id }}"
                         {{ 'data-pending-request' if event.pending_move_request }}></span>
