@@ -9,7 +9,7 @@ from datetime import time
 
 from flask import session
 from wtforms.fields import StringField, TextAreaField
-from wtforms.fields.core import BooleanField, SelectField
+from wtforms.fields.core import SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
@@ -25,8 +25,9 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
+from indico.web.forms.fields.simple import IndicoButtonsBooleanField
 from indico.web.forms.validators import LinkedDateTime
-from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+from indico.web.forms.widgets import CKEditorWidget
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -69,7 +70,9 @@ class EventLabelForm(IndicoForm):
 
 
 class EventCreationFormBase(IndicoForm):
-    listing = BooleanField(_('Listing'), default=True, widget=SwitchWidget())
+    listing = IndicoButtonsBooleanField(_('Listing'), default=True,
+                                        true_caption=(_('List in a category'), 'eye'),
+                                        false_caption=(_('Keep unlisted'), 'eye-blocked'))
     category = CategoryField(_('Category'), require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
