@@ -20,12 +20,8 @@ class Breadcrumb:
 
     If `url` is present, the breadcrumb will be a link to it.
 
-    The `content` is typically string or Markup object, but in some special cases
-    it may also be a different object.
-
-    Typically this class does not need to be used when registering a template hook
-    unless you need the ability to specify priority or disable markup wrapping at
-    execution time, or yield multiple snippets with different settings.
+    If `icon` is present, the breadcrumb will include the specified icon after the
+    title.
     """
 
     title: str

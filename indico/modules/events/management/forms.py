@@ -273,8 +273,7 @@ class EventProtectionForm(IndicoForm):
             return event.category.nth_parent(self.visibility.data - 1)
 
     def _init_visibility(self, event):
-        if event.category is None:
-            return None
+        assert event.category
 
         self.visibility.choices = get_visibility_options(event, allow_invisible=True)
         # Check if event visibility would be affected by any of the categories
