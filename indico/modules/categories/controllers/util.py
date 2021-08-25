@@ -14,6 +14,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.db import db
+from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.date_time import format_date
@@ -143,6 +144,9 @@ def get_category_view_params(category, now, is_flat=False):
                             (session.user and session.user.settings.get('show_past_events', False)))
 
     managers = sorted(category.get_manager_list(), key=attrgetter('principal_type.name', 'name'))
+    pending_event_moves = 0
+    if category.can_manage(session.user):
+        pending_event_moves = category.event_move_requests.filter_by(state=MoveRequestState.pending).count()
 
     threshold_format = '%Y-%m'
     return {
@@ -162,5 +166,6 @@ def get_category_view_params(category, now, is_flat=False):
         'has_hidden_events': has_hidden_events,
         'json_ld': list(map(serialize_event_for_json_ld, json_ld_events)),
         'atom_feed_url': url_for('.export_atom', category),
-        'atom_feed_title': _('Events of "{}"').format(category.title)
+        'atom_feed_title': _('Events of "{}"').format(category.title),
+        'pending_event_moves': pending_event_moves,
     }

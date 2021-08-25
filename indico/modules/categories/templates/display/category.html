@@ -17,6 +17,21 @@
             </div>
         {% endblock %}
     </div>
+    {% if pending_event_moves %}
+        {% call message_box('info') %}
+            {%- set link_start -%}
+                <a href="{{ url_for('categories.manage_moderation', category) }}">
+            {%- endset -%}
+            {%- set link_end -%}
+                </a>
+            {%- endset -%}
+            {% trans count=pending_event_moves %}
+                There is {{ count }} event move request {{ link_start }}pending moderation{{ link_end }}.
+            {% pluralize %}
+                There are {{ count }} event move requests {{ link_start }}pending moderation{{ link_end }}.
+            {% endtrans %}
+        {% endcall %}
+    {% endif %}
     {% if not category.children and not events_by_month and not past_event_count and not future_event_count %}
         {% if has_hidden_events %}
             {% call message_box('highlight', icon=true) %}
