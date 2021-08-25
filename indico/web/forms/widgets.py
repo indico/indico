@@ -235,7 +235,8 @@ class TypeaheadWidget(JinjaWidget):
             options.update(self.typeahead_options)
         options.update(kwargs.pop('options', {}))
         return super().__call__(field, options=options, min_trigger_length=self.min_trigger_length,
-                                search_url=self.search_url, choices=getattr(field, 'choices', []))
+                                search_url=self.search_url, choices=getattr(field, 'choices', []),
+                                input_args=kwargs)
 
 
 class LocationWidget(JinjaWidget):

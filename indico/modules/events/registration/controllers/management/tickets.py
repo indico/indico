@@ -53,7 +53,7 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
     def _process(self):
         # QRCode (Version 6 with error correction L can contain up to 106 bytes)
         qr = qrcode.QRCode(
-            version=6,
+            version=None,
             error_correction=qrcode.constants.ERROR_CORRECT_M,
             box_size=4,
             border=1

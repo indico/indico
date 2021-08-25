@@ -55,6 +55,9 @@ Improvements
 - Allow filtering abstracts by custom fields having no value (:issue:`5033`, :pr:`5034`)
 - Add support for syncing email addresses when logging in using external accounts
   (:pr:`5035`)
+- Use more space-efficient QR code version in registration tickets (:pr:`5052`)
+- Improve user experience when accessing an event restricted to registered participants
+  while not logged in (:pr:`5053`)
 
 Bugfixes
 ^^^^^^^^
@@ -77,6 +80,8 @@ Internal Changes
 - Add ``event.registration.after_registration_form_clone`` signal (:pr:`5037`, thanks
   :user:`vasantvohra`)
 - Add ``registration-invite-options`` template hook (:pr:`5045`, thanks :user:`vasantvohra`)
+- Fix Typeahead widget not working with extra validators (:issue:`5048`, :pr:`5050`,
+  thanks :user:`jbtwist`)
 
 
 Version 3.0
