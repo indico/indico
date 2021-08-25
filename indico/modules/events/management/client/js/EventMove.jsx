@@ -88,7 +88,8 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
               <Modal.Content>
                 <Form onSubmit={fprops.handleSubmit} id="move-event-form">
                   {publish ? (
-                    <>You are about to publish this event to{' '}
+                    <>
+                      You are about to publish this event to{' '}
                       <Param
                         name="target"
                         value={targetCategory.path.join(' » ')}
@@ -149,21 +150,22 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
                             </Plural>
                           </PluralTranslate>
                         )}
-
                       </p>
                       <FinalTextArea
                         name="comment"
                         label={Translate.string('Comment')}
-                        description={publish ?
-                          <Translate>
-                            You can provide a comment to the category managers to help them decide
-                            whether to approve your publish request.
-                          </Translate>
-                        :
-                          <Translate>
-                            You can provide a comment to the category managers to help them decide
-                            whether to approve your move request.
-                          </Translate>
+                        description={
+                          publish ? (
+                            <Translate>
+                              You can provide a comment to the category managers to help them decide
+                              whether to approve your publish request.
+                            </Translate>
+                          ) : (
+                            <Translate>
+                              You can provide a comment to the category managers to help them decide
+                              whether to approve your move request.
+                            </Translate>
+                          )
                         }
                       />
                     </>
@@ -197,12 +199,14 @@ EventMove.propTypes = {
   renderTrigger: PropTypes.func.isRequired,
   getEventCount: PropTypes.func,
   currentCategoryId: PropTypes.number,
+  publish: PropTypes.bool,
 };
 
 EventMove.defaultProps = {
   bulk: false,
   currentCategoryId: null,
   getEventCount: null,
+  publish: false,
 };
 
 export function SingleEventMove({
@@ -284,9 +288,10 @@ export function EventPublish({eventId, hasPendingPublishRequest}) {
     <IButton
       highlight
       icon="play"
-      title={hasPendingPublishRequest
-        ? Translate.string('Event has a pending publish request')
-        : Translate.string('Publish event to a category')
+      title={
+        hasPendingPublishRequest
+          ? Translate.string('Event has a pending publish request')
+          : Translate.string('Publish event to a category')
       }
       disabled={hasPendingPublishRequest}
       onClick={fn}
@@ -295,13 +300,7 @@ export function EventPublish({eventId, hasPendingPublishRequest}) {
     </IButton>
   );
 
-  return (
-    <EventMove
-      submitMove={submitMove}
-      renderTrigger={renderTrigger}
-      publish
-    />
-  );
+  return <EventMove submitMove={submitMove} renderTrigger={renderTrigger} publish />;
 }
 
 EventPublish.propTypes = {
