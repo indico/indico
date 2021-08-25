@@ -10,7 +10,7 @@ import eventURL from 'indico-url:events.display';
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Checkbox, Image, Input, Placeholder, Table} from 'semantic-ui-react';
 
 import {handleSubmitError} from 'indico/react/forms';
@@ -147,7 +147,7 @@ function RequestList({requests, onSubmit, loading}) {
           <Table.HeaderCell />
           <Translate as={Table.HeaderCell}>User</Translate>
           <Translate as={Table.HeaderCell}>Event</Translate>
-          <Translate as={Table.HeaderCell}>Event Path</Translate>
+          <Translate as={Table.HeaderCell}>Category</Translate>
           <Translate as={Table.HeaderCell}>Event Date</Translate>
           <Translate as={Table.HeaderCell}>Requested Date</Translate>
         </Table.Row>
@@ -228,6 +228,23 @@ export default function CategoryModeration({categoryId}) {
       return handleSubmitError(e);
     }
   };
+
+  const numRequests = data?.length;
+  useEffect(() => {
+    const badge = document.querySelector(
+      '#side-menu-category-management-sidemenu .item.active .badge'
+    );
+
+    if (!badge || numRequests === undefined) {
+      return;
+    }
+
+    if (numRequests) {
+      badge.textContent = numRequests;
+    } else {
+      badge.style.display = 'none';
+    }
+  }, [numRequests]);
 
   if (!lastData) {
     return null;

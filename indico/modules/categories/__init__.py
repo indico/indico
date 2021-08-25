@@ -59,8 +59,9 @@ def _sidemenu_items(sender, category, **kwargs):
     yield SideMenuItem('protection', _('Protection'), url_for('categories.manage_protection', category),
                        70, icon='shield')
     if _is_moderation_visible(category):
+        count = category.event_move_requests.filter_by(state=MoveRequestState.pending).count() or None
         yield SideMenuItem('moderation', _('Moderation'), url_for('categories.manage_moderation', category),
-                           60, icon='user-reading')
+                           60, icon='user-reading', badge=count)
     yield SideMenuItem('roles', _('Roles'), url_for('categories.manage_roles', category),
                        50, icon='users')
     yield SideMenuItem('logs', _('Logs'), url_for('logs.category', category),
