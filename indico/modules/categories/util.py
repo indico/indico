@@ -176,8 +176,6 @@ def get_visibility_options(category_or_event, allow_invisible=True):
     def _category_above_message(number):
         return ngettext('From the category above', 'From {} categories above', number).format(number)
 
-    options = []
-
     options = [(n + 1, ('{} \N{RIGHTWARDS ARROW} "{}"'.format(_category_above_message(n).format(n), title)))
                for n, title in enumerate(category.chain_titles[::-1])]
     if event is None:
