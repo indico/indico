@@ -7,7 +7,7 @@ export:
   #         If set to None (`~`), the column will not be exported. Use this e.g. for
   #         a column containing a UUID or an ID referencing something that is never
   #         exported (such as a category).
-  #         If set to a string, that string is executed as a snipped of Python code.
+  #         If set to a string, that string is executed as a snippet of Python code.
   #         It has access to `VALUE`, `MAKE_EVENT_REF()` and `MAKE_ID_REF(target, id)`.
   #         The target of `MAKE_ID_REF` is usually specified as `Model.attr`, but can
   #         also reference a column directly (e.g. using the `secondary` notation
@@ -445,7 +445,7 @@ import:
   # - none -- sets the column to None (NULL)
   # - skip -- skips the row. This cascades to all rows referencing the skipped row.
   # - anything else -- executes the value as Python code. Any non-underscored variable
-  #                    defined inside the code snipped will be applied to the row.
+  #                    defined inside the code snippet will be applied to the row.
   missing_users:
     # set to the system user
     Event.creator_id: system
