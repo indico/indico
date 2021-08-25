@@ -4,6 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+import itertools
 
 from sqlalchemy.orm import joinedload
 
@@ -38,3 +39,19 @@ def notify_event_creation(event, occurrences=None):
     if emails:
         template = get_template_module('events/emails/event_creation.txt', event=event, occurrences=occurrences)
         send_email(make_email(bcc_list=emails, template=template))
+
+
+def notify_move_request(move_requests, accept, reason=''):
+    """Send email notifications when a move request is accepted/rejected.
+
+    :param move_requests: List of `EventMoveRequest` that were accepted/rejected.
+    :param accept: Whether the requests were accepted.
+    :param reason: Optional reason for rejection.
+    """
+
+    move_requests = sorted(move_requests, key=lambda rq: rq.requestor.id)
+    for requestor, requests in itertools.groupby(move_requests, lambda rq: rq.requestor):
+        events = [rq.event for rq in requests]
+        template = get_template_module('events/emails/move_request_closure.txt',
+                                       events=events, accept=accept, reason=reason)
+        send_email(make_email(bcc_list=requestor.email, template=template))

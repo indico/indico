@@ -33,6 +33,7 @@ from indico.modules.categories.schemas import EventMoveRequestSchema
 from indico.modules.categories.util import get_image_data, serialize_category_role
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
+from indico.modules.events.notifications import notify_move_request
 from indico.modules.events.operations import create_event_request
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
@@ -141,6 +142,9 @@ class RHAPIEventMoveRequests(RHManageCategoryBase):
 
         for rq in move_requests:
             update_event_move_request(rq, accept, reason)
+
+        notify_move_request(move_requests, accept, reason)
+
         return '', 204
 
 

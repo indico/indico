@@ -1,0 +1,33 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    Event move request update
+{%- endblock %}
+
+{% block header -%}{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        {% if accept %}
+            The following events have been moved:
+        {% else %}
+            Move requests of the following events have been rejected:
+        {% endif %}
+
+        {% filter underline %}Events{% endfilter %}
+        {%- for evt in events %}
+            {{ evt.title }} ({{ evt.external_url }}) {# -#}
+        {% endfor %}
+
+        {% if not accept %}
+            {% filter underline %}Rejection reason{% endfilter %}
+            {{ reason }}
+        {%- endif -%}
+    {%- endfilter -%}
+{%- endblock %}
+
+{% block footer_title -%}
+    Event notifications
+{%- endblock %}
+
+{% block footer_url %}{% endblock %}
