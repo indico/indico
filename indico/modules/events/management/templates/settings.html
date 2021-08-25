@@ -52,7 +52,7 @@
         </div>
     {%- endif -%}
     {%- if not event.category and event.can_manage(session.user) -%}
-        <div id="unlisted-event-info" class="action-box info">
+        <div class="action-box info">
             <div class="section">
                 <div class="icon icon-unlisted-event"></div>
                 <div class="text">
@@ -62,11 +62,6 @@
                     {% endtrans %}
                 </div>
             </div>
-
-            <script>
-                // Render PublicationModal into #draft-mode-warning-button
-                setupDraftModeWarning();
-            </script>
         </div>
     {%- endif -%}
     {%- if show_draft_warning -%}

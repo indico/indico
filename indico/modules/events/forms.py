@@ -78,7 +78,7 @@ class EventCreationFormBase(IndicoForm):
     create_booking = JSONField()
 
     def validate_category(self, field):
-        if self._fields['listing'].data and not field.data.can_create_events(session.user):
+        if self.listing.data and not field.data.can_create_events(session.user):
             raise ValidationError(_('You are not allowed to create events in this category.'))
 
 

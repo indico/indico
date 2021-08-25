@@ -85,7 +85,7 @@ class RHEventProtection(RHManageEventBase):
             update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
                                                  'own_no_access_contact': form.own_no_access_contact.data,
                                                  'access_key': form.access_key.data,
-                                                 'visibility': form.visibility.data,
+                                                 'visibility': form.visibility.data if form.visibility else None,
                                                  'public_regform_access': form.public_regform_access.data})
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')

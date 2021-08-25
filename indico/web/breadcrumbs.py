@@ -14,7 +14,7 @@ from indico.web.flask.util import url_for
 from indico.web.util import url_for_index
 
 
-@dataclass()
+@dataclass(frozen=True)
 class Breadcrumb:
     """A breadcrumb to be rendered by the template.
 

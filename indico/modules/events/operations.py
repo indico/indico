@@ -395,14 +395,14 @@ def create_event_request(event, category, comment=''):
     db.session.flush()
     logger.info('Category move request %r to %r created by %r', req, category, session.user)
     sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
-    event.log(EventLogRealm.event, LogKind.change, 'Category', f'Move to "{category.title}" requested',
+    verb = 'move' if event.category else 'publish'
+    event.log(EventLogRealm.event, LogKind.change, 'Category', f'{verb.capitalize()} to "{category.title}" requested',
               user=session.user, data={'Category ID': category.id, 'Category': sep.join(category.chain_titles),
                                        'Comment': comment},
               meta={'event_move_request_id': req.id})
-    category.log(CategoryLogRealm.events, LogKind.positive, 'Moderation', f'Event move requested: "{event.title}"',
-                 session.user, data={
-                     'Event ID': event.id,
-                     'From': sep.join(event.category.chain_titles if event.category else 'Unlisted')
-                 },
-                 meta={'event_move_request_id': req.id})
+    category_log_data = {'Event ID': event.id}
+    if event.category:
+        category_log_data['From'] = sep.join(event.category.chain_titles)
+    category.log(CategoryLogRealm.events, LogKind.positive, 'Moderation', f'Event {verb} requested: "{event.title}"',
+                 session.user, data=category_log_data, meta={'event_move_request_id': req.id})
     return req

@@ -82,16 +82,10 @@
                         </a>
                     </div>
                 </div>
-                <div id="happeningCategories" class="dashboard-box">
-                    <h3>{% trans %}Your unlisted events{% endtrans %}</h3>
-                    <ol>
-                        {% if not unlisted_events %}
-                            <li class="no-event">
-                                <span class="event-title italic text-superfluous">
-                                    {% trans %}You have no unlisted events.{% endtrans %}
-                                </span>
-                            </li>
-                        {% else %}
+                {% if unlisted_events %}
+                    <div class="dashboard-box">
+                        <h3>{% trans %}Your unlisted events{% endtrans %}</h3>
+                        <ol>
                             {% for event in unlisted_events %}
                                 <li class="flexrow">
                                     <span class="event-date f-self-no-shrink"
@@ -109,9 +103,9 @@
                                     </a>
                                 </li>
                             {% endfor %}
-                        {% endif %}
-                    </ol>
-                </div>
+                        </ol>
+                    </div>
+                {% endif %}
                 <div class="dashboard-box">
                     <h3>
                         {% trans %}Your events at hand{% endtrans %}
@@ -174,7 +168,7 @@
                         {% endif %}
                     </ol>
                 </div>
-                <div id="happeningCategories" class="dashboard-box">
+                <div class="dashboard-box">
                     <h3>{% trans %}Happening in your categories{% endtrans %}</h3>
                     <ol>
                         {% if not categories %}
