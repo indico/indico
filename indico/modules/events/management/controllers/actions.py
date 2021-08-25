@@ -12,6 +12,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.events import EventType
+from indico.modules.events.notifications import notify_move_request_creation
 from indico.modules.events.operations import create_event_request, lock_event, unlock_event, update_event_type
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
@@ -105,6 +106,7 @@ class RHMoveEvent(RHManageEventBase):
                   'success')
         else:
             create_event_request(self.event, self.target_category, self.comment)
+            notify_move_request_creation([self.event], self.target_category, self.comment)
             flash(_('Moving the event "{event}" to "{category}" has been requested and is pending approval')
                   .format(event=self.event.title, category=self.target_category.title),
                   'success')

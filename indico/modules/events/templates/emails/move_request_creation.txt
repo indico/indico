@@ -1,0 +1,28 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    Event move request created
+{%- endblock %}
+
+{% block header -%}{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        There are new move requests for the category:
+        {{ target_category.chain_titles|join(' » ') }}
+
+        {% filter underline %}Requested events{% endfilter %}
+        {%- for evt in events %}
+            {{ evt.title }} ({{ evt.external_url }})
+        {% endfor %}
+
+        {% filter underline %}Comment{% endfilter %}
+        {{ comment }}
+    {%- endfilter -%}
+{%- endblock %}
+
+{% block footer_title -%}
+    Event notifications
+{%- endblock %}
+
+{% block footer_url %}{% endblock %}
