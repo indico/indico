@@ -8,7 +8,7 @@
     {% endif %}
     <li class="item {{ classes }}">
         {%- if item.disabled %}
-            <span class="title">
+            <span class="title {{ icon }}">
                 <span class="side-menu-label">{{ item.title }}</span>
             </span>
         {%- else -%}
