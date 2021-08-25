@@ -36,6 +36,7 @@ from indico.modules.categories import Category
 from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixin
+from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.logs import EventLogEntry
@@ -919,20 +920,27 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from indico.modules.logs import LogKind
         if self.pending_move_request:
             self.pending_move_request.withdraw(user=session.user)
-        old_category = getattr(self, 'category', None)
+        old_category = self.category
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
-        old_path = sep.join(old_category.chain_titles if old_category else [_('Unlisted')])
+        old_path = sep.join(old_category.chain_titles) if old_category else 'Unlisted'
         new_path = sep.join(self.category.chain_titles)
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
-        self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
-                 data={'From': old_path, 'To': new_path}, meta=log_meta)
         if old_category:
+            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
+                     data={'From': old_path, 'To': new_path}, meta=log_meta)
             old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
                              session.user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
-        category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
-                     session.user, data={'From': old_path}, meta=log_meta)
+            category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
+                         session.user, data={'From': old_path}, meta=log_meta)
+        else:
+            notify_event_creation(self)
+
+            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event published', session.user,
+                     data={'To': new_path}, meta=log_meta)
+            category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event published here: "{self.title}"',
+                         session.user, meta=log_meta)
 
     def delete(self, reason, user=None):
         from indico.modules.events import EventLogRealm, logger

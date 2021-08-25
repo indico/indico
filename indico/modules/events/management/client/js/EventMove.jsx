@@ -24,13 +24,13 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
   const selectCategoryForMove = initialCategoryId => {
     let dialogTitle;
     if (publish) {
-      dialogTitle = 'Publish event';
+      dialogTitle = Translate.string('Publish event');
     } else {
       dialogTitle = bulk ? Translate.string('Move events') : Translate.string('Move event');
     }
 
     $('<div>').categorynavigator({
-      category: initialCategoryId ? initialCategoryId : undefined,
+      category: initialCategoryId,
       openInDialog: true,
       dialogTitle,
       dialogSubtitle: bulk
@@ -88,7 +88,7 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
               <Modal.Content>
                 <Form onSubmit={fprops.handleSubmit} id="move-event-form">
                   {publish ? (
-                    <>
+                    <Translate>
                       You are about to publish this event to{' '}
                       <Param
                         name="target"
@@ -96,7 +96,7 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
                         wrapper={<strong />}
                       />
                       .
-                    </>
+                    </Translate>
                   ) : (
                     <PluralTranslate count={eventCount}>
                       <Singular>
@@ -155,17 +155,10 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
                         name="comment"
                         label={Translate.string('Comment')}
                         description={
-                          publish ? (
-                            <Translate>
-                              You can provide a comment to the category managers to help them decide
-                              whether to approve your publish request.
-                            </Translate>
-                          ) : (
-                            <Translate>
-                              You can provide a comment to the category managers to help them decide
-                              whether to approve your move request.
-                            </Translate>
-                          )
+                          <Translate>
+                            You can provide a comment to the category managers to help them decide
+                            whether to approve your request.
+                          </Translate>
                         }
                       />
                     </>
@@ -271,43 +264,6 @@ SingleEventMove.defaultProps = {
   inCategoryManagement: false,
 };
 
-export function EventPublish({eventId, hasPendingPublishRequest}) {
-  const submitMove = async (targetCategoryId, {comment}) => {
-    const data = {target_category_id: targetCategoryId, comment};
-    try {
-      await indicoAxios.post(eventMoveURL({event_id: eventId}), data);
-    } catch (e) {
-      return handleSubmitError(e);
-    }
-    location.reload();
-    // never finish submitting to avoid fields being re-enabled
-    await new Promise(() => {});
-  };
-
-  const renderTrigger = fn => (
-    <IButton
-      highlight
-      icon="play"
-      title={
-        hasPendingPublishRequest
-          ? Translate.string('Event has a pending publish request')
-          : Translate.string('Publish event to a category')
-      }
-      disabled={hasPendingPublishRequest}
-      onClick={fn}
-    >
-      <Translate>Publish</Translate>
-    </IButton>
-  );
-
-  return <EventMove submitMove={submitMove} renderTrigger={renderTrigger} publish />;
-}
-
-EventPublish.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  hasPendingPublishRequest: PropTypes.bool.isRequired,
-};
-
 export function BulkEventMove({currentCategoryId, getEventData}) {
   const submitMove = async (targetCategoryId, {comment}) => {
     const selectedEventData = getEventData();
@@ -351,4 +307,41 @@ export function BulkEventMove({currentCategoryId, getEventData}) {
 BulkEventMove.propTypes = {
   currentCategoryId: PropTypes.number.isRequired,
   getEventData: PropTypes.func.isRequired,
+};
+
+export function EventPublish({eventId, hasPendingPublishRequest}) {
+  const submitMove = async (targetCategoryId, {comment}) => {
+    const data = {target_category_id: targetCategoryId, comment};
+    try {
+      await indicoAxios.post(eventMoveURL({event_id: eventId}), data);
+    } catch (e) {
+      return handleSubmitError(e);
+    }
+    location.reload();
+    // never finish submitting to avoid fields being re-enabled
+    await new Promise(() => {});
+  };
+
+  const renderTrigger = fn => (
+    <IButton
+      highlight
+      icon="play"
+      title={
+        hasPendingPublishRequest
+          ? Translate.string('Event has a pending publish request')
+          : Translate.string('Publish event to a category')
+      }
+      disabled={hasPendingPublishRequest}
+      onClick={fn}
+    >
+      <Translate>Publish</Translate>
+    </IButton>
+  );
+
+  return <EventMove submitMove={submitMove} renderTrigger={renderTrigger} publish />;
+}
+
+EventPublish.propTypes = {
+  eventId: PropTypes.number.isRequired,
+  hasPendingPublishRequest: PropTypes.bool.isRequired,
 };

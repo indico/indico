@@ -74,10 +74,10 @@
 {% macro _render_move_event(event) %}
     {% if event.category %}
         <span class="hide-if-locked"
-            id="event-action-move-container"
-            data-event-id="{{ event.id }}"
-            data-category-id="{{ event.category.id }}"
-            {{ 'data-pending-request' if event.pending_move_request }}></span>
+              id="event-action-move-container"
+              data-event-id="{{ event.id }}"
+              data-category-id="{{ event.category.id }}"
+              {{ 'data-pending-request' if event.pending_move_request }}></span>
     {% endif %}
 {% endmacro %}
 
@@ -110,11 +110,11 @@
     <div class="action-menu">
         <div class="toolbar">
             {% if event.can_manage(session.user) %}
-                {% if event.category is none %}
+                {% if not event.category %}
                     <span class="hide-if-locked group"
-                        id="event-action-publish-container"
-                        data-event-id="{{ event.id }}"
-                        {{ 'data-pending-request' if event.pending_move_request }}></span>
+                          id="event-action-publish-container"
+                          data-event-id="{{ event.id }}"
+                          {{ 'data-pending-request' if event.pending_move_request }}></span>
                    </a>
                 {% endif %}
 

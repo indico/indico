@@ -165,16 +165,12 @@ def get_linked_events(user, dt, limit=None, load_also=()):
 
 
 def get_unlisted_events(user):
-    """Get the unlisted events for the given user.
-
-    :param user: A `User`
-    """
-    return (Event.query
+    return (user.created_events
             .filter(~Event.is_deleted,
-                    Event.creator_id == user.id,
                     Event.category_id.is_(None))
             .options(load_only('id', 'title', 'start_dt'))
-            .order_by(Event.start_dt)).all()
+            .order_by(Event.start_dt)
+            .all())
 
 
 def serialize_user(user):
