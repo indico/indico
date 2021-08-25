@@ -936,7 +936,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                          session.user, data={'From': old_path}, meta=log_meta)
         else:
             notify_event_creation(self)
-
             self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event published', session.user,
                      data={'To': new_path}, meta=log_meta)
             category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event published here: "{self.title}"',

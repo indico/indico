@@ -25,8 +25,10 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
     let dialogTitle;
     if (publish) {
       dialogTitle = Translate.string('Publish event');
+    } else if (bulk) {
+      dialogTitle = Translate.string('Move events');
     } else {
-      dialogTitle = bulk ? Translate.string('Move events') : Translate.string('Move event');
+      dialogTitle = Translate.string('Move event');
     }
 
     $('<div>').categorynavigator({

@@ -85,7 +85,7 @@
                 {% if unlisted_events %}
                     <div class="dashboard-box">
                         <h3>{% trans %}Your unlisted events{% endtrans %}</h3>
-                        <ol>
+                        <ul>
                             {% for event in unlisted_events %}
                                 <li class="flexrow">
                                     <span class="event-date f-self-no-shrink"
@@ -103,7 +103,7 @@
                                     </a>
                                 </li>
                             {% endfor %}
-                        </ol>
+                        </ul>
                     </div>
                 {% endif %}
                 <div class="dashboard-box">

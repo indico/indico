@@ -82,11 +82,13 @@ class RHEventProtection(RHManageEventBase):
         form.permissions.hidden_permissions = [(p.name, perms) for p, perms in hidden_permissions]
         if form.validate_on_submit():
             update_permissions(self.event, form)
-            update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
-                                                 'own_no_access_contact': form.own_no_access_contact.data,
-                                                 'access_key': form.access_key.data,
-                                                 'visibility': form.visibility.data if form.visibility else None,
-                                                 'public_regform_access': form.public_regform_access.data})
+            data = {'protection_mode': form.protection_mode.data,
+                    'own_no_access_contact': form.own_no_access_contact.data,
+                    'access_key': form.access_key.data,
+                    'public_regform_access': form.public_regform_access.data}
+            if form.visibility:
+                data['visibility'] = form.visibility.data
+            update_event_protection(self.event, data)
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event))
