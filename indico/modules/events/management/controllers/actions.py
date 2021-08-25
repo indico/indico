@@ -112,7 +112,7 @@ class RHMoveEvent(RHManageEventBase):
 
 
 class RHWithdrawMoveRequest(RHManageEventBase):
-    """Move event to a different category."""
+    """Withdraw a move request."""
 
     def _process_args(self):
         RHManageEventBase._process_args(self)
