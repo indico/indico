@@ -9,11 +9,21 @@
     <li class="item {{ classes }}">
         {%- if item.disabled %}
             <span class="title {{ icon }}">
-                <span class="side-menu-label">{{ item.title }}</span>
+                <span class="side-menu-label">
+                    {{- item.title -}}
+                </span>
+                {% if item.badge is not none %}
+                    <span class="badge">{{ item.badge }}</span>
+                {% endif %}
             </span>
         {%- else -%}
             <a class="title {{ icon }}" href="{{ item.url }}">
-                <span class="side-menu-label">{{ item.title }}</span>
+                <span class="side-menu-label">
+                    {{- item.title -}}
+                </span>
+                {% if item.badge is not none %}
+                    <span class="badge">{{ item.badge }}</span>
+                {% endif %}
             </a>
         {%- endif -%}
     </li>

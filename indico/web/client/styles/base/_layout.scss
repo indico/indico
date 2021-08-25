@@ -133,6 +133,11 @@ body > * {
   .side-menu-label {
     @include ellipsis();
     margin-right: 0.5rem;
+
+    & + .badge {
+      // keep some space on the right in case the label is too long
+      margin-right: 0.5em;
+    }
   }
 }
 

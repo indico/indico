@@ -68,11 +68,12 @@ class SideMenuItem:
     :param disabled: if `True`, the item will be displayed as disabled
     :param section: section the item will be put in
     :param icon: icon that will be displayed next to the item
+    :param badge: text (typically a number) that is shown in a badge
     """
 
     is_section = False
 
-    def __init__(self, name, title, url, weight=-1, active=False, disabled=False, section=None, icon=None):
+    def __init__(self, name, title, url, weight=-1, active=False, disabled=False, section=None, icon=None, badge=None):
         self.name = name
         self.title = title
         self.url = url
@@ -81,6 +82,7 @@ class SideMenuItem:
         self.section = section
         self.weight = weight
         self.icon = ('icon-' + icon) if icon else None
+        self.badge = badge
 
     def __repr__(self):
         return format_repr(self, 'name', 'title', 'url', active=False, disabled=False)
