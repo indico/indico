@@ -13,7 +13,7 @@
 # and other colorclass contributors.
 """Handles mapping between color names and ANSI codes and determining auto color codes."""
 
-from collections import Mapping
+from collections.abc import Mapping
 
 
 BASE_CODES = {
