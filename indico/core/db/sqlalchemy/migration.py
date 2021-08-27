@@ -8,6 +8,7 @@
 import os
 
 import alembic.command
+import click
 from alembic.script import ScriptDirectory
 from flask import current_app
 from flask_migrate import Migrate, stamp
@@ -50,10 +51,10 @@ def _require_extensions(*names):
     missing = sorted(name for name in names if not has_extension(db.engine, name))
     if not missing:
         return True
-    print(cformat('%{red}Required Postgres extensions missing: {}').format(', '.join(missing)))
-    print(cformat('%{yellow}Create them using these SQL commands (as a Postgres superuser):'))
+    click.secho(f"Required Postgres extensions missing: {', '.join(missing)}", fg='red')
+    click.secho('Create them using these SQL commands (as a Postgres superuser):', fg='yellow')
     for name in missing:
-        print(cformat('%{white!}  CREATE EXTENSION {};').format(name))
+        click.secho(f'  CREATE EXTENSION {name};', bold=True)
     return False
 
 
@@ -67,7 +68,7 @@ def _require_pg_version(version):
     cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
     if cur_version >= req_version:
         return True
-    print(cformat('%{red}Postgres version too old; you need at least {} (or newer)').format(version))
+    click.secho(f'Postgres version too old; you need at least {version} (or newer)', fg='red')
     return False
 
 
@@ -75,8 +76,8 @@ def _require_encoding(encoding):
     cur_encoding = db.engine.execute("SELECT current_setting('server_encoding')").scalar()
     if cur_encoding == encoding:
         return True
-    print(cformat('%{red}Database encoding must be {}; got {}').format(encoding, cur_encoding))
-    print(cformat('%{yellow}Recreate your database using `createdb -E {} -T template0 ...`').format(encoding))
+    click.secho(f'Database encoding must be {encoding}; got {cur_encoding}', fg='red')
+    click.secho(f'Recreate your database using `createdb -E {encoding} -T template0 ...`', fg='yellow')
     return False
 
 
@@ -92,7 +93,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
     tables = get_all_tables(db)
     if 'alembic_version' not in tables['public']:
         if verbose:
-            print(cformat('%{green}Setting the alembic version to HEAD'))
+            click.secho('Setting the alembic version to HEAD', fg='green')
         stamp(directory=os.path.join(root_path, 'migrations'), revision='heads')
         PluginScriptDirectory.dir = os.path.join(root_path, 'core', 'plugins', 'alembic')
         alembic.command.ScriptDirectory = PluginScriptDirectory
@@ -111,8 +112,8 @@ def prepare_db(empty=False, root_path=None, verbose=True):
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
     if any(tables.values()):
         if verbose:
-            print(cformat('%{red}Your database is not empty!'))
-            print(cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!'))
+            click.secho('Your database is not empty!', fg='red')
+            click.secho('If you just added a new table/model, create an alembic revision instead!', fg='yellow')
             print()
             print('Tables in your database:')
             for schema, schema_tables in sorted(tables.items()):

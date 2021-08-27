@@ -80,7 +80,7 @@ def search(substring, include_deleted, include_pending, include_blocked, include
                        include_blocked=include_blocked, external=include_external,
                        allow_system_user=include_system, **criteria)
     if not res:
-        print(cformat('%{yellow}No results found'))
+        click.secho('No results found', fg='yellow')
         return
     elif len(res) > 100:
         click.confirm(f'{len(res)} results found. Show them anyway?', abort=True)
@@ -120,7 +120,7 @@ def create(grant_admin):
         email = email.lower()
         if not User.query.filter(User.all_emails == email, ~User.is_deleted, ~User.is_pending).has_rows():
             break
-        print(cformat('%{red}Email already exists'))
+        click.secho('Email already exists', fg='red')
     first_name = click.prompt('First name').strip()
     last_name = click.prompt('Last name').strip()
     affiliation = click.prompt('Affiliation', '').strip()
@@ -129,7 +129,7 @@ def create(grant_admin):
         username = click.prompt('Enter username').lower().strip()
         if not Identity.query.filter_by(provider='indico', identifier=username).has_rows():
             break
-        print(cformat('%{red}Username already exists'))
+        click.secho('Username already exists', fg='red')
     password = prompt_pass()
     if password is None:
         return
@@ -139,7 +139,7 @@ def create(grant_admin):
     user.is_admin = grant_admin
     _print_user_info(user)
 
-    if click.confirm(cformat('%{yellow}Create the new {}?').format(user_type), default=True):
+    if click.confirm(click.style(f'Create the new {user_type}?', fg='yellow'), default=True):
         db.session.add(user)
         db.session.commit()
         print(cformat('%{green}New {} created successfully with ID: %{green!}{}').format(user_type, user.id))
@@ -151,16 +151,16 @@ def grant_admin(user_id):
     """Grant administration rights to a given user."""
     user = User.get(user_id)
     if user is None:
-        print(cformat('%{red}This user does not exist'))
+        click.secho('This user does not exist', fg='red')
         return
     _print_user_info(user)
     if user.is_admin:
-        print(cformat('%{yellow}This user already has administration rights'))
+        click.secho('This user already has administration rights', fg='yellow')
         return
-    if click.confirm(cformat('%{yellow}Grant administration rights to this user?')):
+    if click.confirm(click.style('Grant administration rights to this user?', fg='yellow')):
         user.is_admin = True
         db.session.commit()
-        print(cformat('%{green}Administration rights granted successfully'))
+        click.secho('Administration rights granted successfully', fg='green')
 
 
 @cli.command()
@@ -169,16 +169,16 @@ def revoke_admin(user_id):
     """Revoke administration rights from a given user."""
     user = User.get(user_id)
     if user is None:
-        print(cformat('%{red}This user does not exist'))
+        click.secho('This user does not exist', fg='red')
         return
     _print_user_info(user)
     if not user.is_admin:
-        print(cformat('%{yellow}This user does not have administration rights'))
+        click.secho('This user does not have administration rights', fg='yellow')
         return
-    if click.confirm(cformat('%{yellow}Revoke administration rights from this user?')):
+    if click.confirm(click.style('Revoke administration rights from this user?', fg='yellow')):
         user.is_admin = False
         db.session.commit()
-        print(cformat('%{green}Administration rights revoked successfully'))
+        click.secho('Administration rights revoked successfully', fg='green')
 
 
 @cli.command()
@@ -187,16 +187,16 @@ def block(user_id):
     """Block a given user."""
     user = User.get(user_id)
     if user is None:
-        print(cformat('%{red}This user does not exist'))
+        click.secho('This user does not exist', fg='red')
         return
     _print_user_info(user)
     if user.is_blocked:
-        print(cformat('%{yellow}This user is already blocked'))
+        click.secho('This user is already blocked', fg='yellow')
         return
-    if click.confirm(cformat('%{yellow}Block this user?')):
+    if click.confirm(click.style('Block this user?', fg='yellow')):
         user.is_blocked = True
         db.session.commit()
-        print(cformat('%{green}Successfully blocked user'))
+        click.secho('Successfully blocked user', fg='green')
 
 
 @cli.command()
@@ -205,16 +205,16 @@ def unblock(user_id):
     """Unblock a given user."""
     user = User.get(user_id)
     if user is None:
-        print(cformat('%{red}This user does not exist'))
+        click.secho('This user does not exist', fg='red')
         return
     _print_user_info(user)
     if not user.is_blocked:
-        print(cformat('%{yellow}This user is not blocked'))
+        click.secho('This user is not blocked', fg='yellow')
         return
-    if click.confirm(cformat('%{yellow}Unblock this user?')):
+    if click.confirm(click.style('Unblock this user?', fg='yellow')):
         user.is_blocked = False
         db.session.commit()
-        print(cformat('%{green}Successfully unblocked user'))
+        click.secho('Successfully unblocked user', fg='green')
 
 
 @cli.group('token')
@@ -229,7 +229,7 @@ def token_list(user_id, verbose):
     """List the tokens of the user."""
     user = User.get(user_id)
     if user is None:
-        click.echo(cformat('%{red!}This user does not exist'))
+        click.secho('This user does not exist', fg='red', bold=True)
         return
     _print_user_info(user)
     query = (
@@ -242,7 +242,7 @@ def token_list(user_id, verbose):
 
     tokens = query.all()
     if not tokens:
-        click.echo(cformat('%{yellow}This user has no tokens'))
+        click.secho('This user has no tokens', fg='yellow')
         return
 
     verbose_cols = ('Last IP', 'Use count', 'Status', 'ID') if verbose else ()
@@ -285,11 +285,11 @@ def token_create(user_id, token_name, scopes):
     """Create a personal token for a user."""
     user = User.get(user_id)
     if user is None:
-        click.echo(cformat('%{red!}This user does not exist'))
+        click.secho('This user does not exist', fg='red', bold=True)
         return
     token = user.query_personal_tokens().filter(db.func.lower(PersonalToken.name) == token_name.lower()).first()
     if token:
-        click.echo(cformat('%{red!}A token with this name already exists'))
+        click.secho('A token with this name already exists', fg='red', bold=True)
         return
     token = PersonalToken(user=user, name=token_name, scopes=scopes)
     access_token = token.generate_token()
@@ -316,11 +316,11 @@ def token_update(user_id, token_name, add_scopes, del_scopes, new_token_name, re
         return
     user = User.get(user_id)
     if user is None:
-        click.echo(cformat('%{red!}This user does not exist'))
+        click.secho('This user does not exist', fg='red', bold=True)
         return
     token = user.query_personal_tokens().filter(db.func.lower(PersonalToken.name) == token_name.lower()).first()
     if not token:
-        click.echo(cformat('%{red!}This token does not exist or has been revoked'))
+        click.secho('This token does not exist or has been revoked', fg='red', bold=True)
         return
     old_scopes = set(token.scopes)
     old_name = token.name
@@ -337,17 +337,17 @@ def token_update(user_id, token_name, add_scopes, del_scopes, new_token_name, re
             .has_rows()
         )
         if conflict:
-            click.echo(cformat('%{red!}A token with this name already exists'))
+            click.secho('A token with this name already exists', fg='red', bold=True)
             return
         token.name = new_token_name
     if reset_token:
         new_access_token = token.generate_token()
     db.session.commit()
-    click.echo(cformat("%{green}Token '{}' updated").format(old_name))
+    click.secho(f"Token '{old_name}' updated", fg='green')
     if token.name != old_name:
-        click.echo(cformat('Name: %{white!}{}').format(token.name))
+        click.secho(f'Name: {token.name}', bold=True)
     if new_access_token:
-        click.echo(cformat('Token: %{white!}{}').format(new_access_token))
+        click.secho(f'Token: {new_access_token}', bold=True)
     if token.scopes != old_scopes:
         click.echo(f'Scopes: {token.get_scope() or "-"}')
 
@@ -359,15 +359,15 @@ def token_revoke(user_id, token_name):
     """Revoke a user's personal token."""
     user = User.get(user_id)
     if user is None:
-        click.echo(cformat('%{red!}This user does not exist'))
+        click.secho('This user does not exist', fg='red', bold=True)
         return
     token = user.query_personal_tokens().filter(db.func.lower(PersonalToken.name) == token_name.lower()).first()
     if not token:
-        click.echo(cformat('%{red!}This token does not exist or has been revoked'))
+        click.secho('This token does not exist or has been revoked', fg='red', bold=True)
         return
     elif token.revoked_dt:
-        click.echo(cformat('%{yellow}This token is already revoked'))
+        click.secho('This token is already revoked', fg='yellow')
         return
     token.revoke()
     db.session.commit()
-    click.echo(cformat("%{green}Token '{}' revoked").format(token.name))
+    click.secho(f"Token '{token.name}' revoked", fg='green')

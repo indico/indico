@@ -198,15 +198,16 @@ def main(ctx, ci, year, path):
                     if update_header(filepath, year, ci):
                         error = True
         except subprocess.CalledProcessError:
-            raise click.UsageError(cformat('%{red!}You must be within a git repository to run this script.'))
+            raise click.UsageError(
+                click.style('You must be within a git repository to run this script.', fg='red', bold=True))
 
     if not error:
-        print(cformat('%{green}\u2705 All headers are up to date'))
+        click.secho('\u2705 All headers are up to date', fg='green')
     elif ci:
-        print(cformat('%{red}\u274C Some headers need to be updated or added'))
+        click.secho('\u274C Some headers need to be updated or added', fg='red')
         sys.exit(1)
     else:
-        print(cformat('%{yellow}\U0001F504 Some headers have been updated (or are missing)'))
+        click.secho('\U0001F504 Some headers have been updated (or are missing)', fg='yellow')
 
 
 if __name__ == '__main__':

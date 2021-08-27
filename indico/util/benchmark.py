@@ -8,7 +8,7 @@
 import time
 from math import isinf
 
-from indico.util.console import cformat
+import click
 
 
 class Benchmark:
@@ -58,12 +58,12 @@ class Benchmark:
     def print_result(self, slow=float('inf'), veryslow=float('inf')):
         duration = float(self)
         if duration == float('-inf'):
-            print(cformat('%{blue!}skipped'))
+            click.secho('skipped', fg='blue')
         elif duration == float('inf'):
-            print(cformat('%{red}running'))
+            click.secho('running', fg='red')
         elif duration >= veryslow:
-            print(cformat('%{red!}{}').format(self))
+            click.secho(str(self), fg='red', bold=True)
         elif duration >= slow:
-            print(cformat('%{yellow!}{}').format(self))
+            click.secho(str(self), fg='yellow', bold=True)
         else:
-            print(cformat('%{green!}{}').format(self))
+            click.secho(str(self), fg='green', bold=True)
