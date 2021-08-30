@@ -1,0 +1,17 @@
+There are new move requests for the category:
+Home » target
+
+Requested events
+----------------
+test 1 (http://localhost/event/1/)
+
+test 2 (http://localhost/event/2/)
+
+
+Comment
+-------
+
+
+--
+Indico :: Event notifications
+

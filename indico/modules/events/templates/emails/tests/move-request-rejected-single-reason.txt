@@ -1,0 +1,17 @@
+
+Move requests of the following events have been rejected:
+
+
+Events
+------
+test 1 (http://localhost/event/1/) 
+
+
+Rejection reason
+----------------
+We do not want your event.
+Sorry not sorry.
+
+--
+Indico :: Event notifications
+

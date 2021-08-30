@@ -1,0 +1,14 @@
+
+The following events have been moved:
+
+
+Events
+------
+test 1 (http://localhost/event/1/) 
+test 2 (http://localhost/event/2/) 
+
+
+
+--
+Indico :: Event notifications
+
