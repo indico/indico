@@ -27,18 +27,18 @@ BASE_CODES = {
     'bgwhite': 47,
 
     'hiblack': 90, 'hired': 91, 'higreen': 92, 'hiyellow': 93, 'hiblue': 94, 'himagenta': 95, 'hicyan': 96,
-    'hiwhite': 97,
+    'hiwhite': 97, 'grey': 90,  # alias for hiblack
 
     'hibgblack': 100, 'hibgred': 101, 'hibggreen': 102, 'hibgyellow': 103, 'hibgblue': 104, 'hibgmagenta': 105,
-    'hibgcyan': 106, 'hibgwhite': 107,
+    'hibgcyan': 106, 'hibgwhite': 107, 'bggrey': 100,  # alias for hibgblack
 
     '/black': 39, '/red': 39, '/green': 39, '/yellow': 39, '/blue': 39, '/magenta': 39, '/cyan': 39, '/white': 39,
     '/hiblack': 39, '/hired': 39, '/higreen': 39, '/hiyellow': 39, '/hiblue': 39, '/himagenta': 39, '/hicyan': 39,
-    '/hiwhite': 39,
+    '/hiwhite': 39, '/grey': 39,
 
     '/bgblack': 49, '/bgred': 49, '/bggreen': 49, '/bgyellow': 49, '/bgblue': 49, '/bgmagenta': 49, '/bgcyan': 49,
     '/bgwhite': 49, '/hibgblack': 49, '/hibgred': 49, '/hibggreen': 49, '/hibgyellow': 49, '/hibgblue': 49,
-    '/hibgmagenta': 49, '/hibgcyan': 49, '/hibgwhite': 49
+    '/hibgmagenta': 49, '/hibgcyan': 49, '/hibgwhite': 49, '/bggrey': 49
 }
 
 
