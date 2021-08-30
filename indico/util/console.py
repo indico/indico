@@ -15,7 +15,6 @@ from datetime import timedelta
 
 import click
 from click.types import convert_type
-from termcolor import colored
 
 from indico.util.date_time import format_human_timedelta
 from indico.util.string import validate_email
@@ -104,9 +103,13 @@ def verbose_iterator(iterable, total, get_id, get_title=None, print_every=10, pr
 
 
 def _cformat_sub(m):
-    bg = 'on_{}'.format(m.group('bg')) if m.group('bg') else None
-    attrs = ['bold'] if m.group('fg_bold') else None
-    return colored('', m.group('fg'), bg, attrs=attrs)[:-4]
+    bg = bold = ''
+    if m.group('fg_bold'):
+        bold = '{b}'
+    if bg_color := m.group('bg'):
+        bg = '{bg%s}' % bg_color
+    fg = '{%s}' % m.group('fg')
+    return Color(f'{bold}{bg}{fg}')
 
 
 def cformat(string):
@@ -114,7 +117,7 @@ def cformat(string):
 
     Bold foreground can be achieved by suffixing the color with a '!'.
     """
-    reset = colored('')
+    reset = Color('{/all}')
     string = string.replace('%{reset}', reset)
     string = re.sub(r'%\{(?P<fg>[a-z]+)(?P<fg_bold>!?)(?:,(?P<bg>[a-z]+))?}', _cformat_sub, string)
     if not string.endswith(reset):
