@@ -20,7 +20,7 @@ from indico.web.flask.templating import get_template_module
 ))
 def test_move_request_creation_email_plaintext(snapshot, create_category, create_event, num_events, comment,
                                                snapshot_name):
-    cat = create_category(title='target')
+    cat = create_category(id_=314, title='target')
     events = [create_event(id_=n, title=f'test {n}') for n in range(1, num_events + 1)]
     template = get_template_module('events/emails/move_request_creation.txt',
                                    events=events, target_category=cat, comment=comment)
@@ -38,7 +38,7 @@ def test_move_request_creation_email_plaintext(snapshot, create_category, create
 ))
 def test_move_request_closed_email_plaintext(snapshot, create_category, create_event, accept, num_events, reason,
                                              snapshot_name):
-    cat = create_category(title='target')
+    cat = create_category(id_=314, title='target')
     events = [create_event(id_=n, title=f'test {n}') for n in range(1, num_events + 1)]
     template = get_template_module('events/emails/move_request_closure.txt',
                                    events=events, target_category=cat, accept=accept, reason=reason)

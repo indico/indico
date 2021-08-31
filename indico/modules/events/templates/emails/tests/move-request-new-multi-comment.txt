@@ -4,14 +4,15 @@ Home » target
 Requested events
 ----------------
 test 1 (http://localhost/event/1/)
-
 test 2 (http://localhost/event/2/)
-
 
 Comment
 -------
 Please move this.
 Thanks!
+
+View all move requests here:
+http://localhost/category/314/manage/moderation
 
 --
 Indico :: Event notifications

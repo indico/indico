@@ -4,6 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+
 import itertools
 
 from sqlalchemy.orm import joinedload
@@ -84,4 +85,4 @@ def notify_move_request_closure(move_requests, accept, reason=''):
         events = [rq.event for rq in requests]
         template = get_template_module('events/emails/move_request_closure.txt',
                                        events=events, accept=accept, reason=reason)
-        send_email(make_email(bcc_list=requestor.email, template=template))
+        send_email(make_email(to_list=requestor.email, template=template))

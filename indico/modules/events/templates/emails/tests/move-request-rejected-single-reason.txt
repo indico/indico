@@ -1,11 +1,11 @@
 
-Move requests of the following events have been rejected:
+Request to move event rejected:
 
+- test 1 (http://localhost/event/1/)
 
-Events
-------
-test 1 (http://localhost/event/1/) 
-
+Requested category
+------------------
+Home » target
 
 Rejection reason
 ----------------

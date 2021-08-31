@@ -1,25 +1,40 @@
 {% extends 'emails/base.txt' %}
 
 {% block subject -%}
-    Event move request update
+    {%- if accept -%}
+        Event move request accepted
+    {%- else -%}
+        Event move request rejected
+    {%- endif -%}
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
     {%- filter dedent -%}
-        {% if accept %}
-            The following events have been moved:
-        {% else %}
-            Move requests of the following events have been rejected:
-        {% endif %}
+        {%- if accept -%}
+            {% if events|length == 1 %}
+                Event moved:
+            {% else %}
+                The following events have been moved:
+            {% endif %}
+        {%- else -%}
+            {% if events|length == 1 %}
+                Request to move event rejected:
+            {% else %}
+                Move requests of the following events have been rejected:
+            {% endif %}
+        {%- endif %}
 
-        {% filter underline %}Events{% endfilter %}
         {%- for evt in events %}
-            {{ evt.title }} ({{ evt.external_url }}) {# -#}
-        {% endfor %}
+            - {{ evt.title }} ({{ evt.external_url }})
+        {%- endfor %}
 
-        {% if not accept %}
+        {% filter underline %}{{ 'New' if accept else 'Requested' }} category{% endfilter %}
+        {{ target_category.chain_titles|join(' » ') -}}
+
+        {% if not accept and reason %}
+
             {% filter underline %}Rejection reason{% endfilter %}
             {{ reason }}
         {%- endif -%}
