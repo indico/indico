@@ -48,7 +48,7 @@
 
             <script type="text/html" class="latex-info-text">
                 <p>
-                    {%- trans link_start='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">'|safe,
+                    {%- trans link_start='<a href="https://docs.mathjax.org/en/latest/input/tex/macros/index.html">'|safe,
                              link_end='</a>'|safe -%}
                         You may write formulae using {{ link_start }}LaTeX{{ link_end }} (math mode only) by surrounding
                         them in <code>$...$</code>.
@@ -60,7 +60,7 @@
                 <p>
                     {%- if field.use_mathjax %}
                         {%- trans markdown='<a href="http://commonmark.org/help/">Markdown</a>'|safe,
-                                  latex='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">LaTeX</a>'|safe -%}
+                                  latex='<a href="https://docs.mathjax.org/en/latest/input/tex/macros/index.html">LaTeX</a>'|safe -%}
                             You can use {{ markdown }} and {{ latex }} formulae.
                         {%- endtrans -%}
                     {% else %}
