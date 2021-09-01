@@ -938,6 +938,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from indico.modules.events import EventLogRealm, logger
         from indico.modules.logs import LogKind
         self.is_deleted = True
+        if self.pending_move_request:
+            self.pending_move_request.withdraw(user=user)
         signals.event.deleted.send(self, user=user)
         db.session.flush()
         logger.info('Event %r deleted [%s]', self, reason)
