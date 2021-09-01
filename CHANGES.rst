@@ -58,6 +58,8 @@ Improvements
 - Use more space-efficient QR code version in registration tickets (:pr:`5052`)
 - Improve user experience when accessing an event restricted to registered participants
   while not logged in (:pr:`5053`)
+- When searching external users, prefer results with a name in case of multiple matches
+  with the same email address (:pr:`5066`)
 
 Bugfixes
 ^^^^^^^^

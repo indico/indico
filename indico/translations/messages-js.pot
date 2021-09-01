@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0.1-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-08-13 12:14+0200\n"
+"POT-Creation-Date: 2021-09-01 15:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -585,7 +585,7 @@ msgstr ""
 msgid "Confirm action"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/declarative.js:360
+#: indico/web/client/js/jquery/utils/declarative.js:361
 msgid "Direct link to this item"
 msgstr ""
 
