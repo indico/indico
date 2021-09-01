@@ -926,11 +926,11 @@ type(
       var link = Html.a(
         {
           className: 'fake-link',
-          style: {display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'},
+          style: {display: 'inline', padding: '0 4px 0 0'},
         },
-        Util.truncate(title)
+        title
       );
-      var divInput = Html.div({style: {height: '20px', overflow: 'auto'}}, colorSquare, link);
+      var divInput = Html.div({}, colorSquare, link);
 
       if (typeof value == 'string') {
         link.setAttribute('href', value);
@@ -973,7 +973,7 @@ type(
         );
       }
 
-      var listItem = Html.li({}, divInput);
+      var listItem = Html.li({style: {marginBottom: '2px'}}, divInput);
       return listItem;
     },
   },
