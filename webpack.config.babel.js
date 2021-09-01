@@ -145,7 +145,6 @@ export default env => {
       }),
       new webpack.ProvidePlugin({
         _: ['underscore', 'default'],
-        moment: 'moment',
       }),
     ],
     resolve: {

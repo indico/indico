@@ -12,6 +12,13 @@ import 'jquery-colorbox/example1/colorbox.css';
 
 import 'jquery-form';
 
+import moment from 'moment';
+// Make moment globally available.
+// Previously, we used the webpack `ProvidePlugin`, but instead of having
+// a single shared instance of moment, this resulted in duplicate instances,
+// which didn't have the correct locale as set in `indico_base.html`.
+window.moment = moment;
+
 // moment.js locales
 import 'moment/locale/tr';
 import 'moment/locale/mn';
