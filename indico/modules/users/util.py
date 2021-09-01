@@ -8,6 +8,7 @@
 import hashlib
 import os
 import typing as t
+from collections import defaultdict
 from datetime import datetime
 from io import BytesIO
 from operator import itemgetter
@@ -230,6 +231,23 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
     return query
 
 
+def _deduplicate_identities(identities):
+    by_email = defaultdict(list)
+    for ident in identities:
+        if not ident.data.get('email'):
+            # skip users with no or an empty email
+            continue
+        by_email[ident.data['email']].append(ident)
+    for mail_identities in by_email.values():
+        # if we have multiple identities for the same email, we prefer one that has names
+        mail_identities.sort(key=lambda x: (10*len(x.data.get('first_name') or '') +
+                                            10*len(x.data.get('last_name') or '') +
+                                            len(x.data.get('affiliation') or ''),
+                                            x.identifier),
+                             reverse=True)
+        yield mail_identities[0]
+
+
 def search_users(exact=False, include_deleted=False, include_pending=False, include_blocked=False,
                  external=False, allow_system_user=False, **criteria):
     """Search for users.
@@ -281,10 +299,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
     if external:
         identities = multipass.search_identities(exact=exact, **criteria)
 
-        for ident in identities:
-            if not ident.data.get('email'):
-                # Skip users with no email
-                continue
+        for ident in _deduplicate_identities(identities):
             if ((ident.provider.name, ident.identifier) not in found_identities and
                     ident.data['email'].lower() not in found_emails):
                 found_emails[ident.data['email'].lower()] = ident
