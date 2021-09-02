@@ -22,15 +22,17 @@
                     </div>
                     {% trans %}Payments are disabled for this event{% endtrans %}
                 </div>
-                <div class="toolbar hide-if-locked">
-                    <a href="#" class="js-enable-payments"
-                       data-href="{{ url_for('event_features.switch', event, feature='payment') }}"
-                       data-method="PUT"
-                       data-title="{% trans %}Enable payments for the whole event?{% endtrans %}"
-                       data-confirm="{% trans %}This will enable payments for all registration forms. If you need to disable it later on, you can do it from the Features menu entry.{% endtrans %}">
-                        {% trans %}Enable payments{% endtrans %}
-                    </a>
-                </div>
+                {% if event.can_manage(session.user) %}
+                    <div class="toolbar hide-if-locked">
+                        <a href="#" class="js-enable-payments"
+                           data-href="{{ url_for('event_features.switch', event, feature='payment') }}"
+                           data-method="PUT"
+                           data-title="{% trans %}Enable payments for the whole event?{% endtrans %}"
+                           data-confirm="{% trans %}This will enable payments for all registration forms. If you need to disable it later on, you can do it from the Features menu entry.{% endtrans %}">
+                            {% trans %}Enable payments{% endtrans %}
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}

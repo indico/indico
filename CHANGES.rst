@@ -72,6 +72,8 @@ Bugfixes
 - Render markdown in track descriptions in PDF generation (:issue:`5043`, :pr:`5044`)
 - Fix error when importing chairpersons from an existing event (:pr:`5047`)
 - Fix broken timetable entry permalinks when query string args are present (:pr:`5049`)
+- Do not show "Payments" event management menu entry for registration managers
+  (:issue:`5072`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
