@@ -16,6 +16,12 @@
 {% endblock %}
 
 {% block info %}
+    {% if sess.code %}
+        <div class="generic-data">
+            <i class="icon-tag header-data"></i>
+            {{ sess.code }}
+        </div>
+    {% endif %}
     <div class="generic-data">
         <i class="icon-time header-data"></i>
         <span class="time-info">
