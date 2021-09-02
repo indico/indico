@@ -4,10 +4,13 @@
 <div class="balloon {{ 'event-locked' if event_locked }}">
     <div class="title-container session-block">
         <div class="title">
-            {{- block.session.title }}
-            {%- if block.title %}
+            {{ block.session.title }}
+            {% if block.title %}
                 <span class="balloon-subtitle">({{ block.title }})</span>
-            {%- endif -%}
+            {% endif %}
+            {% if block.session.code %}
+                <span class="balloon-code">({{ block.session.code }})</span>
+            {% endif %}
         </div>
     </div>
     <div class="description" data-display-href="{{ url_for('sessions.display_session', block.session) }}">

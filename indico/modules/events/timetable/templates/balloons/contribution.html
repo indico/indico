@@ -3,7 +3,12 @@
 
 <div class="balloon {{ 'event-locked' if event_locked }}">
     <div class="title-container">
-        <div class="title">{{ contrib.title }}</div>
+        <div class="title">
+            {{ contrib.title }}
+            {% if contrib.code %}
+                <span class="balloon-code">({{ contrib.code }})</span>
+            {% endif %}
+        </div>
         <div class="group right entry-action-buttons hide-if-locked">
             {% if editable %}
                 {% if can_manage_contributions %}
