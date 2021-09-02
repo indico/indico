@@ -163,6 +163,7 @@ class TimetableSerializer:
                                                    key=lambda x: (x.author_type != AuthorType.primary,
                                                                   x.author_type != AuthorType.secondary,
                                                                   x.display_order_key)))),
+                     'code': contribution.code,
                      'sessionCode': block.session.code if block else None,
                      'sessionId': block.session_id if block else None,
                      'sessionSlotId': block.id if block else None,
