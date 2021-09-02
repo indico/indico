@@ -15,7 +15,6 @@ import './display';
 import './base';
 
 import SearchBox from 'indico/modules/search/components/SearchBox';
-import {setMomentLocale} from 'indico/utils/date';
 
 import CategoryStatistics from './components/CategoryStatistics';
 import {LocaleContext} from './context.js';
@@ -50,14 +49,13 @@ import {LocaleContext} from './context.js';
     }
   });
   global.setupCategoryStats = function setupCategoryStats() {
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
       const rootElement = document.querySelector('#category-stats-root');
       if (!rootElement) {
         return;
       }
       const categoryId = parseInt(rootElement.dataset.categoryId, 10);
       const lang = rootElement.dataset.lang;
-      await setMomentLocale(lang);
       ReactDOM.render(
         <LocaleContext.Provider value={lang}>
           <CategoryStatistics categoryId={categoryId} />
