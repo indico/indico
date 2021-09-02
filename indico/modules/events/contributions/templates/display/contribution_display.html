@@ -63,7 +63,7 @@
                     <span>{{ contribution.code }}</span>
                 </div>
             {% endif %}
-            <div class="time-data">
+            <div class="generic-data">
                 <i class="icon-calendar header-data"></i>
                 <span class="time-info">
                     {%- if contribution.start_dt_display %}
@@ -74,7 +74,7 @@
                 </span>
             </div>
             {% if contribution.duration_display -%}
-                <div class="time-data">
+                <div class="generic-data">
                     <i class="icon-time header-data"></i>
                     <span class="time-info" title="{% trans %}Duration{% endtrans %}">
                         {{ contribution.duration_display|format_human_timedelta(narrow=true) }}
@@ -82,12 +82,12 @@
                 </div>
             {%- endif %}
             {% if contribution.has_location_info %}
-                <div class="location-data">
+                <div class="generic-data">
                     {{ render_location(contribution, class='contribution-location') }}
                 </div>
             {% endif %}
             {% if contribution.board_number -%}
-                <div class="board-data">
+                <div class="generic-data">
                     <i class="icon-price-tag header-data"></i>
                     <span class="board-info">
                         {% trans board_number=contribution.board_number %}Board: {{ board_number }}{% endtrans %}
