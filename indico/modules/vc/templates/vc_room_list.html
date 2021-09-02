@@ -31,7 +31,7 @@
     <tr class="result-group-entry">
         <td class="entry-time">
             <a class="discreet-link" href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}">
-                {{ event.start_dt.time() | format_time('HH:mm') }}
+                {{ event.start_dt.time() | format_time }}
             </a>
         </td>
         <td class="entry-type">
