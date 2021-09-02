@@ -49,12 +49,20 @@
 {% endmacro %}
 
 {% block title -%}
-    <span class="js-mathjax">{{ contribution.title }}</span>
+    <span class="js-mathjax">
+        {{ contribution.title }}
+    </span>
 {%- endblock %}
 
 {% block info -%}
     <div class="flexrow f-j-space-between">
         <div>
+            {% if contribution.code %}
+                <div class="generic-data">
+                    <i class="icon-tag header-data"></i>
+                    <span>{{ contribution.code }}</span>
+                </div>
+            {% endif %}
             <div class="time-data">
                 <i class="icon-calendar header-data"></i>
                 <span class="time-info">
