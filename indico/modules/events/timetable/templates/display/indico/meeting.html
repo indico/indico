@@ -23,7 +23,7 @@
                         {% block day_header scoped %}
                             <div class="day-header" style="width: 100%;">
                                 <div class="day-title" data-anchor="{{ anchor }}" data-anchor-strip-arg="note">
-                                    {{ item.start_dt | format_date(format='EEEE, d MMMM', timezone=timezone) }}
+                                    {{ item.start_dt | format_skeleton(format='EEEEdMMMM', timezone=timezone) }}
                                 </div>
                                 {% if days %}
                                     <a class="js-go-to-day icon-calendar arrow js-dropdown" data-toggle="dropdown"></a>
@@ -31,7 +31,7 @@
                                         {% for day, _ in days %}
                                             <li>
                                                 <a href="#day-{{ day.isoformat() }}">
-                                                    {{ day | format_date(format='EEE, d MMM', timezone=timezone) }}
+                                                    {{ day | format_skeleton(format='EEEdMMM', timezone=timezone) }}
                                                 </a>
                                             </li>
                                         {% endfor %}

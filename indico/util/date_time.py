@@ -13,6 +13,7 @@ import pytz
 from babel.dates import format_date as _format_date
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_interval as _format_interval
+from babel.dates import format_skeleton as _format_skeleton
 from babel.dates import format_time as _format_time
 from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone
@@ -145,6 +146,19 @@ def format_interval(start_dt, end_dt, format='yMd', locale=None):
         locale = get_current_locale()
 
     return _format_interval(start_dt, end_dt, format, locale=locale)
+
+
+def format_skeleton(dt, format, locale=None, timezone=None):
+    """Basically a wrapper around Babel's own format_skeleton.
+
+    The argument order is swapped to keep uniformity with other format_* functions.
+    """
+    if not locale:
+        locale = get_current_locale()
+    if timezone and isinstance(dt, datetime) and dt.tzinfo:
+        dt = dt.astimezone(pytz.timezone(timezone) if isinstance(timezone, str) else timezone)
+
+    return _format_skeleton(format, dt, locale=locale)
 
 
 def format_human_timedelta(delta, granularity='seconds', narrow=False):

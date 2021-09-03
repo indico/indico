@@ -226,6 +226,7 @@ def setup_jinja(app):
     app.add_template_filter(date_time_util.format_human_date)
     app.add_template_filter(date_time_util.format_timedelta)
     app.add_template_filter(date_time_util.format_interval)
+    app.add_template_filter(date_time_util.format_skeleton)
     app.add_template_filter(date_time_util.format_number)
     app.add_template_filter(date_time_util.format_human_timedelta)
     app.add_template_filter(date_time_util.format_pretty_date)
