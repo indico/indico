@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
+from collections import Counter
 from datetime import datetime
 from datetime import time as dt_time
 from datetime import timedelta
@@ -13,17 +15,16 @@ import pytz
 from babel.dates import format_date as _format_date
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_interval as _format_interval
-from babel.dates import format_skeleton as _format_skeleton
 from babel.dates import format_time as _format_time
 from babel.dates import format_timedelta as _format_timedelta
-from babel.dates import get_timezone
+from babel.dates import get_timezone, match_skeleton
 from babel.numbers import format_number as _format_number
 from dateutil.relativedelta import relativedelta as _relativedelta
 from dateutil.rrule import DAILY, FR, MO, TH, TU, WE, rrule
 from flask import has_request_context, session
 
 from indico.core.config import config
-from indico.util.i18n import _, get_current_locale, ngettext, parse_locale
+from indico.util.i18n import IndicoLocale, _, get_current_locale, ngettext, parse_locale
 
 
 class relativedelta(_relativedelta):
@@ -148,17 +149,34 @@ def format_interval(start_dt, end_dt, format='yMd', locale=None):
     return _format_interval(start_dt, end_dt, format, locale=locale)
 
 
-def format_skeleton(dt, format, locale=None, timezone=None):
+def _adjust_skeleton(format, skeleton):
+    for char, count in Counter(skeleton).items():
+        format = re.sub(fr'{re.escape(char)}+', char * count, format)
+    return format
+
+
+def format_skeleton(dt, skeleton, locale=None, timezone=None):
     """Basically a wrapper around Babel's own format_skeleton.
+
+    It also keeps the specified width from the originally requested
+    skeleton string and adjusts the one from the locale data accordingly.
 
     The argument order is swapped to keep uniformity with other format_* functions.
     """
     if not locale:
         locale = get_current_locale()
-    if timezone and isinstance(dt, datetime) and dt.tzinfo:
-        dt = dt.astimezone(pytz.timezone(timezone) if isinstance(timezone, str) else timezone)
+    if not timezone and dt.tzinfo:
+        timezone = session.tzinfo
 
-    return _format_skeleton(format, dt, locale=locale)
+    # See https://github.com/python-babel/babel/issues/803 if you wonder why
+    # we aren't using the default format_skeleton from Babel.
+    locale = IndicoLocale.parse(locale)
+    requested_skeleton = skeleton
+    if skeleton not in locale.datetime_skeletons:
+        skeleton = match_skeleton(skeleton, locale.datetime_skeletons)
+    format = locale.datetime_skeletons[skeleton]
+    format = _adjust_skeleton(str(format), requested_skeleton)
+    return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
 
 
 def format_human_timedelta(delta, granularity='seconds', narrow=False):
