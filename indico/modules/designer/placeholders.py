@@ -11,7 +11,7 @@ from babel.numbers import format_currency
 from PIL import Image
 
 from indico.modules.events.registration.util import generate_ticket_qr_code
-from indico.util.date_time import format_date, format_datetime
+from indico.util.date_time import format_date, format_datetime, format_interval
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
 
@@ -99,7 +99,7 @@ class EventDatesPlaceholder(DesignerPlaceholder):
         if start_dt.date() == end_dt.date():
             interval = format_datetime(start_dt)
         elif start_dt.date().replace(day=1) == end_dt.date().replace(day=1):
-            interval = '{} - {} {}'.format(start_dt.day, end_dt.day, format_date(start_dt, format='MMMM yyyy'))
+            interval = format_interval(start_dt, end_dt, 'dMMMMy')
         return interval
 
 

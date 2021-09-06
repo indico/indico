@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import pytest
 from pytz import timezone
 
-from indico.util.date_time import as_utc, format_human_timedelta, iterdays, strftime_all_years
+from indico.util.date_time import as_utc, format_human_timedelta, format_skeleton, iterdays, strftime_all_years
 
 
 @pytest.mark.parametrize(('delta', 'granularity', 'expected'), (
@@ -68,3 +68,12 @@ iterdays_test_data = (
                          iterdays_test_data)
 def test_iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist, expected):
     assert len(list(iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist))) == expected
+
+
+@pytest.mark.parametrize(('skeleton', 'expected'), (
+    ('EEEEdMMMM', 'Monday, 8 February'),
+    ('EEEdMMM', 'Mon, 8 Feb'),
+))
+def test_format_skeleton(skeleton, expected):
+    dt = datetime(2021, 2, 8).astimezone(timezone('Europe/Zurich'))
+    assert format_skeleton(dt, skeleton, 'en_GB', 'Europe/Zurich') == expected

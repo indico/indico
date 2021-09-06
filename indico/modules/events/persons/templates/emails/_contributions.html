@@ -7,7 +7,7 @@
                 {%- if contribution.timetable_entry -%}
                     {{ contribution.timetable_entry.start_dt | format_datetime(format='EEEE', timezone=timezone) }}
                     {{ contribution.timetable_entry.start_dt | format_datetime(format='medium', timezone=timezone) }}
-                    - {{ contribution.timetable_entry.end_dt | format_datetime(format='HH:mm', timezone=timezone) }}
+                    - {{ contribution.timetable_entry.end_dt | format_time(timezone=timezone) }}
                 {%- else -%}
                     Not scheduled yet
                 {%- endif -%}
