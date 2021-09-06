@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
+# Adrian, 2021
 # Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2019-2021
 # Oleksandr Pylypovskyi <o.pylypovskyi@gmail.com>, 2018-2019
 # Sonya Sirets <prettyflysonia@gmail.com>, 2018-2019
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-05 17:54+0200\n"
-"PO-Revision-Date: 2021-06-30 08:09+0000\n"
-"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>\n"
+"POT-Creation-Date: 2021-09-01 15:29+0200\n"
+"PO-Revision-Date: 2021-09-06 15:25+0000\n"
+"Last-Translator: Adrian\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,11 +67,11 @@ msgstr[3] "{0} довготривалих подій не показано"
 msgid "Long lasting events"
 msgstr "Довготривалі події"
 
-#: indico/modules/categories/client/js/display.js:21
+#: indico/modules/categories/client/js/display.js:25
 msgid "empty"
 msgstr "порожньо"
 
-#: indico/modules/categories/client/js/display.js:22
+#: indico/modules/categories/client/js/display.js:26
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} подія"
@@ -78,15 +79,15 @@ msgstr[1] "{0} події"
 msgstr[2] "{0} подій"
 msgstr[3] "{0} подій"
 
-#: indico/modules/categories/client/js/display.js:151
+#: indico/modules/categories/client/js/display.js:166
 msgid "Remove from your favorites"
 msgstr "Видалити з вибраного"
 
-#: indico/modules/categories/client/js/display.js:154
+#: indico/modules/categories/client/js/display.js:169
 msgid "Add to your favorites"
 msgstr "Додати до вибраного"
 
-#: indico/modules/categories/client/js/display.js:156
+#: indico/modules/categories/client/js/display.js:171
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
@@ -342,12 +343,12 @@ msgstr "Помилка"
 msgid "Choose a file"
 msgstr "Вибрати файл"
 
-#: indico/modules/events/abstracts/client/js/index.js:76
-#: indico/modules/events/abstracts/client/js/index.js:89
+#: indico/modules/events/abstracts/client/js/index.js:78
+#: indico/modules/events/abstracts/client/js/index.js:91
 msgid "Show preview"
 msgstr "Показати попередній варіант"
 
-#: indico/modules/events/abstracts/client/js/index.js:80
+#: indico/modules/events/abstracts/client/js/index.js:82
 msgid "Hide preview"
 msgstr "Сховати попередній варіант"
 
@@ -655,7 +656,7 @@ msgstr "Присутні незбережені зміни, які будуть 
 msgid "Confirm action"
 msgstr "Підтвердити операцію"
 
-#: indico/web/client/js/jquery/utils/declarative.js:360
+#: indico/web/client/js/jquery/utils/declarative.js:361
 msgid "Direct link to this item"
 msgstr "Пряме посилання на цей пункт"
 
@@ -883,7 +884,7 @@ msgstr "Напишіть, аби додати {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
 msgid "Delete"
 msgstr "Видалити"
 
@@ -937,7 +938,7 @@ msgstr[2] "Лишилось <strong> {0} </strong> слів"
 msgstr[3] "Лишилось <strong> {0} </strong> слів"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1435
 msgid "Edit"
 msgstr "Редагувати"
 
@@ -1308,171 +1309,177 @@ msgstr "Додати засідання"
 msgid "Add session block"
 msgstr "Додати блок засідання"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:43
+#: indico/web/client/js/legacy/libs/timetable/Base.js:45
 msgid "Session"
 msgstr "Засідання"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:44
+#: indico/web/client/js/legacy/libs/timetable/Base.js:46
 msgid "Room"
 msgstr "Аудиторія"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:131
+#: indico/web/client/js/legacy/libs/timetable/Base.js:133
 msgid "Updating the timetable..."
 msgstr "Оновлення розкладу..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:182
-#: indico/web/client/js/legacy/libs/timetable/Base.js:421
+#: indico/web/client/js/legacy/libs/timetable/Base.js:184
+#: indico/web/client/js/legacy/libs/timetable/Base.js:423
 msgid "Filter"
 msgstr "Фільтр"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:200
+#: indico/web/client/js/legacy/libs/timetable/Base.js:202
 msgid "Printable version"
 msgstr "Версія для друку"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:221
+#: indico/web/client/js/legacy/libs/timetable/Base.js:223
 msgid "Go back"
 msgstr "Повернутись"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:228
-#: indico/web/client/js/legacy/libs/timetable/Base.js:387
+#: indico/web/client/js/legacy/libs/timetable/Base.js:230
+#: indico/web/client/js/legacy/libs/timetable/Base.js:389
 msgid "Print"
 msgstr "Друкувати"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:272
+#: indico/web/client/js/legacy/libs/timetable/Base.js:274
 msgid "Export to PDF"
 msgstr "Експортувати в PDF"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:280
+#: indico/web/client/js/legacy/libs/timetable/Base.js:282
 msgid "Switching to full screen mode..."
 msgstr "Перемкнутись у повноекранний режим..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:317
+#: indico/web/client/js/legacy/libs/timetable/Base.js:319
 msgid "Exit Full Screen"
 msgstr "Вийти з повноекранного режиму"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:394
+#: indico/web/client/js/legacy/libs/timetable/Base.js:396
 msgid "PDF"
 msgstr "PDF"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:401
+#: indico/web/client/js/legacy/libs/timetable/Base.js:403
 msgid "Full screen"
 msgstr "Повноекранний режим"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:408
+#: indico/web/client/js/legacy/libs/timetable/Base.js:410
 msgid "Link"
 msgstr "Посилання"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:413
+#: indico/web/client/js/legacy/libs/timetable/Base.js:415
 msgid "Detailed view"
 msgstr "Детальний перегляд"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:476
+#: indico/web/client/js/legacy/libs/timetable/Base.js:478
 msgid "All days"
 msgstr "Всі дні"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:689
+#: indico/web/client/js/legacy/libs/timetable/Base.js:482
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1215
+msgctxt "momentjs date format for timetable tab headers"
+msgid "ddd DD/MM"
+msgstr "ddd DD/MM"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:684
 msgid "You are viewing the contents of the session block:"
 msgstr "Ви продивляєтесь вміст блоку засідання:"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:778
+#: indico/web/client/js/legacy/libs/timetable/Base.js:773
 msgid "Your changes triggered the automatic modification of some settings:"
 msgstr "Ваші зміни призвели до автоматичного оновлення деяких налаштувань:"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:786
-#: indico/web/client/js/legacy/libs/timetable/Base.js:790
+#: indico/web/client/js/legacy/libs/timetable/Base.js:781
+#: indico/web/client/js/legacy/libs/timetable/Base.js:785
 msgid "The <strong>starting time</strong> of the session interval <strong>"
 msgstr "<strong>Початковий час</strong> інтервалу засідання <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:788
-#: indico/web/client/js/legacy/libs/timetable/Base.js:792
-#: indico/web/client/js/legacy/libs/timetable/Base.js:801
-#: indico/web/client/js/legacy/libs/timetable/Base.js:805
+#: indico/web/client/js/legacy/libs/timetable/Base.js:783
+#: indico/web/client/js/legacy/libs/timetable/Base.js:787
+#: indico/web/client/js/legacy/libs/timetable/Base.js:796
+#: indico/web/client/js/legacy/libs/timetable/Base.js:800
 msgid "</strong> was moved from "
 msgstr "</strong> було переміщено від "
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:793
+#: indico/web/client/js/legacy/libs/timetable/Base.js:788
 msgid ""
 "The <strong>starting time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong>Початковий час</strong> <strong>заходу</strong> було зсунуто від"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:799
-#: indico/web/client/js/legacy/libs/timetable/Base.js:803
+#: indico/web/client/js/legacy/libs/timetable/Base.js:794
+#: indico/web/client/js/legacy/libs/timetable/Base.js:798
 msgid "The <strong>ending time</strong> of the session interval <strong>"
 msgstr "<strong>Кінцевий час</strong> інтервалу засідання <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:806
+#: indico/web/client/js/legacy/libs/timetable/Base.js:801
 msgid ""
 "The <strong>ending time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong>Кінцевий час</strong> <strong>заходу</strong> було зсунуто від"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:812
+#: indico/web/client/js/legacy/libs/timetable/Base.js:807
 msgid "The contents of the interval <strong>"
 msgstr "Вміст інтервалу <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:814
+#: indico/web/client/js/legacy/libs/timetable/Base.js:809
 msgid "</strong> were moved from "
 msgstr "</strong> було переміщено від "
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:824
+#: indico/web/client/js/legacy/libs/timetable/Base.js:819
 msgid " to "
 msgstr "до"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1017
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1012
 msgid "Session block"
 msgstr "Блоки засідань"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1035
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1030
 msgid "Contribution"
 msgstr "Доповідь"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1049
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1044
 msgid "Break"
 msgstr "Перерва"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1066
 msgid "Add poster"
 msgstr "Додати постер"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1076
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
 msgid "Add new"
 msgstr "Додати новий"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1080
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1075
 #: indico/web/client/js/legacy/libs/timetable/Management.js:664
 msgid "Reschedule"
 msgstr "Перенести"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1090
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1085
 msgid "Fit to content"
 msgstr "Узгодити з  наповненням"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1099
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1094
 msgid "Add new block"
 msgstr "Додати новий блок"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1143
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1138
 msgid "Add one hour"
 msgstr "Додати одну годину"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1212
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1207
 msgid "Session legend"
 msgstr "Легенда засіданя"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1243
 msgid "see more..."
 msgstr "більше..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1253
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
 msgid "less..."
 msgstr "менше..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1567
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1562
 msgid "Go to event timetable"
 msgstr "До розкладу заходів"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1737
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1732
 msgid "Up to timetable"
 msgstr "Піднятись до розкладу"
 
@@ -1531,35 +1538,35 @@ msgstr "Нагору"
 msgid "Move down"
 msgstr "Вниз"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1478
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1437
 msgid "Edit poster"
 msgstr "Редагувати постер"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1469
 msgid "Manage protection"
 msgstr "Керувати захистом"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1512
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1471
 msgid "Manage poster protection"
 msgstr "Керувати захистом постерів"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1499
 msgid "Unschedule"
 msgstr "Видалити з графіку"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1541
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1500
 msgid "Unschedule poster"
 msgstr "Видалити постер з графіку"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1501
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "Ви впевнені, що хочете видалити постер з графіку?"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1545
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
 msgid "Delete poster"
 msgstr "Видалити постер"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1546
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1505
 msgid "Are you sure you want to delete the poster?"
 msgstr "Ви впевнені, що хочете видалити постер?"
 
