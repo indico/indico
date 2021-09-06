@@ -2,13 +2,13 @@
 # Translators:
 # Andre Garcia <sambombe@gmail.com>, 2019
 # Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2020
+# Adrian, 2021
 # Sedir G. Morais <philippi.sedir@gmail.com>, 2021
-# Adrian Mönnich, 2021
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-07-21 17:54+0200\n"
-"Last-Translator: Adrian Mönnich, 2021\n"
+"POT-Creation-Date: 2021-09-21 15:30+0200\n"
+"Last-Translator: Sedir G. Morais <philippi.sedir@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/indico/teams/6478/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -137,7 +137,7 @@ msgstr "Excluir PDF atual"
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:121
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:89
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:512
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:170
@@ -226,7 +226,7 @@ msgstr "Exportar"
 
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
 msgid "Publish now"
-msgstr ""
+msgstr "Publicar agora"
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:20
 msgid "Set contribution list in draft mode"
@@ -407,7 +407,7 @@ msgstr "Restringir a visibilidade deste comentário a outros editores"
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:211
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
 msgid "Comment"
 msgstr "Comentar"
 
@@ -425,27 +425,27 @@ msgid "On {modificationDate}"
 msgstr "Em {modificationDate}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:80
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:78
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:89
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:80
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:91
 msgid "edited"
 msgstr "editado"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:89
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:93
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:95
 msgid "Edit comment"
 msgstr "Editar comentário"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:94
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:98
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:119
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:105
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:127
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:102
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:129
 msgid "Remove comment"
 msgstr "Remover comentário"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:109
 msgid "Are you sure you want to remove this comment?"
 msgstr "Tem certeza de que deseja remover este comentário?"
 
@@ -604,12 +604,12 @@ msgid "{submitterName} submitted a revision"
 msgstr "{submitterName} submeteu uma revisão"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:57
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
 msgid "Hide old revision"
 msgstr "Ocultar revisão antiga"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
 msgid "Show old revision"
 msgstr "Mostrar revisão antiga"
 
@@ -1461,7 +1461,7 @@ msgstr "Revisar"
 msgid "Change reviews"
 msgstr "Alterar revisões"
 
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:81
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:83
 msgid "On {modificationDate} by {modifiedBy}"
 msgstr "Em {modificationDate} por {modifiedBy}"
 
@@ -1508,35 +1508,35 @@ msgstr "O paper requer alterações."
 msgid "{reviewerName} left a review"
 msgstr "{reviewerName} deixou uma revisão"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:112
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:114
 msgid "Proposed to {actionName}accept{/actionName}"
 msgstr "Proposto para {actionName}aceitação{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:120
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:122
 msgid "Proposed to {actionName}reject{/actionName}"
 msgstr "Proposto para {actionName}rejeição{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:128
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:130
 msgid "Proposed to {actionName}correct{/actionName}"
 msgstr "Proposto para {actionName}correção{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:138
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:140
 msgid "· score {prettyScore}"
 msgstr "pontuação {prettyScore}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:146
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:148
 msgid "Score: {score} / {maxScore}"
 msgstr "Pontuação: {score} / {maxScore}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:159
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
 msgid "hide ratings"
 msgstr "ocultar classificações"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:163
 msgid "show ratings"
 msgstr "mostrar classificações"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:173
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:175
 msgid "Edit review"
 msgstr "Editar revisão"
 
