@@ -9,7 +9,7 @@
                 {% for day, entries in top_level_entries.items() | sort %}
                         <button class="i-button big day {%- if day == current_day %} highlight{% endif %}"
                                 data-day="{{ day }}">
-                            {{- day | format_skeleton(format='EEEdMMM') -}}
+                            {{- day | format_skeleton('EEEdMMM') -}}
                         </button>
                 {% endfor %}
             </div>

@@ -25,7 +25,7 @@
         <tr>
             {% for day, events in events_by_day %}
                 <th style="width: {{ width }}%;">
-                    {{ day|format_skeleton(format='EEEdMMM') }}
+                    {{ day|format_skeleton('EEEdMMM') }}
                 </th>
             {% endfor %}
         </tr>

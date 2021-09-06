@@ -1,7 +1,7 @@
 <ul class="indico_event_list" data-ts="{{ ts }}">
     {% for date, events in events_by_date %}
         <li>
-            <span class="indico_event_list_day">{{ date | format_date(format='full') }}</span>
+            <span class="indico_event_list_day">{{ date | format_date('full') }}</span>
             <ul class="indico_day_content">
                 {% for event in events %}
                     <li class="indico_event_entry" data-id="{{ event.id }}">
@@ -18,4 +18,3 @@
         </li>
     {% endfor %}
 </ul>
-
