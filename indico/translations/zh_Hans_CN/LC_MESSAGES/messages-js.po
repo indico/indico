@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-13 18:34+0200\n"
+"POT-Creation-Date: 2021-09-01 15:29+0200\n"
 "PO-Revision-Date: 2021-07-14 07:00+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
@@ -612,7 +612,7 @@ msgstr "您尚未保存的更改将丢失。"
 msgid "Confirm action"
 msgstr "确认操作"
 
-#: indico/web/client/js/jquery/utils/declarative.js:360
+#: indico/web/client/js/jquery/utils/declarative.js:361
 msgid "Direct link to this item"
 msgstr "直接连接到此项"
 
