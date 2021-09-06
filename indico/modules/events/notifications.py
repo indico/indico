@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import itertools
+from operator import attrgetter
 
 from sqlalchemy.orm import joinedload
 
@@ -80,9 +81,9 @@ def notify_move_request_closure(move_requests, accept, reason=''):
     :param reason: Optional reason for rejection.
     """
 
-    move_requests = sorted(move_requests, key=lambda rq: rq.requestor.id)
-    for requestor, requests in itertools.groupby(move_requests, lambda rq: rq.requestor):
+    move_requests = sorted(move_requests, key=attrgetter('requestor.id', 'category.id'))
+    for (requestor, category), requests in itertools.groupby(move_requests, attrgetter('requestor', 'category')):
         events = [rq.event for rq in requests]
         template = get_template_module('events/emails/move_request_closure.txt',
-                                       events=events, accept=accept, reason=reason)
+                                       events=events, target_category=category, accept=accept, reason=reason)
         send_email(make_email(to_list=requestor.email, template=template))
