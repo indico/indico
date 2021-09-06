@@ -33,6 +33,7 @@ Bugfixes
 - Fix broken timetable entry permalinks when query string args are present (:pr:`5049`)
 - Do not show "Payments" event management menu entry for registration managers
   (:issue:`5072`)
+- Replace some hardcoded date formats with locale-aware ones (:issue:`5059`, :pr:`5071`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
