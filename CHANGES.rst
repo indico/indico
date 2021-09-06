@@ -18,6 +18,7 @@ Improvements
   while not logged in (:pr:`5053`)
 - When searching external users, prefer results with a name in case of multiple matches
   with the same email address (:pr:`5066`)
+- Show program codes in additional places (:pr:`5075`)
 
 Bugfixes
 ^^^^^^^^
