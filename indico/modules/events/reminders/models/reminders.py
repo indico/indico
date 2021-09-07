@@ -210,7 +210,7 @@ class EventReminder(db.Model):
         email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
         attachments = []
         if self.attach_ical:
-            event_ical = event_to_ical(self.event)
+            event_ical = event_to_ical(self.event, skip_access_check=True)
             attachments.append(('event.ics', event_ical, 'text/calendar'))
         email = make_email(
             bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl, attachments=attachments
