@@ -165,7 +165,7 @@ def format_skeleton(dt, skeleton, locale=None, timezone=None):
     """
     if not locale:
         locale = get_current_locale()
-    if not timezone and dt.tzinfo:
+    if not timezone and isinstance(dt, datetime) and dt.tzinfo:
         timezone = session.tzinfo
 
     # See https://github.com/python-babel/babel/issues/803 if you wonder why
