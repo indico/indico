@@ -35,6 +35,7 @@ Bugfixes
 - Do not show "Payments" event management menu entry for registration managers
   (:issue:`5072`)
 - Replace some hardcoded date formats with locale-aware ones (:issue:`5059`, :pr:`5071`)
+- Clone the scientific program description together with tracks (:pr:`5077`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
