@@ -36,6 +36,8 @@ Bugfixes
   (:issue:`5072`)
 - Replace some hardcoded date formats with locale-aware ones (:issue:`5059`, :pr:`5071`)
 - Clone the scientific program description together with tracks (:pr:`5077`)
+- Fix database error when importing registrations to an event that already contains a
+  deleted registration form with registrations (:pr:`5078`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
