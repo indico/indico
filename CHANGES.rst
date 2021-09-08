@@ -44,10 +44,21 @@ Internal Changes
 ----
 
 
-Version 3.0.1
+Version 3.0.2
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+
+Version 3.0.1
+-------------
+
+*Released on September 08, 2021*
 
 Improvements
 ^^^^^^^^^^^^

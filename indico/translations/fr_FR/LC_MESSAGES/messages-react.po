@@ -2,12 +2,12 @@
 # Translators:
 # Michito <crossner90@gmail.com>, 2019
 # Michel Jouvin <jouvin@lal.in2p3.fr>, 2019
-# Adrian Mönnich, 2020
+# Adrian, 2020
 # Thomas Baron <thomas.baron@cern.ch>, 2021
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-07-21 11:36+0200\n"
+"POT-Creation-Date: 2021-09-21 15:30+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2021\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
