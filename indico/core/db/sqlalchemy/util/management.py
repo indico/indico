@@ -5,11 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import click
 from sqlalchemy import ForeignKeyConstraint, MetaData, Table, inspect
 from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
-from indico.util.console import cformat
 
 
 DEFAULT_TICKET_DATA = {
@@ -110,19 +110,19 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
     from indico.modules.designer.models.templates import DesignerTemplate
     from indico.modules.users import User
     if verbose:
-        print(cformat('%{green}Creating tables'))
+        click.secho('Creating tables', fg='green')
     db.create_all()
     if add_initial_data:
         if verbose:
-            print(cformat('%{green}Creating system user'))
+            click.secho('Creating system user', fg='green')
         db.session.add(User(id=0, is_system=True, first_name='Indico', last_name='System'))
         if verbose:
-            print(cformat('%{green}Creating root category'))
+            click.secho('Creating root category', fg='green')
         cat = Category(id=0, title='Home', protection_mode=ProtectionMode.public)
         db.session.add(cat)
         db.session.flush()
         if verbose:
-            print(cformat('%{green}Creating default ticket template for root category '))
+            click.secho('Creating default ticket template for root category', fg='green')
         dtt = DesignerTemplate(category_id=0, title='Default ticket', type=TemplateType.badge,
                                data=DEFAULT_TICKET_DATA, is_system_template=True)
         dbt = DesignerTemplate(category_id=0, title='Default badge', type=TemplateType.badge,
@@ -132,7 +132,7 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
         db.session.add(dtt)
         db.session.add(dbt)
         if verbose:
-            print(cformat('%{green}Creating system oauth apps'))
+            click.secho('Creating system oauth apps', fg='green')
         for sat in SystemAppType:
             if sat != SystemAppType.none:
                 db.session.add(OAuthApplication(system_app_type=sat, **sat.default_data))

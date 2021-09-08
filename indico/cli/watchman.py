@@ -11,6 +11,7 @@ import subprocess
 import sys
 import time
 
+import click
 import pywatchman
 from flask.helpers import get_root_path
 from werkzeug._reloader import _find_watchdog_paths
@@ -62,7 +63,7 @@ class Watcher:
             files = sorted(f for record in data for f in record.get('files', []))
             relpath = os.path.relpath(self.path)
             if relpath == '.':
-                print(cformat('%{cyan}Changes found:').format(relpath))
+                click.secho('Changes found:', fg='cyan')
             else:
                 print(cformat('%{cyan}Changes found in %{cyan!}{}%{reset}%{cyan}:').format(relpath))
             for f in files:
@@ -144,14 +145,14 @@ class Watchman:
     def _launch(self, quiet=False, retry=0):
         assert not self._proc
         if not quiet and not retry:
-            print(cformat('%{green!}Launching Indico'))
+            click.secho('Launching Indico', fg='green', bold=True)
         try:
             argv = _disable_reloader(sys.argv)
             self._proc = subprocess.Popen(argv)
         except OSError as exc:
             delay = (retry + 1) * 0.5
-            print(cformat('%{red!}Could not launch Indico: {}').format(exc))
-            print(cformat('%{yellow}Retrying in {}s').format(delay))
+            click.secho(f'Could not launch Indico: {exc}', fg='red', bold=True)
+            click.secho(f'Retrying in {delay}s', fg='yellow')
             time.sleep(delay)
             self._launch(quiet=quiet, retry=(retry + 1))
 
@@ -159,11 +160,11 @@ class Watchman:
         if not self._proc:
             return
         if not quiet:
-            print(cformat('%{red!}Terminating Indico'))
+            click.secho('Terminating Indico', fg='red', bold=True)
         self._proc.terminate()
         self._proc = None
 
     def _restart(self):
-        print(cformat('%{yellow!}Restarting Indico'))
+        click.secho('Restarting Indico', fg='yellow', bold=True)
         self._terminate(quiet=True)
         self._launch(quiet=True)

@@ -13,7 +13,6 @@ import click
 from sqlalchemy import inspect
 
 from indico.core.db.sqlalchemy.util.models import get_all_models, import_all_models
-from indico.util.console import cformat
 
 
 def _find_backrefs():
@@ -76,10 +75,10 @@ def main(ci):
         if in_backrefs and not backrefs_written:
             _write_backrefs(rels, new_source)
         if not backrefs_written:
-            print(cformat('%{yellow}Class {} has no comment for backref information').format(cls.__name__))
+            click.secho(f'Class {cls.__name__} has no comment for backref information', fg='yellow')
             has_missing = True
         if source != new_source:
-            print(cformat('%{green!}Updating backref info for {} in {}').format(cls.__name__, path))
+            click.secho(f'Updating backref info for {cls.__name__} in {path}', fg='green', bold=True)
             has_updates = True
             with open(path, 'w') as f:
                 f.writelines(line + '\n' for line in new_source)

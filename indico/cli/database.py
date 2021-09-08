@@ -115,7 +115,7 @@ def _safe_downgrade(*args, **kwargs):
                       '%{red!}Debug mode is NOT ACTIVE, so make sure you are on the right machine!'))
     if not skip_confirm and input(cformat('%{yellow!}***%{reset} '
                                           'To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
-        print(cformat('%{green}Aborted%{reset}'))
+        click.secho('Aborted', fg='green')
         sys.exit(1)
     else:
         return func(*args, **kwargs)
@@ -140,9 +140,9 @@ def _call_with_plugins(*args, **kwargs):
         alembic.command.ScriptDirectory = PluginScriptDirectory
         for plugin in plugins:
             if not os.path.exists(plugin.alembic_versions_path):
-                print(cformat("%{cyan}skipping plugin '{}' (no migrations folder)").format(plugin.name))
+                click.secho(f"skipping plugin '{plugin.name}' (no migrations folder)", fg='cyan')
                 continue
-            print(cformat("%{cyan!}executing command for plugin '{}'").format(plugin.name))
+            click.secho(f"executing command for plugin '{plugin.name}'", fg='cyan', bold=True)
             with plugin.plugin_context():
                 func(*args, **kwargs)
 

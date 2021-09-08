@@ -63,8 +63,6 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
-colorclass==2.2.0
-    # via -r requirements.in
 cryptography==3.4.7
     # via authlib
 decorator==5.0.9
@@ -292,8 +290,6 @@ sqlalchemy==1.4.21
     #   flask-sqlalchemy
     #   marshmallow-sqlalchemy
     #   sentry-sdk
-termcolor==1.1.0
-    # via -r requirements.in
 terminaltables==3.1.0
     # via -r requirements.in
 traitlets==5.0.5

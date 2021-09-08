@@ -9,7 +9,6 @@ import click
 from celery.bin.celery import celery as celery_cmd
 
 from indico.core.celery.util import unlock_task
-from indico.util.console import cformat
 
 
 # remove the celery shell command
@@ -30,6 +29,6 @@ def unlock(name):
     """
 
     if unlock_task(name):
-        print(cformat('%{green!}Task {} unlocked').format(name))
+        click.secho(f'Task {name} unlocked', fg='green', bold=True)
     else:
-        print(cformat('%{yellow}Task {} is not locked').format(name))
+        click.secho(f'Task {name} is not locked', fg='yellow')
