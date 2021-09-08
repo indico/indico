@@ -107,6 +107,8 @@ class RegistrationCloner(EventCloner):
             return [_('The target event already has registrations')]
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
+        if event_exists:
+            self._delete_orphaned_registrations(new_event)
         form_map = shared_data['registration_forms']['form_map']
         field_data_map = shared_data['registration_forms']['field_data_map']
         for old_form, new_form in form_map.items():
@@ -150,3 +152,9 @@ class RegistrationCloner(EventCloner):
             .filter(Registration.event_id == new_event.id)
             .scalar() or 0
         )
+
+    def _delete_orphaned_registrations(self, event):
+        # Avoid friendly ID conflicts with registrations in deleted regforms
+        Registration.query.with_parent(event).filter(
+            Registration.registration_form.has(is_deleted=True)
+        ).update({Registration.is_deleted: True}, synchronize_session='fetch')

@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-05 17:54+0200\n"
-"PO-Revision-Date: 2021-06-28 08:42+0000\n"
+"POT-Creation-Date: 2021-09-01 15:29+0200\n"
+"PO-Revision-Date: 2021-07-26 08:14+0000\n"
 "Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/indico/indico/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
@@ -70,11 +70,11 @@ msgstr[3] "Nie pokazano długotrwałych wydarzeń {0}"
 msgid "Long lasting events"
 msgstr "Długotrwałe wydarzenia"
 
-#: indico/modules/categories/client/js/display.js:21
+#: indico/modules/categories/client/js/display.js:25
 msgid "empty"
 msgstr "pusty"
 
-#: indico/modules/categories/client/js/display.js:22
+#: indico/modules/categories/client/js/display.js:26
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "wydarzenie {0}"
@@ -82,15 +82,15 @@ msgstr[1] "wydarzenia {0}"
 msgstr[2] "wydarzenia {0}"
 msgstr[3] "wydarzenia {0}"
 
-#: indico/modules/categories/client/js/display.js:151
+#: indico/modules/categories/client/js/display.js:166
 msgid "Remove from your favorites"
 msgstr "Usuń z ulubionych"
 
-#: indico/modules/categories/client/js/display.js:154
+#: indico/modules/categories/client/js/display.js:169
 msgid "Add to your favorites"
 msgstr "Dodaj do ulubionych"
 
-#: indico/modules/categories/client/js/display.js:156
+#: indico/modules/categories/client/js/display.js:171
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
@@ -346,12 +346,12 @@ msgstr "Błąd"
 msgid "Choose a file"
 msgstr "Wybierz plik"
 
-#: indico/modules/events/abstracts/client/js/index.js:76
-#: indico/modules/events/abstracts/client/js/index.js:89
+#: indico/modules/events/abstracts/client/js/index.js:78
+#: indico/modules/events/abstracts/client/js/index.js:91
 msgid "Show preview"
 msgstr "Pokaż podgląd"
 
-#: indico/modules/events/abstracts/client/js/index.js:80
+#: indico/modules/events/abstracts/client/js/index.js:82
 msgid "Hide preview"
 msgstr "Ukryj podgląd"
 
@@ -659,7 +659,7 @@ msgstr "Masz niezapisane zmiany, które stracisz. "
 msgid "Confirm action"
 msgstr "Potwierdź"
 
-#: indico/web/client/js/jquery/utils/declarative.js:360
+#: indico/web/client/js/jquery/utils/declarative.js:361
 msgid "Direct link to this item"
 msgstr "Bezpośredni odnośnik"
 
@@ -887,7 +887,7 @@ msgstr "Wpisz, aby dodać {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
 msgid "Delete"
 msgstr "Usuń"
 
@@ -941,7 +941,7 @@ msgstr[2] "<strong>{0}</strong> słów pozostało"
 msgstr[3] "<strong>{0}</strong> słów pozostało"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1435
 msgid "Edit"
 msgstr "Edytuj"
 
@@ -1312,171 +1312,177 @@ msgstr "Dodaj sesję"
 msgid "Add session block"
 msgstr "Dodaj blok sesji"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:43
+#: indico/web/client/js/legacy/libs/timetable/Base.js:45
 msgid "Session"
 msgstr "Sesja"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:44
+#: indico/web/client/js/legacy/libs/timetable/Base.js:46
 msgid "Room"
 msgstr "Pokój"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:131
+#: indico/web/client/js/legacy/libs/timetable/Base.js:133
 msgid "Updating the timetable..."
 msgstr "Aktualizuję harmonogram..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:182
-#: indico/web/client/js/legacy/libs/timetable/Base.js:421
+#: indico/web/client/js/legacy/libs/timetable/Base.js:184
+#: indico/web/client/js/legacy/libs/timetable/Base.js:423
 msgid "Filter"
 msgstr "Filtr"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:200
+#: indico/web/client/js/legacy/libs/timetable/Base.js:202
 msgid "Printable version"
 msgstr "Wersja do druku"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:221
+#: indico/web/client/js/legacy/libs/timetable/Base.js:223
 msgid "Go back"
 msgstr "Wróć"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:228
-#: indico/web/client/js/legacy/libs/timetable/Base.js:387
+#: indico/web/client/js/legacy/libs/timetable/Base.js:230
+#: indico/web/client/js/legacy/libs/timetable/Base.js:389
 msgid "Print"
 msgstr "Drukuj"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:272
+#: indico/web/client/js/legacy/libs/timetable/Base.js:274
 msgid "Export to PDF"
 msgstr "Eksportuj do PDF"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:280
+#: indico/web/client/js/legacy/libs/timetable/Base.js:282
 msgid "Switching to full screen mode..."
 msgstr "Przełącz do pełnego ekranu..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:317
+#: indico/web/client/js/legacy/libs/timetable/Base.js:319
 msgid "Exit Full Screen"
 msgstr "Opuść pełny ekran"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:394
+#: indico/web/client/js/legacy/libs/timetable/Base.js:396
 msgid "PDF"
 msgstr "PDF"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:401
+#: indico/web/client/js/legacy/libs/timetable/Base.js:403
 msgid "Full screen"
 msgstr "Pełny ekran"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:408
+#: indico/web/client/js/legacy/libs/timetable/Base.js:410
 msgid "Link"
 msgstr "Odnośnik"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:413
+#: indico/web/client/js/legacy/libs/timetable/Base.js:415
 msgid "Detailed view"
 msgstr "Widok szczegółowy"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:476
+#: indico/web/client/js/legacy/libs/timetable/Base.js:478
 msgid "All days"
 msgstr "Wszystkie dni"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:689
+#: indico/web/client/js/legacy/libs/timetable/Base.js:482
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1215
+msgctxt "momentjs date format for timetable tab headers"
+msgid "ddd DD/MM"
+msgstr "ddd DD/MM"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:684
 msgid "You are viewing the contents of the session block:"
 msgstr "Pokazujesz zawartość tego bloku sesji:"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:778
+#: indico/web/client/js/legacy/libs/timetable/Base.js:773
 msgid "Your changes triggered the automatic modification of some settings:"
 msgstr "Twoje zmiany włączyły automatyczną modyfikację pewnych ustawień:"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:786
-#: indico/web/client/js/legacy/libs/timetable/Base.js:790
+#: indico/web/client/js/legacy/libs/timetable/Base.js:781
+#: indico/web/client/js/legacy/libs/timetable/Base.js:785
 msgid "The <strong>starting time</strong> of the session interval <strong>"
 msgstr "<strong>Początek</strong> przedziału sesji <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:788
-#: indico/web/client/js/legacy/libs/timetable/Base.js:792
-#: indico/web/client/js/legacy/libs/timetable/Base.js:801
-#: indico/web/client/js/legacy/libs/timetable/Base.js:805
+#: indico/web/client/js/legacy/libs/timetable/Base.js:783
+#: indico/web/client/js/legacy/libs/timetable/Base.js:787
+#: indico/web/client/js/legacy/libs/timetable/Base.js:796
+#: indico/web/client/js/legacy/libs/timetable/Base.js:800
 msgid "</strong> was moved from "
 msgstr "</strong> przesunięto z "
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:793
+#: indico/web/client/js/legacy/libs/timetable/Base.js:788
 msgid ""
 "The <strong>starting time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong>godzinę rozpoczęcia</strong>  <strong>wydarzenia</strong> przesunięto z "
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:799
-#: indico/web/client/js/legacy/libs/timetable/Base.js:803
+#: indico/web/client/js/legacy/libs/timetable/Base.js:794
+#: indico/web/client/js/legacy/libs/timetable/Base.js:798
 msgid "The <strong>ending time</strong> of the session interval <strong>"
 msgstr "<strong>Zakończenie</strong> przedziału sesji <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:806
+#: indico/web/client/js/legacy/libs/timetable/Base.js:801
 msgid ""
 "The <strong>ending time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong>Czas zakończenia</strong> <strong>wydarzenia</strong> został przeniesiony z "
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:812
+#: indico/web/client/js/legacy/libs/timetable/Base.js:807
 msgid "The contents of the interval <strong>"
 msgstr "Zawartość przedziału <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:814
+#: indico/web/client/js/legacy/libs/timetable/Base.js:809
 msgid "</strong> were moved from "
 msgstr "</strong>przeniesiono z "
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:824
+#: indico/web/client/js/legacy/libs/timetable/Base.js:819
 msgid " to "
 msgstr " do "
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1017
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1012
 msgid "Session block"
 msgstr "Blok sesji"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1035
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1030
 msgid "Contribution"
 msgstr "Kontrybucja"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1049
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1044
 msgid "Break"
 msgstr "Przerwa"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1066
 msgid "Add poster"
 msgstr "Dodaj poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1076
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
 msgid "Add new"
 msgstr "Dodaj nowy"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1080
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1075
 #: indico/web/client/js/legacy/libs/timetable/Management.js:664
 msgid "Reschedule"
 msgstr "Zmień termin"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1090
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1085
 msgid "Fit to content"
 msgstr "Dopasuj do zawartości"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1099
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1094
 msgid "Add new block"
 msgstr "Dodaj nowy blok"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1143
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1138
 msgid "Add one hour"
 msgstr "Dodaj jedną godzinę"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1212
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1207
 msgid "Session legend"
 msgstr "Legenda sesji"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1243
 msgid "see more..."
 msgstr "zobacz jeszcze..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1253
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
 msgid "less..."
 msgstr "mniej..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1567
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1562
 msgid "Go to event timetable"
 msgstr "Przejdź do harmonogramu wydarzenia"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1737
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1732
 msgid "Up to timetable"
 msgstr "Wróć do harmonogramu"
 
@@ -1535,35 +1541,35 @@ msgstr "Przejdź w górę"
 msgid "Move down"
 msgstr "Przejdź w dół"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1478
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1437
 msgid "Edit poster"
 msgstr "Edytuj poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1469
 msgid "Manage protection"
 msgstr "Zarządzaj ochroną"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1512
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1471
 msgid "Manage poster protection"
 msgstr "Zarządzaj ochroną plakatu"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1499
 msgid "Unschedule"
 msgstr "Wypisz z harmonogramu"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1541
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1500
 msgid "Unschedule poster"
 msgstr "Usuń plakat z harmonogramu"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1501
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "Czy na pewno chcesz usunąć plakat z harmonogramu?"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1545
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
 msgid "Delete poster"
 msgstr "Usuń poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1546
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1505
 msgid "Are you sure you want to delete the poster?"
 msgstr "Czy chcesz usunąć ten plakat?"
 

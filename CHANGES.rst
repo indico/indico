@@ -60,6 +60,8 @@ Improvements
   while not logged in (:pr:`5053`)
 - When searching external users, prefer results with a name in case of multiple matches
   with the same email address (:pr:`5066`)
+- Show program codes in additional places (:pr:`5075`)
+- Display localized country names (:issue:`5070`, :pr:`5076`)
 
 Bugfixes
 ^^^^^^^^
@@ -74,6 +76,10 @@ Bugfixes
 - Fix broken timetable entry permalinks when query string args are present (:pr:`5049`)
 - Do not show "Payments" event management menu entry for registration managers
   (:issue:`5072`)
+- Replace some hardcoded date formats with locale-aware ones (:issue:`5059`, :pr:`5071`)
+- Clone the scientific program description together with tracks (:pr:`5077`)
+- Fix database error when importing registrations to an event that already contains a
+  deleted registration form with registrations (:pr:`5078`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

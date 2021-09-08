@@ -202,6 +202,7 @@ def setup_jinja(app):
     app.add_template_global(render_field, '_render_field')
     app.add_template_global(iter_form_fields, '_iter_form_fields')
     app.add_template_global(format_currency)
+    app.add_template_global(date_time_util.format_interval)
     app.add_template_global(get_currency_name)
     app.add_template_global(url_for_index)
     app.add_template_global(url_for_login)
@@ -219,14 +220,14 @@ def setup_jinja(app):
     app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
-    # Filters (indico functions returning UTF8)
+    # Filters
     app.add_template_filter(date_time_util.format_date)
     app.add_template_filter(date_time_util.format_time)
     app.add_template_filter(date_time_util.format_datetime)
     app.add_template_filter(date_time_util.format_human_date)
     app.add_template_filter(date_time_util.format_timedelta)
+    app.add_template_filter(date_time_util.format_skeleton)
     app.add_template_filter(date_time_util.format_number)
-    # Filters (new ones returning unicode)
     app.add_template_filter(date_time_util.format_human_timedelta)
     app.add_template_filter(date_time_util.format_pretty_date)
     app.add_template_filter(date_time_util.format_pretty_datetime)

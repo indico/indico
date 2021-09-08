@@ -12,8 +12,8 @@
     \JINJA{if show_dates}
         \begin{center}
             \Large
-            \VAR{event.start_dt.astimezone(tz).strftime("%A %d %B %Y")} -
-            \VAR{event.end_dt.astimezone(tz).strftime("%A %d %B %Y")}
+            \VAR{event.start_dt.astimezone(tz)|format_date('full')} -
+            \VAR{event.end_dt.astimezone(tz)|format_date('full')}
         \end{center}
 
         \JINJA{if event.venue_name}

@@ -14,12 +14,13 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.events.tracks.settings import track_settings
 from indico.util.i18n import _
 
 
 class TrackCloner(EventCloner):
     name = 'tracks'
-    friendly_name = _('Tracks')
+    friendly_name = _('Tracks and scientific program')
     always_available_dep = True
 
     @property
@@ -32,19 +33,23 @@ class TrackCloner(EventCloner):
 
     def get_conflicts(self, target_event):
         if self._has_content(target_event):
-            return [_('The target event already has tracks')]
+            return [_('The target event already has tracks or a program')]
 
     @no_autoflush
     def run(self, new_event, cloners, shared_data, event_exists=False):
         self._track_map = {}
         self._track_group_map = {}
+        self._clone_program(new_event)
         self._clone_track_groups(new_event)
         self._clone_tracks(new_event)
         db.session.flush()
         return {'track_map': self._track_map}
 
     def _has_content(self, event):
-        return bool(event.tracks)
+        return bool(event.tracks) or bool(track_settings.get(event, 'program'))
+
+    def _clone_program(self, new_event):
+        track_settings.set_multi(new_event, track_settings.get_all(self.old_event, no_defaults=True))
 
     def _clone_tracks(self, new_event):
         attrs = get_simple_column_attrs(Track)

@@ -147,6 +147,9 @@ type(
       if (this.eventData.slotTitle && this.eventData.slotTitle !== '') {
         title += ': ' + this.eventData.slotTitle;
       }
+      if (this.eventData.code) {
+        title += ` (${this.eventData.code})`;
+      }
       return title;
     },
 

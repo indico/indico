@@ -1,12 +1,12 @@
 # 
 # Translators:
 # 中天 梁 <liangzt@ihep.ac.cn>, 2020
-# Adrian Mönnich, 2021
+# Adrian, 2021
 # Lanxin Ma <ma@ihep.ac.cn>, 2021
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-07-21 18:34+0200\n"
+"POT-Creation-Date: 2021-09-21 15:30+0200\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2021\n"
 "Language-Team: Chinese (China) (GB2312) (https://www.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"

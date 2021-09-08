@@ -159,9 +159,9 @@
 
     \VAR{(_('Submitted by {0} on {1}')|latex(true)).format(
         '\\textbf{%s}'|rawlatex|format(abstract.submitter.get_full_name(abbrev_first_name=false, show_title=true)),
-        '\\textbf{%s}'|rawlatex|format(abstract.submitted_dt.strftime("%A %d %B %Y"))
+        '\\textbf{%s}'|rawlatex|format(abstract.submitted_dt|format_date('full'))
     )|rawlatex}
     \JINJA{if abstract.modified_dt}
-        \fancyfoot[C]{\color{gray} \VAR{_('Last modified:')} \VAR{abstract.modified_dt.strftime('%A %d %B %Y')}}
+        \fancyfoot[C]{\color{gray} \VAR{_('Last modified:')} \VAR{abstract.modified_dt|format_date('full')}}
     \JINJA{endif}
 \JINJA{endmacro}

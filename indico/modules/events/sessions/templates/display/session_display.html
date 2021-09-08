@@ -16,7 +16,13 @@
 {% endblock %}
 
 {% block info %}
-    <div class="time-data">
+    {% if sess.code %}
+        <div class="generic-data">
+            <i class="icon-tag header-data"></i>
+            {{ sess.code }}
+        </div>
+    {% endif %}
+    <div class="generic-data">
         <i class="icon-time header-data"></i>
         <span class="time-info">
             {% if sess.start_dt -%}
@@ -27,7 +33,7 @@
         </span>
     </div>
     {% if sess.has_location_info %}
-        <div class="location-data">
+        <div class="generic-data">
             {{ render_location(sess, class='session-location') }}
         </div>
     {% endif %}

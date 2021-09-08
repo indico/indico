@@ -1,11 +1,11 @@
 # 
 # Translators:
-# Adrian Mönnich, 2021
+# Adrian, 2021
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-06-21 11:05+0200\n"
-"Last-Translator: Adrian Mönnich, 2021\n"
+"POT-Creation-Date: 2021-09-21 15:30+0200\n"
+"Last-Translator: Adrian, 2021\n"
 "Language-Team: English (United Kingdom) (https://www.transifex.com/indico/teams/6478/en_GB/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -131,7 +131,7 @@ msgstr ""
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:121
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:89
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:512
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:170
@@ -212,64 +212,60 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:35
-msgid "Published"
+#: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
+msgid "Publish now"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:35
-msgid "Draft"
-msgstr ""
-
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:47
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:20
 msgid "Set contribution list in draft mode"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:48
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:21
 msgid "Publish contributions"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:55
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:28
 msgid ""
 "Are you sure you want to change the contribution list back to draft mode?"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:60
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:33
 msgid "By doing so the following menu items won't be accessible:"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:66
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:39
 msgid "Are you sure you want to publish the contribution list?"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:69
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:42
 msgid "By doing so the following menu items will be accessible:"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:75
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:48
 msgid "Contribution List"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:78
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:51
 msgid "My Contributions"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:81
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:54
 msgid "Author List"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:84
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:57
 msgid "Speaker List"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:87
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:60
 msgid "Timetable"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:90
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:63
 msgid "Book of Abstracts"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:96
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:69
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:67
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:218
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:95
@@ -279,7 +275,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:105
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:72
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:66
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:217
 #: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:94
@@ -289,7 +285,15 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/index.jsx:44
+#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:32
+msgid "Published"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/PublicationSwitch.jsx:32
+msgid "Draft"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx:45
 msgid "Contribution"
 msgstr ""
 
@@ -386,7 +390,7 @@ msgstr ""
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:211
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
 msgid "Comment"
 msgstr ""
 
@@ -404,27 +408,27 @@ msgid "On {modificationDate}"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:80
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:78
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:89
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:80
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:91
 msgid "edited"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:89
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:93
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:95
 msgid "Edit comment"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:94
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:98
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:119
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:105
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:127
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:102
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:129
 msgid "Remove comment"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:109
 msgid "Are you sure you want to remove this comment?"
 msgstr ""
 
@@ -582,12 +586,12 @@ msgid "{submitterName} submitted a revision"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:57
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
 msgid "Hide old revision"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
 msgid "Show old revision"
 msgstr ""
 
@@ -1397,7 +1401,7 @@ msgstr ""
 msgid "Change reviews"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:81
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:83
 msgid "On {modificationDate} by {modifiedBy}"
 msgstr ""
 
@@ -1443,35 +1447,35 @@ msgstr ""
 msgid "{reviewerName} left a review"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:112
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:114
 msgid "Proposed to {actionName}accept{/actionName}"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:120
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:122
 msgid "Proposed to {actionName}reject{/actionName}"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:128
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:130
 msgid "Proposed to {actionName}correct{/actionName}"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:138
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:140
 msgid "· score {prettyScore}"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:146
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:148
 msgid "Score: {score} / {maxScore}"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:159
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
 msgid "hide ratings"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:163
 msgid "show ratings"
 msgstr ""
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:173
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:175
 msgid "Edit review"
 msgstr ""
 
@@ -2453,7 +2457,7 @@ msgid "My Blockings"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/SidebarMenu.jsx:91
-#: indico/web/client/js/react/components/UserMenu.jsx:117
+#: indico/web/client/js/react/components/UserMenu.jsx:120
 msgid "Administration"
 msgstr ""
 
@@ -3632,19 +3636,19 @@ msgstr ""
 msgid "Back to top"
 msgstr ""
 
-#: indico/web/client/js/react/components/UserMenu.jsx:44
+#: indico/web/client/js/react/components/UserMenu.jsx:45
 msgid "Impersonate user"
 msgstr ""
 
-#: indico/web/client/js/react/components/UserMenu.jsx:101
+#: indico/web/client/js/react/components/UserMenu.jsx:104
 msgid "My Profile"
 msgstr ""
 
-#: indico/web/client/js/react/components/UserMenu.jsx:104
+#: indico/web/client/js/react/components/UserMenu.jsx:107
 msgid "My Preferences"
 msgstr ""
 
-#: indico/web/client/js/react/components/UserMenu.jsx:123
+#: indico/web/client/js/react/components/UserMenu.jsx:126
 msgid "Logout"
 msgstr ""
 

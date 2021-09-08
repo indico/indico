@@ -105,22 +105,24 @@ def generate_event_component(event, user=None):
     return component
 
 
-def event_to_ical(event, user=None, scope=None):
+def event_to_ical(event, user=None, scope=None, *, skip_access_check=False):
     """Serialize an event into an ical.
 
     :param event: The event to serialize
     :param user: The user who needs to be able to access the events
     :param scope: If specified, use a more detailed timetable using the given scope
+    :param skip_access_check: Do not perform access checks. Defaults to False.
     """
-    return events_to_ical([event], user, scope)
+    return events_to_ical([event], user, scope, skip_access_check=skip_access_check)
 
 
-def events_to_ical(events, user=None, scope=None):
+def events_to_ical(events, user=None, scope=None, *, skip_access_check=False):
     """Serialize multiple events into an ical.
 
     :param events: A list of events to serialize
     :param user: The user who needs to be able to access the events
     :param scope: If specified, use a more detailed timetable using the given scope
+    :param skip_access_check: Do not perform access checks. Defaults to False.
     """
     from indico.modules.events.contributions.ical import generate_contribution_component
     from indico.modules.events.sessions.ical import generate_session_block_component
@@ -130,7 +132,7 @@ def events_to_ical(events, user=None, scope=None):
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
     for event in events:
-        if not event.can_access(user):
+        if not skip_access_check and not event.can_access(user):
             continue
 
         if scope == CalendarScope.contribution:
