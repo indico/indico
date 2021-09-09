@@ -44,7 +44,7 @@ Internal Changes
 ----
 
 
-Version 3.0.2
+Version 3.0.3
 -------------
 
 *Unreleased*
@@ -53,6 +53,18 @@ Bugfixes
 ^^^^^^^^
 
 - None so far :)
+
+
+Version 3.0.2
+-------------
+
+*Released on September 09, 2021*
+
+Bugfixes
+^^^^^^^^
+
+- Fix JavaScript errors on the login page which caused problems when using multiple
+  form-based login methods (e.g. LDAP and local Indico accounts)
 
 
 Version 3.0.1
