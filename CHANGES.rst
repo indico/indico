@@ -10,7 +10,8 @@ Version 3.0.2
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix JavaScript errors on the login page which caused problems when using multiple
+  form-based login methods (e.g. LDAP and local Indico accounts)
 
 
 Version 3.0.1
