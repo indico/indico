@@ -5,7 +5,7 @@ Changelog
 Version 3.0.2
 -------------
 
-*Unreleased*
+*Released on September 09, 2021*
 
 Bugfixes
 ^^^^^^^^
