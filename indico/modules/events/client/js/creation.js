@@ -81,6 +81,7 @@ import {camelizeKeys} from 'indico/utils/case';
         options.categoryField.prop('disabled', false);
         $('#category-title-event-creation-category').text(options.initialCategory.title);
         options.categoryField.trigger('indico:categorySelected', [options.initialCategory]);
+        $(`#category-warning-event-creation-category`).addClass('hidden');
       } else {
         $('#form-group-event-creation-category').hide();
         $('#form-group-event-creation-protection_mode').hide();
