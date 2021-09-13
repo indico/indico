@@ -82,20 +82,23 @@
   background: #dcebf5;
 }
 
-.dashboard-box ol {
+.dashboard-box ol,
+.dashboard-box ul {
   list-style: none;
   margin: 0;
   padding: 0;
   border: none;
 }
 
-.dashboard-box ol li {
+.dashboard-box ol li,
+.dashboard-box ul li {
   border-bottom: 1px solid #e5e5e5;
   padding: 10px 10px 5px 10px;
 }
 
 .dashboard-box ol li a,
-.dashboard-box ol li.no-event span {
+.dashboard-box ol li.no-event span,
+.dashboard-box ul li a {
   font-size: 1.2em;
   line-height: 18px;
   position: relative;
@@ -128,23 +131,27 @@
   border-bottom: none;
 }
 
-.dashboard-box ol li > a:hover .event-title {
+.dashboard-box ol li > a:hover .event-title,
+.dashboard-box ul li > a:hover .event-title {
   text-decoration: underline;
 }
 
-.dashboard-box ol .event-title {
+.dashboard-box ol .event-title,
+.dashboard-box ul .event-title {
   vertical-align: middle;
 }
 
 .dashboard-box ol .event-date,
-.dashboard-box ol .event-category {
+.dashboard-box ol .event-category,
+.dashboard-box ul .event-date {
   color: $dark-gray;
   display: inline-block;
   font-weight: normal;
   vertical-align: middle;
 }
 
-.dashboard-box ol .event-date {
+.dashboard-box ol .event-date,
+.dashboard-box ul .event-date {
   display: inline-block;
   font-size: 12px;
   width: 85px;
