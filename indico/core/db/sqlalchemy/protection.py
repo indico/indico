@@ -212,10 +212,10 @@ class ProtectionMixin:
                 # mixin or a legacy object with an AccessController
                 parent = self.protection_parent
                 if parent is None:
-                    # This should be the case for the top-level object,
-                    # i.e. the root category, which shouldn't allow
-                    # ProtectionMode.inheriting as it makes no sense.
-                    raise TypeError(f'protection_parent of {self} is None')
+                    # This is the case for unlisted events, which are inheriting
+                    # by default but have no parent category, so its parent
+                    # protection won't be checked.
+                    rv = False
                 elif hasattr(parent, 'can_access'):
                     rv = parent.can_access(user, allow_admin=allow_admin)
                 else:

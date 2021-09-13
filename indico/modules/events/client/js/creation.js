@@ -66,11 +66,7 @@ import {camelizeKeys} from 'indico/utils/case';
     }
 
     options.categoryField.on('indico:categorySelected', (evt, cat) => {
-      if (!options.listingField.prop('checked')) {
-        options.protectionModeFields.filter('[value=inheriting]').prop('disabled', true);
-        options.protectionModeFields.filter('[value=public]').prop('checked', true);
-      } else if (!currentCategory) {
-        options.protectionModeFields.prop('disabled', false);
+      if (!currentCategory) {
         options.protectionModeFields.filter('[value=inheriting]').prop('checked', true);
       }
       currentCategory = cat;
@@ -80,13 +76,14 @@ import {camelizeKeys} from 'indico/utils/case';
     options.listingField.on('change', evt => {
       if (evt.target.checked) {
         $('#form-group-event-creation-category').show();
+        $('#form-group-event-creation-protection_mode').show();
         options.categoryField.val(JSON.stringify(options.initialCategory));
         options.categoryField.prop('disabled', false);
         $('#category-title-event-creation-category').text(options.initialCategory.title);
         options.categoryField.trigger('indico:categorySelected', [options.initialCategory]);
       } else {
         $('#form-group-event-creation-category').hide();
-        $('#event-creation-protection_mode-1').prop('disabled', true);
+        $('#form-group-event-creation-protection_mode').hide();
         options.categoryField.val('');
         options.categoryField.prop('disabled', true);
         options.categoryField.trigger('indico:categorySelected', []);
