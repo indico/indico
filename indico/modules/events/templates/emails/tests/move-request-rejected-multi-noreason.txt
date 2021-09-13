@@ -1,0 +1,13 @@
+
+Move requests of the following events have been rejected:
+
+- test 1 (http://localhost/event/1/)
+- test 2 (http://localhost/event/2/)
+
+Requested category
+------------------
+Home » target
+
+--
+Indico :: Event notifications
+

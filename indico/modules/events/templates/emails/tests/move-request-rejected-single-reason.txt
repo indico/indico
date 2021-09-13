@@ -1,0 +1,17 @@
+
+Request to move event rejected:
+
+- test 1 (http://localhost/event/1/)
+
+Requested category
+------------------
+Home » target
+
+Rejection reason
+----------------
+We do not want your event.
+Sorry not sorry.
+
+--
+Indico :: Event notifications
+

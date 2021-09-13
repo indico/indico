@@ -102,6 +102,7 @@ packaging==21.0
     # via
     #   -c requirements.txt
     #   pytest
+    #   pytest-snapshot
     #   sphinx
     #   sqlbag
 parso==0.8.2
@@ -143,6 +144,7 @@ pytest==6.2.4
     #   pytest-cov
     #   pytest-mock
     #   pytest-redis
+    #   pytest-snapshot
 pytest-cov==2.12.1
     # via -r requirements.dev.in
 pytest-localserver==0.5.0
@@ -150,6 +152,8 @@ pytest-localserver==0.5.0
 pytest-mock==3.6.1
     # via -r requirements.dev.in
 pytest-redis==2.1.1
+    # via -r requirements.dev.in
+pytest-snapshot==0.6.1
     # via -r requirements.dev.in
 python-dateutil==2.8.2
     # via

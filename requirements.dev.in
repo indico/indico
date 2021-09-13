@@ -13,6 +13,7 @@ pytest-cov
 pytest-localserver
 pytest-mock
 pytest-redis
+pytest-snapshot
 pytest
 pyquotes
 pyupgrade

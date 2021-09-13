@@ -1,0 +1,13 @@
+There is a new move request for the category:
+Home » target
+
+Requested events
+----------------
+test 1 (http://localhost/event/1/)
+
+View all move requests here:
+http://localhost/category/314/manage/moderation
+
+--
+Indico :: Event notifications
+
