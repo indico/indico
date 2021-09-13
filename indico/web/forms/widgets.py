@@ -221,22 +221,24 @@ class TypeaheadWidget(JinjaWidget):
                                searching for suggestions.
     :param typeahead_options: Params passed to the typeahead js
                               initialization.
+    :param choices: Choices passed to the typeahead js initialization.
     """
 
-    def __init__(self, search_url=None, min_trigger_length=1, typeahead_options=None):
+    def __init__(self, search_url=None, min_trigger_length=1, typeahead_options=None, choices=None):
         super().__init__('forms/typeahead_widget.html')
         self.search_url = search_url
         self.min_trigger_length = min_trigger_length
         self.typeahead_options = typeahead_options
+        self.choices = choices
 
     def __call__(self, field, **kwargs):
         options = {}
         if self.typeahead_options:
             options.update(self.typeahead_options)
         options.update(kwargs.pop('options', {}))
+        choices = self.choices if self.choices is not None else getattr(field, 'choices', [])
         return super().__call__(field, options=options, min_trigger_length=self.min_trigger_length,
-                                search_url=self.search_url, choices=getattr(field, 'choices', []),
-                                input_args=kwargs)
+                                search_url=self.search_url, choices=choices, input_args=kwargs)
 
 
 class LocationWidget(JinjaWidget):
