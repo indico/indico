@@ -61,5 +61,10 @@
             hiddenPermissions: {{ field.hidden_permissions|default([])|tojson }},
             hiddenPermissionsInfo: {{ field.hidden_permissions_info|tojson }}
         });
+
+        // make sure permission widget updates even if protection widget is not there to trigger an update
+        {% if field.event.category is none %}
+            $('#permissions-widget-{{ field.id }}').trigger('indico:protectionModeChanged');
+        {% endif %}
     </script>
 {% endblock %}
