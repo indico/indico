@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 3.0.1-dev\n"
+"Project-Id-Version: indico 3.0.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-09-07 14:35+0200\n"
+"POT-Creation-Date: 2021-09-13 17:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2445,17 +2445,7 @@ msgid_plural "You have moved {count} events to the category \"{cat}\""
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/controllers/util.py:26
-msgctxt "babel date format for category event list headers (month/year only)"
-msgid "MMMM yyyy"
-msgstr ""
-
-#: indico/modules/categories/controllers/util.py:43
-msgctxt "babel date format for category event list event entries (day/month only)"
-msgid "dd MMM"
-msgstr ""
-
-#: indico/modules/categories/controllers/util.py:165
+#: indico/modules/categories/controllers/util.py:163
 msgid "Events of \"{}\""
 msgstr ""
 

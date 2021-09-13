@@ -17,18 +17,16 @@ from indico.core.db import db
 from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import serialize_event_for_json_ld
-from indico.util.date_time import format_date
-from indico.util.i18n import _, pgettext
+from indico.util.date_time import format_date, format_skeleton
+from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 
 
 def group_by_month(events, now, tzinfo):
-    date_format = pgettext('babel date format for category event list headers (month/year only)', 'MMMM yyyy')
-
     def _format_tuple(x):
         (year, month), events = x
-        return {'name': format_date(date(year, month, 1), format=date_format),
+        return {'name': format_skeleton(date(year, month, 1), 'MMMMyyyy'),
                 'events': list(events),
                 'is_current': year == now.year and month == now.month}
 
@@ -41,7 +39,7 @@ def group_by_month(events, now, tzinfo):
 
 
 def make_format_event_date_func(category):
-    day_month = pgettext('babel date format for category event list event entries (day/month only)', 'dd MMM')
+    day_month = 'ddMMM'
 
     def fn(event):
         tzinfo = category.display_tzinfo
@@ -51,10 +49,10 @@ def make_format_event_date_func(category):
             return '{} - {}'.format(format_date(start_dt, timezone=tzinfo),
                                     format_date(end_dt, timezone=tzinfo))
         elif (start_dt.month != end_dt.month) or (start_dt.day != end_dt.day):
-            return '{} - {}'.format(format_date(start_dt, day_month, timezone=tzinfo),
-                                    format_date(end_dt, day_month, timezone=tzinfo))
+            return '{} - {}'.format(format_skeleton(start_dt, day_month, timezone=tzinfo),
+                                    format_skeleton(end_dt, day_month, timezone=tzinfo))
         else:
-            return format_date(start_dt, day_month, timezone=tzinfo)
+            return format_skeleton(start_dt, day_month, timezone=tzinfo)
 
     return fn
 
