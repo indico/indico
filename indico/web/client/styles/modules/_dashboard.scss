@@ -82,7 +82,6 @@
   background: #dcebf5;
 }
 
-.dashboard-box ol,
 .dashboard-box ul {
   list-style: none;
   margin: 0;
@@ -90,15 +89,13 @@
   border: none;
 }
 
-.dashboard-box ol li,
 .dashboard-box ul li {
   border-bottom: 1px solid #e5e5e5;
   padding: 10px 10px 5px 10px;
 }
 
-.dashboard-box ol li a,
-.dashboard-box ol li.no-event span,
-.dashboard-box ul li a {
+.dashboard-box ul li a,
+.dashboard-box ul li.no-event span {
   font-size: 1.2em;
   line-height: 18px;
   position: relative;
@@ -109,66 +106,62 @@
   -ms-user-select: none;
 }
 
-.dashboard-box.suggestions ol li > a {
+.dashboard-box.suggestions ul li > a {
   margin-right: 15px;
 }
 
-.dashboard-box ol li .actions {
+.dashboard-box ul li .actions {
   font-size: 10px;
   padding: 0 0 5px 10px;
 }
 
-.dashboard-box ol li .actions a:hover span {
+.dashboard-box ul li .actions a:hover span {
   text-decoration: underline;
 }
 
-.dashboard-box.suggestions ol .item-legend {
+.dashboard-box.suggestions ul .item-legend {
   display: none;
 }
 
-.dashboard-box ol li:last-child > a,
-.dashboard-box ol li.no-event:last-child span {
+.dashboard-box ul li:last-child > a,
+.dashboard-box ul li.no-event:last-child span {
   border-bottom: none;
 }
 
-.dashboard-box ol li > a:hover .event-title,
 .dashboard-box ul li > a:hover .event-title {
   text-decoration: underline;
 }
 
-.dashboard-box ol .event-title,
 .dashboard-box ul .event-title {
   vertical-align: middle;
 }
 
-.dashboard-box ol .event-date,
-.dashboard-box ol .event-category,
-.dashboard-box ul .event-date {
+.dashboard-box ul .event-date,
+.dashboard-box ul .event-category {
   color: $dark-gray;
   display: inline-block;
   font-weight: normal;
   vertical-align: middle;
 }
 
-.dashboard-box ol .event-date,
 .dashboard-box ul .event-date {
   display: inline-block;
   font-size: 12px;
-  width: 85px;
+  width: 95px;
 }
 
-.dashboard-box ol .event-category {
+.dashboard-box ul .event-category {
   display: block;
   font-size: 0.8em;
 }
 
-.dashboard-box ol .item-legend {
+.dashboard-box ul .item-legend {
   max-width: 150px;
   position: relative;
   float: right;
 }
 
-.dashboard-box ol li .close-box {
+.dashboard-box ul li .close-box {
   display: none;
   font-size: 18px;
   position: absolute;
@@ -177,7 +170,7 @@
   margin: 10px 10px 0 0;
 }
 
-.dashboard-box ol li:hover .close-box {
+.dashboard-box ul li:hover .close-box {
   display: inline-block;
 }
 
