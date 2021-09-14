@@ -28,7 +28,8 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far
+- Send event reminders as individual emails with the recipient in the To field
+  instead of using BCC (:issue:`2318`, :pr:`5088`)
 
 Bugfixes
 ^^^^^^^^
