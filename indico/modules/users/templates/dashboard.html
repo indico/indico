@@ -110,7 +110,7 @@
                     <h3>
                         {% trans %}Your events at hand{% endtrans %}
                     </h3>
-                    <ol>
+                    <ul>
                         {% for event, roles in linked_events %}
                             <li id="event-{{ event.id }}" class="flexrow">
                                 <span class="event-date" title="{{ _format_event_times(event) }}">
@@ -138,23 +138,23 @@
                                 </span>
                             </li>
                         {% endfor %}
-                    </ol>
+                    </ul>
                 </div>
                 {% if suggested_categories %}
                     <div id="suggestedCategories" class="dashboard-box suggestions">
                         <h3>{% trans %}You might be interested in the following categories...{% endtrans %}</h3>
-                        <ol>
+                        <ul>
                             {% for category in suggested_categories %}
                                 {{ suggested_category(category.categ, category.path) }}
                             {% endfor %}
-                        </ol>
+                        </ul>
                     </div>
                 {% endif %}
             </div>
             <div class="dashboard-col">
                 <div id="yourCategories" class="dashboard-box">
                     <h3>{% trans %}Your categories{% endtrans %}</h3>
-                    <ol>
+                    <ul>
                         {% if not categories %}
                             <li class="no-event">
                                 <span class="event-title italic text-superfluous">
@@ -166,11 +166,11 @@
                                 {{ user_category(category.categ, category.path, category.managed) }}
                             {% endfor %}
                         {% endif %}
-                    </ol>
+                    </ul>
                 </div>
                 <div class="dashboard-box">
                     <h3>{% trans %}Happening in your categories{% endtrans %}</h3>
-                    <ol>
+                    <ul>
                         {% if not categories %}
                             <li class="no-event">
                                 <span class="event-title italic text-superfluous">
@@ -204,7 +204,7 @@
                                 </li>
                             {% endfor %}
                         {% endif %}
-                    </ol>
+                    </ul>
                 </div>
             </div>
         </div>
