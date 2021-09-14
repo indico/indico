@@ -212,10 +212,12 @@ class EventReminder(db.Model):
         if self.attach_ical:
             event_ical = event_to_ical(self.event, skip_access_check=True)
             attachments.append(('event.ics', event_ical, 'text/calendar'))
-        email = make_email(
-            bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl, attachments=attachments
-        )
-        send_email(email, self.event, 'Reminder', self.creator)
+
+        for recipient in recipients:
+            email = make_email(
+                to_list=recipient, from_address=self.reply_to_address, template=email_tpl, attachments=attachments
+            )
+            send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'scheduled_dt', is_sent=False)
