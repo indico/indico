@@ -53,6 +53,29 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_registration_id, Event.id == event_id)
 
 
+registrations_registration_tags_table = db.Table(
+    'registrations_registration_tags',
+    db.metadata,
+    db.Column(
+        'registration_id',
+        db.Integer,
+        db.ForeignKey('event_registration.registrations.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    db.Column(
+        'registration_tag_id',
+        db.Integer,
+        db.ForeignKey('event_registration.registration_tags.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    schema='event_registration'
+)
+
+
 class Registration(db.Model):
     """Somebody's registration for an event through a registration form."""
     __tablename__ = 'registrations'
@@ -225,6 +248,12 @@ class Registration(db.Model):
             'registration',
             lazy=True
         )
+    )
+    #: The registration tags assigned to this registration
+    registration_tags = db.relationship(
+        'RegistrationTag',
+        secondary=registrations_registration_tags_table,
+        cascade='all, delete'
     )
 
     # relationship backrefs:
@@ -697,3 +726,55 @@ def _mapper_configured():
     @listens_for(Registration.transaction, 'set')
     def _set_transaction_id(target, value, *unused):
         value.registration = target
+
+
+class RegistrationTag(db.Model):
+    """Registration tag used to mark/filter registrations."""
+    __tablename__ = 'registration_tags'
+    __table_args__ = {'schema': 'event_registration'}
+
+    #: The ID of the object
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    #: The ID of the event where this tag was created
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=False,
+        nullable=False
+    )
+    #: Tag name
+    name = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: Tag color (hex)
+    color = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: The Event where this tag was created
+    event = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'registration_tags',
+            lazy='dynamic'
+        )
+    )
+
+    @property
+    def locator(self):
+        return dict(self.event.locator, tag_id=self.id)
+
+
+# class RegistrationRegistrationTag(db.Model):
+#     """Many-to-many association table between Registration and RegistrationTag."""
+#     __tablename__ = 'registrations_registration_tags'
+#     __table_args__ = {'schema': 'event_registration'}
+
+#     registration_id = db.Column(db.ForeignKey('event_registration.registrations.id'), primary_key=True)
+#     registration_tag_id = db.Column(db.ForeignKey('event_registration.registration_tags.id'), primary_key=True)
+#     registration_tag = db.relationship('RegistrationTag')

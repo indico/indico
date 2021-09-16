@@ -1310,3 +1310,14 @@ textarea.regFormDescriptionInputMgmt {
     color: $dark-gray;
   }
 }
+
+.registration-tag {
+  border-radius: 7px;
+  border-width: 2px;
+  border-style: solid;
+  padding: 0 5px;
+}
+
+.registration-tags {
+  width: 650px;
+}

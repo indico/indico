@@ -426,6 +426,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - paper_templates (PaperTemplate.event)
     # - persons (EventPerson.event)
     # - registration_forms (RegistrationForm.event)
+    # - registration_tags (RegistrationTag.event)
     # - registrations (Registration.event)
     # - reminders (EventReminder.event)
     # - requests (Request.event)

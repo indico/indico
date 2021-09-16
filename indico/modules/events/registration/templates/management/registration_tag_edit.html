@@ -1,0 +1,19 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+{% from 'message_box.html' import message_box %}
+
+<div class="registration-tags">
+    {{ form_header(form, id='registration-tag-form') }}
+    {{ form_rows(form) }}
+    {% call form_footer(form) %}
+        {% if tag %}
+            <input id="save-button" class="i-button big highlight" type="submit"
+                value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
+        {% else %}
+            <input id="save-button" class="i-button big highlight" type="submit"
+                value="{% trans %}Add{% endtrans %}" data-disabled-until-change>
+        {% endif %}
+        <a href="{{ url_for('.manage_registration_tags', event) }}" class="i-button big" data-button-back>
+            {%- trans %}Back{% endtrans -%}
+        </a>
+    {% endcall %}
+</div>

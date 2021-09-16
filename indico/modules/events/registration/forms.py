@@ -13,7 +13,7 @@ from flask import request
 from wtforms.fields import BooleanField, FloatField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import DecimalField, EmailField
 from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
-from wtforms.widgets.html5 import NumberInput
+from wtforms.widgets.html5 import ColorInput, NumberInput
 
 from indico.core import signals
 from indico.core.config import config
@@ -423,3 +423,8 @@ class RejectRegistrantsForm(IndicoForm):
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form
+
+
+class RegistrationTagForm(IndicoForm):
+    name = StringField(_('Name'), [DataRequired()])
+    color = StringField(_('Color'), [DataRequired()], widget=ColorInput())

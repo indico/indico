@@ -25,6 +25,14 @@ _bp.add_url_rule('/manage/registration/display', 'manage_regforms_display', regf
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/managers', 'manage_registration_managers', regforms.RHManageRegistrationManagers,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/tags', 'manage_registration_tags', regforms.RHManageRegistrationTags,
+                 methods=('GET',))
+_bp.add_url_rule('/manage/registration/tags/add', 'manage_registration_tags_add', regforms.RHAddRegistrationTag,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/tags/<int:tag_id>/edit', 'manage_registration_tags_edit',
+                 regforms.RHEditRegistrationTag, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/tags/<int:tag_id>/delete', 'manage_registration_tags_delete',
+                 regforms.RHDeleteRegistrationTag, methods=('POST',))
 
 # Single registration form management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHRegistrationFormManage)
