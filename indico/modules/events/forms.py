@@ -9,7 +9,7 @@ from datetime import time
 
 from flask import session
 from wtforms.fields import StringField, TextAreaField
-from wtforms.fields.core import SelectField
+from wtforms.fields.core import BooleanField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
@@ -25,9 +25,10 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
+from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import IndicoButtonsBooleanField
-from indico.web.forms.validators import LinkedDateTime, UsedIf
-from indico.web.forms.widgets import CKEditorWidget
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -102,3 +103,12 @@ class LectureCreationForm(EventCreationFormBase):
     person_link_data = EventPersonLinkListField(_('Speakers'))
     description = TextAreaField(_('Description'), widget=CKEditorWidget())
     theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)
+
+
+class UnlistedEventsForm(IndicoForm):
+    enabled = BooleanField(_('Enabled'), widget=SwitchWidget(), default=False)
+    restricted = BooleanField(_('Require permission'), [HiddenUnless('enabled', preserve_data=True)],
+                              widget=SwitchWidget())
+    authorized_creators = PrincipalListField(_('Permissions'), [HiddenUnless('enabled', preserve_data=True)],
+                                             allow_external_users=True, allow_groups=True,
+                                             description=_('These users may create unlisted events.'))

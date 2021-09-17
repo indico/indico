@@ -22,6 +22,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions import Session
+from indico.modules.events.settings import unlisted_events_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
@@ -229,3 +230,8 @@ def serialize_category_role(role, legacy=True):
             'name': role.name,
             'identifier': f'CategoryRole:{role.id}',
         }
+
+
+def can_create_unlisted_events(user):
+    return (user.is_admin or unlisted_events_settings.get('enabled') and (not unlisted_events_settings.get('restricted')
+            or unlisted_events_settings.acls.contains_user('authorized_creators', user)))

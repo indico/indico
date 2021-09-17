@@ -5,7 +5,9 @@
                    'has_events': form.category.data.has_events} if form.category.data else none %}
 
 {{ form_header(form, action=url_for('events.create', event_type=event_type)) }}
-{{ form_row(form.listing) }}
+{% if can_create_unlisted_events %}
+    {{ form_row(form.listing) }}
+{% endif %}
 {{ form_row(form.category, orientation=('hidden' if single_category else '')) }}
 {{ form_rows(form, fields=form._field_order) }}
 {% if form._advanced_field_order %}

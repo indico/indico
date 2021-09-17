@@ -5,18 +5,20 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, request
+from flask import flash, redirect, request
 
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
-from indico.modules.events.forms import EventLabelForm, ReferenceTypeForm
+from indico.modules.events.forms import EventLabelForm, ReferenceTypeForm, UnlistedEventsForm
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import (create_event_label, create_reference_type, delete_event_label,
                                               delete_reference_type, update_event_label, update_reference_type)
+from indico.modules.events.settings import unlisted_events_settings
 from indico.modules.events.views import WPEventAdmin
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
@@ -135,3 +137,15 @@ class RHDeleteEventLabel(RHManageEventLabelBase):
         delete_event_label(self.event_label)
         flash(_("Event label '{}' successfully deleted").format(self.event_label.title), 'success')
         return jsonify_data(html=_render_event_label_list())
+
+
+class RHUnlistedEvents(RHAdminBase):
+    """Manage unlisted events in the server admin area."""
+
+    def _process(self):
+        form = UnlistedEventsForm(obj=FormDefaults(**unlisted_events_settings.get_all()))
+        if form.validate_on_submit():
+            unlisted_events_settings.set_multi(form.data)
+            flash(_('Settings have been saved'), 'success')
+            return redirect(url_for('events.unlisted_events'))
+        return WPEventAdmin.render_template('admin/unlisted_events.html', 'unlisted_events', form=form)

@@ -144,6 +144,8 @@ def _sidemenu_items(sender, **kwargs):
                            section='customization')
         yield SideMenuItem('event_labels', _('Event Labels'), url_for('events.event_labels'),
                            section='customization')
+        yield SideMenuItem('unlisted_events', _('Unlisted events'), url_for('events.unlisted_events'),
+                           section='customization')
 
 
 @signals.menu.sections.connect_via('top-menu')
