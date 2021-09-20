@@ -141,6 +141,18 @@
                                 {%- trans %}Download attachments{% endtrans -%}
                             </a>
                         </li>
+                        <li>
+                            <a href="#"
+                               class="icon-tag js-requires-selected-row disabled"
+                               data-href="{{ url_for('.manage_registration_tags_assign', regform) }}"
+                               data-title="{% trans %}Edit registration tags{% endtrans %}"
+                               data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                               data-method="POST"
+                               data-ajax-dialog
+                               data-reload-after>
+                                {%- trans %}Edit registration tags{% endtrans -%}
+                            </a>
+                        </li>
                     </ul>
                     {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
                     {% if (regform.moderation_enabled or pending_registrations) and not event.is_locked %}

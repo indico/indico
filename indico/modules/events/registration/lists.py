@@ -5,13 +5,16 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from operator import attrgetter
+
 from flask import request
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItem
-from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
+from indico.modules.events.registration.models.registrations import (Registration, RegistrationData, RegistrationState,
+                                                                     RegistrationTag)
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -54,10 +57,19 @@ class RegistrationListGenerator(ListGeneratorBase):
             'payment_date': {
                 'title': _('Payment date'),
             },
+            'registration_tags': {
+                'title': _('Registration Tags'),
+                'filter_choices': self._get_registration_tag_choices()
+            },
         }
         self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
                                'phone', 'country')
         self.list_config = self._get_config()
+
+    def _get_registration_tag_choices(self):
+        tags = RegistrationTag.query.with_parent(self.event).all()
+        tags.sort(key=attrgetter('name'))
+        return {str(tag.id): tag.name for tag in tags}
 
     def _get_static_columns(self, ids):
         """
@@ -150,6 +162,11 @@ class RegistrationListGenerator(ListGeneratorBase):
         if 'state' in filters['items']:
             states = [RegistrationState(int(state)) for state in filters['items']['state']]
             items_criteria.append(Registration.state.in_(states))
+
+        if 'registration_tags' in filters['items']:
+            tag_ids = [int(tag_id) for tag_id in filters['items']['registration_tags']]
+            for tag_id in tag_ids:
+                items_criteria.append(Registration.registration_tags.any(RegistrationTag.id == tag_id))
 
         if field_filters:
             subquery = (RegistrationData.query

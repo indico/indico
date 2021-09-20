@@ -768,13 +768,3 @@ class RegistrationTag(db.Model):
     @property
     def locator(self):
         return dict(self.event.locator, tag_id=self.id)
-
-
-# class RegistrationRegistrationTag(db.Model):
-#     """Many-to-many association table between Registration and RegistrationTag."""
-#     __tablename__ = 'registrations_registration_tags'
-#     __table_args__ = {'schema': 'event_registration'}
-
-#     registration_id = db.Column(db.ForeignKey('event_registration.registrations.id'), primary_key=True)
-#     registration_tag_id = db.Column(db.ForeignKey('event_registration.registration_tags.id'), primary_key=True)
-#     registration_tag = db.relationship('RegistrationTag')

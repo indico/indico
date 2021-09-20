@@ -7,7 +7,7 @@
 
 from operator import attrgetter, itemgetter
 
-from flask import flash, redirect, request, session
+from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
 
 from indico.core import signals
@@ -19,10 +19,9 @@ from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
 from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
                                                       RegistrationFormForm, RegistrationFormScheduleForm,
-                                                      RegistrationManagersForm, RegistrationTagForm)
+                                                      RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.models.registrations import RegistrationTag
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import create_personal_data_fields, get_event_section_data
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
@@ -45,14 +44,6 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
                     .options(undefer('active_registration_count'))
                     .order_by(db.func.lower(RegistrationForm.title)).all())
         return WPManageRegistration.render_template('management/regform_list.html', self.event, regforms=regforms)
-
-
-class RHManageRegistrationTags(RHManageRegFormsBase):
-    """List all registration tags for an event."""
-
-    def _process(self):
-        tags = self.event.registration_tags.all()
-        return WPManageRegistration.render_template('management/registration_tags.html', self.event, tags=tags)
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
@@ -301,47 +292,3 @@ class RHManageRegistrationManagers(RHManageRegFormsBase):
             update_object_principals(self.event, form.managers.data, permission='registration')
             return jsonify_data(flash=False)
         return jsonify_form(form)
-
-
-class RHAddRegistrationTag(RHManageRegFormsBase):
-    """Add a new registration tag."""
-
-    def _process(self):
-        form = RegistrationTagForm()
-        if form.validate_on_submit():
-            tag = RegistrationTag(event=self.event)
-            form.populate_obj(tag, existing_only=True)
-            db.session.flush()
-            logger.info('Registration tag created by %s: %s', session.user, tag)
-            flash(_('A new tag has been created.'), 'success')
-            return jsonify_data(flash=False)
-
-        return jsonify_template('events/registration/management/registration_tag_edit.html',
-                                event=self.event, form=form, tag=None)
-
-
-class RHDeleteRegistrationTag(RHManageRegFormsBase):
-    """Delete a registration tag."""
-
-    def _process(self):
-        tag = RegistrationTag.get_or_404(request.view_args['tag_id'])
-        db.session.delete(tag)
-        logger.info('Registration tag deleted by %s: %s', session.user, tag)
-        flash(_('Tag {} has been deleted.').format(tag.name), 'success')
-        return redirect(url_for('.manage_registration_tags', self.event))
-
-
-class RHEditRegistrationTag(RHManageRegFormsBase):
-    """Modify an existing registration tag."""
-
-    def _process(self):
-        tag = RegistrationTag.get_or_404(request.view_args['tag_id'])
-        form = RegistrationTagForm(obj=tag)
-        if form.validate_on_submit():
-            form.populate_obj(tag, existing_only=True)
-            logger.info('Registration tag modified by %s: %s', session.user, tag)
-            flash(_('Tag {} has been modified.').format(tag.name), 'success')
-            return jsonify_data(flash=False)
-
-        return jsonify_template('events/registration/management/registration_tag_edit.html',
-                                event=self.event, form=form, tag=tag)

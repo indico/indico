@@ -15,22 +15,18 @@
     <ul class="group-list with-buttons no-content-before">
         {% for tag in tags %}
             <li>
-                <strong class="registration-tag" style="border-color: {{tag.color}}; background-color: {{tag.color}};">
+                <strong class="registration-tag" style="background-color: {{tag.color}};">
                     {{ tag.name }}
                 </strong>
                 <span class="right hide-if-locked">
-                    <button class="i-button" data-href="{{ url_for('.manage_registration_tags_edit', tag) }}"
+                    <button class="icon-edit i-button text-color borderless" data-href="{{ url_for('.manage_registration_tags_edit', tag) }}"
                             data-title="{% trans %}Edit a tag{% endtrans %}"
                             data-ajax-dialog
-                            data-reload-after>
-                        {% trans %}Edit{% endtrans %}
-                    </button>
-                    <button class="i-button"
+                            data-reload-after></button>
+                    <button class="icon-remove i-button text-color borderless danger"
                             data-method="POST" data-href="{{ url_for('.manage_registration_tags_delete', tag) }}"
                             data-title="{% trans %}Delete tag{% endtrans %}"
-                            data-confirm="{% trans %}Do you really want to delete this tag?{% endtrans %}">
-                        {%- trans %}Delete{% endtrans -%}
-                    </button>
+                            data-confirm="{% trans %}Do you really want to delete this tag?{% endtrans %}"></button>
                 </span>
             </li>
         {% endfor %}
@@ -40,7 +36,7 @@
 {% block content %}
     <div class="i-box-group vert fixed-width registration-tags">
         <div class="i-box">
-            <div class="i-box-header">
+            <div class="i-box-header" style="margin-bottom: 0;">
                 <div class="i-box-title">{%- trans %}Registration Tags{% endtrans -%}</div>
                 <div class="i-box-buttons hide-if-locked">
                     <a class="i-button icon-plus" data-href="{{ url_for('.manage_registration_tags_add', event) }}"
@@ -55,7 +51,7 @@
                 {% if tags|length > 0 %}
                     {{ render_tags(tags) }}
                 {% else %}
-                    <span class="empty">{% trans %}There are no registration tags.{% endtrans %}</span>
+                    <span class="empty">{% trans %}There are no tags.{% endtrans %}</span>
                 {% endif %}
             </div>
         </div>

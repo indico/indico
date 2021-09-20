@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global setupSearchBox:false, handleRowSelection:false, setupTableSorter:false */
+/* global setupSearchBox:false, handleRowSelection:false, setupTableSorter:false, handleAjaxError:false */
 
 (function(global) {
   function colorizeFilter(filter) {
@@ -164,7 +164,7 @@
       applySearchFilters = setupSearchBox(filterConfig);
     }
     setupStaticURLGeneration();
-    handleRowSelection(false);
+    handleRowSelection(true);
     setupTableSorter();
 
     $('.list').on('indico:htmlUpdated', function() {

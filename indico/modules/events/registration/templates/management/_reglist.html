@@ -15,7 +15,7 @@
                 </div>
             {% endif %}
             <div class="js-list-table-wrapper">
-                <table class="i-table tablesorter">
+                <table class="i-table tablesorter" style="table-layout: auto;">
                     <thead>
                         <tr class="i-table">
                             <th class="i-table thin-column"></th>
@@ -79,6 +79,12 @@
                                             {%- else %}
                                                 -
                                             {% endif %}
+                                        </td>
+                                    {% elif item.id == 'registration_tags' %}
+                                        <td class="i-table">
+                                            {% for tag in registration.registration_tags|sort(attribute='name') %}
+                                                <span class="registration-tag" style="background-color: {{tag.color}};">{{ tag.name }}</span>
+                                            {% endfor %}
                                         </td>
                                     {% else %}
                                         <td class="i-table">{{ data[item.id].friendly_data if item.id in data }}</td>

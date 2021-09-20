@@ -8,8 +8,8 @@
 from indico.modules.events.registration import api
 from indico.modules.events.registration.controllers import display
 from indico.modules.events.registration.controllers.compat import compat_registration
-from indico.modules.events.registration.controllers.management import (fields, invitations, regforms, reglists,
-                                                                       sections, tickets)
+from indico.modules.events.registration.controllers.management import (fields, invitations, regforms, registration_tags,
+                                                                       reglists, sections, tickets)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -25,14 +25,6 @@ _bp.add_url_rule('/manage/registration/display', 'manage_regforms_display', regf
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/managers', 'manage_registration_managers', regforms.RHManageRegistrationManagers,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/tags', 'manage_registration_tags', regforms.RHManageRegistrationTags,
-                 methods=('GET',))
-_bp.add_url_rule('/manage/registration/tags/add', 'manage_registration_tags_add', regforms.RHAddRegistrationTag,
-                 methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/tags/<int:tag_id>/edit', 'manage_registration_tags_edit',
-                 regforms.RHEditRegistrationTag, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/tags/<int:tag_id>/delete', 'manage_registration_tags_delete',
-                 regforms.RHDeleteRegistrationTag, methods=('POST',))
 
 # Single registration form management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHRegistrationFormManage)
@@ -130,6 +122,18 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode', 'ticke
                  tickets.RHTicketConfigQRCode)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode.png', 'tickets_qrcode_image',
                  tickets.RHTicketConfigQRCodeImage)
+
+# Registration tag management
+_bp.add_url_rule('/manage/registration/tags', 'manage_registration_tags', registration_tags.RHManageRegistrationTags,
+                 methods=('GET',))
+_bp.add_url_rule('/manage/registration/tags/add', 'manage_registration_tags_add',
+                 registration_tags.RHRegistrationTagAdd, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/tags/<int:tag_id>/edit', 'manage_registration_tags_edit',
+                 registration_tags.RHRegistrationTagEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/tags/<int:tag_id>/delete', 'manage_registration_tags_delete',
+                 registration_tags.RHRegistrationTagDelete, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tags/assign', 'manage_registration_tags_assign',
+                 registration_tags.RHRegistrationTagsAssign, methods=('GET', 'POST'))
 
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated

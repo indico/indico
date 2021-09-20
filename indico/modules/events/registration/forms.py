@@ -30,7 +30,8 @@ from indico.util.placeholders import get_missing_placeholders, render_placeholde
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
 from indico.web.forms.fields.principals import PrincipalListField
-from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
+from indico.web.forms.fields.simple import (HiddenFieldList, IndicoEmailRecipientsField,
+                                            IndicoSelectMultipleCheckboxField)
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
@@ -426,5 +427,21 @@ class RejectRegistrantsForm(IndicoForm):
 
 
 class RegistrationTagForm(IndicoForm):
+    """
+    Form to create a new registration tag.
+    """
     name = StringField(_('Name'), [DataRequired()])
     color = StringField(_('Color'), [DataRequired()], widget=ColorInput())
+
+
+class RegistrationTagsAssignForm(IndicoForm):
+    """
+    Form to assign registration tags to registrations.
+    """
+    add = IndicoSelectMultipleCheckboxField(_('Add'), description=_('Selected tags to assign'))
+    remove = IndicoSelectMultipleCheckboxField(_('Remove'), description=_('Selected tags to remove'))
+    registration_id = HiddenFieldList()
+    submitted = HiddenField()
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form
