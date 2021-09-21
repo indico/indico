@@ -72,7 +72,7 @@
 
 
 {% macro _render_move_event(event) %}
-    {% if event.category %}
+    {% if not event.is_unlisted %}
         <span class="hide-if-locked"
               id="event-action-move-container"
               data-event-id="{{ event.id }}"
@@ -110,7 +110,7 @@
     <div class="action-menu">
         <div class="toolbar">
             {% if event.can_manage(session.user) %}
-                {% if not event.category %}
+                {% if event.is_unlisted %}
                     <span class="hide-if-locked group"
                           id="event-action-publish-container"
                           data-event-id="{{ event.id }}"

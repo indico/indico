@@ -51,7 +51,7 @@
             </div>
         </div>
     {%- endif -%}
-    {%- if not event.category and event.can_manage(session.user) -%}
+    {%- if event.is_unlisted and event.can_manage(session.user) -%}
         <div class="action-box info">
             <div class="section">
                 <div class="icon icon-unlisted-event"></div>

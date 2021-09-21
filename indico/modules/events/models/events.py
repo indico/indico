@@ -1028,6 +1028,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                         ~RegistrationForm.is_deleted)
                 .has_rows())
 
+    @property
+    def is_unlisted(self):
+        return self.category is None
+
 
 Event.register_location_events()
 Event.register_protection_events()

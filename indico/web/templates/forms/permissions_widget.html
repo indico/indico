@@ -57,14 +57,14 @@
     <script>
         $('#permissions-widget-{{ field.id }}').permissionswidget({
             objectType: {{ field.object_type | tojson }},
-            isUnlistedEvent: {{ (field.object_type == 'event' and field.event.category is none) | tojson }},
+            isUnlistedEvent: {{ (field.object_type == 'event' and field.event.is_unlisted) | tojson }},
             permissionsInfo: {{ field.permissions_info | tojson }},
             hiddenPermissions: {{ field.hidden_permissions | default([]) | tojson }},
             hiddenPermissionsInfo: {{ field.hidden_permissions_info | tojson }}
         });
 
         // make sure permission widget updates even if protection widget is not there to trigger an update
-        {% if field.object_type == 'event' and field.event.category is none %}
+        {% if field.object_type == 'event' and field.event.is_unlisted %}
             $('#permissions-widget-{{ field.id }}').trigger('indico:protectionModeChanged');
         {% endif %}
     </script>

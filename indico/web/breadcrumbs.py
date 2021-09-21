@@ -49,7 +49,7 @@ def render_breadcrumbs(*titles, category=None, event=None, management=False, cat
 
     if not category and not event:
         items = [Breadcrumb(_('Home'), url_for_index())]
-    elif event and not event.category:
+    elif event and event.is_unlisted:
         assert category is None
         items = []
         items.append(Breadcrumb(_('My unlisted events'), url_for('users.user_dashboard')))
