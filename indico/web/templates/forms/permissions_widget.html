@@ -57,7 +57,7 @@
     <script>
         $('#permissions-widget-{{ field.id }}').permissionswidget({
             objectType: {{ field.object_type | tojson }},
-            isUnlistedEvent: {{ (field.object_type == 'event' and field.event.is_unlisted) | tojson }},
+            isUnlisted: {{ field.is_unlisted | tojson }},
             permissionsInfo: {{ field.permissions_info | tojson }},
             hiddenPermissions: {{ field.hidden_permissions | default([]) | tojson }},
             hiddenPermissionsInfo: {{ field.hidden_permissions_info | tojson }}

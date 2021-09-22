@@ -138,6 +138,9 @@ class ProtectionMixin:
         if self.disable_protection_mode:
             raise NotImplementedError
         if self.is_inheriting:
+            # Unlisted events inherit protections but have no parent, they are visible only by the owner and ACLs.
+            if not self.protection_parent:
+                return True
             return self.protection_parent.is_protected
         else:
             return self.is_self_protected
