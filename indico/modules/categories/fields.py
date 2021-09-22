@@ -41,7 +41,7 @@ class CategoryField(HiddenField):
         if valuelist:
             try:
                 category_id = int(json.loads(valuelist[0])['id'])
-            except KeyError:
+            except (KeyError, TypeError):
                 self.data = None
             else:
                 self.data = Category.get(category_id, is_deleted=False)

@@ -56,6 +56,9 @@ import {camelizeKeys} from 'indico/utils/case';
     protectionMessage.appendTo(options.protectionModeFields.closest('.form-field'));
 
     function updateProtectionMessage() {
+      if (!options.listingField.checked) {
+        return;
+      }
       let mode = options.protectionModeFields.filter(':checked').val();
       if (mode === 'inheriting') {
         mode = currentCategory.is_protected ? 'inheriting-protected' : 'inheriting-public';
@@ -79,7 +82,9 @@ import {camelizeKeys} from 'indico/utils/case';
         $('#form-group-event-creation-protection_mode').show();
         options.categoryField.val(JSON.stringify(options.initialCategory));
         options.categoryField.prop('disabled', false);
-        $('#category-title-event-creation-category').text(options.initialCategory.title);
+        if (options.initialCategory) {
+          $('#category-title-event-creation-category').text(options.initialCategory.title);
+        }
         options.categoryField.trigger('indico:categorySelected', [options.initialCategory]);
         $(`#category-warning-event-creation-category`).addClass('hidden');
       } else {

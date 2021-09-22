@@ -25,7 +25,7 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
-from indico.web.forms.validators import LinkedDateTime
+from indico.web.forms.validators import LinkedDateTime, UsedIf
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
@@ -70,7 +70,8 @@ class EventLabelForm(IndicoForm):
 
 class EventCreationFormBase(IndicoForm):
     listing = BooleanField(_('Listing'), default=True, widget=SwitchWidget())
-    category = CategoryField(_('Category'), require_event_creation_rights=True)
+    category = CategoryField(_('Category'), [UsedIf(lambda form, field: form.listing.data), DataRequired()],
+                             require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)
