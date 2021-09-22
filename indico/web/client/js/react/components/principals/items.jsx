@@ -137,13 +137,13 @@ PrincipalListItem.propTypes = {
   detail: PropTypes.string,
   meta: PropTypes.object,
   actions: PropTypes.node,
-  onDelete: PropTypes.func.isRequired,
-  onAddFavorite: PropTypes.func.isRequired,
-  onDelFavorite: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
+  onAddFavorite: PropTypes.func,
+  onDelFavorite: PropTypes.func,
   canDelete: PropTypes.bool,
   disabled: PropTypes.bool,
   readOnly: PropTypes.bool,
-  favorite: PropTypes.bool.isRequired,
+  favorite: PropTypes.bool,
   search: PropTypes.node,
   avatarURL: PropTypes.string,
 };
@@ -160,6 +160,10 @@ PrincipalListItem.defaultProps = {
   meta: {},
   search: null,
   avatarURL: null,
+  onDelete: null,
+  onAddFavorite: null,
+  onDelFavorite: null,
+  favorite: false,
 };
 
 export const EmptyPrincipalListItem = ({search}) => (
