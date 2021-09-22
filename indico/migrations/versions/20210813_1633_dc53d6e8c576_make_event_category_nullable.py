@@ -20,4 +20,14 @@ def upgrade():
 
 
 def downgrade():
-    op.create_check_constraint('category_data_set', 'events', 'category_id IS NOT NULL OR is_deleted', schema='events')
+    op.execute('SET CONSTRAINTS ALL IMMEDIATE')
+    op.execute('''
+        UPDATE events.events
+        SET is_deleted = true
+        WHERE category_id IS NULL AND NOT is_deleted
+    ''')
+    op.execute('''
+        ALTER TABLE events.events
+        ADD CONSTRAINT "ck_events_category_data_set"
+        CHECK (category_id IS NOT NULL OR is_deleted)
+    ''')
