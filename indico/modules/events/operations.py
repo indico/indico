@@ -96,6 +96,10 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     theme = data.pop('theme', None)
     create_booking = data.pop('create_booking', False)
     person_link_data = data.pop('person_link_data', {})
+    if category is None:
+        # don't allow setting a protection mode on unlisted events; we
+        # keep the inheriting default
+        data.pop('protection_mode', None)
     event.populate_from_dict(data)
     db.session.flush()
     event.person_link_data = person_link_data
