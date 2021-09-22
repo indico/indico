@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Icon, List, Loader, Popup} from 'semantic-ui-react';
+import {Icon, List, Loader, Popup, Image} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -55,6 +55,7 @@ export const PrincipalListItem = ({
   favorite,
   search,
   actions,
+  avatarURL,
 }) => (
   <List.Item>
     <div styleName="item">
@@ -75,6 +76,8 @@ export const PrincipalListItem = ({
             >
               {PrincipalType.getDeletedText(type)}
             </Popup>
+          ) : avatarURL ? (
+            <Image src={avatarURL} size="mini" avatar />
           ) : (
             <Icon name={PrincipalType.getIcon(type)} size="large" />
           )}
@@ -142,6 +145,7 @@ PrincipalListItem.propTypes = {
   readOnly: PropTypes.bool,
   favorite: PropTypes.bool.isRequired,
   search: PropTypes.node,
+  avatarURL: PropTypes.string,
 };
 
 PrincipalListItem.defaultProps = {
@@ -155,6 +159,7 @@ PrincipalListItem.defaultProps = {
   detail: null,
   meta: {},
   search: null,
+  avatarURL: null,
 };
 
 export const EmptyPrincipalListItem = ({search}) => (
