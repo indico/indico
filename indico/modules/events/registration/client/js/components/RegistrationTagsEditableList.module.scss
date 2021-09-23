@@ -1,0 +1,45 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2021 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.removable-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  grid-gap: 4px;
+}
+
+.selectable-tags-container {
+  max-height: 260px;
+  overflow-y: auto;
+
+  & > div {
+    padding: 0.35em 1em 0.35em 1em;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+
+:global(.ui.label).registration-tag {
+  margin-right: 0;
+  margin-left: 0;
+
+  &.removable i {
+    opacity: 0.5;
+    transition: all 0.1s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &.selectable {
+    transition: all 0.15s ease;
+    width: max-content;
+  }
+}

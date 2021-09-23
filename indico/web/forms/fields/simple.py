@@ -157,3 +157,7 @@ class IndicoEmailRecipientsField(Field):
 
 class IndicoTagListField(HiddenFieldList):
     widget = JinjaWidget('forms/tag_list_widget.html', single_kwargs=True)
+
+
+class IndicoMultipleTagSelectField(SelectMultipleField):
+    widget = JinjaWidget('forms/multiple_tag_select_widget.html', single_kwargs=True, single_line=True)

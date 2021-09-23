@@ -323,6 +323,7 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
                                                     if (x.transaction is not None and
                                                         x.transaction.status == TransactionStatus.successful)
                                                     else '')),
+        'tags_present': ('Tags', lambda x: [t.title for t in x.tags] if x.tags else ''),
     }
     for item in regform_items:
         field_names.append(unique_col(item.title, item.id))

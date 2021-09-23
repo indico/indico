@@ -1,7 +1,7 @@
 {% from 'events/registration/display/_registration_summary_blocks.html' import render_registration_summary,
                                                                                render_invoice %}
 
-{% macro render_registration_details(registration, payment_enabled) %}
+{% macro render_registration_details(registration, payment_enabled, assigned_tags, all_tags) %}
     <div id="registration-details">
         {{ template_hook('before-registration-actions', registration=registration) }}
         <div class="action-box">
@@ -25,7 +25,11 @@
         {% if registration.state.name not in ('rejected', 'withdrawn') %}
             {{ _render_withdraw_actions(registration) }}
         {% endif %}
-
+        {% if all_tags %}
+            <div class="action-box">
+                {{ _render_registration_tags(registration, assigned_tags, all_tags) }}
+            </div>
+        {% endif %}
         {{ template_hook('before-registration-summary', registration=registration) }}
         {{ render_registration_summary(registration, from_management=True) }}
         {% call render_invoice(registration, payment_enabled) %}
@@ -190,6 +194,16 @@
     <div class="toolbar hide-if-locked">
         {% set action = _('Reset rejection') if registration.state.name == 'rejected' else _('Reset withdrawal') %}
         {{ _render_reset_registration_button(registration, action, registration.has_conflict()) }}
+    </div>
+{% endmacro %}
+
+
+{% macro _render_registration_tags(registration, assigned_tags, all_tags) %}
+    <div class="section" id="registration-detail-registration-tags-assign"
+         data-event-id="{{ registration.registration_form.event.id }}"
+         data-regform-id="{{ registration.registration_form.id }}"
+         data-registration-id="{{ registration.id }}"
+         data-assigned-tags='{{ assigned_tags|tojson|forceescape }}' data-all-tags='{{ all_tags|tojson|forceescape }}'>
     </div>
 {% endmacro %}
 

@@ -41,6 +41,7 @@ export {default as ManagementPageTitle} from './ManagementPageTitle';
 export {default as WTFButtonsBooleanField} from './WTFButtonsBooleanField';
 export {default as WTFDateField} from './WTFDateField';
 export {default as WTFDateTimeField} from './WTFDateTimeField';
+export {default as WTFMultipleTagSelectField} from './WTFMultipleTagSelectField';
 export {default as WTFTimeField} from './WTFTimeField';
 export {default as WTFDurationField} from './WTFDurationField';
 export {default as WTFOccurrencesField} from './WTFOccurrencesField';

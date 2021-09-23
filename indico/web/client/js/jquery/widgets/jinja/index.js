@@ -17,6 +17,7 @@ import './linking_widget';
 import './location_widget';
 import './markdown_widget';
 import './multiple_items_widget';
+import './multiple_tag_select_widget';
 import './occurrences_widget';
 import './override_multiple_items_widget';
 import './person_link_widget';

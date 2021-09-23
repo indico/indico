@@ -11,6 +11,7 @@ from io import BytesIO
 
 from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload, subqueryload
+from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -39,6 +40,7 @@ from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateM
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
+from indico.modules.events.registration.schemas import RegistrationTagSchema
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
                                                      get_event_section_data, get_ticket_attachments, get_title_uuid,
@@ -63,7 +65,13 @@ badge_cache = make_scoped_cache('badge-printing')
 def _render_registration_details(registration):
     event = registration.registration_form.event
     tpl = get_template_module('events/registration/management/_registration_details.html')
-    return tpl.render_registration_details(registration=registration, payment_enabled=event.has_feature('payment'))
+
+    schema = RegistrationTagSchema(many=True)
+    assigned_tags = schema.dump(registration.tags)
+    all_tags = schema.dump(event.registration_tags)
+
+    return tpl.render_registration_details(registration=registration, payment_enabled=event.has_feature('payment'),
+                                           assigned_tags=assigned_tags, all_tags=all_tags)
 
 
 class RHRegistrationsListManage(RHManageRegFormBase):
@@ -164,11 +172,13 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
 
     registration_query_options = ()
 
-    def _process_args(self):
+    @use_kwargs({
+        'registration_ids': fields.List(fields.Integer(), data_key='registration_id', missing=[]),
+    })
+    def _process_args(self, registration_ids):
         RHManageRegFormBase._process_args(self)
-        ids = set(request.form.getlist('registration_id'))
         self.registrations = (Registration.query.with_parent(self.regform)
-                              .filter(Registration.id.in_(ids),
+                              .filter(Registration.id.in_(registration_ids),
                                       ~Registration.is_deleted)
                               .order_by(*Registration.order_by_name)
                               .options(*self.registration_query_options)
@@ -323,6 +333,10 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
 
 class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style."""
+
+    def _process_args(self):
+        RHRegistrationsExportBase._process_args(self)
+        self.export_config['static_item_ids'].remove('tags_present')
 
     def _process(self):
         pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],

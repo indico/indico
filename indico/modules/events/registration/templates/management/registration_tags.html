@@ -13,11 +13,11 @@
 
 {% macro render_tags(tags) %}
     <ul class="group-list with-buttons no-content-before">
-        {% for tag in tags %}
+        {% for tag in tags|sort(attribute='title', case_sensitive=false) %}
             <li>
-                <strong class="registration-tag" style="background-color: {{tag.color}};">
-                    {{ tag.name }}
-                </strong>
+                <span class="ui label medium {{ tag.color }}">
+                    {{ tag.title }}
+                </span>
                 <span class="right hide-if-locked">
                     <button class="icon-edit i-button text-color borderless" data-href="{{ url_for('.manage_registration_tags_edit', tag) }}"
                             data-title="{% trans %}Edit a tag{% endtrans %}"
@@ -40,20 +40,22 @@
                 <div class="i-box-title">{%- trans %}Registration Tags{% endtrans -%}</div>
                 <div class="i-box-buttons hide-if-locked">
                     <a class="i-button icon-plus" data-href="{{ url_for('.manage_registration_tags_add', event) }}"
-                        data-title="{%- trans %}Add a tag{% endtrans -%}"
-                        data-ajax-dialog
-                        data-reload-after>
+                       data-title="{%- trans %}Add a tag{% endtrans -%}"
+                       data-ajax-dialog
+                       data-reload-after>
                         {%- trans %}Add a tag{% endtrans -%}
                     </a>
                 </div>
             </div>
-            <div class="i-box-content">
-                {% if tags|length > 0 %}
-                    {{ render_tags(tags) }}
-                {% else %}
-                    <span class="empty">{% trans %}There are no tags.{% endtrans %}</span>
-                {% endif %}
-            </div>
+            {% if event.registration_tags %}
+                <div class="i-box-content">
+                    {{ render_tags(event.registration_tags) }}
+                </div>
+            {% else %}
+                <div class="i-box-content" style="margin-top: 10px;">
+                    {% trans %}There are no tags.{% endtrans %}
+                </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
