@@ -44,7 +44,13 @@
       success(data) {
         navigatorCategory = data;
         const {category} = navigatorCategory;
-        $categoryWarning.toggleClass('hidden', !category.has_children || category.has_events);
+        $categoryWarning.toggleClass(
+          'hidden',
+          !category.has_children ||
+            category.has_events ||
+            // match the emptying of category field when root category has no events (done in RHCreateEvent)
+            (!category.has_events && category.id === 0)
+        );
       },
     });
 

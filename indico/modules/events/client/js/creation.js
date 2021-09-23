@@ -60,6 +60,7 @@ import {camelizeKeys} from 'indico/utils/case';
 
     function updateProtectionMessage() {
       if (!currentCategory) {
+        protectionMessage.html('');
         return;
       }
       let mode = options.protectionModeFields.filter(':checked').val();
@@ -71,14 +72,19 @@ import {camelizeKeys} from 'indico/utils/case';
       protectionMessage.html(elem);
     }
 
-    function updateListingMessage() {
-      const listingValue = JSON.parse($listingField.val());
-      listingMessage.toggle(!listingValue);
+    function updateWarningMessage() {
+      $(`#category-warning-event-creation-category`).toggleClass(
+        'hidden',
+        (currentCategory && currentCategory.has_events) || !currentCategory
+      );
     }
 
     options.categoryField.on('indico:categorySelected', (evt, cat) => {
-      if (!currentCategory) {
+      if (cat) {
+        options.protectionModeFields.prop('disabled', false);
+      } else {
         options.protectionModeFields.filter('[value=inheriting]').prop('checked', true);
+        options.protectionModeFields.prop('disabled', true);
       }
       currentCategory = cat;
       updateProtectionMessage();
@@ -90,17 +96,19 @@ import {camelizeKeys} from 'indico/utils/case';
         $('#form-group-event-creation-category').show();
         $('#form-group-event-creation-protection_mode').show();
         options.categoryField.val(JSON.stringify(options.initialCategory));
-        if (options.initialCategory) {
-          $('#category-title-event-creation-category').text(options.initialCategory.title);
-        }
         options.categoryField.trigger('indico:categorySelected', [options.initialCategory]);
-        $(`#category-warning-event-creation-category`).addClass('hidden');
+        $('#category-title-event-creation-category').text(
+          options.initialCategory ? options.initialCategory.title : ''
+        );
       } else {
         $('#form-group-event-creation-category').hide();
         $('#form-group-event-creation-protection_mode').hide();
         options.categoryField.trigger('indico:categorySelected', []);
       }
-      updateListingMessage();
+
+      // update listing and warning message boxes
+      listingMessage.toggleClass('hidden', !JSON.parse($listingField.val()));
+      updateWarningMessage();
     });
 
     options.protectionModeFields.on('change', function() {
