@@ -17,6 +17,9 @@ depends_on = None
 
 def upgrade():
     op.drop_constraint('ck_events_category_data_set', 'events', schema='events')
+    op.create_check_constraint('unlisted_events_always_inherit', 'events',
+                               'is_deleted OR category_id IS NOT NULL OR protection_mode = 1',
+                               schema='events')
 
 
 def downgrade():
@@ -31,3 +34,4 @@ def downgrade():
         ADD CONSTRAINT "ck_events_category_data_set"
         CHECK (category_id IS NOT NULL OR is_deleted)
     ''')
+    op.drop_constraint('ck_events_unlisted_events_always_inherit', 'events', schema='events')

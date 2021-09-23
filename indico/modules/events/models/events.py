@@ -106,6 +106,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                 db.CheckConstraint("url_shortcut != ''", 'url_shortcut_not_empty'),
                 db.CheckConstraint('cloned_from_id != id', 'not_cloned_from_self'),
                 db.CheckConstraint('visibility IS NULL OR visibility >= 0', 'valid_visibility'),
+                db.CheckConstraint('is_deleted OR category_id IS NOT NULL OR protection_mode = 1',
+                                   'unlisted_events_always_inherit'),
                 {'schema': 'events'})
 
     @declared_attr
