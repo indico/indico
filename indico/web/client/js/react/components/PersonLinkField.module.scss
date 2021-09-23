@@ -1,0 +1,15 @@
+@import 'base/palette';
+
+:global(.action-box),
+:global(.i-form) {
+  color: inherit !important;
+}
+
+.button {
+  cursor: pointer;
+  opacity: 0.5 !important;
+
+  &:hover {
+    opacity: 1 !important;
+  }
+}

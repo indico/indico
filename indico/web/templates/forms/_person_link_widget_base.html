@@ -15,9 +15,10 @@
 {% endmacro %}
 
 {% block html %}
-    {% set list_in_custom_order = field._value()|selectattr('displayOrder')|list|length > 0 %}
-    {% set use_custom_order = list_in_custom_order if field._value() else not field.default_sort_alpha %}
+    <div id="person-link-field-{{ field.id }}"></div>
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
+    <!-- {% set list_in_custom_order = field._value()|selectattr('displayOrder')|list|length > 0 %}
+    {% set use_custom_order = list_in_custom_order if field._value() else not field.default_sort_alpha %}
     <div id="people-list-{{ field.id }}" class="person-link-list {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
         {% block sections %}{% endblock %}
         <div class="i-box-footer">
@@ -43,7 +44,7 @@
                 </span>
             </div>
         </div>
-    </div>
+    </div> -->
 {% endblock %}
 
 {% block javascript %}
