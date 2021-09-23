@@ -45,8 +45,8 @@ export default function WTFButtonsBooleanField({checkboxId, trueCaption, falseCa
 
 WTFButtonsBooleanField.propTypes = {
   checkboxId: PropTypes.string.isRequired,
-  trueCaption: PropTypes.array,
-  falseCaption: PropTypes.array,
+  trueCaption: PropTypes.node,
+  falseCaption: PropTypes.node,
   disabled: PropTypes.bool,
 };
 
