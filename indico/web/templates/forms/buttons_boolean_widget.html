@@ -11,7 +11,7 @@
 
 {% block javascript %}
     <script>
-        setupBooleanButtonsWidget({
+        setupButtonsBooleanWidget({
             fieldId: {{ field.id | tojson }},
             trueCaption: {{ field.true_caption | tojson }},
             falseCaption: {{ field.false_caption | tojson }},

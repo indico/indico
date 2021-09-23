@@ -9,7 +9,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {WTFButtonsBooleanField} from 'indico/react/components';
 
-window.setupBooleanButtonsWidget = function setupBooleanButtonsWidget({
+window.setupButtonsBooleanWidget = function setupButtonsBooleanWidget({
   fieldId,
   trueCaption,
   falseCaption,
