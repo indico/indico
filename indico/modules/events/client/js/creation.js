@@ -80,11 +80,14 @@ import {camelizeKeys} from 'indico/utils/case';
     }
 
     options.categoryField.on('indico:categorySelected', (evt, cat) => {
+      if (!currentCategory) {
+        options.protectionModeFields.filter('[value=inheriting]').prop('checked', true);
+      }
       if (cat) {
         options.protectionModeFields.prop('disabled', false);
       } else {
-        options.protectionModeFields.filter('[value=inheriting]').prop('checked', true);
         options.protectionModeFields.prop('disabled', true);
+        options.protectionModeFields.filter('[value=inheriting]').prop('checked', true);
       }
       currentCategory = cat;
       updateProtectionMessage();
