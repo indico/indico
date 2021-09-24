@@ -95,6 +95,8 @@ class CategoryRole(db.Model):
     @staticmethod
     def get_category_roles(cat):
         """Get the category roles available for the specified category."""
+        if cat is None:
+            return []
         return CategoryRole.query.join(cat.chain_query.subquery()).order_by(CategoryRole.code).all()
 
     @staticmethod

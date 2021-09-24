@@ -143,6 +143,8 @@ class AbstractSubmissionSettingsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
+        if self.event and self.event.is_unlisted:
+            self.authorized_submitters.allow_category_roles = False
 
     def validate_contrib_type_required(self, field):
         if field.data and not self.event.contribution_types.count():
