@@ -64,6 +64,24 @@
     <div class="inheriting-acl-message"></div>
 {%- endmacro %}
 
+{% macro render_unlisted_event_protection_message() -%}
+    <div class="action-box for-form protection-message unlisted-event-protection-message danger">
+        <div class="section">
+            <div class="icon icon-lock"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Unlisted event{% endtrans %}
+                </div>
+                <div>
+                    {% trans -%}
+                        This object is <strong>only</strong> accessible by the <strong>users specified</strong> above. The protection mode can be configured once the event has been published in a category.
+                    {%- endtrans %}
+                </div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
 {%- macro render_non_inheriting_children_message(protected_object, non_inheriting_objects) -%}
     {% if non_inheriting_objects %}
         <div class="action-box for-form highlight">

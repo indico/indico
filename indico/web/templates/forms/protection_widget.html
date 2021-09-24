@@ -15,7 +15,8 @@
             aclMessageUrl: {{ field.acl_message_url | tojson }},
             hasInheritedAcl: {{ (field.acl_message_url and field.protected_object.get_inherited_acl()) | bool | tojson }},
             permissionsFieldId: {{ (field.get_form().permissions.id if 'permissions' in field.get_form()
-                                    else none) | tojson }}
+                                    else none) | tojson }},
+            isUnlistedEvent: {{ field.is_unlisted_event | tojson }}
         });
     </script>
 {%- endblock %}
