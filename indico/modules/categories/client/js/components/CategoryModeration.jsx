@@ -73,7 +73,11 @@ function MoveRequest({
         <Table.Cell>
           <a href={eventURL({event_id: event.id})}>{event.title}</a>
         </Table.Cell>
-        <Table.Cell>{category.chainTitles.join(' » ')}</Table.Cell>
+        {category ? (
+          <Table.Cell>{category.chainTitles.join(' » ')}</Table.Cell>
+        ) : (
+          <Translate as={Table.Cell}>Unlisted event</Translate>
+        )}
         <Table.Cell>{getEventTime(event)}</Table.Cell>
         <Table.Cell>
           <span title={moment(requestedDt).format('L LT')}>{moment(requestedDt).fromNow()}</span>
@@ -106,7 +110,7 @@ MoveRequest.propTypes = {
   category: PropTypes.shape({
     id: PropTypes.number.isRequired,
     chainTitles: PropTypes.arrayOf(PropTypes.string).isRequired,
-  }).isRequired,
+  }),
   requestedDt: PropTypes.string.isRequired,
   requestorComment: PropTypes.string.isRequired,
   selected: PropTypes.bool,
@@ -115,6 +119,7 @@ MoveRequest.propTypes = {
 
 MoveRequest.defaultProps = {
   selected: false,
+  category: null,
 };
 
 function RequestList({requests, onSubmit, loading}) {

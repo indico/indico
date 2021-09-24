@@ -25,7 +25,8 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
-from indico.web.forms.validators import LinkedDateTime
+from indico.web.forms.fields.simple import IndicoButtonsBooleanField
+from indico.web.forms.validators import LinkedDateTime, UsedIf
 from indico.web.forms.widgets import CKEditorWidget
 
 
@@ -69,7 +70,11 @@ class EventLabelForm(IndicoForm):
 
 
 class EventCreationFormBase(IndicoForm):
-    category = CategoryField(_('Category'), [DataRequired()], require_event_creation_rights=True)
+    listing = IndicoButtonsBooleanField(_('Listing'), default=True,
+                                        true_caption=(_('List in a category'), 'eye'),
+                                        false_caption=(_('Keep unlisted'), 'eye-blocked'))
+    category = CategoryField(_('Category'), [UsedIf(lambda form, field: form.listing.data), DataRequired()],
+                             require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)
@@ -77,7 +82,7 @@ class EventCreationFormBase(IndicoForm):
     create_booking = JSONField()
 
     def validate_category(self, field):
-        if not field.data.can_create_events(session.user):
+        if self.listing.data and not field.data.can_create_events(session.user):
             raise ValidationError(_('You are not allowed to create events in this category.'))
 
 

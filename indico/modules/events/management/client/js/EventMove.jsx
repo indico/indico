@@ -18,14 +18,23 @@ import {FinalSubmitButton, FinalTextArea, handleSubmitError} from 'indico/react/
 import {Param, Translate, PluralTranslate, Singular, Plural} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
-function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount, bulk}) {
+function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount, bulk, publish}) {
   const [targetCategory, setTargetCategory] = useState(null);
 
   const selectCategoryForMove = initialCategoryId => {
+    let dialogTitle;
+    if (publish) {
+      dialogTitle = Translate.string('Publish event');
+    } else if (bulk) {
+      dialogTitle = Translate.string('Move events');
+    } else {
+      dialogTitle = Translate.string('Move event');
+    }
+
     $('<div>').categorynavigator({
       category: initialCategoryId,
       openInDialog: true,
-      dialogTitle: bulk ? Translate.string('Move events') : Translate.string('Move event'),
+      dialogTitle,
       dialogSubtitle: bulk
         ? Translate.string('Select destination category for the selected events')
         : Translate.string('Select destination category for the event'),
@@ -80,47 +89,69 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
               </Modal.Header>
               <Modal.Content>
                 <Form onSubmit={fprops.handleSubmit} id="move-event-form">
-                  <PluralTranslate count={eventCount}>
-                    <Singular>
-                      You are about to move this event to{' '}
+                  {publish ? (
+                    <Translate>
+                      You are about to publish this event to{' '}
                       <Param
                         name="target"
                         value={targetCategory.path.join(' » ')}
                         wrapper={<strong />}
                       />
                       .
-                    </Singular>
-                    <Plural>
-                      You are about to move <Param name="count" value={eventCount} /> events to{' '}
-                      <Param
-                        name="target"
-                        value={targetCategory.path.join(' » ')}
-                        wrapper={<strong />}
-                      />
-                      .
-                    </Plural>
-                  </PluralTranslate>
+                    </Translate>
+                  ) : (
+                    <PluralTranslate count={eventCount}>
+                      <Singular>
+                        You are about to move this event to{' '}
+                        <Param
+                          name="target"
+                          value={targetCategory.path.join(' » ')}
+                          wrapper={<strong />}
+                        />
+                        .
+                      </Singular>
+                      <Plural>
+                        You are about to move <Param name="count" value={eventCount} /> events to{' '}
+                        <Param
+                          name="target"
+                          value={targetCategory.path.join(' » ')}
+                          wrapper={<strong />}
+                        />
+                        .
+                      </Plural>
+                    </PluralTranslate>
+                  )}
                   {targetCategory.moderated && (
                     <>
                       <p>
-                        <PluralTranslate count={eventCount}>
-                          <Singular>
-                            Moving an event there{' '}
+                        {publish ? (
+                          <>
+                            Publishing an event there{' '}
                             <Param name="strong" wrapper={<strong />}>
                               requires approval
                             </Param>{' '}
-                            by a category manager. Until approved, the event will remain in its
-                            current category.
-                          </Singular>
-                          <Plural>
-                            Moving events there{' '}
-                            <Param name="strong" wrapper={<strong />}>
-                              requires approval
-                            </Param>{' '}
-                            by a category manager. Until approved, the events will remain in its
-                            current category.
-                          </Plural>
-                        </PluralTranslate>
+                            by a category manager. Until approved, the event will remain unlisted.
+                          </>
+                        ) : (
+                          <PluralTranslate count={eventCount}>
+                            <Singular>
+                              Moving an event there{' '}
+                              <Param name="strong" wrapper={<strong />}>
+                                requires approval
+                              </Param>{' '}
+                              by a category manager. Until approved, the event will remain in its
+                              current category.
+                            </Singular>
+                            <Plural>
+                              Moving events there{' '}
+                              <Param name="strong" wrapper={<strong />}>
+                                requires approval
+                              </Param>{' '}
+                              by a category manager. Until approved, the events will remain in its
+                              current category.
+                            </Plural>
+                          </PluralTranslate>
+                        )}
                       </p>
                       <FinalTextArea
                         name="comment"
@@ -128,7 +159,7 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
                         description={
                           <Translate>
                             You can provide a comment to the category managers to help them decide
-                            whether to approve your move request.
+                            whether to approve your request.
                           </Translate>
                         }
                       />
@@ -163,12 +194,14 @@ EventMove.propTypes = {
   renderTrigger: PropTypes.func.isRequired,
   getEventCount: PropTypes.func,
   currentCategoryId: PropTypes.number,
+  publish: PropTypes.bool,
 };
 
 EventMove.defaultProps = {
   bulk: false,
   currentCategoryId: null,
   getEventCount: null,
+  publish: false,
 };
 
 export function SingleEventMove({
@@ -276,4 +309,41 @@ export function BulkEventMove({currentCategoryId, getEventData}) {
 BulkEventMove.propTypes = {
   currentCategoryId: PropTypes.number.isRequired,
   getEventData: PropTypes.func.isRequired,
+};
+
+export function EventPublish({eventId, hasPendingPublishRequest}) {
+  const submitMove = async (targetCategoryId, {comment}) => {
+    const data = {target_category_id: targetCategoryId, comment};
+    try {
+      await indicoAxios.post(eventMoveURL({event_id: eventId}), data);
+    } catch (e) {
+      return handleSubmitError(e);
+    }
+    location.reload();
+    // never finish submitting to avoid fields being re-enabled
+    await new Promise(() => {});
+  };
+
+  const renderTrigger = fn => (
+    <IButton
+      highlight
+      icon="play"
+      title={
+        hasPendingPublishRequest
+          ? Translate.string('Event has a pending publish request')
+          : Translate.string('Publish event to a category')
+      }
+      disabled={hasPendingPublishRequest}
+      onClick={fn}
+    >
+      <Translate>Publish</Translate>
+    </IButton>
+  );
+
+  return <EventMove submitMove={submitMove} renderTrigger={renderTrigger} publish />;
+}
+
+EventPublish.propTypes = {
+  eventId: PropTypes.number.isRequired,
+  hasPendingPublishRequest: PropTypes.bool.isRequired,
 };

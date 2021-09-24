@@ -77,7 +77,7 @@ import Palette from '../../utils/palette';
         self._fillCache(self.options.category);
         self._categoryId = self.options.category.category.id;
       } else {
-        self._categoryId = self.options.category;
+        self._categoryId = self.options.category || 0;
       }
       if (self.options.openInDialog) {
         self._createInDialog();

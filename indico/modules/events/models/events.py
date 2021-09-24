@@ -36,6 +36,7 @@ from indico.modules.categories import Category
 from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixin
+from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.logs import EventLogEntry
@@ -77,6 +78,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     __tablename__ = 'events'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
+    allow_none_protection_parent = True
     allow_access_key = True
     allow_no_access_contact = True
     location_backref_name = 'events'
@@ -97,7 +99,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                          cls.is_deleted, cls.category_id, cls.start_dt, cls.end_dt),
                 db.Index('ix_uq_events_url_shortcut', db.func.lower(cls.url_shortcut), unique=True,
                          postgresql_where=db.text('NOT is_deleted')),
-                db.CheckConstraint('category_id IS NOT NULL OR is_deleted', 'category_data_set'),
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                    'valid_stylesheet'),
@@ -105,6 +106,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                 db.CheckConstraint("url_shortcut != ''", 'url_shortcut_not_empty'),
                 db.CheckConstraint('cloned_from_id != id', 'not_cloned_from_self'),
                 db.CheckConstraint('visibility IS NULL OR visibility >= 0', 'valid_visibility'),
+                db.CheckConstraint('is_deleted OR category_id IS NOT NULL OR protection_mode = 1',
+                                   'unlisted_events_always_inherit'),
                 {'schema': 'events'})
 
     @declared_attr
@@ -707,7 +710,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     def can_lock(self, user):
         """Check whether the user can lock/unlock the event."""
-        return user and (user.is_admin or user == self.creator or self.category.can_manage(user))
+        return user and (user.is_admin or user == self.creator or (self.category and self.category.can_manage(user)))
 
     def can_display(self, user):
         """Check whether the user can display the event in the category."""
@@ -923,16 +926,23 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         old_category = self.category
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
-        old_path = sep.join(old_category.chain_titles)
+        old_path = sep.join(old_category.chain_titles) if old_category else 'Unlisted'
         new_path = sep.join(self.category.chain_titles)
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
-        self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
-                 data={'From': old_path, 'To': new_path}, meta=log_meta)
-        old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
-                         session.user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
-        category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
-                     session.user, data={'From': old_path}, meta=log_meta)
+        if old_category:
+            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
+                     data={'From': old_path, 'To': new_path}, meta=log_meta)
+            old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
+                             session.user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
+            category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
+                         session.user, data={'From': old_path}, meta=log_meta)
+        else:
+            notify_event_creation(self)
+            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event published', session.user,
+                     data={'To': new_path}, meta=log_meta)
+            category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event published here: "{self.title}"',
+                         session.user, meta=log_meta)
 
     def delete(self, reason, user=None):
         from indico.modules.events import EventLogRealm, logger
@@ -1019,6 +1029,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                         ~Registration.is_deleted,
                         ~RegistrationForm.is_deleted)
                 .has_rows())
+
+    @property
+    def is_unlisted(self):
+        return self.category is None
 
 
 Event.register_location_events()

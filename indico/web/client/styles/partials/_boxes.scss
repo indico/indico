@@ -377,6 +377,10 @@ $i-box-padding: 10px;
       &[class*='icon-']:not(:empty)::before {
         margin-right: 0.5em;
       }
+
+      &:last-child {
+        margin-bottom: 10px;
+      }
     }
   }
 

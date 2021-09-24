@@ -72,11 +72,13 @@
 
 
 {% macro _render_move_event(event) %}
-    <span class="hide-if-locked"
-          id="event-action-move-container"
-          data-event-id="{{ event.id }}"
-          data-category-id="{{ event.category.id }}"
-          {{ 'data-pending-request' if event.pending_move_request }}></span>
+    {% if not event.is_unlisted %}
+        <span class="hide-if-locked"
+              id="event-action-move-container"
+              data-event-id="{{ event.id }}"
+              data-category-id="{{ event.category.id }}"
+              {{ 'data-pending-request' if event.pending_move_request }}></span>
+    {% endif %}
 {% endmacro %}
 
 
@@ -108,6 +110,14 @@
     <div class="action-menu">
         <div class="toolbar">
             {% if event.can_manage(session.user) %}
+                {% if event.is_unlisted %}
+                    <span class="hide-if-locked group"
+                          id="event-action-publish-container"
+                          data-event-id="{{ event.id }}"
+                          {{ 'data-pending-request' if event.pending_move_request }}></span>
+                   </a>
+                {% endif %}
+
                 <div class="group">
                     <a class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
                        data-href="{{ url_for('event_management.clone', event) }}"

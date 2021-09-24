@@ -9,6 +9,7 @@ import json
 
 from markupsafe import escape
 from wtforms.fields import Field, HiddenField, PasswordField, RadioField, SelectMultipleField, TextAreaField
+from wtforms.fields.core import BooleanField
 from wtforms.widgets import CheckboxInput
 
 from indico.util.i18n import _
@@ -32,6 +33,15 @@ class IndicoSelectMultipleCheckboxBooleanField(IndicoSelectMultipleCheckboxField
         for value, label in self.choices:
             selected = self.data is not None and self.data.get(self.coerce(value))
             yield (value, label, selected)
+
+
+class IndicoButtonsBooleanField(BooleanField):
+    widget = JinjaWidget('forms/buttons_boolean_widget.html', single_kwargs=True, single_line=True)
+
+    def __init__(self, *args, **kwargs):
+        self.true_caption = kwargs.pop('true_caption')
+        self.false_caption = kwargs.pop('false_caption')
+        super().__init__(*args, **kwargs)
 
 
 class IndicoRadioField(RadioField):

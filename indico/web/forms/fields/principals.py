@@ -187,6 +187,10 @@ class PermissionsField(JSONField):
         return get_permissions_info(PermissionsField.type_mapping[self.object_type])[0]
 
     @property
+    def is_unlisted(self):
+        return self.object_type in ['event', 'session', 'contribution'] and self.event.is_unlisted
+
+    @property
     def hidden_permissions_info(self):
         all_permissions = get_available_permissions(PermissionsField.type_mapping[self.object_type])
         visible_permissions = get_permissions_info(PermissionsField.type_mapping[self.object_type])[0]

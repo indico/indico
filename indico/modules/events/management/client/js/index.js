@@ -23,19 +23,32 @@ import './badges';
 
 import {$T} from 'indico/utils/i18n';
 
-import {SingleEventMove} from './EventMove';
+import {SingleEventMove, EventPublish} from './EventMove';
 
 (function(global) {
   global.setupEventManagementActionMenu = function setupEventManagementActionMenu() {
     const moveContainer = document.querySelector('#event-action-move-container');
-    ReactDOM.render(
-      React.createElement(SingleEventMove, {
-        eventId: +moveContainer.dataset.eventId,
-        currentCategoryId: +moveContainer.dataset.categoryId,
-        hasPendingMoveRequest: moveContainer.dataset.pendingRequest !== undefined,
-      }),
-      moveContainer
-    );
+    if (moveContainer) {
+      ReactDOM.render(
+        React.createElement(SingleEventMove, {
+          eventId: +moveContainer.dataset.eventId,
+          currentCategoryId: +moveContainer.dataset.categoryId,
+          hasPendingMoveRequest: moveContainer.dataset.pendingRequest !== undefined,
+        }),
+        moveContainer
+      );
+    }
+
+    const publishContainer = document.querySelector('#event-action-publish-container');
+    if (publishContainer) {
+      ReactDOM.render(
+        React.createElement(EventPublish, {
+          eventId: +publishContainer.dataset.eventId,
+          hasPendingPublishRequest: publishContainer.dataset.pendingRequest !== undefined,
+        }),
+        publishContainer
+      );
+    }
 
     $('#event-action-menu-clones-target').qbubble({
       content: {

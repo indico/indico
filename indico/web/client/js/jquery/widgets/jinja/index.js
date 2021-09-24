@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import './buttons_boolean_widget';
 import './category_picker_widget';
 import './ckeditor_widget';
 import './color_picker_widget';

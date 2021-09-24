@@ -164,6 +164,15 @@ def get_linked_events(user, dt, limit=None, load_also=()):
     return {event: links[event.id] for event in query}
 
 
+def get_unlisted_events(user):
+    return (user.created_events
+            .filter(~Event.is_deleted,
+                    Event.category_id.is_(None))
+            .options(load_only('id', 'title', 'start_dt'))
+            .order_by(Event.start_dt)
+            .all())
+
+
 def serialize_user(user):
     """Serialize user to JSON-like object."""
     return {

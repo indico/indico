@@ -51,6 +51,19 @@
             </div>
         </div>
     {%- endif -%}
+    {%- if event.is_unlisted and event.can_manage(session.user) -%}
+        <div class="action-box info">
+            <div class="section">
+                <div class="icon icon-unlisted-event"></div>
+                <div class="text">
+                    <div class="label">{% trans %}This event is currently unlisted{% endtrans %}</div>
+                    {% trans %}
+                        Unlisted events are not shown in any category and only explicitly authorized users can see them.
+                    {% endtrans %}
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
     {%- if show_draft_warning -%}
         {{ render_draft_mode_warning(event) }}
     {%- endif -%}

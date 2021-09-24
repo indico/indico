@@ -104,7 +104,7 @@ class RHCreateEvent(RHProtected):
 
     def _create_event(self, data):
         data = data.copy()
-        return create_event(data.pop('category'), self.event_type, data)
+        return create_event(data.pop('category', None), self.event_type, data)
 
     @materialize_iterable()
     def _create_series(self, data):
@@ -136,15 +136,22 @@ class RHCreateEvent(RHProtected):
             return redirect(url_for_index(_anchor=f'create-event:{self.event_type.name}'))
         form_cls = LectureCreationForm if self.event_type == EventType.lecture else EventCreationForm
         form = form_cls(obj=self._get_form_defaults(), prefix='event-creation-')
+
         if form.validate_on_submit():
+            data = form.data
+            listing = data.pop('listing')
+            # TODO: this should be done in the frontend
+            if not listing:
+                del data['category']
+
             if self.event_type == EventType.lecture:
-                events = self._create_series(form.data)
+                events = self._create_series(data)
                 event = events[0]
                 if len(events) > 1:
                     flash(Markup(render_template('events/series_created_msg.html', events=events)), 'info')
                 notify_event_creation(event, occurrences=events)
             else:
-                event = self._create_event(form.data)
+                event = self._create_event(data)
                 notify_event_creation(event)
             return jsonify_data(flash=False, redirect=url_for('event_management.settings', event))
         check_room_availability = rb_check_user_access(session.user) and config.ENABLE_ROOMBOOKING

@@ -9,6 +9,7 @@ from flask import session
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
+from indico.modules.categories.models.categories import Category
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.pdf import PIXELS_CM
 from indico.modules.designer.placeholders import GROUP_TITLES
@@ -50,7 +51,7 @@ def get_image_placeholder_types():
 
 def get_all_templates(obj):
     """Get all templates usable by an event/category."""
-    category = obj.category if isinstance(obj, Event) else obj
+    category = (obj.category or Category.get_root()) if isinstance(obj, Event) else obj
     return set(DesignerTemplate.query.filter(DesignerTemplate.category_id.in_(categ['id'] for categ in category.chain)))
 
 
@@ -70,6 +71,8 @@ def get_not_deletable_templates(obj):
 
 
 def get_default_ticket_on_category(category, only_inherited=False):
+    if category is None:
+        category = Category.get_root()
     if not only_inherited and category.default_ticket_template:
         return category.default_ticket_template
     parent_chain = category.parent_chain_query.options(joinedload('default_ticket_template')).all()
@@ -78,6 +81,8 @@ def get_default_ticket_on_category(category, only_inherited=False):
 
 
 def get_default_badge_on_category(category, only_inherited=False):
+    if category is None:
+        category = Category.get_root()
     if not only_inherited and category.default_badge_template:
         return category.default_badge_template
     parent_chain = category.parent_chain_query.options(joinedload('default_badge_template')).all()

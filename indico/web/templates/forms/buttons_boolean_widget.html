@@ -1,0 +1,21 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="i-form-field-fixed-width">
+        <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-checkbox"
+               {% if field.data is not none %}value="{{ field.data | tojson }}"{% endif %}
+               {{ input_args | html_params }}>
+        <span id="{{ field.id }}"></span>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupButtonsBooleanWidget({
+            fieldId: {{ field.id | tojson }},
+            trueCaption: {{ field.true_caption | tojson }},
+            falseCaption: {{ field.false_caption | tojson }},
+            disabled: {{ input_args.disabled | default(false) | tojson }},
+        });
+    </script>
+{% endblock %}

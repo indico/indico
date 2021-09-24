@@ -42,6 +42,8 @@ class AttachmentFormBase(IndicoForm):
         self.folder.query = (AttachmentFolder.query
                              .filter_by(object=linked_object, is_default=False, is_deleted=False)
                              .order_by(db.func.lower(AttachmentFolder.title)))
+        if self.event and self.event.is_unlisted:
+            self.acl.allow_category_roles = False
 
     @generated_data
     def protection_mode(self):
@@ -113,6 +115,8 @@ class AttachmentFolderForm(IndicoForm):
         self.event = getattr(self.linked_object, 'event', None)  # not present in categories
         super().__init__(*args, **kwargs)
         self.title.choices = self._get_title_suggestions()
+        if self.event and self.event.is_unlisted:
+            self.acl.allow_category_roles = False
 
     def _get_title_suggestions(self):
         query = db.session.query(AttachmentFolder.title).filter_by(is_deleted=False, is_default=False,

@@ -20,11 +20,18 @@ import _ from 'lodash';
         aclMessageUrl: null,
         hasInheritedAcl: false,
         permissionsFieldId: null,
+        isUnlistedEvent: false,
       },
       options
     );
 
     const inputs = $(`input[name=${options.fieldName}][id^=${options.fieldId}]`);
+
+    if (options.isUnlistedEvent) {
+      inputs.prop('disabled', true);
+      $(`#form-group-protected-${options.fieldId} .protection-message`).hide();
+      $(`#form-group-protected-${options.fieldId} .unlisted-event-protection-message`).show();
+    }
 
     inputs.on('change', function() {
       const $this = $(this);
@@ -32,10 +39,8 @@ import _ from 'lodash';
         $this.val() === 'protected' || ($this.val() === 'inheriting' && options.parentProtected);
 
       if (this.checked) {
-        $('#form-group-protected-{0} .protection-message'.format(options.fieldId)).hide();
-        $(
-          '#form-group-protected-{0} .{1}-protection-message'.format(options.fieldId, $this.val())
-        ).show();
+        $(`#form-group-protected-${options.fieldId} .protection-message`).hide();
+        $(`#form-group-protected-${options.fieldId} .${$this.val()}-protection-message`).show();
 
         if (options.aclMessageUrl && options.hasInheritedAcl) {
           $.ajax({
@@ -51,7 +56,7 @@ import _ from 'lodash';
           });
         }
         if (options.permissionsFieldId) {
-          $('#permissions-widget-{0}'.format(options.permissionsFieldId)).trigger(
+          $(`#permissions-widget-${options.permissionsFieldId}`).trigger(
             'indico:protectionModeChanged',
             [isProtected]
           );
@@ -60,7 +65,9 @@ import _ from 'lodash';
     });
 
     _.defer(function() {
-      inputs.trigger('change');
+      if (!options.isUnlistedEvent) {
+        inputs.trigger('change');
+      }
     });
   };
 })(window);

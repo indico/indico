@@ -32,7 +32,7 @@ export default function PublicationButton({eventId, onSuccess}) {
 
   const trigger = (
     <IButton onClick={() => setModalOpen(true)}>
-      <Translate>Publish now</Translate>
+      <Translate>Publish contributions</Translate>
     </IButton>
   );
 

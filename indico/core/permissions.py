@@ -187,7 +187,7 @@ def update_permissions(obj, form):
         event_id = obj.id
     else:
         event_id = obj.event.id
-        category_id = obj.event.category.id
+        category_id = obj.event.category.id if obj.event.category else None
 
     current_principal_permissions = {p.principal: get_principal_permissions(p, type(obj))
                                      for p in obj.acl_entries}

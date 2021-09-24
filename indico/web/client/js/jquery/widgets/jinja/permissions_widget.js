@@ -21,6 +21,7 @@ import Palette from 'indico/utils/palette';
   $.widget('indico.permissionswidget', {
     options: {
       objectType: null,
+      isUnlisted: null,
       permissionsInfo: null,
       hiddenPermissions: null,
       hiddenPermissionsInfo: null,
@@ -346,11 +347,13 @@ import Palette from 'indico/utils/palette';
         this.$permissionsWidgetList.append(this._renderItem(item));
       });
       // Add default entries
-      const anonymous = [
-        {_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'},
-        [READ_ACCESS_PERMISSIONS],
-      ];
-      this.$permissionsWidgetList.append(this._renderItem(anonymous));
+      if (!this.options.isUnlisted) {
+        const anonymous = [
+          {_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'},
+          [READ_ACCESS_PERMISSIONS],
+        ];
+        this.$permissionsWidgetList.append(this._renderItem(anonymous));
+      }
 
       if (this.options.hiddenPermissions.length > 0) {
         const additionalPermissions = [
@@ -375,16 +378,18 @@ import Palette from 'indico/utils/palette';
       }
 
       let managersTitle;
-      if (this.options.objectType === 'event') {
+      if (!this.options.isUnlisted && this.options.objectType === 'event') {
         managersTitle = $T.gettext('Category Managers');
       } else if (this.options.objectType === 'category') {
         managersTitle = $T.gettext('Parent Category Managers');
-      } else {
+      } else if (['session', 'contribution'].includes(this.options.objectType)) {
         managersTitle = $T.gettext('Event Managers');
       }
-      const managers = [{_type: 'DefaultEntry', name: managersTitle}, [FULL_ACCESS_PERMISSIONS]];
-      this.$permissionsWidgetList.prepend(this._renderItem(managers));
-      this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
+      if (managersTitle) {
+        const managers = [{_type: 'DefaultEntry', name: managersTitle}, [FULL_ACCESS_PERMISSIONS]];
+        this.$permissionsWidgetList.prepend(this._renderItem(managers));
+        this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
+      }
 
       if (this.$eventRoleDropdown.length) {
         this._renderDropdown(this.$eventRoleDropdown);

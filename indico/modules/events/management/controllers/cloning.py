@@ -148,7 +148,8 @@ class RHCloneEvent(RHManageEventBase):
         elif step == 2:
             return CloneContentsForm(self.event, set_defaults=set_defaults)
         elif step == 3:
-            default_category = (self.event.category if self.event.category.can_create_events(session.user)
+            default_category = (self.event.category
+                                if self.event.category and self.event.category.can_create_events(session.user)
                                 else None)
             return CloneCategorySelectForm(self.event, category=default_category)
         elif step == 4:

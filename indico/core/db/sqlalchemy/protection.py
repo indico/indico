@@ -55,6 +55,8 @@ class ProtectionMixin:
     #: Whether the object can have contact information shown in case of
     #: no access
     allow_no_access_contact = False
+    #: Whether the object can have no protection parent
+    allow_none_protection_parent = False
 
     @classmethod
     def register_protection_events(cls):
@@ -136,6 +138,9 @@ class ProtectionMixin:
         if self.disable_protection_mode:
             raise NotImplementedError
         if self.is_inheriting:
+            # Unlisted events inherit protections but have no parent, they are visible only by the owner and ACLs.
+            if not self.protection_parent:
+                return True
             return self.protection_parent.is_protected
         else:
             return self.is_self_protected
@@ -207,6 +212,11 @@ class ProtectionMixin:
             # might not need to check the parents at all
             if self.inheriting_have_acl and any(user in entry.principal for entry in iter_acl(self.acl_entries)):
                 rv = True
+            elif self.allow_none_protection_parent and self.protection_parent is None:
+                # This is the case for unlisted events, which are inheriting
+                # by default but have no parent category, so its parent
+                # protection won't be checked.
+                rv = False
             else:
                 # the parent can be either an object inheriting from this
                 # mixin or a legacy object with an AccessController
@@ -317,6 +327,9 @@ class ProtectionMixin:
             self.acl_entries.remove(entry)
 
     def get_inherited_acl(self):
+        if self.protection_parent is None:
+            return []
+
         own_acl = {entry.principal for entry in self.acl_entries}
         parent_acl = self.protection_parent.get_access_list(skip_managers=True)
         return [x for x in parent_acl if x not in own_acl]

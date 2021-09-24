@@ -259,7 +259,10 @@ class EventProtectionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.protected_object = self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
-        self._init_visibility(self.event)
+        if not self.event.category:
+            del self.visibility
+        else:
+            self._init_visibility(self.event)
 
     def _get_event_own_visibility_horizon(self, event):
         if self.visibility.data is None:  # unlimited
@@ -270,6 +273,8 @@ class EventProtectionForm(IndicoForm):
             return event.category.nth_parent(self.visibility.data - 1)
 
     def _init_visibility(self, event):
+        assert event.category
+
         self.visibility.choices = get_visibility_options(event, allow_invisible=True)
         # Check if event visibility would be affected by any of the categories
         real_horizon = event.category.real_visibility_horizon
