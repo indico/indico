@@ -141,8 +141,7 @@ class RHCreateEvent(RHProtected):
         if form.validate_on_submit():
             data = form.data
             listing = data.pop('listing')
-            # TODO: this should be done in the frontend
-            if not listing:
+            if not listing and can_create_unlisted_events(session.user):
                 del data['category']
 
             if self.event_type == EventType.lecture:

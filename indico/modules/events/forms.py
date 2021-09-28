@@ -16,6 +16,7 @@ from wtforms.validators import DataRequired, InputRequired, ValidationError
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories.fields import CategoryField
+from indico.modules.categories.util import can_create_unlisted_events
 from indico.modules.events.fields import EventPersonLinkListField, IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
@@ -74,8 +75,9 @@ class EventCreationFormBase(IndicoForm):
     listing = IndicoButtonsBooleanField(_('Listing'), default=True,
                                         true_caption=(_('List in a category'), 'eye'),
                                         false_caption=(_('Keep unlisted'), 'eye-blocked'))
-    category = CategoryField(_('Category'), [UsedIf(lambda form, field: form.listing.data), DataRequired()],
-                             require_event_creation_rights=True)
+    category = CategoryField(_('Category'), [UsedIf(lambda form, _: (form.listing.data or
+                                                                     not can_create_unlisted_events(session.user))),
+                                             DataRequired()], require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)
@@ -83,7 +85,8 @@ class EventCreationFormBase(IndicoForm):
     create_booking = JSONField()
 
     def validate_category(self, field):
-        if self.listing.data and not field.data.can_create_events(session.user):
+        if ((self.listing.data or not can_create_unlisted_events(session.user))
+                and not field.data.can_create_events(session.user)):
             raise ValidationError(_('You are not allowed to create events in this category.'))
 
 
