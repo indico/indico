@@ -56,7 +56,6 @@ import {camelizeKeys} from 'indico/utils/case';
 
     protectionMessage.appendTo(options.protectionModeFields.closest('.form-field'));
     listingMessage.appendTo($listingField.closest('.form-field'));
-    listingMessage.hide();
 
     function updateProtectionMessage() {
       if (!currentCategory) {
@@ -110,7 +109,7 @@ import {camelizeKeys} from 'indico/utils/case';
       }
 
       // update listing and warning message boxes
-      listingMessage.toggleClass('hidden', !JSON.parse($listingField.val()));
+      listingMessage.toggleClass('hidden', JSON.parse($listingField.val()));
       updateWarningMessage();
     });
 
