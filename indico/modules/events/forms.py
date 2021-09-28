@@ -107,8 +107,9 @@ class LectureCreationForm(EventCreationFormBase):
 
 class UnlistedEventsForm(IndicoForm):
     enabled = BooleanField(_('Enabled'), widget=SwitchWidget(), default=False)
-    restricted = BooleanField(_('Require permission'), [HiddenUnless('enabled', preserve_data=True)],
-                              widget=SwitchWidget())
-    authorized_creators = PrincipalListField(_('Permissions'), [HiddenUnless('enabled', preserve_data=True)],
+    restricted = BooleanField(_('Restrict creation'), [HiddenUnless('enabled', preserve_data=True)],
+                              widget=SwitchWidget(),
+                              description=_('Restrict creation of unlisted events to the authorized users below.'))
+    authorized_creators = PrincipalListField(_('Authorized users'), [HiddenUnless('enabled', preserve_data=True)],
                                              allow_external_users=True, allow_groups=True,
                                              description=_('These users may create unlisted events.'))

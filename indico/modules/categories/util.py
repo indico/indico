@@ -233,5 +233,9 @@ def serialize_category_role(role, legacy=True):
 
 
 def can_create_unlisted_events(user):
-    return (user.is_admin or unlisted_events_settings.get('enabled') and (not unlisted_events_settings.get('restricted')
-            or unlisted_events_settings.acls.contains_user('authorized_creators', user)))
+    if not user or not unlisted_events_settings.get('enabled'):
+        return False
+    elif user.is_admin or not unlisted_events_settings.get('restricted'):
+        return True
+    else:
+        return unlisted_events_settings.acls.contains_user('authorized_creators', user)
