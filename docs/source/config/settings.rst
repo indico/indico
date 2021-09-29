@@ -490,13 +490,15 @@ Emails
 
 .. data:: SMTP_CERTFILE
 
-    If provided, this certificate will be used for SMTP authentication.
+    If provided, this certificate file will be used for certificate-based
+    SMTP authentication.
 
     Default: ``None``
 
 .. data:: SMTP_KEYFILE
 
-    If provided, this private key will be used for client certificate SMTP authentication.
+    If provided, this private key file will be used for certificate-based
+    SMTP authentication.
 
     Default: ``None``
 
