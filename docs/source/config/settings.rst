@@ -488,6 +488,20 @@ Emails
 
     Default: ``False``
 
+.. data:: SMTP_CERTFILE
+
+    If provided, this certificate file will be used for certificate-based
+    SMTP authentication.
+
+    Default: ``None``
+
+.. data:: SMTP_KEYFILE
+
+    If provided, this private key file will be used for certificate-based
+    SMTP authentication.
+
+    Default: ``None``
+
 .. data:: SMTP_TIMEOUT
 
     The timeout in seconds after which a connection attempt to the SMTP

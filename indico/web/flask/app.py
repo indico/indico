@@ -153,6 +153,8 @@ def configure_emails(app, config):
     app.config['EMAIL_USE_TLS'] = config.SMTP_USE_TLS
     app.config['EMAIL_USE_SSL'] = False
     app.config['EMAIL_TIMEOUT'] = config.SMTP_TIMEOUT
+    app.config['EMAIL_SSL_CERTFILE'] = config.SMTP_CERTFILE
+    app.config['EMAIL_SSL_KEYFILE'] = config.SMTP_KEYFILE
 
 
 def configure_xsendfile(app, method):

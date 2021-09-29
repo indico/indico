@@ -13,6 +13,11 @@ Security fixes
 - Protect authentication endpoints against CSRF login attacks (:pr:`5099`,
   thanks :user:`omegak`)
 
+Improvements
+^^^^^^^^^^^^
+
+- Support TLS certificates for SMTP authentication (:pr:`5100`, thanks :user:`dweinholz`)
+
 Bugfixes
 ^^^^^^^^
 
