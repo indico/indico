@@ -7,6 +7,12 @@ Version 3.0.3
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Protect authentication endpoints against CSRF login attacks (:pr:`5099`,
+  thanks :user:`omegak`)
+
 Bugfixes
 ^^^^^^^^
 
