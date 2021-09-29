@@ -490,7 +490,7 @@ Emails
 
 .. data:: SMTP_CERTFILE
 
-    If provided, this certfile will be used for the encrypted SMTP connection
+    If provided, this certificate will be used for SMTP authentication.
 
     Default: ``None``
 
