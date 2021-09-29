@@ -156,6 +156,7 @@ def configure_emails(app, config):
     app.config['EMAIL_SSL_CERTFILE'] = config.SMTP_CERTFILE
     app.config['EMAIL_SSL_KEYFILE'] = config.SMTP_KEYFILE
 
+
 def configure_xsendfile(app, method):
     if not method:
         return
