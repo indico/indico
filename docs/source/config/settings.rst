@@ -496,7 +496,7 @@ Emails
 
 .. data:: SMTP_KEYFILE
 
-    If provided, this keyfile will be used for the encrypted SMTP connection
+    If provided, this private key will be used for client certificate SMTP authentication.
 
     Default: ``None``
 
