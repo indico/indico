@@ -488,6 +488,18 @@ Emails
 
     Default: ``False``
 
+.. data:: SMTP_CERTFILE
+
+    If provided, this certfile will be used for the encrypted SMTP connection
+
+    Default: ``None``
+
+.. data:: SMTP_KEYFILE
+
+    If provided, this keyfile will be used for the encrypted SMTP connection
+
+    Default: ``None``
+
 .. data:: SMTP_TIMEOUT
 
     The timeout in seconds after which a connection attempt to the SMTP
