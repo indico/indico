@@ -105,7 +105,8 @@ class IndicoSession(BaseSession):
 
     @property
     def csrf_protected(self):
-        return self.user is not None
+        # Protect auth endpoints to prevent CSRF login attacks
+        return self.user is not None or request.blueprint == 'auth'
 
     @property
     def timezone(self):
