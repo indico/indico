@@ -7,7 +7,7 @@
 
 from indico.modules.events.controllers.admin import (RHCreateEventLabel, RHCreateReferenceType, RHDeleteEventLabel,
                                                      RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
-                                                     RHEventLabels, RHReferenceTypes)
+                                                     RHEventLabels, RHReferenceTypes, RHUnlistedEvents)
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import RHEventAccessKey, RHExportEventICAL
 from indico.modules.events.controllers.entry import event_or_shorturl
@@ -23,6 +23,7 @@ _bp.add_url_rule('/admin/external-id-types/create', 'create_reference_type', RHC
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/event-labels/', 'event_labels', RHEventLabels, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/event-labels/create', 'create_event_label', RHCreateEventLabel, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/unlisted-events/', 'unlisted_events', RHUnlistedEvents, methods=('GET', 'POST'))
 
 # Single reference type
 _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>/edit', 'update_reference_type', RHEditReferenceType,

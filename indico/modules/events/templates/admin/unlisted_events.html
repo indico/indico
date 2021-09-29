@@ -1,0 +1,14 @@
+{% extends 'layout/admin_page.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}
+    {% trans %}Unlisted events{% endtrans %}
+{% endblock %}
+
+{% block description %}
+    {% trans %}Unlisted events enable users to set up and customize events before publishing them into a category.{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ simple_form(form, back_button=false) }}
+{% endblock %}

@@ -9,13 +9,14 @@ from datetime import time
 
 from flask import session
 from wtforms.fields import StringField, TextAreaField
-from wtforms.fields.core import SelectField
+from wtforms.fields.core import BooleanField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories.fields import CategoryField
+from indico.modules.categories.util import can_create_unlisted_events
 from indico.modules.events.fields import EventPersonLinkListField, IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
@@ -25,9 +26,10 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
+from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import IndicoButtonsBooleanField
-from indico.web.forms.validators import LinkedDateTime, UsedIf
-from indico.web.forms.widgets import CKEditorWidget
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -73,8 +75,9 @@ class EventCreationFormBase(IndicoForm):
     listing = IndicoButtonsBooleanField(_('Listing'), default=True,
                                         true_caption=(_('List in a category'), 'eye'),
                                         false_caption=(_('Keep unlisted'), 'eye-blocked'))
-    category = CategoryField(_('Category'), [UsedIf(lambda form, field: form.listing.data), DataRequired()],
-                             require_event_creation_rights=True)
+    category = CategoryField(_('Category'), [UsedIf(lambda form, _: (form.listing.data or
+                                                                     not can_create_unlisted_events(session.user))),
+                                             DataRequired()], require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)
@@ -82,7 +85,8 @@ class EventCreationFormBase(IndicoForm):
     create_booking = JSONField()
 
     def validate_category(self, field):
-        if self.listing.data and not field.data.can_create_events(session.user):
+        if ((self.listing.data or not can_create_unlisted_events(session.user))
+                and not field.data.can_create_events(session.user)):
             raise ValidationError(_('You are not allowed to create events in this category.'))
 
 
@@ -102,3 +106,13 @@ class LectureCreationForm(EventCreationFormBase):
     person_link_data = EventPersonLinkListField(_('Speakers'))
     description = TextAreaField(_('Description'), widget=CKEditorWidget())
     theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)
+
+
+class UnlistedEventsForm(IndicoForm):
+    enabled = BooleanField(_('Enabled'), widget=SwitchWidget(), default=False)
+    restricted = BooleanField(_('Restrict creation'), [HiddenUnless('enabled', preserve_data=True)],
+                              widget=SwitchWidget(),
+                              description=_('Restrict creation of unlisted events to the authorized users below.'))
+    authorized_creators = PrincipalListField(_('Authorized users'), [HiddenUnless('enabled', preserve_data=True)],
+                                             allow_external_users=True, allow_groups=True,
+                                             description=_('These users may create unlisted events.'))

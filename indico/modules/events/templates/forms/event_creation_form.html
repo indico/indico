@@ -5,7 +5,9 @@
                    'has_events': form.category.data.has_events} if form.category.data else none %}
 
 {{ form_header(form, action=url_for('events.create', event_type=event_type)) }}
-{{ form_row(form.listing) }}
+{% if can_create_unlisted_events %}
+    {{ form_row(form.listing) }}
+{% endif %}
 {{ form_row(form.category, orientation=('hidden' if single_category else '')) }}
 {{ form_rows(form, fields=form._field_order) }}
 {% if form._advanced_field_order %}
@@ -91,19 +93,17 @@ purely client-side and are worded for event creation instead of being generic.
 </script>
 
 <script type="text/html" id="event-listing-message">
-    <div class="form-group">
-        <div class="action-box mid-form for-form listing-message unlisted-message info">
-            <div class="section">
-                <div class="icon icon-eye-blocked"></div>
-                <div class="text">
-                    <div class="label">
-                        {% trans %}Unlisted event{% endtrans %}
-                    </div>
-                    <div>
-                        {% trans -%}
-                            Users will not see this event yet. You can publish the event in a category once it is ready.
-                        {%- endtrans %}
-                    </div>
+    <div class="action-box mid-form for-form listing-message unlisted-message info hidden">
+        <div class="section">
+            <div class="icon icon-eye-blocked"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Unlisted event{% endtrans %}
+                </div>
+                <div>
+                    {% trans -%}
+                        Users will not see this event yet. You can publish the event in a category once it is ready.
+                    {%- endtrans %}
                 </div>
             </div>
         </div>

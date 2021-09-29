@@ -19,6 +19,7 @@ from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.categories import Category
+from indico.modules.categories.util import can_create_unlisted_events
 from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
@@ -140,8 +141,7 @@ class RHCreateEvent(RHProtected):
         if form.validate_on_submit():
             data = form.data
             listing = data.pop('listing')
-            # TODO: this should be done in the frontend
-            if not listing:
+            if not listing and can_create_unlisted_events(session.user):
                 del data['category']
 
             if self.event_type == EventType.lecture:
@@ -159,7 +159,8 @@ class RHCreateEvent(RHProtected):
         return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
                                 event_type=self.event_type.name, single_category=(not self.root_category.has_children),
                                 check_room_availability=check_room_availability,
-                                rb_excluded_categories=rb_excluded_categories)
+                                rb_excluded_categories=rb_excluded_categories,
+                                can_create_unlisted_events=can_create_unlisted_events(session.user))
 
 
 class RHPrepareEvent(RH):
