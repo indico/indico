@@ -21,7 +21,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix certain registration list filters (checkin status & state) being combined
+  with OR instead of AND (:pr:`5101`)
 
 
 Version 3.0.2
