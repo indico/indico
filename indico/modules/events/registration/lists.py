@@ -160,7 +160,7 @@ class RegistrationListGenerator(ListGeneratorBase):
                         .correlate(Registration)
                         .scalar_subquery())
             query = query.filter(subquery == len(field_filters))
-        return query.filter(db.or_(*items_criteria))
+        return query.filter(db.and_(*items_criteria))
 
     def get_list_kwargs(self):
         reg_list_config = self._get_config()

@@ -73,6 +73,8 @@ DEFAULTS = {
     'SENTRY_DSN': None,
     'SENTRY_LOGGING_LEVEL': 'WARNING',
     'SESSION_LIFETIME': 86400 * 31,
+    'SMTP_CERTFILE': None,
+    'SMTP_KEYFILE': None,
     'SMTP_LOGIN': None,
     'SMTP_PASSWORD': None,
     'SMTP_SERVER': ('localhost', 25),

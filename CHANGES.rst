@@ -50,10 +50,22 @@ Version 3.0.3
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Protect authentication endpoints against CSRF login attacks (:pr:`5099`,
+  thanks :user:`omegak`)
+
+Improvements
+^^^^^^^^^^^^
+
+- Support TLS certificates for SMTP authentication (:pr:`5100`, thanks :user:`dweinholz`)
+
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix certain registration list filters (checkin status & state) being combined
+  with OR instead of AND (:pr:`5101`)
 
 
 Version 3.0.2
