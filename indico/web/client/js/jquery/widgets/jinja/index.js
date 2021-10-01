@@ -27,3 +27,4 @@ import './selectize_widget';
 import './synced_input_widget';
 import './typeahead_widget';
 import './permissions_widget';
+import './sui_color_picker_widget';

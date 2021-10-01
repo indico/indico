@@ -5,8 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from wtforms.fields import SelectField
+
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.util.i18n import _
+from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
 
@@ -56,3 +59,11 @@ class IndicoSinglePalettePickerField(IndicoPalettePickerField):
 
     def _value(self):
         return ColorTuple(self.text_color, self.data)._asdict()
+
+
+class SUIColorPickerField(SelectField):
+    widget = JinjaWidget('forms/sui_color_picker_widget.html', single_kwargs=True, single_line=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.choices = list(zip(get_sui_colors(), get_sui_colors()))

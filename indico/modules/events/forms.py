@@ -9,7 +9,7 @@ from datetime import time
 
 from flask import session
 from wtforms.fields import StringField, TextAreaField
-from wtforms.fields.core import BooleanField, SelectField
+from wtforms.fields.core import BooleanField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
@@ -23,9 +23,9 @@ from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.colors import get_sui_colors
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
+from indico.web.forms.fields.colors import SUIColorPickerField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import IndicoButtonsBooleanField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf
@@ -57,7 +57,7 @@ class ReferenceTypeForm(IndicoForm):
 
 class EventLabelForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
-    color = SelectField(_('Color'), [DataRequired()], choices=list(zip(get_sui_colors(), get_sui_colors())))
+    color = SUIColorPickerField(_('Color'), [DataRequired()])
 
     def __init__(self, *args, **kwargs):
         self.event_label = kwargs.pop('event_label', None)
