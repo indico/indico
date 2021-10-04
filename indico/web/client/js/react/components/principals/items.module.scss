@@ -9,7 +9,9 @@
 @import 'base/defaults';
 @import 'base/borders';
 
-.item {
+.item,
+:global(.ui.list) > .item,
+:global(.ui.list.list) > .item {
   display: flex;
   align-items: center;
 }
@@ -52,6 +54,8 @@
 }
 
 .actions {
+  display: flex;
+  align-items: center;
   white-space: nowrap;
 }
 
@@ -75,6 +79,10 @@
       color: $yellow;
     }
   }
+
+  &.edit {
+    font-size: 1.4em !important;
+  }
 }
 
 .favorite:global(.disabled) {
@@ -83,4 +91,8 @@
   .content {
     opacity: 0.45;
   }
+}
+
+.roles {
+  margin: 0 15px;
 }
