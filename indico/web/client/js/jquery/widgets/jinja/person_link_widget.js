@@ -21,6 +21,7 @@ import {camelizeKeys} from 'indico/utils/case';
         fieldId={options.fieldId}
         eventId={options.eventId}
         defaultValue={camelizeKeys(persons)}
+        roles={options.roles || []}
         {...options}
       />,
       document.getElementById(`person-link-field-${options.fieldId}`)

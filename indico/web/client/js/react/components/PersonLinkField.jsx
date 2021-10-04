@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Button, Segment, List, Modal, Form, Icon} from 'semantic-ui-react';
+import {Button, Segment, List, Modal, Form} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {FinalDropdown, FinalInput} from 'indico/react/forms';
@@ -17,7 +17,7 @@ import {snakifyKeys} from 'indico/utils/case';
 
 import {Translate} from '../i18n';
 
-import {PrincipalListItem} from './principals/items';
+import {PersonListItem} from './principals/items';
 import {PrincipalType} from './principals/util';
 
 import './PersonLinkField.module.scss';
@@ -105,7 +105,7 @@ ExternalPersonModal.defaultProps = {
   person: undefined,
 };
 
-export function WTFPersonLinkField({fieldId, eventId, defaultValue}) {
+export function WTFPersonLinkField({fieldId, eventId, defaultValue, roles}) {
   const [persons, setPersons] = useState(defaultValue);
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
 
@@ -116,23 +116,32 @@ export function WTFPersonLinkField({fieldId, eventId, defaultValue}) {
     inputField.dispatchEvent(new Event('change', {bubbles: true}));
   };
 
-  return <PersonLinkField value={persons} eventId={eventId} onChange={onChange} />;
+  return <PersonLinkField value={persons} eventId={eventId} onChange={onChange} roles={roles} />;
 }
 
 WTFPersonLinkField.propTypes = {
   fieldId: PropTypes.string.isRequired,
   defaultValue: PropTypes.array,
   eventId: PropTypes.number,
+  roles: PropTypes.array,
 };
 
 WTFPersonLinkField.defaultProps = {
   defaultValue: [],
   eventId: null,
+  roles: [],
 };
 
 // TODO: strip out unnecessary person data
-export default function PersonLinkField({value, onChange, emptyMessage, eventId, sessionUser}) {
-  const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = useFavoriteUsers();
+export default function PersonLinkField({
+  value: persons,
+  onChange,
+  emptyMessage,
+  eventId,
+  sessionUser,
+  roles,
+}) {
+  const [favoriteUsers] = useFavoriteUsers();
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState(null);
 
@@ -148,48 +157,61 @@ export default function PersonLinkField({value, onChange, emptyMessage, eventId,
 
   const onSubmit = data => {
     onChange(
-      selected !== null ? value.map((v, idx) => (idx === selected ? data : v)) : [...value, data]
+      selected !== null
+        ? persons.map((v, idx) => (idx === selected ? data : v))
+        : [...persons, data]
     );
     onClose();
+  };
+
+  const onChangeRoles = (idx, value) => {
+    const keys = value.filter(r => r.active).map(r => r.value);
+    onChange(persons.map((v, i) => (i === idx ? {...v, roles: keys} : v)));
   };
 
   return (
     <>
       <Segment attached="top">
-        {value.length > 0 ? (
+        {persons.length > 0 ? (
           <List divided relaxed>
-            {value.map(({userId, firstName, lastName, email, affiliation, avatarURL}, idx) => (
-              <PrincipalListItem
-                key={userId || email}
-                type={PrincipalType.user}
-                name={firstName ? `${firstName} ${lastName}` : lastName}
-                detail={affiliation ? `${email} (${affiliation})` : email}
-                avatarURL={avatarURL}
-                favorite={!!favoriteUsers[userId]}
-                onAddFavorite={() => handleAddFavorite(userId)}
-                onDelFavorite={() => handleDelFavorite(userId)}
-                onDelete={() => onChange(value.filter(p => p.userId !== userId))}
-                canDelete
-                search={
-                  <Icon styleName="button" name="pencil" size="large" onClick={() => onEdit(idx)} />
-                }
-              />
-            ))}
+            {persons.map(
+              (
+                {userId, firstName, lastName, email, affiliation, avatarURL, roles: roleKeys},
+                idx
+              ) => (
+                <PersonListItem
+                  key={userId || email}
+                  type={PrincipalType.user}
+                  name={firstName ? `${firstName} ${lastName}` : lastName}
+                  detail={affiliation ? `${email} (${affiliation})` : email}
+                  avatarURL={avatarURL}
+                  onDelete={() => onChange(persons.filter(p => p.userId !== userId))}
+                  onEdit={() => onEdit(idx)}
+                  roles={roles.map(({value, label}) => ({
+                    value,
+                    label,
+                    active: roleKeys && roleKeys.includes(value),
+                  }))}
+                  onChangeRoles={v => onChangeRoles(idx, v)}
+                  canDelete
+                />
+              )
+            )}
           </List>
         ) : (
-          emptyMessage || <Translate>There are currently no value</Translate>
+          emptyMessage || <Translate>There are currently no persons</Translate>
         )}
       </Segment>
       <Button.Group size="small" attached="bottom" floated="right">
         {sessionUser && (
-          <Button type="button" onClick={() => onChange([...value, sessionUser])}>
+          <Button type="button" onClick={() => onChange([...persons, sessionUser])}>
             Add myself
           </Button>
         )}
         <UserSearch
           favorites={favoriteUsers}
-          existing={value.map(u => `User:${u.userId}`)}
-          onAddItems={i => onChange([...value, ...i])}
+          existing={persons.map(u => `User:${u.userId}`)}
+          onAddItems={i => onChange([...persons, ...i])}
           triggerFactory={props => (
             // eslint-disable-next-line react/react-in-jsx-scope
             <Button {...props} type="button">
@@ -206,7 +228,7 @@ export default function PersonLinkField({value, onChange, emptyMessage, eventId,
           open={modalOpen}
           onClose={onClose}
           onSubmit={onSubmit}
-          person={value[selected]}
+          person={persons[selected]}
         />
       </Button.Group>
     </>
@@ -219,10 +241,12 @@ PersonLinkField.propTypes = {
   emptyMessage: PropTypes.string,
   sessionUser: PropTypes.object,
   eventId: PropTypes.number,
+  roles: PropTypes.array,
 };
 
 PersonLinkField.defaultProps = {
   emptyMessage: null,
   sessionUser: null,
   eventId: null,
+  roles: [],
 };

@@ -52,6 +52,7 @@
         setupPersonLinkWidget({
             fieldId: {{ field.id | tojson }},
             eventId: {{ (field.event.id if field.event else none) | tojson }},
+            roles: [{value: 'submitter', label: 'Submitter' }],
             disableUserSearch: {{ field.disable_user_search | default(false) | tojson }},
             authorTypes: {{ (field.author_types or none) | tojson }},
             showEmptyCoauthors: {{ field.show_empty_coauthors | default(true) | tojson }},
