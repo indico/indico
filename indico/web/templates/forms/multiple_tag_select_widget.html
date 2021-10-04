@@ -1,0 +1,14 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div id="{{ field.id }}-wrapper"></div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupMultipleTagSelectWidget({
+            fieldId: {{ field.id | tojson }},
+            choices: {{ field.choices | tojson }},
+        });
+    </script>
+{% endblock %}

@@ -5,6 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global $T:false, alertPopup:false, handleAjaxError:false, ajaxDialog:false */
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import 'indico/legacy/angular';
 
 import './invitations';
@@ -17,6 +22,8 @@ import './form/sectiontoolbar';
 import './form/table';
 
 import './form/templates';
+
+import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
 
 (function(global) {
   $(document).ready(function() {
@@ -76,4 +83,25 @@ import './form/templates';
       });
     });
   };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const rootElement = document.getElementById('registration-detail-registration-tags-assign');
+
+    if (rootElement) {
+      const assignedTags = JSON.parse(rootElement.dataset.assignedTags);
+      const allTags = JSON.parse(rootElement.dataset.allTags);
+      const {eventId, regformId, registrationId} = rootElement.dataset;
+
+      ReactDOM.render(
+        <RegistrationTagsEditableList
+          eventId={parseInt(eventId, 10)}
+          regformId={parseInt(regformId, 10)}
+          registrationId={parseInt(registrationId, 10)}
+          assignedTags={assignedTags}
+          allTags={allTags}
+        />,
+        rootElement
+      );
+    }
+  });
 })(window);

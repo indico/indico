@@ -12,8 +12,10 @@ from indico.core.db import db
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
+from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
+from indico.util.string import natural_sort_key
 from indico.web.flask.templating import get_template_module
 
 
@@ -27,9 +29,10 @@ class RegistrationListGenerator(ListGeneratorBase):
         super().__init__(regform.event, entry_parent=regform)
         self.regform = regform
         self.default_list_config = {
-            'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),
+            'items': ('title', 'email', 'affiliation', 'reg_date', 'state', 'tags_present'),
             'filters': {'fields': {}, 'items': {}}
         }
+        registration_tag_choices = self._get_registration_tag_choices()
         self.static_items = {
             'reg_date': {
                 'title': _('Registration Date'),
@@ -54,10 +57,25 @@ class RegistrationListGenerator(ListGeneratorBase):
             'payment_date': {
                 'title': _('Payment date'),
             },
+            'tags_present': {
+                'title': _('Tags'),
+                'filter_title': _('Has tags'),
+                'filter_choices': registration_tag_choices
+            },
+            'tags_absent': {
+                'title': _('Tags absent'),
+                'filter_title': _('Does not have tags'),
+                'filter_choices': registration_tag_choices,
+                'filter_only': True
+            },
         }
         self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
                                'phone', 'country')
         self.list_config = self._get_config()
+
+    def _get_registration_tag_choices(self):
+        tags = sorted(self.event.registration_tags, key=lambda tag: natural_sort_key(tag.title))
+        return {str(tag.id): tag.title for tag in tags}
 
     def _get_static_columns(self, ids):
         """
@@ -150,6 +168,14 @@ class RegistrationListGenerator(ListGeneratorBase):
         if 'state' in filters['items']:
             states = [RegistrationState(int(state)) for state in filters['items']['state']]
             items_criteria.append(Registration.state.in_(states))
+
+        if 'tags_present' in filters['items']:
+            tag_ids = [int(tag_id) for tag_id in filters['items']['tags_present']]
+            items_criteria.append(Registration.tags.any(RegistrationTag.id.in_(tag_ids)))
+
+        if 'tags_absent' in filters['items']:
+            tag_ids = [int(tag_id) for tag_id in filters['items']['tags_absent']]
+            items_criteria.append(~Registration.tags.any(RegistrationTag.id.in_(tag_ids)))
 
         if field_filters:
             subquery = (RegistrationData.query

@@ -15,15 +15,14 @@
                 </div>
             {% endif %}
             <div class="js-list-table-wrapper">
-                <table class="i-table tablesorter">
+                <table class="i-table tablesorter" style="table-layout: auto;">
                     <thead>
                         <tr class="i-table">
                             <th class="i-table thin-column"></th>
                             {{ template_hook('registration-status-flag', regform=regform, registration=none, header=true) }}
                             <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
                             <th class="i-table">{% trans %}Full name{% endtrans %}</th>
-
-                            {% for item in static_columns %}
+                            {% for item in static_columns if not item.get('filter_only') %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
                             {% endfor %}
                             {% for item in dynamic_columns %}
@@ -50,7 +49,7 @@
                                         {{- registration.display_full_name -}}
                                     </a>
                                 </td>
-                                {% for item in static_columns %}
+                                {% for item in static_columns if not item.get('filter_only') %}
                                     {% if item.id == 'reg_date' %}
                                         <td class="i-table" data-text="{{ registration.submitted_dt }}">
                                             {{- registration.submitted_dt | format_datetime(timezone=registration.event.tzinfo) -}}
@@ -79,6 +78,12 @@
                                             {%- else %}
                                                 -
                                             {% endif %}
+                                        </td>
+                                    {% elif item.id == 'tags_present' %}
+                                        <td class="i-table" style="padding-top: 8px; padding-bottom: 8px;">
+                                            {% for tag in registration.tags|sort(attribute='title', case_sensitive=false) %}
+                                                <span class="ui label {{ tag.color }}">{{ tag.title }}</span>
+                                            {% endfor %}
                                         </td>
                                     {% else %}
                                         <td class="i-table">{{ data[item.id].friendly_data if item.id in data }}</td>

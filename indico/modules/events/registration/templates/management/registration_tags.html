@@ -1,0 +1,61 @@
+{% extends 'events/management/base.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {%- trans %}Registration tags{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    {% trans -%}
+        Create registration tags to mark and filter registrations.
+    {%- endtrans %}
+{% endblock %}
+
+{% macro render_tags(tags) %}
+    <ul class="group-list with-buttons no-content-before">
+        {% for tag in tags|sort(attribute='title', case_sensitive=false) %}
+            <li>
+                <span class="ui label medium {{ tag.color }}">
+                    {{ tag.title }}
+                </span>
+                <span class="right hide-if-locked">
+                    <button class="icon-edit i-button text-color borderless" data-href="{{ url_for('.manage_registration_tags_edit', tag) }}"
+                            data-title="{% trans %}Edit a tag{% endtrans %}"
+                            data-ajax-dialog
+                            data-reload-after></button>
+                    <button class="icon-remove i-button text-color borderless danger"
+                            data-method="POST" data-href="{{ url_for('.manage_registration_tags_delete', tag) }}"
+                            data-title="{% trans %}Delete tag{% endtrans %}"
+                            data-confirm="{% trans %}Do you really want to delete this tag?{% endtrans %}"></button>
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% block content %}
+    <div class="i-box-group vert fixed-width registration-tags">
+        <div class="i-box">
+            <div class="i-box-header" style="margin-bottom: 0;">
+                <div class="i-box-title">{%- trans %}Registration Tags{% endtrans -%}</div>
+                <div class="i-box-buttons hide-if-locked">
+                    <a class="i-button icon-plus" data-href="{{ url_for('.manage_registration_tags_add', event) }}"
+                       data-title="{%- trans %}Add a tag{% endtrans -%}"
+                       data-ajax-dialog
+                       data-reload-after>
+                        {%- trans %}Add a tag{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+            {% if event.registration_tags %}
+                <div class="i-box-content">
+                    {{ render_tags(event.registration_tags) }}
+                </div>
+            {% else %}
+                <div class="i-box-content" style="margin-top: 10px;">
+                    {% trans %}There are no tags.{% endtrans %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

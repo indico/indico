@@ -53,6 +53,29 @@ def _get_next_friendly_id(context):
     return increment_and_get(Event._last_friendly_registration_id, Event.id == event_id)
 
 
+registrations_tags_table = db.Table(
+    'registration_tags',
+    db.metadata,
+    db.Column(
+        'registration_id',
+        db.Integer,
+        db.ForeignKey('event_registration.registrations.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    db.Column(
+        'registration_tag_id',
+        db.Integer,
+        db.ForeignKey('event_registration.tags.id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True,
+    ),
+    schema='event_registration'
+)
+
+
 class Registration(db.Model):
     """Somebody's registration for an event through a registration form."""
     __tablename__ = 'registrations'
@@ -224,6 +247,17 @@ class Registration(db.Model):
         backref=db.backref(
             'registration',
             lazy=True
+        )
+    )
+    #: The registration tags assigned to this registration
+    tags = db.relationship(
+        'RegistrationTag',
+        secondary=registrations_tags_table,
+        passive_deletes=True,
+        collection_class=set,
+        backref=db.backref(
+            'registrations',
+            lazy=False
         )
     )
 

@@ -1,14 +1,17 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false) %}
+{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false, filter_only=false) %}
     {% set filters = filters['items'] if is_static_item else filters['fields'] %}
+    {% set filter_title = item.get('filter_title', item.title) if is_static_item else item.title %}
     <div class="label-group list-column">
-        <div class="i-label title-wrapper"
+        <div class="i-label title-wrapper" {% if filter_only %}data-only-filter{% endif %}
              data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
-            <div class="title">{{ item.title }}</div>
-            <div class="actions">
-                <span class="visibility icon-eye"></span>
-            </div>
+            <div class="title">{{ filter_title }}</div>
+            {% if not filter_only %}
+                <div class="actions">
+                    <span class="visibility icon-eye"></span>
+                </div>
+            {% endif %}
         </div>
         {% if filter_choices %}
             <div class="i-label filter">
@@ -81,7 +84,8 @@
     <div class="flexrow f-wrap">
         {% for item_id, item in static_items.items() %}
             {% set filter_choices = item.get('filter_choices') %}
-            {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
+            {% set filter_only = item.get('filter_only', false) %}
+            {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true, filter_only=filter_only) }}
         {% endfor %}
     </div>
 

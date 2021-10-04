@@ -25,12 +25,14 @@ from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
+from indico.web.forms.fields.colors import SUIColorPickerField
 from indico.web.forms.fields.principals import PrincipalListField
-from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
+from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField, IndicoMultipleTagSelectField
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
@@ -420,6 +422,45 @@ class RejectRegistrantsForm(IndicoForm):
     attach_rejection_reason = BooleanField(_('Attach reason'), widget=SwitchWidget())
     registration_id = HiddenFieldList()
     submitted = HiddenField()
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form
+
+
+class RegistrationTagForm(IndicoForm):
+    """Form to create a new registration tag."""
+
+    title = StringField(_('Title'), [DataRequired()])
+    color = SUIColorPickerField(_('Color'), [DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        self.tag = kwargs.pop('tag', None)
+        super().__init__(*args, **kwargs)
+
+    def validate_title(self, field):
+        query = RegistrationTag.query.with_parent(self.event).filter(
+            db.func.lower(RegistrationTag.title) == field.data.lower()
+        )
+        if self.tag:
+            query = query.filter(RegistrationTag.id != self.tag.id)
+        if query.has_rows():
+            raise ValidationError(_('This title is already in use.'))
+
+
+class RegistrationTagsAssignForm(IndicoForm):
+    """Form to assign registration tags to registrations."""
+
+    add = IndicoMultipleTagSelectField(_('Add'), description=_('Select tags to assign'))
+    remove = IndicoMultipleTagSelectField(_('Remove'), description=_('Select tags to remove'))
+    registration_id = HiddenFieldList()
+    submitted = HiddenField()
+
+    def validate_remove(self, field):
+        if set(self.remove.data) & set(self.add.data):
+            raise ValidationError(_('You cannot add and remove the same tag'))
+
+    validate_add = validate_remove
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form

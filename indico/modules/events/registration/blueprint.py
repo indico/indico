@@ -9,7 +9,7 @@ from indico.modules.events.registration import api
 from indico.modules.events.registration.controllers import display
 from indico.modules.events.registration.controllers.compat import compat_registration
 from indico.modules.events.registration.controllers.management import (fields, invitations, regforms, reglists,
-                                                                       sections, tickets)
+                                                                       sections, tags, tickets)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -123,6 +123,18 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode', 'ticke
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode.png', 'tickets_qrcode_image',
                  tickets.RHTicketConfigQRCodeImage)
 
+# Registration tag management
+_bp.add_url_rule('/manage/registration/tags', 'manage_registration_tags', tags.RHManageRegistrationTags,
+                 methods=('GET',))
+_bp.add_url_rule('/manage/registration/tags/add', 'manage_registration_tags_add',
+                 tags.RHRegistrationTagAdd, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/tags/<int:tag_id>/edit', 'manage_registration_tags_edit',
+                 tags.RHRegistrationTagEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/tags/<int:tag_id>/delete', 'manage_registration_tags_delete',
+                 tags.RHRegistrationTagDelete, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tags/assign', 'manage_registration_tags_assign',
+                 tags.RHRegistrationTagsAssign, methods=('POST',))
+
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated
 # Right now, Angular strips off trailing slashes, thus causing Flask to throw errors
@@ -179,7 +191,8 @@ _bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 
 _bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants',
                  api.RHAPIRegistrants)
 _bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api.RHAPIRegistrationForms)
-
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registration_tags_assign',
+                 tags.RHAPIRegistrationTagsAssign, methods=('POST',))
 
 # Participants
 _bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<int:event_id>',
