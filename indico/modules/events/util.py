@@ -177,19 +177,14 @@ def get_random_color(event):
     return random.choice(tuple(unused_colors) or get_colors())
 
 
+# TODO: to schemas - where is this used?
 def serialize_event_person(person):
     """Serialize EventPerson to JSON-like object."""
-    return {'_type': 'EventPerson',
-            'id': person.id,
-            'email': person.email,
-            'name': person.display_full_name,
-            'firstName': person.first_name,
-            'lastName': person.last_name,
-            'title': person.title,
-            'affiliation': person.affiliation,
-            'phone': person.phone,
-            'address': person.address,
-            'user_id': person.user_id}
+
+    from indico.modules.events.persons.schemas import EventPersonSchema
+
+    return EventPersonSchema().dump(person)
+    # TODO: return {'_type': 'EventPerson',
 
 
 def serialize_person_link(person_link):
@@ -205,6 +200,8 @@ def serialize_person_link(person_link):
             'address': person_link.address,
             'displayOrder': person_link.display_order,
             'userId': person_link.person.user_id}
+    if person_link.person.user:
+        data.update({'avatarURL': person_link.person.user.avatar_url})
     if person_link.person.id is not None:
         # In case of a newly added person we only serialize the data again
         # if the form's validation failed and the field needs to be displayed

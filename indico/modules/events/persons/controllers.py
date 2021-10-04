@@ -32,7 +32,7 @@ from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
 from indico.modules.events.persons.operations import update_person
-from indico.modules.events.persons.schemas import EventPersonSchema
+from indico.modules.events.persons.schemas import PublicEventPersonSchema
 from indico.modules.events.persons.views import WPManagePersons
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
@@ -428,4 +428,4 @@ class RHEventPersonSearch(RHAuthenticatedEventBase):
     ), location='query')
     def _process(self, exact, **criteria):
         matches, total = self._search_event_persons(exact=exact, **criteria)
-        return jsonify(users=EventPersonSchema().dump(matches, many=True), total=total)
+        return jsonify(users=PublicEventPersonSchema().dump(matches, many=True), total=total)

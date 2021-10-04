@@ -18,9 +18,8 @@ from indico.modules.events.models.persons import EventPerson, EventPersonLink, P
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.util import serialize_person_link
-from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
-from indico.util.i18n import _, orig_string
+from indico.util.i18n import _
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.widgets import JinjaWidget
@@ -127,22 +126,18 @@ class PersonLinkListFieldBase(EventPersonListField):
         self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
 
     @no_autoflush
-    def _get_person_link(self, data, extra_data=None):
-        extra_data = extra_data or {}
+    def _get_person_link(self, data):
+        from indico.modules.events.schemas import PersonLinkSchema
+
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
-        person_data = {'title': next((x.value for x in UserTitle if data.get('title') == orig_string(x.title)),
-                                     UserTitle.none),
-                       'first_name': data.get('firstName', ''), 'last_name': data['familyName'],
-                       'affiliation': data.get('affiliation', ''), 'address': data.get('address', ''),
-                       'phone': data.get('phone', ''), 'display_order': data['displayOrder']}
-        person_data.update(extra_data)
         person_link = None
         if self.object and inspect(person).persistent:
             person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
         if not person_link:
             person_link = self.person_link_cls(person=person)
-        person_link.populate_from_dict(person_data)
+        person_link.populate_from_dict(PersonLinkSchema(
+            only=('first_name', 'last_name', 'affiliation', 'address', 'phone', 'display_order')).load(data))
         email = data.get('email', '').lower()
         if email != person_link.email:
             if not self.event or not self.event.persons.filter_by(email=email).first():
@@ -182,11 +177,14 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
-        return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
+        return {self._get_person_link(x):
+                'submitter' in x.pop('roles', ['submitter'] if self.default_is_submitter else []) for x in data}
 
     def _serialize_person_link(self, principal, extra_data=None):
         data = (extra_data or {}) | serialize_person_link(principal)
-        data['isSubmitter'] = self.data[principal] if self.get_form().is_submitted() else principal.is_submitter
+        data['roles'] = []
+        if self.get_form().is_submitted() and self.data[principal] or principal.is_submitter:
+            data['roles'].append('submitter')
         return data
 
     def pre_validate(self, form):
