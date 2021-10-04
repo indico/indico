@@ -18,7 +18,11 @@ Major Features
   specific users, categories now also support a moderation workflow which allows
   event managers to request moving an event to a category. Only once a category
   manager approves this request, the event is actually moved (:issue:`2057`, :pr:`5013`)
-- TODO write something about unlisted events
+- Admins now have the option to enable "Unlisted events", which are events that
+  are not (yet) assigned to a category. Such events are only accessible to its
+  creator and other users who have been granted access explicitly, and do not
+  show up in any category's event listing (:issue:`4294`, :issue:`5055`, :pr:`5023`,
+  :pr:`5095`)
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -30,6 +34,9 @@ Improvements
 
 - Send event reminders as individual emails with the recipient in the To field
   instead of using BCC (:issue:`2318`, :pr:`5088`)
+- Let event managers assign custom tags to registrations and filter the list
+  of registrations by the presence or absence of specific tags (:issue:`4948`,
+  :pr:`5091`)
 
 Bugfixes
 ^^^^^^^^
