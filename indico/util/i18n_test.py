@@ -17,7 +17,11 @@ from speaklater import _LazyString
 from werkzeug.datastructures import LanguageAccept
 
 from indico.core.plugins import IndicoPlugin, plugin_engine
-from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, ngettext, session_language
+from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, ngettext, pgettext, session_language
+
+
+def _to_msgid(context, message):
+    return f'{context}\x04{message}'
 
 
 DICTIONARIES = {
@@ -34,7 +38,14 @@ DICTIONARIES = {
 
     'en_PI': {
         'I need a drink.': "I be needin' a bottle of rhum!"
-    }
+    },
+
+    'pl_PL': {
+        ('Convener', 0): 'Lider',
+        ('Convener', 1): 'Liderzy',
+        (_to_msgid('Dummy context', 'Convener'), 0): 'Lider (Context)',
+        (_to_msgid('Dummy context', 'Convener'), 1): 'Liderzy (Context)',
+    },
 }
 
 
@@ -165,3 +176,19 @@ def test_translation_plugins(app, tmpdir):
         assert _('This is not a string') == french_core_str
         assert gettext_context('This is not a string') == french_plugin_str
         assert gettext_plugin('This is not a string') == french_plugin_str
+
+
+@pytest.mark.usefixtures('mock_translations')
+def test_gettext_plurals():
+    session.lang = 'pl_PL'  # Polish
+
+    assert _('Convener') == 'Lider'
+    assert _('User') == 'User'
+
+
+@pytest.mark.usefixtures('mock_translations')
+def test_pgettext_plurals():
+    session.lang = 'pl_PL'  # Polish
+
+    assert pgettext('Dummy context', 'Convener') == 'Lider (Context)'
+    assert pgettext('Dummy context', 'User') == 'User'

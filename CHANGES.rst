@@ -23,6 +23,7 @@ Bugfixes
 
 - Fix certain registration list filters (checkin status & state) being combined
   with OR instead of AND (:pr:`5101`)
+- Fix translations not being taken into account in some places (:issue:`5073`, :pr:`5105`)
 
 
 Version 3.0.2
