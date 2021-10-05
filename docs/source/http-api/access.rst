@@ -70,7 +70,7 @@ OAuth flow have the ``indo_`` prefix instead.
 Scopes
 ~~~~~~
 
-API tokens can have one of these scopes:
+API tokens can have one or more of these scopes:
 
 .. exec::
     def main():
