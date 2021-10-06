@@ -58,7 +58,7 @@
                             {% endif %}
                             {% if track.can_convene(session.user) %}
                                 <div class="label i-tag">
-                                    {%- trans %}Convener{% endtrans -%}
+                                    {{- pgettext('track convener', 'Convener') -}}
                                 </div>
                             {% endif %}
                         </li>
