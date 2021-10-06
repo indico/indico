@@ -13,15 +13,15 @@ import {Translate} from '../i18n';
 
 export default function WTFMultipleTagSelectField({fieldId, wrapperId, choices}) {
   const parentElement = useMemo(() => document.getElementById(wrapperId), [wrapperId]);
-  const [value, setValue] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState([]);
 
   // Trigger change only after the DOM has changed
   useEffect(() => {
     parentElement.dispatchEvent(new Event('change', {bubbles: true}));
-  }, [value, parentElement]);
+  }, [selectedOptions, parentElement]);
 
   const handleChange = (e, {value}) => {
-    setValue(value);
+    setSelectedOptions(value);
   };
 
   const renderLabel = label => ({
@@ -50,13 +50,20 @@ export default function WTFMultipleTagSelectField({fieldId, wrapperId, choices})
         options={options}
         placeholder={Translate.string('Choose an option')}
         selection
-        value={value}
+        value={selectedOptions}
         renderLabel={renderLabel}
       />
       {/* Since Dropdown does not render as a <select> element, we use a dummy <select>
        * with the correct name attribute and options selected which are used when the form is submitted.
        */}
-      <select id={fieldId} name={fieldId} multiple readOnly value={value} style={{display: 'none'}}>
+      <select
+        id={fieldId}
+        name={fieldId}
+        multiple
+        readOnly
+        value={selectedOptions}
+        style={{display: 'none'}}
+      >
         {options.map(({key, text, value}) => (
           <option key={key} value={value}>
             {text}
