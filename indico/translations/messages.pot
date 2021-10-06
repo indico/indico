@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-09-13 17:04+0200\n"
+"POT-Creation-Date: 2021-10-06 10:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -412,8 +412,7 @@ msgstr ""
 msgid "Time and Place"
 msgstr ""
 
-#: indico/legacy/pdfinterface/conference.py:845 indico/modules/events/abstracts/templates/display/tracks.html:61
-#: indico/modules/events/persons/controllers.py:56
+#: indico/legacy/pdfinterface/conference.py:845 indico/modules/events/persons/controllers.py:56
 #: indico/modules/events/timetable/templates/display/indico/_session_block.html:46
 msgid "Convener"
 msgid_plural "Conveners"
@@ -5099,6 +5098,11 @@ msgid_plural "%(total)s abstracts"
 msgstr[0] ""
 msgstr[1] ""
 
+#: indico/modules/events/abstracts/templates/display/tracks.html:61
+msgctxt "track convener"
+msgid "Convener"
+msgstr ""
+
 #: indico/modules/events/abstracts/templates/forms/edit_review_tracks.html:3
 msgid "The abstract is being reviewed for the following tracks:"
 msgstr ""
@@ -6609,6 +6613,10 @@ msgstr ""
 
 #: indico/modules/events/contributions/models/fields.py:134
 msgid "No value"
+msgstr ""
+
+#: indico/modules/events/contributions/templates/contrib_list_filter.html:34
+msgid "Customize contribution list"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/contrib_list_filter.html:37
@@ -15639,28 +15647,6 @@ msgstr ""
 
 #: indico/util/date_time.py:314
 msgid "{date_fmt} 'at' {time_fmt}"
-msgstr ""
-
-#: indico/util/i18n_test.py:70 indico/util/i18n_test.py:80 indico/util/i18n_test.py:105
-msgid "Fetch the cow"
-msgstr ""
-
-#: indico/util/i18n_test.py:71 indico/util/i18n_test.py:81 indico/util/i18n_test.py:106
-msgid "The wheels"
-msgstr ""
-
-#: indico/util/i18n_test.py:97 indico/util/i18n_test.py:98
-msgid "{} cow"
-msgid_plural "{} cows"
-msgstr[0] ""
-msgstr[1] ""
-
-#: indico/util/i18n_test.py:114
-msgid "I need a drink."
-msgstr ""
-
-#: indico/util/i18n_test.py:159 indico/util/i18n_test.py:165
-msgid "This is not a string"
 msgstr ""
 
 #: indico/util/marshmallow.py:52
