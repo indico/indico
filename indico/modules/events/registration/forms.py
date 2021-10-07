@@ -213,6 +213,14 @@ class InvitationFormExisting(InvitationFormBase):
                                   .format(emails=', '.join(sorted(existing))))
 
 
+class ImportInvitationsForm(InvitationFormBase):
+    _invitation_fields = ('source_file', 'skip_existing') + InvitationFormBase._invitation_fields
+    source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
+                            accepted_file_types='.csv')
+    skip_existing = BooleanField(_('Skip existing invitations'), widget=SwitchWidget(), default=False,
+                                 description=_('If enabled, users with existing invitations will be ignored.'))
+
+
 class EmailRegistrantsForm(IndicoForm):
     from_address = SelectField(_('From'), [DataRequired()])
     cc_addresses = EmailListField(_('CC'),

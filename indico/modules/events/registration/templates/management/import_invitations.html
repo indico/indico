@@ -1,0 +1,38 @@
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_fieldset %}
+{% from 'message_box.html' import message_box %}
+
+{{ form_header(form, multipart=true, action=url_for('.import', regform)) }}
+{% call form_fieldset(_('Invitation details')) %}
+    {% call message_box('highlight', large_icon=true) %}
+        {% trans -%}
+            You should upload a CSV (comma-separated values) file with exactly 4 columns in the
+            following order:
+        {% endtrans %}
+        <ul>
+            <li>
+                {%- trans %}First Name{% endtrans -%}
+            </li>
+            <li>
+                {%- trans %}Last Name{% endtrans -%}
+            </li>
+            <li>
+                {%- trans %}Affiliation{% endtrans -%}
+            </li>
+            <li>
+                {%- trans %}E-mail{% endtrans -%}
+            </li>
+        </ul>
+        {% trans -%}
+            The fields "First Name", "Last Name" and "E-mail" are mandatory.
+        {%- endtrans %}
+        <br>
+    {% endcall %}
+    {{ form_rows(form, fields=form._invitation_fields) }}
+{% endcall %}
+{% call form_fieldset(_('Email')) %}
+    {{ form_rows(form, fields=form._email_fields) }}
+{% endcall %}
+{% call form_footer(form) %}
+    <input class="i-button big highlight" type="submit" value="{% trans %}Send{% endtrans %}" data-disabled-until-change>
+    <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+{% endcall %}

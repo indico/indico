@@ -36,7 +36,7 @@ from indico.modules.events.registration.models.invitations import InvitationStat
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormPersonalDataSection)
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
-from indico.modules.events.registration.notifications import (notify_registration_creation,
+from indico.modules.events.registration.notifications import (notify_invitation, notify_registration_creation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
 from indico.modules.users.util import get_user_by_email
@@ -47,6 +47,51 @@ from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import validate_email, validate_email_verbose
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
+
+
+def import_user_records_from_csv(fileobj, columns):
+    """Parse and do basic validation of user data from a CSV file.
+
+    :param fileobj: the CSV file to be read
+    :param columns: A list of column names, 'first_name', 'last_name', & 'email' are compulsory.
+    :return: A list dictionaries each representing one row,
+             the keys of which are given by the column names.
+    """
+    with csv_text_io_wrapper(fileobj) as ftxt:
+        reader = csv.reader(ftxt.read().splitlines())
+    used_emails = set()
+    email_row_map = {}
+    user_records = []
+    for row_num, row in enumerate(reader, 1):
+        values = [value.strip() for value in row]
+        if len(columns) != len(values):
+            raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
+                                 .format(row_num))
+        record = dict(zip(columns, values))
+
+        if not record['email']:
+            raise UserValueError(_('Row {}: missing e-mail address').format(row_num))
+        record['email'] = record['email'].lower()
+
+        if not validate_email(record['email']):
+            raise UserValueError(_('Row {}: invalid e-mail address').format(row_num))
+        if not record['first_name'] or not record['last_name']:
+            raise UserValueError(_('Row {}: missing first or last name').format(row_num))
+        record['first_name'] = record['first_name'].title()
+        record['last_name'] = record['last_name'].title()
+
+        if record['email'] in used_emails:
+            raise UserValueError(_('Row {}: email address is not unique').format(row_num))
+        if conflict_row_num := email_row_map.get(record['email']):
+            raise UserValueError(_('Row {}: email address belongs to the same user as in row {}')
+                                 .format(row_num, conflict_row_num))
+
+        used_emails.add(record['email'])
+        if user := get_user_by_email(record['email']):
+            email_row_map.update((e, row_num) for e in user.all_emails)
+
+        user_records.append(record)
+    return user_records
 
 
 def get_title_uuid(regform, title):
@@ -558,59 +603,86 @@ def update_regform_item_positions(regform):
             child.position = next(positions if child_active else disabled_positions)
 
 
+def create_invitation(regform, user, skip_moderation, email_from, email_subject, email_body):
+    invitation = RegistrationInvitation(
+        skip_moderation=skip_moderation,
+        email=user['email'],
+        first_name=user['first_name'],
+        last_name=user['last_name'],
+        affiliation=user['affiliation']
+    )
+    regform.invitations.append(invitation)
+    db.session.flush()
+    notify_invitation(invitation, email_subject, email_body, email_from)
+    return invitation
+
+
 def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False):
     """Import event registrants from a CSV file into a form."""
-    with csv_text_io_wrapper(fileobj) as ftxt:
-        reader = csv.reader(ftxt.read().splitlines())
+    columns = ['first_name', 'last_name', 'affiliation', 'position', 'phone', 'email']
+    user_records = import_user_records_from_csv(fileobj, columns=columns)
+
     reg_data = (db.session.query(Registration.user_id, Registration.email)
                 .with_parent(regform)
                 .filter(Registration.is_active)
                 .all())
     registered_user_ids = {rd.user_id for rd in reg_data if rd.user_id is not None}
     registered_emails = {rd.email for rd in reg_data}
-    used_emails = set()
-    email_row_map = {}
-    todo = []
-    for row_num, row in enumerate(reader, 1):
-        try:
-            first_name, last_name, affiliation, position, phone, email = (value.strip() for value in row)
-            email = email.lower()
-        except ValueError:
-            raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
-                                 .format(row_num))
 
-        if not email:
-            raise UserValueError(_('Row {}: missing e-mail address').format(row_num))
-        if not validate_email(email):
-            raise UserValueError(_('Row {}: invalid e-mail address').format(row_num))
-        if not first_name or not last_name:
-            raise UserValueError(_('Row {}: missing first or last name').format(row_num))
-        if email in registered_emails:
+    for row_num, record in enumerate(user_records, 1):
+        if record['email'] in registered_emails:
             raise UserValueError(_('Row {}: a registration with this email already exists').format(row_num))
 
-        user = get_user_by_email(email)
+        user = get_user_by_email(record['email'])
         if user and user.id in registered_user_ids:
             raise UserValueError(_('Row {}: a registration for this user already exists').format(row_num))
-        if email in used_emails:
-            raise UserValueError(_('Row {}: email address is not unique').format(row_num))
-        if conflict_row_num := email_row_map.get(email):
-            raise UserValueError(_('Row {}: email address belongs to the same user as in row {}')
-                                 .format(row_num, conflict_row_num))
 
-        used_emails.add(email)
-        if user:
-            email_row_map.update((e, row_num) for e in user.all_emails)
-
-        todo.append({
-            'email': email,
-            'first_name': first_name.title(),
-            'last_name': last_name.title(),
-            'affiliation': affiliation,
-            'phone': phone,
-            'position': position
-        })
     return [create_registration(regform, data, notify_user=notify_users, skip_moderation=skip_moderation)
-            for data in todo]
+            for data in user_records]
+
+
+def import_invitations_from_csv(regform, fileobj, email_from, email_subject, email_body,
+                                skip_moderation=True, skip_existing=False):
+    """Import invitations from a CSV file.
+
+    :return: A list of invitations and the number of skipped records which
+             is zero if skip_existing=False
+    """
+    columns = ['first_name', 'last_name', 'affiliation', 'email']
+    user_records = import_user_records_from_csv(fileobj, columns=columns)
+
+    reg_data = (db.session.query(Registration.user_id, Registration.email)
+                .with_parent(regform)
+                .filter(Registration.is_active)
+                .all())
+    registered_user_ids = {rd.user_id for rd in reg_data if rd.user_id is not None}
+    registered_emails = {rd.email for rd in reg_data}
+    invited_emails = {inv.email for inv in regform.invitations}
+
+    filtered_records = []
+    for row_num, user in enumerate(user_records, 1):
+        if user['email'] in registered_emails:
+            if skip_existing:
+                continue
+            raise UserValueError(_('Row {}: a registration with this email already exists').format(row_num))
+
+        indico_user = get_user_by_email(user['email'])
+        if indico_user and indico_user.id in registered_user_ids:
+            if skip_existing:
+                continue
+            raise UserValueError(_('Row {}: a registration for this user already exists').format(row_num))
+
+        if user['email'] in invited_emails:
+            if skip_existing:
+                continue
+            raise UserValueError(_('Row {}: an invitation for this user already exists').format(row_num))
+
+        filtered_records.append(user)
+
+    invitations = [create_invitation(regform, user, skip_moderation, email_from, email_subject, email_body)
+                   for user in filtered_records]
+    skipped_records = len(user_records) - len(filtered_records)
+    return invitations, skipped_records
 
 
 def get_registered_event_persons(event):

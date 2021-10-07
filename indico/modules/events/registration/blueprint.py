@@ -109,6 +109,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitat
                  invitations.RHRegistrationFormInvitations)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/invite', 'invite',
                  invitations.RHRegistrationFormInvite, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/import', 'import',
+                 invitations.RHRegistrationFormInviteImport, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>', 'delete_invitation',
                  invitations.RHRegistrationFormDeleteInvitation, methods=('DELETE',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>/decline',
