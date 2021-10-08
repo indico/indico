@@ -7,9 +7,20 @@
 
 from copy import deepcopy
 
+from marshmallow import fields, validate
 from wtforms.validators import DataRequired, Optional
 
+from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
+
+
+class BillableFieldDataSchema(mm.Schema):
+    is_billable = fields.Bool(load_default=False)
+    price = fields.Float(load_default=0)
+
+
+class LimitedPlacesBillableFieldDataSchema(BillableFieldDataSchema):
+    places_limit = fields.Integer(load_default=0, validate=validate.Range(0))
 
 
 class RegistrationFormFieldBase:
@@ -27,6 +38,10 @@ class RegistrationFormFieldBase:
     not_required_validator = Optional
     #: the data fields that need to be versioned
     versioned_data_fields = frozenset({'is_billable', 'price'})
+    #: the marshmallow base schema for configuring the field
+    setup_schema_base_cls = mm.Schema
+    #: a dict with extra marshmallow fields to include in the setup schema
+    setup_schema_fields = {}
 
     def __init__(self, form_item):
         self.form_item = form_item
@@ -67,6 +82,11 @@ class RegistrationFormFieldBase:
         elif self.not_required_validator:
             validators.append(self.not_required_validator())
         return self.wtf_field_class(self.form_item.title, validators, **self.wtf_field_kwargs)
+
+    def create_setup_schema(self):
+        name = f'{type(self).__name__}SetupDataSchema'
+        schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
+        return schema()
 
     def has_data_changed(self, value, old_data):
         return value != old_data.data
@@ -135,6 +155,8 @@ class RegistrationFormFieldBase:
 
 
 class RegistrationFormBillableField(RegistrationFormFieldBase):
+    setup_schema_base_cls = BillableFieldDataSchema
+
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         data = deepcopy(data)
@@ -154,6 +176,8 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
 
 
 class RegistrationFormBillableItemsField(RegistrationFormBillableField):
+    setup_schema_base_cls = mm.Schema
+
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super().process_field_data(

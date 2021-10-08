@@ -10,10 +10,12 @@ from datetime import datetime
 from operator import itemgetter
 
 import wtforms
+from marshmallow import fields, validate
 from werkzeug.datastructures import FileStorage
 from wtforms.validators import InputRequired, NumberRange, ValidationError
 
-from indico.modules.events.registration.fields.base import RegistrationFormBillableField, RegistrationFormFieldBase
+from indico.modules.events.registration.fields.base import (LimitedPlacesBillableFieldDataSchema,
+                                                            RegistrationFormBillableField, RegistrationFormFieldBase)
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.fs import secure_client_filename
@@ -26,12 +28,20 @@ from indico.web.forms.validators import IndicoEmail
 class TextField(RegistrationFormFieldBase):
     name = 'text'
     wtf_field_class = wtforms.StringField
+    setup_schema_fields = {
+        'length': fields.Integer(load_default=None, validate=validate.Range(5, 60)),
+        'min_length': fields.Integer(load_default=None, validate=validate.Range(1)),
+        'max_length': fields.Integer(load_default=None, validate=validate.Range(1)),
+    }
 
 
 class NumberField(RegistrationFormBillableField):
     name = 'number'
     wtf_field_class = wtforms.IntegerField
     required_validator = InputRequired
+    setup_schema_fields = {
+        'min_value': fields.Integer(load_default=0, validate=validate.Range(0)),
+    }
 
     @property
     def validators(self):
@@ -52,11 +62,16 @@ class NumberField(RegistrationFormBillableField):
 class TextAreaField(RegistrationFormFieldBase):
     name = 'textarea'
     wtf_field_class = wtforms.StringField
+    setup_schema_fields = {
+        'number_of_columns': fields.Integer(load_default=None, validate=validate.Range(1, 60)),
+        'number_of_rows': fields.Integer(load_default=None, validate=validate.Range(1, 20)),
+    }
 
 
 class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
     wtf_field_class = wtforms.BooleanField
+    setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
@@ -109,6 +124,25 @@ class CheckboxField(RegistrationFormBillableField):
 class DateField(RegistrationFormFieldBase):
     name = 'date'
     wtf_field_class = wtforms.StringField
+    setup_schema_fields = {
+        'date_format': fields.String(required=True, validate=validate.OneOf([
+            '%d/%m/%Y %H:%M',
+            '%d.%m.%Y %H:%M',
+            '%m/%d/%Y %H:%M',
+            '%m.%d.%Y %H:%M',
+            '%Y/%m/%d %H:%M',
+            '%Y.%m.%d %H:%M',
+            '%d/%m/%Y',
+            '%d.%m.%Y',
+            '%m/%d/%Y',
+            '%m.%d.%Y',
+            '%Y/%m/%d',
+            '%Y.%m.%d',
+            '%m/%Y',
+            '%m.%Y',
+            '%Y'
+        ])),
+    }
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         if value:
@@ -135,6 +169,10 @@ class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     wtf_field_class = IndicoRadioField
     required_validator = InputRequired
+    setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
+    setup_schema_fields = {
+        'default_value': fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no'])),
+    }
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
