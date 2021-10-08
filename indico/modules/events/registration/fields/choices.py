@@ -11,16 +11,19 @@ from copy import deepcopy
 from datetime import date, datetime
 from uuid import uuid4
 
+from marshmallow import fields, post_load, pre_load, validate
 from sqlalchemy.dialects.postgresql import ARRAY
 from wtforms.validators import ValidationError
 
 from indico.core.db import db
-from indico.modules.events.registration.fields.base import (RegistrationFormBillableField,
+from indico.modules.events.registration.fields.base import (LimitedPlacesBillableFieldDataSchema,
+                                                            RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import format_date, iterdays
 from indico.util.i18n import _
+from indico.util.marshmallow import not_empty
 from indico.util.string import camelize_keys, snakify_keys
 from indico.web.forms.fields import JSONField
 
@@ -60,10 +63,32 @@ def _get_choice_by_id(choice_id, choices):
             return choice
 
 
+class ChoiceItemSchema(LimitedPlacesBillableFieldDataSchema):
+    id = fields.UUID()
+    is_enabled = fields.Bool(required=True)
+    max_extra_slots = fields.Integer(missing=0, validate=validate.Range(0, 99))
+    extra_slots_pay = fields.Bool(missing=False)
+    caption = fields.String(required=True, validate=not_empty)
+
+    @post_load
+    def _stringify_uuid(self, data, **kwargs):
+        if 'id' in data:
+            data['id'] = str(data['id'])
+        return data
+
+
 class ChoiceBaseField(RegistrationFormBillableItemsField):
     versioned_data_fields = RegistrationFormBillableItemsField.versioned_data_fields | {'choices'}
     has_default_item = False
     wtf_field_class = JSONField
+    setup_schema_fields = {
+        'default_item': fields.String(missing=None),
+        'with_extra_slots': fields.Bool(missing=False),
+        # TODO when moving the frontend to react, make sure it's always sent and make it required.
+        # the legacy angular UI sometimes omits this...
+        'item_type': fields.String(missing='dropdown', validate=validate.OneOf(['dropdown', 'radiogroup'])),
+        'choices': fields.List(fields.Nested(ChoiceItemSchema), required=True, validate=not_empty)
+    }
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
@@ -308,17 +333,46 @@ class MultiChoiceField(ChoiceBaseField):
 
 
 def _to_machine_date(date):
-    return datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
+    return date.strftime('%Y-%m-%d')
 
 
 def _to_date(date):
     return datetime.strptime(date, '%Y-%m-%d').date()
 
 
+class AccommodationItemSchema(LimitedPlacesBillableFieldDataSchema):
+    id = fields.UUID()
+    is_enabled = fields.Bool(required=True)
+    is_no_accommodation = fields.Bool(missing=False)
+    caption = fields.String(required=True, validate=not_empty)
+
+    @pre_load
+    def _remove_noise(self, data, **kwargs):
+        # TODO remove this once the angular frontend is gone
+        data = data.copy()
+        data.pop('placeholder', None)
+        return data
+
+    @post_load
+    def _stringify_uuid(self, data, **kwargs):
+        if 'id' in data:
+            data['id'] = str(data['id'])
+        return data
+
+
 class AccommodationField(RegistrationFormBillableItemsField):
     name = 'accommodation'
     wtf_field_class = JSONField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
+    setup_schema_fields = {
+        # TODO: switch to standard %Y-%m-%d (iso) format in the frontend and then get rid
+        # of the format strings here (default is iso format)
+        'arrival_date_from': fields.Date('%d/%m/%Y', required=True),
+        'arrival_date_to': fields.Date('%d/%m/%Y', required=True),
+        'departure_date_from': fields.Date('%d/%m/%Y', required=True),
+        'departure_date_to': fields.Date('%d/%m/%Y', required=True),
+        'choices': fields.List(fields.Nested(AccommodationItemSchema), required=True, validate=not_empty)
+    }
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):

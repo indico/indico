@@ -6,28 +6,75 @@
 # LICENSE file for more details.
 
 from flask import jsonify, request, session
+from marshmallow import EXCLUDE, ValidationError, fields, post_load, pre_load, validates
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
+from indico.core.marshmallow import mm
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
+from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
 from indico.modules.events.registration.util import update_regform_item_positions
+from indico.util.marshmallow import not_empty
 from indico.util.string import snakify_keys
 
 
-def _fill_form_field_with_data(field, field_data, set_data=True):
-    field.title = field_data.pop('title')
-    field.description = field_data.pop('description', '')
-    field.is_enabled = field_data.pop('is_enabled')
-    field.is_required = field_data.pop('is_required', False)
-    field.input_type = field_data.pop('input_type', None)
-    if set_data:
+class GeneralFieldDataSchema(mm.Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    title = fields.String(required=True, validate=not_empty)
+    description = fields.String(missing='')
+    is_required = fields.Bool(missing=False)
+    input_type = fields.String(required=True, validate=not_empty)
+
+    @pre_load
+    def _remove_noise(self, data, **kwargs):
+        # TODO remove this once the angular frontend is gone. we never allow enabling
+        # or disabling a field here; that's handled in a separate request
+        data = data.copy()
+        data.pop('is_enabled', None)
+        return data
+
+    @validates('input_type')
+    def _check_input_type(self, input_type, **kwargs):
+        field = self.context['field']
+        if field.input_type is not None and field.input_type != input_type:
+            # TODO: when moving the frontend to react we should probably simply
+            # stop sending it except when creating a new field and reject requests
+            # that contain an input_type
+            raise ValidationError('Cannot change field input type')
+        if input_type not in get_field_types():
+            raise ValidationError('Invalid field type')
+
+    @post_load(pass_original=True)
+    def _split_unknown(self, data, original_data, **kwargs):
+        parsed = {k: v for k, v in data.items() if k in self.load_fields}
+        unknown = {k: v for k, v in original_data.items() if k not in self.load_fields}
+        unknown.pop('is_enabled', None)  # TODO: remove together with _remove_noise
+        return parsed, unknown
+
+
+class TextDataSchema(GeneralFieldDataSchema):
+    class Meta(GeneralFieldDataSchema.Meta):
+        exclude = ('is_required', 'input_type')
+
+
+def _fill_form_field_with_data(field, field_data, is_static_text=False):
+    schema_cls = TextDataSchema if is_static_text else GeneralFieldDataSchema
+    schema = schema_cls(context={'field': field})
+    general_data, raw_field_specific_data = schema.load(field_data)
+    for key, value in general_data.items():
+        setattr(field, key, value)
+    if not is_static_text:
+        schema = field.field_impl.create_setup_schema()
+        field_specific_data = schema.load(raw_field_specific_data)
         if field.id is None:  # new field
-            field.data, field.versioned_data = field.field_impl.process_field_data(field_data)
+            field.data, field.versioned_data = field.field_impl.process_field_data(field_specific_data)
         else:
-            field.data, field.versioned_data = field.field_impl.process_field_data(field_data, field.data,
+            field.data, field.versioned_data = field.field_impl.process_field_data(field_specific_data, field.data,
                                                                                    field.versioned_data)
 
 
@@ -134,7 +181,7 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
         del field_data['input_type']
-        _fill_form_field_with_data(self.field, field_data, set_data=False)
+        _fill_form_field_with_data(self.field, field_data, is_static_text=True)
         return jsonify(view_data=self.field.view_data)
 
 
@@ -150,7 +197,7 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
         field_data = snakify_keys(request.json['fieldData'])
         del field_data['input_type']
         form_field = RegistrationFormText(parent_id=self.section.id, registration_form=self.regform)
-        _fill_form_field_with_data(form_field, field_data, set_data=False)
+        _fill_form_field_with_data(form_field, field_data, is_static_text=True)
         db.session.add(form_field)
         db.session.flush()
         return jsonify(view_data=form_field.view_data)
