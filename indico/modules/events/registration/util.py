@@ -188,8 +188,6 @@ def create_personal_data_fields(regform):
             continue
         field = RegistrationFormPersonalDataField(registration_form=regform, personal_data_type=pd_type,
                                                   is_required=pd_type.is_required)
-        if not data.get('is_enabled', True):
-            field.position = data['position']
         for key, value in data.items():
             setattr(field, key, value)
         field.data, versioned_data = field.field_impl.process_field_data(data.pop('data', {}))

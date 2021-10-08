@@ -73,19 +73,23 @@ class PersonalDataType(int, IndicoEnum):
         return [
             (cls.first_name, {
                 'title': cls.first_name.get_title(),
-                'input_type': 'text'
+                'input_type': 'text',
+                'position': 1
             }),
             (cls.last_name, {
                 'title': cls.last_name.get_title(),
-                'input_type': 'text'
+                'input_type': 'text',
+                'position': 2
             }),
             (cls.email, {
                 'title': cls.email.get_title(),
-                'input_type': 'email'
+                'input_type': 'email',
+                'position': 3
             }),
             (cls.affiliation, {
                 'title': cls.affiliation.get_title(),
-                'input_type': 'text'
+                'input_type': 'text',
+                'position': 4
             }),
             # Fields disabled by default start in position 1000 to avoid problems reordering
             (cls.address, {
