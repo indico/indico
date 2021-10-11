@@ -33,6 +33,12 @@ Bugfixes
 - Remove deleted registration forms from ACLs (:issue:`5130`, :pr:`5131`, thanks
   :user:`jbtwist`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Truncate file names to 150 characters to avoid hitting file system path limits
+  (:pr:`5116`, thanks :user:`vasantvohra`)
+
 
 Version 3.0.2
 -------------
