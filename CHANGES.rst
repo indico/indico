@@ -17,6 +17,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Support TLS certificates for SMTP authentication (:pr:`5100`, thanks :user:`dweinholz`)
+- Add CSV/Excel contribution list exports containing affiliations (:issue:`5114`, :pr:`5118`)
 
 Bugfixes
 ^^^^^^^^
