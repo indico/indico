@@ -1,0 +1,141 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2021 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import addTemplateURL from 'indico-url:receipts.add_template';
+import editTemplateURL from 'indico-url:receipts.edit_template';
+import templateURL from 'indico-url:receipts.template';
+import templateListURL from 'indico-url:receipts.template_list';
+
+import PropTypes from 'prop-types';
+import React, {useReducer} from 'react';
+import {useHistory} from 'react-router';
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+
+import {handleSubmitError} from 'indico/react/forms';
+import {routerPathFromFlask, useNumericParam} from 'indico/react/util/routing';
+import {indicoAxios} from 'indico/utils/axios';
+
+import TemplateListPane from './TemplateListPane';
+import TemplatePane from './TemplatePane';
+import {templateSchema} from './util';
+
+const targetLocatorSchema = PropTypes.shape({
+  event_id: PropTypes.number,
+  category_id: PropTypes.number,
+});
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'ADD_TEMPLATE':
+      return {...state, ownTemplates: [...state.ownTemplates, action.template]};
+    case 'UPDATE_TEMPLATE':
+      return {
+        ...state,
+        ownTemplates: state.ownTemplates.map(tpl =>
+          tpl.id === action.id ? {...tpl, ...action.changes} : tpl
+        ),
+      };
+    case 'DELETE_TEMPLATE':
+      return {...state, ownTemplates: state.ownTemplates.filter(tpl => tpl.id !== action.id)};
+    default:
+      return state;
+  }
+}
+
+function EditTemplatePane({templates, dispatch, targetLocator}) {
+  const templateId = useNumericParam('template_id');
+  const history = useHistory();
+
+  const saveTemplate = async data => {
+    try {
+      await indicoAxios.patch(editTemplateURL({template_id: templateId, ...targetLocator}), data);
+      dispatch({type: 'UPDATE_TEMPLATE', id: templateId, changes: data});
+      // back to list of templates
+      history.push(templateListURL(targetLocator));
+    } catch (err) {
+      return handleSubmitError(err);
+    }
+  };
+
+  return (
+    <TemplatePane
+      targetLocator={targetLocator}
+      template={templates.find(tpl => tpl.id === templateId)}
+      onSubmit={saveTemplate}
+    />
+  );
+}
+
+EditTemplatePane.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  targetLocator: targetLocatorSchema.isRequired,
+  templates: PropTypes.arrayOf(templateSchema).isRequired,
+};
+
+function NewTemplatePane({dispatch, targetLocator}) {
+  const history = useHistory();
+
+  const createTemplate = async data => {
+    try {
+      const {data: template} = await indicoAxios.post(addTemplateURL(targetLocator), data);
+      dispatch({type: 'ADD_TEMPLATE', template});
+      // back to list of templates
+      history.push(templateListURL(targetLocator));
+    } catch (err) {
+      return handleSubmitError(err);
+    }
+  };
+
+  return <TemplatePane onSubmit={createTemplate} targetLocator={targetLocator} />;
+}
+
+NewTemplatePane.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  targetLocator: targetLocatorSchema.isRequired,
+};
+
+export default function ReceiptTemplateManagement({initialState, targetLocator}) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const targetIdParams = Object.keys(targetLocator);
+  return (
+    <Router>
+      <Switch>
+        <Route
+          exact
+          path={routerPathFromFlask(addTemplateURL, targetIdParams)}
+          render={() => <NewTemplatePane dispatch={dispatch} targetLocator={targetLocator} />}
+        />
+        <Route
+          exact
+          path={[routerPathFromFlask(templateURL, [...targetIdParams, 'template_id'])]}
+          render={() => (
+            <EditTemplatePane
+              templates={state.ownTemplates}
+              dispatch={dispatch}
+              targetLocator={targetLocator}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={routerPathFromFlask(templateListURL, targetIdParams)}
+          component={() => (
+            <TemplateListPane dispatch={dispatch} targetLocator={targetLocator} {...state} />
+          )}
+        />
+      </Switch>
+    </Router>
+  );
+}
+
+ReceiptTemplateManagement.propTypes = {
+  initialState: PropTypes.shape({
+    ownTemplates: PropTypes.arrayOf(templateSchema),
+    inheritedTemplates: PropTypes.arrayOf(templateSchema),
+  }).isRequired,
+  targetLocator: targetLocatorSchema.isRequired,
+};

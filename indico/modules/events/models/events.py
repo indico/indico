@@ -428,6 +428,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - paper_review_questions (PaperReviewQuestion.event)
     # - paper_templates (PaperTemplate.event)
     # - persons (EventPerson.event)
+    # - receipt_templates (ReceiptTemplate.event)
     # - registration_forms (RegistrationForm.event)
     # - registration_tags (RegistrationTag.event)
     # - registrations (Registration.event)
