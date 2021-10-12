@@ -4,6 +4,7 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
+
 import menuEntriesURL from 'indico-url:event_editing.api_menu_entries';
 
 import PropTypes from 'prop-types';

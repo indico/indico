@@ -4,6 +4,7 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
+
 /* global ajaxDialog:false */
 
 import anonymousTeamURL from 'indico-url:event_editing.api_anonymous_team';
