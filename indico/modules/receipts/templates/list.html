@@ -1,0 +1,23 @@
+{% extends 'categories/management/base.html' if category|default(none) else 'events/management/base.html' %}
+
+{% macro render_template_row(tpl) %}
+    <td>
+       {{ tpl.title }}
+    </td>
+{% endmacro %}
+
+{% block title %}
+    {% trans %}Receipt / Certificate Templates{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div id="template-list"></div>
+    <script>
+        setupReceiptTemplateList(
+            document.querySelector('#template-list'),
+            {{ own_templates | tojson }},
+            {{ inherited_templates | tojson }},
+            {{ target_locator | tojson }}
+        );
+    </script>
+{% endblock %}
