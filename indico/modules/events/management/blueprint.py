@@ -60,6 +60,9 @@ _bp.add_url_rule('/program-codes/assign/contributions', 'assign_program_codes_co
                  program_codes.RHAssignProgramCodesContributions, methods=('GET', 'POST'))
 _bp.add_url_rule('/program-codes/assign/subcontributions', 'assign_program_codes_subcontributions',
                  program_codes.RHAssignProgramCodesSubContributions, methods=('GET', 'POST'))
+# Program Codes API
+_bp.add_url_rule('/api/program-codes/contributions', 'api_program_codes_contributions',
+                 program_codes.RHProgramCodesAPIContributions, methods=('GET', 'PATCH'))
 
 
 for object_type, prefixes in event_management_object_url_prefixes.items():
