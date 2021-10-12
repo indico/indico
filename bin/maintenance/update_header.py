@@ -108,7 +108,8 @@ def gen_header(data):
         data['dates'] = data['start_year']
     else:
         data['dates'] = '{} - {}'.format(data['start_year'], data['end_year'])
-    return '\n'.join(line.rstrip() for line in data['header'].format(**data).strip().splitlines())
+    comment = '\n'.join(line.rstrip() for line in data['header'].format(**data).strip().splitlines())
+    return f'{comment}\n'
 
 
 def _update_header(file_path, config, substring, regex, data, ci):
@@ -123,7 +124,9 @@ def _update_header(file_path, config, substring, regex, data, ci):
         for match in regex.finditer(content):
             if substring in match.group():
                 found = True
-                content = content[:match.start()] + gen_header(data | config) + content[match.end():]
+                match_end = content[match.end():].lstrip()
+                match_end = f'\n{match_end}' if match_end else match_end
+                content = content[:match.start()] + gen_header(data | config) + match_end
         if shebang_line:
             content = shebang_line + '\n' + content
     if content != orig_content:
