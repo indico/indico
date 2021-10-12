@@ -52,13 +52,14 @@
         </div>
     {%- endif -%}
     {%- if event.is_unlisted and event.can_manage(session.user) -%}
-        <div class="action-box info">
+        <div class="action-box warning">
             <div class="section">
                 <div class="icon icon-unlisted-event"></div>
                 <div class="text">
                     <div class="label">{% trans %}This event is currently unlisted{% endtrans %}</div>
                     {% trans %}
-                        Unlisted events are not shown in any category and only explicitly authorized users can see them.
+                        Unlisted events are not shown in any category and only explicitly authorized users can see them.<br>
+                        <strong>Please note:</strong> If you want to preserve events long-term, you should consider publishing them to a category.
                     {% endtrans %}
                 </div>
             </div>
