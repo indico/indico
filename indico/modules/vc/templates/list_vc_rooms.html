@@ -1,22 +1,38 @@
-{% macro render_vc_room(event_vc_room, event) -%}
+{% macro render_vc_room(event_vc_room, event, details=true, single=false) -%}
     {% set vc_room = event_vc_room.vc_room %}
     {% set plugin = vc_room.plugin %}
-    <div class="event-service-row">
-        <div class="event-service-row-collapsed clearfix">
-            <div class="event-service-info event-service-row-toggle trigger left">
-                <img src="{{ plugin.icon_url }}" style="height: 16px;" alt="">
-                <span class="event-service-title">{{ vc_room.name }}</span>
+    {% if details %}
+        <div class="event-service-row">
+            <div class="event-service-row-collapsed clearfix">
+                <div class="event-service-info event-service-row-toggle trigger left">
+                    <img src="{{ plugin.icon_url }}" style="height: 16px;" alt="">
+                    <span class="event-service-title">{{ vc_room.name }}</span>
+                </div>
+                {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
             </div>
+            <div class="event-service-details">
+                {{ plugin.render_info_box(vc_room, event_vc_room, event) | safe }}
+            </div>
+            <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
+        </div>
+    {% else %}
+        {% if single %}
             {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
-        </div>
-        <div class="event-service-details">
-            {{ plugin.render_info_box(vc_room, event_vc_room, event) | safe }}
-        </div>
-        <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
-    </div>
+        {% else %}
+            <div class="event-service-row">
+                <div class="event-service-row-collapsed clearfix">
+                    <div class="event-service-info left">
+                        <img src="{{ plugin.icon_url }}" style="height: 16px;" alt="">
+                        <span class="event-service-title">{{ vc_room.name }}</span>
+                    </div>
+                    {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
 {%- endmacro %}
 
-{% macro render_vc_rooms_list(event, event_vc_rooms, linked_to=None) -%}
+{% macro render_vc_rooms_list(event, event_vc_rooms, linked_to=None, details=true) -%}
     <div>
         {% if linked_to %}
             {% if linked_to.event %}
@@ -49,7 +65,7 @@
             {% endif %}
         {% else %}
             {% for event_vc_room in event_vc_rooms %}
-                {{ render_vc_room(event_vc_room, event) }}
+                {{ render_vc_room(event_vc_room, event, details, single=event_vc_rooms|length == 1) }}
             {% endfor %}
         {% endif %}
     </div>

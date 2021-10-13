@@ -246,7 +246,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
             'active_menu_item': self.sidemenu_option,
             'bg_color_css': 'background: #{0}; border-color: #{0};'.format(bg_color) if bg_color else '',
             'text_color_css': f'color: #{text_color};' if text_color else '',
-            'announcement': announcement
+            'announcement': announcement,
         }
 
     def get_extra_css_files(self):
@@ -297,7 +297,8 @@ class WPConferenceDisplay(WPConferenceDisplayBase):
     menu_entry_name = 'overview'
 
     def _get_body(self, params):
-        return render_template('events/display/conference.html', **self._kwargs)
+        show_vc_rooms = layout_settings.get(self.event, 'show_vc_rooms')
+        return render_template('events/display/conference.html', show_vc_rooms=show_vc_rooms, **self._kwargs)
 
     def _get_footer(self):
         return render_event_footer(self.event)

@@ -10,7 +10,7 @@
     {% call simple_form(form, save_reminder=true, back_button=false) %}
         {% call form_fieldset(_('General')) %}
             {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges',
-                                       'name_format')) }}
+                                       'name_format', 'show_vc_rooms')) }}
         {% endcall %}
         {% call form_fieldset(_('Header Style')) %}
             {{ form_rows(form, fields=('header_text_color', 'header_background_color')) }}

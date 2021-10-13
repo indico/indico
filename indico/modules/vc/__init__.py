@@ -23,6 +23,14 @@ from indico.web.menu import SideMenuItem, TopMenuItem
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase', 'VCRoomEventAssociation')
 
 
+@template_hook('conference-home-info')
+def _inject_conference_home(event, **kwargs):
+    res = VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True)
+    event_vc_rooms = [event_vc_room for event_vc_room in res.all() if event_vc_room.vc_room.plugin is not None]
+    if event_vc_rooms:
+        return render_template('vc/conference_home.html', event=event, event_vc_rooms=event_vc_rooms)
+
+
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
     res = VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True)

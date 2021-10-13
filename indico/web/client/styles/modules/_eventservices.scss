@@ -16,6 +16,20 @@ div.event-service-association-title {
   }
 }
 
+.text.conference {
+  align-self: center;
+
+  .event-service-row {
+    border-radius: 2px;
+    border: 1px solid $pastel-blue;
+    background-color: #f9f9f9;
+  }
+}
+
+.event-service-toolbar.vc-toolbar.toolbar.right {
+  margin-right: 0;
+}
+
 div.event-service-row {
   border: 1px solid $pastel-gray;
   background-color: $light-gray;
