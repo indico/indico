@@ -40,7 +40,6 @@ from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateM
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
-from indico.modules.events.registration.schemas import RegistrationTagSchema
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
                                                      get_event_section_data, get_ticket_attachments, get_title_uuid,
@@ -63,6 +62,8 @@ badge_cache = make_scoped_cache('badge-printing')
 
 
 def _render_registration_details(registration):
+    from indico.modules.events.registration.schemas import RegistrationTagSchema
+
     event = registration.registration_form.event
     tpl = get_template_module('events/registration/management/_registration_details.html')
 
