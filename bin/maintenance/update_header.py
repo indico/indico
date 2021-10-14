@@ -45,6 +45,9 @@ SUPPORTED_FILES = {
     'scss': {
         'regex': re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
         'format': {'comment_start': '//', 'comment_middle': '//', 'comment_end': ''}},
+    'sh': {
+        'regex': re.compile(r'((^#|[\r\n]#).*)*'),
+        'format': {'comment_start': '#', 'comment_middle': '#', 'comment_end': ''}},
 }
 
 
