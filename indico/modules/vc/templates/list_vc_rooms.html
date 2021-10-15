@@ -1,7 +1,6 @@
-{% macro render_vc_room(event_vc_room, event, details=true, single=false) -%}
+{% macro render_vc_room(event_vc_room, event) -%}
     {% set vc_room = event_vc_room.vc_room %}
     {% set plugin = vc_room.plugin %}
-    {% if details %}
         <div class="event-service-row">
             <div class="event-service-row-collapsed clearfix">
                 <div class="event-service-info event-service-row-toggle trigger left">
@@ -15,12 +14,17 @@
             </div>
             <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
         </div>
-    {% else %}
-        {% if single %}
+{%- endmacro %}
+
+{%- macro render_conference_vc_rooms_list(event, event_vc_rooms) -%}
+    {% for event_vc_room in event_vc_rooms %}
+        {% set vc_room = event_vc_room.vc_room %}
+        {% set plugin = vc_room.plugin %}
+        {% if loop.length == 1 %}
             {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
         {% else %}
             <div class="event-service-row">
-                <div class="event-service-row-collapsed clearfix">
+                <div class="event-service-row-collapsed conference clearfix">
                     <div class="event-service-info left">
                         <img src="{{ plugin.icon_url }}" style="height: 16px;" alt="">
                         <span class="event-service-title">{{ vc_room.name }}</span>
@@ -29,10 +33,10 @@
                 </div>
             </div>
         {% endif %}
-    {% endif %}
+    {% endfor %}
 {%- endmacro %}
 
-{% macro render_vc_rooms_list(event, event_vc_rooms, linked_to=None, details=true) -%}
+{% macro render_vc_rooms_list(event, event_vc_rooms, linked_to=None) -%}
     <div>
         {% if linked_to %}
             {% if linked_to.event %}
@@ -65,7 +69,7 @@
             {% endif %}
         {% else %}
             {% for event_vc_room in event_vc_rooms %}
-                {{ render_vc_room(event_vc_room, event, details, single=event_vc_rooms|length == 1) }}
+                {{ render_vc_room(event_vc_room, event) }}
             {% endfor %}
         {% endif %}
     </div>

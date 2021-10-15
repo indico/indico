@@ -297,8 +297,7 @@ class WPConferenceDisplay(WPConferenceDisplayBase):
     menu_entry_name = 'overview'
 
     def _get_body(self, params):
-        show_vc_rooms = layout_settings.get(self.event, 'show_vc_rooms')
-        return render_template('events/display/conference.html', show_vc_rooms=show_vc_rooms, **self._kwargs)
+        return render_template('events/display/conference.html', **self._kwargs)
 
     def _get_footer(self):
         return render_event_footer(self.event)
