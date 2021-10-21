@@ -6,7 +6,9 @@
 # LICENSE file for more details.
 
 from flask import flash, redirect
+from werkzeug.exceptions import Forbidden
 
+from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import PrivacyDashboardForm
 from indico.modules.events.management.settings import privacy_settings
@@ -26,3 +28,8 @@ class RHEventPrivacy(RHManageEventBase):
             flash(_('Privacy settings have been updated'), 'success')
             return redirect(url_for('.privacy', self.event))
         return WPEventPrivacy.render_template('privacy_dashboard.html', self.event, 'privacy', form=form)
+
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
+        if not config.ENABLE_PRIVACY_DASHBOARD:
+            raise Forbidden(_('The Privacy dashboard feature is disabled.'))

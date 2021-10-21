@@ -8,6 +8,7 @@
 from flask import session
 
 from indico.core import signals
+from indico.core.config import config
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, SideMenuSection
@@ -30,8 +31,9 @@ def _sidemenu_items(sender, event, **kwargs):
         yield SideMenuItem('settings', _('Settings'), url_for('event_management.settings', event), 100, icon='settings')
         yield SideMenuItem('protection', _('Protection'), url_for('event_management.protection', event),
                            70, icon='shield')
-        yield SideMenuItem('privacy', _('Privacy dashboard'), url_for('event_management.privacy', event),
-                           70, icon='lock')
+        if config.ENABLE_PRIVACY_DASHBOARD:
+            yield SideMenuItem('privacy', _('Privacy dashboard'), url_for('event_management.privacy', event),
+                               69, icon='lock')
         if event.type_ == EventType.conference:
             yield SideMenuItem('program_codes', _('Program Codes'), url_for('event_management.program_codes', event),
                                section='advanced')
