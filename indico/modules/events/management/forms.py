@@ -235,8 +235,10 @@ class PrivacyDashboardForm(IndicoForm):
     _privacy_policy_fields = ('privacy_policy_url', 'privacy_policy_text')
     data_controller_name = StringField(_('Person/Institution'))
     data_controller_email = EmailField(_('Contact email'), [Email()])
-    privacy_policy_url = URLField(_('URL'), [Optional(), URL()])
-    privacy_policy_text = TextAreaField(_('Text'))
+    privacy_policy_url = URLField(_('URL'), [Optional(), URL()],
+                                  description=_('The URL to an external page with the privacy policy'))
+    privacy_policy_text = TextAreaField(_('Text'), widget=CKEditorWidget(),
+                                        description=_('Only used if no URL is provided'))
 
 
 class EventProtectionForm(IndicoForm):
