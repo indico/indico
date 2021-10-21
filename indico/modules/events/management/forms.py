@@ -13,9 +13,9 @@ from flask import request, session
 from markupsafe import escape
 from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
-from wtforms import BooleanField, FloatField, SelectField, StringField, TextAreaField
+from wtforms import BooleanField, EmailField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.fields import IntegerField, URLField
-from wtforms.validators import URL, DataRequired, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import URL, Email, DataRequired, InputRequired, NumberRange, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
@@ -228,6 +228,15 @@ class EventClassificationForm(IndicoForm):
         if not self.label.query.has_rows():
             del self.label
             del self.label_message
+
+
+class PrivacyDashboardForm(IndicoForm):
+    _data_controller_fields = ('data_controller_name', 'data_controller_email')
+    _privacy_policy_fields = ('privacy_policy_url', 'privacy_policy_text')
+    data_controller_name = StringField(_('Person/Institution'))
+    data_controller_email = EmailField(_('Contact email'), [Email()])
+    privacy_policy_url = URLField(_('URL'), [Optional(), URL()])
+    privacy_policy_text = TextAreaField(_('Text'))
 
 
 class EventProtectionForm(IndicoForm):

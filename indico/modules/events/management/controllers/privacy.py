@@ -5,13 +5,24 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import flash, redirect
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
+from indico.modules.events.management.forms import PrivacyDashboardForm
+from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.management.views import WPEventPrivacy
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 
 
 class RHEventPrivacy(RHManageEventBase):
     """Show event privacy dashboard."""
 
     def _process(self):
-        return WPEventPrivacy.render_template('privacy_dashboard.html', self.event, 'privacy')
+        form = PrivacyDashboardForm(obj=FormDefaults(**privacy_settings.get_all(self.event)), event=self.event)
+        if form.validate_on_submit():
+            privacy_settings.set_multi(self.event, form.data)
+            flash(_('Privacy settings have been updated'), 'success')
+            return redirect(url_for('.privacy', self.event))
+        return WPEventPrivacy.render_template('privacy_dashboard.html', self.event, 'privacy', form=form)
