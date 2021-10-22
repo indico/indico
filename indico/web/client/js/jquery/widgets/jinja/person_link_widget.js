@@ -13,18 +13,19 @@ import {camelizeKeys} from 'indico/utils/case';
 
 (function(global) {
   global.setupPersonLinkWidget = function setupPersonLinkWidget(options) {
-    const field = document.getElementById(options.fieldId);
+    const {fieldId, eventId, roles, ...rest} = options;
+    const field = document.getElementById(fieldId);
     const persons = JSON.parse(field.value);
 
     ReactDOM.render(
       <WTFPersonLinkField
-        fieldId={options.fieldId}
-        eventId={options.eventId}
+        fieldId={fieldId}
+        eventId={eventId}
         defaultValue={camelizeKeys(persons)}
-        roles={options.roles || []}
-        {...options}
+        roles={roles || []}
+        {...rest}
       />,
-      document.getElementById(`person-link-field-${options.fieldId}`)
+      document.getElementById(`person-link-field-${fieldId}`)
     );
   };
 })(window);

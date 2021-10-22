@@ -17,34 +17,6 @@
 {% block html %}
     <div id="person-link-field-{{ field.id }}"></div>
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
-    <!-- {% set list_in_custom_order = field._value()|selectattr('displayOrder')|list|length > 0 %}
-    {% set use_custom_order = list_in_custom_order if field._value() else not field.default_sort_alpha %}
-    <div id="people-list-{{ field.id }}" class="person-link-list {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
-        {% block sections %}{% endblock %}
-        <div class="i-box-footer">
-            <span class="alpha-order-switch i-button label icon-only icon-sort-alpha-asc {% if not use_custom_order %}active{% endif %}">
-            </span>
-            <div class="right">
-                {% if field.disable_user_search %}
-                    {% set msg = _("You have to log in in order to be able to search for Indico users") %}
-                {% else %}
-                    {% set msg = _("Search among Indico users") %}
-                {% endif %}
-                {% if session.user %}
-                    <span id="add-myself-{{ field.id }}" class="i-button icon-user"
-                          title="{% trans %}Add yourself to the list{% endtrans %}">
-                        {% trans %}Add myself{% endtrans %}
-                    </span>
-                {% endif %}
-                <span id="principalField-{{ field.id }}"></span>
-                {#--#}
-                <span id="add-new-{{ field.id }}" class="i-button highlight"
-                      title="{% trans %}Enter person information manually{% endtrans %}">
-                    {% trans %}Enter manually{% endtrans %}
-                </span>
-            </div>
-        </div>
-    </div> -->
 {% endblock %}
 
 {% block javascript %}
@@ -52,7 +24,7 @@
         setupPersonLinkWidget({
             fieldId: {{ field.id | tojson }},
             eventId: {{ (field.event.id if field.event else none) | tojson }},
-            roles: [{value: 'submitter', label: 'Submitter' }],
+            roles: {{ field.roles | default([]) | tojson }},
             disableUserSearch: {{ field.disable_user_search | default(false) | tojson }},
             authorTypes: {{ (field.author_types or none) | tojson }},
             showEmptyCoauthors: {{ field.show_empty_coauthors | default(true) | tojson }},
