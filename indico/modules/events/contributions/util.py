@@ -86,16 +86,6 @@ def get_events_with_linked_contributions(user, dt=None):
     return data
 
 
-def serialize_contribution_person_link(person_link, is_submitter=None):
-    """Serialize ContributionPersonLink to JSON-like object."""
-    data = serialize_person_link(person_link)
-    data['isSpeaker'] = person_link.is_speaker
-    if not isinstance(person_link, SubContributionPersonLink):
-        data['authorType'] = person_link.author_type.value
-        data['isSubmitter'] = person_link.is_submitter if is_submitter is None else is_submitter
-    return data
-
-
 def sort_contribs(contribs, sort_by):
     mapping = {'number': 'friendly_id', 'name': 'title'}
     if sort_by == BOASortField.schedule:

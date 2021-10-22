@@ -10,8 +10,8 @@ from wtforms import ValidationError
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
                                                                 SubContributionPersonLink)
-from indico.modules.events.contributions.util import serialize_contribution_person_link
 from indico.modules.events.fields import PersonLinkListFieldBase
+from indico.modules.events.util import serialize_person_link
 from indico.util.i18n import _
 from indico.web.forms.widgets import JinjaWidget
 
@@ -21,7 +21,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
 
     person_link_cls = ContributionPersonLink
     linked_object_attr = 'contrib'
-    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
+    widget = JinjaWidget('forms/_person_link_widget_base.html', allow_empty_email=True)
 
     def __init__(self, *args, **kwargs):
         self.author_types = AuthorType.serialize()
@@ -29,22 +29,39 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
         self.allow_submitters = kwargs.pop('allow_submitters', True)
         self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
         self.default_author_type = kwargs.pop('default_author_type', AuthorType.none)
-        self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         self.default_is_speaker = True
+        self.roles = [
+            {'name': 'primary', 'label': _('Author'), 'section': True},
+            {'name': 'secondary', 'label': _('Co-author'), 'section': True},
+            {'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
+             'default': kwargs.pop('default_is_submitter', True)},
+            {'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'}
+        ]
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
-        return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
+        return {self._get_person_link(x): 'submitter' in x.pop('roles', []) for x in data}
 
     @no_autoflush
     def _get_person_link(self, data):
-        extra_data = {'author_type': data.pop('authorType', self.default_author_type),
-                      'is_speaker': data.pop('isSpeaker', self.default_is_speaker)}
-        return super()._get_person_link(data, extra_data)
+        person_link = super()._get_person_link(data)
+        roles = data.pop('roles', [])
+        person_link.is_speaker = 'speaker' in roles
+        person_link.author_type = next((AuthorType.get(a) for a in roles if AuthorType.get(a)),
+                                       self.default_author_type)
+        return person_link
 
     def _serialize_person_link(self, principal, extra_data=None):
-        is_submitter = self.data[principal] if self.get_form().is_submitted() else None
-        return serialize_contribution_person_link(principal, is_submitter=is_submitter)
+        data = serialize_person_link(principal)
+        data['roles'] = []
+        is_submitter = self.get_form().is_submitted() and self.data[principal] or principal.is_submitter
+        if principal.is_speaker:
+            data['roles'].append('speaker')
+        if not isinstance(principal, SubContributionPersonLink):
+            data['roles'].append(principal.author_type.name)
+            if is_submitter:
+                data['roles'].append('submitter')
+        return data
 
     def pre_validate(self, form):
         super().pre_validate(form)
