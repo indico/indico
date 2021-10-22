@@ -99,7 +99,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
     linked_object_attr = 'abstract'
     default_sort_alpha = False
     create_untrusted_persons = True
-    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
+    widget = JinjaWidget('forms/_person_link_widget_base.html', allow_empty_email=True)
 
     def __init__(self, *args, **kwargs):
         self.author_types = AuthorType.serialize()
@@ -112,6 +112,11 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.require_primary_author = True
         self.sort_by_last_name = True
         self.disable_user_search = kwargs.pop('disable_user_search', False)
+        self.roles = [
+            {'name': 'primary', 'label': _('Author'), 'section': True},
+            {'name': 'secondary', 'label': _('Co-author'), 'section': True},
+            {'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'}
+        ]
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
@@ -119,14 +124,19 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
 
     @no_autoflush
     def _get_person_link(self, data):
-        extra_data = {'author_type': data.pop('authorType', self.default_author_type),
-                      'is_speaker': data.pop('isSpeaker', self.default_is_speaker)}
-        return super()._get_person_link(data, extra_data)
+        person_link = super()._get_person_link(data)
+        roles = data.pop('roles', [])
+        person_link.is_speaker = 'speaker' in roles
+        person_link.author_type = next((AuthorType.get(a) for a in roles if AuthorType.get(a)),
+                                       self.default_author_type)
+        return person_link
 
     def _serialize_person_link(self, principal, extra_data=None):
-        data = (extra_data or {}) | serialize_person_link(principal)
-        data['isSpeaker'] = principal.is_speaker
-        data['authorType'] = principal.author_type.value
+        data = serialize_person_link(principal)
+        data['roles'] = []
+        if principal.is_speaker:
+            data['roles'].append('speaker')
+        data['roles'].append(principal.author_type.name)
         return data
 
     def pre_validate(self, form):
