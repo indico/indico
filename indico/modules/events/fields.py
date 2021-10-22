@@ -157,7 +157,7 @@ class PersonLinkListFieldBase(EventPersonListField):
         else:
             return self._serialize_person_link(principal)
 
-    def _serialize_person_link(self, principal, extra_data=None):
+    def _serialize_person_link(self, principal):
         raise NotImplementedError
 
     def _value(self):
@@ -169,19 +169,23 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
 
     person_link_cls = EventPersonLink
     linked_object_attr = 'event'
-    widget = JinjaWidget('events/forms/event_person_link_widget.html')
+    widget = JinjaWidget('forms/_person_link_widget_base.html')
 
     def __init__(self, *args, **kwargs):
-        self.allow_submitters = True
-        self.default_is_submitter = kwargs.pop('default_is_submitter', True)
+        self.allow_submitters = True  # TODO
+        self.roles = [
+            {'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
+             'default': kwargs.pop('default_is_submitter', True)}
+        ]
+        # self.empty_message = (_('There are no speakers')
+        #                       if self.get_form().event_type == 'lecture' else _('There are no chairpersons'))
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
-        return {self._get_person_link(x):
-                'submitter' in x.pop('roles', ['submitter'] if self.default_is_submitter else []) for x in data}
+        return {self._get_person_link(x): 'submitter' in x.pop('roles', []) for x in data}
 
-    def _serialize_person_link(self, principal, extra_data=None):
-        data = (extra_data or {}) | serialize_person_link(principal)
+    def _serialize_person_link(self, principal):
+        data = serialize_person_link(principal)
         data['roles'] = []
         if self.get_form().is_submitted() and self.data[principal] or principal.is_submitter:
             data['roles'].append('submitter')
