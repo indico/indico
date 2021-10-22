@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Icon, List, Loader, Popup, Image, Label} from 'semantic-ui-react';
+import {Icon, List, Loader, Popup, Image} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -35,9 +35,9 @@ PendingPrincipalListItem.defaultProps = {
   type: PrincipalType.user,
 };
 
-const PrincipalItemIcon = ({type, meta, invalid, avatarURL}) =>
+const PrincipalItemIcon = ({type, meta, invalid, avatarURL, className}) =>
   type === PrincipalType.eventRole || type === PrincipalType.categoryRole ? (
-    <div styleName="event-role">
+    <div styleName="event-role" className={className}>
       <span style={meta.style}>{meta.code}</span>
     </div>
   ) : (
@@ -54,7 +54,7 @@ const PrincipalItemIcon = ({type, meta, invalid, avatarURL}) =>
           {PrincipalType.getDeletedText(type)}
         </Popup>
       ) : avatarURL ? (
-        <Image src={avatarURL} size="mini" avatar />
+        <Image src={avatarURL} className={className} size="mini" avatar />
       ) : (
         <Icon name={PrincipalType.getIcon(type)} size="large" />
       )}
@@ -66,6 +66,7 @@ PrincipalItemIcon.propTypes = {
   meta: PropTypes.object,
   invalid: PropTypes.bool,
   avatarURL: PropTypes.string,
+  className: PropTypes.string,
 };
 
 PrincipalItemIcon.defaultProps = {
@@ -73,6 +74,7 @@ PrincipalItemIcon.defaultProps = {
   meta: {},
   invalid: false,
   avatarURL: null,
+  className: undefined,
 };
 
 const PrincipalItemContent = ({name, detail, children}) => (
@@ -213,94 +215,6 @@ PrincipalListItem.defaultProps = {
   onAddFavorite: null,
   onDelFavorite: null,
   favorite: false,
-};
-
-export const PersonListItem = ({
-  type,
-  meta,
-  invalid,
-  name,
-  detail,
-  avatarURL,
-  children,
-  canDelete,
-  onDelete,
-  onEdit,
-  disabled,
-  roles,
-  onChangeRoles,
-}) => (
-  <PrincipalItem as={List.Item}>
-    <PrincipalItem.Icon type={type} meta={meta} invalid={invalid} avatarURL={avatarURL} />
-    <PrincipalItem.Content name={name} detail={detail}>
-      {children}
-    </PrincipalItem.Content>
-    <div styleName="roles">
-      {roles &&
-        roles.map(({value, label, active}, idx) => (
-          <Label
-            as="a"
-            size="small"
-            key={value}
-            color={active ? 'blue' : undefined}
-            onClick={() =>
-              onChangeRoles &&
-              onChangeRoles(roles.map((r, i) => (i === idx ? {...r, active: !active} : r)))
-            }
-          >
-            {label}
-          </Label>
-        ))}
-    </div>
-    <div styleName="actions">
-      <Icon
-        styleName="button edit"
-        name="pencil alternate"
-        size="large"
-        onClick={onEdit}
-        disabled={disabled}
-      />
-      {canDelete && (
-        <Icon
-          styleName="button delete"
-          name="remove"
-          size="large"
-          onClick={onDelete}
-          disabled={disabled}
-        />
-      )}
-    </div>
-  </PrincipalItem>
-);
-
-PersonListItem.propTypes = {
-  type: PrincipalType.propType,
-  invalid: PropTypes.bool,
-  name: PropTypes.string.isRequired,
-  detail: PropTypes.string,
-  meta: PropTypes.object,
-  onDelete: PropTypes.func,
-  canDelete: PropTypes.bool,
-  onEdit: PropTypes.func.isRequired,
-  disabled: PropTypes.bool,
-  avatarURL: PropTypes.string,
-  children: PropTypes.node,
-  roles: PropTypes.array,
-  onChangeRoles: PropTypes.func,
-};
-
-PersonListItem.defaultProps = {
-  type: PrincipalType.user,
-  canDelete: true,
-  disabled: false,
-  invalid: false,
-  detail: null,
-  meta: {},
-  avatarURL: null,
-  onDelete: null,
-  children: null,
-  roles: null,
-  onChangeRoles: null,
 };
 
 export const EmptyPrincipalListItem = ({search}) => (

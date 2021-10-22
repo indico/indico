@@ -1,8 +1,7 @@
 @import 'base/palette';
 
-:global(.action-box),
-:global(.i-form) {
-  color: inherit !important;
+.person-link-field {
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .button {
@@ -12,4 +11,48 @@
   &:hover {
     opacity: 1 !important;
   }
+
+  &.delete {
+    color: red;
+  }
+
+  &.edit {
+    font-size: 1.2em !important;
+  }
+}
+
+.titled-rule {
+  display: flex;
+  align-items: center;
+  color: #adadad;
+  font-size: 0.9em;
+  line-height: 1.2;
+}
+
+.titled-rule::after {
+  content: '';
+  flex: 1;
+  background-color: #d4d4d5;
+  height: 1px;
+  display: inline-block;
+  margin-left: 1rem;
+}
+
+:global(.ui.label .icon).label-icon {
+  margin: 0;
+}
+
+.roles {
+  margin: 0 15px;
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.icon {
+  width: 32px !important;
 }

@@ -79,10 +79,6 @@
       color: $yellow;
     }
   }
-
-  &.edit {
-    font-size: 1.4em !important;
-  }
 }
 
 .favorite:global(.disabled) {
@@ -91,8 +87,4 @@
   .content {
     opacity: 0.45;
   }
-}
-
-.roles {
-  margin: 0 15px;
 }
