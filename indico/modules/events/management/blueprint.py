@@ -43,8 +43,7 @@ _bp.add_url_rule('/protection/acl-message', 'acl_message', protection.RHEventACL
 _bp.add_url_rule('!/permissions-dialog/<any(event,session,contribution,category):type>', 'permissions_dialog',
                  protection.RHPermissionsDialog, methods=('POST',))
 # Privacy dashboard
-_bp.add_url_rule('/privacy', 'privacy', privacy.RHEventPrivacy, methods=('GET', 'POST'))
-
+_bp.add_url_rule('/privacy-dashboard', 'privacy_dashboard', privacy.RHEventPrivacy, methods=('GET', 'POST'))
 # Cloning
 _bp.add_url_rule('/clone', 'clone', cloning.RHCloneEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/clone/preview', 'clone_preview', cloning.RHClonePreview, methods=('GET', 'POST'))

@@ -26,8 +26,8 @@ class RHEventPrivacy(RHManageEventBase):
         if form.validate_on_submit():
             privacy_settings.set_multi(self.event, form.data)
             flash(_('Privacy settings have been updated'), 'success')
-            return redirect(url_for('.privacy', self.event))
-        return WPEventPrivacy.render_template('privacy_dashboard.html', self.event, 'privacy', form=form)
+            return redirect(url_for('.privacy_dashboard', self.event))
+        return WPEventPrivacy.render_template('privacy_dashboard.html', self.event, 'privacy_dashboard', form=form)
 
     def _check_access(self):
         RHManageEventBase._check_access(self)

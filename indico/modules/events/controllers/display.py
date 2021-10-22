@@ -14,9 +14,11 @@ from webargs import fields
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
 from indico.modules.events.ical import CalendarScope, event_to_ical
 from indico.modules.events.layout.views import WPPage
+from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
+from indico.modules.legal.views import WPDisplayPrivacyPolicy
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import allow_signed_url
@@ -76,3 +78,14 @@ class RHEventAccessKey(RHEventBase):
     def _process(self):
         self.event.set_session_access_key(request.form['access_key'])
         return jsonify(valid=self.event.check_access_key())
+
+
+class RHDisplayPrivacyPolicy(RHEventBase):
+    """Display event privacy policy."""
+
+    def _process(self):
+        url = privacy_settings.get(self.event, 'privacy_policy_url')
+        if url:
+            return redirect(url)
+        return WPDisplayPrivacyPolicy.render_template('privacy.html',
+                                                      content=privacy_settings.get(self.event, 'privacy_policy'))

@@ -1,0 +1,12 @@
+{% if url %}
+    <a href="{{ url }}">{% trans %}Privacy of this event{% endtrans %}</a>
+{% else %}
+    <a href="{{ url_for('events.display_privacy', event) }}"
+       data-title="{{ _("Privacy Policy") }}"
+       data-href="{{ url_for('events.display_privacy', event) }}"
+       data-ajax-dialog
+       data-hide-page-header
+       data-close-button>
+        {% trans %}Privacy of this event{% endtrans %}
+    </a>
+{% endif %}

@@ -5,20 +5,35 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, redirect, request, session
+from flask import flash, redirect, render_template, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events import Event
+from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.registration.util import get_event_regforms_registrations
 from indico.modules.events.views import WPAccessKey
 from indico.util.i18n import _
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
 
+_current_event = None
+
+
+@template_hook('page-footer', priority=52)
+def _inject_event_privacy_footer(**kwargs):
+    global _curent_event
+    if _current_event:
+        return render_template('events/privacy_footer.html', event=_current_event,
+                               url=privacy_settings.get(_current_event, 'privacy_policy_url'))
+
+
 class RHEventBase(RH):
     def _process_args(self):
+        global _current_event
         self.event = Event.get(request.view_args['event_id'])
+        _current_event = self.event
         if self.event is None:
             raise NotFound(_('An event with this ID does not exist.'))
         elif self.event.is_deleted:
