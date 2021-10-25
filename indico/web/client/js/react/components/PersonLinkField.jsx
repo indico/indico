@@ -106,27 +106,20 @@ ExternalPersonModal.defaultProps = {
 };
 
 const PersonListItem = ({
-  meta,
-  invalid,
-  name,
-  detail,
-  avatarURL,
+  person: {avatarURL, firstName, lastName, affiliation, email},
+  roles,
   canDelete,
   onDelete,
   onEdit,
+  onClickRole,
   disabled,
-  roles,
-  onChangeRoles,
 }) => (
   <PrincipalItem as={List.Item}>
-    <PrincipalItem.Icon
-      type={PrincipalType.user}
-      meta={meta}
-      invalid={invalid}
-      avatarURL={avatarURL}
-      styleName="icon"
+    <PrincipalItem.Icon type={PrincipalType.user} avatarURL={avatarURL} styleName="icon" />
+    <PrincipalItem.Content
+      name={firstName ? `${firstName} ${lastName}` : lastName}
+      detail={affiliation ? `${email} (${affiliation})` : email}
     />
-    <PrincipalItem.Content name={name} detail={detail} />
     <div styleName="roles">
       {roles &&
         roles.map(({name: roleName, label, icon, active}, idx) => (
@@ -135,10 +128,7 @@ const PersonListItem = ({
             size="small"
             key={roleName}
             color={active ? 'blue' : undefined}
-            onClick={() =>
-              onChangeRoles &&
-              onChangeRoles(idx, roles.map((r, i) => (i === idx ? {...r, active: !active} : r)))
-            }
+            onClick={() => onClickRole && onClickRole(idx, roles)}
           >
             {icon ? <Icon styleName="label-icon" name={icon} /> : label}
           </Label>
@@ -166,29 +156,22 @@ const PersonListItem = ({
 );
 
 PersonListItem.propTypes = {
-  invalid: PropTypes.bool,
-  name: PropTypes.string.isRequired,
-  detail: PropTypes.string,
-  meta: PropTypes.object,
+  person: PropTypes.object.isRequired,
+  roles: PropTypes.array.isRequired,
   onDelete: PropTypes.func,
   canDelete: PropTypes.bool,
   onEdit: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   avatarURL: PropTypes.string,
-  roles: PropTypes.array,
-  onChangeRoles: PropTypes.func,
+  onClickRole: PropTypes.func,
 };
 
 PersonListItem.defaultProps = {
   canDelete: true,
   disabled: false,
-  invalid: false,
-  detail: null,
-  meta: {},
   avatarURL: null,
   onDelete: null,
-  roles: null,
-  onChangeRoles: null,
+  onClickRole: null,
 };
 
 const PersonLinkSection = ({
@@ -199,38 +182,40 @@ const PersonLinkSection = ({
   onEdit,
   canDelete,
 }) => {
-  const onChangeRoles = (personIndex, roleIndex, roles) => {
+  const onClickRole = (personIndex, roleIndex, value) => {
     const role = defaultRoles[roleIndex];
-    const keys = roles
-      .filter((r, i) => r.active && (roleIndex === i || !role.section || !defaultRoles[i].section))
+    const roles = value
+      .filter((r, i) =>
+        // ensure only a single section is selected at a time
+        roleIndex === i ? !r.active : r.active && (!role.section || !defaultRoles[i].section)
+      )
       .map(r => r.name);
-    onChange(persons.map((v, i) => (i === personIndex ? {...v, roles: keys} : v)));
+    onChange(persons.map((v, i) => (i === personIndex ? {...v, roles} : v)));
   };
-
-  const renderPersons = () =>
-    persons.map(({userId, firstName, lastName, email, affiliation, avatarURL, roles}, idx) => (
-      <PersonListItem
-        key={userId || email}
-        name={firstName ? `${firstName} ${lastName}` : lastName}
-        detail={affiliation ? `${email} (${affiliation})` : email}
-        avatarURL={avatarURL}
-        onDelete={() => onChange(persons.filter((_, i) => i !== idx))}
-        onEdit={() => onEdit(idx)}
-        roles={defaultRoles.map(({name, ...rest}) => ({
-          ...rest,
-          name,
-          active: roles && roles.includes(name),
-        }))}
-        onChangeRoles={(roleIdx, value) => onChangeRoles(idx, roleIdx, value)}
-        canDelete={canDelete}
-      />
-    ));
 
   return (
     <>
       {sectionLabel && <div styleName="titled-rule">{sectionLabel}</div>}
       <List divided relaxed>
-        {persons.length > 0 ? renderPersons() : <Translate>There are no persons</Translate>}
+        {persons.length > 0 ? (
+          persons.map((p, idx) => (
+            <PersonListItem
+              key={p.userId || p.email}
+              person={p}
+              onDelete={() => onChange(persons.filter((_, i) => i !== idx))}
+              onEdit={() => onEdit(idx)}
+              onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
+              canDelete={canDelete}
+              roles={defaultRoles.map(({name, ...rest}) => ({
+                ...rest,
+                name,
+                active: p.roles && p.roles.includes(name),
+              }))}
+            />
+          ))
+        ) : (
+          <Translate>There are no persons</Translate>
+        )}
       </List>
     </>
   );
