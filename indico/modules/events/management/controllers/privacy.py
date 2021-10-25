@@ -34,7 +34,6 @@ class RHEventPrivacy(RHManageEventBase):
             return redirect(url_for('.privacy_dashboard', self.event))
         regforms = (RegistrationForm.query
                     .with_parent(self.event)
-                    .options(undefer('active_registration_count'))
                     .order_by(db.func.lower(RegistrationForm.title)).all())
         return WPEventPrivacy.render_template('privacy_dashboard.html', self.event, 'privacy_dashboard', form=form,
                                               regforms=regforms)
