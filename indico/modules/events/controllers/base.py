@@ -8,6 +8,7 @@
 from flask import flash, redirect, render_template, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.config import config
 from indico.modules.events import Event
 from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.registration.util import get_event_regforms_registrations
@@ -21,12 +22,13 @@ from indico.web.rh import RH
 _current_event = None
 
 
-@template_hook('page-footer', priority=52)
-def _inject_event_privacy_footer(**kwargs):
-    global _curent_event
-    if _current_event:
-        return render_template('events/privacy_footer.html', event=_current_event,
-                               url=privacy_settings.get(_current_event, 'privacy_policy_url'))
+if config.ENABLE_PRIVACY_DASHBOARD:
+    @template_hook('page-footer', priority=52)
+    def _inject_event_privacy_footer(**kwargs):
+        global _curent_event
+        if _current_event:
+            return render_template('events/privacy_footer.html', event=_current_event,
+                                   url=privacy_settings.get(_current_event, 'privacy_policy_url'))
 
 
 class RHEventBase(RH):
