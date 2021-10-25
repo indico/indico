@@ -28,6 +28,8 @@ Bugfixes
 - Fix translations not being taken into account in some places (:issue:`5073`, :pr:`5105`)
 - Use correct/consistent field order for personal data fields in newly created
   registration forms
+- Remove deleted registration forms from ACLs (:issue:`5130`, :pr:`5131`, thanks
+  :user:`jbtwist`)
 
 
 Version 3.0.2
