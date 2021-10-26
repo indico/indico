@@ -4,6 +4,7 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
+
 import 'AngularJS/dist/angular';
 import 'AngularJS/dist/angular-resource';
 import 'AngularJS/dist/angular-sanitize';

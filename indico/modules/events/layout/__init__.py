@@ -39,6 +39,7 @@ layout_settings = EventSettingsProxy('layout', {
     'use_custom_menu': False,
     'timetable_by_room': False,
     'timetable_detailed': False,
+    'show_vc_rooms': False,
 }, converters={
     'name_format': EnumConverter(NameFormat)
 })

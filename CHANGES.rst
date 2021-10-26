@@ -67,6 +67,11 @@ Improvements
 ^^^^^^^^^^^^
 
 - Support TLS certificates for SMTP authentication (:pr:`5100`, thanks :user:`dweinholz`)
+- Add CSV/Excel contribution list exports containing affiliations (:issue:`5114`, :pr:`5118`)
+- Include program codes in contribution PDFs and spreadsheets (:pr:`5126`)
+- Add an API for bulk-assigning contribution program codes programmatically (:issue:`5115`,
+  :pr:`5120`)
+- Add layout setting to show videoconferences on the main conference page (:pr:`5124`)
 
 Bugfixes
 ^^^^^^^^
@@ -76,6 +81,14 @@ Bugfixes
 - Fix translations not being taken into account in some places (:issue:`5073`, :pr:`5105`)
 - Use correct/consistent field order for personal data fields in newly created
   registration forms
+- Remove deleted registration forms from ACLs (:issue:`5130`, :pr:`5131`, thanks
+  :user:`jbtwist`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Truncate file names to 150 characters to avoid hitting file system path limits
+  (:pr:`5116`, thanks :user:`vasantvohra`)
 
 
 Version 3.0.2

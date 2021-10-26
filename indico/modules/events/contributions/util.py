@@ -128,15 +128,21 @@ def sort_contribs(contribs, sort_by):
     return sorted(contribs, key=key_func)
 
 
-def generate_spreadsheet_from_contributions(contributions):
+def generate_spreadsheet_from_contributions(contributions, *, affiliations=False):
     """
     Return a tuple consisting of spreadsheet columns and respective
     contribution values.
     """
 
+    def _format_person(person):
+        if affiliations and person.affiliation:
+            return f'{person.full_name} ({person.affiliation})'
+        return person.full_name
+
     has_board_number = any(c.board_number for c in contributions)
     has_authors = any(pl.author_type != AuthorType.none for c in contributions for pl in c.person_links)
-    headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters', 'Materials']
+    headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters', 'Materials',
+               'Program Code']
     if has_authors:
         headers += ['Authors', 'Co-Authors']
     if has_board_number:
@@ -150,11 +156,12 @@ def generate_spreadsheet_from_contributions(contributions):
                         'Session': c.session.title if c.session else None,
                         'Track': c.track.title if c.track else None,
                         'Materials': None,
-                        'Presenters': ', '.join(speaker.full_name for speaker in c.speakers)}
+                        'Presenters': ', '.join(_format_person(speaker) for speaker in c.speakers),
+                        'Program Code': c.code}
         if has_authors:
             contrib_data.update({
-                'Authors': ', '.join(author.full_name for author in c.primary_authors),
-                'Co-Authors': ', '.join(author.full_name for author in c.secondary_authors)
+                'Authors': ', '.join(_format_person(author) for author in c.primary_authors),
+                'Co-Authors': ', '.join(_format_person(author) for author in c.secondary_authors)
             })
         if has_board_number:
             contrib_data['Board number'] = c.board_number

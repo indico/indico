@@ -1,0 +1,26 @@
+{% from 'vc/list_vc_rooms.html' import render_conference_vc_rooms_list, render_vc_rooms_list  %}
+
+{% if not g.static_site and event_vc_rooms %}
+    <div class="action-box highlight">
+        <div class="section align-top">
+            <span class="icon icon-camera align-top"></span>
+            <div class="text">
+                <div class="label">
+                    {% trans count=event_vc_rooms|length -%}
+                        Videoconference
+                    {%- pluralize -%}
+                        Videoconferences
+                    {%- endtrans %}
+                </div>
+                {% if event_vc_rooms|length == 1 %}
+                    <div>
+                        {%- trans %}There is a videoconference for this event.{% endtrans -%}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="text conference">
+                {{ render_conference_vc_rooms_list(event, event_vc_rooms) }}
+            </div>
+        </div>
+    </div>
+{% endif %}

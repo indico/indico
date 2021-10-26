@@ -118,9 +118,21 @@
                             </a>
                         </li>
                         <li>
+                            <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_csv_export', event, affiliations=1) }}">
+                                {%- trans %}CSV with affiliations{% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
                             <a href="#" class="icon-file-excel js-submit-form js-enable-if-checked disabled"
                                data-href="{{ url_for('.contributions_excel_export', event) }}">
                                 {%- trans %}XLSX (Excel){% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-file-excel js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_excel_export', event, affiliations=1) }}">
+                                {%- trans %}XLSX (Excel) with affiliations{% endtrans -%}
                             </a>
                         </li>
                         <li>

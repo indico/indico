@@ -205,6 +205,10 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
     """Delete a registration form."""
 
     def _process(self):
+        rels = ('in_attachment_acls', 'in_attachment_folder_acls', 'in_contribution_acls', 'in_event_acls',
+                'in_session_acls')
+        for rel in rels:
+            getattr(self.regform, rel).delete()
         self.regform.is_deleted = True
         signals.event.registration_form_deleted.send(self.regform)
         flash(_('Registration form deleted'), 'success')

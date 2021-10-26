@@ -7,6 +7,9 @@
         \sffamily
         \noindent
         \VAR{_('Contribution ID')}: \textbf{\VAR{contrib.friendly_id}}
+        \JINJA{if contrib.code}
+            \VAR{_('Contribution code')}: \textbf{\VAR{contrib.code}}
+        \JINJA{endif}
         \hfill
         \VAR{_('Type')}: \textbf{\VAR{(contrib.type.name if contrib.type else _('not specified'))}}
     }

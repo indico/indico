@@ -5,7 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, request, session
+from flask import flash, jsonify, request, session
+from webargs import fields
+from webargs.flaskparser import abort
 
 from indico.core.db import db
 from indico.modules.events import EventLogRealm
@@ -23,6 +25,7 @@ from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
+from indico.web.args import use_kwargs
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -53,6 +56,20 @@ class RHProgramCodeTemplates(RHManageEventBase):
         return jsonify_form(form)
 
 
+def _get_update_log_data(updates):
+    changes = {}
+    fields = {}
+    for obj, change in updates.items():
+        title = getattr(obj, 'full_title', obj.title)
+        friendly_id = getattr(obj, 'friendly_id', None)
+        if friendly_id is not None:
+            title = f'#{friendly_id}: {title}'
+        key = f'obj_{obj.id}'
+        fields[key] = {'type': 'string', 'title': title}
+        changes[key] = change
+    return {'Changes': make_diff_log(changes, fields)}
+
+
 class RHAssignProgramCodesBase(RHManageEventBase):
     object_type = None
     show_dates = True
@@ -64,19 +81,6 @@ class RHAssignProgramCodesBase(RHManageEventBase):
 
     def _get_objects(self):
         raise NotImplementedError
-
-    def _get_update_log_data(self, updates):
-        changes = {}
-        fields = {}
-        for obj, change in updates.items():
-            title = getattr(obj, 'full_title', obj.title)
-            friendly_id = getattr(obj, 'friendly_id', None)
-            if friendly_id is not None:
-                title = f'#{friendly_id}: {title}'
-            key = f'obj_{obj.id}'
-            fields[key] = {'type': 'string', 'title': title}
-            changes[key] = change
-        return {'Changes': make_diff_log(changes, fields)}
 
     def _process(self):
         if 'assign' in request.form:
@@ -90,7 +94,7 @@ class RHAssignProgramCodesBase(RHManageEventBase):
                 flash(_('The program codes have been successfully assigned'), 'success')
                 self.event.log(EventLogRealm.management, LogKind.change, 'Program',
                                'Program codes assigned to {}'.format(self.object_type.replace('-', ' ')),
-                               session.user, data=self._get_update_log_data(updates))
+                               session.user, data=_get_update_log_data(updates))
             else:
                 flash(_('No codes have been changed'), 'info')
             return jsonify_data()
@@ -159,3 +163,31 @@ class RHAssignProgramCodesSubContributions(RHAssignProgramCodesBase):
                           db.func.lower(Contribution.title),
                           SubContribution.position)
                 .all())
+
+
+class RHProgramCodesAPIContributions(RHManageEventBase):
+    """RESTful API to bulk-update contribution codes."""
+
+    def _process_GET(self):
+        return jsonify({c.friendly_id: c.code for c in self.event.contributions})
+
+    @use_kwargs({
+        'codes': fields.Dict(keys=fields.Int, values=fields.String, required=True)
+    })
+    def _process_PATCH(self, codes):
+        contribs = {c.friendly_id: c
+                    for c in Contribution.query.with_parent(self.event).filter(Contribution.friendly_id.in_(codes))}
+        if invalid := (codes - contribs.keys()):
+            abort(422, messages={'codes': [f'Invalid IDs: {", ".join(map(str, invalid))}']})
+
+        updates = {}
+        for friendly_id, code in codes.items():
+            contrib = contribs[friendly_id]
+            if code != contrib.code:
+                updates[contrib] = (contrib.code, code)
+                contrib.code = code
+
+        self.event.log(EventLogRealm.management, LogKind.change, 'Program',
+                       'Program codes assigned to contributions',
+                       session.user, data=_get_update_log_data(updates))
+        return jsonify({contrib.friendly_id: changes for contrib, changes in updates.items()})

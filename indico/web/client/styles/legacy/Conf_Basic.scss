@@ -94,6 +94,32 @@ div.datePlace > div.timezone {
   color: #777;
 }
 
+div.event-details {
+  font-size: 1.1em;
+  margin-top: 0.5em;
+
+  .event-details-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.5em;
+  }
+
+  .event-details-label {
+    width: 120px;
+    text-align: right;
+    font-weight: bold;
+    margin-right: 1em;
+
+    &.align-top {
+      align-self: flex-start;
+    }
+  }
+
+  .event-details-content {
+    flex: 1;
+  }
+}
+
 /* ------Main content------ */
 
 #confSectionsBox {

@@ -71,6 +71,8 @@ class ConferenceLayoutForm(LoggedLayoutForm):
     show_social_badges = BooleanField(_('Show social badges'), widget=SwitchWidget())
     name_format = IndicoEnumSelectField(_('Name format'), enum=NameFormat, none=_('Inherit from user preferences'),
                                         description=_('Format in which names are displayed'))
+    show_vc_rooms = BooleanField(_('Show videoconferences'), widget=SwitchWidget(),
+                                 description=_('Show videoconferences on the main conference page'))
 
     # Style
     header_text_color = StringField(_('Text color'), widget=ColorPickerWidget())
