@@ -22,13 +22,12 @@ from indico.web.rh import RH
 _current_event = None
 
 
-if config.ENABLE_PRIVACY_DASHBOARD:
-    @template_hook('page-footer', priority=52)
-    def _inject_event_privacy_footer(**kwargs):
-        global _curent_event
-        if _current_event:
-            return render_template('events/privacy_footer.html', event=_current_event,
-                                   url=privacy_settings.get(_current_event, 'privacy_policy_url'))
+@template_hook('page-footer', priority=52)
+def _inject_event_privacy_footer(**kwargs):
+    global _curent_event
+    if config.ENABLE_PRIVACY_DASHBOARD and _current_event:
+        return render_template('events/privacy_footer.html', event=_current_event,
+                               url=privacy_settings.get(_current_event, 'privacy_policy_url'))
 
 
 class RHEventBase(RH):
