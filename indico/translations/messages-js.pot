@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.0.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-10-06 10:56+0200\n"
+"POT-Creation-Date: 2021-10-26 12:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -489,14 +489,6 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/field.js:850
 msgid "Yes/No"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "yes"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "no"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/field.js:869
