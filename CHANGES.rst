@@ -37,6 +37,7 @@ Improvements
 - Let event managers assign custom tags to registrations and filter the list
   of registrations by the presence or absence of specific tags (:issue:`4948`,
   :pr:`5091`)
+- Allow importing registration invitations from a CSV file (:issue:`3673`, :pr:`5108`)
 
 Bugfixes
 ^^^^^^^^
