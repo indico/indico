@@ -404,7 +404,8 @@ class BadgeSettingsForm(IndicoForm):
 
 
 class ImportRegistrationsForm(IndicoForm):
-    source_file = FileField(_('Source File'), [DataRequired()], accepted_file_types='.csv')
+    source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
+                            accepted_file_types='.csv')
     skip_moderation = BooleanField(_('Skip Moderation'), widget=SwitchWidget(), default=True,
                                    description=_('If enabled, the registration will be immediately accepted'))
     notify_users = BooleanField(_('E-mail users'), widget=SwitchWidget(),

@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from wtforms.fields.core import BooleanField, StringField
-from wtforms.validators import DataRequired, InputRequired, Length
+from wtforms.validators import DataRequired, Length
 
 from indico.modules.events.models.roles import EventRole
 from indico.util.i18n import _
@@ -39,5 +39,6 @@ class EventRoleForm(IndicoForm):
 
 
 class ImportMembersCSVForm(IndicoForm):
-    source_file = FileField(_('Source File'), [InputRequired(), DataRequired()], accepted_file_types='.csv,.txt')
+    source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV or TXT file.'))],
+                            accepted_file_types='.csv,.txt')
     remove_existing = BooleanField(_('Remove existing members'), widget=SwitchWidget())
