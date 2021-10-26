@@ -246,7 +246,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
             'active_menu_item': self.sidemenu_option,
             'bg_color_css': 'background: #{0}; border-color: #{0};'.format(bg_color) if bg_color else '',
             'text_color_css': f'color: #{text_color};' if text_color else '',
-            'announcement': announcement
+            'announcement': announcement,
         }
 
     def get_extra_css_files(self):

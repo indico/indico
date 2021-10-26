@@ -23,6 +23,10 @@
     align-items: center;
     overflow: visible;
 
+    &.align-top {
+      align-items: flex-start;
+    }
+
     > .toolbar {
       margin: 0;
       padding: 0 0 0 0.5em;
@@ -63,6 +67,11 @@
     padding-right: 0.5rem;
     flex-shrink: 0;
     align-self: center;
+
+    &.align-top {
+      align-self: flex-start;
+      margin-top: 0.15em;
+    }
   }
 
   &.for-form {

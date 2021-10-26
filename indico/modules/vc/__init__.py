@@ -8,6 +8,7 @@
 from flask import has_request_context, render_template, session
 
 from indico.core import signals
+from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.users import User
 from indico.modules.vc.forms import VCPluginSettingsFormBase
@@ -21,6 +22,16 @@ from indico.web.menu import SideMenuItem, TopMenuItem
 
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase', 'VCRoomEventAssociation')
+
+
+@template_hook('conference-home-info')
+def _inject_conference_home(event, **kwargs):
+    if not layout_settings.get(event, 'show_vc_rooms'):
+        return
+    res = VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True)
+    event_vc_rooms = [event_vc_room for event_vc_room in res.all() if event_vc_room.vc_room.plugin is not None]
+    if event_vc_rooms:
+        return render_template('vc/conference_home.html', event=event, event_vc_rooms=event_vc_rooms)
 
 
 @template_hook('event-header')

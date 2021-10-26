@@ -21,6 +21,7 @@ Improvements
 - Include program codes in contribution PDFs and spreadsheets (:pr:`5126`)
 - Add an API for bulk-assigning contribution program codes programmatically (:issue:`5115`,
   :pr:`5120`)
+- Add layout setting to show videoconferences on the main conference page (:pr:`5124`)
 
 Bugfixes
 ^^^^^^^^
