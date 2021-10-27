@@ -332,15 +332,15 @@ class CreateBookingSchema(mm.Schema):
     start_dt = fields.DateTime(required=True)
     end_dt = fields.DateTime(required=True)
     repeat_frequency = EnumField(RepeatFrequency, required=True)
-    repeat_interval = fields.Int(missing=0, validate=lambda x: x >= 0)
+    repeat_interval = fields.Int(load_default=0, validate=lambda x: x >= 0)
     room_id = fields.Int(required=True)
     booked_for_user = Principal(data_key='user', allow_external_users=True)
     booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), required=True)
-    is_prebooking = fields.Bool(missing=False)
+    is_prebooking = fields.Bool(load_default=False)
     link_type = EnumField(LinkType)
     link_id = fields.Int()
-    link_back = fields.Bool(missing=False)
-    admin_override_enabled = fields.Bool(missing=False)
+    link_back = fields.Bool(load_default=False)
+    admin_override_enabled = fields.Bool(load_default=False)
 
     @validates_schema(skip_on_field_errors=True)
     def validate_dts(self, data, **kwargs):
@@ -383,7 +383,7 @@ class LocationArgs(mm.Schema):
 
     name = fields.String(required=True)
     room_name_format = fields.String(required=True)
-    map_url_template = fields.URL(schemes={'http', 'https'}, allow_none=True, missing='')
+    map_url_template = fields.URL(schemes={'http', 'https'}, allow_none=True, load_default='')
 
     @validates('name')
     def _check_name_unique(self, name, **kwargs):
@@ -408,7 +408,7 @@ class FeatureArgs(mm.Schema):
 
     name = fields.String(validate=validate.Length(min=2), required=True)
     title = fields.String(validate=validate.Length(min=2), required=True)
-    icon = fields.String(missing='')
+    icon = fields.String(load_default='')
 
     @validates('name')
     def _check_name_unique(self, name, **kwargs):
@@ -425,7 +425,7 @@ class EquipmentTypeArgs(mm.Schema):
         rh_context = ('equipment_type',)
 
     name = fields.String(validate=validate.Length(min=2), required=True)
-    features = ModelList(RoomFeature, missing=[])
+    features = ModelList(RoomFeature, load_default=[])
 
     @validates('name')
     def _check_name_unique(self, name, **kwargs):
@@ -443,7 +443,7 @@ class RoomAttributeArgs(mm.Schema):
 
     name = fields.String(validate=validate.Length(min=2), required=True)
     title = fields.String(validate=validate.Length(min=2), required=True)
-    hidden = fields.Bool(missing=False)
+    hidden = fields.Bool(load_default=False)
 
     @validates('name')
     def _check_name_unique(self, name, **kwargs):

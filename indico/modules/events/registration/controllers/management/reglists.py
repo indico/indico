@@ -174,7 +174,7 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
     registration_query_options = ()
 
     @use_kwargs({
-        'registration_ids': fields.List(fields.Integer(), data_key='registration_id', missing=[]),
+        'registration_ids': fields.List(fields.Integer(), data_key='registration_id', load_default=[]),
     })
     def _process_args(self, registration_ids):
         RHManageRegFormBase._process_args(self)
@@ -265,7 +265,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
     """Create new registration (management area)."""
 
     @use_kwargs({
-        'user': Principal(allow_external_users=True, missing=None),
+        'user': Principal(allow_external_users=True, load_default=None),
     }, location='query')
     def _get_user_data(self, user):
         if user is None:

@@ -192,7 +192,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
 
     @use_kwargs(ReviewEditableArgs)
     def _process(self, action, comment):
-        argmap = {'tags': EditingTagsField(self.event, missing=set())}
+        argmap = {'tags': EditingTagsField(self.event, load_default=set())}
         if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
             argmap['files'] = EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                                 required=True)
@@ -223,7 +223,7 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
 
     @use_kwargs({
         'action': EnumField(EditingConfirmationAction, required=True),
-        'comment': fields.String(missing='')
+        'comment': fields.String(load_default='')
     })
     def _process(self, action, comment):
         confirm_editable_changes(self.revision, session.user, action, comment)
@@ -252,12 +252,12 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
         return False
 
     @use_kwargs({
-        'comment': fields.String(missing=''),
+        'comment': fields.String(load_default=''),
         'state': EnumField(InitialRevisionState)
     })
     def _process(self, comment, state):
         args = parser.parse({
-            'tags': EditingTagsField(self.event, allow_system_tags=self.is_service_call, missing=set()),
+            'tags': EditingTagsField(self.event, allow_system_tags=self.is_service_call, load_default=set()),
             'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                        required=True)
         }, unknown=EXCLUDE)
@@ -314,7 +314,7 @@ class RHCreateRevisionComment(RHContributionEditableRevisionBase):
 
     @use_kwargs({
         'text': fields.String(required=True, validate=not_empty),
-        'internal': fields.Bool(missing=False)
+        'internal': fields.Bool(load_default=False)
     })
     def _process(self, text, internal):
         user = session.user
@@ -347,8 +347,8 @@ class RHEditRevisionComment(RHContributionEditableRevisionBase):
         return self.comment.can_modify(session.user)
 
     @use_kwargs({
-        'text': fields.String(missing=None, validate=not_empty),
-        'internal': fields.Bool(missing=None)
+        'text': fields.String(load_default=None, validate=not_empty),
+        'internal': fields.Bool(load_default=None)
     })
     def _process_PATCH(self, text, internal):
         updates = {}

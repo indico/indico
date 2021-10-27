@@ -152,9 +152,9 @@ class RHExportDashboardICS(RHProtected):
         return session.user
 
     @use_kwargs({
-        'from_': HumanizedDate(data_key='from', missing=lambda: now_utc(False) - relativedelta(weeks=1)),
-        'include': fields.List(fields.Str(), missing={'linked', 'categories'}),
-        'limit': fields.Integer(missing=100, validate=lambda v: 0 < v <= 500)
+        'from_': HumanizedDate(data_key='from', load_default=lambda: now_utc(False) - relativedelta(weeks=1)),
+        'include': fields.List(fields.Str(), load_default={'linked', 'categories'}),
+        'limit': fields.Integer(load_default=100, validate=lambda v: 0 < v <= 500)
     }, location='query')
     def _process(self, from_, include, limit):
         user = self._get_user()
@@ -744,9 +744,9 @@ class RHUserSearch(RHProtected):
         'last_name': fields.Str(validate=validate.Length(min=1)),
         'email': fields.Str(validate=lambda s: len(s) > 3),
         'affiliation': fields.Str(validate=validate.Length(min=1)),
-        'exact': fields.Bool(missing=False),
-        'external': fields.Bool(missing=False),
-        'favorites_first': fields.Bool(missing=False)
+        'exact': fields.Bool(load_default=False),
+        'external': fields.Bool(load_default=False),
+        'favorites_first': fields.Bool(load_default=False)
     }, validate=validate_with_message(
         lambda args: args.keys() & {'first_name', 'last_name', 'email', 'affiliation'},
         'No criteria provided'

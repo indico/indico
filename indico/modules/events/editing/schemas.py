@@ -295,7 +295,7 @@ class EditingReviewAction(IndicoEnum):
 
 class ReviewEditableArgs(mm.Schema):
     action = EnumField(EditingReviewAction, required=True)
-    comment = fields.String(missing='')
+    comment = fields.String(load_default='')
 
     @validates_schema(skip_on_field_errors=True)
     def validate_everything(self, data, **kwargs):
@@ -315,7 +315,7 @@ class EditableTagArgs(mm.Schema):
     code = fields.String(required=True, validate=not_empty)
     title = fields.String(required=True, validate=not_empty)
     color = fields.String(required=True, validate=validate.OneOf(get_sui_colors()))
-    system = fields.Bool(missing=False)
+    system = fields.Bool(load_default=False)
 
     @validates('code')
     def _check_for_unique_tag_code(self, code, **kwargs):
@@ -420,12 +420,12 @@ class EditableTypePrincipalsSchema(mm.Schema):
     class Meta:
         rh_context = ('event',)
 
-    principals = PrincipalList(many=True, allow_event_roles=True, allow_category_roles=True)
+    principals = PrincipalList(allow_event_roles=True, allow_category_roles=True)
 
 
 class ReviewCommentSchema(mm.Schema):
     text = fields.String(required=True)
-    internal = fields.Boolean(missing=False)
+    internal = fields.Boolean(load_default=False)
 
 
 class RoleSchema(mm.Schema):
@@ -455,7 +455,7 @@ class ServiceUserSchema(mm.SQLAlchemyAutoSchema):
 
 
 class ServiceReviewEditableSchema(mm.Schema):
-    publish = fields.Boolean(missing=True)
+    publish = fields.Boolean(load_default=True)
     comment = fields.String()
     comments = fields.List(fields.Nested(ReviewCommentSchema))
     tags = fields.List(fields.Int())
@@ -464,9 +464,9 @@ class ServiceReviewEditableSchema(mm.Schema):
 class ServiceActionSchema(mm.Schema):
     name = fields.String(required=True)
     title = fields.String(required=True)
-    color = fields.String(missing=None)
-    icon = fields.String(missing=None)
-    confirm = fields.String(missing=None)
+    color = fields.String(load_default=None)
+    icon = fields.String(load_default=None)
+    confirm = fields.String(load_default=None)
 
 
 class ServiceActionResultSchema(mm.Schema):

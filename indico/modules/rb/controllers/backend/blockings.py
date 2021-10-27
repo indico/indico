@@ -21,7 +21,7 @@ from indico.web.args import use_args, use_kwargs
 
 class RHCreateRoomBlocking(RHRoomBookingBase):
     @use_args({
-        'room_ids': fields.List(fields.Int(), missing=[]),
+        'room_ids': fields.List(fields.Int(), load_default=[]),
         'start_date': fields.Date(required=True),
         'end_date': fields.Date(required=True),
         'reason': fields.Str(required=True),
@@ -53,9 +53,9 @@ class RHUpdateRoomBlocking(RHRoomBookingBase):
 
 class RHRoomBlockings(RHRoomBookingBase):
     @use_kwargs({
-        'timeframe': fields.Str(missing=None),
-        'my_rooms': fields.Bool(missing=False),
-        'mine': fields.Bool(missing=False)
+        'timeframe': fields.Str(load_default=None),
+        'my_rooms': fields.Bool(load_default=False),
+        'mine': fields.Bool(load_default=False)
     }, location='query')
     def _process(self, timeframe, my_rooms, mine):
         filters = {'timeframe': timeframe, 'created_by': session.user if mine else None,

@@ -55,8 +55,8 @@ class RHRoomsPermissions(RHRoomBookingBase):
 class RHSearchRooms(RHRoomBookingBase):
     @use_args({
         **search_room_args,
-        'unavailable': fields.Bool(missing=False),
-        'admin_override_enabled': fields.Bool(missing=False)
+        'unavailable': fields.Bool(load_default=False),
+        'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
     def _process(self, args):
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))

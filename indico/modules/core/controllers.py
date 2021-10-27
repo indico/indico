@@ -73,7 +73,7 @@ class RHReportErrorAPI(RH):
         send_email(make_email(config.SUPPORT_EMAIL, from_address=(email or config.NO_REPLY_EMAIL), template=template))
 
     @use_kwargs({
-        'email': fields.Email(missing=None),
+        'email': fields.Email(load_default=None),
         'comment': fields.String(required=True),
     })
     def _process(self, email, comment):
@@ -251,7 +251,7 @@ class RHPrincipals(PrincipalsMixin, RHProtected):
     """
 
     @use_kwargs({
-        'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_emails=True, missing={})
+        'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_emails=True, load_default={})
     })
     def _process_args(self, values):
         self.values = values
@@ -275,7 +275,7 @@ class RHSignURL(RH):
         'endpoint': fields.String(required=True,
                                   validate=validate_with_message(lambda ep: ep in current_app.view_functions,
                                                                  'Invalid endpoint')),
-        'params': fields.Dict(keys=fields.String(), missing={},
+        'params': fields.Dict(keys=fields.String(), load_default={},
                               validate=validate_with_message(lambda params: not any(x.startswith('_') for x in params),
                                                              'Params starting with an underscore are not allowed'))
     })

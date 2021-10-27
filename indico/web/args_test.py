@@ -220,7 +220,7 @@ def test_meta_location(location):
 def test_use_args_kwargs(decorator, partial, args, result):
     fn = make_decorated_func(decorator, {
         'a': fields.Integer(required=True),
-        'b': fields.String(missing='no-b'),
+        'b': fields.String(load_default='no-b'),
         'c': fields.String(),
     }, args, partial=partial)
 
@@ -249,7 +249,7 @@ context_test_params = pytest.mark.parametrize(('partial', 'args', 'result'), (
 def test_use_args_kwargs_context(decorator, partial, args, result):
     fn = make_decorated_func(decorator, {
         'a': fields.Integer(required=True),
-        'b': fields.String(missing='no-b'),
+        'b': fields.String(load_default='no-b'),
         'c': fields.String(),
         'd': ContextData('data'),
     }, args, partial=partial, context={'data': 'x'})
@@ -264,7 +264,7 @@ def test_use_args_kwargs_rh_context(monkeypatch, decorator, partial, args, resul
     monkeypatch.setattr('indico.web.args.g', fake_g)
     fn = make_decorated_func(decorator, {
         'a': fields.Integer(required=True),
-        'b': fields.String(missing='no-b'),
+        'b': fields.String(load_default='no-b'),
         'c': fields.String(),
         'd': ContextData('data'),
     }, args, partial=partial, rh_context=('data',))
@@ -276,7 +276,7 @@ class TestContextSchema(mm.Schema):
         rh_context = ('data',)
 
     a = fields.Integer(required=True)
-    b = fields.String(missing='no-b')
+    b = fields.String(load_default='no-b')
     c = fields.String()
     d = ContextData('data')
 

@@ -448,7 +448,7 @@ class RHContributionsExportCSV(RHManageContributionsExportActionsBase):
     """Export list of contributions to CSV."""
 
     @use_kwargs({
-        'affiliations': fields.Bool(missing=False)
+        'affiliations': fields.Bool(load_default=False)
     }, location='query')
     def _process(self, affiliations):
         headers, rows = generate_spreadsheet_from_contributions(self.contribs, affiliations=affiliations)
@@ -459,7 +459,7 @@ class RHContributionsExportExcel(RHManageContributionsExportActionsBase):
     """Export list of contributions to XLSX."""
 
     @use_kwargs({
-        'affiliations': fields.Bool(missing=False)
+        'affiliations': fields.Bool(load_default=False)
     }, location='query')
     def _process(self, affiliations):
         headers, rows = generate_spreadsheet_from_contributions(self.contribs, affiliations=affiliations)

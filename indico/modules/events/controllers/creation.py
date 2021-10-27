@@ -171,9 +171,9 @@ class RHPrepareEvent(RH):
     @use_kwargs({
         'title': fields.String(required=True),
         'start_dt': NaiveDateTime(required=True),
-        'tz': fields.String(missing=config.DEFAULT_TIMEZONE, validate=lambda v: v in common_timezones_set),
+        'tz': fields.String(load_default=config.DEFAULT_TIMEZONE, validate=lambda v: v in common_timezones_set),
         'duration': fields.Integer(required=True, validate=lambda v: v > 0),
-        'event_type': fields.String(missing='meeting'),
+        'event_type': fields.String(load_default='meeting'),
     })
     def _process(self, title, start_dt, tz, duration, event_type):
         event_key = str(uuid4())

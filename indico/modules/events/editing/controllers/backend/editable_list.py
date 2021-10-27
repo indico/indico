@@ -187,8 +187,8 @@ class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):
                 .all())
 
     @use_kwargs({
-        'has_files': fields.Dict(keys=fields.Int, values=fields.Bool, missing={}),
-        'extensions': fields.Dict(keys=fields.Int, values=fields.List(fields.String()), missing={}),
+        'has_files': fields.Dict(keys=fields.Int, values=fields.Bool, load_default={}),
+        'extensions': fields.Dict(keys=fields.Int, values=fields.List(fields.String()), load_default={}),
     })
     def _process(self, has_files, extensions):
         editables = self._query_editables(has_files, extensions)

@@ -152,7 +152,7 @@ class RHGroupDeleteMember(RHLocalGroupBase):
 class RHGroupSearch(RHProtected):
     @use_kwargs({
         'name': fields.Str(required=True),
-        'exact': fields.Bool(missing=False),
+        'exact': fields.Bool(load_default=False),
     }, location='query')
     def _process(self, name, exact):
         groups = GroupProxy.search(name, exact=exact)

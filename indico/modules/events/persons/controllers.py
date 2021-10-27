@@ -421,7 +421,7 @@ class RHEventPersonSearch(RHAuthenticatedEventBase):
         'last_name': fields.Str(validate=validate.Length(min=1)),
         'email': fields.Str(validate=lambda s: len(s) > 3),
         'affiliation': fields.Str(validate=validate.Length(min=1)),
-        'exact': fields.Bool(missing=False),
+        'exact': fields.Bool(load_default=False),
     }, validate=validate_with_message(
         lambda args: args.keys() & {'first_name', 'last_name', 'email', 'affiliation'},
         'No criteria provided'

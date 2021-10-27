@@ -25,8 +25,8 @@ from indico.web.rh import allow_signed_url
 @allow_signed_url
 class RHExportEventICAL(RHDisplayEventBase):
     @use_kwargs({
-        'scope': EnumField(CalendarScope, missing=None),
-        'detail': fields.String(missing=None)
+        'scope': EnumField(CalendarScope, load_default=None),
+        'detail': fields.String(load_default=None)
     }, location='query')
     def _process(self, scope, detail):
         if not scope and detail == 'contributions':

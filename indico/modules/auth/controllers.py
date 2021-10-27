@@ -615,8 +615,8 @@ class RHResetPassword(RH):
 
 class RHAdminImpersonate(RHAdminBase):
     @use_kwargs({
-        'undo': fields.Bool(missing=False),
-        'user_id': fields.Int(missing=None)
+        'undo': fields.Bool(load_default=False),
+        'user_id': fields.Int(load_default=None)
     })
     def _process_args(self, undo, user_id):
         RHAdminBase._process_args(self)

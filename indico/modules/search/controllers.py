@@ -44,11 +44,11 @@ class RHAPISearch(RH):
     """
 
     @use_kwargs({
-        'page': fields.Int(missing=None),
+        'page': fields.Int(load_default=None),
         'q': fields.String(required=True),
-        'type': fields.List(EnumField(SearchTarget), missing=None),
+        'type': fields.List(EnumField(SearchTarget), load_default=None),
         'admin_override_enabled': fields.Bool(
-            missing=False,
+            load_default=False,
             validate=validate_with_message(lambda value: session.user and session.user.is_admin,
                                            'Restricted to admins')
         ),

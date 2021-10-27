@@ -86,7 +86,7 @@ class RHMoveEvent(RHManageEventBase):
 
     @use_kwargs({
         'target_category': ModelField(Category, filter_deleted=True, required=True, data_key='target_category_id'),
-        'comment': fields.String(missing=''),
+        'comment': fields.String(load_default=''),
     })
     def _process_args(self, target_category, comment):
         RHManageEventBase._process_args(self)

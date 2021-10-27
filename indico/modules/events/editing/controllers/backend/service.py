@@ -75,7 +75,7 @@ class RHDisconnectService(RHEditingManagementBase):
     """Disconnect the event from the editing workflow service."""
 
     @use_kwargs({
-        'force': fields.Bool(missing=False),
+        'force': fields.Bool(load_default=False),
     })
     def _process(self, force):
         if not editing_settings.get(self.event, 'service_url'):

@@ -41,7 +41,7 @@ class PersonSchema(_ResultSchemaBase):
     #: The person's name
     name = fields.String(required=True)
     #: The person's affiliation
-    affiliation = fields.String(missing=None)
+    affiliation = fields.String(load_default=None)
 
 
 class HighlightSchema(_ResultSchemaBase):
@@ -103,7 +103,7 @@ class EventResultSchema(ResultSchemaBase):
     #: The event location
     location: LocationResultSchema = fields.Nested(LocationResultSchema, required=True)
     #: The event content to highlight
-    highlight = fields.Nested(HighlightSchema, missing={})
+    highlight = fields.Nested(HighlightSchema, load_default={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
 
@@ -123,9 +123,9 @@ class ContributionResultSchema(ResultSchemaBase):
     #: The contribution description
     description = fields.String(required=True)
     #: The contribution start date time
-    start_dt = fields.DateTime(missing=None)
+    start_dt = fields.DateTime(load_default=None)
     #: The contribution end date time
-    end_dt = fields.DateTime(missing=None)
+    end_dt = fields.DateTime(load_default=None)
     #: The contribution associated persons
     persons: PersonSchema = fields.List(fields.Nested(PersonSchema), required=True)
     #: The contribution location
@@ -133,7 +133,7 @@ class ContributionResultSchema(ResultSchemaBase):
     #: The contribution duration
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
     #: The contribution content to highlight
-    highlight = fields.Nested(HighlightSchema, missing={})
+    highlight = fields.Nested(HighlightSchema, load_default={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
     event_path = fields.Method('_get_event_path', dump_only=True)
@@ -198,15 +198,15 @@ class AttachmentResultSchema(ResultSchemaBase):
     #: The attachment event id
     event_id = fields.Int(required=True)
     #: The attachment contribution id
-    contribution_id = fields.Int(missing=None)
+    contribution_id = fields.Int(load_default=None)
     #: The attachment sub-contribution id
-    subcontribution_id = fields.Int(missing=None)
+    subcontribution_id = fields.Int(load_default=None)
     #: The attachment title
     title = fields.String(required=True)
     #: The attachment filename
-    filename = fields.String(missing=None)
+    filename = fields.String(load_default=None)
     #: The attachment author
-    user: PersonSchema = fields.Nested(PersonSchema, missing=None)
+    user: PersonSchema = fields.Nested(PersonSchema, load_default=None)
     #: The attachment type
     attachment_type: AttachmentType = EnumField(AttachmentType, required=True)
     #: The attachment last modified date time
@@ -235,19 +235,19 @@ class EventNoteResultSchema(ResultSchemaBase):
     #: The note event id
     event_id = fields.Int(required=True)
     #: The note contribution id
-    contribution_id = fields.Int(missing=None)
+    contribution_id = fields.Int(load_default=None)
     #: The note sub-contribution id
-    subcontribution_id = fields.Int(missing=None)
+    subcontribution_id = fields.Int(load_default=None)
     #: The note title
     title = fields.String(required=True)
     #: The note author
-    user: PersonSchema = fields.Nested(PersonSchema, missing=None)
+    user: PersonSchema = fields.Nested(PersonSchema, load_default=None)
     #: The note last modification date time
     modified_dt = fields.DateTime(required=True)
     #: The note content
     content = fields.String(required=True)
     #: The note content to highlight
-    highlight: HighlightSchema = fields.Nested(HighlightSchema, missing={})
+    highlight: HighlightSchema = fields.Nested(HighlightSchema, load_default={})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
     event_path = fields.Method('_get_event_path', dump_only=True)
@@ -315,7 +315,7 @@ class PageNavSchema(_ResultSchemaBase):
 
 class ResultSchema(_ResultSchemaBase):
     total = fields.Int(required=True)
-    pages = fields.Int(missing=None)
-    pagenav = fields.Nested(PageNavSchema, missing=None)
+    pages = fields.Int(load_default=None)
+    pagenav = fields.Nested(PageNavSchema, load_default=None)
     results = fields.List(fields.Nested(ResultItemSchema), required=True)
-    aggregations = fields.Dict(fields.String(), fields.Nested(AggregationSchema), missing={})
+    aggregations = fields.Dict(fields.String(), fields.Nested(AggregationSchema), load_default={})

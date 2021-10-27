@@ -22,7 +22,7 @@ search_room_args = {
     'start_dt': fields.DateTime(),
     'end_dt': fields.DateTime(),
     'repeat_frequency': EnumField(RepeatFrequency),
-    'repeat_interval': fields.Int(missing=0),
+    'repeat_interval': fields.Int(load_default=0),
     'building': fields.Str(),
     'sw_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
     'sw_lng': fields.Float(validate=lambda x: -180 <= x <= 180),

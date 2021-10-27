@@ -49,7 +49,7 @@ class RHCreatePaperComment(RHPaperBase):
 
     @use_kwargs({
         'comment': fields.String(validate=not_empty),
-        'visibility': EnumField(PaperCommentVisibility, missing=None)
+        'visibility': EnumField(PaperCommentVisibility, load_default=None)
     })
     def _process(self, comment, visibility):
         create_comment(self.paper, comment, visibility, session.user)
@@ -120,7 +120,7 @@ class RHSubmitNewRevision(RHPaperBase):
 def _parse_review_args(event, review_type):
     args_schema = {
         'proposed_action': EnumField(PaperAction, required=True),
-        'comment': fields.String(missing='')
+        'comment': fields.String(load_default='')
     }
 
     for question in event.cfp.get_questions_for_review_type(review_type):

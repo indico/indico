@@ -133,7 +133,7 @@ class RHAPIEventMoveRequests(RHManageCategoryBase):
 
     @use_kwargs({
         'accept': fields.Bool(required=True),
-        'reason': fields.String(missing=None)
+        'reason': fields.String(load_default=None)
     })
     def _process_POST(self, accept, reason):
         move_requests = parser.parse({
@@ -382,8 +382,8 @@ class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
     """Base RH to manage selected events in a category."""
 
     @use_kwargs({
-        'all_selected': fields.Bool(missing=False),
-        'event_ids': fields.List(fields.Int(), data_key='event_id', missing=[]),
+        'all_selected': fields.Bool(load_default=False),
+        'event_ids': fields.List(fields.Int(), data_key='event_id', load_default=[]),
     })
     def _process_args(self, all_selected, event_ids):
         RHManageCategoryBase._process_args(self)
@@ -448,7 +448,7 @@ class RHSplitCategory(RHManageCategorySelectedEventsBase):
 class RHMoveEvents(RHManageCategorySelectedEventsBase):
     @use_kwargs({
         'target_category': ModelField(Category, filter_deleted=True, required=True, data_key='target_category_id'),
-        'comment': fields.String(missing=''),
+        'comment': fields.String(load_default=''),
     })
     def _process_args(self, target_category, comment):
         RHManageCategorySelectedEventsBase._process_args(self)
