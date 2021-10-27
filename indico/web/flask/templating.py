@@ -16,7 +16,7 @@ from dateutil.relativedelta import relativedelta
 from flask import current_app
 from flask_pluginengine.templating import PluginEnvironment
 from flask_pluginengine.util import get_state
-from jinja2 import environmentfilter
+from jinja2 import pass_environment
 from jinja2.filters import _GroupTuple, make_attrgetter
 from jinja2.loaders import BaseLoader, FileSystemLoader, TemplateNotFound, split_template_path
 from jinja2.runtime import StrictUndefined
@@ -44,7 +44,7 @@ def dedent(value):
     return indentation_re.sub('', value)
 
 
-@environmentfilter
+@pass_environment
 def natsort(environment, value, reverse=False, case_sensitive=False, attribute=None):
     """Sort an iterable in natural order.
 
@@ -74,7 +74,7 @@ def natsort(environment, value, reverse=False, case_sensitive=False, attribute=N
     return sorted(value, key=sort_func, reverse=reverse)
 
 
-@environmentfilter
+@pass_environment
 def groupby(environment, value, attribute, reverse=False):
     """Like Jinja's builtin `groupby` filter, but allows reversed order."""
     expr = make_attrgetter(environment, attribute)
