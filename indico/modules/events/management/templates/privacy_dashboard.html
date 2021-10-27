@@ -15,28 +15,35 @@
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
                data-disabled-until-change data-save-reminder>
     {% endcall %}
-    {% call form_fieldset(_('Registration forms')) %}
-        {% for regform in regforms %}
-            <div class="action-box">
-                <div class="section">
-                    <div class="icon icon-quill"></div>
-                    <div class="text">
-                        <div class="label">{{ regform.title }}</div>
-                    </div>
-                    <div class="toolbar">
-                        <div class="group">
-                            <a href="{{ url_for('event_registration.manage_regform', regform) }}" class="i-button highlight icon-settings">
-                                {% trans %}Manage{% endtrans %}
-                            </a>
+    {% if regforms %}
+        {% call form_fieldset(_('Registration forms')) %}
+            {% for regform in regforms %}
+                <div class="action-box">
+                    <div class="section">
+                        <div class="icon icon-quill"></div>
+                        <div class="text">
+                            <div class="label">{{ regform.title }}</div>
+                        </div>
+                        <div class="toolbar">
+                            <div class="group">
+                                {% if regform.publish_registrations_mode.name == 'hide_all' %}
+                                    {% trans %}Hiding all registrations.{% endtrans %}
+                                {% elif regform.publish_registrations_mode.name == 'show_with_consent' %}
+                                    {% trans %}Only showing registrations with user consent.{% endtrans %}
+                                {% elif regform.publish_registrations_mode.name == 'show_all' %}
+                                    {% trans %}Showing all registrations.{% endtrans %}
+                                {% endif %}
+                            </div>
+                            <div class="group">
+                                <a href="{{ url_for('event_registration.edit_regform', regform) }}" class="i-button highlight icon-settings">
+                                    {% trans %}Manage privacy{% endtrans %}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            {%- call message_box('info', fixed_width=true) -%}
-                {% trans %}There are no registration forms yet.{% endtrans %}
-            {%- endcall %}
-        {% endfor %}
-    {% endcall %}
+            {% endfor %}
+        {% endcall %}
+    {% endif %}
     {{ form_footer(form) }}
 {% endblock %}

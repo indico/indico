@@ -507,7 +507,7 @@ def get_published_registrations(event):
             .filter(Registration.is_publishable,
                     ~RegistrationForm.is_deleted,
                     RegistrationForm.event_id == event.id,
-                    RegistrationForm.publish_registrations_mode != PublishRegistrationsMode.hide_all)
+                    RegistrationForm.publish_registrations_mode == PublishRegistrationsMode.show_all)
             .join(Registration.registration_form)
             .options(contains_eager(Registration.registration_form))
             .order_by(db.func.lower(Registration.first_name),

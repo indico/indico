@@ -37,10 +37,10 @@ class ModificationMode(RichIntEnum):
 
 
 class PublishRegistrationsMode(RichIntEnum):
-    __titles__ = [None, L_('No'), L_('Show only with user consent'), L_('Show all')]
-    hide_all = 1
-    show_with_consent = 2
-    show_all = 3
+    __titles__ = [L_('Never'), L_('With user consent'), L_('Always')]
+    hide_all = 0
+    show_with_consent = 1
+    show_all = 2
 
 
 class RegistrationForm(db.Model):

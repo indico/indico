@@ -141,7 +141,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         query = (Registration.query.with_parent(self.event)
                  .filter(Registration.is_publishable,
-                         RegistrationForm.publish_registrations_mode != PublishRegistrationsMode.hide_all,
+                         RegistrationForm.publish_registrations_mode == PublishRegistrationsMode.show_all,
                          ~RegistrationForm.is_deleted,
                          ~Registration.is_deleted)
                  .join(Registration.registration_form)
@@ -194,7 +194,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
     def _process(self):
         regforms = (RegistrationForm.query.with_parent(self.event)
-                    .filter(RegistrationForm.publish_registrations_mode,
+                    .filter(RegistrationForm.publish_registrations_mode != PublishRegistrationsMode.hide_all,
                             ~RegistrationForm.is_deleted)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .all())
@@ -202,7 +202,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             tables = [self._merged_participant_list_table()]
         else:
             tables = []
-            regforms_dict = {regform.id: regform for regform in regforms if regform.publish_registrations_enabled}
+            regforms_dict = {regform.id: regform for regform in regforms
+                             if regform.publish_registrations_mode != PublishRegistrationsMode.hide_all}
             for form_id in registration_settings.get_participant_list_form_ids(self.event):
                 try:
                     regform = regforms_dict.pop(form_id)
@@ -215,7 +216,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             tables.extend(map(self._participant_list_table, regforms_dict.values()))
 
         published = (RegistrationForm.query.with_parent(self.event)
-                     .filter(RegistrationForm.publish_registrations_mode)
+                     .filter(RegistrationForm.publish_registrations_mode != PublishRegistrationsMode.hide_all)
                      .has_rows())
         num_participants = sum(len(table['rows']) for table in tables)
 

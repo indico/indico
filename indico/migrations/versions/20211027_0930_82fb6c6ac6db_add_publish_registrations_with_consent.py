@@ -20,18 +20,27 @@ depends_on = None
 
 
 class _PublishRegistrationsMode(int, Enum):
-    hide_all = 1
-    show_with_consent = 2
-    show_all = 3
+    hide_all = 0
+    show_with_consent = 1
+    show_all = 2
 
 
 def upgrade():
-    op.add_column('forms', sa.Column('publish_registrations_mode', PyIntEnum(_PublishRegistrationsMode), server_default='1', nullable=False), schema='event_registration')
+    op.add_column('forms',
+                  sa.Column('publish_registrations_mode', PyIntEnum(_PublishRegistrationsMode), server_default='0',
+                            nullable=False),
+                  schema='event_registration')
     op.execute('UPDATE event_registration.forms SET publish_registrations_mode = 2 WHERE publish_registrations_enabled')
     op.drop_column('forms', 'publish_registrations_enabled', schema='event_registration')
 
 
 def downgrade():
-    op.add_column('forms', sa.Column('publish_registrations_enabled', sa.BOOLEAN(), server_default='false', autoincrement=False, nullable=False), schema='event_registration')
-    op.execute('UPDATE event_registration.forms SET publish_registrations_enabled = true WHERE publish_registrations_mode != 1')
+    op.add_column('forms',
+                  sa.Column('publish_registrations_enabled', sa.Boolean(), server_default='false', nullable=False),
+                  schema='event_registration')
+    op.execute('''
+        UPDATE event_registration.forms
+        SET publish_registrations_enabled = true
+        WHERE publish_registrations_mode = 2
+    ''')
     op.drop_column('forms', 'publish_registrations_mode', schema='event_registration')

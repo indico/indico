@@ -20,7 +20,7 @@ from indico.modules.events.registration.controllers.management import RHManageRe
 from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
                                                       RegistrationFormForm, RegistrationFormScheduleForm,
                                                       RegistrationManagersForm)
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.forms import PublishRegistrationsMode, RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (create_personal_data_fields, get_event_section_data,
@@ -59,7 +59,9 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             registration_settings.set_participant_list_form_ids(self.event, data['participant_list_forms'])
             registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
             for regform in regforms:
-                regform.publish_registrations_enabled = regform.id in data['participant_list_forms']
+                regform.publish_registrations_mode = (PublishRegistrationsMode.show_all
+                                                      if regform.id in data['participant_list_forms']
+                                                      else PublishRegistrationsMode.hide_all)
             flash(_('The participants display settings have been saved.'), 'success')
             return redirect(url_for('.manage_regforms_display', self.event))
 
@@ -84,12 +86,12 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             except KeyError:
                 continue
             # Make sure publication was not disabled since the display settings were modified.
-            if regform.publish_registrations_enabled:
+            if regform.publish_registrations_mode == PublishRegistrationsMode.show_all:
                 enabled_forms.append(regform)
                 del available_forms[form_id]
         for form_id, regform in available_forms.items():
             # There might be forms with publication enabled that haven't been sorted by the user yet.
-            if regform.publish_registrations_enabled:
+            if regform.publish_registrations_mode == PublishRegistrationsMode.show_all:
                 enabled_forms.append(regform)
             else:
                 disabled_forms.append(regform)
