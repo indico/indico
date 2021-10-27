@@ -17,7 +17,6 @@ from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.persons import EventPerson, EventPersonLink, PersonLinkBase
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.persons.util import get_event_person
-from indico.modules.events.util import serialize_person_link
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.web.forms.fields import MultipleItemsField
@@ -127,8 +126,7 @@ class PersonLinkListFieldBase(EventPersonListField):
 
     @no_autoflush
     def _get_person_link(self, data):
-        from indico.modules.events.schemas import PersonLinkSchema
-
+        from indico.modules.events.persons.schemas import PersonLinkSchema
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
         person_link = None
@@ -139,6 +137,8 @@ class PersonLinkListFieldBase(EventPersonListField):
         person_link.populate_from_dict(PersonLinkSchema(
             only=('first_name', 'last_name', 'affiliation', 'address', 'phone', 'display_order')).load(data))
         email = data.get('email', '').lower()
+        if not email:
+            raise UserValueError(_(f'A valid email address is required for {person_link.name}'))
         if email != person_link.email:
             if not self.event or not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
@@ -146,7 +146,7 @@ class PersonLinkListFieldBase(EventPersonListField):
                 if inspect(person).persistent:
                     signals.event.person_updated.send(person_link.person)
             else:
-                raise UserValueError(_('There is already a person with the email {}').format(email))
+                raise UserValueError(_(f'There is already a person with the email {email}'))
         return person_link
 
     def _serialize_principal(self, principal):
@@ -185,7 +185,8 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         return {self._get_person_link(x): 'submitter' in x.pop('roles', []) for x in data}
 
     def _serialize_person_link(self, principal):
-        data = serialize_person_link(principal)
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema().dump(principal)
         data['roles'] = []
         if self.get_form().is_submitted() and self.data[principal] or principal.is_submitter:
             data['roles'].append('submitter')

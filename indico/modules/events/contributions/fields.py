@@ -11,7 +11,6 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
                                                                 SubContributionPersonLink)
 from indico.modules.events.fields import PersonLinkListFieldBase
-from indico.modules.events.util import serialize_person_link
 from indico.util.i18n import _
 from indico.web.forms.widgets import JinjaWidget
 
@@ -51,8 +50,9 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
                                        self.default_author_type)
         return person_link
 
-    def _serialize_person_link(self, principal, extra_data=None):
-        data = serialize_person_link(principal)
+    def _serialize_person_link(self, principal):
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema().dump(principal)
         data['roles'] = []
         is_submitter = self.get_form().is_submitted() and self.data[principal] or principal.is_submitter
         if principal.is_speaker:

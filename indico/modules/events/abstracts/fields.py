@@ -23,7 +23,6 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import serialize_person_link
 from indico.modules.users.models.users import User
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
@@ -131,8 +130,9 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
                                        self.default_author_type)
         return person_link
 
-    def _serialize_person_link(self, principal, extra_data=None):
-        data = serialize_person_link(principal)
+    def _serialize_person_link(self, principal):
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema().dump(principal)
         data['roles'] = []
         if principal.is_speaker:
             data['roles'].append('speaker')
