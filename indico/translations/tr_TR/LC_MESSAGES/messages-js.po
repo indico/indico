@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-05 17:54+0200\n"
-"PO-Revision-Date: 2021-06-25 21:24+0000\n"
-"Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>\n"
+"POT-Creation-Date: 2021-10-26 12:56+0200\n"
+"PO-Revision-Date: 2021-10-26 10:58+0000\n"
+"Last-Translator: Adrian\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/indico/indico/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,25 +64,25 @@ msgstr[1] "{0} gösterilmeyen uzun süren etkinlikler"
 msgid "Long lasting events"
 msgstr "Uzun süren etkinlikler"
 
-#: indico/modules/categories/client/js/display.js:21
+#: indico/modules/categories/client/js/display.js:25
 msgid "empty"
 msgstr "boş"
 
-#: indico/modules/categories/client/js/display.js:22
+#: indico/modules/categories/client/js/display.js:26
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} olaylar"
 msgstr[1] "{0} etkinlikler"
 
-#: indico/modules/categories/client/js/display.js:151
+#: indico/modules/categories/client/js/display.js:166
 msgid "Remove from your favorites"
 msgstr "Favorilerinden çıkar"
 
-#: indico/modules/categories/client/js/display.js:154
+#: indico/modules/categories/client/js/display.js:169
 msgid "Add to your favorites"
 msgstr "Favorilerine ekle"
 
-#: indico/modules/categories/client/js/display.js:156
+#: indico/modules/categories/client/js/display.js:171
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
@@ -316,12 +316,12 @@ msgstr "Hata"
 msgid "Choose a file"
 msgstr "Bir dosya seç"
 
-#: indico/modules/events/abstracts/client/js/index.js:76
-#: indico/modules/events/abstracts/client/js/index.js:89
+#: indico/modules/events/abstracts/client/js/index.js:78
+#: indico/modules/events/abstracts/client/js/index.js:91
 msgid "Show preview"
 msgstr "Ön izlemeyi göster"
 
-#: indico/modules/events/abstracts/client/js/index.js:80
+#: indico/modules/events/abstracts/client/js/index.js:82
 msgid "Hide preview"
 msgstr "Ön izlemeyi gizle"
 
@@ -525,14 +525,6 @@ msgstr "Metin alanı"
 msgid "Yes/No"
 msgstr "Evet/Hayır"
 
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "yes"
-msgstr "evet"
-
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "no"
-msgstr "hayır"
-
 #: indico/modules/events/registration/client/js/form/field.js:869
 msgid "Email address"
 msgstr "E-posta adresi"
@@ -627,7 +619,7 @@ msgstr "Kaybedilecek kaydedilmemiş değişiklikleriniz var."
 msgid "Confirm action"
 msgstr "Eylemi onayla"
 
-#: indico/web/client/js/jquery/utils/declarative.js:360
+#: indico/web/client/js/jquery/utils/declarative.js:361
 msgid "Direct link to this item"
 msgstr "Bu öğeye doğrudan bağlantı"
 
@@ -736,7 +728,7 @@ msgstr "Kaydet"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:672
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:675
 msgid "Loading..."
 msgstr "Yükleniyor..."
 
@@ -845,7 +837,7 @@ msgstr "Eklenecek tür {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1506
 msgid "Delete"
 msgstr "Sil"
 
@@ -895,7 +887,7 @@ msgstr[0] "<strong>1</strong> kelime kaldı"
 msgstr[1] "<strong>{0}</strong> kelime kaldı"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1438
 msgid "Edit"
 msgstr "Düzenle"
 
@@ -1264,171 +1256,177 @@ msgstr "Oturum ekle"
 msgid "Add session block"
 msgstr "Oturum öbeği ekle"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:43
+#: indico/web/client/js/legacy/libs/timetable/Base.js:45
 msgid "Session"
 msgstr "Oturum"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:44
+#: indico/web/client/js/legacy/libs/timetable/Base.js:46
 msgid "Room"
 msgstr "Oda"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:131
+#: indico/web/client/js/legacy/libs/timetable/Base.js:133
 msgid "Updating the timetable..."
 msgstr "Zaman çizelgesini güncelliyor..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:182
-#: indico/web/client/js/legacy/libs/timetable/Base.js:421
+#: indico/web/client/js/legacy/libs/timetable/Base.js:184
+#: indico/web/client/js/legacy/libs/timetable/Base.js:423
 msgid "Filter"
 msgstr "Süzgeç"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:200
+#: indico/web/client/js/legacy/libs/timetable/Base.js:202
 msgid "Printable version"
 msgstr "Yazdırılabilir sürüm"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:221
+#: indico/web/client/js/legacy/libs/timetable/Base.js:223
 msgid "Go back"
 msgstr "Geriye dön"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:228
-#: indico/web/client/js/legacy/libs/timetable/Base.js:387
+#: indico/web/client/js/legacy/libs/timetable/Base.js:230
+#: indico/web/client/js/legacy/libs/timetable/Base.js:389
 msgid "Print"
 msgstr "Yazdır"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:272
+#: indico/web/client/js/legacy/libs/timetable/Base.js:274
 msgid "Export to PDF"
 msgstr "PDF'ye aktar"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:280
+#: indico/web/client/js/legacy/libs/timetable/Base.js:282
 msgid "Switching to full screen mode..."
 msgstr "Tam ekran moduna geçiyor..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:317
+#: indico/web/client/js/legacy/libs/timetable/Base.js:319
 msgid "Exit Full Screen"
 msgstr "Tam Ekrandan Çık"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:394
+#: indico/web/client/js/legacy/libs/timetable/Base.js:396
 msgid "PDF"
 msgstr "PDF"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:401
+#: indico/web/client/js/legacy/libs/timetable/Base.js:403
 msgid "Full screen"
 msgstr "Tam ekran"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:408
+#: indico/web/client/js/legacy/libs/timetable/Base.js:410
 msgid "Link"
 msgstr "Bağlantı"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:413
+#: indico/web/client/js/legacy/libs/timetable/Base.js:415
 msgid "Detailed view"
 msgstr "Detaylı görünüm"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:476
+#: indico/web/client/js/legacy/libs/timetable/Base.js:478
 msgid "All days"
 msgstr "Tüm günler"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:689
+#: indico/web/client/js/legacy/libs/timetable/Base.js:482
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1218
+msgctxt "momentjs date format for timetable tab headers"
+msgid "ddd DD/MM"
+msgstr ""
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:684
 msgid "You are viewing the contents of the session block:"
 msgstr "Oturum öbeği içeriklerini görüntülüyorsunuz:"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:778
+#: indico/web/client/js/legacy/libs/timetable/Base.js:773
 msgid "Your changes triggered the automatic modification of some settings:"
 msgstr "Değişiklikleriniz bazı ayarlarda otomatik değişimi tetikledi:"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:786
-#: indico/web/client/js/legacy/libs/timetable/Base.js:790
+#: indico/web/client/js/legacy/libs/timetable/Base.js:781
+#: indico/web/client/js/legacy/libs/timetable/Base.js:785
 msgid "The <strong>starting time</strong> of the session interval <strong>"
 msgstr "<strong>Oturum arasının</strong> başlangıç zamanı <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:788
-#: indico/web/client/js/legacy/libs/timetable/Base.js:792
-#: indico/web/client/js/legacy/libs/timetable/Base.js:801
-#: indico/web/client/js/legacy/libs/timetable/Base.js:805
+#: indico/web/client/js/legacy/libs/timetable/Base.js:783
+#: indico/web/client/js/legacy/libs/timetable/Base.js:787
+#: indico/web/client/js/legacy/libs/timetable/Base.js:796
+#: indico/web/client/js/legacy/libs/timetable/Base.js:800
 msgid "</strong> was moved from "
 msgstr "</strong> taşındı"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:793
+#: indico/web/client/js/legacy/libs/timetable/Base.js:788
 msgid ""
 "The <strong>starting time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong>Etkinliğin</strong>  <strong>başlangıç zamanı</strong> taşındı"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:799
-#: indico/web/client/js/legacy/libs/timetable/Base.js:803
+#: indico/web/client/js/legacy/libs/timetable/Base.js:794
+#: indico/web/client/js/legacy/libs/timetable/Base.js:798
 msgid "The <strong>ending time</strong> of the session interval <strong>"
 msgstr "<strong>Oturum aralığının</strong> bitiş zamanı <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:806
+#: indico/web/client/js/legacy/libs/timetable/Base.js:801
 msgid ""
 "The <strong>ending time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong>Etkinliğin</strong><strong>bitiş zamanı</strong> taşındı"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:812
+#: indico/web/client/js/legacy/libs/timetable/Base.js:807
 msgid "The contents of the interval <strong>"
 msgstr "Aralığın içerikleri <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:814
+#: indico/web/client/js/legacy/libs/timetable/Base.js:809
 msgid "</strong> were moved from "
 msgstr "</strong> taşındı"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:824
+#: indico/web/client/js/legacy/libs/timetable/Base.js:819
 msgid " to "
 msgstr "Taşınan yer"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1017
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1012
 msgid "Session block"
 msgstr "Oturum öbeği"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1035
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1030
 msgid "Contribution"
 msgstr "Katkı"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1049
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1044
 msgid "Break"
 msgstr "Ara"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1066
 msgid "Add poster"
 msgstr "Gönderi sahibi ekle"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1076
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
 msgid "Add new"
 msgstr "Yeni ekle"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1080
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1075
 #: indico/web/client/js/legacy/libs/timetable/Management.js:664
 msgid "Reschedule"
 msgstr "Yeniden zamanla"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1090
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1085
 msgid "Fit to content"
 msgstr "İçeriğe sığdır"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1099
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1094
 msgid "Add new block"
 msgstr "Yeni öbek ekle"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1143
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1138
 msgid "Add one hour"
 msgstr "Bir saat ekle"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1212
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1207
 msgid "Session legend"
 msgstr "Oturum göstergesi"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1243
 msgid "see more..."
 msgstr "daha fazla bilgi..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1253
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
 msgid "less..."
 msgstr "daha az..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1567
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1562
 msgid "Go to event timetable"
 msgstr "Etkinlik zaman çizelgesine git"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1737
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1732
 msgid "Up to timetable"
 msgstr "Zaman çizelgesine bağlı"
 
@@ -1450,72 +1448,72 @@ msgstr "Öbeği oturumun içine taşımak için sürükle"
 msgid "Show materials"
 msgstr "Malzemeler göster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:215
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:218
 msgid "et al."
 msgstr "vd."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:318
 msgid "This poster session has "
 msgstr "Bu gönderi sahibinin oturumda"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:320
 msgid " contribution(s)."
 msgstr "katkı(lar)."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:319
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:322
 msgid "Please click for more information."
 msgstr "Lütfen daha fazla bilgi için tıklayın."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:622
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:625
 msgid "Move entry"
 msgstr "Giriyi taşı"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:666
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:677
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:669
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:680
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr "Bu zaman çizelgesi artık mevcut değildir. Lütfen sayfayı yenileyin."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:678
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:681
 msgid "Refresh"
 msgstr "Yenile"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:784
 msgid "Move up"
 msgstr "Yukarı taşı"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:790
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
 msgid "Move down"
 msgstr "Aşağı taşı"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1478
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1440
 msgid "Edit poster"
 msgstr "Gönderi sahibini düzenle"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1472
 msgid "Manage protection"
 msgstr "Korumayı yönet"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1512
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1474
 msgid "Manage poster protection"
 msgstr "Gönderi sahibi korumasını yönet"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1502
 msgid "Unschedule"
 msgstr "Zamanlamadan çıkar"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1541
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
 msgid "Unschedule poster"
 msgstr "Gönderi sahibini zamanlamadan çıkar"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "Gönderi sahibini zamanlamadan çıkarmak istediğinizden emin misiniz?"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1545
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1507
 msgid "Delete poster"
 msgstr "Gönderi sahibini sil"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1546
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1508
 msgid "Are you sure you want to delete the poster?"
 msgstr "Gönderi sahibini silmek istediğinizden emin misiniz?"
 

@@ -1,12 +1,12 @@
 # 
 # Translators:
 # İNFOYED TERCÜME <infoyed@gmail.com>, 2021
-# Adrian Mönnich, 2021
+# Adrian, 2021
 # selcuk bilmis <selcukbilmis@gmail.com>, 2021
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-07-21 17:54+0200\n"
+"POT-Creation-Date: 2021-10-21 12:56+0200\n"
 "Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/indico/teams/6478/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -136,7 +136,7 @@ msgstr "Mevcut PDF'yi sil"
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:121
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:89
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:512
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:170
@@ -405,7 +405,7 @@ msgstr "Bu yorumun görünürlüğünü diğer editörlere kısıtla"
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:211
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
 msgid "Comment"
 msgstr "Yorum"
 
@@ -423,27 +423,27 @@ msgid "On {modificationDate}"
 msgstr "Tarih: {modificationDate}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:80
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:78
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:89
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:80
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:91
 msgid "edited"
 msgstr "düzenlendi"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:89
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:93
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:95
 msgid "Edit comment"
 msgstr "Yorumu düzenle"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:94
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:98
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:119
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:105
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:127
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:102
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:129
 msgid "Remove comment"
 msgstr "Yorumu kaldır"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:100
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:107
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:109
 msgid "Are you sure you want to remove this comment?"
 msgstr "Bu yorumu kaldırmak istediğinizden emin misiniz?"
 
@@ -601,12 +601,12 @@ msgid "{submitterName} submitted a revision"
 msgstr "{submitterName} bir düzeltme sundu"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:57
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
 msgid "Hide old revision"
 msgstr "Eski düzeltmeyi gizle"
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
 msgid "Show old revision"
 msgstr "Eski düzeltmeyi göster"
 
@@ -710,7 +710,7 @@ msgstr ""
 " bir düzenlenebilir dosya türünü etkinleştirmek için değiştire tıklayın"
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:115
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:176
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:177
 msgid "List"
 msgstr "Liste"
 
@@ -736,8 +736,8 @@ msgid "Configure the tags that can be assigned to revisions"
 msgstr "Düzeltmelere atanabilecek etiketleri yapılandır"
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:31
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:123
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:135
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:124
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:136
 msgid "Configure"
 msgstr "Yapılandır"
 
@@ -922,103 +922,103 @@ msgstr "Kimlik numarası veya arama dizgisini gir"
 msgid "There are no editables yet."
 msgstr "Henüz herhangi bir düzenlenebilir dosya yoktur."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:67
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:68
 msgid "Send emails to the editing team"
 msgstr "Düzenleme ekibine e-postalar gönder"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:72
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:73
 msgid "Assign an editor to papers"
 msgstr "Makalelere bir editör ata"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:73
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:74
 msgid "Assign an editor to posters"
 msgstr "Posterlere bir editör ata"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:74
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:75
 msgid "Assign an editor to slides"
 msgstr "Slaytlara bir editör ata"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:90
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:91
 msgid "Submission is open"
 msgstr "Sunma açıktır"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:91
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:92
 msgid "Submission is not open"
 msgstr "Sunma açık değildir"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:93
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:94
 msgid "Toggle whether users can submit new editables"
 msgstr ""
 "Kullanıcıların yeni düzenlenebilir dosya sunup sunamayacağını değiştir"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:97
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:110
 msgid "Close now"
 msgstr "Şimdi kapat"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:97
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:110
 msgid "Start now"
 msgstr "Şimdi başlat"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:103
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:104
 msgid "Editing is open"
 msgstr "Düzenleme açık"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:104
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:105
 msgid "Editing is not open"
 msgstr "Düzenleme açık değil"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:106
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:107
 msgid "Toggle whether editors can review submissions"
 msgstr ""
 "Editörlerin gönderileri gözden geçirme yapıp yapmayabileceğini değiştir"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:116
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:117
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx:24
 msgid "File types"
 msgstr "Dosya tipleri"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:117
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:118
 msgid "Configure file types"
 msgstr "Dosya tiplerini yapılandır"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:128
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:129
 msgid "Ready for review conditions"
 msgstr "Gözden geçirme koşulları için hazır"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:129
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:130
 msgid "Configure conditions for reviewing"
 msgstr "Gözden geçirme koşullarını yapılandır"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:140
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:141
 msgid "Editing team"
 msgstr "Düzenleme ekibi"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:141
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:142
 msgid "Configure editing team"
 msgstr "Düzenleme ekibini yapılandır"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:148
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:149
 msgid "Keep editing team members anonymous"
 msgstr "Düzenleme ekibi üyelerini isimsiz tut"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:151
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:152
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:20
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:43
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:127
 msgid "Contact"
 msgstr "İletişim"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:154
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:155
 msgid "Manage team"
 msgstr "Ekibi yönet"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:162
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:163
 msgid "Editor assignment"
 msgstr "Editör ataması"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:170
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:171
 msgid "Allow editors to self-assign editables"
 msgstr "Editörlerin düzenlenebilir dosyaları kendilerine atamalarına izin ver"
 
@@ -1456,7 +1456,7 @@ msgstr "Gözden geçir"
 msgid "Change reviews"
 msgstr "Gözden geçirmeleri değiştir"
 
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:81
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:83
 msgid "On {modificationDate} by {modifiedBy}"
 msgstr "{modificationDate} tarihinde {modifiedBy} tarafından"
 
@@ -1503,35 +1503,35 @@ msgstr "Makalede değişiklikler gerekiyor."
 msgid "{reviewerName} left a review"
 msgstr "{reviewerName} bir gözden geçirmeyi terk etti"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:112
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:114
 msgid "Proposed to {actionName}accept{/actionName}"
 msgstr "Kabul edilmesi {actionName}önerildi{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:120
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:122
 msgid "Proposed to {actionName}reject{/actionName}"
 msgstr "Reddedilmesi {actionName}önerildi{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:128
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:130
 msgid "Proposed to {actionName}correct{/actionName}"
 msgstr "Düzeltilmesi {actionName}önerildi{/actionName}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:138
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:140
 msgid "· score {prettyScore}"
 msgstr "· puan {prettyScore}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:146
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:148
 msgid "Score: {score} / {maxScore}"
 msgstr "Puan: {score} / {maxScore}"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:159
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
 msgid "hide ratings"
 msgstr "puanlamaları gizle"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:161
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:163
 msgid "show ratings"
 msgstr "puanlamaları göster"
 
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:173
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:175
 msgid "Edit review"
 msgstr "Gözden geçirmeyi düzenle"
 

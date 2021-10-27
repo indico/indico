@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-07-05 17:54+0200\n"
-"PO-Revision-Date: 2021-06-30 02:12+0000\n"
-"Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>\n"
+"POT-Creation-Date: 2021-10-26 12:56+0200\n"
+"PO-Revision-Date: 2021-10-26 10:58+0000\n"
+"Last-Translator: Adrian\n"
 "Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,25 +64,25 @@ msgstr[1] "{0} удаан үргэлжлэх үйл явдлуудыг хару�
 msgid "Long lasting events"
 msgstr "Урт үргэлжилсэн үйл явдал"
 
-#: indico/modules/categories/client/js/display.js:21
+#: indico/modules/categories/client/js/display.js:25
 msgid "empty"
 msgstr "хоосон"
 
-#: indico/modules/categories/client/js/display.js:22
+#: indico/modules/categories/client/js/display.js:26
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} үйл явдал"
 msgstr[1] "{0} үйл явдлууд"
 
-#: indico/modules/categories/client/js/display.js:151
+#: indico/modules/categories/client/js/display.js:166
 msgid "Remove from your favorites"
 msgstr "Өөрийн дуртай зүйлсээс хасах"
 
-#: indico/modules/categories/client/js/display.js:154
+#: indico/modules/categories/client/js/display.js:169
 msgid "Add to your favorites"
 msgstr "Дуртай зүйл дээрээ нэмэх"
 
-#: indico/modules/categories/client/js/display.js:156
+#: indico/modules/categories/client/js/display.js:171
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
@@ -316,12 +316,12 @@ msgstr "Алдаа"
 msgid "Choose a file"
 msgstr "Файл сонгох"
 
-#: indico/modules/events/abstracts/client/js/index.js:76
-#: indico/modules/events/abstracts/client/js/index.js:89
+#: indico/modules/events/abstracts/client/js/index.js:78
+#: indico/modules/events/abstracts/client/js/index.js:91
 msgid "Show preview"
 msgstr "Урьдчилсан харагдацыг үзүүлэх"
 
-#: indico/modules/events/abstracts/client/js/index.js:80
+#: indico/modules/events/abstracts/client/js/index.js:82
 msgid "Hide preview"
 msgstr "Урьдчилсан харагдацыг нуух"
 
@@ -525,14 +525,6 @@ msgstr "Текстийн хэсэг"
 msgid "Yes/No"
 msgstr "Тийм/Үгүй"
 
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "yes"
-msgstr "тийм"
-
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "no"
-msgstr "үгүй"
-
 #: indico/modules/events/registration/client/js/form/field.js:869
 msgid "Email address"
 msgstr "Цахим шуудангийн хаяг"
@@ -627,7 +619,7 @@ msgstr "Танд алдагдах хадгалагдаагүй өөрчлөлт�
 msgid "Confirm action"
 msgstr "Үйлдэлийг батлах"
 
-#: indico/web/client/js/jquery/utils/declarative.js:360
+#: indico/web/client/js/jquery/utils/declarative.js:361
 msgid "Direct link to this item"
 msgstr "Энэхүү зүйл рүү шууд холбох"
 
@@ -736,7 +728,7 @@ msgstr "Хадгалах"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:672
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:675
 msgid "Loading..."
 msgstr "Ачааллаж байна..."
 
@@ -845,7 +837,7 @@ msgstr "{0}-г нэмэхийн тулд шивэх"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1544
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1506
 msgid "Delete"
 msgstr "Устгах"
 
@@ -895,7 +887,7 @@ msgstr[0] "<strong>1</strong> үг үлдсэн"
 msgstr[1] "<strong>{0} </strong> үгнүүд үлдсэн"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1476
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1438
 msgid "Edit"
 msgstr "Засварлах"
 
@@ -1264,171 +1256,177 @@ msgstr "Хурал нэмэх"
 msgid "Add session block"
 msgstr "Хурлын блок нэмэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:43
+#: indico/web/client/js/legacy/libs/timetable/Base.js:45
 msgid "Session"
 msgstr "Хурал"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:44
+#: indico/web/client/js/legacy/libs/timetable/Base.js:46
 msgid "Room"
 msgstr "Өрөө"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:131
+#: indico/web/client/js/legacy/libs/timetable/Base.js:133
 msgid "Updating the timetable..."
 msgstr "Цагийн хуваарийг шинэчилж байна..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:182
-#: indico/web/client/js/legacy/libs/timetable/Base.js:421
+#: indico/web/client/js/legacy/libs/timetable/Base.js:184
+#: indico/web/client/js/legacy/libs/timetable/Base.js:423
 msgid "Filter"
 msgstr "Шүүлтүүр"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:200
+#: indico/web/client/js/legacy/libs/timetable/Base.js:202
 msgid "Printable version"
 msgstr "Хэвлэх хувилбар"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:221
+#: indico/web/client/js/legacy/libs/timetable/Base.js:223
 msgid "Go back"
 msgstr "Буцах"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:228
-#: indico/web/client/js/legacy/libs/timetable/Base.js:387
+#: indico/web/client/js/legacy/libs/timetable/Base.js:230
+#: indico/web/client/js/legacy/libs/timetable/Base.js:389
 msgid "Print"
 msgstr "Хэвлэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:272
+#: indico/web/client/js/legacy/libs/timetable/Base.js:274
 msgid "Export to PDF"
 msgstr "PDF болгож хувиргах"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:280
+#: indico/web/client/js/legacy/libs/timetable/Base.js:282
 msgid "Switching to full screen mode..."
 msgstr "Бүтэн дэлгэцийн горим руу шилжих..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:317
+#: indico/web/client/js/legacy/libs/timetable/Base.js:319
 msgid "Exit Full Screen"
 msgstr "Бүтэн дэлгэцээс гарах"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:394
+#: indico/web/client/js/legacy/libs/timetable/Base.js:396
 msgid "PDF"
 msgstr "PDF"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:401
+#: indico/web/client/js/legacy/libs/timetable/Base.js:403
 msgid "Full screen"
 msgstr "Бүтэн дэлгэц"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:408
+#: indico/web/client/js/legacy/libs/timetable/Base.js:410
 msgid "Link"
 msgstr "Холбоос"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:413
+#: indico/web/client/js/legacy/libs/timetable/Base.js:415
 msgid "Detailed view"
 msgstr "Нарийвчилсан харагдац"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:476
+#: indico/web/client/js/legacy/libs/timetable/Base.js:478
 msgid "All days"
 msgstr "Бүх өдрүүд"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:689
+#: indico/web/client/js/legacy/libs/timetable/Base.js:482
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1218
+msgctxt "momentjs date format for timetable tab headers"
+msgid "ddd DD/MM"
+msgstr ""
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:684
 msgid "You are viewing the contents of the session block:"
 msgstr "Та хурлын блокийн агуулгыг үзэж байна:"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:778
+#: indico/web/client/js/legacy/libs/timetable/Base.js:773
 msgid "Your changes triggered the automatic modification of some settings:"
 msgstr "Таны оруулсан өөрчлөлт зарим тохиргооны автомат өөрчлөлтийг өдөөлөө:"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:786
-#: indico/web/client/js/legacy/libs/timetable/Base.js:790
+#: indico/web/client/js/legacy/libs/timetable/Base.js:781
+#: indico/web/client/js/legacy/libs/timetable/Base.js:785
 msgid "The <strong>starting time</strong> of the session interval <strong>"
 msgstr "Хурлын завсарлагааны <strong> <strong>эхлэх цаг</strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:788
-#: indico/web/client/js/legacy/libs/timetable/Base.js:792
-#: indico/web/client/js/legacy/libs/timetable/Base.js:801
-#: indico/web/client/js/legacy/libs/timetable/Base.js:805
+#: indico/web/client/js/legacy/libs/timetable/Base.js:783
+#: indico/web/client/js/legacy/libs/timetable/Base.js:787
+#: indico/web/client/js/legacy/libs/timetable/Base.js:796
+#: indico/web/client/js/legacy/libs/timetable/Base.js:800
 msgid "</strong> was moved from "
 msgstr "</strong>-г доороос шилжүүлсэн"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:793
+#: indico/web/client/js/legacy/libs/timetable/Base.js:788
 msgid ""
 "The <strong>starting time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong>Үйл явдал</strong>-н <strong>эхлэх цаг</strong>-ийг дараахаас шилжүүлсэн"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:799
-#: indico/web/client/js/legacy/libs/timetable/Base.js:803
+#: indico/web/client/js/legacy/libs/timetable/Base.js:794
+#: indico/web/client/js/legacy/libs/timetable/Base.js:798
 msgid "The <strong>ending time</strong> of the session interval <strong>"
 msgstr "Хурлын завсарлагааны <strong><strong>дуусах цаг</strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:806
+#: indico/web/client/js/legacy/libs/timetable/Base.js:801
 msgid ""
 "The <strong>ending time</strong> of the <strong>Event</strong> was moved "
 "from "
 msgstr "<strong>Үйл явдал</strong>-н <strong>дуусах цаг</strong>-ийг дараахаас шилжүүлсэн"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:812
+#: indico/web/client/js/legacy/libs/timetable/Base.js:807
 msgid "The contents of the interval <strong>"
 msgstr "Завсарлагааны агуулга <strong>"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:814
+#: indico/web/client/js/legacy/libs/timetable/Base.js:809
 msgid "</strong> were moved from "
 msgstr "</strong>-г дараахаас шилжүүлсэн"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:824
+#: indico/web/client/js/legacy/libs/timetable/Base.js:819
 msgid " to "
 msgstr "дараах руу"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1017
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1012
 msgid "Session block"
 msgstr "Хурлын блок"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1035
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1030
 msgid "Contribution"
 msgstr "Хувь нэмэр"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1049
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1044
 msgid "Break"
 msgstr "Завсарлага"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1066
 msgid "Add poster"
 msgstr "Зурагт хуудас нэмэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1076
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
 msgid "Add new"
 msgstr "Шинийг нэмэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1080
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1075
 #: indico/web/client/js/legacy/libs/timetable/Management.js:664
 msgid "Reschedule"
 msgstr "Дахин төлөвлөх"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1090
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1085
 msgid "Fit to content"
 msgstr "Агуулгатай тохирсон"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1099
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1094
 msgid "Add new block"
 msgstr "Шинэ блок нэмэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1143
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1138
 msgid "Add one hour"
 msgstr "Нэг цаг нэмэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1212
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1207
 msgid "Session legend"
 msgstr "Хурлын нэмэлт мэдээлэл"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1243
 msgid "see more..."
 msgstr "дэлгэрэнгүй харах..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1253
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
 msgid "less..."
 msgstr "хураангуйлах..."
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1567
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1562
 msgid "Go to event timetable"
 msgstr "Үйл явдлын цагийн хуваарь руу очих"
 
-#: indico/web/client/js/legacy/libs/timetable/Base.js:1737
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1732
 msgid "Up to timetable"
 msgstr "Цагийн хуваариас хамаарах"
 
@@ -1450,72 +1448,72 @@ msgstr "Блокийг хурал дотор шилжүүлэхийн тулд �
 msgid "Show materials"
 msgstr "Материалуудыг харуулах"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:215
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:218
 msgid "et al."
 msgstr "г.м."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:318
 msgid "This poster session has "
 msgstr "Энэхүү зурагт хуудасны хурал дараах зүйлтэй"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:320
 msgid " contribution(s)."
 msgstr "хувь нэмэр(үүд)тэй."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:319
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:322
 msgid "Please click for more information."
 msgstr "Дэлгэрэнгүй мэдээлэлл авахын тулд дарна уу."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:622
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:625
 msgid "Move entry"
 msgstr "Мэдээллийг шилжүүлэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:666
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:677
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:669
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:680
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr "Энэхүү цагийн хуваарийн мэдээлэл цаашид оршин байхгүй. Энэхүү хуудсыг шинэчилнэ үү."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:678
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:681
 msgid "Refresh"
 msgstr "Шинэчлэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:784
 msgid "Move up"
 msgstr "Дээш шилжүүлэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:790
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
 msgid "Move down"
 msgstr "Доош шилжүүлэх"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1478
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1440
 msgid "Edit poster"
 msgstr "Зурагт хуудсыг засварлах"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1510
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1472
 msgid "Manage protection"
 msgstr "Хамгаалалтыг удирдах"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1512
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1474
 msgid "Manage poster protection"
 msgstr "Зурагт хуудасны хамгаалалтыг удирдах"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1540
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1502
 msgid "Unschedule"
 msgstr "Хуваарьгүй болгох"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1541
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
 msgid "Unschedule poster"
 msgstr "Зурагт хуудсыг хуваарьгүй болгох"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1542
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "Та зурагт хуудсыг хуваарьгүй болгохыг хүсэж байгаад итгэлтэй байна уу?"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1545
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1507
 msgid "Delete poster"
 msgstr "Зурагт хуудсыг устгах"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1546
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1508
 msgid "Are you sure you want to delete the poster?"
 msgstr "Та зурагт хуудсыг устгахыг хүсэж байгаадаа итгэлтэй байна уу?"
 
