@@ -21,7 +21,7 @@ from werkzeug.utils import cached_property
 # `util.py` for whatever you are going to add.
 
 
-def _create_app(info):
+def _create_app():
     from indico.web.flask.app import make_app
     return make_app()
 
