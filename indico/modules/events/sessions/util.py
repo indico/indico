@@ -23,7 +23,6 @@ from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
 
 
 def can_manage_sessions(user, event, permission=None):
@@ -157,24 +156,6 @@ def get_sessions_for_user(event, user):
 
 def has_sessions_for_user(event, user):
     return _query_sessions_for_user(event, user).has_rows()
-
-
-def serialize_session_for_ical(sess):
-    from indico.modules.events.contributions.util import serialize_contribution_for_ical
-    from indico.modules.events.util import serialize_person_link
-    return {
-        '_fossil': 'sessionMetadataWithContributions',
-        'id': sess.id,
-        'startDate': sess.start_dt,
-        'endDate': sess.end_dt,
-        'url': url_for('sessions.display_session', sess, _external=True),
-        'title': sess.title,
-        'location': sess.venue_name,
-        'roomFullname': sess.room_name,
-        'description': sess.description,
-        'speakers': [serialize_person_link(x) for c in sess.contributions for x in c.speakers],
-        'contributions': [serialize_contribution_for_ical(c) for c in sess.contributions]
-    }
 
 
 def get_session_timetable_pdf(sess, **kwargs):
