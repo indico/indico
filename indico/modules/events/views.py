@@ -39,7 +39,7 @@ def _get_print_url(event, theme=None, theme_override=False):
             show_date = None
         if show_session == 'all':
             show_session = None
-        if detail_level in ('all', 'contrinbution'):
+        if detail_level in ('all', 'contribution'):
             detail_level = None
         return url_for('events.display', event, showDate=show_date, showSession=show_session, detailLevel=detail_level,
                        print='1', view=view)
