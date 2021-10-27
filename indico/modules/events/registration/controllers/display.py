@@ -19,7 +19,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.forms import PublishRegistrationsMode, RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
@@ -141,7 +141,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         query = (Registration.query.with_parent(self.event)
                  .filter(Registration.is_publishable,
-                         RegistrationForm.publish_registrations_enabled,
+                         RegistrationForm.publish_registrations_mode != PublishRegistrationsMode.hide_all,
                          ~RegistrationForm.is_deleted,
                          ~Registration.is_deleted)
                  .join(Registration.registration_form)
@@ -194,7 +194,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
     def _process(self):
         regforms = (RegistrationForm.query.with_parent(self.event)
-                    .filter(RegistrationForm.publish_registrations_enabled,
+                    .filter(RegistrationForm.publish_registrations_mode,
                             ~RegistrationForm.is_deleted)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .all())
@@ -215,7 +215,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             tables.extend(map(self._participant_list_table, regforms_dict.values()))
 
         published = (RegistrationForm.query.with_parent(self.event)
-                     .filter(RegistrationForm.publish_registrations_enabled)
+                     .filter(RegistrationForm.publish_registrations_mode)
                      .has_rows())
         num_participants = sum(len(table['rows']) for table in tables)
 

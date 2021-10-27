@@ -32,7 +32,7 @@ from indico.modules.events.registration.fields.choices import (AccommodationFiel
                                                                get_field_merged_options)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
                                                                    RegistrationFormPersonalDataField)
-from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.forms import PublishRegistrationsMode, RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormPersonalDataSection)
@@ -507,7 +507,7 @@ def get_published_registrations(event):
             .filter(Registration.is_publishable,
                     ~RegistrationForm.is_deleted,
                     RegistrationForm.event_id == event.id,
-                    RegistrationForm.publish_registrations_enabled)
+                    RegistrationForm.publish_registrations_mode != PublishRegistrationsMode.hide_all)
             .join(Registration.registration_form)
             .options(contains_eager(Registration.registration_form))
             .order_by(db.func.lower(Registration.first_name),

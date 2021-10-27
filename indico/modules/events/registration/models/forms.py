@@ -36,6 +36,13 @@ class ModificationMode(RichIntEnum):
     allowed_until_approved = 4
 
 
+class PublishRegistrationsMode(RichIntEnum):
+    __titles__ = [None, L_('No'), L_('Show only with user consent'), L_('Show all')]
+    hide_all = 1
+    show_with_consent = 2
+    show_all = 3
+
+
 class RegistrationForm(db.Model):
     """A registration form for an event."""
 
@@ -128,10 +135,10 @@ class RegistrationForm(db.Model):
         nullable=True
     )
     #: Whether registrations should be displayed in the participant list
-    publish_registrations_enabled = db.Column(
-        db.Boolean,
+    publish_registrations_mode = db.Column(
+        PyIntEnum(PublishRegistrationsMode),
         nullable=False,
-        default=False
+        default=PublishRegistrationsMode.hide_all
     )
     #: Whether to display the number of registrations
     publish_registration_count = db.Column(

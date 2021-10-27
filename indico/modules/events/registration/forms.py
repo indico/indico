@@ -22,7 +22,7 @@ from indico.modules.designer import PageLayout, PageOrientation, PageSize, Templ
 from indico.modules.designer.util import get_default_ticket_on_category, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
-from indico.modules.events.registration.models.forms import ModificationMode
+from indico.modules.events.registration.models.forms import ModificationMode, PublishRegistrationsMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
@@ -69,9 +69,9 @@ class RegistrationFormForm(IndicoForm):
                                       description=_('Maximum number of registrations'))
     modification_mode = IndicoEnumSelectField(_('Modification allowed'), enum=ModificationMode,
                                               description=_('Will users be able to modify their data? When?'))
-    publish_registrations_enabled = BooleanField(_('Publish registrations'), widget=SwitchWidget(),
-                                                 description=_('Registrations from this form will be displayed in the '
-                                                               'event page'))
+    publish_registrations_mode = IndicoEnumSelectField(_('Publish registrations'), enum=PublishRegistrationsMode,
+                                                       description=_('Registrations from this form will be displayed '
+                                                                     'in the event page'))
     publish_registration_count = BooleanField(_('Publish number of registrations'), widget=SwitchWidget(),
                                               description=_('Number of registered participants will be displayed in '
                                                             'the event page'))
