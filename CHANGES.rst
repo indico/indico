@@ -2,6 +2,17 @@ Changelog
 =========
 
 
+Version 3.0.4
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+
 Version 3.0.3
 -------------
 
