@@ -301,7 +301,7 @@ export default function PersonLinkField({value: persons, onChange, eventId, sess
       </Segment>
       <Button.Group size="small" attached="bottom" floated="right">
         {sessionUser && (
-          <Translate as={Button} type="button" onClick={() => onChange([...persons, sessionUser])}>
+          <Translate as={Button} type="button" onClick={() => onAdd([sessionUser])}>
             Add myself
           </Translate>
         )}
@@ -348,7 +348,7 @@ PersonLinkField.defaultProps = {
   roles: [],
 };
 
-export function WTFPersonLinkField({fieldId, eventId, defaultValue, roles}) {
+export function WTFPersonLinkField({fieldId, eventId, defaultValue, roles, sessionUser}) {
   const [persons, setPersons] = useState(defaultValue);
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
 
@@ -359,7 +359,15 @@ export function WTFPersonLinkField({fieldId, eventId, defaultValue, roles}) {
     inputField.dispatchEvent(new Event('change', {bubbles: true}));
   };
 
-  return <PersonLinkField value={persons} eventId={eventId} onChange={onChange} roles={roles} />;
+  return (
+    <PersonLinkField
+      value={persons}
+      eventId={eventId}
+      onChange={onChange}
+      roles={roles}
+      sessionUser={sessionUser}
+    />
+  );
 }
 
 WTFPersonLinkField.propTypes = {
@@ -367,10 +375,12 @@ WTFPersonLinkField.propTypes = {
   defaultValue: PropTypes.array,
   eventId: PropTypes.number,
   roles: PropTypes.array,
+  sessionUser: PropTypes.object,
 };
 
 WTFPersonLinkField.defaultProps = {
   defaultValue: [],
   eventId: null,
   roles: [],
+  sessionUser: null,
 };

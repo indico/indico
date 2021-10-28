@@ -25,38 +25,18 @@
             fieldId: {{ field.id | tojson }},
             eventId: {{ (field.event.id if field.event else none) | tojson }},
             roles: {{ field.roles | default([]) | tojson }},
-            disableUserSearch: {{ field.disable_user_search | default(false) | tojson }},
-            authorTypes: {{ (field.author_types or none) | tojson }},
-            showEmptyCoauthors: {{ field.show_empty_coauthors | default(true) | tojson }},
             sortByLastName: {{ field.sort_by_last_name | default(false) | tojson }},
-            allow: {
-                authors: {{ field.allow_authors | default(false) | tojson }},
-                submitters: {{ field.allow_submitters | default(false) | tojson }},
-                emptyEmail: {{ allow_empty_email | default(false) | tojson }},
-                externalUsers: {{ field.allow_external | default(true) | tojson }},
-                speakers: {{ field.allow_speakers | default(true) | tojson }},
-            },
-            defaults: {
-                authorType: {{ (field.default_author_type.value if field.default_author_type else 0) | tojson }},
-                isSpeaker: {{ field.default_is_speaker | default(false) |tojson }},
-                isSubmitter: {{ field.default_is_submitter | default(false) |tojson }}
-            },
-            require: {
-                primaryAuthor: {{ field.require_primary_author | default(false) | tojson }},
-                secondaryAuthor: {{ field.require_secondary_author | default(false) | tojson }},
-                submitter: {{ field.require_submitter_author | default(false) | tojson }},
-                speaker: {{ field.require_speaker_author | default(false) | tojson }}
-            },
             sessionUser: {{ ({
                 'id': session.user.id,
                 'title': session.user.title,
                 'identifier': session.user.identifier,
                 'name': session.user.display_full_name,
-                'familyName': session.user.last_name,
+                'lastName': session.user.last_name,
                 'firstName': session.user.first_name,
                 'affiliation': session.user.affiliation,
                 'phone': session.user.phone,
                 'email': session.user.email,
+                'avatarURL': session.user.avatar_url,
                 '_type': 'Avatar'
             } if session.user else none) | tojson }}
         });
