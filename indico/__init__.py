@@ -8,7 +8,7 @@
 from indico.util.mimetypes import register_custom_mimetypes
 
 
-__version__ = '3.0.3'
+__version__ = '3.0.4-dev'
 PREFERRED_PYTHON_VERSION_SPEC = '~=3.9.0'
 
 register_custom_mimetypes()
