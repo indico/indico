@@ -327,7 +327,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
     },
     mode: currentEnv,
     optimization: {
-      runtimeChunk: {name: 'common-runtime'},
+      runtimeChunk: isPlugin ? false : {name: 'common-runtime'},
       splitChunks: {
         cacheGroups: isPlugin
           ? {}
