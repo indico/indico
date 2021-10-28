@@ -30,8 +30,13 @@ def upgrade():
                   sa.Column('publish_registrations_mode', PyIntEnum(_PublishRegistrationsMode), server_default='0',
                             nullable=False),
                   schema='event_registration')
+    op.alter_column('forms', 'publish_registrations_mode', server_default=None, schema='event_registration')
     op.execute('UPDATE event_registration.forms SET publish_registrations_mode = 2 WHERE publish_registrations_enabled')
     op.drop_column('forms', 'publish_registrations_enabled', schema='event_registration')
+    op.add_column('registrations',
+                  sa.Column('consented_to_publish', sa.Boolean(), nullable=False, server_default='false'),
+                  schema='event_registration')
+    op.alter_column('registrations', 'consented_to_publish', server_default=None, schema='event_registration')
 
 
 def downgrade():
@@ -44,3 +49,4 @@ def downgrade():
         WHERE publish_registrations_mode = 2
     ''')
     op.drop_column('forms', 'publish_registrations_mode', schema='event_registration')
+    op.drop_column('registrations', 'consented_to_publish', schema='event_registration')

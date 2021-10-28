@@ -213,6 +213,12 @@ class Registration(db.Model):
         nullable=False,
         default='',
     )
+    #: If a consent was given to publish this registration
+    consented_to_publish = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False,
+    )
     #: The Event containing this registration
     event = db.relationship(
         'Event',
@@ -295,11 +301,19 @@ class Registration(db.Model):
 
     @hybrid_property
     def is_publishable(self):
-        return self.is_active and self.state in (RegistrationState.complete, RegistrationState.unpaid)
+        mode = self.registration_form.publish_registrations_mode
+        show_all = mode == PublishRegistrationsMode.show_all
+        show_with_consent = mode == PublishRegistrationsMode.show_with_consent and self.consented_to_publish
+        return self.is_active and self.state in (RegistrationState.complete,
+                                                 RegistrationState.unpaid) and (show_all or show_with_consent)
 
     @is_publishable.expression
     def is_publishable(cls):
-        return cls.is_active & (cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)))
+        show_all = cls.registration_form.has(publish_registrations_mode=PublishRegistrationsMode.show_all)
+        show_with_consent = cls.registration_form.has(
+            publish_registrations_mode=PublishRegistrationsMode.show_with_consent) & cls.consented_to_publish
+        return cls.is_active & (cls.state.in_((RegistrationState.complete,
+                                               RegistrationState.unpaid))) & (show_all | show_with_consent)
 
     @hybrid_property
     def is_cancelled(self):
@@ -717,6 +731,13 @@ class RegistrationData(StoredFileMixin, db.Model):
 
     def render_price(self):
         return format_currency(self.price, self.registration.currency, locale=session.lang or 'en_GB')
+
+
+class PublishRegistrationsMode(RichIntEnum):
+    __titles__ = [L_('Never'), L_('With user consent'), L_('Always')]
+    hide_all = 0
+    show_with_consent = 1
+    show_all = 2
 
 
 @listens_for(mapper, 'after_configured', once=True)

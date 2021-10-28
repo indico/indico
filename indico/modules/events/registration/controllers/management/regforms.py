@@ -20,8 +20,9 @@ from indico.modules.events.registration.controllers.management import RHManageRe
 from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
                                                       RegistrationFormForm, RegistrationFormScheduleForm,
                                                       RegistrationManagersForm)
-from indico.modules.events.registration.models.forms import PublishRegistrationsMode, RegistrationForm
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (create_personal_data_fields, get_event_section_data,
                                                      get_flat_section_setup_data)

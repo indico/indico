@@ -19,10 +19,11 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
-from indico.modules.events.registration.models.forms import PublishRegistrationsMode, RegistrationForm
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
+                                                                     RegistrationState)
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_event_section_data,
                                                      get_flat_section_submission_data, get_initial_form_values,
@@ -141,7 +142,6 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         query = (Registration.query.with_parent(self.event)
                  .filter(Registration.is_publishable,
-                         RegistrationForm.publish_registrations_mode == PublishRegistrationsMode.show_all,
                          ~RegistrationForm.is_deleted,
                          ~Registration.is_deleted)
                  .join(Registration.registration_form)

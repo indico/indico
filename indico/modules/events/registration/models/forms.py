@@ -21,7 +21,8 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
-from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
+                                                                     RegistrationState)
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
@@ -34,13 +35,6 @@ class ModificationMode(RichIntEnum):
     allowed_until_payment = 2
     not_allowed = 3
     allowed_until_approved = 4
-
-
-class PublishRegistrationsMode(RichIntEnum):
-    __titles__ = [L_('Never'), L_('With user consent'), L_('Always')]
-    hide_all = 0
-    show_with_consent = 1
-    show_all = 2
 
 
 class RegistrationForm(db.Model):

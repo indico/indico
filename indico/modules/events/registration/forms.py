@@ -22,9 +22,9 @@ from indico.modules.designer import PageLayout, PageOrientation, PageSize, Templ
 from indico.modules.designer.util import get_default_ticket_on_category, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
-from indico.modules.events.registration.models.forms import ModificationMode, PublishRegistrationsMode
+from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
