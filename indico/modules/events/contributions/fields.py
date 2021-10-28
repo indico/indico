@@ -26,28 +26,28 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
         self.author_types = AuthorType.serialize()
         self.allow_authors = kwargs.pop('allow_authors', kwargs['_form'].event.type == 'conference')
         self.allow_submitters = kwargs.pop('allow_submitters', True)
-        self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
-        self.default_author_type = kwargs.pop('default_author_type', AuthorType.none)
-        self.default_is_speaker = True
         self.roles = [
-            {'name': 'primary', 'label': _('Author'), 'section': True},
-            {'name': 'secondary', 'label': _('Co-author'), 'section': True},
-            {'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
-             'default': kwargs.pop('default_is_submitter', True)},
-            {'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'}
+            {'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone', 'default': True}
         ]
+        if self.allow_submitters:
+            self.roles.append({'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
+                               'default': kwargs.pop('default_is_submitter', True)})
+        if self.allow_authors:
+            self.roles.extend([
+                {'name': 'primary', 'label': _('Author'), 'section': True},
+                {'name': 'secondary', 'label': _('Co-author'), 'section': True},
+            ])
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
-        return {self._get_person_link(x): 'submitter' in x.pop('roles', []) for x in data}
+        return {self._get_person_link(x): 'submitter' in x.get('roles', []) for x in data}
 
     @no_autoflush
     def _get_person_link(self, data):
         person_link = super()._get_person_link(data)
-        roles = data.pop('roles', [])
+        roles = data.get('roles', [])
         person_link.is_speaker = 'speaker' in roles
-        person_link.author_type = next((AuthorType.get(a) for a in roles if AuthorType.get(a)),
-                                       self.default_author_type)
+        person_link.author_type = next((AuthorType.get(a) for a in roles if AuthorType.get(a)), AuthorType.none)
         return person_link
 
     def _serialize_person_link(self, principal):

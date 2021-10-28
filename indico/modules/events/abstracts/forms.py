@@ -23,7 +23,6 @@ from indico.modules.events.abstracts.models.abstracts import EditTrackMode
 from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
 from indico.modules.events.abstracts.settings import (AllowEditingType, BOACorrespondingAuthorType, BOALinkFormat,
                                                       BOASortField, SubmissionRightsType, abstracts_settings)
-from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
@@ -462,7 +461,6 @@ class AbstractForm(IndicoForm):
     description = IndicoMarkdownField(_('Content'), editor=True, mathjax=True)
     submitted_contrib_type = QuerySelectField(_('Contribution type'), get_label='name', allow_blank=True,
                                               blank_text=_('No type selected'))
-    person_links = AbstractPersonLinkListField(_('Authors'), default_author_type=AuthorType.primary)
     submission_comment = TextAreaField(_('Comments'))
     attachments = EditableFileField(_('Attachments'), multiple_files=True, lightweight=True)
 
@@ -471,6 +469,11 @@ class AbstractForm(IndicoForm):
         self.abstract = kwargs.pop('abstract', None)
         is_invited = kwargs.pop('invited', False)
         management = kwargs.pop('management', False)
+        self.person_links = AbstractPersonLinkListField(
+            _('Authors'),
+            allow_speakers=not is_invited and abstracts_settings.get(self.event, 'allow_speakers'),
+            require_primary_author=not is_invited,
+            require_speaker=not is_invited and abstracts_settings.get(self.event, 'speakers_required'))
         description_settings = abstracts_settings.get(self.event, 'description_settings')
         description_validators = self._get_description_validators(description_settings, invited=is_invited)
         if description_validators:
@@ -496,12 +499,6 @@ class AbstractForm(IndicoForm):
             del self.attachments
         if not description_settings['is_active']:
             del self.description
-        if not is_invited:
-            self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
-            self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
-            self.person_links.disable_user_search = session.user is None
-        else:
-            self.person_links.require_primary_author = False
 
     def _get_description_validators(self, description_settings, invited=False):
         validators = []

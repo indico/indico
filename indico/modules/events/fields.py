@@ -172,17 +172,14 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
     widget = JinjaWidget('forms/_person_link_widget_base.html')
 
     def __init__(self, *args, **kwargs):
-        self.allow_submitters = True  # TODO
         self.roles = [
             {'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
              'default': kwargs.pop('default_is_submitter', True)}
         ]
-        # self.empty_message = (_('There are no speakers')
-        #                       if self.get_form().event_type == 'lecture' else _('There are no chairpersons'))
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
-        return {self._get_person_link(x): 'submitter' in x.pop('roles', []) for x in data}
+        return {self._get_person_link(x): 'submitter' in x.get('roles', []) for x in data}
 
     def _serialize_person_link(self, principal):
         from indico.modules.events.persons.schemas import PersonLinkSchema

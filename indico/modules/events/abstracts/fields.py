@@ -101,21 +101,16 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
     widget = JinjaWidget('forms/_person_link_widget_base.html', allow_empty_email=True)
 
     def __init__(self, *args, **kwargs):
-        self.author_types = AuthorType.serialize()
-        self.allow_authors = True
-        self.allow_submitters = False
-        self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
-        self.default_author_type = kwargs.pop('default_author_type', AuthorType.none)
-        self.default_is_submitter = False
-        self.default_is_speaker = False
-        self.require_primary_author = True
+        self.allow_speakers = kwargs.pop('allow_speakers', True)
+        self.require_primary_author = kwargs.pop('require_primary_author', True)  # TODO
+        self.require_speaker = kwargs.pop('require_speaker', False)  # TODO
         self.sort_by_last_name = True
-        self.disable_user_search = kwargs.pop('disable_user_search', False)
         self.roles = [
-            {'name': 'primary', 'label': _('Author'), 'section': True},
+            {'name': 'primary', 'label': _('Author'), 'section': True, 'default': True},
             {'name': 'secondary', 'label': _('Co-author'), 'section': True},
-            {'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'}
         ]
+        if self.allow_speakers:
+            self.roles.append({'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'})
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
@@ -124,10 +119,9 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
     @no_autoflush
     def _get_person_link(self, data):
         person_link = super()._get_person_link(data)
-        roles = data.pop('roles', [])
+        roles = data.get('roles', [])
         person_link.is_speaker = 'speaker' in roles
-        person_link.author_type = next((AuthorType.get(a) for a in roles if AuthorType.get(a)),
-                                       self.default_author_type)
+        person_link.author_type = next((AuthorType.get(a) for a in roles if AuthorType.get(a)), AuthorType.none)
         return person_link
 
     def _serialize_person_link(self, principal):
@@ -142,9 +136,6 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
     def pre_validate(self, form):
         super().pre_validate(form)
         for person_link in self.data:
-            if not self.allow_authors and person_link.author_type != AuthorType.none:
-                if not self.object_data or person_link not in self.object_data:
-                    person_link.author_type = AuthorType.none
             if person_link.author_type == AuthorType.none and not person_link.is_speaker:
                 raise ValidationError(_('{} has no role').format(person_link.full_name))
 
