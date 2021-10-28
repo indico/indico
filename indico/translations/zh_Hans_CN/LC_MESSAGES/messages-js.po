@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-09-01 15:29+0200\n"
-"PO-Revision-Date: 2021-07-14 07:00+0000\n"
-"Last-Translator: Lanxin Ma <ma@ihep.ac.cn>\n"
+"POT-Creation-Date: 2021-10-26 12:56+0200\n"
+"PO-Revision-Date: 2021-10-26 10:58+0000\n"
+"Last-Translator: Adrian\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -510,14 +510,6 @@ msgstr "文本区"
 msgid "Yes/No"
 msgstr "是/否"
 
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "yes"
-msgstr "是"
-
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "no"
-msgstr "否"
-
 #: indico/modules/events/registration/client/js/form/field.js:869
 msgid "Email address"
 msgstr "邮件地址"
@@ -716,7 +708,7 @@ msgstr "保存"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:672
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:675
 msgid "Loading..."
 msgstr "加载..."
 
@@ -825,7 +817,7 @@ msgstr "输入以添加 {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1506
 msgid "Delete"
 msgstr "删除"
 
@@ -873,7 +865,7 @@ msgid_plural "<strong>{0}</strong> words left"
 msgstr[0] "<strong> {0} </strong> 剩余单词"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1435
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1438
 msgid "Edit"
 msgstr "编辑"
 
@@ -1304,7 +1296,7 @@ msgid "All days"
 msgstr "全天"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:482
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1215
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1218
 msgctxt "momentjs date format for timetable tab headers"
 msgid "ddd DD/MM"
 msgstr "ddd DD/MM"
@@ -1433,72 +1425,72 @@ msgstr "下拉移动分会里的块"
 msgid "Show materials"
 msgstr "显示资料"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:215
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:218
 msgid "et al."
 msgstr "等"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:318
 msgid "This poster session has "
 msgstr "此海报分会有"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:320
 msgid " contribution(s)."
 msgstr "贡献(s)。"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:319
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:322
 msgid "Please click for more information."
 msgstr "请点击以得到更多信息。"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:622
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:625
 msgid "Move entry"
 msgstr "移动条目"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:666
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:677
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:669
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:680
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr "此日程表条目不存在了。请刷新页面。"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:678
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:681
 msgid "Refresh"
 msgstr "刷新"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:784
 msgid "Move up"
 msgstr "上移"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:790
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
 msgid "Move down"
 msgstr "下移"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1437
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1440
 msgid "Edit poster"
 msgstr "编辑海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1469
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1472
 msgid "Manage protection"
 msgstr "管理保护"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1471
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1474
 msgid "Manage poster protection"
 msgstr "管理海报保护"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1499
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1502
 msgid "Unschedule"
 msgstr "计划外的"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1500
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
 msgid "Unschedule poster"
 msgstr "计划外的海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1501
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "您确定要取消海报吗？"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1507
 msgid "Delete poster"
 msgstr "删除海报"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1505
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1508
 msgid "Are you sure you want to delete the poster?"
 msgstr "您确定要删除这个海报？"
 

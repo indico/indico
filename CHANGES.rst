@@ -53,10 +53,21 @@ Internal Changes
 ----
 
 
-Version 3.0.3
+Version 3.0.4
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+
+Version 3.0.3
+-------------
+
+*Released on October 28, 2021*
 
 Security fixes
 ^^^^^^^^^^^^^^

@@ -8,7 +8,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-09-21 15:30+0200\n"
+"POT-Creation-Date: 2021-10-21 12:56+0200\n"
 "Last-Translator: Adrian, 2021\n"
 "Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
 "MIME-Version: 1.0\n"
@@ -718,7 +718,7 @@ msgstr ""
 "typy udostępnić."
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:115
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:176
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:177
 msgid "List"
 msgstr "Listuj"
 
@@ -744,8 +744,8 @@ msgid "Configure the tags that can be assigned to revisions"
 msgstr "Skonfiguruj tagi dla wersji"
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:31
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:123
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:135
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:124
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:136
 msgid "Configure"
 msgstr "Skonfiguruj"
 
@@ -928,101 +928,101 @@ msgstr "Wprowadź #id lub poszukiwany łańcuch"
 msgid "There are no editables yet."
 msgstr "Jeszcze nie ma plików do redagowania."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:67
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:68
 msgid "Send emails to the editing team"
 msgstr "Wyślij maile to zespołu redakcyjnego"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:72
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:73
 msgid "Assign an editor to papers"
 msgstr "Przydziel redaktora do artykułów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:73
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:74
 msgid "Assign an editor to posters"
 msgstr "Przydziel redaktora do posterów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:74
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:75
 msgid "Assign an editor to slides"
 msgstr "Przydziel redaktora do slajdów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:90
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:91
 msgid "Submission is open"
 msgstr "Zgłoszenia są otwarte"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:91
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:92
 msgid "Submission is not open"
 msgstr "Zgłoszenia nie są otwarte"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:93
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:94
 msgid "Toggle whether users can submit new editables"
 msgstr "Przełącz możliwość składania nowych plików do redagowania."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:97
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:110
 msgid "Close now"
 msgstr "Zamknij teraz"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:96
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:109
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:97
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:110
 msgid "Start now"
 msgstr "Zacznij teraz"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:103
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:104
 msgid "Editing is open"
 msgstr "Redagowanie jest otwarte"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:104
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:105
 msgid "Editing is not open"
 msgstr "Redagowanie nie jest otwarte"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:106
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:107
 msgid "Toggle whether editors can review submissions"
 msgstr "Przełącz możliwość recenzowania przez redaktorów złożonych tekstów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:116
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:117
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx:24
 msgid "File types"
 msgstr "Typy plików"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:117
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:118
 msgid "Configure file types"
 msgstr "Skonfiguruj typy plików"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:128
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:129
 msgid "Ready for review conditions"
 msgstr "Gotowe dla warunków oceniania"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:129
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:130
 msgid "Configure conditions for reviewing"
 msgstr "Skonfiguruj warunki opiniowania"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:140
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:141
 msgid "Editing team"
 msgstr "Zespół redagujacy"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:141
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:142
 msgid "Configure editing team"
 msgstr "Skonfiguruj zespół redagujący"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:148
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:149
 msgid "Keep editing team members anonymous"
 msgstr "Zachowaj anonimowość członków zespołu edytującego"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:151
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:152
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:20
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:43
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:127
 msgid "Contact"
 msgstr "Kontakt"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:154
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:155
 msgid "Manage team"
 msgstr "Zarządzaj zespołem"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:162
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:163
 msgid "Editor assignment"
 msgstr "Przydziały redaktora"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:170
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:171
 msgid "Allow editors to self-assign editables"
 msgstr "Pozwól redaktorom samodzielnie rozdzielić pliki edytowalne"
 

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-09-01 15:29+0200\n"
-"PO-Revision-Date: 2021-09-06 15:25+0000\n"
+"POT-Creation-Date: 2021-10-26 12:56+0200\n"
+"PO-Revision-Date: 2021-10-26 10:58+0000\n"
 "Last-Translator: Adrian\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
@@ -554,14 +554,6 @@ msgstr "Текстова область"
 msgid "Yes/No"
 msgstr "Так/Ні"
 
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "yes"
-msgstr "так"
-
-#: indico/modules/events/registration/client/js/form/field.js:853
-msgid "no"
-msgstr "ні"
-
 #: indico/modules/events/registration/client/js/form/field.js:869
 msgid "Email address"
 msgstr "Адреса електронної пошти"
@@ -775,7 +767,7 @@ msgstr "Зберегти"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:672
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:675
 msgid "Loading..."
 msgstr "Завантаження..."
 
@@ -884,7 +876,7 @@ msgstr "Напишіть, аби додати {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1506
 msgid "Delete"
 msgstr "Видалити"
 
@@ -938,7 +930,7 @@ msgstr[2] "Лишилось <strong> {0} </strong> слів"
 msgstr[3] "Лишилось <strong> {0} </strong> слів"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1435
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1438
 msgid "Edit"
 msgstr "Редагувати"
 
@@ -1372,7 +1364,7 @@ msgid "All days"
 msgstr "Всі дні"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:482
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1215
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1218
 msgctxt "momentjs date format for timetable tab headers"
 msgid "ddd DD/MM"
 msgstr "ddd DD/MM"
@@ -1501,72 +1493,72 @@ msgstr "Скиньте для переміщення блоку всередин
 msgid "Show materials"
 msgstr "Показати матеріали"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:215
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:218
 msgid "et al."
 msgstr "et al."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:315
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:318
 msgid "This poster session has "
 msgstr "Ця постерна сесія має"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:317
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:320
 msgid " contribution(s)."
 msgstr "внесок(ків)"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:319
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:322
 msgid "Please click for more information."
 msgstr "Клінкіть для розширеної інформації."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:622
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:625
 msgid "Move entry"
 msgstr "Перемістити доповідь "
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:666
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:677
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:669
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:680
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr "Цей запис розкладу більше не існує. Оновіть сторінку, будь ласка."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:678
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:681
 msgid "Refresh"
 msgstr "Оновити"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:784
 msgid "Move up"
 msgstr "Нагору"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:790
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
 msgid "Move down"
 msgstr "Вниз"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1437
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1440
 msgid "Edit poster"
 msgstr "Редагувати постер"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1469
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1472
 msgid "Manage protection"
 msgstr "Керувати захистом"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1471
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1474
 msgid "Manage poster protection"
 msgstr "Керувати захистом постерів"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1499
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1502
 msgid "Unschedule"
 msgstr "Видалити з графіку"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1500
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
 msgid "Unschedule poster"
 msgstr "Видалити постер з графіку"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1501
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "Ви впевнені, що хочете видалити постер з графіку?"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1507
 msgid "Delete poster"
 msgstr "Видалити постер"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1505
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1508
 msgid "Are you sure you want to delete the poster?"
 msgstr "Ви впевнені, що хочете видалити постер?"
 
