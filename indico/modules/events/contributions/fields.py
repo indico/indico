@@ -36,7 +36,6 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
         return roles
 
     def __init__(self, *args, **kwargs):
-        self.author_types = AuthorType.serialize()
         self.allow_authors = kwargs.pop('allow_authors', kwargs['_form'].event.type == 'conference')
         self.allow_submitters = kwargs.pop('allow_submitters', True)
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
