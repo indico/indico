@@ -2,6 +2,42 @@ Changelog
 =========
 
 
+Version 3.2
+-----------
+
+*Unreleased*
+
+Major Features
+^^^^^^^^^^^^^^
+
+- TODO write something about new regform
+- TODO write something about privacy features
+- TODO write something about conference receipts
+
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- Nothing so far
+
+Improvements
+^^^^^^^^^^^^
+
+- Nothing so far
+
+Bugfixes
+^^^^^^^^
+
+- Nothing so far
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Nothing so far
+
+
+----
+
+
 Version 3.1
 -----------
 
