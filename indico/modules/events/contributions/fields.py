@@ -22,21 +22,24 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
     linked_object_attr = 'contrib'
     widget = JinjaWidget('forms/_person_link_widget_base.html', allow_empty_email=True)
 
+    @property
+    def roles(self):
+        roles = [{'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone', 'default': True}]
+        if self.allow_submitters:
+            roles.append({'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
+                          'default': self.default_is_submitter})
+        if self.allow_authors:
+            roles.extend([
+                {'name': 'primary', 'label': _('Author'), 'section': True},
+                {'name': 'secondary', 'label': _('Co-author'), 'section': True},
+            ])
+        return roles
+
     def __init__(self, *args, **kwargs):
         self.author_types = AuthorType.serialize()
         self.allow_authors = kwargs.pop('allow_authors', kwargs['_form'].event.type == 'conference')
         self.allow_submitters = kwargs.pop('allow_submitters', True)
-        self.roles = [
-            {'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone', 'default': True}
-        ]
-        if self.allow_submitters:
-            self.roles.append({'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
-                               'default': kwargs.pop('default_is_submitter', True)})
-        if self.allow_authors:
-            self.roles.extend([
-                {'name': 'primary', 'label': _('Author'), 'section': True},
-                {'name': 'secondary', 'label': _('Co-author'), 'section': True},
-            ])
+        self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):

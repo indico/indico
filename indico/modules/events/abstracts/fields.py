@@ -100,17 +100,21 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
     create_untrusted_persons = True
     widget = JinjaWidget('forms/_person_link_widget_base.html', allow_empty_email=True)
 
+    @property
+    def roles(self):
+        roles = [
+            {'name': 'primary', 'label': _('Author'), 'section': True, 'default': True},
+            {'name': 'secondary', 'label': _('Co-author'), 'section': True},
+        ]
+        if self.allow_speakers:
+            roles.append({'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'})
+        return roles
+
     def __init__(self, *args, **kwargs):
         self.allow_speakers = kwargs.pop('allow_speakers', True)
         self.require_primary_author = kwargs.pop('require_primary_author', True)  # TODO
         self.require_speaker = kwargs.pop('require_speaker', False)  # TODO
         self.sort_by_last_name = True
-        self.roles = [
-            {'name': 'primary', 'label': _('Author'), 'section': True, 'default': True},
-            {'name': 'secondary', 'label': _('Co-author'), 'section': True},
-        ]
-        if self.allow_speakers:
-            self.roles.append({'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'})
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):

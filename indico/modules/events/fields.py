@@ -171,11 +171,13 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
     linked_object_attr = 'event'
     widget = JinjaWidget('forms/_person_link_widget_base.html')
 
+    @property
+    def roles(self):
+        return [{'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
+                 'default': self.default_is_submitter}]
+
     def __init__(self, *args, **kwargs):
-        self.roles = [
-            {'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
-             'default': kwargs.pop('default_is_submitter', True)}
-        ]
+        self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
