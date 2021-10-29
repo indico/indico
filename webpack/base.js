@@ -290,7 +290,10 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
         publicPath: config.build.distURL,
       }),
       // Do not load moment locales (we'll load them explicitly)
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^\.\/locale$/,
+        contextRegExp: /moment$/,
+      }),
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
