@@ -171,7 +171,7 @@ $i-label-color: $light-black;
   > .handle:first-child {
     @include icon-before('icon-handle');
     margin-left: -$i-label-horizontal-padding;
-    margin-right: $i-label-horizontal-padding/2;
+    margin-right: $i-label-horizontal-padding / 2;
   }
 }
 

@@ -63,3 +63,12 @@ rules:
     - ignoreInside: [at-rule, nested-at-rule]
       ignoreInsideAtRules: [if, else, function, each]
   scss/no-duplicate-mixins: true
+
+  # we have "empty" comments in our license header
+  scss/comment-no-empty: null
+  # we make heavy use of globals like darken() and lighten()
+  scss/no-global-function-names: null
+  # heavily used
+  scss/at-extend-no-missing-placeholder: null
+  # prettier's formatting can violate this
+  scss/operator-no-newline-after: null

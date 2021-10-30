@@ -256,12 +256,12 @@ a.i-big-button {
   i {
     display: block;
     font-size: 3em;
-    line-height: ($size/3) * 2;
+    line-height: ($size / 3) * 2;
   }
 
   span {
     font-weight: bold;
-    line-height: $size/3;
+    line-height: $size / 3;
     overflow: hidden;
     white-space: nowrap;
   }
