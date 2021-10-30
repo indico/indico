@@ -11,7 +11,7 @@ import React from 'react';
 import {Form, Header, Tab} from 'semantic-ui-react';
 
 import {ACLField} from 'indico/react/components';
-import {FinalField, FinalRadio, parsers as p} from 'indico/react/forms';
+import {FinalField, FinalRadio} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 export default function RoomEditPermissions({
