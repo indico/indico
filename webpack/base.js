@@ -220,6 +220,18 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
 
   const indicoClientPath = globalBuildConfig.clientPath;
 
+  // Do not load moment locales (we'll load them explicitly)
+  // We have to disable this for plugins since for some weird reason
+  // that probably not even that webpack maintainers know, it breaks
+  // certain plugins (burotel) in obscure ways as soon as exports.js
+  // in the core is used...
+  const ignorePlugin = isPlugin
+    ? null
+    : new webpack.IgnorePlugin({
+        resourceRegExp: /^\.\/locale$/,
+        contextRegExp: /moment$/,
+      });
+
   return {
     devtool: 'source-map',
     cache: true,
@@ -289,11 +301,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
         fileName: 'manifest.json',
         publicPath: config.build.distURL,
       }),
-      // Do not load moment locales (we'll load them explicitly)
-      new webpack.IgnorePlugin({
-        resourceRegExp: /^\.\/locale$/,
-        contextRegExp: /moment$/,
-      }),
+      ...(ignorePlugin ? [ignorePlugin] : []),
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
