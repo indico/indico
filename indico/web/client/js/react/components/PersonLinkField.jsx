@@ -309,10 +309,9 @@ export default function PersonLinkField({value: persons, onChange, eventId, sess
           existing={persons.map(u => `User:${u.userId}`)}
           onAddItems={onAdd}
           triggerFactory={props => (
-            // eslint-disable-next-line react/react-in-jsx-scope
-            <Translate as={Button} {...props} type="button" disabled={!sessionUser}>
-              Search
-            </Translate>
+            <Button type="button" {...props}>
+              <Translate>Search</Translate>
+            </Button>
           )}
           withEventPersons={eventId !== null}
           eventId={eventId}
