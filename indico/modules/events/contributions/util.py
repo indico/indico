@@ -317,12 +317,7 @@ def import_contributions_from_csv(event, f):
             continue
 
         # set the information of the speaker
-        person = get_event_person(event, {
-            'firstName': speaker_data['first_name'],
-            'familyName': speaker_data['last_name'],
-            'affiliation': speaker_data['affiliation'],
-            'email': email
-        })
+        person = get_event_person(event, speaker_data)
         link = ContributionPersonLink(person=person, is_speaker=True)
         link.populate_from_dict({
             'first_name': speaker_data['first_name'],

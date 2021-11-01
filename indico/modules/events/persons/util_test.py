@@ -26,8 +26,8 @@ def test_get_person_for_user(db, dummy_event, dummy_user):
 def test_create_event_person(db, dummy_event):
     data = {
         'email': 'test@acme.com',
-        'firstName': 'John',
-        'familyName': 'Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'affiliation': 'ACME Inc.'
     }
     person = create_event_person(dummy_event, **data)
@@ -40,8 +40,8 @@ def test_create_event_person(db, dummy_event):
 def test_get_event_person(db, dummy_event, dummy_user):
     data = {
         'email': 'test@acme.com',
-        'firstName': 'John',
-        'familyName': 'Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'affiliation': 'ACME Inc.'
     }
     person_1 = get_event_person(dummy_event, data)
@@ -55,8 +55,8 @@ def test_get_event_person(db, dummy_event, dummy_user):
 
     data = {
         'email': '1337@example.com',
-        'firstName': 'Sea',
-        'familyName': 'Pig',
+        'first_name': 'Sea',
+        'last_name': 'Pig',
         'affiliation': 'ACME Inc.'
     }
     person_2 = get_event_person(dummy_event, data)
@@ -75,8 +75,8 @@ def test_get_event_person(db, dummy_event, dummy_user):
     # User for whom there is already an EventPerson in this event
     data = {
         'email': 'test@acme.com',
-        'firstName': 'JOHN',
-        'familyName': 'DOE',
+        'first_name': 'JOHN',
+        'last_name': 'DOE',
         'affiliation': 'ACME'
     }
     person_3 = get_event_person(dummy_event, data)
@@ -86,8 +86,8 @@ def test_get_event_person(db, dummy_event, dummy_user):
     assert person_3.full_name == 'John Doe'
 
     data = {
-        'firstName': 'Foo',
-        'familyName': 'Bar'
+        'first_name': 'Foo',
+        'last_name': 'Bar'
     }
     person_4 = get_event_person(dummy_event, data)
     # We should get a new person
@@ -100,8 +100,8 @@ def test_get_event_person(db, dummy_event, dummy_user):
 def test_get_event_person_edit(db, dummy_event, dummy_user):
     data = {
         'email': 'test@acme.com',
-        'firstName': 'John',
-        'familyName': 'Doe',
+        'first_name': 'John',
+        'last_name': 'Doe',
         'affiliation': 'ACME Inc.'
     }
     person_1 = get_event_person(dummy_event, dict(data, _type='Avatar', identifier=f'User:{dummy_user.id}'))
