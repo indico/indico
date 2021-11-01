@@ -304,16 +304,24 @@ class Registration(db.Model):
         mode = self.registration_form.publish_registrations_mode
         show_all = mode == PublishRegistrationsMode.show_all
         show_with_consent = mode == PublishRegistrationsMode.show_with_consent and self.consented_to_publish
-        return self.is_active and self.state in (RegistrationState.complete,
-                                                 RegistrationState.unpaid) and (show_all or show_with_consent)
+        return (
+            self.is_active and
+            self.state in (RegistrationState.complete, RegistrationState.unpaid) and
+            (show_all or show_with_consent)
+        )
 
     @is_publishable.expression
     def is_publishable(cls):
         show_all = cls.registration_form.has(publish_registrations_mode=PublishRegistrationsMode.show_all)
-        show_with_consent = cls.registration_form.has(
-            publish_registrations_mode=PublishRegistrationsMode.show_with_consent) & cls.consented_to_publish
-        return cls.is_active & (cls.state.in_((RegistrationState.complete,
-                                               RegistrationState.unpaid))) & (show_all | show_with_consent)
+        show_with_consent = db.and_(
+            cls.registration_form.has(publish_registrations_mode=PublishRegistrationsMode.show_with_consent),
+            cls.consented_to_publish
+        )
+        return db.and_(
+            cls.is_active,
+            cls.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
+            (show_all | show_with_consent)
+        )
 
     @hybrid_property
     def is_cancelled(self):

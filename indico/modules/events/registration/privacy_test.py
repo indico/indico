@@ -50,13 +50,13 @@ def test_registration_publishable_query(dummy_event, dummy_regform):
     assert not reg.consented_to_publish
     assert reg.is_active
     assert reg.state == RegistrationState.complete
-    assert not _get_publishable().all()
+    assert not _get_publishable().has_rows()
 
     dummy_regform.publish_registrations_mode = PublishRegistrationsMode.show_all
-    assert _get_publishable().all()
+    assert _get_publishable().has_rows()
 
     dummy_regform.publish_registrations_mode = PublishRegistrationsMode.show_with_consent
-    assert not _get_publishable().all()
+    assert not _get_publishable().has_rows()
 
     reg.consented_to_publish = True
-    assert _get_publishable().all()
+    assert _get_publishable().has_rows()
