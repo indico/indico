@@ -18,6 +18,7 @@ from indico.modules.events import Event, EventLogRealm, logger
 from indico.modules.events.cloning import EventCloner, get_event_cloners
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
+from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
@@ -410,3 +411,21 @@ def create_event_request(event, category, comment=''):
     category.log(CategoryLogRealm.events, LogKind.positive, 'Moderation', f'Event {verb} requested: "{event.title}"',
                  session.user, data=category_log_data, meta={'event_move_request_id': req.id})
     return req
+
+
+def update_event_privacy(event, data):
+    log_fields = {'data_controller_name': {'title': 'Data controller name', 'type': 'string'},
+                  'data_controller_email': {'title': 'Data controller e-mail', 'type': 'string'},
+                  'privacy_policy_url': {'title': 'Privacy policy URL', 'type': 'string'},
+                  'privacy_policy': {'title': 'Privacy policy', 'type': 'text'}}
+    assert set(data.keys()) <= log_fields.keys()
+    changes = {}
+    for key, value in data.items():
+        old_value = privacy_settings.get(event, key)
+        if old_value != value:
+            changes[key] = (old_value, value)
+    privacy_settings.set_multi(event, data)
+    logger.info('Privacy settings of event %r updated with %r by %r', event, data, session.user)
+    if changes:
+        event.log(EventLogRealm.management, LogKind.change, 'Event', 'Privacy settings updated', session.user,
+                  data={'Changes': make_diff_log(changes, log_fields)})
