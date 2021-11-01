@@ -73,7 +73,7 @@ def generate_basic_component(entity, uid=None, url=None, title=None, description
     if url:
         cal_description.append(url)
     if cal_description:
-        component.add('description', '\n'.join(cal_description))
+        component.add('description', '\n\n'.join(cal_description))
 
     return component
 
