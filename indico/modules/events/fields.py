@@ -138,7 +138,7 @@ class PersonLinkListFieldBase(EventPersonListField):
             only=('first_name', 'last_name', 'affiliation', 'address', 'phone', 'display_order')).load(data))
         email = data.get('email', '').lower()
         if not email:
-            raise UserValueError(_(f'A valid email address is required for {person_link.name}'))
+            raise UserValueError(_('A valid email address is required'))
         if email != person_link.email:
             if not self.event or not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
@@ -146,7 +146,7 @@ class PersonLinkListFieldBase(EventPersonListField):
                 if inspect(person).persistent:
                     signals.event.person_updated.send(person_link.person)
             else:
-                raise UserValueError(_(f'There is already a person with the email {email}'))
+                raise UserValueError(_('There is already a person with the email {email}').format(email=email))
         return person_link
 
     def _serialize_principal(self, principal):
