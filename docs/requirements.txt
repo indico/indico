@@ -3,3 +3,4 @@ flask
 Flask-Babel
 sphinx-issues
 plantweb
+docutils==0.17.1
