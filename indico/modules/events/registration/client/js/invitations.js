@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+/* global handleAjaxError:false */
+
 (function(global) {
   global.setupInvitationPage = function setupInvitationPage() {
     $('#invitation-list').on('indico:confirmed', '.js-invitation-action', function(evt) {

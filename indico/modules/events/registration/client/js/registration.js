@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+/* global handleAjaxError:false, ajaxDialog:false, alertPopup:false, $T:false */
+
 (function(global) {
   $(document).ready(function() {
     setupRegistrationFormScheduleDialogs();
