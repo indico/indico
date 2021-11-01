@@ -177,16 +177,6 @@ def get_random_color(event):
     return random.choice(tuple(unused_colors) or get_colors())
 
 
-# TODO: to schemas - where is this used?
-def serialize_event_person(person):
-    """Serialize EventPerson to JSON-like object."""
-
-    from indico.modules.events.persons.schemas import EventPersonSchema
-
-    return EventPersonSchema().dump(person)
-    # TODO: return {'_type': 'EventPerson',
-
-
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, permission=None):
     """Update an object's ACL with a new list of principals.
 

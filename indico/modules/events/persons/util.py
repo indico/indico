@@ -12,13 +12,9 @@ from indico.util.user import principal_from_identifier
 
 def create_event_person(event, create_untrusted_persons=False, **data):
     """Create an event person from data passed as kwargs."""
-
     from marshmallow import EXCLUDE
 
     from indico.modules.events.persons.schemas import EventPersonSchema
-
-    # title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
-    # TODO: test
     event_person = EventPerson(event=event, is_untrusted=create_untrusted_persons)
     event_person.populate_from_dict(EventPersonSchema(unknown=EXCLUDE).load(data))
     return event_person

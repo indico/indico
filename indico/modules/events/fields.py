@@ -89,7 +89,7 @@ class EventPersonListField(PrincipalListField):
         raise NotImplementedError
 
     def _serialize_principal(self, principal):
-        from indico.modules.events.util import serialize_event_person
+        from indico.modules.events.persons.schemas import EventPersonSchema
         if principal.id is None:
             # We created an EventPerson which has not been persisted to the
             # database. Revert the conversion.
@@ -98,7 +98,7 @@ class EventPersonListField(PrincipalListField):
                 return principal
         if not isinstance(principal, EventPerson):
             return super()._serialize_principal(principal)
-        return serialize_event_person(principal)
+        return EventPersonSchema().dump(principal)
 
     def process_formdata(self, valuelist):
         if valuelist:

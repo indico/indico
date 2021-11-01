@@ -20,12 +20,12 @@ class PersonLinkSchema(mm.Schema):
     _type = fields.Constant('PersonLink')
     person_id = fields.Int()
     user_id = fields.Function(lambda o: o.person.user_id)
-    first_name = fields.String(missing='')
+    first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
     title = fields.Method('get_title', deserialize='load_title')
-    affiliation = fields.String(missing='')
-    phone = fields.String(missing='')
-    address = fields.String(missing='')
+    affiliation = fields.String(load_default='')
+    phone = fields.String(load_default='')
+    address = fields.String(load_default='')
     email = fields.String(required=True)
     display_order = fields.Int()
     avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None)
@@ -50,11 +50,12 @@ class EventPersonSchema(mm.SQLAlchemyAutoSchema):
                          'first_name', 'last_name', 'user_identifier')
         fields = public_fields + ('phone', 'address')
 
+    _type = fields.Constant('EventPerson')
     title = fields.Method('get_title', deserialize='load_title')
-    name = fields.String(attribute='full_name')  # TODO: Unknown name fallback
+    name = fields.String(attribute='full_name')
     user_identifier = fields.String(attribute='user.identifier')
     last_name = fields.String(required=True)
-    email = fields.String(missing='')
+    email = fields.String(load_default='')
 
     def get_title(self, obj):
         return obj.title

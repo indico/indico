@@ -3,7 +3,7 @@
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
-// LICENSE file for more details
+// LICENSE file for more details.
 
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
@@ -237,7 +237,6 @@ PersonLinkSection.defaultProps = {
   canDelete: true,
 };
 
-// TODO: Disable user search when not logged-in
 export default function PersonLinkField({value: persons, onChange, eventId, sessionUser, roles}) {
   const [favoriteUsers] = useFavoriteUsers();
   const [modalOpen, setModalOpen] = useState(false);
