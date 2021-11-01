@@ -174,7 +174,7 @@ class RHExportDashboardICS(RHProtected):
 
         all_events = sorted(all_events, key=lambda e: (e.start_dt, e.id))[:limit]
 
-        response = {'results': [serialize_event_for_ical(event, 'events') for event in all_events]}
+        response = {'results': [serialize_event_for_ical(event) for event in all_events]}
         serializer = Serializer.create('ics')
         return send_file('event.ics', BytesIO(serializer(response)), 'text/calendar')
 

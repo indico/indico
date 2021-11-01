@@ -575,16 +575,20 @@ def register_location_change(entry):
             old_locations[entry][field] = getattr(entry, field)
 
 
-def serialize_event_for_ical(event, detail_level):
-    from indico.modules.events.contributions.util import serialize_contribution_for_ical
-    fossil = 'conferenceMetadataWithContribs' if detail_level == 'contributions' else 'conferenceMetadata'
-    data = {'id': event.id, 'title': event.title, 'description': event.description, 'startDate': event.start_dt,
-            'endDate': event.end_dt, 'url': event.external_url,
-            'location': event.venue_name, 'roomFullname': event.room_name, 'speakers': [], '_fossil': fossil,
-            'contributions': []}
-    if detail_level == 'contributions':
-        data['contributions'] = [serialize_contribution_for_ical(c) for c in event.contributions]
-    return data
+def serialize_event_for_ical(event):
+    return {
+        '_fossil': 'conferenceMetadata',
+        'id': event.id,
+        'title': event.title,
+        'description': event.description,
+        'startDate': event.start_dt,
+        'endDate': event.end_dt,
+        'url': event.external_url,
+        'location': event.venue_name,
+        'roomFullname': event.room_name,
+        'speakers': [],
+        'contributions': []
+    }
 
 
 def serialize_event_for_json_ld(event, full=False):
