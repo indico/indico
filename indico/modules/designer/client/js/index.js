@@ -83,11 +83,13 @@ import {$T} from 'indico/utils/i18n';
       bold: false,
       italic: false,
       text_align: 'center',
-      color: 'black',
+      color: '#000000',
+      background_color: null,
       font_size: '15pt',
       width: isImage(type) ? 150 : 400,
       height: isImage(type) ? 150 : null,
       text: $T('Fixed text'),
+      zIndex: itemIdCounter + 10,
 
       // The following attributes have no meaning to the server
       selected: false,
@@ -107,6 +109,8 @@ import {$T} from 'indico/utils/i18n';
           fontSize: zoomFont(this.font_size),
           textAlign: this.text_align.replace('Justified', 'justify'),
           color: this.color,
+          backgroundColor: this.background_color,
+          zIndex: this.zIndex,
         })
         .attr('data-type', this.type)
         .text(this.type === 'fixed' ? this.text : itemTitles[this.type]);
@@ -149,9 +153,10 @@ import {$T} from 'indico/utils/i18n';
         position: 'absolute',
         left: item.x + 'px',
         top: item.y + 'px',
-        zIndex: itemIdCounter + 10,
+        zIndex: item.zIndex,
       })
       .data('id', item.id)
+      .attr('data-id', item.id)
       .appendTo(templateSide);
 
     if (isBackside) {
@@ -160,7 +165,6 @@ import {$T} from 'indico/utils/i18n';
 
     newDiv.draggable({
       containment: templateSide,
-      stack: templateSide + ' > div',
       opacity: 0.5,
       drag: function(e, ui) {
         if (snapToGrid) {
@@ -240,11 +244,28 @@ import {$T} from 'indico/utils/i18n';
     var itemStyles = _.filter([item.bold ? 'bold' : null, item.italic ? 'italic' : null]);
 
     // Change the selectors so that they match the properties of the item
+    $('#text-color-selector').val(item.color);
+    var textColorPreview = $('#text-color-preview');
+    if (textColorPreview.hasClass('no-value') && item.color.length > 1) {
+      textColorPreview.removeClass('no-value');
+    }
+    textColorPreview.attr('style', 'background-color: ' + item.color + '; opacity: 1;');
+    if (item.color.length < 1) {
+      textColorPreview.addClass('no-value');
+    }
+    $('#bg-color-selector').val(item.background_color);
+    var bgColorPreview = $('#bg-color-preview');
+    if (bgColorPreview.hasClass('no-value') && item.background_color.length > 1) {
+      bgColorPreview.removeClass('no-value');
+    }
+    bgColorPreview.attr('style', 'background-color: ' + item.background_color + '; opacity: 1;');
+    if (!item.background_color || item.background_color.length < 1) {
+      bgColorPreview.addClass('no-value');
+    }
     $('#alignment-selector').val(item.text_align);
     $('#font-selector').val(item.font_family);
     $('#size-selector').val(item.font_size);
     $('#style-selector').val(itemStyles.length ? itemStyles.join('_') : 'normal');
-    $('#color-selector').val(item.color);
     $('.js-element-width').val(item.width / pixelsPerCm);
     $('.js-element-height').val(item.height / pixelsPerCm);
 
@@ -340,6 +361,7 @@ import {$T} from 'indico/utils/i18n';
       newDiv.css({
         left: zoom(item.x) + 'px',
         top: zoom(item.y) + 'px',
+        zIndex: item.zIndex,
       });
       newDiv.append(item.toHTML());
       if (item.selected && !isBackside) {
@@ -424,7 +446,55 @@ import {$T} from 'indico/utils/i18n';
           selectedItem.y = unzoom(y > 0 ? y : 0);
         }
       },
+      back: function() {
+        if (div) {
+          var backmostItem = _.minBy(
+            Object.values(items).filter(
+              item => selectedItem.id !== item.id && itemsOverlap(selectedItem, item)
+            ),
+            'zIndex'
+          );
+          var zIndex = Math.min(selectedItem.zIndex, backmostItem.zIndex - 1);
+          selectedItem.zIndex = zIndex;
+          normalizeZIndex();
+        }
+      },
+      front: function() {
+        if (div) {
+          var foremostItem = _.maxBy(
+            Object.values(items).filter(
+              item => selectedItem.id !== item.id && itemsOverlap(selectedItem, item)
+            ),
+            'zIndex'
+          );
+          var zIndex = Math.max(selectedItem.zIndex, foremostItem.zIndex + 1);
+          selectedItem.zIndex = zIndex;
+          normalizeZIndex();
+        }
+      },
     }[direction]());
+  }
+
+  function itemsOverlap(item1, item2) {
+    const {x: left1, y: top1} = item1;
+    const {x: left2, y: top2} = item2;
+
+    const right1 = left1 + item1.width;
+    const bottom1 = top1 + (item1.height || 22);
+    const right2 = left2 + item2.width;
+    const bottom2 = top2 + (item2.height || 22);
+
+    if (left1 >= right2 || left2 >= right1) {
+      return false;
+    }
+    return !(top1 >= bottom2 || top2 >= bottom1);
+  }
+
+  function normalizeZIndex() {
+    _.sortBy(Object.values(items), 'zIndex').forEach((item, n) => {
+      item.zIndex = n + 10;
+      $('.ui-draggable[data-id=' + item.id + ']').css('zIndex', n + 10);
+    });
   }
 
   function setSelectedItemAttribute(attribute) {
@@ -440,7 +510,10 @@ import {$T} from 'indico/utils/i18n';
         selectedItem.font_family = $('#font-selector').val();
       },
       color: function() {
-        selectedItem.color = $('#color-selector').val();
+        selectedItem.color = $('#text-color-selector').val();
+      },
+      background_color: function() {
+        selectedItem.background_color = $('#bg-color-selector').val();
       },
       alignment: function() {
         selectedItem.text_align = $('#alignment-selector').val();

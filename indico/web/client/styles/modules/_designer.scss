@@ -68,8 +68,10 @@
 
   .designer-item {
     border: 1px dashed $dark-blue;
+    line-height: initial;
 
     &.selected {
+      border-width: 3px;
       background-color: $pastel-blue;
 
       &[data-type='fixed'] {
@@ -378,4 +380,16 @@
 .not-clonable {
   opacity: 0.2;
   cursor: default;
+}
+
+#text-color-preview,
+#bg-color-preview {
+  width: 1em;
+  height: 1.5em;
+  margin-right: 0;
+}
+
+#text-color-selector,
+#bg-color-selector {
+  width: 9em !important;
 }
