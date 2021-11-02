@@ -237,7 +237,14 @@ PersonLinkSection.defaultProps = {
   canDelete: true,
 };
 
-export default function PersonLinkField({value: persons, onChange, eventId, sessionUser, roles}) {
+export default function PersonLinkField({
+  value: persons,
+  onChange,
+  eventId,
+  sessionUser,
+  roles,
+  emptyMessage,
+}) {
   const [favoriteUsers] = useFavoriteUsers();
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -257,8 +264,9 @@ export default function PersonLinkField({value: persons, onChange, eventId, sess
   };
 
   const onAdd = values => {
+    const existing = persons.map(p => p.email);
     values.forEach(p => (p.roles = roles.filter(x => x.default).map(x => x.name)));
-    onChange([...persons, ...values]);
+    onChange([...persons, ...values.filter(v => !existing.includes(v.email))]);
   };
 
   const onSubmit = value => {
@@ -277,7 +285,7 @@ export default function PersonLinkField({value: persons, onChange, eventId, sess
         {sections.map(({name, label}) => {
           const filterCondition = p => p.roles && p.roles.includes(name);
           const filtered = persons.filter(filterCondition);
-          return (
+          return filtered.length === 0 ? null : (
             <PersonLinkSection
               key={name}
               label={label}
@@ -297,6 +305,7 @@ export default function PersonLinkField({value: persons, onChange, eventId, sess
             onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
           />
         )}
+        {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
       </Segment>
       <Button.Group size="small" attached="bottom" floated="right">
         {sessionUser && (
@@ -306,7 +315,7 @@ export default function PersonLinkField({value: persons, onChange, eventId, sess
         )}
         <UserSearch
           favorites={favoriteUsers}
-          existing={persons.map(u => `User:${u.userId}`)}
+          existing={persons.map(p => p.userIdentifier)}
           onAddItems={onAdd}
           triggerFactory={props => (
             <Button type="button" {...props}>
@@ -340,18 +349,24 @@ PersonLinkField.propTypes = {
 };
 
 PersonLinkField.defaultProps = {
-  emptyMessage: Translate.string('There are no persons'),
+  emptyMessage: null,
   sessionUser: null,
   eventId: null,
   roles: [],
 };
 
-export function WTFPersonLinkField({fieldId, eventId, defaultValue, roles, sessionUser}) {
+export function WTFPersonLinkField({
+  fieldId,
+  eventId,
+  defaultValue,
+  roles,
+  sessionUser,
+  emptyMessage,
+}) {
   const [persons, setPersons] = useState(defaultValue);
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
 
   const onChange = value => {
-    // TODO: displayOrder
     inputField.value = JSON.stringify(snakifyKeys(value));
     setPersons(value);
     inputField.dispatchEvent(new Event('change', {bubbles: true}));
@@ -364,6 +379,7 @@ export function WTFPersonLinkField({fieldId, eventId, defaultValue, roles, sessi
       onChange={onChange}
       roles={roles}
       sessionUser={sessionUser}
+      emptyMessage={emptyMessage}
     />
   );
 }
@@ -374,6 +390,7 @@ WTFPersonLinkField.propTypes = {
   eventId: PropTypes.number,
   roles: PropTypes.array,
   sessionUser: PropTypes.object,
+  emptyMessage: PropTypes.string,
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -381,4 +398,5 @@ WTFPersonLinkField.defaultProps = {
   eventId: null,
   roles: [],
   sessionUser: null,
+  emptyMessage: null,
 };
