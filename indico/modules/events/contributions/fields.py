@@ -20,7 +20,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
 
     person_link_cls = ContributionPersonLink
     linked_object_attr = 'contrib'
-    widget = JinjaWidget('forms/_person_link_widget_base.html', allow_empty_email=True)
+    widget = JinjaWidget('forms/person_link_widget.html', allow_empty_email=True)
 
     @property
     def roles(self):

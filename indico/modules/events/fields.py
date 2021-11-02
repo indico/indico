@@ -169,7 +169,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
 
     person_link_cls = EventPersonLink
     linked_object_attr = 'event'
-    widget = JinjaWidget('forms/_person_link_widget_base.html')
+    widget = JinjaWidget('forms/person_link_widget.html')
 
     @property
     def roles(self):
