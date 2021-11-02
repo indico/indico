@@ -39,6 +39,7 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
         self.allow_authors = kwargs.pop('allow_authors', kwargs['_form'].event.type == 'conference')
         self.allow_submitters = kwargs.pop('allow_submitters', True)
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
+        self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):

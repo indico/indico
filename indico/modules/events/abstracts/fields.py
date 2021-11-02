@@ -115,6 +115,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.require_primary_author = kwargs.pop('require_primary_author', True)
         self.require_speaker = kwargs.pop('require_speaker', False)
         self.sort_by_last_name = True
+        self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):

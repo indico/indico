@@ -26,6 +26,7 @@
             eventId: {{ (field.event.id if field.event else none) | tojson }},
             roles: {{ field.roles | default([]) | tojson }},
             sortByLastName: {{ field.sort_by_last_name | default(false) | tojson }},
+            emptyMessage: {{ field.empty_message | tojson }},
             sessionUser: {{ ({
                 'id': session.user.id,
                 'title': session.user.title,

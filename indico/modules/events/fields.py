@@ -178,6 +178,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
 
     def __init__(self, *args, **kwargs):
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
+        self.empty_message = _('There are no chairpersons')
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
