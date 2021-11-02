@@ -20,6 +20,7 @@ class PersonLinkSchema(mm.Schema):
     _type = fields.Constant('PersonLink')
     person_id = fields.Int()
     user_id = fields.Function(lambda o: o.person.user_id)
+    user_identifier = fields.String(attribute='user.identifier')
     first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
     title = fields.Method('get_title', deserialize='load_title')
@@ -27,7 +28,7 @@ class PersonLinkSchema(mm.Schema):
     phone = fields.String(load_default='')
     address = fields.String(load_default='')
     email = fields.String(required=True)
-    display_order = fields.Int()
+    display_order = fields.Int(load_default=0, dump_default=0)
     avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None)
 
     def get_title(self, obj):
