@@ -53,7 +53,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
 
     def _process(self):
         regforms = sorted(self.event.registration_forms, key=lambda f: f.title.lower())
-        form = ParticipantsDisplayForm()
+        form = ParticipantsDisplayForm(regforms=regforms)
         if form.validate_on_submit():
             data = form.json.data
             registration_settings.set(self.event, 'merge_registration_forms', data['merge_forms'])
@@ -65,6 +65,9 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
                                                       else PublishRegistrationsMode.hide_all)
             flash(_('The participants display settings have been saved.'), 'success')
             return redirect(url_for('.manage_regforms_display', self.event))
+        elif form.is_submitted():
+            for error in form.error_list:
+                flash(error, 'error')
 
         available_columns = {field[0].name: field[1]['title'] for field in PersonalDataType.FIELD_DATA}
         enabled_columns = []
@@ -194,7 +197,7 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
         return FormDefaults(self.regform, limit_registrations=self.regform.registration_limit is not None)
 
     def _process(self):
-        form = RegistrationFormForm(obj=self._get_form_defaults(), event=self.event)
+        form = RegistrationFormForm(obj=self._get_form_defaults(), event=self.event, regform=self.regform)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()

@@ -110,6 +110,7 @@ class RegistrationFormForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.regform = kwargs.pop('regform') if 'regform' in kwargs else None
         super().__init__(*args, **kwargs)
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
@@ -119,6 +120,13 @@ class RegistrationFormForm(IndicoForm):
     def _set_currencies(self):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
+
+    def validate_publish_registrations_mode(self, field):
+        if (self.regform and
+                field.data == PublishRegistrationsMode.show_all and
+                self.regform.publish_registrations_mode != PublishRegistrationsMode.show_all and
+                self.regform.existing_registrations_count > 0):
+            raise ValidationError(_('Show always can only be set if there are no registered users.'))
 
 
 class RegistrationFormScheduleForm(IndicoForm):
@@ -290,6 +298,10 @@ class ParticipantsDisplayForm(IndicoForm):
     """Form to customize the display of the participant list."""
     json = JSONField()
 
+    def __init__(self, *args, **kwargs):
+        self.regforms = kwargs.pop('regforms')
+        super().__init__(*args, **kwargs)
+
     def validate_json(self, field):
         schema = {
             'type': 'object',
@@ -309,6 +321,12 @@ class ParticipantsDisplayForm(IndicoForm):
             jsonschema.validate(field.data, schema)
         except jsonschema.ValidationError as exc:
             raise ValidationError(str(exc))
+        for regform in self.regforms:
+            if (regform.id in field.data['participant_list_forms'] and
+                    regform.publish_registrations_mode != PublishRegistrationsMode.show_all and
+                    regform.existing_registrations_count > 0):
+                raise ValidationError(_("Form '{}' has enrolled participants, so it can't be set to show all "
+                                        'participants.').format(regform.title))
 
 
 class ParticipantsDisplayFormColumnsForm(IndicoForm):
