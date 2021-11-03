@@ -57,13 +57,13 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         data = PersonLinkSchema().dump(principal)
         data['roles'] = []
-        is_submitter = self.get_form().is_submitted() and self.data[principal] or principal.is_submitter
         if principal.is_speaker:
             data['roles'].append('speaker')
-        if not isinstance(principal, SubContributionPersonLink):
-            data['roles'].append(principal.author_type.name)
-            if is_submitter:
-                data['roles'].append('submitter')
+        is_submitter = (self.data[principal] if self.get_form().is_submitted()
+                        else principal.contribution and principal.is_submitter)
+        data['roles'].append(principal.author_type.name)
+        if is_submitter:
+            data['roles'].append('submitter')
         return data
 
     def pre_validate(self, form):
@@ -81,4 +81,12 @@ class SubContributionPersonLinkListField(ContributionPersonLinkListField):
 
     person_link_cls = SubContributionPersonLink
     linked_object_attr = 'subcontrib'
-    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
+    widget = JinjaWidget('forms/person_link_widget.html', allow_empty_email=True)
+
+    def _serialize_person_link(self, principal):
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema().dump(principal)
+        data['roles'] = []
+        if principal.is_speaker:
+            data['roles'].append('speaker')
+        return data

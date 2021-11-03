@@ -188,7 +188,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         data = PersonLinkSchema().dump(principal)
         data['roles'] = []
-        if self.get_form().is_submitted() and self.data[principal] or principal.is_submitter:
+        if self.get_form().is_submitted() and self.data[principal] or (principal.event and principal.is_submitter):
             data['roles'].append('submitter')
         return data
 
