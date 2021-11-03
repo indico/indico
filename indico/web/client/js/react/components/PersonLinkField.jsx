@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Button, Segment, List, Modal, Form, Label, Icon} from 'semantic-ui-react';
+import {Button, Segment, List, Modal, Form, Label, Icon, Popup} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
@@ -123,15 +123,22 @@ const PersonListItem = ({
     <div styleName="roles">
       {roles &&
         roles.map(({name: roleName, label, icon, active}, idx) => (
-          <Label
-            as="a"
-            size="small"
+          <Popup
             key={roleName}
-            color={active ? 'blue' : undefined}
-            onClick={() => onClickRole && onClickRole(idx, roles)}
-          >
-            {icon ? <Icon styleName="label-icon" name={icon} /> : label}
-          </Label>
+            trigger={
+              <Label
+                as="a"
+                size="small"
+                color={active ? 'blue' : undefined}
+                onClick={() => onClickRole && onClickRole(idx, roles)}
+              >
+                {icon ? <Icon styleName="label-icon" name={icon} /> : label}
+              </Label>
+            }
+            disabled={!icon}
+            content={label}
+            size="tiny"
+          />
         ))}
     </div>
     <div styleName="actions">
