@@ -50,8 +50,8 @@ function ExternalPersonModal({open, onSubmit, onClose, person}) {
             />
           </Form.Field>
           <Form.Field>
-            <Translate as="label">Family Name</Translate>
-            <FinalInput name="lastName" required />
+            <Translate as="label">Affiliation</Translate>
+            <FinalInput name="affiliation" />
           </Form.Field>
         </Form.Group>
         <Form.Group widths="equal">
@@ -60,8 +60,8 @@ function ExternalPersonModal({open, onSubmit, onClose, person}) {
             <FinalInput name="firstName" />
           </Form.Field>
           <Form.Field>
-            <Translate as="label">Affiliation</Translate>
-            <FinalInput name="affiliation" />
+            <Translate as="label">Family Name</Translate>
+            <FinalInput name="lastName" required />
           </Form.Field>
         </Form.Group>
         <Form.Field>
