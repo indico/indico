@@ -144,7 +144,10 @@ class RHManageParticipants(RHManageRegFormsBase):
         set_feature_enabled(self.event, 'registration', True)
         if not regform:
             regform = RegistrationForm(event=self.event, title='Participants', is_participation=True,
-                                       currency=payment_settings.get('currency'))
+                                       currency=payment_settings.get('currency'),
+                                       publish_registrations_mode=(PublishRegistrationsMode.hide_all
+                                                                   if self.event.type_ == EventType.conference
+                                                                   else PublishRegistrationsMode.show_with_consent))
             create_personal_data_fields(regform)
             db.session.add(regform)
             db.session.flush()
@@ -167,7 +170,9 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
 
     def _process(self):
         form = RegistrationFormForm(event=self.event, currency=payment_settings.get('currency'),
-                                    publish_registrations_enabled=(self.event.type_ != EventType.conference))
+                                    publish_registrations_mode=(PublishRegistrationsMode.hide_all
+                                                                if self.event.type_ == EventType.conference
+                                                                else PublishRegistrationsMode.show_with_consent))
         if form.validate_on_submit():
             regform = RegistrationForm(event=self.event)
             create_personal_data_fields(regform)
