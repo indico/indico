@@ -7,6 +7,15 @@
 {% endblock %}
 
 {% block content %}
+    <div id="registration-form-setup-container"
+         data-event-id="{{ event.id }}"
+         data-regform-id="{{ regform.id }}"
+         data-sections="{{ sections | tojson | forceescape }}"></div>
+
+    <hr>
+    <h1>Warning, angular 💩 below</h1>
+    <hr>
+
     <div ng-app="nd" ng-controller="AppCtrl">
         {% block regform %}
             <div nd-reg-form

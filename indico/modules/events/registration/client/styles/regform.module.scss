@@ -1,0 +1,61 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2021 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'base/palette';
+@import 'base/utilities';
+
+.form-item {
+  display: flex;
+  padding: 4px 0;
+
+  &.disabled {
+    background: $light-gray;
+
+    > .label,
+    > .content {
+      color: $dark-gray;
+    }
+  }
+
+  > .label {
+    flex-basis: 125px;
+  }
+
+  > .content {
+    flex-grow: 1;
+  }
+
+  .required {
+    display: inline-block;
+    margin-left: 2px;
+    color: #812;
+  }
+
+  &.editable {
+    .sortable-handle {
+      color: $dark-gray;
+      width: 15px;
+    }
+
+    &.disabled .sortable-handle {
+      pointer-events: none;
+    }
+
+    &:not(.disabled):hover .sortable-handle,
+    &:not(.disabled):active .sortable-handle {
+      @include icon-before('icon-handle');
+      cursor: move;
+    }
+  }
+}
+
+// TODO: clean up the old CSS; we may no longer need this afterwards.
+// make sure to test this with the lockUI dimmer - the content must not
+// jump around when it gets activated
+:global(.regform-section-list) > :first-child :global(.regform-section) {
+  margin-top: 0;
+}
