@@ -43,6 +43,7 @@ def downgrade():
     op.add_column('forms',
                   sa.Column('publish_registrations_enabled', sa.Boolean(), server_default='false', nullable=False),
                   schema='event_registration')
+    op.alter_column('forms', 'publish_registrations_enabled', server_default=None, schema='event_registration')
     op.execute('''
         UPDATE event_registration.forms
         SET publish_registrations_enabled = true
