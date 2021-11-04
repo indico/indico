@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Button, Segment, List, Modal, Form, Label, Icon, Popup} from 'semantic-ui-react';
+import {Button, Segment, List, Modal, Form, Label, Icon, Popup, Message} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
@@ -37,6 +37,12 @@ function ExternalPersonModal({open, onSubmit, onClose, person}) {
     <Modal as={Form} size="tiny" open={open} onClose={onClose} onSubmit={handleSubmit}>
       <Translate as={Modal.Header}>Enter Person</Translate>
       <Modal.Content>
+        {person && person.userId && (
+          <Translate as={Message}>
+            You are updating details that were originally linked to a user. Please note that its
+            identity will remain the same.
+          </Translate>
+        )}
         <Form.Group widths="equal">
           <Form.Field>
             <Translate as="label">Title</Translate>
