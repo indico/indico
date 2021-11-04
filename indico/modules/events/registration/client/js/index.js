@@ -24,6 +24,7 @@ import './legacy_form/table';
 import './legacy_form/templates';
 
 import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
+import setupRegformSetup from './form_setup';
 
 (function(global) {
   $(document).ready(function() {
@@ -110,5 +111,12 @@ import RegistrationTagsEditableList from './components/RegistrationTagsEditableL
     $('#registration-details')
       .parent()
       .on('indico:htmlUpdated', setupRegistrationTags);
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const rootElement = document.getElementById('registration-form-setup-container');
+    if (rootElement) {
+      setupRegformSetup(rootElement);
+    }
   });
 })(window);
