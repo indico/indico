@@ -15,13 +15,13 @@ import 'indico/legacy/angular';
 import './invitations';
 import './reglists';
 
-import './form/form';
-import './form/section';
-import './form/field';
-import './form/sectiontoolbar';
-import './form/table';
+import './legacy_form/form';
+import './legacy_form/section';
+import './legacy_form/field';
+import './legacy_form/sectiontoolbar';
+import './legacy_form/table';
 
-import './form/templates';
+import './legacy_form/templates';
 
 import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
 

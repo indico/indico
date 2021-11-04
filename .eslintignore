@@ -1,6 +1,6 @@
 # Legacy
 indico/web/client/js/legacy/
-indico/modules/events/registration/client/js/form/
+indico/modules/events/registration/client/js/legacy_form/
 
 # Not legacy, but not tidy either
 indico/web/client/js/jquery/

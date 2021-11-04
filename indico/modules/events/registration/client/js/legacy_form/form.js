@@ -50,7 +50,7 @@ ndRegForm.value('fieldDefaults', {
 });
 
 ndRegForm.config(function(urlProvider) {
-  urlProvider.setModulePath('/dist/mod_assets/_/_/_/modules/events/registration/client/js/form');
+  urlProvider.setModulePath('/dist/mod_assets/_/_/_/modules/events/registration/client/js/legacy_form');
 });
 
 ndRegForm.factory('regFormFactory', function(
