@@ -57,6 +57,7 @@ import './utils/sortablelist';
 if (process.env.NODE_ENV !== 'development') {
   $.migrateMute = true;
 }
+$.migrateMute = true;
 // explicit tracebacks are not needed
 $.migrateTrace = false;
 require('jquery-migrate');
