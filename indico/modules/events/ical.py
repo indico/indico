@@ -72,6 +72,8 @@ def generate_basic_component(entity, uid=None, url=None, title=None, description
             pass
     if url:
         cal_description.append(url)
+    if label := getattr(entity, 'label', None):
+        cal_description.append(label.title)
     if cal_description:
         component.add('description', '\n\n'.join(cal_description))
 
