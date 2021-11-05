@@ -14,7 +14,7 @@ import {Dimmer, Loader} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper} from 'indico/react/sortable';
 
-import SortableFormSection from './SortableFormSection';
+import SetupFormSection from './SetupFormSection';
 
 export default function RegistrationFormSetup() {
   const items = useSelector(state => state.sections);
@@ -25,7 +25,7 @@ export default function RegistrationFormSetup() {
       <DndProvider backend={HTML5Backend}>
         <SortableWrapper accept="regform-section" className="regform-section-list">
           {items.map((section, index) => (
-            <SortableFormSection key={section.id} index={index} {...section} setupMode />
+            <SetupFormSection key={section.id} index={index} {...section} setupMode />
           ))}
         </SortableWrapper>
       </DndProvider>
