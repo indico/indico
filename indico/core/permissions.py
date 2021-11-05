@@ -195,6 +195,7 @@ def update_permissions(obj, form):
     new_principal_permissions = {
         principal_from_identifier(
             fossil['identifier'],
+            allow_external_users=True,
             allow_groups=True,
             allow_networks=True,
             allow_emails=True,

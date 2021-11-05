@@ -117,6 +117,7 @@ class CategoryProtectionForm(IndicoForm):
     def validate_permissions(self, field):
         for principal_fossil, permissions in field.data:
             principal = principal_from_identifier(principal_fossil['identifier'],
+                                                  allow_external_users=True,
                                                   allow_groups=True,
                                                   allow_networks=True,
                                                   allow_category_roles=True,
