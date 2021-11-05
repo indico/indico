@@ -19,7 +19,7 @@ import FormItemSetupActions from './FormItemSetupActions';
 
 import '../../styles/regform.module.scss';
 
-export default function SortableFormItem({index, sectionId, ...rest}) {
+export default function SetupFormItem({index, sectionId, ...rest}) {
   const {id, isEnabled} = rest;
   const dispatch = useDispatch();
   const [handleRef, itemRef, style] = useSortableItem({
@@ -56,10 +56,10 @@ const itemPropTypes = _.pick(
   ...Object.keys(FormItemSetupActions.propTypes)
 );
 
-SortableFormItem.propTypes = {
+SetupFormItem.propTypes = {
   sectionId: PropTypes.number.isRequired,
   index: PropTypes.number.isRequired,
   ...itemPropTypes,
 };
 
-SortableFormItem.defaultProps = _.pick(FormItem.defaultProps, Object.keys(itemPropTypes));
+SetupFormItem.defaultProps = _.pick(FormItem.defaultProps, Object.keys(itemPropTypes));

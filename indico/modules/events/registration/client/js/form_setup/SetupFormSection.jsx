@@ -15,9 +15,9 @@ import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 import FormSection from '../form/FormSection';
 
 import * as actions from './actions';
-import SortableFormItem from './SortableFormItem';
+import SetupFormItem from './SetupFormItem';
 
-export default function SortableFormSection({index, ...rest}) {
+export default function SetupFormSection({index, ...rest}) {
   const {id} = rest;
   const dispatch = useDispatch();
   const [handleRef, itemRef, style] = useSortableItem({
@@ -40,7 +40,7 @@ export default function SortableFormSection({index, ...rest}) {
       <SortableWrapper accept={`regform-item@${id}`}>
         <FormSection
           sortHandle={<div className="section-sortable-handle hide-if-locked" ref={handleRef} />}
-          ItemComponent={SortableFormItem}
+          ItemComponent={SetupFormItem}
           itemProps={{sectionId: id}}
           {...rest}
         />
@@ -51,7 +51,7 @@ export default function SortableFormSection({index, ...rest}) {
 
 const sectionPropTypes = _.pick(FormSection.propTypes, 'id');
 
-SortableFormSection.propTypes = {
+SetupFormSection.propTypes = {
   index: PropTypes.number.isRequired,
   ...sectionPropTypes,
 };
