@@ -7,20 +7,54 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {useDispatch} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 
-export default function FormItemSetupActions({fieldIsRequired, fieldIsPersonalData, isEnabled}) {
+import * as actions from './actions';
+
+export default function FormItemSetupActions({
+  id,
+  fieldIsRequired,
+  fieldIsPersonalData,
+  isEnabled,
+}) {
+  const dispatch = useDispatch();
+
+  const handleEnableClick = () => {
+    dispatch(actions.enableItem(id));
+  };
+
+  const handleDisableClick = () => {
+    dispatch(actions.disableItem(id));
+  };
+
+  const handleRemoveClick = () => {
+    dispatch(actions.removeItem(id));
+  };
+
   return (
     <>
       {!fieldIsPersonalData && (
-        <a className="icon-remove hide-if-locked" title={Translate.string('Remove field')} />
+        <a
+          className="icon-remove hide-if-locked"
+          title={Translate.string('Remove field')}
+          onClick={handleRemoveClick}
+        />
       )}
       {!isEnabled && (
-        <a className="icon-checkmark hide-if-locked" title={Translate.string('Enable field')} />
+        <a
+          className="icon-checkmark hide-if-locked"
+          title={Translate.string('Enable field')}
+          onClick={handleEnableClick}
+        />
       )}
       {!fieldIsRequired && isEnabled && (
-        <a className="icon-disable hide-if-locked" title={Translate.string('Disable field')} />
+        <a
+          className="icon-disable hide-if-locked"
+          title={Translate.string('Disable field')}
+          onClick={handleDisableClick}
+        />
       )}
       <a className="icon-settings hide-if-locked" title={Translate.string('Configure field')} />
     </>
@@ -28,6 +62,7 @@ export default function FormItemSetupActions({fieldIsRequired, fieldIsPersonalDa
 }
 
 FormItemSetupActions.propTypes = {
+  id: PropTypes.number.isRequired,
   fieldIsRequired: PropTypes.bool.isRequired,
   fieldIsPersonalData: PropTypes.bool.isRequired,
   isEnabled: PropTypes.bool.isRequired,
