@@ -26,7 +26,7 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_timetable(event):
-        return contribution_settings.get(event, 'published')
+        return contribution_settings.get(event, 'published') or event.can_manage(session.user)
 
     yield MenuEntryData(title=_('Timetable'), name='timetable', endpoint='timetable.timetable', position=3,
                         visible=_visible_timetable, static_site=True)

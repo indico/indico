@@ -30,7 +30,7 @@ class RHTimetableProtectionBase(RHDisplayEventBase):
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
-        if not published:
+        if not published and not self.event.can_manage(session.user):
             raise NotFound(_('The contributions of this event have not been published yet'))
 
 
@@ -51,7 +51,8 @@ class RHTimetable(RHTimetableProtectionBase):
             timetable_settings = layout_settings.get(self.event, 'timetable_theme_settings')
             return self.view_class.render_template('display.html', self.event, event_info=event_info,
                                                    timetable_data=timetable_data, timetable_settings=timetable_settings,
-                                                   timetable_layout=self.timetable_layout)
+                                                   timetable_layout=self.timetable_layout,
+                                                   published=contribution_settings.get(self.event, 'published'))
         else:
             return self.view_class_simple(self, self.event, self.theme, self.theme_override).display()
 

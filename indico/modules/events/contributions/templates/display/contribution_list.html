@@ -1,6 +1,7 @@
 {% extends 'events/display/conference/base.html' %}
 
 {% from 'events/contributions/display/_contribution_list.html' import render_contribution_list %}
+{% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 
 {% block title %}
@@ -8,6 +9,9 @@
 {% endblock %}
 
 {% block content -%}
+    {% if not published %}
+        {{ render_draft_mode_warning(event) }}
+    {% endif %}
     {% if total_entries %}
         <div class="toolbar f-j-end space-after">
             <div id="counter" class="group">

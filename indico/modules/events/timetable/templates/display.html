@@ -1,4 +1,5 @@
 {% extends 'events/display/conference/base.html' %}
+{% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
 {% from 'events/timetable/_timetable.html' import render_timetable %}
 
 {% block title %}
@@ -6,5 +7,8 @@
 {% endblock %}
 
 {% block content %}
+    {% if not published %}
+        {{ render_draft_mode_warning(event) }}
+    {% endif %}
     {{ render_timetable(timetable_data, event_info, timetable_layout) }}
 {% endblock %}
