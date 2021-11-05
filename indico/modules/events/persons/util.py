@@ -44,7 +44,6 @@ def get_event_person(event, data, create_untrusted_persons=False, allow_external
                     return person
         # We have no way to identify an existing event person with the provided information
         return create_event_person(event, create_untrusted_persons=create_untrusted_persons, **data)
-    # TODO: restore Avatar type?
     elif person_type == 'Avatar':
         principal = principal_from_identifier(data['identifier'], allow_external_users=allow_external)
         return get_event_person_for_user(event, principal, create_untrusted_persons=create_untrusted_persons)
