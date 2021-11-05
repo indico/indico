@@ -29,6 +29,14 @@
     flex-grow: 1;
   }
 
+  > .actions {
+    visibility: hidden;
+
+    a + a {
+      margin-left: 3px;
+    }
+  }
+
   .required {
     display: inline-block;
     margin-left: 2px;
@@ -45,10 +53,13 @@
       pointer-events: none;
     }
 
-    &:not(.disabled):hover .sortable-handle,
-    &:not(.disabled):active .sortable-handle {
+    &:not(.disabled):hover .sortable-handle {
       @include icon-before('icon-handle');
       cursor: move;
+    }
+
+    &:hover > .actions {
+      visibility: visible;
     }
   }
 }

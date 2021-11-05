@@ -28,13 +28,15 @@ export default function FormItem({
   isEnabled,
   isRequired,
   sortHandle,
+  setupMode,
+  setupActions,
   ...rest
 }) {
   const meta = fieldRegistry[inputType] || {noLabel: false, component: null};
   const InputComponent = meta.component;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
   return (
-    <div styleName={`form-item editable ${toClasses({disabled: !isEnabled})}`}>
+    <div styleName={`form-item ${toClasses({disabled: !isEnabled, editable: setupMode})}`}>
       {sortHandle}
       {!meta.noLabel && (
         <span styleName="label">
@@ -46,6 +48,7 @@ export default function FormItem({
         {InputComponent ? <InputComponent {...inputProps} /> : `Unknown input type: ${inputType}`}
         {description && <div className="field-description">{description}</div>}
       </div>
+      {setupActions && <div styleName="actions">{setupActions}</div>}
     </div>
   );
 }
@@ -68,6 +71,10 @@ FormItem.propTypes = {
   inputType: PropTypes.string.isRequired,
   /** The handle to sort the section during setup */
   sortHandle: PropTypes.node,
+  /** Whether the field is being shown during form setup */
+  setupMode: PropTypes.bool,
+  /** Actions available during form setup */
+  setupActions: PropTypes.node,
   // ... and various other field-specific keys (billing, limited-places, other config)
 };
 
@@ -77,4 +84,6 @@ FormItem.defaultProps = {
   isRequired: false,
   htmlName: null,
   sortHandle: null,
+  setupMode: false,
+  setupActions: null,
 };

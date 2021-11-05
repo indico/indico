@@ -20,10 +20,10 @@ export default function FormSection({
   sortHandle,
   ItemComponent,
   itemProps,
-  showDisabledFields,
+  setupMode,
 }) {
   const enabledFields = items.filter(item => item.isEnabled);
-  const disabledFields = showDisabledFields ? items.filter(item => !item.isEnabled) : [];
+  const disabledFields = setupMode ? items.filter(item => !item.isEnabled) : [];
 
   return (
     <div className={`regform-section ${isManagerOnly ? 'manager-only' : ''}`}>
@@ -34,7 +34,13 @@ export default function FormSection({
       </div>
       <div className="i-box-content">
         {enabledFields.map((item, index) => (
-          <ItemComponent key={item.id} index={index} {...itemProps} {...item} />
+          <ItemComponent
+            key={item.id}
+            index={index}
+            setupMode={setupMode}
+            {...itemProps}
+            {...item}
+          />
         ))}
         {disabledFields.length > 0 && (
           <>
@@ -46,7 +52,13 @@ export default function FormSection({
               />
             </div>
             {disabledFields.map((item, index) => (
-              <ItemComponent key={item.id} index={index} {...itemProps} {...item} />
+              <ItemComponent
+                key={item.id}
+                index={index}
+                setupMode={setupMode}
+                {...itemProps}
+                {...item}
+              />
             ))}
           </>
         )}
@@ -73,12 +85,12 @@ FormSection.propTypes = {
   ItemComponent: PropTypes.elementType,
   /** Additional props passed to each item component */
   itemProps: PropTypes.object,
-  /** Whether to show disabled fields as wel */
-  showDisabledFields: PropTypes.bool,
+  /** Whether the registration form is currently being set up */
+  setupMode: PropTypes.bool,
 };
 
 FormSection.defaultProps = {
-  showDisabledFields: false,
+  setupMode: false,
   sortHandle: null,
   ItemComponent: FormItem,
   itemProps: {},

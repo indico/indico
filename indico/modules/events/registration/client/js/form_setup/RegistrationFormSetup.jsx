@@ -25,7 +25,7 @@ export default function RegistrationFormSetup() {
       <DndProvider backend={HTML5Backend}>
         <SortableWrapper accept="regform-section" className="regform-section-list">
           {items.map((section, index) => (
-            <SortableFormSection key={section.id} index={index} {...section} showDisabledFields />
+            <SortableFormSection key={section.id} index={index} {...section} setupMode />
           ))}
         </SortableWrapper>
       </DndProvider>

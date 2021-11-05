@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useDispatch} from 'react-redux';
@@ -16,7 +17,8 @@ import FormSection from '../form/FormSection';
 import * as actions from './actions';
 import SortableFormItem from './SortableFormItem';
 
-export default function SortableFormSection({id, index, items, ...rest}) {
+export default function SortableFormSection({index, ...rest}) {
+  const {id} = rest;
   const dispatch = useDispatch();
   const [handleRef, itemRef, style] = useSortableItem({
     type: 'regform-section',
@@ -37,11 +39,9 @@ export default function SortableFormSection({id, index, items, ...rest}) {
     <div ref={itemRef} style={style}>
       <SortableWrapper accept={`regform-item@${id}`}>
         <FormSection
-          sortHandle={<div className="section-sortable-handle" ref={handleRef} />}
-          id={id}
+          sortHandle={<div className="section-sortable-handle hide-if-locked" ref={handleRef} />}
           ItemComponent={SortableFormItem}
           itemProps={{sectionId: id}}
-          items={items}
           {...rest}
         />
       </SortableWrapper>
@@ -49,8 +49,9 @@ export default function SortableFormSection({id, index, items, ...rest}) {
   );
 }
 
+const sectionPropTypes = _.pick(FormSection.propTypes, 'id');
+
 SortableFormSection.propTypes = {
-  id: PropTypes.number.isRequired,
   index: PropTypes.number.isRequired,
-  ...FormSection.propTypes,
+  ...sectionPropTypes,
 };

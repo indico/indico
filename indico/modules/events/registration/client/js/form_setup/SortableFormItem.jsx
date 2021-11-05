@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useDispatch} from 'react-redux';
@@ -14,18 +15,20 @@ import {useSortableItem} from 'indico/react/sortable';
 import FormItem from '../form/FormItem';
 
 import * as actions from './actions';
+import FormItemSetupActions from './FormItemSetupActions';
 
 import '../../styles/regform.module.scss';
 
-export default function SortableFormItem({id, index, sectionId, ...rest}) {
+export default function SortableFormItem({index, sectionId, ...rest}) {
+  const {id, inputType, isEnabled} = rest;
   const dispatch = useDispatch();
   const [handleRef, itemRef, style] = useSortableItem({
     type: `regform-item@${sectionId}`,
     id,
     index,
     separateHandle: true,
-    active: rest.isEnabled,
-    itemData: {isStaticText: rest.inputType === 'label'},
+    active: isEnabled,
+    itemData: {isStaticText: inputType === 'label'},
     moveItem: (sourceIndex, targetIndex) => {
       dispatch(actions.moveItem(sectionId, sourceIndex, targetIndex));
     },
@@ -47,18 +50,25 @@ export default function SortableFormItem({id, index, sectionId, ...rest}) {
   return (
     <div ref={itemRef} style={style}>
       <FormItem
-        sortHandle={<div styleName="sortable-handle" ref={handleRef} />}
-        id={id}
+        sortHandle={<div styleName="sortable-handle" className="hide-if-locked" ref={handleRef} />}
+        setupActions={<FormItemSetupActions {...rest} />}
         {...rest}
       />
     </div>
   );
 }
 
+const itemPropTypes = _.pick(
+  FormItem.propTypes,
+  'inputType',
+  'isEnabled',
+  ...Object.keys(FormItemSetupActions.propTypes)
+);
+
 SortableFormItem.propTypes = {
-  id: PropTypes.number.isRequired,
   sectionId: PropTypes.number.isRequired,
-  inputType: PropTypes.string.isRequired,
   index: PropTypes.number.isRequired,
-  ...FormItem.propTypes,
+  ...itemPropTypes,
 };
+
+SortableFormItem.defaultProps = _.pick(FormItem.defaultProps, Object.keys(itemPropTypes));
