@@ -7,6 +7,11 @@ Version 3.0.4
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Allow external users in event/category ACLs (:pr:`5146`)
+
 Bugfixes
 ^^^^^^^^
 

@@ -641,6 +641,7 @@ def set_custom_fields(obj, custom_fields_data):
 def check_permissions(event, field, allow_networks=False):
     for principal_fossil, permissions in field.data:
         principal = principal_from_identifier(principal_fossil['identifier'],
+                                              allow_external_users=True,
                                               allow_groups=True,
                                               allow_category_roles=True,
                                               allow_event_roles=True,

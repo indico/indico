@@ -480,6 +480,7 @@ import Palette from 'indico/utils/palette';
           {([favorites]) => (
             <>
               <UserSearch
+                withExternalUsers
                 favorites={favorites}
                 existing={existing.filter(e => e.startsWith('User'))}
                 onAddItems={e => {
