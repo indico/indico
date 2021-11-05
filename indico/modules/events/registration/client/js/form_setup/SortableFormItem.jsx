@@ -20,7 +20,7 @@ import FormItemSetupActions from './FormItemSetupActions';
 import '../../styles/regform.module.scss';
 
 export default function SortableFormItem({index, sectionId, ...rest}) {
-  const {id, inputType, isEnabled} = rest;
+  const {id, isEnabled} = rest;
   const dispatch = useDispatch();
   const [handleRef, itemRef, style] = useSortableItem({
     type: `regform-item@${sectionId}`,
@@ -28,21 +28,12 @@ export default function SortableFormItem({index, sectionId, ...rest}) {
     index,
     separateHandle: true,
     active: isEnabled,
-    itemData: {isStaticText: inputType === 'label'},
     moveItem: (sourceIndex, targetIndex) => {
       dispatch(actions.moveItem(sectionId, sourceIndex, targetIndex));
     },
     onDrop: item => {
       if (item.index !== item.originalIndex) {
-        dispatch(
-          actions.saveItemPosition(
-            sectionId,
-            item.id,
-            item.index,
-            item.originalIndex,
-            item.isStaticText
-          )
-        );
+        dispatch(actions.saveItemPosition(sectionId, item.id, item.index, item.originalIndex));
       }
     },
   });
