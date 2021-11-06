@@ -7,7 +7,15 @@
 
 import _ from 'lodash';
 
-import {LOCK_UI, MOVE_ITEM, MOVE_SECTION, REMOVE_ITEM, UNLOCK_UI, UPDATE_ITEM} from './actions';
+import {
+  LOCK_UI,
+  MOVE_ITEM,
+  MOVE_SECTION,
+  REMOVE_ITEM,
+  SET_FORM_DATA,
+  UNLOCK_UI,
+  UPDATE_ITEM,
+} from './actions';
 
 export default {
   uiLocked: (state = false, action) => {
@@ -20,55 +28,50 @@ export default {
         return state;
     }
   },
-  sections: (state = [], action) => {
+  items: (state = {}, action) => {
     switch (action.type) {
-      case MOVE_SECTION: {
-        const dragItem = state[action.sourceIndex];
-        const newItems = [...state];
-        newItems.splice(action.sourceIndex, 1);
-        newItems.splice(action.targetIndex, 0, dragItem);
-        return newItems;
-      }
+      case SET_FORM_DATA:
+        return action.items;
+      case UPDATE_ITEM:
+        return {...state, [action.itemId]: action.data};
+      case REMOVE_ITEM:
+        return _.omit(state, action.itemId);
       case MOVE_ITEM: {
-        const sectionIndex = state.findIndex(x => x.id === action.sectionId);
-        const section = state[sectionIndex];
-        const dragItem = section.items[action.sourceIndex];
-        const newItems = [...section.items];
-        newItems.splice(action.sourceIndex, 1);
-        newItems.splice(action.targetIndex, 0, dragItem);
-        const newSections = [...state];
-        newSections[sectionIndex] = {
-          ...section,
-          items: newItems,
-        };
-        return newSections;
+        const sorted = _.sortBy(
+          Object.values(state).filter(f => f.sectionId === action.sectionId),
+          ['position', 'id']
+        );
+        const sourceItem = sorted[action.sourceIndex];
+        sorted.splice(action.sourceIndex, 1);
+        sorted.splice(action.targetIndex, 0, sourceItem);
+        // use same positioning logic as on the server side. not sure if it's needed, we
+        // could probably stick with just incrementing, but it might avoid some re-renders..
+        let enabledPos = 1;
+        let disabledPos = 1000;
+        const newState = {...state};
+        sorted.forEach(item => {
+          newState[item.id] = {...item, position: item.isEnabled ? enabledPos++ : disabledPos++};
+        });
+        return newState;
       }
-      case UPDATE_ITEM: {
-        const sectionIndex = state.findIndex(x => x.id === action.sectionId);
-        const section = state[sectionIndex];
-        const itemIndex = section.items.findIndex(x => x.id === action.itemId);
-        const newItems = [...section.items];
-        newItems[itemIndex] = action.data;
-        _.sortBy(newItems, 'position');
-        const newSections = [...state];
-        newSections[sectionIndex] = {
-          ...section,
-          items: newItems,
-        };
-        return newSections;
-      }
-      case REMOVE_ITEM: {
-        const sectionIndex = state.findIndex(x => x.id === action.sectionId);
-        const section = state[sectionIndex];
-        const itemIndex = section.items.findIndex(x => x.id === action.itemId);
-        const newItems = [...section.items];
-        newItems.splice(itemIndex, 1);
-        const newSections = [...state];
-        newSections[sectionIndex] = {
-          ...section,
-          items: newItems,
-        };
-        return newSections;
+      default:
+        return state;
+    }
+  },
+  sections: (state = {}, action) => {
+    switch (action.type) {
+      case SET_FORM_DATA:
+        return action.sections;
+      case MOVE_SECTION: {
+        const sorted = _.sortBy(Object.values(state), ['position', 'id']);
+        const sourceSection = sorted[action.sourceIndex];
+        sorted.splice(action.sourceIndex, 1);
+        sorted.splice(action.targetIndex, 0, sourceSection);
+        const newState = {...state};
+        sorted.forEach((section, index) => {
+          newState[section.id] = {...section, position: index + 1};
+        });
+        return newState;
       }
       default:
         return state;

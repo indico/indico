@@ -23,7 +23,8 @@ from indico.modules.events.registration.forms import (ParticipantsDisplayForm, P
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
-from indico.modules.events.registration.util import create_personal_data_fields, get_event_section_data
+from indico.modules.events.registration.util import (create_personal_data_fields, get_event_section_data,
+                                                     get_flat_section_setup_data)
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
                                                       WPManageRegistrationStats)
 from indico.modules.events.util import update_object_principals
@@ -271,7 +272,9 @@ class RHRegistrationFormModify(RHManageRegFormBase):
 
     def _process(self):
         return WPManageRegistration.render_template('management/regform_modify.html', self.event,
-                                                    sections=get_event_section_data(self.regform, management=True),
+                                                    form_data=get_flat_section_setup_data(self.regform),
+                                                    angular_sections=get_event_section_data(self.regform,
+                                                                                            management=True),
                                                     regform=self.regform)
 
 

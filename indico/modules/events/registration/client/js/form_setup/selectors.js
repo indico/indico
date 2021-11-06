@@ -5,62 +5,73 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-export const getSections = state => state.sections;
-
 export const isUILocked = state => state.uiLocked;
+const getStaticData = state => state.staticData;
+const getFlatSections = state => state.sections;
+const getItems = state => state.items;
 
-const getItemIdSectionIdMapping = createSelector(
-  getSections,
-  sections => {
-    const mapping = new Map();
-    sections.forEach(section => {
-      section.items.forEach(item => {
-        mapping.set(item.id, section.id);
-      });
+/** Get a sorted list of top-level sections. */
+const getSections = createSelector(
+  getFlatSections,
+  sections => _.sortBy(Object.values(sections), ['position', 'id'])
+);
+
+/** Get a mapping from section IDs to sorted item lists. */
+const getSectionItemMapping = createSelector(
+  getFlatSections,
+  getItems,
+  (sections, fields) => {
+    const mapping = new Map(Object.values(sections).map(s => [s.id, []]));
+    _.sortBy(Object.values(fields), ['position', 'id']).forEach(field => {
+      mapping.get(field.sectionId).push(field);
     });
     return mapping;
   }
 );
 
-const getFlatItems = createSelector(
+/** Get the nested form structure of sections and their items. */
+export const getNestedSections = createSelector(
   getSections,
-  sections => {
-    const mapping = new Map();
-    sections.forEach(section => {
-      section.items.forEach(item => {
-        mapping.set(item.id, item);
-      });
-    });
-    return mapping;
-  }
+  getSectionItemMapping,
+  (sortedSections, sectionFields) =>
+    sortedSections.map(section => ({
+      ...section,
+      items: sectionFields.get(section.id),
+    }))
 );
 
-export const getSectionIdByItemId = createSelector(
-  getItemIdSectionIdMapping,
-  (_, itemId) => itemId,
-  (mapping, itemId) => mapping.get(itemId)
+/** Get the section ID for a given item ID. */
+export const getSectionIdForItem = createSelector(
+  getItems,
+  (__, itemId) => itemId,
+  (fields, itemId) => fields[itemId].sectionId
 );
 
+/** Get an item by its ID. */
 const getItemById = createSelector(
-  getFlatItems,
-  (_, itemId) => itemId,
-  (mapping, itemId) => mapping.get(itemId)
+  getItems,
+  (__, itemId) => itemId,
+  (fields, itemId) => fields[itemId]
 );
 
+/** Check whether an item is a static text field. */
 const isItemStaticText = createSelector(
   getItemById,
   item => item.inputType === 'label'
 );
 
+/** Select the correct URL for an item action dependin on whether it's static text or a field. */
 export const pickItemURL = createSelector(
   isItemStaticText,
   isStaticText => (textURL, fieldURL) => (isStaticText ? textURL : fieldURL)
 );
 
+/** Get the URL path arguments for a regform/section/field operation. */
 export const getURLParams = createSelector(
-  state => state.staticData,
+  getStaticData,
   staticData => {
     const {eventId, regformId} = staticData;
     return (sectionId = null, itemId = null) => {
