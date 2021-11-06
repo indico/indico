@@ -14,11 +14,12 @@ import {Dimmer, Loader} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper} from 'indico/react/sortable';
 
+import {isUILocked, getSections} from './selectors';
 import SetupFormSection from './SetupFormSection';
 
 export default function RegistrationFormSetup() {
-  const items = useSelector(state => state.sections);
-  const uiLocked = useSelector(state => state.uiLocked);
+  const items = useSelector(getSections);
+  const uiLocked = useSelector(isUILocked);
 
   return (
     <Dimmer.Dimmable dimmed={uiLocked}>
