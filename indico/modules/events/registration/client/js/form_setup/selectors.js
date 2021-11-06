@@ -7,8 +7,12 @@
 
 import {createSelector} from 'reselect';
 
+export const getSections = state => state.sections;
+
+export const isUILocked = state => state.uiLocked;
+
 const getItemIdSectionIdMapping = createSelector(
-  state => state.sections,
+  getSections,
   sections => {
     const mapping = new Map();
     sections.forEach(section => {
@@ -21,7 +25,7 @@ const getItemIdSectionIdMapping = createSelector(
 );
 
 const getFlatItems = createSelector(
-  state => state.sections,
+  getSections,
   sections => {
     const mapping = new Map();
     sections.forEach(section => {
