@@ -397,10 +397,8 @@ class RegistrationFormPersonalDataSection(RegistrationFormSection):
     }
 
     @property
-    def view_data(self):
-        field_data = dict(super().view_data, is_personal_data=True)
-        del field_data['isPersonalData']
-        return camelize_keys(field_data)
+    def own_data(self):
+        return dict(super().own_data, is_personal_data=True)
 
 
 class RegistrationFormText(RegistrationFormItem):
@@ -416,6 +414,6 @@ class RegistrationFormText(RegistrationFormItem):
 
     @property
     def view_data(self):
-        field_data = dict(super().view_data, is_enabled=self.is_enabled, input_type='label',
+        field_data = dict(super().view_data, section_id=self.parent_id, is_enabled=self.is_enabled, input_type='label',
                           title=self.title)
         return camelize_keys(field_data)

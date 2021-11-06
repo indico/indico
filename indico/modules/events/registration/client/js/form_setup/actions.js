@@ -16,10 +16,11 @@ import toggleTextURL from 'indico-url:event_registration.toggle_text';
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 
-import {getSectionIdByItemId, getURLParams, pickItemURL} from './selectors';
+import {getSectionIdForItem, getURLParams, pickItemURL} from './selectors';
 
 export const LOCK_UI = 'Lock interface';
 export const UNLOCK_UI = 'Unlock interface';
+export const SET_FORM_DATA = 'Set form data';
 export const MOVE_SECTION = 'Move section';
 export const MOVE_ITEM = 'Move item';
 export const UPDATE_ITEM = 'Update item';
@@ -43,6 +44,10 @@ function lockingAjaxAction(requestFunc, ...args) {
   };
 }
 
+export function setFormData(data) {
+  return {type: SET_FORM_DATA, items: data.items, sections: data.sections};
+}
+
 export function moveSection(sourceIndex, targetIndex) {
   return {type: MOVE_SECTION, sourceIndex, targetIndex};
 }
@@ -51,12 +56,12 @@ export function moveItem(sectionId, sourceIndex, targetIndex) {
   return {type: MOVE_ITEM, sectionId, sourceIndex, targetIndex};
 }
 
-export function updateItem(sectionId, itemId, data) {
-  return {type: UPDATE_ITEM, sectionId, itemId, data};
+export function updateItem(itemId, data) {
+  return {type: UPDATE_ITEM, itemId, data};
 }
 
-export function _removeItem(sectionId, itemId) {
-  return {type: REMOVE_ITEM, sectionId, itemId};
+export function _removeItem(itemId) {
+  return {type: REMOVE_ITEM, itemId};
 }
 
 export function saveSectionPosition(sectionId, position, oldPosition) {
@@ -93,7 +98,7 @@ export function saveItemPosition(sectionId, itemId, position, oldPosition) {
 export function enableItem(itemId) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const sectionId = getSectionIdByItemId(store, itemId);
+    const sectionId = getSectionIdForItem(store, itemId);
     const urlFunc = pickItemURL(store, itemId)(toggleTextURL, toggleFieldURL);
     const params = getURLParams(store)(sectionId, itemId);
     const url = urlFunc({...params, enable: 'true'});
@@ -102,7 +107,7 @@ export function enableItem(itemId) {
       // XXX this API should probably be changed to return the whole section or at least
       // the updated positions for all items - right now it only returns the changed item
       // even though the positions of other items change as well
-      dispatch(updateItem(sectionId, itemId, resp.data.view_data));
+      dispatch(updateItem(itemId, resp.data.view_data));
     }
   };
 }
@@ -110,7 +115,7 @@ export function enableItem(itemId) {
 export function disableItem(itemId) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const sectionId = getSectionIdByItemId(store, itemId);
+    const sectionId = getSectionIdForItem(store, itemId);
     const urlFunc = pickItemURL(store, itemId)(toggleTextURL, toggleFieldURL);
     const params = getURLParams(store)(sectionId, itemId);
     const url = urlFunc({...params, enable: 'false'});
@@ -119,7 +124,7 @@ export function disableItem(itemId) {
       // XXX this API should probably be changed to return the whole section or at least
       // the updated positions for all items - right now it only returns the changed item
       // even though the positions of other items change as well
-      dispatch(updateItem(sectionId, itemId, resp.data.view_data));
+      dispatch(updateItem(itemId, resp.data.view_data));
     }
   };
 }
@@ -127,12 +132,12 @@ export function disableItem(itemId) {
 export function removeItem(itemId) {
   return async (dispatch, getStore) => {
     const store = getStore();
-    const sectionId = getSectionIdByItemId(store, itemId);
+    const sectionId = getSectionIdForItem(store, itemId);
     const urlFunc = pickItemURL(store, itemId)(modifyTextURL, modifyFieldURL);
     const url = urlFunc(getURLParams(store)(sectionId, itemId));
     const resp = await lockingAjaxAction(() => indicoAxios.delete(url))(dispatch);
     if (!resp.error) {
-      dispatch(_removeItem(sectionId, itemId));
+      dispatch(_removeItem(itemId));
     }
   };
 }

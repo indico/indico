@@ -44,7 +44,7 @@ from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
-from indico.util.string import validate_email, validate_email_verbose
+from indico.util.string import camelize_keys, validate_email, validate_email_verbose
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -111,6 +111,12 @@ def get_title_uuid(regform, title):
     valid_choices = {x['id'] for x in title_field.current_data.versioned_data['choices']}
     uuid = next((k for k, v in title_field.data['captions'].items() if v == title), None)
     return {uuid: 1} if uuid in valid_choices else None
+
+
+def get_flat_section_setup_data(regform):
+    section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections if not s.is_deleted}
+    item_data = {f.id: f.view_data for f in regform.form_items if not f.is_section and not f.is_deleted}
+    return {'sections': section_data, 'items': item_data}
 
 
 def get_event_section_data(regform, management=False, registration=None):

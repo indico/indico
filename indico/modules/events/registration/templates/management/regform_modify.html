@@ -10,7 +10,7 @@
     <div id="registration-form-setup-container"
          data-event-id="{{ event.id }}"
          data-regform-id="{{ regform.id }}"
-         data-sections="{{ sections | tojson | forceescape }}"></div>
+         data-form-data="{{ form_data | tojson | forceescape }}"></div>
 
     <hr>
     <h1>Warning, angular 💩 below</h1>
@@ -21,7 +21,7 @@
             <div nd-reg-form
                  event-id="{{ event.id }}"
                  conf-form-id="{{ regform.id }}"
-                 conf-sections="{{ sections | tojson | forceescape }}"
+                 conf-sections="{{ angular_sections | tojson | forceescape }}"
                  conf-currency="{{ regform.currency }}"
                  event-start-date="{{ event.start_dt }}"
                  event-end-date="{{ event.end_dt }}"

@@ -11,20 +11,21 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
+import {setFormData} from './actions';
 import reducers from './reducers';
 import RegistrationFormSetup from './RegistrationFormSetup';
 
 export default function setupRegformSetup(root) {
-  const {eventId, regformId, sections} = root.dataset;
+  const {eventId, regformId, formData} = root.dataset;
 
   const initialData = {
     staticData: {
       eventId: parseInt(eventId, 10),
       regformId: parseInt(regformId, 10),
     },
-    sections: JSON.parse(sections),
   };
   const store = createReduxStore('regform-setup', reducers, initialData);
+  store.dispatch(setFormData(JSON.parse(formData)));
 
   ReactDOM.render(
     <Provider store={store}>
