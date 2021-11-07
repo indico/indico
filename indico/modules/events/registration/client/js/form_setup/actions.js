@@ -6,11 +6,13 @@
 // LICENSE file for more details.
 
 import modifyFieldURL from 'indico-url:event_registration.modify_field';
+import modifySectionURL from 'indico-url:event_registration.modify_section';
 import modifyTextURL from 'indico-url:event_registration.modify_text';
 import moveFieldURL from 'indico-url:event_registration.move_field';
 import moveSectionURL from 'indico-url:event_registration.move_section';
 import moveTextURL from 'indico-url:event_registration.move_text';
 import toggleFieldURL from 'indico-url:event_registration.toggle_field';
+import toggleSectionURL from 'indico-url:event_registration.toggle_section';
 import toggleTextURL from 'indico-url:event_registration.toggle_text';
 
 import {indicoAxios} from 'indico/utils/axios';
@@ -22,6 +24,9 @@ export const LOCK_UI = 'Lock interface';
 export const UNLOCK_UI = 'Unlock interface';
 export const SET_FORM_DATA = 'Set form data';
 export const MOVE_SECTION = 'Move section';
+export const UPDATE_SECTION = 'Update section';
+export const TOGGLE_SECTION = 'Toggle section';
+export const REMOVE_SECTION = 'Remove section';
 export const MOVE_ITEM = 'Move item';
 export const UPDATE_ITEM = 'Update item';
 export const REMOVE_ITEM = 'Remove item';
@@ -52,15 +57,27 @@ export function moveSection(sourceIndex, targetIndex) {
   return {type: MOVE_SECTION, sourceIndex, targetIndex};
 }
 
+function _toggleSection(sectionId, enabled) {
+  return {type: TOGGLE_SECTION, sectionId, enabled};
+}
+
+function _removeSection(sectionId) {
+  return {type: REMOVE_SECTION, sectionId};
+}
+
+function updateSection(sectionId, data, patch = false) {
+  return {type: UPDATE_SECTION, sectionId, data, patch};
+}
+
 export function moveItem(sectionId, sourceIndex, targetIndex) {
   return {type: MOVE_ITEM, sectionId, sourceIndex, targetIndex};
 }
 
-export function updateItem(itemId, data) {
+function updateItem(itemId, data) {
   return {type: UPDATE_ITEM, itemId, data};
 }
 
-export function _removeItem(itemId) {
+function _removeItem(itemId) {
   return {type: REMOVE_ITEM, itemId};
 }
 
@@ -75,6 +92,43 @@ export function saveSectionPosition(sectionId, position, oldPosition) {
       // but moving stuff around is the only case where the local state gets updated
       // before saving, so it's probably not worth it
       dispatch(moveSection(position, oldPosition));
+    }
+  };
+}
+
+export function enableSection(sectionId) {
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const params = getURLParams(store)(sectionId);
+    const url = toggleSectionURL({...params, enable: 'true'});
+    const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
+    if (!resp.error) {
+      dispatch(_toggleSection(sectionId, true));
+      dispatch(updateSection(sectionId, {position: resp.data.position}, true));
+    }
+  };
+}
+
+export function disableSection(sectionId) {
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const params = getURLParams(store)(sectionId);
+    const url = toggleSectionURL({...params, enable: 'false'});
+    const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
+    if (!resp.error) {
+      dispatch(_toggleSection(sectionId, false));
+      dispatch(updateSection(sectionId, {position: resp.data.position}, true));
+    }
+  };
+}
+
+export function removeSection(sectionId) {
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const url = modifySectionURL(getURLParams(store)(sectionId));
+    const resp = await lockingAjaxAction(() => indicoAxios.delete(url))(dispatch);
+    if (!resp.error) {
+      dispatch(_removeSection(sectionId));
     }
   };
 }

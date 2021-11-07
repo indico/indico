@@ -12,6 +12,8 @@ import {Translate} from 'indico/react/i18n';
 
 import FormItem from './FormItem';
 
+import '../../styles/regform.module.scss';
+
 export default function FormSection({
   title,
   description,
@@ -21,6 +23,7 @@ export default function FormSection({
   ItemComponent,
   itemProps,
   setupMode,
+  setupActions,
 }) {
   const enabledFields = items.filter(item => item.isEnabled);
   const disabledFields = setupMode ? items.filter(item => !item.isEnabled) : [];
@@ -31,6 +34,11 @@ export default function FormSection({
       <div className="i-box-header">
         <div className="i-box-title">{title}</div>
         <div className="i-box-description">{description}</div>
+        {setupActions && (
+          <div className="i-box-buttons" styleName="section-actions">
+            {setupActions}
+          </div>
+        )}
       </div>
       <div className="i-box-content">
         {enabledFields.map((item, index) => (
@@ -87,10 +95,13 @@ FormSection.propTypes = {
   itemProps: PropTypes.object,
   /** Whether the registration form is currently being set up */
   setupMode: PropTypes.bool,
+  /** Actions available during form setup */
+  setupActions: PropTypes.node,
 };
 
 FormSection.defaultProps = {
   setupMode: false,
+  setupActions: null,
   sortHandle: null,
   ItemComponent: FormItem,
   itemProps: {},

@@ -8,6 +8,31 @@
 @import 'base/palette';
 @import 'base/utilities';
 
+.setup-toolbar {
+  margin-bottom: 1em;
+}
+
+.disabled-sections {
+  // TODO turn this into something generic - the same CSS is used in the editing TagManager
+  :global(.segment) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .actions {
+      min-width: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      i:global(.icon) {
+        margin-right: 0;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
 .form-item {
   display: flex;
   padding: 4px 0;
@@ -69,4 +94,10 @@
 // jump around when it gets activated
 :global(.regform-section-list) > :first-child :global(.regform-section) {
   margin-top: 0;
+}
+
+.section-actions {
+  a + a {
+    margin-left: 3px;
+  }
 }

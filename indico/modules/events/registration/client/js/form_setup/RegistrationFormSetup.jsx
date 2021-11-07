@@ -5,31 +5,49 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 import {useSelector} from 'react-redux';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
+import {IButton} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper} from 'indico/react/sortable';
 
-import {isUILocked, getNestedSections} from './selectors';
+import DisabledSectionsModal from './DisabledSectionsModal';
+import {isUILocked, getNestedSections, getDisabledSections} from './selectors';
 import SetupFormSection from './SetupFormSection';
 
+import '../../styles/regform.module.scss';
+
 export default function RegistrationFormSetup() {
-  const items = useSelector(getNestedSections);
+  const sections = useSelector(getNestedSections);
+  const disabledSections = useSelector(getDisabledSections);
   const uiLocked = useSelector(isUILocked);
+  const [disabledSectionModalActive, setDisabledSectionModalActive] = useState(false);
 
   return (
     <Dimmer.Dimmable dimmed={uiLocked}>
       <DndProvider backend={HTML5Backend}>
+        {disabledSections.length > 0 && (
+          <div className="toolbar" styleName="setup-toolbar">
+            <IButton onClick={() => setDisabledSectionModalActive(true)}>
+              <Translate>Disabled sections</Translate>
+            </IButton>
+          </div>
+        )}
+
         <SortableWrapper accept="regform-section" className="regform-section-list">
-          {items.map((section, index) => (
+          {sections.map((section, index) => (
             <SetupFormSection key={section.id} index={index} {...section} setupMode />
           ))}
         </SortableWrapper>
       </DndProvider>
+
+      {disabledSectionModalActive && (
+        <DisabledSectionsModal onClose={() => setDisabledSectionModalActive(false)} />
+      )}
 
       <Dimmer inverted active={uiLocked}>
         <Loader size="massive">
