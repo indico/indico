@@ -13,10 +13,16 @@ const getStaticData = state => state.staticData;
 const getFlatSections = state => state.sections;
 const getItems = state => state.items;
 
-/** Get a sorted list of top-level sections. */
+/** Get a sorted list of disabled sections. */
+export const getDisabledSections = createSelector(
+  getFlatSections,
+  sections => _.sortBy(Object.values(sections).filter(s => !s.enabled), ['position', 'id'])
+);
+
+/** Get a sorted list of enabled top-level sections. */
 const getSections = createSelector(
   getFlatSections,
-  sections => _.sortBy(Object.values(sections), ['position', 'id'])
+  sections => _.sortBy(Object.values(sections).filter(s => s.enabled), ['position', 'id'])
 );
 
 /** Get a mapping from section IDs to sorted item lists. */

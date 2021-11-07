@@ -12,9 +12,12 @@ import {
   MOVE_ITEM,
   MOVE_SECTION,
   REMOVE_ITEM,
+  REMOVE_SECTION,
   SET_FORM_DATA,
+  TOGGLE_SECTION,
   UNLOCK_UI,
   UPDATE_ITEM,
+  UPDATE_SECTION,
 } from './actions';
 
 export default {
@@ -36,6 +39,8 @@ export default {
         return {...state, [action.itemId]: action.data};
       case REMOVE_ITEM:
         return _.omit(state, action.itemId);
+      case REMOVE_SECTION:
+        return _.omitBy(state, item => item.sectionId === action.sectionId);
       case MOVE_ITEM: {
         const sorted = _.sortBy(
           Object.values(state).filter(f => f.sectionId === action.sectionId),
@@ -62,14 +67,35 @@ export default {
     switch (action.type) {
       case SET_FORM_DATA:
         return action.sections;
+      case TOGGLE_SECTION:
+        return {
+          ...state,
+          [action.sectionId]: {...state[action.sectionId], enabled: action.enabled},
+        };
+      case UPDATE_SECTION:
+        return {
+          ...state,
+          [action.sectionId]: action.patch
+            ? {...state[action.sectionId], ...action.data}
+            : action.data,
+        };
+      case REMOVE_SECTION:
+        return _.omit(state, action.sectionId);
       case MOVE_SECTION: {
         const sorted = _.sortBy(Object.values(state), ['position', 'id']);
         const sourceSection = sorted[action.sourceIndex];
         sorted.splice(action.sourceIndex, 1);
         sorted.splice(action.targetIndex, 0, sourceSection);
+        // use same positioning logic as on the server side. not sure if it's needed, we
+        // could probably stick with just incrementing, but it might avoid some re-renders..
+        let enabledPos = 1;
+        let disabledPos = 1000;
         const newState = {...state};
-        sorted.forEach((section, index) => {
-          newState[section.id] = {...section, position: index + 1};
+        sorted.forEach(section => {
+          newState[section.id] = {
+            ...section,
+            position: section.enabled ? enabledPos++ : disabledPos++,
+          };
         });
         return newState;
       }
