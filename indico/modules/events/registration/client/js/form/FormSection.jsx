@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import {Translate} from 'indico/react/i18n';
+import {Markdown} from 'indico/react/util';
 
 import FormItem from './FormItem';
 
@@ -32,8 +33,12 @@ export default function FormSection({
     <div className={`regform-section ${isManagerOnly ? 'manager-only' : ''}`}>
       {sortHandle}
       <div className="i-box-header">
-        <div className="i-box-title">{title}</div>
-        <div className="i-box-description">{description}</div>
+        <div styleName="header-wrapper">
+          <div className="i-box-title">{title}</div>
+          <div className="i-box-description">
+            <Markdown>{description}</Markdown>
+          </div>
+        </div>
         {setupActions && (
           <div className="i-box-buttons" styleName="section-actions">
             {setupActions}
