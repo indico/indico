@@ -179,6 +179,8 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
     def __init__(self, *args, **kwargs):
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         self.empty_message = _('There are no chairpersons')
+        if self.event.type == 'lecture':
+            self.empty_message = _('There are no speakers')
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
@@ -188,7 +190,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         data = PersonLinkSchema().dump(principal)
         data['roles'] = []
-        if self.get_form().is_submitted() and self.data[principal] or (principal.event and principal.is_submitter):
+        if (self.get_form().is_submitted() and self.data[principal]) or (principal.event and principal.is_submitter):
             data['roles'].append('submitter')
         return data
 
