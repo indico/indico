@@ -96,6 +96,14 @@
   margin-top: 0;
 }
 
+:global(.regform-section > .i-box-header) {
+  align-items: baseline;
+
+  .header-wrapper {
+    flex-grow: 1;
+  }
+}
+
 .section-actions {
   a + a {
     margin-left: 3px;

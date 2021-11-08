@@ -56,7 +56,13 @@ export default function SectionSettingsModal({id, onClose}) {
           <Modal.Content>
             <Form id="regform-section-form" onSubmit={fprops.handleSubmit}>
               <FinalInput name="title" label={Translate.string('Title')} required />
-              <FinalTextArea name="description" label={Translate.string('Description')} />
+              <FinalTextArea
+                name="description"
+                label={Translate.string('Description')}
+                description={
+                  <Translate>You can use Markdown or basic HTML formatting tags.</Translate>
+                }
+              />
               <FinalCheckbox
                 disabled={isPersonalData}
                 name="is_manager_only"
