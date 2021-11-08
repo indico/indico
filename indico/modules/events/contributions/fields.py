@@ -29,10 +29,10 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
             roles.append({'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
                           'default': self.default_is_submitter})
         if self.allow_authors:
-            roles.extend([
+            roles += [
                 {'name': 'primary', 'label': _('Author'), 'section': True},
                 {'name': 'secondary', 'label': _('Co-author'), 'section': True},
-            ])
+            ]
         return roles
 
     def __init__(self, *args, **kwargs):

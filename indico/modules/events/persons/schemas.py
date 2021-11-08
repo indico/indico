@@ -19,7 +19,7 @@ class PersonLinkSchema(mm.Schema):
 
     _type = fields.Constant('PersonLink')
     person_id = fields.Int()
-    user_id = fields.Function(lambda o: o.person.user_id)
+    user_id = fields.Int(attribute='person.user_id')
     user_identifier = fields.String(attribute='user.identifier')
     first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
