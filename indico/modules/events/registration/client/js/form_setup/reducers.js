@@ -8,6 +8,7 @@
 import _ from 'lodash';
 
 import {
+  CREATE_SECTION,
   LOCK_UI,
   MOVE_ITEM,
   MOVE_SECTION,
@@ -81,6 +82,11 @@ export default {
         return {
           ...state,
           [action.sectionId]: {...state[action.sectionId], enabled: action.enabled},
+        };
+      case CREATE_SECTION:
+        return {
+          ...state,
+          [action.data.id]: action.data,
         };
       case UPDATE_SECTION:
         return {

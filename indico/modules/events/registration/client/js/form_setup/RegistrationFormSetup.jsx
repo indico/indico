@@ -16,6 +16,7 @@ import {Translate} from 'indico/react/i18n';
 import {SortableWrapper} from 'indico/react/sortable';
 
 import DisabledSectionsModal from './DisabledSectionsModal';
+import SectionSettingsModal from './SectionSettingsModal';
 import {isUILocked, getNestedSections, getDisabledSections} from './selectors';
 import SetupFormSection from './SetupFormSection';
 
@@ -26,17 +27,21 @@ export default function RegistrationFormSetup() {
   const disabledSections = useSelector(getDisabledSections);
   const uiLocked = useSelector(isUILocked);
   const [disabledSectionModalActive, setDisabledSectionModalActive] = useState(false);
+  const [addSectionModalActive, setAddSectionModalActive] = useState(false);
 
   return (
     <Dimmer.Dimmable dimmed={uiLocked}>
       <DndProvider backend={HTML5Backend}>
-        {disabledSections.length > 0 && (
-          <div className="toolbar" styleName="setup-toolbar">
+        <div className="toolbar" styleName="setup-toolbar">
+          <IButton icon="plus" onClick={() => setAddSectionModalActive(true)}>
+            <Translate>Add section</Translate>
+          </IButton>
+          {disabledSections.length > 0 && (
             <IButton onClick={() => setDisabledSectionModalActive(true)}>
               <Translate>Disabled sections</Translate>
             </IButton>
-          </div>
-        )}
+          )}
+        </div>
 
         <SortableWrapper accept="regform-section" className="regform-section-list">
           {sections.map((section, index) => (
@@ -45,6 +50,9 @@ export default function RegistrationFormSetup() {
         </SortableWrapper>
       </DndProvider>
 
+      {addSectionModalActive && (
+        <SectionSettingsModal onClose={() => setAddSectionModalActive(false)} />
+      )}
       {disabledSectionModalActive && (
         <DisabledSectionsModal onClose={() => setDisabledSectionModalActive(false)} />
       )}

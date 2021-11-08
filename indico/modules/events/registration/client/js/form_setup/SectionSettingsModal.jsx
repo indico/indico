@@ -21,12 +21,14 @@ import '../../styles/regform.module.scss';
 
 export default function SectionSettingsModal({id, onClose}) {
   const dispatch = useDispatch();
+  const editing = id !== null;
   const {title, description, isPersonalData, isManagerOnly} = useSelector(state =>
-    getSectionById(state, id)
+    editing ? getSectionById(state, id) : {}
   );
 
   const handleSubmit = async formData => {
-    const rv = await dispatch(actions.updateSection(id, formData));
+    const action = editing ? actions.updateSection(id, formData) : actions.createSection(formData);
+    const rv = await dispatch(action);
     if (rv.error) {
       return rv.error;
     }
@@ -37,7 +39,7 @@ export default function SectionSettingsModal({id, onClose}) {
     <FinalForm
       onSubmit={handleSubmit}
       subscription={{submitting: true}}
-      initialValues={{title, description, is_manager_only: isManagerOnly}}
+      initialValues={editing ? {title, description, is_manager_only: isManagerOnly} : null}
     >
       {fprops => (
         <Modal
@@ -49,13 +51,17 @@ export default function SectionSettingsModal({id, onClose}) {
           open
         >
           <Modal.Header>
-            <Translate>
-              Configure section "<Param name="section" value={title} />"
-            </Translate>
+            {editing ? (
+              <Translate>
+                Configure section "<Param name="section" value={title} />"
+              </Translate>
+            ) : (
+              <Translate>Add new section</Translate>
+            )}
           </Modal.Header>
           <Modal.Content>
             <Form id="regform-section-form" onSubmit={fprops.handleSubmit}>
-              <FinalInput name="title" label={Translate.string('Title')} required />
+              <FinalInput name="title" label={Translate.string('Title')} required autoFocus />
               <FinalTextArea
                 name="description"
                 label={Translate.string('Description')}
@@ -86,6 +92,10 @@ export default function SectionSettingsModal({id, onClose}) {
 }
 
 SectionSettingsModal.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.number,
   onClose: PropTypes.func.isRequired,
+};
+
+SectionSettingsModal.defaultProps = {
+  id: null,
 };
