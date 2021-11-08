@@ -459,6 +459,7 @@ class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
 class AbstractForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     description = IndicoMarkdownField(_('Content'), editor=True, mathjax=True)
+    person_links = AbstractPersonLinkListField(_('Authors'))
     submitted_contrib_type = QuerySelectField(_('Contribution type'), get_label='name', allow_blank=True,
                                               blank_text=_('No type selected'))
     submission_comment = TextAreaField(_('Comments'))
@@ -499,6 +500,11 @@ class AbstractForm(IndicoForm):
             del self.attachments
         if not description_settings['is_active']:
             del self.description
+        if not is_invited:
+            self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
+            self.person_links.require_speaker = abstracts_settings.get(self.event, 'speakers_required')
+        else:
+            self.person_links.require_primary_author = False
 
     def _get_description_validators(self, description_settings, invited=False):
         validators = []
