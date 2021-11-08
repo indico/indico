@@ -16,7 +16,7 @@ import toggleSectionURL from 'indico-url:event_registration.toggle_section';
 import toggleTextURL from 'indico-url:event_registration.toggle_text';
 
 import {indicoAxios} from 'indico/utils/axios';
-import {ajaxAction} from 'indico/utils/redux';
+import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 
 import {getSectionIdForItem, getURLParams, pickItemURL} from './selectors';
 
@@ -70,10 +70,8 @@ function _removeSection(sectionId) {
   return {type: REMOVE_SECTION, sectionId};
 }
 
-// TODO currently unused, but we'll most likely start using it when editing
-// sections; otherwise remove it if we don't need it after all.
-// eslint-disable-next-line no-unused-vars
-function updateSection(sectionId, data, patch = false) {
+// TODO: remove patch mode unless we end up using it
+function _updateSection(sectionId, data, patch = false) {
   return {type: UPDATE_SECTION, sectionId, data, patch};
 }
 
@@ -138,6 +136,20 @@ export function removeSection(sectionId) {
     if (!resp.error) {
       dispatch(_removeSection(sectionId));
     }
+  };
+}
+
+export function updateSection(sectionId, data) {
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const url = modifySectionURL(getURLParams(store)(sectionId));
+    const payload = {changes: data};
+    const resp = await submitFormAction(() => indicoAxios.patch(url, payload))(dispatch);
+    if (!resp.error) {
+      delete resp.data.items;
+      dispatch(_updateSection(sectionId, resp.data));
+    }
+    return resp;
   };
 }
 

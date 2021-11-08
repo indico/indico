@@ -49,6 +49,13 @@ export const getNestedSections = createSelector(
     }))
 );
 
+/** Get a section by its ID. */
+export const getSectionById = createSelector(
+  getFlatSections,
+  (__, sectionId) => sectionId,
+  (sections, sectionId) => sections[sectionId]
+);
+
 /** Get the section ID for a given item ID. */
 export const getSectionIdForItem = createSelector(
   getItems,
