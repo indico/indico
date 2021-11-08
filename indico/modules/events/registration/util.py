@@ -119,6 +119,12 @@ def get_flat_section_setup_data(regform):
     return {'sections': section_data, 'items': item_data}
 
 
+def get_flat_section_positions_setup_data(regform):
+    section_data = {s.id: s.position for s in regform.sections if not s.is_deleted}
+    item_data = {f.id: f.position for f in regform.form_items if not f.is_section and not f.is_deleted}
+    return {'sections': section_data, 'items': item_data}
+
+
 def get_event_section_data(regform, management=False, registration=None):
     data = []
     if not registration:

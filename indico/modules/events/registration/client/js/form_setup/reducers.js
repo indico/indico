@@ -17,6 +17,7 @@ import {
   TOGGLE_SECTION,
   UNLOCK_UI,
   UPDATE_ITEM,
+  UPDATE_POSITIONS,
   UPDATE_SECTION,
 } from './actions';
 
@@ -37,6 +38,15 @@ export default {
         return action.items;
       case UPDATE_ITEM:
         return {...state, [action.itemId]: action.data};
+      case UPDATE_POSITIONS: {
+        const newState = {...state};
+        Object.entries(action.items)
+          .filter(([id]) => id in newState)
+          .forEach(([id, position]) => {
+            newState[id] = {...newState[id], position};
+          });
+        return newState;
+      }
       case REMOVE_ITEM:
         return _.omit(state, action.itemId);
       case REMOVE_SECTION:
@@ -79,6 +89,15 @@ export default {
             ? {...state[action.sectionId], ...action.data}
             : action.data,
         };
+      case UPDATE_POSITIONS: {
+        const newState = {...state};
+        Object.entries(action.sections)
+          .filter(([id]) => id in newState)
+          .forEach(([id, position]) => {
+            newState[id] = {...newState[id], position};
+          });
+        return newState;
+      }
       case REMOVE_SECTION:
         return _.omit(state, action.sectionId);
       case MOVE_SECTION: {

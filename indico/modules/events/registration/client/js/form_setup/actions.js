@@ -30,6 +30,7 @@ export const REMOVE_SECTION = 'Remove section';
 export const MOVE_ITEM = 'Move item';
 export const UPDATE_ITEM = 'Update item';
 export const REMOVE_ITEM = 'Remove item';
+export const UPDATE_POSITIONS = 'Update positions';
 
 function lockUI() {
   return {type: LOCK_UI};
@@ -53,6 +54,10 @@ export function setFormData(data) {
   return {type: SET_FORM_DATA, items: data.items, sections: data.sections};
 }
 
+function updatePositions(data) {
+  return {type: UPDATE_POSITIONS, items: data.items, sections: data.sections};
+}
+
 export function moveSection(sourceIndex, targetIndex) {
   return {type: MOVE_SECTION, sourceIndex, targetIndex};
 }
@@ -65,6 +70,9 @@ function _removeSection(sectionId) {
   return {type: REMOVE_SECTION, sectionId};
 }
 
+// TODO currently unused, but we'll most likely start using it when editing
+// sections; otherwise remove it if we don't need it after all.
+// eslint-disable-next-line no-unused-vars
 function updateSection(sectionId, data, patch = false) {
   return {type: UPDATE_SECTION, sectionId, data, patch};
 }
@@ -104,7 +112,7 @@ export function enableSection(sectionId) {
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
     if (!resp.error) {
       dispatch(_toggleSection(sectionId, true));
-      dispatch(updateSection(sectionId, {position: resp.data.position}, true));
+      dispatch(updatePositions(resp.data.positions));
     }
   };
 }
@@ -117,7 +125,7 @@ export function disableSection(sectionId) {
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
     if (!resp.error) {
       dispatch(_toggleSection(sectionId, false));
-      dispatch(updateSection(sectionId, {position: resp.data.position}, true));
+      dispatch(updatePositions(resp.data.positions));
     }
   };
 }
@@ -158,10 +166,8 @@ export function enableItem(itemId) {
     const url = urlFunc({...params, enable: 'true'});
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
     if (!resp.error) {
-      // XXX this API should probably be changed to return the whole section or at least
-      // the updated positions for all items - right now it only returns the changed item
-      // even though the positions of other items change as well
       dispatch(updateItem(itemId, resp.data.view_data));
+      dispatch(updatePositions(resp.data.positions));
     }
   };
 }
@@ -175,10 +181,8 @@ export function disableItem(itemId) {
     const url = urlFunc({...params, enable: 'false'});
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
     if (!resp.error) {
-      // XXX this API should probably be changed to return the whole section or at least
-      // the updated positions for all items - right now it only returns the changed item
-      // even though the positions of other items change as well
       dispatch(updateItem(itemId, resp.data.view_data));
+      dispatch(updatePositions(resp.data.positions));
     }
   };
 }

@@ -23,7 +23,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
       getRequestParams(section),
       function(updatedSection) {
         regFormFactory.processResponse(updatedSection, {
-          success: function(updatedSection) {
+          success: function({view_data: updatedSection}) {
             section.enabled = updatedSection.enabled;
           },
         });
