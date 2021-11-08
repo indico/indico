@@ -57,7 +57,9 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
 
     def _process_PATCH(self):
         changes = request.json['changes']
-        if set(changes.keys()) > {'title', 'description'}:
+        if set(changes.keys()) > {'title', 'description', 'is_manager_only'}:
+            raise BadRequest
+        if self.section.type == RegistrationFormItemType.section_pd and changes.get('is_manager_only'):
             raise BadRequest
         for field, value in changes.items():
             setattr(self.section, field, value)
