@@ -37,11 +37,11 @@ class RHRegistrationFormAddSection(RHManageRegFormBase):
         section = RegistrationFormSection(registration_form=self.regform)
         section.title = request.json['title']
         section.description = request.json.get('description')
-        section.is_manager_only = request.json['is_manager_only']
+        section.is_manager_only = request.json.get('is_manager_only', False)
         db.session.add(section)
         db.session.flush()
         logger.info('Section %s created by %s', section, session.user)
-        return jsonify_data(**section.view_data)
+        return jsonify(section.view_data)
 
 
 class RHRegistrationFormModifySection(RHManageRegFormSectionBase):

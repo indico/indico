@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import addSectionURL from 'indico-url:event_registration.add_section';
 import modifyFieldURL from 'indico-url:event_registration.modify_field';
 import modifySectionURL from 'indico-url:event_registration.modify_section';
 import modifyTextURL from 'indico-url:event_registration.modify_text';
@@ -27,6 +28,7 @@ export const MOVE_SECTION = 'Move section';
 export const UPDATE_SECTION = 'Update section';
 export const TOGGLE_SECTION = 'Toggle section';
 export const REMOVE_SECTION = 'Remove section';
+export const CREATE_SECTION = 'Create section';
 export const MOVE_ITEM = 'Move item';
 export const UPDATE_ITEM = 'Update item';
 export const REMOVE_ITEM = 'Remove item';
@@ -73,6 +75,10 @@ function _removeSection(sectionId) {
 // TODO: remove patch mode unless we end up using it
 function _updateSection(sectionId, data, patch = false) {
   return {type: UPDATE_SECTION, sectionId, data, patch};
+}
+
+function _createSection(data) {
+  return {type: CREATE_SECTION, data};
 }
 
 export function moveItem(sectionId, sourceIndex, targetIndex) {
@@ -148,6 +154,19 @@ export function updateSection(sectionId, data) {
     if (!resp.error) {
       delete resp.data.items;
       dispatch(_updateSection(sectionId, resp.data));
+    }
+    return resp;
+  };
+}
+
+export function createSection(data) {
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const url = addSectionURL(getURLParams(store)());
+    const resp = await submitFormAction(() => indicoAxios.post(url, data))(dispatch);
+    if (!resp.error) {
+      delete resp.data.items;
+      dispatch(_createSection(resp.data));
     }
     return resp;
   };
