@@ -12,7 +12,7 @@ from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
-from indico.modules.events.registration.util import update_regform_item_positions
+from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
 from indico.web.util import jsonify_data
 
 
@@ -80,7 +80,8 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
             logger.info('Section %s enabled by %s', self.section, session.user)
         else:
             logger.info('Section %s disabled by %s', self.section, session.user)
-        return jsonify_data(**self.section.view_data)
+        return jsonify_data(view_data=self.section.view_data,
+                            positions=get_flat_section_positions_setup_data(self.regform))
 
 
 class RHRegistrationFormMoveSection(RHManageRegFormSectionBase):

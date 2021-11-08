@@ -16,7 +16,7 @@ from indico.modules.events.registration.controllers.management.sections import R
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
-from indico.modules.events.registration.util import update_regform_item_positions
+from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
 from indico.util.marshmallow import not_empty
 from indico.util.string import snakify_keys
 
@@ -105,7 +105,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         update_regform_item_positions(self.regform)
         db.session.flush()
         logger.info('Field %s modified by %s', self.field, session.user)
-        return jsonify(view_data=self.field.view_data)
+        return jsonify(view_data=self.field.view_data, positions=get_flat_section_positions_setup_data(self.regform))
 
 
 class RHRegistrationFormModifyField(RHManageRegFormFieldBase):

@@ -242,7 +242,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             },
             function(updatedSection) {
               regFormFactory.processResponse(updatedSection, {
-                success: function(updatedSection) {
+                success: function({view_data: updatedSection}) {
                   var index = -1;
                   _.find($scope.sections, function(section) {
                     index++;
