@@ -12,12 +12,14 @@ import {toClasses} from 'indico/react/util';
 
 import InputLabel from './fields/InputLabel';
 import InputText from './fields/InputText';
+import InputTextArea from './fields/InputTextArea';
 
 import '../../styles/regform.module.scss';
 
 const fieldRegistry = {
   label: {noLabel: true, component: InputLabel},
   text: {component: InputText},
+  textarea: {component: InputTextArea},
   // TODO add other input types
 };
 
