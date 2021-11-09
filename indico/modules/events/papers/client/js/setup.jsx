@@ -25,8 +25,8 @@ export default () => {
   const initialData = {
     staticData: {
       user: {
-        fullName: Indico.User.full_name,
-        avatarURL: Indico.User.avatar_url,
+        fullName: Indico.User.fullName,
+        avatarURL: Indico.User.avatarURL,
       },
     },
   };

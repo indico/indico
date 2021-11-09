@@ -52,8 +52,8 @@ export default function ReviewForm({block}) {
   const lastRevision = useSelector(getLastRevision);
   const canJudge = useSelector(canJudgeLastRevision);
   const currentUser = {
-    fullName: Indico.User.full_name,
-    avatarURL: Indico.User.avatar_url,
+    fullName: Indico.User.fullName,
+    avatarURL: Indico.User.avatarURL,
   };
 
   const [commentFormVisible, setCommentFormVisible] = useState(false);

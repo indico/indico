@@ -69,14 +69,17 @@ def generate_user_file(user=None):
     else:
         user_vars = {
             'id': user.id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
+            'firstName': user.first_name,
+            'lastName': user.last_name,
+            'fullName': user.full_name,
             'email': user.email,
-            'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users},
+            'favoriteUsers': {u.id: serialize_user(u) for u in user.favorite_users},
             'language': session.lang,
-            'avatar_url': user.avatar_url,
-            'is_admin': user.is_admin,
-            'full_name': user.full_name
+            'avatarURL': user.avatar_url,
+            'isAdmin': user.is_admin,
+            'affiliation': user.affiliation,
+            'address': user.address,
+            'phone': user.phone
         }
     return render_template('assets/vars_user.js', user_vars=user_vars, user=user)
 
