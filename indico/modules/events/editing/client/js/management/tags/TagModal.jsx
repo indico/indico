@@ -7,10 +7,10 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Form as FinalForm} from 'react-final-form';
-import {Button, Form, Label, Modal} from 'semantic-ui-react';
+import {Label} from 'semantic-ui-react';
 
-import {FinalDropdown, FinalInput, FinalSubmitButton} from 'indico/react/forms';
+import {FinalDropdown, FinalInput} from 'indico/react/forms';
+import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {SUIPalette} from 'indico/utils/palette';
 
@@ -35,39 +35,23 @@ export default function TagModal({header, onSubmit, tag, onClose}) {
   };
 
   return (
-    <FinalForm onSubmit={handleSubmit} subscription={{submitting: true}} initialValues={tag}>
-      {fprops => (
-        <Modal
-          onClose={onClose}
-          size="tiny"
-          closeIcon={!fprops.submitting}
-          closeOnEscape={!fprops.submitting}
-          closeOnDimmerClick={!fprops.submitting}
-          open
-        >
-          <Modal.Header>{header}</Modal.Header>
-          <Modal.Content>
-            <Form id="tag-form" onSubmit={fprops.handleSubmit}>
-              <FinalInput name="code" label={Translate.string('Code')} required autoFocus />
-              <FinalInput name="title" label={Translate.string('Title')} required />
-              <FinalDropdown
-                name="color"
-                label={Translate.string('Color')}
-                options={availableColors}
-                selection
-                required
-              />
-            </Form>
-          </Modal.Content>
-          <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
-            <FinalSubmitButton form="tag-form" label={Translate.string('Submit')} />
-            <Button onClick={onClose} disabled={fprops.submitting}>
-              <Translate>Cancel</Translate>
-            </Button>
-          </Modal.Actions>
-        </Modal>
-      )}
-    </FinalForm>
+    <FinalModalForm
+      id="tag-form"
+      onSubmit={handleSubmit}
+      onClose={onClose}
+      initialValues={tag}
+      header={header}
+    >
+      <FinalInput name="code" label={Translate.string('Code')} required autoFocus />
+      <FinalInput name="title" label={Translate.string('Title')} required />
+      <FinalDropdown
+        name="color"
+        label={Translate.string('Color')}
+        options={availableColors}
+        selection
+        required
+      />
+    </FinalModalForm>
   );
 }
 

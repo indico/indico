@@ -10,16 +10,11 @@ import principalsURL from 'indico-url:event_editing.api_editable_type_principals
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Form as FinalForm} from 'react-final-form';
-import {Button, Form, Loader, Message, Modal} from 'semantic-ui-react';
+import {Loader, Message} from 'semantic-ui-react';
 
 import {FinalPrincipalList} from 'indico/react/components';
-import {
-  getChangedValues,
-  handleSubmitError,
-  FinalSubmitButton,
-  FinalUnloadPrompt,
-} from 'indico/react/forms';
+import {getChangedValues, handleSubmitError} from 'indico/react/forms';
+import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
@@ -51,41 +46,28 @@ export default function TeamManager({editableType, onClose}) {
   }
 
   return (
-    <div style={{padding: '30'}}>
-      <FinalForm
-        onSubmit={handleSubmit}
-        initialValues={{principals}}
-        initialValuesEqual={_.isEqual}
-        subscription={{}}
-      >
-        {fprops => (
-          <Modal onClose={onClose} size="small" closeOnDimmerClick={false} open>
-            <Modal.Header content={Translate.string('Set editors')} />
-            <Modal.Content>
-              <Form id="team-manager-form" onSubmit={fprops.handleSubmit}>
-                <FinalUnloadPrompt />
-                <Message>
-                  <FinalPrincipalList
-                    name="principals"
-                    withEventRoles
-                    withCategoryRoles
-                    favoriteUsersController={favoriteUsersController}
-                    label={Translate.string('Editors')}
-                    eventId={eventId}
-                  />
-                </Message>
-              </Form>
-            </Modal.Content>
-            <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
-              <FinalSubmitButton form="team-manager-form" label={Translate.string('Submit')} />
-              <Button onClick={onClose} disabled={fprops.submitting}>
-                <Translate>Cancel</Translate>
-              </Button>
-            </Modal.Actions>
-          </Modal>
-        )}
-      </FinalForm>
-    </div>
+    <FinalModalForm
+      id="team-manager"
+      size="small"
+      onSubmit={handleSubmit}
+      onClose={onClose}
+      header={Translate.string('Set editors')}
+      initialValues={{principals}}
+      initialValuesEqual={_.isEqual}
+      unloadPrompt
+      unloadPromptRouter
+    >
+      <Message>
+        <FinalPrincipalList
+          name="principals"
+          withEventRoles
+          withCategoryRoles
+          favoriteUsersController={favoriteUsersController}
+          label={Translate.string('Editors')}
+          eventId={eventId}
+        />
+      </Message>
+    </FinalModalForm>
   );
 }
 
