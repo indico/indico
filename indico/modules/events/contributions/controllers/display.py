@@ -78,7 +78,8 @@ class RHDisplayProtectionBase(RHDisplayEventBase):
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
-        if not published and not has_contributions_with_user_as_submitter(self.event, session.user):
+        can_manage = self.event.can_manage(session.user)
+        if not published and not can_manage and not has_contributions_with_user_as_submitter(self.event, session.user):
             raise NotFound(_('The contributions of this event have not been published yet.'))
 
         if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event):
@@ -114,6 +115,7 @@ class RHContributionList(RHDisplayProtectionBase):
     def _process(self):
         return self.view_class.render_template('display/contribution_list.html', self.event,
                                                timezone=self.event.display_tzinfo,
+                                               published=contribution_settings.get(self.event, 'published'),
                                                **self.list_generator.get_list_kwargs())
 
 

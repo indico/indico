@@ -536,6 +536,10 @@ ul.category-resource-qtip {
         border-top: 1px dotted #aaa;
       }
 
+      .title .ui.label {
+        text-transform: uppercase;
+      }
+
       .category-icon {
         float: right;
         margin-left: 3px;

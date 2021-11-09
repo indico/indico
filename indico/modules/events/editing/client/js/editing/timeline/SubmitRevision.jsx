@@ -29,8 +29,8 @@ export default function SubmitRevision() {
   const lastRevision = useSelector(selectors.getLastRevision);
   const dispatch = useDispatch();
   const currentUser = {
-    fullName: Indico.User.full_name,
-    avatarURL: Indico.User.avatar_url,
+    fullName: Indico.User.name,
+    avatarURL: Indico.User.avatarURL,
   };
   const files = getFilesFromRevision(fileTypes, lastRevision);
 

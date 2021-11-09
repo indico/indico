@@ -74,6 +74,10 @@ Improvements
   of registrations by the presence or absence of specific tags (:issue:`4948`,
   :pr:`5091`)
 - Allow importing registration invitations from a CSV file (:issue:`3673`, :pr:`5108`)
+- Show event label on category overviews and in iCal event titles (:issue:`5140`,
+  :pr:`5143`)
+- Let event managers view the final timetable even while in draft mode (:issue:`5141`,
+  :pr:`5145`)
 
 Bugfixes
 ^^^^^^^^

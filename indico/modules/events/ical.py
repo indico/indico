@@ -34,12 +34,17 @@ def generate_basic_component(entity, uid=None, url=None, title=None, description
 
     :return: iCalendar event with basic properties
     """
-    component = icalendar.Event()
+    if not title:
+        title = entity.title
 
+    if label := getattr(entity, 'label', None):
+        title += f' [{label.title}]'
+
+    component = icalendar.Event()
     component.add('dtstamp', now_utc(False))
     component.add('dtstart', entity.start_dt)
     component.add('dtend', entity.end_dt)
-    component.add('summary', title or entity.title)
+    component.add('summary', title.strip())
 
     if uid:
         component.add('uid', uid)
