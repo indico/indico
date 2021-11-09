@@ -221,6 +221,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
                                from_address=form.from_address.data, template=template, html=True,
                                attachments=attachments)
+            signals.core.before_notification_send.send('registration-custom-email', email=email,
+                                                       registration=registration, form=form)
             send_email(email, self.event, 'Registration', log_metadata={'registration_id': registration.id})
 
     def _process(self):
