@@ -11,6 +11,7 @@ import React from 'react';
 import {toClasses} from 'indico/react/util';
 
 import InputLabel from './fields/InputLabel';
+import InputPhone from './fields/InputPhone';
 import InputText from './fields/InputText';
 import InputTextArea from './fields/InputTextArea';
 
@@ -20,6 +21,7 @@ const fieldRegistry = {
   label: {noLabel: true, component: InputLabel},
   text: {component: InputText},
   textarea: {component: InputTextArea},
+  phone: {component: InputPhone},
   // TODO add other input types
 };
 
