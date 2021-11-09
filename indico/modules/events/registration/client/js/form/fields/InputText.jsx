@@ -8,16 +8,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {mapPropsToAttributes} from './util';
+
 const attributeMap = {length: 'size', minLength: 'minLength', maxLength: 'maxLength'};
 
 export default function InputText({htmlName, disabled, ...props}) {
-  const inputProps = {};
-  Object.entries(attributeMap).forEach(([prop, attr]) => {
-    const val = props[prop];
-    if (val !== null && val > 0) {
-      inputProps[attr] = val;
-    }
-  });
+  const inputProps = mapPropsToAttributes(props, attributeMap);
   return <input type="text" name={htmlName} {...inputProps} disabled={disabled} />;
 }
 
