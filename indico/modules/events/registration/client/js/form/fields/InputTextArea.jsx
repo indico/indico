@@ -8,19 +8,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {mapPropsToAttributes} from './util';
+
 const attributeMap = {
   numberOfRows: 'rows',
   numberOfColumns: 'cols',
 };
 
 export default function InputTextArea({htmlName, disabled, ...props}) {
-  const inputProps = {};
-  Object.entries(attributeMap).forEach(([prop, attr]) => {
-    const val = props[prop];
-    if (val !== null && val > 0) {
-      inputProps[attr] = val;
-    }
-  });
+  const inputProps = mapPropsToAttributes(props, attributeMap);
   return <textarea name={htmlName} {...inputProps} disabled={disabled} />;
 }
 
