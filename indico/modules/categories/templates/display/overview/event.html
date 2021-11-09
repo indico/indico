@@ -33,6 +33,12 @@
                     {{ render_location(event, class='right') }}
                 {% endif %}
             </span>
+            {% if event.label %}
+                <span class="ui label basic mini {{ event.label.color }}"
+                      title="{{ event.label_message }}">
+                    {{- event.label.title -}}
+                </span>
+            {% endif %}
         </td>
     </tr>
     <tr>
