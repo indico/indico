@@ -60,5 +60,5 @@ translitcodec
 ua-parser
 webargs
 werkzeug
-wtforms[ipaddress,email]
+wtforms[ipaddress,email]<3
 xlsxwriter
