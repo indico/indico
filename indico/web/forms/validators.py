@@ -22,7 +22,7 @@ class UsedIf:
     If the field is not used, validation stops.
     """
 
-    field_flags = ('conditional',)
+    field_flags = {'conditional': True}
 
     def __init__(self, condition):
         self.condition = condition
@@ -48,7 +48,7 @@ class HiddenUnless:
                           via `FormDefaults`).
     """
 
-    field_flags = ('initially_hidden',)
+    field_flags = {'initially_hidden': True}
 
     def __init__(self, field, value=None, preserve_data=False):
         self.field = field
@@ -114,7 +114,7 @@ class IndicoEmail:
 class DateRange:
     """Validate that a date is within the specified boundaries."""
 
-    field_flags = ('date_range',)
+    field_flags = {'date_range': True}
 
     def __init__(self, earliest='today', latest=None):
         self.earliest = earliest
@@ -161,7 +161,7 @@ class DateRange:
 class DateTimeRange:
     """Validate that a datetime is within the specified boundaries."""
 
-    field_flags = ('datetime_range',)
+    field_flags = {'datetime_range': True}
 
     def __init__(self, earliest='now', latest=None):
         self.earliest = earliest
@@ -214,7 +214,7 @@ class LinkedDate:
     be equal.
     """
 
-    field_flags = ('linked_date',)
+    field_flags = {'linked_date': True}
 
     def __init__(self, field, not_before=True, not_after=False, not_equal=False):
         if not not_before and not not_after:
@@ -247,7 +247,7 @@ class LinkedDateTime:
     be equal.
     """
 
-    field_flags = ('linked_datetime',)
+    field_flags = {'linked_datetime': True}
 
     def __init__(self, field, not_before=True, not_after=False, not_equal=False):
         if not not_before and not not_after:
