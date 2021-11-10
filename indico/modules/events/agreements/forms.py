@@ -5,8 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.fields import BooleanField, FileField, SelectField, TextAreaField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import BooleanField, EmailField, FileField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, InputRequired, Optional, ValidationError
 
 from indico.util.i18n import _

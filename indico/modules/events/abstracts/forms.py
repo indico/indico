@@ -9,11 +9,10 @@ from datetime import time
 from itertools import groupby
 
 from flask import request, session
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import BooleanField, EmailField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets import Select
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
 from indico.core.db import db

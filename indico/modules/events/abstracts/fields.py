@@ -9,7 +9,7 @@ from operator import attrgetter
 
 from flask import request, session
 from sqlalchemy.orm import joinedload
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush

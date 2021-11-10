@@ -11,7 +11,7 @@ from flask import request
 from pytz import utc
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
-from wtforms.widgets.html5 import NumberInput
+from wtforms.widgets import NumberInput
 
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.forms import ContributionForm

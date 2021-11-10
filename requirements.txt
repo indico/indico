@@ -239,6 +239,7 @@ python-dateutil==2.8.2
     #   -r requirements.in
     #   feedgen
     #   icalendar
+    #   wtforms-dateutil
 pytz==2021.3
     # via
     #   -r requirements.in
@@ -284,6 +285,7 @@ sqlalchemy==1.4.26
     #   flask-sqlalchemy
     #   marshmallow-sqlalchemy
     #   sentry-sdk
+    #   wtforms-sqlalchemy
 terminaltables==3.1.0
     # via -r requirements.in
 traitlets==5.1.1
@@ -319,10 +321,16 @@ werkzeug==2.0.2
     # via
     #   -r requirements.in
     #   flask
-wtforms[email,ipaddress]==2.3.3
+wtforms[email]==3.0.0
     # via
     #   -r requirements.in
     #   flask-wtf
+    #   wtforms-dateutil
+    #   wtforms-sqlalchemy
+wtforms-dateutil==0.1
+    # via -r requirements.in
+wtforms-sqlalchemy==0.3
+    # via -r requirements.in
 xlsxwriter==3.0.2
     # via -r requirements.in
 

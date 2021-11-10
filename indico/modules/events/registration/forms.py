@@ -10,10 +10,10 @@ from operator import itemgetter
 
 import jsonschema
 from flask import request
-from wtforms.fields import BooleanField, FloatField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
-from wtforms.fields.html5 import DecimalField, EmailField
+from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
+                            StringField, TextAreaField)
 from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
-from wtforms.widgets.html5 import NumberInput
+from wtforms.widgets import NumberInput
 
 from indico.core import signals
 from indico.core.config import config

@@ -13,9 +13,9 @@ import pytz
 from flask import session
 from markupsafe import escape
 from wtforms import Field, SelectField
-from wtforms.ext.dateutil.fields import DateField, DateTimeField
 from wtforms.fields import TimeField
 from wtforms.validators import StopValidation
+from wtforms_dateutil import DateField, DateTimeField
 
 from indico.core.config import config
 from indico.core.logger import Logger

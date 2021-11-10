@@ -7,8 +7,8 @@
 
 import re
 
+from markupsafe import Markup
 from wtforms.widgets import CheckboxInput, HiddenInput, TextArea, TextInput
-from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
 from indico.core.config import config
@@ -34,7 +34,7 @@ class ConcatWidget:
         for subfield in field:
             fmt = '{0} {1}' if self.prefix_label else '{1} {0}'
             html.append(fmt.format(subfield.label(**label_args), subfield(**field_args)))
-        return HTMLString(self.separator.join(html))
+        return Markup(self.separator.join(html))
 
 
 class HiddenInputs(HiddenInput):
@@ -43,7 +43,7 @@ class HiddenInputs(HiddenInput):
 
     def __call__(self, field, **kwargs):
         items = field._value() or []
-        return HTMLString('\n'.join(self.item_widget(field, value=item) for item in items))
+        return Markup('\n'.join(self.item_widget(field, value=item) for item in items))
 
 
 class HiddenCheckbox(CheckboxInput, HiddenInput):
@@ -97,7 +97,7 @@ class JinjaWidget:
             inject_js(template_module.javascript())
         elif html_comment_re.sub('', javascript).strip():
             raise ValueError('Template did not provide valid javascript')
-        return HTMLString(html)
+        return Markup(html)
 
 
 class PasswordWidget(JinjaWidget):

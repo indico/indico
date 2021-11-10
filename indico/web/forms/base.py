@@ -12,10 +12,10 @@ from flask import flash, g, has_request_context, request, session
 from flask_wtf import FlaskForm
 from wtforms import ValidationError
 from wtforms.csrf.core import CSRF
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields.core import FieldList
+from wtforms.fields import FieldList
 from wtforms.form import FormMeta
 from wtforms.widgets.core import HiddenInput
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core import signals
 from indico.core.auth import multipass

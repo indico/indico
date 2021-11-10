@@ -9,8 +9,7 @@ from datetime import date, datetime, timedelta
 from operator import attrgetter
 
 from flask_pluginengine import current_plugin
-from wtforms.fields.core import BooleanField, SelectField
-from wtforms.fields.html5 import IntegerField
+from wtforms.fields import BooleanField, IntegerField, SelectField
 from wtforms.fields.simple import HiddenField, StringField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional, ValidationError
 

@@ -5,9 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.sessions.models.sessions import Session
