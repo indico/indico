@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {toClasses} from 'indico/react/util';
+import {Markdown, toClasses} from 'indico/react/util';
 
 import InputLabel from './fields/InputLabel';
 import InputPhone from './fields/InputPhone';
@@ -50,7 +50,11 @@ export default function FormItem({
       )}
       <div styleName="content">
         {InputComponent ? <InputComponent {...inputProps} /> : `Unknown input type: ${inputType}`}
-        {description && <div className="field-description">{description}</div>}
+        {description && (
+          <div className="field-description">
+            <Markdown>{description}</Markdown>
+          </div>
+        )}
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
     </div>
