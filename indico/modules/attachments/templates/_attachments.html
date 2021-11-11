@@ -176,6 +176,7 @@
                            data-title="{%- trans %}Add link{% endtrans -%}">
                             {%- trans %}Add link{% endtrans -%}
                         </a>
+                        {{ template_hook('attachment-sources', linked_object=linked_object) }}
                     </div>
                 </div>
             </div>
