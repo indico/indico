@@ -5,8 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.widgets import CheckboxInput
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 
 from indico.web.forms.widgets import JinjaWidget
 

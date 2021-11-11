@@ -9,8 +9,7 @@ from datetime import time
 
 from flask import request
 from markupsafe import escape
-from wtforms.fields import BooleanField, HiddenField, SelectField, StringField, TextAreaField
-from wtforms.fields.html5 import IntegerField
+from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, NumberRange, Optional
 
 from indico.core.db import db

@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.fields.core import BooleanField, StringField
+from wtforms.fields import BooleanField, StringField
 from wtforms.validators import DataRequired, Length
 
 from indico.modules.events.models.roles import EventRole

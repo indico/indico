@@ -224,9 +224,11 @@
 
             {{ template_hook('url-shortener', event=event, classes='i-button text-color subtle icon-link') }}
 
-            <a class="i-button text-color subtle icon-edit"
-               href="{{ url_for('event_management.settings', event) }}"
-               title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
+            {% block management_button %}
+                <a class="i-button text-color subtle icon-edit"
+                   href="{{ url_for('event_management.settings', event) }}"
+                   title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
+            {% endblock %}
 
             {% if event.type == 'conference' and theme %}
                 <span class="separator"></span>

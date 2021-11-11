@@ -7,8 +7,7 @@
 
 from fnmatch import fnmatch
 
-from wtforms.fields import PasswordField, SelectField, StringField, TextAreaField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import EmailField, PasswordField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
 from indico.modules.auth import Identity

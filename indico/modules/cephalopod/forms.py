@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from wtforms import BooleanField, StringField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import EmailField
 from wtforms.validators import DataRequired, Email
 
 from indico.util.i18n import _

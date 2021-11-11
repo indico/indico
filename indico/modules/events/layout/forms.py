@@ -5,8 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.fields import BooleanField, SelectField, TextAreaField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField, SelectField, TextAreaField, URLField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, Optional, ValidationError
 

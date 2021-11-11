@@ -5,11 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, TextAreaField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField, TextAreaField, URLField
 from wtforms.fields.simple import HiddenField, StringField
 from wtforms.validators import DataRequired, Optional, ValidationError
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode

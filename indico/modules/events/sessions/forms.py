@@ -7,9 +7,9 @@
 
 from datetime import timedelta
 
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.db import db
 from indico.modules.events.sessions.fields import SessionBlockPersonLinkListField

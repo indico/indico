@@ -5,8 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.fields import TextAreaField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import TextAreaField, URLField
 from wtforms.validators import URL, Optional
 
 from indico.util.i18n import _

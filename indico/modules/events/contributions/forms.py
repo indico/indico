@@ -8,9 +8,9 @@
 from datetime import timedelta
 
 from flask import request
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, HiddenField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import RenderMode

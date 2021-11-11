@@ -60,5 +60,7 @@ translitcodec
 ua-parser
 webargs
 werkzeug
-wtforms[ipaddress,email]
+wtforms[email]
+wtforms-dateutil
+wtforms-sqlalchemy
 xlsxwriter

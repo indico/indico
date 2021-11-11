@@ -14,9 +14,9 @@ from markupsafe import escape
 from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, FloatField, SelectField, StringField, TextAreaField
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields.html5 import IntegerField, URLField
+from wtforms.fields import IntegerField, URLField
 from wtforms.validators import URL, DataRequired, InputRequired, NumberRange, Optional, ValidationError
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
 from indico.core.db import db

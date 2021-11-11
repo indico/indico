@@ -34,7 +34,7 @@ blinker==1.4
     #   flask-multipass
     #   flask-pluginengine
     #   sentry-sdk
-celery==5.1.2
+celery==5.2.0
     # via
     #   -r requirements.in
     #   sentry-sdk
@@ -49,7 +49,7 @@ cffi==1.15.0
     #   cryptography
 charset-normalizer==2.0.7
     # via requests
-click==7.1.2
+click==8.0.3
     # via
     #   -r requirements.in
     #   celery
@@ -113,7 +113,7 @@ flask-sqlalchemy==2.5.1
     #   flask-migrate
 flask-webpackext==1.0.2
     # via -r requirements.in
-flask-wtf==0.15.1
+flask-wtf==1.0.0
     # via -r requirements.in
 greenlet==1.1.2
     # via sqlalchemy
@@ -131,7 +131,7 @@ idna==3.3
     #   requests
 indico-fonts==1.1
     # via -r requirements.in
-ipython==7.28.0
+ipython==7.29.0
     # via -r requirements.in
 itsdangerous==2.0.1
     # via
@@ -140,19 +140,19 @@ itsdangerous==2.0.1
     #   flask-wtf
 jedi==0.18.0
     # via ipython
-jinja2==3.0.2
+jinja2==3.0.3
     # via
     #   -r requirements.in
     #   flask
     #   flask-babel
     #   flask-pluginengine
-jsonschema==4.1.2
+jsonschema==4.2.1
     # via -r requirements.in
-kombu==5.1.0
+kombu==5.2.1
     # via celery
 limits==1.5.1
     # via flask-limiter
-lxml[html5]==4.6.3
+lxml[html5]==4.6.4
     # via
     #   -r requirements.in
     #   feedgen
@@ -191,7 +191,7 @@ mypy-extensions==0.4.3
     # via typing-inspect
 node-semver==0.8.1
     # via pywebpack
-packaging==21.0
+packaging==21.2
     # via
     #   -r requirements.in
     #   bleach
@@ -205,7 +205,7 @@ pillow==8.4.0
     # via
     #   -r requirements.in
     #   reportlab
-prompt-toolkit==3.0.21
+prompt-toolkit==3.0.22
     # via
     #   -r requirements.in
     #   click-repl
@@ -218,7 +218,7 @@ pure-eval==0.2.1
     # via sentry-sdk
 pycountry==20.7.3
     # via -r requirements.in
-pycparser==2.20
+pycparser==2.21
     # via cffi
 pygments==2.10.0
     # via
@@ -228,7 +228,7 @@ pynpm==0.1.2
     # via
     #   flask-webpackext
     #   pywebpack
-pyparsing==3.0.1
+pyparsing==2.4.7
     # via packaging
 pypdf2==1.26.0
     # via -r requirements.in
@@ -239,6 +239,7 @@ python-dateutil==2.8.2
     #   -r requirements.in
     #   feedgen
     #   icalendar
+    #   wtforms-dateutil
 pytz==2021.3
     # via
     #   -r requirements.in
@@ -284,6 +285,7 @@ sqlalchemy==1.4.26
     #   flask-sqlalchemy
     #   marshmallow-sqlalchemy
     #   sentry-sdk
+    #   wtforms-sqlalchemy
 terminaltables==3.1.0
     # via -r requirements.in
 traitlets==5.1.1
@@ -319,11 +321,17 @@ werkzeug==2.0.2
     # via
     #   -r requirements.in
     #   flask
-wtforms[email,ipaddress]==2.3.3
+wtforms[email]==3.0.0
     # via
     #   -r requirements.in
     #   flask-wtf
-xlsxwriter==3.0.1
+    #   wtforms-dateutil
+    #   wtforms-sqlalchemy
+wtforms-dateutil==0.1
+    # via -r requirements.in
+wtforms-sqlalchemy==0.3
+    # via -r requirements.in
+xlsxwriter==3.0.2
     # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:

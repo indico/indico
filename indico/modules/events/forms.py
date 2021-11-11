@@ -8,9 +8,7 @@
 from datetime import time
 
 from flask import session
-from wtforms.fields import StringField, TextAreaField
-from wtforms.fields.core import BooleanField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField, StringField, TextAreaField, URLField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 from indico.core.db import db

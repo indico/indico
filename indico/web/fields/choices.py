@@ -5,8 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.fields import SelectField
-from wtforms.fields.html5 import IntegerField
+from wtforms.fields import IntegerField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional, ValidationError
 
 from indico.util.i18n import _, ngettext

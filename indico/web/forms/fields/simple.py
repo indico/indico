@@ -8,8 +8,8 @@
 import json
 
 from markupsafe import escape
-from wtforms.fields import Field, HiddenField, PasswordField, RadioField, SelectMultipleField, TextAreaField
-from wtforms.fields.core import BooleanField
+from wtforms.fields import (BooleanField, Field, HiddenField, PasswordField, RadioField, SelectMultipleField,
+                            TextAreaField)
 from wtforms.widgets import CheckboxInput
 
 from indico.util.i18n import _
