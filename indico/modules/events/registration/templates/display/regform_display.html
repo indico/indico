@@ -71,20 +71,22 @@
             <div class="section">
                 <span class="icon icon-info"></span>
                 <div class="text">
-                    <div class="label">
-                        {%- if moderated %}
-                            {%- trans %}Account required to apply{% endtrans %}
-                        {%- else %}
-                            {%- trans %}Account required to register{% endtrans %}
-                        {%- endif -%}
-                    </div>
-                    <div>
-                        {%- if moderated %}
-                            {%- trans %}In order to apply for this event you have to be logged in.{% endtrans %}
-                        {%- else %}
-                            {%- trans %}In order to register for this event you have to be logged in.{% endtrans %}
-                        {%- endif -%}
-                    </div>
+                    {% block login_required_warning %}
+                        <div class="label">
+                            {%- if moderated %}
+                                {%- trans %}Account required to apply{% endtrans %}
+                            {%- else %}
+                                {%- trans %}Account required to register{% endtrans %}
+                            {%- endif -%}
+                        </div>
+                        <div>
+                            {%- if moderated %}
+                                {%- trans %}In order to apply for this event you have to be logged in.{% endtrans %}
+                            {%- else %}
+                                {%- trans %}In order to register for this event you have to be logged in.{% endtrans %}
+                            {%- endif -%}
+                        </div>
+                    {% endblock %}
                 </div>
                 <div class="toolbar">
                     <a href="{{ url_for_login(request.relative_url) }}" class="i-button next highlight">
@@ -94,16 +96,18 @@
             </div>
         </div>
     {% else %}
-        {% if moderated %}
-            {% call message_box('warning', fixed_width=true, large_icon=true) %}
-                <div class="label">
-                    {% trans %}Participation in this event is moderated{% endtrans %}
-                </div>
-                {% trans -%}
-                    The organizers will have to approve your application.
-                {%- endtrans %}
-            {% endcall %}
-        {% endif %}
+        {% block moderated_warning %}
+            {% if moderated %}
+                {% call message_box('warning', fixed_width=true, large_icon=true) %}
+                    <div class="label">
+                        {% trans %}Participation in this event is moderated{% endtrans %}
+                    </div>
+                    {% trans -%}
+                        The organizers will have to approve your application.
+                    {%- endtrans %}
+                {% endcall %}
+            {% endif %}
+        {% endblock %}
 
         {{ template_hook('before-regform', event=event, regform=regform, management=management, registration=none) }}
         <div ng-app="nd" ng-controller="AppCtrl">

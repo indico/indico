@@ -28,34 +28,36 @@
     <div class="action-box highlight">
         <div class="section">
             <span class="icon icon-ticket"></span>
-            <div class="text">
-                <div class="label">
-                    {%- if is_form_moderated %}
-                        {%- trans %}Application{% endtrans %}
-                    {%- else %}
-                        {%- trans %}Registration{% endtrans %}
-                    {%- endif -%}
-                </div>
-                {% if user_registrations %}
-                    {% if user_registrations < regforms|length %}
-                        <div>
-                            {% trans %}
-                                You are registered for this event, but there are more registration forms available.
-                            {% endtrans %}
-                        </div>
-                    {% else %}
-                        <div>{% trans %}You are registered for this event.{% endtrans %}</div>
-                    {%  endif %}
-                {% else %}
-                    <div>
+            {% block form_labels %}
+                <div class="text">
+                    <div class="label">
                         {%- if is_form_moderated %}
-                            {%- trans %}Application for this event is currently open.{% endtrans %}
+                            {%- trans %}Application{% endtrans %}
                         {%- else %}
-                            {%- trans %}Registration for this event is currently open.{% endtrans %}
+                            {%- trans %}Registration{% endtrans %}
                         {%- endif -%}
                     </div>
-                {% endif %}
-            </div>
+                    {% if user_registrations %}
+                        {% if user_registrations < regforms|length %}
+                            <div>
+                                {% trans %}
+                                    You are registered for this event, but there are more registration forms available.
+                                {% endtrans %}
+                            </div>
+                        {% else %}
+                            <div>{% trans %}You are registered for this event.{% endtrans %}</div>
+                        {%  endif %}
+                    {% else %}
+                        <div>
+                            {%- if is_form_moderated %}
+                                {%- trans %}Application for this event is currently open.{% endtrans %}
+                            {%- else %}
+                                {%- trans %}Registration for this event is currently open.{% endtrans %}
+                            {%- endif -%}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endblock %}
             <div class="toolbar">
                 {% if is_number_published %}
                     <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">
@@ -73,14 +75,16 @@
                         {% trans %}See details{% endtrans %}
                     </a>
                 {% else %}
-                    <a href="{{ url_for('event_registration.display_regform_list', event) }}"
-                       class="i-button next highlight">
-                        {%- if is_form_moderated %}
-                            {%- trans %}Apply now{% endtrans %}
-                        {%- else %}
-                            {%- trans %}Register now{% endtrans %}
-                        {%- endif -%}
-                    </a>
+                    {% block register_now_button %}
+                        <a href="{{ url_for('event_registration.display_regform_list', event) }}"
+                           class="i-button next highlight">
+                            {%- if is_form_moderated %}
+                                {%- trans %}Apply now{% endtrans %}
+                            {%- else %}
+                                {%- trans %}Register now{% endtrans %}
+                            {%- endif -%}
+                        </a>
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>

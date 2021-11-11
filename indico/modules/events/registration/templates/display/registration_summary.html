@@ -8,44 +8,46 @@
     <div class="section">
         <div class="icon icon-quill"></div>
         <div class="text">
-            {% if registration.state.name == 'complete' %}
-                <div class="label">
-                    {% trans %}Your registration has been completed{% endtrans %}
-                </div>
-            {% elif registration.state.name == 'rejected' %}
-                <div class="label">
-                    {% trans %}Your registration has been rejected{% endtrans %}
-                </div>
-                {% trans -%}
-                    Contact an event manager if you think this is an error.
-                {%- endtrans %}
-            {% elif registration.state.name == 'withdrawn' %}
-                <div class="label">
-                    {% trans %}You have withdrawn your registration{% endtrans %}
-                </div>
-                {% trans -%}
-                    Contact an event manager if you changed your mind.
-                {%- endtrans %}
-            {% elif registration.state.name == 'pending' %}
-                <div class="label">
-                    {% trans %}Your registration is awaiting approval{% endtrans %}
-                </div>
-                {% trans -%}
-                    An event manager will manually validate it.
-                {%- endtrans %}
-            {% elif registration.state.name == 'unpaid' %}
-                <div class="label">
-                    {% trans %}Your registration is awaiting payment{% endtrans %}
-                </div>
-                {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
-                    {% trans %}Awaiting your payment.{% endtrans %}
-                {% elif registration.transaction.status.name == 'pending' %}
-                    {% trans %}Awaiting payment confirmation.{% endtrans %}
+            {% block registration_state %}
+                {% if registration.state.name == 'complete' %}
+                    <div class="label">
+                        {% trans %}Your registration has been completed{% endtrans %}
+                    </div>
+                {% elif registration.state.name == 'rejected' %}
+                    <div class="label">
+                        {% trans %}Your registration has been rejected{% endtrans %}
+                    </div>
+                    {% trans -%}
+                        Contact an event manager if you think this is an error.
+                    {%- endtrans %}
+                {% elif registration.state.name == 'withdrawn' %}
+                    <div class="label">
+                        {% trans %}You have withdrawn your registration{% endtrans %}
+                    </div>
+                    {% trans -%}
+                        Contact an event manager if you changed your mind.
+                    {%- endtrans %}
+                {% elif registration.state.name == 'pending' %}
+                    <div class="label">
+                        {% trans %}Your registration is awaiting approval{% endtrans %}
+                    </div>
+                    {% trans -%}
+                        An event manager will manually validate it.
+                    {%- endtrans %}
+                {% elif registration.state.name == 'unpaid' %}
+                    <div class="label">
+                        {% trans %}Your registration is awaiting payment{% endtrans %}
+                    </div>
+                    {% if not registration.transaction or registration.transaction.status.name not in ('successful', 'pending') %}
+                        {% trans %}Awaiting your payment.{% endtrans %}
+                    {% elif registration.transaction.status.name == 'pending' %}
+                        {% trans %}Awaiting payment confirmation.{% endtrans %}
+                    {% endif %}
+                    <a href="#payment-summary" class="js-highlight-payment">
+                        {%- trans %}Proceed to checkout{% endtrans -%}
+                    </a>.
                 {% endif %}
-                <a href="#payment-summary" class="js-highlight-payment">
-                    {%- trans %}Proceed to checkout{% endtrans -%}
-                </a>.
-            {% endif %}
+            {% endblock %}
         </div>
         <div class="toolbar">
             {% if registration.registration_form.modification_mode.name != 'not_allowed' and registration.is_active %}
