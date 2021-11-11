@@ -5,7 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import addFieldURL from 'indico-url:event_registration.add_field';
 import addSectionURL from 'indico-url:event_registration.add_section';
+import addTextURL from 'indico-url:event_registration.add_text';
 import modifyFieldURL from 'indico-url:event_registration.modify_field';
 import modifySectionURL from 'indico-url:event_registration.modify_section';
 import modifyTextURL from 'indico-url:event_registration.modify_text';
@@ -32,6 +34,7 @@ export const CREATE_SECTION = 'Create section';
 export const MOVE_ITEM = 'Move item';
 export const UPDATE_ITEM = 'Update item';
 export const REMOVE_ITEM = 'Remove item';
+export const CREATE_ITEM = 'Create item';
 export const UPDATE_POSITIONS = 'Update positions';
 
 function lockUI() {
@@ -85,12 +88,16 @@ export function moveItem(sectionId, sourceIndex, targetIndex) {
   return {type: MOVE_ITEM, sectionId, sourceIndex, targetIndex};
 }
 
-function updateItem(itemId, data) {
+function _updateItem(itemId, data) {
   return {type: UPDATE_ITEM, itemId, data};
 }
 
 function _removeItem(itemId) {
   return {type: REMOVE_ITEM, itemId};
+}
+
+function _createItem(data) {
+  return {type: CREATE_ITEM, data};
 }
 
 export function saveSectionPosition(sectionId, position, oldPosition) {
@@ -197,7 +204,7 @@ export function enableItem(itemId) {
     const url = urlFunc({...params, enable: 'true'});
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
     if (!resp.error) {
-      dispatch(updateItem(itemId, resp.data.view_data));
+      dispatch(_updateItem(itemId, resp.data.view_data));
       dispatch(updatePositions(resp.data.positions));
     }
   };
@@ -212,7 +219,7 @@ export function disableItem(itemId) {
     const url = urlFunc({...params, enable: 'false'});
     const resp = await lockingAjaxAction(() => indicoAxios.post(url))(dispatch);
     if (!resp.error) {
-      dispatch(updateItem(itemId, resp.data.view_data));
+      dispatch(_updateItem(itemId, resp.data.view_data));
       dispatch(updatePositions(resp.data.positions));
     }
   };
@@ -228,5 +235,34 @@ export function removeItem(itemId) {
     if (!resp.error) {
       dispatch(_removeItem(itemId));
     }
+  };
+}
+
+export function updateItem(itemId, data) {
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const sectionId = getSectionIdForItem(store, itemId);
+    const urlFunc = pickItemURL(store, itemId)(modifyTextURL, modifyFieldURL);
+    const url = urlFunc(getURLParams(store)(sectionId, itemId));
+    const payload = {fieldData: data};
+    const resp = await submitFormAction(() => indicoAxios.patch(url, payload))(dispatch);
+    if (!resp.error) {
+      dispatch(_updateItem(itemId, resp.data.view_data));
+    }
+    return resp;
+  };
+}
+
+export function createItem(sectionId, inputType, data) {
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const urlFunc = inputType === 'label' ? addTextURL : addFieldURL;
+    const url = urlFunc(getURLParams(store)(sectionId));
+    const payload = {fieldData: {...data, input_type: inputType}};
+    const resp = await submitFormAction(() => indicoAxios.post(url, payload))(dispatch);
+    if (!resp.error) {
+      dispatch(_createItem(resp.data.view_data));
+    }
+    return resp;
   };
 }

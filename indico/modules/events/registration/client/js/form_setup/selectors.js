@@ -64,7 +64,7 @@ export const getSectionIdForItem = createSelector(
 );
 
 /** Get an item by its ID. */
-const getItemById = createSelector(
+export const getItemById = createSelector(
   getItems,
   (__, itemId) => itemId,
   (fields, itemId) => fields[itemId]

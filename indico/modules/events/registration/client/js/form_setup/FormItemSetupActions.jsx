@@ -6,12 +6,13 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import ItemSettingsModal from './ItemSettingsModal';
 
 export default function FormItemSetupActions({
   id,
@@ -20,6 +21,7 @@ export default function FormItemSetupActions({
   isEnabled,
 }) {
   const dispatch = useDispatch();
+  const [settingsModalActive, setSettingsModalActive] = useState(false);
 
   const handleEnableClick = () => {
     dispatch(actions.enableItem(id));
@@ -31,6 +33,10 @@ export default function FormItemSetupActions({
 
   const handleRemoveClick = () => {
     dispatch(actions.removeItem(id));
+  };
+
+  const handleConfigureClick = () => {
+    setSettingsModalActive(true);
   };
 
   return (
@@ -56,7 +62,14 @@ export default function FormItemSetupActions({
           onClick={handleDisableClick}
         />
       )}
-      <a className="icon-settings hide-if-locked" title={Translate.string('Configure field')} />
+      <a
+        className="icon-settings hide-if-locked"
+        title={Translate.string('Configure field')}
+        onClick={handleConfigureClick}
+      />
+      {settingsModalActive && (
+        <ItemSettingsModal id={id} onClose={() => setSettingsModalActive(false)} />
+      )}
     </>
   );
 }

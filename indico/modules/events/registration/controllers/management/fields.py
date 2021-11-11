@@ -122,11 +122,11 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
 
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
-        if (self.field.type == RegistrationFormItemType.field_pd and self.field.personal_data_type.is_required and
-                not field_data['is_required']):
+        if self.field.type == RegistrationFormItemType.field_pd and self.field.personal_data_type.is_required:
+            field_data['is_required'] = True
+        elif 'input_type' in field_data and self.field.input_type != field_data['input_type']:
             raise BadRequest
-        elif self.field.input_type != field_data['input_type']:
-            raise BadRequest
+        field_data['input_type'] = self.field.input_type
         _fill_form_field_with_data(self.field, field_data)
         return jsonify(view_data=self.field.view_data)
 
@@ -180,7 +180,7 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
 
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
-        del field_data['input_type']
+        field_data.pop('input_type', None)
         _fill_form_field_with_data(self.field, field_data, is_static_text=True)
         return jsonify(view_data=self.field.view_data)
 

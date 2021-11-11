@@ -7,6 +7,10 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Form} from 'semantic-ui-react';
+
+import {FinalInput, validators as v} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 
 import {mapPropsToAttributes} from './util';
 
@@ -32,3 +36,32 @@ InputTextArea.defaultProps = {
   numberOfRows: 2,
   numberOfColumns: 60,
 };
+
+export function TextAreaSettings() {
+  return (
+    <Form.Group widths="equal">
+      <FinalInput
+        name="numberOfColumns"
+        type="number"
+        label={Translate.string('Columns')}
+        placeholder={String(InputTextArea.defaultProps.numberOfColumns)}
+        step="1"
+        min="1"
+        max="60"
+        validate={v.optional(v.range(1, 60))}
+        fluid
+      />
+      <FinalInput
+        name="numberOfRows"
+        type="number"
+        label={Translate.string('Rows')}
+        placeholder={String(InputTextArea.defaultProps.numberOfRows)}
+        step="1"
+        min="1"
+        max="20"
+        validate={v.optional(v.range(1, 20))}
+        fluid
+      />
+    </Form.Group>
+  );
+}
