@@ -16,8 +16,8 @@ const attributeMap = {
 };
 
 export default function InputTextArea({htmlName, disabled, ...props}) {
-  const inputProps = mapPropsToAttributes(props, attributeMap);
-  return <textarea name={htmlName} {...inputProps} disabled={disabled} />;
+  const inputProps = mapPropsToAttributes(props, attributeMap, InputTextArea.defaultProps);
+  return <textarea name={htmlName} {...inputProps} disabled={disabled} style={{resize: 'none'}} />;
 }
 
 InputTextArea.propTypes = {
