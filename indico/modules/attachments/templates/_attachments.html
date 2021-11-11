@@ -35,7 +35,7 @@
         {% if management -%}
             <td class="actions hide-if-locked">
                 <a class="icon-edit js-dialog-action"
-                   data-href="{{ url_for('.modify_attachment', attachment) }}"
+                   data-href="{{ url_for('attachments.modify_attachment', attachment) }}"
                    data-title="
                     {%- if attachment.type.name == 'file' -%}
                         {% trans name=attachment.title %}Edit file &quot;{{ name }}&quot;{% endtrans %}
@@ -44,7 +44,7 @@
                     {% endif -%}"></a>
                 <a href="#" class="icon-remove js-delete"
                    data-method="DELETE"
-                   data-href="{{ url_for('.delete_attachment', attachment) }}"
+                   data-href="{{ url_for('attachments.delete_attachment', attachment) }}"
                    data-title="{% trans name=attachment.title %}Remove {{ name }}?{% endtrans %}"
                    data-confirm="{% trans name=attachment.title -%}
                        Are you sure you want to remove &quot;{{ name }}&quot;?<br>
@@ -78,11 +78,11 @@
         {% if management -%}
             <td class="actions hide-if-locked">
                 <a class="icon-edit js-dialog-action"
-                           data-href="{{ url_for('.edit_folder', folder) }}"
+                           data-href="{{ url_for('attachments.edit_folder', folder) }}"
                            data-title="{% trans name=folder.title %}Edit folder: {{ name }}{% endtrans %}"></a>
                 <a href="#" class="icon-remove js-delete"
                    data-method="DELETE"
-                   data-href="{{ url_for('.delete_folder', folder) }}"
+                   data-href="{{ url_for('attachments.delete_folder', folder) }}"
                    data-title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
                    data-confirm="{% trans name=folder.title -%}
                        Are you sure you want to remove &quot;{{ name }}&quot;?<br>
@@ -135,7 +135,7 @@
     {% if management %}
         <div class="i-box-footer text-right js-attachment-actions hide-if-locked">
             <a href="#" class="i-button icon-folder-plus js-dialog-action"
-               data-href="{{ url_for('.create_folder', linked_object) }}"
+               data-href="{{ url_for('attachments.create_folder', linked_object) }}"
                data-title="{% trans %}Create a new folder{% endtrans %}">{% trans %}New folder{% endtrans -%}</a>
         </div>
     {% endif %}
@@ -167,12 +167,12 @@
                 <div class="toolbar">
                     <div class="group">
                         <a href="#" class="i-button icon-file js-dialog-action"
-                           data-href="{{ url_for('.upload', linked_object) }}"
+                           data-href="{{ url_for('attachments.upload', linked_object) }}"
                            data-title="{%- trans %}Upload files{% endtrans -%}">
                             {%- trans %}Upload files{% endtrans -%}
                         </a>
                         <a href="#" class="i-button icon-link js-dialog-action"
-                           data-href="{{ url_for('.add_link', linked_object) }}"
+                           data-href="{{ url_for('attachments.add_link', linked_object) }}"
                            data-title="{%- trans %}Add link{% endtrans -%}">
                             {%- trans %}Add link{% endtrans -%}
                         </a>
@@ -192,7 +192,7 @@
                         <div>{% trans %}You can generate a ZIP file containing materials from the event.{% endtrans %}</div>
                     </div>
                     <div class="toolbar">
-                        <a href="{{ url_for('.package_management', linked_object) }}" class="i-button icon-package-download">
+                        <a href="{{ url_for('attachments.package_management', linked_object) }}" class="i-button icon-package-download">
                             {%- trans %}Material Package{% endtrans -%}
                         </a>
                     </div>
