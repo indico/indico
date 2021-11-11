@@ -7,6 +7,10 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Form} from 'semantic-ui-react';
+
+import {FinalInput, validators as v} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 
 import {mapPropsToAttributes} from './util';
 
@@ -31,3 +35,39 @@ InputText.defaultProps = {
   minLength: null,
   maxLength: null,
 };
+
+export function TextSettings() {
+  return (
+    <Form.Group widths="equal">
+      <FinalInput
+        name="length"
+        type="number"
+        label={Translate.string('Width')}
+        placeholder={String(InputText.defaultProps.length)}
+        step="1"
+        min="5"
+        max="60"
+        validate={v.optional(v.range(5, 60))}
+        fluid
+      />
+      <FinalInput
+        name="minLength"
+        type="number"
+        label={Translate.string('Min. length')}
+        step="1"
+        min="1"
+        validate={v.optional(v.min(1))}
+        fluid
+      />
+      <FinalInput
+        name="maxLength"
+        type="number"
+        label={Translate.string('Max. length')}
+        step="1"
+        min="1"
+        validate={v.optional(v.min(1))}
+        fluid
+      />
+    </Form.Group>
+  );
+}

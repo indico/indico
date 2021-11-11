@@ -27,6 +27,11 @@ export function getChangedValues(data, form) {
   );
 }
 
+export function getValuesForFields(data, form) {
+  const fields = form.getRegisteredFields().filter(x => !x.includes('['));
+  return _.fromPairs(fields.map(name => [name, data[name]]));
+}
+
 /**
  * Handle the error from an axios request, taking into account submission
  * errors that can be handled by final-form instead of showing the usual

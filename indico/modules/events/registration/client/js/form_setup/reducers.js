@@ -8,6 +8,7 @@
 import _ from 'lodash';
 
 import {
+  CREATE_ITEM,
   CREATE_SECTION,
   LOCK_UI,
   MOVE_ITEM,
@@ -37,6 +38,11 @@ export default {
     switch (action.type) {
       case SET_FORM_DATA:
         return action.items;
+      case CREATE_ITEM:
+        return {
+          ...state,
+          [action.data.id]: action.data,
+        };
       case UPDATE_ITEM:
         return {...state, [action.itemId]: action.data};
       case UPDATE_POSITIONS: {
