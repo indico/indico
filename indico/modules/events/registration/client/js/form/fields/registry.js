@@ -8,6 +8,7 @@
 import InputBoolean, {BooleanSettings} from './InputBoolean';
 import InputCountry from './InputCountry';
 import InputLabel from './InputLabel';
+import InputNumber, {NumberSettings} from './InputNumber';
 import InputPhone from './InputPhone';
 import InputSingleChoice, {
   SingleChoiceSettings,
@@ -43,6 +44,11 @@ export const fieldRegistry = {
     title: 'Text field',
     inputComponent: InputText,
     settingsComponent: TextSettings,
+  },
+  number: {
+    title: 'Number',
+    inputComponent: InputNumber,
+    settingsComponent: NumberSettings,
   },
   textarea: {
     title: 'Text area',
