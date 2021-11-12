@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import InputBoolean, {BooleanSettings} from './InputBoolean';
 import InputLabel from './InputLabel';
 import InputPhone from './InputPhone';
 import InputSingleChoice, {
@@ -46,6 +47,11 @@ export const fieldRegistry = {
     title: 'Text area',
     inputComponent: InputTextArea,
     settingsComponent: TextAreaSettings,
+  },
+  bool: {
+    title: 'Boolean',
+    inputComponent: InputBoolean,
+    settingsComponent: BooleanSettings,
   },
   phone: {
     title: 'Phone',
