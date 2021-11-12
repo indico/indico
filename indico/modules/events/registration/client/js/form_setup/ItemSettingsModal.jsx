@@ -16,21 +16,12 @@ import {FinalCheckbox, FinalInput, FinalTextArea, getValuesForFields} from 'indi
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, Param} from 'indico/react/i18n';
 
-import {TextSettings} from '../form/fields/InputText';
-import {TextAreaSettings} from '../form/fields/InputTextArea';
+import {fieldRegistry} from '../form/fields/registry';
 
 import * as actions from './actions';
 import {getItemById} from './selectors';
 
 import '../../styles/regform.module.scss';
-
-const fieldRegistry = {
-  label: {title: 'Static label', settingsComponent: null, noRequired: true},
-  text: {title: 'Text field', settingsComponent: TextSettings},
-  textarea: {title: 'Text area', settingsComponent: TextAreaSettings},
-  phone: {title: 'Phone', settingsComponent: null},
-  // TODO add other input types
-};
 
 const newItemTypeOptions = Object.entries(fieldRegistry).map(([name, {title}]) => ({
   key: name,
@@ -47,7 +38,7 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
   );
   const inputType = editing ? existingInputType : newItemType;
   const isUnsupportedField = !(inputType in fieldRegistry); // TODO remove once no longer needed
-  const meta = fieldRegistry[inputType] || {component: null};
+  const meta = fieldRegistry[inputType] || {};
   const SettingsComponent = meta.settingsComponent;
 
   const handleSubmit = async (formData, form) => {
