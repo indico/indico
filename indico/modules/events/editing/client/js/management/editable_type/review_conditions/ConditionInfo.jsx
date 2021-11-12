@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React, {useState, useContext} from 'react';
 import {Icon, Label} from 'semantic-ui-react';
 
-import {RequestConfirm, TooltipIfTruncated} from 'indico/react/components';
+import {RequestConfirmDelete, TooltipIfTruncated} from 'indico/react/components';
 import {handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
@@ -89,19 +89,13 @@ export default function ConditionInfo({fileTypes, condId, editableType, onUpdate
           disabled={disableActions}
         />
       </div>
-      <RequestConfirm
-        header={Translate.string('Delete review condition')}
-        confirmText={Translate.string('Yes')}
-        cancelText={Translate.string('No')}
+      <RequestConfirmDelete
         onClose={() => setIsDeleting(false)}
-        content={
-          <div className="content">
-            <Translate>Are you sure you want to delete this condition?</Translate>
-          </div>
-        }
         requestFunc={deleteCondition}
         open={isDeleting}
-      />
+      >
+        <Translate>Are you sure you want to delete this condition?</Translate>
+      </RequestConfirmDelete>
     </>
   );
 }
