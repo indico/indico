@@ -42,6 +42,7 @@ Improvements
   :pr:`5143`)
 - Let event managers view the final timetable even while in draft mode (:issue:`5141`,
   :pr:`5145`)
+- Add option to export role members as CSV (:issue:`5147`, :pr:`5156`)
 
 Bugfixes
 ^^^^^^^^

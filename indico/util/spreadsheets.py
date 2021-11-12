@@ -64,7 +64,7 @@ def csv_text_io_wrapper(buf):
         w.detach()
 
 
-def generate_csv(headers, rows):
+def generate_csv(headers, rows, *, include_header=True):
     """Generate a CSV file from a list of headers and rows.
 
     While CSV cells may contain multiline data, we replace linebreaks
@@ -73,12 +73,14 @@ def generate_csv(headers, rows):
 
     :param headers: a list of cell captions
     :param rows: a list of dicts mapping captions to values
+    :param include_header: whether to include a header in the data
     :return: an `io.BytesIO` containing the CSV data
     """
     buf = BytesIO()
     with csv_text_io_wrapper(buf) as csvbuf:
         writer = csv.writer(csvbuf)
-        writer.writerow(map(_prepare_header, headers))
+        if include_header:
+            writer.writerow(map(_prepare_header, headers))
         header_positions = {name: i for i, name in enumerate(headers)}
         assert all(len(row) == len(headers) for row in rows)
         for row in rows:
@@ -125,15 +127,16 @@ def generate_xlsx(headers, rows, tz=None):
     return buf
 
 
-def send_csv(filename, headers, rows):
+def send_csv(filename, headers, rows, *, include_header=True):
     """Send a CSV file to the client.
 
     :param filename: The name of the CSV file
     :param headers: a list of cell captions
     :param rows: a list of dicts mapping captions to values
+    :param include_header: whether to include a header in the data
     :return: a flask response containing the CSV data
     """
-    buf = generate_csv(headers, rows)
+    buf = generate_csv(headers, rows, include_header=include_header)
     return send_file(filename, buf, 'text/csv', inline=False)
 
 
