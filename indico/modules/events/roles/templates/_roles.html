@@ -83,6 +83,10 @@
                     <div class="empty">{% trans %}There are no members yet.{% endtrans %}</div>
                 {% endif %}
                 <div class="toolbar f-j-end">
+                    <a href="{{ url_for('.members_export_csv', role) }}"
+                       class="i-button highlight text-color icon-file-download">
+                        {% trans %}Export users to CSV file{% endtrans %}
+                    </a>
                     <button class="i-button highlight text-color icon-upload"
                             data-href="{{ url_for('.add_members_import_csv', role) }}"
                             data-update="#event-role-{{ role.id }}"
