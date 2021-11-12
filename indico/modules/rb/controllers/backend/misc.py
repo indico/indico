@@ -80,7 +80,7 @@ class RHRoomsSprite(RHRoomBookingBase):
         if 'version' not in request.view_args:
             return redirect(url_for('.sprite', version=rb_cache.get('rooms-sprite-token')))
         photo_data = rb_cache.get('rooms-sprite')
-        return send_file('rooms-sprite.jpg', BytesIO(photo_data), 'image/jpeg', no_cache=False, cache_timeout=365*86400)
+        return send_file('rooms-sprite.jpg', BytesIO(photo_data), 'image/jpeg', no_cache=False, max_age=365*86400)
 
 
 class RHStats(RHRoomBookingBase):
