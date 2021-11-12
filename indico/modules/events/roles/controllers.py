@@ -22,6 +22,7 @@ from indico.modules.logs import LogKind
 from indico.modules.users import User
 from indico.util.marshmallow import PrincipalList
 from indico.util.roles import ImportRoleMembersMixin
+from indico.util.spreadsheets import send_csv
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_role_colors
@@ -152,3 +153,11 @@ class RHEventRoleMembersImportCSV(ImportRoleMembersMixin, RHManageEventRole):
     """Add users to an event role from CSV."""
 
     logger = logger
+
+
+class RHEventRoleMembersExportCSV(RHManageEventRole):
+    """Export role members to a CSV."""
+
+    def _process(self):
+        emails = [{'Email': user.email} for user in self.role.members]
+        return send_csv('role-members.csv', ['Email'], emails, include_header=False)
