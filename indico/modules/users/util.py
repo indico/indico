@@ -469,7 +469,7 @@ def send_default_avatar(user: t.Union[User, str, None]):
         color = '#cccccc'
     avatar = render_template('users/avatar.svg', bg_color=color, text=text)
     return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
-                     no_cache=False, inline=True, safe=False, cache_timeout=(86400*7))
+                     no_cache=False, inline=True, safe=False, max_age=86400*7)
 
 
 def send_avatar(user):
@@ -479,7 +479,7 @@ def send_avatar(user):
     metadata = user.picture_metadata
     return send_file('avatar.png', BytesIO(user.picture), mimetype=metadata['content_type'],
                      inline=True, conditional=True, last_modified=parse_date(metadata['lastmod']),
-                     cache_timeout=(86400*7))
+                     max_age=86400*7)
 
 
 def get_avatar_url_from_name(first_name):
