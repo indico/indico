@@ -10,20 +10,8 @@ import React from 'react';
 
 import {Markdown, toClasses} from 'indico/react/util';
 
-import InputLabel from './fields/InputLabel';
-import InputPhone from './fields/InputPhone';
-import InputText from './fields/InputText';
-import InputTextArea from './fields/InputTextArea';
-
+import {fieldRegistry} from './fields/registry';
 import '../../styles/regform.module.scss';
-
-const fieldRegistry = {
-  label: {noLabel: true, component: InputLabel},
-  text: {component: InputText},
-  textarea: {component: InputTextArea},
-  phone: {component: InputPhone},
-  // TODO add other input types
-};
 
 export default function FormItem({
   title,
@@ -36,8 +24,8 @@ export default function FormItem({
   setupActions,
   ...rest
 }) {
-  const meta = fieldRegistry[inputType] || {noLabel: false, component: null};
-  const InputComponent = meta.component;
+  const meta = fieldRegistry[inputType] || {};
+  const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
   return (
     <div styleName={`form-item ${toClasses({disabled: !isEnabled, editable: setupMode})}`}>
