@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {Icon, Modal, Popup, Segment} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
+import {RequestConfirmDelete} from 'indico/react/components';
+import {Translate, Param} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import {getDisabledSections} from './selectors';
@@ -19,13 +20,14 @@ import '../../styles/regform.module.scss';
 
 function DisabledSection({id, title}) {
   const dispatch = useDispatch();
+  const [confirmDeleteActive, setConfirmDeleteActive] = useState(false);
 
   const handleEnableClick = () => {
     dispatch(actions.enableSection(id));
   };
 
   const handleRemoveClick = () => {
-    dispatch(actions.removeSection(id));
+    setConfirmDeleteActive(true);
   };
 
   return (
@@ -59,6 +61,19 @@ function DisabledSection({id, title}) {
           }
         />
       </div>
+      <RequestConfirmDelete
+        requestFunc={() => dispatch(actions.removeSection(id))}
+        onClose={() => setConfirmDeleteActive(false)}
+        open={confirmDeleteActive}
+        size="mini"
+        persistent
+      >
+        <Translate>
+          Are you sure you want to delete the section "
+          <Param name="field" value={title} wrapper={<strong />} />
+          "?
+        </Translate>
+      </RequestConfirmDelete>
     </Segment>
   );
 }

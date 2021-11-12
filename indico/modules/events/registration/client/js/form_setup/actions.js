@@ -149,6 +149,7 @@ export function removeSection(sectionId) {
     if (!resp.error) {
       dispatch(_removeSection(sectionId));
     }
+    return !!resp.error;
   };
 }
 
@@ -235,6 +236,7 @@ export function removeItem(itemId) {
     if (!resp.error) {
       dispatch(_removeItem(itemId));
     }
+    return !!resp.error;
   };
 }
 

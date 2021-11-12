@@ -9,19 +9,22 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
 
-import {Translate} from 'indico/react/i18n';
+import {RequestConfirmDelete} from 'indico/react/components';
+import {Translate, Param} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import ItemSettingsModal from './ItemSettingsModal';
 
 export default function FormItemSetupActions({
   id,
+  title,
   fieldIsRequired,
   fieldIsPersonalData,
   isEnabled,
 }) {
   const dispatch = useDispatch();
   const [settingsModalActive, setSettingsModalActive] = useState(false);
+  const [confirmDeleteActive, setConfirmDeleteActive] = useState(false);
 
   const handleEnableClick = () => {
     dispatch(actions.enableItem(id));
@@ -32,7 +35,7 @@ export default function FormItemSetupActions({
   };
 
   const handleRemoveClick = () => {
-    dispatch(actions.removeItem(id));
+    setConfirmDeleteActive(true);
   };
 
   const handleConfigureClick = () => {
@@ -70,12 +73,25 @@ export default function FormItemSetupActions({
       {settingsModalActive && (
         <ItemSettingsModal id={id} onClose={() => setSettingsModalActive(false)} />
       )}
+      <RequestConfirmDelete
+        requestFunc={() => dispatch(actions.removeItem(id))}
+        onClose={() => setConfirmDeleteActive(false)}
+        open={confirmDeleteActive}
+        persistent
+      >
+        <Translate>
+          Are you sure you want to delete the field "
+          <Param name="field" value={title} wrapper={<strong />} />
+          "?
+        </Translate>
+      </RequestConfirmDelete>
     </>
   );
 }
 
 FormItemSetupActions.propTypes = {
   id: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
   fieldIsRequired: PropTypes.bool.isRequired,
   fieldIsPersonalData: PropTypes.bool.isRequired,
   isEnabled: PropTypes.bool.isRequired,
