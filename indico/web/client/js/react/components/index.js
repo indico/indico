@@ -33,7 +33,7 @@ export {default as MathJax} from './MathJax';
 export {default as FileSubmission} from './files/FileSubmission';
 export {default as FinalSingleFileManager} from './files/SingleFileManager';
 export {default as ClipboardButton} from './ClipboardButton';
-export {default as RequestConfirm} from './RequestConfirm';
+export {default as RequestConfirm, RequestConfirmDelete} from './RequestConfirm';
 export {default as ReviewRating} from './ReviewRating';
 export {default as ManagementPageBackButton} from './ManagementPageBackButton';
 export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';

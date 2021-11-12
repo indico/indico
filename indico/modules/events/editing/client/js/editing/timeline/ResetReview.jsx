@@ -63,17 +63,14 @@ export default function ResetReview({revisionId}) {
       />
       <RequestConfirm
         header={Translate.string('Reset review')}
-        confirmText={Translate.string('Yes')}
-        cancelText={Translate.string('No')}
+        confirmText={Translate.string('Reset')}
         onClose={() => setIsOpen(false)}
-        content={
-          <div className="content">
-            <Translate>Are you sure you want to reset the review?</Translate>
-          </div>
-        }
         requestFunc={resetRevisions}
         open={isOpen}
-      />
+        negative
+      >
+        <Translate>Are you sure you want to reset the review?</Translate>
+      </RequestConfirm>
     </>
   );
 }

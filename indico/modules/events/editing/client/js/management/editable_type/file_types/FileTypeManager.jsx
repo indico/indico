@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import React, {useReducer} from 'react';
 import {Button, Icon, Loader, Message, Segment, Popup, Label} from 'semantic-ui-react';
 
-import {RequestConfirm, TooltipIfTruncated} from 'indico/react/components';
+import {RequestConfirmDelete, TooltipIfTruncated} from 'indico/react/components';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
@@ -212,24 +212,18 @@ export default function FileTypeManager({eventId, editableType}) {
           onClose={() => dispatch({type: 'CLEAR'})}
         />
       )}
-      <RequestConfirm
-        header={Translate.string('Delete file type')}
-        confirmText={Translate.string('Yes')}
-        cancelText={Translate.string('No')}
+      <RequestConfirmDelete
         onClose={() => dispatch({type: 'CLEAR'})}
-        content={
-          currentFileType ? (
-            <div className="content">
-              <Translate>
-                Are you sure you want to delete the file type{' '}
-                <Param name="fileType" value={currentFileType.name} wrapper={<strong />} />?
-              </Translate>
-            </div>
-          ) : null
-        }
         requestFunc={() => deleteFileType(currentFileType.id)}
         open={operation === 'delete'}
-      />
+      >
+        {currentFileType && (
+          <Translate>
+            Are you sure you want to delete the file type{' '}
+            <Param name="fileType" value={currentFileType.name} wrapper={<strong />} />?
+          </Translate>
+        )}
+      </RequestConfirmDelete>
     </div>
   );
 }

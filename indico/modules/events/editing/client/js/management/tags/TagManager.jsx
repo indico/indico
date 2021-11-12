@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import React, {useReducer} from 'react';
 import {Button, Icon, Label, Loader, Message, Segment, Popup} from 'semantic-ui-react';
 
-import {RequestConfirm} from 'indico/react/components';
+import {RequestConfirmDelete} from 'indico/react/components';
 import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
@@ -163,24 +163,18 @@ export default function TagManager({eventId}) {
           onClose={() => dispatch({type: 'CLEAR'})}
         />
       )}
-      <RequestConfirm
-        header={Translate.string('Delete tag')}
-        confirmText={Translate.string('Yes')}
-        cancelText={Translate.string('No')}
+      <RequestConfirmDelete
         onClose={() => dispatch({type: 'CLEAR'})}
-        content={
-          currentTag ? (
-            <div className="content">
-              <Translate>
-                Are you sure you want to delete the tag{' '}
-                <Param name="tag" value={currentTag.verboseTitle} wrapper={<strong />} />?
-              </Translate>
-            </div>
-          ) : null
-        }
         requestFunc={() => deleteTag(currentTag.id)}
         open={operation === 'delete'}
-      />
+      >
+        {currentTag && (
+          <Translate>
+            Are you sure you want to delete the tag{' '}
+            <Param name="tag" value={currentTag.verboseTitle} wrapper={<strong />} />?
+          </Translate>
+        )}
+      </RequestConfirmDelete>
     </div>
   );
 }
