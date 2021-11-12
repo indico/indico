@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import InputBoolean, {BooleanSettings} from './InputBoolean';
+import InputCountry from './InputCountry';
 import InputLabel from './InputLabel';
 import InputPhone from './InputPhone';
 import InputSingleChoice, {
@@ -56,6 +57,10 @@ export const fieldRegistry = {
   phone: {
     title: 'Phone',
     inputComponent: InputPhone,
+  },
+  country: {
+    title: 'Country',
+    inputComponent: InputCountry,
   },
   single_choice: {
     title: 'Single Choice',
