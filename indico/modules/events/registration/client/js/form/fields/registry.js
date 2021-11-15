@@ -8,6 +8,7 @@
 import {Translate} from 'indico/react/i18n';
 
 import InputBoolean, {BooleanSettings} from './InputBoolean';
+import InputCheckbox from './InputCheckbox';
 import InputCountry from './InputCountry';
 import InputLabel from './InputLabel';
 import InputNumber, {NumberSettings} from './InputNumber';
@@ -56,6 +57,11 @@ export const fieldRegistry = {
     title: Translate.string('Text area'),
     inputComponent: InputTextArea,
     settingsComponent: TextAreaSettings,
+  },
+  checkbox: {
+    title: Translate.string('Checkbox'),
+    inputComponent: InputCheckbox,
+    noLabel: true,
   },
   bool: {
     title: Translate.string('Yes/No'),

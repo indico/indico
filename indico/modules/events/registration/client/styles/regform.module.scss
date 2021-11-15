@@ -96,6 +96,12 @@
       list-style-type: none;
     }
   }
+
+  .checkbox-input-label {
+    input[type='checkbox'] {
+      margin-right: 0.5em;
+    }
+  }
 }
 
 // TODO: clean up the old CSS; we may no longer need this afterwards.
