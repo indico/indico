@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {Translate} from 'indico/react/i18n';
+
 import InputBoolean, {BooleanSettings} from './InputBoolean';
 import InputCountry from './InputCountry';
 import InputLabel from './InputLabel';
@@ -35,41 +37,41 @@ Available keys:
 
 export const fieldRegistry = {
   label: {
-    title: 'Static label',
+    title: Translate.string('Static label'),
     inputComponent: InputLabel,
     noRequired: true,
     noLabel: true,
   },
   text: {
-    title: 'Text field',
+    title: Translate.string('Text'),
     inputComponent: InputText,
     settingsComponent: TextSettings,
   },
   number: {
-    title: 'Number',
+    title: Translate.string('Number'),
     inputComponent: InputNumber,
     settingsComponent: NumberSettings,
   },
   textarea: {
-    title: 'Text area',
+    title: Translate.string('Text area'),
     inputComponent: InputTextArea,
     settingsComponent: TextAreaSettings,
   },
   bool: {
-    title: 'Boolean',
+    title: Translate.string('Yes/No'),
     inputComponent: InputBoolean,
     settingsComponent: BooleanSettings,
   },
   phone: {
-    title: 'Phone',
+    title: Translate.string('Phone'),
     inputComponent: InputPhone,
   },
   country: {
-    title: 'Country',
+    title: Translate.string('Country'),
     inputComponent: InputCountry,
   },
   single_choice: {
-    title: 'Single Choice',
+    title: Translate.string('Single Choice'),
     inputComponent: InputSingleChoice,
     settingsComponent: SingleChoiceSettings,
     settingsModalSize: 'small',
