@@ -12,7 +12,7 @@ import InputCheckbox from './InputCheckbox';
 import InputCountry from './InputCountry';
 import InputEmail from './InputEmail';
 import InputLabel from './InputLabel';
-import InputNumber, {NumberSettings} from './InputNumber';
+import InputNumber, {NumberSettings, numberSettingsFormValidator} from './InputNumber';
 import InputPhone from './InputPhone';
 import InputSingleChoice, {
   SingleChoiceSettings,
@@ -31,6 +31,7 @@ Available keys:
   from a larger modal size than "tiny"
 - settingsFormDecorator: optional; a final-form decorator to apply to the
   settings form
+- settingsFormValidator: optional, a function for final-form's form-level validation
 - settingsFormInitialData: optional; initial data to use when creating a new
   field in case some of the settings need to be initialized
 - noLabel: optional; render the field without a label on the left
@@ -53,6 +54,7 @@ export const fieldRegistry = {
     title: Translate.string('Number'),
     inputComponent: InputNumber,
     settingsComponent: NumberSettings,
+    settingsFormValidator: numberSettingsFormValidator,
   },
   textarea: {
     title: Translate.string('Text area'),

@@ -10,6 +10,7 @@ from datetime import datetime
 from operator import itemgetter
 
 import wtforms
+from marshmallow import ValidationError as MMValidationError
 from marshmallow import fields, validate, validates_schema
 from werkzeug.datastructures import FileStorage
 from wtforms.validators import InputRequired, NumberRange, ValidationError
@@ -43,7 +44,7 @@ class NumberFieldDataSchema(BillableFieldDataSchema):
     @validates_schema(skip_on_field_errors=True)
     def validate_min_max(self, data, **kwargs):
         if data['min_value'] and data['max_value'] and data['min_value'] > data['max_value']:
-            raise ValidationError('Maximum value must be less than minimum value')
+            raise MMValidationError('Maximum value must be less than minimum value', 'max_value')
 
 
 class NumberField(RegistrationFormBillableField):
