@@ -93,6 +93,7 @@ export function FinalModalForm({
   submitLabel,
   className,
   decorators,
+  validate,
 }) {
   const confirmingOnClose = dirty => () => {
     if (
@@ -111,6 +112,7 @@ export function FinalModalForm({
       initialValues={initialValues}
       initialValuesEqual={initialValuesEqual}
       decorators={decorators}
+      validate={validate}
     >
       {fprops => (
         <Modal
@@ -176,6 +178,8 @@ FinalModalForm.propTypes = {
   initialValuesEqual: PropTypes.func,
   /** Decorators to apply to the final-form, e.g. to use final-form-calculate. */
   decorators: PropTypes.array,
+  /** Form-level validator to apply to the final-form. */
+  validate: PropTypes.func,
   /** The size of the modal. */
   size: PropTypes.oneOf(['mini', 'tiny', 'small', 'large', 'fullscreen']),
   /** The header of the modal (typically a title). */
@@ -216,6 +220,7 @@ FinalModalForm.defaultProps = {
   initialValues: null,
   initialValuesEqual: undefined,
   decorators: undefined,
+  validate: undefined,
   size: 'tiny', // default to something reasonably small - let people explicitly go larger!
   disabledUntilChange: true,
   unloadPrompt: false,
