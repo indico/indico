@@ -10,6 +10,7 @@ import {Translate} from 'indico/react/i18n';
 import InputBoolean, {BooleanSettings} from './InputBoolean';
 import InputCheckbox from './InputCheckbox';
 import InputCountry from './InputCountry';
+import InputEmail from './InputEmail';
 import InputLabel from './InputLabel';
 import InputNumber, {NumberSettings} from './InputNumber';
 import InputPhone from './InputPhone';
@@ -75,6 +76,10 @@ export const fieldRegistry = {
   country: {
     title: Translate.string('Country'),
     inputComponent: InputCountry,
+  },
+  email: {
+    title: Translate.string('Email'),
+    inputComponent: InputEmail,
   },
   single_choice: {
     title: Translate.string('Single Choice'),
