@@ -743,3 +743,7 @@ form.horizontal .clone-event-dialog-footer .form-field {
 .import-event-dates {
   color: $dark-blue;
 }
+
+.list.registrations .i-dropdown .icon-id-badge::before {
+  padding-left: 4px;
+}

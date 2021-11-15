@@ -8,18 +8,34 @@
 from flask import flash, redirect, request, session
 from webargs import fields
 
+from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
 from indico.modules.events.registration.controllers.management.reglists import RHRegistrationsActionBase
 from indico.modules.events.registration.forms import RegistrationTagForm, RegistrationTagsAssignForm
 from indico.modules.events.registration.models.tags import RegistrationTag
+from indico.modules.events.registration.util import ActionMenuEntry
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_form
+
+
+@signals.event.registrant_list_action_menu.connect
+def _get_action_menu_items(reg_form, **kwargs):
+    yield ActionMenuEntry(
+        'ajax-dialog',
+        'tag',
+        _('Edit Tags'),
+        _('Edit Tags'),
+        url=url_for('.manage_registration_tags_assign', reg_form),
+        weight=50,
+        requires_selected=bool(reg_form.event.registration_tags),
+        reload_page=True
+    )
 
 
 class RHManageRegistrationTagBase(RHManageRegFormsBase):

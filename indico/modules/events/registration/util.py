@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import csv
+import dataclasses
 import itertools
 from operator import attrgetter
 
@@ -51,6 +52,23 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
+
+
+@dataclasses.dataclass
+class ActionMenuEntry:
+    type: str
+    icon_name: str
+    text: str
+    tooltip_text: str
+    # _: dataclasses.KW_ONLY  # TODO uncomment once we require python3.10+; until then consider everything below kw-only
+    weight: int = 0
+    params: dict = dataclasses.field(default_factory=dict)
+    url: str = ''
+    callback: str = ''
+    requires_selected: bool = True
+    reload_page: bool = False
+    hide_if_locked: bool = False
+    extra_classes: str = ''
 
 
 def import_user_records_from_csv(fileobj, columns):

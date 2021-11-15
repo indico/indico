@@ -111,6 +111,9 @@ import {$T} from '../../utils/i18n';
       'button[data-content][data-ajax-dialog]',
       'input:button[data-content][data-ajax-dialog]',
       'a[data-content][data-ajax-dialog]',
+      'button[data-callback]',
+      'input:button[data-callback]',
+      'a[data-callback]'
     ];
     $('body').on('click', selectors.join(', '), function(e) {
       e.preventDefault();
@@ -119,6 +122,7 @@ import {$T} from '../../utils/i18n';
         return;
       }
       var url = $this.data('href');
+      var callback = $this.data('callback');
       var method = ($this.data('method') || 'GET').toUpperCase();
       var params = $this.data('params') || {};
       var paramsSelector = $this.data('params-selector');
@@ -223,6 +227,11 @@ import {$T} from '../../utils/i18n';
               }
             },
           });
+          return;
+        }
+
+        if (callback) {
+          window[callback](params);
           return;
         }
 

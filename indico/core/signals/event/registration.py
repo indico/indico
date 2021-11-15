@@ -127,3 +127,9 @@ Called after a permanent UUID is assigned to an accompanying person. The sender 
 ``AccompanyingPersonSchema`` object. The temporary ID is passed in the ``temporary_id``
 kwarg and the permanent UUID is passed in the ``permanent_id`` kwarg.
 ''')
+
+registrant_list_action_menu = _signals.signal('registrant-list-action-menu', '''
+Called when composing the list of menu items to be displayed under the "Actions" button
+at the top of the list of registrants/participants. The `sender` is the corresponding
+registration form.
+''')
