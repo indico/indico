@@ -10,11 +10,12 @@ from datetime import datetime
 from operator import itemgetter
 
 import wtforms
-from marshmallow import fields, validate
+from marshmallow import fields, validate, validates_schema
 from werkzeug.datastructures import FileStorage
 from wtforms.validators import InputRequired, NumberRange, ValidationError
 
-from indico.modules.events.registration.fields.base import (LimitedPlacesBillableFieldDataSchema,
+from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
+                                                            LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField, RegistrationFormFieldBase)
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
@@ -35,18 +36,26 @@ class TextField(RegistrationFormFieldBase):
     }
 
 
+class NumberFieldDataSchema(BillableFieldDataSchema):
+    min_value = fields.Integer(load_default=0, validate=validate.Range(0), allow_none=True)
+    max_value = fields.Integer(validate=validate.Range(0), allow_none=True)
+
+    @validates_schema(skip_on_field_errors=True)
+    def validate_min_max(self, data, **kwargs):
+        if data['min_value'] and data['max_value'] and data['min_value'] > data['max_value']:
+            raise ValidationError('Maximum value must be less than minimum value')
+
+
 class NumberField(RegistrationFormBillableField):
     name = 'number'
     wtf_field_class = wtforms.IntegerField
     required_validator = InputRequired
-    setup_schema_fields = {
-        'min_value': fields.Integer(load_default=0, validate=validate.Range(0)),
-    }
+    setup_schema_base_cls = NumberFieldDataSchema
 
     @property
     def validators(self):
-        min_value = self.form_item.data.get('min_value', None)
-        return [NumberRange(min=min_value)] if min_value else None
+        return [NumberRange(min=self.form_item.data.get('min_value', None) or 0,
+                            max=self.form_item.data.get('max_value', None))]
 
     def calculate_price(self, reg_data, versioned_data):
         if not versioned_data.get('is_billable'):
