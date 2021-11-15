@@ -19,6 +19,7 @@ import toggleSectionURL from 'indico-url:event_registration.toggle_section';
 import toggleTextURL from 'indico-url:event_registration.toggle_text';
 
 import {indicoAxios} from 'indico/utils/axios';
+import {camelizeKeys} from 'indico/utils/case';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 
 import {getSectionIdForItem, getURLParams, pickItemURL} from './selectors';
@@ -163,7 +164,7 @@ export function updateSection(sectionId, data) {
       delete resp.data.items;
       dispatch(_updateSection(sectionId, resp.data));
     }
-    return resp;
+    return camelizeKeys(resp);
   };
 }
 
@@ -176,7 +177,7 @@ export function createSection(data) {
       delete resp.data.items;
       dispatch(_createSection(resp.data));
     }
-    return resp;
+    return camelizeKeys(resp);
   };
 }
 
@@ -251,7 +252,7 @@ export function updateItem(itemId, data) {
     if (!resp.error) {
       dispatch(_updateItem(itemId, resp.data.view_data));
     }
-    return resp;
+    return camelizeKeys(resp);
   };
 }
 
@@ -265,6 +266,6 @@ export function createItem(sectionId, inputType, data) {
     if (!resp.error) {
       dispatch(_createItem(resp.data.view_data));
     }
-    return resp;
+    return camelizeKeys(resp);
   };
 }
