@@ -11,6 +11,7 @@ import traceback
 import sentry_sdk
 from flask import current_app, g, jsonify, request, session
 from itsdangerous import BadData
+from marshmallow import ValidationError
 from sqlalchemy.exc import DatabaseError
 from werkzeug.exceptions import BadRequestKeyError, Forbidden, HTTPException, UnprocessableEntity
 
@@ -41,6 +42,17 @@ def handle_expectederror(exc):
     response = jsonify(exc.data)
     response.status_code = 418
     return response
+
+
+@errors_bp.app_errorhandler(ValidationError)
+def handle_validationerror(exc):
+    # marshmallow validation failed outside webargs
+    if request.is_xhr or request.is_json:
+        # this error came from a webargs parsing failure
+        response = jsonify(webargs_errors=exc.messages)
+        response.status_code = 422
+        return response
+    return render_error(exc, exc.name, get_error_description(exc), 422)
 
 
 @errors_bp.app_errorhandler(UnprocessableEntity)
