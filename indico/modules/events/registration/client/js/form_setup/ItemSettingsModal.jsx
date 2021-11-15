@@ -66,6 +66,7 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
       unloadPrompt
       size={meta.settingsModalSize || 'tiny'}
       decorators={meta.settingsFormDecorator ? [meta.settingsFormDecorator] : undefined}
+      validate={meta.settingsFormValidator}
       header={
         editing ? (
           <Translate>

@@ -7,7 +7,6 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Field} from 'react-final-form';
 import {Form} from 'semantic-ui-react';
 
 import {FinalInput, validators as v} from 'indico/react/forms';
@@ -38,34 +37,37 @@ InputNumber.defaultProps = {
 export function NumberSettings() {
   return (
     <Form.Group widths="equal">
-      <Field name="maxValue" subscription={{value: true}}>
-        {({input: {value: maxValue}}) => (
-          <FinalInput
-            name="minValue"
-            type="number"
-            label={Translate.string('Minimum')}
-            placeholder={String(InputNumber.defaultProps.minValue)}
-            step="1"
-            min="0"
-            validate={v.optional(v.range(0, maxValue || parseFloat('Infinity')))}
-            fluid
-          />
-        )}
-      </Field>
-      <Field name="minValue" subscription={{value: true}}>
-        {({input: {value: minValue}}) => (
-          <FinalInput
-            name="maxValue"
-            type="number"
-            label={Translate.string('Maximum')}
-            placeholder={Translate.string('No maximum')}
-            step="1"
-            min="0"
-            validate={v.optional(v.min(minValue || 0))}
-            fluid
-          />
-        )}
-      </Field>
+      <FinalInput
+        name="minValue"
+        type="number"
+        label={Translate.string('Minimum')}
+        placeholder={String(InputNumber.defaultProps.minValue)}
+        step="1"
+        min="0"
+        validate={v.optional(v.min(0))}
+        format={val => val || ''}
+        fluid
+      />
+      <FinalInput
+        name="maxValue"
+        type="number"
+        label={Translate.string('Maximum')}
+        placeholder={Translate.string('No maximum')}
+        step="1"
+        min="1"
+        validate={v.optional(v.min(1))}
+        fluid
+      />
     </Form.Group>
   );
+}
+
+export function numberSettingsFormValidator({minValue, maxValue}) {
+  if (minValue && maxValue && minValue > maxValue) {
+    const msg = Translate.string('The minimum value cannot be greater than the maximum value.');
+    return {
+      minValue: msg,
+      maxValue: msg,
+    };
+  }
 }
