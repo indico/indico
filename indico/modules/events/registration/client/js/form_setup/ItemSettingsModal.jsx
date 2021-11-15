@@ -55,13 +55,17 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
 
   return (
     <FinalModalForm
+      // force re-render since we may need to change form decorators and initial values
+      key={editing ? 'edit' : `new-${newItemType}`}
       id="regform-item-settings"
       onSubmit={handleSubmit}
       onClose={onClose}
-      initialValues={editing ? itemData : null}
+      initialValues={editing ? itemData : meta.settingsFormInitialData}
       initialValuesEqual={_.isEqual}
       alignTop
       unloadPrompt
+      size={meta.settingsModalSize || 'tiny'}
+      decorators={meta.settingsFormDecorator ? [meta.settingsFormDecorator] : undefined}
       header={
         editing ? (
           <Translate>
@@ -72,9 +76,9 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
             <Translate>Add new field</Translate>
             <div style={{float: 'right'}}>
               <FormSpy subscription={{dirty: true}}>
-                {({dirty, form}) => (
+                {({dirty}) => (
                   <Dropdown
-                    defaultOpen={!editing}
+                    defaultOpen={!editing && !newItemType}
                     selectOnNavigation={false}
                     selectOnBlur={false}
                     value={newItemType}
@@ -87,8 +91,9 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
                       ) {
                         return;
                       }
+                      // this will force the FinalModalForm to re-render, so we do not need to
+                      // explicitly `restart()` the form
                       setNewItemType(value);
-                      form.restart();
                     }}
                     text={
                       newItemType

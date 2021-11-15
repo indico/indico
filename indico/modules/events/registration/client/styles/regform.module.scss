@@ -87,6 +87,15 @@
       visibility: visible;
     }
   }
+
+  ul.radio-group {
+    margin: 0;
+    padding-left: 0;
+
+    li {
+      list-style-type: none;
+    }
+  }
 }
 
 // TODO: clean up the old CSS; we may no longer need this afterwards.

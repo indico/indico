@@ -7,6 +7,11 @@
 
 import InputLabel from './InputLabel';
 import InputPhone from './InputPhone';
+import InputSingleChoice, {
+  SingleChoiceSettings,
+  singleChoiceSettingsFormDecorator,
+  singleChoiceSettingsInitialData,
+} from './InputSingleChoice';
 import InputText, {TextSettings} from './InputText';
 import InputTextArea, {TextAreaSettings} from './InputTextArea';
 
@@ -15,6 +20,12 @@ Available keys:
 - title: required; used to show the field type when adding a new field
 - inputComponent: required; the component used to render the field
 - settingsComponent: optional; used if the field has custom settings
+- settingsModalSize: optional; used if the field has settings which benefit
+  from a larger modal size than "tiny"
+- settingsFormDecorator: optional; a final-form decorator to apply to the
+  settings form
+- settingsFormInitialData: optional; initial data to use when creating a new
+  field in case some of the settings need to be initialized
 - noLabel: optional; render the field without a label on the left
 - noRequired: optional; hide the option to make the field required
 */
@@ -39,6 +50,14 @@ export const fieldRegistry = {
   phone: {
     title: 'Phone',
     inputComponent: InputPhone,
+  },
+  single_choice: {
+    title: 'Single Choice',
+    inputComponent: InputSingleChoice,
+    settingsComponent: SingleChoiceSettings,
+    settingsModalSize: 'small',
+    settingsFormDecorator: singleChoiceSettingsFormDecorator,
+    settingsFormInitialData: singleChoiceSettingsInitialData,
   },
   // TODO add other input types
 };

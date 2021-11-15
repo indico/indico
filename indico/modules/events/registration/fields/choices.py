@@ -11,11 +11,13 @@ from copy import deepcopy
 from datetime import date, datetime
 from uuid import uuid4
 
-from marshmallow import fields, post_load, pre_load, validate
+from marshmallow import ValidationError as MMValidationError
+from marshmallow import fields, post_load, pre_load, validate, validates_schema
 from sqlalchemy.dialects.postgresql import ARRAY
 from wtforms.validators import ValidationError
 
 from indico.core.db import db
+from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
@@ -77,18 +79,40 @@ class ChoiceItemSchema(LimitedPlacesBillableFieldDataSchema):
         return data
 
 
+class ChoiceSetupSchema(mm.Schema):
+    default_item = fields.String(load_default=None)
+    with_extra_slots = fields.Bool(load_default=False)
+    # TODO when moving the frontend to react, make sure it's always sent and make it required.
+    # the legacy angular UI sometimes omits this...
+    item_type = fields.String(load_default='dropdown', validate=validate.OneOf(['dropdown', 'radiogroup']))
+    choices = fields.List(fields.Nested(ChoiceItemSchema), required=True, validate=not_empty)
+
+    @pre_load
+    def _generate_new_uuids(self, data, **kwrags):
+        data = data.copy()
+        if 'choices' in data:
+            # generate uuids for the random client-side IDs
+            data['choices'] = data['choices'].copy()
+            for c in data['choices']:
+                orig_id = c.get('id', '')
+                if orig_id.startswith('new:'):
+                    c['id'] = str(uuid4())
+                    if data.get('default_item') == orig_id:
+                        data['default_item'] = c['id']
+        return data
+
+    @validates_schema(skip_on_field_errors=True)
+    def _validate_default_item(self, data, **kwargs):
+        ids = {c['id'] for c in data['choices']}
+        if data['default_item'] and data['default_item'] not in ids:
+            raise MMValidationError('Invalid default item', 'default_item')
+
+
 class ChoiceBaseField(RegistrationFormBillableItemsField):
     versioned_data_fields = RegistrationFormBillableItemsField.versioned_data_fields | {'choices'}
     has_default_item = False
     wtf_field_class = JSONField
-    setup_schema_fields = {
-        'default_item': fields.String(load_default=None),
-        'with_extra_slots': fields.Bool(load_default=False),
-        # TODO when moving the frontend to react, make sure it's always sent and make it required.
-        # the legacy angular UI sometimes omits this...
-        'item_type': fields.String(load_default='dropdown', validate=validate.OneOf(['dropdown', 'radiogroup'])),
-        'choices': fields.List(fields.Nested(ChoiceItemSchema), required=True, validate=not_empty)
-    }
+    setup_schema_base_cls = ChoiceSetupSchema
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
@@ -145,6 +169,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
             item['price'] = float(item['price']) if item.get('price') else 0
             item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
             item['max_extra_slots'] = int(item['max_extra_slots']) if item.get('max_extra_slots') else 0
+            # TODO remove caption check - new code always sends an ID
             if cls.has_default_item and unversioned_data['default_item'] in {item['caption'], item['id']}:
                 unversioned_data['default_item'] = item['id']
             captions[item['id']] = item.pop('caption')
