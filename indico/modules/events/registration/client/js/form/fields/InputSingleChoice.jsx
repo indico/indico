@@ -163,8 +163,6 @@ export function SingleChoiceSettings() {
           {key: 'dropdown', value: 'dropdown', text: Translate.string('Drop-down list')},
           {key: 'radiogroup', value: 'radiogroup', text: Translate.string('Radio buttons')},
         ]}
-        selectOnNavigation={false}
-        selectOnBlur={false}
         selection
         required
       />
@@ -178,8 +176,6 @@ export function SingleChoiceSettings() {
               .map(c => ({key: c.id, value: c.id, text: c.caption}))}
             disabled={!choices.some(c => c.isEnabled)}
             parse={p.nullIfEmpty}
-            selectOnNavigation={false}
-            selectOnBlur={false}
             selection
           />
         )}

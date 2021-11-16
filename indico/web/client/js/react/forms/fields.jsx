@@ -204,6 +204,7 @@ function DropdownAdapter(props) {
       multiple={isMultiple}
       undefinedValue={isMultiple ? [] : null}
       selectOnBlur={false}
+      selectOnNavigation={false}
       fieldProps={fieldProps}
       getValue={(__, {value}) => value}
     />
