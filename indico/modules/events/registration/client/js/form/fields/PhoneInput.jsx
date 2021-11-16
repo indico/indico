@@ -8,15 +8,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-export default function InputPhone({htmlName, disabled}) {
+export default function PhoneInput({htmlName, disabled}) {
   return <input type="tel" name={htmlName} disabled={disabled} />;
 }
 
-InputPhone.propTypes = {
+PhoneInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
 };
 
-InputPhone.defaultProps = {
+PhoneInput.defaultProps = {
   disabled: false,
 };

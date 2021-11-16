@@ -10,7 +10,7 @@ import React from 'react';
 
 import {Translate} from 'indico/react/i18n';
 
-export default function InputCountry({htmlName, disabled, choices}) {
+export default function CountryInput({htmlName, disabled, choices}) {
   return (
     <select name={htmlName} disabled={disabled}>
       <option key="" value="">
@@ -25,12 +25,12 @@ export default function InputCountry({htmlName, disabled, choices}) {
   );
 }
 
-InputCountry.propTypes = {
+CountryInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
 };
 
-InputCountry.defaultProps = {
+CountryInput.defaultProps = {
   disabled: false,
 };

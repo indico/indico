@@ -16,12 +16,12 @@ import {mapPropsToAttributes} from './util';
 
 const attributeMap = {length: 'size', minLength: 'minLength', maxLength: 'maxLength'};
 
-export default function InputText({htmlName, disabled, ...props}) {
-  const inputProps = mapPropsToAttributes(props, attributeMap, InputText.defaultProps);
+export default function TextInput({htmlName, disabled, ...props}) {
+  const inputProps = mapPropsToAttributes(props, attributeMap, TextInput.defaultProps);
   return <input type="text" name={htmlName} {...inputProps} disabled={disabled} />;
 }
 
-InputText.propTypes = {
+TextInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   length: PropTypes.number,
@@ -29,7 +29,7 @@ InputText.propTypes = {
   maxLength: PropTypes.number,
 };
 
-InputText.defaultProps = {
+TextInput.defaultProps = {
   disabled: false,
   length: 60,
   minLength: null,
@@ -43,7 +43,7 @@ export function TextSettings() {
         name="length"
         type="number"
         label={Translate.string('Width')}
-        placeholder={String(InputText.defaultProps.length)}
+        placeholder={String(TextInput.defaultProps.length)}
         step="1"
         min="5"
         max="60"
