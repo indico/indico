@@ -80,11 +80,7 @@ class ChoiceItemSchema(LimitedPlacesBillableFieldDataSchema):
 
 
 class ChoiceSetupSchema(mm.Schema):
-    default_item = fields.String(load_default=None)
     with_extra_slots = fields.Bool(load_default=False)
-    # TODO when moving the frontend to react, make sure it's always sent and make it required.
-    # the legacy angular UI sometimes omits this...
-    item_type = fields.String(load_default='dropdown', validate=validate.OneOf(['dropdown', 'radiogroup']))
     choices = fields.List(fields.Nested(ChoiceItemSchema), required=True, validate=not_empty)
 
     @pre_load
@@ -101,6 +97,13 @@ class ChoiceSetupSchema(mm.Schema):
                         data['default_item'] = c['id']
         return data
 
+
+class SingleChoiceSetupSchema(ChoiceSetupSchema):
+    default_item = fields.String(load_default=None)
+    # TODO when moving the frontend to react, make sure it's always sent and make it required.
+    # the legacy angular UI sometimes omits this...
+    item_type = fields.String(load_default='dropdown', validate=validate.OneOf(['dropdown', 'radiogroup']))
+
     @validates_schema(skip_on_field_errors=True)
     def _validate_default_item(self, data, **kwargs):
         ids = {c['id'] for c in data['choices']}
@@ -112,7 +115,6 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     versioned_data_fields = RegistrationFormBillableItemsField.versioned_data_fields | {'choices'}
     has_default_item = False
     wtf_field_class = JSONField
-    setup_schema_base_cls = ChoiceSetupSchema
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
@@ -208,6 +210,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
 class SingleChoiceField(ChoiceBaseField):
     name = 'single_choice'
     has_default_item = True
+    setup_schema_base_cls = SingleChoiceSetupSchema
 
     @property
     def default_value(self):
@@ -243,6 +246,7 @@ def _hashable_choice(choice):
 
 class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
+    setup_schema_base_cls = ChoiceSetupSchema
 
     @property
     def default_value(self):
