@@ -12,6 +12,10 @@ import CheckboxInput from './CheckboxInput';
 import CountryInput from './CountryInput';
 import EmailInput from './EmailInput';
 import LabelInput from './LabelInput';
+import MultiChoiceInput, {
+  MultiChoiceSettings,
+  multiChoiceSettingsInitialData,
+} from './MultiChoiceInput';
 import NumberInput, {NumberSettings, numberSettingsFormValidator} from './NumberInput';
 import PhoneInput from './PhoneInput';
 import SingleChoiceInput, {
@@ -90,6 +94,13 @@ export const fieldRegistry = {
     settingsModalSize: 'small',
     settingsFormDecorator: singleChoiceSettingsFormDecorator,
     settingsFormInitialData: singleChoiceSettingsInitialData,
+  },
+  multi_choice: {
+    title: Translate.string('Multiple Choice'),
+    inputComponent: MultiChoiceInput,
+    settingsComponent: MultiChoiceSettings,
+    settingsModalSize: 'small',
+    settingsFormInitialData: multiChoiceSettingsInitialData,
   },
   // TODO add other input types
 };
