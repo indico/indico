@@ -16,6 +16,7 @@ import BooleanInput, {BooleanSettings} from './BooleanInput';
 import CheckboxInput from './CheckboxInput';
 import CountryInput from './CountryInput';
 import EmailInput from './EmailInput';
+import FileInput from './FileInput';
 import LabelInput from './LabelInput';
 import MultiChoiceInput, {
   MultiChoiceSettings,
@@ -98,6 +99,11 @@ export const fieldRegistry = {
     title: Translate.string('Country'),
     inputComponent: CountryInput,
     icon: 'earth',
+  },
+  file: {
+    title: Translate.string('File'),
+    inputComponent: FileInput,
+    icon: 'upload',
   },
   email: {
     title: Translate.string('Email'),
