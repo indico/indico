@@ -83,7 +83,7 @@ def render_field(field, widget_attrs, disabled=None):
         widget_attrs = dict(widget_attrs)
         widget_attrs.pop('placeholder', None)
     args = _attrs_for_validators(field, field.validators)
-    args['required'] = (field.flags.required and not field.flags.conditional and
+    args['required'] = (bool(field.flags.required) and not field.flags.conditional and
                         not isinstance(field, (IndicoSelectMultipleCheckboxField,
                                                IndicoQuerySelectMultipleCheckboxField)))
     args.update(widget_attrs)
