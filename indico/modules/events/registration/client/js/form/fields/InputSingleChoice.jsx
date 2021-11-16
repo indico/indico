@@ -114,7 +114,6 @@ export default function InputSingleChoice({
       </>
     );
   } else {
-    // XXX can this happen?! maybe make sure we always have a value!
     return `ERROR: Unknown type ${itemType}`;
   }
 }
