@@ -16,19 +16,19 @@ import {mapPropsToAttributes} from './util';
 
 const attributeMap = {minValue: 'min', maxValue: 'max'};
 
-export default function InputNumber({htmlName, disabled, ...props}) {
-  const inputProps = mapPropsToAttributes(props, attributeMap, InputNumber.defaultProps);
+export default function NumberInput({htmlName, disabled, ...props}) {
+  const inputProps = mapPropsToAttributes(props, attributeMap, NumberInput.defaultProps);
   return <input type="number" name={htmlName} {...inputProps} disabled={disabled} />;
 }
 
-InputNumber.propTypes = {
+NumberInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   minValue: PropTypes.number,
   maxValue: PropTypes.number,
 };
 
-InputNumber.defaultProps = {
+NumberInput.defaultProps = {
   disabled: false,
   minValue: 0,
   maxValue: null,
@@ -41,7 +41,7 @@ export function NumberSettings() {
         name="minValue"
         type="number"
         label={Translate.string('Minimum')}
-        placeholder={String(InputNumber.defaultProps.minValue)}
+        placeholder={String(NumberInput.defaultProps.minValue)}
         step="1"
         min="0"
         validate={v.optional(v.min(0))}

@@ -19,19 +19,19 @@ const attributeMap = {
   numberOfColumns: 'cols',
 };
 
-export default function InputTextArea({htmlName, disabled, ...props}) {
-  const inputProps = mapPropsToAttributes(props, attributeMap, InputTextArea.defaultProps);
+export default function TextAreaInput({htmlName, disabled, ...props}) {
+  const inputProps = mapPropsToAttributes(props, attributeMap, TextAreaInput.defaultProps);
   return <textarea name={htmlName} {...inputProps} disabled={disabled} style={{resize: 'none'}} />;
 }
 
-InputTextArea.propTypes = {
+TextAreaInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   numberOfRows: PropTypes.number,
   numberOfColumns: PropTypes.number,
 };
 
-InputTextArea.defaultProps = {
+TextAreaInput.defaultProps = {
   disabled: false,
   numberOfRows: 2,
   numberOfColumns: 60,
@@ -44,7 +44,7 @@ export function TextAreaSettings() {
         name="numberOfColumns"
         type="number"
         label={Translate.string('Columns')}
-        placeholder={String(InputTextArea.defaultProps.numberOfColumns)}
+        placeholder={String(TextAreaInput.defaultProps.numberOfColumns)}
         step="1"
         min="1"
         max="60"
@@ -55,7 +55,7 @@ export function TextAreaSettings() {
         name="numberOfRows"
         type="number"
         label={Translate.string('Rows')}
-        placeholder={String(InputTextArea.defaultProps.numberOfRows)}
+        placeholder={String(TextAreaInput.defaultProps.numberOfRows)}
         step="1"
         min="1"
         max="20"

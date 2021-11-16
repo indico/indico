@@ -30,7 +30,7 @@ const choiceShape = {
   maxExtraSlots: PropTypes.number.isRequired,
 };
 
-export default function InputSingleChoice({
+export default function SingleChoiceInput({
   htmlName,
   disabled,
   isRequired,
@@ -118,7 +118,7 @@ export default function InputSingleChoice({
   }
 }
 
-InputSingleChoice.propTypes = {
+SingleChoiceInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
@@ -128,7 +128,7 @@ InputSingleChoice.propTypes = {
   // TODO: placesUsed, captions - only needed once we deal with real data
 };
 
-InputSingleChoice.defaultProps = {
+SingleChoiceInput.defaultProps = {
   disabled: false,
   defaultItem: null,
   withExtraSlots: false,

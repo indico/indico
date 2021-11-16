@@ -7,9 +7,9 @@
 
 import PropTypes from 'prop-types';
 
-export default function InputLabel({title}) {
+export default function LabelInput({title}) {
   return title;
 }
-InputLabel.propTypes = {
+LabelInput.propTypes = {
   title: PropTypes.string.isRequired,
 };

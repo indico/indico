@@ -8,15 +8,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-export default function InputEmail({htmlName, disabled}) {
+export default function EmailInput({htmlName, disabled}) {
   return <input type="email" name={htmlName} size="60" disabled={disabled} />;
 }
 
-InputEmail.propTypes = {
+EmailInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
 };
 
-InputEmail.defaultProps = {
+EmailInput.defaultProps = {
   disabled: false,
 };

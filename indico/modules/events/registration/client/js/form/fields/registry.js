@@ -7,20 +7,20 @@
 
 import {Translate} from 'indico/react/i18n';
 
-import InputBoolean, {BooleanSettings} from './InputBoolean';
-import InputCheckbox from './InputCheckbox';
-import InputCountry from './InputCountry';
-import InputEmail from './InputEmail';
-import InputLabel from './InputLabel';
-import InputNumber, {NumberSettings, numberSettingsFormValidator} from './InputNumber';
-import InputPhone from './InputPhone';
-import InputSingleChoice, {
+import BooleanInput, {BooleanSettings} from './BooleanInput';
+import CheckboxInput from './CheckboxInput';
+import CountryInput from './CountryInput';
+import EmailInput from './EmailInput';
+import LabelInput from './LabelInput';
+import NumberInput, {NumberSettings, numberSettingsFormValidator} from './NumberInput';
+import PhoneInput from './PhoneInput';
+import SingleChoiceInput, {
   SingleChoiceSettings,
   singleChoiceSettingsFormDecorator,
   singleChoiceSettingsInitialData,
-} from './InputSingleChoice';
-import InputText, {TextSettings} from './InputText';
-import InputTextArea, {TextAreaSettings} from './InputTextArea';
+} from './SingleChoiceInput';
+import TextAreaInput, {TextAreaSettings} from './TextAreaInput';
+import TextInput, {TextSettings} from './TextInput';
 
 /*
 Available keys:
@@ -41,51 +41,51 @@ Available keys:
 export const fieldRegistry = {
   label: {
     title: Translate.string('Static label'),
-    inputComponent: InputLabel,
+    inputComponent: LabelInput,
     noRequired: true,
     noLabel: true,
   },
   text: {
     title: Translate.string('Text'),
-    inputComponent: InputText,
+    inputComponent: TextInput,
     settingsComponent: TextSettings,
   },
   number: {
     title: Translate.string('Number'),
-    inputComponent: InputNumber,
+    inputComponent: NumberInput,
     settingsComponent: NumberSettings,
     settingsFormValidator: numberSettingsFormValidator,
   },
   textarea: {
     title: Translate.string('Text area'),
-    inputComponent: InputTextArea,
+    inputComponent: TextAreaInput,
     settingsComponent: TextAreaSettings,
   },
   checkbox: {
     title: Translate.string('Checkbox'),
-    inputComponent: InputCheckbox,
+    inputComponent: CheckboxInput,
     noLabel: true,
   },
   bool: {
     title: Translate.string('Yes/No'),
-    inputComponent: InputBoolean,
+    inputComponent: BooleanInput,
     settingsComponent: BooleanSettings,
   },
   phone: {
     title: Translate.string('Phone'),
-    inputComponent: InputPhone,
+    inputComponent: PhoneInput,
   },
   country: {
     title: Translate.string('Country'),
-    inputComponent: InputCountry,
+    inputComponent: CountryInput,
   },
   email: {
     title: Translate.string('Email'),
-    inputComponent: InputEmail,
+    inputComponent: EmailInput,
   },
   single_choice: {
     title: Translate.string('Single Choice'),
-    inputComponent: InputSingleChoice,
+    inputComponent: SingleChoiceInput,
     settingsComponent: SingleChoiceSettings,
     settingsModalSize: 'small',
     settingsFormDecorator: singleChoiceSettingsFormDecorator,

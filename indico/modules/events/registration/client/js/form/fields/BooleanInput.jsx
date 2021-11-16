@@ -11,7 +11,7 @@ import React from 'react';
 import {FinalDropdown} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-export default function InputBoolean({htmlName, disabled, isRequired, defaultValue}) {
+export default function BooleanInput({htmlName, disabled, isRequired, defaultValue}) {
   return (
     <select name={htmlName} disabled={disabled} defaultValue={defaultValue}>
       {!isRequired && <option value="">{Translate.string('Choose an option')}</option>}
@@ -21,14 +21,14 @@ export default function InputBoolean({htmlName, disabled, isRequired, defaultVal
   );
 }
 
-InputBoolean.propTypes = {
+BooleanInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
   defaultValue: PropTypes.string,
 };
 
-InputBoolean.defaultProps = {
+BooleanInput.defaultProps = {
   disabled: false,
   isRequired: false,
   defaultValue: '',

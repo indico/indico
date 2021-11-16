@@ -10,7 +10,7 @@ import React from 'react';
 
 import '../../../styles/regform.module.scss';
 
-export default function InputCheckbox({htmlName, disabled, title, isRequired}) {
+export default function CheckboxInput({htmlName, disabled, title, isRequired}) {
   return (
     <label styleName="checkbox-input-label">
       <input type="checkbox" name={htmlName} disabled={disabled} />
@@ -20,13 +20,13 @@ export default function InputCheckbox({htmlName, disabled, title, isRequired}) {
   );
 }
 
-InputCheckbox.propTypes = {
+CheckboxInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool.isRequired,
 };
 
-InputCheckbox.defaultProps = {
+CheckboxInput.defaultProps = {
   disabled: false,
 };
