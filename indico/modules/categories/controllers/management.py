@@ -41,7 +41,7 @@ from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import ModelField, PrincipalList, not_empty
-from indico.util.roles import ImportRoleMembersMixin
+from indico.util.roles import ExportRoleMembersMixin, ImportRoleMembersMixin
 from indico.util.string import crc32
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -586,3 +586,8 @@ class RHCategoryRoleMembersImportCSV(ImportRoleMembersMixin, RHManageCategoryRol
     """Add users to a category role from CSV."""
 
     logger = logger
+    log_realm = CategoryLogRealm.category
+
+
+class RHCategoryRoleMembersExportCSV(ExportRoleMembersMixin, RHManageCategoryRole):
+    """Export category role members to a CSV."""

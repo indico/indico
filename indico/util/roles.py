@@ -11,9 +11,10 @@ from flask import flash, session
 
 from indico.core.errors import UserValueError
 from indico.modules.events.roles.forms import ImportMembersCSVForm
+from indico.modules.logs.models.entries import LogKind
 from indico.modules.users import User
 from indico.util.i18n import _, ngettext
-from indico.util.spreadsheets import csv_text_io_wrapper
+from indico.util.spreadsheets import csv_text_io_wrapper, send_csv
 from indico.util.string import validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
@@ -23,6 +24,7 @@ class ImportRoleMembersMixin:
     """Import members from a CSV file into a role."""
 
     logger = None
+    log_realm = None
 
     def import_members_from_csv(self, f):
         with csv_text_io_wrapper(f) as ftxt:
@@ -56,10 +58,19 @@ class ImportRoleMembersMixin:
                 for member in deleted_members:
                     self.logger.info(f'User {member} removed from role {self.role} by {session.user}')
                 self.role.members = users
+                self.role.obj.log(self.log_realm, LogKind.negative, 'Roles',
+                                  f'Removed users from role "{self.role.name}"', session.user,
+                                  data={'Users': sorted(f'{member.full_name} <{member.email}>'
+                                                        for member in deleted_members)})
             else:
                 self.role.members |= users
             for user in new_members:
                 self.logger.info(f'User {user} added to role {self.role} by {session.user}')
+            if new_members:
+                self.role.obj.log(self.log_realm, LogKind.positive, 'Roles',
+                                  f'Added users to role "{self.role.name}"', session.user,
+                                  data={'Users': sorted(f'{member.full_name} <{member.email}>'
+                                                        for member in new_members)})
             flash(ngettext('{} member has been imported.',
                            '{} members have been imported.',
                            len(users)).format(len(users)), 'success')
@@ -70,3 +81,11 @@ class ImportRoleMembersMixin:
             tpl = get_template_module('events/roles/_roles.html')
             return jsonify_data(html=tpl.render_role(self.role, collapsed=False, email_button=False))
         return jsonify_template('events/roles/import_members.html', form=form, role=self.role)
+
+
+class ExportRoleMembersMixin:
+    """Export role members to a CSV file."""
+
+    def _process(self):
+        emails = [{'Email': user.email} for user in self.role.members]
+        return send_csv('role-members.csv', ['Email'], emails, include_header=False)

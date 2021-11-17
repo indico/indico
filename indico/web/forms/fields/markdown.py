@@ -27,7 +27,7 @@ class IndicoMarkdownField(TextAreaField):
     def __init__(self, *args, **kwargs):
         self.use_editor = kwargs.pop('editor', False)
         self.use_mathjax = kwargs.pop('mathjax', False)
-        orig_id = kwargs['_prefix'] + kwargs['_name']
+        orig_id = kwargs['_prefix'] + kwargs['name']
         if self.use_editor:
             # WMD relies on this awful ID :/
             kwargs['id'] = 'wmd-input-f_' + orig_id
