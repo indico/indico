@@ -152,6 +152,7 @@ class RHEventRoleMembersImportCSV(ImportRoleMembersMixin, RHManageEventRole):
     """Add users to an event role from CSV."""
 
     logger = logger
+    log_realm = EventLogRealm.management
 
 
 class RHEventRoleMembersExportCSV(ExportRoleMembersMixin, RHManageEventRole):

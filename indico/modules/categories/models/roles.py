@@ -85,6 +85,10 @@ class CategoryRole(db.Model):
         return f'CategoryRole:{self.id}'
 
     @property
+    def obj(self):
+        return self.category
+
+    @property
     def css(self):
         return 'color: #{0} !important; border-color: #{0} !important'.format(self.color)
 

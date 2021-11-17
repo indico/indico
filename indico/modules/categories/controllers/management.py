@@ -586,6 +586,7 @@ class RHCategoryRoleMembersImportCSV(ImportRoleMembersMixin, RHManageCategoryRol
     """Add users to a category role from CSV."""
 
     logger = logger
+    log_realm = CategoryLogRealm.category
 
 
 class RHCategoryRoleMembersExportCSV(ExportRoleMembersMixin, RHManageCategoryRole):

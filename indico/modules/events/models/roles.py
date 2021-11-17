@@ -84,6 +84,10 @@ class EventRole(db.Model):
         return f'EventRole:{self.id}'
 
     @property
+    def obj(self):
+        return self.event
+
+    @property
     def css(self):
         return 'color: #{0} !important; border-color: #{0} !important'.format(self.color)
 
