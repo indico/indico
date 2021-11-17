@@ -84,7 +84,7 @@ import RegistrationTagsEditableList from './components/RegistrationTagsEditableL
     });
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function setupRegistrationTags() {
     const rootElement = document.getElementById('registration-detail-registration-tags-assign');
 
     if (rootElement) {
@@ -103,5 +103,12 @@ import RegistrationTagsEditableList from './components/RegistrationTagsEditableL
         rootElement
       );
     }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupRegistrationTags();
+    $('#registration-details')
+      .parent()
+      .on('indico:htmlUpdated', setupRegistrationTags);
   });
 })(window);
