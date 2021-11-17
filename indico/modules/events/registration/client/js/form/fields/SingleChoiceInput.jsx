@@ -90,7 +90,7 @@ export default function SingleChoiceInput({
                 name={htmlName}
                 id={`${htmlName}-${c.id}`}
                 value={c.id}
-                disabled={!c.isEnabled}
+                disabled={!c.isEnabled || disabled}
                 checked={c.id === value}
                 onChange={handleChange}
               />{' '}
