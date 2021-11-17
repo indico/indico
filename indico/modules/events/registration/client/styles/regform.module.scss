@@ -110,6 +110,22 @@
   :global(.DateRangePickerInput_calendarIcon)[disabled] {
     visibility: hidden;
   }
+
+  :global(.DateInput_input) {
+    width: 7.3em;
+  }
+
+  :global(.SingleDatePickerInput_calendarIcon) {
+    padding: 0 5px 2px 8px;
+  }
+
+  :global(.rc-time-picker) {
+    width: 3.5em;
+  }
+
+  :global(.rc-time-picker-input) {
+    height: inherit;
+  }
 }
 
 // TODO: clean up the old CSS; we may no longer need this afterwards.

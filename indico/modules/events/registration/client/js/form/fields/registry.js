@@ -15,6 +15,7 @@ import AccommodationInput, {
 import BooleanInput, {BooleanSettings} from './BooleanInput';
 import CheckboxInput from './CheckboxInput';
 import CountryInput from './CountryInput';
+import DateInput, {DateSettings, dateSettingsInitialData} from './DateInput';
 import EmailInput from './EmailInput';
 import FileInput from './FileInput';
 import LabelInput from './LabelInput';
@@ -83,6 +84,13 @@ export const fieldRegistry = {
     inputComponent: CheckboxInput,
     noLabel: true,
     icon: 'checkbox-checked',
+  },
+  date: {
+    title: Translate.string('Date'),
+    inputComponent: DateInput,
+    settingsComponent: DateSettings,
+    settingsFormInitialData: dateSettingsInitialData,
+    icon: 'calendar',
   },
   bool: {
     title: Translate.string('Yes/No'),
