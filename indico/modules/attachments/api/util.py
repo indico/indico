@@ -118,6 +118,8 @@ def _build_attachment_api_data(attachment):
         data['filename'] = attachment.file.filename
         data['content_type'] = attachment.file.content_type
         data['size'] = attachment.file.size
+        data['checksum'] = attachment.file.md5
+
 
     elif attachment.type == AttachmentType.link:
         data['link_url'] = attachment.link_url
