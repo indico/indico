@@ -17,10 +17,10 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
                                                            RHShowPastEventsInCategory, RHSubcatInfo)
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
-                                                              RHAPIEventMoveRequests, RHCategoryRoleMembersImportCSV,
-                                                              RHCategoryRoles, RHCreateCategory, RHDeleteCategory,
-                                                              RHDeleteCategoryRole, RHDeleteEvents,
-                                                              RHDeleteSubcategories, RHEditCategoryRole,
+                                                              RHAPIEventMoveRequests, RHCategoryRoleMembersExportCSV,
+                                                              RHCategoryRoleMembersImportCSV, RHCategoryRoles,
+                                                              RHCreateCategory, RHDeleteCategory, RHDeleteCategoryRole,
+                                                              RHDeleteEvents, RHDeleteSubcategories, RHEditCategoryRole,
                                                               RHManageCategoryContent, RHManageCategoryIcon,
                                                               RHManageCategoryLogo, RHManageCategoryModeration,
                                                               RHManageCategoryProtection, RHManageCategorySettings,
@@ -60,6 +60,8 @@ _bp.add_url_rule('/manage/roles/<int:role_id>/members/<int:user_id>', 'remove_ro
                  methods=('DELETE',))
 _bp.add_url_rule('/manage/roles/<int:role_id>/members/import', 'add_members_import_csv',
                  RHCategoryRoleMembersImportCSV, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/roles/<int:role_id>/members.csv', 'members_export_csv', RHCategoryRoleMembersExportCSV)
+
 
 # Event management
 _bp.add_url_rule('/manage/events/delete', 'delete_events', RHDeleteEvents, methods=('GET', 'POST'))

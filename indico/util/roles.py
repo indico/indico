@@ -13,7 +13,7 @@ from indico.core.errors import UserValueError
 from indico.modules.events.roles.forms import ImportMembersCSVForm
 from indico.modules.users import User
 from indico.util.i18n import _, ngettext
-from indico.util.spreadsheets import csv_text_io_wrapper
+from indico.util.spreadsheets import csv_text_io_wrapper, send_csv
 from indico.util.string import validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
@@ -70,3 +70,11 @@ class ImportRoleMembersMixin:
             tpl = get_template_module('events/roles/_roles.html')
             return jsonify_data(html=tpl.render_role(self.role, collapsed=False, email_button=False))
         return jsonify_template('events/roles/import_members.html', form=form, role=self.role)
+
+
+class ExportRoleMembersMixin:
+    """Export role members to a CSV file."""
+
+    def _process(self):
+        emails = [{'Email': user.email} for user in self.role.members]
+        return send_csv('role-members.csv', ['Email'], emails, include_header=False)
