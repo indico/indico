@@ -13,7 +13,15 @@
         </td>
         <td class="i-table value searchable">
             <div class="{{ content_class }}">
-                {{- content -}}
+                {% if content is not string and content is sequence %}
+                    <ul>
+                        {% for item in content %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {{- content -}}
+                {% endif %}
             </div>
         </td>
     </tr>
