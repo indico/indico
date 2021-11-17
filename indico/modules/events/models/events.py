@@ -725,13 +725,19 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
         :return: A dict containing ``first``, ``last``, ``prev`` and ``next``.
         """
+        if self.is_unlisted and self.creator == session.user:
+            category_filters = [Event.category_id.is_(None), Event.creator == session.user]
+        elif self.is_unlisted:
+            return {'first': None, 'last': None, 'prev': None, 'next': None}
+        else:
+            category_filters = [Event.category_id == self.category_id]
         subquery = (select([Event.id,
                             db.func.first_value(Event.id).over(order_by=(Event.start_dt, Event.id)).label('first'),
                             db.func.last_value(Event.id).over(order_by=(Event.start_dt, Event.id),
                                                               range_=(None, None)).label('last'),
                             db.func.lag(Event.id).over(order_by=(Event.start_dt, Event.id)).label('prev'),
                             db.func.lead(Event.id).over(order_by=(Event.start_dt, Event.id)).label('next')])
-                    .where(db.and_(Event.category_id == self.category_id,
+                    .where(db.and_(*category_filters,
                                    ~Event.is_deleted,
                                    (Event.visibility.is_(None) | (Event.visibility != 0) | (Event.id == self.id))))
                     .alias())
