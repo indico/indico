@@ -18,6 +18,63 @@ import {Choices, choiceShape} from './ChoicesSetup';
 
 import '../../../styles/regform.module.scss';
 
+function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
+  return (
+    <select name={htmlName} disabled={disabled} value={value} onChange={onChange}>
+      <option key="" value="">
+        {Translate.string('Choose an option')}
+      </option>
+      {choices.map(c => (
+        <option key={c.id} value={c.id} disabled={!c.isEnabled}>
+          {c.caption}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+SingleChoiceDropdown.propTypes = {
+  htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+function SingleChoiceRadioGroup({htmlName, disabled, choices, value, onChange, isRequired}) {
+  const radioChoices = [...choices];
+  if (!isRequired) {
+    radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
+  }
+  return (
+    <ul styleName="radio-group">
+      {radioChoices.map(c => (
+        <li key={c.id}>
+          <input
+            type="radio"
+            name={htmlName}
+            id={`${htmlName}-${c.id}`}
+            value={c.id}
+            disabled={!c.isEnabled || disabled}
+            checked={c.id === value}
+            onChange={onChange}
+          />{' '}
+          <label htmlFor={`${htmlName}-${c.id}`}>{c.caption}</label>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+SingleChoiceRadioGroup.propTypes = {
+  htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  isRequired: PropTypes.bool.isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 export default function SingleChoiceInput({
   htmlName,
   disabled,
@@ -59,51 +116,40 @@ export default function SingleChoiceInput({
     setSlotsUsed(1);
   };
 
+  let component = null;
   if (itemType === 'dropdown') {
-    return (
-      <>
-        <select name={htmlName} disabled={disabled} value={value} onChange={handleChange}>
-          <option key="" value="">
-            {Translate.string('Choose an option')}
-          </option>
-          {choices.map(c => (
-            <option key={c.id} value={c.id} disabled={!c.isEnabled}>
-              {c.caption}
-            </option>
-          ))}
-        </select>
-        {extraSlotsDropdown}
-      </>
+    component = (
+      <SingleChoiceDropdown
+        htmlName={htmlName}
+        disabled={disabled}
+        choices={choices}
+        extraSlotsDropdown={extraSlotsDropdown}
+        value={value}
+        onChange={handleChange}
+      />
     );
   } else if (itemType === 'radiogroup') {
-    const radioChoices = [...choices];
-    if (!isRequired) {
-      radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
-    }
-    return (
-      <>
-        <ul styleName="radio-group">
-          {radioChoices.map(c => (
-            <li key={c.id}>
-              <input
-                type="radio"
-                name={htmlName}
-                id={`${htmlName}-${c.id}`}
-                value={c.id}
-                disabled={!c.isEnabled || disabled}
-                checked={c.id === value}
-                onChange={handleChange}
-              />{' '}
-              <label htmlFor={`${htmlName}-${c.id}`}>{c.caption}</label>
-            </li>
-          ))}
-        </ul>
-        {extraSlotsDropdown}
-      </>
+    component = (
+      <SingleChoiceRadioGroup
+        htmlName={htmlName}
+        disabled={disabled}
+        choices={choices}
+        extraSlotsDropdown={extraSlotsDropdown}
+        value={value}
+        onChange={handleChange}
+        isRequired={isRequired}
+      />
     );
   } else {
     return `ERROR: Unknown type ${itemType}`;
   }
+
+  return (
+    <>
+      {component}
+      {extraSlotsDropdown}
+    </>
+  );
 }
 
 SingleChoiceInput.propTypes = {
@@ -112,6 +158,7 @@ SingleChoiceInput.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   defaultItem: PropTypes.string,
+  isRequired: PropTypes.bool.isRequired,
   withExtraSlots: PropTypes.bool,
   // TODO: placesUsed, captions - only needed once we deal with real data
 };

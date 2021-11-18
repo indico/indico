@@ -21,7 +21,7 @@ export default function FormSection({
   isManagerOnly,
   items,
   sortHandle,
-  ItemComponent,
+  itemComponent: ItemComponent,
   itemProps,
   setupMode,
   setupActions,
@@ -95,7 +95,7 @@ FormSection.propTypes = {
   /** The handle to sort the section during setup */
   sortHandle: PropTypes.node,
   /** The react component to render individual form items */
-  ItemComponent: PropTypes.elementType,
+  itemComponent: PropTypes.elementType,
   /** Additional props passed to each item component */
   itemProps: PropTypes.object,
   /** Whether the registration form is currently being set up */
@@ -108,6 +108,6 @@ FormSection.defaultProps = {
   setupMode: false,
   setupActions: null,
   sortHandle: null,
-  ItemComponent: FormItem,
+  itemComponent: FormItem,
   itemProps: {},
 };
