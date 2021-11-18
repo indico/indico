@@ -608,7 +608,7 @@ var ndSelectController = function($scope) {
   };
 
   $scope.onExtraSlotsChanged = function(item, value) {
-    var valueElement = $('[name={0}]'.format($scope.field.htmlName)),
+    var valueElement = $('#registrationForm [name={0}]'.format($scope.field.htmlName)),
       data = JSON.parse(valueElement.val() || '{}');
     if (data[item.id]) {
       data[item.id] = value;
@@ -1011,7 +1011,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
       });
 
       function updateAccommodationPostData(fieldName, value) {
-        var accommodationField = $('[name=field_{0}]'.format(scope.field.id)),
+        var accommodationField = $('#registrationForm [name=field_{0}]'.format(scope.field.id)),
           accommodationData = accommodationField.val() ? JSON.parse(accommodationField.val()) : {};
         accommodationData[fieldName] = value;
         accommodationField.val(JSON.stringify(accommodationData));
