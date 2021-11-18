@@ -15,7 +15,11 @@ import AccommodationInput, {
 import BooleanInput, {BooleanSettings} from './BooleanInput';
 import CheckboxInput from './CheckboxInput';
 import CountryInput from './CountryInput';
-import DateInput, {DateSettings, dateSettingsInitialData} from './DateInput';
+import DateInput, {
+  DateSettings,
+  dateSettingsFormDecorator,
+  dateSettingsInitialData,
+} from './DateInput';
 import EmailInput from './EmailInput';
 import FileInput from './FileInput';
 import LabelInput from './LabelInput';
@@ -89,6 +93,7 @@ export const fieldRegistry = {
     title: Translate.string('Date'),
     inputComponent: DateInput,
     settingsComponent: DateSettings,
+    settingsFormDecorator: dateSettingsFormDecorator,
     settingsFormInitialData: dateSettingsInitialData,
     icon: 'calendar',
   },

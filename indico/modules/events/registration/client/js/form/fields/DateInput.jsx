@@ -5,21 +5,24 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import createDecorator from 'final-form-calculate';
 import PropTypes from 'prop-types';
 import TimePicker from 'rc-time-picker';
 import React, {useState} from 'react';
+import {Field} from 'react-final-form';
+import {Form} from 'semantic-ui-react';
 
 import {SingleDatePicker} from 'indico/react/components';
-import {FinalDropdown} from 'indico/react/forms';
+import {FinalDropdown, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-export default function DateInput({htmlName, id, disabled, dateFormat, hasTime}) {
+export default function DateInput({htmlName, id, disabled, dateFormat, timeFormat}) {
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
-  const uses24HourFormat = true; // TODO: depend on the selected format string
-  const timeDateFormat = dateFormat
-    .replace(/%([HMdmY])/g, (match, c) => ({H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c]))
-    .split(' ');
+  const friendlyDateFormat = dateFormat.replace(
+    /%([HMdmY])/g,
+    (match, c) => ({H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c])
+  );
 
   if (dateFormat.includes('%d')) {
     return (
@@ -28,25 +31,24 @@ export default function DateInput({htmlName, id, disabled, dateFormat, hasTime})
           id={`regform-datepicker-${id}`}
           date={date}
           onDateChange={setDate}
-          placeholder={timeDateFormat[0]}
-          displayFormat={timeDateFormat[0]}
+          placeholder={friendlyDateFormat}
+          displayFormat={friendlyDateFormat}
           disabled={disabled}
           isOutsideRange={() => false}
           enableOutsideDays
           noBorder
           small
         />
-        {hasTime && (
+        {timeFormat && (
           <TimePicker
             id={`regform-timepicker-${id}`}
             showSecond={false}
             value={time}
             focusOnOpen
-            format={timeDateFormat[1]}
             onChange={setTime}
-            use12Hours={!uses24HourFormat}
+            use12Hours={timeFormat === '12h'}
             allowEmpty={false}
-            placeholder="--:--"
+            placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
             disabled={disabled}
             getPopupContainer={node => node}
           />
@@ -55,7 +57,7 @@ export default function DateInput({htmlName, id, disabled, dateFormat, hasTime})
     );
   } else {
     return (
-      <input type="text" name={htmlName} placeholder={timeDateFormat[0]} disabled={disabled} />
+      <input type="text" name={htmlName} placeholder={friendlyDateFormat} disabled={disabled} />
     );
   }
 }
@@ -65,12 +67,6 @@ DateInput.propTypes = {
   id: PropTypes.number.isRequired,
   disabled: PropTypes.bool,
   dateFormat: PropTypes.oneOf([
-    '%d/%m/%Y %H:%M',
-    '%d.%m.%Y %H:%M',
-    '%m/%d/%Y %H:%M',
-    '%m.%d.%Y %H:%M',
-    '%Y/%m/%d %H:%M',
-    '%Y.%m.%d %H:%M',
     '%d/%m/%Y',
     '%d.%m.%Y',
     '%m/%d/%Y',
@@ -81,26 +77,32 @@ DateInput.propTypes = {
     '%m.%Y',
     '%Y',
   ]).isRequired,
-  hasTime: PropTypes.bool,
+  timeFormat: PropTypes.oneOf(['12h', '24h']),
 };
 
 DateInput.defaultProps = {
   disabled: false,
-  hasTime: false,
+  timeFormat: null,
 };
+
+export const dateSettingsFormDecorator = createDecorator({
+  field: 'dateFormat',
+  updates: dateFormat => {
+    // clear the time format when it doesn't make sense for the selected date format
+    if (!dateFormat.includes('%d')) {
+      return {timeFormat: null};
+    }
+    return {};
+  },
+});
 
 export const dateSettingsInitialData = {
   dateFormat: '%d/%m/%Y',
+  timeFormat: null,
 };
 
 export function DateSettings() {
-  const options = [
-    '%d/%m/%Y %H:%M',
-    '%d.%m.%Y %H:%M',
-    '%m/%d/%Y %H:%M',
-    '%m.%d.%Y %H:%M',
-    '%Y/%m/%d %H:%M',
-    '%Y.%m.%d %H:%M',
+  const dateOptions = [
     '%d/%m/%Y',
     '%d.%m.%Y',
     '%m/%d/%Y',
@@ -118,13 +120,34 @@ export function DateSettings() {
       (match, c) => ({H: 'hh', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c])
     ),
   }));
+  const timeOptions = [
+    {key: '12h', value: '12h', text: Translate.string('12 hours')},
+    {key: '24h', value: '24h', text: Translate.string('24 hours')},
+  ];
   return (
-    <FinalDropdown
-      name="dateFormat"
-      label={Translate.string('Date format')}
-      options={options}
-      required
-      selection
-    />
+    <Form.Group widths="equal">
+      <FinalDropdown
+        name="dateFormat"
+        label={Translate.string('Date format')}
+        options={dateOptions}
+        required
+        selection
+        fluid
+      />
+      <Field name="dateFormat" subscription={{value: true}}>
+        {({input: {value: dateFormat}}) => (
+          <FinalDropdown
+            name="timeFormat"
+            label={Translate.string('Time format')}
+            options={timeOptions}
+            placeholder={Translate.string('None')}
+            disabled={!dateFormat.includes('%d')}
+            parse={p.nullIfEmpty}
+            selection
+            fluid
+          />
+        )}
+      </Field>
+    </Form.Group>
   );
 }
