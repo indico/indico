@@ -11,10 +11,11 @@ from operator import itemgetter
 
 import wtforms
 from marshmallow import ValidationError as MMValidationError
-from marshmallow import fields, validate, validates_schema
+from marshmallow import fields, pre_load, validate, validates_schema
 from werkzeug.datastructures import FileStorage
 from wtforms.validators import InputRequired, NumberRange, ValidationError
 
+from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
                                                             LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField, RegistrationFormFieldBase)
@@ -129,34 +130,64 @@ class CheckboxField(RegistrationFormBillableField):
         return None
 
 
+class DateFieldDataSchema(mm.Schema):
+    date_format = fields.String(required=True, validate=validate.OneOf([
+        '%d/%m/%Y %I:%M %p',
+        '%d.%m.%Y %I:%M %p',
+        '%m/%d/%Y %I:%M %p',
+        '%m.%d.%Y %I:%M %p',
+        '%Y/%m/%d %I:%M %p',
+        '%Y.%m.%d %I:%M %p',
+        '%d/%m/%Y %H:%M',
+        '%d.%m.%Y %H:%M',
+        '%m/%d/%Y %H:%M',
+        '%m.%d.%Y %H:%M',
+        '%Y/%m/%d %H:%M',
+        '%Y.%m.%d %H:%M',
+        '%d/%m/%Y',
+        '%d.%m.%Y',
+        '%m/%d/%Y',
+        '%m.%d.%Y',
+        '%Y/%m/%d',
+        '%Y.%m.%d',
+        '%m/%Y',
+        '%m.%Y',
+        '%Y'
+    ]))
+
+    @pre_load
+    def _merge_date_time_formats(self, data, **kwargs):
+        data = data.copy()
+        time_format = data.pop('time_format', None)
+        if time_format == '12h':
+            data['date_format'] += ' %I:%M %p'
+        elif time_format == '24h':
+            data['date_format'] += ' %H:%M'
+        return data
+
+
 class DateField(RegistrationFormFieldBase):
     name = 'date'
     wtf_field_class = wtforms.StringField
-    setup_schema_fields = {
-        'date_format': fields.String(required=True, validate=validate.OneOf([
-            '%d/%m/%Y %H:%M',
-            '%d.%m.%Y %H:%M',
-            '%m/%d/%Y %H:%M',
-            '%m.%d.%Y %H:%M',
-            '%Y/%m/%d %H:%M',
-            '%Y.%m.%d %H:%M',
-            '%d/%m/%Y',
-            '%d.%m.%Y',
-            '%m/%d/%Y',
-            '%m.%d.%Y',
-            '%Y/%m/%d',
-            '%Y.%m.%d',
-            '%m/%Y',
-            '%m.%Y',
-            '%Y'
-        ])),
-    }
+    setup_schema_base_cls = DateFieldDataSchema
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         if value:
             date_format = self.form_item.data['date_format']
             value = datetime.strptime(value, date_format).isoformat()
         return super().process_form_data(registration, value, old_data, billable_items_locked)
+
+    @classmethod
+    def unprocess_field_data(cls, versioned_data, unversioned_data):
+        data = {}
+        time_date_formats = unversioned_data['date_format'].split(' ', 1)
+        data['date_format'] = time_date_formats[0]
+        if len(time_date_formats) > 1:
+            if time_date_formats[1] == '%I:%M %p':
+                data['time_format'] = '12h'
+            elif time_date_formats[1] == '%H:%M':
+                data['time_format'] = '24h'
+        return data
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         date_string = registration_data.data
