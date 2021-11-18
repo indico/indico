@@ -102,6 +102,14 @@
       margin-right: 0.5em;
     }
   }
+
+  :global(.DateRangePickerInput__disabled) {
+    background: inherit;
+  }
+
+  :global(.DateRangePickerInput_calendarIcon)[disabled] {
+    visibility: hidden;
+  }
 }
 
 // TODO: clean up the old CSS; we may no longer need this afterwards.

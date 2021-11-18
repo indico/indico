@@ -389,19 +389,71 @@ class AccommodationItemSchema(LimitedPlacesBillableFieldDataSchema):
         return data
 
 
+class AccommodationDateRangeSchema(mm.Schema):
+    start_date = fields.Date(required=True)
+    end_date = fields.Date(required=True)
+
+    @validates_schema(skip_on_field_errors=True)
+    def _validate_dates(self, data, **kwargs):
+        if data['start_date'] > data['end_date']:
+            raise MMValidationError('The end date cannot be before the start date', 'end_date')
+
+
+class AccommodationSetupSchema(mm.Schema):
+    choices = fields.List(fields.Nested(AccommodationItemSchema), required=True, validate=not_empty)
+    arrival = fields.Nested(AccommodationDateRangeSchema, required=True)
+    departure = fields.Nested(AccommodationDateRangeSchema, required=True)
+
+    @validates_schema(skip_on_field_errors=True)
+    def _validate_periods(self, data, **kwargs):
+        if data['departure']['start_date'] < data['arrival']['start_date']:
+            raise MMValidationError('The departure period cannot begin before the arrival period.', 'departure')
+        if data['arrival']['end_date'] > data['departure']['end_date']:
+            raise MMValidationError('The arrival period cannot end after the departure period.', 'arrival')
+
+    @pre_load
+    def _generate_new_uuids(self, data, **kwrags):
+        data = data.copy()
+        if 'choices' in data:
+            # generate uuids for the random client-side IDs
+            data['choices'] = data['choices'].copy()
+            for c in data['choices']:
+                if c.get('id', '').startswith('new:'):
+                    c['id'] = str(uuid4())
+        return data
+
+    @pre_load
+    def _merge_dates(self, data, **kwargs):
+        # TODO remove this function once the angular frontend is gone
+        if not (data.keys() >= {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}):
+            return data
+        data = data.copy()
+        data['arrival'] = {
+            'start_date': datetime.strptime(data.pop('arrival_date_from'), '%d/%m/%Y').date().isoformat(),
+            'end_date': datetime.strptime(data.pop('arrival_date_to'), '%d/%m/%Y').date().isoformat(),
+        }
+        data['departure'] = {
+            'start_date': datetime.strptime(data.pop('departure_date_from'), '%d/%m/%Y').date().isoformat(),
+            'end_date': datetime.strptime(data.pop('departure_date_to'), '%d/%m/%Y').date().isoformat(),
+        }
+        return data
+
+    @post_load
+    def _split_dates(self, data, **kwargs):
+        data['arrival_date_from'] = data['arrival']['start_date']
+        data['arrival_date_to'] = data['arrival']['end_date']
+        data['departure_date_from'] = data['departure']['start_date']
+        data['departure_date_to'] = data['departure']['end_date']
+        del data['arrival']
+        del data['departure']
+        return data
+
+
 class AccommodationField(RegistrationFormBillableItemsField):
     name = 'accommodation'
     wtf_field_class = JSONField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
-    setup_schema_fields = {
-        # TODO: switch to standard %Y-%m-%d (iso) format in the frontend and then get rid
-        # of the format strings here (default is iso format)
-        'arrival_date_from': fields.Date('%d/%m/%Y', required=True),
-        'arrival_date_to': fields.Date('%d/%m/%Y', required=True),
-        'departure_date_from': fields.Date('%d/%m/%Y', required=True),
-        'departure_date_to': fields.Date('%d/%m/%Y', required=True),
-        'choices': fields.List(fields.Nested(AccommodationItemSchema), required=True, validate=not_empty)
-    }
+    setup_schema_base_cls = AccommodationSetupSchema
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
@@ -428,6 +480,15 @@ class AccommodationField(RegistrationFormBillableItemsField):
         arrival_date_to = _to_date(unversioned_data['arrival_date_to'])
         departure_date_from = _to_date(unversioned_data['departure_date_from'])
         departure_date_to = _to_date(unversioned_data['departure_date_to'])
+        data['arrival'] = {
+            'start_date': unversioned_data['arrival_date_from'],
+            'end_date': unversioned_data['arrival_date_to'],
+        }
+        data['departure'] = {
+            'start_date': unversioned_data['departure_date_from'],
+            'end_date': unversioned_data['departure_date_to'],
+        }
+        # TODO: remove this once the angular frontend is gone
         data['arrival_dates'] = [(dt.date().isoformat(), format_date(dt))
                                  for dt in iterdays(arrival_date_from, arrival_date_to)]
         data['departure_dates'] = [(dt.date().isoformat(), format_date(dt))

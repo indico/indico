@@ -16,12 +16,14 @@ import reducers from './reducers';
 import RegistrationFormSetup from './RegistrationFormSetup';
 
 export default function setupRegformSetup(root) {
-  const {eventId, regformId, formData} = root.dataset;
+  const {eventId, eventStartDate, eventEndDate, regformId, formData} = root.dataset;
 
   const initialData = {
     staticData: {
       eventId: parseInt(eventId, 10),
       regformId: parseInt(regformId, 10),
+      eventStartDate,
+      eventEndDate,
     },
   };
   const store = createReduxStore('regform-setup', reducers, initialData);
