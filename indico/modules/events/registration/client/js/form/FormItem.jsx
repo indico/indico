@@ -33,7 +33,7 @@ export default function FormItem({
       {!meta.noLabel && (
         <span styleName="label">
           {title}
-          {isRequired && <span styleName="required">*</span>}
+          {(isRequired || meta.alwaysRequired) && <span styleName="required">*</span>}
         </span>
       )}
       <div styleName="content">

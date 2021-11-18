@@ -7,6 +7,11 @@
 
 import {Translate} from 'indico/react/i18n';
 
+import AccommodationInput, {
+  AccommodationSettings,
+  accommodationSettingsInitialData,
+  accommodationSettingsFormValidator,
+} from './AccommodationInput';
 import BooleanInput, {BooleanSettings} from './BooleanInput';
 import CheckboxInput from './CheckboxInput';
 import CountryInput from './CountryInput';
@@ -37,9 +42,11 @@ Available keys:
   settings form
 - settingsFormValidator: optional, a function for final-form's form-level validation
 - settingsFormInitialData: optional; initial data to use when creating a new
-  field in case some of the settings need to be initialized
+  field in case some of the settings need to be initialized. if it's a callable, the
+  staticData from the state will be passed to it
 - noLabel: optional; render the field without a label on the left
 - noRequired: optional; hide the option to make the field required
+- alwaysRequired: optional; always display the field as required
 */
 
 export const fieldRegistry = {
@@ -102,5 +109,14 @@ export const fieldRegistry = {
     settingsModalSize: 'small',
     settingsFormInitialData: multiChoiceSettingsInitialData,
   },
-  // TODO add other input types
+  accommodation: {
+    title: Translate.string('Accommodation'),
+    inputComponent: AccommodationInput,
+    settingsComponent: AccommodationSettings,
+    settingsModalSize: 'small',
+    settingsFormInitialData: accommodationSettingsInitialData,
+    settingsFormValidator: accommodationSettingsFormValidator,
+    noRequired: true,
+    alwaysRequired: true,
+  },
 };

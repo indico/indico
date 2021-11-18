@@ -19,7 +19,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {fieldRegistry} from '../form/fields/registry';
 
 import * as actions from './actions';
-import {getItemById} from './selectors';
+import {getStaticData, getItemById} from './selectors';
 
 import '../../styles/regform.module.scss';
 
@@ -33,6 +33,7 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
   const dispatch = useDispatch();
   const [newItemType, setNewItemType] = useState(null);
   const editing = id !== null;
+  const staticData = useSelector(getStaticData);
   const {inputType: existingInputType, fieldIsRequired, ...itemData} = useSelector(state =>
     editing ? getItemById(state, id) : {}
   );
@@ -53,6 +54,13 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
     onClose();
   };
 
+  let initialValues = itemData;
+  if (!editing) {
+    initialValues = _.isFunction(meta.settingsFormInitialData)
+      ? meta.settingsFormInitialData(staticData)
+      : meta.settingsFormInitialData;
+  }
+
   return (
     <FinalModalForm
       // force re-render since we may need to change form decorators and initial values
@@ -60,7 +68,7 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
       id="regform-item-settings"
       onSubmit={handleSubmit}
       onClose={onClose}
-      initialValues={editing ? itemData : meta.settingsFormInitialData}
+      initialValues={initialValues}
       initialValuesEqual={_.isEqual}
       alignTop
       unloadPrompt

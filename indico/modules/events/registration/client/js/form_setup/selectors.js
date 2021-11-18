@@ -9,7 +9,7 @@ import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 export const isUILocked = state => state.uiLocked;
-const getStaticData = state => state.staticData;
+export const getStaticData = state => state.staticData;
 const getFlatSections = state => state.sections;
 const getItems = state => state.items;
 

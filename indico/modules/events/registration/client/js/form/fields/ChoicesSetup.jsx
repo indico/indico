@@ -20,11 +20,19 @@ export const choiceShape = {
   isEnabled: PropTypes.bool.isRequired,
   isBillable: PropTypes.bool.isRequired,
   price: PropTypes.number.isRequired,
-  placesLimit: PropTypes.number.isRequired,
-  maxExtraSlots: PropTypes.number.isRequired,
+  placesLimit: PropTypes.number,
+  maxExtraSlots: PropTypes.number,
 };
 
-export function Choices({onFocus, onBlur, onChange, disabled, value, withExtraSlots}) {
+export function Choices({
+  onFocus,
+  onBlur,
+  onChange,
+  disabled,
+  value,
+  withExtraSlots,
+  forAccommodation,
+}) {
   const makeOnDelete = id => () => onChange(value.filter(choice => choice.id !== id));
   const makeOnChange = id => (field, val) =>
     onChange(value.map(choice => (choice.id !== id ? choice : {...choice, [field]: val})));
@@ -43,8 +51,10 @@ export function Choices({onFocus, onBlur, onChange, disabled, value, withExtraSl
       isBillable: false,
       price: 0,
       placesLimit: 0,
-      maxExtraSlots: 0,
     };
+    if (!forAccommodation) {
+      newItem.maxExtraSlots = 0;
+    }
     onChange([...value, newItem]);
   };
 
@@ -116,7 +126,13 @@ Choices.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   disabled: PropTypes.bool.isRequired,
-  withExtraSlots: PropTypes.bool.isRequired,
+  withExtraSlots: PropTypes.bool,
+  forAccommodation: PropTypes.bool,
+};
+
+Choices.defaultProps = {
+  withExtraSlots: false,
+  forAccommodation: false,
 };
 
 function Choice({
@@ -131,6 +147,7 @@ function Choice({
   maxExtraSlots,
   extraSlotsPay,
   isEnabled,
+  isNoAccommodation,
   onChange,
   onMove,
   onDelete,
@@ -167,39 +184,46 @@ function Choice({
           value={caption}
           required
           onChange={makeOnChange('caption')}
+          placeholder={isNoAccommodation ? Translate.string('No accommodation') : undefined}
         />
       </td>
       <td>
-        <input
-          type="checkbox"
-          name="isBillable"
-          checked={isBillable}
-          onChange={makeOnChange('isBillable', true)}
-          {...fieldProps}
-        />
+        {!isNoAccommodation && (
+          <input
+            type="checkbox"
+            name="isBillable"
+            checked={isBillable}
+            onChange={makeOnChange('isBillable', true)}
+            {...fieldProps}
+          />
+        )}
       </td>
       <td>
-        <input
-          type="number"
-          name="price"
-          min="0"
-          step="0.01"
-          value={price || ''}
-          onChange={makeOnChange('price', false, true)}
-          {...fieldProps}
-        />
+        {!isNoAccommodation && (
+          <input
+            type="number"
+            name="price"
+            min="0"
+            step="0.01"
+            value={price || ''}
+            onChange={makeOnChange('price', false, true)}
+            {...fieldProps}
+          />
+        )}
       </td>
       <td>
-        <input
-          type="number"
-          name="placesLimit"
-          min="0"
-          value={placesLimit || ''}
-          onChange={makeOnChange('placesLimit', false, true)}
-          {...fieldProps}
-        />
+        {!isNoAccommodation && (
+          <input
+            type="number"
+            name="placesLimit"
+            min="0"
+            value={placesLimit || ''}
+            onChange={makeOnChange('placesLimit', false, true)}
+            {...fieldProps}
+          />
+        )}
       </td>
-      {withExtraSlots && (
+      {!isNoAccommodation && withExtraSlots && (
         <>
           <td>
             <input
@@ -232,11 +256,13 @@ function Choice({
         />
       </td>
       <td className="row-actions">
-        <a
-          className="icon-remove remove-row"
-          title={Translate.string('Remove row')}
-          onClick={fieldProps.disabled ? undefined : onDelete}
-        />
+        {!isNoAccommodation && (
+          <a
+            className="icon-remove remove-row"
+            title={Translate.string('Remove row')}
+            onClick={fieldProps.disabled ? undefined : onDelete}
+          />
+        )}
       </td>
     </tr>
   );

@@ -9,6 +9,8 @@
 {% block content %}
     <div id="registration-form-setup-container"
          data-event-id="{{ event.id }}"
+         data-event-start-date="{{ event.start_dt_local.date() }}"
+         data-event-end-date="{{ event.end_dt_local.date() }}"
          data-regform-id="{{ regform.id }}"
          data-form-data="{{ form_data | tojson | forceescape }}"></div>
 
