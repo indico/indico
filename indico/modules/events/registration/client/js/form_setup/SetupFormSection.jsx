@@ -42,7 +42,7 @@ export default function SetupFormSection({index, ...rest}) {
         <FormSection
           sortHandle={<div className="section-sortable-handle hide-if-locked" ref={handleRef} />}
           setupActions={<FormSectionSetupActions {...rest} />}
-          ItemComponent={SetupFormItem}
+          itemComponent={SetupFormItem}
           itemProps={{sectionId: id}}
           {...rest}
         />

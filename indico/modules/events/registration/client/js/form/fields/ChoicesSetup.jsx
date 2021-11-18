@@ -163,11 +163,11 @@ function Choice({
     onDrop: () => null,
   });
 
-  const makeOnChange = (field, checkbox = false, number = false) => evt => {
+  const makeOnChange = field => evt => {
     const elem = evt.target;
-    if (checkbox) {
+    if (elem.type === 'checkbox') {
       onChange(field, elem.checked);
-    } else if (number) {
+    } else if (elem.type === 'number') {
       onChange(field, +elem.value);
     } else {
       onChange(field, elem.value);
@@ -193,7 +193,7 @@ function Choice({
             type="checkbox"
             name="isBillable"
             checked={isBillable}
-            onChange={makeOnChange('isBillable', true)}
+            onChange={makeOnChange('isBillable')}
             {...fieldProps}
           />
         )}
@@ -206,7 +206,7 @@ function Choice({
             min="0"
             step="0.01"
             value={price || ''}
-            onChange={makeOnChange('price', false, true)}
+            onChange={makeOnChange('price')}
             {...fieldProps}
           />
         )}
@@ -218,7 +218,7 @@ function Choice({
             name="placesLimit"
             min="0"
             value={placesLimit || ''}
-            onChange={makeOnChange('placesLimit', false, true)}
+            onChange={makeOnChange('placesLimit')}
             {...fieldProps}
           />
         )}
@@ -231,7 +231,7 @@ function Choice({
               name="maxExtraSlots"
               min="0"
               value={maxExtraSlots}
-              onChange={makeOnChange('maxExtraSlots', false, true)}
+              onChange={makeOnChange('maxExtraSlots')}
               {...fieldProps}
             />
           </td>
@@ -240,7 +240,7 @@ function Choice({
               type="checkbox"
               name="extraSlotsPay"
               checked={extraSlotsPay}
-              onChange={makeOnChange('extraSlotsPay', true)}
+              onChange={makeOnChange('extraSlotsPay')}
               {...fieldProps}
             />
           </td>
@@ -251,7 +251,7 @@ function Choice({
           type="checkbox"
           name="enabled"
           checked={isEnabled}
-          onChange={makeOnChange('isEnabled', true)}
+          onChange={makeOnChange('isEnabled')}
           {...fieldProps}
         />
       </td>

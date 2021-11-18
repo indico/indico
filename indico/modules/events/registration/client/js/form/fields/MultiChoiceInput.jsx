@@ -26,7 +26,7 @@ export default function MultiChoiceInput({htmlName, disabled, choices, withExtra
   const [value, setValue] = useState({});
 
   const makeHandleChange = choice => evt => {
-    setValue(prev => ({...prev, [choice.id]: evt.target.checked ? 1 : 0}));
+    setValue(prev => ({...prev, [choice.id]: +evt.target.checked}));
   };
   const makeHandleSlotsChange = choice => evt => {
     setValue(prev => ({...prev, [choice.id]: +evt.target.value}));
