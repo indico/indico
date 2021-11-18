@@ -23,8 +23,8 @@ const DateRangePicker = props => {
     inputIconPosition: 'after',
     showDefaultInputIcon: true,
     hideKeyboardShortcutsPanel: true,
-    focusedInput,
-    onFocusChange: setFocusedInput,
+    focusedInput: props.focusedInput !== undefined ? props.focusedInput : focusedInput,
+    onFocusChange: props.onFocusChange || setFocusedInput,
   });
 };
 
