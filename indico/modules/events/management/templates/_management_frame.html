@@ -24,7 +24,8 @@
 {%- endmacro -%}
 
 
-{% macro render_event_management_header_right(event, event_types) %}
+{# The extra args are not used in Indico but are there on purpose for others overriding the template. #}
+{% macro render_event_management_header_right(event, event_types, with_clone_info=true, with_action_menu=true) %}
     {% set start_date = event.start_dt | format_date('d MMM', timezone=event.tzinfo) %}
     {% set end_date = event.end_dt | format_date('d MMM', timezone=event.tzinfo) %}
 
@@ -41,10 +42,14 @@
                 </span>
             </a>
             {{ template_hook('event-management-after-title', event=event) }}
-            <div class="subtitle">
-                {{ _render_clone_info(event) }}
-            </div>
+            {% if with_clone_info %}
+                <div class="subtitle">
+                    {{ _render_clone_info(event) }}
+                </div>
+            {% endif %}
         </div>
-        {{ render_action_menu(event, event_types) }}
+        {% if with_action_menu %}
+            {{ render_action_menu(event, event_types) }}
+        {% endif %}
     </div>
 {% endmacro %}

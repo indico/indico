@@ -96,18 +96,18 @@
             </div>
         </div>
     {% else %}
-        {% block moderated_warning %}
-            {% if moderated %}
-                {% call message_box('warning', fixed_width=true, large_icon=true) %}
-                    <div class="label">
-                        {% trans %}Participation in this event is moderated{% endtrans %}
-                    </div>
+        {% if moderated %}
+            {% call message_box('warning', fixed_width=true, large_icon=true) %}
+                <div class="label">
+                    {% trans %}Participation in this event is moderated{% endtrans %}
+                </div>
+                {% block moderated_warning_explanation %}
                     {% trans -%}
                         The organizers will have to approve your application.
                     {%- endtrans %}
-                {% endcall %}
-            {% endif %}
-        {% endblock %}
+                {% endblock %}
+            {% endcall %}
+        {% endif %}
 
         {{ template_hook('before-regform', event=event, regform=regform, management=management, registration=none) }}
         <div ng-app="nd" ng-controller="AppCtrl">
