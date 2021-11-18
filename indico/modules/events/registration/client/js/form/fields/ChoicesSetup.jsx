@@ -64,7 +64,7 @@ export function Choices({
   // edit  the actual data)
   return (
     <>
-      <SortableWrapper accept="regform-item-choice">
+      <SortableWrapper styleName="choices-table-wrapper" accept="regform-item-choice">
         <table styleName="choices-table">
           <thead>
             <tr>
@@ -88,10 +88,7 @@ export function Choices({
                   </th>
                 </>
               )}
-              <th>
-                <Translate>Enabled</Translate>
-              </th>
-              <th />
+              <th style={{width: '3.7em'}} />
             </tr>
           </thead>
           <tbody>
@@ -171,7 +168,7 @@ function Choice({
   };
 
   return (
-    <tr ref={itemRef} style={style}>
+    <tr ref={itemRef} style={style} styleName={!isEnabled ? 'disabled-row' : undefined}>
       <td styleName="table-sortable-handle" ref={handleRef} />
       <td>
         <input
@@ -231,21 +228,25 @@ function Choice({
           </td>
         </>
       )}
-      <td>
-        <input
-          type="checkbox"
-          name="enabled"
-          checked={isEnabled}
-          onChange={makeOnChange('isEnabled')}
-          {...fieldProps}
-        />
-      </td>
-      <td className="row-actions">
+      <td style={{textAlign: 'end'}}>
         {!isNoAccommodation && (
           <a
             className="icon-remove remove-row"
             title={Translate.string('Remove row')}
             onClick={fieldProps.disabled ? undefined : onDelete}
+          />
+        )}
+        {isEnabled ? (
+          <a
+            className="icon-disable"
+            title={Translate.string('Disable choice')}
+            onClick={() => onChange('isEnabled', false)}
+          />
+        ) : (
+          <a
+            className="icon-checkmark remove-row"
+            title={Translate.string('Enable choice')}
+            onClick={() => onChange('isEnabled', true)}
           />
         )}
       </td>
