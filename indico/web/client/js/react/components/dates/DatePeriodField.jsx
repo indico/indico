@@ -24,6 +24,7 @@ export default class DatePeriodField extends React.Component {
     onChange: PropTypes.func.isRequired,
     onFocus: PropTypes.func.isRequired,
     onBlur: PropTypes.func.isRequired,
+    onFieldFocusChange: PropTypes.func,
     readOnly: PropTypes.bool,
     disabled: PropTypes.bool,
     disabledDateFields: PropTypes.oneOf([START_DATE, END_DATE]),
@@ -33,6 +34,7 @@ export default class DatePeriodField extends React.Component {
     }),
     minimumDays: PropTypes.number,
     initialVisibleMonth: PropTypes.func,
+    extraPickerProps: PropTypes.object,
   };
 
   static defaultProps = {
@@ -43,6 +45,8 @@ export default class DatePeriodField extends React.Component {
     value: null,
     minimumDays: 1,
     initialVisibleMonth: null,
+    onFieldFocusChange: null,
+    extraPickerProps: {},
   };
 
   state = {
@@ -72,7 +76,11 @@ export default class DatePeriodField extends React.Component {
   };
 
   handleFocusChange = focused => {
+    const {onFieldFocusChange} = this.props;
     this.setState({focused});
+    if (onFieldFocusChange) {
+      onFieldFocusChange(focused);
+    }
     if (!focused) {
       const {onFocus, onBlur} = this.props;
       onFocus();
@@ -88,6 +96,7 @@ export default class DatePeriodField extends React.Component {
       disabledDate,
       initialVisibleMonth,
       readOnly,
+      extraPickerProps,
     } = this.props;
     const {focused} = this.state;
     const props = {};
@@ -110,6 +119,7 @@ export default class DatePeriodField extends React.Component {
           minimumNights={minimumDays - 1}
           initialVisibleMonth={initialVisibleMonth}
           block
+          {...extraPickerProps}
         />
       </div>
     );
