@@ -14,7 +14,7 @@ import {START_DATE, END_DATE} from 'react-dates/constants';
 import {DateRangePicker} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
-import {FinalField} from '../../forms';
+import {FinalField, validators as v} from '../../forms';
 
 import './DatePeriodField.module.scss';
 
@@ -130,6 +130,9 @@ export default class DatePeriodField extends React.Component {
  * Like `FinalField` but for a `DatePeriodField`.
  */
 export function FinalDatePeriod({name, ...rest}) {
+  if (rest.required) {
+    rest.validate = rest.validate ? v.chain(v.dates(), rest.validate) : v.dates();
+  }
   return <FinalField name={name} component={DatePeriodField} isEqual={_.isEqual} {...rest} />;
 }
 
