@@ -34,6 +34,7 @@ import TextInput, {TextSettings} from './TextInput';
 /*
 Available keys:
 - title: required; used to show the field type when adding a new field
+- icon: required; used in the add field dropdown (this uses an indico icon, not a SUI icon)
 - inputComponent: required; the component used to render the field
 - settingsComponent: optional; used if the field has custom settings
 - settingsModalSize: optional; used if the field has settings which benefit
