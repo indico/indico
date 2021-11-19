@@ -13,11 +13,13 @@ import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import ItemSettingsModal from './ItemSettingsModal';
+import ItemTypeDropdown from './ItemTypeDropdown';
 import SectionSettingsModal from './SectionSettingsModal';
 
 export default function FormSectionSetupActions({id, isPersonalData}) {
   const [settingsModalActive, setSettingsModalActive] = useState(false);
   const [fieldModalActive, setFieldModalActive] = useState(false);
+  const [newItemType, setNewItemType] = useState(null);
   const dispatch = useDispatch();
 
   const handleDisableClick = () => {
@@ -26,10 +28,6 @@ export default function FormSectionSetupActions({id, isPersonalData}) {
 
   const handleConfigureClick = () => {
     setSettingsModalActive(true);
-  };
-
-  const handleAddClick = () => {
-    setFieldModalActive(true);
   };
 
   return (
@@ -46,16 +44,22 @@ export default function FormSectionSetupActions({id, isPersonalData}) {
         title={Translate.string('Configure section')}
         onClick={handleConfigureClick}
       />
-      <a
-        className="icon-plus hide-if-locked"
-        title={Translate.string('Add field')}
-        onClick={handleAddClick}
+      <ItemTypeDropdown
+        inModal={false}
+        onClick={value => {
+          setNewItemType(value);
+          setFieldModalActive(true);
+        }}
       />
       {settingsModalActive && (
         <SectionSettingsModal id={id} onClose={() => setSettingsModalActive(false)} />
       )}
       {fieldModalActive && (
-        <ItemSettingsModal sectionId={id} onClose={() => setFieldModalActive(false)} />
+        <ItemSettingsModal
+          sectionId={id}
+          defaultNewItemType={newItemType}
+          onClose={() => setFieldModalActive(false)}
+        />
       )}
     </>
   );

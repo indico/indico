@@ -55,44 +55,53 @@ export const fieldRegistry = {
     inputComponent: LabelInput,
     noRequired: true,
     noLabel: true,
+    icon: 'tag',
   },
   text: {
     title: Translate.string('Text'),
     inputComponent: TextInput,
     settingsComponent: TextSettings,
+    icon: 'textfield',
   },
   number: {
     title: Translate.string('Number'),
     inputComponent: NumberInput,
     settingsComponent: NumberSettings,
     settingsFormValidator: numberSettingsFormValidator,
+    icon: 'seven-segment9',
   },
   textarea: {
     title: Translate.string('Text area'),
     inputComponent: TextAreaInput,
     settingsComponent: TextAreaSettings,
+    icon: 'textarea',
   },
   checkbox: {
     title: Translate.string('Checkbox'),
     inputComponent: CheckboxInput,
     noLabel: true,
+    icon: 'checkbox-checked',
   },
   bool: {
     title: Translate.string('Yes/No'),
     inputComponent: BooleanInput,
     settingsComponent: BooleanSettings,
+    icon: 'switchon',
   },
   phone: {
     title: Translate.string('Phone'),
     inputComponent: PhoneInput,
+    icon: 'phone',
   },
   country: {
     title: Translate.string('Country'),
     inputComponent: CountryInput,
+    icon: 'earth',
   },
   email: {
     title: Translate.string('Email'),
     inputComponent: EmailInput,
+    icon: 'mail',
   },
   single_choice: {
     title: Translate.string('Single Choice'),
@@ -101,6 +110,7 @@ export const fieldRegistry = {
     settingsModalSize: 'small',
     settingsFormDecorator: singleChoiceSettingsFormDecorator,
     settingsFormInitialData: singleChoiceSettingsInitialData,
+    icon: 'dropmenu',
   },
   multi_choice: {
     title: Translate.string('Multiple Choice'),
@@ -108,6 +118,7 @@ export const fieldRegistry = {
     settingsComponent: MultiChoiceSettings,
     settingsModalSize: 'small',
     settingsFormInitialData: multiChoiceSettingsInitialData,
+    icon: 'list',
   },
   accommodation: {
     title: Translate.string('Accommodation'),
@@ -118,5 +129,6 @@ export const fieldRegistry = {
     settingsFormValidator: accommodationSettingsFormValidator,
     noRequired: true,
     alwaysRequired: true,
+    icon: 'home',
   },
 };
