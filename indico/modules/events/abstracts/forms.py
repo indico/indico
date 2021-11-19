@@ -470,11 +470,6 @@ class AbstractForm(IndicoForm):
         self.abstract = kwargs.pop('abstract', None)
         is_invited = kwargs.pop('invited', False)
         management = kwargs.pop('management', False)
-        self.person_links = AbstractPersonLinkListField(
-            _('Authors'),
-            allow_speakers=not is_invited and abstracts_settings.get(self.event, 'allow_speakers'),
-            require_primary_author=not is_invited,
-            require_speaker=not is_invited and abstracts_settings.get(self.event, 'speakers_required'))
         description_settings = abstracts_settings.get(self.event, 'description_settings')
         description_validators = self._get_description_validators(description_settings, invited=is_invited)
         if description_validators:

@@ -14,7 +14,8 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.modules.events.layout import theme_settings
-from indico.modules.events.models.persons import EventPerson, EventPersonLink, PersonLinkBase
+from indico.modules.events.models.events import EventType
+from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.users.util import get_user_by_email
@@ -67,50 +68,7 @@ class ReferencesField(MultipleItemsField):
             return [{'id': r.id, 'type': str(r.reference_type_id), 'value': r.value} for r in self.data]
 
 
-class EventPersonListField(PrincipalListField):
-    """A field that lets you select a list Indico user and EventPersons.
-
-    This requires its form to have an event set.
-    """
-
-    #: Whether new event persons created by the field should be
-    #: marked as untrusted
-    create_untrusted_persons = False
-
-    def __init__(self, *args, **kwargs):
-        self.event_person_conversions = {}
-        super().__init__(*args, allow_groups=False, allow_external_users=True, **kwargs)
-
-    @property
-    def event(self):
-        return getattr(self.get_form(), 'event', None)
-
-    def _convert_data(self, data):
-        raise NotImplementedError
-
-    def _serialize_principal(self, principal):
-        from indico.modules.events.persons.schemas import EventPersonSchema
-        if principal.id is None:
-            # We created an EventPerson which has not been persisted to the
-            # database. Revert the conversion.
-            principal = self.event_person_conversions[principal]
-            if isinstance(principal, dict):
-                return principal
-        if not isinstance(principal, EventPerson):
-            return super()._serialize_principal(principal)
-        return EventPersonSchema().dump(principal)
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            self.data = json.loads(valuelist[0])
-            try:
-                self.data = self._convert_data(self.data)
-            except ValueError:
-                self.data = []
-                raise
-
-
-class PersonLinkListFieldBase(EventPersonListField):
+class PersonLinkListFieldBase(PrincipalListField):
     #: class that inherits from `PersonLinkBase`
     person_link_cls = None
     #: name of the attribute on the form containing the linked object
@@ -119,10 +77,12 @@ class PersonLinkListFieldBase(EventPersonListField):
     default_sort_alpha = True
 
     widget = None
+    create_untrusted_persons = False
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, allow_groups=False, allow_external_users=True, **kwargs)
         self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
+        self.event = self.object.event
 
     @no_autoflush
     def _get_person_link(self, data):
@@ -149,19 +109,23 @@ class PersonLinkListFieldBase(EventPersonListField):
                 raise UserValueError(_('There is already a person with the email {email}').format(email=email))
         return person_link
 
-    def _serialize_principal(self, principal):
-        if not isinstance(principal, PersonLinkBase):
-            return super()._serialize_principal(principal)
-        if principal.id is None:
-            return super()._serialize_principal(principal.person)
-        else:
-            return self._serialize_person_link(principal)
-
     def _serialize_person_link(self, principal):
+        raise NotImplementedError
+
+    def _convert_data(self, data):
         raise NotImplementedError
 
     def _value(self):
         return [self._serialize_person_link(person_link) for person_link in self.data] if self.data else []
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = json.loads(valuelist[0])
+            try:
+                self.data = self._convert_data(self.data)
+            except ValueError:
+                self.data = []
+                raise
 
 
 class EventPersonLinkListField(PersonLinkListFieldBase):
@@ -179,9 +143,9 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
     def __init__(self, *args, **kwargs):
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         self.empty_message = _('There are no chairpersons')
-        if self.event.type == 'lecture':
-            self.empty_message = _('There are no speakers')
         super().__init__(*args, **kwargs)
+        if kwargs.pop('event_type', self.object.event and self.object.event.type_) == EventType.lecture:
+            self.empty_message = _('There are no speakers')
 
     def _convert_data(self, data):
         return {self._get_person_link(x): 'submitter' in x.get('roles', []) for x in data}
