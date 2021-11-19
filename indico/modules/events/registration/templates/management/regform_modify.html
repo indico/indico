@@ -16,9 +16,19 @@
 
     <hr>
     <h1>Warning, angular 💩 below</h1>
+    <button type="button" id="load-legacy-angular">Load legacy form</button>
+    <script>
+        (() => {
+            const btn = document.querySelector('#load-legacy-angular')
+            btn.addEventListener('click', () => {
+                angular.bootstrap(document.querySelector("[ng-controller='AppCtrl']"), ['nd']);
+                btn.remove();
+            });
+        })();
+    </script>
     <hr>
 
-    <div ng-app="nd" ng-controller="AppCtrl">
+    <div ng-controller="AppCtrl">
         {% block regform %}
             <div nd-reg-form
                  event-id="{{ event.id }}"
