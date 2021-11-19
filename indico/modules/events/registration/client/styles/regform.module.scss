@@ -80,7 +80,11 @@
 
     &:not(.disabled):hover .sortable-handle {
       @include icon-before('icon-handle');
-      cursor: move;
+      cursor: grab;
+    }
+
+    &:not(.disabled):hover .sortable-handle:active {
+      cursor: grabbing;
     }
 
     &:hover > .actions {

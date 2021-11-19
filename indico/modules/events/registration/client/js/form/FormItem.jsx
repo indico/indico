@@ -11,6 +11,7 @@ import React from 'react';
 import {Markdown, toClasses} from 'indico/react/util';
 
 import {fieldRegistry} from './fields/registry';
+
 import '../../styles/regform.module.scss';
 
 export default function FormItem({

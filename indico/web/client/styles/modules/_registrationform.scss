@@ -78,7 +78,7 @@
     );
 
     background-color: lighten($dark-gray, $color-variation);
-    cursor: move;
+    cursor: grab;
     font-size: 1.2em;
     height: 10px;
     margin: -10px -10px 10px -10px;
@@ -94,6 +94,10 @@
         color: $dark-gray;
         top: 3px;
       }
+    }
+
+    &:active {
+      cursor: grabbing;
     }
 
     &::before {
@@ -916,7 +920,11 @@ textarea.regFormDescriptionInputMgmt {
   .table-sortable-handle {
     color: $dark-gray;
     width: 15px;
-    cursor: move;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
   }
 }
 
