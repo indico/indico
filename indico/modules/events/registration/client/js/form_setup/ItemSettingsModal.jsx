@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {FormSpy} from 'react-final-form';
 import {useSelector, useDispatch} from 'react-redux';
-import {Dropdown, Message} from 'semantic-ui-react';
+import {Message} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalInput, FinalTextArea, getValuesForFields} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
@@ -19,19 +19,12 @@ import {Translate, Param} from 'indico/react/i18n';
 import {fieldRegistry} from '../form/fields/registry';
 
 import * as actions from './actions';
+import ItemTypeDropdown from './ItemTypeDropdown';
 import {getStaticData, getItemById} from './selectors';
 
-import '../../styles/regform.module.scss';
-
-const newItemTypeOptions = Object.entries(fieldRegistry).map(([name, {title}]) => ({
-  key: name,
-  value: name,
-  text: title,
-}));
-
-export default function ItemSettingsModal({id, sectionId, onClose}) {
+export default function ItemSettingsModal({id, sectionId, defaultNewItemType, onClose}) {
   const dispatch = useDispatch();
-  const [newItemType, setNewItemType] = useState(null);
+  const [newItemType, setNewItemType] = useState(defaultNewItemType);
   const editing = id !== null;
   const staticData = useSelector(getStaticData);
   const {inputType: existingInputType, fieldIsRequired, ...itemData} = useSelector(state =>
@@ -61,6 +54,20 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
       : meta.settingsFormInitialData;
   }
 
+  const handleChangeItemType = (dirty, value) => {
+    if (
+      newItemType &&
+      dirty &&
+      // eslint-disable-next-line no-alert
+      !confirm('Changing the type will reset this form.')
+    ) {
+      return;
+    }
+    // this will force the FinalModalForm to re-render, so we do not need to
+    // explicitly `restart()` the form
+    setNewItemType(value);
+  };
+
   return (
     <FinalModalForm
       // force re-render since we may need to change form decorators and initial values
@@ -70,7 +77,6 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
       onClose={onClose}
       initialValues={initialValues}
       initialValuesEqual={_.isEqual}
-      alignTop
       unloadPrompt
       size={meta.settingsModalSize || 'tiny'}
       decorators={meta.settingsFormDecorator ? [meta.settingsFormDecorator] : undefined}
@@ -86,30 +92,10 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
             <div style={{float: 'right'}}>
               <FormSpy subscription={{dirty: true}}>
                 {({dirty}) => (
-                  <Dropdown
-                    defaultOpen={!editing && !newItemType}
-                    selectOnNavigation={false}
-                    selectOnBlur={false}
-                    value={newItemType}
-                    onChange={(__, {value}) => {
-                      if (
-                        newItemType &&
-                        dirty &&
-                        // eslint-disable-next-line no-alert
-                        !confirm('Changing the type will reset this form.')
-                      ) {
-                        return;
-                      }
-                      // this will force the FinalModalForm to re-render, so we do not need to
-                      // explicitly `restart()` the form
-                      setNewItemType(value);
-                    }}
-                    text={
-                      newItemType
-                        ? fieldRegistry[newItemType].title
-                        : Translate.string('Choose type')
-                    }
-                    options={newItemTypeOptions}
+                  <ItemTypeDropdown
+                    newItemType={newItemType}
+                    inModal
+                    onClick={value => handleChangeItemType(dirty, value)}
                   />
                 )}
               </FormSpy>
@@ -153,10 +139,12 @@ export default function ItemSettingsModal({id, sectionId, onClose}) {
 ItemSettingsModal.propTypes = {
   id: PropTypes.number,
   sectionId: PropTypes.number,
+  defaultNewItemType: PropTypes.string,
   onClose: PropTypes.func.isRequired,
 };
 
 ItemSettingsModal.defaultProps = {
   id: null,
   sectionId: null,
+  defaultNewItemType: null,
 };
