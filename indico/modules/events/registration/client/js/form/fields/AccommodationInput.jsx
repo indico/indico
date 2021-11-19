@@ -163,17 +163,9 @@ export function accommodationSettingsFormValidator({arrival, departure}) {
   const departureDateTo = toMoment(departure.endDate, moment.HTML5_FMT.DATE);
 
   const errors = {};
-  let dataMissing = false;
-  if (!arrivalDateFrom || !arrivalDateTo) {
-    errors.arrival = Translate.string('This field is required.');
-    dataMissing = true;
-  }
-  if (!departureDateFrom || !departureDateTo) {
-    errors.departure = Translate.string('This field is required.');
-    dataMissing = true;
-  }
-  if (dataMissing) {
-    return errors;
+  if (!arrivalDateFrom || !arrivalDateTo || !departureDateFrom || !departureDateTo) {
+    // already covered by field-level validation
+    return;
   }
 
   if (departureDateFrom.isBefore(arrivalDateFrom)) {

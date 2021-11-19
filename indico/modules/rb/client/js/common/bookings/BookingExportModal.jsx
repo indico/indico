@@ -64,7 +64,6 @@ export default function BookingExportModal({rooms, onClose}) {
             <FinalDatePeriod
               name="dates"
               label={Translate.string('Period')}
-              validate={v.dates()}
               disabledDate={() => false}
               required
               allowNull
