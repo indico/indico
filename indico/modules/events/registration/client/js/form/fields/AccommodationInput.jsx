@@ -136,7 +136,6 @@ export const accommodationSettingsInitialData = staticData => ({
       id: `new:no-accommodation`,
       caption: 'No accommodation',
       isEnabled: true,
-      isBillable: false,
       isNoAccommodation: true,
       price: 0,
       placesLimit: 0,

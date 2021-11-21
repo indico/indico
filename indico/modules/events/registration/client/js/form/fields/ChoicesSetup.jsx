@@ -18,7 +18,6 @@ export const choiceShape = {
   caption: PropTypes.string.isRequired,
   // XXX are those values always present?
   isEnabled: PropTypes.bool.isRequired,
-  isBillable: PropTypes.bool.isRequired,
   price: PropTypes.number.isRequired,
   placesLimit: PropTypes.number,
   maxExtraSlots: PropTypes.number,
@@ -48,7 +47,6 @@ export function Choices({
       id: `new:${nanoid()}`,
       caption: '',
       isEnabled: true,
-      isBillable: false,
       price: 0,
       placesLimit: 0,
     };
@@ -71,9 +69,6 @@ export function Choices({
               <th style={{width: '1.75em'}} />
               <th>
                 <Translate>Caption</Translate>
-              </th>
-              <th>
-                <Translate>Billable</Translate>
               </th>
               <th style={{width: '7em'}}>
                 <Translate>Price</Translate>
@@ -141,7 +136,6 @@ function Choice({
   index,
   id,
   caption,
-  isBillable,
   price,
   placesLimit,
   maxExtraSlots,
@@ -186,17 +180,6 @@ function Choice({
           onChange={makeOnChange('caption')}
           placeholder={isNoAccommodation ? Translate.string('No accommodation') : undefined}
         />
-      </td>
-      <td>
-        {!isNoAccommodation && (
-          <input
-            type="checkbox"
-            name="isBillable"
-            checked={isBillable}
-            onChange={makeOnChange('isBillable')}
-            {...fieldProps}
-          />
-        )}
       </td>
       <td>
         {!isNoAccommodation && (
