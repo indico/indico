@@ -121,6 +121,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         items = deepcopy(versioned_data['choices'])
         for item in items:
             item['caption'] = unversioned_data['captions'][item['id']]
+            item['is_billable'] = item['price'] > 0
         return {'choices': items}
 
     @property
@@ -167,7 +168,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         for item in items:
             if 'id' not in item:
                 item['id'] = str(uuid4())
-            item.setdefault('is_billable', False)
+            assert 'is_billable' not in item
             item['price'] = float(item['price']) if item.get('price') else 0
             item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
             item['max_extra_slots'] = int(item['max_extra_slots']) if item.get('max_extra_slots') else 0
@@ -461,7 +462,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
         for item in items:
             if 'id' not in item:
                 item['id'] = str(uuid4())
-            item.setdefault('is_billable', False)
+            assert 'is_billable' not in item
             item['price'] = float(item['price']) if item.get('price') else 0
             item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
             captions[item['id']] = item.pop('caption')
@@ -494,6 +495,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
         items = deepcopy(versioned_data['choices'])
         for item in items:
             item['caption'] = unversioned_data['captions'][item['id']]
+            item['is_billable'] = item['price'] > 0
         data['choices'] = items
         return data
 
