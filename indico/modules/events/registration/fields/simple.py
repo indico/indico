@@ -59,8 +59,6 @@ class NumberField(RegistrationFormBillableField):
                             max=self.form_item.data.get('max_value', None))]
 
     def calculate_price(self, reg_data, versioned_data):
-        if not versioned_data.get('is_billable'):
-            return 0
         return versioned_data.get('price', 0) * int(reg_data or 0)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
@@ -87,7 +85,7 @@ class CheckboxField(RegistrationFormBillableField):
                              False: L_('No')}
 
     def calculate_price(self, reg_data, versioned_data):
-        if not versioned_data.get('is_billable') or not reg_data:
+        if not reg_data:
             return 0
         return versioned_data.get('price', 0)
 
@@ -229,8 +227,6 @@ class BooleanField(RegistrationFormBillableField):
         return places_used
 
     def calculate_price(self, reg_data, versioned_data):
-        if not versioned_data.get('is_billable'):
-            return 0
         return versioned_data.get('price', 0) if reg_data else 0
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):

@@ -198,7 +198,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def calculate_price(self, reg_data, versioned_data):
         if not reg_data:
             return 0
-        billable_choices = [x for x in versioned_data['choices'] if x['id'] in reg_data and x['is_billable']]
+        billable_choices = [x for x in versioned_data['choices'] if x['id'] in reg_data and x['price']]
         price = 0
         for billable_field in billable_choices:
             price += billable_field['price']
@@ -344,10 +344,8 @@ class MultiChoiceField(ChoiceBaseField):
         if has_old_data:
             old_choices_mapping = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
             new_choices_mapping = {x['id']: x for x in new_choices}
-            old_billable = {uuid: num for uuid, num in old_data.data.items()
-                            if old_choices_mapping[uuid]['is_billable'] and old_choices_mapping[uuid]['price']}
-            new_billable = {uuid: num for uuid, num in value.items()
-                            if new_choices_mapping[uuid]['is_billable'] and new_choices_mapping[uuid]['price']}
+            old_billable = {uuid: num for uuid, num in old_data.data.items() if old_choices_mapping[uuid]['price']}
+            new_billable = {uuid: num for uuid, num in value.items() if new_choices_mapping[uuid]['price']}
         if has_old_data and old_billable != new_billable:
             # preserve existing data
             return return_value
@@ -553,9 +551,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
     def calculate_price(self, reg_data, versioned_data):
         if not reg_data:
             return 0
-        item = next((x for x in versioned_data['choices']
-                     if reg_data['choice'] == x['id'] and x.get('is_billable', False)), None)
-        if not item or not item['price']:
+        item = next((x for x in versioned_data['choices'] if reg_data['choice'] == x['id'] and x['price']), None)
+        if not item:
             return 0
         nights = (_to_date(reg_data['departure_date']) - _to_date(reg_data['arrival_date'])).days
         return item['price'] * nights
