@@ -165,7 +165,7 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
         return super().process_field_data(data, old_data, old_versioned_data)
 
     def calculate_price(self, reg_data, versioned_data):
-        return versioned_data.get('price', 0) if versioned_data.get('is_billable') else 0
+        return versioned_data.get('price', 0)
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False, new_data_version=None):
         if new_data_version is None:

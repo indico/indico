@@ -24,9 +24,9 @@ def multi_choice_field():
     field = RegistrationFormField(input_type='multi_choice')
     field.versioned_data = {
         'choices': [
-            {'id': _id(1), 'places_limit': 0, 'is_billable': False, 'price': 0},
-            {'id': _id(2), 'places_limit': 0, 'is_billable': False, 'price': 0},
-            {'id': _id(3), 'places_limit': 0, 'is_billable': True, 'price': 10}
+            {'id': _id(1), 'places_limit': 0, 'price': 0},
+            {'id': _id(2), 'places_limit': 0, 'price': 0},
+            {'id': _id(3), 'places_limit': 0, 'price': 10}
         ]
     }
     return field
@@ -37,7 +37,7 @@ def _update_data(data, changes):
     refs = {x['id']: x for x in data['choices']}
     for id_, item_changes in changes.items():
         if id_ not in refs:
-            entry = {'id': id_, 'places_limit': 0, 'is_billable': False, 'price': 0}
+            entry = {'id': id_, 'places_limit': 0, 'price': 0}
             entry.update(item_changes)
             data['choices'].append(entry)
         elif item_changes is None:
@@ -146,7 +146,7 @@ def test_multi_choice_field_process_form_data_price_change_deselected(multi_choi
     # item was deselected.
     # field data should be upgraded to a new version containing both the new items and the old-priced one
     multi_choice_field.versioned_data = _update_data(multi_choice_field.versioned_data,
-                                                     {_id(2): {'is_billable': True, 'price': 100},
+                                                     {_id(2): {'price': 100},
                                                       _id(3): {'price': 500}})
     old_version = multi_choice_field.current_data
     old_data = RegistrationData(field_data=old_version, data={_id(2): 1, _id(3): 1})
