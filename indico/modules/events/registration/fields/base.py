@@ -7,7 +7,7 @@
 
 from copy import deepcopy
 
-from marshmallow import fields, validate
+from marshmallow import fields, pre_load, validate
 from wtforms.validators import DataRequired, Optional
 
 from indico.core.marshmallow import mm
@@ -15,8 +15,14 @@ from indico.modules.events.registration.models.registrations import Registration
 
 
 class BillableFieldDataSchema(mm.Schema):
-    is_billable = fields.Bool(load_default=False)
     price = fields.Float(load_default=0)
+
+    @pre_load
+    def _remove_is_billable(self, data, **kwargs):
+        # TODO remove this once the angular frontend is gone
+        data = data.copy()
+        data.pop('is_billable', None)
+        return data
 
 
 class LimitedPlacesBillableFieldDataSchema(BillableFieldDataSchema):
@@ -37,7 +43,7 @@ class RegistrationFormFieldBase:
     #: the validator to use when the field is not required
     not_required_validator = Optional
     #: the data fields that need to be versioned
-    versioned_data_fields = frozenset({'is_billable', 'price'})
+    versioned_data_fields = frozenset({'price'})
     #: the marshmallow base schema for configuring the field
     setup_schema_base_cls = mm.Schema
     #: a dict with extra marshmallow fields to include in the setup schema
@@ -160,12 +166,17 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         data = deepcopy(data)
-        data.setdefault('is_billable', False)
         data['price'] = float(data['price']) if data.get('price') else 0
         return super().process_field_data(data, old_data, old_versioned_data)
 
     def calculate_price(self, reg_data, versioned_data):
         return versioned_data.get('price', 0)
+
+    @classmethod
+    def unprocess_field_data(cls, versioned_data, unversioned_data):
+        data = versioned_data | unversioned_data
+        data['is_billable'] = data['price'] > 0
+        return data
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False, new_data_version=None):
         if new_data_version is None:
@@ -183,7 +194,6 @@ class RegistrationFormBillableItemsField(RegistrationFormBillableField):
         unversioned_data, versioned_data = super().process_field_data(
             data, old_data, old_versioned_data)
         # we don't have field-level billing data here
-        del versioned_data['is_billable']
         del versioned_data['price']
         return unversioned_data, versioned_data
 

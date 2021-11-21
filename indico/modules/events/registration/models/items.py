@@ -67,7 +67,6 @@ class PersonalDataType(int, IndicoEnum):
     @classmethod
     def FIELD_DATA(cls):
         title_item = {'price': 0,
-                      'is_billable': False,
                       'places_limit': 0,
                       'is_enabled': True}
         return [
