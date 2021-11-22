@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix editing service API calls using the service token (:pr:`5170`)
 
 
 Version 3.0.3

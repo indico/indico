@@ -14,6 +14,7 @@ from werkzeug.exceptions import BadRequest, ServiceUnavailable
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.oauth.util import TOKEN_PREFIX_SERVICE
 from indico.modules.events.editing.controllers.base import RHEditingManagementBase
 from indico.modules.events.editing.service import (ServiceRequestFailed, check_service_url, make_event_identifier,
                                                    service_get_status, service_handle_disconnected,
@@ -53,7 +54,7 @@ class RHConnectService(RHEditingManagementBase):
             editing_settings.set(self.event, 'service_event_identifier', make_event_identifier(self.event))
         editing_settings.set_multi(self.event, {
             'service_url': url,
-            'service_token': str(uuid4()),
+            'service_token': f'{TOKEN_PREFIX_SERVICE}{uuid4()}',
         })
         # we need to commit the token so the service can already use it when processing
         # the enabled event in case it wants to set up tags etc
