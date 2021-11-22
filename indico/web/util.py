@@ -287,7 +287,9 @@ def verify_signed_user_url(url, method):
 
 def get_oauth_user(scopes):
     from indico.core.oauth import require_oauth
-    if not request.headers.get('Authorization', '').lower().startswith('bearer '):
+    from indico.core.oauth.util import TOKEN_PREFIX_SERVICE
+    token = request.headers.get('Authorization', '')
+    if not token.lower().startswith('bearer ') or token.lower().startswith(f'bearer {TOKEN_PREFIX_SERVICE}'):
         return None
     try:
         oauth_token = require_oauth.acquire_token(scopes)

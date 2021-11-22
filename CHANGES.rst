@@ -79,6 +79,8 @@ Improvements
 - Let event managers view the final timetable even while in draft mode (:issue:`5141`,
   :pr:`5145`)
 - Add option to export role members as CSV (:issue:`5147`, :pr:`5156`)
+- Include attachment checksums in API responses (:issue:`5084`, :pr:`5169`, thanks
+  :user:`avivace`)
 
 Bugfixes
 ^^^^^^^^
@@ -107,7 +109,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix editing service API calls using the service token (:pr:`5170`)
 
 
 Version 3.0.3

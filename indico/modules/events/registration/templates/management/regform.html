@@ -1,16 +1,18 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% block content %}
-    {% if not regform.has_started %}
-        {% include 'events/registration/management/regform_actions/not_started.html' %}
-    {% elif regform.is_open %}
-        {% include 'events/registration/management/regform_actions/open.html' %}
-    {% elif regform.has_ended %}
-        {% include 'events/registration/management/regform_actions/ended.html' %}
-    {% endif %}
+    {% block regform_state %}
+        {% if not regform.has_started %}
+            {% include 'events/registration/management/regform_actions/not_started.html' %}
+        {% elif regform.is_open %}
+            {% include 'events/registration/management/regform_actions/open.html' %}
+        {% elif regform.has_ended %}
+            {% include 'events/registration/management/regform_actions/ended.html' %}
+        {% endif %}
+    {% endblock %}
 
-    <div class="action-box">
-        {% block regform_setup %}
+    {% block regform_setup_box %}
+        <div class="action-box">
             <div class="section">
                 <div class="icon icon-settings"></div>
                 <div class="text">
@@ -40,36 +42,38 @@
                     </a>
                 </div>
             </div>
-        {% endblock %}
-    </div>
+        </div>
+    {% endblock %}
 
     <div class="action-box">
-        {% block registrant_actions %}
-            <div class="section">
-                <div class="icon icon-users"></div>
-                <div class="text">
-                    <div class="label">
-                        {% trans %}List of registrations{% endtrans %}
-                    </div>
-                    {% trans %}Add, remove or modify registrations.{% endtrans %}
+        <div class="section">
+            <div class="icon icon-users"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}List of registrations{% endtrans %}
                 </div>
-                <div class="toolbar">
-                    <div class="group">
+                {% trans %}Add, remove or modify registrations.{% endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    {% block registrations_count_label %}
                         <span class="i-button label icon-user" title="{% trans %}Total registrations{% endtrans %}">
                             {{ regform.existing_registrations_count }}
                             {%- if regform.registration_limit %}
                                 / {{ regform.registration_limit }}
                             {%- endif -%}
                         </span>
-                    </div>
-                    <div class="group">
-                        <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-settings">
-                            {% trans %}Manage{% endtrans %}
-                        </a>
-                    </div>
+                    {% endblock %}
+                </div>
+                <div class="group">
+                    <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-settings">
+                        {% trans %}Manage{% endtrans %}
+                    </a>
                 </div>
             </div>
+        </div>
 
+        {% block invitations_section %}
             <div class="section">
                 <div class="icon icon-mail"></div>
                 <div class="text">
@@ -84,6 +88,9 @@
                     </a>
                 </div>
             </div>
+        {% endblock %}
+
+        {% block ticket_config_section %}
             <div class="section">
                 <div class="icon icon-ticket"></div>
                 <div class="text">
