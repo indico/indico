@@ -25,6 +25,8 @@ MAX_TOKENS_PER_SCOPE = 50
 TOKEN_PREFIX_OAUTH = 'indo_'
 # The prefix for personal tokens
 TOKEN_PREFIX_PERSONAL = 'indp_'
+# The prefix for service tokens (not handled by this module)
+TOKEN_PREFIX_SERVICE = 'inds_'
 
 
 def query_token(token_string, allow_personal=False):
