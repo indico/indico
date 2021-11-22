@@ -13,9 +13,9 @@
 
 {% block content %}
     {% if not event.has_feature('payment') %}
-        <div id="payment-disabled-notice" class="action-box highlight">
-            <div class="section">
-                {% block payments_disabled %}
+        {% block payments_disabled_box %}
+            <div id="payment-disabled-notice" class="action-box highlight">
+                <div class="section">
                     <div class="icon icon-coins"></div>
                     <div class="text">
                         <div class="label">
@@ -34,13 +34,13 @@
                             </a>
                         </div>
                     {% endif %}
-                {% endblock %}
+                </div>
             </div>
-        </div>
+        {% endblock %}
     {% endif %}
 
-    <div class="action-box">
-        {% block global_registration_actions %}
+    {% block global_registration_actions_box %}
+        <div class="action-box">
             <div class="section">
                 <div class="icon icon-settings"></div>
                 <div class="text">
@@ -90,32 +90,34 @@
     </div>
     {{ template_hook('extra-registration-settings', event=event) }}
     <div class="regform-list">
-        {% block regform_list %}
-            <h3>{% trans %}List of registration forms{% endtrans %}</h3>
-            {% for regform in regforms %}
-                <div class="action-box">
-                    <div class="section">
-                        <div class="icon icon-quill"></div>
-                        <div class="text">
-                            <div class="label">{{ regform.title }}</div>
-                        </div>
-                        <div class="toolbar">
-                            <div class="group">
-                                <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-users">
-                                    {%- trans %}Registrations{% endtrans -%}
+        <h3>{% trans %}List of registration forms{% endtrans %}</h3>
+        {% for regform in regforms %}
+            <div class="action-box">
+                <div class="section">
+                    <div class="icon icon-quill"></div>
+                    <div class="text">
+                        <div class="label">{{ regform.title }}</div>
+                    </div>
+                    <div class="toolbar">
+                        <div class="group">
+                            <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-users">
+                                {%- trans %}Registrations{% endtrans -%}
+                                {% block existing_count scoped %}
                                     <span class="badge">
                                         {{- regform.existing_registrations_count -}}
                                         {% if regform.registration_limit %}
                                             / {{ regform.registration_limit }}
                                         {%- endif -%}
                                     </span>
-                                </a>
-                            </div>
-                            <div class="group">
-                                <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
-                                    {% trans %}Manage{% endtrans %}
-                                </a>
-                            </div>
+                                {% endblock %}
+                            </a>
+                        </div>
+                        <div class="group">
+                            <a href="{{ url_for('.manage_regform', regform) }}" class="i-button highlight icon-settings">
+                                {% trans %}Manage{% endtrans %}
+                            </a>
+                        </div>
+                        {% block delete_regform_button scoped %}
                             <div class="group hide-if-locked">
                                 <a href="#" class="i-button icon-remove danger text-color"
                                    title="{% trans %}Delete this registration form{% endtrans %}"
@@ -125,15 +127,15 @@
                                    data-title="{% trans %}Delete registration form?{% endtrans %}"
                                    data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}"></a>
                             </div>
-                        </div>
+                        {% endblock %}
                     </div>
                 </div>
-            {% else %}
-                {%- call message_box('info', fixed_width=true) -%}
-                    {% trans %}There are no registration forms yet.{% endtrans %}
-                {%- endcall %}
-            {% endfor %}
-        {% endblock %}
+            </div>
+        {% else %}
+            {%- call message_box('info', fixed_width=true) -%}
+                {% trans %}There are no registration forms yet.{% endtrans %}
+            {%- endcall %}
+        {% endfor %}
     </div>
 
     <div class="toolbar f-j-end hide-if-locked">

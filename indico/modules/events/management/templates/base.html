@@ -5,7 +5,9 @@
 
 {% block banner %}
     <div class="content-column" id="event-management-header-right">
-        {{ render_event_management_header_right(event, base_layout_params.event_types) }}
+        {% block banner_content %}
+            {{ render_event_management_header_right(event, base_layout_params.event_types) }}
+        {% endblock %}
     </div>
 {% endblock %}
 

@@ -28,36 +28,38 @@
     <div class="action-box highlight">
         <div class="section">
             <span class="icon icon-ticket"></span>
-            {% block form_labels %}
-                <div class="text">
-                    <div class="label">
+            <div class="text">
+                <div class="label">
+                    {% block form_label_title %}
                         {%- if is_form_moderated %}
                             {%- trans %}Application{% endtrans %}
                         {%- else %}
                             {%- trans %}Registration{% endtrans %}
                         {%- endif -%}
-                    </div>
-                    {% if user_registrations %}
-                        {% if user_registrations < regforms|length %}
-                            <div>
-                                {% trans %}
-                                    You are registered for this event, but there are more registration forms available.
-                                {% endtrans %}
-                            </div>
-                        {% else %}
-                            <div>{% trans %}You are registered for this event.{% endtrans %}</div>
-                        {%  endif %}
-                    {% else %}
+                    {% endblock %}
+                </div>
+                {% if user_registrations %}
+                    {% if user_registrations < regforms|length %}
                         <div>
+                            {% trans %}
+                                You are registered for this event, but there are more registration forms available.
+                            {% endtrans %}
+                        </div>
+                    {% else %}
+                        <div>{% trans %}You are registered for this event.{% endtrans %}</div>
+                    {%  endif %}
+                {% else %}
+                    <div>
+                        {% block form_label_description %}
                             {%- if is_form_moderated %}
                                 {%- trans %}Application for this event is currently open.{% endtrans %}
                             {%- else %}
                                 {%- trans %}Registration for this event is currently open.{% endtrans %}
                             {%- endif -%}
-                        </div>
-                    {% endif %}
-                </div>
-            {% endblock %}
+                        {% endblock %}
+                    </div>
+                {% endif %}
+            </div>
             <div class="toolbar">
                 {% if is_number_published %}
                     <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">
@@ -75,16 +77,16 @@
                         {% trans %}See details{% endtrans %}
                     </a>
                 {% else %}
-                    {% block register_now_button %}
-                        <a href="{{ url_for('event_registration.display_regform_list', event) }}"
-                           class="i-button next highlight">
+                    <a href="{{ url_for('event_registration.display_regform_list', event) }}"
+                       class="i-button next highlight">
+                        {% block register_now_button_text %}
                             {%- if is_form_moderated %}
                                 {%- trans %}Apply now{% endtrans %}
                             {%- else %}
                                 {%- trans %}Register now{% endtrans %}
                             {%- endif -%}
-                        </a>
-                    {% endblock %}
+                        {% endblock %}
+                    </a>
                 {% endif %}
             </div>
         </div>
