@@ -107,6 +107,10 @@
     }
   }
 
+  .price {
+    margin-left: 1em;
+  }
+
   :global(.DateRangePickerInput__disabled) {
     background: inherit;
   }

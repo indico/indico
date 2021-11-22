@@ -6,19 +6,42 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
+import {useSelector} from 'react-redux';
 import {Form} from 'semantic-ui-react';
 
 import {FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
+import {getCurrency} from '../../form_setup/selectors';
+
 import {mapPropsToAttributes} from './util';
+
+import '../../../styles/regform.module.scss';
 
 const attributeMap = {minValue: 'min', maxValue: 'max'};
 
-export default function NumberInput({htmlName, disabled, ...props}) {
+export default function NumberInput({htmlName, disabled, price, ...props}) {
+  const [value, setValue] = useState('');
+  const currency = useSelector(getCurrency);
   const inputProps = mapPropsToAttributes(props, attributeMap, NumberInput.defaultProps);
-  return <input type="number" name={htmlName} {...inputProps} disabled={disabled} />;
+  return (
+    <>
+      <input
+        type="number"
+        name={htmlName}
+        {...inputProps}
+        disabled={disabled}
+        value={value}
+        onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
+      />
+      {price && (
+        <span styleName="price">
+          {price} {currency} (Total: {value * price} {currency})
+        </span>
+      )}
+    </>
+  );
 }
 
 NumberInput.propTypes = {
@@ -26,12 +49,14 @@ NumberInput.propTypes = {
   disabled: PropTypes.bool,
   minValue: PropTypes.number,
   maxValue: PropTypes.number,
+  price: PropTypes.number,
 };
 
 NumberInput.defaultProps = {
   disabled: false,
   minValue: 0,
   maxValue: null,
+  price: 0,
 };
 
 export function NumberSettings() {

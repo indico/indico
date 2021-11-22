@@ -16,7 +16,7 @@ import reducers from './reducers';
 import RegistrationFormSetup from './RegistrationFormSetup';
 
 export default function setupRegformSetup(root) {
-  const {eventId, eventStartDate, eventEndDate, regformId, formData} = root.dataset;
+  const {eventId, eventStartDate, eventEndDate, regformId, currency, formData} = root.dataset;
 
   const initialData = {
     staticData: {
@@ -24,6 +24,7 @@ export default function setupRegformSetup(root) {
       regformId: parseInt(regformId, 10),
       eventStartDate,
       eventEndDate,
+      currency,
     },
   };
   const store = createReduxStore('regform-setup', reducers, initialData);

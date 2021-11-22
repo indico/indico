@@ -13,6 +13,12 @@ export const getStaticData = state => state.staticData;
 const getFlatSections = state => state.sections;
 const getItems = state => state.items;
 
+/** Get the currency used by the registration form. */
+export const getCurrency = createSelector(
+  getStaticData,
+  staticData => staticData.currency
+);
+
 /** Get a sorted list of disabled sections. */
 export const getDisabledSections = createSelector(
   getFlatSections,
