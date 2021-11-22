@@ -120,10 +120,7 @@ FormFieldAdapter.propTypes = {
   hideErrorWhileActive: PropTypes.bool,
   undefinedValue: PropTypes.any,
   label: PropTypes.string,
-  componentLabel: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.exact({children: PropTypes.node}),
-  ]),
+  componentLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   placeholder: PropTypes.string,
   meta: PropTypes.object.isRequired,
   as: PropTypes.elementType.isRequired,
