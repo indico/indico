@@ -13,6 +13,8 @@ import {Button} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 
+import './ChoicesSetup.module.scss';
+
 export const choiceShape = {
   id: PropTypes.string.isRequired,
   caption: PropTypes.string.isRequired,
@@ -63,7 +65,7 @@ export function Choices({
   return (
     <>
       <SortableWrapper accept="regform-item-choice">
-        <table className="regform-table">
+        <table styleName="choices-table">
           <thead>
             <tr>
               <th style={{width: '1.75em'}} />
@@ -170,7 +172,7 @@ function Choice({
 
   return (
     <tr ref={itemRef} style={style}>
-      <td className="table-sortable-handle" ref={handleRef} />
+      <td styleName="table-sortable-handle" ref={handleRef} />
       <td>
         <input
           type="text"
