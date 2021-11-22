@@ -12,7 +12,14 @@ import {FormSpy} from 'react-final-form';
 import {useSelector, useDispatch} from 'react-redux';
 import {Message} from 'semantic-ui-react';
 
-import {FinalCheckbox, FinalInput, FinalTextArea, getValuesForFields} from 'indico/react/forms';
+import {
+  FinalCheckbox,
+  FinalInput,
+  FinalTextArea,
+  getValuesForFields,
+  validators as v,
+  parsers as p,
+} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, Param} from 'indico/react/i18n';
 
@@ -52,6 +59,9 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
     initialValues = _.isFunction(meta.settingsFormInitialData)
       ? meta.settingsFormInitialData(staticData)
       : meta.settingsFormInitialData;
+    if (meta.hasPrice) {
+      initialValues = {...(initialValues || {}), price: 0};
+    }
   }
 
   const handleChangeItemType = (dirty, value) => {
@@ -116,6 +126,17 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
             label={Translate.string('Description')}
             description={<Translate>You can use Markdown or basic HTML formatting tags.</Translate>}
           />
+          {meta.hasPrice && (
+            <FinalInput
+              name="price"
+              type="number"
+              min="0"
+              step="0.01"
+              validate={v.min(0)}
+              parse={val => p.number(val, true, 0)}
+              label={Translate.string('Price')}
+            />
+          )}
           {!meta.noRequired && (
             <FinalCheckbox
               name="isRequired"

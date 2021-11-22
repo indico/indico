@@ -5,12 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-function number(value, acceptTrailingDot = true) {
+function number(value, acceptTrailingDot = true, emptyValue = null) {
   if (typeof value === 'number') {
     return value;
   } else if (typeof value === 'string') {
     if (value === '') {
-      return null;
+      return emptyValue;
     } else if (!isNaN(+value)) {
       if (acceptTrailingDot || value.slice(-1) !== '.') {
         return +value;
