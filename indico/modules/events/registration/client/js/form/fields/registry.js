@@ -54,6 +54,7 @@ Available keys:
 - noLabel: optional; render the field without a label on the left
 - noRequired: optional; hide the option to make the field required
 - alwaysRequired: optional; always display the field as required
+- hasPrice: optional; show price field if the whole field can have a price attached
 */
 
 export const fieldRegistry = {
@@ -75,6 +76,7 @@ export const fieldRegistry = {
     inputComponent: NumberInput,
     settingsComponent: NumberSettings,
     settingsFormValidator: numberSettingsFormValidator,
+    hasPrice: true,
     icon: 'seven-segment9',
   },
   textarea: {
@@ -87,6 +89,7 @@ export const fieldRegistry = {
     title: Translate.string('Checkbox'),
     inputComponent: CheckboxInput,
     noLabel: true,
+    hasPrice: true,
     icon: 'checkbox-checked',
   },
   date: {
@@ -101,6 +104,7 @@ export const fieldRegistry = {
     title: Translate.string('Yes/No'),
     inputComponent: BooleanInput,
     settingsComponent: BooleanSettings,
+    hasPrice: true,
     icon: 'switchon',
   },
   phone: {
