@@ -4,7 +4,7 @@ babel
 bcrypt
 bleach
 blinker
-celery
+celery[redis]
 certifi
 click
 distro
