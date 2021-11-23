@@ -21,7 +21,7 @@ export default function BooleanInput({htmlName, disabled, isRequired, defaultVal
     <select name={htmlName} disabled={disabled} defaultValue={defaultValue}>
       {!isRequired && <option value="">{Translate.string('Choose an option')}</option>}
       <option value="yes">
-        {Translate.string('Yes')} {price && `(${price} ${currency})`}
+        {Translate.string('Yes')} {!!price && `(${price} ${currency})`}
       </option>
       <option value="no">{Translate.string('No')}</option>
     </select>
