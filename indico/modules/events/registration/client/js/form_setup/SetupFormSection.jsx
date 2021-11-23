@@ -18,6 +18,8 @@ import * as actions from './actions';
 import FormSectionSetupActions from './FormSectionSetupActions';
 import SetupFormItem from './SetupFormItem';
 
+import '../../styles/regform.module.scss';
+
 export default function SetupFormSection({index, ...rest}) {
   const {id} = rest;
   const dispatch = useDispatch();
@@ -40,7 +42,9 @@ export default function SetupFormSection({index, ...rest}) {
     <div ref={itemRef} style={style}>
       <SortableWrapper accept={`regform-item@${id}`}>
         <FormSection
-          sortHandle={<div className="section-sortable-handle hide-if-locked" ref={handleRef} />}
+          sortHandle={
+            <div className="hide-if-locked" styleName="section-sortable-handle" ref={handleRef} />
+          }
           setupActions={<FormSectionSetupActions {...rest} />}
           itemComponent={SetupFormItem}
           itemProps={{sectionId: id}}
