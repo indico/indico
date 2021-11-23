@@ -9,20 +9,23 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Field} from 'react-final-form';
+import {useSelector} from 'react-redux';
 
 import {FinalCheckbox, FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+
+import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
 
 import '../../../styles/regform.module.scss';
 
 export default function MultiChoiceInput({htmlName, disabled, choices, withExtraSlots}) {
-  // TODO: billable/price
   // TODO: places left
   // TODO: set value as `{uuid: places}` (when adding final-form integration)
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
+  const currency = useSelector(getCurrency);
   const [value, setValue] = useState({});
 
   const makeHandleChange = choice => evt => {
@@ -45,20 +48,29 @@ export default function MultiChoiceInput({htmlName, disabled, choices, withExtra
             checked={!!value[choice.id]}
             onChange={makeHandleChange(choice)}
           />{' '}
-          <label htmlFor={`${htmlName}-${choice.id}`}>{choice.caption}</label>
+          <label htmlFor={`${htmlName}-${choice.id}`}>
+            {choice.caption} {!!choice.price && `(${choice.price} ${currency})`}
+          </label>
           {!!value[choice.id] && withExtraSlots && choice.maxExtraSlots > 0 && (
-            <select
-              name={`${htmlName}-${choice.id}-extra`}
-              disabled={disabled}
-              value={value[choice.id]}
-              onChange={makeHandleSlotsChange(choice)}
-            >
-              {_.range(1, choice.maxExtraSlots + 2).map(i => (
-                <option key={i} value={i}>
-                  {i}
-                </option>
-              ))}
-            </select>
+            <>
+              <select
+                name={`${htmlName}-${choice.id}-extra`}
+                disabled={disabled}
+                value={value[choice.id]}
+                onChange={makeHandleSlotsChange(choice)}
+              >
+                {_.range(1, choice.maxExtraSlots + 2).map(i => (
+                  <option key={i} value={i}>
+                    {i}
+                  </option>
+                ))}
+              </select>
+              {!!choice.price && (
+                <span styleName="price">
+                  Total: {(choice.extraSlotsPay ? value[choice.id] : 1) * choice.price} {currency}
+                </span>
+              )}
+            </>
           )}
         </li>
       ))}
