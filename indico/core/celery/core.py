@@ -49,6 +49,10 @@ class IndicoCelery(Celery):
         if not config.CELERY_BROKER and not app.config['TESTING']:
             raise ValueError('Celery broker URL is not set')
         self.conf['broker_url'] = config.CELERY_BROKER
+        if config.CELERY_BROKER and config.CELERY_BROKER.startswith('redis://'):
+            # default timeout is 1h, so retries >1h would result in task duplication
+            # https://docs.celeryproject.org/en/master/getting-started/backends-and-brokers/redis.html#visibility-timeout
+            self.conf['broker_transport_options'] = {'visibility_timeout': 86400*2}
         self.conf['result_backend'] = config.CELERY_RESULT_BACKEND or config.CELERY_BROKER
         self.conf['beat_scheduler'] = IndicoPersistentScheduler
         self.conf['beat_schedule_filename'] = os.path.join(config.TEMP_DIR, 'celerybeat-schedule')
