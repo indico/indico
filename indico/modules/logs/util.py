@@ -90,7 +90,7 @@ def render_changes(a, b, type_):
             a = '\N{EMPTY SET}'
         if b in (None, ''):
             b = '\N{EMPTY SET}'
-        return '{} \N{RIGHTWARDS ARROW} {}'.format(a, b)
+        return f'{a} \N{RIGHTWARDS ARROW} {b}'
     elif type_ == 'string':
         return '{} \N{RIGHTWARDS ARROW} {}'.format(a or '\N{EMPTY SET}', b or '\N{EMPTY SET}')
     elif type_ == 'list':
