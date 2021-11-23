@@ -8,11 +8,13 @@
 import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Button} from 'semantic-ui-react';
+import {useSelector} from 'react-redux';
+import {Button, Input} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 
+import {getCurrency} from '../../form_setup/selectors';
 import './ChoicesSetup.module.scss';
 
 export const choiceShape = {
@@ -34,6 +36,7 @@ export function Choices({
   withExtraSlots,
   forAccommodation,
 }) {
+  const currency = useSelector(getCurrency);
   const makeOnDelete = id => () => onChange(value.filter(choice => choice.id !== id));
   const makeOnChange = id => (field, val) =>
     onChange(value.map(choice => (choice.id !== id ? choice : {...choice, [field]: val})));
@@ -73,22 +76,18 @@ export function Choices({
                 <Translate>Caption</Translate>
               </th>
               <th style={{width: '7em'}}>
-                <Translate>Price</Translate>
+                <Translate>Price ({currency})</Translate>
               </th>
               <th style={{width: '7em'}}>
                 <Translate>Limit</Translate>
               </th>
-              {withExtraSlots && (
-                <>
-                  <th>
-                    <Translate>Max. extra slots</Translate>
-                  </th>
-                  <th>
-                    <Translate>Extra slots pay</Translate>
-                  </th>
-                </>
+              {withExtraSlots ? (
+                <th colSpan="2">
+                  <Translate>Max. extra slots</Translate>
+                </th>
+              ) : (
+                <th style={{width: '3.7em'}} />
               )}
-              <th style={{width: '3.7em'}} />
             </tr>
           </thead>
           <tbody>
@@ -206,27 +205,24 @@ function Choice({
         )}
       </td>
       {!isNoAccommodation && withExtraSlots && (
-        <>
-          <td>
-            <input
-              type="number"
-              name="maxExtraSlots"
-              min="0"
-              value={maxExtraSlots}
-              onChange={makeOnChange('maxExtraSlots')}
-              {...fieldProps}
-            />
-          </td>
-          <td>
-            <input
-              type="checkbox"
-              name="extraSlotsPay"
-              checked={extraSlotsPay}
-              onChange={makeOnChange('extraSlotsPay')}
-              {...fieldProps}
-            />
-          </td>
-        </>
+        <td style={{width: 0}}>
+          <Input
+            type="number"
+            name="maxExtraSlots"
+            min="0"
+            value={maxExtraSlots}
+            onChange={makeOnChange('maxExtraSlots')}
+            icon={{
+              name: 'dollar',
+              link: true,
+              color: extraSlotsPay ? 'blue' : 'grey',
+              title: Translate.string('Extra slots pay'),
+              onClick: () => onChange('extraSlotsPay', !extraSlotsPay),
+            }}
+            style={{width: '7.5em'}}
+            {...fieldProps}
+          />
+        </td>
       )}
       <td style={{textAlign: 'end'}}>
         {!isNoAccommodation && (
