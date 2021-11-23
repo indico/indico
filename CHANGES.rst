@@ -16,6 +16,8 @@ Bugfixes
 ^^^^^^^^
 
 - Fix editing service API calls using the service token (:pr:`5170`)
+- Fix excessive retries for Celery tasks with a retry wait time longer
+  than 1 hour (:pr:`5172`)
 
 
 Version 3.0.3
