@@ -35,7 +35,7 @@ export default function NumberInput({htmlName, disabled, price, ...props}) {
         value={value}
         onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
       />
-      {price && (
+      {!!price && (
         <span styleName="price">
           {price} {currency} (Total: {value * price} {currency})
         </span>

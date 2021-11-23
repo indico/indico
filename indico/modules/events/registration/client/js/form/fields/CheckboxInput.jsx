@@ -23,7 +23,7 @@ export default function CheckboxInput({htmlName, disabled, title, isRequired, pr
         {title}
         {isRequired && <span styleName="required">*</span>}
       </label>
-      {price && (
+      {!!price && (
         <span styleName="price">
           {price} {currency}
         </span>
