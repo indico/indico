@@ -10,15 +10,19 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Field} from 'react-final-form';
+import {useSelector} from 'react-redux';
 
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+
+import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
 
 import '../../../styles/regform.module.scss';
 
 function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
+  const currency = useSelector(getCurrency);
   return (
     <select name={htmlName} disabled={disabled} value={value} onChange={onChange}>
       <option key="" value="">
@@ -26,7 +30,7 @@ function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
       </option>
       {choices.map(c => (
         <option key={c.id} value={c.id} disabled={!c.isEnabled}>
-          {c.caption}
+          {c.caption} {!!c.price && `(${c.price} ${currency})`}
         </option>
       ))}
     </select>
@@ -42,6 +46,7 @@ SingleChoiceDropdown.propTypes = {
 };
 
 function SingleChoiceRadioGroup({htmlName, disabled, choices, value, onChange, isRequired}) {
+  const currency = useSelector(getCurrency);
   const radioChoices = [...choices];
   if (!isRequired) {
     radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
@@ -59,7 +64,9 @@ function SingleChoiceRadioGroup({htmlName, disabled, choices, value, onChange, i
             checked={c.id === value}
             onChange={onChange}
           />{' '}
-          <label htmlFor={`${htmlName}-${c.id}`}>{c.caption}</label>
+          <label htmlFor={`${htmlName}-${c.id}`}>
+            {c.caption} {!!c.price && `(${c.price} ${currency})`}
+          </label>
         </li>
       ))}
     </ul>
@@ -84,11 +91,11 @@ export default function SingleChoiceInput({
   defaultItem,
   withExtraSlots,
 }) {
-  // TODO: billable/price
   // TODO: places left
   // TODO: set value as `{uuid: places}` (when adding final-form integration)
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
+  const currency = useSelector(getCurrency);
   const [value, setValue] = useState(defaultItem || '');
   const [slotsUsed, setSlotsUsed] = useState(1);
   const selectedChoice = choices.find(c => c.id === value);
@@ -148,6 +155,11 @@ export default function SingleChoiceInput({
     <>
       {component}
       {extraSlotsDropdown}
+      {extraSlotsDropdown && !!selectedChoice.price && (
+        <span styleName="price">
+          Total: {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price} {currency}
+        </span>
+      )}
     </>
   );
 }
