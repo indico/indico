@@ -9,11 +9,14 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
+import {useSelector} from 'react-redux';
 
 import {DatePeriodField, FinalDatePeriod} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
+
+import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
 
@@ -24,12 +27,15 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
   // TODO: places left
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
+  const currency = useSelector(getCurrency);
   const [value, setValue] = useState({
     choice: null,
     isNoAccommodation: false,
     arrivalDate: null,
     departureDate: null,
   });
+
+  const selectedChoice = choices.find(c => c.id === value.choice);
 
   const [focusedDateField, setFocusedDateField] = useState(null);
 
@@ -69,6 +75,11 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
     ? 1
     : Math.max(1, moment(departureDateFrom).diff(moment(value.arrivalDate), 'days') + 1);
 
+  const nights =
+    value.arrivalDate && value.departureDate
+      ? moment(value.departureDate).diff(moment(value.arrivalDate), 'days')
+      : 0;
+
   return (
     <>
       <ul styleName="radio-group">
@@ -85,7 +96,11 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
                 checked={c.id === value.choice}
                 onChange={makeHandleChange(c)}
               />{' '}
-              <label htmlFor={`${htmlName}-${c.id}`}>{c.caption}</label>
+              <label htmlFor={`${htmlName}-${c.id}`}>
+                {c.caption}{' '}
+                {!!c.price &&
+                  Translate.string('({price} {currency} per night)', {price: c.price, currency})}
+              </label>
             </li>
           ))}
       </ul>
@@ -107,6 +122,11 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
           endDatePlaceholderText: Translate.string('Departure'),
         }}
       />
+      {selectedChoice && !!selectedChoice.price && (
+        <span styleName="price">
+          Total: {nights * selectedChoice.price} {currency}
+        </span>
+      )}
     </>
   );
 }
