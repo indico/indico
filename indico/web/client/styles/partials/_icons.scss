@@ -84,6 +84,7 @@ i[class^='icon-']::before {
  *      - icomoon.zip/selection.json to indico/web/static/fonts/icomoon/
  *      - Replace the icon definitions between the comments below with the ones found in icomoon.zip/style.css
           (pay attention to the indentation!)
+        - Replace any underscores with dashes in the css
  */
 
 /* Icomoon's icon definitions */
@@ -372,6 +373,9 @@ i[class^='icon-']::before {
 .icon-mobile::before {
   content: '\3e';
 }
+.icon-move::before {
+  content: '\ed4d';
+}
 .icon-new::before {
   content: '\e97b';
 }
@@ -548,6 +552,9 @@ i[class^='icon-']::before {
 }
 .icon-wrench::before {
   content: '\77';
+}
+.icon-drag-indicator::before {
+  content: '\e90b';
 }
 .icon-id-badge::before {
   content: '\e907';
