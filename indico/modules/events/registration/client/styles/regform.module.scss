@@ -35,7 +35,7 @@
 
 .form-item {
   display: flex;
-  padding: 4px 0;
+  padding: 6px 0;
 
   &.disabled {
     background: $light-gray;
@@ -48,13 +48,38 @@
 
   > .label {
     flex-basis: 125px;
+    padding-top: 5px;
   }
 
   > .content {
     flex-grow: 1;
+
+    > .description {
+      max-width: 550px;
+      padding: 5px 2px 10px 2px;
+      text-align: justify;
+      font-style: italic;
+      font-size: 0.9em;
+      color: $dark-gray;
+    }
+
+    textarea,
+    select,
+    input[type='text'],
+    input[type='number'],
+    input[type='email'],
+    input[type='file'],
+    input[type='tel'] {
+      width: auto;
+    }
+
+    input[type='file'] {
+      width: 550px;
+    }
   }
 
   > .actions {
+    padding-top: 5px;
     visibility: hidden;
 
     a + a {
@@ -72,6 +97,7 @@
     .sortable-handle {
       color: $dark-gray;
       width: 15px;
+      padding-top: 5px;
     }
 
     &.disabled .sortable-handle {
