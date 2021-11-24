@@ -9,7 +9,7 @@ import json
 import uuid
 
 from markupsafe import escape
-from wtforms import HiddenField
+from wtforms import HiddenField, ValidationError
 
 from indico.web.forms.fields.util import is_preprocessed_formdata
 from indico.web.forms.widgets import JinjaWidget
@@ -53,17 +53,17 @@ class MultiStringField(HiddenField):
     def pre_validate(self, form):
         try:
             if not all(isinstance(item, dict) for item in self.data):
-                raise ValueError('Invalid data. Expected list of dicts.')
+                raise ValidationError('Invalid data. Expected list of dicts.')
             if self.unique:
                 unique_values = {item[self.field_name] for item in self.data}
                 if len(unique_values) != len(self.data):
-                    raise ValueError('Items must be unique')
+                    raise ValidationError('Items must be unique')
             if self.uuid_field:
                 unique_uuids = {uuid.UUID(item[self.uuid_field], version=4) for item in self.data}
                 if len(unique_uuids) != len(self.data):
-                    raise ValueError('UUIDs must be unique')
+                    raise ValidationError('UUIDs must be unique')
             if not all(item[self.field_name].strip() for item in self.data):
-                raise ValueError('Empty items are not allowed')
+                raise ValidationError('Empty items are not allowed')
         finally:
             if self.flat:
                 self.data = [x[self.field_name] for x in self.data]
@@ -138,28 +138,30 @@ class MultipleItemsField(HiddenField):
         coercions = {f['id']: f['coerce'] for f in self.fields if f.get('coerce') is not None}
         for i, item in enumerate(self.serialized_data):
             if not isinstance(item, dict):
-                raise ValueError(f'Invalid item type: {type(item).__name__}')
+                raise ValidationError(f'Invalid item type: {type(item).__name__}')
             item_keys = set(item)
             if self.uuid_field:
                 item_keys.discard(self.uuid_field)
             if item_keys != {x['id'] for x in self.fields}:
-                raise ValueError('Invalid item (bad keys): {}'.format(escape(', '.join(item.keys()))))
+                raise ValidationError('Invalid item (bad keys): {}'.format(escape(', '.join(item.keys()))))
             if self.unique_field:
                 if item[self.unique_field] in unique_used:
-                    raise ValueError(f'{self.field_names[self.unique_field]} must be unique')
+                    raise ValidationError(f'{self.field_names[self.unique_field]} must be unique')
                 unique_used.add(item[self.unique_field])
             if self.uuid_field and not self.uuid_field_opaque:
                 if item[self.uuid_field] in uuid_used:
-                    raise ValueError('UUID must be unique')
+                    raise ValidationError('UUID must be unique')
                 # raises ValueError if uuid is invalid
-                uuid.UUID(item[self.uuid_field], version=4)
+                try:
+                    uuid.UUID(item[self.uuid_field], version=4)
+                except ValueError:
+                    raise ValidationError('Invalid UUID')
                 uuid_used.add(item[self.uuid_field])
             for key, fn in coercions.items():
                 try:
                     self.data[i][key] = fn(self.data[i][key])
-                except ValueError:
-                    raise ValueError("Invalid value for field '{}': {}".format(self.field_names[key],
-                                                                               escape(item[key])))
+                except ValidationError:
+                    raise ValidationError(f"Invalid value for field '{self.field_names[key]}': {escape(item[key])}")
 
     def _value(self):
         return self.data or []

@@ -9,6 +9,7 @@ from operator import attrgetter
 
 from flask import request, session
 from sqlalchemy.orm import joinedload
+from wtforms import ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.db import db
@@ -81,11 +82,11 @@ class EmailRuleListField(JSONField):
     def pre_validate(self, form):
         super().pre_validate(form)
         if not all(self.data):
-            raise ValueError(_('Rules may not be empty'))
+            raise ValidationError(_('Rules may not be empty'))
         if any('*' in crit for rule in self.data for crit in rule.values()):
             # '*' (any) rules should never be included in the JSON, and having
             # such an entry would result in the rule never passing.
-            raise ValueError('Unexpected "*" criterion')
+            raise ValidationError('Unexpected "*" criterion')
 
     def _value(self):
         return super()._value() if self.data else '[]'
@@ -135,7 +136,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
                 if not self.object_data or person_link not in self.object_data:
                     person_link.author_type = AuthorType.none
             if person_link.author_type == AuthorType.none and not person_link.is_speaker:
-                raise ValueError(_('{} has no role').format(person_link.full_name))
+                raise ValidationError(_('{} has no role').format(person_link.full_name))
 
 
 class AbstractField(QuerySelectField):
@@ -176,7 +177,7 @@ class AbstractField(QuerySelectField):
     def pre_validate(self, form):
         super().pre_validate(form)
         if self.data is not None and self.data.id in self.excluded_abstract_ids:
-            raise ValueError(_('This abstract cannot be selected.'))
+            raise ValidationError(_('This abstract cannot be selected.'))
 
     @property
     def event(self):
