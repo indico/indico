@@ -11,7 +11,7 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import {Button, Input} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
+import {Translate, Param} from 'indico/react/i18n';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 
 import {getCurrency} from '../../form_setup/selectors';
@@ -76,7 +76,9 @@ export function Choices({
                 <Translate>Caption</Translate>
               </th>
               <th style={{width: '7em'}}>
-                <Translate>Price ({currency})</Translate>
+                <Translate>
+                  Price (<Param name="currency" value={currency} />)
+                </Translate>
               </th>
               <th style={{width: '7em'}}>
                 <Translate>Limit</Translate>
