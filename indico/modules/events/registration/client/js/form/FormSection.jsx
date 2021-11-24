@@ -31,8 +31,8 @@ export default function FormSection({
 
   return (
     <div className={`regform-section ${isManagerOnly ? 'manager-only' : ''}`}>
-      {sortHandle}
       <div className="i-box-header">
+        {sortHandle}
         <div styleName="header-wrapper">
           <div className="i-box-title">{title}</div>
           <div className="i-box-description">

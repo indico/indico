@@ -79,7 +79,7 @@
     }
 
     &:not(.disabled):hover .sortable-handle {
-      @include icon-before('icon-handle');
+      @include icon-before('icon-drag-indicator');
       cursor: grab;
     }
 
@@ -150,25 +150,20 @@
   .header-wrapper {
     flex-grow: 1;
   }
-}
 
-.section-sortable-handle {
-  @include icon-before('icon-move');
-  height: 20px;
-  margin: -10px -10px 10px -10px;
-  text-align: center;
-  font-size: 1.2em;
-  cursor: grab;
-  background-color: lighten($gray, 15%);
-  transition: all 0.15s;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
-
-  &:hover {
-    background-color: lighten($gray, 5%);
+  .section-sortable-handle {
+    font-size: 1.2em;
+    width: 15px;
+    position: relative;
+    left: -3px;
   }
 
-  &:active {
+  &:hover .section-sortable-handle {
+    @include icon-before('icon-drag-indicator');
+    cursor: grab;
+  }
+
+  &:hover .section-sortable-handle:active {
     cursor: grabbing;
   }
 }
