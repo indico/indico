@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from wtforms import ValidationError
 from wtforms.fields import SelectField
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
@@ -26,7 +27,7 @@ class IndicoPalettePickerField(JSONField):
 
     def pre_validate(self, form):
         if self.data not in self.color_list:
-            raise ValueError(_('Invalid colors selected'))
+            raise ValidationError(_('Invalid colors selected'))
 
     def process_formdata(self, valuelist):
         super().process_formdata(valuelist)
@@ -55,7 +56,7 @@ class IndicoSinglePalettePickerField(IndicoPalettePickerField):
 
     def pre_validate(self, form):
         if not any(self.data == color.background for color in self.color_list):
-            raise ValueError(_('Invalid color selected'))
+            raise ValidationError(_('Invalid color selected'))
 
     def _value(self):
         return ColorTuple(self.text_color, self.data)._asdict()

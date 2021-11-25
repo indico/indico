@@ -12,7 +12,7 @@ import dateutil.parser
 import pytz
 from flask import session
 from markupsafe import escape
-from wtforms import Field, SelectField
+from wtforms import Field, SelectField, ValidationError
 from wtforms.fields import TimeField
 from wtforms.validators import StopValidation
 from wtforms_dateutil import DateField, DateTimeField
@@ -89,9 +89,9 @@ class TimeDeltaField(Field):
         if self.best_unit in self.units:
             return
         if self.object_data is None:
-            raise ValueError(_('Please choose a valid unit.'))
+            raise ValidationError(_('Please choose a valid unit.'))
         if self.object_data != self.data:
-            raise ValueError(_('Please choose a different unit or keep the previous value.'))
+            raise ValidationError(_('Please choose a different unit or keep the previous value.'))
 
     def _value(self):
         if self.data is None:
@@ -166,7 +166,7 @@ class RelativeDeltaField(Field):
 
     def pre_validate(self, form):
         if self.object_data is None:
-            raise ValueError(_('Please choose a valid unit.'))
+            raise ValidationError(_('Please choose a valid unit.'))
 
     def _value(self):
         if self.data is None:

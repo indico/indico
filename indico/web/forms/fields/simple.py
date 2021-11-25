@@ -8,6 +8,7 @@
 import json
 
 from markupsafe import escape
+from wtforms import ValidationError
 from wtforms.fields import (BooleanField, Field, HiddenField, PasswordField, RadioField, SelectMultipleField,
                             TextAreaField)
 from wtforms.widgets import CheckboxInput
@@ -117,7 +118,7 @@ class EmailListField(TextListField):
 
     def _validate_item(self, line):
         if not validate_email(line):
-            raise ValueError(_('Invalid email address: {}').format(escape(line)))
+            raise ValidationError(_('Invalid email address: {}').format(escape(line)))
 
 
 class IndicoPasswordField(PasswordField):
