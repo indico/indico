@@ -139,16 +139,12 @@
     visibility: hidden;
   }
 
-  :global(.DateInput_input) {
-    width: 7.3em;
+  :global(.SingleDatePickerInput) {
+    border-radius: 4px;
   }
 
-  :global(.SingleDatePickerInput_calendarIcon) {
-    padding: 0 5px 2px 8px;
-  }
-
-  :global(.rc-time-picker) {
-    width: 6em;
+  :global(.DateInput) {
+    width: inherit;
   }
 
   :global(.rc-time-picker-input) {

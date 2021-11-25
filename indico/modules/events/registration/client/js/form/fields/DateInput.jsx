@@ -38,34 +38,35 @@ export default function DateInput({
     return (
       <Form.Field required={isRequired} disabled={disabled} styleName="field">
         <label>{title}</label>
-        <>
-          <SingleDatePicker
-            id={`regform-datepicker-${id}`}
-            date={date}
-            onDateChange={setDate}
-            placeholder={friendlyDateFormat}
-            displayFormat={friendlyDateFormat}
-            disabled={disabled}
-            isOutsideRange={() => false}
-            enableOutsideDays
-            noBorder
-            small
-          />
-          {timeFormat && (
-            <TimePicker
-              id={`regform-timepicker-${id}`}
-              showSecond={false}
-              value={time}
-              focusOnOpen
-              onChange={setTime}
-              use12Hours={timeFormat === '12h'}
-              allowEmpty={false}
-              placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
-              disabled={disabled}
-              getPopupContainer={node => node}
+        <Form.Group>
+          <Form.Field>
+            <SingleDatePicker
+              id={`regform-datepicker-${id}`}
+              date={date}
+              onDateChange={setDate}
+              placeholder={friendlyDateFormat}
+              displayFormat={friendlyDateFormat}
+              isOutsideRange={() => false}
+              verticalSpacing={10}
+              enableOutsideDays
             />
+          </Form.Field>
+          {timeFormat && (
+            <Form.Field>
+              <TimePicker
+                id={`regform-timepicker-${id}`}
+                showSecond={false}
+                value={time}
+                focusOnOpen
+                onChange={setTime}
+                use12Hours={timeFormat === '12h'}
+                allowEmpty={false}
+                placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
+                getPopupContainer={node => node}
+              />
+            </Form.Field>
           )}
-        </>
+        </Form.Group>
       </Form.Field>
     );
   } else {
