@@ -117,7 +117,7 @@ class PersonLinkListFieldBase(PrincipalListField):
         raise NotImplementedError
 
     def _convert_data(self, data):
-        raise NotImplementedError
+        return [self._get_person_link(x) for x in data]
 
     def _value(self):
         return [self._serialize_person_link(person_link) for person_link in self.data] if self.data else []
@@ -126,6 +126,8 @@ class PersonLinkListFieldBase(PrincipalListField):
         if valuelist:
             self.data = json.loads(valuelist[0])
             try:
+                for person_link in set(self.event.person_links):
+                    person_link.is_submitter = False
                 self.data = self._convert_data(self.data)
             except ValueError:
                 self.data = []
@@ -154,14 +156,18 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         if event_type == EventType.lecture:
             self.empty_message = _('There are no speakers')
 
-    def _convert_data(self, data):
-        return {self._get_person_link(x): 'submitter' in x.get('roles', []) for x in data}
+    @no_autoflush
+    def _get_person_link(self, data):
+        person_link = super()._get_person_link(data)
+        roles = data.get('roles', [])
+        person_link.is_submitter = 'submitter' in roles
+        return person_link
 
     def _serialize_person_link(self, principal):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         data = PersonLinkSchema().dump(principal)
         data['roles'] = []
-        if (self.get_form().is_submitted() and self.data[principal]) or (principal.event and principal.is_submitter):
+        if principal.event and principal.is_submitter:
             data['roles'].append('submitter')
         return data
 

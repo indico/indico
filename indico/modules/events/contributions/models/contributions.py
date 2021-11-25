@@ -27,7 +27,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.events import Event
-from indico.modules.events.models.persons import AuthorsSpeakersMixin, PersonLinkDataMixin
+from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.sessions.models.sessions import Session
@@ -74,7 +74,7 @@ class CustomFieldsMixin:
 
 
 class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionManagersMixin, LocationMixin,
-                   AttachedItemsMixin, AttachedNotesMixin, PersonLinkDataMixin, AuthorsSpeakersMixin, CustomFieldsMixin,
+                   AttachedItemsMixin, AttachedNotesMixin, AuthorsSpeakersMixin, CustomFieldsMixin,
                    db.Model):
     __tablename__ = 'contributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
