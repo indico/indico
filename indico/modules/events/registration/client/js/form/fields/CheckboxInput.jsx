@@ -18,8 +18,8 @@ export default function CheckboxInput({htmlName, disabled, title, isRequired, pr
   const currency = useSelector(getCurrency);
 
   return (
-    <Form.Field required={isRequired} styleName="field">
-      <Checkbox name={htmlName} disabled={disabled} label={title} />
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
+      <Checkbox name={htmlName} label={title} />
       {!!price && (
         <span styleName="price">
           {price} {currency}
