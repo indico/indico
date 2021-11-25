@@ -50,6 +50,20 @@ def get_event_person(event, data, create_untrusted_persons=False, allow_external
     elif person_type == 'EventPerson':
         return event.persons.filter_by(id=data['id']).one()
     elif person_type == 'PersonLink':
-        return event.persons.filter_by(id=data['personId']).one()
+        return event.persons.filter_by(id=data['person_id']).one()
     else:
         raise ValueError(f"Unknown person type '{person_type}'")
+
+
+def update_submitter_permissions(event, value):
+    """Update submitter permissions for new person links.
+
+    :param event: An event
+    :param value: A dict of persons to a boolean referring their submitter status
+    """
+    for person_link in set(event.person_links) - set(value):
+        person_link.is_submitter = False
+    event.person_links = [value.keys()]
+    for person_link, is_submitter in value.items():
+        action = {'add_permissions': {'submit'}} if is_submitter else {'del_permissions': {'submit'}}
+        event.update_principal(person_link.person.principal, **action)
