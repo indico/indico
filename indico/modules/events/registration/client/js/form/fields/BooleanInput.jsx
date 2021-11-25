@@ -19,18 +19,26 @@ import '../../../styles/regform.module.scss';
 
 export default function BooleanInput({htmlName, disabled, title, isRequired, defaultValue, price}) {
   const currency = useSelector(getCurrency);
+  const options = [
+    {
+      key: 'yes',
+      value: 'yes',
+      text: Translate.string('Yes') + (price ? `(${price} ${currency})` : ''),
+    },
+    {key: 'no', value: 'no', text: Translate.string('No')},
+  ];
 
   return (
-    <Form.Field required={isRequired} disabled={disabled} styleName="field">
-      <label>{title}</label>
-      <select name={htmlName} defaultValue={defaultValue}>
-        {!isRequired && <option value="">{Translate.string('Choose an option')}</option>}
-        <option value="yes">
-          {Translate.string('Yes')} {!!price && `(${price} ${currency})`}
-        </option>
-        <option value="no">{Translate.string('No')}</option>
-      </select>
-    </Form.Field>
+    <Form.Select
+      fluid
+      required={isRequired}
+      disabled={disabled}
+      styleName="field"
+      label={title}
+      options={options}
+      name={htmlName}
+      defaultValue={defaultValue}
+    />
   );
 }
 
