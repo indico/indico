@@ -37,29 +37,31 @@
   display: flex;
   padding-top: 7px;
 
+  &:last-child {
+    padding-bottom: 7px;
+  }
+
   &.disabled {
     background: $light-gray;
 
-    > .label,
     > .content {
       color: $dark-gray;
     }
-  }
-
-  > .label {
-    flex-basis: 125px;
-    padding-top: 5px;
   }
 
   > .content {
     flex-grow: 1;
 
     .field {
-      margin-bottom: 0;
+      margin-bottom: 3px;
+
+      .price {
+        margin-left: 2em;
+      }
     }
 
     > .description {
-      max-width: 550px;
+      max-width: 600px;
       padding: 3px 0 0 2px;
       text-align: justify;
       font-style: italic;
@@ -78,12 +80,11 @@
     }
 
     input[type='file'] {
-      width: 550px;
+      width: 600px;
     }
   }
 
   > .actions {
-    padding-top: 5px;
     visibility: hidden;
 
     a + a {
@@ -91,17 +92,16 @@
     }
   }
 
-  .required {
-    display: inline-block;
-    margin-left: 2px;
-    color: #812;
-  }
-
   &.editable {
     .sortable-handle {
       color: $dark-gray;
-      width: 15px;
-      padding-top: 5px;
+      margin-left: -10px;
+      width: 25px;
+
+      &::before {
+        position: relative;
+        left: 8px;
+      }
     }
 
     &.disabled .sortable-handle {
@@ -129,16 +129,6 @@
     li {
       list-style-type: none;
     }
-  }
-
-  .checkbox-input-label {
-    input[type='checkbox'] {
-      margin-right: 0.5em;
-    }
-  }
-
-  .price {
-    margin-left: 1em;
   }
 
   :global(.DateRangePickerInput__disabled) {
