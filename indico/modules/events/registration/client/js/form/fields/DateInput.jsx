@@ -73,7 +73,7 @@ export default function DateInput({
     return (
       <Form.Field required={isRequired} disabled={disabled} styleName="field">
         <label>{title}</label>
-        <input type="text" name={htmlName} placeholder={friendlyDateFormat} disabled={disabled} />
+        <input type="text" name={htmlName} placeholder={friendlyDateFormat} />
       </Form.Field>
     );
   }

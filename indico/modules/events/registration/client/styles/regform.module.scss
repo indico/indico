@@ -55,8 +55,13 @@
     .field {
       margin-bottom: 3px;
 
+      .number-field {
+        display: flex;
+        align-items: center;
+      }
+
       .price {
-        margin-left: 2em;
+        margin-left: 1.5em;
       }
     }
 

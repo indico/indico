@@ -28,18 +28,20 @@ export default function NumberInput({htmlName, disabled, price, title, isRequire
   return (
     <Form.Field required={isRequired} disabled={disabled} styleName="field">
       <label>{title}</label>
-      <input
-        type="number"
-        name={htmlName}
-        {...inputProps}
-        value={value}
-        onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
-      />
-      {!!price && (
-        <span styleName="price">
-          {price} {currency} (Total: {value * price} {currency})
-        </span>
-      )}
+      <div styleName="number-field">
+        <input
+          type="number"
+          name={htmlName}
+          value={value}
+          {...inputProps}
+          onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
+        />
+        {!!price && (
+          <span styleName="price">
+            {price} {currency} (<b>Total</b>: {value * price} {currency})
+          </span>
+        )}
+      </div>
     </Form.Field>
   );
 }
