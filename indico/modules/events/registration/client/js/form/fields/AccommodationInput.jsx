@@ -114,24 +114,23 @@ export default function AccommodationInput({
             </li>
           ))}
       </ul>
-      <DatePeriodField
-        onChange={handleDateChange}
-        onFocus={() => undefined}
-        onBlur={() => undefined}
-        disabled={value.choice === null || value.isNoAccommodation}
-        disabledDate={isDateDisabled}
-        initialVisibleMonth={() => arrivalDateFrom}
-        onFieldFocusChange={setFocusedDateField}
-        minimumDays={minimumDays}
-        value={{startDate: value.arrivalDate, endDate: value.departureDate}}
-        extraPickerProps={{
-          noBorder: true,
-          block: false,
-          small: true,
-          startDatePlaceholderText: Translate.string('Arrival'),
-          endDatePlaceholderText: Translate.string('Departure'),
-        }}
-      />
+      {value.choice !== null && !value.isNoAccommodation && (
+        <DatePeriodField
+          onChange={handleDateChange}
+          onFocus={() => undefined}
+          onBlur={() => undefined}
+          disabledDate={isDateDisabled}
+          initialVisibleMonth={() => arrivalDateFrom}
+          onFieldFocusChange={setFocusedDateField}
+          minimumDays={minimumDays}
+          value={{startDate: value.arrivalDate, endDate: value.departureDate}}
+          extraPickerProps={{
+            block: false,
+            startDatePlaceholderText: Translate.string('Arrival'),
+            endDatePlaceholderText: Translate.string('Departure'),
+          }}
+        />
+      )}
       {selectedChoice && !!selectedChoice.price && (
         <span styleName="price">
           Total: {nights * selectedChoice.price} {currency}
