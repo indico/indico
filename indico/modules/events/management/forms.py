@@ -176,13 +176,13 @@ class EventLocationForm(IndicoForm):
 
 
 class EventPersonsForm(IndicoForm):
-    person_link_data = EventPersonLinkListField(_('Chairpersons'))
+    person_links = EventPersonLinkListField(_('Chairpersons'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
         if self.event.type_ == EventType.lecture:
-            self.person_link_data.label.text = _('Speakers')
+            self.person_links.label.text = _('Speakers')
 
 
 class EventContactInfoForm(IndicoForm):

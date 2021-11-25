@@ -23,30 +23,6 @@ from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
-class PersonLinkDataMixin:
-    @property
-    def person_link_data(self):
-        return {x: x.is_submitter for x in self.person_links}
-
-    @person_link_data.setter
-    @no_autoflush
-    def person_link_data(self, value):
-        # Revoke submission rights for removed persons
-        for person_link in set(self.person_links) - value.keys():
-            principal = person_link.person.principal
-            if principal:
-                self.update_principal(principal, del_permissions={'submit'})
-        # Update person links
-        self.person_links = list(value.keys())
-        for person_link, is_submitter in value.items():
-            person = person_link.person
-            principal = person.principal
-            if not principal:
-                continue
-            action = {'add_permissions': {'submit'}} if is_submitter else {'del_permissions': {'submit'}}
-            self.update_principal(principal, **action)
-
-
 class AuthorsSpeakersMixin:
     AUTHORS_SPEAKERS_DISPLAY_ORDER_ATTR = 'display_order_key'
 
@@ -490,6 +466,15 @@ class EventPersonLink(PersonLinkBase):
         if not self.event:
             raise Exception('No event to check submission rights against')
         return self.person.has_role('submit', self.event)
+
+    @is_submitter.setter
+    def is_submitter(self, value):
+        if not self.event:
+            raise Exception('No event to check submission rights against')
+        action = {'add_permissions': {'submit'}} if value else {'del_permissions': {'submit'}}
+        if value != self.is_submitter:
+            self.event.update_principal(self.person.principal, **action)
+            db.session.flush()
 
     def __repr__(self):
         return format_repr(self, 'id', 'person_id', 'event_id', _text=self.full_name)

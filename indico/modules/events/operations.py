@@ -139,7 +139,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 
 def update_event(event, update_timetable=False, **data):
     assert set(data.keys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
-                                'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
+                                'person_links', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
                                 'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
                                 'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message',
                                 'own_map_url'}
@@ -155,9 +155,9 @@ def update_event(event, update_timetable=False, **data):
     changes.update(event.populate_from_dict(data))
     # Person links are partially updated when the WTForms field is processed,
     # we we don't have proper change tracking there in some cases
-    changes.pop('person_link_data', None)
+    changes.pop('person_links', None)
     visible_person_link_changes = event.person_links != old_person_links
-    if visible_person_link_changes or 'person_link_data' in data:
+    if visible_person_link_changes or 'person_links' in data:
         changes['person_links'] = (old_person_links, event.person_links)
     db.session.flush()
     signals.event.updated.send(event, changes=changes)

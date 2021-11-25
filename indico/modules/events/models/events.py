@@ -35,7 +35,7 @@ from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related
 from indico.modules.categories import Category
 from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
 from indico.modules.events.management.util import get_non_inheriting_objects
-from indico.modules.events.models.persons import EventPerson, PersonLinkDataMixin
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
@@ -67,7 +67,7 @@ class _EventSettingProperty(EventSettingProperty):
 
 
 class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin,
-            AttachedNotesMixin, PersonLinkDataMixin, db.Model):
+            AttachedNotesMixin, db.Model):
     """An Indico event.
 
     This model contains the most basic information related to an event.
