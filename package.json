@@ -29,7 +29,7 @@
     "geodesy": "^2.2.1",
     "glob-to-regexp": "^0.4.1",
     "history": "^4.10.1",
-    "indico-sui-theme": "^0.0.6",
+    "indico-sui-theme": "^0.0.7",
     "jed": "^1.1.1",
     "jquery": "^3.6.0",
     "jquery-colorbox": "^1.6.4",
