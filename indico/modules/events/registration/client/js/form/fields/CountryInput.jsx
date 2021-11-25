@@ -7,21 +7,27 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Form} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-export default function CountryInput({htmlName, disabled, choices}) {
+import '../../../styles/regform.module.scss';
+
+export default function CountryInput({htmlName, disabled, choices, title, isRequired}) {
   return (
-    <select name={htmlName} disabled={disabled}>
-      <option key="" value="">
-        {Translate.string('Select a country')}
-      </option>
-      {choices.map(country => (
-        <option key={country.countryKey} value={country.countryKey}>
-          {country.caption}
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
+      <label>{title}</label>
+      <select name={htmlName}>
+        <option key="" value="">
+          {Translate.string('Select a country')}
         </option>
-      ))}
-    </select>
+        {choices.map(country => (
+          <option key={country.countryKey} value={country.countryKey}>
+            {country.caption}
+          </option>
+        ))}
+      </select>
+    </Form.Field>
   );
 }
 
@@ -29,6 +35,8 @@ CountryInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
 };
 
 CountryInput.defaultProps = {

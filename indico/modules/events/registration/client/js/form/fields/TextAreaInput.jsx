@@ -12,6 +12,8 @@ import {Form} from 'semantic-ui-react';
 import {FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
+import '../../../styles/regform.module.scss';
+
 import {mapPropsToAttributes} from './util';
 
 const attributeMap = {
@@ -19,9 +21,14 @@ const attributeMap = {
   numberOfColumns: 'cols',
 };
 
-export default function TextAreaInput({htmlName, disabled, ...props}) {
+export default function TextAreaInput({htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextAreaInput.defaultProps);
-  return <textarea name={htmlName} {...inputProps} disabled={disabled} style={{resize: 'none'}} />;
+  return (
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
+      <label>{title}</label>
+      <textarea name={htmlName} {...inputProps} style={{resize: 'none'}} />
+    </Form.Field>
+  );
 }
 
 TextAreaInput.propTypes = {
@@ -29,6 +36,8 @@ TextAreaInput.propTypes = {
   disabled: PropTypes.bool,
   numberOfRows: PropTypes.number,
   numberOfColumns: PropTypes.number,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
 };
 
 TextAreaInput.defaultProps = {

@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {Checkbox} from 'semantic-ui-react';
+import {Checkbox, Form} from 'semantic-ui-react';
 
 import {getCurrency} from '../../form_setup/selectors';
 
@@ -18,15 +18,14 @@ export default function CheckboxInput({htmlName, disabled, title, isRequired, pr
   const currency = useSelector(getCurrency);
 
   return (
-    <>
+    <Form.Field required={isRequired} styleName="field">
       <Checkbox name={htmlName} disabled={disabled} label={title} />
-      {isRequired && <span styleName="required">*</span>}
       {!!price && (
         <span styleName="price">
           {price} {currency}
         </span>
       )}
-    </>
+    </Form.Field>
   );
 }
 

@@ -21,17 +21,17 @@ import '../../../styles/regform.module.scss';
 
 const attributeMap = {minValue: 'min', maxValue: 'max'};
 
-export default function NumberInput({htmlName, disabled, price, ...props}) {
+export default function NumberInput({htmlName, disabled, price, title, isRequired, ...props}) {
   const [value, setValue] = useState('');
   const currency = useSelector(getCurrency);
   const inputProps = mapPropsToAttributes(props, attributeMap, NumberInput.defaultProps);
   return (
-    <>
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
+      <label>{title}</label>
       <input
         type="number"
         name={htmlName}
         {...inputProps}
-        disabled={disabled}
         value={value}
         onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
       />
@@ -40,7 +40,7 @@ export default function NumberInput({htmlName, disabled, price, ...props}) {
           {price} {currency} (Total: {value * price} {currency})
         </span>
       )}
-    </>
+    </Form.Field>
   );
 }
 
@@ -50,6 +50,8 @@ NumberInput.propTypes = {
   minValue: PropTypes.number,
   maxValue: PropTypes.number,
   price: PropTypes.number,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
 };
 
 NumberInput.defaultProps = {

@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
+import {Form} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -85,6 +86,7 @@ SingleChoiceRadioGroup.propTypes = {
 export default function SingleChoiceInput({
   htmlName,
   disabled,
+  title,
   isRequired,
   itemType,
   choices,
@@ -152,15 +154,19 @@ export default function SingleChoiceInput({
   }
 
   return (
-    <>
-      {component}
-      {extraSlotsDropdown}
-      {extraSlotsDropdown && !!selectedChoice.price && (
-        <span styleName="price">
-          Total: {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price} {currency}
-        </span>
-      )}
-    </>
+    <Form.Field required={isRequired} styleName="field">
+      <label>{title}</label>
+      <>
+        {component}
+        {extraSlotsDropdown}
+        {extraSlotsDropdown && !!selectedChoice.price && (
+          <span styleName="price">
+            Total: {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price}{' '}
+            {currency}
+          </span>
+        )}
+      </>
+    </Form.Field>
   );
 }
 
@@ -170,6 +176,7 @@ SingleChoiceInput.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   defaultItem: PropTypes.string,
+  title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool.isRequired,
   withExtraSlots: PropTypes.bool,
   // TODO: placesUsed, captions - only needed once we deal with real data

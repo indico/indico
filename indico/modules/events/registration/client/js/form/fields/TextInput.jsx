@@ -14,16 +14,25 @@ import {Translate} from 'indico/react/i18n';
 
 import {mapPropsToAttributes} from './util';
 
+import '../../../styles/regform.module.scss';
+
 const attributeMap = {length: 'size', minLength: 'minLength', maxLength: 'maxLength'};
 
-export default function TextInput({htmlName, disabled, ...props}) {
+export default function TextInput({htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextInput.defaultProps);
-  return <input type="text" name={htmlName} {...inputProps} disabled={disabled} />;
+  return (
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
+      <label>{title}</label>
+      <input type="text" name={htmlName} {...inputProps} />
+    </Form.Field>
+  );
 }
 
 TextInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
   length: PropTypes.number,
   minLength: PropTypes.number,
   maxLength: PropTypes.number,

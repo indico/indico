@@ -31,18 +31,12 @@ export default function FormItem({
   return (
     <div styleName={`form-item ${toClasses({disabled: !isEnabled, editable: setupMode})}`}>
       {sortHandle}
-      {
-        <span styleName="label">
-          {!meta.noLabel && (
-            <>
-              {title}
-              {(isRequired || meta.alwaysRequired) && <span styleName="required">*</span>}
-            </>
-          )}
-        </span>
-      }
       <div styleName="content">
-        {InputComponent ? <InputComponent {...inputProps} /> : `Unknown input type: ${inputType}`}
+        {InputComponent ? (
+          <InputComponent isRequired={isRequired || meta.alwaysRequired} {...inputProps} />
+        ) : (
+          `Unknown input type: ${inputType}`
+        )}
         {description && (
           <div styleName="description">
             <Markdown>{description}</Markdown>

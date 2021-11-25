@@ -7,14 +7,24 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Form} from 'semantic-ui-react';
 
-export default function FileInput({htmlName, disabled}) {
-  return <input type="file" name={htmlName} disabled={disabled} />;
+import '../../../styles/regform.module.scss';
+
+export default function FileInput({htmlName, disabled, title, isRequired}) {
+  return (
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
+      <label>{title}</label>
+      <input type="file" name={htmlName} />
+    </Form.Field>
+  );
 }
 
 FileInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
 };
 
 FileInput.defaultProps = {

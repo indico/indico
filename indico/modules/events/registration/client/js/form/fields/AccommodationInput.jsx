@@ -10,6 +10,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
+import {Form} from 'semantic-ui-react';
 
 import {DatePeriodField, FinalDatePeriod} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
@@ -22,7 +23,15 @@ import {Choices, choiceShape} from './ChoicesSetup';
 
 import '../../../styles/regform.module.scss';
 
-export default function AccommodationInput({htmlName, disabled, choices, arrival, departure}) {
+export default function AccommodationInput({
+  htmlName,
+  disabled,
+  choices,
+  arrival,
+  departure,
+  title,
+  isRequired,
+}) {
   // TODO: billable/price
   // TODO: places left
   // TODO: disable options triggering price changes after payment (or warn for managers)
@@ -81,7 +90,8 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
       : 0;
 
   return (
-    <>
+    <Form.Field required={isRequired} styleName="field">
+      <label>{title}</label>
       <ul styleName="radio-group">
         {choices
           .filter(c => c.isEnabled || !c.isNoAccommodation) // show disabled unless no accommodation
@@ -127,7 +137,7 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
           Total: {nights * selectedChoice.price} {currency}
         </span>
       )}
-    </>
+    </Form.Field>
   );
 }
 
@@ -143,6 +153,8 @@ AccommodationInput.propTypes = {
     startDate: PropTypes.string.isRequired,
     endDate: PropTypes.string.isRequired,
   }).isRequired,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
   // TODO: placesUsed, captions - only needed once we deal with real data
 };
 

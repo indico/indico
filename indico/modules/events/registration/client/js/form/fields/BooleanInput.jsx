@@ -8,29 +8,36 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
+import {Form} from 'semantic-ui-react';
 
 import {FinalDropdown} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
 
-export default function BooleanInput({htmlName, disabled, isRequired, defaultValue, price}) {
+import '../../../styles/regform.module.scss';
+
+export default function BooleanInput({htmlName, disabled, title, isRequired, defaultValue, price}) {
   const currency = useSelector(getCurrency);
 
   return (
-    <select name={htmlName} disabled={disabled} defaultValue={defaultValue}>
-      {!isRequired && <option value="">{Translate.string('Choose an option')}</option>}
-      <option value="yes">
-        {Translate.string('Yes')} {!!price && `(${price} ${currency})`}
-      </option>
-      <option value="no">{Translate.string('No')}</option>
-    </select>
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
+      <label>{title}</label>
+      <select name={htmlName} defaultValue={defaultValue}>
+        {!isRequired && <option value="">{Translate.string('Choose an option')}</option>}
+        <option value="yes">
+          {Translate.string('Yes')} {!!price && `(${price} ${currency})`}
+        </option>
+        <option value="no">{Translate.string('No')}</option>
+      </select>
+    </Form.Field>
   );
 }
 
 BooleanInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool,
   defaultValue: PropTypes.string,
   price: PropTypes.number,
