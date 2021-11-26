@@ -8,12 +8,14 @@
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.notifications import make_email, send_email
+from indico.modules.core.settings import core_settings
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.ical import event_to_ical
+from indico.modules.events.ical import MIMECalendar, event_to_ical
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
@@ -210,8 +212,9 @@ class EventReminder(db.Model):
         email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
         attachments = []
         if self.attach_ical:
-            event_ical = event_to_ical(self.event, skip_access_check=True)
-            attachments.append(('event.ics', event_ical, 'text/calendar'))
+            event_ical = event_to_ical(self.event, skip_access_check=True, method='REQUEST',
+                                       organizer=(core_settings.get('site_title'), config.NO_REPLY_EMAIL))
+            attachments.append(MIMECalendar('event.ics', event_ical))
 
         for recipient in recipients:
             email = make_email(

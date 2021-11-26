@@ -45,6 +45,7 @@ Improvements
 - Add option to export role members as CSV (:issue:`5147`, :pr:`5156`)
 - Include attachment checksums in API responses (:issue:`5084`, :pr:`5169`, thanks
   :user:`avivace`)
+- iCalendar invites now render nicely in Outlook (:pr:`5178`)
 
 Bugfixes
 ^^^^^^^^

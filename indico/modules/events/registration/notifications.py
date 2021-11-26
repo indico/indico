@@ -8,8 +8,10 @@
 from flask import session
 
 from indico.core import signals
+from indico.core.config import config
 from indico.core.notifications import make_email, send_email
-from indico.modules.events.ical import event_to_ical
+from indico.modules.core.settings import core_settings
+from indico.modules.events.ical import MIMECalendar, event_to_ical
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.util.placeholders import replace_placeholders
 from indico.util.signals import values_from_signal
@@ -38,8 +40,9 @@ def _notify_registration(registration, template_name, to_managers=False, attach_
             registration.state == RegistrationState.complete):
         attachments += get_ticket_attachments(registration)
     if not to_managers and registration.registration_form.attach_ical:
-        event_ical = event_to_ical(registration.event)
-        attachments.append(('event.ics', event_ical, 'text/calendar'))
+        event_ical = event_to_ical(registration.event, method='REQUEST',
+                                   organizer=(core_settings.get('site_title'), config.NO_REPLY_EMAIL))
+        attachments.append(MIMECalendar('event.ics', event_ical))
 
     tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
                               attach_rejection_reason=attach_rejection_reason)
