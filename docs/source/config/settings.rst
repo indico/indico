@@ -509,6 +509,28 @@ Emails
 
     Default: ``30``
 
+.. data:: SMTP_ALLOWED_SENDERS
+
+    A list of allowed envelope sender addresses. Each entry must be an email
+    address, but using the ``*`` wildcard is allowed.
+    For any address not matching an entry in this list, the envelope sender
+    will be rewritten to the :data:`SMTP_SENDER_FALLBACK` address. The ``From``
+    email header which is shown to end users is not affected by this.
+
+    For example, if your mail server only allowed sending emails from your domain
+    ``example.com``, you would set this setting to ``{'*@example.com'}``. If only
+    a specific sender address was allowed, you'd use e.g. ``{'indico@example.com'}``.
+
+    Default: ``set()``
+
+.. data:: SMTP_SENDER_FALLBACK
+
+    The envelope sender address to be used for any senders that are not whitelisted
+    in :data:`SMTP_ALLOWED_SENDERS`. This setting is required if the sender whitelist
+    is used.
+
+    Default: ``None``
+
 .. data:: NO_REPLY_EMAIL
 
     The email address used when sending emails to users to which they

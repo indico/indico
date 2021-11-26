@@ -46,6 +46,9 @@ Improvements
 - Include attachment checksums in API responses (:issue:`5084`, :pr:`5169`, thanks
   :user:`avivace`)
 - iCalendar invites now render nicely in Outlook (:pr:`5178`)
+- Envelope senders for emails can now be restricted to specific addresses/domains
+  using the :data:`SMTP_ALLOWED_SENDERS` and :data:`SMTP_SENDER_FALLBACK` config
+  settings (:issue:`4837`, :issue:`2224`, :issue:`1877`, :pr:`5179`)
 
 Bugfixes
 ^^^^^^^^
