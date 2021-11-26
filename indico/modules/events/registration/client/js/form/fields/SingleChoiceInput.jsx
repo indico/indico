@@ -104,19 +104,20 @@ export default function SingleChoiceInput({
 
   let extraSlotsDropdown = null;
   if (withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0) {
+    const options = _.range(1, selectedChoice.maxExtraSlots + 2).map(i => ({
+      key: i,
+      value: i,
+      text: i,
+    }));
     extraSlotsDropdown = (
-      <select
+      <Form.Select
         name={`${htmlName}-extra`}
+        options={options}
         disabled={disabled}
         value={slotsUsed}
-        onChange={evt => setSlotsUsed(evt.target.value)}
-      >
-        {_.range(1, selectedChoice.maxExtraSlots + 2).map(i => (
-          <option key={i} value={i}>
-            {i}
-          </option>
-        ))}
-      </select>
+        onChange={(_evt, data) => setSlotsUsed(data.value)}
+        fluid
+      />
     );
   }
 
@@ -156,7 +157,7 @@ export default function SingleChoiceInput({
   return (
     <Form.Field required={isRequired} styleName="field">
       <label>{title}</label>
-      <>
+      <Form.Group>
         {component}
         {extraSlotsDropdown}
         {extraSlotsDropdown && !!selectedChoice.price && (
@@ -165,7 +166,7 @@ export default function SingleChoiceInput({
             {currency}
           </span>
         )}
-      </>
+      </Form.Group>
     </Form.Field>
   );
 }
