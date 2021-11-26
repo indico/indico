@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
-import {Form} from 'semantic-ui-react';
+import {Form, Label} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -28,18 +28,27 @@ function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
     key: c.id,
     value: c.id,
     disabled: !c.isEnabled,
-    text: c.price ? `${c.caption} (${c.price} ${currency})` : c.caption,
+    text: c.caption,
+    description: c.price ? `${c.price} ${currency}` : undefined,
   }));
+  const price = value ? choices.find(c => c.id === value).price : null;
   return (
-    <Form.Select
-      name={htmlName}
-      placeholder={Translate.string('Choose an option')}
-      options={options}
-      disabled={disabled}
-      value={value}
-      onChange={onChange}
-      search
-    />
+    <>
+      <Form.Select
+        name={htmlName}
+        placeholder={Translate.string('Choose an option')}
+        options={options}
+        disabled={disabled}
+        value={value}
+        onChange={onChange}
+        search
+      />
+      {!!price && (
+        <Label pointing="left">
+          {price} {currency}
+        </Label>
+      )}
+    </>
   );
 }
 
