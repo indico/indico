@@ -24,17 +24,22 @@ import '../../../styles/regform.module.scss';
 
 function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
   const currency = useSelector(getCurrency);
+  const options = choices.map(c => ({
+    key: c.id,
+    value: c.id,
+    disabled: !c.isEnabled,
+    text: c.price ? `${c.caption} (${c.price} ${currency})` : c.caption,
+  }));
   return (
-    <select name={htmlName} disabled={disabled} value={value} onChange={onChange}>
-      <option key="" value="">
-        {Translate.string('Choose an option')}
-      </option>
-      {choices.map(c => (
-        <option key={c.id} value={c.id} disabled={!c.isEnabled}>
-          {c.caption} {!!c.price && `(${c.price} ${currency})`}
-        </option>
-      ))}
-    </select>
+    <Form.Select
+      name={htmlName}
+      placeholder={Translate.string('Choose an option')}
+      options={options}
+      disabled={disabled}
+      value={value}
+      onChange={onChange}
+      search
+    />
   );
 }
 
@@ -53,24 +58,19 @@ function SingleChoiceRadioGroup({htmlName, disabled, choices, value, onChange, i
     radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
   }
   return (
-    <ul styleName="radio-group">
+    <Form.Group grouped>
       {radioChoices.map(c => (
-        <li key={c.id}>
-          <input
-            type="radio"
-            name={htmlName}
-            id={`${htmlName}-${c.id}`}
-            value={c.id}
-            disabled={!c.isEnabled || disabled}
-            checked={c.id === value}
-            onChange={onChange}
-          />{' '}
-          <label htmlFor={`${htmlName}-${c.id}`}>
-            {c.caption} {!!c.price && `(${c.price} ${currency})`}
-          </label>
-        </li>
+        <Form.Radio
+          label={c.price ? `${c.caption} (${c.price} ${currency})` : c.caption}
+          name={htmlName}
+          key={c.id}
+          value={c.id}
+          disabled={!c.isEnabled || disabled}
+          checked={c.id === value}
+          onChange={onChange}
+        />
       ))}
-    </ul>
+    </Form.Group>
   );
 }
 
@@ -120,8 +120,8 @@ export default function SingleChoiceInput({
     );
   }
 
-  const handleChange = evt => {
-    setValue(evt.target.value);
+  const handleChange = (_evt, data) => {
+    setValue(data.value);
     setSlotsUsed(1);
   };
 
