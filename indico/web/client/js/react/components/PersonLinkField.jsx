@@ -322,7 +322,11 @@ export default function PersonLinkField({
       </Segment>
       <Button.Group size="small" attached="bottom" floated="right">
         {sessionUser && (
-          <Translate as={Button} type="button" onClick={() => onAdd([sessionUser])}>
+          <Translate
+            as={Button}
+            type="button"
+            onClick={() => onAdd([{...sessionUser, name: sessionUser.fullName}])}
+          >
             Add myself
           </Translate>
         )}
