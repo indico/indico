@@ -10,10 +10,10 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
-import {Form} from 'semantic-ui-react';
+import {Checkbox, Form, Dropdown, Label} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalField} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
 
@@ -37,55 +37,94 @@ export default function MultiChoiceInput({
   const currency = useSelector(getCurrency);
   const [value, setValue] = useState({});
 
-  const makeHandleChange = choice => evt => {
-    setValue(prev => ({...prev, [choice.id]: +evt.target.checked}));
+  const makeHandleChange = choice => () => {
+    setValue(prev => ({...prev, [choice.id]: +!prev[choice.id]}));
   };
-  const makeHandleSlotsChange = choice => evt => {
-    setValue(prev => ({...prev, [choice.id]: +evt.target.value}));
+  const makeHandleSlotsChange = choice => (__, {value: newValue}) => {
+    setValue(prev => ({...prev, [choice.id]: +newValue}));
   };
+
+  const formatPrice = choice =>
+    ((choice.extraSlotsPay ? value[choice.id] : 1) * choice.price).toFixed(1);
+
+  const selected = Object.values(value).some(v => v !== 0);
 
   return (
     <Form.Field required={isRequired} styleName="field">
       <label>{title}</label>
-      <ul styleName="radio-group">
-        {choices.map(choice => (
-          <li key={choice.id}>
-            <input
-              type="checkbox"
-              name={htmlName}
-              id={`${htmlName}-${choice.id}`}
-              value={choice.id}
-              disabled={!choice.isEnabled || disabled}
-              checked={!!value[choice.id]}
-              onChange={makeHandleChange(choice)}
-            />{' '}
-            <label htmlFor={`${htmlName}-${choice.id}`}>
-              {choice.caption} {!!choice.price && `(${choice.price} ${currency})`}
-            </label>
-            {!!value[choice.id] && withExtraSlots && choice.maxExtraSlots > 0 && (
-              <>
-                <select
-                  name={`${htmlName}-${choice.id}-extra`}
-                  disabled={disabled}
-                  value={value[choice.id]}
-                  onChange={makeHandleSlotsChange(choice)}
-                >
-                  {_.range(1, choice.maxExtraSlots + 2).map(i => (
-                    <option key={i} value={i}>
-                      {i}
-                    </option>
-                  ))}
-                </select>
-                {!!choice.price && (
-                  <span styleName="price">
-                    Total: {(choice.extraSlotsPay ? value[choice.id] : 1) * choice.price} {currency}
-                  </span>
+      <table styleName="multichoice-table">
+        <tbody>
+          {choices.map(choice => {
+            return (
+              <tr key={choice.id}>
+                <td style={{paddingRight: 20}}>
+                  <div style={{maxWidth: 320}}>
+                    <Checkbox
+                      name={htmlName}
+                      value={choice.id}
+                      disabled={!choice.isEnabled || disabled || choice.placesLimit === 0}
+                      checked={!!value[choice.id]}
+                      onChange={makeHandleChange(choice)}
+                      label={
+                        choice.caption +
+                        (!withExtraSlots && choice.price ? ` (${choice.price} ${currency})` : '')
+                      }
+                    />
+                  </div>
+                </td>
+                <td style={{paddingRight: 40}}>
+                  {choice.placesLimit > 0 ? (
+                    <Label color="green">
+                      <span style={{whiteSpace: 'nowrap'}}>
+                        <PluralTranslate count={choice.placesLimit}>
+                          <Singular>1 space left</Singular>
+                          <Plural>
+                            <Param name="count" value={choice.placesLimit} /> spaces left
+                          </Plural>
+                        </PluralTranslate>
+                      </span>
+                    </Label>
+                  ) : (
+                    <Label color="red">
+                      <span style={{whiteSpace: 'nowrap'}}>
+                        <Translate>No places left</Translate>
+                      </span>
+                    </Label>
+                  )}
+                </td>
+                {withExtraSlots && selected && (
+                  <td style={{paddingRight: 20}}>
+                    {!!value[choice.id] && (
+                      <Dropdown
+                        selection
+                        style={{minWidth: 80}}
+                        disabled={choice.maxExtraSlots === 0}
+                        name={`${htmlName}-${choice.id}-extra`}
+                        value={value[choice.id]}
+                        onChange={makeHandleSlotsChange(choice)}
+                        options={_.range(1, choice.maxExtraSlots + 2).map(i => ({
+                          key: i,
+                          value: i,
+                          text: i,
+                        }))}
+                      />
+                    )}
+                  </td>
                 )}
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
+                {selected && withExtraSlots && (
+                  <td>
+                    {!!value[choice.id] && choice.price !== 0 && (
+                      <span style={{whiteSpace: 'nowrap'}}>
+                        <b>Total</b>: {formatPrice(choice)} {currency}
+                      </span>
+                    )}
+                  </td>
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </Form.Field>
   );
 }

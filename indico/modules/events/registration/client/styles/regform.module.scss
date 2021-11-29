@@ -60,6 +60,14 @@
         align-items: center;
       }
 
+      .multichoice-table {
+        border-spacing: 0 5px;
+      }
+
+      .place-limit {
+        color: $green;
+      }
+
       .price {
         margin-left: 1.5em;
       }
@@ -84,7 +92,8 @@
       width: auto;
     }
 
-    input[type='file'] {
+    input[type='file'],
+    input[type='email'] {
       width: 600px;
     }
   }
