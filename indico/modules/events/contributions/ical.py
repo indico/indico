@@ -13,7 +13,7 @@ from indico.modules.events.ical import generate_basic_component
 from indico.web.flask.util import url_for
 
 
-def generate_contribution_component(contribution, related_to_uid=None):
+def generate_contribution_component(contribution, related_to_uid=None, organizer=None):
     """Generate an Event icalendar component from an Indico Contribution.
 
     :param contribution: The Indico Contribution to use
@@ -22,7 +22,7 @@ def generate_contribution_component(contribution, related_to_uid=None):
     """
     uid = f'indico-contribution-{contribution.id}@{url_parse(config.BASE_URL).host}'
     url = url_for('contributions.display_contribution', contribution, _external=True)
-    component = generate_basic_component(contribution, uid, url)
+    component = generate_basic_component(contribution, uid, url, organizer=organizer)
 
     if related_to_uid:
         component.add('related-to', related_to_uid)
