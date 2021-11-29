@@ -111,11 +111,38 @@
       .single-choice-field {
         align-items: center;
         margin-bottom: 0;
-      }
 
-      .single-choice-radio-group {
-        margin-right: 2em;
-        margin-bottom: 0;
+        .dropdown-text {
+          display: flex;
+          align-items: center;
+
+          .caption {
+            flex-grow: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 27em;
+          }
+
+          .labels {
+            margin-top: -11px;
+            margin-bottom: -11px;
+            margin-left: 0.5em;
+            white-space: nowrap;
+
+            :global(.label) {
+              white-space: nowrap;
+            }
+          }
+        }
+
+        :global(.dropdown .divider.text) {
+          width: 100%;
+        }
+
+        .single-choice-radio-group {
+          margin-right: 2em;
+          margin-bottom: 0;
+        }
       }
 
       textarea,

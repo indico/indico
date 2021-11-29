@@ -19,6 +19,7 @@ import {Translate} from 'indico/react/i18n';
 import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
+import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
 
@@ -27,28 +28,32 @@ function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
   const options = choices.map(c => ({
     key: c.id,
     value: c.id,
-    disabled: !c.isEnabled,
-    text: c.caption,
-    description: c.price ? `${c.price} ${currency}` : undefined,
+    disabled: !c.isEnabled || c.placesLimit <= 0,
+    text: (
+      <div styleName="dropdown-text">
+        <div styleName="caption">{c.caption}</div>
+        <div styleName="labels">
+          {!!c.price && (
+            <Label>
+              {c.price} {currency}
+            </Label>
+          )}
+          <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+        </div>
+      </div>
+    ),
   }));
-  const price = value ? choices.find(c => c.id === value).price : null;
   return (
-    <>
-      <Form.Select
-        name={htmlName}
-        placeholder={Translate.string('Choose an option')}
-        options={options}
-        disabled={disabled}
-        value={value}
-        onChange={onChange}
-        search
-      />
-      {!!price && (
-        <Label pointing="left">
-          {price} {currency}
-        </Label>
-      )}
-    </>
+    <Form.Select
+      name={htmlName}
+      placeholder={Translate.string('Choose an option')}
+      options={options}
+      disabled={disabled}
+      value={value}
+      onChange={onChange}
+      width={10}
+      search
+    />
   );
 }
 
@@ -102,7 +107,6 @@ export default function SingleChoiceInput({
   defaultItem,
   withExtraSlots,
 }) {
-  // TODO: places left
   // TODO: set value as `{uuid: places}` (when adding final-form integration)
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
@@ -170,10 +174,12 @@ export default function SingleChoiceInput({
         {component}
         {extraSlotsDropdown}
         {extraSlotsDropdown && !!selectedChoice.price && (
-          <span styleName="price">
-            <b>Total</b>: {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price}{' '}
-            {currency}
-          </span>
+          <Label pointing="left">
+            <b>
+              <Translate>Total</Translate>
+            </b>
+            : {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price} {currency}
+          </Label>
         )}
       </Form.Group>
     </Form.Field>
