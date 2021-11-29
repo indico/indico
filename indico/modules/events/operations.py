@@ -22,6 +22,7 @@ from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.persons.util import update_submitter_permissions
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import orig_string
@@ -96,14 +97,18 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     data.setdefault('creator', session.user)
     theme = data.pop('theme', None)
     create_booking = data.pop('create_booking', False)
+    person_links = data.pop('person_links', [])
     person_link_data = data.pop('person_link_data', {})
     if category is None:
         # don't allow setting a protection mode on unlisted events; we
         # keep the inheriting default
         data.pop('protection_mode', None)
     event.populate_from_dict(data)
+    if person_link_data:
+        update_submitter_permissions(event, person_link_data)
+    else:
+        event.person_links = person_links
     db.session.flush()
-    event.person_link_data = person_link_data
     if theme is not None:
         layout_settings.set(event, 'timetable_theme', theme)
     if add_creator_as_manager:

@@ -100,7 +100,7 @@ class BreakEntryForm(EntryFormMixin, IndicoForm):
 
 class ContributionEntryForm(EntryFormMixin, ContributionForm):
     _entry_type = TimetableEntryType.CONTRIBUTION
-    _display_fields = ('title', 'description', 'type', 'time', 'duration', 'person_link_data', 'location_data',
+    _display_fields = ('title', 'description', 'type', 'time', 'duration', 'person_links', 'location_data',
                        'keywords', 'references')
 
     def __init__(self, *args, **kwargs):

@@ -42,8 +42,8 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
         self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
 
-    def _convert_data(self, data):
-        return {self._get_person_link(x): 'submitter' in x.get('roles', []) for x in data}
+    # def _convert_data(self, data):
+        # return {self._get_person_link(x): 'submitter' in x.get('roles', []) for x in data}
 
     @no_autoflush
     def _get_person_link(self, data):

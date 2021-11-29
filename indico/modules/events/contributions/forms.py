@@ -45,7 +45,7 @@ class ContributionForm(IndicoForm):
     duration = IndicoDurationField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
                                    default=timedelta(minutes=20))
     type = QuerySelectField(_('Type'), get_label='name', allow_blank=True, blank_text=_('No type selected'))
-    person_link_data = ContributionPersonLinkListField(_('People'))
+    person_links = ContributionPersonLinkListField(_('People'))
     location_data = IndicoLocationField(_('Location'))
     keywords = IndicoTagListField(_('Keywords'))
     references = ReferencesField(_('External IDs'), reference_class=ContributionReference,
@@ -66,7 +66,7 @@ class ContributionForm(IndicoForm):
         super().__init__(*args, **kwargs)
         self.type.query = self.event.contribution_types
         if self.event.type != 'conference':
-            self.person_link_data.label.text = _('Speakers')
+            self.person_links.label.text = _('Speakers')
         if not self.type.query.count():
             del self.type
         if not to_schedule and (self.contrib is None or not self.contrib.is_scheduled):

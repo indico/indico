@@ -180,8 +180,8 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
                                           'type': abstract.accepted_contrib_type,
                                           'track': abstract.accepted_track,
                                           'session': contrib_session,
-                                          'person_link_data': {link: (author_submission_rights or link.is_speaker)
-                                                               for link in contrib_person_links}},
+                                          'person_links': {link: (author_submission_rights or link.is_speaker)
+                                                           for link in contrib_person_links}},
                                   custom_fields_data=custom_fields_data)
     if abstracts_settings.get(event, 'copy_attachments') and abstract.files:
         folder = AttachmentFolder.get_or_create_default(contrib)
