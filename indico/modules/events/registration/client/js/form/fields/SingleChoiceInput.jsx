@@ -67,7 +67,7 @@ function SingleChoiceRadioGroup({htmlName, disabled, choices, value, onChange, i
     radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
   }
   return (
-    <Form.Group grouped>
+    <Form.Group grouped styleName="single-choice-radio-group">
       {radioChoices.map(c => (
         <Form.Radio
           label={c.price ? `${c.caption} (${c.price} ${currency})` : c.caption}
@@ -166,12 +166,12 @@ export default function SingleChoiceInput({
   return (
     <Form.Field required={isRequired} styleName="field">
       <label>{title}</label>
-      <Form.Group>
+      <Form.Group styleName="single-choice-field">
         {component}
         {extraSlotsDropdown}
         {extraSlotsDropdown && !!selectedChoice.price && (
           <span styleName="price">
-            Total: {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price}{' '}
+            <b>Total</b>: {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price}{' '}
             {currency}
           </span>
         )}

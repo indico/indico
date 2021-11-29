@@ -108,6 +108,16 @@
         margin-left: 1.5em;
       }
 
+      .single-choice-field {
+        align-items: center;
+        margin-bottom: 0;
+      }
+
+      .single-choice-radio-group {
+        margin-right: 2em;
+        margin-bottom: 0;
+      }
+
       textarea,
       input[type='email'],
       input[type='file'],
