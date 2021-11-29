@@ -143,8 +143,9 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
     def __init__(self, *args, **kwargs):
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         self.empty_message = _('There are no chairpersons')
+        event_type = kwargs.pop('event_type', EventType.conference)
         super().__init__(*args, **kwargs)
-        if kwargs.pop('event_type', self.object.event and self.object.event.type_) == EventType.lecture:
+        if event_type or (self.object.event and self.object.event.type_) == EventType.lecture:
             self.empty_message = _('There are no speakers')
 
     def _convert_data(self, data):
