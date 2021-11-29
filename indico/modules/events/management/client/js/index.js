@@ -85,13 +85,9 @@ import {SingleEventMove, EventPublish} from './EventMove';
       })
       .get();
 
-    const visibleEntries = personRows.filter(function() {
-      const $this = $(this);
-
-      return _.any(filters, function(filterName) {
-        return $this.data('person-roles')[filterName];
-      });
-    });
+    const visibleEntries = personRows.filter((idx, entry) =>
+      filters.find(filterName => $(entry).data('person-roles')[filterName])
+    );
 
     personRows.addClass('hidden');
     visibleEntries.removeClass('hidden');
