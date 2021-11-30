@@ -21,6 +21,28 @@ import {Choices, choiceShape} from './ChoicesSetup';
 
 import '../../../styles/regform.module.scss';
 
+function PlacesLeft({placesLeft, isEnabled}) {
+  return placesLeft > 0 ? (
+    <Label color={isEnabled ? 'green' : 'grey'}>
+      <PluralTranslate count={placesLeft}>
+        <Singular>1 place left</Singular>
+        <Plural>
+          <Param name="count" value={placesLeft} /> places left
+        </Plural>
+      </PluralTranslate>
+    </Label>
+  ) : (
+    <Label color="red">
+      <Translate>No places left</Translate>
+    </Label>
+  );
+}
+
+PlacesLeft.propTypes = {
+  placesLeft: PropTypes.number.isRequired,
+  isEnabled: PropTypes.bool.isRequired,
+};
+
 export default function MultiChoiceInput({
   htmlName,
   disabled,
@@ -45,9 +67,9 @@ export default function MultiChoiceInput({
   };
 
   const formatPrice = choice =>
-    ((choice.extraSlotsPay ? value[choice.id] : 1) * choice.price).toFixed(1);
+    ((choice.extraSlotsPay ? value[choice.id] || 0 : 1) * choice.price).toFixed(1);
 
-  const selected = Object.values(value).some(v => v !== 0);
+  const noPrices = choices.every(choice => choice.price === 0);
 
   return (
     <Form.Field required={isRequired} styleName="field">
@@ -57,7 +79,7 @@ export default function MultiChoiceInput({
           {choices.map(choice => {
             return (
               <tr key={choice.id}>
-                <td style={{paddingRight: 20}}>
+                <td style={{paddingTop: 10, paddingBottom: 10}}>
                   <div style={{maxWidth: 320}}>
                     <Checkbox
                       name={htmlName}
@@ -65,44 +87,29 @@ export default function MultiChoiceInput({
                       disabled={!choice.isEnabled || disabled || choice.placesLimit === 0}
                       checked={!!value[choice.id]}
                       onChange={makeHandleChange(choice)}
-                      label={
-                        choice.caption +
-                        (!withExtraSlots && choice.price ? ` (${choice.price} ${currency})` : '')
-                      }
+                      label={choice.caption}
                     />
                   </div>
                 </td>
-                <td style={{paddingRight: 40}}>
-                  {choice.placesLimit > 0 ? (
-                    <Label color="green">
-                      <span style={{whiteSpace: 'nowrap'}}>
-                        <PluralTranslate count={choice.placesLimit}>
-                          <Singular>1 space left</Singular>
-                          <Plural>
-                            <Param name="count" value={choice.placesLimit} /> spaces left
-                          </Plural>
-                        </PluralTranslate>
-                      </span>
-                    </Label>
-                  ) : (
-                    <Label color="red">
-                      <span style={{whiteSpace: 'nowrap'}}>
-                        <Translate>No places left</Translate>
-                      </span>
-                    </Label>
-                  )}
-                </td>
-                {withExtraSlots && selected && (
-                  <td style={{paddingRight: 20}}>
-                    {!!value[choice.id] && (
+                {!withExtraSlots && !noPrices && (
+                  <td style={{paddingLeft: 5}}>
+                    {choice.isEnabled && choice.placesLimit > 0 && (
+                      <Label pointing="left">
+                        {choice.price} {currency}
+                      </Label>
+                    )}
+                  </td>
+                )}
+                {withExtraSlots && (
+                  <td style={{paddingLeft: 20}}>
+                    {choice.isEnabled && choice.placesLimit > 0 && (
                       <Dropdown
                         selection
-                        style={{minWidth: 80}}
-                        disabled={choice.maxExtraSlots === 0}
+                        styleName="multichoice-dropdown"
                         name={`${htmlName}-${choice.id}-extra`}
-                        value={value[choice.id]}
+                        value={value[choice.id] || 0}
                         onChange={makeHandleSlotsChange(choice)}
-                        options={_.range(1, choice.maxExtraSlots + 2).map(i => ({
+                        options={_.range(0, choice.maxExtraSlots + 2).map(i => ({
                           key: i,
                           value: i,
                           text: i,
@@ -111,15 +118,18 @@ export default function MultiChoiceInput({
                     )}
                   </td>
                 )}
-                {selected && withExtraSlots && (
-                  <td>
-                    {!!value[choice.id] && choice.price !== 0 && (
-                      <span style={{whiteSpace: 'nowrap'}}>
+                {withExtraSlots && !noPrices && (
+                  <td style={{paddingLeft: 5}}>
+                    {choice.isEnabled && choice.placesLimit > 0 && (
+                      <Label pointing="left">
                         <b>Total</b>: {formatPrice(choice)} {currency}
-                      </span>
+                      </Label>
                     )}
                   </td>
                 )}
+                <td style={{paddingLeft: 35}}>
+                  <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
+                </td>
               </tr>
             );
           })}
