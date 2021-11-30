@@ -22,8 +22,8 @@ def get_countries(locale=None):
 @memoize
 def _get_countries(locale):
     _countries = {country.alpha_2: getattr(country, 'common_name', country.name) for country in pycountry.countries}
-    _countries.update(config.CUSTOM_COUNTRIES)
     _countries = {code: locale.territories.get(code, name) for code, name in _countries.items()}
+    _countries.update(config.CUSTOM_COUNTRIES)
     return ImmutableDict(_countries)
 
 

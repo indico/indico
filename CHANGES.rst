@@ -53,7 +53,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far
+- Fix :data:`CUSTOM_COUNTRIES` not overriding names of existing countries (:pr:`5183`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
