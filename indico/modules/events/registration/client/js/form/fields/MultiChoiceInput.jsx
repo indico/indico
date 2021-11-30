@@ -22,18 +22,20 @@ import {Choices, choiceShape} from './ChoicesSetup';
 import '../../../styles/regform.module.scss';
 
 function PlacesLeft({placesLeft, isEnabled}) {
-  return placesLeft > 0 ? (
-    <Label color={isEnabled ? 'green' : 'grey'}>
-      <PluralTranslate count={placesLeft}>
-        <Singular>1 place left</Singular>
-        <Plural>
-          <Param name="count" value={placesLeft} /> places left
-        </Plural>
-      </PluralTranslate>
-    </Label>
-  ) : (
-    <Label color="red">
-      <Translate>No places left</Translate>
+  const color = placesLeft > 0 ? (isEnabled ? 'green' : 'grey') : 'red';
+
+  return (
+    <Label color={color} style={{whiteSpace: 'nowrap'}}>
+      {placesLeft > 0 ? (
+        <PluralTranslate count={placesLeft}>
+          <Singular>1 place left</Singular>
+          <Plural>
+            <Param name="count" value={placesLeft} /> places left
+          </Plural>
+        </PluralTranslate>
+      ) : (
+        <Translate>No places left</Translate>
+      )}
     </Label>
   );
 }
@@ -67,7 +69,7 @@ export default function MultiChoiceInput({
   };
 
   const formatPrice = choice =>
-    ((choice.extraSlotsPay ? value[choice.id] || 0 : 1) * choice.price).toFixed(1);
+    ((choice.extraSlotsPay ? value[choice.id] || 0 : 1) * choice.price).toFixed(2);
 
   const noPrices = choices.every(choice => choice.price === 0);
 
@@ -80,7 +82,7 @@ export default function MultiChoiceInput({
             return (
               <tr key={choice.id}>
                 <td style={{paddingTop: 10, paddingBottom: 10}}>
-                  <div style={{maxWidth: 320}}>
+                  <div style={{maxWidth: 300}}>
                     <Checkbox
                       name={htmlName}
                       value={choice.id}
@@ -95,13 +97,13 @@ export default function MultiChoiceInput({
                   <td style={{paddingLeft: 5}}>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Label pointing="left">
-                        {choice.price} {currency}
+                        {choice.price.toFixed(2)} {currency}
                       </Label>
                     )}
                   </td>
                 )}
                 {withExtraSlots && (
-                  <td style={{paddingLeft: 20}}>
+                  <td style={{paddingLeft: 5}}>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Dropdown
                         selection
@@ -122,12 +124,13 @@ export default function MultiChoiceInput({
                   <td style={{paddingLeft: 5}}>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Label pointing="left">
-                        <b>Total</b>: {formatPrice(choice)} {currency}
+                        {choice.price.toFixed(2)} {currency} (Total: {formatPrice(choice)}{' '}
+                        {currency})
                       </Label>
                     )}
                   </td>
                 )}
-                <td style={{paddingLeft: 35}}>
+                <td style={{paddingLeft: 5}}>
                   <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
                 </td>
               </tr>

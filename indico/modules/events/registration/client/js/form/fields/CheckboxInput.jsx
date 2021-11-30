@@ -22,7 +22,7 @@ export default function CheckboxInput({htmlName, disabled, title, isRequired, pr
       <Checkbox name={htmlName} label={title} />
       {!!price && (
         <Label pointing="left" styleName="price-tag">
-          {price} {currency}
+          {price.toFixed(2)} {currency}
         </Label>
       )}
     </Form.Field>

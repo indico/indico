@@ -25,7 +25,7 @@ export default function BooleanInput({htmlName, disabled, title, isRequired, def
       key: 'yes',
       value: 'yes',
       text: Translate.string('Yes'),
-      description: price ? `${price} ${currency}` : null,
+      description: price ? `${price.toFixed(2)} ${currency}` : null,
     },
     {
       key: 'no',
@@ -48,7 +48,7 @@ export default function BooleanInput({htmlName, disabled, title, isRequired, def
         />
         {!!price && value === 'yes' && (
           <Label pointing="left" styleName="price-tag">
-            {price} {currency}
+            {price.toFixed(2)} {currency}
           </Label>
         )}
       </div>

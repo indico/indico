@@ -25,7 +25,7 @@ export default function NumberInput({htmlName, disabled, price, title, isRequire
   const [value, setValue] = useState('');
   const currency = useSelector(getCurrency);
   const inputProps = mapPropsToAttributes(props, attributeMap, NumberInput.defaultProps);
-  const total = (value * price).toFixed(1);
+  const total = (value * price).toFixed(2);
 
   return (
     <Form.Field required={isRequired} disabled={disabled} styleName="field">
@@ -38,11 +38,9 @@ export default function NumberInput({htmlName, disabled, price, title, isRequire
           {...inputProps}
           onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
         />
-        {!!price && value > 0 && (
-          <Label pointing="left" styleName="price-tag">
-            Total: {total} {currency}
-          </Label>
-        )}
+        <Label pointing="left" styleName="price-tag">
+          {price.toFixed(2)} {currency} (Total: {total} {currency})
+        </Label>
       </div>
     </Form.Field>
   );
