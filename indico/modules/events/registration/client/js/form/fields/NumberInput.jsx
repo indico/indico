@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Form} from 'semantic-ui-react';
+import {Form, Label} from 'semantic-ui-react';
 
 import {FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -25,6 +25,8 @@ export default function NumberInput({htmlName, disabled, price, title, isRequire
   const [value, setValue] = useState('');
   const currency = useSelector(getCurrency);
   const inputProps = mapPropsToAttributes(props, attributeMap, NumberInput.defaultProps);
+  const total = (value * price).toFixed(1);
+
   return (
     <Form.Field required={isRequired} disabled={disabled} styleName="field">
       <label>{title}</label>
@@ -36,10 +38,10 @@ export default function NumberInput({htmlName, disabled, price, title, isRequire
           {...inputProps}
           onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
         />
-        {!!price && (
-          <span styleName="price">
-            {price} {currency} (<b>Total</b>: {value * price} {currency})
-          </span>
+        {!!price && value > 0 && (
+          <Label pointing="left" styleName="price-tag">
+            Total: {total} {currency}
+          </Label>
         )}
       </div>
     </Form.Field>

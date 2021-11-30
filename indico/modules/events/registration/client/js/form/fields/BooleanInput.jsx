@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Form} from 'semantic-ui-react';
+import {Dropdown, Form, Label} from 'semantic-ui-react';
 
 import {FinalDropdown} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -18,27 +18,41 @@ import {getCurrency} from '../../form_setup/selectors';
 import '../../../styles/regform.module.scss';
 
 export default function BooleanInput({htmlName, disabled, title, isRequired, defaultValue, price}) {
+  const [value, setValue] = useState(defaultValue);
   const currency = useSelector(getCurrency);
   const options = [
     {
       key: 'yes',
       value: 'yes',
-      text: Translate.string('Yes') + (price ? `(${price} ${currency})` : ''),
+      text: Translate.string('Yes'),
+      description: price ? `${price} ${currency}` : null,
     },
-    {key: 'no', value: 'no', text: Translate.string('No')},
+    {
+      key: 'no',
+      value: 'no',
+      text: Translate.string('No'),
+    },
   ];
 
   return (
-    <Form.Select
-      fluid
-      required={isRequired}
-      disabled={disabled}
-      styleName="field"
-      label={title}
-      options={options}
-      name={htmlName}
-      defaultValue={defaultValue}
-    />
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
+      <label>{title}</label>
+      <div styleName="boolean-field">
+        <Dropdown
+          selection
+          options={options}
+          name={htmlName}
+          defaultValue={defaultValue}
+          value={value}
+          onChange={(_, {value: newValue}) => setValue(newValue)}
+        />
+        {!!price && value === 'yes' && (
+          <Label pointing="left" styleName="price-tag">
+            {price} {currency}
+          </Label>
+        )}
+      </div>
+    </Form.Field>
   );
 }
 

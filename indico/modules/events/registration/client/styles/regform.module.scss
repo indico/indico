@@ -55,7 +55,13 @@
     .field {
       margin-bottom: 3px;
 
-      .number-field {
+      .price-tag {
+        float: unset;
+        margin-left: 2em;
+      }
+
+      .number-field,
+      .boolean-field {
         display: flex;
         align-items: center;
       }
