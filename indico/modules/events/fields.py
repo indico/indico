@@ -82,7 +82,11 @@ class PersonLinkListFieldBase(PrincipalListField):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, allow_groups=False, allow_external_users=True, **kwargs)
         self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
-        self.event = self.object.event
+
+    @property
+    def event(self):
+        # The event should be a property as it may only be available later, such as, in creation forms
+        return getattr(self.get_form(), 'event', None)
 
     @no_autoflush
     def _get_person_link(self, data):
