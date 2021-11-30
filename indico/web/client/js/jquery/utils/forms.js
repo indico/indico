@@ -282,7 +282,9 @@
     folderProtection
   ) {
     protectionField.on('change', function() {
-      toggleAclField(aclField, !this.checked);
+      if (aclField) {
+        toggleAclField(aclField, !this.checked);
+      }
 
       if (selfProtection && inheritedProtection) {
         selfProtection.toggle(this.checked);

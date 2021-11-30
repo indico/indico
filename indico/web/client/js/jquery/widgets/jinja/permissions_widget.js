@@ -24,6 +24,8 @@ import Palette from 'indico/utils/palette';
       permissionsInfo: null,
       hiddenPermissions: null,
       hiddenPermissionsInfo: null,
+      eventId: null,
+      categoryId: null,
     },
 
     _update() {
@@ -495,6 +497,8 @@ import Palette from 'indico/utils/palette';
                   this._addItems(items, [READ_ACCESS_PERMISSIONS]);
                 }}
                 triggerFactory={userSearchTrigger}
+                eventId={this.options.eventId}
+                categoryId={this.options.categoryId}
               />
               <GroupSearch
                 existing={existing.filter(e => e.startsWith('Group'))}

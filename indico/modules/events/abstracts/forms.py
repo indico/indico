@@ -127,7 +127,7 @@ class AbstractSubmissionSettingsForm(IndicoForm):
                                                     enum=SubmissionRightsType, sorted=True,
                                                     description=_('Specify who will get contribution submission rights '
                                                                   'once an abstract has been accepted'))
-    authorized_submitters = PrincipalListField(_('Authorized submitters'), event=lambda form: form.event,
+    authorized_submitters = PrincipalListField(_('Authorized submitters'),
                                                allow_external_users=True, allow_groups=True,
                                                allow_event_roles=True, allow_category_roles=True,
                                                description=_('These users may always submit abstracts, '
@@ -498,7 +498,9 @@ class AbstractForm(IndicoForm):
         if not is_invited:
             self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
             self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
-            self.person_links.disable_user_search = session.user is None
+            self.person_links.disable_user_search = ((not config.ALLOW_PUBLIC_USER_SEARCH and
+                                                      not self.event.can_manage(session.user)) or
+                                                     session.user is None)
         else:
             self.person_links.require_primary_author = False
 

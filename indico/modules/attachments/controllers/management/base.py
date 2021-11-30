@@ -10,6 +10,7 @@ import mimetypes
 from flask import flash, render_template, request, session
 
 from indico.core import signals
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.attachments import logger
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin, SpecificFolderMixin
@@ -32,8 +33,9 @@ def _render_attachment_list(linked_object):
     return tpl.render_attachments(attachments=get_attached_items(linked_object), linked_object=linked_object)
 
 
-def _render_protection_message(linked_object):
-    return render_template('attachments/_protection_message.html', parent=_get_parent_info(linked_object))
+def _render_protection_message(linked_object, users_allowed=True):
+    return render_template('attachments/_protection_message.html',
+                           parent=_get_parent_info(linked_object), users_allowed=users_allowed)
 
 
 def _get_parent_info(parent):
@@ -57,6 +59,14 @@ def _get_folders_protection_info(linked_object):
     return {folder.id: folder.is_self_protected for folder in folders}
 
 
+def _is_user_search_allowed(obj=None):
+    if config.ALLOW_PUBLIC_USER_SEARCH:
+        return True
+    elif obj and obj.can_manage(session.user):
+        return True
+    return False
+
+
 class ManageAttachmentsMixin:
     """Show the attachment management page."""
     wp = None
@@ -76,7 +86,8 @@ class AddAttachmentFilesMixin:
     """Upload file attachments."""
 
     def _process(self):
-        form = AddAttachmentFilesForm(linked_object=self.object)
+        user_search_allowed = _is_user_search_allowed(self.object)
+        form = AddAttachmentFilesForm(linked_object=self.object, acl_enabled=user_search_allowed)
         if form.validate_on_submit():
             files = form.files.data
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
@@ -97,7 +108,8 @@ class AddAttachmentFilesMixin:
                   .format(count=len(files)), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/upload.html', form=form, action=url_for('.upload', self.object),
-                                protection_message=_render_protection_message(self.object),
+                                protection_message=_render_protection_message(self.object,
+                                                                              users_allowed=user_search_allowed),
                                 folders_protection_info=_get_folders_protection_info(self.object),
                                 existing_attachment=None)
 
@@ -106,13 +118,15 @@ class AddAttachmentLinkMixin:
     """Add link attachment."""
 
     def _process(self):
-        form = AddAttachmentLinkForm(linked_object=self.object)
+        user_search_allowed = _is_user_search_allowed(self.object)
+        form = AddAttachmentLinkForm(linked_object=self.object, acl_enabled=user_search_allowed)
         if form.validate_on_submit():
             add_attachment_link(form.data, self.object)
             flash(_('The link has been added'), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/add_link.html', form=form,
-                                protection_message=_render_protection_message(self.object),
+                                protection_message=_render_protection_message(self.object,
+                                                                              users_allowed=user_search_allowed),
                                 folders_protection_info=_get_folders_protection_info(self.object))
 
 
@@ -120,11 +134,13 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
     """Edit an attachment."""
 
     def _process(self):
+        user_search_allowed = _is_user_search_allowed(self.object)
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_self_protected, skip_attrs={'file'})
         if self.attachment.type == AttachmentType.file:
-            form = EditAttachmentFileForm(linked_object=self.object, obj=defaults, file=self.attachment)
+            form = EditAttachmentFileForm(linked_object=self.object, obj=defaults, file=self.attachment,
+                                          acl_enabled=user_search_allowed)
         else:
-            form = EditAttachmentLinkForm(linked_object=self.object, obj=defaults)
+            form = EditAttachmentLinkForm(linked_object=self.object, obj=defaults, acl_enabled=user_search_allowed)
 
         if form.validate_on_submit():
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
@@ -151,7 +167,8 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
                     'attachments/add_link.html')
         return jsonify_template(template, form=form, existing_attachment=self.attachment,
                                 action=url_for('.modify_attachment', self.attachment),
-                                protection_message=_render_protection_message(self.object),
+                                protection_message=_render_protection_message(self.object,
+                                                                              users_allowed=user_search_allowed),
                                 folders_protection_info=_get_folders_protection_info(self.object))
 
 
@@ -159,7 +176,9 @@ class CreateFolderMixin:
     """Create a new empty folder."""
 
     def _process(self):
-        form = AttachmentFolderForm(obj=FormDefaults(is_always_visible=True), linked_object=self.object)
+        user_search_allowed = _is_user_search_allowed(self.object)
+        form = AttachmentFolderForm(obj=FormDefaults(is_always_visible=True), linked_object=self.object,
+                                    acl_enabled=user_search_allowed)
         if form.validate_on_submit():
             folder = AttachmentFolder(object=self.object)
             form.populate_obj(folder, skip={'acl'})
@@ -171,15 +190,17 @@ class CreateFolderMixin:
             flash(_('Folder "{name}" created').format(name=folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/create_folder.html', form=form,
-                                protection_message=_render_protection_message(self.object))
+                                protection_message=_render_protection_message(self.object,
+                                                                              users_allowed=user_search_allowed))
 
 
 class EditFolderMixin(SpecificFolderMixin):
     """Edit a folder."""
 
     def _process(self):
+        user_search_allowed = _is_user_search_allowed(self.object)
         defaults = FormDefaults(self.folder, protected=self.folder.is_self_protected)
-        form = AttachmentFolderForm(obj=defaults, linked_object=self.object)
+        form = AttachmentFolderForm(obj=defaults, linked_object=self.object, acl_enabled=user_search_allowed)
         if form.validate_on_submit():
             form.populate_obj(self.folder, skip={'acl'})
             if self.folder.is_self_protected:
@@ -191,7 +212,8 @@ class EditFolderMixin(SpecificFolderMixin):
             flash(_('Folder "{name}" updated').format(name=self.folder.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
         return jsonify_template('attachments/create_folder.html', form=form,
-                                protection_message=_render_protection_message(self.object))
+                                protection_message=_render_protection_message(self.object,
+                                                                              users_allowed=user_search_allowed))
 
 
 class DeleteFolderMixin(SpecificFolderMixin):

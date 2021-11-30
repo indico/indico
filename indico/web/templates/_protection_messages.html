@@ -16,7 +16,7 @@
     </div>
 {%- endmacro %}
 
-{% macro render_protected_protection_message() -%}
+{% macro render_protected_protection_message(users_allowed=true) -%}
     <div class="action-box for-form protection-message protected-protection-message danger">
         <div class="section">
             <div class="icon icon-lock"></div>
@@ -25,9 +25,17 @@
                     {% trans %}Protected{% endtrans %}
                 </div>
                 <div>
-                    {% trans -%}
-                        This object is <strong>only</strong> accessible by the <strong>users specified</strong> above and the <strong>managers</strong> of <strong>parent resources</strong>.
-                    {%- endtrans %}
+                    {% if users_allowed %}
+                        {% trans -%}
+                            This object is <strong>only</strong> accessible by you, the <strong>users specified</strong>
+                            above and the <strong>managers</strong> of <strong>parent resources</strong>.
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans -%}
+                            This object is <strong>only</strong> accessible by you and the <strong>managers</strong> of
+                            <strong>parent resources</strong>.
+                        {%- endtrans %}
+                    {% endif %}
                 </div>
             </div>
         </div>

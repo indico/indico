@@ -27,6 +27,7 @@ from indico.util.string import crc32, snakify
 
 
 DEFAULTS = {
+    'ALLOW_PUBLIC_USER_SEARCH': True,
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,

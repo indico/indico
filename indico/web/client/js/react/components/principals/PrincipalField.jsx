@@ -35,6 +35,8 @@ const PrincipalField = props => {
     favoriteUsersController,
     withExternalUsers,
     className,
+    eventId,
+    categoryId,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -100,6 +102,8 @@ const PrincipalField = props => {
       favorites={favoriteUsers}
       disabled={disabled}
       withExternalUsers={withExternalUsers}
+      eventId={eventId}
+      categoryId={categoryId}
       single
     />
   );
@@ -143,6 +147,8 @@ PrincipalField.propTypes = {
   favoriteUsersController: PropTypes.array.isRequired,
   withExternalUsers: PropTypes.bool,
   className: PropTypes.string,
+  eventId: PropTypes.number,
+  categoryId: PropTypes.number,
 };
 
 PrincipalField.defaultProps = {
@@ -150,6 +156,8 @@ PrincipalField.defaultProps = {
   required: false,
   withExternalUsers: false,
   className: '',
+  eventId: null,
+  categoryId: null,
 };
 
 export default React.memo(PrincipalField);

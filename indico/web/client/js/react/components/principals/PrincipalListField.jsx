@@ -126,6 +126,7 @@ const PrincipalListField = props => {
                 withExternalUsers={withExternalUsers}
                 onOpen={onFocus}
                 onClose={onBlur}
+                eventId={eventId}
               />
               {withGroups && (
                 <GroupSearch
