@@ -66,6 +66,14 @@
         align-items: center;
       }
 
+      .boolean-field :global(.ui.dropdown) {
+        max-width: 250px;
+      }
+
+      .date-field {
+        margin-bottom: 0;
+      }
+
       .multichoice-dropdown {
         padding-top: 6px;
         padding-left: 12px;
@@ -87,33 +95,34 @@
         }
       }
 
+      .country-dropdown {
+        max-width: 500px;
+      }
+
       .price {
         margin-left: 1.5em;
+      }
+
+      textarea,
+      input[type='email'],
+      input[type='file'],
+      input[type='text'] {
+        max-width: 500px;
+      }
+
+      input[type='tel'],
+      input[type='number'] {
+        max-width: 250px;
       }
     }
 
     > .description {
-      max-width: 600px;
+      max-width: 500px;
       padding: 3px 0 0 2px;
       text-align: justify;
       font-style: italic;
       font-size: 0.9em;
       color: $dark-gray;
-    }
-
-    textarea,
-    select,
-    input[type='text'],
-    input[type='number'],
-    input[type='email'],
-    input[type='file'],
-    input[type='tel'] {
-      width: auto;
-    }
-
-    input[type='file'],
-    input[type='email'] {
-      width: 600px;
     }
   }
 

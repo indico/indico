@@ -40,6 +40,7 @@ export default function BooleanInput({htmlName, disabled, title, isRequired, def
       <div styleName="boolean-field">
         <Dropdown
           selection
+          fluid
           options={options}
           name={htmlName}
           defaultValue={defaultValue}

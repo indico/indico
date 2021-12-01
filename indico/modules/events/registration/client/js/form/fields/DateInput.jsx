@@ -38,7 +38,7 @@ export default function DateInput({
     return (
       <Form.Field required={isRequired} disabled={disabled} styleName="field">
         <label>{title}</label>
-        <Form.Group>
+        <Form.Group styleName="date-field">
           <Form.Field>
             <SingleDatePicker
               id={`regform-datepicker-${id}`}

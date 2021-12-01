@@ -21,6 +21,7 @@ export default function CountryInput({htmlName, disabled, choices, title, isRequ
     <Form.Field required={isRequired} disabled={disabled} styleName="field">
       <label>{title}</label>
       <Dropdown
+        styleName="country-dropdown"
         placeholder={Translate.string('Select a country')}
         name={htmlName}
         fluid
