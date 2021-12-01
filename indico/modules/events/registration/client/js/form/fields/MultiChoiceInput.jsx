@@ -82,16 +82,15 @@ export default function MultiChoiceInput({
             return (
               <tr key={choice.id}>
                 <td style={{paddingTop: 10, paddingBottom: 10}}>
-                  <div style={{maxWidth: 300}}>
-                    <Checkbox
-                      name={htmlName}
-                      value={choice.id}
-                      disabled={!choice.isEnabled || disabled || choice.placesLimit === 0}
-                      checked={!!value[choice.id]}
-                      onChange={makeHandleChange(choice)}
-                      label={choice.caption}
-                    />
-                  </div>
+                  <Checkbox
+                    styleName="multichoice-checkbox"
+                    name={htmlName}
+                    value={choice.id}
+                    disabled={!choice.isEnabled || disabled || choice.placesLimit === 0}
+                    checked={!!value[choice.id]}
+                    onChange={makeHandleChange(choice)}
+                    label={choice.caption}
+                  />
                 </td>
                 {!withExtraSlots && !noPrices && (
                   <td style={{paddingLeft: 5}}>

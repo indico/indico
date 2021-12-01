@@ -66,10 +66,6 @@
         align-items: center;
       }
 
-      .multichoice-table {
-        border-spacing: 0 5px;
-      }
-
       .multichoice-dropdown {
         padding-top: 6px;
         padding-left: 12px;
@@ -80,6 +76,15 @@
         i:global(.dropdown.icon) {
           padding-top: 7px;
           right: 0.8em;
+        }
+      }
+
+      .multichoice-checkbox {
+        max-width: 300px;
+
+        label {
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
 
