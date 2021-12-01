@@ -577,6 +577,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if old_type is not None and old_type != value:
             signals.event.type_changed.send(self, old_type=old_type)
 
+    @hybrid_property
+    def is_unlisted(self):
+        return self.category is None
+
+    @is_unlisted.expression
+    def is_unlisted(cls):
+        return cls.category_id.is_(None)
+
     @property
     def url(self):
         return url_for('events.display', self)
@@ -1036,10 +1044,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                         ~Registration.is_deleted,
                         ~RegistrationForm.is_deleted)
                 .has_rows())
-
-    @property
-    def is_unlisted(self):
-        return self.category is None
 
 
 Event.register_location_events()
