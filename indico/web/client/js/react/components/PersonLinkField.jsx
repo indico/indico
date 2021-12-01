@@ -96,7 +96,7 @@ function ExternalPersonModal({open, onSubmit, onClose, person}) {
     </Modal>
   );
 
-  return <FinalForm initialValues={person} onSubmit={onSubmit} render={modal} />;
+  return <FinalForm initialValues={person || {}} onSubmit={onSubmit} render={modal} />;
 }
 
 ExternalPersonModal.propTypes = {
