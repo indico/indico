@@ -76,7 +76,7 @@ export default function MultiChoiceInput({
   return (
     <Form.Field required={isRequired} styleName="field">
       <label>{title}</label>
-      <table styleName="multichoice-table">
+      <table>
         <tbody>
           {choices.map(choice => {
             return (
