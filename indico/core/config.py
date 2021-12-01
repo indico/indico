@@ -73,10 +73,12 @@ DEFAULTS = {
     'SENTRY_DSN': None,
     'SENTRY_LOGGING_LEVEL': 'WARNING',
     'SESSION_LIFETIME': 86400 * 31,
+    'SMTP_ALLOWED_SENDERS': set(),
     'SMTP_CERTFILE': None,
     'SMTP_KEYFILE': None,
     'SMTP_LOGIN': None,
     'SMTP_PASSWORD': None,
+    'SMTP_SENDER_FALLBACK': None,
     'SMTP_SERVER': ('localhost', 25),
     'SMTP_TIMEOUT': 30,
     'SMTP_USE_CELERY': True,
@@ -265,6 +267,8 @@ class IndicoConfig:
         login_rate_limiter._get_current_object()  # fail in case FAILED_LOGIN_RATE_LIMIT invalid
         if self.DEFAULT_TIMEZONE not in pytz.all_timezones_set:
             raise ValueError(f'Invalid default timezone: {self.DEFAULT_TIMEZONE}')
+        if self.SMTP_ALLOWED_SENDERS and not self.SMTP_SENDER_FALLBACK:
+            raise ValueError('Cannot restrict SMTP senders without a fallback')
 
     def __getattr__(self, name):
         try:

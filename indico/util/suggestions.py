@@ -114,7 +114,7 @@ def get_category_scores(user, debug=False):
     if not event_ids:
         return {}
     attended = (Event.query
-                .filter(Event.id.in_(event_ids), ~Event.is_deleted)
+                .filter(Event.id.in_(event_ids), ~Event.is_deleted, ~Event.is_unlisted)
                 .options(joinedload('category'))
                 .order_by(Event.start_dt, Event.id)
                 .all())

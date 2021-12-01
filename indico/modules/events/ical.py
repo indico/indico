@@ -5,6 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import typing as t
+from email import message
+from email.mime.base import MIMEBase
+from email.policy import compat32
+
 import icalendar
 from lxml import html
 from lxml.etree import ParserError
@@ -13,9 +18,23 @@ from werkzeug.urls import url_parse
 from indico.core import signals
 from indico.core.config import config
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.models.events import Event
+from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.users.models.users import User
 from indico.util.date_time import now_utc
 from indico.util.enum import IndicoEnum
 from indico.util.signals import values_from_signal
+
+
+class MIMECalendar(MIMEBase):
+    """MIME `text/calendar` class which adds the `method=REQUEST` to the Content-Type."""
+
+    def __init__(self, filename: str, payload: str):
+        message.Message.__init__(self, policy=compat32)
+        self.add_header('Content-Type', 'text/calendar', filename=filename, encoding='utf-8', method='REQUEST')
+        self['MIME-Version'] = '1.0'
+        self.set_payload(payload)
 
 
 class CalendarScope(IndicoEnum):
@@ -23,7 +42,14 @@ class CalendarScope(IndicoEnum):
     session = 2
 
 
-def generate_basic_component(entity, uid=None, url=None, title=None, description=None):
+def generate_basic_component(
+    entity: t.Union[Event, Session, Contribution],
+    uid: t.Optional[str] = None,
+    url: t.Optional[str] = None,
+    title: t.Optional[str] = None,
+    description: t.Optional[str] = None,
+    organizer: t.Optional[t.Tuple[str, str]] = None
+):
     """Generate an iCalendar component with basic common properties.
 
     :param entity: Event/session/contribution where properties come from
@@ -31,6 +57,7 @@ def generate_basic_component(entity, uid=None, url=None, title=None, description
     :param url: URL for the component (defaults to `entity.external_url`)
     :param title: A title for the component
     :param description: A text based description for the component
+    :param organizer: ORGANIZER field of the iCalendar object
 
     :return: iCalendar event with basic properties
     """
@@ -41,6 +68,10 @@ def generate_basic_component(entity, uid=None, url=None, title=None, description
         title += f' [{label.title}]'
 
     component = icalendar.Event()
+
+    if organizer:
+        component.add('organizer', f'mailto:{organizer[1]}', parameters={'cn': organizer[0]})
+
     component.add('dtstamp', now_utc(False))
     component.add('dtstart', entity.start_dt)
     component.add('dtend', entity.end_dt)
@@ -83,10 +114,14 @@ def generate_basic_component(entity, uid=None, url=None, title=None, description
     return component
 
 
-def generate_event_component(event, user=None):
+def generate_event_component(
+    event: Event,
+    user: t.Optional[User] = None,
+    organizer: t.Optional[t.Tuple[str, str]] = None
+):
     """Generate an event icalendar component from an Indico event."""
     uid = f'indico-event-{event.id}@{url_parse(config.BASE_URL).host}'
-    component = generate_basic_component(event, uid)
+    component = generate_basic_component(event, uid, organizer=organizer)
 
     # add contact information
     contact_info = event.contact_emails + event.contact_phones
@@ -110,24 +145,45 @@ def generate_event_component(event, user=None):
     return component
 
 
-def event_to_ical(event, user=None, scope=None, *, skip_access_check=False):
+def event_to_ical(
+    event: Event,
+    user: t.Optional[User] = None,
+    scope: t.Optional[str] = None,
+    *,
+    skip_access_check: bool = False,
+    method: t.Optional[str] = None,
+    organizer: t.Optional[t.Tuple[str, str]] = None
+):
     """Serialize an event into an ical.
 
     :param event: The event to serialize
     :param user: The user who needs to be able to access the events
     :param scope: If specified, use a more detailed timetable using the given scope
     :param skip_access_check: Do not perform access checks. Defaults to False.
+    :param method: METHOD field of the iCalendar object
+    :param organizer: ORGANIZER field of the iCalendar object
     """
-    return events_to_ical([event], user, scope, skip_access_check=skip_access_check)
+    return events_to_ical([event], user, scope, skip_access_check=skip_access_check, method=method,
+                          organizer=organizer)
 
 
-def events_to_ical(events, user=None, scope=None, *, skip_access_check=False):
+def events_to_ical(
+    events: list[Event],
+    user: t.Optional[User] = None,
+    scope: t.Optional[str] = None,
+    *,
+    skip_access_check: bool = False,
+    method: t.Optional[str] = None,
+    organizer: t.Optional[t.Tuple[str, str]] = None
+):
     """Serialize multiple events into an ical.
 
     :param events: A list of events to serialize
     :param user: The user who needs to be able to access the events
     :param scope: If specified, use a more detailed timetable using the given scope
     :param skip_access_check: Do not perform access checks. Defaults to False.
+    :param method: METHOD field of the iCalendar object
+    :param organizer: ORGANIZER field of the iCalendar object
     """
     from indico.modules.events.contributions.ical import generate_contribution_component
     from indico.modules.events.sessions.ical import generate_session_block_component
@@ -136,30 +192,33 @@ def events_to_ical(events, user=None, scope=None, *, skip_access_check=False):
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
+    if method:
+        calendar.add('method', method)
+
     for event in events:
         if not skip_access_check and not event.can_access(user):
             continue
 
         if scope == CalendarScope.contribution:
             components = [
-                generate_contribution_component(contrib)
+                generate_contribution_component(contrib, organizer=organizer)
                 for contrib in event.contributions
                 if contrib.start_dt and contrib.can_access(user)
             ]
         elif scope == CalendarScope.session:
             components = [
-                generate_session_block_component(block)
+                generate_session_block_component(block, organizer=organizer)
                 for session in event.sessions
                 if session.start_dt and session.can_access(user)
                 for block in session.blocks
             ]
             components += [
-                generate_contribution_component(contrib)
+                generate_contribution_component(contrib, organizer=organizer)
                 for contrib in event.contributions
                 if contrib.start_dt and contrib.session_id is None and contrib.can_access(user)
             ]
         else:
-            components = [generate_event_component(event, user)]
+            components = [generate_event_component(event, user, organizer=organizer)]
 
         for component in components:
             calendar.add_component(component)

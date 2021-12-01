@@ -9,7 +9,9 @@ import os
 import pickle
 import tempfile
 from datetime import date
+from email.headerregistry import parser
 from email.utils import make_msgid
+from fnmatch import fnmatch
 
 import click
 from celery.exceptions import MaxRetriesExceededError, Retry
@@ -64,6 +66,17 @@ def send_email_task(task, email, log_entry=None):
             db.session.commit()
 
 
+def _rewrite_sender(msg: EmailMessage):
+    if not config.SMTP_SENDER_FALLBACK:
+        # no fallback set, cannot rewrite. let's hope all emails go through...
+        return
+
+    from_email_raw = parser.get_mailbox(msg.from_email)[0].addr_spec  # just the addr without a name part
+    if not any(fnmatch(from_email_raw, pattern) for pattern in config.SMTP_ALLOWED_SENDERS):
+        msg.extra_headers['From'] = msg.from_email
+        msg.from_email = config.SMTP_SENDER_FALLBACK
+
+
 def do_send_email(email, log_entry=None, _from_task=False):
     """Send an email.
 
@@ -87,6 +100,7 @@ def do_send_email(email, log_entry=None, _from_task=False):
                            attachments=email['attachments'], connection=conn)
         if not msg.to:
             msg.extra_headers['To'] = 'Undisclosed-recipients:;'
+        _rewrite_sender(msg)
         if email['html']:
             msg.content_subtype = 'html'
         msg.extra_headers['message-id'] = make_msgid(domain=url_parse(config.BASE_URL).host)
