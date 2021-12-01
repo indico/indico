@@ -12,7 +12,7 @@ import {Button, Segment, List, Modal, Form, Label, Icon, Popup, Message} from 's
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
-import {FinalDropdown, FinalInput} from 'indico/react/forms';
+import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {snakifyKeys} from 'indico/utils/case';
 
@@ -77,7 +77,7 @@ function ExternalPersonModal({open, onSubmit, onClose, person}) {
         <Form.Group widths="equal">
           <Form.Field>
             <Translate as="label">Address</Translate>
-            <FinalInput name="address" />
+            <FinalTextArea name="address" />
           </Form.Field>
           <Form.Field>
             <Translate as="label">Telephone</Translate>
