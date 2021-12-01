@@ -83,8 +83,7 @@
         max-width: 300px;
 
         label {
-          overflow: hidden;
-          text-overflow: ellipsis;
+          overflow-wrap: anywhere;
         }
       }
 
