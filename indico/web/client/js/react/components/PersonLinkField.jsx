@@ -7,12 +7,12 @@
 
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
-import {Form as FinalForm} from 'react-final-form';
-import {Button, Segment, List, Modal, Form, Label, Icon, Popup, Message} from 'semantic-ui-react';
+import {Button, Segment, List, Form, Label, Icon, Popup, Message} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
 import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
+import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {snakifyKeys} from 'indico/utils/case';
 
@@ -32,82 +32,65 @@ const titles = [
   {text: Translate.string('Mx'), value: 'Mx'},
 ];
 
-function ExternalPersonModal({open, onSubmit, onClose, person}) {
-  const modal = ({handleSubmit}) => (
-    <Modal as={Form} size="tiny" open={open} onClose={onClose} onSubmit={handleSubmit}>
-      <Translate as={Modal.Header}>Enter Person</Translate>
-      <Modal.Content>
-        {person && person.userId && (
-          <Translate as={Message}>
-            You are updating details that were originally linked to a user. Please note that its
-            identity will remain the same.
-          </Translate>
-        )}
-        <Form.Group widths="equal">
-          <Form.Field>
-            <Translate as="label">Title</Translate>
-            <FinalDropdown
-              name="title"
-              placeholder="Title"
-              fluid
-              search
-              selection
-              options={titles}
-            />
-          </Form.Field>
-          <Form.Field>
-            <Translate as="label">Affiliation</Translate>
-            <FinalInput name="affiliation" />
-          </Form.Field>
-        </Form.Group>
-        <Form.Group widths="equal">
-          <Form.Field>
-            <Translate as="label">First Name</Translate>
-            <FinalInput name="firstName" />
-          </Form.Field>
-          <Form.Field>
-            <Translate as="label">Family Name</Translate>
-            <FinalInput name="lastName" required />
-          </Form.Field>
-        </Form.Group>
-        <Form.Field>
-          <Translate as="label">Email</Translate>
-          <FinalInput name="email" />
-        </Form.Field>
-        <Form.Group widths="equal">
-          <Form.Field>
-            <Translate as="label">Address</Translate>
-            <FinalTextArea name="address" />
-          </Form.Field>
-          <Form.Field>
-            <Translate as="label">Telephone</Translate>
-            <FinalInput name="telephone" />
-          </Form.Field>
-        </Form.Group>
-      </Modal.Content>
-      <Modal.Actions>
-        <Translate as={Button} type="submit" primary>
-          Confirm
-        </Translate>
-        <Translate as={Button} onClick={onClose}>
-          Cancel
-        </Translate>
-      </Modal.Actions>
-    </Modal>
-  );
-
-  return <FinalForm initialValues={person || {}} onSubmit={onSubmit} render={modal} />;
-}
+const ExternalPersonModal = ({onSubmit, onClose, person}) => (
+  <FinalModalForm
+    id="person-link-details"
+    size="tiny"
+    onClose={onClose}
+    onSubmit={onSubmit}
+    header={Translate.string('Enter Person')}
+    initialValues={person || {}}
+  >
+    {person && person.userId && (
+      <Translate as={Message}>
+        You are updating details that were originally linked to a user. Please note that its
+        identity will remain the same.
+      </Translate>
+    )}
+    <Form.Group widths="equal">
+      <Form.Field>
+        <Translate as="label">Title</Translate>
+        <FinalDropdown name="title" placeholder="Title" fluid search selection options={titles} />
+      </Form.Field>
+      <Form.Field>
+        <Translate as="label">Affiliation</Translate>
+        <FinalInput name="affiliation" />
+      </Form.Field>
+    </Form.Group>
+    <Form.Group widths="equal">
+      <Form.Field>
+        <Translate as="label">First Name</Translate>
+        <FinalInput name="firstName" />
+      </Form.Field>
+      <Form.Field>
+        <Translate as="label">Family Name</Translate>
+        <FinalInput name="lastName" required />
+      </Form.Field>
+    </Form.Group>
+    <Form.Field>
+      <Translate as="label">Email</Translate>
+      <FinalInput name="email" required />
+    </Form.Field>
+    <Form.Group widths="equal">
+      <Form.Field>
+        <Translate as="label">Address</Translate>
+        <FinalTextArea name="address" />
+      </Form.Field>
+      <Form.Field>
+        <Translate as="label">Telephone</Translate>
+        <FinalInput name="telephone" />
+      </Form.Field>
+    </Form.Group>
+  </FinalModalForm>
+);
 
 ExternalPersonModal.propTypes = {
-  open: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   person: PropTypes.object,
 };
 
 ExternalPersonModal.defaultProps = {
-  open: false,
   person: undefined,
 };
 
@@ -250,6 +233,7 @@ PersonLinkSection.defaultProps = {
   canDelete: true,
 };
 
+// TODO: each person includes way more data than needed in the form data
 export default function PersonLinkField({
   value: persons,
   onChange,
@@ -345,12 +329,9 @@ export default function PersonLinkField({
         <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
           Enter manually
         </Translate>
-        <ExternalPersonModal
-          open={modalOpen}
-          onClose={onClose}
-          onSubmit={onSubmit}
-          person={persons[selected]}
-        />
+        {modalOpen && (
+          <ExternalPersonModal onClose={onClose} onSubmit={onSubmit} person={persons[selected]} />
+        )}
       </Button.Group>
     </div>
   );
