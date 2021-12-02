@@ -103,7 +103,7 @@ flask-marshmallow==0.14.0
     # via -r requirements.in
 flask-migrate==3.1.0
     # via -r requirements.in
-flask-multipass==0.4.4
+flask-multipass==0.4.5
     # via -r requirements.in
 flask-pluginengine==0.4
     # via -r requirements.in
