@@ -339,7 +339,8 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
 
     def _process_args(self):
         RHRegistrationsExportBase._process_args(self)
-        self.export_config['static_item_ids'].remove('tags_present')
+        if 'tags_present' in self.export_config['static_item_ids']:
+            self.export_config['static_item_ids'].remove('tags_present')
 
     def _process(self):
         pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
