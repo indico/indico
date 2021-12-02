@@ -337,10 +337,6 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
 class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style."""
 
-    def _process_args(self):
-        RHRegistrationsExportBase._process_args(self)
-        self.export_config['static_item_ids'].remove('tags_present')
-
     def _process(self):
         pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
                                    static_items=self.export_config['static_item_ids'])

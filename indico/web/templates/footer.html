@@ -1,7 +1,10 @@
 <div class="footer {{ 'dark' if dark|default(false) }}">
     {% block footer -%}
         {%- set indico -%}
-            <a href="https://getindico.io">Indico</a> <span class="version">{{ indico_version }}</span>
+            <a href="https://getindico.io">Indico</a>
+            {% block indico_version %}
+                <span class="version">{{ indico_version }}</span>
+            {% endblock %}
         {%- endset -%}
         <div class="flexrow f-j-space-between">
             <div class="flexrow f-a-center f-self-stretch">

@@ -33,7 +33,7 @@ export default function WTFMultipleTagSelectField({fieldId, wrapperId, choices})
     },
   });
 
-  const options = choices.map(([id, title, color]) => ({
+  const options = choices.map(([id, [title, color]]) => ({
     key: id,
     text: title,
     value: id,
