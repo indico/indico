@@ -44,7 +44,6 @@ export default function BooleanInput({htmlName, disabled, title, isRequired, def
           options={options}
           name={htmlName}
           defaultValue={defaultValue}
-          value={value}
           onChange={(_, {value: newValue}) => setValue(newValue)}
         />
         {!!price && value === 'yes' && (
