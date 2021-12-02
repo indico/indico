@@ -10,14 +10,22 @@ import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Dropdown, Form, Label} from 'semantic-ui-react';
 
-import {FinalDropdown} from 'indico/react/forms';
+import {FinalDropdown, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
 
 import '../../../styles/regform.module.scss';
 
-export default function BooleanInput({htmlName, disabled, title, isRequired, defaultValue, price}) {
+export default function BooleanInput({
+  htmlName,
+  disabled,
+  title,
+  isRequired,
+  defaultValue,
+  price,
+  placesLimit,
+}) {
   const [value, setValue] = useState(defaultValue);
   const currency = useSelector(getCurrency);
   const options = [
@@ -51,6 +59,7 @@ export default function BooleanInput({htmlName, disabled, title, isRequired, def
             {price.toFixed(2)} {currency}
           </Label>
         )}
+        {placesLimit}
       </div>
     </Form.Field>
   );
@@ -63,6 +72,7 @@ BooleanInput.propTypes = {
   isRequired: PropTypes.bool,
   defaultValue: PropTypes.string,
   price: PropTypes.number,
+  placesLimit: PropTypes.number,
 };
 
 BooleanInput.defaultProps = {
@@ -70,6 +80,7 @@ BooleanInput.defaultProps = {
   isRequired: false,
   defaultValue: '',
   price: 0,
+  placesLimit: 0,
 };
 
 export function BooleanSettings() {
@@ -78,12 +89,25 @@ export function BooleanSettings() {
     {key: 'no', value: 'no', text: Translate.string('No')},
   ];
   return (
-    <FinalDropdown
-      name="defaultValue"
-      label={Translate.string('Default value')}
-      options={options}
-      placeholder={Translate.string('None')}
-      selection
-    />
+    <>
+      <FinalInput
+        name="placesLimit"
+        type="number"
+        label={Translate.string('Places limit')}
+        placeholder={Translate.string('None')}
+        step="1"
+        min="1"
+        validate={v.optional(v.min(0))}
+        parse={val => (val === '' ? 0 : val)}
+        format={val => (val === 0 ? '' : val)}
+      />
+      <FinalDropdown
+        name="defaultValue"
+        label={Translate.string('Default value')}
+        options={options}
+        placeholder={Translate.string('None')}
+        selection
+      />
+    </>
   );
 }
