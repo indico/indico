@@ -23,7 +23,7 @@ import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
 
-function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
+function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange, isRequired}) {
   const currency = useSelector(getCurrency);
   const options = choices.map(c => ({
     key: c.id,
@@ -52,6 +52,7 @@ function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
       value={value}
       onChange={onChange}
       width={10}
+      clearable={!isRequired}
       search
     />
   );
@@ -61,6 +62,7 @@ SingleChoiceDropdown.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  isRequired: PropTypes.bool.isRequired,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
 };
@@ -149,6 +151,7 @@ export default function SingleChoiceInput({
         extraSlotsDropdown={extraSlotsDropdown}
         value={value}
         onChange={handleChange}
+        isRequired={isRequired}
       />
     );
   } else if (itemType === 'radiogroup') {
