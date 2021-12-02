@@ -23,6 +23,16 @@ class IndicoSelectMultipleCheckboxField(SelectMultipleField):
     widget = JinjaWidget('forms/checkbox_group_widget.html', single_kwargs=True)
     option_widget = CheckboxInput()
 
+    class _Option(SelectMultipleField._Option):
+        def __init__(self, *args, **kwargs):
+            # WTForms 3 started passing validators to the sub-options, but this resulted
+            # in the `required` flag to be set for the choices in various subclasses of
+            # this field when using custom widgets (in some of the plugins). Removing
+            # the validators avoids this, and in case of a checkbox there's nothing to
+            # "validate" in the child items anyway.
+            kwargs.pop('validators', None)
+            super().__init__(*args, **kwargs)
+
 
 class IndicoSelectMultipleCheckboxBooleanField(IndicoSelectMultipleCheckboxField):
     def process_formdata(self, valuelist):
