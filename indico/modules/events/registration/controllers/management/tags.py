@@ -95,7 +95,7 @@ class RHRegistrationTagsAssign(RHRegistrationsActionBase):
 
     def _process(self):
         tags = sorted(self.event.registration_tags, key=lambda tag: natural_sort_key(tag.title))
-        choices = [(str(tag.id), tag.title, tag.color) for tag in tags]
+        choices = [(str(tag.id), (tag.title, tag.color)) for tag in tags]
 
         form = RegistrationTagsAssignForm(regform=self.regform, registration_id=[reg.id for reg in self.registrations])
         form.add.choices = choices
