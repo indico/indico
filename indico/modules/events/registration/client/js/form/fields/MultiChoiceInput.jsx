@@ -13,37 +13,14 @@ import {useSelector} from 'react-redux';
 import {Checkbox, Form, Dropdown, Label} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalField} from 'indico/react/forms';
-import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
+import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
-
-function PlacesLeft({placesLeft, isEnabled}) {
-  const color = placesLeft > 0 ? (isEnabled ? 'green' : 'grey') : 'red';
-
-  return (
-    <Label color={color} style={{whiteSpace: 'nowrap'}}>
-      {placesLeft > 0 ? (
-        <PluralTranslate count={placesLeft}>
-          <Singular>1 place left</Singular>
-          <Plural>
-            <Param name="count" value={placesLeft} /> places left
-          </Plural>
-        </PluralTranslate>
-      ) : (
-        <Translate>No places left</Translate>
-      )}
-    </Label>
-  );
-}
-
-PlacesLeft.propTypes = {
-  placesLeft: PropTypes.number.isRequired,
-  isEnabled: PropTypes.bool.isRequired,
-};
 
 export default function MultiChoiceInput({
   htmlName,
