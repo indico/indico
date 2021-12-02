@@ -1012,6 +1012,9 @@ class RegistrantToPDF(PDFBase):
             if 'checked_in_date' in self.static_items:
                 check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
                 _print_row(_('Check-in date'), check_in_date)
+            if 'tags_present' in self.static_items and registration.tags:
+                tags = ', '.join(sorted(t.title for t in registration.tags))
+                _print_row(_('Tags'), tags)
 
         for item in self._display:
             if item.input_type == 'accommodation' and item.id in data:
@@ -1167,6 +1170,8 @@ class RegistrantsListToPDF(PDFBase):
             lp.append(Paragraph('<b>{}</b>'.format(_('Checked in')), text_format))
         if 'checked_in_date' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Check-in date')), text_format))
+        if 'tags_present' in self.static_items:
+            lp.append(Paragraph('<b>{}</b>'.format(_('Tags')), text_format))
         l.append(lp)
 
         for registration in self._regList:
@@ -1210,6 +1215,9 @@ class RegistrantsListToPDF(PDFBase):
             if 'checked_in_date' in self.static_items:
                 check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
                 lp.append(Paragraph(check_in_date, text_format))
+            if 'tags_present' in self.static_items:
+                tags = ', '.join(sorted(t.title for t in registration.tags))
+                lp.append(Paragraph(tags, text_format))
             l.append(lp)
         noneList = (None,) * (len(self._display) + len(self.static_items) + (accommodation_col_counter * 2) + 2)
         t = Table(l, colWidths=noneList, style=tsRegs)
