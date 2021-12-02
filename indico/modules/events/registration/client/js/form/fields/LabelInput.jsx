@@ -6,10 +6,14 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
+import React from 'react';
+
+import '../../../styles/regform.module.scss';
 
 export default function LabelInput({title}) {
-  return title;
+  return <div styleName="label">{title}</div>;
 }
+
 LabelInput.propTypes = {
   title: PropTypes.string.isRequired,
 };

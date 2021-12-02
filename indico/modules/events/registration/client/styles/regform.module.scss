@@ -52,6 +52,11 @@
   > .content {
     flex-grow: 1;
 
+    .label {
+      max-width: 500px;
+      overflow-wrap: anywhere;
+    }
+
     .field {
       margin-bottom: 3px;
 
