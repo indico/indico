@@ -40,7 +40,7 @@ class PersonLinkSchema(mm.Schema):
     @post_dump
     def dump_type(self, data, **kwargs):
         if not data['person_id']:
-            del data['_type']
+            del data['type']
         return data
 
 
