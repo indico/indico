@@ -23,7 +23,13 @@ import {camelizeKeys} from 'indico/utils/case';
         eventId={eventId}
         defaultValue={camelizeKeys(persons)}
         roles={roles || []}
-        sessionUser={sessionUser}
+        sessionUser={
+          sessionUser && {
+            name: sessionUser.fullName,
+            userId: sessionUser.id,
+            ...sessionUser,
+          }
+        }
         {...rest}
       />,
       document.getElementById(`person-link-field-${fieldId}`)
