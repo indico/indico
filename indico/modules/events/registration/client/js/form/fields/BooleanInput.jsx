@@ -8,17 +8,18 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Dropdown, Form, Label} from 'semantic-ui-react';
+import {Button, Form, Label} from 'semantic-ui-react';
 
 import {FinalDropdown, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
 
+import {PlacesLeft} from './PlacesLeftLabel';
+
 import '../../../styles/regform.module.scss';
 
 export default function BooleanInput({
-  htmlName,
   disabled,
   title,
   isRequired,
@@ -28,45 +29,42 @@ export default function BooleanInput({
 }) {
   const [value, setValue] = useState(defaultValue);
   const currency = useSelector(getCurrency);
-  const options = [
-    {
-      key: 'yes',
-      value: 'yes',
-      text: Translate.string('Yes'),
-      description: price ? `${price.toFixed(2)} ${currency}` : null,
-    },
-    {
-      key: 'no',
-      value: 'no',
-      text: Translate.string('No'),
-    },
-  ];
+  const makeOnClick = newValue => () => {
+    if (value === newValue && !isRequired) {
+      setValue('');
+    } else {
+      setValue(newValue);
+    }
+  };
 
   return (
     <Form.Field required={isRequired} disabled={disabled} styleName="field">
       <label>{title}</label>
       <div styleName="boolean-field">
-        <Dropdown
-          selection
-          fluid
-          options={options}
-          name={htmlName}
-          defaultValue={defaultValue}
-          onChange={(_, {value: newValue}) => setValue(newValue)}
-        />
+        <Button.Group>
+          <Button active={value === 'yes'} onClick={makeOnClick('yes')}>
+            <Translate>Yes</Translate>
+          </Button>
+          <Button active={value === 'no'} onClick={makeOnClick('no')}>
+            <Translate>No</Translate>
+          </Button>
+        </Button.Group>
         {!!price && value === 'yes' && (
           <Label pointing="left" styleName="price-tag">
             {price.toFixed(2)} {currency}
           </Label>
         )}
-        {placesLimit}
+        {!!placesLimit && (
+          <div style={{marginLeft: '1em'}}>
+            <PlacesLeft placesLeft={placesLimit} isEnabled={!disabled} />
+          </div>
+        )}
       </div>
     </Form.Field>
   );
 }
 
 BooleanInput.propTypes = {
-  htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool,

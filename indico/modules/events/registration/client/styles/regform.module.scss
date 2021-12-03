@@ -71,8 +71,9 @@
         align-items: center;
       }
 
-      .boolean-field :global(.ui.dropdown) {
-        max-width: 250px;
+      .boolean-field :global(.ui.button:not(.active):not(:hover):focus) {
+        background-color: #e0e1e2;
+        color: rgba(0, 0, 0, 0.6);
       }
 
       .date-field {
