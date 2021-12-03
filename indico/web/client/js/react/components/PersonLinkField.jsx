@@ -23,13 +23,12 @@ import {PrincipalItem} from './principals/items';
 import './PersonLinkField.module.scss';
 
 const titles = [
-  {text: Translate.string('None'), value: ''},
-  {text: Translate.string('Mr'), value: 'Mr'},
-  {text: Translate.string('Ms'), value: 'Ms'},
-  {text: Translate.string('Mrs'), value: 'Mrs'},
-  {text: Translate.string('Dr'), value: 'Dr'},
-  {text: Translate.string('Prof'), value: 'Prof'},
-  {text: Translate.string('Mx'), value: 'Mx'},
+  {text: Translate.string('Mr'), value: 'mr'},
+  {text: Translate.string('Ms'), value: 'ms'},
+  {text: Translate.string('Mrs'), value: 'mrs'},
+  {text: Translate.string('Dr'), value: 'dr'},
+  {text: Translate.string('Prof'), value: 'prof'},
+  {text: Translate.string('Mx'), value: 'mx'},
 ];
 
 const ExternalPersonModal = ({onSubmit, onClose, person}) => (

@@ -5,12 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import EXCLUDE, fields, post_dump
+from marshmallow import EXCLUDE, fields, post_dump, pre_load
+from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users.models.users import UserTitle
-from indico.util.i18n import orig_string
 
 
 class PersonLinkSchema(mm.Schema):
@@ -23,7 +23,7 @@ class PersonLinkSchema(mm.Schema):
     user_identifier = fields.String(attribute='person.user.identifier')
     first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
-    title = fields.Method('get_title', deserialize='load_title')
+    _title = EnumField(UserTitle, data_key='title', load_default=UserTitle.none)
     affiliation = fields.String(load_default='')
     phone = fields.String(load_default='')
     address = fields.String(load_default='')
@@ -31,11 +31,11 @@ class PersonLinkSchema(mm.Schema):
     display_order = fields.Int(load_default=0, dump_default=0)
     avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None)
 
-    def get_title(self, obj):
-        return obj.title
-
-    def load_title(self, title):
-        return next((x.value for x in UserTitle if title == orig_string(x.title)), UserTitle.none)
+    @pre_load
+    def load_title(self, data, **kwargs):
+        if not data.get('title'):
+            data['title'] = UserTitle.none.name
+        return data
 
     @post_dump
     def dump_type(self, data, **kwargs):
@@ -52,14 +52,14 @@ class EventPersonSchema(mm.SQLAlchemyAutoSchema):
         fields = public_fields + ('phone', 'address')
 
     type = fields.Constant('EventPerson')
-    title = fields.Method('get_title', deserialize='load_title')
+    _title = EnumField(UserTitle, data_key='title', load_default=UserTitle.none)
     name = fields.String(attribute='full_name')
     user_identifier = fields.String(attribute='user.identifier')
     last_name = fields.String(required=True)
     email = fields.String(load_default='')
 
-    def get_title(self, obj):
-        return obj.title
-
-    def load_title(self, title):
-        return next((x.value for x in UserTitle if title == orig_string(x.title)), UserTitle.none)
+    @pre_load
+    def load_title(self, data, **kwargs):
+        if not data.get('title'):
+            data['title'] = UserTitle.none.name
+        return data

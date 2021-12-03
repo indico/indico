@@ -101,7 +101,7 @@ PrincipalItemContent.defaultProps = {
 };
 
 export const PrincipalItem = ({as, children, className, ...rest}) => {
-  const Component = as || 'div';
+  const Component = as;
   return (
     <Component styleName="item" className={className} {...rest}>
       {children}
@@ -116,7 +116,7 @@ PrincipalItem.propTypes = {
 };
 
 PrincipalItem.defaultProps = {
-  as: null,
+  as: 'div',
   children: null,
   className: null,
 };

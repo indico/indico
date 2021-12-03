@@ -99,7 +99,7 @@ class PersonLinkListFieldBase(PrincipalListField):
         if not person_link:
             person_link = self.person_link_cls(person=person)
         person_link.populate_from_dict(PersonLinkSchema(
-            only=('first_name', 'last_name', 'affiliation', 'address', 'phone', 'display_order')).load(data))
+            only=('first_name', 'last_name', 'affiliation', 'address', 'phone', '_title', 'display_order')).load(data))
         email = data.get('email', '').lower()
         if not email:
             raise UserValueError(_('A valid email address is required'))
