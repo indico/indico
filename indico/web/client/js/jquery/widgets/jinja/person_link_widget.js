@@ -16,6 +16,19 @@ import {camelizeKeys} from 'indico/utils/case';
     const {fieldId, eventId, roles, sessionUser, ...rest} = options;
     const field = document.getElementById(fieldId);
     const persons = JSON.parse(field.value);
+    const user = sessionUser && {
+      name: sessionUser.fullName,
+      userId: sessionUser.id,
+      userIdentifier: `User:${sessionUser.id}`,
+      avatarURL: sessionUser.avatarURL,
+      firstName: sessionUser.firstName,
+      lastName: sessionUser.lastName,
+      affiliation: sessionUser.affiliation,
+      email: sessionUser.email,
+      address: sessionUser.address,
+      phone: sessionUser.phone,
+      ...sessionUser,
+    };
 
     ReactDOM.render(
       <WTFPersonLinkField
@@ -23,20 +36,7 @@ import {camelizeKeys} from 'indico/utils/case';
         eventId={eventId}
         defaultValue={camelizeKeys(persons)}
         roles={roles || []}
-        sessionUser={
-          sessionUser && {
-            name: sessionUser.fullName,
-            userId: sessionUser.id,
-            avatarURL: sessionUser.avatarURL,
-            firstName: sessionUser.firstName,
-            lastName: sessionUser.lastName,
-            affiliation: sessionUser.affiliation,
-            email: sessionUser.email,
-            address: sessionUser.address,
-            phone: sessionUser.phone,
-            ...sessionUser,
-          }
-        }
+        sessionUser={user}
         {...rest}
       />,
       document.getElementById(`person-link-field-${fieldId}`)
