@@ -309,7 +309,7 @@ export default function PersonLinkField({
           <Translate
             as={Button}
             type="button"
-            onClick={() => onAdd([{...sessionUser, name: sessionUser.fullName}])}
+            onClick={() => onAdd([sessionUser])}
             disabled={persons.some(p => p.userId === sessionUser.userId)}
           >
             Add myself

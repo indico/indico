@@ -27,6 +27,13 @@ import {camelizeKeys} from 'indico/utils/case';
           sessionUser && {
             name: sessionUser.fullName,
             userId: sessionUser.id,
+            avatarURL: sessionUser.avatarURL,
+            firstName: sessionUser.firstName,
+            lastName: sessionUser.lastName,
+            affiliation: sessionUser.affiliation,
+            email: sessionUser.email,
+            address: sessionUser.address,
+            phone: sessionUser.phone,
             ...sessionUser,
           }
         }
