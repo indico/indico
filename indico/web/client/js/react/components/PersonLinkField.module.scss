@@ -11,6 +11,11 @@
   color: rgba(0, 0, 0, 0.87);
 }
 
+.person-link-field .segment {
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
 .button {
   cursor: pointer;
   opacity: 0.5 !important;
@@ -50,8 +55,23 @@
 }
 
 .roles {
+  display: flex;
   margin: 0 15px;
   flex-shrink: 0;
+}
+
+.roles :global(.ui.label) {
+  margin: 0;
+}
+
+.roles :global(.ui.label):not(:first-child) {
+  border-bottom-left-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+}
+
+.roles :global(.ui.label):not(:last-child) {
+  border-bottom-right-radius: 0 !important;
+  border-top-right-radius: 0 !important;
 }
 
 .actions {

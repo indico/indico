@@ -278,7 +278,7 @@ export default function PersonLinkField({
 
   return (
     <div styleName="person-link-field">
-      <Segment attached="top">
+      <Segment attached="top" styleName="segment">
         {sections.map(({name, label}) => {
           const filterCondition = p => p.roles && p.roles.includes(name);
           const filtered = persons.filter(filterCondition);
