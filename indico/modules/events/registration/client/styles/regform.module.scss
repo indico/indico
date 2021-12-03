@@ -79,27 +79,6 @@
         margin-bottom: 0;
       }
 
-      .multichoice-dropdown {
-        padding-top: 6px;
-        padding-left: 12px;
-        min-height: 30px;
-        height: 30px;
-        min-width: 50px;
-
-        i:global(.dropdown.icon) {
-          padding-top: 7px;
-          right: 0.8em;
-        }
-      }
-
-      .multichoice-checkbox {
-        max-width: 300px;
-
-        label {
-          overflow-wrap: anywhere;
-        }
-      }
-
       .country-dropdown {
         max-width: 500px;
       }

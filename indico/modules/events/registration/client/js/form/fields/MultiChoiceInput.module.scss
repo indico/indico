@@ -1,0 +1,39 @@
+table {
+  border-collapse: collapse;
+
+  tr {
+    td:first-child {
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+
+    td:not(:first-child) {
+      padding-left: 5px;
+    }
+  }
+
+  .dropdown:global(.ui.dropdown) {
+    padding-top: 6px;
+    padding-left: 12px;
+    min-height: 30px;
+    height: 30px;
+    min-width: 50px;
+
+    i:global(.dropdown.icon) {
+      padding-top: 7px;
+      right: 0.8em;
+    }
+  }
+
+  .row:not(:last-child) {
+    border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+  }
+
+  .checkbox {
+    max-width: 300px;
+
+    label {
+      overflow-wrap: anywhere;
+    }
+  }
+}

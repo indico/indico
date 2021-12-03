@@ -21,6 +21,7 @@ import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
+import './MultiChoiceInput.module.scss';
 
 export default function MultiChoiceInput({
   htmlName,
@@ -57,10 +58,10 @@ export default function MultiChoiceInput({
         <tbody>
           {choices.map(choice => {
             return (
-              <tr key={choice.id}>
-                <td style={{paddingTop: 10, paddingBottom: 10}}>
+              <tr key={choice.id} styleName="row">
+                <td>
                   <Checkbox
-                    styleName="multichoice-checkbox"
+                    styleName="checkbox"
                     name={htmlName}
                     value={choice.id}
                     disabled={!choice.isEnabled || disabled || choice.placesLimit === 0}
@@ -70,7 +71,7 @@ export default function MultiChoiceInput({
                   />
                 </td>
                 {!withExtraSlots && !noPrices && (
-                  <td style={{paddingLeft: 5}}>
+                  <td>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Label pointing="left">
                         {choice.price.toFixed(2)} {currency}
@@ -79,11 +80,11 @@ export default function MultiChoiceInput({
                   </td>
                 )}
                 {withExtraSlots && (
-                  <td style={{paddingLeft: 5}}>
+                  <td>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Dropdown
                         selection
-                        styleName="multichoice-dropdown"
+                        styleName="dropdown"
                         name={`${htmlName}-${choice.id}-extra`}
                         value={value[choice.id] || 0}
                         onChange={makeHandleSlotsChange(choice)}
@@ -97,7 +98,7 @@ export default function MultiChoiceInput({
                   </td>
                 )}
                 {withExtraSlots && !noPrices && (
-                  <td style={{paddingLeft: 5}}>
+                  <td>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Label pointing="left">
                         {choice.price.toFixed(2)} {currency} (Total: {formatPrice(choice)}{' '}
@@ -106,7 +107,7 @@ export default function MultiChoiceInput({
                     )}
                   </td>
                 )}
-                <td style={{paddingLeft: 5}}>
+                <td>
                   <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
                 </td>
               </tr>
