@@ -41,7 +41,8 @@ const ExternalPersonModal = ({onSubmit, onClose, person}) => (
     header={Translate.string('Enter Person')}
     initialValues={person || {}}
   >
-    {person && person.userId && (
+    {/* eslint-disable-next-line eqeqeq */}
+    {person && person.userId != null && (
       <Translate as={Message}>
         You are updating details that were originally linked to a user. Please note that its
         identity will remain the same.
@@ -233,7 +234,6 @@ PersonLinkSection.defaultProps = {
   canDelete: true,
 };
 
-// TODO: each person includes way more data than needed in the form data
 export default function PersonLinkField({
   value: persons,
   onChange,
