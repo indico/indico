@@ -30,8 +30,8 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
                           'default': self.default_is_submitter})
         if self.allow_authors:
             roles += [
-                {'name': 'primary', 'label': _('Author'), 'section': True},
-                {'name': 'secondary', 'label': _('Co-author'), 'section': True},
+                {'name': 'primary', 'label': _('Author'), 'plural': _('Authors'), 'section': True},
+                {'name': 'secondary', 'label': _('Co-author'), 'plural': _('Co-authors'), 'section': True},
             ]
         return roles
 

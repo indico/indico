@@ -279,13 +279,13 @@ export default function PersonLinkField({
   return (
     <div styleName="person-link-field">
       <Segment attached="top" styleName="segment">
-        {sections.map(({name, label}) => {
+        {sections.map(({name, label, plural}) => {
           const filterCondition = p => p.roles && p.roles.includes(name);
           const filtered = persons.filter(filterCondition);
           return filtered.length === 0 ? null : (
             <PersonLinkSection
               key={name}
-              label={label}
+              label={plural || label}
               persons={filtered}
               defaultRoles={roles}
               onEdit={idx => onEdit(persons.findIndex(p => p === filtered[idx]))}

@@ -103,8 +103,8 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
     @property
     def roles(self):
         roles = [
-            {'name': 'primary', 'label': _('Author'), 'section': True, 'default': True},
-            {'name': 'secondary', 'label': _('Co-author'), 'section': True},
+            {'name': 'primary', 'label': _('Author'), 'plural': _('Authors'), 'section': True, 'default': True},
+            {'name': 'secondary', 'label': _('Co-author'), 'plural': _('Co-authors'), 'section': True},
         ]
         if self.allow_speakers:
             roles.append({'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'})
