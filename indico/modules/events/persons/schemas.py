@@ -17,7 +17,7 @@ class PersonLinkSchema(mm.Schema):
     class Meta:
         unknown = EXCLUDE
 
-    _type = fields.Constant('PersonLink')
+    type = fields.Constant('PersonLink')
     person_id = fields.Int()
     user_id = fields.Int(attribute='person.user_id')
     user_identifier = fields.String(attribute='person.user.identifier')
@@ -51,7 +51,7 @@ class EventPersonSchema(mm.SQLAlchemyAutoSchema):
                          'first_name', 'last_name', 'user_identifier')
         fields = public_fields + ('phone', 'address')
 
-    _type = fields.Constant('EventPerson')
+    type = fields.Constant('EventPerson')
     title = fields.Method('get_title', deserialize='load_title')
     name = fields.String(attribute='full_name')
     user_identifier = fields.String(attribute='user.identifier')
