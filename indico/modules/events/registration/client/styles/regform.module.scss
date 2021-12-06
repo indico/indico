@@ -190,15 +190,6 @@
     }
   }
 
-  ul.radio-group {
-    margin: 0;
-    padding-left: 0;
-
-    li {
-      list-style-type: none;
-    }
-  }
-
   :global(.DateRangePickerInput__disabled) {
     background: inherit;
   }
@@ -209,10 +200,18 @@
 
   :global(.SingleDatePickerInput) {
     border-radius: 4px;
+
+    & > :global(.DateInput) {
+      max-width: 130px;
+    }
+
+    & > button {
+      margin-left: 5px;
+    }
   }
 
-  :global(.DateInput) {
-    width: inherit;
+  :global(.rc-time-picker) {
+    max-width: 110px;
   }
 
   :global(.rc-time-picker-input) {
