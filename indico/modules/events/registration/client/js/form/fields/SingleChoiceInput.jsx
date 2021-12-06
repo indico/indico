@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
-import {Form, Label} from 'semantic-ui-react';
+import {Form, Label, Dropdown} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -22,96 +22,16 @@ import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
+import './table.module.scss';
 
-function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange, isRequired}) {
-  const currency = useSelector(getCurrency);
-  const options = choices.map(c => ({
-    key: c.id,
-    value: c.id,
-    disabled: !c.isEnabled || c.placesLimit <= 0,
-    text: (
-      <div styleName="dropdown-text">
-        <div styleName="caption">{c.caption}</div>
-        <div styleName="labels">
-          {!!c.price && (
-            <Label>
-              {c.price} {currency}
-            </Label>
-          )}
-          <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
-        </div>
-      </div>
-    ),
-  }));
-  return (
-    <Form.Select
-      name={htmlName}
-      placeholder={Translate.string('Choose an option')}
-      options={options}
-      disabled={disabled}
-      value={value}
-      onChange={onChange}
-      width={10}
-      clearable={!isRequired}
-      search
-    />
-  );
-}
-
-SingleChoiceDropdown.propTypes = {
-  htmlName: PropTypes.string.isRequired,
-  disabled: PropTypes.bool.isRequired,
-  choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
-  isRequired: PropTypes.bool.isRequired,
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
-function SingleChoiceRadioGroup({htmlName, disabled, choices, value, onChange, isRequired}) {
-  const currency = useSelector(getCurrency);
-  const radioChoices = [...choices];
-  if (!isRequired) {
-    radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
-  }
-  return (
-    <Form.Group grouped styleName="single-choice-radio-group">
-      {radioChoices.map(c => (
-        <Form.Radio
-          label={c.price ? `${c.caption} (${c.price} ${currency})` : c.caption}
-          name={htmlName}
-          key={c.id}
-          value={c.id}
-          disabled={!c.isEnabled || disabled}
-          checked={c.id === value}
-          onChange={onChange}
-        />
-      ))}
-    </Form.Group>
-  );
-}
-
-SingleChoiceRadioGroup.propTypes = {
-  htmlName: PropTypes.string.isRequired,
-  disabled: PropTypes.bool.isRequired,
-  choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
-  isRequired: PropTypes.bool.isRequired,
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
-export default function SingleChoiceInput({
+function SingleChoiceDropdown({
   htmlName,
   disabled,
-  title,
-  isRequired,
-  itemType,
   choices,
-  defaultItem,
   withExtraSlots,
+  defaultItem,
+  isRequired,
 }) {
-  // TODO: set value as `{uuid: places}` (when adding final-form integration)
-  // TODO: disable options triggering price changes after payment (or warn for managers)
-  // TODO: warnings for deleted/modified choices
   const currency = useSelector(getCurrency);
   const [value, setValue] = useState(defaultItem || '');
   const [slotsUsed, setSlotsUsed] = useState(1);
@@ -130,7 +50,10 @@ export default function SingleChoiceInput({
         options={options}
         disabled={disabled}
         value={slotsUsed}
-        onChange={(_evt, data) => setSlotsUsed(data.value)}
+        onChange={(_evt, data) => {
+          setSlotsUsed(data.value);
+          console.log(data.value);
+        }}
         fluid
       />
     );
@@ -141,6 +64,184 @@ export default function SingleChoiceInput({
     setSlotsUsed(1);
   };
 
+  const options = choices.map(c => ({
+    key: c.id,
+    value: c.id,
+    disabled: !c.isEnabled || c.placesLimit <= 0,
+    text: (
+      <div styleName="dropdown-text">
+        <div styleName="caption">{c.caption}</div>
+        <div styleName="labels">
+          {!!c.price && (
+            <Label>
+              {c.price} {currency}
+            </Label>
+          )}
+          <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+        </div>
+      </div>
+    ),
+  }));
+
+  return (
+    <Form.Group styleName="single-choice-dropdown">
+      <Form.Select
+        name={htmlName}
+        placeholder={Translate.string('Choose an option')}
+        options={options}
+        disabled={disabled}
+        value={value}
+        onChange={handleChange}
+        width={10}
+        clearable={!isRequired}
+        search
+      />
+      {extraSlotsDropdown}
+      {extraSlotsDropdown && !!selectedChoice.price && (
+        <Label pointing="left">
+          {Translate.string('Total: {total} {currency}', {
+            total: ((selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price).toFixed(
+              2
+            ),
+            currency,
+          })}
+        </Label>
+      )}
+    </Form.Group>
+  );
+}
+
+SingleChoiceDropdown.propTypes = {
+  htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  isRequired: PropTypes.bool.isRequired,
+  withExtraSlots: PropTypes.bool.isRequired,
+  defaultItem: PropTypes.string,
+};
+
+SingleChoiceDropdown.defaultProps = {
+  defaultItem: null,
+};
+
+function SingleChoiceRadioGroup({
+  htmlName,
+  disabled,
+  choices,
+  withExtraSlots,
+  defaultItem,
+  isRequired,
+}) {
+  const currency = useSelector(getCurrency);
+  const [value, setValue] = useState(defaultItem || '');
+  const [slotsUsed, setSlotsUsed] = useState(1);
+  const selectedChoice = choices.find(c => c.id === value) || {};
+  const radioChoices = [...choices];
+  if (!isRequired) {
+    radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
+  }
+
+  const handleChange = newValue => {
+    setValue(newValue);
+    setSlotsUsed(1);
+  };
+
+  const noPrices = choices.every(choice => choice.price === 0);
+
+  return (
+    <table>
+      <tbody>
+        {radioChoices.map(c => {
+          return (
+            <tr key={c.id} styleName="row">
+              <td>
+                <Form.Radio
+                  styleName="radio"
+                  label={c.caption}
+                  name={htmlName}
+                  key={c.id}
+                  value={c.id}
+                  disabled={!c.isEnabled || disabled || c.placesLimit === 0}
+                  checked={c.id === value}
+                  onChange={() => handleChange(c.id)}
+                />
+              </td>
+              {!noPrices && (
+                <td>
+                  {c.isEnabled && c.placesLimit > 0 && (
+                    <Label pointing="left">
+                      {c.price.toFixed(2)} {currency}
+                    </Label>
+                  )}
+                </td>
+              )}
+              <td>
+                {c.id !== '' && <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />}
+              </td>
+              {withExtraSlots && !noPrices && selectedChoice.id === c.id && (
+                <>
+                  <td>
+                    {c.isEnabled && c.placesLimit > 0 && (
+                      <Dropdown
+                        selection
+                        styleName="dropdown"
+                        value={slotsUsed}
+                        onChange={(e, data) => setSlotsUsed(data.value)}
+                        options={_.range(1, c.maxExtraSlots + 2).map(i => ({
+                          key: i,
+                          value: i,
+                          text: i,
+                        }))}
+                      />
+                    )}
+                  </td>
+                  <td>
+                    {c.isEnabled && c.placesLimit > 0 && (
+                      <Label pointing="left">
+                        {Translate.string('Total: {total} {currency}', {
+                          total: (slotsUsed * c.price).toFixed(2),
+                          currency,
+                        })}
+                      </Label>
+                    )}
+                  </td>
+                </>
+              )}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+SingleChoiceRadioGroup.propTypes = {
+  htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  withExtraSlots: PropTypes.bool.isRequired,
+  isRequired: PropTypes.bool.isRequired,
+  defaultItem: PropTypes.string,
+};
+
+SingleChoiceRadioGroup.defaultProps = {
+  defaultItem: null,
+};
+
+export default function SingleChoiceInput({
+  htmlName,
+  disabled,
+  title,
+  isRequired,
+  itemType,
+  choices,
+  defaultItem,
+  withExtraSlots,
+}) {
+  // TODO: set value as `{uuid: places}` (when adding final-form integration)
+  // TODO: disable options triggering price changes after payment (or warn for managers)
+  // TODO: warnings for deleted/modified choices
+
   let component = null;
   if (itemType === 'dropdown') {
     component = (
@@ -148,9 +249,8 @@ export default function SingleChoiceInput({
         htmlName={htmlName}
         disabled={disabled}
         choices={choices}
-        extraSlotsDropdown={extraSlotsDropdown}
-        value={value}
-        onChange={handleChange}
+        withExtraSlots={withExtraSlots}
+        defaultItem={defaultItem}
         isRequired={isRequired}
       />
     );
@@ -160,9 +260,7 @@ export default function SingleChoiceInput({
         htmlName={htmlName}
         disabled={disabled}
         choices={choices}
-        extraSlotsDropdown={extraSlotsDropdown}
-        value={value}
-        onChange={handleChange}
+        withExtraSlots={withExtraSlots}
         isRequired={isRequired}
       />
     );
@@ -171,20 +269,9 @@ export default function SingleChoiceInput({
   }
 
   return (
-    <Form.Field required={isRequired} styleName="field">
+    <Form.Field required={isRequired} disabled={disabled} styleName="field">
       <label>{title}</label>
-      <Form.Group styleName="single-choice-field">
-        {component}
-        {extraSlotsDropdown}
-        {extraSlotsDropdown && !!selectedChoice.price && (
-          <Label pointing="left">
-            <b>
-              <Translate>Total</Translate>
-            </b>
-            : {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price} {currency}
-          </Label>
-        )}
-      </Form.Group>
+      {component}
     </Form.Field>
   );
 }

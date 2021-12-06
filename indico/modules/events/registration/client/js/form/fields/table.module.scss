@@ -1,3 +1,10 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2021 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 table {
   border-collapse: collapse;
 
@@ -8,7 +15,7 @@ table {
     }
 
     td:not(:first-child) {
-      padding-left: 5px;
+      padding-left: 10px;
     }
   }
 
@@ -29,7 +36,8 @@ table {
     border-bottom: 1px solid rgba(34, 36, 38, 0.15);
   }
 
-  .checkbox {
+  .checkbox,
+  .radio {
     max-width: 300px;
 
     label {

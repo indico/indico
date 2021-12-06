@@ -79,15 +79,20 @@
         margin-bottom: 0;
       }
 
+      &.accommodation-field {
+        .date-picker {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-top: 10px;
+        }
+      }
+
       .country-dropdown {
         max-width: 500px;
       }
 
-      .price {
-        margin-left: 1.5em;
-      }
-
-      .single-choice-field {
+      .single-choice-dropdown {
         align-items: center;
         margin-bottom: 0;
 

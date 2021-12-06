@@ -10,7 +10,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Form} from 'semantic-ui-react';
+import {Form, Label} from 'semantic-ui-react';
 
 import {DatePeriodField, FinalDatePeriod} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
@@ -22,6 +22,7 @@ import {getCurrency} from '../../form_setup/selectors';
 import {Choices, choiceShape} from './ChoicesSetup';
 
 import '../../../styles/regform.module.scss';
+import './table.module.scss';
 
 export default function AccommodationInput({
   htmlName,
@@ -89,52 +90,71 @@ export default function AccommodationInput({
       ? moment(value.departureDate).diff(moment(value.arrivalDate), 'days')
       : 0;
 
+  const noPrices = choices.every(choice => choice.price === 0);
+
   return (
-    <Form.Field required={isRequired} styleName="field">
+    <Form.Field required={isRequired} styleName="field accommodation-field">
       <label>{title}</label>
-      <ul styleName="radio-group">
-        {choices
-          .filter(c => c.isEnabled || !c.isNoAccommodation) // show disabled unless no accommodation
-          .map(c => (
-            <li key={c.id}>
-              <input
-                type="radio"
-                name={htmlName}
-                id={`${htmlName}-${c.id}`}
-                value={c.id}
-                disabled={!c.isEnabled || disabled}
-                checked={c.id === value.choice}
-                onChange={makeHandleChange(c)}
-              />{' '}
-              <label htmlFor={`${htmlName}-${c.id}`}>
-                {c.caption}{' '}
-                {!!c.price &&
-                  Translate.string('({price} {currency} per night)', {price: c.price, currency})}
-              </label>
-            </li>
-          ))}
-      </ul>
+      <table>
+        <tbody>
+          {choices
+            .filter(c => c.isEnabled || !c.isNoAccommodation)
+            .map(c => {
+              return (
+                <tr key={c.id} styleName="row">
+                  <td>
+                    <Form.Radio
+                      styleName="radio"
+                      label={c.caption}
+                      name={htmlName}
+                      key={c.id}
+                      value={c.id}
+                      disabled={!c.isEnabled || disabled}
+                      checked={c.id === value.choice}
+                      onChange={makeHandleChange(c)}
+                    />
+                  </td>
+                  {!noPrices && (
+                    <td>
+                      {c.isEnabled && c.placesLimit > 0 && (
+                        <Label pointing="left">
+                          {Translate.string('{price} {currency} per night', {
+                            price: c.price.toFixed(2),
+                            currency,
+                          })}
+                        </Label>
+                      )}
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
       {value.choice !== null && !value.isNoAccommodation && (
-        <DatePeriodField
-          onChange={handleDateChange}
-          onFocus={() => undefined}
-          onBlur={() => undefined}
-          disabledDate={isDateDisabled}
-          initialVisibleMonth={() => arrivalDateFrom}
-          onFieldFocusChange={setFocusedDateField}
-          minimumDays={minimumDays}
-          value={{startDate: value.arrivalDate, endDate: value.departureDate}}
-          extraPickerProps={{
-            block: false,
-            startDatePlaceholderText: Translate.string('Arrival'),
-            endDatePlaceholderText: Translate.string('Departure'),
-          }}
-        />
-      )}
-      {selectedChoice && !!selectedChoice.price && (
-        <span styleName="price">
-          Total: {nights * selectedChoice.price} {currency}
-        </span>
+        <div styleName="date-picker">
+          <DatePeriodField
+            onChange={handleDateChange}
+            onFocus={() => undefined}
+            onBlur={() => undefined}
+            disabledDate={isDateDisabled}
+            initialVisibleMonth={() => arrivalDateFrom}
+            onFieldFocusChange={setFocusedDateField}
+            minimumDays={minimumDays}
+            value={{startDate: value.arrivalDate, endDate: value.departureDate}}
+            extraPickerProps={{
+              block: false,
+              startDatePlaceholderText: Translate.string('Arrival'),
+              endDatePlaceholderText: Translate.string('Departure'),
+            }}
+          />
+          <Label pointing="left" styleName="price-tag">
+            {Translate.string('Total: {total} {currency}', {
+              total: (nights * selectedChoice.price).toFixed(2),
+              currency,
+            })}
+          </Label>
+        </div>
       )}
     </Form.Field>
   );

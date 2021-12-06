@@ -21,7 +21,7 @@ import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
-import './MultiChoiceInput.module.scss';
+import './table.module.scss';
 
 export default function MultiChoiceInput({
   htmlName,
@@ -70,7 +70,7 @@ export default function MultiChoiceInput({
                     label={choice.caption}
                   />
                 </td>
-                {!withExtraSlots && !noPrices && (
+                {!noPrices && (
                   <td>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Label pointing="left">
@@ -79,13 +79,15 @@ export default function MultiChoiceInput({
                     )}
                   </td>
                 )}
+                <td>
+                  <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
+                </td>
                 {withExtraSlots && (
                   <td>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Dropdown
                         selection
                         styleName="dropdown"
-                        name={`${htmlName}-${choice.id}-extra`}
                         value={value[choice.id] || 0}
                         onChange={makeHandleSlotsChange(choice)}
                         options={_.range(0, choice.maxExtraSlots + 2).map(i => ({
@@ -101,15 +103,14 @@ export default function MultiChoiceInput({
                   <td>
                     {choice.isEnabled && choice.placesLimit > 0 && (
                       <Label pointing="left">
-                        {choice.price.toFixed(2)} {currency} (Total: {formatPrice(choice)}{' '}
-                        {currency})
+                        {Translate.string('Total: {total} {currency}', {
+                          total: formatPrice(choice),
+                          currency,
+                        })}
                       </Label>
                     )}
                   </td>
                 )}
-                <td>
-                  <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
-                </td>
               </tr>
             );
           })}
