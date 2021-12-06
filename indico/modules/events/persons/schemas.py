@@ -23,7 +23,7 @@ class PersonLinkSchema(mm.Schema):
     user_identifier = fields.String(attribute='person.user.identifier')
     first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
-    _title = EnumField(UserTitle, data_key='title', load_default=UserTitle.none)
+    _title = EnumField(UserTitle, data_key='title')
     affiliation = fields.String(load_default='')
     phone = fields.String(load_default='')
     address = fields.String(load_default='')
@@ -47,12 +47,12 @@ class PersonLinkSchema(mm.Schema):
 class EventPersonSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventPerson
-        public_fields = ('id', 'identifier', 'title', 'email', 'affiliation', 'name',
+        public_fields = ('id', 'identifier', '_title', 'email', 'affiliation', 'name',
                          'first_name', 'last_name', 'user_identifier')
         fields = public_fields + ('phone', 'address')
 
     type = fields.Constant('EventPerson')
-    _title = EnumField(UserTitle, data_key='title', load_default=UserTitle.none)
+    _title = EnumField(UserTitle, data_key='title')
     name = fields.String(attribute='full_name')
     user_identifier = fields.String(attribute='user.identifier')
     last_name = fields.String(required=True)
