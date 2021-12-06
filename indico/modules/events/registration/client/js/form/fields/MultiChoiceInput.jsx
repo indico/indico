@@ -49,8 +49,6 @@ export default function MultiChoiceInput({
   const formatPrice = choice =>
     ((choice.extraSlotsPay ? value[choice.id] || 0 : 1) * choice.price).toFixed(2);
 
-  const noPrices = choices.every(choice => choice.price === 0);
-
   return (
     <Form.Field required={isRequired} styleName="field">
       <label>{title}</label>
@@ -70,15 +68,13 @@ export default function MultiChoiceInput({
                     label={choice.caption}
                   />
                 </td>
-                {!noPrices && (
-                  <td>
-                    {choice.isEnabled && choice.placesLimit > 0 && (
-                      <Label pointing="left">
-                        {choice.price.toFixed(2)} {currency}
-                      </Label>
-                    )}
-                  </td>
-                )}
+                <td>
+                  {choice.isEnabled && !!choice.price && choice.placesLimit > 0 && (
+                    <Label pointing="left">
+                      {choice.price.toFixed(2)} {currency}
+                    </Label>
+                  )}
+                </td>
                 <td>
                   <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
                 </td>
@@ -99,9 +95,9 @@ export default function MultiChoiceInput({
                     )}
                   </td>
                 )}
-                {withExtraSlots && !noPrices && (
+                {withExtraSlots && (
                   <td>
-                    {choice.isEnabled && choice.placesLimit > 0 && (
+                    {choice.isEnabled && !!choice.price && choice.placesLimit > 0 && (
                       <Label pointing="left">
                         {Translate.string('Total: {total} {currency}', {
                           total: formatPrice(choice),

@@ -50,10 +50,7 @@ function SingleChoiceDropdown({
         options={options}
         disabled={disabled}
         value={slotsUsed}
-        onChange={(_evt, data) => {
-          setSlotsUsed(data.value);
-          console.log(data.value);
-        }}
+        onChange={(_evt, data) => setSlotsUsed(data.value)}
         fluid
       />
     );
@@ -146,8 +143,6 @@ function SingleChoiceRadioGroup({
     setSlotsUsed(1);
   };
 
-  const noPrices = choices.every(choice => choice.price === 0);
-
   return (
     <table>
       <tbody>
@@ -166,19 +161,17 @@ function SingleChoiceRadioGroup({
                   onChange={() => handleChange(c.id)}
                 />
               </td>
-              {!noPrices && (
-                <td>
-                  {c.isEnabled && c.placesLimit > 0 && (
-                    <Label pointing="left">
-                      {c.price.toFixed(2)} {currency}
-                    </Label>
-                  )}
-                </td>
-              )}
+              <td>
+                {c.isEnabled && !!c.price && c.placesLimit > 0 && (
+                  <Label pointing="left">
+                    {c.price.toFixed(2)} {currency}
+                  </Label>
+                )}
+              </td>
               <td>
                 {c.id !== '' && <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />}
               </td>
-              {withExtraSlots && !noPrices && selectedChoice.id === c.id && (
+              {withExtraSlots && selectedChoice.id === c.id && (
                 <>
                   <td>
                     {c.isEnabled && c.placesLimit > 0 && (
@@ -196,7 +189,7 @@ function SingleChoiceRadioGroup({
                     )}
                   </td>
                   <td>
-                    {c.isEnabled && c.placesLimit > 0 && (
+                    {c.isEnabled && !!c.price && c.placesLimit > 0 && (
                       <Label pointing="left">
                         {Translate.string('Total: {total} {currency}', {
                           total: (slotsUsed * c.price).toFixed(2),

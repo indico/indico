@@ -90,8 +90,6 @@ export default function AccommodationInput({
       ? moment(value.departureDate).diff(moment(value.arrivalDate), 'days')
       : 0;
 
-  const noPrices = choices.every(choice => choice.price === 0);
-
   return (
     <Form.Field required={isRequired} styleName="field accommodation-field">
       <label>{title}</label>
@@ -114,18 +112,16 @@ export default function AccommodationInput({
                       onChange={makeHandleChange(c)}
                     />
                   </td>
-                  {!noPrices && (
-                    <td>
-                      {c.isEnabled && c.placesLimit > 0 && (
-                        <Label pointing="left">
-                          {Translate.string('{price} {currency} per night', {
-                            price: c.price.toFixed(2),
-                            currency,
-                          })}
-                        </Label>
-                      )}
-                    </td>
-                  )}
+                  <td>
+                    {c.isEnabled && !!c.price && c.placesLimit > 0 && (
+                      <Label pointing="left">
+                        {Translate.string('{price} {currency} per night', {
+                          price: c.price.toFixed(2),
+                          currency,
+                        })}
+                      </Label>
+                    )}
+                  </td>
                 </tr>
               );
             })}

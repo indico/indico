@@ -17,6 +17,10 @@ table {
     td:not(:first-child) {
       padding-left: 10px;
     }
+
+    td :global(.ui.label) {
+      white-space: nowrap;
+    }
   }
 
   .dropdown:global(.ui.dropdown) {
