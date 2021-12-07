@@ -15,7 +15,7 @@ from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, EmailField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.fields import IntegerField, URLField
-from wtforms.validators import URL, Email, DataRequired, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import URL, DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
@@ -236,7 +236,7 @@ class EventPrivacyForm(IndicoForm):
     data_controller_name = StringField(_('Person/Institution'))
     data_controller_email = EmailField(_('Contact email'), [Optional(), Email()])
     privacy_policy_url = URLField(_('URL'), [Optional(), URL(), Exclusive('privacy_policy')],
-                                  description=_('The URL to an external page with the privacy policy'))
+                                  description=_('The URL to an external page with the privacy notice'))
     privacy_policy = TextAreaField(_('Text'), [Exclusive('privacy_policy_url')], widget=CKEditorWidget(),
                                    description=_('Only used if no URL is provided'))
 
