@@ -82,7 +82,7 @@ class ContributionListGenerator(ListGeneratorBase):
             if status_criteria:
                 criteria.append(db.or_(*status_criteria))
 
-        if filtered_people := filters['items'].get('people') or filters['items'].get('speakers'):
+        if 'people' in filters['items'] or 'speakers' in filters['items']:
             registration_join_criteria = [
                 Registration.event_id == Contribution.event_id,
                 Registration.is_active,
@@ -98,6 +98,7 @@ class ContributionListGenerator(ListGeneratorBase):
             registered_contribs = {id_ for id_, in contrib_query}
 
             people_criteria = []
+            filtered_people = filters['items'].get('people') or filters['items'].get('speakers')
             if 'registered' in filtered_people:
                 people_criteria.append(Contribution.id.in_(registered_contribs))
             if 'not_registered' in filtered_people:
