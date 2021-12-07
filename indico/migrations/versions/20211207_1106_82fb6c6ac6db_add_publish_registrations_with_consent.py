@@ -1,8 +1,8 @@
 """Add publish registrations with consent
 
 Revision ID: 82fb6c6ac6db
-Revises: b36825c7869e
-Create Date: 2021-10-27 09:30:36.529341
+Revises: 3dafee32ba7d
+Create Date: 2021-12-07 11:06:31.529341
 """
 from enum import Enum
 
@@ -14,7 +14,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 
 # revision identifiers, used by Alembic.
 revision = '82fb6c6ac6db'
-down_revision = 'b36825c7869e'
+down_revision = '3dafee32ba7d'
 branch_labels = None
 depends_on = None
 
