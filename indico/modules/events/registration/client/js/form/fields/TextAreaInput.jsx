@@ -18,7 +18,6 @@ import {mapPropsToAttributes} from './util';
 
 const attributeMap = {
   numberOfRows: 'rows',
-  numberOfColumns: 'cols',
 };
 
 export default function TextAreaInput({htmlName, disabled, title, isRequired, ...props}) {
@@ -35,7 +34,6 @@ TextAreaInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   numberOfRows: PropTypes.number,
-  numberOfColumns: PropTypes.number,
   title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool.isRequired,
 };
@@ -43,23 +41,11 @@ TextAreaInput.propTypes = {
 TextAreaInput.defaultProps = {
   disabled: false,
   numberOfRows: 2,
-  numberOfColumns: 60,
 };
 
 export function TextAreaSettings() {
   return (
     <Form.Group widths="equal">
-      <FinalInput
-        name="numberOfColumns"
-        type="number"
-        label={Translate.string('Columns')}
-        placeholder={String(TextAreaInput.defaultProps.numberOfColumns)}
-        step="1"
-        min="1"
-        max="60"
-        validate={v.optional(v.range(1, 60))}
-        fluid
-      />
       <FinalInput
         name="numberOfRows"
         type="number"

@@ -16,7 +16,7 @@ import {mapPropsToAttributes} from './util';
 
 import '../../../styles/regform.module.scss';
 
-const attributeMap = {length: 'size', minLength: 'minLength', maxLength: 'maxLength'};
+const attributeMap = {minLength: 'minLength', maxLength: 'maxLength'};
 
 export default function TextInput({htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextInput.defaultProps);
@@ -33,14 +33,12 @@ TextInput.propTypes = {
   disabled: PropTypes.bool,
   title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool.isRequired,
-  length: PropTypes.number,
   minLength: PropTypes.number,
   maxLength: PropTypes.number,
 };
 
 TextInput.defaultProps = {
   disabled: false,
-  length: 60,
   minLength: null,
   maxLength: null,
 };
@@ -48,17 +46,6 @@ TextInput.defaultProps = {
 export function TextSettings() {
   return (
     <Form.Group widths="equal">
-      <FinalInput
-        name="length"
-        type="number"
-        label={Translate.string('Width')}
-        placeholder={String(TextInput.defaultProps.length)}
-        step="1"
-        min="5"
-        max="60"
-        validate={v.optional(v.range(5, 60))}
-        fluid
-      />
       <FinalInput
         name="minLength"
         type="number"
