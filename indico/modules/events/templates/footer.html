@@ -3,17 +3,17 @@
 {% block footer_links_extra %}
     {% if privacy_url %}
         <li>
-            <a href="{{ privacy_url }}">{% trans %}Privacy of this event{% endtrans %}</a>
+            <a href="{{ privacy_url }}">{% trans %}Event Privacy Policy{% endtrans %}</a>
         </li>
     {% elif privacy_text %}
         <li>
             <a href="{{ url_for('events.display_privacy', event) }}"
-            data-title="{{ _("Privacy Policy") }}"
-            data-href="{{ url_for('events.display_privacy', event) }}"
-            data-ajax-dialog
-            data-hide-page-header
-            data-close-button>
-                {% trans %}Privacy of this event{% endtrans %}
+               data-title="{% trans %}Event Privacy Policy{% endtrans %}"
+               data-href="{{ url_for('events.display_privacy', event) }}"
+               data-ajax-dialog
+               data-hide-page-header
+               data-close-button>
+                {% trans %}Event Privacy Policy{% endtrans %}
             </a>
         </li>
     {% endif %}

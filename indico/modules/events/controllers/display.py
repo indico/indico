@@ -84,8 +84,7 @@ class RHDisplayPrivacyPolicy(RHEventBase):
     """Display event privacy policy."""
 
     def _process(self):
-        url = privacy_settings.get(self.event, 'privacy_policy_url')
-        if url:
+        if url := privacy_settings.get(self.event, 'privacy_policy_url'):
             return redirect(url)
         return WPDisplayPrivacyPolicy.render_template('privacy.html',
                                                       content=privacy_settings.get(self.event, 'privacy_policy'))
