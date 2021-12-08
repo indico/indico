@@ -80,13 +80,16 @@ class Exclusive:
     If any of the given fields have a value, the validated field may not have one.
     """
 
-    def __init__(self, *fields):
+    def __init__(self, *fields, message=None):
         self.fields = fields
+        self.message = message
 
     def __call__(self, form, field):
         if field.data is None:
             return
         if any(form[f].data is not None for f in self.fields):
+            if self.message:
+                raise ValidationError(self.message)
             field_names = sorted(str(form[f].label.text) for f in self.fields)
             msg = ngettext('This field is mutually exclusive with another field: {}',
                            'This field is mutually exclusive with other fields: {}',
