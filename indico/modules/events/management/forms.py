@@ -43,8 +43,9 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
                                      IndicoPasswordField, IndicoProtectionField, IndicoRadioField,
                                      IndicoSelectMultipleCheckboxField, IndicoTagListField, IndicoTimezoneSelectField,
                                      IndicoWeekDayRepetitionField, MultiStringField, RelativeDeltaField)
+from indico.web.forms.fields.itemlists import MultipleItemsField
 from indico.web.forms.fields.principals import PermissionsField
-from indico.web.forms.validators import Exclusive, HiddenUnless, LinkedDateTime
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, PrefixedTextWidget, SwitchWidget
 
 
@@ -232,18 +233,23 @@ class EventClassificationForm(IndicoForm):
 
 class EventPrivacyForm(IndicoForm):
     _data_controller_fields = ('data_controller_name', 'data_controller_email')
-    _privacy_policy_fields = ('privacy_policy_url', 'privacy_policy')
+    _privacy_policy_fields = ('privacy_policy_urls', 'privacy_policy')
     data_controller_name = StringField(_('Person/Institution'))
     data_controller_email = EmailField(_('Contact email'), [Optional(), Email()])
-    privacy_policy_url = URLField(_('URL'),
-                                  [Optional(), URL(), Exclusive('privacy_policy', strict=False,
-                                                                message=_('URL and Text are mutually exclusive'))],
-                                  description=_('The URL to an external page with the privacy notice'))
-    privacy_policy = TextAreaField(_('Text'),
-                                   [Exclusive('privacy_policy_url', strict=False,
-                                              message=_('URL and Text are mutually exclusive'))],
-                                   widget=CKEditorWidget(),
+    privacy_policy_urls = MultipleItemsField(_('URLs'),
+                                             fields=[{'id': 'title', 'caption': _('Title'),
+                                                      'required': True, 'type': 'string'},
+                                                     {'id': 'url', 'caption': _('URL'),
+                                                      'required': True, 'type': 'string'}],
+                                             description=_('Title and URL to an external page '
+                                                           'containing a privacy notice.'),
+                                             unique_field='title', sortable=False)
+    privacy_policy = TextAreaField(_('Text'), widget=CKEditorWidget(),
                                    description=_('Only used if no URL is provided'))
+
+    def validate_privacy_policy(self, field):
+        if self.privacy_policy_urls.data and self.privacy_policy.data:
+            raise ValidationError(_('Define either a privacy notice text or URLs'))
 
 
 class EventProtectionForm(IndicoForm):

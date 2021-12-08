@@ -1,11 +1,12 @@
 {% extends 'footer.html' %}
 
 {% block footer_links_extra %}
-    {% if privacy_url %}
+    {% for privacy_url in privacy_urls  %}
         <li>
-            <a href="{{ privacy_url }}">{% trans %}Event privacy notice{% endtrans %}</a>
+            <a href="{{ privacy_url.url }}">{{ privacy_url.title }}</a>
         </li>
-    {% elif privacy_text %}
+    {% endfor %}
+    {% if privacy_text %}
         <li>
             <a href="{{ url_for('events.display_privacy', event) }}"
                data-title="{% trans %}Event privacy notice{% endtrans %}"
