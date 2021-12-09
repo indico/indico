@@ -16,6 +16,9 @@
     {% call form_fieldset(_('Price options')) %}
         {{ form_rows(form, fields=form._price_fields) }}
     {% endcall %}
+    {% call form_fieldset(_('Privacy')) %}
+        {{ form_rows(form, fields=form._privacy_fields) }}
+    {% endcall %}
     {% call form_fieldset(_('Notifications for registrants')) %}
         {{ form_rows(form, fields=form._registrant_notification_fields) }}
     {% endcall %}
