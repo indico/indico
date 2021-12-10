@@ -25,6 +25,12 @@ class _PublishRegistrationsMode(int, Enum):
     show_all = 2
 
 
+class _PublishConsentType(int, Enum):
+    not_given = 0
+    participants = 1
+    all = 2
+
+
 def upgrade():
     op.add_column('forms',
                   sa.Column('publish_registrations_mode', PyIntEnum(_PublishRegistrationsMode), server_default='0',
@@ -34,9 +40,9 @@ def upgrade():
     op.execute('UPDATE event_registration.forms SET publish_registrations_mode = 2 WHERE publish_registrations_enabled')
     op.drop_column('forms', 'publish_registrations_enabled', schema='event_registration')
     op.add_column('registrations',
-                  sa.Column('consented_to_publish', sa.Boolean(), nullable=False, server_default='false'),
+                  sa.Column('consent_to_publish', PyIntEnum(_PublishConsentType), server_default='2', nullable=False),
                   schema='event_registration')
-    op.alter_column('registrations', 'consented_to_publish', server_default=None, schema='event_registration')
+    op.alter_column('registrations', 'consent_to_publish', server_default=None, schema='event_registration')
 
 
 def downgrade():
@@ -50,4 +56,4 @@ def downgrade():
         WHERE publish_registrations_mode = 2
     ''')
     op.drop_column('forms', 'publish_registrations_mode', schema='event_registration')
-    op.drop_column('registrations', 'consented_to_publish', schema='event_registration')
+    op.drop_column('registrations', 'consent_to_publish', schema='event_registration')

@@ -82,7 +82,7 @@ def _inject_event_header(event, **kwargs):
                                                                                   include_scheduled=False)
         # A participant could appear more than once in the list in case he register to multiple registration form.
         # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
-        return render_template('events/registration/display/event_header.html', event=event,
+        return render_template('events/registration/display/event_header.html', event=event, user=session.user,
                                regforms=displayed_regforms, user_registrations=user_registrations)
 
 

@@ -76,6 +76,20 @@ registrations_tags_table = db.Table(
 )
 
 
+class PublishRegistrationsMode(RichIntEnum):
+    __titles__ = [L_('Never'), L_('With user consent'), L_('Always')]
+    hide_all = 0
+    show_with_consent = 1
+    show_all = 2
+
+
+class PublishConsentType(RichIntEnum):
+    __titles__ = [L_('Hidden'), L_('Visible to participants'), L_('Visible to everyone')]
+    not_given = 0
+    participants = 1
+    all = 2
+
+
 class Registration(db.Model):
     """Somebody's registration for an event through a registration form."""
     __tablename__ = 'registrations'
@@ -213,11 +227,11 @@ class Registration(db.Model):
         nullable=False,
         default='',
     )
-    #: If a consent was given to publish this registration
-    consented_to_publish = db.Column(
-        db.Boolean,
+    #: Type of consent given to publish this registration
+    consent_to_publish = db.Column(
+        PyIntEnum(PublishConsentType),
         nullable=False,
-        default=False,
+        default=PublishConsentType.not_given
     )
     #: The Event containing this registration
     event = db.relationship(
@@ -301,27 +315,11 @@ class Registration(db.Model):
 
     @hybrid_property
     def is_publishable(self):
-        mode = self.registration_form.publish_registrations_mode
-        show_all = mode == PublishRegistrationsMode.show_all
-        show_with_consent = mode == PublishRegistrationsMode.show_with_consent and self.consented_to_publish
-        return (
-            self.is_active and
-            self.state in (RegistrationState.complete, RegistrationState.unpaid) and
-            (show_all or show_with_consent)
-        )
+        return self.is_active and self.state in (RegistrationState.complete, RegistrationState.unpaid)
 
     @is_publishable.expression
     def is_publishable(cls):
-        show_all = cls.registration_form.has(publish_registrations_mode=PublishRegistrationsMode.show_all)
-        show_with_consent = db.and_(
-            cls.registration_form.has(publish_registrations_mode=PublishRegistrationsMode.show_with_consent),
-            cls.consented_to_publish
-        )
-        return db.and_(
-            cls.is_active,
-            cls.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
-            (show_all | show_with_consent)
-        )
+        return cls.is_active & (cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)))
 
     @hybrid_property
     def is_cancelled(self):
@@ -623,6 +621,10 @@ class Registration(db.Model):
         """Log with prefilled metadata for the registration."""
         self.event.log(*args, meta={'registration_id': self.id}, **kwargs)
 
+    def is_visible(self, is_participant):
+        # TODO Implement with new consent and visibility settings
+        return True
+
 
 class RegistrationData(StoredFileMixin, db.Model):
     """Data entry within a registration for a field in a registration form."""
@@ -739,13 +741,6 @@ class RegistrationData(StoredFileMixin, db.Model):
 
     def render_price(self):
         return format_currency(self.price, self.registration.currency, locale=session.lang or 'en_GB')
-
-
-class PublishRegistrationsMode(RichIntEnum):
-    __titles__ = [L_('Never'), L_('With user consent'), L_('Always')]
-    hide_all = 0
-    show_with_consent = 1
-    show_all = 2
 
 
 @listens_for(mapper, 'after_configured', once=True)

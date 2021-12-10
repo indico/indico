@@ -497,22 +497,24 @@ def get_registrations_with_tickets(user, event):
     return [r for r in query if not r.is_ticket_blocked]
 
 
-def get_published_registrations(event):
+def get_published_registrations(event, is_participant):
     """Get a list of published registrations for an event.
 
     :param event: the `Event` to get registrations for
     :return: list of `Registration` objects
     """
-    return (Registration.query.with_parent(event)
-            .filter(Registration.is_publishable,
-                    ~RegistrationForm.is_deleted,
-                    ~Registration.is_deleted)
-            .join(Registration.registration_form)
-            .options(contains_eager(Registration.registration_form))
-            .order_by(db.func.lower(Registration.first_name),
-                      db.func.lower(Registration.last_name),
-                      Registration.friendly_id)
-            .all())
+    registrations = (Registration.query.with_parent(event)
+                     .filter(Registration.is_publishable,
+                             ~RegistrationForm.is_deleted,
+                             ~Registration.is_deleted)
+                     .join(Registration.registration_form)
+                     .options(contains_eager(Registration.registration_form))
+                     .order_by(db.func.lower(Registration.first_name),
+                               db.func.lower(Registration.last_name),
+                               Registration.friendly_id)
+                     .all())
+
+    return [reg for reg in registrations if reg.is_visible(is_participant)]
 
 
 def get_events_registered(user, dt=None):

@@ -8,7 +8,7 @@
 from indico.modules.events.registration import api
 from indico.modules.events.registration.controllers import display
 from indico.modules.events.registration.controllers.compat import compat_registration
-from indico.modules.events.registration.controllers.management import (fields, invitations, regforms, reglists,
+from indico.modules.events.registration.controllers.management import (fields, invitations, privacy, regforms, reglists,
                                                                        sections, tags, tickets)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -204,6 +204,9 @@ _bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix=
 _bp_participation.add_url_rule('/manage/participants/', 'manage', regforms.RHManageParticipants,
                                methods=('GET', 'POST'))
 
+# Privacy
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/privacy/visibility', 'manage_registration_change_visibility',
+                 privacy.RHRegistrationChangeVisibility, methods=('POST',))
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_event_registration', __name__, url_prefix='/event/<int:event_id>')

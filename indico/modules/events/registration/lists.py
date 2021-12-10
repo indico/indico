@@ -57,6 +57,9 @@ class RegistrationListGenerator(ListGeneratorBase):
             'payment_date': {
                 'title': _('Payment date'),
             },
+            'visibility': {
+                'title': _('Visibility'),
+            },
             'tags_present': {
                 'title': _('Tags'),
                 'filter_title': _('Has tags'),

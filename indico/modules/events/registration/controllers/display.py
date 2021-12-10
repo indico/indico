@@ -147,8 +147,13 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .join(Registration.registration_form)
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form')))
-        registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in query),
+
+        is_participant = self.event.is_user_registered(session.user)
+        registrations = [reg for reg in query if reg.is_visible(is_participant)]
+
+        registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in registrations),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']))
+
         return {'headers': headers,
                 'rows': registrations,
                 'show_checkin': any(registration['checked_in'] for registration in registrations)}

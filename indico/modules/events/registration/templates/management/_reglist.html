@@ -85,6 +85,10 @@
                                                 <span class="ui label {{ tag.color }}">{{ tag.title }}</span>
                                             {% endfor %}
                                         </td>
+                                    {% elif item.id == 'visibility' %}
+                                        <td class="i-table" data-text="{{ registration.consent_to_publish }}">
+                                            {{ registration.consent_to_publish.title }}
+                                        </td>
                                     {% else %}
                                         <td class="i-table">{{ data[item.id].friendly_data if item.id in data }}</td>
                                     {% endif %}
