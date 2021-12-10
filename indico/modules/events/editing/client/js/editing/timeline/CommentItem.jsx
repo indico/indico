@@ -67,7 +67,7 @@ export default function Comment({
                 />
               )}
               <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
-                {serializeDate(createdDt, 'LL')}
+                {serializeDate(createdDt, 'LLL')}
               </time>
               {modifiedDt && (
                 <span
