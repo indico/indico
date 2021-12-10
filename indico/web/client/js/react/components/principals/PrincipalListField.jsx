@@ -207,6 +207,7 @@ function AddPrincipalDropdown({text, options, disabled, onChange}) {
       button
       upward
       floating
+      scrolling
       disabled={disabled || options.length === 0}
       options={options}
       openOnFocus={false}
