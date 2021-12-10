@@ -77,7 +77,7 @@ registrations_tags_table = db.Table(
 
 
 class PublishRegistrationsMode(RichIntEnum):
-    __titles__ = [L_('Never'), L_('With user consent'), L_('Always')]
+    __titles__ = [L_('Hide all participants'), L_('Show only consenting participants'), L_('Show all participants')]
     hide_all = 0
     show_with_consent = 1
     show_all = 2

@@ -21,16 +21,17 @@ def test_registration_publishable(dummy_event, dummy_regform):
 
     reg = dummy_event.registrations.one()
 
-    assert dummy_regform.publish_registrations_mode == PublishRegistrationsMode.hide_all
+    assert dummy_regform.publish_registrations_public == PublishRegistrationsMode.hide_all
+    assert dummy_regform.publish_registrations_participants == PublishRegistrationsMode.show_with_consent
     assert not reg.consented_to_publish
     assert reg.is_active
     assert reg.state == RegistrationState.complete
     assert not reg.is_publishable
 
-    dummy_regform.publish_registrations_mode = PublishRegistrationsMode.show_all
+    dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_all
     assert reg.is_publishable
 
-    dummy_regform.publish_registrations_mode = PublishRegistrationsMode.show_with_consent
+    dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_with_consent
     assert not reg.is_publishable
 
     reg.consented_to_publish = True
@@ -46,16 +47,17 @@ def test_registration_publishable_query(dummy_event, dummy_regform):
 
     reg = dummy_event.registrations.one()
 
-    assert dummy_regform.publish_registrations_mode == PublishRegistrationsMode.hide_all
+    assert dummy_regform.publish_registrations_public == PublishRegistrationsMode.hide_all
+    assert dummy_regform.publish_registrations_participants == PublishRegistrationsMode.show_with_consent
     assert not reg.consented_to_publish
     assert reg.is_active
     assert reg.state == RegistrationState.complete
     assert not _get_publishable().has_rows()
 
-    dummy_regform.publish_registrations_mode = PublishRegistrationsMode.show_all
+    dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_all
     assert _get_publishable().has_rows()
 
-    dummy_regform.publish_registrations_mode = PublishRegistrationsMode.show_with_consent
+    dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_with_consent
     assert not _get_publishable().has_rows()
 
     reg.consented_to_publish = True

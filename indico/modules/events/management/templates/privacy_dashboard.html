@@ -26,11 +26,11 @@
                         </div>
                         <div class="toolbar">
                             <div class="group">
-                                {% if regform.publish_registrations_mode.name == 'hide_all' %}
+                                {% if regform.publish_registrations_public.name == 'hide_all' %}
                                     {% trans %}Hiding all registrations.{% endtrans %}
-                                {% elif regform.publish_registrations_mode.name == 'show_with_consent' %}
+                                {% elif regform.publish_registrations_public.name == 'show_with_consent' %}
                                     {% trans %}Only showing registrations with user consent.{% endtrans %}
-                                {% elif regform.publish_registrations_mode.name == 'show_all' %}
+                                {% elif regform.publish_registrations_public.name == 'show_all' %}
                                     {% trans %}Showing all registrations.{% endtrans %}
                                 {% endif %}
                             </div>

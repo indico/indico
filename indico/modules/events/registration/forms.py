@@ -47,7 +47,7 @@ def _check_if_payment_required(form, field):
 
 class RegistrationFormForm(IndicoForm):
     _price_fields = ('currency', 'base_price')
-    _privacy_fields = ('publish_registrations_mode', )
+    _privacy_fields = ('publish_registrations_public', 'publish_registrations_participants')
     _registrant_notification_fields = ('notification_sender_address', 'message_pending', 'message_unpaid',
                                        'message_complete', 'attach_ical')
     _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
@@ -81,10 +81,13 @@ class RegistrationFormForm(IndicoForm):
                               widget=NumberInput(step='0.01'),
                               description=_('A fixed fee all users have to pay when registering.'))
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
-    publish_registrations_mode = IndicoEnumSelectField(_('Publish registrations'), enum=PublishRegistrationsMode,
-                                                       description=_('Specify under which conditions registrations '
-                                                                     'will be displayed to participants and everyone '
-                                                                     'else'))
+    publish_registrations_public = IndicoEnumSelectField(_('Public registrations list'), enum=PublishRegistrationsMode,
+                                                         description=_('Specify which registrations will be displayed '
+                                                                       'to everyone who can see the event'))
+    publish_registrations_participants = IndicoEnumSelectField(_('Participants registrations list'),
+                                                               enum=PublishRegistrationsMode,
+                                                               description=_('Specify which registrations will be '
+                                                                             "displayed to the event's participants"))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
     message_pending = TextAreaField(
@@ -124,12 +127,21 @@ class RegistrationFormForm(IndicoForm):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
 
-    def validate_publish_registrations_mode(self, field):
+    def __validate_publish_registration_fields(self, field):
         if (self.regform and
                 field.data == PublishRegistrationsMode.show_all and
-                self.regform.publish_registrations_mode != PublishRegistrationsMode.show_all and
+                self.regform.__dict__[field.name] != PublishRegistrationsMode.show_all and
                 self.regform.existing_registrations_count > 0):
-            raise ValidationError(_('Show always can only be set if there are no registered users.'))
+            raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
+
+    def validate_publish_registrations_public(self, field):
+        if field.data > self.publish_registrations_participants.data:
+            raise ValidationError(_('Registrations list visibility can not be more restrictive to participants than '
+                                    'to the public'))
+        self.__validate_publish_registration_fields(field)
+
+    def validate_publish_registrations_participants(self, field):
+        self.__validate_publish_registration_fields(field)
 
 
 class RegistrationFormScheduleForm(IndicoForm):
@@ -326,7 +338,7 @@ class ParticipantsDisplayForm(IndicoForm):
             raise ValidationError(str(exc))
         for regform in self.regforms:
             if (regform.id in field.data['participant_list_forms'] and
-                    regform.publish_registrations_mode != PublishRegistrationsMode.show_all and
+                    regform.publish_registrations_public != PublishRegistrationsMode.show_all and
                     regform.existing_registrations_count > 0):
                 raise ValidationError(_("Form '{}' has enrolled participants, so it can't be set to show all "
                                         'participants.').format(regform.title))

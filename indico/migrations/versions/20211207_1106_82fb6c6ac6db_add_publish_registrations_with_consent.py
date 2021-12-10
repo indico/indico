@@ -33,11 +33,17 @@ class _PublishConsentType(int, Enum):
 
 def upgrade():
     op.add_column('forms',
-                  sa.Column('publish_registrations_mode', PyIntEnum(_PublishRegistrationsMode), server_default='0',
+                  sa.Column('publish_registrations_public', PyIntEnum(_PublishRegistrationsMode), server_default='0',
                             nullable=False),
                   schema='event_registration')
-    op.alter_column('forms', 'publish_registrations_mode', server_default=None, schema='event_registration')
-    op.execute('UPDATE event_registration.forms SET publish_registrations_mode = 2 WHERE publish_registrations_enabled')
+    op.alter_column('forms', 'publish_registrations_public', server_default=None, schema='event_registration')
+    op.execute('UPDATE event_registration.forms SET publish_registrations_public = 2 WHERE publish_registrations_enabled')
+    op.add_column('forms',
+                  sa.Column('publish_registrations_participants', PyIntEnum(_PublishRegistrationsMode), server_default='0',
+                            nullable=False),
+                  schema='event_registration')
+    op.alter_column('forms', 'publish_registrations_participants', server_default=None, schema='event_registration')
+    op.execute('UPDATE event_registration.forms SET publish_registrations_participants = 2 WHERE publish_registrations_enabled')
     op.drop_column('forms', 'publish_registrations_enabled', schema='event_registration')
     op.add_column('registrations',
                   sa.Column('consent_to_publish', PyIntEnum(_PublishConsentType), server_default='2', nullable=False),
@@ -53,7 +59,8 @@ def downgrade():
     op.execute('''
         UPDATE event_registration.forms
         SET publish_registrations_enabled = true
-        WHERE publish_registrations_mode = 2
+        WHERE publish_registrations_public = 2
     ''')
-    op.drop_column('forms', 'publish_registrations_mode', schema='event_registration')
+    op.drop_column('forms', 'publish_registrations_public', schema='event_registration')
+    op.drop_column('forms', 'publish_registrations_participants', schema='event_registration')
     op.drop_column('registrations', 'consent_to_publish', schema='event_registration')

@@ -128,11 +128,17 @@ class RegistrationForm(db.Model):
         db.Integer,
         nullable=True
     )
-    #: Whether registrations should be displayed in the participant list
-    publish_registrations_mode = db.Column(
+    #: Which registrations should be displayed in the public participant list
+    publish_registrations_public = db.Column(
         PyIntEnum(PublishRegistrationsMode),
         nullable=False,
         default=PublishRegistrationsMode.hide_all
+    )
+    #: Which registrations should be displayed in the private participant list
+    publish_registrations_participants = db.Column(
+        PyIntEnum(PublishRegistrationsMode),
+        nullable=False,
+        default=PublishRegistrationsMode.show_with_consent
     )
     #: Whether to display the number of registrations
     publish_registration_count = db.Column(

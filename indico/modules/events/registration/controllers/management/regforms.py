@@ -60,9 +60,9 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             registration_settings.set_participant_list_form_ids(self.event, data['participant_list_forms'])
             registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
             for regform in regforms:
-                regform.publish_registrations_mode = (PublishRegistrationsMode.show_all
-                                                      if regform.id in data['participant_list_forms']
-                                                      else PublishRegistrationsMode.hide_all)
+                regform.publish_registrations_public = (PublishRegistrationsMode.show_all
+                                                        if regform.id in data['participant_list_forms']
+                                                        else PublishRegistrationsMode.hide_all)
             flash(_('The participants display settings have been saved.'), 'success')
             return redirect(url_for('.manage_regforms_display', self.event))
         elif form.is_submitted():
@@ -90,12 +90,12 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             except KeyError:
                 continue
             # Make sure publication was not disabled since the display settings were modified.
-            if regform.publish_registrations_mode == PublishRegistrationsMode.show_all:
+            if regform.publish_registrations_public == PublishRegistrationsMode.show_all:
                 enabled_forms.append(regform)
                 del available_forms[form_id]
         for form_id, regform in available_forms.items():
             # There might be forms with publication enabled that haven't been sorted by the user yet.
-            if regform.publish_registrations_mode == PublishRegistrationsMode.show_all:
+            if regform.publish_registrations_public == PublishRegistrationsMode.show_all:
                 enabled_forms.append(regform)
             else:
                 disabled_forms.append(regform)
@@ -145,9 +145,9 @@ class RHManageParticipants(RHManageRegFormsBase):
         if not regform:
             regform = RegistrationForm(event=self.event, title='Participants', is_participation=True,
                                        currency=payment_settings.get('currency'),
-                                       publish_registrations_mode=(PublishRegistrationsMode.hide_all
-                                                                   if self.event.type_ == EventType.conference
-                                                                   else PublishRegistrationsMode.show_with_consent))
+                                       publish_registrations_public=(PublishRegistrationsMode.hide_all
+                                                                     if self.event.type_ == EventType.conference
+                                                                     else PublishRegistrationsMode.show_with_consent))
             create_personal_data_fields(regform)
             db.session.add(regform)
             db.session.flush()
@@ -169,10 +169,11 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
     """Create a new registration form."""
 
     def _process(self):
+        publish_registrations_participants = (PublishRegistrationsMode.hide_all
+                                              if self.event.type_ == EventType.conference
+                                              else PublishRegistrationsMode.show_with_consent)
         form = RegistrationFormForm(event=self.event, currency=payment_settings.get('currency'),
-                                    publish_registrations_mode=(PublishRegistrationsMode.hide_all
-                                                                if self.event.type_ == EventType.conference
-                                                                else PublishRegistrationsMode.show_with_consent))
+                                    publish_registrations_participants=publish_registrations_participants)
         if form.validate_on_submit():
             regform = RegistrationForm(event=self.event)
             create_personal_data_fields(regform)
