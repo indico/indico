@@ -90,6 +90,7 @@ Bugfixes
 ^^^^^^^^
 
 - Fix :data:`CUSTOM_COUNTRIES` not overriding names of existing countries (:pr:`5183`)
+- Fix error dialog when submitting an invited abstract without being logger in (:pr:`5200`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
