@@ -1,5 +1,6 @@
 {% extends 'events/management/base.html' %}
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows, form_fieldset, form_row_static %}
+{% from 'events/management/_registrations_visibility_list.html' import render_registrations_visibility_list %}
 
 {% block title %}{% trans %}Privacy dashboard{% endtrans %}{% endblock %}
 
@@ -17,32 +18,7 @@
     {% endcall %}
     {% if regforms %}
         {% call form_fieldset(_('Registration forms')) %}
-            {% for regform in regforms %}
-                <div class="action-box">
-                    <div class="section">
-                        <div class="icon icon-quill"></div>
-                        <div class="text">
-                            <div class="label">{{ regform.title }}</div>
-                        </div>
-                        <div class="toolbar">
-                            <div class="group">
-                                {% if regform.publish_registrations_public.name == 'hide_all' %}
-                                    {% trans %}Hiding all registrations.{% endtrans %}
-                                {% elif regform.publish_registrations_public.name == 'show_with_consent' %}
-                                    {% trans %}Only showing registrations with user consent.{% endtrans %}
-                                {% elif regform.publish_registrations_public.name == 'show_all' %}
-                                    {% trans %}Showing all registrations.{% endtrans %}
-                                {% endif %}
-                            </div>
-                            <div class="group">
-                                <a href="{{ url_for('event_registration.edit_regform', regform) }}" class="i-button highlight icon-settings">
-                                    {% trans %}Manage privacy{% endtrans %}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+            {{ render_registrations_visibility_list(regforms) }}
         {% endcall %}
     {% endif %}
     {{ form_footer(form) }}
