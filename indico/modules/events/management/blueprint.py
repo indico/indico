@@ -6,7 +6,8 @@
 # LICENSE file for more details.
 
 from indico.modules.events import event_management_object_url_prefixes
-from indico.modules.events.management.controllers import actions, cloning, posters, program_codes, protection, settings
+from indico.modules.events.management.controllers import (actions, cloning, posters, privacy, program_codes, protection,
+                                                          settings)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -41,6 +42,8 @@ _bp.add_url_rule('/protection/acl', 'acl', protection.RHEventACL)
 _bp.add_url_rule('/protection/acl-message', 'acl_message', protection.RHEventACLMessage)
 _bp.add_url_rule('!/permissions-dialog/<any(event,session,contribution,category):type>', 'permissions_dialog',
                  protection.RHPermissionsDialog, methods=('POST',))
+# Privacy dashboard
+_bp.add_url_rule('/privacy', 'privacy_dashboard', privacy.RHEventPrivacy, methods=('GET', 'POST'))
 # Cloning
 _bp.add_url_rule('/clone', 'clone', cloning.RHCloneEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/clone/preview', 'clone_preview', cloning.RHClonePreview, methods=('GET', 'POST'))

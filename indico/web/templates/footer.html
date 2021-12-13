@@ -34,6 +34,7 @@
                         {{ item }}
                     </li>
                 {% endfor %}
+                {% block footer_links_extra %}{% endblock %}
             </ul>
             <div class="footer-extra f-self-stretch">
                 {% block footer_extra %}

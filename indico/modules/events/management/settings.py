@@ -14,3 +14,11 @@ program_codes_settings = EventSettingsProxy('program_codes', {
     'contribution_template': '',
     'subcontribution_template': '',
 })
+
+
+privacy_settings = EventSettingsProxy('privacy', {
+    'data_controller_name': '',
+    'data_controller_email': '',
+    'privacy_policy_url': '',
+    'privacy_policy': '',
+})

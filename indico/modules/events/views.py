@@ -17,6 +17,7 @@ from indico.modules.events import Event
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
+from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.date_time import format_date
@@ -38,7 +39,7 @@ def _get_print_url(event, theme=None, theme_override=False):
             show_date = None
         if show_session == 'all':
             show_session = None
-        if detail_level in ('all', 'contrinbution'):
+        if detail_level in ('all', 'contribution'):
             detail_level = None
         return url_for('events.display', event, showDate=show_date, showSession=show_session, detailLevel=detail_level,
                        print='1', view=view)
@@ -73,12 +74,16 @@ def render_event_footer(event, dark=False):
 
     social_settings_data = social_settings.get_all()
     show_social = social_settings_data['enabled'] and layout_settings.get(event, 'show_social_badges')
+    privacy_text = privacy_settings.get(event, 'privacy_policy')
+    privacy_url = privacy_settings.get(event, 'privacy_policy_url')
     return render_template('events/footer.html',
                            event=event,
                            dark=dark,
                            social_settings=social_settings_data,
                            show_social=show_social,
-                           google_calendar_params=google_calendar_params)
+                           google_calendar_params=google_calendar_params,
+                           privacy_text=privacy_text,
+                           privacy_url=privacy_url)
 
 
 class WPEventAdmin(WPAdmin):
@@ -282,6 +287,9 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
     def _get_body(self, params):
         return WPJinjaMixin._get_page_content(self, params)
 
+    def _get_footer(self):
+        return render_event_footer(self.event)
+
     def _apply_decoration(self, body):
         self.logo_url = self.event.logo_url if self.event.has_logo else None
         css_override_form = self._kwargs.get('css_override_form')
@@ -298,9 +306,6 @@ class WPConferenceDisplay(WPConferenceDisplayBase):
 
     def _get_body(self, params):
         return render_template('events/display/conference.html', **self._kwargs)
-
-    def _get_footer(self):
-        return render_event_footer(self.event)
 
 
 class WPAccessKey(WPJinjaMixin, WPDecorated):

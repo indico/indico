@@ -13,9 +13,9 @@ from flask import request, session
 from markupsafe import escape
 from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
-from wtforms import BooleanField, FloatField, SelectField, StringField, TextAreaField
+from wtforms import BooleanField, EmailField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.fields import IntegerField, URLField
-from wtforms.validators import URL, DataRequired, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import URL, DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
@@ -44,7 +44,7 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
                                      IndicoSelectMultipleCheckboxField, IndicoTagListField, IndicoTimezoneSelectField,
                                      IndicoWeekDayRepetitionField, MultiStringField, RelativeDeltaField)
 from indico.web.forms.fields.principals import PermissionsField
-from indico.web.forms.validators import HiddenUnless, LinkedDateTime
+from indico.web.forms.validators import Exclusive, HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, PrefixedTextWidget, SwitchWidget
 
 
@@ -228,6 +228,22 @@ class EventClassificationForm(IndicoForm):
         if not self.label.query.has_rows():
             del self.label
             del self.label_message
+
+
+class EventPrivacyForm(IndicoForm):
+    _data_controller_fields = ('data_controller_name', 'data_controller_email')
+    _privacy_policy_fields = ('privacy_policy_url', 'privacy_policy')
+    data_controller_name = StringField(_('Person/Institution'))
+    data_controller_email = EmailField(_('Contact email'), [Optional(), Email()])
+    privacy_policy_url = URLField(_('URL'),
+                                  [Optional(), URL(), Exclusive('privacy_policy', strict=False,
+                                                                message=_('URL and Text are mutually exclusive'))],
+                                  description=_('The URL to an external page with the privacy notice'))
+    privacy_policy = TextAreaField(_('Text'),
+                                   [Exclusive('privacy_policy_url', strict=False,
+                                              message=_('URL and Text are mutually exclusive'))],
+                                   widget=CKEditorWidget(),
+                                   description=_('Only used if no URL is provided'))
 
 
 class EventProtectionForm(IndicoForm):

@@ -78,16 +78,24 @@ class Exclusive:
     """Make a WTF field mutually exclusive with other fields.
 
     If any of the given fields have a value, the validated field may not have one.
+
+    :param fields: names of exclusive fields
+    :param strict: whether to check for none instead of falsiness
+    :param message: a custom message for the validation error
     """
 
-    def __init__(self, *fields, message=None):
+    def __init__(self, *fields, strict=True, message=None):
         self.fields = fields
+        self.strict = strict
         self.message = message
 
+    def _is_value(self, value):
+        return (value is not None) if self.strict else bool(value)
+
     def __call__(self, form, field):
-        if field.data is None:
+        if not self._is_value(field.data):
             return
-        if any(form[f].data is not None for f in self.fields):
+        if any(self._is_value(form[f].data) for f in self.fields):
             if self.message:
                 raise ValidationError(self.message)
             field_names = sorted(str(form[f].label.text) for f in self.fields)
