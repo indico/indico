@@ -96,25 +96,27 @@
        {%- endtrans %}
     </div>
     <div class="toolbar">
-        <div class="group">
-            <a class="i-button accept"
-               data-update="#registration-details"
-               data-method="POST"
-               data-href="{{ url_for('.approve_registration', registration) }}"
-               data-confirm="{% trans %}Are you sure you want to approve this registration? This will trigger a notification email.{% endtrans %}"
-               data-title="{% trans %}Approve registration{% endtrans %}">
-                {%- trans %}Approve{% endtrans -%}
-            </a>
-        </div>
-        <div class="group">
-            <a class="i-button danger"
-               data-update="#registration-details"
-               data-href="{{ url_for('.reject_registration', registration) }}"
-               data-title="{% trans %}Reject registration{% endtrans %}"
-               data-ajax-dialog>
-                {%- trans %}Reject{% endtrans -%}
-            </a>
-        </div>
+        {% block registration_pending_action_buttons scoped %}
+            <div class="group">
+                <a class="i-button accept"
+                   data-update="#registration-details"
+                   data-method="POST"
+                   data-href="{{ url_for('.approve_registration', registration) }}"
+                   data-confirm="{% trans %}Are you sure you want to approve this registration? This will trigger a notification email.{% endtrans %}"
+                   data-title="{% trans %}Approve registration{% endtrans %}">
+                    {%- trans %}Approve{% endtrans -%}
+                </a>
+            </div>
+            <div class="group">
+                <a class="i-button danger"
+                   data-update="#registration-details"
+                   data-href="{{ url_for('.reject_registration', registration) }}"
+                   data-title="{% trans %}Reject registration{% endtrans %}"
+                   data-ajax-dialog>
+                    {%- trans %}Reject{% endtrans -%}
+                </a>
+            </div>
+        {% endblock %}
     </div>
 {% endmacro %}
 
@@ -216,15 +218,17 @@
             {% trans %}This action will not be notified to the registrant.{% endtrans %}
         {%- endif -%}
     {%- endset %}
-    <a class="i-button warning {{ 'disabled' if conflict }}"
-       data-update="#registration-details"
-       data-method="POST"
-       data-href="{{ url_for('.reset_registration', registration) }}"
-       data-confirm="{% trans %}Are you sure you want to reset this registration status?{% endtrans %} {{ confirm_notification }}"
-       data-title="{{ action_text }}"
-       {% if conflict %}title="{% trans %}There is another valid registration for this user so it cannot be restored.{% endtrans %}"{% endif %}>
-       {{ action_text }}
-    </a>
+    {% block reset_registration_button scoped %}
+        <a class="i-button warning {{ 'disabled' if conflict }}"
+           data-update="#registration-details"
+           data-method="POST"
+           data-href="{{ url_for('.reset_registration', registration) }}"
+           data-confirm="{% trans %}Are you sure you want to reset this registration status?{% endtrans %} {{ confirm_notification }}"
+           data-title="{{ action_text }}"
+            {% if conflict %}title="{% trans %}There is another valid registration for this user so it cannot be restored.{% endtrans %}"{% endif %}>
+            {{ action_text }}
+        </a>
+    {% endblock %}
 {% endmacro %}
 
 

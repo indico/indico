@@ -64,22 +64,18 @@ export default function TimelineItem({block, index}) {
                   ) : (
                     <Translate>
                       <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
-                      submitted a revision
+                      has submitted files
                     </Translate>
                   )}
                 </span>{' '}
                 <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
-                  {serializeDate(createdDt, 'LL')}
+                  {serializeDate(createdDt, 'LLL')}
                 </time>
               </div>
               {!isLastBlock && (
                 <>
                   <a className="block-info-link i-link" onClick={() => setVisible(!visible)}>
-                    {visible ? (
-                      <Translate>Hide old revision</Translate>
-                    ) : (
-                      <Translate>Show old revision</Translate>
-                    )}
+                    {visible ? <Translate>Hide</Translate> : <Translate>Show details</Translate>}
                   </a>
                   {!visible && block.finalState && (
                     <div styleName="state-indicator">
