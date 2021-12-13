@@ -535,7 +535,6 @@ import {$T} from 'indico/utils/i18n';
             );
             forceUpdateUserSearch();
           }}
-          disabled={options.disableUserSearch}
           withExternalUsers={options.allow.externalUsers}
           triggerFactory={searchTrigger}
           withEventPersons={options.eventId !== null}
@@ -544,9 +543,11 @@ import {$T} from 'indico/utils/i18n';
       );
     };
 
-    ReactDOM.render(
-      <UserSearchWrapper />,
-      document.getElementById(`principalField-${options.fieldId}`)
-    );
+    if (!options.disableUserSearch) {
+      ReactDOM.render(
+        <UserSearchWrapper />,
+        document.getElementById(`principalField-${options.fieldId}`)
+      );
+    }
   };
 })(window);
