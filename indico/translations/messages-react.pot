@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-11-21 13:42+0100\n"
+"POT-Creation-Date: 2021-12-21 13:19+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -619,17 +619,15 @@ msgid "Since you are a manager you can edit anyway."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:65
-msgid "{submitterName} submitted a revision"
+msgid "{submitterName} has submitted files"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
-msgid "Hide old revision"
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+msgid "Hide"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
-msgid "Show old revision"
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+msgid "Show details"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx:63
@@ -1571,6 +1569,14 @@ msgstr ""
 
 #: indico/modules/events/papers/client/js/components/TimelineItem.jsx:46
 msgid "{submitterName} submitted paper revision {revisionNumber}"
+msgstr ""
+
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
+msgid "Hide old revision"
+msgstr ""
+
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
+msgid "Show old revision"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:60
