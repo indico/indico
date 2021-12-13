@@ -235,9 +235,14 @@ class EventPrivacyForm(IndicoForm):
     _privacy_policy_fields = ('privacy_policy_url', 'privacy_policy')
     data_controller_name = StringField(_('Person/Institution'))
     data_controller_email = EmailField(_('Contact email'), [Optional(), Email()])
-    privacy_policy_url = URLField(_('URL'), [Optional(), URL(), Exclusive('privacy_policy')],
+    privacy_policy_url = URLField(_('URL'),
+                                  [Optional(), URL(), Exclusive('privacy_policy', strict=False,
+                                                                message=_('URL and Text are mutually exclusive'))],
                                   description=_('The URL to an external page with the privacy notice'))
-    privacy_policy = TextAreaField(_('Text'), [Exclusive('privacy_policy_url')], widget=CKEditorWidget(),
+    privacy_policy = TextAreaField(_('Text'),
+                                   [Exclusive('privacy_policy_url', strict=False,
+                                              message=_('URL and Text are mutually exclusive'))],
+                                   widget=CKEditorWidget(),
                                    description=_('Only used if no URL is provided'))
 
 
