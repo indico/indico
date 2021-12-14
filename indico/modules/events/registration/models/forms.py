@@ -47,6 +47,8 @@ class RegistrationForm(db.Model):
     __table_args__ = (db.Index('ix_uq_forms_participation', 'event_id', unique=True,
                                postgresql_where=db.text('is_participation AND NOT is_deleted')),
                       db.UniqueConstraint('id', 'event_id'),  # useless but needed for the registrations fkey
+                      db.CheckConstraint('publish_registrations_public <= publish_registrations_participants',
+                                         name='publish_registrations_more_restrictive_to_public'),
                       {'schema': 'event_registration'})
 
     #: The ID of the object

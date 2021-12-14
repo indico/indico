@@ -45,6 +45,9 @@ def upgrade():
     op.alter_column('forms', 'publish_registrations_participants', server_default=None, schema='event_registration')
     op.execute('UPDATE event_registration.forms SET publish_registrations_participants = 2 WHERE publish_registrations_enabled')
     op.drop_column('forms', 'publish_registrations_enabled', schema='event_registration')
+    op.create_check_constraint('publish_registrations_more_restrictive_to_public', 'forms',
+                               'publish_registrations_public <= publish_registrations_participants',
+                               schema='event_registration')
     op.add_column('registrations',
                   sa.Column('consent_to_publish', PyIntEnum(_PublishConsentType), server_default='2', nullable=False),
                   schema='event_registration')
@@ -61,6 +64,8 @@ def downgrade():
         SET publish_registrations_enabled = true
         WHERE publish_registrations_public = 2
     ''')
+    op.drop_constraint('ck_forms_publish_registrations_more_restrictive_to_public', 'forms',
+                       schema='event_registration')
     op.drop_column('forms', 'publish_registrations_public', schema='event_registration')
     op.drop_column('forms', 'publish_registrations_participants', schema='event_registration')
     op.drop_column('registrations', 'consent_to_publish', schema='event_registration')
