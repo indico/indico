@@ -14,7 +14,7 @@ from babel.numbers import format_currency
 from flask import has_request_context, request, session
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import mapper
 
 from indico.core import signals
@@ -304,6 +304,27 @@ class Registration(db.Model):
         for r in source.registrations.all():
             if r.registration_form not in target_regforms_used:
                 r.user = target
+
+    @hybrid_method
+    def is_visible(self, is_participant):
+        publish_registrations_mode = (self.registration_form.publish_registrations_participants
+                                      if is_participant else self.registration_form.publish_registrations_public)
+        return (publish_registrations_mode != PublishRegistrationsMode.hide_all
+                and (publish_registrations_mode == PublishRegistrationsMode.show_all
+                     or self.consent_to_publish == PublishConsentType.all
+                     or (is_participant and self.consent_to_publish == PublishConsentType.participants)))
+
+    @is_visible.expression
+    def is_visible(cls, is_participant):
+        def publish_registrations_mode(mode):
+            if is_participant:
+                return cls.registration_form.has(publish_registrations_participants=mode)
+            else:
+                return cls.registration_form.has(publish_registrations_public=mode)
+        return (~publish_registrations_mode(PublishRegistrationsMode.hide_all)
+                & (publish_registrations_mode(PublishRegistrationsMode.show_all)
+                   | (cls.consent_to_publish == PublishConsentType.all)
+                   | ((cls.consent_to_publish == PublishConsentType.participants) & is_participant)))
 
     @hybrid_property
     def is_active(self):
@@ -620,10 +641,6 @@ class Registration(db.Model):
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the registration."""
         self.event.log(*args, meta={'registration_id': self.id}, **kwargs)
-
-    def is_visible(self, is_participant):
-        # TODO Implement with new consent and visibility settings
-        return True
 
 
 class RegistrationData(StoredFileMixin, db.Model):

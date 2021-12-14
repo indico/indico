@@ -142,21 +142,20 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         query = (Registration.query.with_parent(self.event)
                  .filter(Registration.is_publishable,
+                         Registration.is_visible(self.event.is_user_registered(session.user)),
                          ~RegistrationForm.is_deleted,
                          ~Registration.is_deleted)
                  .join(Registration.registration_form)
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form')))
 
-        is_participant = self.event.is_user_registered(session.user)
-        registrations = [reg for reg in query if reg.is_visible(is_participant)]
-
-        registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in registrations),
+        registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in query),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']))
 
         return {'headers': headers,
                 'rows': registrations,
-                'show_checkin': any(registration['checked_in'] for registration in registrations)}
+                'show_checkin': any(registration['checked_in'] for registration in registrations),
+                'num_participants': query.count()}
 
     def _participant_list_table(self, regform):
         def _process_registration(reg, column_ids, active_fields):
@@ -190,25 +189,25 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                       if column_id in active_fields]
         headers = [active_fields[column_id].title.title() for column_id in column_ids]
         active_registrations = sorted(regform.active_registrations, key=attrgetter('last_name', 'first_name', 'id'))
+        is_participant = self.event.is_user_registered(session.user)
         registrations = [_process_registration(reg, column_ids, active_fields) for reg in active_registrations
-                         if reg.is_publishable]
+                         if reg.is_publishable and reg.is_visible(is_participant)]
         return {'headers': headers,
                 'rows': registrations,
                 'title': regform.title,
-                'show_checkin': any(registration['checked_in'] for registration in registrations)}
+                'show_checkin': any(registration['checked_in'] for registration in registrations),
+                'num_participants': len(active_registrations)}
 
     def _process(self):
         regforms = (RegistrationForm.query.with_parent(self.event)
-                    .filter(RegistrationForm.publish_registrations_public != PublishRegistrationsMode.hide_all,
-                            ~RegistrationForm.is_deleted)
+                    .filter(~RegistrationForm.is_deleted)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .all())
         if registration_settings.get(self.event, 'merge_registration_forms'):
             tables = [self._merged_participant_list_table()]
         else:
             tables = []
-            regforms_dict = {regform.id: regform for regform in regforms
-                             if regform.publish_registrations_public != PublishRegistrationsMode.hide_all}
+            regforms_dict = {regform.id: regform for regform in regforms}
             for form_id in registration_settings.get_participant_list_form_ids(self.event):
                 try:
                     regform = regforms_dict.pop(form_id)
@@ -223,7 +222,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         published = (RegistrationForm.query.with_parent(self.event)
                      .filter(RegistrationForm.publish_registrations_public != PublishRegistrationsMode.hide_all)
                      .has_rows())
-        num_participants = sum(len(table['rows']) for table in tables)
+        num_participants = sum(table['num_participants'] for table in tables)
 
         return self.view_class.render_template(
             'display/participant_list.html',
