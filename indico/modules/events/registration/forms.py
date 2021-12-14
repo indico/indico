@@ -336,12 +336,6 @@ class ParticipantsDisplayForm(IndicoForm):
             jsonschema.validate(field.data, schema)
         except jsonschema.ValidationError as exc:
             raise ValidationError(str(exc))
-        for regform in self.regforms:
-            if (regform.id in field.data['participant_list_forms'] and
-                    regform.publish_registrations_public != PublishRegistrationsMode.show_all and
-                    regform.existing_registrations_count > 0):
-                raise ValidationError(_("Form '{}' has enrolled participants, so it can't be set to show all "
-                                        'participants.').format(regform.title))
 
 
 class ParticipantsDisplayFormColumnsForm(IndicoForm):

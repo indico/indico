@@ -2,7 +2,8 @@
 {% from '_switch.html' import switch %}
 {% from 'message_box.html' import message_box %}
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
-{% from '_sortable_list.html' import sortable_lists %}
+{% from '_sortable_list.html' import sortable_list, sortable_lists %}
+{% from 'events/management/_registrations_visibility_list.html' import render_registrations_visibility_labels, render_registrations_visibility_list %}
 
 {% block title %}
     {%- trans %}Participants display{% endtrans -%}
@@ -51,14 +52,11 @@
     <div id="participant-list-columns">
         <p>
             {% trans -%}
-                Select which registration form will have its entries published in the participant list.
+                Each registration form will have its entries published in the participant list according to its privacy settings.
             {%- endtrans %}
         </p>
         <div id="publish-registrations">
-            {{ sortable_lists(_("Shown registration forms"), enabled_forms|sort(attribute='title'),
-                              _("Hidden registration forms"), disabled_forms|sort(attribute='title'),
-                              classes="i-box titled disable-if-locked",
-                              draggable=false) }}
+            {{ render_registrations_visibility_list(regforms, settings_icon='lock-center') }}
         </div>
         <p>
             {% trans -%}
@@ -76,12 +74,12 @@
     <div id="registration-forms">
         <p>
             {% trans -%}
-                By dragging the form titles, you can choose which to display and reorder them.
+                You can reorder the forms by dragging the tiles.
             {%- endtrans %}
         </p>
-        {% call(form) sortable_lists(_("Shown registration forms"), enabled_forms,
-                                     _("Hidden registration forms"), disabled_forms,
-                                     classes="i-box titled disable-if-locked") %}
+        {% call(form) sortable_list(sorted_forms, classes="tiles disable-if-locked") %}
+            {{ render_registrations_visibility_labels(form) }}
+            <a href="{{ url_for('event_registration.edit_regform', form) }}" class="icon-lock-center" title="{% trans %}Manage privacy settings{% endtrans %}"></a>
             <a class="icon-settings js-settings-dialog"
                data-href="{{ url_for('.manage_regform_display', event, form) }}"
                data-title="{% trans title=form.title %}Customize columns for {{ title }}{% endtrans %}"

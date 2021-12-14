@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from operator import attrgetter, itemgetter
+from operator import itemgetter
 
 from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
@@ -59,10 +59,6 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
             registration_settings.set(self.event, 'merge_registration_forms', data['merge_forms'])
             registration_settings.set_participant_list_form_ids(self.event, data['participant_list_forms'])
             registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
-            for regform in regforms:
-                regform.publish_registrations_public = (PublishRegistrationsMode.show_all
-                                                        if regform.id in data['participant_list_forms']
-                                                        else PublishRegistrationsMode.hide_all)
             flash(_('The participants display settings have been saved.'), 'success')
             return redirect(url_for('.manage_regforms_display', self.event))
         elif form.is_submitted():
@@ -81,31 +77,23 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
         disabled_columns.sort(key=itemgetter('title'))
 
         available_forms = {regform.id: regform for regform in regforms}
-        enabled_forms = []
-        disabled_forms = []
+        sorted_forms = []
         # Handle forms that have already been sorted by the user.
         for form_id in registration_settings.get_participant_list_form_ids(self.event):
             try:
                 regform = available_forms[form_id]
             except KeyError:
                 continue
-            # Make sure publication was not disabled since the display settings were modified.
-            if regform.publish_registrations_public == PublishRegistrationsMode.show_all:
-                enabled_forms.append(regform)
-                del available_forms[form_id]
+            sorted_forms.append(regform)
+            del available_forms[form_id]
         for form_id, regform in available_forms.items():
-            # There might be forms with publication enabled that haven't been sorted by the user yet.
-            if regform.publish_registrations_public == PublishRegistrationsMode.show_all:
-                enabled_forms.append(regform)
-            else:
-                disabled_forms.append(regform)
-        disabled_forms.sort(key=attrgetter('title'))
+            sorted_forms.append(regform)
 
         merge_forms = registration_settings.get(self.event, 'merge_registration_forms')
         return WPManageRegistration.render_template('management/regform_display.html', self.event,
                                                     regforms=regforms, enabled_columns=enabled_columns,
-                                                    disabled_columns=disabled_columns, enabled_forms=enabled_forms,
-                                                    disabled_forms=disabled_forms, merge_forms=merge_forms, form=form)
+                                                    disabled_columns=disabled_columns, sorted_forms=sorted_forms,
+                                                    merge_forms=merge_forms, form=form)
 
 
 class RHManageRegistrationFormDisplay(RHManageRegFormBase):

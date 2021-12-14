@@ -1,4 +1,26 @@
-{% macro render_registrations_visibility_list(regforms) %}
+{% macro render_registrations_visibility_labels(regform) %}
+    <span class="i-label icon-users" title="{% trans %}Registrations visilibity to other participants{% endtrans %}">
+        {% if regform.publish_registrations_participants.name == 'hide_all' %}
+            {% trans %}Hiding all{% endtrans %}
+        {% elif regform.publish_registrations_participants.name == 'show_with_consent' %}
+            {% trans %}Showing with consent{% endtrans %}
+        {% elif regform.publish_registrations_participants.name == 'show_all' %}
+            {% trans %}Showing all{% endtrans %}
+        {% endif %}
+    </span>
+    <span class="i-label icon-earth" title="{% trans %}Registrations visilibity to everyone else{% endtrans %}">
+        {% if regform.publish_registrations_public.name == 'hide_all' %}
+            {% trans %}Hiding all{% endtrans %}
+        {% elif regform.publish_registrations_public.name == 'show_with_consent' %}
+            {% trans %}Showing with consent{% endtrans %}
+        {% elif regform.publish_registrations_public.name == 'show_all' %}
+            {% trans %}Showing all{% endtrans %}
+        {% endif %}
+    </span>
+{% endmacro %}
+
+
+{% macro render_registrations_visibility_list(regforms, settings_icon='settings') %}
     <div class="action-box plain">
         {% for regform in regforms %}
             <div class="section">
@@ -8,27 +30,10 @@
                 </div>
                 <div class="toolbar">
                     <div class="group">
-                        <span class="i-label icon-users" title="{% trans %}Registrations visilibity to other participants{% endtrans %}">
-                            {% if regform.publish_registrations_participants.name == 'hide_all' %}
-                                {% trans %}Hiding all{% endtrans %}
-                            {% elif regform.publish_registrations_participants.name == 'show_with_consent' %}
-                                {% trans %}Showing with consent{% endtrans %}
-                            {% elif regform.publish_registrations_participants.name == 'show_all' %}
-                                {% trans %}Showing all{% endtrans %}
-                            {% endif %}
-                        </span>
-                        <span class="i-label icon-earth" title="{% trans %}Registrations visilibity to everyone else{% endtrans %}">
-                            {% if regform.publish_registrations_public.name == 'hide_all' %}
-                                {% trans %}Hiding all{% endtrans %}
-                            {% elif regform.publish_registrations_public.name == 'show_with_consent' %}
-                                {% trans %}Showing with consent{% endtrans %}
-                            {% elif regform.publish_registrations_public.name == 'show_all' %}
-                                {% trans %}Showing all{% endtrans %}
-                            {% endif %}
-                        </span>
+                        {{ render_registrations_visibility_labels(regform) }}
                     </div>
                     <div class="group">
-                        <a href="{{ url_for('event_registration.edit_regform', regform) }}" class="i-button highlight icon-settings" title="{% trans %}Manage privacy{% endtrans %}"></a>
+                        <a href="{{ url_for('event_registration.edit_regform', regform) }}" class="i-button highlight icon-{{ settings_icon }}" title="{% trans %}Manage privacy settings{% endtrans %}"></a>
                     </div>
                 </div>
             </div>
