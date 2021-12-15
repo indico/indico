@@ -26,7 +26,7 @@ class RHRegistrationChangeVisibility(RHRegistrationsActionBase):
             for reg in self.registrations:
                 if consent_type == 'participants':
                     reg.consent_to_publish = PublishConsentType.participants
-                elif consent_type == 'hide':
+                elif consent_type == 'hidden':
                     reg.consent_to_publish = PublishConsentType.not_given
 
             return jsonify_data()
