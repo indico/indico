@@ -12,10 +12,6 @@ import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import 'selectize';
-import 'selectize/dist/css/selectize.css';
-import 'selectize/dist/css/selectize.default.css';
-
 import 'indico/modules/events/util/list_generator';
 import 'indico/modules/events/util/static_filters';
 

@@ -9,10 +9,6 @@
 
 import _ from 'lodash';
 
-import 'selectize';
-import 'selectize/dist/css/selectize.css';
-import 'selectize/dist/css/selectize.default.css';
-
 import {$T} from 'indico/utils/i18n';
 
 import 'indico/modules/events/reviews';
