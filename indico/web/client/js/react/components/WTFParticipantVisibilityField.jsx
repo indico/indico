@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React, {useMemo, useState, useEffect} from 'react';
-import {Dropdown, Form, Label, Icon} from 'semantic-ui-react';
+import {Dropdown, Form, Icon, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -67,6 +67,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
         <Form.Field style={{flexBasis: '50%'}}>
           <label>Visibility to everyone</label>
           <Dropdown
+            disabled={participantVisibility === 'hide_all'}
             fluid
             onChange={(e, {value}) => {
               setPublicVisibility(value);
@@ -79,13 +80,16 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
       </div>
       {publicVisibility === 'show_all' && (
         <div style={{marginTop: 5}}>
-          <Label basic color="orange">
-            <Icon name="info" />
-            <Translate>
-              Setting visibility to 'Show all participants' is discouraged as everyone who can
-              access this event can see the participant list regardless of the participants consent.
-            </Translate>
-          </Label>
+          <Message icon warning>
+            <Icon name="warning" />
+            <Message.Content>
+              <Translate>
+                Setting 'Visibility to everyone' to 'Show all participants' is discouraged as
+                everyone who can access this event can see the participant list regardless of the
+                participants' consent.
+              </Translate>
+            </Message.Content>
+          </Message>
         </div>
       )}
       <input

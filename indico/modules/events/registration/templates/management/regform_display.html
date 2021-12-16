@@ -79,7 +79,9 @@
         </p>
         {% call(form) sortable_list(sorted_forms, classes="tiles disable-if-locked") %}
             {{ render_registrations_visibility_labels(form) }}
-            <a href="{{ url_for('event_registration.edit_regform', form) }}" class="icon-lock-center" title="{% trans %}Manage privacy settings{% endtrans %}"></a>
+            <a class="icon-lock-center"
+               href="{{ url_for('event_registration.manage_registration_privacy_settings', form) }}"
+               title="{% trans %}Manage privacy settings{% endtrans %}"></a>
             <a class="icon-settings js-settings-dialog"
                data-href="{{ url_for('.manage_regform_display', event, form) }}"
                data-title="{% trans title=form.title %}Customize columns for {{ title }}{% endtrans %}"
