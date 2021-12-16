@@ -205,9 +205,10 @@ _bp_participation.add_url_rule('/manage/participants/', 'manage', regforms.RHMan
                                methods=('GET', 'POST'))
 
 # Privacy
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/privacy/settings', 'manage_registration_privacy_settings',
+                 privacy.RHRegistrationPrivacy, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/privacy/visibility', 'manage_registration_change_visibility',
                  privacy.RHRegistrationChangeVisibility, methods=('POST',))
-
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_event_registration', __name__, url_prefix='/event/<int:event_id>')
 _compat_bp.add_url_rule('/registration/', 'registration', compat_registration)

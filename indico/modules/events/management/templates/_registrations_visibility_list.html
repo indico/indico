@@ -33,7 +33,9 @@
                         {{ render_registrations_visibility_labels(regform) }}
                     </div>
                     <div class="group">
-                        <a href="{{ url_for('event_registration.edit_regform', regform) }}" class="i-button highlight icon-{{ settings_icon }}" title="{% trans %}Manage privacy settings{% endtrans %}"></a>
+                        <a href="{{ url_for('event_registration.manage_registration_privacy_settings', regform) }}"
+                           class="i-button highlight icon-{{ settings_icon }}"
+                           title="{% trans %}Manage privacy settings{% endtrans %}"></a>
                     </div>
                 </div>
             </div>

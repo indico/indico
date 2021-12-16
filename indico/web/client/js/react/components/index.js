@@ -45,6 +45,7 @@ export {default as WTFMultipleTagSelectField} from './WTFMultipleTagSelectField'
 export {default as WTFTimeField} from './WTFTimeField';
 export {default as WTFDurationField} from './WTFDurationField';
 export {default as WTFOccurrencesField} from './WTFOccurrencesField';
+export {default as WTFParticipantVisibilityField} from './WTFParticipantVisibilityField';
 export {default as WTFPrincipalListField} from './WTFPrincipalListField';
 export {default as WTFPrincipalField} from './WTFPrincipalField';
 export {default as WTFLinkListField} from './WTFLinkListField';

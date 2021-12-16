@@ -33,7 +33,8 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
 from indico.web.forms.fields.colors import SUIColorPickerField
 from indico.web.forms.fields.principals import PrincipalListField
-from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField, IndicoMultipleTagSelectField
+from indico.web.forms.fields.simple import (HiddenFieldList, IndicoEmailRecipientsField, IndicoMultipleTagSelectField,
+                                            IndicoParticipantVisibilityField)
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
@@ -517,6 +518,19 @@ class ChangeRegistrationVisibilityForm(IndicoForm):
         for reg in self.registrations:
             if reg.consent_to_publish == PublishConsentType.not_given and field.data == 'participants':
                 raise ValidationError(_('Cannot change visibility without a user consent'))
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form
+
+
+class RegistrationPrivacyForm(IndicoForm):
+    """Form to set the privacy settings of a registration form"""
+
+    visibility = IndicoParticipantVisibilityField(_('Participant list visibility'),
+                                                  description=_('Specify under which conditions the participant list '
+                                                                'will be visible to other participants and '
+                                                                'to everyone else who can access the event'))
+    submitted = HiddenField()
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form
