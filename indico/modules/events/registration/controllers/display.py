@@ -141,17 +141,14 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         headers = [PersonalDataType[column_name].get_title() for column_name in column_names]
 
         query = (Registration.query.with_parent(self.event)
-                 .filter(Registration.is_publishable,
-                         Registration.is_visible(self.event.is_user_registered(session.user)),
+                 .filter(Registration.is_publishable(self.event.is_user_registered(session.user)),
                          ~RegistrationForm.is_deleted,
                          ~Registration.is_deleted)
                  .join(Registration.registration_form)
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form')))
-
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in query),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']))
-
         return {'headers': headers,
                 'rows': registrations,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
@@ -191,7 +188,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         active_registrations = sorted(regform.active_registrations, key=attrgetter('last_name', 'first_name', 'id'))
         is_participant = self.event.is_user_registered(session.user)
         registrations = [_process_registration(reg, column_ids, active_fields) for reg in active_registrations
-                         if reg.is_publishable and reg.is_visible(is_participant)]
+                         if reg.is_publishable(is_participant)]
         return {'headers': headers,
                 'rows': registrations,
                 'title': regform.title,

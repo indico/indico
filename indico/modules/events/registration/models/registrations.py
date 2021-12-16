@@ -306,25 +306,32 @@ class Registration(db.Model):
                 r.user = target
 
     @hybrid_method
-    def is_visible(self, is_participant):
+    def is_publishable(self, is_participant):
         publish_registrations_mode = (self.registration_form.publish_registrations_participants
                                       if is_participant else self.registration_form.publish_registrations_public)
-        return (publish_registrations_mode != PublishRegistrationsMode.hide_all
+        return (self.is_active
+                and self.state in (RegistrationState.complete, RegistrationState.unpaid)
+                and publish_registrations_mode != PublishRegistrationsMode.hide_all
                 and (publish_registrations_mode == PublishRegistrationsMode.show_all
                      or self.consent_to_publish == PublishConsentType.all
                      or (is_participant and self.consent_to_publish == PublishConsentType.participants)))
 
-    @is_visible.expression
-    def is_visible(cls, is_participant):
+    @is_publishable.expression
+    def is_publishable(cls, is_participant):
         def publish_registrations_mode(mode):
             if is_participant:
                 return cls.registration_form.has(publish_registrations_participants=mode)
             else:
                 return cls.registration_form.has(publish_registrations_public=mode)
-        return (~publish_registrations_mode(PublishRegistrationsMode.hide_all)
-                & (publish_registrations_mode(PublishRegistrationsMode.show_all)
-                   | (cls.consent_to_publish == PublishConsentType.all)
-                   | ((cls.consent_to_publish == PublishConsentType.participants) & is_participant)))
+        consent_criterion = (
+            cls.consent_to_publish.in_([PublishConsentType.all, PublishConsentType.participants])
+            if is_participant else
+            cls.consent_to_publish == PublishConsentType.all
+        )
+        return db.and_(cls.is_active,
+                       cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)),
+                       ~publish_registrations_mode(PublishRegistrationsMode.hide_all),
+                       publish_registrations_mode(PublishRegistrationsMode.show_all) | consent_criterion)
 
     @hybrid_property
     def is_active(self):
@@ -333,14 +340,6 @@ class Registration(db.Model):
     @is_active.expression
     def is_active(cls):
         return ~cls.is_cancelled & ~cls.is_deleted
-
-    @hybrid_property
-    def is_publishable(self):
-        return self.is_active and self.state in (RegistrationState.complete, RegistrationState.unpaid)
-
-    @is_publishable.expression
-    def is_publishable(cls):
-        return cls.is_active & (cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)))
 
     @hybrid_property
     def is_cancelled(self):

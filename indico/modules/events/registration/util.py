@@ -503,18 +503,17 @@ def get_published_registrations(event, is_participant):
     :param event: the `Event` to get registrations for
     :return: list of `Registration` objects
     """
-    registrations = (Registration.query.with_parent(event)
-                     .filter(Registration.is_publishable,
-                             ~RegistrationForm.is_deleted,
-                             ~Registration.is_deleted)
-                     .join(Registration.registration_form)
-                     .options(contains_eager(Registration.registration_form))
-                     .order_by(db.func.lower(Registration.first_name),
-                               db.func.lower(Registration.last_name),
-                               Registration.friendly_id)
-                     .all())
+    query = (Registration.query.with_parent(event)
+             .filter(Registration.is_publishable(is_participant),
+                     ~RegistrationForm.is_deleted,
+                     ~Registration.is_deleted)
+             .join(Registration.registration_form)
+             .options(contains_eager(Registration.registration_form))
+             .order_by(db.func.lower(Registration.first_name),
+                       db.func.lower(Registration.last_name),
+                       Registration.friendly_id))
 
-    return [reg for reg in registrations if reg.is_visible(is_participant)]
+    return query.all()
 
 
 def get_events_registered(user, dt=None):
