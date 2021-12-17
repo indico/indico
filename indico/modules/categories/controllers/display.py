@@ -165,7 +165,8 @@ class RHCategorySearch(RH):
     def _process(self):
         q = request.args['q'].lower()
         query = (Category.query
-                 .filter(Category.title_matches(q))
+                 .filter(Category.title_matches(q),
+                         ~Category.is_deleted)
                  .options(undefer('deep_children_count'), undefer('deep_events_count'), undefer('has_events'),
                           undefer('has_children'), joinedload('acl_entries')))
         if session.user:
