@@ -16,7 +16,7 @@ import {camelizeKeys} from 'indico/utils/case';
     const {fieldId, eventId, roles, sessionUser, ...rest} = options;
     const field = document.getElementById(fieldId);
     const persons = JSON.parse(field.value);
-    const user = sessionUser && {
+    const user = sessionUser && sessionUser.id && {
       name: sessionUser.fullName,
       userId: sessionUser.id,
       userIdentifier: `User:${sessionUser.id}`,

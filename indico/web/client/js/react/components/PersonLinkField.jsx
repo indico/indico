@@ -241,7 +241,7 @@ export default function PersonLinkField({
   roles,
   emptyMessage,
 }) {
-  const [favoriteUsers] = useFavoriteUsers();
+  const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState(null);
   const sections = roles.filter(x => x.section);
@@ -325,6 +325,7 @@ export default function PersonLinkField({
           )}
           withEventPersons={eventId !== null}
           eventId={eventId}
+          disabled={!sessionUser}
         />
         <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
           Enter manually
