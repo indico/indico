@@ -31,6 +31,10 @@ import 'qtip2/dist/jquery.qtip.css';
 import 'vanderlee-colorpicker';
 import 'vanderlee-colorpicker/jquery.colorpicker.css';
 
+import 'selectize';
+import 'selectize/dist/css/selectize.css';
+import 'selectize/dist/css/selectize.default.css';
+
 import './widgets';
 
 // i18n (Jed)

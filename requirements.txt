@@ -154,7 +154,7 @@ kombu==5.2.2
     # via celery
 limits==1.5.1
     # via flask-limiter
-lxml[html5]==4.6.4
+lxml[html5]==4.7.1
     # via
     #   -r requirements.in
     #   feedgen
