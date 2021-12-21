@@ -23,7 +23,6 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import serialize_person_link
 from indico.modules.users.models.users import User
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
@@ -99,19 +98,24 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
     linked_object_attr = 'abstract'
     default_sort_alpha = False
     create_untrusted_persons = True
-    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
+    widget = JinjaWidget('forms/person_link_widget.html', allow_empty_email=True)
+
+    @property
+    def roles(self):
+        roles = [
+            {'name': 'primary', 'label': _('Author'), 'plural': _('Authors'), 'section': True, 'default': True},
+            {'name': 'secondary', 'label': _('Co-author'), 'plural': _('Co-authors'), 'section': True},
+        ]
+        if self.allow_speakers:
+            roles.append({'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone'})
+        return roles
 
     def __init__(self, *args, **kwargs):
-        self.author_types = AuthorType.serialize()
-        self.allow_authors = True
-        self.allow_submitters = False
-        self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
-        self.default_author_type = kwargs.pop('default_author_type', AuthorType.none)
-        self.default_is_submitter = False
-        self.default_is_speaker = False
-        self.require_primary_author = True
+        self.allow_speakers = kwargs.pop('allow_speakers', True)
+        self.require_primary_author = kwargs.pop('require_primary_author', True)
+        self.require_speaker = kwargs.pop('require_speaker', False)
         self.sort_by_last_name = True
-        self.disable_user_search = kwargs.pop('disable_user_search', False)
+        self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
@@ -119,24 +123,31 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
 
     @no_autoflush
     def _get_person_link(self, data):
-        extra_data = {'author_type': data.pop('authorType', self.default_author_type),
-                      'is_speaker': data.pop('isSpeaker', self.default_is_speaker)}
-        return super()._get_person_link(data, extra_data)
+        person_link = super()._get_person_link(data)
+        roles = data.get('roles', [])
+        person_link.is_speaker = 'speaker' in roles
+        person_link.author_type = next((AuthorType.get(a) for a in roles if AuthorType.get(a)), AuthorType.none)
+        return person_link
 
-    def _serialize_person_link(self, principal, extra_data=None):
-        data = (extra_data or {}) | serialize_person_link(principal)
-        data['isSpeaker'] = principal.is_speaker
-        data['authorType'] = principal.author_type.value
+    def _serialize_person_link(self, principal):
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema().dump(principal)
+        data['roles'] = []
+        if principal.is_speaker:
+            data['roles'].append('speaker')
+        data['roles'].append(principal.author_type.name)
         return data
 
     def pre_validate(self, form):
         super().pre_validate(form)
         for person_link in self.data:
-            if not self.allow_authors and person_link.author_type != AuthorType.none:
-                if not self.object_data or person_link not in self.object_data:
-                    person_link.author_type = AuthorType.none
             if person_link.author_type == AuthorType.none and not person_link.is_speaker:
                 raise ValidationError(_('{} has no role').format(person_link.full_name))
+        if (self.require_primary_author and
+                not any(person_link.author_type == AuthorType.primary for person_link in self.data)):
+            raise ValidationError(_('You must add at least one author'))
+        if self.require_speaker and not any(person_link.is_speaker for person_link in self.data):
+            raise ValidationError(_('You must add at least one speaker'))
 
 
 class AbstractField(QuerySelectField):

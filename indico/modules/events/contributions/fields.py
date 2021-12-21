@@ -10,7 +10,6 @@ from wtforms import ValidationError
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
                                                                 SubContributionPersonLink)
-from indico.modules.events.contributions.util import serialize_contribution_person_link
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.util.i18n import _
 from indico.web.forms.widgets import JinjaWidget
@@ -21,30 +20,51 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
 
     person_link_cls = ContributionPersonLink
     linked_object_attr = 'contrib'
-    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
+    widget = JinjaWidget('forms/person_link_widget.html', allow_empty_email=True)
+
+    @property
+    def roles(self):
+        roles = [{'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone', 'default': True}]
+        if self.allow_submitters:
+            roles.append({'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
+                          'default': self.default_is_submitter})
+        if self.allow_authors:
+            roles += [
+                {'name': 'primary', 'label': _('Author'), 'plural': _('Authors'), 'section': True},
+                {'name': 'secondary', 'label': _('Co-author'), 'plural': _('Co-authors'), 'section': True},
+            ]
+        return roles
 
     def __init__(self, *args, **kwargs):
-        self.author_types = AuthorType.serialize()
         self.allow_authors = kwargs.pop('allow_authors', kwargs['_form'].event.type == 'conference')
         self.allow_submitters = kwargs.pop('allow_submitters', True)
-        self.show_empty_coauthors = kwargs.pop('show_empty_coauthors', True)
-        self.default_author_type = kwargs.pop('default_author_type', AuthorType.none)
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
-        self.default_is_speaker = True
+        self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
 
     def _convert_data(self, data):
-        return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
+        return {self._get_person_link(x): 'submitter' in x.get('roles', []) for x in data}
 
     @no_autoflush
     def _get_person_link(self, data):
-        extra_data = {'author_type': data.pop('authorType', self.default_author_type),
-                      'is_speaker': data.pop('isSpeaker', self.default_is_speaker)}
-        return super()._get_person_link(data, extra_data)
+        person_link = super()._get_person_link(data)
+        roles = data.get('roles', [])
+        person_link.is_speaker = 'speaker' in roles
+        person_link.author_type = next((AuthorType.get(a) for a in roles if AuthorType.get(a)), AuthorType.none)
+        return person_link
 
-    def _serialize_person_link(self, principal, extra_data=None):
-        is_submitter = self.data[principal] if self.get_form().is_submitted() else None
-        return serialize_contribution_person_link(principal, is_submitter=is_submitter)
+    def _serialize_person_link(self, principal):
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema().dump(principal)
+        data['roles'] = []
+        if principal.is_speaker:
+            data['roles'].append('speaker')
+        is_submitter = (self.data[principal] if self.get_form().is_submitted()
+                        else principal.contribution and principal.is_submitter)
+        data['roles'].append(principal.author_type.name)
+        if is_submitter:
+            data['roles'].append('submitter')
+        return data
 
     def pre_validate(self, form):
         super().pre_validate(form)
@@ -61,4 +81,12 @@ class SubContributionPersonLinkListField(ContributionPersonLinkListField):
 
     person_link_cls = SubContributionPersonLink
     linked_object_attr = 'subcontrib'
-    widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
+    widget = JinjaWidget('forms/person_link_widget.html', allow_empty_email=True)
+
+    def _serialize_person_link(self, principal):
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema().dump(principal)
+        data['roles'] = []
+        if principal.is_speaker:
+            data['roles'].append('speaker')
+        return data

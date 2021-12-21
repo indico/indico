@@ -29,7 +29,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.modules.events.util import serialize_person_link, track_time_changes
+from indico.modules.events.util import track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
 from indico.util.spreadsheets import csv_text_io_wrapper
@@ -83,16 +83,6 @@ def get_events_with_linked_contributions(user, dt=None):
     data = defaultdict(set)
     add_acl_data()
     add_contrib_data()
-    return data
-
-
-def serialize_contribution_person_link(person_link, is_submitter=None):
-    """Serialize ContributionPersonLink to JSON-like object."""
-    data = serialize_person_link(person_link)
-    data['isSpeaker'] = person_link.is_speaker
-    if not isinstance(person_link, SubContributionPersonLink):
-        data['authorType'] = person_link.author_type.value
-        data['isSubmitter'] = person_link.is_submitter if is_submitter is None else is_submitter
     return data
 
 
@@ -249,6 +239,7 @@ def get_contributions_for_person(event, person, only_speakers=False):
 
 
 def serialize_contribution_for_ical(contrib):
+    from indico.modules.events.persons.schemas import PersonLinkSchema
     return {
         '_fossil': 'contributionMetadata',
         'id': contrib.id,
@@ -258,7 +249,7 @@ def serialize_contribution_for_ical(contrib):
         'title': contrib.title,
         'location': contrib.venue_name,
         'roomFullname': contrib.room_name,
-        'speakers': [serialize_person_link(x) for x in contrib.speakers],
+        'speakers': [PersonLinkSchema().dump(x) for x in contrib.speakers],
         'description': contrib.description
     }
 
@@ -326,12 +317,7 @@ def import_contributions_from_csv(event, f):
             continue
 
         # set the information of the speaker
-        person = get_event_person(event, {
-            'firstName': speaker_data['first_name'],
-            'familyName': speaker_data['last_name'],
-            'affiliation': speaker_data['affiliation'],
-            'email': email
-        })
+        person = get_event_person(event, speaker_data)
         link = ContributionPersonLink(person=person, is_speaker=True)
         link.populate_from_dict({
             'first_name': speaker_data['first_name'],

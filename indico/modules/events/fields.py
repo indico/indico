@@ -14,13 +14,12 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.modules.events.layout import theme_settings
-from indico.modules.events.models.persons import EventPerson, EventPersonLink, PersonLinkBase
+from indico.modules.events.models.events import EventType
+from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.persons.util import get_event_person
-from indico.modules.events.util import serialize_person_link
-from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
-from indico.util.i18n import _, orig_string
+from indico.util.i18n import _
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.widgets import JinjaWidget
@@ -69,38 +68,59 @@ class ReferencesField(MultipleItemsField):
             return [{'id': r.id, 'type': str(r.reference_type_id), 'value': r.value} for r in self.data]
 
 
-class EventPersonListField(PrincipalListField):
-    """A field that lets you select a list Indico user and EventPersons.
+class PersonLinkListFieldBase(PrincipalListField):
+    #: class that inherits from `PersonLinkBase`
+    person_link_cls = None
+    #: name of the attribute on the form containing the linked object
+    linked_object_attr = None
+    #: If set to `True`, will be sorted alphabetically by default
+    default_sort_alpha = True
 
-    This requires its form to have an event set.
-    """
-
-    #: Whether new event persons created by the field should be
-    #: marked as untrusted
+    widget = None
     create_untrusted_persons = False
 
     def __init__(self, *args, **kwargs):
-        self.event_person_conversions = {}
         super().__init__(*args, allow_groups=False, allow_external_users=True, **kwargs)
+        self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
 
     @property
     def event(self):
+        # The event should be a property as it may only be available later, such as, in creation forms
         return getattr(self.get_form(), 'event', None)
+
+    @no_autoflush
+    def _get_person_link(self, data):
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
+                                  allow_external=True)
+        person_link = None
+        if self.object and inspect(person).persistent:
+            person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
+        if not person_link:
+            person_link = self.person_link_cls(person=person)
+        person_link.populate_from_dict(PersonLinkSchema(
+            only=('first_name', 'last_name', 'affiliation', 'address', 'phone', '_title', 'display_order')).load(data))
+        email = data.get('email', '').lower()
+        if not email:
+            raise UserValueError(_('A valid email address is required'))
+        if email != person_link.email:
+            if not self.event or not self.event.persons.filter_by(email=email).first():
+                person_link.person.email = email
+                person_link.person.user = get_user_by_email(email)
+                if inspect(person).persistent:
+                    signals.event.person_updated.send(person_link.person)
+            else:
+                raise UserValueError(_('There is already a person with the email {email}').format(email=email))
+        return person_link
+
+    def _serialize_person_link(self, principal):
+        raise NotImplementedError
 
     def _convert_data(self, data):
         raise NotImplementedError
 
-    def _serialize_principal(self, principal):
-        from indico.modules.events.util import serialize_event_person
-        if principal.id is None:
-            # We created an EventPerson which has not been persisted to the
-            # database. Revert the conversion.
-            principal = self.event_person_conversions[principal]
-            if isinstance(principal, dict):
-                return principal
-        if not isinstance(principal, EventPerson):
-            return super()._serialize_principal(principal)
-        return serialize_event_person(principal)
+    def _value(self):
+        return [self._serialize_person_link(person_link) for person_link in self.data] if self.data else []
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -112,81 +132,37 @@ class EventPersonListField(PrincipalListField):
                 raise
 
 
-class PersonLinkListFieldBase(EventPersonListField):
-    #: class that inherits from `PersonLinkBase`
-    person_link_cls = None
-    #: name of the attribute on the form containing the linked object
-    linked_object_attr = None
-    #: If set to `True`, will be sorted alphabetically by default
-    default_sort_alpha = True
-
-    widget = None
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
-
-    @no_autoflush
-    def _get_person_link(self, data, extra_data=None):
-        extra_data = extra_data or {}
-        person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
-                                  allow_external=True)
-        person_data = {'title': next((x.value for x in UserTitle if data.get('title') == orig_string(x.title)),
-                                     UserTitle.none),
-                       'first_name': data.get('firstName', ''), 'last_name': data['familyName'],
-                       'affiliation': data.get('affiliation', ''), 'address': data.get('address', ''),
-                       'phone': data.get('phone', ''), 'display_order': data['displayOrder']}
-        person_data.update(extra_data)
-        person_link = None
-        if self.object and inspect(person).persistent:
-            person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
-        if not person_link:
-            person_link = self.person_link_cls(person=person)
-        person_link.populate_from_dict(person_data)
-        email = data.get('email', '').lower()
-        if email != person_link.email:
-            if not self.event or not self.event.persons.filter_by(email=email).first():
-                person_link.person.email = email
-                person_link.person.user = get_user_by_email(email)
-                if inspect(person).persistent:
-                    signals.event.person_updated.send(person_link.person)
-            else:
-                raise UserValueError(_('There is already a person with the email {}').format(email))
-        return person_link
-
-    def _serialize_principal(self, principal):
-        if not isinstance(principal, PersonLinkBase):
-            return super()._serialize_principal(principal)
-        if principal.id is None:
-            return super()._serialize_principal(principal.person)
-        else:
-            return self._serialize_person_link(principal)
-
-    def _serialize_person_link(self, principal, extra_data=None):
-        raise NotImplementedError
-
-    def _value(self):
-        return [self._serialize_person_link(person_link) for person_link in self.data] if self.data else []
-
-
 class EventPersonLinkListField(PersonLinkListFieldBase):
     """A field to manage event's chairpersons."""
 
     person_link_cls = EventPersonLink
     linked_object_attr = 'event'
-    widget = JinjaWidget('events/forms/event_person_link_widget.html')
+    widget = JinjaWidget('forms/person_link_widget.html')
+
+    @property
+    def roles(self):
+        return [{'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
+                 'default': self.default_is_submitter}]
 
     def __init__(self, *args, **kwargs):
-        self.allow_submitters = True
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
+        self.empty_message = _('There are no chairpersons')
+        event_type = kwargs.pop('event_type', None)
         super().__init__(*args, **kwargs)
+        if not event_type and self.object:
+            event_type = self.object.event.type_
+        if event_type == EventType.lecture:
+            self.empty_message = _('There are no speakers')
 
     def _convert_data(self, data):
-        return {self._get_person_link(x): x.pop('isSubmitter', self.default_is_submitter) for x in data}
+        return {self._get_person_link(x): 'submitter' in x.get('roles', []) for x in data}
 
-    def _serialize_person_link(self, principal, extra_data=None):
-        data = (extra_data or {}) | serialize_person_link(principal)
-        data['isSubmitter'] = self.data[principal] if self.get_form().is_submitted() else principal.is_submitter
+    def _serialize_person_link(self, principal):
+        from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema().dump(principal)
+        data['roles'] = []
+        if (self.get_form().is_submitted() and self.data[principal]) or (principal.event and principal.is_submitter):
+            data['roles'].append('submitter')
         return data
 
     def pre_validate(self, form):

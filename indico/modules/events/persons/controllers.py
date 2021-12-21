@@ -428,4 +428,7 @@ class RHEventPersonSearch(RHAuthenticatedEventBase):
     ), location='query')
     def _process(self, exact, **criteria):
         matches, total = self._search_event_persons(exact=exact, **criteria)
-        return jsonify(users=EventPersonSchema().dump(matches, many=True), total=total)
+        return jsonify(
+            users=EventPersonSchema(only=EventPersonSchema.Meta.public_fields).dump(matches, many=True),
+            total=total
+        )

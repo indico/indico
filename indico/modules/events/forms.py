@@ -101,7 +101,7 @@ class LectureCreationForm(EventCreationFormBase):
                     'protection_mode')
     _advanced_field_order = ('description', 'theme')
     occurrences = OccurrencesField(_('Dates'), [DataRequired()])
-    person_link_data = EventPersonLinkListField(_('Speakers'))
+    person_link_data = EventPersonLinkListField(_('Speakers'), event_type=EventType.lecture)
     description = TextAreaField(_('Description'), widget=CKEditorWidget())
     theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)
 

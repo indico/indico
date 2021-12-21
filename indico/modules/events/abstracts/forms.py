@@ -23,7 +23,6 @@ from indico.modules.events.abstracts.models.abstracts import EditTrackMode
 from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
 from indico.modules.events.abstracts.settings import (AllowEditingType, BOACorrespondingAuthorType, BOALinkFormat,
                                                       BOASortField, SubmissionRightsType, abstracts_settings)
-from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
@@ -460,9 +459,9 @@ class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
 class AbstractForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     description = IndicoMarkdownField(_('Content'), editor=True, mathjax=True)
+    person_links = AbstractPersonLinkListField(_('Authors'))
     submitted_contrib_type = QuerySelectField(_('Contribution type'), get_label='name', allow_blank=True,
                                               blank_text=_('No type selected'))
-    person_links = AbstractPersonLinkListField(_('Authors'), default_author_type=AuthorType.primary)
     submission_comment = TextAreaField(_('Comments'))
     attachments = EditableFileField(_('Attachments'), multiple_files=True, lightweight=True)
 
@@ -497,9 +496,8 @@ class AbstractForm(IndicoForm):
         if not description_settings['is_active']:
             del self.description
         if not is_invited:
-            self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
             self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
-            self.person_links.disable_user_search = session.user is None
+            self.person_links.require_speaker = abstracts_settings.get(self.event, 'speakers_required')
         else:
             self.person_links.require_primary_author = False
 

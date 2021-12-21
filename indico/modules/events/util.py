@@ -177,48 +177,6 @@ def get_random_color(event):
     return random.choice(tuple(unused_colors) or get_colors())
 
 
-def serialize_event_person(person):
-    """Serialize EventPerson to JSON-like object."""
-    return {'_type': 'EventPerson',
-            'id': person.id,
-            'email': person.email,
-            'name': person.display_full_name,
-            'firstName': person.first_name,
-            'familyName': person.last_name,
-            'title': person.title,
-            'affiliation': person.affiliation,
-            'phone': person.phone,
-            'address': person.address,
-            'user_id': person.user_id}
-
-
-def serialize_person_link(person_link):
-    """Serialize PersonLink to JSON-like object."""
-    data = {'email': person_link.person.email,
-            'name': person_link.display_full_name,
-            'fullName': person_link.display_full_name,
-            'firstName': person_link.first_name,
-            'familyName': person_link.last_name,
-            'title': person_link.title,
-            'affiliation': person_link.affiliation,
-            'phone': person_link.phone,
-            'address': person_link.address,
-            'displayOrder': person_link.display_order,
-            'userId': person_link.person.user_id}
-    if person_link.person.id is not None:
-        # In case of a newly added person we only serialize the data again
-        # if the form's validation failed and the field needs to be displayed
-        # with the same data.  However, now we don't have a person ID since
-        # the person was never created, so if we send an ID/type in the
-        # serialized data it'll be sent back and cause an error as it'll appear
-        # as an existing person instead of a new one when submitting the form
-        # again.
-        data.update({'_type': 'PersonLink',
-                     'id': person_link.person.id,
-                     'personId': person_link.person.id})
-    return data
-
-
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, permission=None):
     """Update an object's ACL with a new list of principals.
 

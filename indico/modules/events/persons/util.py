@@ -7,17 +7,17 @@
 
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users import User
-from indico.modules.users.models.users import UserTitle
 from indico.util.user import principal_from_identifier
 
 
 def create_event_person(event, create_untrusted_persons=False, **data):
     """Create an event person from data passed as kwargs."""
-    title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
-    return EventPerson(event=event, email=data.get('email', '').lower(), _title=title,
-                       first_name=data.get('firstName'), last_name=data['familyName'],
-                       affiliation=data.get('affiliation'), address=data.get('address'),
-                       phone=data.get('phone'), is_untrusted=create_untrusted_persons)
+    from marshmallow import EXCLUDE
+
+    from indico.modules.events.persons.schemas import EventPersonSchema
+    event_person = EventPerson(event=event, is_untrusted=create_untrusted_persons)
+    event_person.populate_from_dict(EventPersonSchema(unknown=EXCLUDE).load(data))
+    return event_person
 
 
 def get_event_person_for_user(event, user, create_untrusted_persons=False):
