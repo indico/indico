@@ -1,12 +1,23 @@
 {% extends 'footer.html' %}
 
 {% block footer_links_extra %}
-    {% for privacy_url in privacy_urls  %}
+    {% if privacy_urls|length == 1 %}
         <li>
-            <a href="{{ privacy_url.url }}">{{ privacy_url.title }}</a>
+            <a href="{{ privacy_urls[0].url }}">{% trans %}Event privacy notice{% endtrans %}</a>
         </li>
-    {% endfor %}
-    {% if privacy_text %}
+    {% elif privacy_urls %}
+        <li>
+            <div class="privacy-dropdown">
+                <span>{% trans %}Event privacy notices{% endtrans %}</span>
+                <i class="triangle up icon"></i>
+                <div class="menu">
+                    {% for privacy_url in privacy_urls  %}
+                        <a class="item" href="{{ privacy_url.url }}">{{ privacy_url.title }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </li>
+    {% elif privacy_text %}
         <li>
             <a href="{{ url_for('events.display_privacy', event) }}"
                data-title="{% trans %}Event privacy notice{% endtrans %}"
