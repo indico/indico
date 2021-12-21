@@ -23,6 +23,7 @@ import './override_multiple_items_widget';
 import './person_link_widget';
 import './principal_list_widget';
 import './principal_widget';
+import './privacy_policy_urls_widget';
 import './protection_widget';
 import './selectize_widget';
 import './synced_input_widget';

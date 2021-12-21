@@ -1,0 +1,14 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div id="{{ field.id }}-wrapper"></div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupPrivacyPolicyURLsWidget({
+            fieldId: {{ field.id | tojson }},
+            initialValues: {{ field.data | tojson }},
+        });
+    </script>
+{% endblock %}

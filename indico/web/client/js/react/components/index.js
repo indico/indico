@@ -47,5 +47,6 @@ export {default as WTFDurationField} from './WTFDurationField';
 export {default as WTFOccurrencesField} from './WTFOccurrencesField';
 export {default as WTFPrincipalListField} from './WTFPrincipalListField';
 export {default as WTFPrincipalField} from './WTFPrincipalField';
+export {default as WTFPrivacyPolicyURLsField} from './WTFPrivacyPolicyURLsField';
 export {default as WTFSUIColorPicker} from './WTFSUIColorPicker';
 export {default as ICSCalendarLink} from './ICSCalendarLink';
