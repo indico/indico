@@ -145,9 +145,9 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
                 raise ValidationError(_('{} has no role').format(person_link.full_name))
         if (self.require_primary_author and
                 not any(person_link.author_type == AuthorType.primary for person_link in self.data)):
-            raise ValueError(_('You must add at least one author'))
+            raise ValidationError(_('You must add at least one author'))
         if self.require_speaker and not any(person_link.is_speaker for person_link in self.data):
-            raise ValueError(_('You must add at least one speaker'))
+            raise ValidationError(_('You must add at least one speaker'))
 
 
 class AbstractField(QuerySelectField):

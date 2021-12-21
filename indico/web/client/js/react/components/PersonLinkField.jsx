@@ -38,6 +38,7 @@ const ExternalPersonModal = ({onSubmit, onClose, person}) => (
     onClose={onClose}
     onSubmit={onSubmit}
     header={Translate.string('Enter Person')}
+    submitLabel={Translate.string('Save')}
     initialValues={person || {}}
   >
     {/* eslint-disable-next-line eqeqeq */}
