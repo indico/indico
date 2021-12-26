@@ -4,7 +4,7 @@
 {% block html %}
     <div class="i-form-field-fixed-width" data-tooltip-anchor>
         <input id="{{ field.id }}" class="typeahead" type="text" name="{{ field.name }}"
-               {%- if field.data is not none -%}data-data="{{ field._value() | tojson | forceescape}}"{%- endif -%}
+               {%- if field.data is not none -%}data-data="{{ (field._value() or []) | tojson | forceescape}}"{%- endif -%}
                {{ input_args | html_params }} autocomplete="off">
         <span></span>
     </div>
@@ -15,7 +15,6 @@
     <script>
         setupSelectizeWidget({
             fieldId: {{ field.id | tojson }},
-            selectedItem: {{ field._value() | tojson }},
             minTriggerLength: {{ min_trigger_length | tojson }},
             searchUrl: {{ search_url | tojson }},
             searchMethod: {{ search_method | tojson }},
