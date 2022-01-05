@@ -64,7 +64,7 @@ function SingleChoiceDropdown({
   const options = choices.map(c => ({
     key: c.id,
     value: c.id,
-    disabled: !c.isEnabled || c.placesLimit <= 0,
+    disabled: !c.isEnabled,
     text: (
       <div styleName="dropdown-text">
         <div styleName="caption">{c.caption}</div>
@@ -74,7 +74,9 @@ function SingleChoiceDropdown({
               {c.price} {currency}
             </Label>
           )}
-          <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+          {c.placesLimit === 0 ? null : (
+            <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+          )}
         </div>
       </div>
     ),
@@ -156,25 +158,27 @@ function SingleChoiceRadioGroup({
                   name={htmlName}
                   key={c.id}
                   value={c.id}
-                  disabled={!c.isEnabled || disabled || c.placesLimit === 0}
+                  disabled={!c.isEnabled || disabled}
                   checked={c.id === value}
                   onChange={() => handleChange(c.id)}
                 />
               </td>
               <td>
-                {c.isEnabled && !!c.price && c.placesLimit > 0 && (
+                {c.isEnabled && !!c.price && (
                   <Label pointing="left">
                     {c.price.toFixed(2)} {currency}
                   </Label>
                 )}
               </td>
               <td>
-                {c.id !== '' && <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />}
+                {c.id !== '' && c.placesLimit !== 0 && (
+                  <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+                )}
               </td>
               {withExtraSlots && selectedChoice.id === c.id && (
                 <>
                   <td>
-                    {c.isEnabled && c.placesLimit > 0 && (
+                    {c.isEnabled && (
                       <Dropdown
                         selection
                         styleName="dropdown"
@@ -189,7 +193,7 @@ function SingleChoiceRadioGroup({
                     )}
                   </td>
                   <td>
-                    {c.isEnabled && !!c.price && c.placesLimit > 0 && (
+                    {c.isEnabled && !!c.price && (
                       <Label pointing="left">
                         {Translate.string('Total: {total} {currency}', {
                           total: (slotsUsed * c.price).toFixed(2),

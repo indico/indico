@@ -62,25 +62,27 @@ export default function MultiChoiceInput({
                     styleName="checkbox"
                     name={htmlName}
                     value={choice.id}
-                    disabled={!choice.isEnabled || disabled || choice.placesLimit === 0}
+                    disabled={!choice.isEnabled || disabled}
                     checked={!!value[choice.id]}
                     onChange={makeHandleChange(choice)}
                     label={choice.caption}
                   />
                 </td>
                 <td>
-                  {choice.isEnabled && !!choice.price && choice.placesLimit > 0 && (
+                  {choice.isEnabled && !!choice.price && (
                     <Label pointing="left">
                       {choice.price.toFixed(2)} {currency}
                     </Label>
                   )}
                 </td>
                 <td>
-                  <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
+                  {choice.placesLimit === 0 ? null : (
+                    <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
+                  )}
                 </td>
                 {withExtraSlots && (
                   <td>
-                    {choice.isEnabled && choice.placesLimit > 0 && (
+                    {choice.isEnabled && (
                       <Dropdown
                         selection
                         styleName="dropdown"
@@ -97,7 +99,7 @@ export default function MultiChoiceInput({
                 )}
                 {withExtraSlots && (
                   <td>
-                    {choice.isEnabled && !!choice.price && choice.placesLimit > 0 && (
+                    {choice.isEnabled && !!choice.price && (
                       <Label pointing="left">
                         {Translate.string('Total: {total} {currency}', {
                           total: formatPrice(choice),
