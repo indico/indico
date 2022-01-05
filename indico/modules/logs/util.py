@@ -95,6 +95,8 @@ def render_changes(a, b, type_):
         return '{} \N{RIGHTWARDS ARROW} {}'.format(a or '\N{EMPTY SET}', b or '\N{EMPTY SET}')
     elif type_ == 'list':
         return _diff_list(a or [], b or [])
+    elif type_ == 'struct_list':
+        return _diff_list([repr(x) for x in a or []], [repr(x) for x in b or []])
     elif type_ == 'text':
         return _diff_text(a or '', b or '')
     else:
