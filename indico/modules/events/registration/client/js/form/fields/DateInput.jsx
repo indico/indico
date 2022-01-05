@@ -18,15 +18,7 @@ import {Translate} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
 
-export default function DateInput({
-  htmlName,
-  id,
-  disabled,
-  dateFormat,
-  timeFormat,
-  title,
-  isRequired,
-}) {
+export default function DateInput({htmlName, id, dateFormat, timeFormat}) {
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
   const friendlyDateFormat = dateFormat.replace(
@@ -36,53 +28,44 @@ export default function DateInput({
 
   if (dateFormat.includes('%d')) {
     return (
-      <Form.Field required={isRequired} disabled={disabled} styleName="field">
-        <label>{title}</label>
-        <Form.Group styleName="date-field">
+      <Form.Group styleName="date-field">
+        <Form.Field>
+          <SingleDatePicker
+            id={`regform-datepicker-${id}`}
+            date={date}
+            onDateChange={setDate}
+            placeholder={friendlyDateFormat}
+            displayFormat={friendlyDateFormat}
+            isOutsideRange={() => false}
+            verticalSpacing={10}
+            enableOutsideDays
+          />
+        </Form.Field>
+        {timeFormat && (
           <Form.Field>
-            <SingleDatePicker
-              id={`regform-datepicker-${id}`}
-              date={date}
-              onDateChange={setDate}
-              placeholder={friendlyDateFormat}
-              displayFormat={friendlyDateFormat}
-              isOutsideRange={() => false}
-              verticalSpacing={10}
-              enableOutsideDays
+            <TimePicker
+              id={`regform-timepicker-${id}`}
+              showSecond={false}
+              value={time}
+              focusOnOpen
+              onChange={setTime}
+              use12Hours={timeFormat === '12h'}
+              allowEmpty={false}
+              placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
+              getPopupContainer={node => node}
             />
           </Form.Field>
-          {timeFormat && (
-            <Form.Field>
-              <TimePicker
-                id={`regform-timepicker-${id}`}
-                showSecond={false}
-                value={time}
-                focusOnOpen
-                onChange={setTime}
-                use12Hours={timeFormat === '12h'}
-                allowEmpty={false}
-                placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
-                getPopupContainer={node => node}
-              />
-            </Form.Field>
-          )}
-        </Form.Group>
-      </Form.Field>
+        )}
+      </Form.Group>
     );
   } else {
-    return (
-      <Form.Field required={isRequired} disabled={disabled} styleName="field">
-        <label>{title}</label>
-        <input type="text" name={htmlName} placeholder={friendlyDateFormat} />
-      </Form.Field>
-    );
+    return <input type="text" name={htmlName} placeholder={friendlyDateFormat} />;
   }
 }
 
 DateInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   id: PropTypes.number.isRequired,
-  disabled: PropTypes.bool,
   dateFormat: PropTypes.oneOf([
     '%d/%m/%Y',
     '%d.%m.%Y',
@@ -95,12 +78,9 @@ DateInput.propTypes = {
     '%Y',
   ]).isRequired,
   timeFormat: PropTypes.oneOf(['12h', '24h']),
-  title: PropTypes.string.isRequired,
-  isRequired: PropTypes.bool.isRequired,
 };
 
 DateInput.defaultProps = {
-  disabled: false,
   timeFormat: null,
 };
 

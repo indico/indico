@@ -28,21 +28,18 @@ export default function NumberInput({htmlName, disabled, price, title, isRequire
   const total = (value * price).toFixed(2);
 
   return (
-    <Form.Field required={isRequired} disabled={disabled} styleName="field">
-      <label>{title}</label>
-      <div styleName="number-field">
-        <input
-          type="number"
-          name={htmlName}
-          value={value}
-          {...inputProps}
-          onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
-        />
-        <Label pointing="left" styleName="price-tag">
-          {price.toFixed(2)} {currency} (Total: {total} {currency})
-        </Label>
-      </div>
-    </Form.Field>
+    <div styleName="number-field">
+      <input
+        type="number"
+        name={htmlName}
+        value={value}
+        {...inputProps}
+        onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
+      />
+      <Label pointing="left" styleName="price-tag">
+        {price.toFixed(2)} {currency} (Total: {total} {currency})
+      </Label>
+    </div>
   );
 }
 

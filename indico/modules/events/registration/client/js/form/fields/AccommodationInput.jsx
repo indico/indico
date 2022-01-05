@@ -24,15 +24,7 @@ import {Choices, choiceShape} from './ChoicesSetup';
 import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
-export default function AccommodationInput({
-  htmlName,
-  disabled,
-  choices,
-  arrival,
-  departure,
-  title,
-  isRequired,
-}) {
+export default function AccommodationInput({htmlName, disabled, choices, arrival, departure}) {
   // TODO: billable/price
   // TODO: places left
   // TODO: disable options triggering price changes after payment (or warn for managers)
@@ -91,8 +83,7 @@ export default function AccommodationInput({
       : 0;
 
   return (
-    <Form.Field required={isRequired} styleName="field accommodation-field">
-      <label>{title}</label>
+    <div styleName="accommodation-field">
       <table>
         <tbody>
           {choices
@@ -152,7 +143,7 @@ export default function AccommodationInput({
           </Label>
         </div>
       )}
-    </Form.Field>
+    </div>
   );
 }
 
@@ -168,8 +159,6 @@ AccommodationInput.propTypes = {
     startDate: PropTypes.string.isRequired,
     endDate: PropTypes.string.isRequired,
   }).isRequired,
-  title: PropTypes.string.isRequired,
-  isRequired: PropTypes.bool.isRequired,
   // TODO: placesUsed, captions - only needed once we deal with real data
 };
 

@@ -64,6 +64,7 @@ export const fieldRegistry = {
     noRequired: true,
     noLabel: true,
     icon: 'tag',
+    customFormItem: true,
   },
   text: {
     title: Translate.string('Text'),
@@ -91,6 +92,7 @@ export const fieldRegistry = {
     noLabel: true,
     hasPrice: true,
     icon: 'checkbox-checked',
+    customFormItem: true,
   },
   date: {
     title: Translate.string('Date'),
@@ -106,6 +108,7 @@ export const fieldRegistry = {
     settingsComponent: BooleanSettings,
     hasPrice: true,
     icon: 'switchon',
+    customFormItem: true,
   },
   phone: {
     title: Translate.string('Phone'),

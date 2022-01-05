@@ -22,12 +22,7 @@ const attributeMap = {
 
 export default function TextAreaInput({htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextAreaInput.defaultProps);
-  return (
-    <Form.Field required={isRequired} disabled={disabled} styleName="field">
-      <label>{title}</label>
-      <textarea name={htmlName} {...inputProps} style={{resize: 'none'}} />
-    </Form.Field>
-  );
+  return <textarea name={htmlName} {...inputProps} style={{resize: 'none'}} />;
 }
 
 TextAreaInput.propTypes = {

@@ -7,6 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Form} from 'semantic-ui-react';
 
 import {Markdown, toClasses} from 'indico/react/util';
 
@@ -27,13 +28,21 @@ export default function FormItem({
 }) {
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
+  const {customFormItem} = meta;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
   return (
     <div styleName={`form-item ${toClasses({disabled: !isEnabled, editable: setupMode})}`}>
       {sortHandle}
       <div styleName="content">
         {InputComponent ? (
-          <InputComponent isRequired={isRequired || meta.alwaysRequired} {...inputProps} />
+          customFormItem ? (
+            <InputComponent isRequired={isRequired || meta.alwaysRequired} {...inputProps} />
+          ) : (
+            <Form.Field required={isRequired || meta.alwaysRequired} styleName="field">
+              <label>{title}</label>
+              <InputComponent isRequired={isRequired || meta.alwaysRequired} {...inputProps} />
+            </Form.Field>
+          )
         ) : (
           `Unknown input type: ${inputType}`
         )}

@@ -7,14 +7,14 @@
 
 import PropTypes from 'prop-types';
 import React, {useRef, useState} from 'react';
-import {Button, Form, Label} from 'semantic-ui-react';
+import {Button, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
-export default function FileInput({htmlName, disabled, title, isRequired}) {
+export default function FileInput({htmlName}) {
   const [file, setFile] = useState();
   const fileRef = useRef();
 
@@ -32,8 +32,7 @@ export default function FileInput({htmlName, disabled, title, isRequired}) {
   };
 
   return (
-    <Form.Field required={isRequired} disabled={disabled} styleName="field">
-      <label>{title}</label>
+    <>
       <Button.Group size="small">
         <Button
           type="button"
@@ -52,17 +51,10 @@ export default function FileInput({htmlName, disabled, title, isRequired}) {
         {file && <Button icon="delete" onClick={handleFileClear} />}
       </Button.Group>
       <input id={`${htmlName}-file`} hidden type="file" ref={fileRef} onChange={handleFileChange} />
-    </Form.Field>
+    </>
   );
 }
 
 FileInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
-  title: PropTypes.string.isRequired,
-  isRequired: PropTypes.bool.isRequired,
-};
-
-FileInput.defaultProps = {
-  disabled: false,
 };

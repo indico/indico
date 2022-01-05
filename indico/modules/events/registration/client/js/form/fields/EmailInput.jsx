@@ -7,26 +7,13 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Form} from 'semantic-ui-react';
 
 import '../../../styles/regform.module.scss';
 
-export default function EmailInput({htmlName, disabled, title, isRequired}) {
-  return (
-    <Form.Field required={isRequired} disabled={disabled} styleName="field">
-      <label>{title}</label>
-      <input type="email" name={htmlName} size="60" />
-    </Form.Field>
-  );
+export default function EmailInput({htmlName}) {
+  return <input type="email" name={htmlName} size="60" />;
 }
 
 EmailInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
-  title: PropTypes.string.isRequired,
-  isRequired: PropTypes.bool.isRequired,
-};
-
-EmailInput.defaultProps = {
-  disabled: false,
 };

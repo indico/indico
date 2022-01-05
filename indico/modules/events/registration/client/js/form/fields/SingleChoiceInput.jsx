@@ -228,7 +228,6 @@ SingleChoiceRadioGroup.defaultProps = {
 export default function SingleChoiceInput({
   htmlName,
   disabled,
-  title,
   isRequired,
   itemType,
   choices,
@@ -265,12 +264,7 @@ export default function SingleChoiceInput({
     return `ERROR: Unknown type ${itemType}`;
   }
 
-  return (
-    <Form.Field required={isRequired} disabled={disabled} styleName="field">
-      <label>{title}</label>
-      {component}
-    </Form.Field>
-  );
+  return component;
 }
 
 SingleChoiceInput.propTypes = {
@@ -279,7 +273,6 @@ SingleChoiceInput.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   defaultItem: PropTypes.string,
-  title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool.isRequired,
   withExtraSlots: PropTypes.bool,
   // TODO: placesUsed, captions - only needed once we deal with real data
