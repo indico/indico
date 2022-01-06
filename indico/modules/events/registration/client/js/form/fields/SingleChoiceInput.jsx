@@ -175,7 +175,7 @@ function SingleChoiceRadioGroup({
                   <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
                 )}
               </td>
-              {withExtraSlots && selectedChoice.id === c.id && (
+              {withExtraSlots && !!c.maxExtraSlots && selectedChoice.id === c.id && (
                 <>
                   <td>
                     {c.isEnabled && (

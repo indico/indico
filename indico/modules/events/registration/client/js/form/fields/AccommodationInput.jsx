@@ -104,7 +104,7 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
                     />
                   </td>
                   <td>
-                    {c.isEnabled && !!c.price && c.placesLimit > 0 && (
+                    {c.isEnabled && !!c.price && (
                       <Label pointing="left">
                         {Translate.string('{price} {currency} per night', {
                           price: c.price.toFixed(2),
@@ -135,12 +135,14 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
               endDatePlaceholderText: Translate.string('Departure'),
             }}
           />
-          <Label pointing="left" styleName="price-tag">
-            {Translate.string('Total: {total} {currency}', {
-              total: (nights * selectedChoice.price).toFixed(2),
-              currency,
-            })}
-          </Label>
+          {!!selectedChoice.price && (
+            <Label pointing="left" styleName="price-tag">
+              {Translate.string('Total: {total} {currency}', {
+                total: (nights * selectedChoice.price).toFixed(2),
+                currency,
+              })}
+            </Label>
+          )}
         </div>
       )}
     </div>
