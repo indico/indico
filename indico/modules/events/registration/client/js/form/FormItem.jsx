@@ -36,9 +36,17 @@ export default function FormItem({
       <div styleName="content">
         {InputComponent ? (
           customFormItem ? (
-            <InputComponent isRequired={isRequired || meta.alwaysRequired} {...inputProps} />
+            <InputComponent
+              isRequired={isRequired || meta.alwaysRequired}
+              disabled={!isEnabled}
+              {...inputProps}
+            />
           ) : (
-            <Form.Field required={isRequired || meta.alwaysRequired} styleName="field">
+            <Form.Field
+              required={isRequired || meta.alwaysRequired}
+              disabled={!isEnabled}
+              styleName="field"
+            >
               <label>{title}</label>
               <InputComponent isRequired={isRequired || meta.alwaysRequired} {...inputProps} />
             </Form.Field>
