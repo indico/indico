@@ -86,12 +86,12 @@ function SingleChoiceDropdown({
     <Form.Group styleName="single-choice-dropdown">
       <Form.Select
         name={htmlName}
+        style={{width: 500}}
         placeholder={Translate.string('Choose an option')}
         options={options}
         disabled={disabled}
         value={value}
         onChange={handleChange}
-        width={10}
         clearable={!isRequired}
         search
       />
