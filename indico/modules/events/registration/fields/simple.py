@@ -32,7 +32,6 @@ class TextField(RegistrationFormFieldBase):
     name = 'text'
     wtf_field_class = wtforms.StringField
     setup_schema_fields = {
-        'length': fields.Integer(load_default=None, validate=validate.Range(5, 60)),
         'min_length': fields.Integer(load_default=None, validate=validate.Range(1)),
         'max_length': fields.Integer(load_default=None, validate=validate.Range(1)),
     }
@@ -72,7 +71,6 @@ class TextAreaField(RegistrationFormFieldBase):
     name = 'textarea'
     wtf_field_class = wtforms.StringField
     setup_schema_fields = {
-        'number_of_columns': fields.Integer(load_default=None, validate=validate.Range(1, 60)),
         'number_of_rows': fields.Integer(load_default=None, validate=validate.Range(1, 20)),
     }
 
