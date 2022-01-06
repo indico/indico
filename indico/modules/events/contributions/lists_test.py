@@ -8,7 +8,7 @@
 import pytest
 
 from indico.modules.events.contributions.lists import ContributionListGenerator
-from indico.modules.events.contributions.models.persons import ContributionPersonLink
+from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
@@ -41,25 +41,54 @@ def test_filter_contrib_entries(app, db, dummy_event, create_user, create_contri
     dummy_regform = RegistrationForm(event=dummy_event, title='Registration Form', currency='USD')
     dummy_event.registrations.append(create_registration(registered_user, dummy_regform))
     dummy_event.registrations.append(create_registration(registered_speaker, dummy_regform))
-    registered_contribution = create_contribution(dummy_event, 'Registered User', person_links=[
-        ContributionPersonLink(person=EventPerson.create_from_user(registered_user, dummy_event))
-    ])
-    speaker_contribution = create_contribution(dummy_event, 'Registered Speaker', person_links=[
+    registered_speaker_contribution = create_contribution(dummy_event, 'Registered Speaker', person_links=[
         ContributionPersonLink(person=EventPerson.create_from_user(registered_speaker, dummy_event),
                                is_speaker=True)
     ])
-    create_contribution(dummy_event, 'Unregistered User', person_links=[
-        ContributionPersonLink(person=EventPerson.create_from_user(unregistered_user, dummy_event))
-    ])
+    registered_speaker_author_contribution = create_contribution(
+        dummy_event, 'Registered Speaker Author', person_links=[
+            ContributionPersonLink(person=EventPerson.for_user(registered_speaker, dummy_event),
+                                   is_speaker=True, author_type=AuthorType.primary)
+        ])
+    unregistered_speaker_registered_author_contribution = create_contribution(
+        dummy_event, 'Unregistered Speaker, Registered Author', person_links=[
+            ContributionPersonLink(person=EventPerson.for_user(unregistered_user, dummy_event),
+                                   is_speaker=True),
+            ContributionPersonLink(person=EventPerson.for_user(registered_user, dummy_event),
+                                   author_type=AuthorType.primary)
+        ])
+    registered_speaker_unregistered_author_contribution = create_contribution(
+        dummy_event, 'Registered Speaker, Unregistered Author', person_links=[
+            ContributionPersonLink(person=EventPerson.for_user(registered_user, dummy_event), is_speaker=True),
+            ContributionPersonLink(person=EventPerson.for_user(unregistered_user, dummy_event),
+                                   author_type=AuthorType.primary)
+        ])
     # Filter contributions with registered users
     with app.test_request_context():
         list_gen = ContributionListGenerator(dummy_event)
         list_gen.list_config['filters'] = {'items': {'people': {'registered'}}}
         result = list_gen.get_list_kwargs()
-    assert result['contribs'] == [registered_contribution, speaker_contribution]
+    assert result['contribs'] == [
+        registered_speaker_contribution,
+        registered_speaker_author_contribution,
+        unregistered_speaker_registered_author_contribution,
+        registered_speaker_unregistered_author_contribution
+    ]
 
     # Filter contributions with registered speakers
     list_gen.list_config['filters'] = {'items': {'speakers': {'registered'}}}
     with app.test_request_context():
         result = list_gen.get_list_kwargs()
-    assert result['contribs'] == [speaker_contribution]
+    assert result['contribs'] == [
+        registered_speaker_contribution,
+        registered_speaker_author_contribution,
+        registered_speaker_unregistered_author_contribution
+    ]
+
+    # Filter contributions with unregistered speakers and registered users
+    list_gen.list_config['filters'] = {'items': {'speakers': {'not_registered'}, 'people': {'registered'}}}
+    with app.test_request_context():
+        result = list_gen.get_list_kwargs()
+    assert result['contribs'] == [
+        unregistered_speaker_registered_author_contribution
+    ]

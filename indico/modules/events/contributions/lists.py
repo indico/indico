@@ -68,6 +68,20 @@ class ContributionListGenerator(ListGeneratorBase):
                          db.undefer('attachment_count'),
                          db.undefer('is_scheduled')))
 
+    def _build_registration_query(self, is_speaker=False):
+        registration_join_criteria = [
+            Registration.event_id == Contribution.event_id,
+            Registration.is_active,
+            (Registration.user_id == EventPerson.user_id) | (Registration.email == EventPerson.email)
+        ]
+        if is_speaker:
+            registration_join_criteria.append(ContributionPersonLink.is_speaker)
+        return (db.session.query(Contribution.id)
+                .filter(Contribution.event_id == self.event.id)
+                .join(ContributionPersonLink)
+                .join(EventPerson)
+                .join(Registration, db.and_(*registration_join_criteria)))
+
     def _filter_list_entries(self, query, filters):
         if not filters.get('items'):
             return query
@@ -82,27 +96,24 @@ class ContributionListGenerator(ListGeneratorBase):
             if status_criteria:
                 criteria.append(db.or_(*status_criteria))
 
-        if 'people' in filters['items'] or 'speakers' in filters['items']:
-            registration_join_criteria = [
-                Registration.event_id == Contribution.event_id,
-                Registration.is_active,
-                (Registration.user_id == EventPerson.user_id) | (Registration.email == EventPerson.email)
-            ]
-            if 'speakers' in filters['items']:
-                registration_join_criteria.append(ContributionPersonLink.is_speaker)
-            contrib_query = (db.session.query(Contribution.id)
-                             .filter(Contribution.event_id == self.event.id)
-                             .join(ContributionPersonLink)
-                             .join(EventPerson)
-                             .join(Registration, db.and_(*registration_join_criteria)))
-            registered_contribs = {id_ for id_, in contrib_query}
-
+        if 'people' in filters['items']:
+            filtered_people = filters['items'].get('people')
+            contrib_query = self._build_registration_query()
             people_criteria = []
-            filtered_people = filters['items'].get('people') or filters['items'].get('speakers')
             if 'registered' in filtered_people:
-                people_criteria.append(Contribution.id.in_(registered_contribs))
+                people_criteria.append(Contribution.id.in_(contrib_query))
             if 'not_registered' in filtered_people:
-                people_criteria.append(~Contribution.id.in_(registered_contribs))
+                people_criteria.append(~Contribution.id.in_(contrib_query))
+            if people_criteria:
+                criteria.append(db.or_(*people_criteria))
+        if 'speakers' in filters['items']:
+            filtered_people = filters['items'].get('speakers')
+            contrib_query = self._build_registration_query(is_speaker=True)
+            people_criteria = []
+            if 'registered' in filtered_people:
+                people_criteria.append(Contribution.id.in_(contrib_query))
+            if 'not_registered' in filtered_people:
+                people_criteria.append(~Contribution.id.in_(contrib_query))
             if people_criteria:
                 criteria.append(db.or_(*people_criteria))
 
