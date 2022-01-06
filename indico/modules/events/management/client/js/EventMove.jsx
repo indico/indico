@@ -147,7 +147,7 @@ function EventMove({currentCategoryId, submitMove, renderTrigger, getEventCount,
                               <Param name="strong" wrapper={<strong />}>
                                 requires approval
                               </Param>{' '}
-                              by a category manager. Until approved, the events will remain in its
+                              by a category manager. Until approved, the events will remain in their
                               current category.
                             </Plural>
                           </PluralTranslate>
