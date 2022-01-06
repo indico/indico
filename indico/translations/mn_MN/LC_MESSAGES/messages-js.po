@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-10-26 12:56+0200\n"
-"PO-Revision-Date: 2021-10-26 10:58+0000\n"
+"POT-Creation-Date: 2021-11-23 13:42+0100\n"
+"PO-Revision-Date: 2021-11-23 12:43+0000\n"
 "Last-Translator: Adrian\n"
 "Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
 "MIME-Version: 1.0\n"
@@ -88,57 +88,57 @@ msgid ""
 "href=\"{0}\">Dashboard</a>."
 msgstr " <a href=\"{0}\">Хянах самбар</a> дээр тань харагдах энэхүү ангилал дотор үйл явдлуудыг үүсгэх болно."
 
-#: indico/modules/categories/client/js/management.js:53
-#: indico/modules/events/management/client/js/index.js:301
+#: indico/modules/categories/client/js/management.js:56
+#: indico/modules/events/management/client/js/index.js:295
 msgid "Undo"
 msgstr "Буцах"
 
-#: indico/modules/categories/client/js/management.js:55
+#: indico/modules/categories/client/js/management.js:58
 msgid "The category order has been restored."
 msgstr "Ангилалын дарааллыг анхны төлөвт нь оруулсан"
 
-#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/categories/client/js/management.js:60
 msgid "The category list has been sorted."
 msgstr "Ангилалын жагсаалтыг эрэмбэлсэн"
 
-#: indico/modules/categories/client/js/management.js:175
+#: indico/modules/categories/client/js/management.js:178
 msgid "Delete category"
 msgstr "Ангилалыг устгах"
 
-#: indico/modules/categories/client/js/management.js:179
+#: indico/modules/categories/client/js/management.js:182
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Энэхүү ангилал нь хоосон биш учир устгах боломжгүй"
 
-#: indico/modules/categories/client/js/management.js:187
+#: indico/modules/categories/client/js/management.js:190
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "Сонгосон ангилалуудаас дор хаяж нэг нь хоосон биш тул устгах боломжгүй."
 
-#: indico/modules/categories/client/js/management.js:192
+#: indico/modules/categories/client/js/management.js:195
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "Сонгосон ангиллыг устгах"
 msgstr[1] "{0} сонгосон ангиллуудыг устгах"
 
-#: indico/modules/categories/client/js/management.js:200
+#: indico/modules/categories/client/js/management.js:203
 msgid "Select the categories to delete first."
 msgstr "Эхлээд устгах ангилалуудыг сонгоно уу"
 
-#: indico/modules/categories/client/js/management.js:209
+#: indico/modules/categories/client/js/management.js:212
 msgid "Delete categories"
 msgstr "Ангилалуудыг устгах"
 
-#: indico/modules/categories/client/js/management.js:229
+#: indico/modules/categories/client/js/management.js:232
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "Сонгосон ангиллыг шилжүүлэх"
 msgstr[1] "{0} сонгосон ангиллуудыг шилжүүлэх"
 
-#: indico/modules/categories/client/js/management.js:236
+#: indico/modules/categories/client/js/management.js:239
 msgid "Select the categories to move first."
 msgstr "Зөөх ангилалуудыг эхлээд сонгоно уу"
 
-#: indico/modules/categories/client/js/management.js:297
+#: indico/modules/categories/client/js/management.js:268
 #: indico/modules/vc/client/js/index.js:54
 #: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
@@ -146,59 +146,39 @@ msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "*"
 msgstr[1] "Энэхүү ангилал дээрх {0} үйл явдлуудыг одоо сонгосон."
 
-#: indico/modules/categories/client/js/management.js:302
+#: indico/modules/categories/client/js/management.js:273
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "{1} үйл явдлуудаас {0}-г одоогоор сонгосон."
 msgstr[1] "{1} үйл явдлуудаас {0}-уудыг одоогоор сонгосон."
 
-#: indico/modules/categories/client/js/management.js:340
-#: indico/modules/categories/client/js/management.js:404
+#: indico/modules/categories/client/js/management.js:352
 msgid "Move here"
 msgstr "Энд зөөх"
 
-#: indico/modules/categories/client/js/management.js:341
+#: indico/modules/categories/client/js/management.js:353
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "Ангиллыг шилжүүлэх"
 msgstr[1] "Ангиллуудыг шилжүүлэх"
 
-#: indico/modules/categories/client/js/management.js:343
+#: indico/modules/categories/client/js/management.js:355
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Ангилалд зориулж шинэ ангиллын эхийг сонгох"
 msgstr[1] "{0} сонгосон ангиллуудад зориулж шинэ ангиллын эхийг сонгох"
 
-#: indico/modules/categories/client/js/management.js:359
+#: indico/modules/categories/client/js/management.js:371
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Сонгосон ангилал аль хэдийнэ энд байна"
 msgstr[1] "Сонгосон ангиллууд аль хэдийнэ энд байна"
 
-#: indico/modules/categories/client/js/management.js:367
+#: indico/modules/categories/client/js/management.js:379
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Энэ нь таны шилжүүлэхийг оролдож буй ангилал юм"
 msgstr[1] "Энэ нь таны шилжүүлэхийг оролдож буй ангиллуудын нэг юм"
-
-#: indico/modules/categories/client/js/management.js:405
-#: indico/modules/events/management/client/js/index.js:42
-msgid "Move event"
-msgid_plural "Move events"
-msgstr[0] "Үйл явдалыг зөөх"
-msgstr[1] "Үйл явдалуудыг зөөх"
-
-#: indico/modules/categories/client/js/management.js:408
-msgid "Select category destination for the event"
-msgid_plural "Select category destination for {0} selected events"
-msgstr[0] "{0} сонгосон үйл явдалд зориулж ангиллын чиглэлийг сонгох"
-msgstr[1] "{0} сонгосон үйл явдлуудад зориулж ангиллын чиглэлийг сонгох"
-
-#: indico/modules/categories/client/js/management.js:418
-msgid "The event is already here"
-msgid_plural "The selected events are already here"
-msgstr[0] "Үйл явдал аль хэдийнэ энд байна"
-msgstr[1] "Сонгосон үйл явдлууд аль хэдийнэ энд байна"
 
 #: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
@@ -341,17 +321,11 @@ msgstr "{1}-с {0}-г харуулах"
 msgid "There are no entries that match your search criteria."
 msgstr "Таны хайлтын шүүлтүүртэй тохирох мэдээлэл байхгүй байна."
 
-#: indico/modules/events/management/client/js/index.js:38
-msgid ""
-"You are about to move the event to the category \"{0}\". Are you sure you "
-"want to proceed?"
-msgstr "Та \"{0}\" ангилал руу үйл явдлыг зөөх гэж байна. Та үргэлжлүүлэхийг хүсэж байгаадаа итгэлтэй байна уу?"
-
-#: indico/modules/events/management/client/js/index.js:299
+#: indico/modules/events/management/client/js/index.js:293
 msgid "Undoing previous operation..."
 msgstr "Өмнөх үйл ажиллагааг цуцалж байна..."
 
-#: indico/modules/events/registration/client/js/index.js:52
+#: indico/modules/events/registration/client/js/index.js:59
 #: indico/modules/events/registration/client/js/registration.js:39
 msgid "Terms and Conditions"
 msgstr "Үйлчилнгээний Нөхцөлүүд"
@@ -615,7 +589,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "Танд алдагдах хадгалагдаагүй өөрчлөлтүүд байна."
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:696
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "Үйлдэлийг батлах"
 
@@ -745,81 +719,89 @@ msgid "Select a category"
 msgstr "Ангилал сонгох"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:35
+msgid "Not possible for categories where you cannot propose events"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:39
+msgid "Not possible for categories where you cannot propose/create events"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:43
 msgid "Not possible for categories where you cannot create events"
 msgstr "Үйл явдлуудыг үүсгэж чадахгүй ангиллууд дээр боломжгүй"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:41
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:49
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "\"{0}\" ангиллаас доошилж буй ангиллууд дээр боломжгүй"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:45
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
 msgid "Not possible for this category"
 msgstr "Энэхүү ангилал дээр боломжгүй"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:134
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:142
 msgid "Search"
 msgstr "Хайх"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:191
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:199
 msgid "Go to: {0}"
 msgstr "Очих: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:228
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:236
 msgid "This category is protected"
 msgstr "Энэхүү ангиллыг хамгаалсан"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:276
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:284
 msgid "Go to parent: {0}"
 msgstr "Эх файл руу очих: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:325
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:333
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "Та зөвхөн үүнийг <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> хийнэ."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:330
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
-" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a class"
-"=\"js-search\">search</a>."
+" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
+"class=\"js-search\">search</a>."
 msgstr "Та энэхүү зүйлийг<a class=\"js-action\" data-category-id=\"{0}\">{1}</a>-ж, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">дээш залуурдан</a> эсвэл <a class=\"js-search\">хайж</a>болно."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:346
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "Та <a class=\"js-navigate-up\" data-parent-id=\"{2}\"> дээш залуурдан</a>эсвэл <a class=\"js-search\">хайж </a>болно."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:353
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:361
 msgid "Your search doesn't match any category"
 msgstr "Таны хайлт ямар ч ангилалтай тохирсонгүй."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:358
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:366
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "Та хайлтаа <a class=\"js-search\">өөрчилж </a>, эсвэл <a class=\"js-clear-search\">устгаж</a> болно."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:432
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:440
 msgid "In favorite categories"
 msgstr "Дуртай ангилал дотор"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:439
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:447
 msgid "Search result"
 msgstr "Хайлтын үр дүн"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:460
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:468
 msgid "Displaying {0} out of {1} results."
 msgstr "{1} үр дүнгүүдээс {0}-г харуулж байна."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:461
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:469
 msgid "There are no results."
 msgstr "Үр дүн олдсонгүй."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:478
 msgid "Clear search"
 msgstr "Хайлтаа арилгах"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:694
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:702
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Та ангилал <em>{0}</em>-г сонгосон. Та үргэлжлүүлэхийг хүсэж байгаадаа итгэлтэй байна уу?"
 
@@ -915,61 +897,61 @@ msgstr "{0}-с доош байх ёстой"
 msgid "Please fill in the required fields."
 msgstr "Шаардагдах талбарыг бөглөнө үү."
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:171
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
 msgid "IP networks cannot have management permissions"
 msgstr "IP сүлжээнүүдэд удирдлагын зөвшөөрөл шаардлагагүй"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:173
 msgid "Registrants cannot have management permissions"
 msgstr "Бүртгүүлэгчдэд удирдлагын зөвшөөрөл шаардлагагүй"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:184
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
 msgid "Assign Permissions"
 msgstr "Зөвшөөрөл оноох"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:201
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
 msgid "Delete entry '{0}'"
 msgstr "'{0}' мэдээллийг устгах"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Та өөрийгөө жагсаалтаас хасахыг хүсэж байгаад итгэлтэй байна уу?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:286
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
 msgid "All options have been added"
 msgstr "Бүх сонголтыг нэмлээ. "
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:317
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
 msgid "This entry was already added"
 msgstr "Мэдээллийг аль хэдийнэ нэмсэн байна"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:350
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
 msgid "Anonymous"
 msgstr "Нэр нь тодорхойгүй"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:359
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
 msgid "Additional users"
 msgstr "Нэмэлт хэрэглэгчид"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:363
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} хэрэглэгч бусад үүргийн улмаас хандалтыг далдаар уншдаг"
 msgstr[1] "{0} хэрэглэгчид бусад үүргийн улмаас хандалтыг далдаар уншдаг"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:379
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
 msgid "Category Managers"
 msgstr "Ангиллын менежерүүд"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:381
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Parent Category Managers"
 msgstr "Эх ангиллын менежерүүд"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:383
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Event Managers"
 msgstr "Үйл явдлын менежерүүд"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:400
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
 msgid "Registrants in \"{0}\""
 msgstr "\"{0}\" дээрх бүртгүүлэгчид"
 
