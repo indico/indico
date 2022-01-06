@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-10-26 12:56+0200\n"
-"PO-Revision-Date: 2021-10-26 10:58+0000\n"
+"POT-Creation-Date: 2021-11-23 13:42+0100\n"
+"PO-Revision-Date: 2021-11-23 12:43+0000\n"
 "Last-Translator: Adrian\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -85,106 +85,89 @@ msgid ""
 "href=\"{0}\">Dashboard</a>."
 msgstr "这将使此类别中的事件在您的 <a href=\"{0}\"> 面板 </a> 上可见。"
 
-#: indico/modules/categories/client/js/management.js:53
-#: indico/modules/events/management/client/js/index.js:301
+#: indico/modules/categories/client/js/management.js:56
+#: indico/modules/events/management/client/js/index.js:295
 msgid "Undo"
 msgstr "撤销"
 
-#: indico/modules/categories/client/js/management.js:55
+#: indico/modules/categories/client/js/management.js:58
 msgid "The category order has been restored."
 msgstr "类别的次序已还原。"
 
-#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/categories/client/js/management.js:60
 msgid "The category list has been sorted."
 msgstr "类别列表已排序。"
 
-#: indico/modules/categories/client/js/management.js:175
+#: indico/modules/categories/client/js/management.js:178
 msgid "Delete category"
 msgstr "删除类别"
 
-#: indico/modules/categories/client/js/management.js:179
+#: indico/modules/categories/client/js/management.js:182
 msgid "This category cannot be deleted because it is not empty."
 msgstr "这个类别不能删除因为它不为空。"
 
-#: indico/modules/categories/client/js/management.js:187
+#: indico/modules/categories/client/js/management.js:190
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "至少一个已选类别不能被删除因为它不为空。"
 
-#: indico/modules/categories/client/js/management.js:192
+#: indico/modules/categories/client/js/management.js:195
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "删除{0}个已选类别"
 
-#: indico/modules/categories/client/js/management.js:200
+#: indico/modules/categories/client/js/management.js:203
 msgid "Select the categories to delete first."
 msgstr "先选择要删除的类别。"
 
-#: indico/modules/categories/client/js/management.js:209
+#: indico/modules/categories/client/js/management.js:212
 msgid "Delete categories"
 msgstr "删除类别"
 
-#: indico/modules/categories/client/js/management.js:229
+#: indico/modules/categories/client/js/management.js:232
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "移动 {0} 个已选类别"
 
-#: indico/modules/categories/client/js/management.js:236
+#: indico/modules/categories/client/js/management.js:239
 msgid "Select the categories to move first."
 msgstr "先选择要移动的类别"
 
-#: indico/modules/categories/client/js/management.js:297
+#: indico/modules/categories/client/js/management.js:268
 #: indico/modules/vc/client/js/index.js:54
 #: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "当前已选择此类别中的所有{0}个事件。"
 
-#: indico/modules/categories/client/js/management.js:302
+#: indico/modules/categories/client/js/management.js:273
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "当前只选择了{1}个事件中的{0}个。"
 
-#: indico/modules/categories/client/js/management.js:340
-#: indico/modules/categories/client/js/management.js:404
+#: indico/modules/categories/client/js/management.js:352
 msgid "Move here"
 msgstr "移到这里"
 
-#: indico/modules/categories/client/js/management.js:341
+#: indico/modules/categories/client/js/management.js:353
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "移动类别"
 
-#: indico/modules/categories/client/js/management.js:343
+#: indico/modules/categories/client/js/management.js:355
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "为选出的{0}个类别选择新的父类别"
 
-#: indico/modules/categories/client/js/management.js:359
+#: indico/modules/categories/client/js/management.js:371
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "所选类别已在此处"
 
-#: indico/modules/categories/client/js/management.js:367
+#: indico/modules/categories/client/js/management.js:379
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "这是您试图移动的类别中的一个"
-
-#: indico/modules/categories/client/js/management.js:405
-#: indico/modules/events/management/client/js/index.js:42
-msgid "Move event"
-msgid_plural "Move events"
-msgstr[0] "移动事件"
-
-#: indico/modules/categories/client/js/management.js:408
-msgid "Select category destination for the event"
-msgid_plural "Select category destination for {0} selected events"
-msgstr[0] "为 {0} 个选中事件选择类别目的地"
-
-#: indico/modules/categories/client/js/management.js:418
-msgid "The event is already here"
-msgid_plural "The selected events are already here"
-msgstr[0] "选中事件已经在这儿了"
 
 #: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
@@ -327,17 +310,11 @@ msgstr "显示 {0} 个 共 {1} 个"
 msgid "There are no entries that match your search criteria."
 msgstr "没有符合查询条件的条目。"
 
-#: indico/modules/events/management/client/js/index.js:38
-msgid ""
-"You are about to move the event to the category \"{0}\". Are you sure you "
-"want to proceed?"
-msgstr "您将要移动事件到类别 \"{0}\"。您确定要继续吗？"
-
-#: indico/modules/events/management/client/js/index.js:299
+#: indico/modules/events/management/client/js/index.js:293
 msgid "Undoing previous operation..."
 msgstr "撤销前面的操作..."
 
-#: indico/modules/events/registration/client/js/index.js:52
+#: indico/modules/events/registration/client/js/index.js:59
 #: indico/modules/events/registration/client/js/registration.js:39
 msgid "Terms and Conditions"
 msgstr "条款和条件"
@@ -600,7 +577,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "您尚未保存的更改将丢失。"
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:696
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "确认操作"
 
@@ -725,81 +702,89 @@ msgid "Select a category"
 msgstr "选择类别"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:35
+msgid "Not possible for categories where you cannot propose events"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:39
+msgid "Not possible for categories where you cannot propose/create events"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:43
 msgid "Not possible for categories where you cannot create events"
 msgstr "不适用于不能建立事件的类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:41
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:49
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "不适用于从类别 \"{0}\" 降序的类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:45
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
 msgid "Not possible for this category"
 msgstr "不适用此类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:134
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:142
 msgid "Search"
 msgstr "查询"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:191
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:199
 msgid "Go to: {0}"
 msgstr "转到：{0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:228
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:236
 msgid "This category is protected"
 msgstr "此类别是受保护的"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:276
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:284
 msgid "Go to parent: {0}"
 msgstr "转到父级: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:325
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:333
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "您只可以 <a class=\"js-action\" data-category-id=\"{0}\"> {1} </a> 这个。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:330
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
-" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a class"
-"=\"js-search\">search</a>."
+" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
+"class=\"js-search\">search</a>."
 msgstr "您可以 <a class=\"js-action\" data-category-id=\"{0}\"> {1} </a> 此类别，<a class=\"js-navigate-up\" data-parent-id=\"{2}\"> 向上导航 </a> 或 <a class=\"js-search\"> 搜索 </a>。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:346
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "你可以 <a class=\"js-navigate-up\" data-parent-id=\"{2}\"> 向上导航 </a> 或 <a class=\"js-search\"> 搜索 </a>。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:353
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:361
 msgid "Your search doesn't match any category"
 msgstr "你的搜索与任何类别都不匹配"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:358
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:366
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "你可以 <a class=\"js-search\"> 修改 </a> 或 <a class=\"js-clear-search\"> 清除 </a> 你的搜索。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:432
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:440
 msgid "In favorite categories"
 msgstr "在收藏的类别中"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:439
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:447
 msgid "Search result"
 msgstr "查询结果"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:460
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:468
 msgid "Displaying {0} out of {1} results."
 msgstr "显示 {1} 个结果中的 {0}个。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:461
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:469
 msgid "There are no results."
 msgstr "无结果。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:478
 msgid "Clear search"
 msgstr "清空查询"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:694
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:702
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "你选择了类别 <em> {0} </em>。 你确定要继续吗？"
 
@@ -893,60 +878,60 @@ msgstr "必须是 {0} 以下"
 msgid "Please fill in the required fields."
 msgstr "请填写所需字段。"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:171
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
 msgid "IP networks cannot have management permissions"
 msgstr "IP 网络不能有管理权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:173
 msgid "Registrants cannot have management permissions"
 msgstr "注册人不能具有管理权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:184
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
 msgid "Assign Permissions"
 msgstr "赋予权限   "
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:201
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
 msgid "Delete entry '{0}'"
 msgstr "删除第 '{0}' 条"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "您确定要从列表中删除你自己？"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:286
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
 msgid "All options have been added"
 msgstr "所有选项已添加"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:317
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
 msgid "This entry was already added"
 msgstr "此条目已被添加"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:350
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
 msgid "Anonymous"
 msgstr "匿名"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:359
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
 msgid "Additional users"
 msgstr "其他用户"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:363
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} 个用户由于其他角色具有隐式读取权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:379
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
 msgid "Category Managers"
 msgstr "类别管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:381
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Parent Category Managers"
 msgstr "父类别管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:383
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Event Managers"
 msgstr "事件管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:400
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
 msgid "Registrants in \"{0}\""
 msgstr "\"{0}\" 中的注册人"
 
