@@ -6,7 +6,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-10-21 12:56+0200\n"
+"POT-Creation-Date: 2021-11-21 13:42+0100\n"
 "Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/indico/teams/6478/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -17,8 +17,70 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: indico/modules/categories/client/js/base.jsx:28
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:155
 msgid "Category"
 msgstr "Kategori"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:79
+msgid "Unlisted event"
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:145
+msgid "There are no event move requests."
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:153
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:471
+#: indico/web/client/js/react/components/principals/Search.jsx:558
+msgid "User"
+msgstr "Kullanıcı"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:154
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
+msgid "Event"
+msgstr "Etkinlik"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:156
+msgid "Event Date"
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:157
+msgid "Requested Date"
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:184
+msgid "Approve"
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:187
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:77
+#: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:56
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:101
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:62
+msgid "or"
+msgstr "veya"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:192
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:635
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:110
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:160
+msgid "Provide the rejection reason"
+msgstr "Red nedenini sunun"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:196
+msgid "and"
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:199
+#: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:72
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:35
+#: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:35
+#: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:56
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:658
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:123
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:172
+msgid "Reject"
+msgstr "Reddet"
 
 #: indico/modules/categories/client/js/components/CategoryStatistics.jsx:67
 #: indico/modules/search/client/js/components/SearchApp.jsx:268
@@ -134,6 +196,7 @@ msgstr "Mevcut PDF'yi sil"
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:82
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:118
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
+#: indico/modules/events/management/client/js/EventMove.jsx:180
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
 #: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
@@ -224,16 +287,13 @@ msgid "Export"
 msgstr "Dışa aktar"
 
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
-msgid "Publish now"
-msgstr "Şimdi yayınla"
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:21
+msgid "Publish contributions"
+msgstr "Katkıları yayımla"
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:20
 msgid "Set contribution list in draft mode"
 msgstr "Taslak modunda katkı listesi ayarla"
-
-#: indico/modules/events/contributions/client/js/PublicationModal.jsx:21
-msgid "Publish contributions"
-msgstr "Katkıları yayımla"
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:28
 msgid ""
@@ -284,6 +344,7 @@ msgstr "Özet Defteri"
 #: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:169
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:67
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:43
+#: indico/web/client/js/react/components/WTFButtonsBooleanField.jsx:55
 msgid "No"
 msgstr "Hayır"
 
@@ -294,6 +355,7 @@ msgstr "Hayır"
 #: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:168
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:61
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:43
+#: indico/web/client/js/react/components/WTFButtonsBooleanField.jsx:54
 msgid "Yes"
 msgstr "Evet"
 
@@ -380,16 +442,6 @@ msgstr "Dilerseniz bir yorum bırakabilirsiniz"
 msgid "Accept"
 msgstr "Kabul et"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:72
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:35
-#: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:35
-#: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:56
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:658
-#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:123
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:172
-msgid "Reject"
-msgstr "Reddet"
-
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:54
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:55
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:63
@@ -403,6 +455,7 @@ msgid "Restrict visibility of this comment to other editors"
 msgstr "Bu yorumun görünürlüğünü diğer editörlere kısıtla"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
+#: indico/modules/events/management/client/js/EventMove.jsx:158
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
@@ -537,13 +590,6 @@ msgstr "Değişiklik yap"
 msgid "Request changes"
 msgstr "Değişiklik iste"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:77
-#: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:56
-#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:101
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:62
-msgid "or"
-msgstr "veya"
-
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:81
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:93
 msgid "Judge"
@@ -621,6 +667,7 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:67
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:33
+#: indico/modules/events/management/client/js/EventMove.jsx:172
 #: indico/web/client/js/react/components/RequestConfirm.jsx:60
 #: indico/web/client/js/react/components/principals/Search.jsx:477
 msgid "Confirm"
@@ -728,6 +775,7 @@ msgstr "Düzenlenebilir türlerini değiştir"
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:27
 #: indico/modules/events/editing/client/js/management/tags/index.js:23
+#: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:70
 msgid "Tags"
 msgstr "Etiketler"
 
@@ -1321,41 +1369,92 @@ msgstr "Sonraki postere geç"
 msgid "Get next slides"
 msgstr "Sonraki slaytlara geç"
 
-#: indico/modules/events/logs/client/js/components/EventLog.jsx:28
-msgid ""
-"Log entries are currently filtered by URL. {link}Click here{/link} to "
-"disable the filter."
+#: indico/modules/events/management/client/js/EventMove.jsx:27
+msgid "Publish event"
 msgstr ""
-"Günlük girileri şu anda URL ile süzgeçlenmektedir. {link}Süzgeci devre dışı "
-"bırakmak için buraya tıklayın{/link}."
 
-#: indico/modules/events/logs/client/js/components/Filter.jsx:26
-msgid "Show"
-msgstr "Göster"
+#: indico/modules/events/management/client/js/EventMove.jsx:29
+msgid "Move events"
+msgstr ""
 
-#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:40
-msgid "This email is pending and will be sent soon."
-msgstr "E-posta beklemektedir ve yakında gönderilecektir."
+#: indico/modules/events/management/client/js/EventMove.jsx:31
+msgid "Move event"
+msgstr ""
 
-#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:46
-msgid "This email has been sent."
-msgstr "Bu e-posta gönderildi"
+#: indico/modules/events/management/client/js/EventMove.jsx:39
+msgid "Select destination category for the selected events"
+msgstr ""
 
-#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:52
-msgid "Sending this email failed."
-msgstr "Bu e-postanın gönderilmesi başarısız oldu."
+#: indico/modules/events/management/client/js/EventMove.jsx:40
+msgid "Select destination category for the event"
+msgstr ""
 
-#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:130
-msgid "Previous"
-msgstr "Önceki"
+#: indico/modules/events/management/client/js/EventMove.jsx:48
+msgid "The event is already in this category"
+msgstr ""
 
-#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:134
-msgid "Related entries"
-msgstr "İlgili giriler"
+#: indico/modules/events/management/client/js/EventMove.jsx:88
+msgid "Confirm event move"
+msgstr ""
 
-#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:143
-msgid "Next"
-msgstr "Sonraki"
+#: indico/modules/events/management/client/js/EventMove.jsx:93
+msgid "You are about to publish this event to {target}."
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:103
+msgid "You are about to move this event to {target}."
+msgid_plural "You are about to move {count} events to {target}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:136
+msgid ""
+"Moving an event there {strong}requires approval{/strong} by a category "
+"manager. Until approved, the event will remain in its current category."
+msgid_plural ""
+"Moving events there {strong}requires approval{/strong} by a category "
+"manager. Until approved, the events will remain in its current category."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:160
+msgid ""
+"You can provide a comment to the category managers to help them decide "
+"whether to approve your request."
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:177
+msgid "Change category"
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:231
+msgid "Event has a pending move request"
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:232
+#: indico/modules/events/management/client/js/EventMove.jsx:241
+msgid "Move event to another category"
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:245
+msgid "Move"
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:293
+msgid "Move selected events to another category"
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:333
+msgid "Event has a pending publish request"
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:334
+msgid "Publish event to a category"
+msgstr ""
+
+#: indico/modules/events/management/client/js/EventMove.jsx:339
+msgid "Publish"
+msgstr ""
 
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:56
 msgid "Visible only to judges"
@@ -1543,6 +1642,20 @@ msgstr "Bir kullanıcı"
 msgid "{submitterName} submitted paper revision {revisionNumber}"
 msgstr "{submitterName} makale düzeltmesi sundu {revisionNumber}"
 
+#: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:60
+#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:60
+#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:147
+msgid "Add"
+msgstr "Ekle"
+
+#: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:77
+msgid "No tags assigned."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:105
+msgid "Add tags"
+msgstr ""
+
 #: indico/modules/events/sessions/client/js/session_display.jsx:22
 msgid "Session"
 msgstr "Oturum"
@@ -1550,6 +1663,42 @@ msgstr "Oturum"
 #: indico/modules/events/sessions/client/js/session_display.jsx:26
 msgid "Detailed timetable"
 msgstr "Detaylı zaman çizelgesi"
+
+#: indico/modules/logs/client/js/components/EventLog.jsx:28
+msgid ""
+"Log entries are currently filtered by URL. {link}Click here{/link} to "
+"disable the filter."
+msgstr ""
+"Günlük girileri şu anda URL ile süzgeçlenmektedir. {link}Süzgeci devre dışı "
+"bırakmak için buraya tıklayın{/link}."
+
+#: indico/modules/logs/client/js/components/Filter.jsx:26
+msgid "Show"
+msgstr "Göster"
+
+#: indico/modules/logs/client/js/components/LogEntryList.jsx:40
+msgid "This email is pending and will be sent soon."
+msgstr "E-posta beklemektedir ve yakında gönderilecektir."
+
+#: indico/modules/logs/client/js/components/LogEntryList.jsx:46
+msgid "This email has been sent."
+msgstr "Bu e-posta gönderildi"
+
+#: indico/modules/logs/client/js/components/LogEntryList.jsx:52
+msgid "Sending this email failed."
+msgstr "Bu e-postanın gönderilmesi başarısız oldu."
+
+#: indico/modules/logs/client/js/components/LogEntryModal.jsx:130
+msgid "Previous"
+msgstr "Önceki"
+
+#: indico/modules/logs/client/js/components/LogEntryModal.jsx:134
+msgid "Related entries"
+msgstr "İlgili giriler"
+
+#: indico/modules/logs/client/js/components/LogEntryModal.jsx:143
+msgid "Next"
+msgstr "Sonraki"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:120
 msgid "Booked for"
@@ -1682,12 +1831,6 @@ msgstr "Bu rezervasyonu silmek istediğinizden emin misiniz?"
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:611
 msgid "Reject booking"
 msgstr "Rezervasyonu reddet"
-
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:635
-#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:110
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:160
-msgid "Provide the rejection reason"
-msgstr "Red nedenini sunun"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:643
 msgid "I understand that this will reject all occurrences of the booking."
@@ -2648,11 +2791,6 @@ msgstr "Lütfen bir kategori kimliği girin"
 msgid "Add category"
 msgstr "Kategori ekle"
 
-#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:60
-#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:147
-msgid "Add"
-msgstr "Ekle"
-
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:41
 msgid "This equipment type provides the {name} feature."
 msgstr "Bu donatım türü, {name} özelliği sağlar."
@@ -3185,10 +3323,6 @@ msgstr "Bir neden sunmanız gerekmektedir"
 msgid "Choose an event"
 msgstr "Bir etkinlik seç"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
-msgid "Event"
-msgstr "Etkinlik"
-
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:466
 msgid ""
 "You have an event taking place during the selected time. If you are booking "
@@ -3715,12 +3849,7 @@ msgstr "Yakınlardaki etkinlikler"
 msgid "Everything"
 msgstr "Her şey"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:466
-#: indico/web/client/js/react/components/principals/Search.jsx:558
-msgid "User"
-msgstr "Kullanıcı"
-
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:472
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:477
 #: indico/web/client/js/react/components/principals/Search.jsx:691
 msgid "Group"
 msgstr "Grup"
@@ -3787,6 +3916,10 @@ msgstr "Tarihi temizle"
 #: indico/web/client/js/react/components/WTFDateTimeField.jsx:208
 msgid "Clear date and time"
 msgstr "Tarih ve saati temizle"
+
+#: indico/web/client/js/react/components/WTFMultipleTagSelectField.jsx:51
+msgid "Choose an option"
+msgstr ""
 
 #: indico/web/client/js/react/components/WTFOccurrencesField.jsx:82
 msgid "Add occurrence"

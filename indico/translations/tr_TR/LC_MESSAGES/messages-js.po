@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-10-26 12:56+0200\n"
-"PO-Revision-Date: 2021-10-26 10:58+0000\n"
+"POT-Creation-Date: 2021-11-23 13:42+0100\n"
+"PO-Revision-Date: 2021-11-23 12:43+0000\n"
 "Last-Translator: Adrian\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/indico/indico/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -88,57 +88,57 @@ msgid ""
 "href=\"{0}\">Dashboard</a>."
 msgstr "Bu, bu kategorideki etkinlikleri <a href=\"{0}\">Gösterge Paneliniz</a>  üzerinde görünür hale getirecektir."
 
-#: indico/modules/categories/client/js/management.js:53
-#: indico/modules/events/management/client/js/index.js:301
+#: indico/modules/categories/client/js/management.js:56
+#: indico/modules/events/management/client/js/index.js:295
 msgid "Undo"
 msgstr "Geri al"
 
-#: indico/modules/categories/client/js/management.js:55
+#: indico/modules/categories/client/js/management.js:58
 msgid "The category order has been restored."
 msgstr "Kategori düzeni geri yüklendi."
 
-#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/categories/client/js/management.js:60
 msgid "The category list has been sorted."
 msgstr "Kategori listesi sıralandı"
 
-#: indico/modules/categories/client/js/management.js:175
+#: indico/modules/categories/client/js/management.js:178
 msgid "Delete category"
 msgstr "Kategoriyi sil"
 
-#: indico/modules/categories/client/js/management.js:179
+#: indico/modules/categories/client/js/management.js:182
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Bu kategori, boş olmadığı için silinemez."
 
-#: indico/modules/categories/client/js/management.js:187
+#: indico/modules/categories/client/js/management.js:190
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "En az bir seçili kategori, boş olmadığı için silinemez."
 
-#: indico/modules/categories/client/js/management.js:192
+#: indico/modules/categories/client/js/management.js:195
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "Seçili kategoriyi sil"
 msgstr[1] "Seçili {0} Kategorileri Sil"
 
-#: indico/modules/categories/client/js/management.js:200
+#: indico/modules/categories/client/js/management.js:203
 msgid "Select the categories to delete first."
 msgstr "İlk önce silinecek kategorileri seçin."
 
-#: indico/modules/categories/client/js/management.js:209
+#: indico/modules/categories/client/js/management.js:212
 msgid "Delete categories"
 msgstr "Kategorileri sil"
 
-#: indico/modules/categories/client/js/management.js:229
+#: indico/modules/categories/client/js/management.js:232
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "Seçili kategoriyi taşı"
 msgstr[1] "{0} seçili kategorileri taşı"
 
-#: indico/modules/categories/client/js/management.js:236
+#: indico/modules/categories/client/js/management.js:239
 msgid "Select the categories to move first."
 msgstr "İlk önce taşınacak kategorileri seçin."
 
-#: indico/modules/categories/client/js/management.js:297
+#: indico/modules/categories/client/js/management.js:268
 #: indico/modules/vc/client/js/index.js:54
 #: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
@@ -146,59 +146,39 @@ msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "*"
 msgstr[1] "Bu kategorideki tüm {0} etkinlikler şu anda seçili durumdadır."
 
-#: indico/modules/categories/client/js/management.js:302
+#: indico/modules/categories/client/js/management.js:273
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "Şu anda yalnızca {1} olaydan {0} tanesi seçilidir."
 msgstr[1] "Şu anda yalnızca {1} etkinlikten {0} tanesi seçilidir."
 
-#: indico/modules/categories/client/js/management.js:340
-#: indico/modules/categories/client/js/management.js:404
+#: indico/modules/categories/client/js/management.js:352
 msgid "Move here"
 msgstr "Buraya taşı"
 
-#: indico/modules/categories/client/js/management.js:341
+#: indico/modules/categories/client/js/management.js:353
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "Kategorileri taşı"
 msgstr[1] "Kategorileri taşı"
 
-#: indico/modules/categories/client/js/management.js:343
+#: indico/modules/categories/client/js/management.js:355
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Kategori için yeni kategori üst öğesi seçin"
 msgstr[1] "{0} seçili kategori için yeni kategori üst öğesini seç"
 
-#: indico/modules/categories/client/js/management.js:359
+#: indico/modules/categories/client/js/management.js:371
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Seçilen kategoriler zaten buradalar"
 msgstr[1] "Seçilen kategoriler zaten buradalar"
 
-#: indico/modules/categories/client/js/management.js:367
+#: indico/modules/categories/client/js/management.js:379
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Bu, taşımaya çalıştığınız kategorilerden biridir"
 msgstr[1] "Bu, taşımaya çalıştığınız kategorilerden biridir"
-
-#: indico/modules/categories/client/js/management.js:405
-#: indico/modules/events/management/client/js/index.js:42
-msgid "Move event"
-msgid_plural "Move events"
-msgstr[0] "Olayları taşı"
-msgstr[1] "Etkinlikleri taşı"
-
-#: indico/modules/categories/client/js/management.js:408
-msgid "Select category destination for the event"
-msgid_plural "Select category destination for {0} selected events"
-msgstr[0] "Etkinlik için kategoriyi seçin"
-msgstr[1] "{0} seçili etkinlik için kategori varış adresini seç"
-
-#: indico/modules/categories/client/js/management.js:418
-msgid "The event is already here"
-msgid_plural "The selected events are already here"
-msgstr[0] "Seçilen olaylar zaten buradalar"
-msgstr[1] "Seçilen etkinlikler zaten buradalar"
 
 #: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
@@ -341,17 +321,11 @@ msgstr " {1} taneden {0} tanesi görüntülendi"
 msgid "There are no entries that match your search criteria."
 msgstr "Arama kriterlerinizle eşleşen hiçbir giriş yok."
 
-#: indico/modules/events/management/client/js/index.js:38
-msgid ""
-"You are about to move the event to the category \"{0}\". Are you sure you "
-"want to proceed?"
-msgstr "Bu etkinliği \"{0}\" kategorisine taşımak üzeresiniz. İlerlemek istediğinizden emin misiniz?"
-
-#: indico/modules/events/management/client/js/index.js:299
+#: indico/modules/events/management/client/js/index.js:293
 msgid "Undoing previous operation..."
 msgstr "Önceki işlemi geri alıyor..."
 
-#: indico/modules/events/registration/client/js/index.js:52
+#: indico/modules/events/registration/client/js/index.js:59
 #: indico/modules/events/registration/client/js/registration.js:39
 msgid "Terms and Conditions"
 msgstr "Hüküm ve Koşullar"
@@ -615,7 +589,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "Kaybedilecek kaydedilmemiş değişiklikleriniz var."
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:696
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "Eylemi onayla"
 
@@ -745,81 +719,89 @@ msgid "Select a category"
 msgstr "Bir kategori seç"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:35
+msgid "Not possible for categories where you cannot propose events"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:39
+msgid "Not possible for categories where you cannot propose/create events"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:43
 msgid "Not possible for categories where you cannot create events"
 msgstr "Etkinlik oluşturamayacağınız kategoriler için mümkün değildir"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:41
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:49
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "\"{0}\" kategorisinden aşağıdaki kategoriler için mümkün değildir"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:45
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
 msgid "Not possible for this category"
 msgstr "Bu kategori için mümkün değildir"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:134
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:142
 msgid "Search"
 msgstr "Ara"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:191
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:199
 msgid "Go to: {0}"
 msgstr "Git: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:228
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:236
 msgid "This category is protected"
 msgstr "Bu kategori korunmaktadır"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:276
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:284
 msgid "Go to parent: {0}"
 msgstr "Üste git: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:325
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:333
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "Bunu yalnızca <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> yapabilirsiniz."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:330
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
-" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a class"
-"=\"js-search\">search</a>."
+" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
+"class=\"js-search\">search</a>."
 msgstr "Bunu <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> yapabilir, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">gezebilir</a> veya<a class=\"js-search\">arayabilirsiniz</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:346
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "<a class=\"js-navigate-up\" data-parent-id=\"{2}\">Yukarıda gezebilir</a> veya<a class=\"js-search\">arayabilirsiniz</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:353
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:361
 msgid "Your search doesn't match any category"
 msgstr "Aramanız hiçbir kategori ile eşleşmiyor."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:358
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:366
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "Aramanızı <a class=\"js-search\">değiştirebilir</a> veya<a class=\"js-clear-search\">temizleyebilirsiniz</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:432
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:440
 msgid "In favorite categories"
 msgstr "Favori kategorilerde"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:439
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:447
 msgid "Search result"
 msgstr "Arama sonucu"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:460
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:468
 msgid "Displaying {0} out of {1} results."
 msgstr "{1} sonuçtan {0} tanesini görüntülüyor."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:461
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:469
 msgid "There are no results."
 msgstr "Hiçbir sonuç yok."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:478
 msgid "Clear search"
 msgstr "Aramayı temizle"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:694
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:702
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Seçili kategoriniz <em>{0}</em>. İlerlemek istediğinize emin misiniz?"
 
@@ -915,61 +897,61 @@ msgstr "{0} altında olmalı"
 msgid "Please fill in the required fields."
 msgstr "Lütfen gereken boşlukları doldurun."
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:171
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
 msgid "IP networks cannot have management permissions"
 msgstr "IP ağları yönetim izinleri sahip olamaz"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:173
 msgid "Registrants cannot have management permissions"
 msgstr "Kaydettirenler yönetim izinlerine sahip olamaz"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:184
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
 msgid "Assign Permissions"
 msgstr "İzinleri Ata"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:201
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
 msgid "Delete entry '{0}'"
 msgstr "'{0}' girisini sil"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Kendinizi listeden çıkarmak istediğinize emin misiniz?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:286
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
 msgid "All options have been added"
 msgstr "Tüm seçenekler eklendi"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:317
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
 msgid "This entry was already added"
 msgstr "Bu giri zaten eklendi"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:350
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
 msgid "Anonymous"
 msgstr "Adsız"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:359
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
 msgid "Additional users"
 msgstr "İlave kullanıcılar"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:363
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "Diğer roller yüzünden {0} kullanıcı örtük okuma erişimine sahiptir"
 msgstr[1] "Diğer roller yüzünden {0} kullanıcı örtük okuma erişimine sahiptir"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:379
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
 msgid "Category Managers"
 msgstr "Kategori Yöneticileri"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:381
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Parent Category Managers"
 msgstr "Üst Kategori Yöneticileri"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:383
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Event Managers"
 msgstr "Etkinlik Yöneticileri"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:400
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
 msgid "Registrants in \"{0}\""
 msgstr "\"{0}\" içindeki kaydettirenler "
 
