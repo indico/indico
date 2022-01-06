@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Checkbox, Form, Label} from 'semantic-ui-react';
 
@@ -16,12 +16,18 @@ import '../../../styles/regform.module.scss';
 
 export default function CheckboxInput({htmlName, disabled, title, isRequired, price}) {
   const currency = useSelector(getCurrency);
+  const [checked, setChecked] = useState(false);
 
   return (
     <Form.Field required={isRequired} disabled={disabled} styleName="field">
-      <Checkbox name={htmlName} label={title} />
+      <Checkbox
+        name={htmlName}
+        label={title}
+        checked={checked}
+        onClick={() => setChecked(!checked)}
+      />
       {!!price && (
-        <Label pointing="left" styleName="price-tag">
+        <Label pointing="left" styleName={`price-tag ${!checked ? 'greyed' : ''}`}>
           {price.toFixed(2)} {currency}
         </Label>
       )}

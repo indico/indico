@@ -65,6 +65,10 @@
         margin-left: 2em;
       }
 
+      .greyed {
+        color: rgba(0, 0, 0, 0.2);
+      }
+
       .number-field,
       .boolean-field {
         display: flex;

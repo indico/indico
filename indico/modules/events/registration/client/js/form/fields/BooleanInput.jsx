@@ -49,8 +49,8 @@ export default function BooleanInput({
             <Translate>No</Translate>
           </Button>
         </Button.Group>
-        {!!price && value === 'yes' && (
-          <Label pointing="left" styleName="price-tag">
+        {!!price && (
+          <Label pointing="left" styleName={`price-tag ${value === 'no' ? 'greyed' : ''}`}>
             {price.toFixed(2)} {currency}
           </Label>
         )}
