@@ -9,13 +9,13 @@
 # Jean-René Rouet <rouet@in2p3.fr>, 2017
 # Thomas Baron <thomas.baron@cern.ch>, 2013-2015
 # Thomas Baron <thomas.baron@cern.ch>, 2011, 2012
-# Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2021
+# Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2022
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-11-23 13:42+0100\n"
-"PO-Revision-Date: 2021-11-23 19:55+0000\n"
+"POT-Creation-Date: 2021-12-13 13:18+0100\n"
+"PO-Revision-Date: 2022-01-06 13:23+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -56,7 +56,7 @@ msgstr "Aujourd'hui"
 
 #: indico/modules/categories/client/js/calendar.js:50
 msgid "Events happening on {0}"
-msgstr "Evénements ayant lieu le {0}"
+msgstr "Événements ayant lieu le {0}"
 
 #: indico/modules/categories/client/js/calendar.js:62
 msgid "{0} long-lasting event not shown"
@@ -66,7 +66,7 @@ msgstr[1] "{0} événements de longue durée ne sont pas montrés"
 
 #: indico/modules/categories/client/js/calendar.js:72
 msgid "Long lasting events"
-msgstr "Evénements de longue durée"
+msgstr "Événements de longue durée"
 
 #: indico/modules/categories/client/js/display.js:25
 msgid "empty"
@@ -93,7 +93,7 @@ msgid ""
 msgstr "Ceci fera apparaître les événements de cette catégorie sur votre <a href=\"{0}\">tableau de bord</a>."
 
 #: indico/modules/categories/client/js/management.js:56
-#: indico/modules/events/management/client/js/index.js:295
+#: indico/modules/events/management/client/js/index.js:291
 msgid "Undo"
 msgstr "Annuler"
 
@@ -325,7 +325,7 @@ msgstr "{0} sur {1} sont affichés"
 msgid "There are no entries that match your search criteria."
 msgstr "Aucune entrée ne correspond à vos critères de recherche."
 
-#: indico/modules/events/management/client/js/index.js:293
+#: indico/modules/events/management/client/js/index.js:289
 msgid "Undoing previous operation..."
 msgstr "Annulation en cours de la dernière opération..."
 
@@ -765,8 +765,8 @@ msgstr "Vous pouvez uniquement <a class=\"js-action\" data-category-id=\"{0}\">{
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:338
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
-" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a class"
-"=\"js-search\">search</a>."
+" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
+"class=\"js-search\">search</a>."
 msgstr "Vous pouvez <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> celle-ci, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">remonter dans l'arborescence</a> ou <a class=\"js-search\">rechercher</a>."
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:346
