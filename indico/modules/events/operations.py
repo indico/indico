@@ -414,10 +414,16 @@ def create_event_request(event, category, comment=''):
 
 
 def update_event_privacy(event, data):
-    log_fields = {'data_controller_name': {'title': 'Data controller name', 'type': 'string'},
-                  'data_controller_email': {'title': 'Data controller e-mail', 'type': 'string'},
-                  'privacy_policy_url': {'title': 'Privacy policy URL', 'type': 'string'},
-                  'privacy_policy': {'title': 'Privacy policy', 'type': 'text'}}
+    log_fields = {
+        'data_controller_name': {'title': 'Data controller name', 'type': 'string'},
+        'data_controller_email': {'title': 'Data controller e-mail', 'type': 'string'},
+        'privacy_policy_urls': {
+            'title': 'Privacy policy URLs',
+            'type': 'struct_list',
+            'convert': lambda changes: [[dict(sorted(rec.items())) for rec in chg] for chg in changes]
+        },
+        'privacy_policy': {'title': 'Privacy policy', 'type': 'text'}
+    }
     assert set(data.keys()) <= log_fields.keys()
     changes = {}
     for key, value in data.items():

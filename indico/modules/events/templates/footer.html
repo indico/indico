@@ -1,9 +1,20 @@
 {% extends 'footer.html' %}
 
 {% block footer_links_extra %}
-    {% if privacy_url %}
+    {% if privacy_urls|length == 1 %}
         <li>
-            <a href="{{ privacy_url }}">{% trans %}Event privacy notice{% endtrans %}</a>
+            <a href="{{ privacy_urls[0].url }}">{% trans %}Event privacy notice{% endtrans %}</a>
+        </li>
+    {% elif privacy_urls %}
+        <li>
+            <div class="privacy-dropdown">
+                <a href="#" onclick="return false;">{% trans %}Event privacy notices{% endtrans %}</a>
+                <div class="menu">
+                    {% for privacy_url in privacy_urls  %}
+                        <a class="item" href="{{ privacy_url.url }}">{{ privacy_url.title }}</a>
+                    {% endfor %}
+                </div>
+            </div>
         </li>
     {% elif privacy_text %}
         <li>
