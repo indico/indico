@@ -24,11 +24,6 @@ Major Features
   show up in any category's event listing (:issue:`4294`, :issue:`5055`, :pr:`5023`,
   :pr:`5095`)
 
-Internationalization
-^^^^^^^^^^^^^^^^^^^^
-
-- Nothing so far
-
 Improvements
 ^^^^^^^^^^^^
 
@@ -58,11 +53,6 @@ Bugfixes
 - Fix :data:`CUSTOM_COUNTRIES` not overriding names of existing countries (:pr:`5183`)
 - Fix error dialog when submitting an invited abstract without being logger in (:pr:`5200`)
 - Fix category picker search displaying deleted categories (:issue:`5197`, :pr:`5203`)
-
-Internal Changes
-^^^^^^^^^^^^^^^^
-
-- Nothing so far
 
 
 ----
