@@ -49,6 +49,8 @@ Improvements
 - Envelope senders for emails can now be restricted to specific addresses/domains
   using the :data:`SMTP_ALLOWED_SENDERS` and :data:`SMTP_SENDER_FALLBACK` config
   settings (:issue:`4837`, :issue:`2224`, :issue:`1877`, :pr:`5179`)
+- Allow filtering the contribution list based on whether any person (speaker or author)
+  has registered for the event or not (:issue:`5192`, :pr:`5193`)
 
 Bugfixes
 ^^^^^^^^
