@@ -8,7 +8,7 @@
     {% elif privacy_urls %}
         <li>
             <div class="privacy-dropdown">
-                <a href="#">{% trans %}Event privacy notices{% endtrans %}</a>
+                <a href="#" onclick="return false;">{% trans %}Event privacy notices{% endtrans %}</a>
                 <div class="menu">
                     {% for privacy_url in privacy_urls  %}
                         <a class="item" href="{{ privacy_url.url }}">{{ privacy_url.title }}</a>
