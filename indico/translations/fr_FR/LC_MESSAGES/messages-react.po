@@ -3,12 +3,12 @@
 # Michito <crossner90@gmail.com>, 2019
 # Michel Jouvin <jouvin@lal.in2p3.fr>, 2019
 # Adrian, 2020
-# Thomas Baron <thomas.baron@cern.ch>, 2021
+# Thomas Baron <thomas.baron@cern.ch>, 2022
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-11-21 13:42+0100\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2021\n"
+"POT-Creation-Date: 2022-01-22 12:44+0100\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2022\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,7 +39,7 @@ msgstr "Utilisateur"
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:154
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
 msgid "Event"
-msgstr "Evénement"
+msgstr "Événement"
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:156
 msgid "Event Date"
@@ -645,18 +645,16 @@ msgid "Since you are a manager you can edit anyway."
 msgstr "Comme vous êtes un administrateur vous pouvez quand même modifier."
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:65
-msgid "{submitterName} submitted a revision"
-msgstr "{submitterName} a déposé une révision"
+msgid "{submitterName} has submitted files"
+msgstr "{submitterName} a déposé des fichiers"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:79
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
-msgid "Hide old revision"
-msgstr "Cacher l'ancienne révision"
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+msgid "Hide"
+msgstr "Cacher"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:81
-#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
-msgid "Show old revision"
-msgstr "Montrer l'ancienne révision"
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+msgid "Show details"
+msgstr "Montrer les détails"
 
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx:63
 msgid "This revision has been updated"
@@ -1421,15 +1419,15 @@ msgid ""
 "manager. Until approved, the event will remain in its current category."
 msgid_plural ""
 "Moving events there {strong}requires approval{/strong} by a category "
-"manager. Until approved, the events will remain in its current category."
+"manager. Until approved, the events will remain in their current category."
 msgstr[0] ""
-"Déplacer un événement ici {strong}nécessite une approbation{/strong} par un "
-"administrateur de catégorie. L'événement restera dans sa catégorie actuelle "
-"jusqu'à cette approbation."
+"Le déplacement d'un événement ici {strong}nécessite l'approbation{/strong} "
+"par un administrateur de catégorie. Jusqu'à cet approbation, l'événement "
+"restera dans sa catégorie actuelle."
 msgstr[1] ""
-"Déplacer les événements ici {strong}nécessite une approbation{/strong} par "
-"un administrateur de catégorie. Les événements resteront dans leur catégorie"
-" actuelle jusqu'à cette approbation."
+"Le déplacement d'événements ici {strong}nécessite l'approbation{/strong} par"
+" un administrateur de catégorie. Jusqu'à cet approbation, les événements "
+"resteront dans leur catégorie actuelle."
 
 #: indico/modules/events/management/client/js/EventMove.jsx:160
 msgid ""
@@ -1660,6 +1658,14 @@ msgstr "Un utilisateur"
 #: indico/modules/events/papers/client/js/components/TimelineItem.jsx:46
 msgid "{submitterName} submitted paper revision {revisionNumber}"
 msgstr "{submitterName} a déposé la révision {revisionNumber} de l'article"
+
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:59
+msgid "Hide old revision"
+msgstr "Cacher l'ancienne révision"
+
+#: indico/modules/events/papers/client/js/components/TimelineItem.jsx:61
+msgid "Show old revision"
+msgstr "Montrer l'ancienne révision"
 
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:60
 #: indico/modules/rb/client/js/modules/admin/EditableList.jsx:60

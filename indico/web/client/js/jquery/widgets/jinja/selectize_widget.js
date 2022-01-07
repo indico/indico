@@ -18,7 +18,6 @@
         searchMethod: 'GET',
         searchPayload: null,
         selectizeOptions: null,
-        selectedItem: null,
         allowById: false,
         preload: false,
       },
@@ -42,6 +41,10 @@
     var params = {
       load: function(query, callback) {
         var self = this;
+        if (!options.searchUrl) {
+          self.settings.load = null;
+          return callback();
+        }
         var data = getSearchData(query);
         if (!data) {
           return callback();
@@ -65,9 +68,6 @@
               self.settings.load = null;
             }
             callback(res);
-            if (options.selectedItem !== null) {
-              $field[0].selectize.setValue(options.selectedItem.id);
-            }
           });
       },
       score: function(query) {

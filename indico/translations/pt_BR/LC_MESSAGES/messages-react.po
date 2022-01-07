@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2021-10-21 12:56+0200\n"
+"POT-Creation-Date: 2021-11-21 13:42+0100\n"
 "Last-Translator: Sedir G. Morais <philippi.sedir@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/indico/teams/6478/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -18,8 +18,70 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: indico/modules/categories/client/js/base.jsx:28
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:155
 msgid "Category"
 msgstr "Categoria"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:79
+msgid "Unlisted event"
+msgstr "Evento Não Listado"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:145
+msgid "There are no event move requests."
+msgstr "Não há solicitações de movimentação de evento."
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:153
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:471
+#: indico/web/client/js/react/components/principals/Search.jsx:558
+msgid "User"
+msgstr "Usuário"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:154
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
+msgid "Event"
+msgstr "Evento"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:156
+msgid "Event Date"
+msgstr "Data do Evento"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:157
+msgid "Requested Date"
+msgstr "Data de Solicitação"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:184
+msgid "Approve"
+msgstr "Aprovar"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:187
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:77
+#: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:56
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:101
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:62
+msgid "or"
+msgstr "ou"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:192
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:635
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:110
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:160
+msgid "Provide the rejection reason"
+msgstr "Forneça o motivo da rejeição"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:196
+msgid "and"
+msgstr "e"
+
+#: indico/modules/categories/client/js/components/CategoryModeration.jsx:199
+#: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:72
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:35
+#: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:35
+#: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:56
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:658
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:123
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:172
+msgid "Reject"
+msgstr "Rejeitar"
 
 #: indico/modules/categories/client/js/components/CategoryStatistics.jsx:67
 #: indico/modules/search/client/js/components/SearchApp.jsx:268
@@ -135,6 +197,7 @@ msgstr "Excluir PDF atual"
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:82
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:118
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
+#: indico/modules/events/management/client/js/EventMove.jsx:180
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
 #: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
@@ -225,16 +288,13 @@ msgid "Export"
 msgstr "Exportar"
 
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
-msgid "Publish now"
-msgstr "Publicar agora"
+#: indico/modules/events/contributions/client/js/PublicationModal.jsx:21
+msgid "Publish contributions"
+msgstr "Publicar contribuições"
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:20
 msgid "Set contribution list in draft mode"
 msgstr "Definir lista de contribuições em modo rascunho"
-
-#: indico/modules/events/contributions/client/js/PublicationModal.jsx:21
-msgid "Publish contributions"
-msgstr "Publicar contribuições"
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:28
 msgid ""
@@ -286,6 +346,7 @@ msgstr "Livro de Resumos"
 #: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:169
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:67
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:43
+#: indico/web/client/js/react/components/WTFButtonsBooleanField.jsx:55
 msgid "No"
 msgstr "Não"
 
@@ -296,6 +357,7 @@ msgstr "Não"
 #: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:168
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:61
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:43
+#: indico/web/client/js/react/components/WTFButtonsBooleanField.jsx:54
 msgid "Yes"
 msgstr "Sim"
 
@@ -382,16 +444,6 @@ msgstr "Você pode deixar um comentário se desejar"
 msgid "Accept"
 msgstr "Aceitar"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:72
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:35
-#: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:35
-#: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:56
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:658
-#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:123
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:172
-msgid "Reject"
-msgstr "Rejeitar"
-
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:54
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:55
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:63
@@ -405,6 +457,7 @@ msgid "Restrict visibility of this comment to other editors"
 msgstr "Restringir a visibilidade deste comentário a outros editores"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
+#: indico/modules/events/management/client/js/EventMove.jsx:158
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
@@ -540,13 +593,6 @@ msgstr "Fazer alterações"
 msgid "Request changes"
 msgstr "Solicitar alterações"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:77
-#: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:56
-#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:101
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:62
-msgid "or"
-msgstr "ou"
-
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:81
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:93
 msgid "Judge"
@@ -623,6 +669,7 @@ msgstr "{link}Clique aqui para atualizar{/link} e veja a versão mais recente."
 
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:67
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:33
+#: indico/modules/events/management/client/js/EventMove.jsx:172
 #: indico/web/client/js/react/components/RequestConfirm.jsx:60
 #: indico/web/client/js/react/components/principals/Search.jsx:477
 msgid "Confirm"
@@ -728,6 +775,7 @@ msgstr "Alternar tipos editáveis"
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:27
 #: indico/modules/events/editing/client/js/management/tags/index.js:23
+#: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:70
 msgid "Tags"
 msgstr "Tags"
 
@@ -1325,41 +1373,98 @@ msgstr "Obter o próximo pôster"
 msgid "Get next slides"
 msgstr "Obter o próximo slide"
 
-#: indico/modules/events/logs/client/js/components/EventLog.jsx:28
+#: indico/modules/events/management/client/js/EventMove.jsx:27
+msgid "Publish event"
+msgstr "Publicar evento"
+
+#: indico/modules/events/management/client/js/EventMove.jsx:29
+msgid "Move events"
+msgstr "Mover eventos"
+
+#: indico/modules/events/management/client/js/EventMove.jsx:31
+msgid "Move event"
+msgstr "Mover evento"
+
+#: indico/modules/events/management/client/js/EventMove.jsx:39
+msgid "Select destination category for the selected events"
+msgstr "Selecione a categoria de destino para os eventos selecionados"
+
+#: indico/modules/events/management/client/js/EventMove.jsx:40
+msgid "Select destination category for the event"
+msgstr "Selecione a categoria de destino para o evento"
+
+#: indico/modules/events/management/client/js/EventMove.jsx:48
+msgid "The event is already in this category"
+msgstr "O evento já está nesta categoria"
+
+#: indico/modules/events/management/client/js/EventMove.jsx:88
+msgid "Confirm event move"
+msgstr "Confirme a movimentação do evento"
+
+#: indico/modules/events/management/client/js/EventMove.jsx:93
+msgid "You are about to publish this event to {target}."
+msgstr "Você está prestes a publicar este evento para {target}."
+
+#: indico/modules/events/management/client/js/EventMove.jsx:103
+msgid "You are about to move this event to {target}."
+msgid_plural "You are about to move {count} events to {target}."
+msgstr[0] "Você está prestes a mover este evento para {target}."
+msgstr[1] "Você está prestes a mover {count} eventos para {target}."
+
+#: indico/modules/events/management/client/js/EventMove.jsx:136
 msgid ""
-"Log entries are currently filtered by URL. {link}Click here{/link} to "
-"disable the filter."
+"Moving an event there {strong}requires approval{/strong} by a category "
+"manager. Until approved, the event will remain in its current category."
+msgid_plural ""
+"Moving events there {strong}requires approval{/strong} by a category "
+"manager. Until approved, the events will remain in its current category."
+msgstr[0] ""
+"Mover um evento para lá {strong}requer a aprovação{/strong} de um gerente de"
+" categoria. Até ser aprovado, o evento permanecerá na categoria atual."
+msgstr[1] ""
+"Mover eventos para lá {strong}requer aprovação{/strong} de um gerente de "
+"categoria. Até serem aprovados, os eventos permanecerão na categoria atual."
+
+#: indico/modules/events/management/client/js/EventMove.jsx:160
+msgid ""
+"You can provide a comment to the category managers to help them decide "
+"whether to approve your request."
 msgstr ""
-"No momento, as entradas de log são filtradas por URL. {link}Clique "
-"aqui{/link} para desativar o filtro."
+"Você pode fornecer um comentário aos gerentes de categoria para ajudá-los a "
+"decidir se aprovam sua solicitação."
 
-#: indico/modules/events/logs/client/js/components/Filter.jsx:26
-msgid "Show"
-msgstr "Mostrar"
+#: indico/modules/events/management/client/js/EventMove.jsx:177
+msgid "Change category"
+msgstr "Mudar categoria"
 
-#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:40
-msgid "This email is pending and will be sent soon."
-msgstr "Este e-mail está pendente e será enviado em breve."
+#: indico/modules/events/management/client/js/EventMove.jsx:231
+msgid "Event has a pending move request"
+msgstr "O evento tem uma solicitação de movimentação pendente"
 
-#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:46
-msgid "This email has been sent."
-msgstr "Este email foi enviado."
+#: indico/modules/events/management/client/js/EventMove.jsx:232
+#: indico/modules/events/management/client/js/EventMove.jsx:241
+msgid "Move event to another category"
+msgstr "Mover o evento para outra categoria"
 
-#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:52
-msgid "Sending this email failed."
-msgstr "O envio deste email falhou."
+#: indico/modules/events/management/client/js/EventMove.jsx:245
+msgid "Move"
+msgstr "Mover"
 
-#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:130
-msgid "Previous"
-msgstr "Anterior"
+#: indico/modules/events/management/client/js/EventMove.jsx:293
+msgid "Move selected events to another category"
+msgstr "Mova os eventos selecionados para outra categoria"
 
-#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:134
-msgid "Related entries"
-msgstr "Entradas relacionadas"
+#: indico/modules/events/management/client/js/EventMove.jsx:333
+msgid "Event has a pending publish request"
+msgstr "O evento tem uma solicitação de publicação pendente"
 
-#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:143
-msgid "Next"
-msgstr "Próximo"
+#: indico/modules/events/management/client/js/EventMove.jsx:334
+msgid "Publish event to a category"
+msgstr "Publicar evento em uma categoria"
+
+#: indico/modules/events/management/client/js/EventMove.jsx:339
+msgid "Publish"
+msgstr "Publicar"
 
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:56
 msgid "Visible only to judges"
@@ -1548,6 +1653,20 @@ msgstr "Um usuário"
 msgid "{submitterName} submitted paper revision {revisionNumber}"
 msgstr "{submitterName} submeteu a revisão de paper {revisionNumber}"
 
+#: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:60
+#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:60
+#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:147
+msgid "Add"
+msgstr "Adicionar"
+
+#: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:77
+msgid "No tags assigned."
+msgstr "Nenhuma tag atribuída."
+
+#: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:105
+msgid "Add tags"
+msgstr "Adicionar tags"
+
 #: indico/modules/events/sessions/client/js/session_display.jsx:22
 msgid "Session"
 msgstr "Sessão"
@@ -1555,6 +1674,42 @@ msgstr "Sessão"
 #: indico/modules/events/sessions/client/js/session_display.jsx:26
 msgid "Detailed timetable"
 msgstr "Cronograma detalhado"
+
+#: indico/modules/logs/client/js/components/EventLog.jsx:28
+msgid ""
+"Log entries are currently filtered by URL. {link}Click here{/link} to "
+"disable the filter."
+msgstr ""
+"No momento, as entradas de log são filtradas por URL. {link}Clique "
+"aqui{/link} para desativar o filtro."
+
+#: indico/modules/logs/client/js/components/Filter.jsx:26
+msgid "Show"
+msgstr "Mostrar"
+
+#: indico/modules/logs/client/js/components/LogEntryList.jsx:40
+msgid "This email is pending and will be sent soon."
+msgstr "Este e-mail está pendente e será enviado em breve."
+
+#: indico/modules/logs/client/js/components/LogEntryList.jsx:46
+msgid "This email has been sent."
+msgstr "Este email foi enviado."
+
+#: indico/modules/logs/client/js/components/LogEntryList.jsx:52
+msgid "Sending this email failed."
+msgstr "O envio deste email falhou."
+
+#: indico/modules/logs/client/js/components/LogEntryModal.jsx:130
+msgid "Previous"
+msgstr "Anterior"
+
+#: indico/modules/logs/client/js/components/LogEntryModal.jsx:134
+msgid "Related entries"
+msgstr "Entradas relacionadas"
+
+#: indico/modules/logs/client/js/components/LogEntryModal.jsx:143
+msgid "Next"
+msgstr "Próximo"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:120
 msgid "Booked for"
@@ -1687,12 +1842,6 @@ msgstr "Você tem certeza que você quer apagar esta reserva?"
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:611
 msgid "Reject booking"
 msgstr "Rejeitar reserva"
-
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:635
-#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:110
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:160
-msgid "Provide the rejection reason"
-msgstr "Forneça o motivo da rejeição"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:643
 msgid "I understand that this will reject all occurrences of the booking."
@@ -2659,11 +2808,6 @@ msgstr "Por favor insira um ID de Categoria"
 msgid "Add category"
 msgstr "Adicionar categoria"
 
-#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:60
-#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:147
-msgid "Add"
-msgstr "Adicionar"
-
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:41
 msgid "This equipment type provides the {name} feature."
 msgstr "O tipo de equipamento provê o recurso {name}."
@@ -3195,10 +3339,6 @@ msgstr "Você precisa fornecer uma razão"
 msgid "Choose an event"
 msgstr "Escolha um evento"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
-msgid "Event"
-msgstr "Evento"
-
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:466
 msgid ""
 "You have an event taking place during the selected time. If you are booking "
@@ -3727,12 +3867,7 @@ msgstr "Eventos à mão"
 msgid "Everything"
 msgstr "Tudo"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:466
-#: indico/web/client/js/react/components/principals/Search.jsx:558
-msgid "User"
-msgstr "Usuário"
-
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:472
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:477
 #: indico/web/client/js/react/components/principals/Search.jsx:691
 msgid "Group"
 msgstr "Grupo"
@@ -3799,6 +3934,10 @@ msgstr "Limpar data"
 #: indico/web/client/js/react/components/WTFDateTimeField.jsx:208
 msgid "Clear date and time"
 msgstr "Limpar data e hora"
+
+#: indico/web/client/js/react/components/WTFMultipleTagSelectField.jsx:51
+msgid "Choose an option"
+msgstr "Escolha uma opção"
 
 #: indico/web/client/js/react/components/WTFOccurrencesField.jsx:82
 msgid "Add occurrence"

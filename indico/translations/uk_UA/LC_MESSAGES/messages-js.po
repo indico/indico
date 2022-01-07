@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-10-26 12:56+0200\n"
-"PO-Revision-Date: 2021-10-26 10:58+0000\n"
+"POT-Creation-Date: 2021-11-23 13:42+0100\n"
+"PO-Revision-Date: 2021-11-23 12:43+0000\n"
 "Last-Translator: Adrian\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
@@ -93,33 +93,33 @@ msgid ""
 "href=\"{0}\">Dashboard</a>."
 msgstr "Це зробить події у даній категорії видимими у вашій <a href=\"{0}\">Інформаційній панелі</a>."
 
-#: indico/modules/categories/client/js/management.js:53
-#: indico/modules/events/management/client/js/index.js:301
+#: indico/modules/categories/client/js/management.js:56
+#: indico/modules/events/management/client/js/index.js:295
 msgid "Undo"
 msgstr "Відкотити"
 
-#: indico/modules/categories/client/js/management.js:55
+#: indico/modules/categories/client/js/management.js:58
 msgid "The category order has been restored."
 msgstr "Порядок категорії було відновлено."
 
-#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/categories/client/js/management.js:60
 msgid "The category list has been sorted."
 msgstr "Список категорій відсортовано"
 
-#: indico/modules/categories/client/js/management.js:175
+#: indico/modules/categories/client/js/management.js:178
 msgid "Delete category"
 msgstr "Видалити категорію"
 
-#: indico/modules/categories/client/js/management.js:179
+#: indico/modules/categories/client/js/management.js:182
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Категорію неможливо видалити, оскільки вона не порожня."
 
-#: indico/modules/categories/client/js/management.js:187
+#: indico/modules/categories/client/js/management.js:190
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "Принаймні одна з вибраних категорій не може бути видалена, оскільки вона не порожня."
 
-#: indico/modules/categories/client/js/management.js:192
+#: indico/modules/categories/client/js/management.js:195
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "Видалити вибрану категорію"
@@ -127,15 +127,15 @@ msgstr[1] "Видалити {0} вибрані категорії"
 msgstr[2] "Видалити {0} вибраних категорій"
 msgstr[3] "Видалити {0} вибраних категорій"
 
-#: indico/modules/categories/client/js/management.js:200
+#: indico/modules/categories/client/js/management.js:203
 msgid "Select the categories to delete first."
 msgstr "Виберіть категорію перш ніж видалити."
 
-#: indico/modules/categories/client/js/management.js:209
+#: indico/modules/categories/client/js/management.js:212
 msgid "Delete categories"
 msgstr "Видалити категорії"
 
-#: indico/modules/categories/client/js/management.js:229
+#: indico/modules/categories/client/js/management.js:232
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "Перемістити вибрану категорію"
@@ -143,11 +143,11 @@ msgstr[1] "Перемістити {0} вибрані категорії"
 msgstr[2] "Перемістити {0} вибраних категорій"
 msgstr[3] "Перемістити {0} вибраних категорій"
 
-#: indico/modules/categories/client/js/management.js:236
+#: indico/modules/categories/client/js/management.js:239
 msgid "Select the categories to move first."
 msgstr "Вибрати категорії для переміщення."
 
-#: indico/modules/categories/client/js/management.js:297
+#: indico/modules/categories/client/js/management.js:268
 #: indico/modules/vc/client/js/index.js:54
 #: indico/web/client/js/jquery/utils/forms.js:401
 msgid "*"
@@ -157,7 +157,7 @@ msgstr[1] "Всі {0} заходи в цій категорії вибрано."
 msgstr[2] "Всі {0} заходів в цій категорії вибрано."
 msgstr[3] "Всі {0} заходів в цій категорії вибрано."
 
-#: indico/modules/categories/client/js/management.js:302
+#: indico/modules/categories/client/js/management.js:273
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "Лише {0} з {1} заходів зараз вибрано."
@@ -165,12 +165,11 @@ msgstr[1] "Лише {0} з {1} заходів зараз вибрано."
 msgstr[2] "Лише {0} з {1} заходів зараз вибрано."
 msgstr[3] "Лише {0} з {1} заходів зараз вибрано."
 
-#: indico/modules/categories/client/js/management.js:340
-#: indico/modules/categories/client/js/management.js:404
+#: indico/modules/categories/client/js/management.js:352
 msgid "Move here"
 msgstr "Перемістити сюди"
 
-#: indico/modules/categories/client/js/management.js:341
+#: indico/modules/categories/client/js/management.js:353
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "Перемістити категорію"
@@ -178,7 +177,7 @@ msgstr[1] "Перемістити категорії"
 msgstr[2] "Перемістити категорії"
 msgstr[3] "Перемістити категорії"
 
-#: indico/modules/categories/client/js/management.js:343
+#: indico/modules/categories/client/js/management.js:355
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Виберіть батьківську категорію для вибраної категорії"
@@ -186,7 +185,7 @@ msgstr[1] "Виберіть батьківську категорію для {0}
 msgstr[2] "Виберіть батьківську категорію для {0} вибраних категорій"
 msgstr[3] "Виберіть батьківську категорію для {0} вибраних категорій"
 
-#: indico/modules/categories/client/js/management.js:359
+#: indico/modules/categories/client/js/management.js:371
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Вибрана категорія вже тут"
@@ -194,38 +193,13 @@ msgstr[1] "Вибрані категорії вже тут"
 msgstr[2] "Вибрані категорії вже тут"
 msgstr[3] "Вибрані категорії вже тут"
 
-#: indico/modules/categories/client/js/management.js:367
+#: indico/modules/categories/client/js/management.js:379
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Це категорія, яку ви намагаєтесь перемістити"
 msgstr[1] "Це одна з категорій, які ви намагаєтесь перемістити"
 msgstr[2] "Це одна з категорій, які ви намагаєтесь перемістити"
 msgstr[3] "Це одна з категорій, які ви намагаєтесь перемістити"
-
-#: indico/modules/categories/client/js/management.js:405
-#: indico/modules/events/management/client/js/index.js:42
-msgid "Move event"
-msgid_plural "Move events"
-msgstr[0] "Перемістити захід"
-msgstr[1] "Перемістити заходи"
-msgstr[2] "Перемістити заходи"
-msgstr[3] "Перемістити заходи"
-
-#: indico/modules/categories/client/js/management.js:408
-msgid "Select category destination for the event"
-msgid_plural "Select category destination for {0} selected events"
-msgstr[0] "Виберіть категорію призначення для  вибраного заходу"
-msgstr[1] "Виберіть категорію призначення для {0} вибраних заходів"
-msgstr[2] "Виберіть категорію призначення для {0} вибраних заходів"
-msgstr[3] "Виберіть категорію призначення для {0} вибраних заходів"
-
-#: indico/modules/categories/client/js/management.js:418
-msgid "The event is already here"
-msgid_plural "The selected events are already here"
-msgstr[0] "Вибрані захід вже тут"
-msgstr[1] "Вибрані заходи вже тут"
-msgstr[2] "Вибрані заходи вже тут"
-msgstr[3] "Вибрані заходи вже тут"
 
 #: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
@@ -368,17 +342,11 @@ msgstr "Показано {0} з {1}"
 msgid "There are no entries that match your search criteria."
 msgstr "Жодних елементів, які підходять під пошуковий запит, не знайдено."
 
-#: indico/modules/events/management/client/js/index.js:38
-msgid ""
-"You are about to move the event to the category \"{0}\". Are you sure you "
-"want to proceed?"
-msgstr "Ви збираєтесь перемістити захід у категорію “{0}”. Упевнені в продовженні?"
-
-#: indico/modules/events/management/client/js/index.js:299
+#: indico/modules/events/management/client/js/index.js:293
 msgid "Undoing previous operation..."
 msgstr "Скасування попередньої операції..."
 
-#: indico/modules/events/registration/client/js/index.js:52
+#: indico/modules/events/registration/client/js/index.js:59
 #: indico/modules/events/registration/client/js/registration.js:39
 msgid "Terms and Conditions"
 msgstr "Правила та умови"
@@ -644,7 +612,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "Присутні незбережені зміни, які будуть втрачені."
 
 #: indico/web/client/js/jquery/utils/declarative.js:251
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:696
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "Підтвердити операцію"
 
@@ -784,81 +752,89 @@ msgid "Select a category"
 msgstr "Оберіть категорію."
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:35
+msgid "Not possible for categories where you cannot propose events"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:39
+msgid "Not possible for categories where you cannot propose/create events"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:43
 msgid "Not possible for categories where you cannot create events"
 msgstr "Неможливо для категорій, в яких ви не можете створити захід."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:41
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:49
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "Неможливо для категорій, похідних від категорії \"{0}\""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:45
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
 msgid "Not possible for this category"
 msgstr "Неможливо для цієї категорії"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:134
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:142
 msgid "Search"
 msgstr "Пошук"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:191
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:199
 msgid "Go to: {0}"
 msgstr "Перейти до: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:228
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:236
 msgid "This category is protected"
 msgstr "Ця категорія захищена"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:276
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:284
 msgid "Go to parent: {0}"
 msgstr "Перейти до джерела: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:325
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:333
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "Ви можете лише <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> це."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:330
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
-" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a class"
-"=\"js-search\">search</a>."
+" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
+"class=\"js-search\">search</a>."
 msgstr "Ви можете <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> це, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">переміщуватись</a> або <a class=\"js-search\">шукати</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:346
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "Ви можете <a class=\"js-navigate-up\" data-parent-id=\"{2}\">переміщуватись</a> або <a class=\"js-search\">шукати</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:353
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:361
 msgid "Your search doesn't match any category"
 msgstr "За вашим пошуковим запитом не знайдено жодної категорії."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:358
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:366
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "Ви можете <a class=\"js-search\">змінити</a> або <a class=\"js-clear-search\">очистити</a> форму пошуку."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:432
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:440
 msgid "In favorite categories"
 msgstr "У вибраних категоріях"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:439
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:447
 msgid "Search result"
 msgstr "Результати пошуку"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:460
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:468
 msgid "Displaying {0} out of {1} results."
 msgstr "Показ {0} з {1} результатів."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:461
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:469
 msgid "There are no results."
 msgstr "Нічого не знайдено."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:470
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:478
 msgid "Clear search"
 msgstr "Очистити пошук"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:694
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:702
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Ви вибрали категорію <em> {0} </em>. Ви впевнені, що хочете продовжити? "
 
@@ -958,43 +934,43 @@ msgstr "Має бути менше {0}"
 msgid "Please fill in the required fields."
 msgstr "Будь ласка, заповніть всі необхідні поля."
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:171
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
 msgid "IP networks cannot have management permissions"
 msgstr "IP-мережі не можуть мати дозволів на керування"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:173
 msgid "Registrants cannot have management permissions"
 msgstr "Реєстранти не можуть мати дозволів на керування"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:184
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
 msgid "Assign Permissions"
 msgstr "Надати дозволи"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:201
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
 msgid "Delete entry '{0}'"
 msgstr "Видалити елемент {0}"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Ви впевнені, що хочете видалитись зі списку?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:286
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
 msgid "All options have been added"
 msgstr "Всі опції було додано"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:317
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
 msgid "This entry was already added"
 msgstr "Цей елемент уже доданий"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:350
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
 msgid "Anonymous"
 msgstr "Анонімно"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:359
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
 msgid "Additional users"
 msgstr "Додаткові користувачі"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:363
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} користувач має неявний доступ до читання через інші ролі"
@@ -1002,19 +978,19 @@ msgstr[1] "{0} користувачі мають неявний доступ д�
 msgstr[2] "{0} користувачів мають неявний доступ до читання через інші ролі"
 msgstr[3] "{0} користувачів мають неявний доступ до читання через інші ролі"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:379
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
 msgid "Category Managers"
 msgstr "Керівники категорії"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:381
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Parent Category Managers"
 msgstr "Керівники материнської категорії"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:383
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Event Managers"
 msgstr "Керівники заходу"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:400
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
 msgid "Registrants in \"{0}\""
 msgstr "Реєстранти в \"{0}\""
 
