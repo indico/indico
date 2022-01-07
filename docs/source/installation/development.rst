@@ -191,7 +191,7 @@ which plugin you want to build the assets for:
 
 .. code-block:: shell
 
-    ./bin/maintenance/build-assets.py <plugin-name> --dev --watch
+    ./bin/maintenance/build-assets.py plugin <plugin-directory> --dev --watch
 
 You can also build the assets for all the plugins:
 
