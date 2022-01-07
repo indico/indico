@@ -60,11 +60,6 @@ Major Features
   show up in any category's event listing (:issue:`4294`, :issue:`5055`, :pr:`5023`,
   :pr:`5095`)
 
-Internationalization
-^^^^^^^^^^^^^^^^^^^^
-
-- Nothing so far
-
 Improvements
 ^^^^^^^^^^^^
 
@@ -85,6 +80,8 @@ Improvements
 - Envelope senders for emails can now be restricted to specific addresses/domains
   using the :data:`SMTP_ALLOWED_SENDERS` and :data:`SMTP_SENDER_FALLBACK` config
   settings (:issue:`4837`, :issue:`2224`, :issue:`1877`, :pr:`5179`)
+- Allow filtering the contribution list based on whether any person (speaker or author)
+  has registered for the event or not (:issue:`5192`, :pr:`5193`)
 
 Bugfixes
 ^^^^^^^^
@@ -92,11 +89,6 @@ Bugfixes
 - Fix :data:`CUSTOM_COUNTRIES` not overriding names of existing countries (:pr:`5183`)
 - Fix error dialog when submitting an invited abstract without being logger in (:pr:`5200`)
 - Fix category picker search displaying deleted categories (:issue:`5197`, :pr:`5203`)
-
-Internal Changes
-^^^^^^^^^^^^^^^^
-
-- Nothing so far
 
 
 ----
