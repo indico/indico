@@ -159,10 +159,8 @@ class SearchResultCount extends React.Component {
           }
         >
           {icon}
-          <Translate>
-            Unauthorized
-            <Param name="count" value={label} />
-          </Translate>
+          <Translate>Unauthorized</Translate>
+          {label}
         </Responsive.Desktop>
       </Menu.Item>
     );
