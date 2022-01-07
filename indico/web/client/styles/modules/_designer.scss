@@ -385,11 +385,12 @@
 #text-color-preview,
 #bg-color-preview {
   width: 1em;
-  height: 1.5em;
-  margin-right: 0;
+  height: 1.6em;
+  margin-right: -2px;
 }
 
 #text-color-selector,
 #bg-color-selector {
+  height: 1.6em;
   width: 9em !important;
 }
