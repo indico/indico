@@ -49,9 +49,9 @@ class ContributionListGenerator(ListGeneratorBase):
             'status': {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
                                                                 'unscheduled': _('Not scheduled')}},
             'people': {'title': _('People'), 'filter_choices': {'registered': _('Registered'),
-                                                                'not_registered': _('Not registered')}},
+                                                                'not_registered': _('Nobody registered')}},
             'speakers': {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
-                                                                    'not_registered': _('Not registered')}},
+                                                                    'not_registered': _('Nobody registered')}},
         }
 
         self.list_config = self._get_config()
