@@ -18,6 +18,3 @@ class SessionBlockPersonLinkListField(PersonLinkListFieldBase):
     def _serialize_person_link(self, principal):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         return PersonLinkSchema().dump(principal)
-
-    def _convert_data(self, data):
-        return list({self._get_person_link(x) for x in data})
