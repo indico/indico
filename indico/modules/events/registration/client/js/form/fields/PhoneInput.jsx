@@ -10,10 +10,15 @@ import React from 'react';
 
 import '../../../styles/regform.module.scss';
 
-export default function PhoneInput({htmlName}) {
-  return <input type="tel" name={htmlName} />;
+export default function PhoneInput({htmlName, disabled}) {
+  return <input type="tel" name={htmlName} disabled={disabled} />;
 }
 
 PhoneInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
+};
+
+PhoneInput.defaultProps = {
+  disabled: false,
 };

@@ -25,7 +25,6 @@ import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 export default function AccommodationInput({htmlName, disabled, choices, arrival, departure}) {
-  // TODO: billable/price
   // TODO: places left
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices

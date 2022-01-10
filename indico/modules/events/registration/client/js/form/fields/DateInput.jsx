@@ -18,7 +18,7 @@ import {Translate} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
 
-export default function DateInput({htmlName, id, dateFormat, timeFormat}) {
+export default function DateInput({htmlName, disabled, id, dateFormat, timeFormat}) {
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
   const friendlyDateFormat = dateFormat.replace(
@@ -32,6 +32,7 @@ export default function DateInput({htmlName, id, dateFormat, timeFormat}) {
         <Form.Field>
           <SingleDatePicker
             id={`regform-datepicker-${id}`}
+            disabled={disabled}
             date={date}
             onDateChange={setDate}
             placeholder={friendlyDateFormat}
@@ -45,6 +46,7 @@ export default function DateInput({htmlName, id, dateFormat, timeFormat}) {
           <Form.Field>
             <TimePicker
               id={`regform-timepicker-${id}`}
+              disabled={disabled}
               showSecond={false}
               value={time}
               focusOnOpen
@@ -59,12 +61,15 @@ export default function DateInput({htmlName, id, dateFormat, timeFormat}) {
       </Form.Group>
     );
   } else {
-    return <input type="text" name={htmlName} placeholder={friendlyDateFormat} />;
+    return (
+      <input type="text" name={htmlName} disabled={disabled} placeholder={friendlyDateFormat} />
+    );
   }
 }
 
 DateInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
   id: PropTypes.number.isRequired,
   dateFormat: PropTypes.oneOf([
     '%d/%m/%Y',
@@ -81,6 +86,7 @@ DateInput.propTypes = {
 };
 
 DateInput.defaultProps = {
+  disabled: false,
   timeFormat: null,
 };
 

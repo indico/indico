@@ -10,10 +10,15 @@ import React from 'react';
 
 import '../../../styles/regform.module.scss';
 
-export default function EmailInput({htmlName}) {
-  return <input type="email" name={htmlName} size="60" />;
+export default function EmailInput({htmlName, disabled}) {
+  return <input type="email" name={htmlName} disabled={disabled} size="60" />;
 }
 
 EmailInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
+};
+
+EmailInput.defaultProps = {
+  disabled: false,
 };

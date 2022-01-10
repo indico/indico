@@ -20,7 +20,7 @@ const attributeMap = {minLength: 'minLength', maxLength: 'maxLength'};
 
 export default function TextInput({htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextInput.defaultProps);
-  return <input type="text" name={htmlName} {...inputProps} />;
+  return <input type="text" name={htmlName} {...inputProps} disabled={disabled} />;
 }
 
 TextInput.propTypes = {

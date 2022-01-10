@@ -28,14 +28,13 @@ export default function FormItem({
 }) {
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
-  const {customFormItem} = meta;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
   return (
     <div styleName={`form-item ${toClasses({disabled: !isEnabled, editable: setupMode})}`}>
       {sortHandle}
       <div styleName="content">
         {InputComponent ? (
-          customFormItem ? (
+          meta.customFormItem ? (
             <InputComponent
               isRequired={isRequired || meta.alwaysRequired}
               disabled={!isEnabled}

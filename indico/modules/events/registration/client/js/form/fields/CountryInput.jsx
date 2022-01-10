@@ -16,11 +16,12 @@ import '../../../styles/regform.module.scss';
 const isoToFlag = country =>
   String.fromCodePoint(...country.split('').map(c => c.charCodeAt() + 0x1f1a5));
 
-export default function CountryInput({htmlName, choices}) {
+export default function CountryInput({htmlName, disabled, choices}) {
   return (
     <Dropdown
       styleName="country-dropdown"
       placeholder={Translate.string('Select a country')}
+      disabled={disabled}
       name={htmlName}
       fluid
       search
@@ -36,5 +37,10 @@ export default function CountryInput({htmlName, choices}) {
 
 CountryInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
+};
+
+CountryInput.defaultProps = {
+  disabled: false,
 };

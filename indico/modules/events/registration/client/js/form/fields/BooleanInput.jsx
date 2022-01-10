@@ -42,10 +42,10 @@ export default function BooleanInput({
       <label>{title}</label>
       <div styleName="boolean-field">
         <Button.Group>
-          <Button active={value === 'yes'} onClick={makeOnClick('yes')}>
+          <Button active={value === 'yes'} disabled={disabled} onClick={makeOnClick('yes')}>
             <Translate>Yes</Translate>
           </Button>
-          <Button active={value === 'no'} onClick={makeOnClick('no')}>
+          <Button active={value === 'no'} disabled={disabled} onClick={makeOnClick('no')}>
             <Translate>No</Translate>
           </Button>
         </Button.Group>

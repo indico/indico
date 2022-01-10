@@ -14,7 +14,7 @@ import {Translate} from 'indico/react/i18n';
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
-export default function FileInput({htmlName}) {
+export default function FileInput({htmlName, disabled}) {
   const [file, setFile] = useState();
   const fileRef = useRef();
 
@@ -38,6 +38,7 @@ export default function FileInput({htmlName}) {
           type="button"
           htmlFor={`${htmlName}-file`}
           name={htmlName}
+          disabled={disabled}
           icon="upload"
           label={
             <Label styleName={file ? 'fileinput-label-squarecorners' : ''}>
@@ -50,11 +51,23 @@ export default function FileInput({htmlName}) {
         />
         {file && <Button icon="delete" onClick={handleFileClear} />}
       </Button.Group>
-      <input id={`${htmlName}-file`} hidden type="file" ref={fileRef} onChange={handleFileChange} />
+      <input
+        id={`${htmlName}-file`}
+        disabled={disabled}
+        hidden
+        type="file"
+        ref={fileRef}
+        onChange={handleFileChange}
+      />
     </>
   );
 }
 
 FileInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
+};
+
+FileInput.defaultProps = {
+  disabled: false,
 };

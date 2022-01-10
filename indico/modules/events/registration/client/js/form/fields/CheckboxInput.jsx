@@ -23,6 +23,7 @@ export default function CheckboxInput({htmlName, disabled, title, isRequired, pr
       <Checkbox
         name={htmlName}
         label={title}
+        disabled={disabled}
         checked={checked}
         onClick={() => setChecked(!checked)}
       />

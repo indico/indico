@@ -34,6 +34,7 @@ export default function NumberInput({htmlName, disabled, price, title, isRequire
         name={htmlName}
         value={value}
         {...inputProps}
+        disabled={disabled}
         onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
       />
       <Label pointing="left" styleName="price-tag">

@@ -24,7 +24,6 @@ import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 export default function MultiChoiceInput({htmlName, disabled, choices, withExtraSlots}) {
-  // TODO: billable/price
   // TODO: places left
   // TODO: set value as `{uuid: places}` (when adding final-form integration)
   // TODO: disable options triggering price changes after payment (or warn for managers)
