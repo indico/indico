@@ -245,23 +245,13 @@ import {$T} from 'indico/utils/i18n';
 
     // Change the selectors so that they match the properties of the item
     $('#text-color-selector').val(item.color);
-    var textColorPreview = $('#text-color-preview');
-    if (textColorPreview.hasClass('no-value') && item.color.length > 1) {
-      textColorPreview.removeClass('no-value');
-    }
-    textColorPreview.attr('style', 'background-color: ' + item.color + '; opacity: 1;');
-    if (item.color.length < 1) {
-      textColorPreview.addClass('no-value');
-    }
+    const textColorPreview = $('#text-color-preview');
+    textColorPreview.toggleClass('no-value', !item.color);
+    textColorPreview.css({backgroundColor: item.color, opacity: 1});
     $('#bg-color-selector').val(item.background_color);
-    var bgColorPreview = $('#bg-color-preview');
-    if (bgColorPreview.hasClass('no-value') && item.background_color.length > 1) {
-      bgColorPreview.removeClass('no-value');
-    }
-    bgColorPreview.attr('style', 'background-color: ' + item.background_color + '; opacity: 1;');
-    if (!item.background_color || item.background_color.length < 1) {
-      bgColorPreview.addClass('no-value');
-    }
+    const bgColorPreview = $('#bg-color-preview');
+    bgColorPreview.toggleClass('no-value', !item.background_color);
+    bgColorPreview.css({backgroundColor: item.background_color, opacity: 1});
     $('#alignment-selector').val(item.text_align);
     $('#font-selector').val(item.font_family);
     $('#size-selector').val(item.font_size);
@@ -448,26 +438,26 @@ import {$T} from 'indico/utils/i18n';
       },
       back: function() {
         if (div) {
-          var backmostItem = _.minBy(
+          const backmostItem = _.minBy(
             Object.values(items).filter(
               item => selectedItem.id !== item.id && itemsOverlap(selectedItem, item)
             ),
             'zIndex'
           );
-          var zIndex = Math.min(selectedItem.zIndex, backmostItem.zIndex - 1);
+          const zIndex = Math.min(selectedItem.zIndex, backmostItem.zIndex - 1);
           selectedItem.zIndex = zIndex;
           normalizeZIndex();
         }
       },
       front: function() {
         if (div) {
-          var foremostItem = _.maxBy(
+          const foremostItem = _.maxBy(
             Object.values(items).filter(
               item => selectedItem.id !== item.id && itemsOverlap(selectedItem, item)
             ),
             'zIndex'
           );
-          var zIndex = Math.max(selectedItem.zIndex, foremostItem.zIndex + 1);
+          const zIndex = Math.max(selectedItem.zIndex, foremostItem.zIndex + 1);
           selectedItem.zIndex = zIndex;
           normalizeZIndex();
         }
