@@ -10,7 +10,7 @@ from collections import namedtuple
 from io import BytesIO
 
 from PIL import Image
-from reportlab.lib import colors, pagesizes
+from reportlab.lib import pagesizes
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
@@ -40,8 +40,6 @@ ALIGNMENTS = {
     'justified': TA_JUSTIFY
 }
 
-AVAILABLE_COLOR_NAMES = {'black', 'red', 'blue', 'green', 'yellow', 'brown', 'cyan', 'gold', 'pink', 'gray', 'white'}
-COLORS = {k: getattr(colors, k) for k in AVAILABLE_COLOR_NAMES}
 PIXELS_CM = 50
 FONT_SIZE_RE = re.compile(r'(\d+)(pt)?')
 
@@ -96,7 +94,9 @@ class DesignerPDFBase:
     def _draw_item(self, canvas, item, tpl_data, content, margin_x, margin_y):
         style = ParagraphStyle({})
         style.alignment = ALIGNMENTS[item['text_align']]
-        style.textColor = COLORS[item['color']]
+        style.textColor = item.get('color') or '#000000'
+        style.backColor = item.get('background_color') or None
+        style.borderPadding = (0, 0, 4, 0)
         style.fontSize = _extract_font_size(item['font_size'])
         style.leading = style.fontSize
 
