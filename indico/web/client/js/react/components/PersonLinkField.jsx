@@ -174,26 +174,28 @@ PersonListItem.defaultProps = {
   onClickRole: null,
 };
 
-const DraggableItem = ({children, onMove, ...props}) => {
+const DraggablePersonListItem = ({onMove, index, ...props}) => {
   const [dragRef, itemRef, style] = useSortableItem({
-    ...props,
+    type: 'person',
+    index,
     moveItem: onMove,
     separateHandle: true,
   });
   return (
     <div ref={itemRef} style={style} styleName="drag-item">
       <Ref innerRef={dragRef}>
-        {/* To be replaced */}
         <div className="icon-drag-indicator" styleName="handle" />
       </Ref>
-      <div styleName="preview">{children}</div>
+      <div styleName="preview">
+        <PersonListItem {...props} />
+      </div>
     </div>
   );
 };
 
-DraggableItem.propTypes = {
-  children: PropTypes.node.isRequired,
+DraggablePersonListItem.propTypes = {
   onMove: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired,
 };
 
 const PersonLinkSection = ({
@@ -227,20 +229,21 @@ const PersonLinkSection = ({
       <List divided relaxed>
         {persons.length > 0 ? (
           persons.map((p, idx) => (
-            <DraggableItem key={p.userId || p.email} type="person" index={idx} onMove={moveItem}>
-              <PersonListItem
-                person={p}
-                onDelete={() => onChange(persons.filter((_, i) => i !== idx))}
-                onEdit={() => onEdit(idx)}
-                onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
-                canDelete={canDelete}
-                roles={defaultRoles.map(({name, ...rest}) => ({
-                  ...rest,
-                  name,
-                  active: p.roles && p.roles.includes(name),
-                }))}
-              />
-            </DraggableItem>
+            <DraggablePersonListItem
+              key={p.userId || p.email}
+              index={idx}
+              onMove={moveItem}
+              person={p}
+              onDelete={() => onChange(persons.filter((_, i) => i !== idx))}
+              onEdit={() => onEdit(idx)}
+              onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
+              canDelete={canDelete}
+              roles={defaultRoles.map(({name, ...rest}) => ({
+                ...rest,
+                name,
+                active: p.roles && p.roles.includes(name),
+              }))}
+            />
           ))
         ) : (
           <Translate>There are no persons</Translate>
