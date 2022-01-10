@@ -117,7 +117,8 @@ def generate_basic_component(
 def generate_event_component(
     event: Event,
     user: t.Optional[User] = None,
-    organizer: t.Optional[t.Tuple[str, str]] = None
+    organizer: t.Optional[t.Tuple[str, str]] = None,
+    skip_access_check: t.Optional[bool] = False,
 ):
     """Generate an event icalendar component from an Indico event."""
     uid = f'indico-event-{event.id}@{url_parse(config.BASE_URL).host}'
@@ -135,7 +136,8 @@ def generate_event_component(
     # send description to plugins in case one wants to add anything to it
     data = {'description': component.get('description', '')}
     for update in values_from_signal(
-        signals.event.metadata_postprocess.send('ical-export', event=event, data=data, user=user),
+        signals.event.metadata_postprocess.send('ical-export', event=event, data=data, user=user,
+                                                skip_access_check=skip_access_check),
         as_list=True
     ):
         data.update(update)
@@ -218,7 +220,9 @@ def events_to_ical(
                 if contrib.start_dt and contrib.session_id is None and contrib.can_access(user)
             ]
         else:
-            components = [generate_event_component(event, user, organizer=organizer)]
+            components = [
+                generate_event_component(event, user, organizer=organizer, skip_access_check=skip_access_check)
+            ]
 
         for component in components:
             calendar.add_component(component)
