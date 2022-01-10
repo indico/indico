@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-13 13:18+0100\n"
-"PO-Revision-Date: 2022-01-06 19:20+0000\n"
+"POT-Creation-Date: 2022-01-10 15:30+0100\n"
+"PO-Revision-Date: 2022-01-10 14:55+0000\n"
 "Last-Translator: Adrian\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/indico/indico/language/en_GB/)\n"
 "MIME-Version: 1.0\n"
@@ -2703,7 +2703,7 @@ msgstr "You are not authorised to access this category."
 msgid "If you believe you should have access, please contact {}"
 msgstr ""
 
-#: indico/modules/categories/controllers/display.py:580
+#: indico/modules/categories/controllers/display.py:581
 msgid "There are no upcoming events for this category"
 msgstr ""
 
@@ -3899,7 +3899,7 @@ msgid "Template dimensions"
 msgstr ""
 
 #: indico/modules/designer/templates/template.html:80
-#: indico/modules/designer/templates/template.html:254
+#: indico/modules/designer/templates/template.html:260
 msgid "Width:"
 msgstr ""
 
@@ -3908,7 +3908,7 @@ msgid "Change orientation"
 msgstr ""
 
 #: indico/modules/designer/templates/template.html:89
-#: indico/modules/designer/templates/template.html:259
+#: indico/modules/designer/templates/template.html:265
 msgid "Height:"
 msgstr ""
 
@@ -3958,7 +3958,7 @@ msgid "Stretch"
 msgstr ""
 
 #: indico/modules/designer/templates/template.html:144
-#: indico/modules/designer/templates/template.html:246
+#: indico/modules/designer/templates/template.html:252
 msgid "Center"
 msgstr "Centre"
 
@@ -3971,7 +3971,7 @@ msgid "Remove back side"
 msgstr ""
 
 #: indico/modules/designer/templates/template.html:161
-#: indico/modules/designer/templates/template.html:357
+#: indico/modules/designer/templates/template.html:371
 msgid "Select a template for the back side"
 msgstr ""
 
@@ -3995,136 +3995,113 @@ msgstr ""
 msgid "Special Character Fonts"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:195
-msgid "black"
-msgstr ""
-
-#: indico/modules/designer/templates/template.html:196
-msgid "red"
-msgstr ""
-
 #: indico/modules/designer/templates/template.html:197
-msgid "blue"
-msgstr ""
+#: indico/modules/events/layout/forms.py:77
+msgid "Text color"
+msgstr "Text colour"
 
-#: indico/modules/designer/templates/template.html:198
-msgid "green"
-msgstr ""
+#: indico/modules/designer/templates/template.html:207
+msgid "Text background color"
+msgstr "Text background colour"
 
-#: indico/modules/designer/templates/template.html:199
-msgid "yellow"
-msgstr ""
-
-#: indico/modules/designer/templates/template.html:200
-msgid "brown"
-msgstr ""
-
-#: indico/modules/designer/templates/template.html:201
-msgid "gold"
-msgstr ""
-
-#: indico/modules/designer/templates/template.html:202
-msgid "pink"
-msgstr ""
-
-#: indico/modules/designer/templates/template.html:203
-msgid "gray"
-msgstr "grey"
-
-#: indico/modules/designer/templates/template.html:204
-msgid "white"
-msgstr ""
-
-#: indico/modules/designer/templates/template.html:209
+#: indico/modules/designer/templates/template.html:215
 msgid "Normal"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:210
+#: indico/modules/designer/templates/template.html:216
 msgid "Bold"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:211
+#: indico/modules/designer/templates/template.html:217
 msgid "Italic"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:212
+#: indico/modules/designer/templates/template.html:218
 msgid "Bold &amp; Italic"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:244
+#: indico/modules/designer/templates/template.html:250
 msgid "Left"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:245
+#: indico/modules/designer/templates/template.html:251
 msgid "Right"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:247
+#: indico/modules/designer/templates/template.html:253
 msgid "Justified"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:252
+#: indico/modules/designer/templates/template.html:258
 msgid "Element dimensions"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:265
+#: indico/modules/designer/templates/template.html:271
 msgid "Text:"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:269
+#: indico/modules/designer/templates/template.html:275
 msgid "Element positioning"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:271
+#: indico/modules/designer/templates/template.html:277
 msgid "Move item to the top"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:275
+#: indico/modules/designer/templates/template.html:281
 msgid "Move item to the left"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:279
+#: indico/modules/designer/templates/template.html:285
 msgid "Center item"
 msgstr "Centre item"
 
-#: indico/modules/designer/templates/template.html:283
+#: indico/modules/designer/templates/template.html:289
 msgid "Move item to the right"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:287
+#: indico/modules/designer/templates/template.html:293
 msgid "Move item to the bottom"
 msgstr ""
 
+#: indico/modules/designer/templates/template.html:297
+msgid "Move item to the back"
+msgstr ""
+
 #: indico/modules/designer/templates/template.html:301
+msgid "Move item to the front"
+msgstr ""
+
+#: indico/modules/designer/templates/template.html:315
 msgid "Front side"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:302
+#: indico/modules/designer/templates/template.html:316
 msgid "Back side"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:308
+#: indico/modules/designer/templates/template.html:322
 msgid "Insert element:"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:319
+#: indico/modules/designer/templates/template.html:333
 msgid "Fixed data"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:320
+#: indico/modules/designer/templates/template.html:334
 msgid "Fixed text"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:324
-#: indico/modules/designer/templates/template.html:325
+#: indico/modules/designer/templates/template.html:338
+#: indico/modules/designer/templates/template.html:339
 msgid "Insert"
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:352
+#: indico/modules/designer/templates/template.html:366
 msgid "The back side is empty."
 msgstr ""
 
-#: indico/modules/designer/templates/template.html:360
+#: indico/modules/designer/templates/template.html:374
 #, python-format
 msgid ""
 "%(link_start)sSelect an existing template%(link_end)s to be used as the back"
@@ -4203,7 +4180,7 @@ msgstr ""
 #: indico/modules/events/clone.py:85
 #: indico/modules/events/contributions/forms.py:69
 #: indico/modules/events/contributions/forms.py:117
-#: indico/modules/events/contributions/lists.py:51
+#: indico/modules/events/contributions/lists.py:53
 #: indico/modules/events/forms.py:104
 #: indico/modules/events/management/forms.py:185
 #: indico/modules/events/management/templates/_event_person_list.html:5
@@ -7116,6 +7093,7 @@ msgid "Duration"
 msgstr ""
 
 #: indico/modules/events/contributions/forms.py:48
+#: indico/modules/events/contributions/lists.py:51
 msgid "People"
 msgstr ""
 
@@ -7219,15 +7197,16 @@ msgid "Not scheduled"
 msgstr ""
 
 #: indico/modules/events/contributions/lists.py:51
+#: indico/modules/events/contributions/lists.py:53
 msgid "Registered"
 msgstr ""
 
 #: indico/modules/events/contributions/lists.py:52
-#: indico/modules/events/management/templates/_event_person_list.html:11
-msgid "Not registered"
+#: indico/modules/events/contributions/lists.py:54
+msgid "Nobody registered"
 msgstr ""
 
-#: indico/modules/events/contributions/lists.py:163
+#: indico/modules/events/contributions/lists.py:177
 msgid ""
 "The contribution '{}' is not displayed in the list due to the enabled "
 "filters"
@@ -8267,10 +8246,6 @@ msgstr ""
 msgid "Show videoconferences on the main conference page"
 msgstr ""
 
-#: indico/modules/events/layout/forms.py:77
-msgid "Text color"
-msgstr "Text colour"
-
 #: indico/modules/events/layout/forms.py:78
 msgid "Background color"
 msgstr "Background colour"
@@ -9166,6 +9141,10 @@ msgstr ""
 #: indico/modules/events/management/templates/_base_person_list.html:47
 #: indico/modules/events/persons/templates/management/person_list.html:42
 msgid "Send emails"
+msgstr ""
+
+#: indico/modules/events/management/templates/_event_person_list.html:11
+msgid "Not registered"
 msgstr ""
 
 #: indico/modules/events/management/templates/_event_person_list.html:20
@@ -10916,7 +10895,7 @@ msgid "Grants management access to the registration form."
 msgstr ""
 
 #: indico/modules/events/registration/badges.py:57
-#: indico/modules/events/registration/badges.py:142
+#: indico/modules/events/registration/badges.py:143
 msgid "The template dimensions are too large for the page size you selected"
 msgstr ""
 
