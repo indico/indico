@@ -7,13 +7,16 @@
 
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
-import {Button, Segment, List, Form, Label, Icon, Popup, Message} from 'semantic-ui-react';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
+import {Button, Segment, List, Form, Label, Icon, Popup, Message, Ref} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
 import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useFavoriteUsers} from 'indico/react/hooks';
+import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 import {snakifyKeys} from 'indico/utils/case';
 
 import {Translate} from '../i18n';
@@ -171,6 +174,28 @@ PersonListItem.defaultProps = {
   onClickRole: null,
 };
 
+const DraggableItem = ({children, onMove, ...props}) => {
+  const [dragRef, itemRef, style] = useSortableItem({
+    ...props,
+    moveItem: onMove,
+    separateHandle: true,
+  });
+  return (
+    <div ref={itemRef} style={style} styleName="drag-item">
+      <Ref innerRef={dragRef}>
+        {/* To be replaced */}
+        <div className="icon-drag-indicator" styleName="handle" />
+      </Ref>
+      <div styleName="preview">{children}</div>
+    </div>
+  );
+};
+
+DraggableItem.propTypes = {
+  children: PropTypes.node.isRequired,
+  onMove: PropTypes.func.isRequired,
+};
+
 const PersonLinkSection = ({
   label: sectionLabel,
   persons,
@@ -190,31 +215,38 @@ const PersonLinkSection = ({
     onChange(persons.map((v, i) => (i === personIndex ? {...v, roles} : v)));
   };
 
+  const moveItem = (dragIndex, hoverIndex) => {
+    const result = persons.slice();
+    result.splice(hoverIndex, 0, ...result.splice(dragIndex, 1));
+    onChange(result);
+  };
+
   return (
-    <>
+    <SortableWrapper accept="person">
       {sectionLabel && <div styleName="titled-rule">{sectionLabel}</div>}
       <List divided relaxed>
         {persons.length > 0 ? (
           persons.map((p, idx) => (
-            <PersonListItem
-              key={p.userId || p.email}
-              person={p}
-              onDelete={() => onChange(persons.filter((_, i) => i !== idx))}
-              onEdit={() => onEdit(idx)}
-              onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
-              canDelete={canDelete}
-              roles={defaultRoles.map(({name, ...rest}) => ({
-                ...rest,
-                name,
-                active: p.roles && p.roles.includes(name),
-              }))}
-            />
+            <DraggableItem key={p.userId || p.email} type="person" index={idx} onMove={moveItem}>
+              <PersonListItem
+                person={p}
+                onDelete={() => onChange(persons.filter((_, i) => i !== idx))}
+                onEdit={() => onEdit(idx)}
+                onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
+                canDelete={canDelete}
+                roles={defaultRoles.map(({name, ...rest}) => ({
+                  ...rest,
+                  name,
+                  active: p.roles && p.roles.includes(name),
+                }))}
+              />
+            </DraggableItem>
           ))
         ) : (
           <Translate>There are no persons</Translate>
         )}
       </List>
-    </>
+    </SortableWrapper>
   );
 };
 
@@ -278,63 +310,67 @@ export default function PersonLinkField({
 
   return (
     <div styleName="person-link-field">
-      <Segment attached="top" styleName="segment">
-        {sections.map(({name, label, plural}) => {
-          const filterCondition = p => p.roles && p.roles.includes(name);
-          const filtered = persons.filter(filterCondition);
-          return filtered.length === 0 ? null : (
+      <DndProvider backend={HTML5Backend}>
+        <Segment attached="top" styleName="segment">
+          {sections.map(({name, label, plural}) => {
+            const filterCondition = p => p.roles && p.roles.includes(name);
+            const filtered = persons.filter(filterCondition);
+            return filtered.length === 0 ? null : (
+              <PersonLinkSection
+                key={name}
+                label={plural || label}
+                persons={filtered}
+                defaultRoles={roles}
+                onEdit={idx => onEdit(persons.findIndex(p => p === filtered[idx]))}
+                onChange={values =>
+                  onChange(persons.filter(p => !filterCondition(p)).concat(values))
+                }
+              />
+            );
+          })}
+          {others.length > 0 && (
             <PersonLinkSection
-              key={name}
-              label={plural || label}
-              persons={filtered}
+              label={sections.length > 0 ? Translate.string('Others') : undefined}
+              persons={others}
               defaultRoles={roles}
-              onEdit={idx => onEdit(persons.findIndex(p => p === filtered[idx]))}
-              onChange={values => onChange(persons.filter(p => !filterCondition(p)).concat(values))}
+              onEdit={idx => onEdit(persons.findIndex(p => p === others[idx]))}
+              onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
             />
-          );
-        })}
-        {others.length > 0 && (
-          <PersonLinkSection
-            label={sections.length > 0 ? Translate.string('Others') : undefined}
-            persons={others}
-            defaultRoles={roles}
-            onEdit={idx => onEdit(persons.findIndex(p => p === others[idx]))}
-            onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
-          />
-        )}
-        {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
-      </Segment>
-      <Button.Group size="small" attached="bottom" floated="right">
-        {sessionUser && (
-          <Translate
-            as={Button}
-            type="button"
-            onClick={() => onAdd([sessionUser])}
-            disabled={persons.some(p => p.userId === sessionUser.userId)}
-          >
-            Add myself
-          </Translate>
-        )}
-        <UserSearch
-          favorites={favoriteUsers}
-          existing={persons.map(p => p.userIdentifier)}
-          onAddItems={onAdd}
-          triggerFactory={props => (
-            <Button type="button" {...props}>
-              <Translate>Search</Translate>
-            </Button>
           )}
-          withEventPersons={eventId !== null}
-          eventId={eventId}
-          disabled={!sessionUser}
-        />
-        <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
-          Enter manually
-        </Translate>
-        {modalOpen && (
-          <ExternalPersonModal onClose={onClose} onSubmit={onSubmit} person={persons[selected]} />
-        )}
-      </Button.Group>
+          {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
+        </Segment>
+        <Button.Group size="small" attached="bottom" floated="right">
+          {sessionUser && (
+            <Translate
+              as={Button}
+              type="button"
+              onClick={() => onAdd([sessionUser])}
+              disabled={persons.some(p => p.userId === sessionUser.userId)}
+            >
+              Add myself
+            </Translate>
+          )}
+          <UserSearch
+            favorites={favoriteUsers}
+            existing={persons.map(p => p.userIdentifier)}
+            onAddItems={onAdd}
+            triggerFactory={props => (
+              <Button type="button" {...props}>
+                <Translate>Search</Translate>
+              </Button>
+            )}
+            withEventPersons={eventId !== null}
+            eventId={eventId}
+            disabled={!sessionUser}
+          />
+          <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
+            Enter manually
+          </Translate>
+          {modalOpen && (
+            <ExternalPersonModal onClose={onClose} onSubmit={onSubmit} person={persons[selected]} />
+          )}
+        </Button.Group>
+      </DndProvider>
     </div>
   );
 }

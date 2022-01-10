@@ -89,7 +89,7 @@ export function useSortableItem({
       const {index: curIndex, originalIndex} = item;
       const didDrop = monitor.didDrop();
       if (didDrop) {
-        onDrop(item);
+        onDrop && onDrop(item);
       } else {
         moveItem(curIndex, originalIndex);
       }
