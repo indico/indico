@@ -76,6 +76,7 @@ export default function MultiChoiceInput({htmlName, disabled, choices, withExtra
                     <Dropdown
                       selection
                       styleName="dropdown"
+                      disabled={disabled}
                       value={value[choice.id] || 0}
                       onChange={makeHandleSlotsChange(choice)}
                       options={_.range(0, choice.maxExtraSlots + 2).map(i => ({
