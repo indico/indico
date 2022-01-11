@@ -41,7 +41,7 @@ Internal Changes
 Version 3.1
 -----------
 
-*Unreleased*
+*Released on January 11, 2022*
 
 Major Features
 ^^^^^^^^^^^^^^
@@ -84,6 +84,7 @@ Improvements
   has registered for the event or not (:issue:`5192`, :pr:`5193`)
 - Add background color option and layer order to badge/poster designer items (:pr:`5139`,
   thanks :user:`SegiNyn`)
+- Allow external users in event/category ACLs (:pr:`5146`)
 
 Bugfixes
 ^^^^^^^^
@@ -91,6 +92,9 @@ Bugfixes
 - Fix :data:`CUSTOM_COUNTRIES` not overriding names of existing countries (:pr:`5183`)
 - Fix error dialog when submitting an invited abstract without being logger in (:pr:`5200`)
 - Fix category picker search displaying deleted categories (:issue:`5197`, :pr:`5203`)
+- Fix editing service API calls using the service token (:pr:`5170`)
+- Fix excessive retries for Celery tasks with a retry wait time longer
+  than 1 hour (:pr:`5172`)
 
 
 ----
