@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Form} from 'semantic-ui-react';
+import {Form, Label} from 'semantic-ui-react';
 
 import {FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -21,26 +21,26 @@ import '../../../styles/regform.module.scss';
 
 const attributeMap = {minValue: 'min', maxValue: 'max'};
 
-export default function NumberInput({htmlName, disabled, price, ...props}) {
+export default function NumberInput({htmlName, disabled, price, title, isRequired, ...props}) {
   const [value, setValue] = useState('');
   const currency = useSelector(getCurrency);
   const inputProps = mapPropsToAttributes(props, attributeMap, NumberInput.defaultProps);
+  const total = (value * price).toFixed(2);
+
   return (
-    <>
+    <div styleName="number-field">
       <input
         type="number"
         name={htmlName}
+        value={value}
         {...inputProps}
         disabled={disabled}
-        value={value}
         onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
       />
-      {!!price && (
-        <span styleName="price">
-          {price} {currency} (Total: {value * price} {currency})
-        </span>
-      )}
-    </>
+      <Label pointing="left" styleName="price-tag">
+        {price.toFixed(2)} {currency} (Total: {total} {currency})
+      </Label>
+    </div>
   );
 }
 
@@ -50,6 +50,8 @@ NumberInput.propTypes = {
   minValue: PropTypes.number,
   maxValue: PropTypes.number,
   price: PropTypes.number,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
 };
 
 NumberInput.defaultProps = {

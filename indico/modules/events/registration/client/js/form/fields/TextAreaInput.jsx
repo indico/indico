@@ -12,14 +12,15 @@ import {Form} from 'semantic-ui-react';
 import {FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
+import '../../../styles/regform.module.scss';
+
 import {mapPropsToAttributes} from './util';
 
 const attributeMap = {
   numberOfRows: 'rows',
-  numberOfColumns: 'cols',
 };
 
-export default function TextAreaInput({htmlName, disabled, ...props}) {
+export default function TextAreaInput({htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextAreaInput.defaultProps);
   return <textarea name={htmlName} {...inputProps} disabled={disabled} style={{resize: 'none'}} />;
 }
@@ -28,29 +29,18 @@ TextAreaInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   numberOfRows: PropTypes.number,
-  numberOfColumns: PropTypes.number,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
 };
 
 TextAreaInput.defaultProps = {
   disabled: false,
   numberOfRows: 2,
-  numberOfColumns: 60,
 };
 
 export function TextAreaSettings() {
   return (
     <Form.Group widths="equal">
-      <FinalInput
-        name="numberOfColumns"
-        type="number"
-        label={Translate.string('Columns')}
-        placeholder={String(TextAreaInput.defaultProps.numberOfColumns)}
-        step="1"
-        min="1"
-        max="60"
-        validate={v.optional(v.range(1, 60))}
-        fluid
-      />
       <FinalInput
         name="numberOfRows"
         type="number"

@@ -14,9 +14,11 @@ import {Translate} from 'indico/react/i18n';
 
 import {mapPropsToAttributes} from './util';
 
-const attributeMap = {length: 'size', minLength: 'minLength', maxLength: 'maxLength'};
+import '../../../styles/regform.module.scss';
 
-export default function TextInput({htmlName, disabled, ...props}) {
+const attributeMap = {minLength: 'minLength', maxLength: 'maxLength'};
+
+export default function TextInput({htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextInput.defaultProps);
   return <input type="text" name={htmlName} {...inputProps} disabled={disabled} />;
 }
@@ -24,14 +26,14 @@ export default function TextInput({htmlName, disabled, ...props}) {
 TextInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
-  length: PropTypes.number,
+  title: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
   minLength: PropTypes.number,
   maxLength: PropTypes.number,
 };
 
 TextInput.defaultProps = {
   disabled: false,
-  length: 60,
   minLength: null,
   maxLength: null,
 };
@@ -39,17 +41,6 @@ TextInput.defaultProps = {
 export function TextSettings() {
   return (
     <Form.Group widths="equal">
-      <FinalInput
-        name="length"
-        type="number"
-        label={Translate.string('Width')}
-        placeholder={String(TextInput.defaultProps.length)}
-        step="1"
-        min="5"
-        max="60"
-        validate={v.optional(v.range(5, 60))}
-        fluid
-      />
       <FinalInput
         name="minLength"
         type="number"

@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
+import {Form, Label, Dropdown} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -18,22 +19,94 @@ import {Translate} from 'indico/react/i18n';
 import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
+import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
+import './table.module.scss';
 
-function SingleChoiceDropdown({htmlName, disabled, choices, value, onChange}) {
+function SingleChoiceDropdown({
+  htmlName,
+  disabled,
+  choices,
+  withExtraSlots,
+  defaultItem,
+  isRequired,
+}) {
   const currency = useSelector(getCurrency);
+  const [value, setValue] = useState(defaultItem || '');
+  const [slotsUsed, setSlotsUsed] = useState(1);
+  const selectedChoice = choices.find(c => c.id === value);
+
+  let extraSlotsDropdown = null;
+  if (withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0) {
+    const options = _.range(1, selectedChoice.maxExtraSlots + 2).map(i => ({
+      key: i,
+      value: i,
+      text: i,
+    }));
+    extraSlotsDropdown = (
+      <Form.Select
+        name={`${htmlName}-extra`}
+        options={options}
+        disabled={disabled}
+        value={slotsUsed}
+        onChange={(_evt, data) => setSlotsUsed(data.value)}
+        fluid
+      />
+    );
+  }
+
+  const handleChange = (_evt, data) => {
+    setValue(data.value);
+    setSlotsUsed(1);
+  };
+
+  const options = choices.map(c => ({
+    key: c.id,
+    value: c.id,
+    disabled: !c.isEnabled,
+    text: (
+      <div styleName="dropdown-text">
+        <div styleName="caption">{c.caption}</div>
+        <div styleName="labels">
+          {!!c.price && (
+            <Label>
+              {c.price} {currency}
+            </Label>
+          )}
+          {c.placesLimit === 0 ? null : (
+            <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+          )}
+        </div>
+      </div>
+    ),
+  }));
+
   return (
-    <select name={htmlName} disabled={disabled} value={value} onChange={onChange}>
-      <option key="" value="">
-        {Translate.string('Choose an option')}
-      </option>
-      {choices.map(c => (
-        <option key={c.id} value={c.id} disabled={!c.isEnabled}>
-          {c.caption} {!!c.price && `(${c.price} ${currency})`}
-        </option>
-      ))}
-    </select>
+    <Form.Group styleName="single-choice-dropdown">
+      <Form.Select
+        name={htmlName}
+        style={{width: 500}}
+        placeholder={Translate.string('Choose an option')}
+        options={options}
+        disabled={disabled}
+        value={value}
+        onChange={handleChange}
+        clearable={!isRequired}
+        search
+      />
+      {extraSlotsDropdown}
+      {extraSlotsDropdown && !!selectedChoice.price && (
+        <Label pointing="left">
+          {Translate.string('Total: {total} {currency}', {
+            total: ((selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price).toFixed(
+              2
+            ),
+            currency,
+          })}
+        </Label>
+      )}
+    </Form.Group>
   );
 }
 
@@ -41,35 +114,101 @@ SingleChoiceDropdown.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  isRequired: PropTypes.bool.isRequired,
+  withExtraSlots: PropTypes.bool.isRequired,
+  defaultItem: PropTypes.string,
 };
 
-function SingleChoiceRadioGroup({htmlName, disabled, choices, value, onChange, isRequired}) {
+SingleChoiceDropdown.defaultProps = {
+  defaultItem: null,
+};
+
+function SingleChoiceRadioGroup({
+  htmlName,
+  disabled,
+  choices,
+  withExtraSlots,
+  defaultItem,
+  isRequired,
+}) {
   const currency = useSelector(getCurrency);
+  const [value, setValue] = useState(defaultItem || '');
+  const [slotsUsed, setSlotsUsed] = useState(1);
+  const selectedChoice = choices.find(c => c.id === value) || {};
   const radioChoices = [...choices];
   if (!isRequired) {
     radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
   }
+
+  const handleChange = newValue => {
+    setValue(newValue);
+    setSlotsUsed(1);
+  };
+
   return (
-    <ul styleName="radio-group">
-      {radioChoices.map(c => (
-        <li key={c.id}>
-          <input
-            type="radio"
-            name={htmlName}
-            id={`${htmlName}-${c.id}`}
-            value={c.id}
-            disabled={!c.isEnabled || disabled}
-            checked={c.id === value}
-            onChange={onChange}
-          />{' '}
-          <label htmlFor={`${htmlName}-${c.id}`}>
-            {c.caption} {!!c.price && `(${c.price} ${currency})`}
-          </label>
-        </li>
-      ))}
-    </ul>
+    <table styleName="choice-table">
+      <tbody>
+        {radioChoices.map(c => {
+          return (
+            <tr key={c.id} styleName="row">
+              <td>
+                <Form.Radio
+                  styleName="radio"
+                  label={c.caption}
+                  name={htmlName}
+                  key={c.id}
+                  value={c.id}
+                  disabled={!c.isEnabled || disabled}
+                  checked={c.id === value}
+                  onChange={() => handleChange(c.id)}
+                />
+              </td>
+              <td>
+                {c.isEnabled && !!c.price && (
+                  <Label pointing="left">
+                    {c.price.toFixed(2)} {currency}
+                  </Label>
+                )}
+              </td>
+              <td>
+                {c.id !== '' && c.placesLimit !== 0 && (
+                  <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+                )}
+              </td>
+              {withExtraSlots && !!c.maxExtraSlots && selectedChoice.id === c.id && (
+                <>
+                  <td>
+                    {c.isEnabled && (
+                      <Dropdown
+                        selection
+                        styleName="dropdown"
+                        value={slotsUsed}
+                        onChange={(e, data) => setSlotsUsed(data.value)}
+                        options={_.range(1, c.maxExtraSlots + 2).map(i => ({
+                          key: i,
+                          value: i,
+                          text: i,
+                        }))}
+                      />
+                    )}
+                  </td>
+                  <td>
+                    {c.isEnabled && !!c.price && (
+                      <Label pointing="left">
+                        {Translate.string('Total: {total} {currency}', {
+                          total: (slotsUsed * c.price).toFixed(2),
+                          currency,
+                        })}
+                      </Label>
+                    )}
+                  </td>
+                </>
+              )}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 
@@ -77,9 +216,13 @@ SingleChoiceRadioGroup.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  withExtraSlots: PropTypes.bool.isRequired,
   isRequired: PropTypes.bool.isRequired,
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  defaultItem: PropTypes.string,
+};
+
+SingleChoiceRadioGroup.defaultProps = {
+  defaultItem: null,
 };
 
 export default function SingleChoiceInput({
@@ -91,37 +234,9 @@ export default function SingleChoiceInput({
   defaultItem,
   withExtraSlots,
 }) {
-  // TODO: places left
   // TODO: set value as `{uuid: places}` (when adding final-form integration)
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
-  const currency = useSelector(getCurrency);
-  const [value, setValue] = useState(defaultItem || '');
-  const [slotsUsed, setSlotsUsed] = useState(1);
-  const selectedChoice = choices.find(c => c.id === value);
-
-  let extraSlotsDropdown = null;
-  if (withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0) {
-    extraSlotsDropdown = (
-      <select
-        name={`${htmlName}-extra`}
-        disabled={disabled}
-        value={slotsUsed}
-        onChange={evt => setSlotsUsed(evt.target.value)}
-      >
-        {_.range(1, selectedChoice.maxExtraSlots + 2).map(i => (
-          <option key={i} value={i}>
-            {i}
-          </option>
-        ))}
-      </select>
-    );
-  }
-
-  const handleChange = evt => {
-    setValue(evt.target.value);
-    setSlotsUsed(1);
-  };
 
   let component = null;
   if (itemType === 'dropdown') {
@@ -130,9 +245,9 @@ export default function SingleChoiceInput({
         htmlName={htmlName}
         disabled={disabled}
         choices={choices}
-        extraSlotsDropdown={extraSlotsDropdown}
-        value={value}
-        onChange={handleChange}
+        withExtraSlots={withExtraSlots}
+        defaultItem={defaultItem}
+        isRequired={isRequired}
       />
     );
   } else if (itemType === 'radiogroup') {
@@ -141,9 +256,7 @@ export default function SingleChoiceInput({
         htmlName={htmlName}
         disabled={disabled}
         choices={choices}
-        extraSlotsDropdown={extraSlotsDropdown}
-        value={value}
-        onChange={handleChange}
+        withExtraSlots={withExtraSlots}
         isRequired={isRequired}
       />
     );
@@ -151,17 +264,7 @@ export default function SingleChoiceInput({
     return `ERROR: Unknown type ${itemType}`;
   }
 
-  return (
-    <>
-      {component}
-      {extraSlotsDropdown}
-      {extraSlotsDropdown && !!selectedChoice.price && (
-        <span styleName="price">
-          Total: {(selectedChoice.extraSlotsPay ? slotsUsed : 1) * selectedChoice.price} {currency}
-        </span>
-      )}
-    </>
-  );
+  return component;
 }
 
 SingleChoiceInput.propTypes = {

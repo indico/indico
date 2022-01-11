@@ -35,23 +35,126 @@
 
 .form-item {
   display: flex;
-  padding: 4px 0;
+  padding-top: 7px;
+
+  &:last-child {
+    padding-bottom: 7px;
+  }
 
   &.disabled {
     background: $light-gray;
 
-    > .label,
     > .content {
       color: $dark-gray;
     }
   }
 
-  > .label {
-    flex-basis: 125px;
-  }
-
   > .content {
     flex-grow: 1;
+
+    .label {
+      max-width: 500px;
+      overflow-wrap: anywhere;
+    }
+
+    .field {
+      margin-bottom: 3px;
+
+      .price-tag {
+        float: unset;
+        margin-left: 2em;
+      }
+
+      .greyed {
+        color: rgba(0, 0, 0, 0.2);
+      }
+
+      .number-field,
+      .boolean-field {
+        display: flex;
+        align-items: center;
+      }
+
+      .boolean-field :global(.ui.button:not(.active):not(:hover):focus) {
+        background-color: #e0e1e2;
+        color: rgba(0, 0, 0, 0.6);
+      }
+
+      .date-field {
+        margin-bottom: 0;
+      }
+
+      .accommodation-field {
+        .date-picker {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-top: 10px;
+        }
+      }
+
+      .country-dropdown {
+        max-width: 500px;
+      }
+
+      .single-choice-dropdown {
+        align-items: center;
+        margin-bottom: 0;
+
+        .dropdown-text {
+          display: flex;
+          align-items: center;
+
+          .caption {
+            flex-grow: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 27em;
+          }
+
+          .labels {
+            margin-top: -11px;
+            margin-bottom: -11px;
+            margin-left: 0.5em;
+            white-space: nowrap;
+
+            :global(.label) {
+              white-space: nowrap;
+            }
+          }
+        }
+
+        :global(.dropdown .divider.text) {
+          width: 100%;
+        }
+
+        .single-choice-radio-group {
+          margin-right: 2em;
+          margin-bottom: 0;
+        }
+      }
+
+      textarea,
+      input[type='email'],
+      input[type='file'],
+      input[type='text'] {
+        max-width: 500px;
+      }
+
+      input[type='tel'],
+      input[type='number'] {
+        max-width: 250px;
+      }
+    }
+
+    > .description {
+      max-width: 500px;
+      padding: 3px 0 0 2px;
+      text-align: justify;
+      font-style: italic;
+      font-size: 0.9em;
+      color: $dark-gray;
+    }
   }
 
   > .actions {
@@ -62,16 +165,16 @@
     }
   }
 
-  .required {
-    display: inline-block;
-    margin-left: 2px;
-    color: #812;
-  }
-
   &.editable {
     .sortable-handle {
       color: $dark-gray;
-      width: 15px;
+      margin-left: -10px;
+      width: 25px;
+
+      &::before {
+        position: relative;
+        left: 8px;
+      }
     }
 
     &.disabled .sortable-handle {
@@ -92,25 +195,6 @@
     }
   }
 
-  ul.radio-group {
-    margin: 0;
-    padding-left: 0;
-
-    li {
-      list-style-type: none;
-    }
-  }
-
-  .checkbox-input-label {
-    input[type='checkbox'] {
-      margin-right: 0.5em;
-    }
-  }
-
-  .price {
-    margin-left: 1em;
-  }
-
   :global(.DateRangePickerInput__disabled) {
     background: inherit;
   }
@@ -119,16 +203,20 @@
     visibility: hidden;
   }
 
-  :global(.DateInput_input) {
-    width: 7.3em;
-  }
+  :global(.SingleDatePickerInput) {
+    border-radius: 4px;
 
-  :global(.SingleDatePickerInput_calendarIcon) {
-    padding: 0 5px 2px 8px;
+    & > :global(.DateInput) {
+      max-width: 130px;
+    }
+
+    & > button {
+      margin-left: 5px;
+    }
   }
 
   :global(.rc-time-picker) {
-    width: 6em;
+    max-width: 110px;
   }
 
   :global(.rc-time-picker-input) {

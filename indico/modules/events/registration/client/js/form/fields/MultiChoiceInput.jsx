@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
+import {Checkbox, Dropdown, Label} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -17,8 +18,10 @@ import {Translate} from 'indico/react/i18n';
 import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
+import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
+import './table.module.scss';
 
 export default function MultiChoiceInput({htmlName, disabled, choices, withExtraSlots}) {
   // TODO: places left
@@ -28,53 +31,80 @@ export default function MultiChoiceInput({htmlName, disabled, choices, withExtra
   const currency = useSelector(getCurrency);
   const [value, setValue] = useState({});
 
-  const makeHandleChange = choice => evt => {
-    setValue(prev => ({...prev, [choice.id]: +evt.target.checked}));
+  const makeHandleChange = choice => () => {
+    setValue(prev => ({...prev, [choice.id]: +!prev[choice.id]}));
   };
-  const makeHandleSlotsChange = choice => evt => {
-    setValue(prev => ({...prev, [choice.id]: +evt.target.value}));
+  const makeHandleSlotsChange = choice => (__, {value: newValue}) => {
+    setValue(prev => ({...prev, [choice.id]: +newValue}));
   };
 
+  const formatPrice = choice =>
+    ((choice.extraSlotsPay ? value[choice.id] || 0 : 1) * choice.price).toFixed(2);
+
   return (
-    <ul styleName="radio-group">
-      {choices.map(choice => (
-        <li key={choice.id}>
-          <input
-            type="checkbox"
-            name={htmlName}
-            id={`${htmlName}-${choice.id}`}
-            value={choice.id}
-            disabled={!choice.isEnabled || disabled}
-            checked={!!value[choice.id]}
-            onChange={makeHandleChange(choice)}
-          />{' '}
-          <label htmlFor={`${htmlName}-${choice.id}`}>
-            {choice.caption} {!!choice.price && `(${choice.price} ${currency})`}
-          </label>
-          {!!value[choice.id] && withExtraSlots && choice.maxExtraSlots > 0 && (
-            <>
-              <select
-                name={`${htmlName}-${choice.id}-extra`}
-                disabled={disabled}
-                value={value[choice.id]}
-                onChange={makeHandleSlotsChange(choice)}
-              >
-                {_.range(1, choice.maxExtraSlots + 2).map(i => (
-                  <option key={i} value={i}>
-                    {i}
-                  </option>
-                ))}
-              </select>
-              {!!choice.price && (
-                <span styleName="price">
-                  Total: {(choice.extraSlotsPay ? value[choice.id] : 1) * choice.price} {currency}
-                </span>
+    <table styleName="choice-table">
+      <tbody>
+        {choices.map(choice => {
+          return (
+            <tr key={choice.id} styleName="row">
+              <td>
+                <Checkbox
+                  styleName="checkbox"
+                  name={htmlName}
+                  value={choice.id}
+                  disabled={!choice.isEnabled || disabled}
+                  checked={!!value[choice.id]}
+                  onChange={makeHandleChange(choice)}
+                  label={choice.caption}
+                />
+              </td>
+              <td>
+                {choice.isEnabled && !!choice.price && (
+                  <Label pointing="left">
+                    {choice.price.toFixed(2)} {currency}
+                  </Label>
+                )}
+              </td>
+              <td>
+                {choice.placesLimit === 0 ? null : (
+                  <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
+                )}
+              </td>
+              {withExtraSlots && (
+                <td>
+                  {choice.isEnabled && (
+                    <Dropdown
+                      selection
+                      styleName="dropdown"
+                      disabled={disabled}
+                      value={value[choice.id] || 0}
+                      onChange={makeHandleSlotsChange(choice)}
+                      options={_.range(0, choice.maxExtraSlots + 2).map(i => ({
+                        key: i,
+                        value: i,
+                        text: i,
+                      }))}
+                    />
+                  )}
+                </td>
               )}
-            </>
-          )}
-        </li>
-      ))}
-    </ul>
+              {withExtraSlots && (
+                <td>
+                  {choice.isEnabled && !!choice.price && (
+                    <Label pointing="left">
+                      {Translate.string('Total: {total} {currency}', {
+                        total: formatPrice(choice),
+                        currency,
+                      })}
+                    </Label>
+                  )}
+                </td>
+              )}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 

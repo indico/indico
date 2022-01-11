@@ -7,6 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Form} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {Markdown} from 'indico/react/util';
@@ -45,7 +46,7 @@ export default function FormSection({
           </div>
         )}
       </div>
-      <div className="i-box-content">
+      <Form as="div" className="i-box-content">
         {enabledFields.map((item, index) => (
           <ItemComponent
             key={item.id}
@@ -75,7 +76,7 @@ export default function FormSection({
             ))}
           </>
         )}
-      </div>
+      </Form>
     </div>
   );
 }

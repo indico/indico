@@ -8,8 +8,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import '../../../styles/regform.module.scss';
+
 export default function EmailInput({htmlName, disabled}) {
-  return <input type="email" name={htmlName} size="60" disabled={disabled} />;
+  return <input type="email" name={htmlName} disabled={disabled} size="60" />;
 }
 
 EmailInput.propTypes = {

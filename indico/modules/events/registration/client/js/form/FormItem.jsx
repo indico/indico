@@ -7,6 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Form} from 'semantic-ui-react';
 
 import {Markdown, toClasses} from 'indico/react/util';
 
@@ -31,16 +32,33 @@ export default function FormItem({
   return (
     <div styleName={`form-item ${toClasses({disabled: !isEnabled, editable: setupMode})}`}>
       {sortHandle}
-      {!meta.noLabel && (
-        <span styleName="label">
-          {title}
-          {(isRequired || meta.alwaysRequired) && <span styleName="required">*</span>}
-        </span>
-      )}
       <div styleName="content">
-        {InputComponent ? <InputComponent {...inputProps} /> : `Unknown input type: ${inputType}`}
+        {InputComponent ? (
+          meta.customFormItem ? (
+            <InputComponent
+              isRequired={isRequired || meta.alwaysRequired}
+              disabled={!isEnabled}
+              {...inputProps}
+            />
+          ) : (
+            <Form.Field
+              required={isRequired || meta.alwaysRequired}
+              disabled={!isEnabled}
+              styleName="field"
+            >
+              <label>{title}</label>
+              <InputComponent
+                isRequired={isRequired || meta.alwaysRequired}
+                disabled={!isEnabled}
+                {...inputProps}
+              />
+            </Form.Field>
+          )
+        ) : (
+          `Unknown input type: ${inputType}`
+        )}
         {description && (
-          <div className="field-description">
+          <div styleName="description">
             <Markdown>{description}</Markdown>
           </div>
         )}

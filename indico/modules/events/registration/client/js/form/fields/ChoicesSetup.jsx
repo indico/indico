@@ -108,6 +108,14 @@ export function Choices({
           </tbody>
         </table>
       </SortableWrapper>
+      {forAccommodation && (
+        <p
+          className="field-description"
+          style={{textAlign: 'end', marginTop: '-1em', marginBottom: '1em'}}
+        >
+          <Translate>All prices are per night</Translate>
+        </p>
+      )}
       <Button type="button" onClick={handleAdd} disabled={disabled}>
         <Translate>Add new</Translate>
       </Button>

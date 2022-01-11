@@ -7,21 +7,31 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {Dropdown} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
+import '../../../styles/regform.module.scss';
+
+const isoToFlag = country =>
+  String.fromCodePoint(...country.split('').map(c => c.charCodeAt() + 0x1f1a5));
+
 export default function CountryInput({htmlName, disabled, choices}) {
   return (
-    <select name={htmlName} disabled={disabled}>
-      <option key="" value="">
-        {Translate.string('Select a country')}
-      </option>
-      {choices.map(country => (
-        <option key={country.countryKey} value={country.countryKey}>
-          {country.caption}
-        </option>
-      ))}
-    </select>
+    <Dropdown
+      styleName="country-dropdown"
+      placeholder={Translate.string('Select a country')}
+      disabled={disabled}
+      name={htmlName}
+      fluid
+      search
+      selection
+      options={choices.map(country => ({
+        key: country.countryKey,
+        value: country.countryKey,
+        text: `${isoToFlag(country.countryKey)} ${country.caption}`,
+      }))}
+    />
   );
 }
 

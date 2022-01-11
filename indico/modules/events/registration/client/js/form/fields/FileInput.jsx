@@ -6,10 +6,61 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useRef, useState} from 'react';
+import {Button, Label} from 'semantic-ui-react';
+
+import {Translate} from 'indico/react/i18n';
+
+import '../../../styles/regform.module.scss';
+import './FileInput.module.scss';
 
 export default function FileInput({htmlName, disabled}) {
-  return <input type="file" name={htmlName} disabled={disabled} />;
+  const [file, setFile] = useState();
+  const fileRef = useRef();
+
+  const handleFileChange = e => {
+    setFile(e.target.value.split('\\').pop());
+  };
+
+  const handleFileClear = () => {
+    setFile(null);
+    fileRef.current.value = null;
+  };
+
+  const handleSelectFileClick = () => {
+    fileRef.current.click();
+  };
+
+  return (
+    <>
+      <Button.Group size="small">
+        <Button
+          type="button"
+          htmlFor={`${htmlName}-file`}
+          name={htmlName}
+          disabled={disabled}
+          icon="upload"
+          label={
+            <Label styleName={file ? 'fileinput-label-squarecorners' : ''}>
+              <span styleName="fileinput-label">
+                {file ? file : <Translate>Select File</Translate>}
+              </span>
+            </Label>
+          }
+          onClick={handleSelectFileClick}
+        />
+        {file && <Button icon="delete" onClick={handleFileClear} />}
+      </Button.Group>
+      <input
+        id={`${htmlName}-file`}
+        disabled={disabled}
+        hidden
+        type="file"
+        ref={fileRef}
+        onChange={handleFileChange}
+      />
+    </>
+  );
 }
 
 FileInput.propTypes = {
