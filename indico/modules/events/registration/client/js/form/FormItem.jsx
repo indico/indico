@@ -47,7 +47,11 @@ export default function FormItem({
               styleName="field"
             >
               <label>{title}</label>
-              <InputComponent isRequired={isRequired || meta.alwaysRequired} {...inputProps} />
+              <InputComponent
+                isRequired={isRequired || meta.alwaysRequired}
+                disabled={!isEnabled}
+                {...inputProps}
+              />
             </Form.Field>
           )
         ) : (
