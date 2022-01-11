@@ -42,7 +42,7 @@ export default function MultiChoiceInput({htmlName, disabled, choices, withExtra
     ((choice.extraSlotsPay ? value[choice.id] || 0 : 1) * choice.price).toFixed(2);
 
   return (
-    <table>
+    <table styleName="choice-table">
       <tbody>
         {choices.map(choice => {
           return (

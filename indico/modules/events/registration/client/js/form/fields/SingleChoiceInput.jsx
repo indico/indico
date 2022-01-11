@@ -146,7 +146,7 @@ function SingleChoiceRadioGroup({
   };
 
   return (
-    <table>
+    <table styleName="choice-table">
       <tbody>
         {radioChoices.map(c => {
           return (

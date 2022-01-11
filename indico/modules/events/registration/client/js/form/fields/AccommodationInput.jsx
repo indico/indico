@@ -83,7 +83,7 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
 
   return (
     <div styleName="accommodation-field">
-      <table>
+      <table styleName="choice-table">
         <tbody>
           {choices
             .filter(c => c.isEnabled || !c.isNoAccommodation)
