@@ -5,7 +5,7 @@ Changelog
 Version 3.1
 -----------
 
-*Unreleased*
+*Released on January 11, 2022*
 
 Major Features
 ^^^^^^^^^^^^^^
