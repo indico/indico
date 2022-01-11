@@ -22,7 +22,8 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far
+- Add a new event management permission that grants access only to the abstracts
+  module (:pr:`5212`)
 
 Bugfixes
 ^^^^^^^^

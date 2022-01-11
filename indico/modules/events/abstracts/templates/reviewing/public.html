@@ -11,7 +11,7 @@
             </span>
         </h3>
         <div class="toolbar thin">
-            {% set can_manage = abstract.event.can_manage(session.user) %}
+            {% set can_manage = abstract.event.can_manage(session.user, permission='abstracts') %}
             {% if abstract.submitter == session.user or can_manage %}
                 <div class="group">
                     {% if abstract.can_withdraw(session.user, check_state=true) %}
@@ -198,7 +198,7 @@
                         {{- abstract.judgment_dt|format_human_date -}}
                     </time>
                 </div>
-                {% if abstract.event.can_manage(session.user) %}
+                {% if abstract.event.can_manage(session.user, permission='abstracts') %}
                     <div class="hide-if-locked">
                         <a class="i-link icon-remove"
                            title="{% trans %}Reset judgment{% endtrans %}"

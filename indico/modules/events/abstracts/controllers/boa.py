@@ -87,7 +87,11 @@ class RHExportBOA(RHAbstractsBase):
             raise NotFound(_('The contributions of this event have not been published yet'))
 
     def _process(self):
-        if request.args.get('latex') == '1' and config.LATEX_ENABLED and self.event.can_manage(session.user):
+        if (
+            request.args.get('latex') == '1' and
+            config.LATEX_ENABLED and
+            self.event.can_manage(session.user, permission='abstracts')
+        ):
             return send_file('book-of-abstracts.pdf', create_boa(self.event), 'application/pdf')
         if self.event.has_custom_boa:
             return self.event.custom_boa.send()

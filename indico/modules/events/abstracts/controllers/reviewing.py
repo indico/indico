@@ -84,8 +84,8 @@ class RHResetAbstractState(RHAbstractBase):
     def _check_abstract_protection(self):
         if self.abstract.state == AbstractState.submitted:
             return False
-        # manages can always reset
-        if self.event.can_manage(session.user):
+        # abstract managers can always reset
+        if self.event.can_manage(session.user, permission='abstracts'):
             return True
         # judges can reset if the abstract has not been withdrawn
         return self.abstract.can_judge(session.user) and self.abstract.state != AbstractState.withdrawn

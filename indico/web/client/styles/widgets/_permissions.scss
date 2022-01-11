@@ -129,6 +129,10 @@
           }
 
           // Permission label palette
+          &.permission-event-abstracts {
+            @include permission-label($olive);
+          }
+
           &.permission-event-submit {
             @include permission-label($yellow);
           }

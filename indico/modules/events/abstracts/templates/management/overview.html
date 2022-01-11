@@ -34,29 +34,32 @@
             </div>
         </div>
 
-        <div class="section">
-            <div class="icon icon-wrench"></div>
-            <div class="text">
-                <div class="label">
-                    {%- trans %}Fields and types{% endtrans -%}
+        {# Only show contribution settings if user can manage them #}
+        {% if event.can_manage(session.user) %}
+            <div class="section">
+                <div class="icon icon-wrench"></div>
+                <div class="text">
+                    <div class="label">
+                        {%- trans %}Fields and types{% endtrans -%}
+                    </div>
+                    {%- trans %}Configure the contribution types and abstract fields.{% endtrans -%}
                 </div>
-                {%- trans %}Configure the contribution types and abstract fields.{% endtrans -%}
+                <div class="toolbar">
+                    <a href="#" class="i-button"
+                    data-href="{{ url_for('contributions.manage_types', event) }}"
+                    data-title="{% trans %}Manage contribution types{% endtrans %}"
+                    data-ajax-dialog>
+                        {%- trans %}Contribution types{% endtrans -%}
+                    </a>
+                    <a href="#" class="i-button js-dialog-action"
+                    data-title="{% trans %}Manage fields{% endtrans %}"
+                    data-href="{{ url_for('contributions.manage_fields', event) }}"
+                    data-ajax-dialog>
+                        {%- trans %}Abstract fields{% endtrans -%}
+                    </a>
+                </div>
             </div>
-            <div class="toolbar">
-                <a href="#" class="i-button"
-                   data-href="{{ url_for('contributions.manage_types', event) }}"
-                   data-title="{% trans %}Manage contribution types{% endtrans %}"
-                   data-ajax-dialog>
-                    {%- trans %}Contribution types{% endtrans -%}
-                </a>
-                <a href="#" class="i-button js-dialog-action"
-                   data-title="{% trans %}Manage fields{% endtrans %}"
-                   data-href="{{ url_for('contributions.manage_fields', event) }}"
-                   data-ajax-dialog>
-                    {%- trans %}Abstract fields{% endtrans -%}
-                </a>
-            </div>
-        </div>
+        {% endif %}
 
         <div class="section">
             <div class="icon icon-file-check"></div>

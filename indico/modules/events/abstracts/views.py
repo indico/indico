@@ -51,7 +51,7 @@ def render_abstract_page(abstract, view_class=None, management=False):
     judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
     review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event, obj=abstract, formdata=None)
     track_session_map = {track.id: track.default_session_id for track in abstract.event.tracks}
-    can_manage = abstract.event.can_manage(session.user)
+    can_manage = abstract.event.can_manage(session.user, permission='abstracts')
     field_values = filter_field_values(abstract.field_values, can_manage, abstract.user_owns(session.user))
     params = {'abstract': abstract,
               'comment_form': comment_form,

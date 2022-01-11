@@ -68,8 +68,8 @@ class RHAbstractsBase(RHDisplayEventBase):
 
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
-        # Only let event managers access the management versions.
-        if self.management and not self.event.can_manage(session.user):
+        # Only let abstract managers access the management versions.
+        if self.management and not self.event.can_manage(session.user, permission='abstracts'):
             raise Forbidden
         check_event_locked(self, self.event)
 
@@ -86,6 +86,7 @@ class RHManageAbstractsBase(ManageEventMixin, RHAbstractsBase):
     """
 
     DENY_FRAMES = True
+    PERMISSION = 'abstracts'
 
     @property
     def management(self):

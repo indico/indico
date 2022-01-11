@@ -46,7 +46,7 @@ def _clear_boa_cache(sender, obj=None, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user) or not AbstractsFeature.is_allowed_for_event(event):
+    if not event.can_manage(session.user, permission='abstracts') or not AbstractsFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.management', event),
                         section='workflows', weight=30)
@@ -101,9 +101,20 @@ def _get_event_management_permissions(sender, **kwargs):
     yield GlobalReviewPermission
 
 
+@signals.acl.get_management_permissions.connect_via(Event)
+def _get_abstract_permissions(sender, **kwargs):
+    yield AbstractPermission
+
+
 @signals.acl.get_management_permissions.connect_via(Track)
 def _get_track_management_permissions(sender, **kwargs):
     yield ReviewPermission
+
+
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if event.can_manage(session.user, permission='abstracts'):
+        return url_for('abstracts.management', event)
 
 
 class GlobalReviewPermission(ManagementPermission):
@@ -119,6 +130,13 @@ class ReviewPermission(ManagementPermission):
     user_selectable = True
     color = 'orange'
     default = True
+
+
+class AbstractPermission(ManagementPermission):
+    name = 'abstracts'
+    friendly_name = _('Abstracts')
+    description = _('Grants abstract management rights on an event.')
+    user_selectable = True
 
 
 class AbstractReviewerPermission(ManagementPermission):

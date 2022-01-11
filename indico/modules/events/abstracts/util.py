@@ -202,7 +202,7 @@ def make_abstract_form(event, user, notification_option=False, management=False,
         if field_impl is None:
             # field definition is not available anymore
             continue
-        if custom_field.is_active and (custom_field.is_user_editable or event.can_manage(user)):
+        if custom_field.is_active and (custom_field.is_user_editable or event.can_manage(user, permission='abstracts')):
             name = f'custom_{custom_field.id}'
             setattr(form_class, name, field_impl.create_wtf_field())
     return form_class

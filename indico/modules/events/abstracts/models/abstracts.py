@@ -503,7 +503,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         if self.submitter == user:
             return True
-        if self.event.can_manage(user):
+        if self.event.can_manage(user, permission='abstracts'):
             return True
         if any(x.person.user == user for x in self.person_links):
             return True
@@ -551,7 +551,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         elif check_state and self.state != AbstractState.submitted:
             return False
-        elif self.event.can_manage(user):
+        elif self.event.can_manage(user, permission='abstracts'):
             return True
         elif self.event.cfa.allow_convener_judgment and self.can_convene(user):
             return True
@@ -575,7 +575,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             AbstractPublicState.awaiting,
             AbstractPublicState.invited,
         )
-        if self.public_state in manager_edit_states and self.event.can_manage(user):
+        if self.public_state in manager_edit_states and self.event.can_manage(user, permission='abstracts'):
             return True
         elif self.public_state not in (AbstractPublicState.awaiting, AbstractPublicState.invited):
             return False
@@ -599,7 +599,10 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def can_withdraw(self, user, check_state=False):
         if not user:
             return False
-        elif self.event.can_manage(user) and (not check_state or self.state != AbstractState.withdrawn):
+        elif (
+            self.event.can_manage(user, permission='abstracts') and
+            (not check_state or self.state != AbstractState.withdrawn)
+        ):
             return True
         elif user == self.submitter and (not check_state or self.state == AbstractState.submitted):
             return True
