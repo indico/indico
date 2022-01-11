@@ -1,14 +1,14 @@
 # Translations template for indico.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.1-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-13 13:18+0100\n"
+"POT-Creation-Date: 2022-01-10 15:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,7 +81,7 @@ msgstr ""
 msgid "This will make events in this category visible on your <a href=\"{0}\">Dashboard</a>."
 msgstr ""
 
-#: indico/modules/categories/client/js/management.js:56 indico/modules/events/management/client/js/index.js:291
+#: indico/modules/categories/client/js/management.js:56 indico/modules/events/management/client/js/index.js:287
 msgid "Undo"
 msgstr ""
 
@@ -222,65 +222,65 @@ msgstr ""
 msgid "Your Indico server is not synchronized with the Community Hub! You can solve this <a href=\"{0}\">here</a>."
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:31 indico/modules/designer/client/js/index.js:707
+#: indico/modules/designer/client/js/index.js:31 indico/modules/designer/client/js/index.js:770
 msgid "The back side of the templates that use this one as the back side will be removed."
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:34 indico/modules/designer/client/js/index.js:710
+#: indico/modules/designer/client/js/index.js:34 indico/modules/designer/client/js/index.js:773
 msgid "Disassociate back sides"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:90 indico/modules/designer/client/js/index.js:233
+#: indico/modules/designer/client/js/index.js:91 indico/modules/designer/client/js/index.js:237
 msgid "Fixed text"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:497
+#: indico/modules/designer/client/js/index.js:560
 msgid "Please choose a name for the template"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:497 indico/modules/designer/client/js/index.js:503
+#: indico/modules/designer/client/js/index.js:560 indico/modules/designer/client/js/index.js:566
 #: indico/web/client/js/jquery/widgets/principalfield.js:114
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:165
 msgid "Warning"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:502
+#: indico/modules/designer/client/js/index.js:565
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:529
+#: indico/modules/designer/client/js/index.js:592
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:698
+#: indico/modules/designer/client/js/index.js:761
 msgid "This back side template will be removed"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:700
+#: indico/modules/designer/client/js/index.js:763
 msgid "The back side of this template will be removed"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:701
+#: indico/modules/designer/client/js/index.js:764
 msgid "Disassociate back side"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:705
+#: indico/modules/designer/client/js/index.js:768
 msgid "The back side is empty."
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:820
+#: indico/modules/designer/client/js/index.js:883
 msgid "Error"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:937
+#: indico/modules/designer/client/js/index.js:1000
 msgid "Choose a file"
 msgstr ""
 
-#: indico/modules/events/abstracts/client/js/index.js:78 indico/modules/events/abstracts/client/js/index.js:91
+#: indico/modules/events/abstracts/client/js/index.js:74 indico/modules/events/abstracts/client/js/index.js:87
 msgid "Show preview"
 msgstr ""
 
-#: indico/modules/events/abstracts/client/js/index.js:82
+#: indico/modules/events/abstracts/client/js/index.js:78
 msgid "Hide preview"
 msgstr ""
 
@@ -300,7 +300,7 @@ msgstr ""
 msgid "There are no entries that match your search criteria."
 msgstr ""
 
-#: indico/modules/events/management/client/js/index.js:289
+#: indico/modules/events/management/client/js/index.js:285
 msgid "Undoing previous operation..."
 msgstr ""
 

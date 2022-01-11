@@ -82,6 +82,8 @@ Improvements
   settings (:issue:`4837`, :issue:`2224`, :issue:`1877`, :pr:`5179`)
 - Allow filtering the contribution list based on whether any person (speaker or author)
   has registered for the event or not (:issue:`5192`, :pr:`5193`)
+- Add background color option and layer order to badge/poster designer items (:pr:`5139`,
+  thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^

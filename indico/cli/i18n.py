@@ -101,7 +101,7 @@ def wrap_distutils_command(command_class):
         command = command_class(Distribution({
             'name': 'indico',
             'version': indico.__version__,
-            'packages': find_packages(indico.__path__, indico.__name__)
+            'packages': list(find_packages(indico.__path__, indico.__name__))
         }))
 
         for key, val in kwargs.items():

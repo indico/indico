@@ -191,18 +191,24 @@
                         {% endblock %}
                     </div>
                     <div class="subtool">
-                        <select id='color-selector' class="js-font-tool" data-attr="color">
-                            <option value="black">{% trans %}black{% endtrans %}</option>
-                            <option value="red">{% trans %}red{% endtrans %}</option>
-                            <option value="blue">{% trans %}blue{% endtrans %}</option>
-                            <option value="green">{% trans %}green{% endtrans %}</option>
-                            <option value="yellow">{% trans %}yellow{% endtrans %}</option>
-                            <option value="brown">{% trans %}brown{% endtrans %}</option>
-                            <option value="gold">{% trans %}gold{% endtrans %}</option>
-                            <option value="pink">{% trans %}pink{% endtrans %}</option>
-                            <option value="gray">{% trans %}gray{% endtrans %}</option>
-                            <option value="white">{% trans %}white{% endtrans %}</option>
-                        </select>
+                        <div class="i-color-field clearfix">
+                            <div class="clickable-wrapper">
+                                <span id="text-color-preview" class="color-preview"></span>
+                                <input title="{% trans %}Text color{% endtrans %}" type="text"
+                                       id="text-color-selector" value="#" class="js-font-tool" data-attr="color"
+                                       maxlength="7" size="2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="subtool">
+                        <div class="i-color-field clearfix">
+                            <div class="clickable-wrapper">
+                                <span id="bg-color-preview" class="color-preview"></span>
+                                <input title="{% trans %}Text background color{% endtrans %}" type="text"
+                                       value="#" id="bg-color-selector" class="js-font-tool" data-attr="background_color"
+                                       maxlength="7" size="2">
+                            </div>
+                        </div>
                     </div>
                     <div class="subtool">
                         <select id='style-selector' class="js-font-tool" data-attr="style">
@@ -287,6 +293,14 @@
                         <button title="{% trans %}Move item to the bottom{% endtrans %}"
                                 class="i-button move-button icon-only text-color subtle icon-expand"
                                 data-direction="bottom">
+                        </button>
+                        <button title="{% trans %}Move item to the back{% endtrans %}"
+                                class="i-button move-button icon-only text-color subtle icon-first"
+                                data-direction="back">
+                        </button>
+                        <button title="{% trans %}Move item to the front{% endtrans %}"
+                                class="i-button move-button icon-only text-color subtle icon-last"
+                                data-direction="front">
                         </button>
                     </div>
                 </div>
@@ -381,5 +395,13 @@
             setupDesigner({{ template_data | tojson }}, {{ backside_template_data | tojson }}, {{ config | tojson }},
                           {{ placeholders | tojson }}, {{ image_types | tojson }});
         })();
+        setupColorPickerWidget({
+            fieldId: 'text-color-selector',
+            showField: true
+        });
+        setupColorPickerWidget({
+            fieldId: 'bg-color-selector',
+            showField: true
+        });
     </script>
 {% endblock %}

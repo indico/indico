@@ -34,7 +34,7 @@ blinker==1.4
     #   flask-multipass
     #   flask-pluginengine
     #   sentry-sdk
-celery[redis]==5.2.3
+celery[redis]==5.2.2
     # via
     #   -r requirements.in
     #   sentry-sdk
@@ -67,8 +67,6 @@ cryptography==36.0.1
     # via authlib
 decorator==5.1.0
     # via ipython
-deprecated==1.2.13
-    # via redis
 distro==1.6.0
     # via -r requirements.in
 dnspython==2.1.0
@@ -199,7 +197,6 @@ packaging==21.3
     # via
     #   -r requirements.in
     #   bleach
-    #   redis
 parso==0.8.3
     # via jedi
 pexpect==4.8.0
@@ -260,7 +257,7 @@ pyyaml==6.0
     # via -r requirements.in
 qrcode==7.3.1
     # via -r requirements.in
-redis[hiredis]==4.1.0
+redis[hiredis]==3.5.3
     # via
     #   -r requirements.in
     #   celery
@@ -326,8 +323,6 @@ werkzeug==2.0.2
     # via
     #   -r requirements.in
     #   flask
-wrapt==1.13.3
-    # via deprecated
 wtforms[email]==3.0.1
     # via
     #   -r requirements.in

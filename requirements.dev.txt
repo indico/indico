@@ -33,10 +33,6 @@ colorama==0.4.4
     # via sphinx-autobuild
 coverage[toml]==6.2
     # via pytest-cov
-deprecated==1.2.13
-    # via
-    #   -c requirements.txt
-    #   redis
 docutils==0.17.1
     # via
     #   plantweb
@@ -106,7 +102,6 @@ packaging==21.3
     # via
     #   -c requirements.txt
     #   pytest
-    #   redis
     #   sphinx
     #   sqlbag
 parso==0.8.3
@@ -173,7 +168,7 @@ pyupgrade==2.31.0
     # via -r requirements.dev.in
 pywatchman==1.4.1
     # via -r requirements.dev.in
-redis[hiredis]==4.1.0
+redis[hiredis]==3.5.3
     # via
     #   -c requirements.txt
     #   pytest-redis
@@ -262,10 +257,6 @@ werkzeug==2.0.2
     #   pytest-localserver
 wheel==0.37.1
     # via pip-tools
-wrapt==1.13.3
-    # via
-    #   -c requirements.txt
-    #   deprecated
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
