@@ -42,7 +42,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
-                                                     get_event_section_data, get_ticket_attachments, get_title_uuid,
+                                                     get_event_section_data, get_flat_section_submission_data,
+                                                     get_ticket_attachments, get_title_uuid,
                                                      import_registrations_from_csv, make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
@@ -290,7 +291,9 @@ class RHRegistrationCreate(RHManageRegFormBase):
                 flash(error, 'error')
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,
-                                                    sections=get_event_section_data(self.regform),
+                                                    form_data=get_flat_section_submission_data(self.regform),
+                                                    # XXX why don't we include manager-only sections here?!
+                                                    angular_sections=get_event_section_data(self.regform),
                                                     post_url=url_for('.create_registration', self.regform),
                                                     user_data=self._get_user_data(),
                                                     invitation=None,

@@ -24,7 +24,8 @@ from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_event_section_data,
-                                                     get_title_uuid, make_registration_form)
+                                                     get_flat_section_submission_data, get_title_uuid,
+                                                     make_registration_form)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -316,7 +317,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         user_data['title'] = get_title_uuid(self.regform, user_data['title'])
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
-                                               sections=get_event_section_data(self.regform),
+                                               form_data=get_flat_section_submission_data(self.regform),
+                                               angular_sections=get_event_section_data(self.regform),
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                user_data=user_data,

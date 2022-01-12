@@ -52,7 +52,7 @@ class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConfer
     template_prefix = 'events/registration/'
     base_class = WPConferenceDisplayBase
     menu_entry_name = 'registration'
-    bundles = ('module_events.registration.js',)
+    bundles = ('module_events.registration.js', 'module_events.registration.css')
 
 
 class WPDisplayRegistrationParticipantList(WPDisplayRegistrationFormConference):
@@ -62,4 +62,4 @@ class WPDisplayRegistrationParticipantList(WPDisplayRegistrationFormConference):
 class WPDisplayRegistrationFormSimpleEvent(DisplayRegistrationFormMixin, WPSimpleEventDisplayBase):
     template_prefix = 'events/registration/'
     base_class = WPSimpleEventDisplayBase
-    bundles = ('module_events.registration.js',)
+    bundles = ('module_events.registration.js', 'module_events.registration.css')
