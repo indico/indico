@@ -21,6 +21,7 @@ class PersonLinkSchema(mm.Schema):
     person_id = fields.Int()
     user_id = fields.Int(attribute='person.user_id')
     user_identifier = fields.String(attribute='person.user.identifier')
+    name = fields.String(attribute='display_full_name')
     first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
     _title = EnumField(UserTitle, data_key='title')
