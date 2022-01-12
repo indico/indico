@@ -183,6 +183,9 @@ class SubContribution(SearchableTitleMixin, SearchableDescriptionMixin, Attached
     def can_manage(self, user, permission=None, **kwargs):
         return self.contribution.can_manage(user, permission=permission, **kwargs)
 
+    def can_edit(self, user):
+        return self.contribution.can_edit(user)
+
     def is_user_associated(self, user):
         if user is None:
             return False

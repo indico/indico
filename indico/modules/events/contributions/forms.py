@@ -184,6 +184,12 @@ class ContributionDefaultDurationForm(IndicoForm):
                                    default=timedelta(minutes=20))
 
 
+class AllowSubmitterEditsForm(IndicoForm):
+    allow = BooleanField(_('Allow submitters to edit contributions'), widget=SwitchWidget(),
+                         description=_('Allow submitters to edit their contributions '
+                                       'once an abstract has been accepted'))
+
+
 class ContributionTypeForm(IndicoForm):
     """Form to create or edit a ContributionType."""
 

@@ -130,6 +130,7 @@ def _event_created(event, **kwargs):
 
 contribution_settings = EventSettingsProxy('contributions', {
     'default_duration': timedelta(minutes=20),
+    'allow_submitters_edit_contributions': False,
     'published': True
 }, converters={
     'default_duration': TimedeltaConverter
