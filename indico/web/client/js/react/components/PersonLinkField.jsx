@@ -329,7 +329,7 @@ export default function PersonLinkField({
       <DndProvider backend={HTML5Backend}>
         <Segment attached="top" styleName="segment">
           {sections.map(({name, label, plural}) => {
-            const filterCondition = p => p.roles && p.roles.includes(name);
+            const filterCondition = p => p.roles?.includes(name);
             const filtered = persons.filter(filterCondition);
             return filtered.length === 0 ? null : (
               <PersonLinkSection

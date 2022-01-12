@@ -117,7 +117,7 @@ class PersonLinkListFieldBase(PrincipalListField):
         raise NotImplementedError
 
     def _convert_data(self, data):
-        return [self._get_person_link(x) for x in data]
+        return list({self._get_person_link(x) for x in data})
 
     def _value(self):
         return [self._serialize_person_link(person_link) for person_link in self.data] if self.data else []
