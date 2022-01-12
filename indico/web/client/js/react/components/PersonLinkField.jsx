@@ -449,7 +449,7 @@ export function WTFPersonLinkField({
 
   return (
     <PersonLinkField
-      value={!autoSort ? persons : persons.sort((a, b) => a.name.localeCompare(b.name))}
+      value={!autoSort ? persons : persons.slice().sort((a, b) => a.name.localeCompare(b.name))}
       eventId={eventId}
       onChange={onChange}
       roles={roles}
