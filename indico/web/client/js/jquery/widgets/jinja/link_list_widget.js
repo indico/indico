@@ -8,15 +8,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {WTFPrivacyPolicyURLsField} from 'indico/react/components';
+import {WTFLinkListField} from 'indico/react/components';
 
-window.setupPrivacyPolicyURLsWidget = function setupPrivacyPolicyURLsWidget({
+window.setupLinkListWidget = function setupLinkListWidget({
   fieldId,
-  initialValues,
+  initialLinks,
 }) {
   const wrapperId = `${fieldId}-wrapper`;
   ReactDOM.render(
-    <WTFPrivacyPolicyURLsField fieldId={fieldId} wrapperId={wrapperId} initialValues={initialValues} />,
+    <WTFLinkListField fieldId={fieldId} wrapperId={wrapperId} initialLinks={initialLinks} />,
     document.getElementById(wrapperId)
   );
 };

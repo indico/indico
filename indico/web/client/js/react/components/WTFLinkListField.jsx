@@ -10,12 +10,12 @@ import React, {useMemo, useState, useEffect} from 'react';
 
 import {Translate} from 'indico/react/i18n';
 
-export default function WTFPrivacyPolicyURLsField({fieldId, wrapperId, initialValues}) {
+export default function WTFLinkListField({fieldId, wrapperId, initialLinks}) {
   const parentElement = useMemo(() => document.getElementById(wrapperId), [wrapperId]);
-  const [values, setValues] = useState(
-    initialValues.length === 0
+  const [links, setLinks] = useState(
+    initialLinks.length === 0
       ? [{id: 0, title: '', url: ''}]
-      : initialValues.map((value, index) => ({
+      : initialLinks.map((value, index) => ({
           id: index,
           title: value.title,
           url: value.url,
@@ -25,71 +25,71 @@ export default function WTFPrivacyPolicyURLsField({fieldId, wrapperId, initialVa
   // Trigger change only after the DOM has changed
   useEffect(() => {
     parentElement.dispatchEvent(new Event('change', {bubbles: true}));
-  }, [values, parentElement]);
+  }, [links, parentElement]);
 
   const handleChange = (id, field) => () => {
-    const idx = values.findIndex(value => value.id === id);
-    const newValues = [...values];
-    newValues[idx][field] = document.getElementById(`${id}-${field}`).value;
-    setValues(newValues);
+    const idx = links.findIndex(link => link.id === id);
+    const newLinks = [...links];
+    newLinks[idx][field] = document.getElementById(`${id}-${field}`).value;
+    setLinks(newLinks);
   };
 
-  const getProcessedValues = () => {
-    const newValues = values.filter(value => value.title !== '' || value.url !== '');
-    if (newValues.length === 1) {
-      return [{title: '', url: newValues[0].url}];
+  const getProcessedLinks = () => {
+    const newLinks = links.filter(link => link.title || link.url);
+    if (newLinks.length === 1) {
+      return [{title: '', url: newLinks[0].url}];
     }
-    return newValues.map(value => ({
-      title: value.title,
-      url: value.url,
+    return newLinks.map(link => ({
+      title: link.title,
+      url: link.url,
     }));
   };
 
   const addURL = () => {
-    setValues([...values, {id: values.at(-1).id + 1, title: '', url: ''}]);
+    setLinks([...links, {id: links.at(-1).id + 1, title: '', url: ''}]);
   };
 
   let linksTable = null;
   // Values array should never be empty
-  if (values.length === 1) {
+  if (links.length === 1) {
     linksTable = (
       <div style={{marginBottom: '0.5em'}}>
         <input
           type="text"
-          id={`${values[0].id}-url`}
+          id={`${links[0].id}-url`}
           placeholder={Translate.string('URL')}
-          onChange={handleChange(values[0].id, 'url')}
-          value={values[0].url}
+          onChange={handleChange(links[0].id, 'url')}
+          value={links[0].url}
         />
       </div>
     );
   } else {
     const removeURL = id => () => {
-      setValues(values.filter(value => value.id !== id));
+      setLinks(links.filter(link => link.id !== id));
     };
 
     linksTable = (
       <table className="i-table-widget">
         <tbody>
-          {values.map(value => (
-            <tr key={value.id}>
+          {links.map(link => (
+            <tr key={link.id}>
               <td>
                 <input
                   type="text"
-                  id={`${value.id}-title`}
+                  id={`${link.id}-title`}
                   placeholder={Translate.string('Title')}
-                  onChange={handleChange(value.id, 'title')}
-                  value={value.title}
+                  onChange={handleChange(link.id, 'title')}
+                  value={link.title}
                   required
                 />
               </td>
               <td>
                 <input
                   type="url"
-                  id={`${value.id}-url`}
+                  id={`${link.id}-url`}
                   placeholder={Translate.string('URL')}
-                  onChange={handleChange(value.id, 'url')}
-                  value={value.url}
+                  onChange={handleChange(link.id, 'url')}
+                  value={link.url}
                   required
                 />
               </td>
@@ -97,7 +97,7 @@ export default function WTFPrivacyPolicyURLsField({fieldId, wrapperId, initialVa
                 <a
                   className="icon-remove remove-row"
                   title={Translate.string('Remove row')}
-                  onClick={removeURL(value.id)}
+                  onClick={removeURL(link.id)}
                 />
               </td>
             </tr>
@@ -118,16 +118,16 @@ export default function WTFPrivacyPolicyURLsField({fieldId, wrapperId, initialVa
         type="hidden"
         id={fieldId}
         name={fieldId}
-        value={JSON.stringify(getProcessedValues())}
+        value={JSON.stringify(getProcessedLinks())}
       />
     </div>
   );
 }
 
-WTFPrivacyPolicyURLsField.propTypes = {
+WTFLinkListField.propTypes = {
   fieldId: PropTypes.string.isRequired,
   wrapperId: PropTypes.string.isRequired,
-  initialValues: PropTypes.arrayOf(
+  initialLinks: PropTypes.arrayOf(
     PropTypes.shape({
       title: PropTypes.string.isRequired,
       url: PropTypes.string.isRequired,

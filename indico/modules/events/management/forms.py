@@ -44,7 +44,7 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
                                      IndicoSelectMultipleCheckboxField, IndicoTagListField, IndicoTimezoneSelectField,
                                      IndicoWeekDayRepetitionField, MultiStringField, RelativeDeltaField)
 from indico.web.forms.fields.principals import PermissionsField
-from indico.web.forms.fields.privacy import IndicoPrivacyPolicyURLsField
+from indico.web.forms.fields.simple import IndicoLinkListField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, PrefixedTextWidget, SwitchWidget
 
@@ -236,9 +236,9 @@ class EventPrivacyForm(IndicoForm):
     _privacy_policy_fields = ('privacy_policy_urls', 'privacy_policy')
     data_controller_name = StringField(_('Person/Institution'))
     data_controller_email = EmailField(_('Contact email'), [Optional(), Email()])
-    privacy_policy_urls = IndicoPrivacyPolicyURLsField(_('External page'),
-                                                       description=_('List of URLs to external pages containing '
-                                                                     'privacy notices.'))
+    privacy_policy_urls = IndicoLinkListField(_('External page'),
+                                              description=_('List of URLs to external pages containing privacy '
+                                                            'notices.'))
     privacy_policy = TextAreaField(_('Text'), widget=CKEditorWidget(),
                                    description=_('Only used if no URL is provided'))
 

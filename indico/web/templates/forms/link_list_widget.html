@@ -6,9 +6,9 @@
 
 {% block javascript %}
     <script>
-        setupPrivacyPolicyURLsWidget({
+        setupLinkListWidget({
             fieldId: {{ field.id | tojson }},
-            initialValues: {{ field.data | tojson }},
+            initialLinks: {{ field.data | tojson }},
         });
     </script>
 {% endblock %}
