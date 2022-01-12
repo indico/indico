@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Form} from 'semantic-ui-react';
 
-import {FinalInput, validators as v} from 'indico/react/forms';
+import {FinalInput, FinalTextArea, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
@@ -22,7 +22,15 @@ const attributeMap = {
 
 export default function TextAreaInput({htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextAreaInput.defaultProps);
-  return <textarea name={htmlName} {...inputProps} disabled={disabled} style={{resize: 'none'}} />;
+  return (
+    <FinalTextArea
+      name={htmlName}
+      {...inputProps}
+      disabled={disabled}
+      required={isRequired}
+      style={{resize: 'none'}}
+    />
+  );
 }
 
 TextAreaInput.propTypes = {

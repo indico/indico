@@ -8,6 +8,7 @@
 import React, {useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
+import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
@@ -43,11 +44,16 @@ export default function RegistrationFormSetup() {
           )}
         </div>
 
-        <SortableWrapper accept="regform-section" className="regform-section-list">
-          {sections.map((section, index) => (
-            <SetupFormSection key={section.id} index={index} {...section} setupMode />
-          ))}
-        </SortableWrapper>
+        {/* we need a dummy FinalForm so our fields don't break... */}
+        <FinalForm subscription={{}} onSubmit={() => undefined}>
+          {() => (
+            <SortableWrapper accept="regform-section" className="regform-section-list">
+              {sections.map((section, index) => (
+                <SetupFormSection key={section.id} index={index} {...section} setupMode />
+              ))}
+            </SortableWrapper>
+          )}
+        </FinalForm>
       </DndProvider>
 
       {addSectionModalActive && (

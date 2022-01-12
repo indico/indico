@@ -8,31 +8,34 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Checkbox, Form, Label} from 'semantic-ui-react';
+import {Label} from 'semantic-ui-react';
+
+import {FinalCheckbox} from 'indico/react/forms';
 
 import {getCurrency} from '../../form_setup/selectors';
 
-import '../../../styles/regform.module.scss';
+import styles from '../../../styles/regform.module.scss';
 
 export default function CheckboxInput({htmlName, disabled, title, isRequired, price}) {
   const currency = useSelector(getCurrency);
   const [checked, setChecked] = useState(false);
 
   return (
-    <Form.Field required={isRequired} disabled={disabled} styleName="field">
-      <Checkbox
-        name={htmlName}
-        label={title}
-        disabled={disabled}
-        checked={checked}
-        onClick={() => setChecked(!checked)}
-      />
+    <FinalCheckbox
+      fieldProps={{className: styles.field}}
+      name={htmlName}
+      label={title}
+      disabled={disabled}
+      checked={checked}
+      onClick={() => setChecked(!checked)}
+      required={isRequired}
+    >
       {!!price && (
         <Label pointing="left" styleName={`price-tag ${!checked ? 'greyed' : ''}`}>
           {price.toFixed(2)} {currency}
         </Label>
       )}
-    </Form.Field>
+    </FinalCheckbox>
   );
 }
 
