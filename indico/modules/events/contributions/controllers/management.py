@@ -225,8 +225,9 @@ class RHEditContribution(RHManageContributionBase):
             return jsonify_data(flash=(request.args.get('flash') == '1'), **tpl_components)
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.contrib)
+        can_manage = self.contrib.can_manage(session.user)
         self.commit = False
-        return jsonify_template('events/contributions/forms/contribution.html', form=form)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form, can_manage=can_manage)
 
 
 class RHDeleteContributions(RHManageContributionsActionsBase):
@@ -352,8 +353,7 @@ class RHCreateSubContribution(RHManageContributionBase):
 
 
 class RHEditSubContribution(RHManageSubContributionBase):
-    """
-    Edit the subcontribution.
+    """Edit a subcontribution.
 
     If configured in the contribution settings,
     editing of the given subcontribution is also allowed to
@@ -373,8 +373,9 @@ class RHEditSubContribution(RHManageSubContributionBase):
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.subcontrib)
+        can_manage = self.subcontrib.can_manage(session.user)
         self.commit = False
-        return jsonify_template('events/contributions/forms/subcontribution.html', form=form)
+        return jsonify_template('events/contributions/forms/subcontribution.html', form=form, can_manage=can_manage)
 
 
 class RHSubContributionREST(RHManageSubContributionBase):
