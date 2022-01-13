@@ -21,21 +21,14 @@ import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
 
-import '../../../styles/regform.module.scss';
+import styles from '../../../styles/regform.module.scss';
 import './table.module.scss';
 
-export default function AccommodationInput({htmlName, disabled, choices, arrival, departure}) {
+function AccommodationInputComponent({value, onChange, disabled, choices, arrival, departure}) {
   // TODO: places left
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
   const currency = useSelector(getCurrency);
-  const [value, setValue] = useState({
-    choice: null,
-    isNoAccommodation: false,
-    arrivalDate: null,
-    departureDate: null,
-  });
-
   const selectedChoice = choices.find(c => c.id === value.choice);
 
   const [focusedDateField, setFocusedDateField] = useState(null);
@@ -46,18 +39,16 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
   const departureDateTo = toMoment(departure.endDate, moment.HTML5_FMT.DATE);
 
   const makeHandleChange = choice => () => {
-    setValue(prev => {
-      const newValue = {...prev, choice: choice.id, isNoAccommodation: choice.isNoAccommodation};
-      if (choice.isNoAccommodation) {
-        newValue.arrivalDate = null;
-        newValue.departureDate = null;
-      }
-      return newValue;
-    });
+    const newValue = {...value, choice: choice.id, isNoAccommodation: choice.isNoAccommodation};
+    if (choice.isNoAccommodation) {
+      newValue.arrivalDate = null;
+      newValue.departureDate = null;
+    }
+    onChange(newValue);
   };
 
   const handleDateChange = ({startDate, endDate}) => {
-    setValue(prev => ({...prev, arrivalDate: startDate, departureDate: endDate}));
+    onChange({...value, arrivalDate: startDate, departureDate: endDate});
   };
 
   const isDateDisabled = date => {
@@ -94,7 +85,6 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
                     <Form.Radio
                       styleName="radio"
                       label={c.caption}
-                      name={htmlName}
                       key={c.id}
                       value={c.id}
                       disabled={!c.isEnabled || disabled}
@@ -148,9 +138,56 @@ export default function AccommodationInput({htmlName, disabled, choices, arrival
   );
 }
 
+AccommodationInputComponent.propTypes = {
+  value: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  arrival: PropTypes.shape({
+    startDate: PropTypes.string.isRequired,
+    endDate: PropTypes.string.isRequired,
+  }).isRequired,
+  departure: PropTypes.shape({
+    startDate: PropTypes.string.isRequired,
+    endDate: PropTypes.string.isRequired,
+  }).isRequired,
+  // TODO: placesUsed, captions - only needed once we deal with real data
+};
+
+export default function AccommodationInput({
+  htmlName,
+  disabled,
+  isRequired,
+  defaultValue,
+  choices,
+  arrival,
+  departure,
+}) {
+  return (
+    <FinalField
+      name={htmlName}
+      component={AccommodationInputComponent}
+      required={isRequired}
+      disabled={disabled}
+      fieldProps={{className: styles.field}}
+      defaultValue={defaultValue}
+      choices={choices}
+      arrival={arrival}
+      departure={departure}
+      validate={value => {
+        if (!value.isNoAccommodation && (!value.arrivalDate || !value.departureDate)) {
+          return Translate.string('You must select the arrival and departure date');
+        }
+      }}
+    />
+  );
+}
+
 AccommodationInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  isRequired: PropTypes.bool,
+  defaultValue: PropTypes.object,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   arrival: PropTypes.shape({
     startDate: PropTypes.string.isRequired,
@@ -165,6 +202,8 @@ AccommodationInput.propTypes = {
 
 AccommodationInput.defaultProps = {
   disabled: false,
+  isRequired: false,
+  defaultValue: {choice: null, isNoAccommodation: false, arrivalDate: null, departureDate: null},
 };
 
 export const accommodationSettingsInitialData = staticData => ({

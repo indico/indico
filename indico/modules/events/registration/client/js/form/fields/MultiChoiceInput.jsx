@@ -7,7 +7,7 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Checkbox, Dropdown, Label} from 'semantic-ui-react';
@@ -20,22 +20,20 @@ import {getCurrency} from '../../form_setup/selectors';
 import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
-import '../../../styles/regform.module.scss';
+import styles from '../../../styles/regform.module.scss';
 import './table.module.scss';
 
-export default function MultiChoiceInput({htmlName, disabled, choices, withExtraSlots}) {
+function MultiChoiceInputComponent({value, onChange, disabled, choices, withExtraSlots}) {
   // TODO: places left
-  // TODO: set value as `{uuid: places}` (when adding final-form integration)
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
   const currency = useSelector(getCurrency);
-  const [value, setValue] = useState({});
 
   const makeHandleChange = choice => () => {
-    setValue(prev => ({...prev, [choice.id]: +!prev[choice.id]}));
+    onChange({...value, [choice.id]: +!value[choice.id]});
   };
   const makeHandleSlotsChange = choice => (__, {value: newValue}) => {
-    setValue(prev => ({...prev, [choice.id]: +newValue}));
+    onChange({...value, [choice.id]: +newValue});
   };
 
   const formatPrice = choice =>
@@ -50,7 +48,6 @@ export default function MultiChoiceInput({htmlName, disabled, choices, withExtra
               <td>
                 <Checkbox
                   styleName="checkbox"
-                  name={htmlName}
                   value={choice.id}
                   disabled={!choice.isEnabled || disabled}
                   checked={!!value[choice.id]}
@@ -108,16 +105,50 @@ export default function MultiChoiceInput({htmlName, disabled, choices, withExtra
   );
 }
 
+MultiChoiceInputComponent.propTypes = {
+  value: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  withExtraSlots: PropTypes.bool.isRequired,
+  // TODO: placesUsed, captions - only needed once we deal with real data
+};
+
+export default function MultiChoiceInput({
+  htmlName,
+  disabled,
+  isRequired,
+  defaultValue,
+  choices,
+  withExtraSlots,
+}) {
+  return (
+    <FinalField
+      name={htmlName}
+      component={MultiChoiceInputComponent}
+      required={isRequired}
+      disabled={disabled}
+      fieldProps={{className: styles.field}}
+      defaultValue={defaultValue}
+      choices={choices}
+      withExtraSlots={withExtraSlots}
+    />
+  );
+}
+
 MultiChoiceInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  isRequired: PropTypes.bool,
+  defaultValue: PropTypes.object,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,
-  // TODO: placesUsed, captions - only needed once we deal with real data
 };
 
 MultiChoiceInput.defaultProps = {
   disabled: false,
+  isRequired: false,
+  defaultValue: {},
   withExtraSlots: false,
 };
 
