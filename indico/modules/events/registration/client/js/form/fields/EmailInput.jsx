@@ -8,15 +8,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {FinalInput} from 'indico/react/forms';
+
 import '../../../styles/regform.module.scss';
 
-export default function EmailInput({htmlName, disabled}) {
-  return <input type="email" name={htmlName} disabled={disabled} size="60" />;
+export default function EmailInput({htmlName, disabled, isRequired}) {
+  return <FinalInput type="email" name={htmlName} required={isRequired} disabled={disabled} />;
 }
 
 EmailInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  isRequired: PropTypes.bool.isRequired,
 };
 
 EmailInput.defaultProps = {
