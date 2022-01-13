@@ -6,12 +6,17 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useMemo, useState, useEffect} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 
 import {Translate} from 'indico/react/i18n';
 
-export default function WTFLinkListField({fieldId, wrapperId, initialLinks}) {
-  const parentElement = useMemo(() => document.getElementById(wrapperId), [wrapperId]);
+const linkShape = {
+  title: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+};
+
+export default function WTFLinkListField({fieldId, initialLinks}) {
+  const hiddenInputRef = useRef(null);
   const [links, setLinks] = useState(
     initialLinks.length === 0
       ? [{id: 0, title: '', url: ''}]
@@ -22,15 +27,13 @@ export default function WTFLinkListField({fieldId, wrapperId, initialLinks}) {
         }))
   );
 
-  // Trigger change only after the DOM has changed
   useEffect(() => {
-    parentElement.dispatchEvent(new Event('change', {bubbles: true}));
-  }, [links, parentElement]);
+    hiddenInputRef.current.dispatchEvent(new Event('change', {bubbles: true}));
+  }, [links]);
 
-  const handleChange = (id, field) => () => {
-    const idx = links.findIndex(link => link.id === id);
+  const handleChange = (id, field, value) => {
     const newLinks = [...links];
-    newLinks[idx][field] = document.getElementById(`${id}-${field}`).value;
+    newLinks[links.findIndex(link => link.id === id)][field] = value;
     setLinks(newLinks);
   };
 
@@ -56,51 +59,28 @@ export default function WTFLinkListField({fieldId, wrapperId, initialLinks}) {
       <div style={{marginBottom: '0.5em'}}>
         <input
           type="text"
-          id={`${links[0].id}-url`}
+          name="url"
           placeholder={Translate.string('URL')}
-          onChange={handleChange(links[0].id, 'url')}
+          onChange={evt => handleChange(links[0].id, 'url', evt.target.value)}
           value={links[0].url}
         />
       </div>
     );
   } else {
-    const removeURL = id => () => {
-      setLinks(links.filter(link => link.id !== id));
-    };
+    const makeOnChange = id => (field, value) => handleChange(id, field, value);
+    const makeOnDelete = id => () => setLinks(links.filter(link => link.id !== id));
 
     linksTable = (
       <table className="i-table-widget">
         <tbody>
           {links.map(link => (
-            <tr key={link.id}>
-              <td>
-                <input
-                  type="text"
-                  id={`${link.id}-title`}
-                  placeholder={Translate.string('Title')}
-                  onChange={handleChange(link.id, 'title')}
-                  value={link.title}
-                  required
-                />
-              </td>
-              <td>
-                <input
-                  type="url"
-                  id={`${link.id}-url`}
-                  placeholder={Translate.string('URL')}
-                  onChange={handleChange(link.id, 'url')}
-                  value={link.url}
-                  required
-                />
-              </td>
-              <td className="js-action-col">
-                <a
-                  className="icon-remove remove-row"
-                  title={Translate.string('Remove row')}
-                  onClick={removeURL(link.id)}
-                />
-              </td>
-            </tr>
+            <Link
+              key={link.id}
+              onChange={makeOnChange(link.id)}
+              onDelete={makeOnDelete(link.id)}
+              title={link.title}
+              url={link.url}
+            />
           ))}
         </tbody>
       </table>
@@ -115,6 +95,7 @@ export default function WTFLinkListField({fieldId, wrapperId, initialLinks}) {
         </button>
       </div>
       <input
+        ref={hiddenInputRef}
         type="hidden"
         id={fieldId}
         name={fieldId}
@@ -126,11 +107,53 @@ export default function WTFLinkListField({fieldId, wrapperId, initialLinks}) {
 
 WTFLinkListField.propTypes = {
   fieldId: PropTypes.string.isRequired,
-  wrapperId: PropTypes.string.isRequired,
-  initialLinks: PropTypes.arrayOf(
-    PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  initialLinks: PropTypes.arrayOf(PropTypes.shape(linkShape)).isRequired,
+};
+
+function Link({onChange, onDelete, title, url}) {
+  const clearRef = useRef(null);
+  const makeOnChange = field => evt => onChange(field, evt.target.value);
+  const makeOnDelete = () => {
+    onDelete();
+    clearRef.current.dispatchEvent(new Event('indico:closeAutoTooltip'));
+  };
+
+  return (
+    <tr>
+      <td>
+        <input
+          type="text"
+          name="title"
+          placeholder={Translate.string('Title')}
+          onChange={makeOnChange('title')}
+          value={title}
+          required
+        />
+      </td>
+      <td>
+        <input
+          type="url"
+          name="url"
+          placeholder={Translate.string('URL')}
+          onChange={makeOnChange('url')}
+          value={url}
+          required
+        />
+      </td>
+      <td className="js-action-col">
+        <a
+          ref={clearRef}
+          className="icon-remove remove-row"
+          title={Translate.string('Remove row')}
+          onClick={makeOnDelete}
+        />
+      </td>
+    </tr>
+  );
+}
+
+Link.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  ...linkShape,
 };

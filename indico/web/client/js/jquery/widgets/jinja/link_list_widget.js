@@ -16,7 +16,7 @@ window.setupLinkListWidget = function setupLinkListWidget({
 }) {
   const wrapperId = `${fieldId}-wrapper`;
   ReactDOM.render(
-    <WTFLinkListField fieldId={fieldId} wrapperId={wrapperId} initialLinks={initialLinks} />,
+    <WTFLinkListField fieldId={fieldId} initialLinks={initialLinks} />,
     document.getElementById(wrapperId)
   );
 };
