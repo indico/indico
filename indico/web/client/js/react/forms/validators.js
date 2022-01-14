@@ -88,6 +88,24 @@ function chain(...validators) {
   };
 }
 
+/**
+ * Succeeds if at least one validator succeeds,
+ * otherwise returns the last error message.
+ */
+function or(...validators) {
+  return value => {
+    let rv;
+    for (const validator of validators) {
+      rv = validator(value);
+      if (!rv || rv === STOP_VALIDATION) {
+        // validator succeeded -> return
+        return;
+      }
+    }
+    return rv;
+  };
+}
+
 function dates() {
   return value => {
     if (!value || !Object.values(value).every(x => x)) {
@@ -106,5 +124,6 @@ export default {
   required,
   optional,
   chain,
+  or,
   dates,
 };

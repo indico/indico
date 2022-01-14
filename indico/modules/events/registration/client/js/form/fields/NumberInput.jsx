@@ -6,36 +6,30 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import {useSelector} from 'react-redux';
 import {Form, Label} from 'semantic-ui-react';
 
-import {FinalInput, validators as v} from 'indico/react/forms';
+import {FinalInput, FinalField, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
 
-import {mapPropsToAttributes} from './util';
+import styles from '../../../styles/regform.module.scss';
 
-import '../../../styles/regform.module.scss';
-
-const attributeMap = {minValue: 'min', maxValue: 'max'};
-
-export default function NumberInput({htmlName, disabled, price, title, isRequired, ...props}) {
-  const [value, setValue] = useState('');
+function NumberInputComponent({value, onChange, disabled, price, minValue, maxValue}) {
   const currency = useSelector(getCurrency);
-  const inputProps = mapPropsToAttributes(props, attributeMap, NumberInput.defaultProps);
   const total = (value * price).toFixed(2);
 
   return (
     <div styleName="number-field">
       <input
         type="number"
-        name={htmlName}
         value={value}
-        {...inputProps}
+        min={minValue}
+        max={maxValue}
         disabled={disabled}
-        onChange={evt => setValue(evt.target.value ? +evt.target.value : '')}
+        onChange={evt => onChange(evt.target.value ? +evt.target.value : '')}
       />
       <Label pointing="left" styleName="price-tag">
         {price.toFixed(2)} {currency} (Total: {total} {currency})
@@ -44,21 +38,66 @@ export default function NumberInput({htmlName, disabled, price, title, isRequire
   );
 }
 
+NumberInputComponent.propTypes = {
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([''])]).isRequired,
+  onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  price: PropTypes.number.isRequired,
+  minValue: PropTypes.number.isRequired,
+  maxValue: PropTypes.number,
+};
+
+NumberInputComponent.defaultProps = {
+  maxValue: null,
+};
+
+export default function NumberInput({
+  htmlName,
+  disabled,
+  isRequired,
+  defaultValue,
+  price,
+  minValue,
+  maxValue,
+}) {
+  return (
+    <FinalField
+      name={htmlName}
+      component={NumberInputComponent}
+      required={isRequired}
+      disabled={disabled}
+      fieldProps={{className: styles.field}}
+      defaultValue={defaultValue}
+      price={price}
+      minValue={minValue}
+      maxValue={maxValue}
+      parse={x => x} // Prevent empty string being coerced to undefined
+      validate={v.or(value => {
+        if (value !== '' || (isRequired && value === '')) {
+          return Translate.string('This field is required.');
+        }
+      }, v.range(minValue, maxValue || Infinity))}
+    />
+  );
+}
+
 NumberInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  isRequired: PropTypes.bool,
+  defaultValue: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([''])]),
+  price: PropTypes.number,
   minValue: PropTypes.number,
   maxValue: PropTypes.number,
-  price: PropTypes.number,
-  title: PropTypes.string.isRequired,
-  isRequired: PropTypes.bool.isRequired,
 };
 
 NumberInput.defaultProps = {
   disabled: false,
+  isRequired: false,
+  defaultValue: '',
+  price: 0,
   minValue: 0,
   maxValue: null,
-  price: 0,
 };
 
 export function NumberSettings() {
