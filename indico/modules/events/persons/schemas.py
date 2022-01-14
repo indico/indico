@@ -33,9 +33,11 @@ class PersonLinkSchema(mm.Schema):
     avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None)
 
     @pre_load
-    def load_title(self, data, **kwargs):
+    def load_nones(self, data, **kwargs):
         if not data.get('title'):
             data['title'] = UserTitle.none.name
+        if not data.get('affiliation'):
+            data['affiliation'] = ''
         return data
 
     @post_dump
