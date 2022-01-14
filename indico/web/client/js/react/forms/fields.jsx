@@ -286,7 +286,7 @@ export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...r
 
   if (type === 'number') {
     extraProps.parse = parsers.number;
-  } else if (type === 'text' || type === 'email') {
+  } else if (type === 'text' || type === 'email' || type === 'tel') {
     extraProps.format = formatters.trim;
     extraProps.formatOnBlur = true;
     extraProps.parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
@@ -315,7 +315,7 @@ FinalInput.propTypes = {
   // XXX: just add new <input> types here as soon as you start using them,
   // but make sure to handle it properly above (like adding the trim formatter
   // for a field that lets users enter strings)
-  type: PropTypes.oneOf(['text', 'email', 'number']),
+  type: PropTypes.oneOf(['text', 'email', 'number', 'tel']),
   nullIfEmpty: PropTypes.bool,
   noAutoComplete: PropTypes.bool,
 };

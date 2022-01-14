@@ -8,10 +8,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {FinalInput} from 'indico/react/forms';
+
 import '../../../styles/regform.module.scss';
 
 export default function PhoneInput({htmlName, disabled}) {
-  return <input type="tel" name={htmlName} disabled={disabled} />;
+  return <FinalInput type="tel" name={htmlName} disabled={disabled} />;
 }
 
 PhoneInput.propTypes = {
