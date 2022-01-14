@@ -12,7 +12,7 @@ import {Dropdown} from 'semantic-ui-react';
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import styles from '../../../styles/regform.module.scss';
+import '../../../styles/regform.module.scss';
 
 const isoToFlag = country =>
   String.fromCodePoint(...country.split('').map(c => c.charCodeAt() + 0x1f1a5));
@@ -51,7 +51,6 @@ export default function CountryInput({htmlName, disabled, isRequired, defaultVal
       component={CountryInputComponent}
       required={isRequired}
       disabled={disabled}
-      fieldProps={{className: styles.field}}
       defaultValue={defaultValue}
       choices={choices}
     />

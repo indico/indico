@@ -20,7 +20,7 @@ import {getCurrency} from '../../form_setup/selectors';
 import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
-import styles from '../../../styles/regform.module.scss';
+import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function MultiChoiceInputComponent({value, onChange, disabled, choices, withExtraSlots}) {
@@ -128,7 +128,6 @@ export default function MultiChoiceInput({
       component={MultiChoiceInputComponent}
       required={isRequired}
       disabled={disabled}
-      fieldProps={{className: styles.field}}
       defaultValue={defaultValue}
       choices={choices}
       withExtraSlots={withExtraSlots}

@@ -21,7 +21,7 @@ import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
 
-import styles from '../../../styles/regform.module.scss';
+import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function AccommodationInputComponent({value, onChange, disabled, choices, arrival, departure}) {
@@ -169,7 +169,6 @@ export default function AccommodationInput({
       component={AccommodationInputComponent}
       required={isRequired}
       disabled={disabled}
-      fieldProps={{className: styles.field}}
       defaultValue={defaultValue}
       choices={choices}
       arrival={arrival}

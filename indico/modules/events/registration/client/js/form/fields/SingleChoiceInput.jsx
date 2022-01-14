@@ -21,7 +21,7 @@ import {getCurrency} from '../../form_setup/selectors';
 import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
-import styles from '../../../styles/regform.module.scss';
+import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function SingleChoiceDropdown({value, onChange, disabled, isRequired, choices, withExtraSlots}) {
@@ -264,7 +264,6 @@ export default function SingleChoiceInput({
       required={isRequired}
       isRequired={isRequired}
       disabled={disabled}
-      fieldProps={{className: styles.field}}
       defaultValue={defaultValue}
       itemType={itemType}
       choices={choices}

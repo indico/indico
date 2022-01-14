@@ -15,7 +15,7 @@ import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
 
-import styles from '../../../styles/regform.module.scss';
+import '../../../styles/regform.module.scss';
 
 function NumberInputComponent({value, onChange, disabled, price, minValue, maxValue}) {
   const currency = useSelector(getCurrency);
@@ -66,7 +66,6 @@ export default function NumberInput({
       component={NumberInputComponent}
       required={isRequired}
       disabled={disabled}
-      fieldProps={{className: styles.field}}
       defaultValue={defaultValue}
       price={price}
       minValue={minValue}
