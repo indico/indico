@@ -7,9 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React, {useRef, useState} from 'react';
-import {Button, Label} from 'semantic-ui-react';
-
-import {Translate} from 'indico/react/i18n';
+import {Button} from 'semantic-ui-react';
 
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
@@ -40,6 +38,7 @@ export default function FileInput({htmlName, disabled}) {
           name={htmlName}
           disabled={disabled}
           icon="upload"
+          /* https://github.com/Semantic-Org/Semantic-UI-React/issues/4318
           label={
             <Label styleName={file ? 'fileinput-label-squarecorners' : ''}>
               <span styleName="fileinput-label">
@@ -47,6 +46,7 @@ export default function FileInput({htmlName, disabled}) {
               </span>
             </Label>
           }
+          */
           onClick={handleSelectFileClick}
         />
         {file && <Button icon="delete" onClick={handleFileClear} />}
