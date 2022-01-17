@@ -18,22 +18,16 @@ const linkShape = {
 export default function WTFLinkListField({fieldId, initialLinks}) {
   const hiddenInputRef = useRef(null);
   const [links, setLinks] = useState(
-    initialLinks.length === 0
-      ? [{id: 0, title: '', url: ''}]
-      : initialLinks.map((value, index) => ({
-          id: index,
-          title: value.title,
-          url: value.url,
-        }))
+    initialLinks.length === 0 ? [{title: '', url: ''}] : initialLinks
   );
 
   useEffect(() => {
     hiddenInputRef.current.dispatchEvent(new Event('change', {bubbles: true}));
   }, [links]);
 
-  const handleChange = (id, field, value) => {
+  const handleChange = (idx, field, value) => {
     const newLinks = [...links];
-    newLinks[links.findIndex(link => link.id === id)][field] = value;
+    newLinks[idx][field] = value;
     setLinks(newLinks);
   };
 
@@ -42,14 +36,11 @@ export default function WTFLinkListField({fieldId, initialLinks}) {
     if (newLinks.length === 1) {
       return [{title: '', url: newLinks[0].url}];
     }
-    return newLinks.map(link => ({
-      title: link.title,
-      url: link.url,
-    }));
+    return newLinks;
   };
 
   const addURL = () => {
-    setLinks([...links, {id: links.at(-1).id + 1, title: '', url: ''}]);
+    setLinks([...links, {title: '', url: ''}]);
   };
 
   let linksTable = null;
@@ -61,23 +52,24 @@ export default function WTFLinkListField({fieldId, initialLinks}) {
           type="text"
           name="url"
           placeholder={Translate.string('URL')}
-          onChange={evt => handleChange(links[0].id, 'url', evt.target.value)}
+          onChange={evt => handleChange(0, 'url', evt.target.value)}
           value={links[0].url}
         />
       </div>
     );
   } else {
-    const makeOnChange = id => (field, value) => handleChange(id, field, value);
-    const makeOnDelete = id => () => setLinks(links.filter(link => link.id !== id));
+    const makeOnChange = idx => (field, value) => handleChange(idx, field, value);
+    const makeOnDelete = idx => () => setLinks(links.filter((link, i) => i !== idx));
 
     linksTable = (
       <table className="i-table-widget">
         <tbody>
-          {links.map(link => (
+          {links.map((link, idx) => (
             <Link
-              key={link.id}
-              onChange={makeOnChange(link.id)}
-              onDelete={makeOnDelete(link.id)}
+              // eslint-disable-next-line react/no-array-index-key
+              key={idx}
+              onChange={makeOnChange(idx)}
+              onDelete={makeOnDelete(idx)}
               title={link.title}
               url={link.url}
             />
@@ -113,7 +105,7 @@ WTFLinkListField.propTypes = {
 function Link({onChange, onDelete, title, url}) {
   const clearRef = useRef(null);
   const makeOnChange = field => evt => onChange(field, evt.target.value);
-  const makeOnDelete = () => {
+  const handleDelete = () => {
     onDelete();
     clearRef.current.dispatchEvent(new Event('indico:closeAutoTooltip'));
   };
@@ -145,7 +137,7 @@ function Link({onChange, onDelete, title, url}) {
           ref={clearRef}
           className="icon-remove remove-row"
           title={Translate.string('Remove row')}
-          onClick={makeOnDelete}
+          onClick={handleDelete}
         />
       </td>
     </tr>
