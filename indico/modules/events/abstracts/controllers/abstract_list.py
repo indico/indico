@@ -28,6 +28,8 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.util import get_field_values
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
+from indico.util.marshmallow import ModelField
+from indico.web.args import use_kwargs
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -107,11 +109,28 @@ class RHAbstractListStaticURL(RHAbstractListBase):
 
 
 class RHCreateAbstract(RHAbstractListBase):
-    def _process(self):
+    """Create an abstract from scratch or with existing cloned data"""
+
+    @staticmethod
+    def clone_fields(abstract):
+        field_names = ['title', 'description', 'person_links', 'submission_comment', 'submitted_for_tracks',
+                       'submitted_contrib_type']
+        field_data = {}
+        for f in field_names:
+            field_data[f] = getattr(abstract, f)
+        for f in abstract.field_values:
+            field_data[f'custom_{f.contribution_field_id}'] = f.data
+        return field_data
+
+    @use_kwargs({'abstract': ModelField(Abstract, data_key='abstract_id')}, location='query')
+    def _process(self, abstract=None):
         is_invited = request.args.get('invited') == '1'
         abstract_form_class = make_abstract_form(self.event, session.user, notification_option=True,
                                                  management=self.management, invited=is_invited)
-        form = abstract_form_class(event=self.event, management=self.management, invited=is_invited)
+        cloned_fields = {}
+        if abstract:
+            cloned_fields = self.clone_fields(abstract)
+        form = abstract_form_class(event=self.event, management=self.management, invited=is_invited, **cloned_fields)
         if is_invited:
             del form.submitted_contrib_type
             del form.attachments

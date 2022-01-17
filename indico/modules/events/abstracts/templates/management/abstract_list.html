@@ -50,6 +50,7 @@
                                title="{% trans %}Add new abstract{% endtrans %}"
                                data-title="{% trans %}Add new abstract{% endtrans %}"
                                data-href="{{ url_for('.manage_create_abstract', event) }}"
+                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
                                data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
                                data-confirm-close-unsaved
                                data-ajax-dialog>
@@ -66,6 +67,7 @@
                                title="{{ message }}"
                                data-title="{% trans %}Add new invited abstract{% endtrans %}"
                                data-href="{{ url_for('.manage_create_abstract', event, invited=true) }}"
+                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
                                data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
                                data-confirm-close-unsaved
                                data-ajax-dialog>
