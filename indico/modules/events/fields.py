@@ -7,6 +7,7 @@
 
 import json
 
+from marshmallow import EXCLUDE
 from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
 
@@ -91,6 +92,7 @@ class PersonLinkListFieldBase(PrincipalListField):
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema(unknown=EXCLUDE).load(data)
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
         person_link = None
@@ -98,8 +100,8 @@ class PersonLinkListFieldBase(PrincipalListField):
             person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
         if not person_link:
             person_link = self.person_link_cls(person=person)
-        person_link.populate_from_dict(PersonLinkSchema(
-            only=('first_name', 'last_name', 'affiliation', 'address', 'phone', '_title', 'display_order')).load(data))
+        person_link.populate_from_dict(data, keys=(
+            'first_name', 'last_name', 'affiliation', 'address', 'phone', '_title', 'display_order'))
         email = data.get('email', '').lower()
         if not email:
             raise UserValueError(_('A valid email address is required'))

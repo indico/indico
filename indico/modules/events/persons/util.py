@@ -31,7 +31,7 @@ def get_event_person(event, data, create_untrusted_persons=False, allow_external
     If there is already an event person in the same event and for the same user,
     it will be returned. Matching is done with the e-mail.
     """
-    person_type = data.get('_type')
+    person_type = data.get('type')
     if person_type is None:
         if data.get('email'):
             email = data['email'].lower()
@@ -50,6 +50,6 @@ def get_event_person(event, data, create_untrusted_persons=False, allow_external
     elif person_type == 'EventPerson':
         return event.persons.filter_by(id=data['id']).one()
     elif person_type == 'PersonLink':
-        return event.persons.filter_by(id=data['personId']).one()
+        return event.persons.filter_by(id=data['person_id']).one()
     else:
         raise ValueError(f"Unknown person type '{person_type}'")
