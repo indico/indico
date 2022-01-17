@@ -6,8 +6,6 @@
 // LICENSE file for more details.
 
 .i-location-field {
-  max-width: 400px;
-
   .wrapper {
     .typeahead__container,
     .typeahead__field {
@@ -96,7 +94,6 @@
     }
 
     input.i-location-input-field {
-      width: 11.5em !important;
       background-color: transparent;
       padding-right: 2em !important;
       position: relative;

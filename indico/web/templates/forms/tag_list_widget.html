@@ -2,7 +2,7 @@
 
 {% set field_value = field._value() or [] %}
 {% block html -%}
-    <div id="{{ field.id }}" class="i-taglist-field i-form-field-fixed-width"></div>
+    <div id="{{ field.id }}" class="i-taglist-field"></div>
     {# Due to the fact that ajaxifyForms function is called before we apply Taggle widget on the element
        the form at that point has not access to the hidden inputs which are created by taggle.js library, thus
        we need to create input below (which is then removed) to make sure that changes applied to this widget

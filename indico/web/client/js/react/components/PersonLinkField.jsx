@@ -55,7 +55,7 @@ const ExternalPersonModal = ({onSubmit, onClose, person}) => (
     <Form.Group widths="equal">
       <Form.Field>
         <Translate as="label">Title</Translate>
-        <FinalDropdown name="title" placeholder="Title" fluid search selection options={titles} />
+        <FinalDropdown name="title" fluid search selection options={titles} />
       </Form.Field>
       <Form.Field>
         <Translate as="label">Affiliation</Translate>
