@@ -252,7 +252,7 @@ export default function SingleChoiceInput({
   htmlName,
   disabled,
   isRequired,
-  defaultValue,
+  defaultItem,
   itemType,
   choices,
   withExtraSlots,
@@ -261,10 +261,11 @@ export default function SingleChoiceInput({
     <FinalField
       name={htmlName}
       component={SingleChoiceInputComponent}
+      format={v => v || {}}
       required={isRequired}
       isRequired={isRequired}
       disabled={disabled}
-      defaultValue={defaultValue}
+      defaultValue={defaultItem ? {[defaultItem]: 1} : {}}
       itemType={itemType}
       choices={choices}
       withExtraSlots={withExtraSlots}
@@ -276,7 +277,7 @@ SingleChoiceInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.object,
+  defaultItem: PropTypes.string,
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,
@@ -285,7 +286,7 @@ SingleChoiceInput.propTypes = {
 SingleChoiceInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultValue: {},
+  defaultItem: null,
   withExtraSlots: false,
 };
 
