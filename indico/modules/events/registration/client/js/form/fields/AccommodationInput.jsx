@@ -158,7 +158,6 @@ export default function AccommodationInput({
   htmlName,
   disabled,
   isRequired,
-  defaultValue,
   choices,
   arrival,
   departure,
@@ -169,7 +168,12 @@ export default function AccommodationInput({
       component={AccommodationInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={defaultValue}
+      defaultValue={{
+        choice: null,
+        isNoAccommodation: false,
+        arrivalDate: null,
+        departureDate: null,
+      }}
       choices={choices}
       arrival={arrival}
       departure={departure}
@@ -186,7 +190,6 @@ AccommodationInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.object,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   arrival: PropTypes.shape({
     startDate: PropTypes.string.isRequired,
@@ -202,7 +205,6 @@ AccommodationInput.propTypes = {
 AccommodationInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultValue: {choice: null, isNoAccommodation: false, arrivalDate: null, departureDate: null},
 };
 
 export const accommodationSettingsInitialData = staticData => ({

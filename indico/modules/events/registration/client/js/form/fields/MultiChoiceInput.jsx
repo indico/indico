@@ -118,7 +118,6 @@ export default function MultiChoiceInput({
   htmlName,
   disabled,
   isRequired,
-  defaultValue,
   choices,
   withExtraSlots,
 }) {
@@ -128,7 +127,7 @@ export default function MultiChoiceInput({
       component={MultiChoiceInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={defaultValue}
+      defaultValue={{}}
       choices={choices}
       withExtraSlots={withExtraSlots}
     />
@@ -139,7 +138,6 @@ MultiChoiceInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.object,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,
 };
@@ -147,7 +145,6 @@ MultiChoiceInput.propTypes = {
 MultiChoiceInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultValue: {},
   withExtraSlots: false,
 };
 

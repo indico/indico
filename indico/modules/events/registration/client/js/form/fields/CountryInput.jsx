@@ -44,14 +44,14 @@ CountryInputComponent.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
 };
 
-export default function CountryInput({htmlName, disabled, isRequired, defaultValue, choices}) {
+export default function CountryInput({htmlName, disabled, isRequired, choices}) {
   return (
     <FinalField
       name={htmlName}
       component={CountryInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={defaultValue}
+      defaultValue=""
       choices={choices}
     />
   );
@@ -61,12 +61,10 @@ CountryInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.string,
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
 };
 
 CountryInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultValue: '',
 };
