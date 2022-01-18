@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import json
+from operator import attrgetter
 
 from marshmallow import EXCLUDE
 from sqlalchemy import inspect
@@ -122,7 +123,8 @@ class PersonLinkListFieldBase(PrincipalListField):
         return list({self._get_person_link(x) for x in data})
 
     def _value(self):
-        return [self._serialize_person_link(person_link) for person_link in self.data] if self.data else []
+        return [self._serialize_person_link(person_link)
+                for person_link in sorted(self.data, key=attrgetter('display_order_key'))] if self.data else []
 
     def process_formdata(self, valuelist):
         if valuelist:
