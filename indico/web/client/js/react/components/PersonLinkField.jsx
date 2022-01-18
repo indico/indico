@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {DndProvider} from 'react-dnd';
@@ -243,7 +244,7 @@ const PersonLinkSection = ({
               drag={!drag}
               onMove={moveItem}
               person={p}
-              onDelete={() => onChange(persons.filter((_, i) => i !== idx))}
+              onDelete={() => onChange(persons.filter((__, i) => i !== idx))}
               onEdit={() => onEdit(idx)}
               onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
               canDelete={canDelete}
@@ -435,8 +436,20 @@ export function WTFPersonLinkField({
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
 
   const onChange = (value, sort = autoSort) => {
+    const picked = value.map(p =>
+      _.pick(p, [
+        'firstName',
+        'lastName',
+        'affiliation',
+        'email',
+        'address',
+        'phone',
+        'roles',
+        'displayOrder',
+      ])
+    );
     inputField.value = JSON.stringify(
-      snakifyKeys(value.map((x, i) => ({...x, displayOrder: sort ? 0 : i})))
+      snakifyKeys(picked.map((x, i) => ({...x, displayOrder: sort ? 0 : i})))
     );
     setPersons(value);
     inputField.dispatchEvent(new Event('change', {bubbles: true}));

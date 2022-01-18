@@ -28,6 +28,7 @@ class PersonLinkSchema(mm.Schema):
     email = fields.String(required=True)
     display_order = fields.Int(load_default=0, dump_default=0)
     avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None, dump_only=True)
+    roles = fields.List(fields.String(), load_only=True)
 
     @pre_load
     def load_nones(self, data, **kwargs):
