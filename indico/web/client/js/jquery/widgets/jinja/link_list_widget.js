@@ -10,13 +10,10 @@ import ReactDOM from 'react-dom';
 
 import {WTFLinkListField} from 'indico/react/components';
 
-window.setupLinkListWidget = function setupLinkListWidget({
-  fieldId,
-  initialLinks,
-}) {
+window.setupLinkListWidget = function setupLinkListWidget({fieldId}) {
   const wrapperId = `${fieldId}-wrapper`;
   ReactDOM.render(
-    <WTFLinkListField fieldId={fieldId} initialLinks={initialLinks} />,
+    <WTFLinkListField fieldId={fieldId} />,
     document.getElementById(wrapperId)
   );
 };

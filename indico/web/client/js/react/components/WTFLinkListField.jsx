@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -15,15 +15,17 @@ const linkShape = {
   url: PropTypes.string.isRequired,
 };
 
-export default function WTFLinkListField({fieldId, initialLinks}) {
-  const hiddenInputRef = useRef(null);
+export default function WTFLinkListField({fieldId}) {
+  const storageField = useMemo(() => document.getElementById(fieldId), [fieldId]);
+  const initialLinks = storageField.value ? JSON.parse(storageField.value) : [];
   const [links, setLinks] = useState(
     initialLinks.length === 0 ? [{title: '', url: ''}] : initialLinks
   );
 
   useEffect(() => {
-    hiddenInputRef.current.dispatchEvent(new Event('change', {bubbles: true}));
-  }, [links]);
+    storageField.value = JSON.stringify(links);
+    storageField.dispatchEvent(new Event('change', {bubbles: true}));
+  }, [storageField, links]);
 
   const handleChange = (idx, field, value) => {
     const newLinks = [...links];
@@ -31,17 +33,7 @@ export default function WTFLinkListField({fieldId, initialLinks}) {
     setLinks(newLinks);
   };
 
-  const getProcessedLinks = () => {
-    const newLinks = links.filter(link => link.title || link.url);
-    if (newLinks.length === 1) {
-      return [{title: '', url: newLinks[0].url}];
-    }
-    return newLinks;
-  };
-
-  const addURL = () => {
-    setLinks([...links, {title: '', url: ''}]);
-  };
+  const addURL = () => setLinks([...links, {title: '', url: ''}]);
 
   let linksTable = null;
   // Values array should never be empty
@@ -49,7 +41,7 @@ export default function WTFLinkListField({fieldId, initialLinks}) {
     linksTable = (
       <div style={{marginBottom: '0.5em'}}>
         <input
-          type="text"
+          type="url"
           name="url"
           placeholder={Translate.string('URL')}
           onChange={evt => handleChange(0, 'url', evt.target.value)}
@@ -79,27 +71,17 @@ export default function WTFLinkListField({fieldId, initialLinks}) {
     );
   }
   return (
-    <div>
-      <div className="multiple-items-widget">
-        {linksTable}
-        <button type="button" className="js-add-row i-button icon-plus" onClick={addURL}>
-          <Translate>Add</Translate>
-        </button>
-      </div>
-      <input
-        ref={hiddenInputRef}
-        type="hidden"
-        id={fieldId}
-        name={fieldId}
-        value={JSON.stringify(getProcessedLinks())}
-      />
+    <div className="multiple-items-widget">
+      {linksTable}
+      <button type="button" className="js-add-row i-button icon-plus" onClick={addURL}>
+        <Translate>Add</Translate>
+      </button>
     </div>
   );
 }
 
 WTFLinkListField.propTypes = {
   fieldId: PropTypes.string.isRequired,
-  initialLinks: PropTypes.arrayOf(PropTypes.shape(linkShape)).isRequired,
 };
 
 function Link({onChange, onDelete, title, url}) {

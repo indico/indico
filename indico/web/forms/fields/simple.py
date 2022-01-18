@@ -177,6 +177,12 @@ class IndicoMultipleTagSelectField(SelectMultipleField):
 class IndicoLinkListField(JSONField):
     widget = JinjaWidget('forms/link_list_widget.html', single_kwargs=True, single_line=True)
 
+    def process_formdata(self, valuelist):
+        super().process_formdata(valuelist)
+        self.data = [link for link in self.data if link.get('title') or link.get('url')]
+        if len(self.data) == 1:
+            self.data[0]['title'] = ''
+
     def pre_validate(self, form):
         if not all(x.get('url') for x in self.data):
             raise ValidationError(_('URL is required'))
