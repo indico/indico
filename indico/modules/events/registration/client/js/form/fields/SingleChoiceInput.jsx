@@ -26,7 +26,7 @@ import './table.module.scss';
 
 function SingleChoiceDropdown({value, onChange, disabled, isRequired, choices, withExtraSlots}) {
   const currency = useSelector(getCurrency);
-  const selectedChoice = choices.find(c => Object.prototype.hasOwnProperty.call(value, c.id)) || {};
+  const selectedChoice = choices.find(c => c.id in value) || {};
 
   let extraSlotsDropdown = null;
   if (withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0) {
@@ -105,7 +105,7 @@ SingleChoiceDropdown.propTypes = {
 
 function SingleChoiceRadioGroup({value, onChange, disabled, isRequired, choices, withExtraSlots}) {
   const currency = useSelector(getCurrency);
-  const selectedChoice = choices.find(c => Object.prototype.hasOwnProperty.call(value, c.id)) || {};
+  const selectedChoice = choices.find(c => c.id in value) || {};
   const radioChoices = [...choices];
   if (!isRequired) {
     radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
