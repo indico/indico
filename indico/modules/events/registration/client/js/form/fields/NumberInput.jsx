@@ -10,7 +10,7 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import {Form, Label} from 'semantic-ui-react';
 
-import {FinalInput, FinalField, validators as v} from 'indico/react/forms';
+import {FinalInput, FinalField, validators as v, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
@@ -70,7 +70,7 @@ export default function NumberInput({
       price={price}
       minValue={minValue}
       maxValue={maxValue}
-      parse={x => x} // Prevent empty string being coerced to undefined
+      parse={p.number}
       validate={v.or(value => {
         if (value !== '' || (isRequired && value === '')) {
           return Translate.string('This field is required.');
