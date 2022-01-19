@@ -12,6 +12,7 @@ from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.controllers.common import (AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
                                                                 AbstractsExportExcel, AbstractsExportPDFMixin,
@@ -113,11 +114,17 @@ class RHCreateAbstract(RHAbstractListBase):
 
     @staticmethod
     def clone_fields(abstract):
-        field_names = ['title', 'description', 'person_links', 'submission_comment', 'submitted_for_tracks',
-                       'submitted_contrib_type']
+        field_names = ['title', 'description', 'submission_comment', 'submitted_for_tracks', 'submitted_contrib_type']
         field_data = {}
         for f in field_names:
             field_data[f] = getattr(abstract, f)
+        person_links = []
+        link_attrs = get_simple_column_attrs(AbstractPersonLink)
+        for old_link in abstract.person_links:
+            link = AbstractPersonLink(person=old_link.person)
+            link.populate_from_attrs(old_link, link_attrs)
+            person_links.append(link)
+        field_data['person_links'] = person_links
         for f in abstract.field_values:
             field_data[f'custom_{f.contribution_field_id}'] = f.data
         return field_data
