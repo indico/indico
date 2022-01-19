@@ -31,9 +31,11 @@ function NumberInputComponent({value, onChange, disabled, price, minValue, maxVa
         disabled={disabled}
         onChange={evt => onChange(evt.target.value ? +evt.target.value : '')}
       />
-      <Label pointing="left" styleName="price-tag">
-        {price.toFixed(2)} {currency} (Total: {total} {currency})
-      </Label>
+      {!!price && (
+        <Label pointing="left" styleName="price-tag">
+          {price.toFixed(2)} {currency} (Total: {total} {currency})
+        </Label>
+      )}
     </div>
   );
 }
