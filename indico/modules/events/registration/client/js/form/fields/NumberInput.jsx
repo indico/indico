@@ -29,7 +29,7 @@ function NumberInputComponent({value, onChange, disabled, price, minValue, maxVa
         min={minValue}
         max={maxValue}
         disabled={disabled}
-        onChange={evt => onChange(evt.target.value ? +evt.target.value : '')}
+        onChange={evt => onChange(evt.target.value ? +evt.target.value : null)}
       />
       {!!price && (
         <Label pointing="left" styleName="price-tag">
@@ -41,7 +41,8 @@ function NumberInputComponent({value, onChange, disabled, price, minValue, maxVa
 }
 
 NumberInputComponent.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([''])]).isRequired,
+  // XXX: why do we get an empty string here initially?
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([''])]),
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   price: PropTypes.number.isRequired,
@@ -50,34 +51,25 @@ NumberInputComponent.propTypes = {
 };
 
 NumberInputComponent.defaultProps = {
+  value: null,
   maxValue: null,
 };
 
-export default function NumberInput({
-  htmlName,
-  disabled,
-  isRequired,
-  defaultValue,
-  price,
-  minValue,
-  maxValue,
-}) {
+export default function NumberInput({htmlName, disabled, isRequired, price, minValue, maxValue}) {
+  const validate = isRequired
+    ? v.chain(v.required, v.number(), v.range(minValue, maxValue || Infinity))
+    : v.chain(v.optional(), v.number(), v.range(minValue, maxValue || Infinity));
   return (
     <FinalField
       name={htmlName}
       component={NumberInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={defaultValue}
       price={price}
       minValue={minValue}
       maxValue={maxValue}
       parse={p.number}
-      validate={v.or(value => {
-        if (value !== '' || (isRequired && value === '')) {
-          return Translate.string('This field is required.');
-        }
-      }, v.range(minValue, maxValue || Infinity))}
+      validate={validate}
     />
   );
 }
@@ -86,7 +78,6 @@ NumberInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([''])]),
   price: PropTypes.number,
   minValue: PropTypes.number,
   maxValue: PropTypes.number,
@@ -95,7 +86,6 @@ NumberInput.propTypes = {
 NumberInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultValue: '',
   price: 0,
   minValue: 0,
   maxValue: null,
