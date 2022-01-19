@@ -442,6 +442,7 @@ export function FinalSubmitButton({
   label,
   form,
   disabledUntilChange,
+  disabledIfInvalid,
   activeSubmitButton,
   color,
   onClick,
@@ -454,7 +455,10 @@ export function FinalSubmitButton({
     subscription: {validating: true, hasValidationErrors: true, pristine: true, submitting: true},
   });
   const disabled =
-    validating || hasValidationErrors || (disabledUntilChange && pristine) || submitting;
+    validating ||
+    (disabledIfInvalid && hasValidationErrors) ||
+    (disabledUntilChange && pristine) ||
+    submitting;
   return (
     <Form.Field disabled={disabled}>
       <Button
@@ -479,6 +483,7 @@ FinalSubmitButton.propTypes = {
   label: PropTypes.string,
   form: PropTypes.string,
   disabledUntilChange: PropTypes.bool,
+  disabledIfInvalid: PropTypes.bool,
   activeSubmitButton: PropTypes.bool,
   color: PropTypes.string,
   onClick: PropTypes.func,
@@ -492,6 +497,7 @@ FinalSubmitButton.defaultProps = {
   label: null,
   form: null,
   disabledUntilChange: true,
+  disabledIfInvalid: true,
   activeSubmitButton: true,
   color: null,
   onClick: null,
