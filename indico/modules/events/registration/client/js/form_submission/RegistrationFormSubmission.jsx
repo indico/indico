@@ -42,6 +42,7 @@ export default function RegistrationFormSubmission() {
           ))}
           <FinalSubmitButton
             disabledUntilChange={false}
+            disabledIfInvalid={false}
             // TODO: use different label when modifying registration
             label={Translate.string('Register')}
           />
