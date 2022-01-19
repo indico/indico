@@ -39,10 +39,11 @@
       $(this)
         .closest('tr')
         .toggleClass('selected', this.checked);
-      $('.js-requires-selected-row').toggleClass(
-        'disabled',
-        !$('.list input:checkbox:checked').length
-      );
+      const rows = $('.list input:checkbox:checked').length;
+      $('.js-requires-selected-row').toggleClass('disabled', !rows);
+      if (rows > 1) {
+        $('.js-requires-selected-row.single-row').toggleClass('disabled', true);
+      }
     });
 
     if (trigger) {

@@ -163,7 +163,8 @@ class RHCreateAbstract(RHAbstractListBase):
             if tpl_components.get('hide_abstract'):
                 self.list_generator.flash_info_message(abstract)
             return jsonify_data(**tpl_components)
-        return jsonify_form(form, back=_('Cancel'), form_header_kwargs={'action': request.relative_url})
+        return jsonify_form(form, back=_('Cancel'), disabled_until_change=not abstract,
+                            form_header_kwargs={'action': request.relative_url})
 
 
 class RHDeleteAbstracts(RHManageAbstractsActionsBase):
