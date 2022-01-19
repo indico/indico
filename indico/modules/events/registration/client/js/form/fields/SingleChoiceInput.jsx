@@ -75,7 +75,7 @@ function SingleChoiceDropdown({value, onChange, disabled, isRequired, choices, w
         options={options}
         disabled={disabled}
         value={selectedChoice.id}
-        onChange={(e, data) => onChange({[data.value]: 1})}
+        onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
         clearable={!isRequired}
         search
       />
