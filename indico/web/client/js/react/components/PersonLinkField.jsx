@@ -175,9 +175,9 @@ PersonListItem.defaultProps = {
   onClickRole: null,
 };
 
-const DraggablePerson = ({drag, onMove, index, ...props}) => {
+const DraggablePerson = ({drag, dragType, onMove, index, ...props}) => {
   const [dragRef, itemRef, style] = useSortableItem({
-    type: 'person',
+    type: `person-${dragType}`,
     index,
     moveItem: onMove,
     separateHandle: true,
@@ -198,6 +198,7 @@ const DraggablePerson = ({drag, onMove, index, ...props}) => {
 
 DraggablePerson.propTypes = {
   drag: PropTypes.bool,
+  dragType: PropTypes.string.isRequired,
   onMove: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
 };
@@ -214,6 +215,7 @@ const PersonLinkSection = ({
   onEdit,
   canDelete,
   drag,
+  dragType,
 }) => {
   const onClickRole = (personIndex, roleIndex, value) => {
     const role = defaultRoles[roleIndex];
@@ -233,7 +235,7 @@ const PersonLinkSection = ({
   };
 
   return (
-    <SortableWrapper accept="person">
+    <SortableWrapper accept={`person-${dragType}`}>
       {sectionLabel && <div styleName="titled-rule">{sectionLabel}</div>}
       <List divided relaxed>
         {persons.length > 0 ? (
@@ -242,6 +244,7 @@ const PersonLinkSection = ({
               key={p.userId || p.email}
               index={idx}
               drag={!drag}
+              dragType={dragType}
               onMove={moveItem}
               person={p}
               onDelete={() => onChange(persons.filter((__, i) => i !== idx))}
@@ -271,6 +274,7 @@ PersonLinkSection.propTypes = {
   onEdit: PropTypes.func.isRequired,
   canDelete: PropTypes.bool,
   drag: PropTypes.bool,
+  dragType: PropTypes.string.isRequired,
 };
 
 PersonLinkSection.defaultProps = {
@@ -334,6 +338,7 @@ export default function PersonLinkField({
             const filtered = persons.filter(filterCondition);
             return filtered.length === 0 ? null : (
               <PersonLinkSection
+                dragType={name}
                 key={name}
                 drag={!autoSort}
                 label={plural || label}
@@ -349,6 +354,7 @@ export default function PersonLinkField({
           {others.length > 0 && (
             <PersonLinkSection
               drag={!autoSort}
+              dragType="other"
               label={sections.length > 0 ? Translate.string('Others') : undefined}
               persons={others}
               defaultRoles={roles}
