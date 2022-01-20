@@ -2,6 +2,18 @@ Changelog
 =========
 
 
+Version 3.1.1
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Fix published editable files only being visible to users with access to the editing
+  timeline (:pr:`5218`)
+
+
 Version 3.1
 -----------
 
