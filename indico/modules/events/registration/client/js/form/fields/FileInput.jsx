@@ -5,69 +5,40 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import uploadFileURL from 'indico-url:event_registration.upload_registration_file';
+
 import PropTypes from 'prop-types';
-import React, {useRef, useState} from 'react';
-import {Button} from 'semantic-ui-react';
+import React from 'react';
+import {useSelector} from 'react-redux';
+
+import {FinalSingleFileManager} from 'indico/react/components';
+
+import {getStaticData} from '../../form_setup/selectors';
 
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
-export default function FileInput({htmlName, disabled}) {
-  const [file, setFile] = useState();
-  const fileRef = useRef();
-
-  const handleFileChange = e => {
-    setFile(e.target.value.split('\\').pop());
-  };
-
-  const handleFileClear = () => {
-    setFile(null);
-    fileRef.current.value = null;
-  };
-
-  const handleSelectFileClick = () => {
-    fileRef.current.click();
-  };
+export default function FileInput({htmlName, disabled, isRequired}) {
+  const {eventId, regformId} = useSelector(getStaticData);
 
   return (
-    <>
-      <Button.Group size="small">
-        <Button
-          type="button"
-          htmlFor={`${htmlName}-file`}
-          name={htmlName}
-          disabled={disabled}
-          icon="upload"
-          /* https://github.com/Semantic-Org/Semantic-UI-React/issues/4318
-          label={
-            <Label styleName={file ? 'fileinput-label-squarecorners' : ''}>
-              <span styleName="fileinput-label">
-                {file ? file : <Translate>Select File</Translate>}
-              </span>
-            </Label>
-          }
-          */
-          onClick={handleSelectFileClick}
-        />
-        {file && <Button icon="delete" onClick={handleFileClear} />}
-      </Button.Group>
-      <input
-        id={`${htmlName}-file`}
-        disabled={disabled}
-        hidden
-        type="file"
-        ref={fileRef}
-        onChange={handleFileChange}
-      />
-    </>
+    <FinalSingleFileManager
+      name={htmlName}
+      disabled={disabled}
+      required={isRequired}
+      uploadURL={uploadFileURL({event_id: eventId, reg_form_id: regformId})}
+      hideValidationError
+    />
   );
 }
 
 FileInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  isRequired: PropTypes.bool,
 };
 
 FileInput.defaultProps = {
   disabled: false,
+  isRequired: false,
 };

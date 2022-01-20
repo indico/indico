@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import mimetypes
 from datetime import datetime
 from operator import itemgetter
 
@@ -19,9 +18,9 @@ from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
                                                             LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField, RegistrationFormFieldBase)
+from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
-from indico.util.fs import secure_client_filename
 from indico.util.i18n import L_, _
 from indico.util.string import normalize_phone_number
 from indico.web.forms.fields import IndicoRadioField
@@ -311,22 +310,22 @@ class _DeletableFileField(wtforms.FileField):
 
 class FileField(RegistrationFormFieldBase):
     name = 'file'
-    wtf_field_class = _DeletableFileField
+    # Toggle this to make the angular form work
+    # wtf_field_class = _DeletableFileField
+    wtf_field_class = wtforms.StringField
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         data = {'field_data': self.form_item.current_data}
         if not value:
-            return data
-        file_ = value['uploaded_file']
-        if file_:
-            # we have a file -> always save it
-            data['file'] = {
-                'data': file_.stream,
-                'name': secure_client_filename(file_.filename),
-                'content_type': mimetypes.guess_type(file_.filename)[0] or file_.mimetype or 'application/octet-stream'
-            }
-        elif not value['keep_existing']:
             data['file'] = None
+            return data
+
+        if file := File.query.filter(File.uuid == value, ~File.claimed).first():
+            # we have a file -> always save it
+            data['file'] = file
+        else:
+            # TODO: Handle this case when we remove wtforms from regform submission
+            raise ValidationError(_('Invalid file UUID'))
         return data
 
     @property

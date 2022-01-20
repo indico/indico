@@ -11,6 +11,7 @@ import {getStaticData} from '../form_setup/selectors';
 
 // TODO: move common selectors (ie most of the section and currency stuff) into ../form/selectors.js
 export {getNestedSections} from '../form_setup/selectors';
+export {getStaticData} from '../form_setup/selectors';
 
 export const getUserInfo = createSelector(
   getStaticData,

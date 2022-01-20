@@ -12,20 +12,27 @@ import {useSelector} from 'react-redux';
 
 import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import FormSection from '../form/FormSection';
 
-import {getNestedSections, getUserInfo} from './selectors';
+import {getNestedSections, getUserInfo, getStaticData} from './selectors';
 
 import '../../styles/regform.module.scss';
 
 export default function RegistrationFormSubmission() {
   const sections = useSelector(getNestedSections);
   const userInfo = useSelector(getUserInfo);
+  const {csrfToken, submitUrl} = useSelector(getStaticData);
 
   const onSubmit = async data => {
+    data = {...data, csrf_token: csrfToken};
     console.log(data);
-    await new Promise(r => setTimeout(r, 2500));
+    try {
+      await indicoAxios.post(submitUrl, data);
+    } catch (err) {
+      handleAxiosError(err);
+    }
   };
 
   return (

@@ -682,17 +682,18 @@ class RegistrationData(StoredFileMixin, db.Model):
     def user_data(self):
         return self.filename if self.field_data.field.input_type == 'file' else self.data
 
-    def _set_file(self, file_info):
+    def _set_file(self, file):
         # in case we are deleting/replacing a file
         self.storage_backend = None
         self.storage_file_id = None
         self.filename = None
         self.content_type = None
         self.size = None
-        if file_info is not None:
-            self.filename = file_info['name']
-            self.content_type = file_info['content_type']
-            self.save(file_info['data'])
+        if file:
+            self.filename = file.filename
+            self.content_type = file.content_type
+            with file.open() as f:
+                self.save(f)
 
     file = property(fset=_set_file)
     del _set_file

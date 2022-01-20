@@ -16,7 +16,17 @@ import reducers from './reducers';
 import RegistrationFormSubmission from './RegistrationFormSubmission';
 
 export default function setupRegformSetup(root) {
-  const {eventId, regformId, currency, management, moderated, userInfo, formData} = root.dataset;
+  const {
+    eventId,
+    regformId,
+    csrfToken,
+    currency,
+    management,
+    moderated,
+    userInfo,
+    submitUrl,
+    formData,
+  } = root.dataset;
 
   const initialData = {
     staticData: {
@@ -25,6 +35,8 @@ export default function setupRegformSetup(root) {
       management: JSON.parse(management),
       moderated: JSON.parse(moderated),
       userInfo: JSON.parse(userInfo),
+      csrfToken,
+      submitUrl,
       currency,
     },
   };

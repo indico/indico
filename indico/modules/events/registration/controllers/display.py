@@ -29,6 +29,7 @@ from indico.modules.events.registration.util import (check_registration_email, c
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
+from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
@@ -327,6 +328,19 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                management=False,
                                                login_required=self.regform.require_login and not session.user,
                                                is_restricted_access=self.is_restricted_access)
+
+
+class RHUploadRegistrationFile(UploadFileMixin, RHRegistrationFormBase):
+    """
+    Upload a file from a registration form.
+
+    Regform file fields do not wait for the regform to be submitted,
+    but upload the selected files immediately, saving just the genereated uuid.
+    Only this uuid is then sent when the regform is submitted.
+    """
+
+    def get_file_context(self):
+        return 'event', self.event.id, 'regform', self.regform.id, 'registration'
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):
