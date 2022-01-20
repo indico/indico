@@ -6,7 +6,9 @@
 # LICENSE file for more details.
 
 import json
+from operator import attrgetter
 
+from marshmallow import EXCLUDE
 from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
 
@@ -91,6 +93,7 @@ class PersonLinkListFieldBase(PrincipalListField):
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
+        data = PersonLinkSchema(unknown=EXCLUDE).load(data)
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
         person_link = None
@@ -98,8 +101,8 @@ class PersonLinkListFieldBase(PrincipalListField):
             person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
         if not person_link:
             person_link = self.person_link_cls(person=person)
-        person_link.populate_from_dict(PersonLinkSchema(
-            only=('first_name', 'last_name', 'affiliation', 'address', 'phone', '_title', 'display_order')).load(data))
+        person_link.populate_from_dict(data, keys=(
+            'first_name', 'last_name', 'affiliation', 'address', 'phone', '_title', 'display_order'))
         email = data.get('email', '').lower()
         if not email:
             raise UserValueError(_('A valid email address is required'))
@@ -117,10 +120,11 @@ class PersonLinkListFieldBase(PrincipalListField):
         raise NotImplementedError
 
     def _convert_data(self, data):
-        raise NotImplementedError
+        return list({self._get_person_link(x) for x in data})
 
     def _value(self):
-        return [self._serialize_person_link(person_link) for person_link in self.data] if self.data else []
+        return [self._serialize_person_link(person_link)
+                for person_link in sorted(self.data, key=attrgetter('display_order_key'))] if self.data else []
 
     def process_formdata(self, valuelist):
         if valuelist:

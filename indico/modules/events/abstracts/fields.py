@@ -118,9 +118,6 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
 
-    def _convert_data(self, data):
-        return list({self._get_person_link(x) for x in data})
-
     @no_autoflush
     def _get_person_link(self, data):
         person_link = super()._get_person_link(data)

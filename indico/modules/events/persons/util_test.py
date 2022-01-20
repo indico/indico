@@ -104,17 +104,17 @@ def test_get_event_person_edit(db, dummy_event, dummy_user):
         'last_name': 'Doe',
         'affiliation': 'ACME Inc.'
     }
-    person_1 = get_event_person(dummy_event, dict(data, _type='Avatar', identifier=f'User:{dummy_user.id}'))
+    person_1 = get_event_person(dummy_event, dict(data, type='Avatar', identifier=f'User:{dummy_user.id}'))
     assert person_1.id is None
     assert person_1.user == dummy_user
     db.session.add(person_1)
     db.session.flush()
 
-    person_2 = get_event_person(dummy_event, dict(data, _type='EventPerson', id=person_1.id))
+    person_2 = get_event_person(dummy_event, dict(data, type='EventPerson', id=person_1.id))
     assert person_2 == person_1
 
-    person_3 = get_event_person(dummy_event, dict(data, _type='PersonLink', personId=person_1.id))
+    person_3 = get_event_person(dummy_event, dict(data, type='PersonLink', person_id=person_1.id))
     assert person_3 == person_1
 
     with pytest.raises(ValueError):
-        get_event_person(dummy_event, dict(data, _type='UnsupportedPersonType'))
+        get_event_person(dummy_event, dict(data, type='UnsupportedPersonType'))

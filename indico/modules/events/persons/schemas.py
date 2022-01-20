@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import EXCLUDE, fields, post_dump, pre_load
+from marshmallow import fields, post_dump, pre_load
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
@@ -14,13 +14,11 @@ from indico.modules.users.models.users import UserTitle
 
 
 class PersonLinkSchema(mm.Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    type = fields.Constant('PersonLink')
+    type = fields.String(dump_default='PersonLink')
     person_id = fields.Int()
-    user_id = fields.Int(attribute='person.user_id')
-    user_identifier = fields.String(attribute='person.user.identifier')
+    user_id = fields.Int(attribute='person.user_id', dump_only=True)
+    user_identifier = fields.String(attribute='person.user.identifier', dump_only=True)
+    name = fields.String(attribute='display_full_name', dump_only=True)
     first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
     _title = EnumField(UserTitle, data_key='title')
@@ -29,12 +27,15 @@ class PersonLinkSchema(mm.Schema):
     address = fields.String(load_default='')
     email = fields.String(required=True)
     display_order = fields.Int(load_default=0, dump_default=0)
-    avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None)
+    avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None, dump_only=True)
+    roles = fields.List(fields.String(), load_only=True)
 
     @pre_load
-    def load_title(self, data, **kwargs):
+    def load_nones(self, data, **kwargs):
         if not data.get('title'):
             data['title'] = UserTitle.none.name
+        if not data.get('affiliation'):
+            data['affiliation'] = ''
         return data
 
     @post_dump

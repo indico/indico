@@ -23,7 +23,26 @@ from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
-class PersonLinkDataMixin:
+class PersonLinkMixin:
+    person_link_relation_name = None
+    person_link_backref_name = None
+
+    @declared_attr
+    def person_links(cls):
+        return db.relationship(
+            cls.person_link_relation_name,
+            lazy=True,
+            cascade='all, delete-orphan',
+            backref=db.backref(
+                cls.person_link_backref_name,
+                lazy=True
+            )
+        )
+
+    @property
+    def sorted_person_links(self):
+        return sorted(self.person_links, key=attrgetter('display_order_key'))
+
     @property
     def person_link_data(self):
         return {x: x.is_submitter for x in self.person_links}

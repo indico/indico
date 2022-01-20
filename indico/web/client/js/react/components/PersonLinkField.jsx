@@ -5,15 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
-import {Button, Segment, List, Form, Label, Icon, Popup, Message} from 'semantic-ui-react';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
+import {Button, Segment, List, Form, Label, Icon, Popup, Message, Ref} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
 import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useFavoriteUsers} from 'indico/react/hooks';
+import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 import {snakifyKeys} from 'indico/utils/case';
 
 import {Translate} from '../i18n';
@@ -171,6 +175,38 @@ PersonListItem.defaultProps = {
   onClickRole: null,
 };
 
+const DraggablePerson = ({drag, dragType, onMove, index, ...props}) => {
+  const [dragRef, itemRef, style] = useSortableItem({
+    type: `person-${dragType}`,
+    index,
+    moveItem: onMove,
+    separateHandle: true,
+  });
+  return (
+    <div ref={itemRef} style={style} styleName="drag-item">
+      {!drag && (
+        <Ref innerRef={dragRef}>
+          <div className="icon-drag-indicator" styleName="handle" />
+        </Ref>
+      )}
+      <div styleName="preview">
+        <PersonListItem {...props} />
+      </div>
+    </div>
+  );
+};
+
+DraggablePerson.propTypes = {
+  drag: PropTypes.bool,
+  dragType: PropTypes.string.isRequired,
+  onMove: PropTypes.func.isRequired,
+  index: PropTypes.number.isRequired,
+};
+
+DraggablePerson.defaultProps = {
+  drag: true,
+};
+
 const PersonLinkSection = ({
   label: sectionLabel,
   persons,
@@ -178,6 +214,8 @@ const PersonLinkSection = ({
   onChange,
   onEdit,
   canDelete,
+  drag,
+  dragType,
 }) => {
   const onClickRole = (personIndex, roleIndex, value) => {
     const role = defaultRoles[roleIndex];
@@ -190,16 +228,26 @@ const PersonLinkSection = ({
     onChange(persons.map((v, i) => (i === personIndex ? {...v, roles} : v)));
   };
 
+  const moveItem = (dragIndex, hoverIndex) => {
+    const result = persons.slice();
+    result.splice(hoverIndex, 0, ...result.splice(dragIndex, 1));
+    onChange(result);
+  };
+
   return (
-    <>
+    <SortableWrapper accept={`person-${dragType}`}>
       {sectionLabel && <div styleName="titled-rule">{sectionLabel}</div>}
       <List divided relaxed>
         {persons.length > 0 ? (
           persons.map((p, idx) => (
-            <PersonListItem
+            <DraggablePerson
               key={p.userId || p.email}
+              index={idx}
+              drag={!drag}
+              dragType={dragType}
+              onMove={moveItem}
               person={p}
-              onDelete={() => onChange(persons.filter((_, i) => i !== idx))}
+              onDelete={() => onChange(persons.filter((__, i) => i !== idx))}
               onEdit={() => onEdit(idx)}
               onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
               canDelete={canDelete}
@@ -214,7 +262,7 @@ const PersonLinkSection = ({
           <Translate>There are no persons</Translate>
         )}
       </List>
-    </>
+    </SortableWrapper>
   );
 };
 
@@ -225,6 +273,8 @@ PersonLinkSection.propTypes = {
   onChange: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
   canDelete: PropTypes.bool,
+  drag: PropTypes.bool,
+  dragType: PropTypes.string.isRequired,
 };
 
 PersonLinkSection.defaultProps = {
@@ -232,6 +282,7 @@ PersonLinkSection.defaultProps = {
   persons: [],
   defaultRoles: [],
   canDelete: true,
+  drag: false,
 };
 
 export default function PersonLinkField({
@@ -241,6 +292,8 @@ export default function PersonLinkField({
   sessionUser,
   roles,
   emptyMessage,
+  autoSort,
+  setAutoSort,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState(false);
@@ -278,63 +331,78 @@ export default function PersonLinkField({
 
   return (
     <div styleName="person-link-field">
-      <Segment attached="top" styleName="segment">
-        {sections.map(({name, label, plural}) => {
-          const filterCondition = p => p.roles && p.roles.includes(name);
-          const filtered = persons.filter(filterCondition);
-          return filtered.length === 0 ? null : (
+      <DndProvider backend={HTML5Backend}>
+        <Segment attached="top" styleName="segment">
+          {sections.map(({name, label, plural}) => {
+            const filterCondition = p => p.roles?.includes(name);
+            const filtered = persons.filter(filterCondition);
+            return filtered.length === 0 ? null : (
+              <PersonLinkSection
+                dragType={name}
+                key={name}
+                drag={!autoSort}
+                label={plural || label}
+                persons={filtered}
+                defaultRoles={roles}
+                onEdit={idx => onEdit(persons.findIndex(p => p === filtered[idx]))}
+                onChange={values =>
+                  onChange(persons.filter(p => !filterCondition(p)).concat(values))
+                }
+              />
+            );
+          })}
+          {others.length > 0 && (
             <PersonLinkSection
-              key={name}
-              label={plural || label}
-              persons={filtered}
+              drag={!autoSort}
+              dragType="other"
+              label={sections.length > 0 ? Translate.string('Others') : undefined}
+              persons={others}
               defaultRoles={roles}
-              onEdit={idx => onEdit(persons.findIndex(p => p === filtered[idx]))}
-              onChange={values => onChange(persons.filter(p => !filterCondition(p)).concat(values))}
+              onEdit={idx => onEdit(persons.findIndex(p => p === others[idx]))}
+              onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
             />
-          );
-        })}
-        {others.length > 0 && (
-          <PersonLinkSection
-            label={sections.length > 0 ? Translate.string('Others') : undefined}
-            persons={others}
-            defaultRoles={roles}
-            onEdit={idx => onEdit(persons.findIndex(p => p === others[idx]))}
-            onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
-          />
-        )}
-        {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
-      </Segment>
-      <Button.Group size="small" attached="bottom" floated="right">
-        {sessionUser && (
-          <Translate
-            as={Button}
-            type="button"
-            onClick={() => onAdd([sessionUser])}
-            disabled={persons.some(p => p.userId === sessionUser.userId)}
-          >
-            Add myself
-          </Translate>
-        )}
-        <UserSearch
-          favorites={favoriteUsers}
-          existing={persons.map(p => p.userIdentifier)}
-          onAddItems={onAdd}
-          triggerFactory={props => (
-            <Button type="button" {...props}>
-              <Translate>Search</Translate>
-            </Button>
           )}
-          withEventPersons={eventId !== null}
-          eventId={eventId}
-          disabled={!sessionUser}
-        />
-        <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
-          Enter manually
-        </Translate>
-        {modalOpen && (
-          <ExternalPersonModal onClose={onClose} onSubmit={onSubmit} person={persons[selected]} />
-        )}
-      </Button.Group>
+          {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
+        </Segment>
+        <Button.Group size="small" attached="bottom" floated="right">
+          <Button
+            toggle
+            icon="sort alphabet down"
+            type="button"
+            active={autoSort}
+            onClick={() => setAutoSort && setAutoSort(!autoSort)}
+          />
+          {sessionUser && (
+            <Translate
+              as={Button}
+              type="button"
+              onClick={() => onAdd([sessionUser])}
+              disabled={persons.some(p => p.userId === sessionUser.userId)}
+            >
+              Add myself
+            </Translate>
+          )}
+          <UserSearch
+            favorites={favoriteUsers}
+            existing={persons.map(p => p.userIdentifier)}
+            onAddItems={onAdd}
+            triggerFactory={props => (
+              <Button type="button" {...props}>
+                <Translate>Search</Translate>
+              </Button>
+            )}
+            withEventPersons={eventId !== null}
+            eventId={eventId}
+            disabled={!sessionUser}
+          />
+          <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
+            Enter manually
+          </Translate>
+          {modalOpen && (
+            <ExternalPersonModal onClose={onClose} onSubmit={onSubmit} person={persons[selected]} />
+          )}
+        </Button.Group>
+      </DndProvider>
     </div>
   );
 }
@@ -346,6 +414,8 @@ PersonLinkField.propTypes = {
   sessionUser: PropTypes.object,
   eventId: PropTypes.number,
   roles: PropTypes.array,
+  autoSort: PropTypes.bool,
+  setAutoSort: PropTypes.func,
 };
 
 PersonLinkField.defaultProps = {
@@ -353,6 +423,8 @@ PersonLinkField.defaultProps = {
   sessionUser: null,
   eventId: null,
   roles: [],
+  autoSort: true,
+  setAutoSort: null,
 };
 
 export function WTFPersonLinkField({
@@ -363,23 +435,47 @@ export function WTFPersonLinkField({
   sessionUser,
   emptyMessage,
 }) {
-  const [persons, setPersons] = useState(defaultValue);
+  const [persons, setPersons] = useState(
+    defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
+  );
+  const [autoSort, _setAutoSort] = useState(persons.every(p => p.displayOrder === 0));
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
 
-  const onChange = value => {
-    inputField.value = JSON.stringify(snakifyKeys(value));
+  const onChange = (value, sort = autoSort) => {
+    const picked = value.map(p =>
+      _.pick(p, [
+        'firstName',
+        'lastName',
+        'affiliation',
+        'email',
+        'address',
+        'phone',
+        'roles',
+        'displayOrder',
+      ])
+    );
+    inputField.value = JSON.stringify(
+      snakifyKeys(picked.map((x, i) => ({...x, displayOrder: sort ? 0 : i})))
+    );
     setPersons(value);
     inputField.dispatchEvent(new Event('change', {bubbles: true}));
   };
 
+  const setAutoSort = value => {
+    _setAutoSort(value);
+    onChange(persons, value);
+  };
+
   return (
     <PersonLinkField
-      value={persons}
+      value={!autoSort ? persons : persons.slice().sort((a, b) => a.name.localeCompare(b.name))}
       eventId={eventId}
       onChange={onChange}
       roles={roles}
       sessionUser={sessionUser}
       emptyMessage={emptyMessage}
+      autoSort={autoSort}
+      setAutoSort={setAutoSort}
     />
   );
 }

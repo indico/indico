@@ -26,8 +26,7 @@ import {camelizeKeys} from 'indico/utils/case';
       affiliation: sessionUser.affiliation,
       email: sessionUser.email,
       address: sessionUser.address,
-      phone: sessionUser.phone,
-      ...sessionUser,
+      phone: sessionUser.phone
     };
 
     ReactDOM.render(

@@ -27,7 +27,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.events import Event
-from indico.modules.events.models.persons import AuthorsSpeakersMixin, PersonLinkDataMixin
+from indico.modules.events.models.persons import AuthorsSpeakersMixin, PersonLinkMixin
 from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.sessions.models.sessions import Session
@@ -74,7 +74,7 @@ class CustomFieldsMixin:
 
 
 class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionManagersMixin, LocationMixin,
-                   AttachedItemsMixin, AttachedNotesMixin, PersonLinkDataMixin, AuthorsSpeakersMixin, CustomFieldsMixin,
+                   AttachedItemsMixin, AttachedNotesMixin, PersonLinkMixin, AuthorsSpeakersMixin, CustomFieldsMixin,
                    db.Model):
     __tablename__ = 'contributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
@@ -88,6 +88,8 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
                          db.ForeignKeyConstraint(['session_block_id', 'session_id'],
                                                  ['events.session_blocks.id', 'events.session_blocks.session_id']),
                          {'schema': 'events'})
+    person_link_relation_name = 'ContributionPersonLink'
+    person_link_backref_name = 'contribution'
     location_backref_name = 'contributions'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True
@@ -276,16 +278,6 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
     #: External references associated with this contribution
     references = db.relationship(
         'ContributionReference',
-        lazy=True,
-        cascade='all, delete-orphan',
-        backref=db.backref(
-            'contribution',
-            lazy=True
-        )
-    )
-    #: Persons associated with this contribution
-    person_links = db.relationship(
-        'ContributionPersonLink',
         lazy=True,
         cascade='all, delete-orphan',
         backref=db.backref(

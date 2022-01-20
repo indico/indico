@@ -83,3 +83,16 @@
 .icon {
   width: 32px !important;
 }
+
+.drag-item {
+  display: flex;
+  align-items: center;
+}
+
+.drag-item .handle {
+  cursor: pointer;
+}
+
+.drag-item .preview {
+  flex: 1;
+}
