@@ -68,6 +68,7 @@ Improvements
 - Add background color option and layer order to badge/poster designer items (:pr:`5139`,
   thanks :user:`SegiNyn`)
 - Allow external users in event/category ACLs (:pr:`5146`)
+- Add support for abstract cloning (:pr:`5217`)
 
 Bugfixes
 ^^^^^^^^
