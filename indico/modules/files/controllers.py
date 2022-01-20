@@ -15,7 +15,6 @@ from werkzeug.exceptions import Forbidden, UnprocessableEntity
 from indico.core.db import db
 from indico.modules.files import logger
 from indico.modules.files.models.files import File
-from indico.modules.files.schemas import FileSchema
 from indico.util.signing import secure_serializer
 from indico.web.args import use_kwargs
 from indico.web.rh import RHProtected
@@ -38,6 +37,7 @@ class UploadFileMixin:
         return self._save_file(file, file.stream)
 
     def _save_file(self, file, stream):
+        from indico.modules.files.schemas import FileSchema
         context = self.get_file_context()
         content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
         f = File(filename=file.filename, content_type=content_type)
@@ -85,6 +85,7 @@ class RHDeleteFile(RHFileBase):
 
 class RHFileInfo(RHFileBase):
     def _process(self):
+        from indico.modules.files.schemas import FileSchema
         return FileSchema().jsonify(self.file)
 
 
