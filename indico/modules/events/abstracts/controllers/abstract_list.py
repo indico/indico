@@ -137,9 +137,7 @@ class RHCreateAbstract(RHAbstractListBase):
         is_invited = request.args.get('invited') == '1'
         abstract_form_class = make_abstract_form(self.event, session.user, notification_option=True,
                                                  management=self.management, invited=is_invited)
-        cloned_fields = {}
-        if self.abstract:
-            cloned_fields = self.clone_fields(self.abstract)
+        cloned_fields = self.clone_fields(self.abstract) if self.abstract else {}
         form = abstract_form_class(event=self.event, management=self.management, invited=is_invited, **cloned_fields)
         if is_invited:
             del form.submitted_contrib_type
