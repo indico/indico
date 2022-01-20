@@ -41,9 +41,7 @@
         .toggleClass('selected', this.checked);
       const rows = $('.list input:checkbox:checked').length;
       $('.js-requires-selected-row').toggleClass('disabled', !rows);
-      if (rows > 1) {
-        $('.js-requires-selected-row.single-row').toggleClass('disabled', true);
-      }
+      $('.js-requires-selected-row.single-row').toggleClass('disabled', rows !== 1);
     });
 
     if (trigger) {
