@@ -1,0 +1,14 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div id="{{ field.id }}-wrapper"></div>
+    <input type="hidden" id="{{ field.id }}" name="{{ field.id }}" value="{{ field._value() | forceescape }}" />
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupLinkListWidget({
+            fieldId: {{ field.id | tojson }},
+        });
+    </script>
+{% endblock %}

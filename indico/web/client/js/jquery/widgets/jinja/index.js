@@ -13,6 +13,7 @@ import './date_widget';
 import './datetime_widget';
 import './duration_widget';
 import './time_widget';
+import './link_list_widget';
 import './linking_widget';
 import './location_widget';
 import './markdown_widget';
