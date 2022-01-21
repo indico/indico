@@ -129,11 +129,9 @@ idna==3.3
     # via
     #   email-validator
     #   requests
-importlib-metadata==4.10.0
-    # via markdown
 indico-fonts==1.1
     # via -r requirements.in
-ipython==7.31.0
+ipython==7.31.1
     # via -r requirements.in
 itsdangerous==2.0.1
     # via
@@ -335,8 +333,6 @@ wtforms-sqlalchemy==0.3
     # via -r requirements.in
 xlsxwriter==3.0.2
     # via -r requirements.in
-zipp==3.7.0
-    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
