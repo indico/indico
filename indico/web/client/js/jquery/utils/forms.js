@@ -8,6 +8,8 @@
 /* global countWords:false, initForms:false, showFormErrors:false, toggleAclField:false */
 
 // eslint-disable-next-line import/unambiguous
+import {Translate} from "indico/react/i18n";
+
 (function(global) {
   function validatePasswordConfirmation(passwordField, confirmField) {
     if ('setCustomValidity' in confirmField[0]) {
@@ -257,6 +259,13 @@
       lockedForms.data('locked-event-disabled', true);
       lockedForms.find(':input:not([type=hidden]):not([data-button-back])').prop('disabled', true);
       lockedForms.find(':input:submit').hide();
+    }
+
+    if (forms.data('confirm-close-unsaved') !== undefined) {
+      const oldOnBeforeUnload = window.onbeforeunload;
+      window.onbeforeunload = () => forms.data('fieldsChanged') ?
+          Translate.string('Are you sure you want to leave this page without saving?') : undefined;
+      forms.on('submit', () => window.onbeforeunload = oldOnBeforeUnload);
     }
   };
 
