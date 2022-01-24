@@ -200,6 +200,15 @@ import {Translate} from "indico/react/i18n";
           _resetData();
           $this.find('[data-disabled-until-change]').prop('disabled', true);
         });
+
+        if ($this.data('confirm-close-unsaved') !== undefined) {
+          const oldOnBeforeUnload = window.onbeforeunload;
+          window.onbeforeunload = () => $this.data('fieldsChanged') ?
+            Translate.string('Are you sure you want to leave this page without saving?') : undefined;
+          $this.on('submit', () => {
+            window.onbeforeunload = oldOnBeforeUnload
+          });
+        }
       })
       .on('change input', function() {
         const $this = $(this);
@@ -259,13 +268,6 @@ import {Translate} from "indico/react/i18n";
       lockedForms.data('locked-event-disabled', true);
       lockedForms.find(':input:not([type=hidden]):not([data-button-back])').prop('disabled', true);
       lockedForms.find(':input:submit').hide();
-    }
-
-    if (forms.data('confirm-close-unsaved') !== undefined) {
-      const oldOnBeforeUnload = window.onbeforeunload;
-      window.onbeforeunload = () => forms.data('fieldsChanged') ?
-          Translate.string('Are you sure you want to leave this page without saving?') : undefined;
-      forms.on('submit', () => window.onbeforeunload = oldOnBeforeUnload);
     }
   };
 
