@@ -133,7 +133,7 @@ importlib-metadata==4.10.0
     # via markdown
 indico-fonts==1.1
     # via -r requirements.in
-ipython==7.31.0
+ipython==7.31.1
     # via -r requirements.in
 itsdangerous==2.0.1
     # via
