@@ -168,12 +168,6 @@ class DateField(RegistrationFormFieldBase):
     wtf_field_class = wtforms.StringField
     setup_schema_base_cls = DateFieldDataSchema
 
-    def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
-        if value:
-            date_format = self.form_item.data['date_format']
-            value = datetime.strptime(value, date_format).isoformat()
-        return super().process_form_data(registration, value, old_data, billable_items_locked)
-
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
         data = {}

@@ -8,61 +8,161 @@
 import createDecorator from 'final-form-calculate';
 import PropTypes from 'prop-types';
 import TimePicker from 'rc-time-picker';
-import React, {useState} from 'react';
+import React from 'react';
 import {Field} from 'react-final-form';
-import {Form} from 'semantic-ui-react';
+import {Form, Input} from 'semantic-ui-react';
 
 import {SingleDatePicker} from 'indico/react/components';
-import {FinalDropdown, parsers as p} from 'indico/react/forms';
+import {FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+import {toMoment} from 'indico/utils/date';
 
 import '../../../styles/regform.module.scss';
 
-export default function DateInput({htmlName, disabled, id, dateFormat, timeFormat}) {
-  const [date, setDate] = useState(null);
-  const [time, setTime] = useState(null);
+function DateInputComponent({value, onChange, disabled, required, dateFormat, timeFormat}) {
+  const dateValue = value.includes('T') ? value.split('T')[0] : '';
+  const timeValue = value.includes('T') ? value.split('T')[1] : '';
+
+  const handleDateChange = newDate => {
+    const dateString = newDate ? newDate.toISOString().split('T')[0] : '';
+    const timeString = timeFormat ? timeValue : '00:00:00';
+    onChange(`${dateString}T${timeString}`);
+  };
+
+  const handleTimeChange = newTime =>
+    onChange(
+      `${dateValue}T${
+        newTime
+          .set('second', 0)
+          .toISOString()
+          .split('T')[1]
+      }`
+    );
+
+  return (
+    <Form.Group styleName="date-field">
+      <Form.Field>
+        <SingleDatePicker
+          name="date"
+          disabled={disabled}
+          required={required}
+          date={toMoment(dateValue, 'YYYY-MM-DD', true)}
+          onDateChange={handleDateChange}
+          placeholder={dateFormat}
+          displayFormat={dateFormat}
+          isOutsideRange={() => false}
+          verticalSpacing={10}
+          enableOutsideDays
+        />
+      </Form.Field>
+      {timeFormat && (
+        <Form.Field>
+          <TimePicker
+            name="time"
+            disabled={disabled}
+            required={required}
+            showSecond={false}
+            value={toMoment(timeValue, 'HH:mm:ss', true)}
+            focusOnOpen
+            onChange={handleTimeChange}
+            use12Hours={timeFormat === '12h'}
+            allowEmpty={false}
+            placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
+            getPopupContainer={node => node}
+          />
+        </Form.Field>
+      )}
+    </Form.Group>
+  );
+}
+
+DateInputComponent.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  required: PropTypes.bool.isRequired,
+  dateFormat: PropTypes.oneOf([
+    'DD/MM/YYYY',
+    'DD.MM.YYYY',
+    'MM/DD/YYYY',
+    'MM.DD.YYYY',
+    'YYYY/MM/DD',
+    'YYYY.MM.DD',
+    'MM/YYYY',
+    'MM.YYYY',
+    'YYYY',
+  ]).isRequired,
+  timeFormat: PropTypes.oneOf(['12h', '24h']),
+};
+
+DateInputComponent.defaultProps = {
+  timeFormat: null,
+};
+
+export default function DateInput({htmlName, disabled, isRequired, dateFormat, timeFormat}) {
   const friendlyDateFormat = dateFormat.replace(
     /%([HMdmY])/g,
     (match, c) => ({H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c])
   );
+  const validateDateTime = dateTime => {
+    if (dateTime && !dateTime.match(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:00(.*)/)) {
+      return Translate.string('The provided date is invalid.');
+    }
+  };
 
   if (dateFormat.includes('%d')) {
     return (
-      <Form.Group styleName="date-field">
-        <Form.Field>
-          <SingleDatePicker
-            id={`regform-datepicker-${id}`}
-            disabled={disabled}
-            date={date}
-            onDateChange={setDate}
-            placeholder={friendlyDateFormat}
-            displayFormat={friendlyDateFormat}
-            isOutsideRange={() => false}
-            verticalSpacing={10}
-            enableOutsideDays
-          />
-        </Form.Field>
-        {timeFormat && (
-          <Form.Field>
-            <TimePicker
-              id={`regform-timepicker-${id}`}
-              disabled={disabled}
-              showSecond={false}
-              value={time}
-              focusOnOpen
-              onChange={setTime}
-              use12Hours={timeFormat === '12h'}
-              allowEmpty={false}
-              placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
-              getPopupContainer={node => node}
-            />
-          </Form.Field>
-        )}
-      </Form.Group>
+      <FinalField
+        name={htmlName}
+        component={DateInputComponent}
+        required={isRequired}
+        disabled={disabled}
+        dateFormat={friendlyDateFormat}
+        timeFormat={timeFormat}
+        validate={validateDateTime}
+      />
     );
   } else {
+    const parseDate = date => {
+      if (!date) {
+        return date;
+      }
+      const regexps = {
+        '%m/%Y': /^(?<month>\d{2})\/(?<year>\d{4})$/,
+        '%m.%Y': /^(?<month>\d{2})\.(?<year>\d{4})$/,
+        '%Y': /^(?<year>\d{4})$/,
+      };
+      const match = regexps[dateFormat].exec(date);
+      const rv = match ? `${match.groups.year}-${match.groups.month ?? '01'}-01T00:00:00` : date;
+      try {
+        toMoment(rv, 'YYYY-MM-DDTHH:mm:ss', true);
+        return rv;
+      } catch (e) {
+        return date;
+      }
+    };
+    const formatDate = date => {
+      if (!date || !date.includes('T')) {
+        return date;
+      }
+      try {
+        return toMoment(date, 'YYYY-MM-DDTHH:mm:ss', true).format(friendlyDateFormat);
+      } catch (e) {
+        return date;
+      }
+    };
     return (
-      <input type="text" name={htmlName} disabled={disabled} placeholder={friendlyDateFormat} />
+      <FinalField
+        type="text"
+        name={htmlName}
+        component={Input}
+        required={isRequired}
+        disabled={disabled}
+        placeholder={friendlyDateFormat}
+        parse={parseDate}
+        format={formatDate}
+        validate={validateDateTime}
+      />
     );
   }
 }
@@ -70,7 +170,7 @@ export default function DateInput({htmlName, disabled, id, dateFormat, timeForma
 DateInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
-  id: PropTypes.number.isRequired,
+  isRequired: PropTypes.bool,
   dateFormat: PropTypes.oneOf([
     '%d/%m/%Y',
     '%d.%m.%Y',
@@ -87,6 +187,7 @@ DateInput.propTypes = {
 
 DateInput.defaultProps = {
   disabled: false,
+  isRequired: false,
   timeFormat: null,
 };
 
