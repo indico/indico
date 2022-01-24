@@ -8,7 +8,8 @@
 /* global countWords:false, initForms:false, showFormErrors:false, toggleAclField:false */
 
 // eslint-disable-next-line import/unambiguous
-import {Translate} from "indico/react/i18n";
+
+import {Translate} from 'indico/react/i18n';
 
 (function(global) {
   function validatePasswordConfirmation(passwordField, confirmField) {
@@ -203,10 +204,12 @@ import {Translate} from "indico/react/i18n";
 
         if ($this.data('confirm-close-unsaved') !== undefined) {
           const oldOnBeforeUnload = window.onbeforeunload;
-          window.onbeforeunload = () => $this.data('fieldsChanged') ?
-            Translate.string('Are you sure you want to leave this page without saving?') : undefined;
+          window.onbeforeunload = () =>
+            $this.data('fieldsChanged')
+              ? Translate.string('Are you sure you want to leave this page without saving?')
+              : undefined;
           $this.on('submit', () => {
-            window.onbeforeunload = oldOnBeforeUnload
+            window.onbeforeunload = oldOnBeforeUnload;
           });
         }
       })
