@@ -24,7 +24,7 @@ flask
 html2text
 icalendar
 indico-fonts
-ipython
+ipython!=8.0.*  # 8.0 auto-blacks the code and has kind of broken autocompletion
 itsdangerous
 jinja2
 jsonschema

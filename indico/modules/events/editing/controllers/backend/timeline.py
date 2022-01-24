@@ -406,6 +406,9 @@ class RHDownloadRevisionFile(RHContributionEditableRevisionBase):
                               .first_or_404())
 
     def _check_revision_access(self):
+        if (self.revision_file in self.editable.published_revision.files and
+                self.revision_file.file_type.publishable):
+            return self.contrib.can_access(session.user)
         return self.editable.can_see_timeline(session.user)
 
     def _process(self):

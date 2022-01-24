@@ -39,6 +39,23 @@ Internal Changes
 ----
 
 
+Version 3.1.1
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Prompt before leaving the event protection page without saving changes (:pr:`5222`)
+
+Bugfixes
+^^^^^^^^
+
+- Fix published editable files only being visible to users with access to the editing
+  timeline (:pr:`5218`)
+
+
 Version 3.1
 -----------
 

@@ -4,7 +4,7 @@
 {% block title %}{% trans %}Event protection{% endtrans %}{% endblock %}
 
 {% block content %}
-    {{ form_header(form, id='event-protection-form') }}
+    {{ form_header(form, id='event-protection-form', extra_attrs={'data-confirm-close-unsaved': True}) }}
     {{ form_row(form.permissions, skip_label=true) }}
     {{ form_rows(form, skip=form.priv_fields.union(['permissions']),
                  widget_attrs={'own_no_access_contact': {'placeholder': event.no_access_contact}}) }}
