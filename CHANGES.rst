@@ -54,6 +54,8 @@ Bugfixes
 
 - Fix published editable files only being visible to users with access to the editing
   timeline (:pr:`5218`)
+- Fix incorrect date in multi-day meeting date selector dropdown in certain timezones
+  (:pr:`5223`)
 
 
 Version 3.1
