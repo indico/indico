@@ -10,6 +10,7 @@ from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
+from webargs import fields
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.auth.util import redirect_to_login
@@ -33,6 +34,7 @@ from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 
 
@@ -249,9 +251,16 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
 
     ALLOW_PROTECTED_EVENT = True
 
-    def _process_args(self):
+    @use_kwargs({
+        'email': fields.String(required=True),
+        'update': fields.Bool(load_default=False),
+        'management': fields.Bool(load_default=False),
+    }, location='query')
+    def _process_args(self, email, update, management):
         RHRegistrationFormBase._process_args(self)
-        self.update = request.args.get('update')
+        self.email = email.lower()
+        self.update = update
+        self.management = management
         self.existing_registration = self.regform.get_registration(uuid=self.update) if self.update else None
 
     def _check_access(self):
@@ -259,14 +268,11 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
             RHRegistrationFormBase._check_access(self)
 
     def _process(self):
-        email = request.args['email'].lower().strip()
-        management = request.args.get('management') == '1'
-
         if self.update:
-            return jsonify(check_registration_email(self.regform, email, self.existing_registration,
-                                                    management=management))
+            return jsonify(check_registration_email(self.regform, self.email, self.existing_registration,
+                                                    management=self.management))
         else:
-            return jsonify(check_registration_email(self.regform, email, management=management))
+            return jsonify(check_registration_email(self.regform, self.email, management=self.management))
 
 
 class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):

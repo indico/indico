@@ -26,15 +26,16 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
   const [message, setMessage] = useState('');
   const [warning, setWarning] = useState(false);
   const {eventId, regformId, management} = useSelector(getStaticData);
-  const url = useMemo(
-    () => validateEmailURL({event_id: eventId, reg_form_id: regformId, management: +management}),
-    [eventId, regformId, management]
-  );
+  const url = useMemo(() => validateEmailURL({event_id: eventId, reg_form_id: regformId}), [
+    eventId,
+    regformId,
+  ]);
   const validateEmail = useDebouncedAsyncValidate(async email => {
     let msg, response;
     try {
       response = await indicoAxios.get(url, {
-        params: {email, update: undefined}, // TODO: set update=1 when editing a registration
+        // TODO: set update=true when editing a registration
+        params: {email, management, update: false},
       });
     } catch (error) {
       return handleAxiosError(error);
