@@ -5,15 +5,120 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import validateEmailURL from 'indico-url:event_registration.check_email';
+
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useMemo, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {Message} from 'semantic-ui-react';
 
 import {FinalInput} from 'indico/react/forms';
+import {useDebouncedAsyncValidate} from 'indico/react/hooks';
+import {Param, Translate} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
+import {getStaticData} from '../../form_submission/selectors';
 
 import '../../../styles/regform.module.scss';
 
 export default function EmailInput({htmlName, disabled, isRequired}) {
-  return <FinalInput type="email" name={htmlName} required={isRequired} disabled={disabled} />;
+  const isMainEmailField = htmlName === 'email';
+  const [message, setMessage] = useState('');
+  const [warning, setWarning] = useState(false);
+  const {eventId, regformId, management} = useSelector(getStaticData);
+  const url = useMemo(
+    () => validateEmailURL({event_id: eventId, reg_form_id: regformId, management: +management}),
+    [eventId, regformId, management]
+  );
+  const validateEmail = useDebouncedAsyncValidate(async email => {
+    let msg, response;
+    try {
+      response = await indicoAxios.get(url, {
+        params: {email, update: undefined}, // TODO: set update=1 when editing a registration
+      });
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+    const data = response.data;
+    const name = data.user ? $('<span>', {text: data.user}).html() : null;
+    if (data.conflict === 'email-already-registered') {
+      msg = Translate.string('There is already a registration with this email address.');
+    } else if (data.conflict === 'user-already-registered') {
+      msg = Translate.string('The user associated with this email address is already registered.');
+    } else if (data.conflict === 'no-user') {
+      msg = Translate.string('There is no Indico user associated with this email address.');
+    } else if (
+      data.status === 'error' &&
+      (data.conflict === 'email-other-user' || data.conflict === 'email-no-user')
+    ) {
+      msg = Translate.string('This email address is not associated with your Indico account.');
+    } else if (data.conflict === 'email-other-user') {
+      msg = (
+        <Translate>
+          The registration will be re-associated to a different user (
+          <Param name="name" wrapper={<strong />} value={name} />
+          ).
+        </Translate>
+      );
+    } else if (data.conflict === 'email-no-user') {
+      msg = (
+        <Translate>
+          The registration will be disassociated from the current user (
+          <Param name="name" wrapper={<strong />} value={name} />
+          ).
+        </Translate>
+      );
+    } else if (data.conflict === 'email-invalid') {
+      if (data.email_error === 'undeliverable') {
+        msg = Translate.string('The domain used in the email address does not exist.');
+      } else {
+        msg = Translate.string('This email address is invalid.');
+      }
+    } else if (!data.user) {
+      msg = Translate.string('The registration will not be associated with any Indico account.');
+    } else if (data.self) {
+      msg = Translate.string('The registration will be associated with your Indico account.');
+    } else if (data.same) {
+      msg = (
+        <Translate>
+          The registration will remain associated with the Indico account{' '}
+          <Param name="name" wrapper={<strong />} value={name} />.
+        </Translate>
+      );
+    } else {
+      msg = (
+        <Translate>
+          The registration will be associated with the Indico account{' '}
+          <Param name="name" wrapper={<strong />} value={name} />.
+        </Translate>
+      );
+    }
+
+    if (data.status === 'error') {
+      setMessage('');
+      return msg;
+    } else {
+      setMessage(msg);
+      setWarning(data.status === 'warning');
+    }
+  }, 250);
+
+  return (
+    <FinalInput
+      type="email"
+      name={htmlName}
+      required={isRequired}
+      disabled={disabled}
+      validate={isMainEmailField ? validateEmail : undefined}
+      loaderWhileValidating
+    >
+      {isMainEmailField && !!message && (
+        <Message visible warning={warning}>
+          {message}
+        </Message>
+      )}
+    </FinalInput>
+  );
 }
 
 EmailInput.propTypes = {

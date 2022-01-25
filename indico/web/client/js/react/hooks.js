@@ -272,3 +272,25 @@ export function useQueryParams() {
 
   return [queryObject, setQuery];
 }
+
+/**
+ * React hook to debounce a final-form async validation function.
+ */
+export function useDebouncedAsyncValidate(validate, milliseconds = 250) {
+  const timeout = useRef(null);
+  return (value, values, meta) =>
+    new Promise(resolve => {
+      if (timeout.current) {
+        timeout.current();
+      }
+
+      const timerId = setTimeout(() => {
+        resolve(validate(value, values, meta));
+      }, milliseconds);
+
+      timeout.current = () => {
+        clearTimeout(timerId);
+        resolve();
+      };
+    });
+}
