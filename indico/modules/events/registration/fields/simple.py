@@ -21,6 +21,7 @@ from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
+from indico.util.marshmallow import UUIDString
 from indico.util.string import normalize_phone_number, validate_email
 from indico.web.forms.fields import IndicoRadioField
 
@@ -294,7 +295,7 @@ class CountryField(RegistrationFormFieldBase):
 class FileField(RegistrationFormFieldBase):
     name = 'file'
     wtf_field_class = wtforms.StringField
-    mm_field_class = fields.String
+    mm_field_class = UUIDString
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         data = {'field_data': self.form_item.current_data}
