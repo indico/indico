@@ -42,8 +42,10 @@ function MultiChoiceInputComponent({
     onChange({...value, [choice.id]: +newValue});
   };
 
-  const formatPrice = choice =>
-    ((choice.extraSlotsPay ? value[choice.id] || 0 : 1) * choice.price).toFixed(2);
+  const formatPrice = choice => {
+    const v = value[choice.id] || 0;
+    return ((v === 0 ? 0 : choice.extraSlotsPay ? v : 1) * choice.price).toFixed(2);
+  };
 
   return (
     <table styleName="choice-table">
