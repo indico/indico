@@ -7,12 +7,12 @@
 
 import os
 import re
+import typing as t
 from datetime import datetime, time, timedelta
 from uuid import UUID
 
 from dateutil import parser, relativedelta
-from marshmallow import ValidationError
-from marshmallow.fields import Date, DateTime, Field, List
+from marshmallow import ValidationError, fields
 from marshmallow.utils import from_iso_datetime
 from pytz import timezone
 from sqlalchemy import inspect
@@ -87,7 +87,7 @@ def _naive_from_iso(value):
     return dt
 
 
-class NaiveDateTime(DateTime):
+class NaiveDateTime(fields.DateTime):
     SERIALIZATION_FUNCS = {
         'iso': _naive_isoformat,
     }
@@ -97,7 +97,7 @@ class NaiveDateTime(DateTime):
     }
 
 
-class RelativeDayDateTime(Date):
+class RelativeDayDateTime(fields.Date):
     """
     A field that accepts a date or relative date offset and deserializes to
     a datetime object at the start/end of that date.
@@ -144,7 +144,7 @@ class RelativeDayDateTime(Date):
             return timezone(config.DEFAULT_TIMEZONE).localize(datetime.combine(date_value, time(0, 0, 0)))
 
 
-class ModelField(Field):
+class ModelField(fields.Field):
     """Marshmallow field for a single database object.
 
     This serializes an SQLAlchemy object to its identifier (usually the PK),
@@ -192,7 +192,7 @@ class ModelField(Field):
         return obj
 
 
-class ModelList(Field):
+class ModelList(fields.Field):
     """Marshmallow field for a list of database objects.
 
     This serializes a list of SQLAlchemy objects to a list of
@@ -246,7 +246,7 @@ class ModelList(Field):
         return self.collection_class(objs)
 
 
-class Principal(Field):
+class Principal(fields.Field):
     """Marshmallow field for a single principal."""
 
     def __init__(self, allow_groups=False, allow_external_users=False, **kwargs):
@@ -268,7 +268,7 @@ class Principal(Field):
             raise ValidationError(str(exc))
 
 
-class PrincipalList(Field):
+class PrincipalList(fields.Field):
     """Marshmallow field for a list of principals."""
 
     def __init__(self, allow_groups=False, allow_external_users=False, allow_event_roles=False,
@@ -324,7 +324,7 @@ class PrincipalDict(PrincipalList):
             raise ValidationError(str(exc))
 
 
-class PrincipalPermissionList(Field):
+class PrincipalPermissionList(fields.Field):
     """Marshmallow field for a list of principals and their permissions.
 
     :param principal_class: Object class to get principal permissions for
@@ -350,7 +350,7 @@ class PrincipalPermissionList(Field):
             raise ValidationError(str(exc))
 
 
-class HumanizedDate(Field):
+class HumanizedDate(fields.Field):
     """Marshmallow field for human-written dates used in REST APIs.
 
     This field allows for simple time deltas, e.g.: ``1d`` = "1 day`, ``1w`` = "1 week",
@@ -415,7 +415,7 @@ class FileField(ModelField):
         return rv
 
 
-class NoneRemovingList(List):
+class NoneRemovingList(fields.List):
     """Marshmallow field for a `List` that skips None during serialization."""
 
     def _serialize(self, value, attr, obj, **kwargs):
@@ -423,3 +423,11 @@ class NoneRemovingList(List):
         if rv is None:
             return None
         return [x for x in rv if x is not None]
+
+
+class UUIDString(fields.UUID):
+    """A UUID field that returns the UUID as a string instead of a native UUID."""
+
+    def _deserialize(self, value, attr, data, **kwargs) -> t.Optional[str]:
+        rv = self._validated(value)
+        return str(rv) if isinstance(rv, UUID) else rv
