@@ -7,8 +7,34 @@
 {% endblock %}
 
 {% block content %}
+    <div id="registration-form-submission-container"
+             data-event-id="{{ event.id }}"
+             data-regform-id="{{ regform.id }}"
+             data-submit-url="{{ request.url }}"
+             data-currency="{{ regform.currency }}"
+             data-form-data="{{ form_data | tojson | forceescape }}"
+             data-registration-data="{{ registration_data | tojson | forceescape }}"
+             data-user-info="{{ user_data | tojson | forceescape }}"
+             data-management="{{ management | tojson | forceescape }}"
+             data-registration-uuid="{{ registration.uuid }}"
+             data-moderated="{{ moderated | tojson | forceescape }}"></div>
+
+    <hr>
+    <h1>Warning, angular 💩 below</h1>
+    <button type="button" id="load-legacy-angular">Load legacy form</button>
+    <script>
+        (() => {
+            const btn = document.querySelector('#load-legacy-angular')
+            btn.addEventListener('click', () => {
+                angular.bootstrap(document.querySelector("[ng-controller='AppCtrl']"), ['nd']);
+                btn.remove();
+            });
+        })();
+    </script>
+    <hr>
+
     {{ template_hook('before-regform', event=event, regform=regform, registration=registration, management=true) }}
-    <div ng-app="nd" ng-controller="AppCtrl">
+    <div ng-controller="AppCtrl">
         {% block regform %}
             <div nd-reg-form
                  event-id="{{ event.id }}"

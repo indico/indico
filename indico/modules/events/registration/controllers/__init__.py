@@ -8,9 +8,11 @@
 from flask import redirect, request, session
 from sqlalchemy.orm import defaultload
 
+from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.util import (get_event_section_data, make_registration_schema,
-                                                     modify_registration)
+from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.util import (get_event_section_data, get_flat_section_submission_data,
+                                                     get_title_uuid, make_registration_schema, modify_registration)
 from indico.util.string import camelize_keys
 from indico.web.args import parser
 
@@ -43,8 +45,10 @@ class RegistrationEditMixin:
         return redirect(self.success_url)
 
     def _process_GET(self):
+        form_data = get_flat_section_submission_data(self.regform)
+        # Filter out registration data which are not in the regform anymore
         registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
-                             for r in self.registration.data}
+                             for r in self.registration.data if r.field_data.field.id in form_data['items']}
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
                                                             registration=self.registration))
 
@@ -53,8 +57,16 @@ class RegistrationEditMixin:
             'manager': self.management
         }
 
+        user_data = {t.name: getattr(session.user, t.name, None) if session.user else '' for t in PersonalDataType}
+        user_data['title'] = get_title_uuid(self.regform, user_data['title'])
         return self.view_class.render_template(self.template_file, self.event,
                                                sections=section_data, regform=self.regform,
+                                               form_data=form_data,
+                                               payment_conditions=payment_event_settings.get(self.event, 'conditions'),
+                                               payment_enabled=self.event.has_feature('payment'),
+                                               user_data=user_data,
+                                               registration=self.registration,
+                                               management=self.management,
+                                               moderated=False,  # TODO: what to do with this
                                                registration_data=registration_data,
-                                               registration_metadata=registration_metadata,
-                                               registration=self.registration)
+                                               registration_metadata=registration_metadata)
