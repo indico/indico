@@ -20,6 +20,7 @@ import {serializeDate, toMoment} from 'indico/utils/date';
 import {getCurrency} from '../../form_setup/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
+import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
 import './table.module.scss';
@@ -100,6 +101,11 @@ function AccommodationInputComponent({value, onChange, disabled, choices, arriva
                           currency,
                         })}
                       </Label>
+                    )}
+                  </td>
+                  <td>
+                    {c.placesLimit === 0 ? null : (
+                      <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
                     )}
                   </td>
                 </tr>

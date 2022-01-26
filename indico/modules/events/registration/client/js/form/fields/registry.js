@@ -13,7 +13,7 @@ import AccommodationInput, {
   accommodationSettingsFormValidator,
 } from './AccommodationInput';
 import BooleanInput, {BooleanSettings} from './BooleanInput';
-import CheckboxInput from './CheckboxInput';
+import CheckboxInput, {CheckboxSettings} from './CheckboxInput';
 import CountryInput from './CountryInput';
 import DateInput, {
   DateSettings,
@@ -89,6 +89,7 @@ export const fieldRegistry = {
   checkbox: {
     title: Translate.string('Checkbox'),
     inputComponent: CheckboxInput,
+    settingsComponent: CheckboxSettings,
     noLabel: true,
     hasPrice: true,
     icon: 'checkbox-checked',

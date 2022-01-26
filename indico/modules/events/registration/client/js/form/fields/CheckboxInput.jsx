@@ -10,13 +10,16 @@ import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Label} from 'semantic-ui-react';
 
-import {FinalCheckbox} from 'indico/react/forms';
+import {FinalCheckbox, FinalInput, validators as v} from 'indico/react/forms';
+import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form_setup/selectors';
 
+import {PlacesLeft} from './PlacesLeftLabel';
+
 import styles from '../../../styles/regform.module.scss';
 
-export default function CheckboxInput({htmlName, disabled, title, isRequired, price}) {
+export default function CheckboxInput({htmlName, disabled, title, isRequired, price, placesLimit}) {
   const currency = useSelector(getCurrency);
   const [checked, setChecked] = useState(false);
 
@@ -35,6 +38,11 @@ export default function CheckboxInput({htmlName, disabled, title, isRequired, pr
           {price.toFixed(2)} {currency}
         </Label>
       )}
+      {!!placesLimit && (
+        <div style={{marginLeft: '1em'}}>
+          <PlacesLeft placesLeft={placesLimit} isEnabled={!disabled} />
+        </div>
+      )}
     </FinalCheckbox>
   );
 }
@@ -45,9 +53,26 @@ CheckboxInput.propTypes = {
   title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool.isRequired,
   price: PropTypes.number,
+  placesLimit: PropTypes.number.isRequired,
 };
 
 CheckboxInput.defaultProps = {
   disabled: false,
   price: 0,
 };
+
+export function CheckboxSettings() {
+  return (
+    <FinalInput
+      name="placesLimit"
+      type="number"
+      label={Translate.string('Places limit')}
+      placeholder={Translate.string('None')}
+      step="1"
+      min="1"
+      validate={v.optional(v.min(0))}
+      parse={val => (val === '' ? 0 : val)}
+      format={val => (val === 0 ? '' : val)}
+    />
+  );
+}
