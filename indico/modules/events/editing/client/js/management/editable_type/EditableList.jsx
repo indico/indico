@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import React, {useState, useMemo} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
-import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
+import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown, Label} from 'semantic-ui-react';
 
 import {
   TooltipIfTruncated,
@@ -428,19 +428,29 @@ function EditableListDisplay({
             </>
           )}
         </div>
-        <Input
-          placeholder={Translate.string('Enter #id or search string')}
-          onChange={(evt, {value}) => setFilter(value)}
-          value={searchValue}
-          icon={
-            <Icon
-              name="close"
-              link
-              onClick={() => setFilter('')}
-              style={searchValue ? {} : {display: 'none'}}
-            />
-          }
-        />
+        <div>
+          <EditableListFilter
+            filterOptions={[
+              {key: 'status', text: 'Status', options: ['Accepted', 'Submitted']},
+              {key: 'editor', text: 'Editor', options: ['John', 'Matt']},
+              {key: 'keywords', text: 'Keywords', options: ['Computers', 'Physics']},
+              {key: 'program_code', text: 'Program code', options: ['1123', '4234']},
+            ]}
+          />
+          <Input
+            placeholder={Translate.string('Enter #id or search string')}
+            onChange={(evt, {value}) => setFilter(value)}
+            value={searchValue}
+            icon={
+              <Icon
+                name="close"
+                link
+                onClick={() => setFilter('')}
+                style={searchValue ? {} : {display: 'none'}}
+              />
+            }
+          />
+        </div>
       </div>
       {sortedList.length ? (
         <div styleName="editable-list">
@@ -548,4 +558,133 @@ EditableListDisplay.propTypes = {
   eventId: PropTypes.number.isRequired,
   management: PropTypes.bool.isRequired,
   canAssignSelf: PropTypes.bool.isRequired,
+};
+
+const filterShape = {
+  key: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  options: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
+function EditableListFilterSubmenu({filter, addFilter, open, onOpen, isSelectedOption}) {
+  return (
+    <Dropdown
+      scrolling
+      icon={null}
+      className="item"
+      onOpen={onOpen}
+      onBlur={evt => evt.stopPropagation()}
+      open={open}
+      trigger={<Dropdown.Item text={filter.text} icon="plus" />}
+    >
+      <Dropdown.Menu>
+        {filter.options.map(option => (
+          <Dropdown.Item
+            key={option}
+            text={option}
+            value={option}
+            disabled={isSelectedOption(option)}
+            onClick={(evt, {value: v}) => addFilter(filter.key, v)}
+          />
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+}
+
+EditableListFilterSubmenu.propTypes = {
+  filter: PropTypes.shape(filterShape).isRequired,
+  addFilter: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  onOpen: PropTypes.func.isRequired,
+  isSelectedOption: PropTypes.func.isRequired,
+};
+
+function EditableListFilter({filterOptions}) {
+  const [activeFilters, setActiveFilters] = useState([]);
+  const [openSubmenu, setOpenSubmenu] = React.useState(-1);
+
+  const sortFilters = filters =>
+    filters.sort((a, b) => {
+      const textCmp = a.text.localeCompare(b.text);
+      if (textCmp === 0 && a.selectedOption && b.selectedOption) {
+        return a.selectedOption.localeCompare(b.selectedOption);
+      }
+      return textCmp;
+    });
+
+  const addFilter = (key, selectedOption) => {
+    const newFilter = {
+      key: `${key}_${selectedOption}`,
+      text: filterOptions.find(f => f.key === key).text,
+      selectedOption,
+    };
+    setActiveFilters(sortFilters([...activeFilters, newFilter]));
+  };
+
+  const removeFilter = key => {
+    setActiveFilters(activeFilters.filter(f => f.key !== key));
+  };
+
+  const makeIsSelectedOption = filterKey => option =>
+    activeFilters.some(f => f.key === `${filterKey}_${option}`);
+
+  return (
+    <Dropdown
+      text={Translate.string('Filter')}
+      icon="filter"
+      labeled
+      button
+      className="icon"
+      onClose={() => setOpenSubmenu(-1)}
+    >
+      <Dropdown.Menu>
+        {activeFilters.length > 0 ? (
+          <>
+            <div key="_filters" style={{display: 'flex', flexWrap: 'wrap'}}>
+              {activeFilters.map(({key, text, selectedOption}) => (
+                <Label
+                  key={key}
+                  style={{marginTop: '0.4em', marginLeft: '0.4em', marginRight: '0.4em'}}
+                >
+                  {text}
+                  <Label.Detail>{selectedOption}</Label.Detail>
+                  <Icon
+                    name="delete"
+                    onClick={evt => {
+                      evt.stopPropagation();
+                      setOpenSubmenu(-1);
+                      removeFilter(key);
+                    }}
+                  />
+                </Label>
+              ))}
+            </div>
+            <Dropdown.Item
+              key="_clear"
+              text={Translate.string('Clear all filters')}
+              onClick={() => setActiveFilters([])}
+            />
+          </>
+        ) : (
+          <Dropdown.Item text={Translate.string('No filters were added yet')} disabled />
+        )}
+        <Dropdown.Divider />
+        {sortFilters(filterOptions).map(filter => (
+          <EditableListFilterSubmenu
+            key={filter.key}
+            filter={filter}
+            addFilter={addFilter}
+            open={openSubmenu === filter.key}
+            onOpen={() => setOpenSubmenu(filter.key)}
+            isSelectedOption={makeIsSelectedOption(filter.key)}
+          />
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+}
+
+EditableListFilter.propTypes = {
+  filterOptions: PropTypes.arrayOf(PropTypes.shape(filterShape)).isRequired,
 };
