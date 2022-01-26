@@ -34,6 +34,7 @@ from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.marshmallow import UUIDString
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 
@@ -253,7 +254,7 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
 
     @use_kwargs({
         'email': fields.String(required=True),
-        'update': fields.Bool(load_default=False),
+        'update': UUIDString(load_default=None),
         'management': fields.Bool(load_default=False),
     }, location='query')
     def _process_args(self, email, update, management):

@@ -34,8 +34,8 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
     let msg, response;
     try {
       response = await indicoAxios.get(url, {
-        // TODO: set update=true when editing a registration
-        params: {email, management, update: false},
+        // TODO: set update=<uuid> when editing a registration
+        params: {email, management, update: undefined},
       });
     } catch (error) {
       return handleAxiosError(error);
