@@ -278,14 +278,24 @@ export function useQueryParams() {
  */
 export function useDebouncedAsyncValidate(validate, milliseconds = 250) {
   const timeout = useRef(null);
+  const lastValue = useRef(null);
+  const lastResult = useRef(null);
+
   return (value, values, meta) =>
     new Promise(resolve => {
       if (timeout.current) {
         timeout.current();
       }
 
+      if (value === lastValue.current) {
+        resolve(lastResult.current);
+        return;
+      }
+
       const timerId = setTimeout(() => {
-        resolve(validate(value, values, meta));
+        lastValue.current = value;
+        lastResult.current = validate(value, values, meta);
+        resolve(lastResult.current);
       }, milliseconds);
 
       timeout.current = () => {
