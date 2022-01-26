@@ -24,7 +24,7 @@ import '../../../styles/regform.module.scss';
 export default function EmailInput({htmlName, disabled, isRequired}) {
   const isMainEmailField = htmlName === 'email';
   const [message, setMessage] = useState({status: '', message: '', forEmail: ''});
-  const {eventId, regformId, management} = useSelector(getStaticData);
+  const {eventId, regformId, registrationUuid, management} = useSelector(getStaticData);
   const url = useMemo(() => validateEmailURL({event_id: eventId, reg_form_id: regformId}), [
     eventId,
     regformId,
@@ -48,8 +48,7 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
     });
     try {
       response = await indicoAxios.get(url, {
-        // TODO: set update=<uuid> when editing a registration
-        params: {email, management, update: undefined},
+        params: {email, management, update: registrationUuid},
       });
     } catch (error) {
       return handleAxiosError(error);
