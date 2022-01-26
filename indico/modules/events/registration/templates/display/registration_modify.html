@@ -22,9 +22,9 @@
              data-currency="{{ regform.currency }}"
              data-form-data="{{ form_data | tojson | forceescape }}"
              data-registration-data="{{ registration_data | tojson | forceescape }}"
+             data-registration-uuid="{{ registration.uuid }}"
              data-user-info="{{ user_data | tojson | forceescape }}"
              data-management="{{ management | tojson | forceescape }}"
-             data-registration-uuid="{{ registration.uuid }}"
              data-moderated="{{ moderated | tojson | forceescape }}"></div>
 
     <hr>

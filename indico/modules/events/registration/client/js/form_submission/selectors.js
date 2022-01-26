@@ -13,3 +13,9 @@ export const getUserInfo = createSelector(
   getStaticData,
   staticData => staticData.userInfo
 );
+
+/** Indicates whether we are updating the registration */
+export const getUpdateMode = createSelector(
+  getStaticData,
+  staticData => !!staticData.registrationUuid
+);
