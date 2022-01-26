@@ -19,7 +19,15 @@ import {PlacesLeft} from './PlacesLeftLabel';
 
 import styles from '../../../styles/regform.module.scss';
 
-function BooleanInputComponent({value, onChange, disabled, required, price, placesLimit}) {
+function BooleanInputComponent({
+  value,
+  onChange,
+  disabled,
+  required,
+  price,
+  placesLimit,
+  placesUsed,
+}) {
   const currency = useSelector(getCurrency);
   const makeOnClick = newValue => () => {
     if (value === newValue && !required) {
@@ -35,7 +43,7 @@ function BooleanInputComponent({value, onChange, disabled, required, price, plac
         <Button
           type="button"
           active={value === 'yes'}
-          disabled={disabled}
+          disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit)}
           onClick={makeOnClick('yes')}
         >
           <Translate>Yes</Translate>
@@ -56,7 +64,7 @@ function BooleanInputComponent({value, onChange, disabled, required, price, plac
       )}
       {!!placesLimit && (
         <div style={{marginLeft: '1em'}}>
-          <PlacesLeft placesLeft={placesLimit} isEnabled={!disabled} />
+          <PlacesLeft placesLimit={placesLimit} placesUsed={placesUsed} isEnabled={!disabled} />
         </div>
       )}
     </div>
@@ -70,6 +78,7 @@ BooleanInputComponent.propTypes = {
   required: PropTypes.bool.isRequired,
   price: PropTypes.number.isRequired,
   placesLimit: PropTypes.number.isRequired,
+  placesUsed: PropTypes.number.isRequired,
 };
 
 export default function BooleanInput({
@@ -80,6 +89,7 @@ export default function BooleanInput({
   defaultValue,
   price,
   placesLimit,
+  placesUsed,
 }) {
   return (
     <FinalField
@@ -91,6 +101,7 @@ export default function BooleanInput({
       fieldProps={{className: styles.field}}
       price={price}
       placesLimit={placesLimit}
+      placesUsed={placesUsed}
       defaultValue={defaultValue}
     />
   );
@@ -104,6 +115,7 @@ BooleanInput.propTypes = {
   defaultValue: PropTypes.string,
   price: PropTypes.number,
   placesLimit: PropTypes.number,
+  placesUsed: PropTypes.number,
 };
 
 BooleanInput.defaultProps = {
@@ -112,6 +124,7 @@ BooleanInput.defaultProps = {
   defaultValue: '',
   price: 0,
   placesLimit: 0,
+  placesUsed: 0,
 };
 
 export function BooleanSettings() {

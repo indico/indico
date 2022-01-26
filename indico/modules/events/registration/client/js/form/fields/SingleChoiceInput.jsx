@@ -24,7 +24,15 @@ import {PlacesLeft} from './PlacesLeftLabel';
 import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
-function SingleChoiceDropdown({value, onChange, disabled, isRequired, choices, withExtraSlots}) {
+function SingleChoiceDropdown({
+  value,
+  onChange,
+  disabled,
+  isRequired,
+  choices,
+  withExtraSlots,
+  placesUsed,
+}) {
   const currency = useSelector(getCurrency);
   const selectedChoice = choices.find(c => c.id in value) || {};
 
@@ -34,11 +42,18 @@ function SingleChoiceDropdown({value, onChange, disabled, isRequired, choices, w
       key: i,
       value: i,
       text: i,
+      disabled:
+        selectedChoice.placesLimit > 0 &&
+        (placesUsed[selectedChoice.id] || 0) + i > selectedChoice.placesLimit,
     }));
     extraSlotsDropdown = (
       <Form.Select
         options={options}
-        disabled={disabled}
+        disabled={
+          disabled ||
+          (selectedChoice.placesLimit > 0 &&
+            (placesUsed[selectedChoice.id] || 0) >= selectedChoice.placesLimit)
+        }
         value={value[selectedChoice.id]}
         onChange={(_evt, data) => onChange({[selectedChoice.id]: data.value})}
         fluid
@@ -49,7 +64,7 @@ function SingleChoiceDropdown({value, onChange, disabled, isRequired, choices, w
   const options = choices.map(c => ({
     key: c.id,
     value: c.id,
-    disabled: !c.isEnabled,
+    disabled: !c.isEnabled || (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit),
     text: (
       <div styleName="dropdown-text">
         <div styleName="caption">{c.caption}</div>
@@ -60,7 +75,11 @@ function SingleChoiceDropdown({value, onChange, disabled, isRequired, choices, w
             </Label>
           )}
           {c.placesLimit === 0 ? null : (
-            <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+            <PlacesLeft
+              placesLimit={c.placesLimit}
+              placesUsed={placesUsed[c.id] || 0}
+              isEnabled={c.isEnabled}
+            />
           )}
         </div>
       </div>
@@ -101,9 +120,18 @@ SingleChoiceDropdown.propTypes = {
   isRequired: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
+  placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
 };
 
-function SingleChoiceRadioGroup({value, onChange, disabled, isRequired, choices, withExtraSlots}) {
+function SingleChoiceRadioGroup({
+  value,
+  onChange,
+  disabled,
+  isRequired,
+  choices,
+  withExtraSlots,
+  placesUsed,
+}) {
   const currency = useSelector(getCurrency);
   const selectedChoice = choices.find(c => c.id in value) || {};
   const radioChoices = [...choices];
@@ -134,7 +162,11 @@ function SingleChoiceRadioGroup({value, onChange, disabled, isRequired, choices,
                   label={c.caption}
                   key={c.id}
                   value={c.id}
-                  disabled={!c.isEnabled || disabled}
+                  disabled={
+                    !c.isEnabled ||
+                    disabled ||
+                    (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit)
+                  }
                   checked={isChecked(c, idx)}
                   onChange={() => handleChange(c.id)}
                 />
@@ -148,7 +180,11 @@ function SingleChoiceRadioGroup({value, onChange, disabled, isRequired, choices,
               </td>
               <td>
                 {c.id !== '' && c.placesLimit !== 0 && (
-                  <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+                  <PlacesLeft
+                    placesLimit={c.placesLimit}
+                    placesUsed={placesUsed[c.id] || 0}
+                    isEnabled={c.isEnabled}
+                  />
                 )}
               </td>
               {withExtraSlots && !!c.maxExtraSlots && selectedChoice.id === c.id && (
@@ -164,6 +200,9 @@ function SingleChoiceRadioGroup({value, onChange, disabled, isRequired, choices,
                           key: i,
                           value: i,
                           text: i,
+                          disabled:
+                            selectedChoice.placesLimit > 0 &&
+                            (placesUsed[selectedChoice.id] || 0) + i > selectedChoice.placesLimit,
                         }))}
                       />
                     )}
@@ -195,6 +234,7 @@ SingleChoiceRadioGroup.propTypes = {
   isRequired: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
+  placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
 };
 
 function SingleChoiceInputComponent({
@@ -205,6 +245,7 @@ function SingleChoiceInputComponent({
   itemType,
   choices,
   withExtraSlots,
+  placesUsed,
 }) {
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
@@ -219,6 +260,7 @@ function SingleChoiceInputComponent({
         isRequired={isRequired}
         choices={choices}
         withExtraSlots={withExtraSlots}
+        placesUsed={placesUsed}
       />
     );
   } else if (itemType === 'radiogroup') {
@@ -230,6 +272,7 @@ function SingleChoiceInputComponent({
         isRequired={isRequired}
         choices={choices}
         withExtraSlots={withExtraSlots}
+        placesUsed={placesUsed}
       />
     );
   } else {
@@ -245,7 +288,8 @@ SingleChoiceInputComponent.propTypes = {
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
-  // TODO: placesUsed, captions - only needed once we deal with real data
+  placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
+  // TODO: captions - only needed once we deal with real data
 };
 
 export default function SingleChoiceInput({
@@ -256,6 +300,7 @@ export default function SingleChoiceInput({
   itemType,
   choices,
   withExtraSlots,
+  placesUsed,
 }) {
   return (
     <FinalField
@@ -269,6 +314,7 @@ export default function SingleChoiceInput({
       itemType={itemType}
       choices={choices}
       withExtraSlots={withExtraSlots}
+      placesUsed={placesUsed}
     />
   );
 }
@@ -281,6 +327,7 @@ SingleChoiceInput.propTypes = {
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,
+  placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
 };
 
 SingleChoiceInput.defaultProps = {

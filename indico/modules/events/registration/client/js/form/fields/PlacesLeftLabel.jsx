@@ -11,7 +11,8 @@ import {Label} from 'semantic-ui-react';
 
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 
-export function PlacesLeft({placesLeft, isEnabled}) {
+export function PlacesLeft({placesLimit, placesUsed, isEnabled}) {
+  const placesLeft = placesLimit - placesUsed;
   const color = placesLeft > 0 ? (isEnabled ? 'green' : 'grey') : 'red';
 
   return (
@@ -31,6 +32,7 @@ export function PlacesLeft({placesLeft, isEnabled}) {
 }
 
 PlacesLeft.propTypes = {
-  placesLeft: PropTypes.number.isRequired,
+  placesLimit: PropTypes.number.isRequired,
+  placesUsed: PropTypes.number.isRequired,
   isEnabled: PropTypes.bool.isRequired,
 };

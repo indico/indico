@@ -19,7 +19,15 @@ import {PlacesLeft} from './PlacesLeftLabel';
 
 import styles from '../../../styles/regform.module.scss';
 
-export default function CheckboxInput({htmlName, disabled, title, isRequired, price, placesLimit}) {
+export default function CheckboxInput({
+  htmlName,
+  disabled,
+  title,
+  isRequired,
+  price,
+  placesLimit,
+  placesUsed,
+}) {
   const currency = useSelector(getCurrency);
   const [checked, setChecked] = useState(false);
 
@@ -28,7 +36,7 @@ export default function CheckboxInput({htmlName, disabled, title, isRequired, pr
       fieldProps={{className: styles.field}}
       name={htmlName}
       label={title}
-      disabled={disabled}
+      disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit)}
       checked={checked}
       onClick={() => setChecked(!checked)}
       required={isRequired}
@@ -40,7 +48,7 @@ export default function CheckboxInput({htmlName, disabled, title, isRequired, pr
       )}
       {!!placesLimit && (
         <div style={{marginLeft: '1em'}}>
-          <PlacesLeft placesLeft={placesLimit} isEnabled={!disabled} />
+          <PlacesLeft placesLimit={placesLimit} placesUsed={placesUsed} isEnabled={!disabled} />
         </div>
       )}
     </FinalCheckbox>
@@ -54,6 +62,7 @@ CheckboxInput.propTypes = {
   isRequired: PropTypes.bool.isRequired,
   price: PropTypes.number,
   placesLimit: PropTypes.number.isRequired,
+  placesUsed: PropTypes.number.isRequired,
 };
 
 CheckboxInput.defaultProps = {

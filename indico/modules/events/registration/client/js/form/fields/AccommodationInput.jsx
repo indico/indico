@@ -25,8 +25,15 @@ import {PlacesLeft} from './PlacesLeftLabel';
 import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
-function AccommodationInputComponent({value, onChange, disabled, choices, arrival, departure}) {
-  // TODO: places left
+function AccommodationInputComponent({
+  value,
+  onChange,
+  disabled,
+  choices,
+  arrival,
+  departure,
+  placesUsed,
+}) {
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
   const currency = useSelector(getCurrency);
@@ -88,7 +95,11 @@ function AccommodationInputComponent({value, onChange, disabled, choices, arriva
                       label={c.caption}
                       key={c.id}
                       value={c.id}
-                      disabled={!c.isEnabled || disabled}
+                      disabled={
+                        !c.isEnabled ||
+                        disabled ||
+                        (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit)
+                      }
                       checked={c.id === value.choice}
                       onChange={makeHandleChange(c)}
                     />
@@ -105,7 +116,11 @@ function AccommodationInputComponent({value, onChange, disabled, choices, arriva
                   </td>
                   <td>
                     {c.placesLimit === 0 ? null : (
-                      <PlacesLeft placesLeft={c.placesLimit} isEnabled={c.isEnabled} />
+                      <PlacesLeft
+                        placesLimit={c.placesLimit}
+                        placesUsed={placesUsed[c.id] || 0}
+                        isEnabled={c.isEnabled}
+                      />
                     )}
                   </td>
                 </tr>
@@ -157,7 +172,8 @@ AccommodationInputComponent.propTypes = {
     startDate: PropTypes.string.isRequired,
     endDate: PropTypes.string.isRequired,
   }).isRequired,
-  // TODO: placesUsed, captions - only needed once we deal with real data
+  placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
+  // TODO: captions - only needed once we deal with real data
 };
 
 export default function AccommodationInput({
@@ -167,6 +183,7 @@ export default function AccommodationInput({
   choices,
   arrival,
   departure,
+  placesUsed,
 }) {
   return (
     <FinalField
@@ -183,6 +200,7 @@ export default function AccommodationInput({
       choices={choices}
       arrival={arrival}
       departure={departure}
+      placesUsed={placesUsed}
       validate={value => {
         if (!value.isNoAccommodation && (!value.arrivalDate || !value.departureDate)) {
           return Translate.string('You must select the arrival and departure date');
@@ -205,7 +223,8 @@ AccommodationInput.propTypes = {
     startDate: PropTypes.string.isRequired,
     endDate: PropTypes.string.isRequired,
   }).isRequired,
-  // TODO: placesUsed, captions - only needed once we deal with real data
+  placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
+  // TODO: captions - only needed once we deal with real data
 };
 
 AccommodationInput.defaultProps = {

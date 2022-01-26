@@ -23,8 +23,14 @@ import {PlacesLeft} from './PlacesLeftLabel';
 import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
-function MultiChoiceInputComponent({value, onChange, disabled, choices, withExtraSlots}) {
-  // TODO: places left
+function MultiChoiceInputComponent({
+  value,
+  onChange,
+  disabled,
+  choices,
+  withExtraSlots,
+  placesUsed,
+}) {
   // TODO: disable options triggering price changes after payment (or warn for managers)
   // TODO: warnings for deleted/modified choices
   const currency = useSelector(getCurrency);
@@ -49,7 +55,11 @@ function MultiChoiceInputComponent({value, onChange, disabled, choices, withExtr
                 <Checkbox
                   styleName="checkbox"
                   value={choice.id}
-                  disabled={!choice.isEnabled || disabled}
+                  disabled={
+                    !choice.isEnabled ||
+                    disabled ||
+                    (choice.placesLimit > 0 && (placesUsed[choice.id] || 0) >= choice.placesLimit)
+                  }
                   checked={!!value[choice.id]}
                   onChange={makeHandleChange(choice)}
                   label={choice.caption}
@@ -64,7 +74,11 @@ function MultiChoiceInputComponent({value, onChange, disabled, choices, withExtr
               </td>
               <td>
                 {choice.placesLimit === 0 ? null : (
-                  <PlacesLeft placesLeft={choice.placesLimit} isEnabled={choice.isEnabled} />
+                  <PlacesLeft
+                    placesLimit={choice.placesLimit}
+                    placesUsed={placesUsed[choice.id] || 0}
+                    isEnabled={choice.isEnabled}
+                  />
                 )}
               </td>
               {withExtraSlots && (
@@ -73,13 +87,20 @@ function MultiChoiceInputComponent({value, onChange, disabled, choices, withExtr
                     <Dropdown
                       selection
                       styleName="dropdown"
-                      disabled={disabled}
+                      disabled={
+                        disabled ||
+                        (choice.placesLimit > 0 &&
+                          (placesUsed[choice.id] || 0) >= choice.placesLimit)
+                      }
                       value={value[choice.id] || 0}
                       onChange={makeHandleSlotsChange(choice)}
                       options={_.range(0, choice.maxExtraSlots + 2).map(i => ({
                         key: i,
                         value: i,
                         text: i,
+                        disabled:
+                          choice.placesLimit > 0 &&
+                          (placesUsed[choice.id] || 0) + i > choice.placesLimit,
                       }))}
                     />
                   )}
@@ -111,7 +132,8 @@ MultiChoiceInputComponent.propTypes = {
   disabled: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
-  // TODO: placesUsed, captions - only needed once we deal with real data
+  placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
+  // TODO: captions - only needed once we deal with real data
 };
 
 export default function MultiChoiceInput({
@@ -120,6 +142,7 @@ export default function MultiChoiceInput({
   isRequired,
   choices,
   withExtraSlots,
+  placesUsed,
 }) {
   return (
     <FinalField
@@ -130,6 +153,7 @@ export default function MultiChoiceInput({
       defaultValue={{}}
       choices={choices}
       withExtraSlots={withExtraSlots}
+      placesUsed={placesUsed}
     />
   );
 }
@@ -140,6 +164,7 @@ MultiChoiceInput.propTypes = {
   isRequired: PropTypes.bool,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,
+  placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
 };
 
 MultiChoiceInput.defaultProps = {
