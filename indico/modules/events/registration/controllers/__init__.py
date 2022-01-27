@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import redirect, request, session
+from flask import jsonify, request, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.payment import payment_event_settings
@@ -42,7 +42,7 @@ class RegistrationEditMixin:
         if self.management:
             session['registration_notify_user_default'] = notify_user
         modify_registration(self.registration, form_data, management=self.management, notify_user=notify_user)
-        return redirect(self.success_url)
+        return jsonify({'redirect': self.success_url})
 
     def _process_GET(self):
         form_data = get_flat_section_submission_data(self.regform)
