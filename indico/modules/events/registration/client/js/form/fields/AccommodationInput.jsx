@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Form, Label} from 'semantic-ui-react';
 
@@ -185,6 +185,11 @@ export default function AccommodationInput({
   departure,
   placesUsed,
 }) {
+  const noAccommodationOption = useMemo(
+    () => choices.find(c => c.isNoAccommodation && c.isEnabled),
+    [choices]
+  );
+
   return (
     <FinalField
       name={htmlName}
@@ -192,8 +197,8 @@ export default function AccommodationInput({
       required={isRequired}
       disabled={disabled}
       defaultValue={{
-        choice: null,
-        isNoAccommodation: false,
+        choice: noAccommodationOption?.id || null,
+        isNoAccommodation: !!noAccommodationOption,
         arrivalDate: null,
         departureDate: null,
       }}
