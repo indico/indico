@@ -23,8 +23,7 @@ import '../../../styles/regform.module.scss';
 
 export default function EmailInput({htmlName, disabled, isRequired}) {
   const isMainEmailField = htmlName === 'email';
-  const [message, setMessage] = useState('');
-  const [warning, setWarning] = useState(false);
+  const [message, setMessage] = useState({status: '', message: '', forEmail: ''});
   const {eventId, regformId, management} = useSelector(getStaticData);
   const url = useMemo(() => validateEmailURL({event_id: eventId, reg_form_id: regformId}), [
     eventId,
@@ -32,6 +31,21 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
   ]);
   const validateEmail = useDebouncedAsyncValidate(async email => {
     let msg, response;
+    if (!email) {
+      // we disabled the regular required validator in order for this to always run
+      msg = Translate.string('This field is required.');
+      setMessage({
+        status: 'error',
+        forEmail: email,
+        message: msg,
+      });
+      return msg;
+    }
+    setMessage({
+      status: '',
+      forEmail: email,
+      message: Translate.string('Checking email address...'),
+    });
     try {
       response = await indicoAxios.get(url, {
         // TODO: set update=<uuid> when editing a registration
@@ -95,12 +109,9 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
       );
     }
 
+    setMessage({status: data.status, message: msg, forEmail: email});
     if (data.status === 'error') {
-      setMessage('');
       return msg;
-    } else {
-      setMessage(msg);
-      setWarning(data.status === 'warning');
     }
   }, 250);
 
@@ -108,14 +119,18 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
     <FinalInput
       type="email"
       name={htmlName}
-      required={isRequired}
+      required={isRequired && isMainEmailField ? 'no-validator' : isRequired}
       disabled={disabled}
       validate={isMainEmailField ? validateEmail : undefined}
+      // hide the normal error tooltip if we have an error from our async validation
+      hideValidationError={
+        isMainEmailField && message.status === 'error' && message.forEmail ? 'message' : false
+      }
       loaderWhileValidating
     >
-      {isMainEmailField && !!message && (
-        <Message visible warning={warning}>
-          {message}
+      {isMainEmailField && !!message.forEmail && !!message.message && (
+        <Message visible warning={message.status === 'warning'} error={message.status === 'error'}>
+          {message.message}
         </Message>
       )}
     </FinalInput>
