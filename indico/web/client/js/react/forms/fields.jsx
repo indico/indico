@@ -47,9 +47,13 @@ export function FormFieldAdapter({
   // - there was an error during submission
   //   ...and the field has not been modified since the failed submission
   let errorMessage = null;
+  let hasValidationError = false;
   if (touched && error && (dirty || required)) {
     if (!hideValidationError) {
       errorMessage = error;
+    } else if (hideValidationError === 'message') {
+      // if we only hide the message, we still want to apply the error styling
+      hasValidationError = true;
     }
   } else if (submitError && !dirtySinceLastSubmit && !submitting) {
     errorMessage = submitError;
@@ -79,7 +83,7 @@ export function FormFieldAdapter({
     <Form.Field
       required={required}
       disabled={disabled || submitting}
-      error={!!errorMessage}
+      error={!!errorMessage || hasValidationError}
       defaultValue={defaultValue}
       {...fieldProps}
     >
@@ -116,7 +120,7 @@ FormFieldAdapter.propTypes = {
   disabled: PropTypes.bool,
   input: PropTypes.object.isRequired,
   required: PropTypes.bool,
-  hideValidationError: PropTypes.bool,
+  hideValidationError: PropTypes.oneOf([true, false, 'message']),
   hideErrorWhileActive: PropTypes.bool,
   undefinedValue: PropTypes.any,
   label: PropTypes.string,
@@ -235,7 +239,12 @@ export function FinalField({name, adapter, component, description, required, onC
   }
 
   if (required) {
-    extraProps.validate = validators.required;
+    if (required !== 'no-validator') {
+      // unless we opted out, add the required validator. note that you may want to
+      // opt out from this if you have custom validation logic that should run in all
+      // cases even when the required field is empty
+      extraProps.validate = validators.required;
+    }
     extraProps.required = true;
   }
 
@@ -265,7 +274,7 @@ FinalField.propTypes = {
   adapter: PropTypes.elementType,
   component: PropTypes.elementType,
   description: PropTypes.node,
-  required: PropTypes.bool,
+  required: PropTypes.oneOf([true, false, 'no-validator']),
   /** A function that is called with the new and old value whenever the value changes. */
   onChange: PropTypes.func,
 };
