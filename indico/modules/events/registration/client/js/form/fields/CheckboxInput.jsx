@@ -6,7 +6,8 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
+import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Label} from 'semantic-ui-react';
 
@@ -29,7 +30,6 @@ export default function CheckboxInput({
   placesUsed,
 }) {
   const currency = useSelector(getCurrency);
-  const [checked, setChecked] = useState(false);
 
   return (
     <FinalCheckbox
@@ -37,14 +37,16 @@ export default function CheckboxInput({
       name={htmlName}
       label={title}
       disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit)}
-      checked={checked}
-      onClick={() => setChecked(!checked)}
       required={isRequired}
     >
       {!!price && (
-        <Label pointing="left" styleName={`price-tag ${!checked ? 'greyed' : ''}`}>
-          {price.toFixed(2)} {currency}
-        </Label>
+        <Field name={htmlName} subscription={{value: true}}>
+          {({input: {value: checked}}) => (
+            <Label pointing="left" styleName={`price-tag ${!checked ? 'greyed' : ''}`}>
+              {price.toFixed(2)} {currency}
+            </Label>
+          )}
+        </Field>
       )}
       {!!placesLimit && (
         <div style={{marginLeft: '1em'}}>
