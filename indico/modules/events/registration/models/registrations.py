@@ -680,7 +680,7 @@ class RegistrationData(StoredFileMixin, db.Model):
 
     @property
     def user_data(self):
-        return self.filename if self.field_data.field.input_type == 'file' else self.data
+        return self.data
 
     def _set_file(self, file):
         # in case we are deleting/replacing a file

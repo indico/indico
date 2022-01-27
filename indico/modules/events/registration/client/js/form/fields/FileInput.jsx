@@ -13,13 +13,35 @@ import {useSelector} from 'react-redux';
 
 import {FinalSingleFileManager} from 'indico/react/components';
 
+import {getUpdateMode} from '../../form_submission/selectors';
 import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
 export default function FileInput({htmlName, disabled, isRequired}) {
-  const {eventId, regformId} = useSelector(getStaticData);
+  const {eventId, regformId, registrationData, fileData} = useSelector(getStaticData);
+  const isUpdateMode = useSelector(getUpdateMode);
+  let initialFileDetails = null;
+
+  if (isUpdateMode) {
+    const uuid = registrationData[htmlName];
+    const {filename, size} = fileData[uuid] || {};
+
+    if (uuid) {
+      initialFileDetails = {
+        filename,
+        size,
+        uuid,
+        upload: {
+          failed: false,
+          ongoing: false,
+          finished: true,
+          progress: 100,
+        },
+      };
+    }
+  }
 
   return (
     <FinalSingleFileManager
@@ -27,6 +49,7 @@ export default function FileInput({htmlName, disabled, isRequired}) {
       disabled={disabled}
       required={isRequired}
       uploadURL={uploadFileURL({event_id: eventId, reg_form_id: regformId})}
+      initialFileDetails={initialFileDetails}
       hideValidationError
     />
   );
