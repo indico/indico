@@ -126,8 +126,10 @@ class RHCreateAbstract(RHAbstractListBase):
             field_data[f'custom_{f.contribution_field_id}'] = f.data
         return field_data
 
-    @use_kwargs({'abstract_id': fields.Int()}, location='query')
-    def _process_args(self, abstract_id=None):
+    @use_kwargs({
+        'abstract_id': fields.Int(load_default=None)
+    }, location='query')
+    def _process_args(self, abstract_id):
         RHAbstractListBase._process_args(self)
         self.abstract = None
         if abstract_id:
@@ -171,7 +173,7 @@ class RHCreateAbstract(RHAbstractListBase):
             if tpl_components.get('hide_abstract'):
                 self.list_generator.flash_info_message(abstract)
             return jsonify_data(**tpl_components)
-        return jsonify_form(form, back=_('Cancel'), disabled_until_change=not self.abstract,
+        return jsonify_form(form, back=_('Cancel'), disabled_until_change=(not self.abstract or is_invited),
                             form_header_kwargs={'action': request.relative_url})
 
 

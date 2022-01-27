@@ -208,42 +208,6 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <a class="i-button arrow icon-copy js-requires-selected-row single-row hide-if-locked" data-toggle="dropdown">
-                        {% trans %}Clone{% endtrans %}
-                    </a>
-                    <ul class="i-dropdown">
-                        <li>
-                            <a class="js-dialog-action"
-                               title="{% trans %}Add new abstract{% endtrans %}"
-                               data-title="{% trans %}Add new abstract{% endtrans %}"
-                               data-href="{{ url_for('.manage_create_abstract', event) }}"
-                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-confirm-close-unsaved
-                               data-ajax-dialog>
-                                {% trans %}Abstract{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            {%- if can_create_invited_abstracts -%}
-                                {%- set message = _("Add new invited abstract") %}
-                            {%- else -%}
-                                {%- set message = _("You first need to create a notification template for invited abstracts") %}
-                            {%- endif -%}
-                            <a class="js-dialog-action {{ 'disabled' if not can_create_invited_abstracts }}"
-                               title="{{ message }}"
-                               data-title="{% trans %}Add new invited abstract{% endtrans %}"
-                               data-href="{{ url_for('.manage_create_abstract', event, invited=true) }}"
-                               data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                               data-confirm-close-unsaved
-                               data-ajax-dialog>
-                                {% trans %}Invited abstract{% endtrans %}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="group">
                     <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></a>
                 </div>
             </div>
@@ -265,7 +229,7 @@
             </div>
         </div>
         <div class="list-content" id="abstract-list">
-            {{ render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts) }}
+            {{ render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, can_create_invited_abstracts=can_create_invited_abstracts) }}
         </div>
         <div id="filter-placeholder"></div>
     </div>

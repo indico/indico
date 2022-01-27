@@ -19,6 +19,7 @@ Bugfixes
   timeline (:pr:`5218`)
 - Fix incorrect date in multi-day meeting date selector dropdown in certain timezones
   (:pr:`5223`)
+- Add support for abstract cloning (:pr:`5217`)
 
 
 Version 3.1
@@ -68,7 +69,6 @@ Improvements
 - Add background color option and layer order to badge/poster designer items (:pr:`5139`,
   thanks :user:`SegiNyn`)
 - Allow external users in event/category ACLs (:pr:`5146`)
-- Add support for abstract cloning (:pr:`5217`)
 
 Bugfixes
 ^^^^^^^^
