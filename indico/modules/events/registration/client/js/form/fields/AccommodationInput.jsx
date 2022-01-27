@@ -17,7 +17,7 @@ import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 
-import {getCurrency} from '../../form_setup/selectors';
+import {getCurrency} from '../../form/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';

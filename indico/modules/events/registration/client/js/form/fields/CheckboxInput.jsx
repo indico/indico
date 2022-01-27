@@ -13,7 +13,7 @@ import {Label} from 'semantic-ui-react';
 import {FinalCheckbox, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getCurrency} from '../../form_setup/selectors';
+import {getCurrency} from '../../form/selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
 

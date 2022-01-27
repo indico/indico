@@ -15,8 +15,9 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import FormSection from '../form/FormSection';
+import {getNestedSections, getStaticData} from '../form/selectors';
 
-import {getNestedSections, getUserInfo, getStaticData} from './selectors';
+import {getUserInfo} from './selectors';
 
 import '../../styles/regform.module.scss';
 

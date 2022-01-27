@@ -16,9 +16,11 @@ import {IButton} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper} from 'indico/react/sortable';
 
+import {getNestedSections} from '../form/selectors';
+
 import DisabledSectionsModal from './DisabledSectionsModal';
 import SectionSettingsModal from './SectionSettingsModal';
-import {isUILocked, getNestedSections, getDisabledSections} from './selectors';
+import {isUILocked, getDisabledSections} from './selectors';
 import SetupFormSection from './SetupFormSection';
 
 import '../../styles/regform.module.scss';

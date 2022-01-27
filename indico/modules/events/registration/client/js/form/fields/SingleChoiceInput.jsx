@@ -16,7 +16,7 @@ import {Form, Label, Dropdown} from 'semantic-ui-react';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getCurrency} from '../../form_setup/selectors';
+import {getCurrency} from '../../form/selectors';
 
 import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';

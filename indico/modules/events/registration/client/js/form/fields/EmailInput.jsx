@@ -17,7 +17,7 @@ import {useDebouncedAsyncValidate} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
-import {getStaticData} from '../../form_submission/selectors';
+import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
 

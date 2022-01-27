@@ -13,7 +13,7 @@ import {Form, Label} from 'semantic-ui-react';
 import {FinalInput, FinalField, validators as v, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getCurrency} from '../../form_setup/selectors';
+import {getCurrency} from '../../form/selectors';
 
 import '../../../styles/regform.module.scss';
 

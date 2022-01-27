@@ -14,7 +14,7 @@ import {Button, Input} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 
-import {getCurrency} from '../../form_setup/selectors';
+import {getCurrency} from '../../form/selectors';
 import './ChoicesSetup.module.scss';
 
 export const choiceShape = {

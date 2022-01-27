@@ -13,7 +13,7 @@ import {useSelector} from 'react-redux';
 
 import {FinalSingleFileManager} from 'indico/react/components';
 
-import {getStaticData} from '../../form_setup/selectors';
+import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
