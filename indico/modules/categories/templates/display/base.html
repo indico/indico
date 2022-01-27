@@ -2,12 +2,7 @@
 
 <div class="category-container">
     <div class="category-header flexrow">
-        {% if category.is_root or category.attachment_count or category.can_manage(session.user) %}
-            {% set category_title_classes = 'sidebar-padding' %}
-        {% else %}
-            {% set category_title_classes = '' %}
-        {% endif %}
-        <h1 class="category-title {{ category_title_classes }}">
+        <h1 class="category-title">
             {% block title %}
                 {% if category.title == 'Home' and category.is_root %}
                     {% if category.children %}
