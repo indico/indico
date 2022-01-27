@@ -19,7 +19,6 @@ export default function setupRegformSetup(root) {
   const {
     eventId,
     regformId,
-    csrfToken,
     currency,
     management,
     moderated,
@@ -35,7 +34,6 @@ export default function setupRegformSetup(root) {
       management: JSON.parse(management),
       moderated: JSON.parse(moderated),
       userInfo: JSON.parse(userInfo),
-      csrfToken,
       submitUrl,
       currency,
     },

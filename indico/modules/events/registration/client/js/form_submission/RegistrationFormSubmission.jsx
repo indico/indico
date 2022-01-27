@@ -10,36 +10,50 @@ import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 
-import {FinalSubmitButton} from 'indico/react/forms';
+import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 
 import FormSection from '../form/FormSection';
-import {getNestedSections, getStaticData} from '../form/selectors';
+import {getItems, getNestedSections, getStaticData} from '../form/selectors';
 
 import {getUserInfo} from './selectors';
 
 import '../../styles/regform.module.scss';
 
 export default function RegistrationFormSubmission() {
+  const items = useSelector(getItems);
   const sections = useSelector(getNestedSections);
   const userInfo = useSelector(getUserInfo);
-  const {csrfToken, submitUrl} = useSelector(getStaticData);
+  const {submitUrl} = useSelector(getStaticData);
 
   const onSubmit = async data => {
-    data = {...data, csrf_token: csrfToken};
     console.log(data);
+    let resp;
     try {
-      await indicoAxios.post(submitUrl, data);
+      resp = await indicoAxios.post(submitUrl, data);
     } catch (err) {
-      handleAxiosError(err);
+      return handleSubmitError(err);
+    }
+
+    if (resp.data.redirect) {
+      location.href = resp.data.redirect;
     }
   };
+
+  const initialValues = Object.fromEntries(
+    Object.entries(userInfo).filter(([key]) => {
+      return Object.values(items).some(
+        ({htmlName, fieldIsPersonalData, isEnabled}) =>
+          htmlName === key && fieldIsPersonalData && isEnabled
+      );
+    })
+  );
 
   return (
     <FinalForm
       onSubmit={onSubmit}
-      initialValues={userInfo}
+      initialValues={initialValues}
       initialValuesEqual={_.isEqual}
       subscription={{}}
     >

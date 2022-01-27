@@ -11,8 +11,7 @@ from operator import itemgetter
 import wtforms
 from marshmallow import ValidationError as MMValidationError
 from marshmallow import fields, pre_load, validate, validates_schema
-from werkzeug.datastructures import FileStorage
-from wtforms.validators import InputRequired, NumberRange, ValidationError
+from wtforms.validators import InputRequired, ValidationError
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
@@ -22,14 +21,14 @@ from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
-from indico.util.string import normalize_phone_number
+from indico.util.string import normalize_phone_number, validate_email
 from indico.web.forms.fields import IndicoRadioField
-from indico.web.forms.validators import IndicoEmail
 
 
 class TextField(RegistrationFormFieldBase):
     name = 'text'
     wtf_field_class = wtforms.StringField
+    mm_field_class = fields.String
     setup_schema_fields = {
         'min_length': fields.Integer(load_default=None, validate=validate.Range(1)),
         'max_length': fields.Integer(load_default=None, validate=validate.Range(1)),
@@ -50,12 +49,12 @@ class NumberField(RegistrationFormBillableField):
     name = 'number'
     wtf_field_class = wtforms.IntegerField
     required_validator = InputRequired
+    mm_field_class = fields.Integer
     setup_schema_base_cls = NumberFieldDataSchema
 
-    @property
-    def validators(self):
-        return [NumberRange(min=self.form_item.data.get('min_value', None) or 0,
-                            max=self.form_item.data.get('max_value', None))]
+    def validators(self, **kwargs):
+        return validate.Range(min=self.form_item.data.get('min_value', None) or 0,
+                              max=self.form_item.data.get('max_value', None))
 
     def calculate_price(self, reg_data, versioned_data):
         return versioned_data.get('price', 0) * int(reg_data or 0)
@@ -69,6 +68,7 @@ class NumberField(RegistrationFormBillableField):
 class TextAreaField(RegistrationFormFieldBase):
     name = 'textarea'
     wtf_field_class = wtforms.StringField
+    mm_field_class = fields.String
     setup_schema_fields = {
         'number_of_rows': fields.Integer(load_default=None, validate=validate.Range(1, 20)),
     }
@@ -77,6 +77,7 @@ class TextAreaField(RegistrationFormFieldBase):
 class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
     wtf_field_class = wtforms.BooleanField
+    mm_field_class = fields.Boolean
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
@@ -109,18 +110,17 @@ class CheckboxField(RegistrationFormBillableField):
         return {str(val).lower(): caption for val, caption in self.friendly_data_mapping.items()
                 if val is not None}
 
-    @property
-    def validators(self):
-        def _check_number_of_places(form, field):
-            if form.modified_registration:
-                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(field.data, old_data):
-                    return
-            if field.data and self.form_item.data.get('places_limit'):
+    def validators(self, registration=None, **kwargs):
+        def _check_number_of_places(new_data):
+            if registration:
+                old_data = registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(new_data, old_data):
+                    return True
+            if new_data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
                 if not places_left:
-                    raise ValidationError(_('There are no places left for this option.'))
-        return [_check_number_of_places]
+                    raise MMValidationError(_('There are no places left for this option.'))
+        return _check_number_of_places
 
     @property
     def default_value(self):
@@ -166,6 +166,7 @@ class DateFieldDataSchema(mm.Schema):
 class DateField(RegistrationFormFieldBase):
     name = 'date'
     wtf_field_class = wtforms.StringField
+    mm_field_class = fields.String
     setup_schema_base_cls = DateFieldDataSchema
 
     @classmethod
@@ -199,6 +200,8 @@ class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     wtf_field_class = IndicoRadioField
     required_validator = InputRequired
+    mm_field_class = fields.Boolean
+    mm_field_kwargs = {'allow_none': True}
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
     setup_schema_fields = {
         'default_value': fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no'])),
@@ -221,18 +224,17 @@ class BooleanField(RegistrationFormBillableField):
     def view_data(self):
         return dict(super().view_data, places_used=self.get_places_used())
 
-    @property
-    def validators(self):
-        def _check_number_of_places(form, field):
-            if form.modified_registration:
-                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(field.data, old_data):
-                    return
-            if field.data and self.form_item.data.get('places_limit'):
+    def validators(self, registration=None, **kwargs):
+        def _check_number_of_places(new_data):
+            if registration:
+                old_data = registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(new_data, old_data):
+                    return True
+            if new_data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
-                if field.data and not places_left:
-                    raise ValidationError(_('There are no places left for this option.'))
-        return [_check_number_of_places]
+                if new_data and not places_left:
+                    raise MMValidationError(_('There are no places left for this option.'))
+        return _check_number_of_places
 
     @property
     def default_value(self):
@@ -259,11 +261,13 @@ class PhoneField(RegistrationFormFieldBase):
     name = 'phone'
     wtf_field_class = wtforms.StringField
     wtf_field_kwargs = {'filters': [lambda x: normalize_phone_number(x) if x else '']}
+    mm_field_class = fields.String
 
 
 class CountryField(RegistrationFormFieldBase):
     name = 'country'
     wtf_field_class = wtforms.SelectField
+    mm_field_class = fields.String
 
     @property
     def wtf_field_kwargs(self):
@@ -287,26 +291,10 @@ class CountryField(RegistrationFormFieldBase):
         return get_country(registration_data.data) if registration_data.data else ''
 
 
-class _DeletableFileField(wtforms.FileField):
-    def process_formdata(self, valuelist):
-        if not valuelist:
-            self.data = {'keep_existing': False, 'uploaded_file': None}
-        else:
-            # This expects a form with a hidden field and a file field with the same name.
-            # If the hidden field is empty, it indicates that an existing file should be
-            # deleted or replaced with the newly uploaded file.
-            keep_existing = '' not in valuelist
-            uploaded_file = next((x for x in valuelist if isinstance(x, FileStorage)), None)
-            if not uploaded_file or not uploaded_file.filename:
-                uploaded_file = None
-            self.data = {'keep_existing': keep_existing, 'uploaded_file': uploaded_file}
-
-
 class FileField(RegistrationFormFieldBase):
     name = 'file'
-    # Toggle this to make the angular form work
-    # wtf_field_class = _DeletableFileField
     wtf_field_class = wtforms.StringField
+    mm_field_class = fields.String
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         data = {'field_data': self.form_item.current_data}
@@ -336,7 +324,11 @@ class EmailField(RegistrationFormFieldBase):
     name = 'email'
     wtf_field_class = wtforms.StringField
     wtf_field_kwargs = {'filters': [lambda x: x.lower() if x else x]}
+    mm_field_class = fields.Email
 
-    @property
-    def validators(self):
-        return [IndicoEmail()]
+    def validators(self, **kwargs):
+        def _indico_email(value):
+            if value and not validate_email(value):
+                raise MMValidationError(_('Invalid email address'))
+
+        return _indico_email

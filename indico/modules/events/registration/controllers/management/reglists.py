@@ -44,7 +44,7 @@ from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
                                                      get_event_section_data, get_flat_section_submission_data,
                                                      get_ticket_attachments, get_title_uuid,
-                                                     import_registrations_from_csv, make_registration_form)
+                                                     import_registrations_from_csv, make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
@@ -53,7 +53,7 @@ from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
 from indico.util.placeholders import replace_placeholders
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.args import use_kwargs
+from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -277,18 +277,15 @@ class RHRegistrationCreate(RHManageRegFormBase):
         user_data['title'] = get_title_uuid(self.regform, user_data['title'])
         return user_data
 
-    def _process(self):
-        form = make_registration_form(self.regform, management=True)()
-        if form.validate_on_submit():
-            data = form.data
-            session['registration_notify_user_default'] = notify_user = data.pop('notify_user', False)
-            create_registration(self.regform, data, management=True, notify_user=notify_user)
-            flash(_('The registration was created.'), 'success')
-            return redirect(url_for('.manage_reglist', self.regform))
-        elif form.is_submitted():
-            # not very pretty but usually this never happens thanks to client-side validation
-            for error in form.error_list:
-                flash(error, 'error')
+    def _process_POST(self):
+        schema = make_registration_schema(self.regform, management=True)()
+        form = parser.parse(schema)
+        session['registration_notify_user_default'] = notify_user = form.pop('notify_user', False)
+        create_registration(self.regform, form, management=True, notify_user=notify_user)
+        flash(_('The registration was created.'), 'success')
+        return jsonify({'redirect': url_for('.manage_reglist', self.regform)})
+
+    def _process_GET(self):
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,
                                                     form_data=get_flat_section_submission_data(self.regform),

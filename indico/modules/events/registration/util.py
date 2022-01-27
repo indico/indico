@@ -10,17 +10,18 @@ import itertools
 from operator import attrgetter
 
 from flask import current_app, json, session
+from marshmallow import RAISE, ValidationError, fields, validates
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from werkzeug.urls import url_parse
-from wtforms import BooleanField, ValidationError
 
 from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
+from indico.core.marshmallow import IndicoSchema
 from indico.modules.events import EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
@@ -45,8 +46,6 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
-from indico.web.forms.base import IndicoForm
-from indico.web.forms.widgets import SwitchWidget
 
 
 def import_user_records_from_csv(fileobj, columns):
@@ -217,29 +216,33 @@ def check_registration_email(regform, email, registration=None, management=False
             return dict(status='ok', user=None)
 
 
-def make_registration_form(regform, management=False, registration=None):
-    """Create a WTForm based on registration form fields."""
+def make_registration_schema(regform, management=False, registration=None):
+    """Dynamically create a Marshmallow schema based on the registration form fields."""
+    class RegistrationSchema(IndicoSchema):
+        class Meta:
+            unknown = RAISE
 
-    class RegistrationFormWTF(IndicoForm):
-        if management:
-            notify_user = BooleanField(_('Send email'), widget=SwitchWidget())
-
-        def validate_email(self, field):
-            status = check_registration_email(regform, field.data, registration, management=management)
+        @validates('email')
+        def validate_email(self, email, **kwargs):
+            status = check_registration_email(regform, email, registration, management=management)
             if status['status'] == 'error':
                 raise ValidationError('Email validation failed: ' + status['conflict'])
+
+    schema = {}
+
+    if management:
+        schema['notify_user'] = fields.Boolean()
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
             continue
 
         field_impl = form_item.field_impl
-        setattr(RegistrationFormWTF, form_item.html_field_name, field_impl.create_wtf_field())
-    signals.event.registration_form_wtform_created.send(regform, registration=registration, management=management,
-                                                        wtform_cls=RegistrationFormWTF)
+        schema[form_item.html_field_name] = field_impl.create_mm_field(registration=registration)
 
-    RegistrationFormWTF.modified_registration = registration
-    return RegistrationFormWTF
+    # TODO: what to do with signal -> signals.event.registration_form_wtform_created
+
+    return RegistrationSchema.from_dict(schema)
 
 
 def create_personal_data_fields(regform):

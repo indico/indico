@@ -112,7 +112,6 @@
         <div id="registration-form-submission-container"
              data-event-id="{{ event.id }}"
              data-regform-id="{{ regform.id }}"
-             data-csrf-token="{{ session.csrf_token }}"
              data-submit-url="{{ request.url }}"
              data-currency="{{ regform.currency }}"
              data-form-data="{{ form_data | tojson | forceescape }}"

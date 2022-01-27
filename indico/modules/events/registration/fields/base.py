@@ -44,6 +44,10 @@ class RegistrationFormFieldBase:
     not_required_validator = Optional
     #: the data fields that need to be versioned
     versioned_data_fields = frozenset({'price'})
+    #: the marshmallow field class for regform submission
+    mm_field_class = None
+    #: additional options for the marshmallow field
+    mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
     setup_schema_base_cls = mm.Schema
     #: a dict with extra marshmallow fields to include in the setup schema
@@ -56,9 +60,8 @@ class RegistrationFormFieldBase:
     def default_value(self):
         return ''
 
-    @property
-    def validators(self):
-        """Return a list of validators for this field."""
+    def validators(self, **kwargs):
+        """Return a list of marshmallow validators for this field."""
         return None
 
     @property
@@ -93,6 +96,19 @@ class RegistrationFormFieldBase:
         name = f'{type(self).__name__}SetupDataSchema'
         schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
         return schema()
+
+    def create_mm_field(self, registration=None):
+        """
+        Create a marshmallow field.
+        When modifying an existing registration, the `registration` parameter is
+        the previous registration. We pass the registration because
+        some field validators need the old data.
+
+        :param registration: The previous registration if modifying an existing one, otherwise none
+        """
+        return self.mm_field_class(required=self.form_item.is_required,
+                                   validate=self.validators(registration=registration),
+                                   **self.mm_field_kwargs)
 
     def has_data_changed(self, value, old_data):
         return value != old_data.data

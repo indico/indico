@@ -5,12 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, redirect, request, session
+from flask import redirect, request, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.util import get_event_section_data, make_registration_form, modify_registration
+from indico.modules.events.registration.util import (get_event_section_data, make_registration_schema,
+                                                     modify_registration)
 from indico.util.string import camelize_keys
+from indico.web.args import parser
 
 
 class RegistrationFormMixin:
@@ -30,21 +32,17 @@ class RegistrationFormMixin:
 
 
 class RegistrationEditMixin:
-    def _process(self):
-        form = make_registration_form(self.regform, management=self.management, registration=self.registration)()
+    def _process_POST(self):
+        schema = make_registration_schema(self.regform, management=self.management, registration=self.registration)()
+        form_data = parser.parse(schema)
 
-        if form.validate_on_submit():
-            data = form.data
-            notify_user = not self.management or data.pop('notify_user', False)
-            if self.management:
-                session['registration_notify_user_default'] = notify_user
-            modify_registration(self.registration, data, management=self.management, notify_user=notify_user)
-            return redirect(self.success_url)
-        elif form.is_submitted():
-            # not very pretty but usually this never happens thanks to client-side validation
-            for error in form.error_list:
-                flash(error, 'error')
+        notify_user = not self.management or form_data.pop('notify_user', False)
+        if self.management:
+            session['registration_notify_user_default'] = notify_user
+        modify_registration(self.registration, form_data, management=self.management, notify_user=notify_user)
+        return redirect(self.success_url)
 
+    def _process_GET(self):
         registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
                              for r in self.registration.data}
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,

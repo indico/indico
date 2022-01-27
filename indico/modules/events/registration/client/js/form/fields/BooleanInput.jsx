@@ -31,7 +31,7 @@ function BooleanInputComponent({
   const currency = useSelector(getCurrency);
   const makeOnClick = newValue => () => {
     if (value === newValue && !required) {
-      onChange('');
+      onChange(null);
     } else {
       onChange(newValue);
     }
@@ -42,23 +42,23 @@ function BooleanInputComponent({
       <Button.Group>
         <Button
           type="button"
-          active={value === 'yes'}
+          active={value === true}
           disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit)}
-          onClick={makeOnClick('yes')}
+          onClick={makeOnClick(true)}
         >
           <Translate>Yes</Translate>
         </Button>
         <Button
           type="button"
-          active={value === 'no'}
+          active={value === false}
           disabled={disabled}
-          onClick={makeOnClick('no')}
+          onClick={makeOnClick(false)}
         >
           <Translate>No</Translate>
         </Button>
       </Button.Group>
       {!!price && (
-        <Label pointing="left" styleName={`price-tag ${value !== 'yes' ? 'greyed' : ''}`}>
+        <Label pointing="left" styleName={`price-tag ${value !== true ? 'greyed' : ''}`}>
           {price.toFixed(2)} {currency}
         </Label>
       )}
@@ -72,13 +72,17 @@ function BooleanInputComponent({
 }
 
 BooleanInputComponent.propTypes = {
-  value: PropTypes.string.isRequired,
+  value: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   required: PropTypes.bool.isRequired,
   price: PropTypes.number.isRequired,
   placesLimit: PropTypes.number.isRequired,
   placesUsed: PropTypes.number.isRequired,
+};
+
+BooleanInputComponent.defaultProps = {
+  value: null,
 };
 
 export default function BooleanInput({
@@ -91,6 +95,8 @@ export default function BooleanInput({
   placesLimit,
   placesUsed,
 }) {
+  defaultValue = {yes: true, no: false}[defaultValue] || null;
+
   return (
     <FinalField
       name={htmlName}
@@ -98,6 +104,7 @@ export default function BooleanInput({
       component={BooleanInputComponent}
       required={isRequired}
       disabled={disabled}
+      allowNull
       fieldProps={{className: styles.field}}
       price={price}
       placesLimit={placesLimit}

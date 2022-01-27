@@ -11,10 +11,8 @@ from copy import deepcopy
 from datetime import date, datetime
 from uuid import uuid4
 
-from marshmallow import ValidationError as MMValidationError
-from marshmallow import fields, post_load, pre_load, validate, validates_schema
+from marshmallow import ValidationError, fields, post_load, pre_load, validate, validates_schema
 from sqlalchemy.dialects.postgresql import ARRAY
-from wtforms.validators import ValidationError
 
 from indico.core.db import db
 from indico.core.marshmallow import mm
@@ -25,7 +23,7 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import format_date, iterdays
 from indico.util.i18n import _
-from indico.util.marshmallow import not_empty
+from indico.util.marshmallow import UUIDString, not_empty
 from indico.util.string import camelize_keys, snakify_keys
 from indico.web.forms.fields import JSONField
 
@@ -108,12 +106,14 @@ class SingleChoiceSetupSchema(ChoiceSetupSchema):
     def _validate_default_item(self, data, **kwargs):
         ids = {c['id'] for c in data['choices']}
         if data['default_item'] and data['default_item'] not in ids:
-            raise MMValidationError('Invalid default item', 'default_item')
+            raise ValidationError('Invalid default item', 'default_item')
 
 
 class ChoiceBaseField(RegistrationFormBillableItemsField):
     versioned_data_fields = RegistrationFormBillableItemsField.versioned_data_fields | {'choices'}
     has_default_item = False
+    mm_field_class = fields.Dict
+    mm_field_kwargs = {'keys': fields.String(), 'values': fields.Integer()}
     wtf_field_class = JSONField
 
     @classmethod
@@ -132,19 +132,18 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def view_data(self):
         return dict(super().view_data, places_used=self.get_places_used())
 
-    @property
-    def validators(self):
-        def _check_number_of_places(form, field):
-            if not field.data:
-                return
+    def validators(self, registration=None, **kwargs):
+        def _check_number_of_places(new_data):
+            if not new_data:
+                return True
             old_data = None
-            if form.modified_registration:
-                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(field.data, old_data):
+            if registration:
+                old_data = registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(new_data, old_data):
                     return
             choices = self.form_item.versioned_data['choices']
             captions = self.form_item.data['captions']
-            for k in field.data:
+            for k in new_data:
                 choice = next((x for x in choices if x['id'] == k), None)
                 # Need to check the selected choice, because it might have been deleted.
                 if choice:
@@ -153,7 +152,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
                     places_used_dict.setdefault(k, 0)
                     if old_data and old_data.data:
                         places_used_dict[k] -= old_data.data.get(k, 0)
-                    places_used_dict[k] += field.data[k]
+                    places_used_dict[k] += new_data[k]
                     if places_limit and (places_limit - places_used_dict.get(k, 0)) < 0:
                         raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
@@ -395,7 +394,7 @@ class AccommodationDateRangeSchema(mm.Schema):
     @validates_schema(skip_on_field_errors=True)
     def _validate_dates(self, data, **kwargs):
         if data['start_date'] > data['end_date']:
-            raise MMValidationError('The end date cannot be before the start date', 'end_date')
+            raise ValidationError('The end date cannot be before the start date', 'end_date')
 
 
 class AccommodationSetupSchema(mm.Schema):
@@ -406,9 +405,9 @@ class AccommodationSetupSchema(mm.Schema):
     @validates_schema(skip_on_field_errors=True)
     def _validate_periods(self, data, **kwargs):
         if data['departure']['start_date'] < data['arrival']['start_date']:
-            raise MMValidationError('The departure period cannot begin before the arrival period.', 'departure')
+            raise ValidationError('The departure period cannot begin before the arrival period.', 'departure')
         if data['arrival']['end_date'] > data['departure']['end_date']:
-            raise MMValidationError('The arrival period cannot end after the departure period.', 'arrival')
+            raise ValidationError('The arrival period cannot end after the departure period.', 'arrival')
 
     @pre_load
     def _generate_new_uuids(self, data, **kwrags):
@@ -448,11 +447,30 @@ class AccommodationSetupSchema(mm.Schema):
         return data
 
 
+class AccommodationSchema(mm.Schema):
+    choice = UUIDString()
+    isNoAccommodation = fields.Bool(required=True)
+    arrivalDate = fields.Date(allow_none=True)
+    departureDate = fields.Date(allow_none=True)
+
+    @validates_schema(skip_on_field_errors=True)
+    def validate_everything(self, data, **kwargs):
+        if not data['isNoAccommodation']:
+            if not data['choice']:
+                raise ValidationError('This field is required', 'choice')
+            elif not data['arrivalDate']:
+                raise ValidationError('This field is required', 'arrivalDate')
+            elif not data['departureDate']:
+                raise ValidationError('This field is required', 'departureDate')
+
+
 class AccommodationField(RegistrationFormBillableItemsField):
     name = 'accommodation'
     wtf_field_class = JSONField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
     setup_schema_base_cls = AccommodationSetupSchema
+    mm_field_class = fields.Nested
+    mm_field_kwargs = {'nested': AccommodationSchema}
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
@@ -499,34 +517,33 @@ class AccommodationField(RegistrationFormBillableItemsField):
         data['choices'] = items
         return data
 
-    @property
-    def validators(self):
-        def _stay_dates_valid(form, field):
-            if not field.data:
-                return
-            data = snakify_keys(field.data)
+    def validators(self, registration=None, **kwargs):
+        def _stay_dates_valid(new_data):
+            if not new_data:
+                return True
+            data = snakify_keys(new_data)
             if not data.get('is_no_accommodation'):
                 try:
                     arrival_date = data['arrival_date']
                     departure_date = data['departure_date']
                 except KeyError:
                     raise ValidationError(_('Arrival/departure date is missing'))
-                if _to_date(arrival_date) > _to_date(departure_date):
+                if arrival_date > departure_date:
                     raise ValidationError(_("Arrival date can't be set after the departure date."))
 
-        def _check_number_of_places(form, field):
-            if not field.data:
-                return
-            if form.modified_registration:
-                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(snakify_keys(field.data), old_data):
-                    return
-            item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == field.data['choice']),
+        def _check_number_of_places(new_data):
+            if not new_data:
+                return True
+            if registration:
+                old_data = registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(snakify_keys(new_data), old_data):
+                    return True
+            item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == new_data['choice']),
                         None)
             captions = self.form_item.data['captions']
             places_used_dict = self.get_places_used()
             if (item and item['places_limit'] and
-                    (item['places_limit'] < places_used_dict.get(field.data['choice'], 0))):
+                    (item['places_limit'] < places_used_dict.get(new_data['choice'], 0))):
                 raise ValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
         return [_stay_dates_valid, _check_number_of_places]
 
@@ -569,8 +586,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
             data = {'choice': value['choice'],
                     'is_no_accommodation': is_no_accommodation}
             if not is_no_accommodation:
-                data.update({'arrival_date': value['arrivalDate'],
-                             'departure_date': value['departureDate']})
+                data.update({'arrival_date': value['arrivalDate'].isoformat(),
+                             'departure_date': value['departureDate'].isoformat()})
         return super().process_form_data(registration, data, old_data, billable_items_locked, new_data_version)
 
     def get_places_used(self):
