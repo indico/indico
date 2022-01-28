@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2019 CERN
+# Copyright (C) 2002 - 2022 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from functools import wraps
 
@@ -26,7 +24,7 @@ def check_notifications_enabled():
 
 def make_notification(to_users, subject=None, body=None, template=None, content_type='plain_text'):
     if template is not None and (subject is not None or body is not None):
-        raise ValueError("Only subject/body or template can be passed")
+        raise ValueError('Only subject/body or template can be passed')
 
     if template:
         subject = template.get_subject()
