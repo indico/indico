@@ -11,6 +11,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Prompt before leaving the event protection page without saving changes (:pr:`5222`)
+- Add the ability to clone abstracts (:pr:`5217`)
 
 Bugfixes
 ^^^^^^^^
@@ -19,7 +20,6 @@ Bugfixes
   timeline (:pr:`5218`)
 - Fix incorrect date in multi-day meeting date selector dropdown in certain timezones
   (:pr:`5223`)
-- Add support for abstract cloning (:pr:`5217`)
 
 
 Version 3.1
