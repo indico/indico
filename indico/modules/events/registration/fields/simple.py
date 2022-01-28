@@ -52,7 +52,7 @@ class NumberField(RegistrationFormBillableField):
     mm_field_class = fields.Integer
     setup_schema_base_cls = NumberFieldDataSchema
 
-    def validators(self, **kwargs):
+    def get_validators(self, existing_registration):
         return validate.Range(min=self.form_item.data.get('min_value', None) or 0,
                               max=self.form_item.data.get('max_value', None))
 
@@ -110,10 +110,10 @@ class CheckboxField(RegistrationFormBillableField):
         return {str(val).lower(): caption for val, caption in self.friendly_data_mapping.items()
                 if val is not None}
 
-    def validators(self, registration=None, **kwargs):
+    def get_validators(self, existing_registration):
         def _check_number_of_places(new_data):
-            if registration:
-                old_data = registration.data_by_field.get(self.form_item.id)
+            if existing_registration:
+                old_data = existing_registration.data_by_field.get(self.form_item.id)
                 if not old_data or not self.has_data_changed(new_data, old_data):
                     return True
             if new_data and self.form_item.data.get('places_limit'):
@@ -224,10 +224,10 @@ class BooleanField(RegistrationFormBillableField):
     def view_data(self):
         return dict(super().view_data, places_used=self.get_places_used())
 
-    def validators(self, registration=None, **kwargs):
+    def get_validators(self, existing_registration):
         def _check_number_of_places(new_data):
-            if registration:
-                old_data = registration.data_by_field.get(self.form_item.id)
+            if existing_registration:
+                old_data = existing_registration.data_by_field.get(self.form_item.id)
                 if not old_data or not self.has_data_changed(new_data, old_data):
                     return True
             if new_data and self.form_item.data.get('places_limit'):
@@ -326,7 +326,7 @@ class EmailField(RegistrationFormFieldBase):
     wtf_field_kwargs = {'filters': [lambda x: x.lower() if x else x]}
     mm_field_class = fields.Email
 
-    def validators(self, **kwargs):
+    def get_validators(self, existing_registration):
         def _indico_email(value):
             if value and not validate_email(value):
                 raise MMValidationError(_('Invalid email address'))

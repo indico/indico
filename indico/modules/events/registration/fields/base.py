@@ -60,8 +60,12 @@ class RegistrationFormFieldBase:
     def default_value(self):
         return ''
 
-    def validators(self, **kwargs):
-        """Return a list of marshmallow validators for this field."""
+    def get_validators(self, existing_registration):
+        """Return a list of marshmallow validators for this field.
+
+        The ``existing_registration`` is ``None`` if the user is newly registering
+        and not editing a registration.
+        """
         return None
 
     @property
@@ -107,7 +111,7 @@ class RegistrationFormFieldBase:
         :param registration: The previous registration if modifying an existing one, otherwise none
         """
         return self.mm_field_class(required=self.form_item.is_required,
-                                   validate=self.validators(registration=registration),
+                                   validate=self.get_validators(registration),
                                    **self.mm_field_kwargs)
 
     def has_data_changed(self, value, old_data):

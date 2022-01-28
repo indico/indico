@@ -132,13 +132,13 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def view_data(self):
         return dict(super().view_data, places_used=self.get_places_used())
 
-    def validators(self, registration=None, **kwargs):
+    def get_validators(self, existing_registration):
         def _check_number_of_places(new_data):
             if not new_data:
                 return True
             old_data = None
-            if registration:
-                old_data = registration.data_by_field.get(self.form_item.id)
+            if existing_registration:
+                old_data = existing_registration.data_by_field.get(self.form_item.id)
                 if not old_data or not self.has_data_changed(new_data, old_data):
                     return
             choices = self.form_item.versioned_data['choices']
@@ -517,7 +517,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
         data['choices'] = items
         return data
 
-    def validators(self, registration=None, **kwargs):
+    def get_validators(self, existing_registration):
         def _stay_dates_valid(new_data):
             if not new_data:
                 return True
@@ -534,8 +534,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
         def _check_number_of_places(new_data):
             if not new_data:
                 return True
-            if registration:
-                old_data = registration.data_by_field.get(self.form_item.id)
+            if existing_registration:
+                old_data = existing_registration.data_by_field.get(self.form_item.id)
                 if not old_data or not self.has_data_changed(snakify_keys(new_data), old_data):
                     return True
             item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == new_data['choice']),
@@ -545,6 +545,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
             if (item and item['places_limit'] and
                     (item['places_limit'] < places_used_dict.get(new_data['choice'], 0))):
                 raise ValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
+
         return [_stay_dates_valid, _check_number_of_places]
 
     @property
