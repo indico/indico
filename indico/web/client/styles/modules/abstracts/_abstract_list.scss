@@ -9,6 +9,14 @@
   text-align: center;
 }
 
+.actions-column {
+  width: 4em;
+}
+
+.actions-column .group {
+  display: inline;
+}
+
 .accepted-on-other-track {
   td,
   a {
