@@ -460,8 +460,14 @@ export function FinalSubmitButton({
   icon,
   children,
 }) {
-  const {validating, hasValidationErrors, pristine, submitting} = useFormState({
-    subscription: {validating: true, hasValidationErrors: true, pristine: true, submitting: true},
+  const {validating, hasValidationErrors, pristine, submitting, submitError} = useFormState({
+    subscription: {
+      validating: true,
+      hasValidationErrors: true,
+      pristine: true,
+      submitting: true,
+      submitError: true,
+    },
   });
   const disabled =
     validating ||
@@ -470,19 +476,27 @@ export function FinalSubmitButton({
     submitting;
   return (
     <Form.Field disabled={disabled}>
-      <Button
-        type="submit"
-        form={form}
-        disabled={disabled}
-        loading={submitting && activeSubmitButton}
-        primary={color === null}
-        content={label}
-        color={color}
-        onClick={onClick}
-        circular={circular}
-        size={size}
-        icon={icon}
-      />
+      <Popup
+        trigger={
+          <Button
+            type="submit"
+            form={form}
+            disabled={disabled}
+            loading={submitting && activeSubmitButton}
+            primary={color === null}
+            content={label}
+            color={color}
+            onClick={onClick}
+            circular={circular}
+            size={size}
+            icon={icon}
+          />
+        }
+        position="bottom right"
+        open={!!submitError}
+      >
+        <div styleName="field-error">{submitError}</div>
+      </Popup>
       {children && children(disabled)}
     </Form.Field>
   );
