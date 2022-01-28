@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2019 CERN
+# Copyright (C) 2002 - 2022 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from flask import flash, redirect, session
 
@@ -28,8 +26,8 @@ class RHNotificationsAdmin(RHAdminBase):
         form = NotificationSettingsForm(obj=FormDefaults(**settings.get_all()))
         if form.validate_on_submit():
             settings.set_multi(form.data)
-            logger.info("Notification settings updated by %s", session.user)
-            flash(_("Settings saved"), 'success')
+            logger.info('Notification settings updated by %s', session.user)
+            flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin'))
         return WPNotificationSettings.render_template('admin.html', form=form, settings=settings)
 
@@ -37,7 +35,7 @@ class RHNotificationsAdmin(RHAdminBase):
 class RHSendTestMessage(RHAdminBase):
     def _process(self):
         process_notification(
-            make_notification({session.user}, subject='TEST', body='This is a test message!')
+            make_notification({session.user}, subject='TEST', body='This is a test message!', content_type='markdown')
         )
-        flash(_("Test Message sent!"), 'success')
+        flash(_('Test Message sent!'), 'success')
         return jsonify_data(flash=True)

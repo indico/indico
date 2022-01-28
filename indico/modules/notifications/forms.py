@@ -1,14 +1,12 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2019 CERN
+# Copyright (C) 2002 - 2022 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from __future__ import unicode_literals
-
 from wtforms.fields import StringField
-from wtforms.validators import Optional, ValidationError
+from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -20,12 +18,17 @@ class NotificationSettingsForm(IndicoForm):
     webhook_url = StringField(
         _('Webhook URL'),
         [IndicoRegexp(r'^https://.+'), Optional()],
-        description=_("Webhook to contact for notifications.")
+        description=_('Webhook to contact for notifications.')
+    )
+    channel_id = StringField(
+        _('Channel ID'),
+        [DataRequired()],
+        description=_('The notifications target channel identifier.')
     )
     secret_token = IndicoPasswordField(
         _('Secret Token'),
         toggle=True,
-        description=_("The bearer token used for authentication with the Webhook.")
+        description=_('The bearer token used for authentication with the Webhook.')
     )
 
     def validate_secret_token(self, field):

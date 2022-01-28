@@ -1,11 +1,9 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2019 CERN
+# Copyright (C) 2002 - 2022 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
-from __future__ import unicode_literals
 
 from datetime import timedelta
 
@@ -23,11 +21,12 @@ from indico.util.date_time import now_utc
 def _get_config_data():
     url = notification_settings.get('webhook_url')
     token = notification_settings.get('secret_token')
+    channel_id = notification_settings.get('channel_id')
 
     if not url:
         raise ValueError('Webhook URL not set!')
 
-    return url, token
+    return url, token, channel_id
 
 
 def _send_notifications(notifications):
@@ -35,16 +34,16 @@ def _send_notifications(notifications):
 
     :param notifications: an iterable of notification dicts
     """
-    url, token = _get_config_data()
+    url, token, channel_id = _get_config_data()
     sent_items = set()
     try:
         for notification in notifications:
             data = {
                 'notification': {
-                    'target': notification.user.email,
-                    'subject': notification.subject,
+                    'target': channel_id,
+                    'summary': notification.subject,
                     'body': notification.body,
-                    'contentType': 'text/' + notification.render_mode.name
+                    'targetUsers': [{'email': notification.user.email}]
                 }
             }
             resp = requests.post(url, json=data, headers={'Authorization': 'Bearer ' + token})
@@ -64,7 +63,7 @@ def send_webhook_notification(notification):
     _send_notifications((notification,))
 
 
-@celery.periodic_task(name='send_pending_webhook_notifications',  run_every=crontab(minute='*/5'))
+@celery.periodic_task(name='send_pending_webhook_notifications', run_every=crontab(minute='*/5'))
 def send_pending_webhook_notifications():
     """Send notifications that for some reason were not sent immediately."""
     # get all notifications that are older than 5 minutes but weren't sent yet

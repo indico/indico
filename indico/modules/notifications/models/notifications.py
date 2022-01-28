@@ -1,11 +1,9 @@
-# This file is part of the CERN Indico plugins.
-# Copyright (C) 2014 - 2019 CERN
+# This file is part of Indico.
+# Copyright (C) 2002 - 2022 CERN
 #
-# The CERN Indico plugins are free software; you can redistribute
-# them and/or modify them under the terms of the MIT License; see
-# the LICENSE file for more details.
-
-from __future__ import unicode_literals
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see the
+# LICENSE file for more details.
 
 from sqlalchemy.ext.declarative import declared_attr
 
@@ -19,7 +17,7 @@ class Notification(db.Model, RenderModeMixin):
     __tablename__ = 'notifications'
     __table_args__ = {'schema': 'indico'}
 
-    possible_render_modes = {RenderMode.markdown, RenderMode.html, RenderMode.plain_text}
+    possible_render_modes = {RenderMode.html, RenderMode.plain_text}
     default_render_mode = RenderMode.plain_text
 
     #: Entry ID (mainly used to sort by insertion order)
