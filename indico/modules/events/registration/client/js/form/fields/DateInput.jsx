@@ -28,16 +28,7 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
     const timeString = timeFormat ? timeValue : '00:00:00';
     onChange(`${dateString}T${timeString}`);
   };
-
-  const handleTimeChange = newTime =>
-    onChange(
-      `${dateValue}T${
-        newTime
-          .set('second', 0)
-          .toISOString()
-          .split('T')[1]
-      }`
-    );
+  const handleTimeChange = newTime => onChange(`${dateValue}T${newTime.format('HH:mm:00')}`);
 
   return (
     <Form.Group styleName="date-field">
