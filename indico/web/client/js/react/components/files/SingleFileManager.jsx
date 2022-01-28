@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useCallback, useReducer} from 'react';
+import React, {useCallback, useReducer, useEffect} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Field} from 'react-final-form';
 
@@ -69,7 +69,7 @@ const SingleFileManager = ({
   onChange,
   onFocus,
   onBlur,
-  finalFieldName,
+  setValidationError,
   initialFileDetails,
   validExtensions,
   uploadURL,
@@ -168,25 +168,27 @@ const SingleFileManager = ({
     fileAction = {onClick: clear, icon: 'x', color: 'red'};
   }
 
-  return (
-    <>
-      <SingleFileArea dropzone={dropzone} file={file} fileAction={fileAction} />
-      {!!finalFieldName && isUploading && (
-        <Field
-          name={`_${finalFieldName}_uploading`}
-          validate={() => Translate.string('Upload in progress')}
-          render={() => null}
-        />
-      )}
-      {!!finalFieldName && uploadFailed && (
-        <Field
-          name={`_${finalFieldName}_uploading`}
-          validate={() => Translate.string('Upload failed')}
-          render={() => null}
-        />
-      )}
-    </>
-  );
+  useEffect(() => {
+    if (!setValidationError) {
+      return;
+    }
+    // we need to make the form invalid during these states, but can't do that through
+    // a normal validator since it only acts on the field value. so we wrap the whole
+    // component in a separate final-form field and then set that field's value to the
+    // error message (which in turn is returned by the validator of that field as a
+    // validation error)
+    if (isUploading) {
+      setValidationError(Translate.string('Upload in progress'));
+    } else if (uploadFailed) {
+      setValidationError(Translate.string('Upload failed'));
+    } else {
+      // must be undefined since it goes into the fake field's value and we do not want
+      // anything included in the values that end up getting submitted
+      setValidationError(undefined);
+    }
+  }, [setValidationError, isUploading, uploadFailed]);
+
+  return <SingleFileArea dropzone={dropzone} file={file} fileAction={fileAction} />;
 };
 
 SingleFileManager.propTypes = {
@@ -196,7 +198,7 @@ SingleFileManager.propTypes = {
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
-  finalFieldName: PropTypes.string,
+  setValidationError: PropTypes.func,
   initialFileDetails: fileDetailsShape,
   validExtensions: PropTypes.arrayOf(PropTypes.string),
   uploadURL: PropTypes.string.isRequired,
@@ -204,13 +206,26 @@ SingleFileManager.propTypes = {
 
 SingleFileManager.defaultProps = {
   value: null,
-  finalFieldName: null,
+  setValidationError: null,
   initialFileDetails: null,
   validExtensions: null,
 };
 
 export default function FinalSingleFileManager({name, ...rest}) {
-  return <FinalField name={name} component={SingleFileManager} finalFieldName={name} {...rest} />;
+  return (
+    <Field
+      name={`_${name}_invalidator`}
+      validate={value => value || undefined}
+      render={({input: {onChange: setDummyValue}}) => (
+        <FinalField
+          name={name}
+          component={SingleFileManager}
+          setValidationError={setDummyValue}
+          {...rest}
+        />
+      )}
+    />
+  );
 }
 
 FinalSingleFileManager.propTypes = {
