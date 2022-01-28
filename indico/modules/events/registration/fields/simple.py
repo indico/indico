@@ -170,6 +170,15 @@ class DateField(RegistrationFormFieldBase):
     mm_field_class = fields.String
     setup_schema_base_cls = DateFieldDataSchema
 
+    def validators(self, **kwargs):
+        def _validate_date(date_string):
+            try:
+                datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S')
+            except ValueError:
+                raise MMValidationError(_('Invalid date'))
+            return True
+        return _validate_date
+
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
         data = {}
