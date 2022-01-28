@@ -61,7 +61,7 @@
     {% endfor -%}
 {% endmacro %}
 
-{% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=none, reviewed_abstracts=none) %}
+{% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=none, reviewed_abstracts=none, can_create_invited_abstracts=false) %}
     {% if abstracts %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -93,7 +93,7 @@
                                     {%- trans %}Reviewed{% endtrans -%}
                                 </th>
                             {% endif %}
-                            <th class="i-table thin-column" data-sorter="false"></th>
+                            <th class="i-table actions-column" data-sorter="false"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -228,12 +228,50 @@
                                         {% endif %}
                                     </td>
                                 {% endif %}
-                                <td class="i-table">
-                                    {% if abstract.state.name == 'accepted' and abstract.contribution %}
+                                <td class="i-table actions-column">
+                                    <div class="group right">
+                                        {% if abstract.state.name == 'accepted' and abstract.contribution %}
                                         <a class="icon-arrow-right-sparse"
                                            href="{{ url_for('contributions.display_contribution', abstract.contribution) }}"
                                            title="{% trans %}Go to contribution{% endtrans %}"></a>
-                                    {% endif %}
+                                        {% endif %}
+                                        <div class="group hide-if-locked">
+                                            <a class="icon-copy hide-if-locked"
+                                               data-toggle="dropdown"
+                                               title="{% trans %}Clone{% endtrans %}"></a>
+                                            <ul class="i-dropdown">
+                                                <li>
+                                                    <a class="js-dialog-action"
+                                                       title="{% trans %}Add new abstract{% endtrans %}"
+                                                       data-title="{% trans %}Add new abstract{% endtrans %}"
+                                                       data-href="{{ url_for('.manage_create_abstract', abstract) }}"
+                                                       data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                                       data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                                       data-confirm-close-unsaved
+                                                       data-ajax-dialog>
+                                                        {% trans %}Abstract{% endtrans %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    {%- if can_create_invited_abstracts -%}
+                                                        {%- set message = _("Add new invited abstract") %}
+                                                    {%- else -%}
+                                                        {%- set message = _("You first need to create a notification template for invited abstracts") %}
+                                                    {%- endif -%}
+                                                    <a class="js-dialog-action {{ 'disabled' if not can_create_invited_abstracts }}"
+                                                       title="{{ message }}"
+                                                       data-title="{% trans %}Add new invited abstract{% endtrans %}"
+                                                       data-href="{{ url_for('.manage_create_abstract', abstract, invited=true) }}"
+                                                       data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                                       data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                                                       data-confirm-close-unsaved
+                                                       data-ajax-dialog>
+                                                        {% trans %}Invited abstract{% endtrans %}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             {% for item in static_columns if item.id == 'description' %}
@@ -260,4 +298,8 @@
             {%- endif %}
         {%- endcall %}
     {%- endif %}
+
+    <script>
+        $('.abstract-row').dropdown({selector: "a[data-toggle='dropdown']"});
+    </script>
 {% endmacro %}

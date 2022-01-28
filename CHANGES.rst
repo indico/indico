@@ -48,6 +48,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Prompt before leaving the event protection page without saving changes (:pr:`5222`)
+- Add the ability to clone abstracts (:pr:`5217`)
 
 Bugfixes
 ^^^^^^^^
