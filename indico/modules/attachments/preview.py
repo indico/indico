@@ -22,7 +22,7 @@ class Previewer:
 
     ALLOWED_CONTENT_TYPE = None
     TEMPLATES_DIR = 'attachments/previewers/'
-    TEMPATE = None
+    TEMPLATE = None
 
     @classmethod
     def can_preview(cls, attachment_file):
