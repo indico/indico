@@ -8,7 +8,6 @@
 from copy import deepcopy
 
 from marshmallow import fields, validate
-from wtforms.validators import DataRequired, Optional
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
@@ -27,14 +26,6 @@ class RegistrationFormFieldBase:
 
     #: unique name of the field type
     name = None
-    #: wtform field class
-    wtf_field_class = None
-    #: additional options for the WTForm class
-    wtf_field_kwargs = {}
-    #: the validator to use when the field is required
-    required_validator = DataRequired
-    #: the validator to use when the field is not required
-    not_required_validator = Optional
     #: the data fields that need to be versioned
     versioned_data_fields = frozenset({'price'})
     #: the marshmallow field class for regform submission
@@ -80,14 +71,6 @@ class RegistrationFormFieldBase:
         operation on ``Registrationdata.data``.
         """
         return RegistrationData.data.op('#>>')('{}').in_(data_list)
-
-    def create_wtf_field(self):
-        validators = list(self.validators) if self.validators is not None else []
-        if self.form_item.is_required:
-            validators.append(self.required_validator())
-        elif self.not_required_validator:
-            validators.append(self.not_required_validator())
-        return self.wtf_field_class(self.form_item.title, validators, **self.wtf_field_kwargs)
 
     def create_setup_schema(self):
         name = f'{type(self).__name__}SetupDataSchema'

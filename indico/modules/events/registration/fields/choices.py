@@ -25,7 +25,6 @@ from indico.util.date_time import format_date, iterdays
 from indico.util.i18n import _
 from indico.util.marshmallow import UUIDString, not_empty
 from indico.util.string import camelize_keys, snakify_keys
-from indico.web.forms.fields import JSONField
 
 
 def get_field_merged_options(field, registration_data):
@@ -114,7 +113,6 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     has_default_item = False
     mm_field_class = fields.Dict
     mm_field_kwargs = {'keys': fields.String(), 'values': fields.Integer()}
-    wtf_field_class = JSONField
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
@@ -465,7 +463,6 @@ class AccommodationSchema(mm.Schema):
 
 class AccommodationField(RegistrationFormBillableItemsField):
     name = 'accommodation'
-    wtf_field_class = JSONField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
     setup_schema_base_cls = AccommodationSetupSchema
     mm_field_class = fields.Nested

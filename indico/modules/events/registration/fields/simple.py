@@ -8,10 +8,9 @@
 from datetime import datetime
 from operator import itemgetter
 
-import wtforms
 from marshmallow import ValidationError as MMValidationError
 from marshmallow import fields, pre_load, validate, validates_schema
-from wtforms.validators import InputRequired, ValidationError
+from wtforms.validators import ValidationError
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
@@ -22,13 +21,11 @@ from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
 from indico.util.marshmallow import UUIDString
-from indico.util.string import normalize_phone_number, validate_email
-from indico.web.forms.fields import IndicoRadioField
+from indico.util.string import validate_email
 
 
 class TextField(RegistrationFormFieldBase):
     name = 'text'
-    wtf_field_class = wtforms.StringField
     mm_field_class = fields.String
     setup_schema_fields = {
         'min_length': fields.Integer(load_default=None, validate=validate.Range(1)),
@@ -48,8 +45,6 @@ class NumberFieldDataSchema(BillableFieldDataSchema):
 
 class NumberField(RegistrationFormBillableField):
     name = 'number'
-    wtf_field_class = wtforms.IntegerField
-    required_validator = InputRequired
     mm_field_class = fields.Integer
     setup_schema_base_cls = NumberFieldDataSchema
 
@@ -68,7 +63,6 @@ class NumberField(RegistrationFormBillableField):
 
 class TextAreaField(RegistrationFormFieldBase):
     name = 'textarea'
-    wtf_field_class = wtforms.StringField
     mm_field_class = fields.String
     setup_schema_fields = {
         'number_of_rows': fields.Integer(load_default=None, validate=validate.Range(1, 20)),
@@ -77,7 +71,6 @@ class TextAreaField(RegistrationFormFieldBase):
 
 class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
-    wtf_field_class = wtforms.BooleanField
     mm_field_class = fields.Boolean
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
     friendly_data_mapping = {None: '',
@@ -166,7 +159,6 @@ class DateFieldDataSchema(mm.Schema):
 
 class DateField(RegistrationFormFieldBase):
     name = 'date'
-    wtf_field_class = wtforms.StringField
     mm_field_class = fields.String
     setup_schema_base_cls = DateFieldDataSchema
 
@@ -208,8 +200,6 @@ class DateField(RegistrationFormFieldBase):
 
 class BooleanField(RegistrationFormBillableField):
     name = 'bool'
-    wtf_field_class = IndicoRadioField
-    required_validator = InputRequired
     mm_field_class = fields.Boolean
     mm_field_kwargs = {'allow_none': True}
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
@@ -219,11 +209,6 @@ class BooleanField(RegistrationFormBillableField):
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
-
-    @property
-    def wtf_field_kwargs(self):
-        return {'choices': [('yes', _('Yes')), ('no', _('No'))],
-                'coerce': lambda x: {'yes': True, 'no': False}.get(x, None)}
 
     @property
     def filter_choices(self):
@@ -269,29 +254,18 @@ class BooleanField(RegistrationFormBillableField):
 
 class PhoneField(RegistrationFormFieldBase):
     name = 'phone'
-    wtf_field_class = wtforms.StringField
-    wtf_field_kwargs = {'filters': [lambda x: normalize_phone_number(x) if x else '']}
     mm_field_class = fields.String
 
 
 class CountryField(RegistrationFormFieldBase):
     name = 'country'
-    wtf_field_class = wtforms.SelectField
     mm_field_class = fields.String
-
-    @property
-    def wtf_field_kwargs(self):
-        return {'choices': sorted(get_countries().items(), key=itemgetter(1))}
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
         choices = sorted(({'caption': v, 'countryKey': k} for k, v in get_countries().items()),
                          key=itemgetter('caption'))
         return {'choices': choices}
-
-    @property
-    def filter_choices(self):
-        return dict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         if registration_data.data == 'None':
@@ -303,7 +277,6 @@ class CountryField(RegistrationFormFieldBase):
 
 class FileField(RegistrationFormFieldBase):
     name = 'file'
-    wtf_field_class = wtforms.StringField
     mm_field_class = UUIDString
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
@@ -333,8 +306,6 @@ class FileField(RegistrationFormFieldBase):
 
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
-    wtf_field_class = wtforms.StringField
-    wtf_field_kwargs = {'filters': [lambda x: x.lower() if x else x]}
     mm_field_class = fields.Email
 
     def get_validators(self, existing_registration):
