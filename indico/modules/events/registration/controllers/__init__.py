@@ -34,12 +34,7 @@ class RegistrationFormMixin:
 
 
 class RegistrationEditMixin:
-    def _get_registration_data(self, form_data):
-        # Filter out registration data which are not in the regform anymore
-        return {r.field_data.field.html_field_name: camelize_keys(r.user_data)
-                for r in self.registration.data if r.field_data.field.id in form_data['items']}
-
-    def _get_file_data(self, registration_data):
+    def _get_file_data(self):
         return {r.user_data: {'filename': r.filename, 'size': r.size} for r in self.registration.data
                 if r.field_data.field.input_type == 'file' and r.user_data}
 
@@ -57,8 +52,9 @@ class RegistrationEditMixin:
         form_data = get_flat_section_submission_data(self.regform)
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
                                                             registration=self.registration))
-        registration_data = self._get_registration_data(form_data)
-        file_data = self._get_file_data(registration_data)
+        registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
+                             for r in self.registration.data}
+        file_data = self._get_file_data()
 
         registration_metadata = {
             'paid': self.registration.is_paid,
