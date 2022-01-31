@@ -25,9 +25,9 @@ export default function setupRegformSetup(root) {
     userInfo,
     submitUrl,
     formData,
-    registrationData = {},
+    registrationData = null,
     registrationUuid = null,
-    fileData = {},
+    fileData = null,
   } = root.dataset;
 
   const initialData = {
@@ -38,9 +38,9 @@ export default function setupRegformSetup(root) {
       moderated: JSON.parse(moderated),
       userInfo: JSON.parse(userInfo),
       submitUrl,
-      registrationData: JSON.parse(registrationData),
+      registrationData: registrationData ? JSON.parse(registrationData) : {},
       registrationUuid,
-      fileData: JSON.parse(fileData),
+      fileData: fileData ? JSON.parse(fileData) : {},
       currency,
     },
   };

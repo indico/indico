@@ -17,6 +17,7 @@ import {useDebouncedAsyncValidate} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
+import {getUpdateMode} from '../../form_submission/selectors';
 import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
@@ -24,6 +25,7 @@ import '../../../styles/regform.module.scss';
 export default function EmailInput({htmlName, disabled, isRequired}) {
   const isMainEmailField = htmlName === 'email';
   const [message, setMessage] = useState({status: '', message: '', forEmail: ''});
+  const isUpdateMode = useSelector(getUpdateMode);
   const {eventId, regformId, registrationUuid, management} = useSelector(getStaticData);
   const url = useMemo(() => validateEmailURL({event_id: eventId, reg_form_id: regformId}), [
     eventId,
@@ -48,7 +50,7 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
     });
     try {
       response = await indicoAxios.get(url, {
-        params: {email, management, update: registrationUuid},
+        params: isUpdateMode ? {email, management, update: registrationUuid} : {email, management},
       });
     } catch (error) {
       return handleAxiosError(error);
