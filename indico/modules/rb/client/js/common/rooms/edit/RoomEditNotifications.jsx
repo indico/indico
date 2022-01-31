@@ -36,9 +36,7 @@ export default function RoomEditNotifications({active, defaults}) {
             fluid
             name="notification_before_days"
             placeholder={
-              defaults.notification_before_days === null
-                ? ''
-                : String(defaults.notification_before_days)
+              defaults.notification_before_days && String(defaults.notification_before_days)
             }
             label={Translate.string('Single/Daily')}
             type="number"
@@ -50,9 +48,8 @@ export default function RoomEditNotifications({active, defaults}) {
             fluid
             name="notification_before_days_weekly"
             placeholder={
-              defaults.notification_before_days_weekly === null
-                ? ''
-                : String(defaults.notification_before_days_weekly)
+              defaults.notification_before_days_weekly &&
+              String(defaults.notification_before_days_weekly)
             }
             label={Translate.string('Weekly')}
             type="number"
@@ -64,9 +61,8 @@ export default function RoomEditNotifications({active, defaults}) {
             fluid
             name="notification_before_days_monthly"
             placeholder={
-              defaults.notification_before_days_monthly === null
-                ? ''
-                : String(defaults.notification_before_days_monthly)
+              defaults.notification_before_days_monthly &&
+              String(defaults.notification_before_days_monthly)
             }
             label={Translate.string('Monthly')}
             type="number"
@@ -84,11 +80,7 @@ export default function RoomEditNotifications({active, defaults}) {
           <FinalInput
             fluid
             name="end_notification_daily"
-            placeholder={
-              defaults.end_notification_daily === null
-                ? ''
-                : String(defaults.end_notification_daily)
-            }
+            placeholder={defaults.end_notification_daily && String(defaults.end_notification_daily)}
             label={Translate.string('Daily')}
             type="number"
             min="1"
@@ -99,9 +91,7 @@ export default function RoomEditNotifications({active, defaults}) {
             fluid
             name="end_notification_weekly"
             placeholder={
-              defaults.end_notification_weekly === null
-                ? ''
-                : String(defaults.end_notification_weekly)
+              defaults.end_notification_weekly && String(defaults.end_notification_weekly)
             }
             label={Translate.string('Weekly')}
             type="number"
@@ -113,9 +103,7 @@ export default function RoomEditNotifications({active, defaults}) {
             fluid
             name="end_notification_monthly"
             placeholder={
-              defaults.end_notification_monthly === null
-                ? ''
-                : String(defaults.end_notification_monthly)
+              defaults.end_notification_monthly && String(defaults.end_notification_monthly)
             }
             label={Translate.string('Monthly')}
             type="number"
