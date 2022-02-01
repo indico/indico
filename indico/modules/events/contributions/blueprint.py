@@ -103,7 +103,7 @@ _bp.add_url_rule('/manage/contributions/duration', 'manage_default_duration',
                  management.RHManageDefaultContributionDuration, methods=('GET', 'POST'))
 
 # Allow editing by submitters
-_bp.add_url_rule('/manage/contributions/submitter_edits', 'manage_submitter_edits',
+_bp.add_url_rule('/manage/contributions/submitter-edits', 'manage_submitter_edits',
                  management.RHManageSubmitterEdits, methods=('GET', 'POST'))
 
 # Publish contribution
