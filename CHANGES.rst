@@ -21,6 +21,8 @@ Bugfixes
 - Fix incorrect date in multi-day meeting date selector dropdown in certain timezones
   (:pr:`5223`)
 - Remove excessive padding around category titles (:pr:`5225`)
+- Fix error when exporting registrations to PDFs that contained certain invalid HTML-like
+  sequences (:pr:`5233`)
 
 
 Version 3.1
