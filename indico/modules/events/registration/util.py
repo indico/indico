@@ -125,12 +125,20 @@ def get_flat_section_positions_setup_data(regform):
 
 
 def get_flat_section_submission_data(regform, *, management=False, registration=None):
-    # TODO: merged field data for choice fields if there's a registration
     # TODO: skip disabled sections/items unless there's an active registration? (check current behavior first)
     section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections
                     if not s.is_deleted and (management or not s.is_manager_only)}
-    item_data = {f.id: f.view_data for f in regform.form_items
-                 if not f.is_section and not f.is_deleted and (management or not f.parent.is_manager_only)}
+
+    item_data = {}
+    registration_data = {r.field_data.field.id: r for r in registration.data} if registration else None
+    for item in regform.form_items:
+        if item.is_section or item.is_deleted or (not management and item.parent.is_manager_only):
+            continue
+        if registration and item.is_field and isinstance(item.field_impl, (ChoiceBaseField, AccommodationField)):
+            field_data = get_field_merged_options(item, registration_data)
+        else:
+            field_data = item.view_data
+        item_data[item.id] = field_data
     return {'sections': section_data, 'items': item_data}
 
 

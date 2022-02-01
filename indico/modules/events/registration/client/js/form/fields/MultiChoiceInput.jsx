@@ -17,6 +17,7 @@ import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form/selectors';
 
+import ChoiceLabel from './ChoiceLabel';
 import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
@@ -32,7 +33,6 @@ function MultiChoiceInputComponent({
   placesUsed,
 }) {
   // TODO: disable options triggering price changes after payment (or warn for managers)
-  // TODO: warnings for deleted/modified choices
   const currency = useSelector(getCurrency);
 
   const makeHandleChange = choice => () => {
@@ -64,7 +64,7 @@ function MultiChoiceInputComponent({
                   }
                   checked={!!value[choice.id]}
                   onChange={makeHandleChange(choice)}
-                  label={choice.caption}
+                  label={{children: <ChoiceLabel choice={choice} />}}
                 />
               </td>
               <td>

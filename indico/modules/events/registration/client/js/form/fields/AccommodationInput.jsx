@@ -19,6 +19,7 @@ import {serializeDate, toMoment} from 'indico/utils/date';
 
 import {getCurrency} from '../../form/selectors';
 
+import ChoiceLabel from './ChoiceLabel';
 import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
@@ -35,7 +36,6 @@ function AccommodationInputComponent({
   placesUsed,
 }) {
   // TODO: disable options triggering price changes after payment (or warn for managers)
-  // TODO: warnings for deleted/modified choices
   const currency = useSelector(getCurrency);
   const selectedChoice = choices.find(c => c.id === value.choice);
 
@@ -92,7 +92,7 @@ function AccommodationInputComponent({
                   <td>
                     <Form.Radio
                       styleName="radio"
-                      label={c.caption}
+                      label={{children: <ChoiceLabel choice={c} />}}
                       key={c.id}
                       value={c.id}
                       disabled={

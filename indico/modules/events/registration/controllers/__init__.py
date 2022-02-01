@@ -49,7 +49,8 @@ class RegistrationEditMixin:
         return jsonify({'redirect': self.success_url})
 
     def _process_GET(self):
-        form_data = get_flat_section_submission_data(self.regform)
+        form_data = get_flat_section_submission_data(self.regform, management=self.management,
+                                                     registration=self.registration)
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
                                                             registration=self.registration))
         registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)

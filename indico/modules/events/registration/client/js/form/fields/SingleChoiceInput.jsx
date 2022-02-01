@@ -18,6 +18,7 @@ import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form/selectors';
 
+import ChoiceLabel from './ChoiceLabel';
 import {Choices, choiceShape} from './ChoicesSetup';
 import {PlacesLeft} from './PlacesLeftLabel';
 
@@ -67,7 +68,9 @@ function SingleChoiceDropdown({
     disabled: !c.isEnabled || (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit),
     text: (
       <div styleName="dropdown-text">
-        <div styleName="caption">{c.caption}</div>
+        <div styleName="caption">
+          <ChoiceLabel choice={c} />
+        </div>
         <div styleName="labels">
           {!!c.price && (
             <Label>
@@ -159,7 +162,7 @@ function SingleChoiceRadioGroup({
               <td>
                 <Form.Radio
                   styleName="radio"
-                  label={c.caption}
+                  label={{children: <ChoiceLabel choice={c} />}}
                   key={c.id}
                   value={c.id}
                   disabled={
@@ -248,8 +251,6 @@ function SingleChoiceInputComponent({
   placesUsed,
 }) {
   // TODO: disable options triggering price changes after payment (or warn for managers)
-  // TODO: warnings for deleted/modified choices
-
   let component = null;
   if (itemType === 'dropdown') {
     component = (

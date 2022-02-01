@@ -30,6 +30,7 @@ from indico.util.string import camelize_keys, snakify_keys
 def get_field_merged_options(field, registration_data):
     rdata = registration_data.get(field.id)
     result = deepcopy(field.view_data)
+    # TODO: remove these two lists when removing angular; the new code uses _deleted and _modified below
     result['deletedChoice'] = []
     result['modifiedChoice'] = []
     if not rdata or not rdata.data:
@@ -42,7 +43,7 @@ def get_field_merged_options(field, registration_data):
                                                                 field_data.field.data)
             missing_option = next((choice for choice in merged_data['choices'] if choice['id'] == val), None)
             if missing_option:
-                result['choices'].append(missing_option)
+                result['choices'].append(camelize_keys(missing_option) | {'_deleted': True})
                 result['deletedChoice'].append(missing_option['id'])
         else:
             current_choice_data = _get_choice_by_id(val, result['choices'])
@@ -51,7 +52,7 @@ def get_field_merged_options(field, registration_data):
                 caption=current_choice_data['caption'])
             if current_choice_data != registration_choice_data:
                 pos = result['choices'].index(current_choice_data)
-                result['choices'][pos] = registration_choice_data
+                result['choices'][pos] = registration_choice_data | {'_modified': True}
                 result['modifiedChoice'].append(val)
     return result
 
