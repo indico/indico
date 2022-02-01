@@ -458,6 +458,7 @@ export function FinalSubmitButton({
   circular,
   size,
   icon,
+  style,
   children,
 }) {
   const {validating, hasValidationErrors, pristine, submitting, submitError} = useFormState({
@@ -475,7 +476,7 @@ export function FinalSubmitButton({
     (disabledUntilChange && pristine) ||
     submitting;
   return (
-    <Form.Field disabled={disabled}>
+    <Form.Field disabled={disabled} style={style}>
       <Popup
         trigger={
           <Button
@@ -513,6 +514,7 @@ FinalSubmitButton.propTypes = {
   circular: PropTypes.bool,
   icon: PropTypes.string,
   size: PropTypes.string,
+  style: PropTypes.object,
   children: PropTypes.func,
 };
 
@@ -527,5 +529,6 @@ FinalSubmitButton.defaultProps = {
   circular: false,
   icon: null,
   size: null,
+  style: null,
   children: null,
 };

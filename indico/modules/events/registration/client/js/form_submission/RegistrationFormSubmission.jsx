@@ -68,6 +68,10 @@ export default function RegistrationFormSubmission() {
             disabledUntilChange={false}
             disabledIfInvalid={false}
             label={Translate.string(isUpdateMode ? 'Modify' : isModerated ? 'Apply' : 'Register')}
+            style={{
+              marginTop: 15,
+              textAlign: 'center',
+            }}
           />
         </form>
       )}
