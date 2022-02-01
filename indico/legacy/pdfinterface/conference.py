@@ -1155,11 +1155,11 @@ class RegistrantsListToPDF(PDFBase):
         for item in self._display:
             if item.input_type == 'accommodation':
                 accommodation_col_counter += 1
-                lp.append(Paragraph(f'<b>{item.title}</b>', text_format))
+                lp.append(Paragraph(f'<b>{escape(item.title)}</b>', text_format))
                 lp.append(Paragraph('<b>{}</b>'.format(_('Arrival date')), text_format))
                 lp.append(Paragraph('<b>{}</b>'.format(_('Departure date')), text_format))
             else:
-                lp.append(Paragraph(f'<b>{item.title}</b>', text_format))
+                lp.append(Paragraph(f'<b>{escape(item.title)}</b>', text_format))
         if 'reg_date' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Registration date')), text_format))
         if 'state' in self.static_items:
@@ -1177,15 +1177,15 @@ class RegistrantsListToPDF(PDFBase):
         for registration in self._regList:
             lp = []
             lp.append(Paragraph(registration.friendly_id, text_format))
-            lp.append(Paragraph('{} {}'.format(registration.first_name,
-                                               registration.last_name), text_format))
+            lp.append(Paragraph('{} {}'.format(escape(registration.first_name),
+                                               escape(registration.last_name)), text_format))
             data = registration.data_by_field
             for item in self._display:
                 friendly_data = data.get(item.id).friendly_data if data.get(item.id) else ''
                 if item.input_type == 'accommodation':
                     if friendly_data:
                         friendly_data = data[item.id].friendly_data
-                        lp.append(Paragraph(friendly_data['choice'], text_format))
+                        lp.append(Paragraph(escape(friendly_data['choice']), text_format))
                         lp.append(Paragraph(format_date(friendly_data['arrival_date']), text_format))
                         lp.append(Paragraph(format_date(friendly_data['departure_date']), text_format))
                     else:
@@ -1196,13 +1196,11 @@ class RegistrantsListToPDF(PDFBase):
                 elif item.input_type == 'multi_choice':
                     if friendly_data:
                         multi_choice_data = ', '.join(friendly_data)
-                        lp.append(Paragraph(multi_choice_data, text_format))
+                        lp.append(Paragraph(escape(multi_choice_data), text_format))
                     else:
                         lp.append(Paragraph('', text_format))
                 else:
-                    if isinstance(friendly_data, str):
-                        friendly_data = friendly_data
-                    lp.append(Paragraph(str(friendly_data), text_format))
+                    lp.append(Paragraph(escape(str(friendly_data)), text_format))
             if 'reg_date' in self.static_items:
                 lp.append(Paragraph(format_datetime(registration.submitted_dt), text_format))
             if 'state' in self.static_items:
@@ -1217,7 +1215,7 @@ class RegistrantsListToPDF(PDFBase):
                 lp.append(Paragraph(check_in_date, text_format))
             if 'tags_present' in self.static_items:
                 tags = ', '.join(sorted(t.title for t in registration.tags))
-                lp.append(Paragraph(tags, text_format))
+                lp.append(Paragraph(escape(tags), text_format))
             l.append(lp)
         noneList = (None,) * (len(self._display) + len(self.static_items) + (accommodation_col_counter * 2) + 2)
         t = Table(l, colWidths=noneList, style=tsRegs)
