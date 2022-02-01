@@ -583,9 +583,9 @@ class RHManageSubmitterEdits(RHManageContributionsBase):
 
     def _process(self):
         form = AllowSubmitterEditsForm(
-            allow=contribution_settings.get(self.event, 'allow_submitters_edit_contributions'))
+            allow=contribution_settings.get(self.event, 'submitters_can_edit'))
         if form.validate_on_submit():
-            contribution_settings.set(self.event, 'allow_submitters_edit_contributions', form.allow.data)
+            contribution_settings.set(self.event, 'submitters_can_edit', form.allow.data)
             flash(_('Submitter settings changed successfully'), 'success')
             return jsonify_data()
         return jsonify_form(form)
