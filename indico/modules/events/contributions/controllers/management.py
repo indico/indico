@@ -187,7 +187,7 @@ class RHCreateContribution(RHManageContributionsBase):
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(contrib)
             return jsonify_data(**tpl_components)
-        return jsonify_template('events/contributions/forms/contribution.html', form=form)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form, can_manage=True)
 
 
 class RHEditContribution(RHManageContributionBase):
@@ -348,7 +348,7 @@ class RHCreateSubContribution(RHManageContributionBase):
             subcontrib = create_subcontribution(self.contrib, form.data)
             flash(_("Subcontribution '{}' created successfully").format(subcontrib.title), 'success')
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
-        return jsonify_template('events/contributions/forms/subcontribution.html', form=form)
+        return jsonify_template('events/contributions/forms/subcontribution.html', form=form, can_manage=True)
 
 
 class RHEditSubContribution(RHManageSubContributionBase):
