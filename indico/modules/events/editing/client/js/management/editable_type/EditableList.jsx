@@ -105,7 +105,7 @@ function EditableListDisplay({
   const contribsWithEditables = contribList.filter(x => x.editable);
   const contribIdSet = new Set(contribsWithEditables.map(x => x.id));
   const [filteredSet, setFilteredSet] = useState(new Set(contribList.map(e => e.id)));
-  const [searchValue, setSearchValue] = useState('');
+  const [activeFilters, setActiveFilters] = useState({search: '', filters: []});
   const [selfAssignModalVisible, setSelfAssignModalVisible] = useState(false);
 
   const [checked, setChecked] = useState([]);
@@ -125,6 +125,48 @@ function EditableListDisplay({
         value: e.identifier,
       })),
     [editors]
+  );
+
+  const filterOptions = useMemo(
+    () => [
+      {
+        key: 'state',
+        text: Translate.string('Status'),
+        options: [
+          {value: 'accepted', text: Translate.string('Accepted')},
+          {value: 'ready_for_review', text: Translate.string('Ready for review')},
+          {value: 'not_submitted', text: Translate.string('Not submitted')},
+        ],
+      },
+      {
+        key: 'editor',
+        text: Translate.string('Editor'),
+        options: _.uniqBy(
+          contribsWithEditables.map(c => c.editable.editor).filter(Boolean),
+          'id'
+        ).map(({identifier, fullName}) => ({
+          value: identifier,
+          text: fullName,
+        })),
+      },
+      {
+        key: 'code',
+        text: Translate.string('Program code'),
+        options: _.uniq(contribList.map(c => c.code).filter(Boolean)).map(code => ({
+          value: code,
+          text: code,
+        })),
+      },
+      {
+        key: 'keywords',
+        text: Translate.string('Keywords'),
+        options: _.uniq(_.flatten(contribList.map(c => c.keywords))).map(keyword => ({
+          value: keyword,
+          text: keyword,
+        })),
+      },
+    ],
+    [contribList, contribsWithEditables]
   );
 
   const title = {
@@ -189,23 +231,50 @@ function EditableListDisplay({
   };
 
   const setFilter = value => {
-    setSearchValue(value);
-    value = value.toLowerCase().trim();
+    setActiveFilters(value);
+    const searchValue = value.search.toLowerCase().trim();
 
     const isMatch = result => {
-      if (!value) {
-        return true;
+      if (searchValue) {
+        const match = searchValue.match(/^#(\d+)$/);
+        if (match) {
+          return result.friendlyId === +match[1];
+        }
+        if (
+          !(
+            result.title.toLowerCase().includes(searchValue) ||
+            (result.editable &&
+              result.editable.editor &&
+              result.editable.editor.fullName.toLowerCase().includes(searchValue)) ||
+            (result.code && result.code.toLowerCase().includes(searchValue))
+          )
+        ) {
+          return false;
+        }
       }
-      const match = value.match(/^#(\d+)$/);
-      if (match) {
-        return result.friendlyId === +match[1];
-      }
+      const matchFilterType = (filterType, cond) => {
+        const filters = value.filters.filter(f => f.filter.key === filterType);
+        return (
+          filters.length === 0 ||
+          filters.some(cond ?? (f => f.selectedOption === result[filterType]))
+        );
+      };
       return (
-        result.title.toLowerCase().includes(value) ||
-        (result.editable &&
-          result.editable.editor &&
-          result.editable.editor.fullName.toLowerCase().includes(value)) ||
-        (result.code && result.code.toLowerCase().includes(value))
+        matchFilterType(
+          'editor',
+          f =>
+            result.editable &&
+            result.editable.editor &&
+            result.editable.editor.identifier === f.selectedOption
+        ) &&
+        matchFilterType('code') &&
+        matchFilterType(
+          'state',
+          f =>
+            (result.editable && result.editable.state === f.selectedOption) ||
+            (f.selectedOption === 'not_submitted' && !result.editable)
+        ) &&
+        matchFilterType('keywords', f => result.keywords.includes(f.selectedOption))
       );
     };
     const filteredResults = new Set(contribList.filter(isMatch).map(e => e.id));
@@ -428,29 +497,11 @@ function EditableListDisplay({
             </>
           )}
         </div>
-        <div>
-          <EditableListFilter
-            filterOptions={[
-              {key: 'status', text: 'Status', options: ['Accepted', 'Submitted']},
-              {key: 'editor', text: 'Editor', options: ['John', 'Matt']},
-              {key: 'keywords', text: 'Keywords', options: ['Computers', 'Physics']},
-              {key: 'program_code', text: 'Program code', options: ['1123', '4234']},
-            ]}
-          />
-          <Input
-            placeholder={Translate.string('Enter #id or search string')}
-            onChange={(evt, {value}) => setFilter(value)}
-            value={searchValue}
-            icon={
-              <Icon
-                name="close"
-                link
-                onClick={() => setFilter('')}
-                style={searchValue ? {} : {display: 'none'}}
-              />
-            }
-          />
-        </div>
+        <EditableListFilter
+          filterOptions={filterOptions}
+          activeFilters={activeFilters}
+          onChange={filters => setFilter(filters)}
+        />
       </div>
       {sortedList.length ? (
         <div styleName="editable-list">
@@ -550,6 +601,7 @@ EditableListDisplay.propTypes = {
         type: PropTypes.oneOf(Object.values(EditableType)),
         timelineURL: PropTypes.string,
       }),
+      keywords: PropTypes.arrayOf(PropTypes.string).isRequired,
     })
   ).isRequired,
   editors: PropTypes.arrayOf(PropTypes.shape(userPropTypes)).isRequired,
@@ -563,7 +615,12 @@ EditableListDisplay.propTypes = {
 const filterShape = {
   key: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 function EditableListFilterSubmenu({filter, addFilter, open, onOpen, isSelectedOption}) {
@@ -575,16 +632,17 @@ function EditableListFilterSubmenu({filter, addFilter, open, onOpen, isSelectedO
       onOpen={onOpen}
       onBlur={evt => evt.stopPropagation()}
       open={open}
+      disabled={filter.options.length === 0}
       trigger={<Dropdown.Item text={filter.text} icon="plus" />}
     >
       <Dropdown.Menu>
-        {filter.options.map(option => (
+        {_.sortBy(filter.options, 'text').map(option => (
           <Dropdown.Item
-            key={option}
-            text={option}
-            value={option}
-            disabled={isSelectedOption(option)}
-            onClick={(evt, {value: v}) => addFilter(filter.key, v)}
+            key={option.value}
+            value={option.value}
+            text={option.text}
+            disabled={isSelectedOption(option.value)}
+            onClick={(evt, {value: v}) => addFilter(filter, v)}
           />
         ))}
       </Dropdown.Menu>
@@ -600,91 +658,125 @@ EditableListFilterSubmenu.propTypes = {
   isSelectedOption: PropTypes.func.isRequired,
 };
 
-function EditableListFilter({filterOptions}) {
-  const [activeFilters, setActiveFilters] = useState([]);
+function EditableListFilter({filterOptions, activeFilters, onChange}) {
   const [openSubmenu, setOpenSubmenu] = React.useState(-1);
 
-  const sortFilters = filters =>
+  const sortActiveFilters = filters =>
     filters.sort((a, b) => {
-      const textCmp = a.text.localeCompare(b.text);
+      const textCmp = a.filter.text.localeCompare(b.filter.text);
       if (textCmp === 0 && a.selectedOption && b.selectedOption) {
         return a.selectedOption.localeCompare(b.selectedOption);
       }
       return textCmp;
     });
 
-  const addFilter = (key, selectedOption) => {
+  const handleSearchChange = search => onChange({search, filters: activeFilters.filters});
+  const handleFiltersChange = filters => onChange({search: activeFilters.search, filters});
+
+  const addFilter = (filter, selectedOption) => {
     const newFilter = {
-      key: `${key}_${selectedOption}`,
-      text: filterOptions.find(f => f.key === key).text,
+      key: `${filter.key}_${selectedOption}`,
+      filter,
       selectedOption,
     };
-    setActiveFilters(sortFilters([...activeFilters, newFilter]));
+    handleFiltersChange(sortActiveFilters([...activeFilters.filters, newFilter]));
   };
 
   const removeFilter = key => {
-    setActiveFilters(activeFilters.filter(f => f.key !== key));
+    handleFiltersChange(activeFilters.filters.filter(f => f.key !== key));
   };
 
   const makeIsSelectedOption = filterKey => option =>
-    activeFilters.some(f => f.key === `${filterKey}_${option}`);
+    activeFilters.filters.some(f => f.key === `${filterKey}_${option}`);
 
   return (
-    <Dropdown
-      text={Translate.string('Filter')}
-      icon="filter"
-      labeled
-      button
-      className="icon"
-      onClose={() => setOpenSubmenu(-1)}
-    >
-      <Dropdown.Menu>
-        {activeFilters.length > 0 ? (
-          <>
-            <div key="_filters" style={{display: 'flex', flexWrap: 'wrap'}}>
-              {activeFilters.map(({key, text, selectedOption}) => (
-                <Label
-                  key={key}
-                  style={{marginTop: '0.4em', marginLeft: '0.4em', marginRight: '0.4em'}}
-                >
-                  {text}
-                  <Label.Detail>{selectedOption}</Label.Detail>
-                  <Icon
-                    name="delete"
-                    onClick={evt => {
-                      evt.stopPropagation();
-                      setOpenSubmenu(-1);
-                      removeFilter(key);
-                    }}
-                  />
-                </Label>
-              ))}
-            </div>
-            <Dropdown.Item
-              key="_clear"
-              text={Translate.string('Clear all filters')}
-              onClick={() => setActiveFilters([])}
+    <div>
+      <Dropdown
+        text={Translate.string('Filter')}
+        icon="filter"
+        labeled
+        button
+        className={activeFilters.filters.length > 0 ? 'orange icon' : 'icon'}
+        onClose={() => setOpenSubmenu(-1)}
+      >
+        <Dropdown.Menu>
+          {activeFilters.filters.length > 0 ? (
+            <>
+              <div key="_filters" style={{display: 'flex', flexWrap: 'wrap'}}>
+                {activeFilters.filters.map(({key, filter, selectedOption}) => (
+                  <Label
+                    key={key}
+                    style={{marginTop: '0.4em', marginLeft: '0.4em', marginRight: '0.4em'}}
+                    className="fluid"
+                    color="orange"
+                  >
+                    {filter.text}
+                    <Icon
+                      name="delete"
+                      className="float right"
+                      onClick={evt => {
+                        evt.stopPropagation();
+                        setOpenSubmenu(-1);
+                        removeFilter(key);
+                      }}
+                    />
+                    <Label.Detail className="float right">
+                      {filter.options.find(o => o.value === selectedOption).text}
+                    </Label.Detail>
+                  </Label>
+                ))}
+              </div>
+              <Dropdown.Item
+                text={Translate.string('Clear all filters')}
+                onClick={() => handleFiltersChange([])}
+              />
+            </>
+          ) : (
+            <Dropdown.Item text={Translate.string('No filters were added yet')} disabled />
+          )}
+          <Dropdown.Divider />
+          {_.sortBy(filterOptions, 'text').map(filter => (
+            <EditableListFilterSubmenu
+              key={filter.key}
+              filter={filter}
+              addFilter={addFilter}
+              open={openSubmenu === filter.key}
+              onOpen={() => setOpenSubmenu(filter.key)}
+              isSelectedOption={makeIsSelectedOption(filter.key)}
             />
-          </>
-        ) : (
-          <Dropdown.Item text={Translate.string('No filters were added yet')} disabled />
-        )}
-        <Dropdown.Divider />
-        {sortFilters(filterOptions).map(filter => (
-          <EditableListFilterSubmenu
-            key={filter.key}
-            filter={filter}
-            addFilter={addFilter}
-            open={openSubmenu === filter.key}
-            onOpen={() => setOpenSubmenu(filter.key)}
-            isSelectedOption={makeIsSelectedOption(filter.key)}
-          />
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+      <Input
+        placeholder={Translate.string('Enter #id or search string')}
+        onChange={(evt, {value}) => handleSearchChange(value)}
+        value={activeFilters.search}
+        style={{width: '14em'}}
+        icon={
+          activeFilters.search
+            ? {
+                name: 'close',
+                link: true,
+                onClick: () => handleSearchChange(''),
+              }
+            : undefined
+        }
+      />
+    </div>
   );
 }
 
 EditableListFilter.propTypes = {
   filterOptions: PropTypes.arrayOf(PropTypes.shape(filterShape)).isRequired,
+  activeFilters: PropTypes.shape({
+    search: PropTypes.string.isRequired,
+    filters: PropTypes.arrayOf(
+      PropTypes.shape({
+        key: PropTypes.string.isRequired,
+        filter: PropTypes.shape(filterShape).isRequired,
+        selectedOption: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
 };
