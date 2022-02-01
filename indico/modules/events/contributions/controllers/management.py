@@ -191,11 +191,10 @@ class RHCreateContribution(RHManageContributionsBase):
 
 
 class RHEditContribution(RHManageContributionBase):
-    """
-    Edit the contribution.
+    """Edit a contribution.
 
-    If configured in the contribution settings,
-    editing is also allowed to the submitters of the given contribution.
+    If configured in the contribution settings, editing is also
+    allowed for the submitters.
     """
 
     def _check_access(self):
@@ -355,9 +354,8 @@ class RHCreateSubContribution(RHManageContributionBase):
 class RHEditSubContribution(RHManageSubContributionBase):
     """Edit a subcontribution.
 
-    If configured in the contribution settings,
-    editing of the given subcontribution is also allowed to
-    the submitters of the parent contribution.
+    If configured in the contribution settings, editing is also
+    allowed for the submitters of the parent contribution.
     """
 
     def _check_access(self):
@@ -579,14 +577,13 @@ class RHManageDefaultContributionDuration(RHManageContributionsBase):
 
 
 class RHManageSubmitterEdits(RHManageContributionsBase):
-    """Dialog which sets whether to allow contribution edits by their submitters."""
+    """Dialog to configure submitter edit permissions."""
 
     def _process(self):
-        form = AllowSubmitterEditsForm(
-            allow=contribution_settings.get(self.event, 'submitters_can_edit'))
+        form = AllowSubmitterEditsForm(allow=contribution_settings.get(self.event, 'submitters_can_edit'))
         if form.validate_on_submit():
             contribution_settings.set(self.event, 'submitters_can_edit', form.allow.data)
-            flash(_('Submitter settings changed successfully'), 'success')
+            flash(_('Submitter edit settings changed successfully'), 'success')
             return jsonify_data()
         return jsonify_form(form)
 
