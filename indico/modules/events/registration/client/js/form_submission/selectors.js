@@ -19,3 +19,9 @@ export const getUpdateMode = createSelector(
   getStaticData,
   staticData => !!staticData.registrationUuid
 );
+
+/** Indicates whether the registration is moderated */
+export const getModeration = createSelector(
+  getStaticData,
+  staticData => staticData.moderated
+);

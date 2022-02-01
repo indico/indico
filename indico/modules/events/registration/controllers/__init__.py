@@ -71,7 +71,6 @@ class RegistrationEditMixin:
                                                user_data=user_data,
                                                registration=self.registration,
                                                management=self.management,
-                                               moderated=False,  # TODO: what to do with this
                                                registration_data=registration_data,
                                                file_data=file_data,
                                                registration_metadata=registration_metadata)

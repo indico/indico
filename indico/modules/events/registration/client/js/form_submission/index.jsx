@@ -21,7 +21,7 @@ export default function setupRegformSetup(root) {
     regformId,
     currency,
     management,
-    moderated,
+    moderated = false,
     userInfo,
     submitUrl,
     formData,

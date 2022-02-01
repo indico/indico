@@ -17,7 +17,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import FormSection from '../form/FormSection';
 import {getItems, getNestedSections, getStaticData} from '../form/selectors';
 
-import {getUserInfo, getUpdateMode} from './selectors';
+import {getUserInfo, getUpdateMode, getModeration} from './selectors';
 
 import '../../styles/regform.module.scss';
 
@@ -27,6 +27,7 @@ export default function RegistrationFormSubmission() {
   const userInfo = useSelector(getUserInfo);
   const {submitUrl, registrationData} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
+  const isModerated = useSelector(getModeration);
 
   const onSubmit = async data => {
     console.log(data);
@@ -66,8 +67,7 @@ export default function RegistrationFormSubmission() {
           <FinalSubmitButton
             disabledUntilChange={false}
             disabledIfInvalid={false}
-            // TODO: use different label when modifying registration
-            label={Translate.string(isUpdateMode ? 'Modify' : 'Register')}
+            label={Translate.string(isUpdateMode ? 'Modify' : isModerated ? 'Apply' : 'Register')}
           />
         </form>
       )}
