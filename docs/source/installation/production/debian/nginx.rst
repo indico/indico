@@ -17,7 +17,7 @@ much more recent versions.
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
     wget --quiet -O - https://nginx.org/keys/nginx_signing.key | apt-key add -
     apt update
-    apt install -y --install-recommends postgresql-13 libpq-dev nginx libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils libffi-dev liblzma-dev uuid-dev build-essential redis-server
+    apt install -y --install-recommends postgresql-13 libpq-dev nginx libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils liblzma-dev uuid-dev build-essential redis-server
 
 
 If you use Debian, run this command:
