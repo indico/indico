@@ -144,6 +144,17 @@ class PersonalDataType(int, IndicoEnum):
         else:
             return None
 
+    @property
+    def default(self):
+        """
+        The default value used for the corresponding registration field if
+        the value does not exist in `session.user`.
+        """
+        if self == PersonalDataType.title:
+            return {}
+        else:
+            return ''
+
 
 class RegistrationFormItem(db.Model):
     """Generic registration form item."""

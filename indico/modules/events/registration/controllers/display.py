@@ -289,6 +289,14 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         }
     }
 
+    def _get_user_data(self):
+        user_data = {t.name: getattr(session.user, t.name, t.default)
+                     if session.user else t.default for t in PersonalDataType}
+        if self.invitation:
+            user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
+        user_data['title'] = get_title_uuid(self.regform, user_data['title']) or PersonalDataType.title.default
+        return user_data
+
     def _check_access(self):
         RHRegistrationFormRegistrationBase._check_access(self)
         if self.regform.require_login and not session.user and request.method != 'GET':
@@ -320,17 +328,13 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
 
     def _process_GET(self):
-        user_data = {t.name: getattr(session.user, t.name, None) if session.user else '' for t in PersonalDataType}
-        if self.invitation:
-            user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
-        user_data['title'] = get_title_uuid(self.regform, user_data['title'])
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
                                                form_data=get_flat_section_submission_data(self.regform),
                                                angular_sections=get_event_section_data(self.regform),
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
-                                               user_data=user_data,
+                                               user_data=self._get_user_data(),
                                                invitation=self.invitation,
                                                registration=self.registration,
                                                management=False,
