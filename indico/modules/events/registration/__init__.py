@@ -108,7 +108,8 @@ def _extend_event_menu(sender, **kwargs):
 
     def _visible_participant_list(event):
         override = values_from_signal(signals.event.visible_participant_list.send(sender, event=event))
-        return event.has_feature('registration') if not override else override.pop()
+        override = all(override) if override else None
+        return event.has_feature('registration') if override is None else override
 
     yield MenuEntryData(_('Registration'), 'registration', 'event_registration.display_regform_list', position=10,
                         visible=_visible_registration, hide_if_restricted=False)
