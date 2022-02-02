@@ -121,7 +121,6 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         items = deepcopy(versioned_data['choices'])
         for item in items:
             item['caption'] = unversioned_data['captions'][item['id']]
-            item['is_billable'] = item['price'] > 0
         return {'choices': items}
 
     @property
@@ -513,7 +512,6 @@ class AccommodationField(RegistrationFormBillableItemsField):
         items = deepcopy(versioned_data['choices'])
         for item in items:
             item['caption'] = unversioned_data['captions'][item['id']]
-            item['is_billable'] = item['price'] > 0
         data['choices'] = items
         return data
 

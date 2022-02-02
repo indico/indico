@@ -37,16 +37,16 @@
                     </span>
                 </td>
                 <td align="right">
-                    <span ng-if="item.id == accommodation.choice && userdata[fieldName].isBillable">
+                    <span ng-if="item.id == accommodation.choice && userdata[fieldName].price > 0">
                         <span class="regFormPrice">{{ userdata[fieldName].price }}</span>
                         <nd-currency currency="currency"></nd-currency>
-                        <span ng-if="item.isBillable">{{ "per night" | i18n }}</span>
+                        <span ng-if="item.price">{{ "per night" | i18n }}</span>
                     </span>
 
-                    <span ng-if="!userdata[fieldName].isBillable && item.isBillable">
+                    <span ng-if="!userdata[fieldName].price && item.price">
                         <span class="regFormPrice">{{ item.price }}</span>
                         <nd-currency currency="currency"></nd-currency>
-                        <span ng-if="item.isBillable">{{ "per night" | i18n }}</span>
+                        <span ng-if="item.price">{{ "per night" | i18n }}</span>
                     </span>
                 </td>
                 <td>

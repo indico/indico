@@ -345,7 +345,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
   $scope.hasBillableOptions = function(field) {
     return !!_.find(field.choices, function(item) {
-      return item.isBillable && item.price !== 0;
+      return item.price !== 0;
     });
   };
 
@@ -366,7 +366,7 @@ ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
       // TODO look for broadcast messages to children the angular way
 
       scope.changesPrice = function(item) {
-        return item && item.isBillable && item.price !== 0;
+        return item && item.price !== 0;
       };
 
       scope.$parent.$watch('dialogs.newfield', function(val) {
@@ -378,7 +378,7 @@ ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
         // After the field is loaded, we can check whether it's billable, etc
         // and disable it if needed
         scope.field.billableDisabled =
-          (scope.regMetadata.paid && (scope.field.isBillable && scope.field.price > 0)) ||
+          (scope.regMetadata.paid && scope.field.price > 0) ||
           (scope.selectedItemIsBillable &&
             scope.selectedItemIsBillable(scope.userdata, scope.regMetadata));
       });
@@ -399,7 +399,6 @@ ndRegForm.directive('ndCheckboxField', function(url) {
       scope.settings.isBillable = true;
       scope.settings.singleColumn = true;
       scope.settings.placesLimit = true;
-      scope.settings.formData.push('isBillable');
       scope.settings.formData.push('price');
       scope.settings.formData.push('placesLimit');
 
@@ -501,7 +500,6 @@ ndRegForm.directive('ndNumberField', function(url) {
       scope.settings.fieldName = $T('Number');
       scope.settings.isBillable = true;
       scope.settings.number = true;
-      scope.settings.formData.push('isBillable');
       scope.settings.formData.push('price');
       scope.settings.formData.push('minValue');
       scope.settings.formData.push('length');
@@ -698,7 +696,6 @@ ndRegForm.directive('ndRadioField', function(url) {
         actions: ['remove', 'sortable'],
         colNames: [
           $T('Caption'),
-          $T('Billable'),
           $T('Price'),
           $T('Places limit'),
           $T('Max. extra slots'),
@@ -717,15 +714,6 @@ ndRegForm.directive('ndRadioField', function(url) {
             editoptions: {
               size: '30',
             },
-          },
-          {
-            name: 'isBillable',
-            index: 'isBillable',
-            width: 50,
-            editable: true,
-            align: 'center',
-            defaultVal: false,
-            edittype: 'bool_select',
           },
           {
             name: 'price',
@@ -851,7 +839,6 @@ ndRegForm.directive('ndBoolField', function(url) {
       scope.settings.isBillable = true;
       scope.settings.placesLimit = true;
       scope.settings.defaultValues = ['yes', 'no'];
-      scope.settings.formData.push('isBillable');
       scope.settings.formData.push('price');
       scope.settings.formData.push('placesLimit');
       scope.settings.formData.push('defaultValue');
@@ -984,7 +971,6 @@ ndRegForm.directive('ndAccommodationField', function(url) {
         if (!field.choices) {
           formData.choices.push({
             caption: 'No accommodation',
-            isBillable: false,
             isEnabled: true,
             isNoAccommodation: true,
             placesLimit: 0,
@@ -1048,7 +1034,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
           var choice = _.find(scope.field.choices, function(choice) {
             return userdata[scope.field.htmlName].choice == choice.id;
           });
-          return choice && choice.isBillable && registrationMetaData.paid;
+          return choice && choice.price > 0 && registrationMetaData.paid;
         }
 
         return false;
@@ -1075,7 +1061,6 @@ ndRegForm.directive('ndAccommodationField', function(url) {
         sortable: false,
         colNames: [
           $T('Accommodation option'),
-          $T('Billable'),
           $T('Price'),
           $T('Places limit'),
           $T('Enabled'),
@@ -1090,15 +1075,6 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             editoptions: {size: '30'},
             editable: true,
             edittype: 'text',
-          },
-          {
-            name: 'isBillable',
-            index: 'isBillable',
-            width: 60,
-            editable: true,
-            align: 'center',
-            edittype: 'bool_select',
-            defaultVal: true,
           },
           {
             name: 'price',
@@ -1153,7 +1129,6 @@ ndRegForm.directive('ndMultiChoiceField', function(url) {
         actions: ['remove', 'sortable'],
         colNames: [
           $T('Caption'),
-          $T('Billable'),
           $T('Price'),
           $T('Places limit'),
           $T('Max. extra slots'),
@@ -1171,15 +1146,6 @@ ndRegForm.directive('ndMultiChoiceField', function(url) {
             editoptions: {
               size: '30',
             },
-          },
-          {
-            name: 'isBillable',
-            index: 'isBillable',
-            width: 50,
-            editable: true,
-            align: 'center',
-            defaultVal: false,
-            edittype: 'bool_select',
           },
           {
             name: 'price',
@@ -1293,7 +1259,6 @@ ndRegForm.directive('ndFieldDialog', function(url) {
           placesLimit: 0,
           price: 0,
           isEnabled: true,
-          isBillable: false,
           maxExtraSlots: 0,
         });
 
