@@ -18,6 +18,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.logging import connect_log_signals
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.util.i18n import _, ngettext
+from indico.util.signals import values_from_signal
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -106,7 +107,8 @@ def _extend_event_menu(sender, **kwargs):
                 .has_rows())
 
     def _visible_participant_list(event):
-        return event.has_feature('registration')
+        override = values_from_signal(signals.event.visible_participant_list.send(sender, event=event))
+        return event.has_feature('registration') if not override else override.pop()
 
     yield MenuEntryData(_('Registration'), 'registration', 'event_registration.display_regform_list', position=10,
                         visible=_visible_registration, hide_if_restricted=False)

@@ -107,3 +107,10 @@ generated.
 The signal should return a dict that will be used to update the
 original representation (fields to add or override).
 ''')
+
+visible_participant_list = _signals.signal('visible-participant-list', '''
+Expected to return a bool value to override the condition for when the
+Participant list menu should be displayed on the Event page.
+
+The *event* kwarg contains the event object.
+''')
