@@ -15,3 +15,8 @@ Called when printing a badge template.
 The registration form is passed in the `regform` kwarg. The list of registration
 objects are passed in the `registrations` kwarg and it may be modified.
 ''')
+
+customize_badge_style = _signals.signal('customize-badge-style', '''
+Called when printing a badge.
+Sends each `item` in the badge and recieves a dictionary of styles for that `item`
+''')

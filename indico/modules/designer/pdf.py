@@ -18,8 +18,10 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Paragraph
 
+from indico.core import signals
 from indico.legacy.pdfinterface.base import setTTFonts
 from indico.modules.designer import PageOrientation
+from indico.util.signals import values_from_signal
 from indico.util.string import strip_tags
 
 
@@ -92,22 +94,27 @@ class DesignerPDFBase:
         return data
 
     def _draw_item(self, canvas, item, tpl_data, content, margin_x, margin_y):
+        override = values_from_signal(signals.event.designer.customize_badge_style.send(item), as_list=True)
+        update_style = override[0] if override else {}
         style = ParagraphStyle({})
-        style.alignment = ALIGNMENTS[item['text_align']]
-        style.textColor = item.get('color') or '#000000'
-        style.backColor = item.get('background_color') or None
-        style.borderPadding = (0, 0, 4, 0)
-        style.fontSize = _extract_font_size(item['font_size'])
-        style.leading = style.fontSize
+        style.alignment = update_style.get('alignment') or ALIGNMENTS[item['text_align']]
+        style.textColor = update_style.get('textColor') or (item.get('color') or '#000000')
+        style.backColor = update_style.get('backColor') or (item.get('background_color') or None)
+        style.borderPadding = update_style.get('borderPadding') or (0, 0, 4, 0)
+        style.fontSize = update_style.get('fontSize') or _extract_font_size(item['font_size'])
+        style.leading = update_style.get('leading') or style.fontSize
 
-        if item['bold'] and item['italic']:
-            style.fontName = FONT_STYLES[item['font_family']][3]
-        elif item['italic']:
-            style.fontName = FONT_STYLES[item['font_family']][2]
-        elif item['bold']:
-            style.fontName = FONT_STYLES[item['font_family']][1]
+        if update_style.get('fontName'):
+            style.fontName = update_style.get('fontName')
         else:
-            style.fontName = FONT_STYLES[item['font_family']][0]
+            if item['bold'] and item['italic']:
+                style.fontName = FONT_STYLES[item['font_family']][3]
+            elif item['italic']:
+                style.fontName = FONT_STYLES[item['font_family']][2]
+            elif item['bold']:
+                style.fontName = FONT_STYLES[item['font_family']][1]
+            else:
+                style.fontName = FONT_STYLES[item['font_family']][0]
 
         item_x = float(item['x']) / PIXELS_CM * cm
         item_y = float(item['y']) / PIXELS_CM * cm
