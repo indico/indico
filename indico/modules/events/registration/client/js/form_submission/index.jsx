@@ -22,7 +22,7 @@ export default function setupRegformSetup(root) {
     currency,
     management,
     moderated = false,
-    userInfo,
+    userInfo = null,
     submitUrl,
     formData,
     registrationData = null,

@@ -10,9 +10,8 @@ from sqlalchemy.orm import defaultload
 
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.util import (get_event_section_data, get_flat_section_submission_data,
-                                                     get_title_uuid, make_registration_schema, modify_registration)
+                                                     make_registration_schema, modify_registration)
 from indico.util.string import camelize_keys
 from indico.web.args import parser
 
@@ -62,14 +61,11 @@ class RegistrationEditMixin:
             'manager': self.management
         }
 
-        user_data = {t.name: getattr(session.user, t.name, None) if session.user else '' for t in PersonalDataType}
-        user_data['title'] = get_title_uuid(self.regform, user_data['title'])
         return self.view_class.render_template(self.template_file, self.event,
                                                sections=section_data, regform=self.regform,
                                                form_data=form_data,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
-                                               user_data=user_data,
                                                registration=self.registration,
                                                management=self.management,
                                                registration_data=registration_data,

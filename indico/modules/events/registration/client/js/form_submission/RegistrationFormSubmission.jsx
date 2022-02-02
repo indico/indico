@@ -22,6 +22,22 @@ import {getUserInfo, getUpdateMode, getModeration, getManagement} from './select
 
 import '../../styles/regform.module.scss';
 
+/**
+ * The registration Marshmallow schema does not allow
+ * unknown fields so we remove disabled personal data fields from the
+ * form initial values.
+ */
+function getInitialValues(userInfo, items) {
+  return Object.fromEntries(
+    Object.entries(userInfo).filter(([key]) => {
+      return Object.values(items).some(
+        ({htmlName, fieldIsPersonalData, isEnabled}) =>
+          htmlName === key && fieldIsPersonalData && isEnabled
+      );
+    })
+  );
+}
+
 function EmailNotification() {
   return (
     <Message info style={{marginTop: 25}}>
@@ -62,19 +78,10 @@ export default function RegistrationFormSubmission() {
     }
   };
 
-  const initialValues = Object.fromEntries(
-    Object.entries(userInfo).filter(([key]) => {
-      return Object.values(items).some(
-        ({htmlName, fieldIsPersonalData, isEnabled}) =>
-          htmlName === key && fieldIsPersonalData && isEnabled
-      );
-    })
-  );
-
   return (
     <FinalForm
       onSubmit={onSubmit}
-      initialValues={isUpdateMode ? registrationData : initialValues}
+      initialValues={isUpdateMode ? registrationData : getInitialValues(userInfo, items)}
       initialValuesEqual={_.isEqual}
       subscription={{}}
     >
