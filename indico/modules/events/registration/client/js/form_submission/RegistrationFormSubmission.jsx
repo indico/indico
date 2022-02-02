@@ -91,7 +91,7 @@ export default function RegistrationFormSubmission() {
               label={Translate.string(isUpdateMode ? 'Modify' : isModerated ? 'Apply' : 'Register')}
               style={{
                 marginTop: 20,
-                textAlign: 'center',
+                textAlign: 'right',
               }}
             />
           </div>
