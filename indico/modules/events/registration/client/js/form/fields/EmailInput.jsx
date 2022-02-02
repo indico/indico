@@ -130,7 +130,12 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
       loaderWhileValidating
     >
       {isMainEmailField && !!message.forEmail && !!message.message && (
-        <Message visible warning={message.status === 'warning'} error={message.status === 'error'}>
+        <Message
+          visible
+          warning={message.status === 'warning'}
+          error={message.status === 'error'}
+          positive={message.status === 'ok'}
+        >
           {message.message}
         </Message>
       )}
