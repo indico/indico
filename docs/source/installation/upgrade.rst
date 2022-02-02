@@ -125,6 +125,8 @@ are a few places where you need to do something differently:
 - You still need to run ``indico setup wizard`` to create some of the directories,
   but compare the generated config file with your old one and update any settings
   you may have changed manually (e.g. for LDAP or SSO authentication)
+- You need to perform the database structure upgrades just like during any other
+  Indico upgrade: ``indico db upgrade`` and ``indico db --all-plugins upgrade``
 - Copy the contents of the ``/opt/indico/archive`` folder from your old instance and
   ensure owner, group and permissions are correct. This step is critical as this folder
   contains all the files uploaded to Indico
