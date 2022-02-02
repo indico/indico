@@ -18,5 +18,6 @@ objects are passed in the `registrations` kwarg and it may be modified.
 
 customize_badge_style = _signals.signal('customize-badge-style', '''
 Called when printing a badge.
-Sends each `item` in the badge and recieves a dictionary of styles for that `item`
+Each `item` in a badge and it's `styles` are passed in the kwarg. The `styles` is a dictionary
+which may be modified and is used to update the `item style`.
 ''')

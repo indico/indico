@@ -94,27 +94,38 @@ class DesignerPDFBase:
         return data
 
     def _draw_item(self, canvas, item, tpl_data, content, margin_x, margin_y):
-        override = values_from_signal(signals.event.designer.customize_badge_style.send(item), as_list=True)
-        update_style = override[0] if override else {}
-        style = ParagraphStyle({})
-        style.alignment = update_style.get('alignment') or ALIGNMENTS[item['text_align']]
-        style.textColor = update_style.get('textColor') or (item.get('color') or '#000000')
-        style.backColor = update_style.get('backColor') or (item.get('background_color') or None)
-        style.borderPadding = update_style.get('borderPadding') or (0, 0, 4, 0)
-        style.fontSize = update_style.get('fontSize') or _extract_font_size(item['font_size'])
-        style.leading = update_style.get('leading') or style.fontSize
+        styles = {
+            'alignment': ALIGNMENTS[item['text_align']],
+            'textColor': item.get('color') or '#000000',
+            'backColor': item.get('background_color') or None,
+            'borderPadding': (0, 0, 4, 0),
+            'fontSize': _extract_font_size(item['font_size'])
+        }
+        styles['leading'] = styles['fontSize']
 
-        if update_style.get('fontName'):
-            style.fontName = update_style.get('fontName')
+        if item['bold'] and item['italic']:
+            styles['fontName'] = FONT_STYLES[item['font_family']][3]
+        elif item['italic']:
+            styles['fontName'] = FONT_STYLES[item['font_family']][2]
+        elif item['bold']:
+            styles['fontName'] = FONT_STYLES[item['font_family']][1]
         else:
-            if item['bold'] and item['italic']:
-                style.fontName = FONT_STYLES[item['font_family']][3]
-            elif item['italic']:
-                style.fontName = FONT_STYLES[item['font_family']][2]
-            elif item['bold']:
-                style.fontName = FONT_STYLES[item['font_family']][1]
-            else:
-                style.fontName = FONT_STYLES[item['font_family']][0]
+            styles['fontName'] = FONT_STYLES[item['font_family']][0]
+
+        for update in values_from_signal(
+            signals.event.designer.customize_badge_style.send(item, styles=styles),
+            as_list=True
+        ):
+            styles.update(update)
+
+        style = ParagraphStyle({})
+        style.alignment = styles['alignment']
+        style.textColor = styles['textColor']
+        style.backColor = styles['backColor']
+        style.borderPadding = styles['borderPadding']
+        style.fontSize = styles['fontSize']
+        style.leading = styles['leading']
+        style.fontName = styles['fontName']
 
         item_x = float(item['x']) / PIXELS_CM * cm
         item_y = float(item['y']) / PIXELS_CM * cm
