@@ -49,7 +49,7 @@ export default function CheckboxInput({
         </Field>
       )}
       {!!placesLimit && (
-        <div style={{marginLeft: '1em'}}>
+        <div style={{marginLeft: '1em', display: 'inline-block'}}>
           <PlacesLeft placesLimit={placesLimit} placesUsed={placesUsed} isEnabled={!disabled} />
         </div>
       )}
