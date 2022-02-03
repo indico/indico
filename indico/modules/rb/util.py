@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import os
+import string
 from collections import namedtuple
 from datetime import datetime, time, timedelta
 from io import BytesIO
@@ -329,3 +330,7 @@ def get_prebooking_collisions(reservation):
     from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
     valid_occurrences = reservation.occurrences.filter(ReservationOccurrence.is_valid).all()
     return ReservationOccurrence.find_overlapping_with(reservation.room, valid_occurrences, reservation.id).all()
+
+
+def get_format_placeholders(format_str):
+    return [name for text, name, spec, conv in string.Formatter().parse(format_str) if name is not None]

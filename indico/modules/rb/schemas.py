@@ -34,7 +34,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb.util import get_format_placeholders, rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList,
@@ -400,6 +400,10 @@ class LocationArgs(mm.Schema):
         if missing:
             # validated client-side, no i18n needed
             raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
+
+        placeholders = get_format_placeholders(room_name_format)
+        if invalid := set(placeholders) - {'building', 'floor', 'number'}:
+            raise ValidationError(_('Invalid placeholders: {}').format(', '.join(invalid)))
 
 
 class FeatureArgs(mm.Schema):
