@@ -18,6 +18,7 @@ import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 
 import {getCurrency} from '../../form/selectors';
+import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
 import {Choices, choiceShape} from './ChoicesSetup';
@@ -27,6 +28,7 @@ import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function AccommodationInputComponent({
+  existingValue,
   value,
   onChange,
   disabled,
@@ -35,7 +37,8 @@ function AccommodationInputComponent({
   departure,
   placesUsed,
 }) {
-  // TODO: disable options triggering price changes after payment (or warn for managers)
+  const paid = useSelector(getPaid);
+  const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
   const selectedChoice = choices.find(c => c.id === value.choice);
 
@@ -80,6 +83,9 @@ function AccommodationInputComponent({
       ? moment(value.departureDate).diff(moment(value.arrivalDate), 'days')
       : 0;
 
+  const isPaidChoice = choice => choice.price > 0 && paid;
+  const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
+
   return (
     <div styleName="accommodation-field">
       <table styleName="choice-table">
@@ -91,14 +97,22 @@ function AccommodationInputComponent({
                 <tr key={c.id} styleName="row">
                   <td>
                     <Form.Radio
+                      style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
                       styleName="radio"
-                      label={{children: <ChoiceLabel choice={c} />}}
+                      label={{
+                        children: (
+                          <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
+                        ),
+                      }}
                       key={c.id}
                       value={c.id}
                       disabled={
                         !c.isEnabled ||
                         disabled ||
-                        (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit)
+                        isPaidChoiceLocked(c) ||
+                        (c.placesLimit > 0 &&
+                          (placesUsed[c.id] || 0) >= c.placesLimit &&
+                          c.id !== existingValue.choice)
                       }
                       checked={c.id === value.choice}
                       onChange={makeHandleChange(c)}
@@ -173,10 +187,11 @@ AccommodationInputComponent.propTypes = {
     endDate: PropTypes.string.isRequired,
   }).isRequired,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
-  // TODO: captions - only needed once we deal with real data
+  existingValue: PropTypes.shape({choice: PropTypes.string}).isRequired,
 };
 
 export default function AccommodationInput({
+  id,
   htmlName,
   disabled,
   isRequired,
@@ -185,6 +200,7 @@ export default function AccommodationInput({
   departure,
   placesUsed,
 }) {
+  const existingValue = useSelector(state => getFieldValue(state, id)) || {choice: null};
   const noAccommodationOption = useMemo(
     () => choices.find(c => c.isNoAccommodation && c.isEnabled),
     [choices]
@@ -193,6 +209,7 @@ export default function AccommodationInput({
   return (
     <FinalField
       name={htmlName}
+      existingValue={existingValue}
       component={AccommodationInputComponent}
       required={isRequired}
       disabled={disabled}
@@ -218,6 +235,7 @@ export default function AccommodationInput({
 }
 
 AccommodationInput.propTypes = {
+  id: PropTypes.number.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
@@ -231,7 +249,6 @@ AccommodationInput.propTypes = {
     endDate: PropTypes.string.isRequired,
   }).isRequired,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
-  // TODO: captions - only needed once we deal with real data
 };
 
 AccommodationInput.defaultProps = {

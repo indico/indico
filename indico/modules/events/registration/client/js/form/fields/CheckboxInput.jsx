@@ -15,12 +15,14 @@ import {FinalCheckbox, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form/selectors';
+import {getFieldValue} from '../../form_submission/selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
 
 import styles from '../../../styles/regform.module.scss';
 
 export default function CheckboxInput({
+  id,
   htmlName,
   disabled,
   title,
@@ -30,13 +32,14 @@ export default function CheckboxInput({
   placesUsed,
 }) {
   const currency = useSelector(getCurrency);
+  const existingValue = useSelector(state => getFieldValue(state, id));
 
   return (
     <FinalCheckbox
       fieldProps={{className: styles.field}}
       name={htmlName}
       label={title}
-      disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit)}
+      disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
       required={isRequired}
     >
       {!!price && (
@@ -58,6 +61,7 @@ export default function CheckboxInput({
 }
 
 CheckboxInput.propTypes = {
+  id: PropTypes.number.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   title: PropTypes.string.isRequired,

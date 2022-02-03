@@ -549,9 +549,9 @@ class AccommodationField(RegistrationFormBillableItemsField):
         return dict(super().view_data, places_used=self.get_places_used())
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
-        friendly_data = dict(registration_data.data)
-        if not friendly_data:
+        if not registration_data.data:
             return '' if for_humans or for_search else {}
+        friendly_data = dict(registration_data.data)
         unversioned_data = registration_data.field_data.field.data
         friendly_data['choice'] = unversioned_data['captions'][friendly_data['choice']]
         if not friendly_data.get('is_no_accommodation'):

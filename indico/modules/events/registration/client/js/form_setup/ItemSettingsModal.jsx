@@ -24,11 +24,10 @@ import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, Param} from 'indico/react/i18n';
 
 import {fieldRegistry} from '../form/fields/registry';
-import {getStaticData} from '../form/selectors';
+import {getStaticData, getItemById} from '../form/selectors';
 
 import * as actions from './actions';
 import ItemTypeDropdown from './ItemTypeDropdown';
-import {getItemById} from './selectors';
 
 export default function ItemSettingsModal({id, sectionId, defaultNewItemType, onClose}) {
   const dispatch = useDispatch();

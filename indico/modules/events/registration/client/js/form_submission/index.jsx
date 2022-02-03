@@ -15,12 +15,13 @@ import {setFormData} from './actions';
 import reducers from './reducers';
 import RegistrationFormSubmission from './RegistrationFormSubmission';
 
-export default function setupRegformSetup(root) {
+export default function setupRegformSubmission(root) {
   const {
     eventId,
     regformId,
     currency,
     management,
+    paid,
     moderated = false,
     userInfo = null,
     submitUrl,
@@ -35,6 +36,7 @@ export default function setupRegformSetup(root) {
       eventId: parseInt(eventId, 10),
       regformId: parseInt(regformId, 10),
       management: JSON.parse(management),
+      paid: paid ? JSON.parse(paid) : false,
       moderated: JSON.parse(moderated),
       userInfo: JSON.parse(userInfo),
       submitUrl,

@@ -17,6 +17,7 @@ import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/rea
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form/selectors';
+import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
 import {Choices, choiceShape} from './ChoicesSetup';
@@ -26,6 +27,7 @@ import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function SingleChoiceDropdown({
+  existingValue,
   value,
   onChange,
   disabled,
@@ -34,8 +36,13 @@ function SingleChoiceDropdown({
   withExtraSlots,
   placesUsed,
 }) {
+  const paid = useSelector(getPaid);
+  const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
   const selectedChoice = choices.find(c => c.id in value) || {};
+
+  const isPaidChoice = choice => choice.price > 0 && paid;
+  const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
 
   let extraSlotsDropdown = null;
   if (withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0) {
@@ -45,15 +52,18 @@ function SingleChoiceDropdown({
       text: i,
       disabled:
         selectedChoice.placesLimit > 0 &&
-        (placesUsed[selectedChoice.id] || 0) + i > selectedChoice.placesLimit,
+        (placesUsed[selectedChoice.id] || 0) - (existingValue[selectedChoice.id] || 0) + i >
+          selectedChoice.placesLimit,
     }));
     extraSlotsDropdown = (
       <Form.Select
         options={options}
         disabled={
           disabled ||
+          isPaidChoiceLocked(selectedChoice) ||
           (selectedChoice.placesLimit > 0 &&
-            (placesUsed[selectedChoice.id] || 0) >= selectedChoice.placesLimit)
+            (placesUsed[selectedChoice.id] || 0) - (existingValue[selectedChoice.id] || 0) >=
+              selectedChoice.placesLimit)
         }
         value={value[selectedChoice.id]}
         onChange={(_evt, data) => onChange({[selectedChoice.id]: data.value})}
@@ -65,11 +75,14 @@ function SingleChoiceDropdown({
   const options = choices.map(c => ({
     key: c.id,
     value: c.id,
-    disabled: !c.isEnabled || (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit),
+    disabled:
+      !c.isEnabled ||
+      isPaidChoiceLocked(c) ||
+      (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit && !existingValue[c.id]),
     text: (
       <div styleName="dropdown-text">
         <div styleName="caption">
-          <ChoiceLabel choice={c} />
+          <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
         </div>
         <div styleName="labels">
           {!!c.price && (
@@ -124,9 +137,11 @@ SingleChoiceDropdown.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
+  existingValue: PropTypes.objectOf(PropTypes.number).isRequired,
 };
 
 function SingleChoiceRadioGroup({
+  existingValue,
   value,
   onChange,
   disabled,
@@ -135,6 +150,8 @@ function SingleChoiceRadioGroup({
   withExtraSlots,
   placesUsed,
 }) {
+  const paid = useSelector(getPaid);
+  const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
   const selectedChoice = choices.find(c => c.id in value) || {};
   const radioChoices = [...choices];
@@ -153,6 +170,9 @@ function SingleChoiceRadioGroup({
   const isChecked = (currentChoice, idx) =>
     currentChoice.id === selectedChoice.id || (idx === 0 && !selectedChoice.id);
 
+  const isPaidChoice = choice => choice.price > 0 && paid;
+  const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
+
   return (
     <table styleName="choice-table">
       <tbody>
@@ -161,14 +181,21 @@ function SingleChoiceRadioGroup({
             <tr key={c.id} styleName="row">
               <td>
                 <Form.Radio
+                  style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
                   styleName="radio"
-                  label={{children: <ChoiceLabel choice={c} />}}
+                  label={{
+                    children: (
+                      <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
+                    ),
+                  }}
                   key={c.id}
                   value={c.id}
                   disabled={
                     !c.isEnabled ||
                     disabled ||
-                    (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit)
+                    isPaidChoiceLocked(c) ||
+                    (c.placesLimit > 0 &&
+                      (placesUsed[c.id] || 0) - (existingValue[c.id] || 0) >= c.placesLimit)
                   }
                   checked={isChecked(c, idx)}
                   onChange={() => handleChange(c.id)}
@@ -197,6 +224,12 @@ function SingleChoiceRadioGroup({
                       <Dropdown
                         selection
                         styleName="dropdown"
+                        disabled={
+                          disabled ||
+                          isPaidChoiceLocked(c) ||
+                          (c.placesLimit > 0 &&
+                            (placesUsed[c.id] || 0) - (existingValue[c.id] || 0) >= c.placesLimit)
+                        }
                         value={value[selectedChoice.id]}
                         onChange={(e, data) => onChange({[selectedChoice.id]: data.value})}
                         options={_.range(1, c.maxExtraSlots + 2).map(i => ({
@@ -205,7 +238,10 @@ function SingleChoiceRadioGroup({
                           text: i,
                           disabled:
                             selectedChoice.placesLimit > 0 &&
-                            (placesUsed[selectedChoice.id] || 0) + i > selectedChoice.placesLimit,
+                            (placesUsed[selectedChoice.id] || 0) -
+                              (existingValue[selectedChoice.id] || 0) +
+                              i >
+                              selectedChoice.placesLimit,
                         }))}
                       />
                     )}
@@ -238,9 +274,11 @@ SingleChoiceRadioGroup.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
+  existingValue: PropTypes.objectOf(PropTypes.number).isRequired,
 };
 
 function SingleChoiceInputComponent({
+  existingValue,
   value,
   onChange,
   disabled,
@@ -250,12 +288,12 @@ function SingleChoiceInputComponent({
   withExtraSlots,
   placesUsed,
 }) {
-  // TODO: disable options triggering price changes after payment (or warn for managers)
   let component = null;
   if (itemType === 'dropdown') {
     component = (
       <SingleChoiceDropdown
         value={value}
+        existingValue={existingValue}
         onChange={onChange}
         disabled={disabled}
         isRequired={isRequired}
@@ -268,6 +306,7 @@ function SingleChoiceInputComponent({
     component = (
       <SingleChoiceRadioGroup
         value={value}
+        existingValue={existingValue}
         onChange={onChange}
         disabled={disabled}
         isRequired={isRequired}
@@ -290,10 +329,11 @@ SingleChoiceInputComponent.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
-  // TODO: captions - only needed once we deal with real data
+  existingValue: PropTypes.objectOf(PropTypes.number).isRequired,
 };
 
 export default function SingleChoiceInput({
+  id,
   htmlName,
   disabled,
   isRequired,
@@ -303,6 +343,7 @@ export default function SingleChoiceInput({
   withExtraSlots,
   placesUsed,
 }) {
+  const existingValue = useSelector(state => getFieldValue(state, id)) || {};
   return (
     <FinalField
       name={htmlName}
@@ -316,11 +357,13 @@ export default function SingleChoiceInput({
       choices={choices}
       withExtraSlots={withExtraSlots}
       placesUsed={placesUsed}
+      existingValue={existingValue}
     />
   );
 }
 
 SingleChoiceInput.propTypes = {
+  id: PropTypes.number.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,

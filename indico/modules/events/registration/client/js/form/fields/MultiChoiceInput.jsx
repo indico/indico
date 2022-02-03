@@ -16,6 +16,7 @@ import {FinalCheckbox, FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form/selectors';
+import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
 import {Choices, choiceShape} from './ChoicesSetup';
@@ -25,6 +26,7 @@ import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function MultiChoiceInputComponent({
+  existingValue,
   value,
   onChange,
   disabled,
@@ -32,7 +34,8 @@ function MultiChoiceInputComponent({
   withExtraSlots,
   placesUsed,
 }) {
-  // TODO: disable options triggering price changes after payment (or warn for managers)
+  const paid = useSelector(getPaid);
+  const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
 
   const makeHandleChange = choice => () => {
@@ -47,6 +50,9 @@ function MultiChoiceInputComponent({
     return ((v === 0 ? 0 : choice.extraSlotsPay ? v : 1) * choice.price).toFixed(2);
   };
 
+  const isPaidChoice = choice => choice.price > 0 && paid;
+  const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
+
   return (
     <table styleName="choice-table">
       <tbody>
@@ -60,11 +66,22 @@ function MultiChoiceInputComponent({
                   disabled={
                     !choice.isEnabled ||
                     disabled ||
-                    (choice.placesLimit > 0 && (placesUsed[choice.id] || 0) >= choice.placesLimit)
+                    isPaidChoiceLocked(choice) ||
+                    (choice.placesLimit > 0 &&
+                      (placesUsed[choice.id] || 0) >= choice.placesLimit &&
+                      !existingValue[choice.id])
                   }
                   checked={!!value[choice.id]}
                   onChange={makeHandleChange(choice)}
-                  label={{children: <ChoiceLabel choice={choice} />}}
+                  label={{
+                    children: (
+                      <ChoiceLabel
+                        choice={choice}
+                        management={management}
+                        paid={isPaidChoice(choice)}
+                      />
+                    ),
+                  }}
                 />
               </td>
               <td>
@@ -91,8 +108,10 @@ function MultiChoiceInputComponent({
                       styleName="dropdown"
                       disabled={
                         disabled ||
+                        isPaidChoiceLocked(choice) ||
                         (choice.placesLimit > 0 &&
-                          (placesUsed[choice.id] || 0) >= choice.placesLimit)
+                          (placesUsed[choice.id] || 0) - (existingValue[choice.id] || 0) >=
+                            choice.placesLimit)
                       }
                       value={value[choice.id] || 0}
                       onChange={makeHandleSlotsChange(choice)}
@@ -102,7 +121,8 @@ function MultiChoiceInputComponent({
                         text: i,
                         disabled:
                           choice.placesLimit > 0 &&
-                          (placesUsed[choice.id] || 0) + i > choice.placesLimit,
+                          (placesUsed[choice.id] || 0) - (existingValue[choice.id] || 0) + i >
+                            choice.placesLimit,
                       }))}
                     />
                   )}
@@ -135,10 +155,11 @@ MultiChoiceInputComponent.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
-  // TODO: captions - only needed once we deal with real data
+  existingValue: PropTypes.objectOf(PropTypes.number).isRequired,
 };
 
 export default function MultiChoiceInput({
+  id,
   htmlName,
   disabled,
   isRequired,
@@ -146,6 +167,7 @@ export default function MultiChoiceInput({
   withExtraSlots,
   placesUsed,
 }) {
+  const existingValue = useSelector(state => getFieldValue(state, id)) || {};
   return (
     <FinalField
       name={htmlName}
@@ -156,11 +178,13 @@ export default function MultiChoiceInput({
       choices={choices}
       withExtraSlots={withExtraSlots}
       placesUsed={placesUsed}
+      existingValue={existingValue}
     />
   );
 }
 
 MultiChoiceInput.propTypes = {
+  id: PropTypes.number.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,

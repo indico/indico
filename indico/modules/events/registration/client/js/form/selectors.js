@@ -13,6 +13,13 @@ export const getStaticData = state => state.staticData;
 export const getFlatSections = state => state.sections;
 export const getItems = state => state.items;
 
+/** Get an item by its ID. */
+export const getItemById = createSelector(
+  getItems,
+  (__, itemId) => itemId,
+  (fields, itemId) => fields[itemId]
+);
+
 /** Get the currency used by the registration form. */
 export const getCurrency = createSelector(
   getStaticData,

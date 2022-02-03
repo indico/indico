@@ -49,6 +49,12 @@
     }
   }
 
+  // TODO find something nicer... in legacy it's gray so we could for that again unless
+  // we find something nicer.
+  &.paid-disabled {
+    background: $light-yellow;
+  }
+
   > .content {
     flex-grow: 1;
 

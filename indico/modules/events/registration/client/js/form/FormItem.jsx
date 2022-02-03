@@ -7,13 +7,36 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Form} from 'semantic-ui-react';
+import {useSelector} from 'react-redux';
+import {Form, Icon, Popup} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
 import {Markdown, toClasses} from 'indico/react/util';
+
+import {getManagement, isPaidItemLocked} from '../form_submission/selectors';
 
 import {fieldRegistry} from './fields/registry';
 
 import '../../styles/regform.module.scss';
+
+function PaidItemLocked({management}) {
+  const lockedMsg = (
+    <Translate>This field is locked since changing it could trigger a price change.</Translate>
+  );
+  const msg = !management ? (
+    lockedMsg
+  ) : (
+    <>
+      {lockedMsg} <Translate>As a manager you can modify it nonetheless.</Translate>
+    </>
+  );
+
+  return <Popup trigger={<Icon name={management ? 'lock open' : 'lock'} />}>{msg}</Popup>;
+}
+
+PaidItemLocked.propTypes = {
+  management: PropTypes.bool.isRequired,
+};
 
 export default function FormItem({
   title,
@@ -26,30 +49,40 @@ export default function FormItem({
   setupActions,
   ...rest
 }) {
+  // TODO move outside like with setupActions etc?
+  const paidItemLocked = useSelector(state => isPaidItemLocked(state, rest.id));
+  const isManagement = useSelector(getManagement);
+
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
   return (
-    <div styleName={`form-item ${toClasses({disabled: !isEnabled, editable: setupMode})}`}>
+    <div
+      styleName={`form-item ${toClasses({
+        'disabled': !isEnabled || paidItemLocked,
+        'paid-disabled': paidItemLocked,
+        'editable': setupMode,
+      })}`}
+    >
       {sortHandle}
       <div styleName="content">
         {InputComponent ? (
           meta.customFormItem ? (
             <InputComponent
               isRequired={isRequired || meta.alwaysRequired}
-              disabled={!isEnabled}
+              disabled={!isEnabled || (paidItemLocked && !isManagement)}
               {...inputProps}
             />
           ) : (
             <Form.Field
               required={isRequired || meta.alwaysRequired}
-              disabled={!isEnabled}
+              disabled={!isEnabled || (paidItemLocked && !isManagement)}
               styleName="field"
             >
               <label>{title}</label>
               <InputComponent
                 isRequired={isRequired || meta.alwaysRequired}
-                disabled={!isEnabled}
+                disabled={!isEnabled || (paidItemLocked && !isManagement)}
                 {...inputProps}
               />
             </Form.Field>
@@ -64,6 +97,7 @@ export default function FormItem({
         )}
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
+      {paidItemLocked && <PaidItemLocked management={isManagement} />}
     </div>
   );
 }

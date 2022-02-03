@@ -56,6 +56,7 @@ class RegistrationEditMixin:
                              for r in self.registration.data if r.user_data is not None}
         file_data = self._get_file_data()
 
+        # TODO remove with angular
         registration_metadata = {
             'paid': self.registration.is_paid,
             'manager': self.management
@@ -68,6 +69,7 @@ class RegistrationEditMixin:
                                                payment_enabled=self.event.has_feature('payment'),
                                                registration=self.registration,
                                                management=self.management,
+                                               paid=self.registration.is_paid,
                                                registration_data=registration_data,
                                                file_data=file_data,
                                                registration_metadata=registration_metadata)

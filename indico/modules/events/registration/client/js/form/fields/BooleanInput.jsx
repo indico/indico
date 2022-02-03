@@ -14,12 +14,14 @@ import {FinalDropdown, FinalField, FinalInput, validators as v} from 'indico/rea
 import {Translate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form/selectors';
+import {getFieldValue} from '../../form_submission/selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
 
 import styles from '../../../styles/regform.module.scss';
 
 function BooleanInputComponent({
+  id,
   value,
   onChange,
   disabled,
@@ -29,6 +31,8 @@ function BooleanInputComponent({
   placesUsed,
 }) {
   const currency = useSelector(getCurrency);
+  const existingValue = useSelector(state => getFieldValue(state, id));
+
   const makeOnClick = newValue => () => {
     if (value === newValue && !required) {
       onChange(null);
@@ -43,7 +47,7 @@ function BooleanInputComponent({
         <Button
           type="button"
           active={value === true}
-          disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit)}
+          disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
           onClick={makeOnClick(true)}
         >
           <Translate>Yes</Translate>
@@ -72,6 +76,7 @@ function BooleanInputComponent({
 }
 
 BooleanInputComponent.propTypes = {
+  id: PropTypes.number.isRequired,
   value: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
@@ -86,6 +91,7 @@ BooleanInputComponent.defaultProps = {
 };
 
 export default function BooleanInput({
+  id,
   htmlName,
   disabled,
   title,
@@ -99,6 +105,7 @@ export default function BooleanInput({
 
   return (
     <FinalField
+      id={id}
       name={htmlName}
       label={title}
       component={BooleanInputComponent}
@@ -115,6 +122,7 @@ export default function BooleanInput({
 }
 
 BooleanInput.propTypes = {
+  id: PropTypes.number.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   title: PropTypes.string.isRequired,

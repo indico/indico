@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-import {getStaticData, getFlatSections, getItems} from '../form/selectors';
+import {getStaticData, getFlatSections, getItems, getItemById} from '../form/selectors';
 
 export const isUILocked = state => state.uiLocked;
 
@@ -30,13 +30,6 @@ export const getSectionIdForItem = createSelector(
   getItems,
   (__, itemId) => itemId,
   (fields, itemId) => fields[itemId].sectionId
-);
-
-/** Get an item by its ID. */
-export const getItemById = createSelector(
-  getItems,
-  (__, itemId) => itemId,
-  (fields, itemId) => fields[itemId]
 );
 
 /** Check whether an item is a static text field. */
