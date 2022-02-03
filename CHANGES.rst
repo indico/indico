@@ -24,6 +24,12 @@ Bugfixes
 - Fix error when exporting registrations to PDFs that contained certain invalid HTML-like
   sequences (:pr:`5233`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``category-sidebar`` template hook and blocks around category sidebar
+  sections (:pr:`5237`, thanks :user:`omegak`)
+
 
 Version 3.1
 -----------
