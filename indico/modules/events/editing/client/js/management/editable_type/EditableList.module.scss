@@ -15,6 +15,23 @@ $border: 1px solid $pastel-gray;
   justify-content: space-between;
 }
 
+.filters {
+  display: flex;
+  flex-direction: column;
+  margin: 0.4em;
+}
+
+:global(.ui.label).filter {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.4em;
+}
+
+:global(.ui.label).filter .right {
+  margin-left: auto;
+  padding-left: 1em;
+}
+
 .editable-list {
   .table {
     font-family: 'Muli', 'Helvetica Neue', Arial, Helvetica, sans-serif;

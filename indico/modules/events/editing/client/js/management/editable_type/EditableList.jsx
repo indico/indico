@@ -702,27 +702,22 @@ function EditableListFilter({filterOptions, activeFilters, onChange}) {
         <Dropdown.Menu>
           {activeFilters.filters.length > 0 ? (
             <>
-              <div key="_filters" style={{display: 'flex', flexWrap: 'wrap'}}>
+              <div styleName="filters">
                 {activeFilters.filters.map(({key, filter, selectedOption}) => (
-                  <Label
-                    key={key}
-                    style={{marginTop: '0.4em', marginLeft: '0.4em', marginRight: '0.4em'}}
-                    className="fluid"
-                    color="orange"
-                  >
+                  <Label key={key} styleName="filter" className="fluid" color="orange">
                     {filter.text}
+                    <Label.Detail className="float right">
+                      {filter.options.find(o => o.value === selectedOption).text}
+                    </Label.Detail>
                     <Icon
                       name="delete"
-                      className="float right"
+                      styleName="right"
                       onClick={evt => {
                         evt.stopPropagation();
                         setOpenSubmenu(-1);
                         removeFilter(key);
                       }}
                     />
-                    <Label.Detail className="float right">
-                      {filter.options.find(o => o.value === selectedOption).text}
-                    </Label.Detail>
                   </Label>
                 ))}
               </div>
