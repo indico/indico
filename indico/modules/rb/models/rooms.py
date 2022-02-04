@@ -78,13 +78,13 @@ class Room(ProtectionManagersMixin, db.Model):
     )
     floor = db.Column(
         db.String,
-        default='',
-        nullable=False
+        nullable=False,
+        default=''
     )
     number = db.Column(
         db.String,
-        default='',
-        nullable=False
+        nullable=False,
+        default=''
     )
     notification_emails = db.Column(
         ARRAY(db.String),
