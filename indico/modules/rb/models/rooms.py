@@ -74,7 +74,8 @@ class Room(ProtectionManagersMixin, db.Model):
     )
     building = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
+        default=''
     )
     floor = db.Column(
         db.String,
