@@ -18,16 +18,14 @@ objects are passed in the `registrations` kwarg and it may be modified.
 
 update_badge_style = _signals.signal('update-badge-style', '''
 Called when printing a badge.
-
 Each `item` in a badge and it's `styles` are passed in the kwarg.
-The return value is dictionary which is used to update the item `style`.
+The signal returns a dictionary which is used to update the item `style`.
 ''')
 
 draw_item_on_badge = _signals.signal('draw-item-on-badge', '''
 Called when drawing a badge for a given registration on a pdf.
+The `updates` is the sender, and is a dictionary containing the
+information required to draw the items on a pdf at the given position.
 
-The `updates` is a dictionary containing information required to
-draw the items on a pdf at the given position.
-
-The return value is dictionary with the updates.
+The signal returns a dictionary of the updates.
 ''')
