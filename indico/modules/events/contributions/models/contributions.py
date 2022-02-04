@@ -549,6 +549,12 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
             return True
         return False
 
+    def can_edit(self, user):
+        # Submitters can edit their own contributions if configured
+        from indico.modules.events.contributions import contribution_settings
+        submitters_can_edit = contribution_settings.get(self.event, 'submitters_can_edit')
+        return self.can_manage(user, permission=('submit' if submitters_can_edit else None))
+
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)

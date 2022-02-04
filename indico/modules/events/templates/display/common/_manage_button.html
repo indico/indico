@@ -104,7 +104,7 @@
                     {{ _render_note_editor(item) }}
                 {% endif %}
             {% endif %}
-            {% if item.can_manage(session.user) %}
+            {% if item.can_edit(session.user) %}
                 <li>
                     <a href="" class="contribution-edit"
                                data-href="{{ url_for('contributions.manage_update_contrib', item) }}"
@@ -112,6 +112,8 @@
                         {% trans %}Edit contribution{% endtrans %}
                     </a>
                 </li>
+            {% endif %}
+            {% if item.can_manage(session.user) %}
                 <li>
                     <a href=""
                        data-href="{{ url_for('contributions.manage_contrib_protection', item) }}"
@@ -128,7 +130,7 @@
                     {{ _render_note_editor(item) }}
                 {% endif %}
             {% endif %}
-            {% if item.can_manage(session.user) %}
+            {% if item.can_edit(session.user) %}
                 <li>
                     <a href=""
                        class="subcontribution-edit"

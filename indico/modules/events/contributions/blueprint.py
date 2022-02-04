@@ -102,6 +102,10 @@ _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>/delete', 'de
 _bp.add_url_rule('/manage/contributions/duration', 'manage_default_duration',
                  management.RHManageDefaultContributionDuration, methods=('GET', 'POST'))
 
+# Allow editing by submitters
+_bp.add_url_rule('/manage/contributions/submitter-edits', 'manage_submitter_edits',
+                 management.RHManageSubmitterEdits, methods=('GET', 'POST'))
+
 # Publish contribution
 _bp.add_url_rule('/manage/contributions/published', 'manage_publication',
                  management.RHManageContributionPublicationREST, methods=('GET', 'PUT', 'DELETE'))

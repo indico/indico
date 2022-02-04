@@ -111,7 +111,8 @@ class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
             return jsonify_data(entries=[serialize_entry_update(entry, session_=self.session)],
                                 notifications=notifications)
         self.commit = False
-        return jsonify_template('events/contributions/forms/contribution.html', form=form, fields=form._display_fields)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form, fields=form._display_fields,
+                                can_manage=True)
 
 
 class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
@@ -197,7 +198,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
             elif not form.is_submitted():
                 handle_legacy_description(form.description, contrib)
             return jsonify_template('events/contributions/forms/contribution.html', form=form,
-                                    fields=form._display_fields)
+                                    fields=form._display_fields, can_manage=True)
         elif self.entry.break_:
             break_ = self.entry.break_
             tt_entry_dt = self.entry.start_dt.astimezone(self.event.tzinfo)

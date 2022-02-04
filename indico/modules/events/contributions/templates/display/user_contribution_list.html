@@ -17,7 +17,7 @@
                                 </a>
                             </span>
                             <div class="group">
-                                {% if contrib.can_manage(session.user) -%}
+                                {% if contrib.can_edit(session.user) -%}
                                     <a href="#" class="icon-edit js-edit-contribution"
                                        title="{% trans %}Edit this contribution{% endtrans %}"
                                        data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"

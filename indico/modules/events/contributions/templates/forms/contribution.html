@@ -6,10 +6,14 @@
     {{ form_header(form) }}
     {{ form_row(form.title) }}
     {{ form_row(form.description, widget_attrs={'rows': 10}) }}
-    {{ form_rows(form, fields=fields|default(none), skip=skip_fields) }}
-    {% call form_fieldset(_('Advanced'), collapsible=true) %}
-        {{ form_rows(form, fields=form.custom_field_names + ('references', 'board_number', 'code')) }}
-    {% endcall %}
+    {% if can_manage %}
+        {{ form_rows(form, fields=fields|default(none), skip=skip_fields) }}
+        {% call form_fieldset(_('Advanced'), collapsible=true) %}
+            {{ form_rows(form, fields=form.custom_field_names + ('references', 'board_number', 'code')) }}
+        {% endcall %}
+    {% else %}
+        {{ form_rows(form, fields=form._submitter_editable_fields, skip=('title', 'description')) }}
+    {% endif %}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
         <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>

@@ -12,6 +12,7 @@ Improvements
 
 - Prompt before leaving the event protection page without saving changes (:pr:`5222`)
 - Add the ability to clone abstracts (:pr:`5217`)
+- Add setting to allow submitters to edit their own contributions (:pr:`5213`)
 
 Bugfixes
 ^^^^^^^^

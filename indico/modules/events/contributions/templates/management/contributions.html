@@ -41,6 +41,15 @@
                    data-qtip-position="right">
                     {% trans %}Custom fields{% endtrans %}</a>
             </li>
+            <li>
+                <a href="#"
+                   title="{% trans %}Submitter privileges{% endtrans %}"
+                   data-ajax-dialog
+                   data-title="{% trans %}Submitter privileges{% endtrans %}"
+                   data-href="{{ url_for('.manage_submitter_edits', event) }}"
+                   data-qtip-position="right">
+                    {% trans %}Submitter privileges{% endtrans %}</a>
+            </li>
         </ul>
     {%- endif -%}
     <div id="pub-switch" data-event-id="{{ event.id }}"></div>

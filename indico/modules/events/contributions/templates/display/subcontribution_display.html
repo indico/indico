@@ -31,7 +31,7 @@
 
 {% block page_actions -%}
     <div class="toolbar">
-        {% if subcontrib.can_manage(session.user) -%}
+        {% if subcontrib.can_edit(session.user) -%}
             <a href="#" class="i-button icon-edit"
                data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
                data-href="{{ url_for('.manage_edit_subcontrib', subcontrib) }}"
