@@ -9,6 +9,7 @@ from flask import jsonify, request, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.payment import payment_event_settings
+from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import (get_event_section_data, get_flat_section_submission_data,
                                                      make_registration_schema, modify_registration)
@@ -34,8 +35,10 @@ class RegistrationFormMixin:
 
 class RegistrationEditMixin:
     def _get_file_data(self):
-        return {r.user_data: {'filename': r.filename, 'size': r.size} for r in self.registration.data
-                if r.field_data.field.input_type == 'file' and r.user_data}
+        return {r.field_data.field.html_field_name: {'filename': r.filename, 'size': r.size,
+                                                     'uuid': KEEP_EXISTING_FILE_UUID}
+                for r in self.registration.data
+                if r.field_data.field.field_impl.is_file_field and r.storage_file_id is not None}
 
     def _process_POST(self):
         schema = make_registration_schema(self.regform, management=self.management, registration=self.registration)()
@@ -52,9 +55,10 @@ class RegistrationEditMixin:
                                                      registration=self.registration)
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
                                                             registration=self.registration))
-        registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
-                             for r in self.registration.data if r.user_data is not None}
         file_data = self._get_file_data()
+        registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
+                             for r in self.registration.data
+                             if r.user_data is not None or r.field_data.field.html_field_name in file_data}
 
         # TODO remove with angular
         registration_metadata = {

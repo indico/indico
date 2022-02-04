@@ -20,28 +20,9 @@ import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
 export default function FileInput({htmlName, disabled, isRequired}) {
-  const {eventId, regformId, registrationData, fileData} = useSelector(getStaticData);
+  const {eventId, regformId, fileData} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
-  let initialFileDetails = null;
-
-  if (isUpdateMode) {
-    const uuid = registrationData[htmlName];
-    const {filename, size} = fileData[uuid] || {};
-
-    if (uuid) {
-      initialFileDetails = {
-        filename,
-        size,
-        uuid,
-        upload: {
-          failed: false,
-          ongoing: false,
-          finished: true,
-          progress: 100,
-        },
-      };
-    }
-  }
+  const initialFileDetails = isUpdateMode ? fileData[htmlName] || null : null;
 
   return (
     <FinalSingleFileManager

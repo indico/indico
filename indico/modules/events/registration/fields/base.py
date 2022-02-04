@@ -36,6 +36,8 @@ class RegistrationFormFieldBase:
     setup_schema_base_cls = mm.Schema
     #: a dict with extra marshmallow fields to include in the setup schema
     setup_schema_fields = {}
+    #: whether this field is assocated with a file instead of normal data
+    is_file_field = False
 
     def __init__(self, form_item):
         self.form_item = form_item

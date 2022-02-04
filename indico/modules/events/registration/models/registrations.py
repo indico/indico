@@ -680,6 +680,9 @@ class RegistrationData(StoredFileMixin, db.Model):
 
     @property
     def user_data(self):
+        from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
+        if self.field_data.field.field_impl.is_file_field:
+            return KEEP_EXISTING_FILE_UUID if self.storage_file_id is not None else None
         return self.data
 
     def _set_file(self, file):

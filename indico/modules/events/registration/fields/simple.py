@@ -8,9 +8,7 @@
 from datetime import datetime
 from operator import itemgetter
 
-from marshmallow import ValidationError as MMValidationError
-from marshmallow import fields, pre_load, validate, validates_schema
-from wtforms.validators import ValidationError
+from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
@@ -22,6 +20,12 @@ from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
 from indico.util.marshmallow import UUIDString
 from indico.util.string import validate_email
+
+
+# we use a special UUID that's never generated as a valid uuid4 to indicate that the
+# user did not change the file in a file upload field but wants to keep the existing
+# one instead
+KEEP_EXISTING_FILE_UUID = '00000000-0000-0000-0000-000000000001'
 
 
 class TextField(RegistrationFormFieldBase):
@@ -40,7 +44,7 @@ class NumberFieldDataSchema(BillableFieldDataSchema):
     @validates_schema(skip_on_field_errors=True)
     def validate_min_max(self, data, **kwargs):
         if data['min_value'] and data['max_value'] and data['min_value'] > data['max_value']:
-            raise MMValidationError('Maximum value must be less than minimum value', 'max_value')
+            raise ValidationError('Maximum value must be less than minimum value', 'max_value')
 
 
 class NumberField(RegistrationFormBillableField):
@@ -113,7 +117,7 @@ class CheckboxField(RegistrationFormBillableField):
             if new_data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
                 if not places_left:
-                    raise MMValidationError(_('There are no places left for this option.'))
+                    raise ValidationError(_('There are no places left for this option.'))
         return _check_number_of_places
 
     @property
@@ -167,7 +171,7 @@ class DateField(RegistrationFormFieldBase):
             try:
                 datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S')
             except ValueError:
-                raise MMValidationError(_('Invalid date'))
+                raise ValidationError(_('Invalid date'))
             return True
         return _validate_date
 
@@ -228,7 +232,7 @@ class BooleanField(RegistrationFormBillableField):
             if new_data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
                 if new_data and not places_left:
-                    raise MMValidationError(_('There are no places left for this option.'))
+                    raise ValidationError(_('There are no places left for this option.'))
         return _check_number_of_places
 
     @property
@@ -278,20 +282,38 @@ class CountryField(RegistrationFormFieldBase):
 class FileField(RegistrationFormFieldBase):
     name = 'file'
     mm_field_class = UUIDString
+    mm_field_kwargs = {'allow_none': True}
+    is_file_field = True
+
+    def has_data_changed(self, value, old_data):
+        if value == KEEP_EXISTING_FILE_UUID:
+            return False
+        return value != old_data.user_data
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
-        data = {'field_data': self.form_item.current_data}
-        if not value:
-            data['file'] = None
+        # `value` is the UUID of the file (either a real one pointing to a newly uploaded File or
+        # the special one in KEEP_VALUE_UUID) or None (no file specified / remove existing)
+        data = super().process_form_data(registration, value, old_data, billable_items_locked)
+        if not data:
+            # we get an empty dict if `has_data_changed` returned False; in that case we do not
+            # want to touch the file to avoid duplicating it on the server
             return data
 
-        if file := File.query.filter(File.uuid == value, ~File.claimed).first():
-            # we have a file -> always save it
-            data['file'] = file
-            data['data'] = str(file.uuid)
-        else:
-            # TODO: Handle this case when we remove wtforms from regform submission
+        # if we're here we either got None or a real uuid
+        file = File.query.filter(File.uuid == value, ~File.claimed).first() if value else None
+        if value and not file:
             raise ValidationError(_('Invalid file UUID'))
+
+        # we don't want to keep the uuid - while convenient, no registration created before v3.2 has
+        # this data, and we don't want to break editing those registrations even if it's very unlikely
+        # that someone needs to edit a registration that was created with an earlier version and has
+        # a file field...
+        data['data'] = None
+        # pass a reference to the file; the RegistrationData model has a property setter for `file`
+        # which will take care of copying the file into storage. once again, it would be cleaner if
+        # we just used the new `File` model and referenced it, but changing that for all the existing
+        # registrations would be a big mess...
+        data['file'] = file
         return data
 
     @property
@@ -311,6 +333,6 @@ class EmailField(RegistrationFormFieldBase):
     def get_validators(self, existing_registration):
         def _indico_email(value):
             if value and not validate_email(value):
-                raise MMValidationError(_('Invalid email address'))
+                raise ValidationError(_('Invalid email address'))
 
         return _indico_email
