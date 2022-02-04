@@ -112,16 +112,10 @@ class LocationPage extends React.PureComponent {
           if (rv) {
             return rv;
           }
-          const validPlaceholders = ['{building}', '{floor}', '{number}'];
-          const missing = validPlaceholders.filter(x => !val.includes(x));
-          if (missing.length) {
-            return PluralTranslate.string(
-              'Missing placeholder: {placeholders}',
-              'Missing placeholders: {placeholders}',
-              missing.length,
-              {placeholders: missing.join(', ')}
-            );
+          if (!val.includes('{number}')) {
+            return Translate.string('Missing placeholder: number');
           }
+          const validPlaceholders = ['{building}', '{floor}', '{number}'];
           const placeholders = [...val.matchAll(/\{.*?\}/g)].map(match => match[0]);
           const invalid = placeholders.filter(ph => !validPlaceholders.includes(ph));
           if (invalid.length) {
@@ -133,6 +127,12 @@ class LocationPage extends React.PureComponent {
             );
           }
         }}
+        description={
+          <Translate>
+            Specify the room name format using any of the following placeholders:{' '}
+            <Param name="placeholders" wrapper={<code />} value="{building}, {floor}, {number}" />
+          </Translate>
+        }
       />
       <FinalDropdown
         name="_map_url_template_choice"
