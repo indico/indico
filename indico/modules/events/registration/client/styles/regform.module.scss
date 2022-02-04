@@ -35,7 +35,8 @@
 
 .form-item {
   display: flex;
-  padding-top: 7px;
+  margin-top: 4px;
+  padding-top: 3px;
 
   &:last-child {
     padding-bottom: 7px;
@@ -49,14 +50,32 @@
     }
   }
 
-  // TODO find something nicer... in legacy it's gray so we could for that again unless
-  // we find something nicer.
   &.paid-disabled {
-    background: $light-yellow;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255, 229, 184, 0.5),
+      rgba(255, 229, 184, 0.5) 10px,
+      #fff 10px,
+      #fff 20px
+    );
   }
 
   > .content {
     flex-grow: 1;
+
+    // Prevent stacking opacity on form fields
+    :global(.field.disabled) :global(.field.disabled) {
+      opacity: 1;
+    }
+
+    // Prevent stacking opacity on SUI Buttons
+    :global(.field.disabled) :global(.button.disabled) {
+      opacity: 1 !important;
+    }
+
+    :global(.field.disabled) {
+      opacity: 0.8;
+    }
 
     .label {
       max-width: 500px;
