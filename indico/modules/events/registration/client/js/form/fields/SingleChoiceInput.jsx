@@ -213,7 +213,7 @@ function SingleChoiceRadioGroup({
                   <PlacesLeft
                     placesLimit={c.placesLimit}
                     placesUsed={placesUsed[c.id] || 0}
-                    isEnabled={c.isEnabled}
+                    isEnabled={!disabled && c.isEnabled && !isPaidChoiceLocked(c)}
                   />
                 )}
               </td>

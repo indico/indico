@@ -62,6 +62,7 @@ function MultiChoiceInputComponent({
               <td>
                 <Checkbox
                   styleName="checkbox"
+                  style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
                   value={choice.id}
                   disabled={
                     !choice.isEnabled ||
@@ -96,7 +97,7 @@ function MultiChoiceInputComponent({
                   <PlacesLeft
                     placesLimit={choice.placesLimit}
                     placesUsed={placesUsed[choice.id] || 0}
-                    isEnabled={choice.isEnabled}
+                    isEnabled={!disabled && choice.isEnabled && !isPaidChoiceLocked(choice)}
                   />
                 )}
               </td>
