@@ -113,19 +113,14 @@ class DesignerPDFBase:
             styles['fontName'] = FONT_STYLES[item['font_family']][0]
 
         for update in values_from_signal(
-            signals.event.designer.customize_badge_style.send(item, styles=styles),
+            signals.event.designer.update_badge_style.send(item, styles=styles),
             as_list=True
         ):
             styles.update(update)
 
         style = ParagraphStyle({})
-        style.alignment = styles['alignment']
-        style.textColor = styles['textColor']
-        style.backColor = styles['backColor']
-        style.borderPadding = styles['borderPadding']
-        style.fontSize = styles['fontSize']
-        style.leading = styles['leading']
-        style.fontName = styles['fontName']
+        for key, value in styles.items():
+            setattr(style, key, value)
 
         item_x = float(item['x']) / PIXELS_CM * cm
         item_y = float(item['y']) / PIXELS_CM * cm

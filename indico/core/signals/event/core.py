@@ -109,8 +109,8 @@ original representation (fields to add or override).
 ''')
 
 hide_participant_list = _signals.signal('hide-participant-list', '''
-Expected to return a bool value to override the condition for when the
-Participant list menu should be displayed on the Event page.
+The `event` object is the sender.
 
-The *event* kwarg contains the event object.
+The signal should return a bool to determine if the Participant list menu
+should be displayed on the Event page.
 ''')

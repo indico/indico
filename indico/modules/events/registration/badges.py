@@ -13,10 +13,12 @@ from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
 from werkzeug.exceptions import BadRequest
 
+from indico.core import signals
 from indico.modules.designer.pdf import DesignerPDFBase
 from indico.modules.events.registration.settings import DEFAULT_BADGE_SETTINGS
 from indico.util.i18n import _
 from indico.util.placeholders import get_placeholders
+from indico.util.signals import values_from_signal
 
 
 FONT_SIZE_RE = re.compile(r'(\d+)(pt)?')
@@ -98,6 +100,21 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                 text = item['text']
             else:
                 continue
+
+            updates = {
+                'item': item,
+                'items': items,
+                'text': text,
+                'registration': registration,
+                'height': self.height,
+                'width': self.width,
+                'pos_x': pos_x,
+                'pos_y': pos_y
+            }
+            for update in values_from_signal(
+                signals.event.designer.draw_item_on_badge.send(updates),as_list=True):
+                updates.update(update)
+            item, text, pos_x, pos_y = updates['item'], updates['text'], updates['pos_x'], updates['pos_y']
 
             self._draw_item(canvas, item, tpl_data, text, pos_x, pos_y)
 
