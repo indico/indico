@@ -15,21 +15,42 @@ $border: 1px solid $pastel-gray;
   justify-content: space-between;
 }
 
-.filters {
+.filters-menu {
+  max-width: 15em;
+}
+
+.active-filters {
   display: flex;
   flex-direction: column;
   margin: 0.4em;
+  gap: 0.4em;
 }
 
 :global(.ui.label).filter {
   display: flex;
-  align-items: center;
-  margin: 0 0 0.4em;
-}
+  margin: 0;
 
-:global(.ui.label).filter .right {
-  margin-left: auto;
-  padding-left: 1em;
+  p {
+    margin-block-end: 0;
+  }
+
+  :global(.detail) {
+    overflow: hidden;
+
+    p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:not(:last-child) {
+        margin-block-end: 0.1em;
+      }
+    }
+  }
+
+  .right {
+    margin-left: auto;
+    padding-left: 1em;
+  }
 }
 
 .editable-list {
