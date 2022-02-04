@@ -24,6 +24,7 @@ Bugfixes
 - Remove excessive padding around category titles (:pr:`5225`)
 - Fix error when exporting registrations to PDFs that contained certain invalid HTML-like
   sequences (:pr:`5233`)
+- Restore logical order of registration list columns (:pr:`5240`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
