@@ -35,7 +35,7 @@ export const getModeration = createSelector(
 /** Indicates whether this is rendered in the mangement area */
 export const getManagement = createSelector(
   getStaticData,
-  staticData => staticData.management
+  staticData => staticData.management || false
 );
 
 /** Indicates whether this registration has alreadyt been paid */
