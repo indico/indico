@@ -112,7 +112,9 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                 'pos_y': pos_y
             }
             for update in values_from_signal(
-                signals.event.designer.draw_item_on_badge.send(updates),as_list=True):
+                signals.event.designer.draw_item_on_badge.send(updates),
+                as_list=True
+            ):
                 updates.update(update)
             item, text, pos_x, pos_y = updates['item'], updates['text'], updates['pos_x'], updates['pos_y']
 
