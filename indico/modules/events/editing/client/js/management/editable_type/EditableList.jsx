@@ -622,38 +622,6 @@ const filterShape = {
   ).isRequired,
 };
 
-function EditableListFilterSubmenu({filter, toggleFilter, open, onOpen, isSelectedOption}) {
-  return (
-    <Dropdown
-      scrolling
-      icon={null}
-      className="item"
-      direction="right"
-      onOpen={onOpen}
-      onBlur={evt => evt.stopPropagation()}
-      open={open}
-      disabled={filter.options.length === 0}
-      trigger={<Dropdown.Item text={filter.text} icon="plus" />}
-      options={_.sortBy(filter.options, 'text').map(({value, text}) => ({
-        key: value,
-        value,
-        text,
-        active: isSelectedOption(value),
-        selected: false,
-        onClick: (evt, {value: v}) => toggleFilter(filter, v),
-      }))}
-    />
-  );
-}
-
-EditableListFilterSubmenu.propTypes = {
-  filter: PropTypes.shape(filterShape).isRequired,
-  toggleFilter: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
-  onOpen: PropTypes.func.isRequired,
-  isSelectedOption: PropTypes.func.isRequired,
-};
-
 function EditableListFilter({filterOptions, activeFilters, onChange}) {
   const [openSubmenu, setOpenSubmenu] = useState(-1);
 
@@ -683,7 +651,7 @@ function EditableListFilter({filterOptions, activeFilters, onChange}) {
     }
   };
 
-  const makeIsSelectedOption = filterKey => option =>
+  const isSelectedOption = (filterKey, option) =>
     activeFilters.filters.find(f => f.filter.key === filterKey)?.selectedOptions.includes(option);
 
   return (
@@ -734,13 +702,25 @@ function EditableListFilter({filterOptions, activeFilters, onChange}) {
           )}
           <Dropdown.Divider />
           {_.sortBy(filterOptions, 'text').map(filter => (
-            <EditableListFilterSubmenu
+            <Dropdown
               key={filter.key}
-              filter={filter}
-              toggleFilter={toggleFilter}
-              open={openSubmenu === filter.key}
+              scrolling
+              icon={null}
+              className="item"
+              direction="right"
               onOpen={() => setOpenSubmenu(filter.key)}
-              isSelectedOption={makeIsSelectedOption(filter.key)}
+              onBlur={evt => evt.stopPropagation()}
+              open={openSubmenu === filter.key}
+              disabled={filter.options.length === 0}
+              trigger={<Dropdown.Item text={filter.text} icon="plus" />}
+              options={_.sortBy(filter.options, 'text').map(({value, text}) => ({
+                key: value,
+                value,
+                text,
+                active: isSelectedOption(filter.key, value),
+                selected: false,
+                onClick: (evt, {value: v}) => toggleFilter(filter, v),
+              }))}
             />
           ))}
         </Dropdown.Menu>
