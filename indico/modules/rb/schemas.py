@@ -65,7 +65,7 @@ class RoomSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'full_name',
                   'comments', 'division', 'is_reservable', 'reservations_need_confirmation', 'sprite_position',
                   'surface_area', 'latitude', 'longitude', 'telephone', 'key_location', 'max_advance_days',
-                  'owner_name', 'available_equipment', 'has_photo', 'verbose_name', 'map_url', 'site')
+                  'owner_name', 'available_equipment', 'has_photo', 'verbose_name', 'map_url', 'site', 'location_id')
 
 
 class AdminRoomSchema(mm.SQLAlchemyAutoSchema):
