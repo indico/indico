@@ -26,6 +26,7 @@ from indico.modules.receipts.schemas import ReceiptTemplateSchema, ReceiptTplMet
 from indico.modules.receipts.util import (compile_jinja_code, create_pdf, get_inherited_templates,
                                           get_useful_registration_data)
 from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
+from indico.util.i18n import _
 from indico.util.marshmallow import YAML
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
@@ -172,12 +173,29 @@ class RHAllCategoryTemplates(AllTemplateMixin, RHManageCategoryBase):
 
 class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
     def _process(self):
-        # XXX: correctly set registration, events, etc... to "dummy" values
+        # Just some dummy data to test the template
         html = compile_jinja_code(
             self.template.html,
             custom_fields={f['name']: f.get('default') for f in self.template.custom_fields},
             event=self.target,
-            registration=None
+            personal_data={
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'email': 'john.doe@example.com',
+                'price': 100
+            },
+            fields=[{
+                'title': _('Social Dinner'),
+                'value': True,
+                'field_data': {
+                    'price': 50
+                },
+                'actual_price': 50
+            }],
+            base_price=50,
+            total_price=100,
+            currency='EUR',
+            formatted_price='100 EUR'
         )
         f = create_pdf(self.target, {html}, self.template.css)
 
