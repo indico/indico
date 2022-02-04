@@ -12,7 +12,9 @@ import {Form, Header, Tab} from 'semantic-ui-react';
 import {FinalInput, parsers as p, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-export default function RoomEditLocation({active}) {
+export default function RoomEditLocation({active, roomNameFormat}) {
+  const isPlaceholderRequired = (format, name) => format.includes(`{${name}}`);
+
   return (
     <Tab.Pane active={active}>
       <Header>
@@ -29,9 +31,21 @@ export default function RoomEditLocation({active}) {
         <Form.Field width={8}>
           <FinalInput name="site" label={Translate.string('Site')} />
         </Form.Field>
-        <FinalInput name="building" label={Translate.string('Building')} required />
-        <FinalInput name="floor" label={Translate.string('Floor')} required />
-        <FinalInput name="number" label={Translate.string('Number')} required />
+        <FinalInput
+          name="building"
+          label={Translate.string('Building')}
+          required={isPlaceholderRequired(roomNameFormat, 'building')}
+        />
+        <FinalInput
+          name="floor"
+          label={Translate.string('Floor')}
+          required={isPlaceholderRequired(roomNameFormat, 'floor')}
+        />
+        <FinalInput
+          name="number"
+          label={Translate.string('Number')}
+          required={isPlaceholderRequired(roomNameFormat, 'number')}
+        />
       </Form.Group>
       <Form.Group widths="equal">
         <FinalInput
@@ -65,6 +79,7 @@ export default function RoomEditLocation({active}) {
 
 RoomEditLocation.propTypes = {
   active: PropTypes.bool,
+  roomNameFormat: PropTypes.string.isRequired,
 };
 
 RoomEditLocation.defaultProps = {

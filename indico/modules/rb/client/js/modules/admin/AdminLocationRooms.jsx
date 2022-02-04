@@ -68,7 +68,7 @@ function AdminLocationRooms({location, isFetching, fetchRooms, filters: {text}})
       {rooms.length ? (
         <Item.Group divided>
           {rooms.map(room => (
-            <AdminRoomItem key={room.id} room={room} />
+            <AdminRoomItem key={room.id} room={room} roomNameFormat={location.roomNameFormat} />
           ))}
         </Item.Group>
       ) : (
@@ -76,7 +76,13 @@ function AdminLocationRooms({location, isFetching, fetchRooms, filters: {text}})
           <Translate>There are no rooms for the specified location.</Translate>
         </Message>
       )}
-      {adding && <RoomEditModal locationId={location.id} onClose={handleCloseModal} />}
+      {adding && (
+        <RoomEditModal
+          locationId={location.id}
+          roomNameFormat={location.roomNameFormat}
+          onClose={handleCloseModal}
+        />
+      )}
     </>
   );
 }

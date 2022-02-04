@@ -86,7 +86,13 @@ class RoomDetailsModal extends React.Component {
     } = this.props;
     const {roomEditVisible} = this.state;
     if (roomEditVisible) {
-      return <RoomEditModal roomId={room.id} onClose={this.handleCloseRoomEditModal} />;
+      return (
+        <RoomEditModal
+          roomId={room.id}
+          locationId={room.locationId}
+          onClose={this.handleCloseRoomEditModal}
+        />
+      );
     }
     return (
       <Modal onClose={this.handleCloseModal} size="large" closeIcon open>

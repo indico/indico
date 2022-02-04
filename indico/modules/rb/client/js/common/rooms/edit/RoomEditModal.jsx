@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import attributesURL from 'indico-url:rb.admin_attributes';
+import locationsURL from 'indico-url:rb.admin_locations';
 import roomURL from 'indico-url:rb.admin_room';
 import roomAttributesURL from 'indico-url:rb.admin_room_attributes';
 import roomAvailabilityURL from 'indico-url:rb.admin_room_availability';
@@ -44,7 +45,7 @@ import TabPaneError from './TabPaneError';
 
 import './RoomEditModal.module.scss';
 
-function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
+function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreation}) {
   const favoriteUsersController = useFavoriteUsers();
   const [permissionManager, permissionInfo] = usePermissionInfo();
   const equipmentTypes = useSelector(getAllEquipmentTypes);
@@ -76,6 +77,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     nonbookable_periods: [],
   });
   const [roomNotificationDefaults, setRoomNotificationDefaults] = useState({});
+  const [roomFormat, setRoomFormat] = useState(roomNameFormat);
 
   const isNewRoom = roomId === undefined;
 
@@ -102,6 +104,17 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     );
   }, [roomId]);
 
+  useEffect(() => {
+    (async () => {
+      if (!roomNameFormat) {
+        setLoading(true);
+        const location = await fetchData(locationsURL({location_id: locationId}));
+        setRoomFormat(location.room_name_format || '');
+        setLoading(false);
+      }
+    })();
+  }, [roomNameFormat, locationId]);
+
   const tabPanes = useMemo(
     () =>
       [
@@ -119,7 +132,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         {
           key: 'location',
           menuItem: <Translate>Location</Translate>,
-          pane: <RoomEditLocation key="location" />,
+          pane: <RoomEditLocation key="location" roomNameFormat={roomFormat} />,
           fields: [
             'verbose_name',
             'site',
@@ -197,6 +210,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       permissionManager,
       activeTab,
       roomNotificationDefaults,
+      roomFormat,
     ]
   );
 
@@ -373,7 +387,14 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   };
 
   if (newRoomId) {
-    return <RoomEditModal roomId={newRoomId} onClose={onClose} afterCreation />;
+    return (
+      <RoomEditModal
+        roomId={newRoomId}
+        roomNameFormat={roomNameFormat}
+        onClose={onClose}
+        afterCreation
+      />
+    );
   }
   if (!roomDetails || !roomAvailability || !roomAttributes) {
     // In case of error, nothing is returned
@@ -405,6 +426,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
 RoomEditModal.propTypes = {
   roomId: PropTypes.number,
   locationId: PropTypes.number,
+  roomNameFormat: PropTypes.string,
   onClose: PropTypes.func.isRequired,
   afterCreation: PropTypes.bool,
 };
@@ -412,6 +434,7 @@ RoomEditModal.propTypes = {
 RoomEditModal.defaultProps = {
   roomId: undefined,
   locationId: undefined,
+  roomNameFormat: '',
   afterCreation: false,
 };
 
