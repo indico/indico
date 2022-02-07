@@ -112,13 +112,24 @@ class LocationPage extends React.PureComponent {
           if (rv) {
             return rv;
           }
-          const missing = ['{building}', '{floor}', '{number}'].filter(x => !val.includes(x));
+          const validPlaceholders = ['{building}', '{floor}', '{number}'];
+          const missing = validPlaceholders.filter(x => !val.includes(x));
           if (missing.length) {
             return PluralTranslate.string(
               'Missing placeholder: {placeholders}',
               'Missing placeholders: {placeholders}',
               missing.length,
               {placeholders: missing.join(', ')}
+            );
+          }
+          const placeholders = [...val.matchAll(/\{.*?\}/g)].map(match => match[0]);
+          const invalid = placeholders.filter(ph => !validPlaceholders.includes(ph));
+          if (invalid.length) {
+            return PluralTranslate.string(
+              'Invalid placeholder: {placeholders}',
+              'Invalid placeholders: {placeholders}',
+              invalid.length,
+              {placeholders: invalid.join(', ')}
             );
           }
         }}
