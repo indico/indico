@@ -401,7 +401,10 @@ class LocationArgs(mm.Schema):
             # validated client-side, no i18n needed
             raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
 
-        placeholders = get_format_placeholders(room_name_format)
+        try:
+            placeholders = get_format_placeholders(room_name_format)
+        except ValueError:
+            raise ValidationError(_('Invalid placeholder format'))
         if invalid := set(placeholders) - {'building', 'floor', 'number'}:
             raise ValidationError(_('Invalid placeholders: {}').format(', '.join(invalid)))
 
