@@ -112,13 +112,24 @@ class LocationPage extends React.PureComponent {
           if (rv) {
             return rv;
           }
-          const missing = ['{building}', '{floor}', '{number}'].filter(x => !val.includes(x));
+          const validPlaceholders = ['{building}', '{floor}', '{number}'];
+          const missing = validPlaceholders.filter(x => !val.includes(x));
           if (missing.length) {
             return PluralTranslate.string(
               'Missing placeholder: {placeholders}',
               'Missing placeholders: {placeholders}',
               missing.length,
               {placeholders: missing.join(', ')}
+            );
+          }
+          const placeholders = [...val.matchAll(/\{.*?\}/g)].map(match => match[0]);
+          const invalid = placeholders.filter(ph => !validPlaceholders.includes(ph));
+          if (invalid.length) {
+            return PluralTranslate.string(
+              'Invalid placeholder: {placeholders}',
+              'Invalid placeholders: {placeholders}',
+              invalid.length,
+              {placeholders: invalid.join(', ')}
             );
           }
         }}
@@ -142,7 +153,30 @@ class LocationPage extends React.PureComponent {
             readOnly={selectedTemplate !== 'custom'}
             style={selectedTemplate === 'none' ? {display: 'none'} : {}}
             nullIfEmpty
-            validate={v.optional(v.url)}
+            validate={val => {
+              const rv = v.optional(v.url)(val);
+              if (rv) {
+                return rv;
+              }
+              const validPlaceholders = [
+                '{id}',
+                '{building}',
+                '{floor}',
+                '{number}',
+                '{lat}',
+                '{lng}',
+              ];
+              const placeholders = [...val.matchAll(/\{.*?\}/g)].map(match => match[0]);
+              const invalid = placeholders.filter(ph => !validPlaceholders.includes(ph));
+              if (invalid.length) {
+                return PluralTranslate.string(
+                  'Invalid placeholder: {placeholders}',
+                  'Invalid placeholders: {placeholders}',
+                  invalid.length,
+                  {placeholders: invalid.join(', ')}
+                );
+              }
+            }}
             description={
               selectedTemplate === 'custom' && (
                 <Translate>

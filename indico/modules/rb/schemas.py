@@ -34,7 +34,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb.util import get_format_placeholders, rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList,
@@ -396,10 +396,22 @@ class LocationArgs(mm.Schema):
 
     @validates('room_name_format')
     def _check_room_name_format_placeholders(self, room_name_format, **kwargs):
-        missing = {x for x in ('{building}', '{floor}', '{number}') if x not in room_name_format}
-        if missing:
-            # validated client-side, no i18n needed
+        self._validate_placeholders(room_name_format, {'building', 'floor', 'number'}, {'building', 'floor', 'number'})
+
+    @validates('map_url_template')
+    def _check_map_url_template_placeholders(self, map_url_template, **kwargs):
+        self._validate_placeholders(map_url_template, {'id', 'building', 'floor', 'number', 'lat', 'lng'})
+
+    def _validate_placeholders(self, format_string, valid_placeholders, required_placeholders=None):
+        try:
+            placeholders = set(get_format_placeholders(format_string))
+        except ValueError:
+            raise ValidationError(_('Invalid placeholder format'))
+        # placeholders are already validated client-side, no i18n needed here
+        if required_placeholders and (missing := required_placeholders - placeholders):
             raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
+        if invalid := placeholders - valid_placeholders:
+            raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
 
 
 class FeatureArgs(mm.Schema):
