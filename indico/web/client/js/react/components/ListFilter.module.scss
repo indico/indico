@@ -1,0 +1,44 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2022 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.filters-menu {
+  max-width: 15em;
+}
+
+.active-filters {
+  display: flex;
+  flex-direction: column;
+  margin: 0.4em;
+  gap: 0.4em;
+}
+
+:global(.ui.label).filter {
+  display: flex;
+  margin: 0;
+
+  p {
+    margin-block-end: 0;
+  }
+
+  :global(.detail) {
+    overflow: hidden;
+
+    p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:not(:last-child) {
+        margin-block-end: 0.1em;
+      }
+    }
+  }
+
+  .right {
+    margin-left: auto;
+    padding-left: 1em;
+  }
+}
