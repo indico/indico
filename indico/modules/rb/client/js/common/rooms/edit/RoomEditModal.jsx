@@ -45,7 +45,7 @@ import TabPaneError from './TabPaneError';
 
 import './RoomEditModal.module.scss';
 
-function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreation}) {
+function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   const favoriteUsersController = useFavoriteUsers();
   const [permissionManager, permissionInfo] = usePermissionInfo();
   const equipmentTypes = useSelector(getAllEquipmentTypes);
@@ -77,7 +77,7 @@ function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreati
     nonbookable_periods: [],
   });
   const [roomNotificationDefaults, setRoomNotificationDefaults] = useState({});
-  const [roomFormat, setRoomFormat] = useState(roomNameFormat);
+  const [roomNameFormat, setRoomNameFormat] = useState('');
 
   const isNewRoom = roomId === undefined;
 
@@ -104,17 +104,6 @@ function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreati
     );
   }, [roomId]);
 
-  useEffect(() => {
-    (async () => {
-      if (!roomNameFormat) {
-        setLoading(true);
-        const location = await fetchData(locationsURL({location_id: locationId}));
-        setRoomFormat(location.room_name_format || '');
-        setLoading(false);
-      }
-    })();
-  }, [roomNameFormat, locationId]);
-
   const tabPanes = useMemo(
     () =>
       [
@@ -132,7 +121,7 @@ function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreati
         {
           key: 'location',
           menuItem: <Translate>Location</Translate>,
-          pane: <RoomEditLocation key="location" roomNameFormat={roomFormat} />,
+          pane: <RoomEditLocation key="location" roomNameFormat={roomNameFormat} />,
           fields: [
             'verbose_name',
             'site',
@@ -210,7 +199,7 @@ function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreati
       permissionManager,
       activeTab,
       roomNotificationDefaults,
-      roomFormat,
+      roomNameFormat,
     ]
   );
 
@@ -272,13 +261,16 @@ function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreati
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       if (!isNewRoom) {
-        setLoading(true);
-        await fetchRoomData();
-        setLoading(false);
+        fetchRoomData().then(() => setLoading(false));
       }
+
+      const location = await fetchData(locationsURL({location_id: locationId}));
+      setRoomNameFormat(location.room_name_format);
+      setLoading(false);
     })();
-  }, [isNewRoom, fetchRoomData]);
+  }, [isNewRoom, fetchRoomData, locationId]);
 
   const formValidation = values => {
     if (!!values.latitude !== !!values.longitude) {
@@ -388,12 +380,7 @@ function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreati
 
   if (newRoomId) {
     return (
-      <RoomEditModal
-        roomId={newRoomId}
-        roomNameFormat={roomNameFormat}
-        onClose={onClose}
-        afterCreation
-      />
+      <RoomEditModal roomId={newRoomId} locationId={locationId} onClose={onClose} afterCreation />
     );
   }
   if (!roomDetails || !roomAvailability || !roomAttributes) {
@@ -425,16 +412,13 @@ function RoomEditModal({roomId, locationId, roomNameFormat, onClose, afterCreati
 
 RoomEditModal.propTypes = {
   roomId: PropTypes.number,
-  locationId: PropTypes.number,
-  roomNameFormat: PropTypes.string,
+  locationId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
   afterCreation: PropTypes.bool,
 };
 
 RoomEditModal.defaultProps = {
   roomId: undefined,
-  locationId: undefined,
-  roomNameFormat: '',
   afterCreation: false,
 };
 

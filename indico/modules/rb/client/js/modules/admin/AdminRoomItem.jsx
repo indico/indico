@@ -19,7 +19,7 @@ import * as adminActions from './actions';
 
 import './AdminRoomItem.module.scss';
 
-function AdminRoomItem({room, roomNameFormat, deleteRoom, fetchRooms}) {
+function AdminRoomItem({room, locationId, deleteRoom, fetchRooms}) {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -47,11 +47,7 @@ function AdminRoomItem({room, roomNameFormat, deleteRoom, fetchRooms}) {
         <Item.Description>{room.comments}</Item.Description>
       </Item.Content>
       {editing && (
-        <RoomEditModal
-          roomId={room.id}
-          roomNameFormat={roomNameFormat}
-          onClose={handleCloseModal}
-        />
+        <RoomEditModal roomId={room.id} locationId={locationId} onClose={handleCloseModal} />
       )}
       <Confirm
         header={Translate.string('Confirm deletion')}
@@ -68,7 +64,7 @@ function AdminRoomItem({room, roomNameFormat, deleteRoom, fetchRooms}) {
 
 AdminRoomItem.propTypes = {
   room: PropTypes.object.isRequired,
-  roomNameFormat: PropTypes.string.isRequired,
+  locationId: PropTypes.number.isRequired,
   deleteRoom: PropTypes.func.isRequired,
   fetchRooms: PropTypes.func.isRequired,
 };

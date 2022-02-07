@@ -68,7 +68,7 @@ function AdminLocationRooms({location, isFetching, fetchRooms, filters: {text}})
       {rooms.length ? (
         <Item.Group divided>
           {rooms.map(room => (
-            <AdminRoomItem key={room.id} room={room} roomNameFormat={location.roomNameFormat} />
+            <AdminRoomItem key={room.id} room={room} locationId={location.id} />
           ))}
         </Item.Group>
       ) : (
