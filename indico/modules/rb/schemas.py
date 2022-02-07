@@ -400,22 +400,18 @@ class LocationArgs(mm.Schema):
         if missing:
             # validated client-side, no i18n needed
             raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
-
-        try:
-            placeholders = get_format_placeholders(room_name_format)
-        except ValueError:
-            raise ValidationError(_('Invalid placeholder format'))
-        if invalid := set(placeholders) - {'building', 'floor', 'number'}:
-            # validated client-side, no i18n needed
-            raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
+        self._validate_placeholders(room_name_format, {'building', 'floor', 'number'})
 
     @validates('map_url_template')
     def _check_map_url_template_placeholders(self, map_url_template, **kwargs):
+        self._validate_placeholders(map_url_template, {'id', 'building', 'floor', 'number', 'lat', 'lng'})
+
+    def _validate_placeholders(self, format_string, valid_placeholders):
         try:
-            placeholders = get_format_placeholders(map_url_template)
+            placeholders = get_format_placeholders(format_string)
         except ValueError:
             raise ValidationError(_('Invalid placeholder format'))
-        if invalid := set(placeholders) - {'id', 'building', 'floor', 'number', 'lat', 'lng'}:
+        if invalid := set(placeholders) - valid_placeholders:
             # validated client-side, no i18n needed
             raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
 
