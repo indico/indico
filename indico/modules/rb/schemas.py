@@ -406,7 +406,18 @@ class LocationArgs(mm.Schema):
         except ValueError:
             raise ValidationError(_('Invalid placeholder format'))
         if invalid := set(placeholders) - {'building', 'floor', 'number'}:
-            raise ValidationError(_('Invalid placeholders: {}').format(', '.join(invalid)))
+            # validated client-side, no i18n needed
+            raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
+
+    @validates('map_url_template')
+    def _check_map_url_template_placeholders(self, map_url_template, **kwargs):
+        try:
+            placeholders = get_format_placeholders(map_url_template)
+        except ValueError:
+            raise ValidationError(_('Invalid placeholder format'))
+        if invalid := set(placeholders) - {'id', 'building', 'floor', 'number', 'lat', 'lng'}:
+            # validated client-side, no i18n needed
+            raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
 
 
 class FeatureArgs(mm.Schema):
