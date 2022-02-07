@@ -47,7 +47,7 @@ class Location(db.Model):
     @hybrid_property
     def room_name_format(self):
         """Translate Postgres' format syntax (e.g. `%1$s/%2$s-%3$s`) to Python's."""
-        placeholders = ['building', 'floor', 'number']
+        placeholders = ['building', 'floor', 'number', 'site']
         return re.sub(
             r'%(\d)\$s',
             lambda m: '{%s}' % placeholders[int(m.group(1)) - 1],
@@ -63,7 +63,8 @@ class Location(db.Model):
         self._room_name_format = value.format(
             building='%1$s',
             floor='%2$s',
-            number='%3$s'
+            number='%3$s',
+            site='%4$s'
         )
 
     rooms = db.relationship(

@@ -29,7 +29,11 @@ export default function RoomEditLocation({active, roomNameFormat}) {
       />
       <Form.Group widths="four">
         <Form.Field width={8}>
-          <FinalInput name="site" label={Translate.string('Site')} />
+          <FinalInput
+            name="site"
+            label={Translate.string('Site')}
+            required={isPlaceholderRequired(roomNameFormat, 'site')}
+          />
         </Form.Field>
         <FinalInput
           name="building"

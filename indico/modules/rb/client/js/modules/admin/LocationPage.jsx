@@ -130,7 +130,11 @@ class LocationPage extends React.PureComponent {
         description={
           <Translate>
             Specify the room name format using any of the following placeholders:{' '}
-            <Param name="placeholders" wrapper={<code />} value="{building}, {floor}, {number}" />
+            <Param
+              name="placeholders"
+              wrapper={<code />}
+              value="{site}, {building}, {floor}, {number}"
+            />
           </Translate>
         }
       />
