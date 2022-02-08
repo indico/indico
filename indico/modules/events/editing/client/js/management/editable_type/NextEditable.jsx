@@ -11,10 +11,11 @@ import editableListURL from 'indico-url:event_editing.api_filter_editables_by_fi
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {useHistory} from 'react-router-dom';
 import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
 
+import {ListFilter} from 'indico/react/components';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -111,6 +112,60 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     }
   };
 
+  const filterableEditables = useMemo(
+    () =>
+      filteredEditables?.map(e => ({
+        id: e.id,
+        searchableId: e.contributionFriendlyId,
+        searchableFields: e.editor
+          ? [e.contributionTitle, e.contributionCode, e.editor.fullName]
+          : [e.contributionTitle, e.contributionCode],
+        e,
+      })),
+    [filteredEditables]
+  );
+
+  const filterOptions = useMemo(
+    () => [
+      {
+        key: 'code',
+        text: Translate.string('Program code'),
+        options: _.uniq(filteredEditables?.map(e => e.contributionCode).filter(x => x)).map(
+          code => ({
+            value: code,
+            text: code,
+          })
+        ),
+        isMatch: (editable, selectedOptions) =>
+          selectedOptions.includes(editable.e.contributionCode),
+      },
+      {
+        key: 'keywords',
+        text: Translate.string('Keywords'),
+        options: _.uniq(_.flatten(filteredEditables?.map(c => c.contributionKeywords))).map(
+          keyword => ({
+            value: keyword,
+            text: keyword,
+          })
+        ),
+        isMatch: (editable, selectedOptions) =>
+          editable.e.contributionKeywords.some(k => selectedOptions.includes(k)),
+      },
+    ],
+    [filteredEditables]
+  );
+
+  const handleFilterChange = filteredResults => {
+    console.log(filteredResults);
+    /* setFilteredSet(filteredResults);
+    setSortedList(_sortList(sortBy, sortDirection, filteredResults));
+    setChecked(
+      contribsWithEditables
+        .filter(row => checkedSet.has(row.editable.id) && filteredResults.has(row.id))
+        .map(row => row.editable.id)
+    ); */
+  };
+
   const handleAssign = async () => {
     try {
       await indicoAxios.put(
@@ -183,6 +238,11 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
               </div>
             );
           })}
+          <ListFilter
+            list={filterableEditables}
+            filterOptions={filterOptions}
+            onChange={handleFilterChange}
+          />
         </div>
         <Dimmer.Dimmable styleName="filtered-editables" dimmed={loading}>
           <NextEditableTable

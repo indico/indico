@@ -265,11 +265,12 @@ class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
         fields = ('contribution_id', 'contribution_title', 'contribution_code', 'contribution_friendly_id',
-                  'id', 'state', 'timeline_url', 'editor', 'can_assign_self')
+                  'contribution_keywords', 'id', 'state', 'timeline_url', 'editor', 'can_assign_self')
 
-    contribution_friendly_id = fields.String(attribute='contribution.friendly_id')
+    contribution_friendly_id = fields.Int(attribute='contribution.friendly_id')
     contribution_code = fields.String(attribute='contribution.code')
     contribution_title = fields.String(attribute='contribution.title')
+    contribution_keywords = fields.List(fields.String(), attribute='contribution.keywords')
     state = EnumField(EditableState)
     timeline_url = fields.String()
     editor = fields.Nested(EditingUserSchema)

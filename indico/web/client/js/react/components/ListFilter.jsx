@@ -178,7 +178,7 @@ ListFilter.propTypes = {
       searchableId: PropTypes.number,
       searchableFields: PropTypes.arrayOf(PropTypes.string),
     })
-  ).isRequired,
+  ),
   filterOptions: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -194,3 +194,5 @@ ListFilter.propTypes = {
   ).isRequired,
   onChange: PropTypes.func.isRequired,
 };
+
+ListFilter.defaultProps = {list: []};
