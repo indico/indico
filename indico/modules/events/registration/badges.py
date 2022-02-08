@@ -101,24 +101,15 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             else:
                 continue
 
-            updates = {
-                'item': item,
-                'items': items,
-                'text': text,
-                'registration': registration,
-                'height': self.height,
-                'width': self.width,
-                'pos_x': pos_x,
-                'pos_y': pos_y
-            }
+            item_data = {'item': item, 'text': text, 'pos_x': pos_x, 'pos_y': pos_y}
             for update in values_from_signal(
-                signals.event.designer.draw_item_on_badge.send(updates),
+                signals.event.designer.draw_item_on_badge.send(registration, items=items, height=self.height,
+                                                               width=self.width, data=item_data),
                 as_list=True
             ):
-                updates.update(update)
-            item, text, pos_x, pos_y = updates['item'], updates['text'], updates['pos_x'], updates['pos_y']
-
-            self._draw_item(canvas, item, tpl_data, text, pos_x, pos_y)
+                item_data.update(update)
+            self._draw_item(canvas, item_data['item'], tpl_data, item_data['text'], item_data['pos_x'],
+                            item_data['pos_y'])
 
 
 class RegistrantsListToBadgesPDFFoldable(RegistrantsListToBadgesPDF):

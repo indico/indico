@@ -24,8 +24,8 @@ The signal returns a dictionary which is used to update the item `style`.
 
 draw_item_on_badge = _signals.signal('draw-item-on-badge', '''
 Called when drawing a badge for a given registration on a pdf.
-The `updates` is the sender, and is a dictionary containing the
-information required to draw the items on a pdf at the given position.
-
-The signal returns a dictionary of the updates.
+The `registration` object is the sender. The `items`, `self.height`,
+`self.width` and `item_data` are passed in the kwargs.
+`item_data` is a dictionary containing `item`, `text`, `pos_x` and `pos_y`.
+The signal returns a dictionary of updates for the contents of `item_data`.
 ''')
