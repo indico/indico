@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import React, {useState, useMemo} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
-import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
+import {Button, Icon, Input, Loader, Checkbox, Message, Dropdown, Label} from 'semantic-ui-react';
 
 import {
   TooltipIfTruncated,
@@ -105,7 +105,7 @@ function EditableListDisplay({
   const contribsWithEditables = contribList.filter(x => x.editable);
   const contribIdSet = new Set(contribsWithEditables.map(x => x.id));
   const [filteredSet, setFilteredSet] = useState(new Set(contribList.map(e => e.id)));
-  const [searchValue, setSearchValue] = useState('');
+  const [activeFilters, setActiveFilters] = useState({search: '', filters: []});
   const [selfAssignModalVisible, setSelfAssignModalVisible] = useState(false);
 
   const [checked, setChecked] = useState([]);
@@ -125,6 +125,48 @@ function EditableListDisplay({
         value: e.identifier,
       })),
     [editors]
+  );
+
+  const filterOptions = useMemo(
+    () => [
+      {
+        key: 'state',
+        text: Translate.string('Status'),
+        options: [
+          {value: 'accepted', text: Translate.string('Accepted')},
+          {value: 'ready_for_review', text: Translate.string('Ready for review')},
+          {value: 'not_submitted', text: Translate.string('Not submitted')},
+        ],
+      },
+      {
+        key: 'editor',
+        text: Translate.string('Editor'),
+        options: _.uniqBy(
+          contribsWithEditables.map(c => c.editable.editor).filter(Boolean),
+          'id'
+        ).map(({identifier, fullName}) => ({
+          value: identifier,
+          text: fullName,
+        })),
+      },
+      {
+        key: 'code',
+        text: Translate.string('Program code'),
+        options: _.uniq(contribList.map(c => c.code).filter(Boolean)).map(code => ({
+          value: code,
+          text: code,
+        })),
+      },
+      {
+        key: 'keywords',
+        text: Translate.string('Keywords'),
+        options: _.uniq(_.flatten(contribList.map(c => c.keywords))).map(keyword => ({
+          value: keyword,
+          text: keyword,
+        })),
+      },
+    ],
+    [contribList, contribsWithEditables]
   );
 
   const title = {
@@ -188,24 +230,50 @@ function EditableListDisplay({
     setSortedList(list => list.map(_mapper));
   };
 
-  const setFilter = value => {
-    setSearchValue(value);
-    value = value.toLowerCase().trim();
+  const handleFilterChange = value => {
+    setActiveFilters(value);
+    const searchValue = value.search.toLowerCase().trim();
 
     const isMatch = result => {
-      if (!value) {
-        return true;
+      if (searchValue) {
+        const match = searchValue.match(/^#(\d+)$/);
+        if (match) {
+          return result.friendlyId === +match[1];
+        }
+        if (
+          !(
+            result.title.toLowerCase().includes(searchValue) ||
+            (result.editable &&
+              result.editable.editor &&
+              result.editable.editor.fullName.toLowerCase().includes(searchValue)) ||
+            (result.code && result.code.toLowerCase().includes(searchValue))
+          )
+        ) {
+          return false;
+        }
       }
-      const match = value.match(/^#(\d+)$/);
-      if (match) {
-        return result.friendlyId === +match[1];
-      }
+      const matchFilterType = (filterType, cond) => {
+        const filter = value.filters.find(f => f.filter.key === filterType);
+        return (
+          !filter || (cond ? cond(filter) : filter.selectedOptions.includes(result[filterType]))
+        );
+      };
       return (
-        result.title.toLowerCase().includes(value) ||
-        (result.editable &&
-          result.editable.editor &&
-          result.editable.editor.fullName.toLowerCase().includes(value)) ||
-        (result.code && result.code.toLowerCase().includes(value))
+        matchFilterType(
+          'editor',
+          f =>
+            result.editable &&
+            result.editable.editor &&
+            f.selectedOptions.includes(result.editable.editor.identifier)
+        ) &&
+        matchFilterType('code') &&
+        matchFilterType(
+          'state',
+          f =>
+            (result.editable && f.selectedOptions.includes(result.editable.state)) ||
+            (f.selectedOptions.includes('not_submitted') && !result.editable)
+        ) &&
+        matchFilterType('keywords', f => result.keywords.some(k => f.selectedOptions.includes(k)))
       );
     };
     const filteredResults = new Set(contribList.filter(isMatch).map(e => e.id));
@@ -428,18 +496,10 @@ function EditableListDisplay({
             </>
           )}
         </div>
-        <Input
-          placeholder={Translate.string('Enter #id or search string')}
-          onChange={(evt, {value}) => setFilter(value)}
-          value={searchValue}
-          icon={
-            <Icon
-              name="close"
-              link
-              onClick={() => setFilter('')}
-              style={searchValue ? {} : {display: 'none'}}
-            />
-          }
+        <EditableListFilter
+          filterOptions={filterOptions}
+          activeFilters={activeFilters}
+          onChange={handleFilterChange}
         />
       </div>
       {sortedList.length ? (
@@ -540,6 +600,7 @@ EditableListDisplay.propTypes = {
         type: PropTypes.oneOf(Object.values(EditableType)),
         timelineURL: PropTypes.string,
       }),
+      keywords: PropTypes.arrayOf(PropTypes.string).isRequired,
     })
   ).isRequired,
   editors: PropTypes.arrayOf(PropTypes.shape(userPropTypes)).isRequired,
@@ -548,4 +609,151 @@ EditableListDisplay.propTypes = {
   eventId: PropTypes.number.isRequired,
   management: PropTypes.bool.isRequired,
   canAssignSelf: PropTypes.bool.isRequired,
+};
+
+const filterShape = {
+  key: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};
+
+function EditableListFilter({filterOptions, activeFilters, onChange}) {
+  const [openSubmenu, setOpenSubmenu] = useState(-1);
+
+  const handleSearchChange = search => onChange({search, filters: activeFilters.filters});
+  const handleFiltersChange = filters => onChange({search: activeFilters.search, filters});
+
+  const removeFilter = key => {
+    handleFiltersChange(activeFilters.filters.filter(f => f.filter.key !== key));
+  };
+
+  const toggleFilter = (filter, option) => {
+    const activeFilter = activeFilters.filters.find(f => f.filter.key === filter.key);
+    if (activeFilter) {
+      if (activeFilter.selectedOptions.length === 1 && activeFilter.selectedOptions[0] === option) {
+        removeFilter(filter.key);
+      } else {
+        const selectedOptions = activeFilter.selectedOptions.includes(option)
+          ? activeFilter.selectedOptions.filter(o => o !== option)
+          : [...activeFilter.selectedOptions, option];
+        handleFiltersChange([
+          ...activeFilters.filters.filter(f => f.filter.key !== filter.key),
+          {filter, selectedOptions},
+        ]);
+      }
+    } else {
+      handleFiltersChange([...activeFilters.filters, {filter, selectedOptions: [option]}]);
+    }
+  };
+
+  const isSelectedOption = (filterKey, option) =>
+    activeFilters.filters.find(f => f.filter.key === filterKey)?.selectedOptions.includes(option);
+
+  return (
+    <div>
+      <Dropdown
+        text={Translate.string('Filter')}
+        icon="filter"
+        direction="left"
+        labeled
+        button
+        className={activeFilters.filters.length > 0 ? 'orange icon' : 'icon'}
+        onClose={() => setOpenSubmenu(-1)}
+      >
+        <Dropdown.Menu styleName="filters-menu">
+          {activeFilters.filters.length > 0 ? (
+            <>
+              <div styleName="active-filters">
+                {_.sortBy(activeFilters.filters, 'filter.text').map(({filter, selectedOptions}) => (
+                  <Label key={filter.key} styleName="filter" className="fluid" color="orange" basic>
+                    <p>{filter.text}</p>
+                    <Label.Detail className="float right">
+                      {_.sortBy(
+                        filter.options.filter(o => selectedOptions.includes(o.value)),
+                        'text'
+                      ).map(o => (
+                        <p key={o.value}>{o.text}</p>
+                      ))}
+                    </Label.Detail>
+                    <Icon
+                      name="delete"
+                      styleName="right"
+                      onClick={evt => {
+                        evt.stopPropagation();
+                        setOpenSubmenu(-1);
+                        removeFilter(filter.key);
+                      }}
+                    />
+                  </Label>
+                ))}
+              </div>
+              <Dropdown.Item
+                text={Translate.string('Clear all filters')}
+                onClick={() => handleFiltersChange([])}
+              />
+            </>
+          ) : (
+            <Dropdown.Item text={Translate.string('No filters were added yet')} disabled />
+          )}
+          <Dropdown.Divider />
+          {_.sortBy(filterOptions, 'text').map(filter => (
+            <Dropdown
+              key={filter.key}
+              scrolling
+              icon={null}
+              className="item"
+              direction="right"
+              onOpen={() => setOpenSubmenu(filter.key)}
+              onBlur={evt => evt.stopPropagation()}
+              open={openSubmenu === filter.key}
+              disabled={filter.options.length === 0}
+              trigger={<Dropdown.Item text={filter.text} icon="plus" />}
+              options={_.sortBy(filter.options, 'text').map(({value, text}) => ({
+                key: value,
+                value,
+                text,
+                active: isSelectedOption(filter.key, value),
+                selected: false,
+                onClick: (evt, {value: v}) => toggleFilter(filter, v),
+              }))}
+            />
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+      <Input
+        placeholder={Translate.string('Enter #id or search string')}
+        onChange={(evt, {value}) => handleSearchChange(value)}
+        value={activeFilters.search}
+        style={{width: '14em'}}
+        icon={
+          activeFilters.search
+            ? {
+                name: 'close',
+                link: true,
+                onClick: () => handleSearchChange(''),
+              }
+            : undefined
+        }
+      />
+    </div>
+  );
+}
+
+EditableListFilter.propTypes = {
+  filterOptions: PropTypes.arrayOf(PropTypes.shape(filterShape)).isRequired,
+  activeFilters: PropTypes.shape({
+    search: PropTypes.string.isRequired,
+    filters: PropTypes.arrayOf(
+      PropTypes.shape({
+        filter: PropTypes.shape(filterShape).isRequired,
+        selectedOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
 };

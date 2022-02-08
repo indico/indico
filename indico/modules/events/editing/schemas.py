@@ -249,7 +249,7 @@ class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
 class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
-        fields = ('id', 'friendly_id', 'title', 'code', 'editable')
+        fields = ('id', 'friendly_id', 'title', 'code', 'editable', 'keywords')
 
     editable = fields.Method('_get_editable')
 
