@@ -114,7 +114,7 @@ class DesignerPDFBase:
             styles['fontName'] = FONT_STYLES[item['font_family']][0]
 
         for update in values_from_signal(
-            signals.event.designer.update_badge_style.send(item, styles=styles),
+            signals.event.designer.update_badge_style.send(self.template, item=item, styles=styles),
             as_list=True
         ):
             styles.update(update)

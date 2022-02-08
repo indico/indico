@@ -18,7 +18,8 @@ objects are passed in the `registrations` kwarg and it may be modified.
 
 update_badge_style = _signals.signal('update-badge-style', '''
 Called when printing a badge.
-Each `item` in a badge and it's `styles` are passed in the kwarg.
+The `template` is the sender. The `item` and it's `styles`
+are passed in the kwarg.
 The signal returns a dictionary which is used to update the item `style`.
 ''')
 
