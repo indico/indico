@@ -33,6 +33,8 @@ Internal Changes
 - Add ``category-sidebar`` template hook and blocks around category sidebar
   sections (:pr:`5237`, thanks :user:`omegak`)
 
+- Add ``event.reminder.before_reminder_make_email`` signal (:pr:`5242`, thanks
+   :user:`vasantvohra`)
 
 Version 3.1
 -----------

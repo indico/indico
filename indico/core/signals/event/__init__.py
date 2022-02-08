@@ -19,4 +19,5 @@ from indico.core.signals.event.designer import *
 from indico.core.signals.event.notes import *
 from indico.core.signals.event.persons import *
 from indico.core.signals.event.registration import *
+from indico.core.signals.event.reminder import *
 from indico.core.signals.event.timetable import *
