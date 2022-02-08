@@ -84,20 +84,14 @@ class RegistrationListGenerator(ListGeneratorBase):
 
         :return: a list of {'id': ..., 'caption': ...} dicts
         """
+        ids = set(ids)
         result = []
-        for item_id in ids:
-            if item_id in self.personal_items:
-                field = RegistrationFormItem.query.filter_by(registration_form=self.regform,
-                                                             personal_data_type=PersonalDataType[item_id]).one()
-                result.append({
-                    'id': field.id,
-                    'caption': field.title
-                })
-            elif item_id in self.static_items:
-                result.append({
-                    'id': item_id,
-                    'caption': self.static_items[item_id]['title']
-                })
+        for item_id in [x for x in self.personal_items if x in ids]:
+            field = RegistrationFormItem.query.filter_by(registration_form=self.regform,
+                                                         personal_data_type=PersonalDataType[item_id]).one()
+            result.append({'id': field.id, 'caption': field.title})
+        for item_id in [x for x in self.static_items if x in ids]:
+            result.append({'id': item_id, 'caption': self.static_items[item_id]['title']})
         return result
 
     def _column_ids_to_db(self, ids):

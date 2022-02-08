@@ -119,7 +119,7 @@
 
 {% block page_actions -%}
     <div class="toolbar">
-        {% if contribution.can_manage(session.user) -%}
+        {% if contribution.can_edit(session.user) -%}
             <a href="#" class="i-button icon-edit"
                data-title="{% trans %}Edit contribution{% endtrans %}"
                data-href="{{ url_for('contributions.manage_update_contrib', contribution) }}"
@@ -254,7 +254,7 @@
                                         {{- subcontrib.title -}}
                                     </a>
                                 </span>
-                                {% if subcontrib.can_manage(session.user) -%}
+                                {% if subcontrib.can_edit(session.user) -%}
                                     <span>
                                         <a href="#" class="icon-edit"
                                            data-href="{{ url_for('contributions.manage_edit_subcontrib', subcontrib) }}"

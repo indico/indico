@@ -25,10 +25,10 @@ from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions import contribution_settings, get_contrib_field_types
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.common import ContributionListMixin
-from indico.modules.events.contributions.forms import (ContributionDefaultDurationForm, ContributionDurationForm,
-                                                       ContributionExportTeXForm, ContributionProtectionForm,
-                                                       ContributionStartDateForm, ContributionTypeForm,
-                                                       SubContributionForm)
+from indico.modules.events.contributions.forms import (AllowSubmitterEditsForm, ContributionDefaultDurationForm,
+                                                       ContributionDurationForm, ContributionExportTeXForm,
+                                                       ContributionProtectionForm, ContributionStartDateForm,
+                                                       ContributionTypeForm, SubContributionForm)
 from indico.modules.events.contributions.lists import ContributionListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
@@ -187,10 +187,21 @@ class RHCreateContribution(RHManageContributionsBase):
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(contrib)
             return jsonify_data(**tpl_components)
-        return jsonify_template('events/contributions/forms/contribution.html', form=form)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form, can_manage=True)
 
 
 class RHEditContribution(RHManageContributionBase):
+    """Edit a contribution.
+
+    If configured in the contribution settings, editing is also
+    allowed for the submitters.
+    """
+
+    def _check_access(self):
+        if not self.contrib.can_edit(session.user):
+            raise Forbidden
+        check_event_locked(self, self.event)
+
     def _process(self):
         contrib_form_class = make_contribution_form(self.event)
         custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.contrib.field_values}
@@ -213,8 +224,9 @@ class RHEditContribution(RHManageContributionBase):
             return jsonify_data(flash=(request.args.get('flash') == '1'), **tpl_components)
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.contrib)
+        can_manage = self.contrib.can_manage(session.user)
         self.commit = False
-        return jsonify_template('events/contributions/forms/contribution.html', form=form)
+        return jsonify_template('events/contributions/forms/contribution.html', form=form, can_manage=can_manage)
 
 
 class RHDeleteContributions(RHManageContributionsActionsBase):
@@ -336,11 +348,20 @@ class RHCreateSubContribution(RHManageContributionBase):
             subcontrib = create_subcontribution(self.contrib, form.data)
             flash(_("Subcontribution '{}' created successfully").format(subcontrib.title), 'success')
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
-        return jsonify_template('events/contributions/forms/subcontribution.html', form=form)
+        return jsonify_template('events/contributions/forms/subcontribution.html', form=form, can_manage=True)
 
 
 class RHEditSubContribution(RHManageSubContributionBase):
-    """Edit the subcontribution."""
+    """Edit a subcontribution.
+
+    If configured in the contribution settings, editing is also
+    allowed for the submitters of the parent contribution.
+    """
+
+    def _check_access(self):
+        if not self.subcontrib.can_edit(session.user):
+            raise Forbidden
+        check_event_locked(self, self.event)
 
     def _process(self):
         form = SubContributionForm(obj=FormDefaults(self.subcontrib), event=self.event, subcontrib=self.subcontrib)
@@ -350,8 +371,9 @@ class RHEditSubContribution(RHManageSubContributionBase):
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.subcontrib)
+        can_manage = self.subcontrib.can_manage(session.user)
         self.commit = False
-        return jsonify_template('events/contributions/forms/subcontribution.html', form=form)
+        return jsonify_template('events/contributions/forms/subcontribution.html', form=form, can_manage=can_manage)
 
 
 class RHSubContributionREST(RHManageSubContributionBase):
@@ -549,7 +571,19 @@ class RHManageDefaultContributionDuration(RHManageContributionsBase):
         form = ContributionDefaultDurationForm(duration=contribution_settings.get(self.event, 'default_duration'))
         if form.validate_on_submit():
             contribution_settings.set(self.event, 'default_duration', form.duration.data)
-            flash(_('Default contribution duration was changed successfully'))
+            flash(_('Default contribution duration was changed successfully'), 'success')
+            return jsonify_data()
+        return jsonify_form(form)
+
+
+class RHManageSubmitterEdits(RHManageContributionsBase):
+    """Dialog to configure submitter edit permissions."""
+
+    def _process(self):
+        form = AllowSubmitterEditsForm(allow=contribution_settings.get(self.event, 'submitters_can_edit'))
+        if form.validate_on_submit():
+            contribution_settings.set(self.event, 'submitters_can_edit', form.allow.data)
+            flash(_('Submitter edit settings changed successfully'), 'success')
             return jsonify_data()
         return jsonify_form(form)
 

@@ -34,6 +34,7 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class ContributionForm(IndicoForm):
+    _submitter_editable_fields = ('title', 'description', 'person_link_data')
     title = StringField(_('Title'), [DataRequired()])
     description = TextAreaField(_('Description'))
     start_dt = IndicoDateTimeField(_('Start date'),
@@ -110,6 +111,7 @@ class ContributionProtectionForm(IndicoForm):
 
 
 class SubContributionForm(IndicoForm):
+    _submitter_editable_fields = ('title', 'description', 'speakers')
     title = StringField(_('Title'), [DataRequired()])
     description = TextAreaField(_('Description'))
     duration = IndicoDurationField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
@@ -182,6 +184,12 @@ class ContributionDurationForm(IndicoForm):
 class ContributionDefaultDurationForm(IndicoForm):
     duration = IndicoDurationField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
                                    default=timedelta(minutes=20))
+
+
+class AllowSubmitterEditsForm(IndicoForm):
+    allow = BooleanField(_('Edit'), widget=SwitchWidget(),
+                         description=_('Allows submitters to edit basic information of '
+                                       'their contribution (title, description, speakers and authors)'))
 
 
 class ContributionTypeForm(IndicoForm):

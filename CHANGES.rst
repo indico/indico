@@ -49,6 +49,7 @@ Improvements
 
 - Prompt before leaving the event protection page without saving changes (:pr:`5222`)
 - Add the ability to clone abstracts (:pr:`5217`)
+- Add setting to allow submitters to edit their own contributions (:pr:`5213`)
 
 Bugfixes
 ^^^^^^^^
@@ -60,6 +61,13 @@ Bugfixes
 - Remove excessive padding around category titles (:pr:`5225`)
 - Fix error when exporting registrations to PDFs that contained certain invalid HTML-like
   sequences (:pr:`5233`)
+- Restore logical order of registration list columns (:pr:`5240`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``category-sidebar`` template hook and blocks around category sidebar
+  sections (:pr:`5237`, thanks :user:`omegak`)
 
 
 Version 3.1
