@@ -55,26 +55,39 @@ export default function ListFilter({list, filterOptions, onChange}) {
     handleChange(newActiveFilters);
   };
 
-  const removeFilter = key => {
-    handleFiltersChange(activeFilters.filters.filter(f => f.filter.key !== key));
-  };
+  const addFilter = (filter, selectedOptions) =>
+    handleFiltersChange([...activeFilters.filters, {filter, selectedOptions}]);
 
-  const toggleFilter = (filter, option) => {
+  const removeFilter = key =>
+    handleFiltersChange(activeFilters.filters.filter(f => f.filter.key !== key));
+
+  const modifyFilter = (filter, selectedOptions) =>
+    handleFiltersChange([
+      ...activeFilters.filters.filter(f => f.filter.key !== filter.key),
+      {filter, selectedOptions},
+    ]);
+
+  const toggleFilter = (filter, option, isExclusive) => {
     const activeFilter = activeFilters.filters.find(f => f.filter.key === filter.key);
     if (activeFilter) {
       if (activeFilter.selectedOptions.length === 1 && activeFilter.selectedOptions[0] === option) {
         removeFilter(filter.key);
+      } else if (
+        (isExclusive ||
+          activeFilter.selectedOptions.some(so =>
+            filter.options.find(o => o.value === so && o.exclusive)
+          )) &&
+        activeFilter.selectedOptions.find(o => o !== option)
+      ) {
+        modifyFilter(filter, [option]);
       } else {
         const selectedOptions = activeFilter.selectedOptions.includes(option)
           ? activeFilter.selectedOptions.filter(o => o !== option)
           : [...activeFilter.selectedOptions, option];
-        handleFiltersChange([
-          ...activeFilters.filters.filter(f => f.filter.key !== filter.key),
-          {filter, selectedOptions},
-        ]);
+        modifyFilter(filter, selectedOptions);
       }
     } else {
-      handleFiltersChange([...activeFilters.filters, {filter, selectedOptions: [option]}]);
+      addFilter(filter, [option]);
     }
   };
 
@@ -140,15 +153,31 @@ export default function ListFilter({list, filterOptions, onChange}) {
               open={openSubmenu === filter.key}
               disabled={filter.options.length === 0}
               trigger={<Dropdown.Item text={filter.text} icon="plus" />}
-              options={_.sortBy(filter.options, 'text').map(({value, text}) => ({
-                key: value,
-                value,
-                text,
-                active: isSelectedOption(filter.key, value),
-                selected: false,
-                onClick: (evt, {value: v}) => toggleFilter(filter, v),
-              }))}
-            />
+            >
+              <Dropdown.Menu>
+                {_.sortBy(filter.options.filter(o => !o.exclusive), 'text').map(({value, text}) => (
+                  <Dropdown.Item
+                    key={value}
+                    value={value}
+                    text={text}
+                    active={isSelectedOption(filter.key, value)}
+                    onClick={(evt, {value: v}) => toggleFilter(filter, v, !filter.multi)}
+                  />
+                ))}
+                {!!filter.options.find(o => o.exclusive) && <Dropdown.Divider />}
+                {filter.options
+                  .filter(o => o.exclusive)
+                  .map(({value, text}) => (
+                    <Dropdown.Item
+                      key={value}
+                      value={value}
+                      text={text}
+                      active={isSelectedOption(filter.key, value)}
+                      onClick={(evt, {value: v}) => toggleFilter(filter, v, true)}
+                    />
+                  ))}
+              </Dropdown.Menu>
+            </Dropdown>
           ))}
         </Dropdown.Menu>
       </Dropdown>
@@ -187,8 +216,10 @@ ListFilter.propTypes = {
         PropTypes.shape({
           value: PropTypes.string.isRequired,
           text: PropTypes.string.isRequired,
+          exclusive: PropTypes.bool,
         })
       ).isRequired,
+      multi: PropTypes.bool,
       isMatch: PropTypes.func.isRequired,
     })
   ).isRequired,

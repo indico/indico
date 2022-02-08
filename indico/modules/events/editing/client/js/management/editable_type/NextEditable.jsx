@@ -136,6 +136,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
             text: code,
           })
         ),
+        multi: true,
         isMatch: (editable, selectedOptions) =>
           selectedOptions.includes(editable.e.contributionCode),
       },
@@ -148,11 +149,28 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
             text: keyword,
           })
         ),
+        multi: true,
         isMatch: (editable, selectedOptions) =>
           editable.e.contributionKeywords.some(k => selectedOptions.includes(k)),
       },
+      ...fileTypes.map(({id, name, extensions}) => ({
+        key: `filetypes_${id}`,
+        text: name,
+        options: [
+          ...(extensions.length > 1
+            ? extensions.map(extension => ({value: `has_${extension}`, text: extension}))
+            : [{value: 'has_files', text: Translate.string('has files')}]),
+          {
+            value: 'has_no_files',
+            text: Translate.string('has no files'),
+            exclusive: extensions.length > 1,
+          },
+        ],
+        multi: extensions.length > 1,
+        isMatch: () => true,
+      })),
     ],
-    [filteredEditables]
+    [filteredEditables, fileTypes]
   );
 
   const handleFilterChange = filteredResults => {
