@@ -94,14 +94,15 @@ class DesignerPDFBase:
         return data
 
     def _draw_item(self, canvas, item, tpl_data, content, margin_x, margin_y):
+        font_size = _extract_font_size(item['font_size'])
         styles = {
             'alignment': ALIGNMENTS[item['text_align']],
             'textColor': item.get('color') or '#000000',
             'backColor': item.get('background_color') or None,
             'borderPadding': (0, 0, 4, 0),
-            'fontSize': _extract_font_size(item['font_size'])
+            'fontSize': font_size,
+            'leading': font_size
         }
-        styles['leading'] = styles['fontSize']
 
         if item['bold'] and item['italic']:
             styles['fontName'] = FONT_STYLES[item['font_family']][3]
