@@ -18,7 +18,7 @@ import {getFieldValue} from '../../form_submission/selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
 
-import styles from '../../../styles/regform.module.scss';
+import '../../../styles/regform.module.scss';
 
 function BooleanInputComponent({
   id,
@@ -94,7 +94,6 @@ export default function BooleanInput({
   id,
   htmlName,
   disabled,
-  title,
   isRequired,
   defaultValue,
   price,
@@ -107,12 +106,10 @@ export default function BooleanInput({
     <FinalField
       id={id}
       name={htmlName}
-      label={title}
       component={BooleanInputComponent}
       required={isRequired}
       disabled={disabled}
       allowNull
-      fieldProps={{className: styles.field}}
       price={price}
       placesLimit={placesLimit}
       placesUsed={placesUsed}
@@ -125,7 +122,6 @@ BooleanInput.propTypes = {
   id: PropTypes.number.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
-  title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool,
   defaultValue: PropTypes.string,
   price: PropTypes.number,

@@ -104,16 +104,19 @@ function SingleChoiceDropdown({
 
   return (
     <Form.Group styleName="single-choice-dropdown">
-      <Form.Select
-        style={{width: 500}}
-        placeholder={Translate.string('Choose an option')}
-        options={options}
-        disabled={disabled}
-        value={selectedChoice.id}
-        onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
-        clearable={!isRequired}
-        search
-      />
+      <Form.Field>
+        <Dropdown
+          selection
+          style={{width: 500, opacity: 1}}
+          placeholder={Translate.string('Choose an option')}
+          options={options}
+          disabled={disabled}
+          value={selectedChoice.id}
+          onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
+          clearable={!isRequired}
+          search
+        />
+      </Form.Field>
       {extraSlotsDropdown}
       {extraSlotsDropdown && !!selectedChoice.price && (
         <Label pointing="left">

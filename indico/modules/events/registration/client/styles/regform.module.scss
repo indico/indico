@@ -63,18 +63,13 @@
   > .content {
     flex-grow: 1;
 
-    // Prevent stacking opacity on form fields
-    :global(.field.disabled) :global(.field.disabled) {
-      opacity: 1;
+    :global(.field.disabled) {
+      opacity: 0.8;
     }
 
     // Prevent stacking opacity on SUI Buttons
-    :global(.field.disabled) :global(.button.disabled) {
+    :global(.field.disabled) button:global(.button.disabled) {
       opacity: 1 !important;
-    }
-
-    :global(.field.disabled) {
-      opacity: 0.8;
     }
 
     .label {

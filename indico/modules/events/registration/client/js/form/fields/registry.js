@@ -109,7 +109,6 @@ export const fieldRegistry = {
     settingsComponent: BooleanSettings,
     hasPrice: true,
     icon: 'switchon',
-    customFormItem: true,
   },
   phone: {
     title: Translate.string('Phone'),

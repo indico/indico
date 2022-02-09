@@ -56,6 +56,7 @@ export default function FormItem({
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
+  const disabled = !isEnabled || (paidItemLocked && !isManagement);
   return (
     <div
       styleName={`form-item ${toClasses({
@@ -70,19 +71,15 @@ export default function FormItem({
           meta.customFormItem ? (
             <InputComponent
               isRequired={isRequired || meta.alwaysRequired}
-              disabled={!isEnabled || (paidItemLocked && !isManagement)}
+              disabled={disabled}
               {...inputProps}
             />
           ) : (
-            <Form.Field
-              required={isRequired || meta.alwaysRequired}
-              disabled={!isEnabled || (paidItemLocked && !isManagement)}
-              styleName="field"
-            >
-              <label>{title}</label>
+            <Form.Field required={isRequired || meta.alwaysRequired} styleName="field">
+              <label style={disabled ? {opacity: 0.8} : null}>{title}</label>
               <InputComponent
                 isRequired={isRequired || meta.alwaysRequired}
-                disabled={!isEnabled || (paidItemLocked && !isManagement)}
+                disabled={disabled}
                 {...inputProps}
               />
             </Form.Field>
