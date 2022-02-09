@@ -2,7 +2,7 @@
 {% from 'forms/_form.html' import form_field %}
 
 {% block html %}
-    <div class="datetime-widget i-form-field-fixed-width">
+    <div class="datetime-widget">
         {# the hidden field has autofocus on purpose to prevent our JS from focusing the date picker #}
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-datestorage" autofocus
                {% if field.data and not field.date_missing %}value="{{ field.data | format_date('code', timezone=field.timezone) }}"{% endif %}

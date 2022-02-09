@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div class="time-widget i-form-field-fixed-width">
+    <div class="time-widget">
         {# the hidden field has autofocus on purpose to prevent our JS from focusing the time picker #}
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-timestorage" autofocus
                {% if field.data is not none %}value="{{ field._value() }}"{% endif %}
