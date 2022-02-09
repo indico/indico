@@ -2,7 +2,7 @@
 {% from 'forms/_form.html' import form_field %}
 
 {% block html %}
-    <div class="occurrences-widget i-form-field-fixed-width" id="{{ field.id }}-container"></div>
+    <div class="occurrences-widget" id="{{ field.id }}-container"></div>
     <input type="hidden" name="{{ field.name }}" id="{{ field.id }}" value="{{ field._value() }}" autofocus>
 
 {% endblock %}
