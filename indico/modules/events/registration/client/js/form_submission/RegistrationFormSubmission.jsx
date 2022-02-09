@@ -95,7 +95,13 @@ export default function RegistrationFormSubmission() {
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}
-              label={Translate.string(isUpdateMode ? 'Modify' : isModerated ? 'Apply' : 'Register')}
+              label={
+                isUpdateMode
+                  ? Translate.string('Modify')
+                  : isModerated
+                  ? Translate.string('Apply')
+                  : Translate.string('Register')
+              }
               style={{
                 marginTop: 20,
                 textAlign: 'right',
