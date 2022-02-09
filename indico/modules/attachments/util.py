@@ -7,7 +7,9 @@
 
 from flask import session
 
+from indico.core import signals
 from indico.core.db import db
+from indico.util.signals import values_from_signal
 
 
 def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False):
@@ -53,6 +55,12 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
     files = folders.pop(0).attachments if folders[0].is_default else []
     if not files and not folders:
         return {}
+    signal_value = values_from_signal(signals.attachments.get_attached_items.send(linked_object,
+                                                                                  folders=folders,
+                                                                                  files=files),
+                                      as_list=True)
+    if signal_value:
+        folders, files = signal_value[0]
     return {
         'folders': folders,
         'files': files

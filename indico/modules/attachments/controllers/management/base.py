@@ -21,6 +21,7 @@ from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import _, ngettext
+from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -28,8 +29,13 @@ from indico.web.util import jsonify_data, jsonify_template
 
 
 def _render_attachment_list(linked_object):
-    tpl = get_template_module('attachments/_attachments.html')
-    return tpl.render_attachments(attachments=get_attached_items(linked_object), linked_object=linked_object)
+    signal_value = values_from_signal(signals.attachments.render_attachment_list.send(linked_object),
+                                      as_list=True) or [(None, {})]
+    ext_tpl, ext_context = signal_value[0]
+    tpl = ext_tpl or get_template_module('attachments/_attachments.html')
+    context = ext_context or {'attachments': get_attached_items(linked_object),
+                              'linked_object': linked_object}
+    return tpl.render_attachments(**context)
 
 
 def _render_protection_message(linked_object):

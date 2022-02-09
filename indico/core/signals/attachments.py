@@ -62,3 +62,13 @@ with `from_preview=False`).
 get_file_previewers = _signals.signal('get-file-previewers', '''
 Expected to return one or more `Previewer` subclasses.
 ''')
+
+render_attachment_list = _signals.signal('render-attachment-list', '''
+Called when attachment list is rendered.  The *sender* is the
+`linked object`.  Expected to return a couple (template, template context).
+''')
+
+get_attached_items = _signals.signal('get-attached-items', '''
+Called when getting attached items of a linked object.  The *sender* is the
+`linked object`.  Expected to return a couple (folders, files).
+''')

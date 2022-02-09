@@ -34,7 +34,8 @@ Internal Changes
   sections (:pr:`5237`, thanks :user:`omegak`)
 - Add ``event.reminder.before_reminder_make_email`` signal (:pr:`5242`, thanks
   :user:`vasantvohra`)
-
+- Add ``attachments.render_attachment_list`` signal (:pr:`5255`, thanks :user:`vtran99`)
+- Add ``attachments.get_attached_items`` signal (:pr:`5255`, thanks :user:`vtran99`)
 
 Version 3.1
 -----------
