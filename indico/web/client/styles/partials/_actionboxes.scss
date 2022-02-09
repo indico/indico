@@ -73,10 +73,6 @@
       margin-top: 0.15em;
     }
   }
-
-  &.for-form {
-    width: 400px;
-  }
 }
 
 @mixin action-box-colors($color, $emphasis-color, $background-color, $border-color) {
