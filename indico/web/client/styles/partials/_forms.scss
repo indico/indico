@@ -288,9 +288,9 @@ form {
     display: inline-flex;
     align-items: stretch;
     padding-bottom: 0.5em;
+    width: 100%;
 
     .label {
-      flex: 1;
       background: #e8e8e8;
       padding: 0.55em 1em;
       border-radius: 0.3rem 0 0 0.3rem;
