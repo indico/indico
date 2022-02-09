@@ -38,10 +38,10 @@ export const getManagement = createSelector(
   staticData => staticData.management || false
 );
 
-/** Indicates whether this registration has alreadyt been paid */
+/** Indicates whether this registration has already been paid */
 export const getPaid = createSelector(
   getStaticData,
-  staticData => staticData.paid
+  staticData => staticData.paid || false
 );
 
 /** Get the stored value for a field when editing a registration */
