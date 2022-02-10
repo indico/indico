@@ -400,6 +400,8 @@ class LocationArgs(mm.Schema):
 
     @validates('map_url_template')
     def _check_map_url_template_placeholders(self, map_url_template, **kwargs):
+        if not map_url_template:
+            return
         self._validate_placeholders(map_url_template, {'id', 'building', 'floor', 'number', 'lat', 'lng'})
 
     def _validate_placeholders(self, format_string, valid_placeholders, required_placeholders=None):

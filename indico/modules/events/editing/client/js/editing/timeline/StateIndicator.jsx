@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Label, Popup} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
 import Palette from 'indico/utils/palette';
 
 import {EditableStatus} from '../../models';
@@ -16,28 +17,26 @@ import {EditableStatus} from '../../models';
 import './StateIndicator.module.scss';
 
 const colors = {
-  replaced: 'grey',
+  replaced: 'orange',
   needs_submitter_confirmation: 'yellow',
-  rejected: 'red',
+  rejected: 'black',
   accepted: 'green',
-  assigned: 'purple',
-  needs_submitter_changes: 'orange',
-  not_submitted: 'blue',
-  ready_for_review: 'olive',
+  needs_submitter_changes: 'red',
+  ready_for_review: 'grey',
 };
 
 const labelColors = {
-  replaced: Palette.gray,
+  replaced: Palette.orange,
   needs_submitter_confirmation: Palette.yellow,
-  rejected: Palette.red,
+  rejected: Palette.black,
   accepted: Palette.green,
-  assigned: Palette.purple,
-  needs_submitter_changes: Palette.orange,
-  not_submitted: Palette.blue,
-  ready_for_review: Palette.olive,
+  needs_submitter_changes: Palette.red,
+  not_submitted: Palette.black,
+  ready_for_review: Palette.blue,
 };
 
 export default function StateIndicator({label, circular, tooltip, state, monochrome}) {
+  const labelColor = labelColors[state] || Palette.black;
   const trigger = (
     <Label size="tiny" color={monochrome ? 'grey' : colors[state]} circular={circular} />
   );
@@ -52,8 +51,8 @@ export default function StateIndicator({label, circular, tooltip, state, monochr
         disabled={!tooltip}
       />
       {label && (
-        <div styleName="label-text" style={{color: monochrome ? Palette.gray : labelColors[state]}}>
-          {EditableStatus[state]}
+        <div styleName="label-text" style={{color: monochrome ? Palette.gray : labelColor}}>
+          {EditableStatus[state] || Translate.string('Unknown')}
         </div>
       )}
     </>
@@ -64,7 +63,7 @@ StateIndicator.propTypes = {
   label: PropTypes.bool,
   circular: PropTypes.bool,
   tooltip: PropTypes.string,
-  state: PropTypes.oneOf(Object.keys(colors)).isRequired,
+  state: PropTypes.string.isRequired,
   monochrome: PropTypes.bool,
 };
 

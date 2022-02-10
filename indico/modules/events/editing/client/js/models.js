@@ -49,10 +49,10 @@ export const EditableStatus = {
   needs_submitter_confirmation: Translate.string('Needs submitter confirmation'),
   rejected: Translate.string('Rejected'),
   accepted: Translate.string('Accepted'),
-  assigned: Translate.string('Assigned'),
   needs_submitter_changes: Translate.string('Needs submitter changes'),
   not_submitted: Translate.string('Not submitted'),
   ready_for_review: Translate.string('Ready for review'),
+  new: Translate.string('New'),
 };
 
 export const EditableEditingTitles = {
