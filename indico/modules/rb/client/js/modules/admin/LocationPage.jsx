@@ -154,7 +154,10 @@ class LocationPage extends React.PureComponent {
             style={selectedTemplate === 'none' ? {display: 'none'} : {}}
             nullIfEmpty
             validate={val => {
-              const rv = v.optional(v.url)(val);
+              if (!val) {
+                return;
+              }
+              const rv = v.url(val);
               if (rv) {
                 return rv;
               }
