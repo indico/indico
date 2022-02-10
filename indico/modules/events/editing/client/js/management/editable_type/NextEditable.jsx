@@ -59,7 +59,8 @@ NextEditable.propTypes = {
 
 function NextEditableDisplay({eventId, editableType, onClose, fileTypes, management}) {
   const [filters, setFilters] = useState({});
-  const [filteredEditables, setFilteredEditables] = useState(null);
+  const [editables, setEditables] = useState(null);
+  const [filteredSet, setFilteredSet] = useState(new Set());
   const [selectedEditable, setSelectedEditable] = useState(null);
   const [loading, setLoading] = useState(true);
   const history = useHistory();
@@ -82,39 +83,14 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
         setLoading(false);
         return;
       }
-      setFilteredEditables(camelizeKeys(response.data));
+      setEditables(camelizeKeys(response.data));
       setLoading(false);
     })();
   }, [eventId, editableType, filters]);
 
-  const updatePresenceFilter = (id, present) => {
-    if (filters[id] === present) {
-      setFilters(_.omit(filters, id));
-    } else {
-      setFilters({...filters, [id]: present});
-    }
-  };
-
-  const updateExtensionFilter = (id, extension) => {
-    const typeFilter = filters[id];
-    if (!Array.isArray(typeFilter)) {
-      // switching from no filter or presence filter to extension filter
-      setFilters({...filters, [id]: [extension]});
-    } else if (!typeFilter.includes(extension)) {
-      // adding previously-eselected extension
-      setFilters({...filters, [id]: [...typeFilter, extension]});
-    } else if (typeFilter.length === 1) {
-      // deselecting last extension
-      setFilters(_.omit(filters, id));
-    } else {
-      // deselecting some extension
-      setFilters({...filters, [id]: _.without(typeFilter, extension)});
-    }
-  };
-
   const filterableEditables = useMemo(
     () =>
-      filteredEditables?.map(e => ({
+      editables?.map(e => ({
         id: e.id,
         searchableId: e.contributionFriendlyId,
         searchableFields: e.editor
@@ -122,7 +98,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
           : [e.contributionTitle, e.contributionCode],
         e,
       })),
-    [filteredEditables]
+    [editables]
   );
 
   const filterOptions = useMemo(
@@ -130,12 +106,10 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       {
         key: 'code',
         text: Translate.string('Program code'),
-        options: _.uniq(filteredEditables?.map(e => e.contributionCode).filter(x => x)).map(
-          code => ({
-            value: code,
-            text: code,
-          })
-        ),
+        options: _.uniq(editables?.map(e => e.contributionCode).filter(x => x)).map(code => ({
+          value: code,
+          text: code,
+        })),
         multi: true,
         isMatch: (editable, selectedOptions) =>
           selectedOptions.includes(editable.e.contributionCode),
@@ -143,12 +117,10 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       {
         key: 'keywords',
         text: Translate.string('Keywords'),
-        options: _.uniq(_.flatten(filteredEditables?.map(c => c.contributionKeywords))).map(
-          keyword => ({
-            value: keyword,
-            text: keyword,
-          })
-        ),
+        options: _.uniq(_.flatten(editables?.map(c => c.contributionKeywords))).map(keyword => ({
+          value: keyword,
+          text: keyword,
+        })),
         multi: true,
         isMatch: (editable, selectedOptions) =>
           editable.e.contributionKeywords.some(k => selectedOptions.includes(k)),
@@ -158,7 +130,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
         text: name,
         options: [
           ...(extensions.length > 1
-            ? extensions.map(extension => ({value: `has_${extension}`, text: extension}))
+            ? extensions.map(extension => ({value: `has_ext_${extension}`, text: extension}))
             : [{value: 'has_files', text: Translate.string('has files')}]),
           {
             value: 'has_no_files',
@@ -170,19 +142,39 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
         isMatch: () => true,
       })),
     ],
-    [filteredEditables, fileTypes]
+    [editables, fileTypes]
   );
 
-  const handleFilterChange = filteredResults => {
-    console.log(filteredResults);
-    /* setFilteredSet(filteredResults);
-    setSortedList(_sortList(sortBy, sortDirection, filteredResults));
-    setChecked(
-      contribsWithEditables
-        .filter(row => checkedSet.has(row.editable.id) && filteredResults.has(row.id))
-        .map(row => row.editable.id)
-    ); */
+  const handleFilterChange = (filteredResults, activeFilters) => {
+    const filetypesKeyExpr = /^filetypes_(\d+)$/;
+    const formatFilterOptions = filter => {
+      const extOptionExpr = /^has_ext_(.*)$/;
+      const extensionOptions = filter.selectedOptions.filter(o => extOptionExpr.exec(o));
+      return extensionOptions.length > 0
+        ? extensionOptions.map(o => extOptionExpr.exec(o)[1])
+        : !filter.selectedOptions.includes('has_no_files');
+    };
+    const newFilters = Object.assign(
+      {},
+      ...activeFilters.filters
+        .filter(f => filetypesKeyExpr.exec(f.filter.key))
+        .map(f => ({[+filetypesKeyExpr.exec(f.filter.key)[1]]: formatFilterOptions(f)}))
+    );
+    if (!_.isEqual(filters, newFilters)) {
+      setFilters(newFilters);
+    }
+    setFilteredSet(filteredResults);
+    if (selectedEditable && !filteredResults.has(selectedEditable.id)) {
+      setSelectedEditable(null);
+    }
+    // TODO fix the order of editables
   };
+
+  const filteredEditables = useMemo(
+    () =>
+      editables?.map(e => ({...e, canAssignSelf: filteredSet.has(e.id) ? e.canAssignSelf : false})),
+    [editables, filteredSet]
+  );
 
   const handleAssign = async () => {
     try {
@@ -209,53 +201,6 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       <Modal.Header>{GetNextEditableTitles[editableType]}</Modal.Header>
       <Modal.Content>
         <div styleName="filetype-list">
-          {fileTypes.map(fileType => {
-            return (
-              <div key={fileType.id} styleName="filetype-list-item">
-                <strong>{fileType.name}</strong>
-                <div>
-                  {fileType.extensions.length > 1 ? (
-                    <>
-                      <Button.Group size="small">
-                        {fileType.extensions.map(extension => (
-                          <Button
-                            disabled={loading}
-                            content={extension}
-                            key={extension}
-                            onClick={() => updateExtensionFilter(fileType.id, extension)}
-                            color={
-                              Array.isArray(filters[fileType.id]) &&
-                              filters[fileType.id].includes(extension)
-                                ? 'blue'
-                                : null
-                            }
-                            toggle
-                          />
-                        ))}
-                      </Button.Group>{' '}
-                    </>
-                  ) : (
-                    <Button
-                      disabled={loading}
-                      size="small"
-                      content={Translate.string('has files')}
-                      color={filters[fileType.id] === true ? 'blue' : null}
-                      onClick={() => updatePresenceFilter(fileType.id, true)}
-                      toggle
-                    />
-                  )}
-                  <Button
-                    disabled={loading}
-                    size="small"
-                    content={Translate.string('has no files')}
-                    color={filters[fileType.id] === false ? 'orange' : null}
-                    onClick={() => updatePresenceFilter(fileType.id, false)}
-                    toggle
-                  />
-                </div>
-              </div>
-            );
-          })}
           <ListFilter
             list={filterableEditables}
             filterOptions={filterOptions}
@@ -319,7 +264,7 @@ function NextEditableTable({filteredEditables, selectedEditable, setSelectedEdit
                 radio
                 disabled={!editable.canAssignSelf}
                 value={editable.id}
-                checked={selectedEditable === editable}
+                checked={selectedEditable?.id === editable.id}
                 onChange={() => setSelectedEditable(editable)}
               />
             </Table.Cell>

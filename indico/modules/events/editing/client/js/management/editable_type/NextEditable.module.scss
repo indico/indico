@@ -8,14 +8,8 @@
 @import 'base/palette';
 
 .filetype-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  text-align: end;
   padding: 0 8px 8px 8px;
-}
-
-.filetype-list-item {
-  margin: 0 8px 16px 8px;
 }
 
 .filtered-editables {

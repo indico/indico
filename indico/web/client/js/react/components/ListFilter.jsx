@@ -7,7 +7,7 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Icon, Input, Dropdown, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -18,8 +18,8 @@ export default function ListFilter({list, filterOptions, onChange}) {
   const [activeFilters, setActiveFilters] = useState({search: '', filters: []});
   const [openSubmenu, setOpenSubmenu] = useState(-1);
 
-  const handleChange = value => {
-    const searchValue = value.search.toLowerCase().trim();
+  useEffect(() => {
+    const searchValue = activeFilters.search.toLowerCase().trim();
 
     const isMatchingEntry = entry => {
       if (searchValue) {
@@ -37,30 +37,20 @@ export default function ListFilter({list, filterOptions, onChange}) {
         }
       }
       return filterOptions.every(({key, isMatch}) => {
-        const filter = value.filters.find(f => f.filter.key === key);
+        const filter = activeFilters.filters.find(f => f.filter.key === key);
         return !filter || isMatch(entry, filter.selectedOptions);
       });
     };
-    onChange(new Set(list.filter(isMatchingEntry).map(e => e.id)));
-  };
+    onChange(new Set(list.filter(isMatchingEntry).map(e => e.id)), activeFilters);
+  }, [list, filterOptions, onChange, activeFilters]);
 
-  const handleSearchChange = search => {
-    const newActiveFilters = {search, filters: activeFilters.filters};
-    setActiveFilters(newActiveFilters);
-    handleChange(newActiveFilters);
-  };
-  const handleFiltersChange = filters => {
-    const newActiveFilters = {search: activeFilters.search, filters};
-    setActiveFilters(newActiveFilters);
-    handleChange(newActiveFilters);
-  };
+  const handleSearchChange = search => setActiveFilters({search, filters: activeFilters.filters});
+  const handleFiltersChange = filters => setActiveFilters({search: activeFilters.search, filters});
 
   const addFilter = (filter, selectedOptions) =>
     handleFiltersChange([...activeFilters.filters, {filter, selectedOptions}]);
-
   const removeFilter = key =>
     handleFiltersChange(activeFilters.filters.filter(f => f.filter.key !== key));
-
   const modifyFilter = (filter, selectedOptions) =>
     handleFiltersChange([
       ...activeFilters.filters.filter(f => f.filter.key !== filter.key),
