@@ -65,7 +65,7 @@ class RoomSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'full_name',
                   'comments', 'division', 'is_reservable', 'reservations_need_confirmation', 'sprite_position',
                   'surface_area', 'latitude', 'longitude', 'telephone', 'key_location', 'max_advance_days',
-                  'owner_name', 'available_equipment', 'has_photo', 'verbose_name', 'map_url', 'site')
+                  'owner_name', 'available_equipment', 'has_photo', 'verbose_name', 'map_url', 'site', 'location_id')
 
 
 class AdminRoomSchema(mm.SQLAlchemyAutoSchema):
@@ -396,7 +396,7 @@ class LocationArgs(mm.Schema):
 
     @validates('room_name_format')
     def _check_room_name_format_placeholders(self, room_name_format, **kwargs):
-        self._validate_placeholders(room_name_format, {'building', 'floor', 'number'}, {'building', 'floor', 'number'})
+        self._validate_placeholders(room_name_format, {'site', 'building', 'floor', 'number'}, {'number'})
 
     @validates('map_url_template')
     def _check_map_url_template_placeholders(self, map_url_template, **kwargs):

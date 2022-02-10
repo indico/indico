@@ -74,17 +74,18 @@ class Room(ProtectionManagersMixin, db.Model):
     )
     building = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
+        default=''
     )
     floor = db.Column(
         db.String,
-        default='',
-        nullable=False
+        nullable=False,
+        default=''
     )
     number = db.Column(
         db.String,
-        default='',
-        nullable=False
+        nullable=False,
+        default=''
     )
     notification_emails = db.Column(
         ARRAY(db.String),
@@ -312,7 +313,7 @@ class Room(ProtectionManagersMixin, db.Model):
              .filter(db.m.Location.id == cls.location_id)
              .correlate(Room)
              .scalar_subquery())
-        return db.func.format(q, cls.building, cls.floor, cls.number)
+        return db.func.format(q, cls.building, cls.floor, cls.number, cls.site)
 
     @hybrid_property
     def full_name(self):
@@ -380,6 +381,7 @@ class Room(ProtectionManagersMixin, db.Model):
             warnings.warn('Room has no location; using default name format')
             return f'{self.building}/{self.floor}-{self.number}'
         return self.location.room_name_format.format(
+            site=self.site,
             building=self.building,
             floor=self.floor,
             number=self.number

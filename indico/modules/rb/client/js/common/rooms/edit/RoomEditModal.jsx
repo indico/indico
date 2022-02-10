@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import attributesURL from 'indico-url:rb.admin_attributes';
+import locationsURL from 'indico-url:rb.admin_locations';
 import roomURL from 'indico-url:rb.admin_room';
 import roomAttributesURL from 'indico-url:rb.admin_room_attributes';
 import roomAvailabilityURL from 'indico-url:rb.admin_room_availability';
@@ -76,6 +77,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
     nonbookable_periods: [],
   });
   const [roomNotificationDefaults, setRoomNotificationDefaults] = useState({});
+  const [roomNameFormat, setRoomNameFormat] = useState('');
 
   const isNewRoom = roomId === undefined;
 
@@ -119,7 +121,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         {
           key: 'location',
           menuItem: <Translate>Location</Translate>,
-          pane: <RoomEditLocation key="location" />,
+          pane: <RoomEditLocation key="location" roomNameFormat={roomNameFormat} />,
           fields: [
             'verbose_name',
             'site',
@@ -197,6 +199,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       permissionManager,
       activeTab,
       roomNotificationDefaults,
+      roomNameFormat,
     ]
   );
 
@@ -258,13 +261,16 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       if (!isNewRoom) {
-        setLoading(true);
-        await fetchRoomData();
-        setLoading(false);
+        fetchRoomData().then(() => setLoading(false));
       }
+
+      const location = await fetchData(locationsURL({location_id: locationId}));
+      setRoomNameFormat(location.room_name_format);
+      setLoading(false);
     })();
-  }, [isNewRoom, fetchRoomData]);
+  }, [isNewRoom, fetchRoomData, locationId]);
 
   const formValidation = values => {
     if (!!values.latitude !== !!values.longitude) {
@@ -373,7 +379,9 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   };
 
   if (newRoomId) {
-    return <RoomEditModal roomId={newRoomId} onClose={onClose} afterCreation />;
+    return (
+      <RoomEditModal roomId={newRoomId} locationId={locationId} onClose={onClose} afterCreation />
+    );
   }
   if (!roomDetails || !roomAvailability || !roomAttributes) {
     // In case of error, nothing is returned
@@ -404,14 +412,13 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
 
 RoomEditModal.propTypes = {
   roomId: PropTypes.number,
-  locationId: PropTypes.number,
+  locationId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
   afterCreation: PropTypes.bool,
 };
 
 RoomEditModal.defaultProps = {
   roomId: undefined,
-  locationId: undefined,
   afterCreation: false,
 };
 

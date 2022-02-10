@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import attributesURL from 'indico-url:rb.admin_attributes';
+import locationsURL from 'indico-url:rb.admin_locations';
 import permissionInfoURL from 'indico-url:rb.permission_types';
 
 import {mount} from 'enzyme';
@@ -23,10 +24,16 @@ import RoomEditModal from '../edit/RoomEditModal';
 
 jest.mock('indico/react/components/principals/ACLField', () => () => null);
 
+const whenStable = async () => {
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
+};
+
 describe('RoomEditModal', () => {
   const mockStore = configureMockStore();
 
-  it('should contain fields matching the respective Tab pane', () => {
+  it('should contain fields matching the respective Tab pane', async () => {
     const initialState = {
       rooms: {
         equipmentTypes: [],
@@ -35,14 +42,20 @@ describe('RoomEditModal', () => {
     const store = mockStore(initialState);
     const component = mount(
       <Provider store={store}>
-        <RoomEditModal onClose={() => {}} />
+        <RoomEditModal onClose={() => {}} locationId={1} />
       </Provider>
     );
     act(() => {
       axiosMock.mockResponseFor({url: permissionInfoURL()}, {data: {tree: {}, default: ''}});
       axiosMock.mockResponseFor({url: attributesURL()}, {data: [{name: 'foo', value: 'bar'}]});
+      axiosMock.mockResponseFor(
+        {url: locationsURL({location_id: 1})},
+        {data: {room_name_format: '{number}'}}
+      );
     });
+    await whenStable();
     component.update();
+
     const tabCmp = component.find(Tab);
     expect(tabCmp).toBeDefined();
 
