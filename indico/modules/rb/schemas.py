@@ -396,7 +396,7 @@ class LocationArgs(mm.Schema):
 
     @validates('room_name_format')
     def _check_room_name_format_placeholders(self, room_name_format, **kwargs):
-        self._validate_placeholders(room_name_format, {'building', 'floor', 'number'}, {'number'})
+        self._validate_placeholders(room_name_format, {'site', 'building', 'floor', 'number'}, {'number'})
 
     @validates('map_url_template')
     def _check_map_url_template_placeholders(self, map_url_template, **kwargs):

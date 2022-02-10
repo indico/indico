@@ -115,7 +115,7 @@ class LocationPage extends React.PureComponent {
           if (!val.includes('{number}')) {
             return Translate.string('Missing placeholder: number');
           }
-          const validPlaceholders = ['{building}', '{floor}', '{number}'];
+          const validPlaceholders = ['{site}', '{building}', '{floor}', '{number}'];
           const placeholders = [...val.matchAll(/\{.*?\}/g)].map(match => match[0]);
           const invalid = placeholders.filter(ph => !validPlaceholders.includes(ph));
           if (invalid.length) {
