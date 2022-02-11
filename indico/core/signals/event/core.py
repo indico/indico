@@ -107,3 +107,10 @@ generated.
 The signal should return a dict that will be used to update the
 original representation (fields to add or override).
 ''')
+
+hide_participant_list = _signals.signal('hide-participant-list', '''
+The `event` object is the sender.
+
+The signal should return a bool to determine if the Participant list menu
+should be displayed on the Event page.
+''')

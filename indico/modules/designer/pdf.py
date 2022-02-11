@@ -18,8 +18,10 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Paragraph
 
+from indico.core import signals
 from indico.legacy.pdfinterface.base import setTTFonts
 from indico.modules.designer import PageOrientation
+from indico.util.signals import values_from_signal
 from indico.util.string import strip_tags
 
 
@@ -92,22 +94,34 @@ class DesignerPDFBase:
         return data
 
     def _draw_item(self, canvas, item, tpl_data, content, margin_x, margin_y):
-        style = ParagraphStyle({})
-        style.alignment = ALIGNMENTS[item['text_align']]
-        style.textColor = item.get('color') or '#000000'
-        style.backColor = item.get('background_color') or None
-        style.borderPadding = (0, 0, 4, 0)
-        style.fontSize = _extract_font_size(item['font_size'])
-        style.leading = style.fontSize
+        font_size = _extract_font_size(item['font_size'])
+        styles = {
+            'alignment': ALIGNMENTS[item['text_align']],
+            'textColor': item.get('color') or '#000000',
+            'backColor': item.get('background_color') or None,
+            'borderPadding': (0, 0, 4, 0),
+            'fontSize': font_size,
+            'leading': font_size
+        }
 
         if item['bold'] and item['italic']:
-            style.fontName = FONT_STYLES[item['font_family']][3]
+            styles['fontName'] = FONT_STYLES[item['font_family']][3]
         elif item['italic']:
-            style.fontName = FONT_STYLES[item['font_family']][2]
+            styles['fontName'] = FONT_STYLES[item['font_family']][2]
         elif item['bold']:
-            style.fontName = FONT_STYLES[item['font_family']][1]
+            styles['fontName'] = FONT_STYLES[item['font_family']][1]
         else:
-            style.fontName = FONT_STYLES[item['font_family']][0]
+            styles['fontName'] = FONT_STYLES[item['font_family']][0]
+
+        for update in values_from_signal(
+            signals.event.designer.update_badge_style.send(self.template, item=item, styles=styles),
+            as_list=True
+        ):
+            styles.update(update)
+
+        style = ParagraphStyle({})
+        for key, value in styles.items():
+            setattr(style, key, value)
 
         item_x = float(item['x']) / PIXELS_CM * cm
         item_y = float(item['y']) / PIXELS_CM * cm
