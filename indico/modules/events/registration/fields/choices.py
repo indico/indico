@@ -35,7 +35,7 @@ def get_field_merged_options(field, registration_data):
     result['modifiedChoice'] = []
     if not rdata or not rdata.data:
         return result
-    values = [rdata.data['choice']] if 'choice' in rdata.data else list(rdata.data.keys())
+    values = [rdata.data['choice']] if 'choice' in rdata.data else [k for k, v in rdata.data.items() if v]
     for val in values:
         if val and not any(item['id'] == val for item in result['choices']):
             field_data = rdata.field_data
@@ -235,6 +235,8 @@ class SingleChoiceField(ChoiceBaseField):
         # always store no-option as empty dict
         if value is None:
             value = {}
+        # get rid of entries with 0 slots; they shouldn't happen at all but just in case
+        value = {k: v for k, v in value.items() if v}
         return super().process_form_data(registration, value, old_data, billable_items_locked, new_data_version)
 
 
@@ -278,6 +280,8 @@ class MultiChoiceField(ChoiceBaseField):
         # always store no-option as empty dict
         if value is None:
             value = {}
+        # get rid of entries with 0 slots; they're filtered client-side but just in case...
+        value = {k: v for k, v in value.items() if v}
 
         return_value = {}
         has_old_data = old_data is not None and old_data.data is not None

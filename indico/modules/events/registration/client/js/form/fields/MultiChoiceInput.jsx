@@ -39,10 +39,18 @@ function MultiChoiceInputComponent({
   const currency = useSelector(getCurrency);
 
   const makeHandleChange = choice => () => {
-    onChange({...value, [choice.id]: +!value[choice.id]});
+    if (value[choice.id]) {
+      onChange(_.omit(value, choice.id));
+    } else {
+      onChange({...value, [choice.id]: +!value[choice.id]});
+    }
   };
   const makeHandleSlotsChange = choice => (__, {value: newValue}) => {
-    onChange({...value, [choice.id]: +newValue});
+    if (!+newValue) {
+      onChange(_.omit(value, choice.id));
+    } else {
+      onChange({...value, [choice.id]: +newValue});
+    }
   };
 
   const formatPrice = choice => {
