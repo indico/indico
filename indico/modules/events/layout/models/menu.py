@@ -171,13 +171,14 @@ class MenuEntryMixin:
 
 
 class TransientMenuEntry(MenuEntryMixin):
-    def __init__(self, event, is_enabled, name, position, children):
+    def __init__(self, event, is_enabled, name, position, children, new_tab=False):
         super().__init__(event=event)
         self.is_enabled = is_enabled
         self.title = None
         self.name = name
         self.position = position
         self.children = children
+        self.new_tab = new_tab
         self.type = None
         self.plugin = None
         self.link_url = None
