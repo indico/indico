@@ -202,7 +202,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       <Modal.Content>
         <div styleName="filetype-list">
           <ListFilter
-            list={filterableEditables}
+            value={filterableEditables}
             filterOptions={filterOptions}
             onChange={handleFilterChange}
           />

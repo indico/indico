@@ -133,11 +133,10 @@ function EditableListDisplay({
         key: 'state',
         text: Translate.string('Status'),
         options: [
-          {value: 'accepted', text: Translate.string('Accepted')},
+          {value: 'accepted', text: Translate.string('Accepted'), exclusive: true},
           {value: 'ready_for_review', text: Translate.string('Ready for review')},
           {value: 'not_submitted', text: Translate.string('Not submitted')},
         ],
-        multi: true,
         isMatch: (contrib, selectedOptions) =>
           (contrib.c.editable && selectedOptions.includes(contrib.c.editable.state)) ||
           (selectedOptions.includes('not_submitted') && !contrib.c.editable),
@@ -152,7 +151,6 @@ function EditableListDisplay({
           value: identifier,
           text: fullName,
         })),
-        multi: true,
         isMatch: (contrib, selectedOptions) =>
           contrib.c.editable &&
           contrib.c.editable.editor &&
@@ -165,7 +163,6 @@ function EditableListDisplay({
           value: code,
           text: code,
         })),
-        multi: true,
         isMatch: (contrib, selectedOptions) => selectedOptions.includes(contrib.c.code),
       },
       {
@@ -175,7 +172,6 @@ function EditableListDisplay({
           value: keyword,
           text: keyword,
         })),
-        multi: true,
         isMatch: (contrib, selectedOptions) =>
           contrib.c.keywords.some(k => selectedOptions.includes(k)),
       },
@@ -479,7 +475,7 @@ function EditableListDisplay({
           )}
         </div>
         <ListFilter
-          list={filterableContribs}
+          value={filterableContribs}
           filterOptions={filterOptions}
           onChange={handleFilterChange}
         />

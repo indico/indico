@@ -7,82 +7,83 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Icon, Input, Dropdown, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 import './ListFilter.module.scss';
 
-export default function ListFilter({list, filterOptions, onChange}) {
-  const [activeFilters, setActiveFilters] = useState({search: '', filters: []});
+const FilterLabel = ({text, options, onClick}) => (
+  <Label styleName="filter" className="fluid" color="orange" basic>
+    <p>{text}</p>
+    <Label.Detail className="float right">
+      {_.sortBy(options, 'text').map(o => (
+        <p key={o.value}>{o.text}</p>
+      ))}
+    </Label.Detail>
+    <Icon name="delete" styleName="right" onClick={onClick} />
+  </Label>
+);
+
+FilterLabel.propTypes = {
+  text: PropTypes.string.isRequired,
+  options: PropTypes.array.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
+
+export default function ListFilter({value: list, filterOptions, onChange: _onChange}) {
+  const [filters, _setFilters] = useState({});
+  const [searchText, _setSearchText] = useState('');
   const [openSubmenu, setOpenSubmenu] = useState(-1);
 
-  useEffect(() => {
-    const searchValue = activeFilters.search.toLowerCase().trim();
-
-    const isMatchingEntry = entry => {
-      if (searchValue) {
-        if (entry.searchableId) {
-          const match = searchValue.match(/^#(\d+)$/);
-          if (match) {
-            return entry.searchableId === +match[1];
-          }
-        }
-        if (
-          entry.searchableFields &&
-          !entry.searchableFields.some(f => f.toLowerCase().includes(searchValue))
-        ) {
-          return false;
-        }
-      }
-      return filterOptions.every(({key, isMatch}) => {
-        const filter = activeFilters.filters.find(f => f.filter.key === key);
-        return !filter || isMatch(entry, filter.selectedOptions);
-      });
-    };
-    onChange(new Set(list.filter(isMatchingEntry).map(e => e.id)), activeFilters);
-  }, [list, filterOptions, onChange, activeFilters]);
-
-  const handleSearchChange = search => setActiveFilters({search, filters: activeFilters.filters});
-  const handleFiltersChange = filters => setActiveFilters({search: activeFilters.search, filters});
-
-  const addFilter = (filter, selectedOptions) =>
-    handleFiltersChange([...activeFilters.filters, {filter, selectedOptions}]);
-  const removeFilter = key =>
-    handleFiltersChange(activeFilters.filters.filter(f => f.filter.key !== key));
-  const modifyFilter = (filter, selectedOptions) =>
-    handleFiltersChange([
-      ...activeFilters.filters.filter(f => f.filter.key !== filter.key),
-      {filter, selectedOptions},
-    ]);
-
-  const toggleFilter = (filter, option, isExclusive) => {
-    const activeFilter = activeFilters.filters.find(f => f.filter.key === filter.key);
-    if (activeFilter) {
-      if (activeFilter.selectedOptions.length === 1 && activeFilter.selectedOptions[0] === option) {
-        removeFilter(filter.key);
-      } else if (
-        (isExclusive ||
-          activeFilter.selectedOptions.some(so =>
-            filter.options.find(o => o.value === so && o.exclusive)
-          )) &&
-        activeFilter.selectedOptions.find(o => o !== option)
-      ) {
-        modifyFilter(filter, [option]);
-      } else {
-        const selectedOptions = activeFilter.selectedOptions.includes(option)
-          ? activeFilter.selectedOptions.filter(o => o !== option)
-          : [...activeFilter.selectedOptions, option];
-        modifyFilter(filter, selectedOptions);
-      }
-    } else {
-      addFilter(filter, [option]);
-    }
+  const setFilters = value => {
+    _setFilters(value);
+    const filtered = list.filter(x =>
+      filterOptions.every(({key, isMatch}) => !value[key] || isMatch(x, value[key] || []))
+    );
+    _onChange(new Set(filtered.map(e => e.id)));
   };
 
-  const isSelectedOption = (filterKey, option) =>
-    activeFilters.filters.find(f => f.filter.key === filterKey)?.selectedOptions.includes(option);
+  const setSearchText = value => {
+    _setSearchText(value);
+    value = value.toLowerCase().trim();
+    let filtered = list;
+    if (value) {
+      filtered = list.filter(({searchableId, searchableFields}) => {
+        if (searchableId) {
+          const match = value.match(/^#(\d+)$/);
+          if (match) {
+            return searchableId === +match[1];
+          }
+        }
+        return !searchableFields || searchableFields.some(f => f.toLowerCase().includes(value));
+      });
+    }
+    _onChange(new Set(filtered.map(e => e.id)));
+  };
+
+  const toggleFilter = (key, option) => {
+    const filter = filterOptions.find(x => x.key === key);
+    const exclusive =
+      filters[key] &&
+      filter.options.find(
+        o => (option === o.value || filters[key].includes(o.value)) && o.exclusive
+      );
+    const options = filters[key] || [];
+    let selected = [...options, option];
+    if (options.includes(option)) {
+      selected = options.filter(x => x !== option);
+    } else if (exclusive) {
+      selected = [option];
+    }
+    if (!selected.length) {
+      const {[key]: __, ...rest} = filters;
+      setFilters(rest);
+    } else {
+      setFilters({...filters, [key]: selected});
+    }
+  };
 
   return (
     <div>
@@ -92,78 +93,72 @@ export default function ListFilter({list, filterOptions, onChange}) {
         direction="left"
         labeled
         button
-        className={activeFilters.filters.length > 0 ? 'orange icon' : 'icon'}
+        className={Object.keys(filters).length > 0 ? 'orange icon' : 'icon'}
         onClose={() => setOpenSubmenu(-1)}
       >
         <Dropdown.Menu styleName="filters-menu">
-          {activeFilters.filters.length > 0 ? (
+          {Object.keys(filters).length > 0 ? (
             <>
               <div styleName="active-filters">
-                {_.sortBy(activeFilters.filters, 'filter.text').map(({filter, selectedOptions}) => (
-                  <Label key={filter.key} styleName="filter" className="fluid" color="orange" basic>
-                    <p>{filter.text}</p>
-                    <Label.Detail className="float right">
-                      {_.sortBy(
-                        filter.options.filter(o => selectedOptions.includes(o.value)),
-                        'text'
-                      ).map(o => (
-                        <p key={o.value}>{o.text}</p>
-                      ))}
-                    </Label.Detail>
-                    <Icon
-                      name="delete"
-                      styleName="right"
-                      onClick={evt => {
-                        evt.stopPropagation();
+                {_.sortBy(filterOptions, 'text')
+                  .filter(({key}) => filters[key])
+                  .map(({key, text, options}) => (
+                    <FilterLabel
+                      key={key}
+                      text={text}
+                      options={options.filter(o => filters[key].includes(o.value))}
+                      onClick={() => {
                         setOpenSubmenu(-1);
-                        removeFilter(filter.key);
+                        const {[key]: __, ...rest} = filters;
+                        setFilters(rest);
                       }}
                     />
-                  </Label>
-                ))}
+                  ))}
               </div>
               <Dropdown.Item
                 text={Translate.string('Clear all filters')}
-                onClick={() => handleFiltersChange([])}
+                onClick={() => setFilters({})}
               />
             </>
           ) : (
             <Dropdown.Item text={Translate.string('No filters were added yet')} disabled />
           )}
           <Dropdown.Divider />
-          {_.sortBy(filterOptions, 'text').map(filter => (
+          {_.sortBy(filterOptions, 'text').map(({key, text: filterText, options}) => (
             <Dropdown
-              key={filter.key}
+              key={key}
               scrolling
               icon={null}
               className="item"
               direction="right"
-              onOpen={() => setOpenSubmenu(filter.key)}
+              onOpen={() => setOpenSubmenu(key)}
               onBlur={evt => evt.stopPropagation()}
-              open={openSubmenu === filter.key}
-              disabled={filter.options.length === 0}
-              trigger={<Dropdown.Item text={filter.text} icon="plus" />}
+              open={openSubmenu === key}
+              disabled={options.length === 0}
+              trigger={<Dropdown.Item text={filterText} icon="plus" />}
             >
               <Dropdown.Menu>
-                {_.sortBy(filter.options.filter(o => !o.exclusive), 'text').map(({value, text}) => (
-                  <Dropdown.Item
-                    key={value}
-                    value={value}
-                    text={text}
-                    active={isSelectedOption(filter.key, value)}
-                    onClick={(evt, {value: v}) => toggleFilter(filter, v, !filter.multi)}
-                  />
-                ))}
-                {!!filter.options.find(o => o.exclusive) && <Dropdown.Divider />}
-                {filter.options
-                  .filter(o => o.exclusive)
-                  .map(({value, text}) => (
+                {_.sortBy(options.filter(o => !o.exclusive), 'text').map(
+                  ({value: option, text}) => (
                     <Dropdown.Item
-                      key={value}
-                      value={value}
+                      key={option}
+                      value={option}
                       text={text}
-                      active={isSelectedOption(filter.key, value)}
-                      onClick={(evt, {value: v}) => toggleFilter(filter, v, true)}
+                      active={filters[key]?.includes(option)}
+                      onClick={(e, {value}) => toggleFilter(key, value)}
+                    />
+                  )
+                )}
+                {!!options.find(o => o.exclusive) && <Dropdown.Divider />}
+                {options
+                  .filter(o => o.exclusive)
+                  .map(({value: option, text}) => (
+                    <Dropdown.Item
+                      key={option}
+                      value={option}
+                      text={text}
+                      active={filters[key]?.includes(option)}
+                      onClick={(e, {value}) => toggleFilter(key, value)}
                     />
                   ))}
               </Dropdown.Menu>
@@ -173,15 +168,15 @@ export default function ListFilter({list, filterOptions, onChange}) {
       </Dropdown>
       <Input
         placeholder={Translate.string('Enter #id or search string')}
-        onChange={(evt, {value}) => handleSearchChange(value)}
-        value={activeFilters.search}
+        onChange={(e, {value}) => setSearchText(value)}
+        value={searchText}
         style={{width: '14em'}}
         icon={
-          activeFilters.search
+          searchText
             ? {
                 name: 'close',
                 link: true,
-                onClick: () => handleSearchChange(''),
+                onClick: () => setSearchText(''),
               }
             : undefined
         }
@@ -191,7 +186,7 @@ export default function ListFilter({list, filterOptions, onChange}) {
 }
 
 ListFilter.propTypes = {
-  list: PropTypes.arrayOf(
+  value: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       searchableId: PropTypes.number,
@@ -209,11 +204,10 @@ ListFilter.propTypes = {
           exclusive: PropTypes.bool,
         })
       ).isRequired,
-      multi: PropTypes.bool,
       isMatch: PropTypes.func.isRequired,
     })
   ).isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
-ListFilter.defaultProps = {list: []};
+ListFilter.defaultProps = {value: []};
