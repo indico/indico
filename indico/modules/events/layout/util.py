@@ -98,7 +98,7 @@ class MenuEntryData:
     plugin = None
 
     def __init__(self, title, name, endpoint=None, position=-1, is_enabled=True, visible=None, parent=None,
-                 static_site=False, url_kwargs=None, hide_if_restricted=True):
+                 static_site=False, url_kwargs=None, hide_if_restricted=True, new_tab=False):
         self.title = title
         self._name = name
         self.endpoint = endpoint
@@ -109,6 +109,7 @@ class MenuEntryData:
         self.static_site = static_site
         self.url_kwargs = url_kwargs or {}
         self.hide_if_restricted = hide_if_restricted
+        self.new_tab = new_tab
 
     @property
     def name(self):
@@ -280,6 +281,7 @@ def _build_menu_entry(event, custom_menu_enabled, data, position, children=None,
         is_enabled=data.is_enabled,
         name=data.name,
         position=position,
+        new_tab=data.new_tab,
         children=[_build_menu_entry(event, custom_menu_enabled, entry_data, i)
                   for i, entry_data in enumerate(sorted(children or [], key=_menu_entry_key))]
     )
