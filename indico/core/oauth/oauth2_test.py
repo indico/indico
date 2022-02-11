@@ -11,6 +11,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from authlib.common.security import generate_token
+from authlib.common.urls import url_encode
 from authlib.oauth2.client import OAuth2Client
 from sqlalchemy.dialects.postgresql.array import ARRAY
 from werkzeug.urls import url_parse
@@ -39,6 +40,11 @@ class MockSession:
         headers = headers.copy()
         url, headers, data = auth.prepare(method, url, headers, data)
         return CallableJsonWrapper(self.client.open(url, method=method, data=data, headers=headers))
+
+    def post(self, url, *, data, headers, auth):
+        if isinstance(data, dict):
+            data = url_encode(data.items())
+        return self.request('POST', url, data=data, headers=headers, auth=auth)
 
 
 class CallableJsonWrapper:
