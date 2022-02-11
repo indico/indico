@@ -235,7 +235,8 @@ class SerializerBase:
                    if session_.legacy_mapping else str(session_.friendly_id)),
             'db_id': session_.id,
             'friendly_id': session_.friendly_id,
-            'room': session_.get_room_name(full=False)
+            'room': session_.get_room_name(full=False),
+            'code': session_.code,
         }
 
     fossils_mapping = {
@@ -327,7 +328,8 @@ class SerializerBase:
             'inheritRoom': block.own_room is None,
             'slotTitle': block.title,
             'address': block.address,
-            'conveners': [self._serialize_convener(c, can_manage) for c in block.person_links]
+            'conveners': [self._serialize_convener(c, can_manage) for c in block.person_links],
+            'code': block.code,
         }
         if session_access_list:
             block_data['allowed'] = session_access_list
@@ -384,7 +386,8 @@ class SerializerBase:
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
             'references': list(map(self.serialize_reference, contrib.references)),
-            'board_number': contrib.board_number
+            'board_number': contrib.board_number,
+            'code': contrib.code,
         }
         if include_subcontribs:
             data['subContributions'] = list(map(self._serialize_subcontribution, contrib.subcontributions))
@@ -408,7 +411,8 @@ class SerializerBase:
             'folders': build_folders_api_data(subcontrib),
             'speakers': self._serialize_persons(subcontrib.speakers, person_type='SubContribParticipation',
                                                 can_manage=can_manage),
-            'references': list(map(self.serialize_reference, subcontrib.references))
+            'references': list(map(self.serialize_reference, subcontrib.references)),
+            'code': subcontrib.code,
         }
         return data
 
