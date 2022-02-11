@@ -80,6 +80,7 @@ $border: 1px solid $pastel-gray;
     flex: 0 0 24px;
     height: 1em;
     width: 1em;
+    /* stylelint-disable-next-line value-keyword-case */
     fill: currentColor;
   }
 }
