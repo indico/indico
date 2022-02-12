@@ -32,7 +32,7 @@ class MIMECalendar(MIMEBase):
 
     def __init__(self, filename: str, payload: str):
         message.Message.__init__(self, policy=compat32)
-        self.add_header('Content-Type', 'text/calendar', filename=filename, encoding='utf-8', method='REQUEST')
+        self.add_header('Content-Type', 'text/calendar', filename=filename, charset='utf-8', method='REQUEST')
         self['MIME-Version'] = '1.0'
         self.set_payload(payload)
 
