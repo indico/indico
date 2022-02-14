@@ -473,6 +473,18 @@ class AccommodationField(RegistrationFormBillableItemsField):
     mm_field_class = fields.Nested
     mm_field_kwargs = {'nested': AccommodationSchema}
 
+    @property
+    def default_value(self):
+        versioned_data = self.form_item.versioned_data
+        no_accommodation_option = next(
+            (c for c in versioned_data['choices'] if c['is_no_accommodation'] and c['is_enabled']), None)
+        return {
+            'choice': no_accommodation_option['id'] if no_accommodation_option else None,
+            'isNoAccommodation': bool(no_accommodation_option),
+            'arrivalDate': None,
+            'departureDate': None,
+        }
+
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
         unversioned_data, versioned_data = super().process_field_data(data, old_data, old_versioned_data)

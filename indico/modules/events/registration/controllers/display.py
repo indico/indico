@@ -25,8 +25,8 @@ from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_event_section_data,
-                                                     get_flat_section_submission_data, get_title_uuid,
-                                                     make_registration_schema)
+                                                     get_flat_section_submission_data, get_initial_form_values,
+                                                     get_title_uuid, make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -328,13 +328,15 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
 
     def _process_GET(self):
+        initial_values = get_initial_form_values(self.regform) | self._get_user_data()
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
                                                form_data=get_flat_section_submission_data(self.regform),
+                                               initial_values=initial_values,
                                                angular_sections=get_event_section_data(self.regform),
+                                               angular_user_data=self._get_user_data(),
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
-                                               user_data=self._get_user_data(),
                                                invitation=self.invitation,
                                                registration=self.registration,
                                                management=False,

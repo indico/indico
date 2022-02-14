@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Form, Label} from 'semantic-ui-react';
 
@@ -52,8 +52,8 @@ function AccommodationInputComponent({
   const makeHandleChange = choice => () => {
     const newValue = {...value, choice: choice.id, isNoAccommodation: choice.isNoAccommodation};
     if (choice.isNoAccommodation) {
-      newValue.arrivalDate = null;
-      newValue.departureDate = null;
+      delete newValue.arrivalDate;
+      delete newValue.departureDate;
     }
     onChange(newValue);
   };
@@ -195,17 +195,14 @@ export default function AccommodationInput({
   htmlName,
   disabled,
   isRequired,
+  defaultValue,
   choices,
   arrival,
   departure,
   placesUsed,
 }) {
+  const setupMode = useSelector(state => !!state.staticData.setupMode);
   const existingValue = useSelector(state => getFieldValue(state, id)) || {choice: null};
-  const noAccommodationOption = useMemo(
-    () => choices.find(c => c.isNoAccommodation && c.isEnabled),
-    [choices]
-  );
-
   return (
     <FinalField
       name={htmlName}
@@ -213,12 +210,7 @@ export default function AccommodationInput({
       component={AccommodationInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={{
-        choice: noAccommodationOption?.id || null,
-        isNoAccommodation: !!noAccommodationOption,
-        arrivalDate: null,
-        departureDate: null,
-      }}
+      defaultValue={setupMode ? defaultValue : undefined}
       choices={choices}
       arrival={arrival}
       departure={departure}
@@ -230,6 +222,7 @@ export default function AccommodationInput({
           return Translate.string('You must select the arrival and departure date');
         }
       }}
+      isEqual={_.isEqual}
     />
   );
 }
@@ -239,6 +232,7 @@ AccommodationInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
+  defaultValue: PropTypes.object.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   arrival: PropTypes.shape({
     startDate: PropTypes.string.isRequired,

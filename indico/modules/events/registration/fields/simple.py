@@ -202,14 +202,20 @@ class DateField(RegistrationFormFieldBase):
         return dict(super().view_data, has_time=has_time)
 
 
+class BooleanFieldSetupSchema(LimitedPlacesBillableFieldDataSchema):
+    default_value = fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no']))
+
+    @pre_load()
+    def _convert_to_yes_no(self, data, **kwargs):
+        data['default_value'] = {True: 'yes', False: 'no'}.get(data['default_value'], '')
+        return data
+
+
 class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     mm_field_class = fields.Boolean
     mm_field_kwargs = {'allow_none': True}
-    setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
-    setup_schema_fields = {
-        'default_value': fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no'])),
-    }
+    setup_schema_base_cls = BooleanFieldSetupSchema
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
@@ -237,7 +243,8 @@ class BooleanField(RegistrationFormBillableField):
 
     @property
     def default_value(self):
-        return None
+        data = self.form_item.data
+        return {'yes': True, 'no': False}.get(data.get('default_value'))
 
     def get_places_used(self):
         places_used = 0

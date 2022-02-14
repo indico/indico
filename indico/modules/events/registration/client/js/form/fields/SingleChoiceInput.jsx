@@ -340,12 +340,13 @@ export default function SingleChoiceInput({
   htmlName,
   disabled,
   isRequired,
-  defaultItem,
+  defaultValue,
   itemType,
   choices,
   withExtraSlots,
   placesUsed,
 }) {
+  const setupMode = useSelector(state => !!state.staticData.setupMode);
   const existingValue = useSelector(state => getFieldValue(state, id)) || {};
   return (
     <FinalField
@@ -355,12 +356,13 @@ export default function SingleChoiceInput({
       required={isRequired}
       isRequired={isRequired}
       disabled={disabled}
-      defaultValue={defaultItem ? {[defaultItem]: 1} : {}}
+      defaultValue={setupMode ? defaultValue : undefined}
       itemType={itemType}
       choices={choices}
       withExtraSlots={withExtraSlots}
       placesUsed={placesUsed}
       existingValue={existingValue}
+      isEqual={_.isEqual}
     />
   );
 }
@@ -370,7 +372,7 @@ SingleChoiceInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultItem: PropTypes.string,
+  defaultValue: PropTypes.object.isRequired,
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,
@@ -380,7 +382,6 @@ SingleChoiceInput.propTypes = {
 SingleChoiceInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultItem: null,
   withExtraSlots: false,
 };
 

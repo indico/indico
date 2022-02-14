@@ -172,22 +172,25 @@ export default function MultiChoiceInput({
   htmlName,
   disabled,
   isRequired,
+  defaultValue,
   choices,
   withExtraSlots,
   placesUsed,
 }) {
   const existingValue = useSelector(state => getFieldValue(state, id)) || {};
+  const setupMode = useSelector(state => !!state.staticData.setupMode);
   return (
     <FinalField
       name={htmlName}
       component={MultiChoiceInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={{}}
+      defaultValue={setupMode ? defaultValue : undefined}
       choices={choices}
       withExtraSlots={withExtraSlots}
       placesUsed={placesUsed}
       existingValue={existingValue}
+      isEqual={_.isEqual}
     />
   );
 }
@@ -197,6 +200,7 @@ MultiChoiceInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
+  defaultValue: PropTypes.object.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,

@@ -142,6 +142,19 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
     return {'sections': section_data, 'items': item_data}
 
 
+def get_initial_form_values(regform, *, management=False):
+    initial_values = {}
+    for item in regform.form_items:
+        if (
+            not item.is_section
+            and not item.is_deleted
+            and item.is_enabled and
+            (management or not item.parent.is_manager_only)
+        ):
+            initial_values[item.html_field_name] = item.field_impl.default_value
+    return initial_values
+
+
 def get_event_section_data(regform, management=False, registration=None):
     data = []
     if not registration:
