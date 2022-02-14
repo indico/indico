@@ -20,7 +20,7 @@ import {toMoment} from 'indico/utils/date';
 import '../../../styles/regform.module.scss';
 
 function DateInputComponent({value, onChange, disabled, required, dateFormat, timeFormat}) {
-  const dateValue = value.includes('T') ? value.split('T')[0] : '';
+  const dateValue = value.split('T')[0];
   const timeValue = value.includes('T') ? value.split('T')[1] : '';
 
   const handleDateChange = newDate => {
@@ -28,7 +28,8 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
     const timeString = timeFormat ? timeValue : '00:00:00';
     onChange(`${dateString}T${timeString}`);
   };
-  const handleTimeChange = newTime => onChange(`${dateValue}T${newTime.format('HH:mm:00')}`);
+  const handleTimeChange = newTime =>
+    onChange(newTime ? `${dateValue}T${newTime.format('HH:mm:00')}` : dateValue);
 
   return (
     <Form.Group styleName="date-field">
