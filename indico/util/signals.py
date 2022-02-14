@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import functools
+import inspect
 from itertools import zip_longest
 from types import GeneratorType
 
@@ -74,3 +76,64 @@ def named_objects_from_signal(signal_response, name_attr='name', plugin_attr=Non
         names = ', '.join(sorted(getattr(x, name_attr) for x in conflicting))
         raise RuntimeError(f'Non-unique object names: {names}')
     return mapping
+
+
+_inspect_signature = functools.cache(inspect.signature)
+
+
+def make_interceptable(func, key=None, ctx=None):
+    """Create a wrapper to make a function call interceptable.
+
+    The returned wrapper behaves like the original function, but it triggers a signal
+    which can modify its call arguments or even override the return value (in which
+    case the original function would not get called at all, unless the signal handler
+    decides to do so itself).
+
+    This function can also be used as a decorator; in that case neither a key nor context
+    can be provided (but it would not make sense anyway).
+
+    :param func: The function to make interceptable
+    :param key: An optional key in case using just the function name would be too generic
+                (e.g. in case of most util functions)
+    :param ctx: Additional context (usually a dict) to provide additional data that may
+                be useful to the signal handler but isn't part of the call args
+    """
+    from indico.core import signals
+    sender = interceptable_sender(func, key)
+    sig = _inspect_signature(func)
+
+    @functools.wraps(func)
+    def _wrapper(*args, **kwargs):
+        if not signals.plugin.interceptable_function.has_receivers_for(sender):
+            # this check is rather "optimistic" (quote taken from the has_receivers_for docs) and
+            # it usually passes even when there's no receiver connected anymore, but outside testing
+            # we never disconnect signals anyway...
+            return func(*args, **kwargs)
+        bound_args = sig.bind(*args, **kwargs)
+        return_none = object()
+        sig_rvs = values_from_signal(signals.plugin.interceptable_function.send(sender, func=func, args=bound_args,
+                                                                                ctx=ctx, RETURN_NONE=return_none),
+                                     as_list=True)
+        if not sig_rvs:
+            # no return value override -> call the original function
+            rv = func(*bound_args.args, **bound_args.kwargs)
+        elif len(sig_rvs) != 1:
+            raise RuntimeError(f'Multiple results returned for interceptable {sender}')
+        else:
+            rv = sig_rvs[0]
+            if rv is return_none:
+                rv = None
+        return rv
+
+    return _wrapper
+
+
+def interceptable_sender(func, key=None):
+    """Get the signal sender to intercept a function call.
+
+    :param func: The function that should be intercepted
+    :param key: An optional key in case using just the function
+                name would be too generic (e.g. most utils)
+    """
+    name = f'{func.__module__}.{func.__qualname__}'
+    return f'{name}::{key}' if key else name

@@ -34,6 +34,8 @@ Internal Changes
   sections (:pr:`5237`, thanks :user:`omegak`)
 - Add ``event.reminder.before_reminder_make_email`` signal (:pr:`5242`, thanks
   :user:`vasantvohra`)
+- Add ``plugin.interceptable_function`` signal to intercept selected function
+  calls (:pr:`5254`)
 
 
 Version 3.1
