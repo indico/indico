@@ -109,3 +109,30 @@ the following arguments:
 If a plugin wants to modify the resulting data, it may do so by modifying the contents of
 ``data``.
 ''')
+
+interceptable_function = _signals.signal('interceptable-function', '''
+This signal provides a generic way to let plugins intercept function calls and
+inspect or modify their call arguments. The sender should always be taken from the
+:func:`~indico.util.signals.interceptable_sender` util and not be used directly.
+
+The signal handler also receives the original function in the ``func`` kwarg and the
+:class:`~inspect.BoundArguments` for the original function call in the ``args`` kwarg.
+Additional context may be preovided in the ``ctx`` kwargs.
+
+The args object is mutable; its `arguments` attribute is a dict containing all the arguments
+of the original function call; if necessary its `apply_defaults` method can be called to
+fill in any default values the function provides.
+
+The signal handler may also return a value; if it does so, the original function will NOT
+be called but rather the returned value used. Note that using the signal in this way should
+only be done if you are very sure that no other signal handler does so, as the function call
+will fail with an error in case more than one return value override is specified.
+
+Due to how Python works, returning an explicit ``None`` in order to override the return value
+with ``None`` won't work; but you can use the special ``RETURN_NONE`` kwarg for this purpose.
+
+Note that this signal does NOT let you intercept arbitrary functions; only those which are
+either decorated or where the caller explicitly wrapped the function using
+:func:`~indico.util.signals.make_interceptable` can be intercepted. If you believe a certain
+function should allow this, you're welcome to send a Pull Request.
+''')
