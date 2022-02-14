@@ -204,6 +204,18 @@ class EventReminder(db.Model):
     def is_overdue(self):
         return not self.is_sent and self.scheduled_dt <= now_utc()
 
+    def _make_email(self, recipient, template, attachments):
+        email_params = {
+            'to_list': recipient,
+            'from_address': self.reply_to_address,
+            'template': template,
+            'attachments': attachments
+        }
+        extra_params = signals.event.reminder.before_reminder_make_email.send(self, **email_params)
+        for param in values_from_signal(extra_params, as_list=True):
+            email_params.update(param)
+        return make_email(**email_params)
+
     def send(self):
         """Send the reminder to its recipients."""
         self.is_sent = True
@@ -219,12 +231,7 @@ class EventReminder(db.Model):
             attachments.append(MIMECalendar('event.ics', event_ical))
 
         for recipient in recipients:
-            email_params = dict(to_list=recipient, from_address=self.reply_to_address, template=email_tpl,
-                                attachments=attachments)
-            extra_params = signals.event.reminder.before_reminder_make_email.send(self, **email_params)
-            for param in values_from_signal(extra_params, as_list=True):
-                email_params.update(param)
-            email = make_email(**email_params)
+            email = self._make_email(recipient, email_tpl, attachments)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
     def __repr__(self):
