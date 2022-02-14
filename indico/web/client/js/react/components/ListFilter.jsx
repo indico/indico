@@ -32,7 +32,7 @@ FilterLabel.propTypes = {
   onClick: PropTypes.func.isRequired,
 };
 
-export default function ListFilter({value: list, filterOptions, onChange: _onChange}) {
+export default function ListFilter({list, filterOptions, onChange}) {
   const [filters, _setFilters] = useState({});
   const [searchText, _setSearchText] = useState('');
   const [openSubmenu, setOpenSubmenu] = useState(-1);
@@ -42,7 +42,7 @@ export default function ListFilter({value: list, filterOptions, onChange: _onCha
     const filtered = list.filter(x =>
       filterOptions.every(({key, isMatch}) => !value[key] || isMatch(x, value[key] || []))
     );
-    _onChange(new Set(filtered.map(e => e.id)));
+    onChange(new Set(filtered.map(e => e.id)));
   };
 
   const setSearchText = value => {
@@ -60,7 +60,7 @@ export default function ListFilter({value: list, filterOptions, onChange: _onCha
         return !searchableFields || searchableFields.some(f => f.toLowerCase().includes(value));
       });
     }
-    _onChange(new Set(filtered.map(e => e.id)));
+    onChange(new Set(filtered.map(e => e.id)));
   };
 
   const toggleFilter = (key, option) => {
@@ -186,7 +186,7 @@ export default function ListFilter({value: list, filterOptions, onChange: _onCha
 }
 
 ListFilter.propTypes = {
-  value: PropTypes.arrayOf(
+  list: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       searchableId: PropTypes.number,
@@ -210,4 +210,4 @@ ListFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-ListFilter.defaultProps = {value: []};
+ListFilter.defaultProps = {list: []};

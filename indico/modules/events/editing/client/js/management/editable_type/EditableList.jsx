@@ -475,7 +475,7 @@ function EditableListDisplay({
           )}
         </div>
         <ListFilter
-          value={filterableContribs}
+          list={filterableContribs}
           filterOptions={filterOptions}
           onChange={handleFilterChange}
         />
