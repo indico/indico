@@ -8,16 +8,19 @@
 
 {% block content %}
     <div id="registration-form-submission-container"
-             data-event-id="{{ event.id }}"
-             data-regform-id="{{ regform.id }}"
-             data-submit-url="{{ request.url }}"
-             data-currency="{{ regform.currency }}"
-             data-form-data="{{ form_data | tojson | forceescape }}"
-             data-registration-data="{{ registration_data | tojson | forceescape }}"
-             data-registration-uuid="{{ registration.uuid }}"
-             data-file-data="{{ file_data | tojson | forceescape }}"
-             data-management="{{ management | tojson | forceescape }}"
-             data-paid="{{ paid | tojson | forceescape }}"></div>
+         data-event-id="{{ event.id }}"
+         data-regform-id="{{ regform.id }}"
+         data-submit-url="{{ request.url }}"
+         data-currency="{{ regform.currency }}"
+         data-form-data="{{ form_data | tojson | forceescape }}"
+         data-registration-data="{{ registration_data | tojson | forceescape }}"
+         data-registration-uuid="{{ registration.uuid }}"
+         data-file-data="{{ file_data | tojson | forceescape }}"
+         data-management="{{ management | tojson | forceescape }}"
+         data-paid="{{ paid | tojson | forceescape }}"
+         data-publish-to-participants="{{ regform.publish_registrations_participants.name }}"
+         data-publish-to-public="{{ regform.publish_registrations_public.name }}"
+         data-consent-to-publish="{{ registration.consent_to_publish.name }}"></div>
 
     <hr>
     <h1>Warning, angular 💩 below</h1>

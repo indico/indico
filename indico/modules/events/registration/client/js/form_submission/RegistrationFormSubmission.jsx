@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
@@ -20,10 +21,17 @@ import {
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
+import ConsentToPublishDropdown from '../components/ConsentToPublishDropdown';
 import FormSection from '../form/FormSection';
 import {getNestedSections, getStaticData} from '../form/selectors';
 
-import {getUpdateMode, getModeration, getManagement} from './selectors';
+import {
+  getUpdateMode,
+  getModeration,
+  getManagement,
+  getPublishToParticipants,
+  getPublishToPublic,
+} from './selectors';
 
 import '../../styles/regform.module.scss';
 
@@ -44,12 +52,46 @@ function EmailNotification() {
   );
 }
 
+function ConsentToPublish({publishToParticipants, publishToPublic}) {
+  const isWarning = publishToParticipants === 'show_all' && publishToPublic === 'show_all';
+
+  return (
+    <Message info={!isWarning} warning={isWarning} style={{marginTop: 25}}>
+      <Message.Header>
+        <Translate>Participant list</Translate>
+      </Message.Header>
+      {(publishToParticipants === 'show_with_consent' ||
+        publishToPublic === 'show_with_consent') && (
+        <p>
+          <Translate>
+            Specify whether you consent to being included in the event's list of participants
+          </Translate>
+        </p>
+      )}
+      <ConsentToPublishDropdown
+        name="consent_to_publish"
+        publishToParticipants={publishToParticipants}
+        publishToPublic={publishToPublic}
+        useFinalForms
+      />
+    </Message>
+  );
+}
+
+ConsentToPublish.propTypes = {
+  publishToParticipants: PropTypes.oneOf(['hide_all', 'show_with_consent', 'show_all']).isRequired,
+  publishToPublic: PropTypes.oneOf(['hide_all', 'show_with_consent', 'show_all']).isRequired,
+};
+
 export default function RegistrationFormSubmission() {
   const sections = useSelector(getNestedSections);
   const {submitUrl, registrationData, initialValues} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
   const isManagement = useSelector(getManagement);
+  const publishToParticipants = useSelector(getPublishToParticipants);
+  const publishToPublic = useSelector(getPublishToPublic);
+  const showConsentToPublish = !isManagement && publishToParticipants !== 'hide_all';
 
   const onSubmit = async (data, form) => {
     let resp;
@@ -78,6 +120,12 @@ export default function RegistrationFormSubmission() {
           ))}
           <div>
             {isManagement && <EmailNotification />}
+            {showConsentToPublish && (
+              <ConsentToPublish
+                publishToParticipants={publishToParticipants}
+                publishToPublic={publishToPublic}
+              />
+            )}
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}

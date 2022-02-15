@@ -84,8 +84,8 @@ class PublishRegistrationsMode(RichIntEnum):
 
 
 class PublishConsentType(RichIntEnum):
-    __titles__ = [L_('Hidden'), L_('Visible to participants'), L_('Visible to everyone')]
-    not_given = 0
+    __titles__ = [L_('Do not display to anyone'), L_('Display to other participants'), L_('Display to everyone')]
+    nobody = 0
     participants = 1
     all = 2
 
@@ -231,7 +231,7 @@ class Registration(db.Model):
     consent_to_publish = db.Column(
         PyIntEnum(PublishConsentType),
         nullable=False,
-        default=PublishConsentType.not_given
+        default=PublishConsentType.nobody
     )
     #: The Event containing this registration
     event = db.relationship(

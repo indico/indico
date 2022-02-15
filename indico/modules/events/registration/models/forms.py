@@ -407,6 +407,11 @@ class RegistrationForm(db.Model):
                 .options(subqueryload('data'))
                 .all())
 
+    @property
+    def is_consent_to_publish_applicable(self):
+        return (self.publish_registrations_participants == PublishRegistrationsMode.show_with_consent or
+                self.publish_registrations_public == PublishRegistrationsMode.show_with_consent)
+
     def __repr__(self):
         return f'<RegistrationForm({self.id}, {self.event_id}, {self.title})>'
 

@@ -26,7 +26,7 @@ class _PublishRegistrationsMode(int, Enum):
 
 
 class _PublishConsentType(int, Enum):
-    not_given = 0
+    nobody = 0
     participants = 1
     all = 2
 

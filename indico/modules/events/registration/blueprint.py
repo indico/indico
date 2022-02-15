@@ -197,6 +197,8 @@ _bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants',
 _bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api.RHAPIRegistrationForms)
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registration_tags_assign',
                  tags.RHAPIRegistrationTagsAssign, methods=('POST',))
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_registration_change_consent',
+                 privacy.RHAPIRegistrationChangeConsent, methods=('POST',))
 
 # Participants
 _bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<int:event_id>',

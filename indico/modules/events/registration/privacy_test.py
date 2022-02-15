@@ -23,7 +23,7 @@ def test_registration_publishable(dummy_event, dummy_regform):
 
     assert dummy_regform.publish_registrations_public == PublishRegistrationsMode.hide_all
     assert dummy_regform.publish_registrations_participants == PublishRegistrationsMode.show_with_consent
-    assert reg.consent_to_publish == PublishConsentType.not_given
+    assert reg.consent_to_publish == PublishConsentType.nobody
     assert reg.is_active
     assert reg.state == RegistrationState.complete
     assert not reg.is_publishable(True)
@@ -37,7 +37,7 @@ def test_registration_publishable(dummy_event, dummy_regform):
     assert not reg.is_publishable(False)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert reg.is_publishable(True)
     assert not reg.is_publishable(False)
     reg.consent_to_publish = PublishConsentType.participants
@@ -48,7 +48,7 @@ def test_registration_publishable(dummy_event, dummy_regform):
     assert not reg.is_publishable(False)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.hide_all
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert not reg.is_publishable(True)
     assert not reg.is_publishable(False)
     reg.consent_to_publish = PublishConsentType.participants
@@ -60,7 +60,7 @@ def test_registration_publishable(dummy_event, dummy_regform):
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_with_consent
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_with_consent
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert not reg.is_publishable(True)
     assert not reg.is_publishable(False)
     reg.consent_to_publish = PublishConsentType.participants
@@ -71,7 +71,7 @@ def test_registration_publishable(dummy_event, dummy_regform):
     assert reg.is_publishable(False)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert reg.is_publishable(True)
     assert not reg.is_publishable(False)
     reg.consent_to_publish = PublishConsentType.participants
@@ -83,7 +83,7 @@ def test_registration_publishable(dummy_event, dummy_regform):
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_all
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert reg.is_publishable(True)
     assert reg.is_publishable(False)
     reg.consent_to_publish = PublishConsentType.participants
@@ -132,7 +132,7 @@ def test_registration_publishable_query(dummy_event, dummy_regform):
     assert not _get_publishable(False).has_rows()
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert _get_publishable(True).has_rows()
     assert not _get_publishable(False).has_rows()
     reg.consent_to_publish = PublishConsentType.participants
@@ -143,7 +143,7 @@ def test_registration_publishable_query(dummy_event, dummy_regform):
     assert not _get_publishable(False).has_rows()
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.hide_all
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert not _get_publishable(True).has_rows()
     assert not _get_publishable(False).has_rows()
     reg.consent_to_publish = PublishConsentType.participants
@@ -155,7 +155,7 @@ def test_registration_publishable_query(dummy_event, dummy_regform):
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_with_consent
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_with_consent
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert not _get_publishable(True).has_rows()
     assert not _get_publishable(False).has_rows()
     reg.consent_to_publish = PublishConsentType.participants
@@ -166,7 +166,7 @@ def test_registration_publishable_query(dummy_event, dummy_regform):
     assert _get_publishable(False).has_rows()
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert _get_publishable(True).has_rows()
     assert not _get_publishable(False).has_rows()
     reg.consent_to_publish = PublishConsentType.participants
@@ -178,7 +178,7 @@ def test_registration_publishable_query(dummy_event, dummy_regform):
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_all
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.not_given
+    reg.consent_to_publish = PublishConsentType.nobody
     assert _get_publishable(True).has_rows()
     assert _get_publishable(False).has_rows()
     reg.consent_to_publish = PublishConsentType.participants

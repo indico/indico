@@ -44,6 +44,18 @@ export const getPaid = createSelector(
   staticData => staticData.paid || false
 );
 
+/** Indicates the registration form's publishing to other participants mode */
+export const getPublishToParticipants = createSelector(
+  getStaticData,
+  staticData => staticData.publishToParticipants
+);
+
+/** Indicates the registration form's public publishing mode */
+export const getPublishToPublic = createSelector(
+  getStaticData,
+  staticData => staticData.publishToPublic
+);
+
 /** Get the stored value for a field when editing a registration */
 export const getFieldValue = createSelector(
   getUpdateMode,

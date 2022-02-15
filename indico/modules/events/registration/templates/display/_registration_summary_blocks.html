@@ -18,6 +18,19 @@
             </tr>
         {%- endfor %}
     {%- endfor %}
+    <tr class="regform-done-title">
+        <td colspan="2">{% trans %}Privacy options{% endtrans %}</td>
+    </tr>
+    <tr>
+        <th class="regform-done-caption">{% trans %}Visibility{% endtrans %}</th>
+        <td class="regform-done-data">
+            <div id="registration-summary-consent-to-publish"
+                 data-locator="{{ registration.locator.registrant|tojson|forceescape }}"
+                 data-publish-to-participants="{{ registration.registration_form.publish_registrations_participants.name }}"
+                 data-publish-to-public="{{ registration.registration_form.publish_registrations_public.name }}"
+                 data-initial-consent-to-publish="{{ registration.consent_to_publish.name }}"></div>
+        </td>
+    </tr>
 {% endmacro %}
 
 {% macro render_data(registration, field, from_management=false) %}

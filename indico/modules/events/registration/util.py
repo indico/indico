@@ -10,7 +10,7 @@ import itertools
 from operator import attrgetter
 
 from flask import current_app, json, session
-from marshmallow import RAISE, ValidationError, fields, validates
+from marshmallow import RAISE, ValidationError, fields, validate, validates
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
@@ -36,7 +36,8 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormPersonalDataSection)
-from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
+from indico.modules.events.registration.models.registrations import (PublishConsentType, Registration, RegistrationData,
+                                                                     RegistrationState)
 from indico.modules.events.registration.notifications import (notify_invitation, notify_registration_creation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
@@ -288,6 +289,8 @@ def make_registration_schema(regform, management=False, registration=None):
 
     if management:
         schema['notify_user'] = fields.Boolean()
+    elif regform.is_consent_to_publish_applicable:
+        schema['consent_to_publish'] = fields.String(validate=validate.OneOf([t.name for t in PublishConsentType]))
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
@@ -366,6 +369,8 @@ def create_registration(regform, data, invitation=None, management=False, notify
     if invitation:
         invitation.state = InvitationState.accepted
         invitation.registration = registration
+    if not management and regform.is_consent_to_publish_applicable:
+        registration.consent_to_publish = PublishConsentType[data.get('consent_to_publish', 'nobody')]
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
     signals.event.registration_created.send(registration, management=management, data=data)
@@ -414,6 +419,8 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
+    if not management and regform.is_consent_to_publish_applicable:
+        registration.consent_to_publish = PublishConsentType[data.get('consent_to_publish', 'nobody')]
     registration.sync_state()
     db.session.flush()
     # sanity check

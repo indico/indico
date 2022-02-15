@@ -6,14 +6,17 @@
 # LICENSE file for more details.
 
 from flask.helpers import flash
+from marshmallow import fields, validate
 
 from indico.core.db import db
+from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.controllers.management.reglists import RHRegistrationsActionBase
 from indico.modules.events.registration.forms import ChangeRegistrationVisibilityForm, RegistrationPrivacyForm
 from indico.modules.events.registration.models.registrations import PublishConsentType, PublishRegistrationsMode
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
 from indico.web.util import jsonify_data, jsonify_form
 
 
@@ -32,7 +35,7 @@ class RHRegistrationChangeVisibility(RHRegistrationsActionBase):
                 if consent_type == 'participants':
                     reg.consent_to_publish = PublishConsentType.participants
                 elif consent_type == 'hidden':
-                    reg.consent_to_publish = PublishConsentType.not_given
+                    reg.consent_to_publish = PublishConsentType.nobody
             db.session.flush()
             return jsonify_data()
 
@@ -61,3 +64,14 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
 
         return WPManageRegistration.render_template('management/regform_privacy.html', self.event,
                                                     regform=self.regform, form=form)
+
+
+class RHAPIRegistrationChangeConsent(RHRegistrationFormRegistrationBase):
+    """Internal API to change registration consent to publish."""
+
+    @use_kwargs({
+        'consent_to_publish': fields.String(validate=validate.OneOf([t.name for t in PublishConsentType])),
+    })
+    def _process_POST(self, consent_to_publish):
+        self.registration.consent_to_publish = PublishConsentType[consent_to_publish]
+        return '', 204

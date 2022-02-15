@@ -508,7 +508,7 @@ class ChangeRegistrationVisibilityForm(IndicoForm):
 
     def validate_consent(self, field):
         for reg in self.registrations:
-            if reg.consent_to_publish == PublishConsentType.not_given and field.data == 'participants':
+            if reg.consent_to_publish == PublishConsentType.nobody and field.data == 'participants':
                 raise ValidationError(_('Cannot change visibility without a user consent'))
 
     def is_submitted(self):
