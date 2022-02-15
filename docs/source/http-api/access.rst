@@ -80,9 +80,9 @@ API tokens can have one or more of these scopes:
 
     main()
 
-The ``everything`` scopes are special because they can be used with *any* Indico endpoint, i.e. they are
-not restricted to official APIs. This has the advantage that even Indico actions which do not have a corresponding
-API can be scripted.
+The ``everything`` scopes are special because they can be used with *any* Indico endpoint (including file attachments),
+i.e. they are not restricted to official APIs. This has the advantage that even Indico actions which do not have a
+corresponding API can be scripted.
 Endpoints covered by the ``legacy_api`` scopes are *not* included; these scopes need to be granted explicitly.
 
 .. warning::
