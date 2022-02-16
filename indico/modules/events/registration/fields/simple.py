@@ -126,7 +126,7 @@ class CheckboxField(RegistrationFormBillableField):
 
     @property
     def default_value(self):
-        return None
+        return False
 
 
 class DateFieldDataSchema(mm.Schema):
