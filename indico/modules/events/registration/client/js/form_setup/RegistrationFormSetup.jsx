@@ -16,7 +16,7 @@ import {IButton} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper} from 'indico/react/sortable';
 
-import {getNestedSections} from '../form/selectors';
+import {getNestedSections, getItems} from '../form/selectors';
 
 import DisabledSectionsModal from './DisabledSectionsModal';
 import SectionSettingsModal from './SectionSettingsModal';
@@ -28,9 +28,14 @@ import '../../styles/regform.module.scss';
 export default function RegistrationFormSetup() {
   const sections = useSelector(getNestedSections);
   const disabledSections = useSelector(getDisabledSections);
+  const items = useSelector(getItems);
   const uiLocked = useSelector(isUILocked);
   const [disabledSectionModalActive, setDisabledSectionModalActive] = useState(false);
   const [addSectionModalActive, setAddSectionModalActive] = useState(false);
+
+  const initialValues = Object.fromEntries(
+    Object.entries(items).map(([, {htmlName, defaultValue}]) => [htmlName, defaultValue])
+  );
 
   return (
     <Dimmer.Dimmable dimmed={uiLocked}>
@@ -47,14 +52,30 @@ export default function RegistrationFormSetup() {
         </div>
 
         {/* we need a dummy FinalForm so our fields don't break... */}
-        <FinalForm subscription={{}} onSubmit={() => undefined}>
-          {() => (
-            <SortableWrapper accept="regform-section" className="regform-section-list">
-              {sections.map((section, index) => (
-                <SetupFormSection key={section.id} index={index} {...section} setupMode />
-              ))}
-            </SortableWrapper>
-          )}
+        <FinalForm
+          initialValues={initialValues}
+          subscription={{initialValues: true}}
+          onSubmit={() => undefined}
+        >
+          {fprops => {
+            // FinalForm does not propagate changes to initialValues immediately.
+            // The first render contains the old initialValues, which is a problem for
+            // newly added fields whose initialValue becomes undefined.
+            // Thus, we filter out all fields that have no corresponding value until
+            // the updated initiaValues become available.
+            const currentSections = sections.map(section => ({
+              ...section,
+              items: section.items.filter(item => item.htmlName in fprops.initialValues),
+            }));
+
+            return (
+              <SortableWrapper accept="regform-section" className="regform-section-list">
+                {currentSections.map((section, index) => (
+                  <SetupFormSection key={section.id} index={index} {...section} setupMode />
+                ))}
+              </SortableWrapper>
+            );
+          }}
         </FinalForm>
       </DndProvider>
 

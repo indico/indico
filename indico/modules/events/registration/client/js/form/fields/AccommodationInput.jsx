@@ -195,13 +195,11 @@ export default function AccommodationInput({
   htmlName,
   disabled,
   isRequired,
-  defaultValue,
   choices,
   arrival,
   departure,
   placesUsed,
 }) {
-  const setupMode = useSelector(state => !!state.staticData.setupMode);
   const existingValue = useSelector(state => getFieldValue(state, id)) || {choice: null};
   return (
     <FinalField
@@ -210,7 +208,6 @@ export default function AccommodationInput({
       component={AccommodationInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={setupMode ? defaultValue : undefined}
       choices={choices}
       arrival={arrival}
       departure={departure}
@@ -232,7 +229,6 @@ AccommodationInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.object.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   arrival: PropTypes.shape({
     startDate: PropTypes.string.isRequired,

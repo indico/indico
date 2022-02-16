@@ -25,7 +25,6 @@ export default function setupRegformSetup(root) {
       eventStartDate,
       eventEndDate,
       currency,
-      setupMode: true,
     },
   };
   const store = createReduxStore('regform-setup', reducers, initialData);

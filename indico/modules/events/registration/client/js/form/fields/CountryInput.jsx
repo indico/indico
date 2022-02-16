@@ -7,7 +7,6 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {useSelector} from 'react-redux';
 import {Dropdown} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
@@ -47,15 +46,13 @@ CountryInputComponent.propTypes = {
   clearable: PropTypes.bool.isRequired,
 };
 
-export default function CountryInput({htmlName, disabled, isRequired, defaultValue, choices}) {
-  const setupMode = useSelector(state => !!state.staticData.setupMode);
+export default function CountryInput({htmlName, disabled, isRequired, choices}) {
   return (
     <FinalField
       name={htmlName}
       component={CountryInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={setupMode ? defaultValue : undefined}
       choices={choices}
       clearable={!isRequired}
       parse={x => x}
@@ -67,7 +64,6 @@ CountryInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.string.isRequired,
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
 };
 

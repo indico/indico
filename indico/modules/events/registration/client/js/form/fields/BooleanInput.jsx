@@ -95,12 +95,10 @@ export default function BooleanInput({
   htmlName,
   disabled,
   isRequired,
-  defaultValue,
   price,
   placesLimit,
   placesUsed,
 }) {
-  const setupMode = useSelector(state => !!state.staticData.setupMode);
   return (
     <FinalField
       id={id}
@@ -112,7 +110,6 @@ export default function BooleanInput({
       price={price}
       placesLimit={placesLimit}
       placesUsed={placesUsed}
-      defaultValue={setupMode ? defaultValue : undefined}
     />
   );
 }
@@ -122,7 +119,6 @@ BooleanInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.bool,
   price: PropTypes.number,
   placesLimit: PropTypes.number,
   placesUsed: PropTypes.number,
@@ -131,7 +127,6 @@ BooleanInput.propTypes = {
 BooleanInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultValue: null,
   price: 0,
   placesLimit: 0,
   placesUsed: 0,
