@@ -349,12 +349,16 @@ def modify_registration(registration, data, management=False, notify_user=True):
     personal_data_changes = {}
     regform = registration.registration_form
     data_by_field = registration.data_by_field
-    if management or not registration.user:
+    if 'email' in data and (management or not registration.user):
         registration.user = get_user_by_email(data['email'])
 
     billable_items_locked = not management and registration.is_paid
     for form_item in regform.active_fields:
         field_impl = form_item.field_impl
+
+        if form_item.html_field_name not in data:
+            continue
+
         if management or not form_item.parent.is_manager_only:
             value = data.get(form_item.html_field_name)
         elif form_item.id not in data_by_field:

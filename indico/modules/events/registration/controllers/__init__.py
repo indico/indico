@@ -40,8 +40,18 @@ class RegistrationEditMixin:
                 for r in self.registration.data
                 if r.field_data.field.field_impl.is_file_field and r.storage_file_id is not None}
 
+    def _get_optional_fields(self):
+        """Get fields for which we already have a value and thus are not required."""
+
+        data_by_field = self.registration.data_by_field
+        return [form_item.html_field_name for form_item in self.regform.active_fields
+                if data_by_field.get(form_item.id) is not None]
+
     def _process_POST(self):
-        schema = make_registration_schema(self.regform, management=self.management, registration=self.registration)()
+        optional_fields = self._get_optional_fields()
+        schema = make_registration_schema(
+            self.regform, management=self.management, registration=self.registration
+        )(partial=optional_fields)
         form_data = parser.parse(schema)
 
         notify_user = not self.management or form_data.pop('notify_user', False)
@@ -58,7 +68,7 @@ class RegistrationEditMixin:
         file_data = self._get_file_data()
         registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
                              for r in self.registration.data
-                             if r.user_data is not None or r.field_data.field.html_field_name in file_data}
+                             if r.user_data is not None or r.field_data.field.field_impl.is_file_field}
 
         # TODO remove with angular
         registration_metadata = {

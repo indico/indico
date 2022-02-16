@@ -11,7 +11,12 @@ import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Message} from 'semantic-ui-react';
 
-import {FinalSubmitButton, handleSubmitError, FinalCheckbox} from 'indico/react/forms';
+import {
+  FinalSubmitButton,
+  handleSubmitError,
+  FinalCheckbox,
+  getChangedValues,
+} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
@@ -46,11 +51,10 @@ export default function RegistrationFormSubmission() {
   const isModerated = useSelector(getModeration);
   const isManagement = useSelector(getManagement);
 
-  const onSubmit = async data => {
-    console.log(data);
+  const onSubmit = async (data, form) => {
     let resp;
     try {
-      resp = await indicoAxios.post(submitUrl, data);
+      resp = await indicoAxios.post(submitUrl, isUpdateMode ? getChangedValues(data, form) : data);
     } catch (err) {
       return handleSubmitError(err);
     }
