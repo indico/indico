@@ -64,6 +64,10 @@ class NumberField(RegistrationFormBillableField):
             return ''
         return str(registration_data.data) if for_humans else registration_data.data
 
+    @property
+    def default_value(self):
+        return None
+
 
 class TextAreaField(RegistrationFormFieldBase):
     name = 'textarea'

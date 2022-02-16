@@ -25,7 +25,7 @@ function NumberInputComponent({value, onChange, disabled, price, minValue, maxVa
     <div styleName="number-field">
       <input
         type="number"
-        value={value}
+        value={value !== null ? value : ''}
         min={minValue}
         max={maxValue}
         disabled={disabled}
@@ -41,8 +41,7 @@ function NumberInputComponent({value, onChange, disabled, price, minValue, maxVa
 }
 
 NumberInputComponent.propTypes = {
-  // XXX: why do we get an empty string here initially?
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([''])]),
+  value: PropTypes.number,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   price: PropTypes.number.isRequired,
@@ -65,6 +64,7 @@ export default function NumberInput({htmlName, disabled, isRequired, price, minV
       component={NumberInputComponent}
       required={isRequired}
       disabled={disabled}
+      allowNull
       price={price}
       minValue={minValue}
       maxValue={maxValue}
