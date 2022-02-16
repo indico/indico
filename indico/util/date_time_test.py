@@ -75,5 +75,5 @@ def test_iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist, expect
     ('EEEdMMM', 'Mon, 8 Feb'),
 ))
 def test_format_skeleton(skeleton, expected):
-    dt = datetime(2021, 2, 8).astimezone(timezone('Europe/Zurich'))
+    dt = as_utc(datetime(2021, 2, 8)).astimezone(timezone('Europe/Zurich'))
     assert format_skeleton(dt, skeleton, 'en_GB', 'Europe/Zurich') == expected
