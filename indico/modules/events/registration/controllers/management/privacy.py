@@ -56,9 +56,9 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
     def _process_POST(self):
         form = RegistrationPrivacyForm(event=self.event, regform=self.regform)
         if form.validate_on_submit():
-            participantVisibility, everyoneVisibility = form.visibility.data
-            self.regform.publish_registrations_participants = PublishRegistrationsMode[participantVisibility]
-            self.regform.publish_registrations_public = PublishRegistrationsMode[everyoneVisibility]
+            participant_visibility, public_visibility = form.visibility.data
+            self.regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
+            self.regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
             db.session.flush()
             flash(_('Settings saved'), 'success')
 

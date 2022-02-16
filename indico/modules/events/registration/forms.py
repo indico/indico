@@ -120,22 +120,6 @@ class RegistrationFormForm(IndicoForm):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
 
-    def __validate_publish_registration_fields(self, field):
-        if (self.regform and
-                field.data == PublishRegistrationsMode.show_all and
-                self.regform.__dict__[field.name] != PublishRegistrationsMode.show_all and
-                self.regform.existing_registrations_count > 0):
-            raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
-
-    def validate_publish_registrations_public(self, field):
-        if field.data > self.publish_registrations_participants.data:
-            raise ValidationError(_('Registrations list visibility can not be more restrictive to participants than '
-                                    'to the public'))
-        self.__validate_publish_registration_fields(field)
-
-    def validate_publish_registrations_participants(self, field):
-        self.__validate_publish_registration_fields(field)
-
 
 class RegistrationFormScheduleForm(IndicoForm):
     start_dt = IndicoDateTimeField(_('Start'), [Optional()], default_time=time(0, 0),
@@ -524,5 +508,29 @@ class RegistrationPrivacyForm(IndicoForm):
                                                                 'to everyone else who can access the event'))
     submitted = HiddenField()
 
+    def __init__(self, *args, **kwargs):
+        self.regform = kwargs.pop('regform')
+        super().__init__(*args, **kwargs)
+
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form
+
+    def validate_visibility(self, field):
+        participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data)
+        if participant_visibility.value < public_visibility.value:
+            raise ValidationError(_('Registrations list visibility can not be more restrictive to participants than '
+                                    'to the public'))
+        participant_visibility_changed_to_show_all = (
+            participant_visibility == PublishRegistrationsMode.show_all and
+            self.regform.publish_registrations_participants != PublishRegistrationsMode.show_all
+        )
+        public_visibility_changed_to_show_all = (
+            public_visibility == PublishRegistrationsMode.show_all and
+            self.regform.publish_registrations_public != PublishRegistrationsMode.show_all
+        )
+        if (
+            self.regform and
+            self.regform.existing_registrations_count > 0 and
+            (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all)
+        ):
+            raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
