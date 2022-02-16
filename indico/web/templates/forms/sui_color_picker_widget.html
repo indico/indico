@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div class="i-form-field-fixed-width">
+    <div>
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-data"
                {% if field.data is not none %}value="{{ field.data }}"{% endif %}
                {{ input_args | html_params }}>

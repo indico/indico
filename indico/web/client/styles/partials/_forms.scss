@@ -34,6 +34,10 @@ form {
   width: 400px;
 }
 
+.i-form-field-fluid {
+  width: 100%;
+}
+
 .i-form {
   @extend %font-family-form;
   box-sizing: border-box;
@@ -66,7 +70,7 @@ form {
 
     .form-field {
       float: left;
-      width: 80%;
+      width: 70%;
     }
   }
 
@@ -200,14 +204,13 @@ form {
 .i-form .form-group .form-field {
   @extend %form-field-block;
 
-  @include apply-to-text-inputs('.i-form-field-fixed-width');
+  @include apply-to-text-inputs('.i-form-field-fluid');
+  @include apply-to-inputs('%form-field-input');
 
   > select,
   > textarea {
-    @extend .i-form-field-fixed-width;
+    @extend .i-form-field-fluid;
   }
-
-  @include apply-to-inputs('%form-field-input');
 
   .selectize-control input[type='text'] {
     height: auto;
@@ -285,9 +288,9 @@ form {
     display: inline-flex;
     align-items: stretch;
     padding-bottom: 0.5em;
+    width: 100%;
 
     .label {
-      flex: 1;
       background: #e8e8e8;
       padding: 0.55em 1em;
       border-radius: 0.3rem 0 0 0.3rem;
