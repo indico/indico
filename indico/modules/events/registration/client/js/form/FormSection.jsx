@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Form} from 'semantic-ui-react';
+import {Form, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {Markdown} from 'indico/react/util';
@@ -30,12 +30,22 @@ export default function FormSection({
   const enabledFields = items.filter(item => item.isEnabled);
   const disabledFields = setupMode ? items.filter(item => !item.isEnabled) : [];
 
+  const managerPopup = (
+    <Popup
+      content={Translate.string('This section is only visible to managers.')}
+      trigger={<i className="icon-user-reading" style={{marginRight: 5}} />}
+    />
+  );
+
   return (
-    <div className={`regform-section ${isManagerOnly ? 'manager-only' : ''}`}>
+    <div className="regform-section" styleName={isManagerOnly ? 'manager-only' : null}>
       <div className="i-box-header">
         {sortHandle}
         <div styleName="header-wrapper">
-          <div className="i-box-title">{title}</div>
+          <div className="i-box-title">
+            {isManagerOnly ? managerPopup : null}
+            {title}
+          </div>
           <div className="i-box-description">
             <Markdown>{description}</Markdown>
           </div>
