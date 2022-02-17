@@ -288,9 +288,10 @@ class RHRegistrationCreate(RHManageRegFormBase):
 
     def _process_GET(self):
         initial_values = get_initial_form_values(self.regform) | self._get_user_data()
+        form_data = get_flat_section_submission_data(self.regform, management=True)
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,
-                                                    form_data=get_flat_section_submission_data(self.regform),
+                                                    form_data=form_data,
                                                     initial_values=initial_values,
                                                     # XXX why don't we include manager-only sections here?!
                                                     angular_sections=get_event_section_data(self.regform),
