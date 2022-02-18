@@ -75,7 +75,7 @@ class RegistrationEditMixin:
         }
 
         return self.view_class.render_template(self.template_file, self.event,
-                                               sections=section_data, regform=self.regform,
+                                               angular_sections=section_data, regform=self.regform,
                                                form_data=form_data,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
