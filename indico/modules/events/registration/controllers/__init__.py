@@ -12,7 +12,8 @@ from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import (get_event_section_data, get_flat_section_submission_data,
-                                                     make_registration_schema, modify_registration)
+                                                     get_form_registration_data, make_registration_schema,
+                                                     modify_registration)
 from indico.util.string import camelize_keys
 from indico.web.args import parser
 
@@ -65,8 +66,7 @@ class RegistrationEditMixin:
                                                      registration=self.registration)
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
                                                             registration=self.registration))
-        registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
-                             for r in self.registration.data}
+        registration_data = get_form_registration_data(self.regform, self.registration, management=self.management)
 
         # TODO remove with angular
         registration_metadata = {

@@ -375,6 +375,10 @@ class RegistrationForm(db.Model):
         return [x for x in self.form_items if x.is_section]
 
     @property
+    def active_sections(self):
+        return [x for x in self.sections if x.is_visible and not x.is_deleted]
+
+    @property
     def disabled_sections(self):
         return [x for x in self.sections if not x.is_visible and not x.is_deleted]
 

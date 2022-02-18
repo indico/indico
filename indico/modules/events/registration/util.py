@@ -125,16 +125,16 @@ def get_flat_section_positions_setup_data(regform):
 
 
 def get_flat_section_submission_data(regform, *, management=False, registration=None):
-    # TODO: skip disabled sections/items unless there's an active registration? (check current behavior first)
-    section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections
-                    if not s.is_deleted and (management or not s.is_manager_only)}
+    section_data = {s.id: camelize_keys(s.own_data) for s in regform.active_sections
+                    if management or not s.is_manager_only}
 
     item_data = {}
     registration_data = {r.field_data.field.id: r for r in registration.data} if registration else None
-    for item in regform.form_items:
-        if item.is_section or item.is_deleted or (not management and item.parent.is_manager_only):
+    for item in regform.active_fields:
+        can_modify = management or not item.parent.is_manager_only
+        if not can_modify:
             continue
-        if registration and item.is_field and isinstance(item.field_impl, (ChoiceBaseField, AccommodationField)):
+        if registration and isinstance(item.field_impl, (ChoiceBaseField, AccommodationField)):
             field_data = get_field_merged_options(item, registration_data)
         else:
             field_data = item.view_data
@@ -144,15 +144,30 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
 
 def get_initial_form_values(regform, *, management=False):
     initial_values = {}
-    for item in regform.form_items:
-        if (
-            not item.is_section
-            and not item.is_deleted
-            and item.is_enabled and
-            (management or not item.parent.is_manager_only)
-        ):
+    for item in regform.active_fields:
+        can_modify = management or not item.parent.is_manager_only
+        if can_modify:
             initial_values[item.html_field_name] = item.field_impl.default_value
     return initial_values
+
+
+def get_form_registration_data(regform, registration, *, management=False):
+    """
+    Return a mapping from 'html_field_name' to the registration data.
+    This also includes default values for any newly added fields since
+    the React frontend requires all initial values to be present.
+    """
+    data_by_field = registration.data_by_field
+    registration_data = {}
+    for item in regform.active_fields:
+        can_modify = management or not item.parent.is_manager_only
+        if not can_modify:
+            continue
+        elif item.id in data_by_field:
+            registration_data[item.html_field_name] = camelize_keys(data_by_field[item.id].user_data)
+        else:
+            registration_data[item.html_field_name] = item.field_impl.default_value
+    return registration_data
 
 
 def get_event_section_data(regform, management=False, registration=None):
