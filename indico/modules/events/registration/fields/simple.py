@@ -211,6 +211,11 @@ class BooleanFieldSetupSchema(LimitedPlacesBillableFieldDataSchema):
 
     @pre_load()
     def _convert_to_yes_no(self, data, **kwargs):
+        """
+        For historical reasons, the boolean default value is
+        saved as 'yes'/'no'/'' instead of True/False/None where the latter
+        is used for the actual value of the field.
+        """
         data['default_value'] = {True: 'yes', False: 'no'}.get(data['default_value'], '')
         return data
 
