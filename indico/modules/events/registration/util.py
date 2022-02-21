@@ -330,12 +330,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     for form_item in regform.active_fields:
         default = form_item.field_impl.default_value
         can_modify = management or not form_item.parent.is_manager_only
-
-        if can_modify:
-            value = data.get(form_item.html_field_name, default)
-        else:
-            value = default
-
+        value = data.get(form_item.html_field_name, default) if can_modify else default
         data_entry = RegistrationData()
         registration.data.append(data_entry)
         for attr, value in form_item.field_impl.process_form_data(registration, value).items():
@@ -380,9 +375,10 @@ def modify_registration(registration, data, management=False, notify_user=True):
         if has_data and can_modify:
             value = data.get(form_item.html_field_name)
         elif not has_data and form_item.id not in data_by_field:
-            # set default value for a field if it didn't have one before
+            # set default value for a field if it didn't have one before (including manager-only fields)
             value = field_impl.default_value
         else:
+            # keep current value
             continue
 
         if form_item.id not in data_by_field:
