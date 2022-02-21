@@ -171,7 +171,9 @@ export default function ListFilter({
                     />
                   )
                 )}
-                {!!options.find(o => o.exclusive) && <Dropdown.Divider />}
+                {!!options.find(o => o.exclusive) && !!options.find(o => !o.exclusive) && (
+                  <Dropdown.Divider />
+                )}
                 {options
                   .filter(o => o.exclusive)
                   .map(({value: option, text}) => (
@@ -208,13 +210,7 @@ export default function ListFilter({
 }
 
 ListFilter.propTypes = {
-  list: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      searchableId: PropTypes.number,
-      searchableFields: PropTypes.arrayOf(PropTypes.string),
-    })
-  ),
+  list: PropTypes.array,
   filters: PropTypes.object,
   searchText: PropTypes.string,
   filterOptions: PropTypes.arrayOf(
