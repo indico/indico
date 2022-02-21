@@ -60,11 +60,18 @@ NextEditable.propTypes = {
 function NextEditableDisplay({eventId, editableType, onClose, fileTypes, management}) {
   const [editables, setEditables] = useState(null);
   const [filters, setFilters] = useState({});
-  const [filteredSet, setFilteredSet] = useState(new Set());
+  const [filteredSet, _setFilteredSet] = useState(new Set());
   const [selectedEditable, setSelectedEditable] = useState(null);
   const [loading, setLoading] = useState(true);
   const currFilters = useRef(null);
   const history = useHistory();
+
+  const setFilteredSet = value => {
+    _setFilteredSet(value);
+    if (selectedEditable && !value.has(selectedEditable.id)) {
+      setSelectedEditable(null);
+    }
+  };
 
   const getEditables = useCallback(
     async _filters => {
@@ -85,17 +92,6 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     },
     [eventId, editableType]
   );
-
-  useEffect(() => {
-    (async () => {
-      setSelectedEditable(null);
-      setLoading(true);
-      const _editables = await getEditables();
-      setEditables(_editables);
-      setFilteredSet(new Set(_editables.map(e => e.id)));
-      setLoading(false);
-    })();
-  }, [eventId, editableType, getEditables]);
 
   const filterOptions = useMemo(
     () => [
@@ -135,10 +131,6 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     ],
     [editables, fileTypes]
   );
-
-  const onChangeList = result => {
-    setFilteredSet(new Set(result.map(e => e.id)));
-  };
 
   const onChangeFilters = async activeFilters => {
     const filetypesKeyExpr = /^filetypes_(\d+)$/;
@@ -201,6 +193,17 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     }
   };
 
+  useEffect(() => {
+    (async () => {
+      setSelectedEditable(null);
+      setLoading(true);
+      const _editables = await getEditables();
+      setEditables(_editables);
+      _setFilteredSet(new Set(_editables.map(e => e.id)));
+      setLoading(false);
+    })();
+  }, [eventId, editableType, getEditables]);
+
   return (
     <Modal onClose={onClose} closeOnDimmerClick={false} open>
       <Modal.Header>{GetNextEditableTitles[editableType]}</Modal.Header>
@@ -217,7 +220,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
                 : [e.contributionTitle, e.contributionCode]
             }
             onChangeFilters={onChangeFilters}
-            onChangeList={onChangeList}
+            onChangeList={result => setFilteredSet(new Set(result.map(e => e.id)))}
           />
         </div>
         <Dimmer.Dimmable styleName="filtered-editables" dimmed={loading}>
