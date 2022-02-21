@@ -32,35 +32,57 @@ FilterLabel.propTypes = {
   onClick: PropTypes.func.isRequired,
 };
 
-export default function ListFilter({list, filterOptions, onChange}) {
-  const [filters, _setFilters] = useState({});
-  const [searchText, _setSearchText] = useState('');
+export default function ListFilter({
+  list,
+  filters: externalFilters,
+  searchText: externalSearchText,
+  filterOptions,
+  searchableId,
+  searchableFields,
+  onChangeFilters,
+  onChangeSearchText,
+  onChangeList,
+}) {
+  const [internalFilters, setInternalFilters] = useState({});
+  const [internalSearchText, setInternalSearchText] = useState('');
   const [openSubmenu, setOpenSubmenu] = useState(-1);
+  const filters = onChangeFilters ? externalFilters : internalFilters;
+  const searchText = onChangeSearchText ? externalSearchText : internalSearchText;
 
   const setFilters = value => {
-    _setFilters(value);
+    if (onChangeFilters) {
+      onChangeFilters(value);
+      return;
+    }
+    setInternalFilters(value);
     const filtered = list.filter(x =>
-      filterOptions.every(({key, isMatch}) => !value[key] || isMatch(x, value[key] || []))
+      filterOptions.every(
+        ({key, isMatch}) => !value[key] || !isMatch || isMatch(x, value[key] || [])
+      )
     );
-    onChange(new Set(filtered.map(e => e.id)));
+    onChangeList(new Set(filtered.map(e => e.id)));
   };
 
   const setSearchText = value => {
-    _setSearchText(value);
+    if (onChangeSearchText) {
+      onChangeSearchText(value);
+      return;
+    }
+    setInternalSearchText(value);
     value = value.toLowerCase().trim();
     let filtered = list;
     if (value) {
-      filtered = list.filter(({searchableId, searchableFields}) => {
+      filtered = list.filter(e => {
         if (searchableId) {
           const match = value.match(/^#(\d+)$/);
           if (match) {
-            return searchableId === +match[1];
+            return searchableId(e) === +match[1];
           }
         }
-        return !searchableFields || searchableFields.some(f => f.toLowerCase().includes(value));
+        return !searchableFields || searchableFields(e).some(f => f.toLowerCase().includes(value));
       });
     }
-    onChange(new Set(filtered.map(e => e.id)));
+    onChangeList(new Set(filtered.map(e => e.id)));
   };
 
   const toggleFilter = (key, option) => {
@@ -193,6 +215,8 @@ ListFilter.propTypes = {
       searchableFields: PropTypes.arrayOf(PropTypes.string),
     })
   ),
+  filters: PropTypes.object,
+  searchText: PropTypes.string,
   filterOptions: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -204,10 +228,23 @@ ListFilter.propTypes = {
           exclusive: PropTypes.bool,
         })
       ).isRequired,
-      isMatch: PropTypes.func.isRequired,
+      isMatch: PropTypes.func,
     })
   ).isRequired,
-  onChange: PropTypes.func.isRequired,
+  searchableId: PropTypes.func,
+  searchableFields: PropTypes.func,
+  onChangeList: PropTypes.func,
+  onChangeFilters: PropTypes.func,
+  onChangeSearchText: PropTypes.string,
 };
 
-ListFilter.defaultProps = {list: []};
+ListFilter.defaultProps = {
+  list: [],
+  filters: undefined,
+  searchText: undefined,
+  searchableId: undefined,
+  searchableFields: undefined,
+  onChangeList: undefined,
+  onChangeFilters: undefined,
+  onChangeSearchText: undefined,
+};

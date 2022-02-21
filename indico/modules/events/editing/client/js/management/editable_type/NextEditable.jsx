@@ -11,7 +11,7 @@ import editableListURL from 'indico-url:event_editing.api_filter_editables_by_fi
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import {useHistory} from 'react-router-dom';
 import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
 
@@ -58,48 +58,44 @@ NextEditable.propTypes = {
 };
 
 function NextEditableDisplay({eventId, editableType, onClose, fileTypes, management}) {
-  const [filters, setFilters] = useState({});
   const [editables, setEditables] = useState(null);
+  const [filters, setFilters] = useState({});
   const [filteredSet, setFilteredSet] = useState(new Set());
   const [selectedEditable, setSelectedEditable] = useState(null);
   const [loading, setLoading] = useState(true);
+  const currFilters = useRef(null);
   const history = useHistory();
 
-  useEffect(() => {
-    (async () => {
-      setSelectedEditable(null);
-      setLoading(true);
+  const getEditables = useCallback(
+    async _filters => {
       let response;
       try {
         response = await indicoAxios.post(
           editableListURL({event_id: eventId, type: editableType}),
           {
-            extensions: _.pickBy(filters, x => Array.isArray(x)),
-            has_files: _.pickBy(filters, x => !Array.isArray(x)),
+            extensions: _.pickBy(_filters, x => Array.isArray(x)),
+            has_files: _.pickBy(_filters, x => !Array.isArray(x)),
           }
         );
       } catch (e) {
         handleAxiosError(e);
-        setLoading(false);
         return;
       }
-      setEditables(camelizeKeys(response.data));
+      return camelizeKeys(response.data);
+    },
+    [eventId, editableType]
+  );
+
+  useEffect(() => {
+    (async () => {
+      setSelectedEditable(null);
+      setLoading(true);
+      const _editables = await getEditables();
+      setEditables(_editables);
+      setFilteredSet(new Set(_editables.map(e => e.id)));
       setLoading(false);
     })();
-  }, [eventId, editableType, filters]);
-
-  const filterableEditables = useMemo(
-    () =>
-      editables?.map(e => ({
-        id: e.id,
-        searchableId: e.contributionFriendlyId,
-        searchableFields: e.editor
-          ? [e.contributionTitle, e.contributionCode, e.editor.fullName]
-          : [e.contributionTitle, e.contributionCode],
-        e,
-      })),
-    [editables]
-  );
+  }, [eventId, editableType, getEditables]);
 
   const filterOptions = useMemo(
     () => [
@@ -110,9 +106,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
           value: code,
           text: code,
         })),
-        multi: true,
-        isMatch: (editable, selectedOptions) =>
-          selectedOptions.includes(editable.e.contributionCode),
+        isMatch: (editable, selectedOptions) => selectedOptions.includes(editable.contributionCode),
       },
       {
         key: 'keywords',
@@ -121,9 +115,8 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
           value: keyword,
           text: keyword,
         })),
-        multi: true,
         isMatch: (editable, selectedOptions) =>
-          editable.e.contributionKeywords.some(k => selectedOptions.includes(k)),
+          editable.contributionKeywords.some(k => selectedOptions.includes(k)),
       },
       ...fileTypes.map(({id, name, extensions}) => ({
         key: `filetypes_${id}`,
@@ -131,43 +124,55 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
         options: [
           ...(extensions.length > 1
             ? extensions.map(extension => ({value: `has_ext_${extension}`, text: extension}))
-            : [{value: 'has_files', text: Translate.string('has files')}]),
+            : [{value: 'has_files', text: Translate.string('has files'), exclusive: true}]),
           {
             value: 'has_no_files',
             text: Translate.string('has no files'),
-            exclusive: extensions.length > 1,
+            exclusive: true,
           },
         ],
-        multi: extensions.length > 1,
-        isMatch: () => true,
       })),
     ],
     [editables, fileTypes]
   );
 
-  const handleFilterChange = (filteredResults, activeFilters) => {
+  const onChangeList = result => {
+    setFilteredSet(new Set(result.map(e => e.id)));
+  };
+
+  const onChangeFilters = async activeFilters => {
     const filetypesKeyExpr = /^filetypes_(\d+)$/;
-    const formatFilterOptions = filter => {
+    const formatFilterOptions = options => {
       const extOptionExpr = /^has_ext_(.*)$/;
-      const extensionOptions = filter.selectedOptions.filter(o => extOptionExpr.exec(o));
+      const extensionOptions = options.filter(o => extOptionExpr.exec(o));
       return extensionOptions.length > 0
         ? extensionOptions.map(o => extOptionExpr.exec(o)[1])
-        : !filter.selectedOptions.includes('has_no_files');
+        : !options.includes('has_no_files');
     };
-    const newFilters = Object.assign(
-      {},
-      ...activeFilters.filters
-        .filter(f => filetypesKeyExpr.exec(f.filter.key))
-        .map(f => ({[+filetypesKeyExpr.exec(f.filter.key)[1]]: formatFilterOptions(f)}))
+    const newFilters = Object.keys(activeFilters)
+      .filter(f => filetypesKeyExpr.exec(f))
+      .reduce(
+        (acc, f) => ({
+          ...acc,
+          [+filetypesKeyExpr.exec(f)[1]]: formatFilterOptions(activeFilters[f]),
+        }),
+        {}
+      );
+    let _editables = editables;
+    if (!_.isEqual(currFilters.current, newFilters)) {
+      setLoading(true);
+      _editables = await getEditables(newFilters);
+      setLoading(false);
+      setEditables(_editables);
+      currFilters.current = newFilters;
+    }
+    const filtered = _editables.filter(x =>
+      filterOptions.every(
+        ({key, isMatch}) => !activeFilters[key] || !isMatch || isMatch(x, activeFilters[key] || [])
+      )
     );
-    if (!_.isEqual(filters, newFilters)) {
-      setFilters(newFilters);
-    }
-    setFilteredSet(filteredResults);
-    if (selectedEditable && !filteredResults.has(selectedEditable.id)) {
-      setSelectedEditable(null);
-    }
-    // TODO fix the order of editables
+    setFilters(activeFilters);
+    setFilteredSet(new Set(filtered.map(e => e.id)));
   };
 
   const filteredEditables = useMemo(
@@ -202,9 +207,17 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       <Modal.Content>
         <div styleName="filetype-list">
           <ListFilter
-            list={filterableEditables}
+            list={editables}
+            filters={filters}
             filterOptions={filterOptions}
-            onChange={handleFilterChange}
+            searchableId={e => e.contributionFriendlyId}
+            searchableFields={e =>
+              e.editor
+                ? [e.contributionTitle, e.contributionCode, e.editor.fullName]
+                : [e.contributionTitle, e.contributionCode]
+            }
+            onChangeFilters={onChangeFilters}
+            onChangeList={onChangeList}
           />
         </div>
         <Dimmer.Dimmable styleName="filtered-editables" dimmed={loading}>
