@@ -379,7 +379,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
         if has_data and can_modify:
             value = data.get(form_item.html_field_name)
-        elif not has_data and form_item.id not in data_by_field and can_modify:
+        elif not has_data and form_item.id not in data_by_field:
             # set default value for a field if it didn't have one before
             value = field_impl.default_value
         else:
