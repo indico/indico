@@ -254,7 +254,7 @@ function EditableListDisplay({
     [contribList]
   );
 
-  const handleFilterChange = filteredResults => {
+  const onChangeList = filteredResults => {
     setFilteredSet(filteredResults);
     setSortedList(_sortList(sortBy, sortDirection, filteredResults));
     setChecked(
@@ -477,7 +477,7 @@ function EditableListDisplay({
         <ListFilter
           list={filterableContribs}
           filterOptions={filterOptions}
-          onChange={handleFilterChange}
+          onChangeList={onChangeList}
         />
       </div>
       {sortedList.length ? (
