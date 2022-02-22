@@ -220,6 +220,14 @@ class RHLayoutCSSPreview(RHLayoutBase):
         return WPConferenceDisplay(self, self.event, css_override_form=form, css_url_override=css_url).display()
 
 
+class RHLayoutViewStylesheet(RHLayoutBase):
+    def _process(self):
+        form = CSSSelectionForm(event=self.event, formdata=request.args, csrf_enabled=False)
+        if not form.validate() or not form.theme.data:
+            raise NotFound
+        return redirect(get_css_url(self.event, force_theme=form.theme.data))
+
+
 class RHLayoutCSSSaveTheme(RHLayoutBase):
     def _process(self):
         form = CSSSelectionForm(event=self.event)
