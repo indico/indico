@@ -467,8 +467,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from indico.modules.categories import Category
         if not isinstance(category_ids, (list, tuple, set)):
             category_ids = [category_ids]
-        cte = Category.get_tree_cte()
-        return (cte.c.id == Event.category_id) & cte.c.path.overlap(category_ids)
+        cte = Category.get_subtree_ids_cte(category_ids)
+        return cte.c.id == Event.category_id
 
     @classmethod
     def is_visible_in(cls, category_id):

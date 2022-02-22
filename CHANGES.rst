@@ -27,6 +27,8 @@ Bugfixes
 - Fix error when exporting registrations to PDFs that contained certain invalid HTML-like
   sequences (:pr:`5233`)
 - Restore logical order of registration list columns (:pr:`5240`)
+- Fix a performance issue in the HTTP API when exporting events from a specific category
+  while specifying a limit (only affected large databases) (:pr:`5260`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
