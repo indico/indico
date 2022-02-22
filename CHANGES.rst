@@ -24,6 +24,8 @@ Improvements
 
 - Add a new event management permission that grants access only to the abstracts
   module (:pr:`5212`)
+- Add a link to quickly view the current stylesheet on the conference layout
+  customization page (:issue:`5239`, :pr:`5259`)
 
 Bugfixes
 ^^^^^^^^

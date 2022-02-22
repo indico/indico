@@ -10,7 +10,8 @@ from indico.modules.events.layout.controllers.images import RHImageDelete, RHIma
 from indico.modules.events.layout.controllers.layout import (RHLayoutCSSDelete, RHLayoutCSSDisplay, RHLayoutCSSPreview,
                                                              RHLayoutCSSSaveTheme, RHLayoutCSSUpload, RHLayoutEdit,
                                                              RHLayoutLogoDelete, RHLayoutLogoUpload,
-                                                             RHLayoutTimetableThemeForm, RHLogoDisplay)
+                                                             RHLayoutTimetableThemeForm, RHLayoutViewStylesheet,
+                                                             RHLogoDisplay)
 from indico.modules.events.layout.controllers.menu import (RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
                                                            RHMenuEntryEdit, RHMenuEntryPosition,
                                                            RHMenuEntryToggleDefault, RHMenuEntryToggleEnabled,
@@ -36,6 +37,7 @@ _bp.add_url_rule('/menu/<int:menu_entry_id>/delete', 'menu_delete_entry', RHMenu
 _bp.add_url_rule('/menu/add', 'menu_add_entry', RHMenuAddEntry, methods=('GET', 'POST'))
 _bp.add_url_rule('/theme/save', 'css_save_theme', RHLayoutCSSSaveTheme, methods=('POST',))
 _bp.add_url_rule('/theme/preview', 'css_preview', RHLayoutCSSPreview)
+_bp.add_url_rule('/theme/stylesheet', 'view_stylesheet', RHLayoutViewStylesheet)
 _bp.add_url_rule('/css', 'upload_css', RHLayoutCSSUpload, methods=('POST',))
 _bp.add_url_rule('/css', 'delete_css', RHLayoutCSSDelete, methods=('DELETE',))
 _bp.add_url_rule('/logo', 'upload_logo', RHLayoutLogoUpload, methods=('POST',))

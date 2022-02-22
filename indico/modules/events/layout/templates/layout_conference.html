@@ -32,6 +32,14 @@
                     {%- trans %}Preview{% endtrans -%}
                 </a>
             {% endcall %}
+            <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-field">
+                    <a href="{{ url_for('event_layout.view_stylesheet', event) }}" target="_blank" class="js-view-stylesheet-btn">
+                        {%- trans %}View current stylesheet{% endtrans -%}
+                    </a>
+                </div>
+            </div>
         {% endcall %}
     {% endcall %}
 
@@ -75,12 +83,31 @@
         $(document).ready(function() {
             'use strict';
 
+            function updateViewStylesheet(theme) {
+                if (theme !== '') {
+                    const stylesheetURL = build_url(
+                        {{ url_for('event_layout.view_stylesheet', event) | tojson }},
+                        {theme}
+                    );
+                    $('.js-view-stylesheet-btn').attr('href', stylesheetURL).show();
+                } else {
+                    $('.js-view-stylesheet-btn').hide();
+                }
+            }
+
             $('#theme').nullableselector({nullvalue: ''}).on('change', function() {
-                var previewURL = build_url({{ url_for('event_layout.css_preview', event) | tojson }}, {
-                    theme: $(this).val()
+                const $this = $(this);
+                const previewURL = build_url({{ url_for('event_layout.css_preview', event) | tojson }}, {
+                    theme: $this.val()
                 });
-                $(this).nextAll('.js-theme-preview-btn').attr('href', previewURL);
+                $this.nextAll('.js-theme-preview-btn').attr('href', previewURL);
+                updateViewStylesheet($this.val());
             }).trigger('change');
+
+            $('#use_custom_css').on('change', function () {
+                const useCustomCSS = $(this).prop('checked');
+                updateViewStylesheet(useCustomCSS ? '_custom' : $('#theme').val())
+            });
 
             function updateCustomCSS(hasFile) {
                 var useCustomCSS = $('#use_custom_css');
