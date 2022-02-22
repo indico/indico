@@ -287,7 +287,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
         return jsonify({'redirect': url_for('.manage_reglist', self.regform)})
 
     def _process_GET(self):
-        initial_values = get_initial_form_values(self.regform) | self._get_user_data()
+        initial_values = get_initial_form_values(self.regform, management=True) | self._get_user_data()
         form_data = get_flat_section_submission_data(self.regform, management=True)
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,

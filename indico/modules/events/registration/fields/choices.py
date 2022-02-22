@@ -480,9 +480,9 @@ class AccommodationField(RegistrationFormBillableItemsField):
             (c for c in versioned_data['choices'] if c['is_no_accommodation'] and c['is_enabled']), None)
         return {
             'choice': no_accommodation_option['id'] if no_accommodation_option else None,
-            'isNoAccommodation': bool(no_accommodation_option),
-            'arrivalDate': None,
-            'departureDate': None,
+            'is_no_accommodation': bool(no_accommodation_option),
+            'arrival_date': None,
+            'departure_date': None,
         }
 
     @classmethod

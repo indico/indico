@@ -147,7 +147,7 @@ def get_initial_form_values(regform, *, management=False):
     for item in regform.active_fields:
         can_modify = management or not item.parent.is_manager_only
         if can_modify:
-            initial_values[item.html_field_name] = item.field_impl.default_value
+            initial_values[item.html_field_name] = camelize_keys(item.field_impl.default_value)
     return initial_values
 
 

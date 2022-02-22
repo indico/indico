@@ -138,7 +138,7 @@ class RegistrationFormFieldBase:
     @property
     def view_data(self):
         return (self.unprocess_field_data(self.form_item.versioned_data, self.form_item.data) |
-                {'defaultValue': self.default_value})
+                {'default_value': self.default_value})
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         """Return the data contained in the field.
