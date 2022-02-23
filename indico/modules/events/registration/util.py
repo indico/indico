@@ -289,7 +289,7 @@ def make_registration_schema(regform, management=False, registration=None):
 
     if management:
         schema['notify_user'] = fields.Boolean()
-    elif regform.is_consent_to_publish_applicable:
+    elif regform.needs_publish_consent:
         schema['consent_to_publish'] = fields.String(validate=validate.OneOf([t.name for t in PublishConsentType]))
 
     for form_item in regform.active_fields:
@@ -369,7 +369,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     if invitation:
         invitation.state = InvitationState.accepted
         invitation.registration = registration
-    if not management and regform.is_consent_to_publish_applicable:
+    if not management and regform.needs_publish_consent:
         registration.consent_to_publish = PublishConsentType[data.get('consent_to_publish', 'nobody')]
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
@@ -419,7 +419,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
-    if not management and regform.is_consent_to_publish_applicable:
+    if not management and regform.needs_publish_consent:
         registration.consent_to_publish = PublishConsentType[data.get('consent_to_publish', 'nobody')]
     registration.sync_state()
     db.session.flush()
@@ -508,6 +508,7 @@ def get_published_registrations(event, is_participant):
     """Get a list of published registrations for an event.
 
     :param event: the `Event` to get registrations for
+    :param is_participant: whether the user accessing the registrations is a participant of the event
     :return: list of `Registration` objects
     """
     query = (Registration.query.with_parent(event)

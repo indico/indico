@@ -27,7 +27,6 @@ class RHRegistrationChangeVisibility(RHRegistrationsActionBase):
         form = ChangeRegistrationVisibilityForm(regform=self.regform,
                                                 registration_id=[reg.id for reg in self.registrations],
                                                 registrations=self.registrations)
-        form.consent.choices = [('participants', _('Visible to participants')), ('hidden', _('Hidden'))]
 
         if form.validate_on_submit():
             consent_type = form.consent.data

@@ -109,7 +109,7 @@ class RegistrationFormForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        self.regform = kwargs.pop('regform') if 'regform' in kwargs else None
+        self.regform = kwargs.pop('regform', None)
         super().__init__(*args, **kwargs)
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
@@ -482,7 +482,8 @@ class RegistrationTagsAssignForm(IndicoForm):
 class ChangeRegistrationVisibilityForm(IndicoForm):
     """Form to change visibility of registrations."""
 
-    consent = SelectField(_('Visibility'), [DataRequired()], description=_('Select visibility level'))
+    consent = SelectField(_('Visibility'), [DataRequired()], description=_('Select visibility level'),
+                          choices=[('participants', _('Visible to participants')), ('hidden', _('Hidden'))])
     registration_id = HiddenFieldList()
     submitted = HiddenField()
 
@@ -491,9 +492,9 @@ class ChangeRegistrationVisibilityForm(IndicoForm):
         super().__init__(*args, **kwargs)
 
     def validate_consent(self, field):
-        for reg in self.registrations:
-            if reg.consent_to_publish == PublishConsentType.nobody and field.data == 'participants':
-                raise ValidationError(_('Cannot change visibility without a user consent'))
+        if field.data == 'participants' and any(reg.consent_to_publish == PublishConsentType.nobody
+                                                for reg in self.registrations):
+            raise ValidationError(_('Cannot change visibility without a user consent'))
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form
@@ -506,14 +507,10 @@ class RegistrationPrivacyForm(IndicoForm):
                                                   description=_('Specify under which conditions the participant list '
                                                                 'will be visible to other participants and '
                                                                 'to everyone else who can access the event'))
-    submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
         super().__init__(*args, **kwargs)
-
-    def is_submitted(self):
-        return super().is_submitted() and 'submitted' in request.form
 
     def validate_visibility(self, field):
         participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data)

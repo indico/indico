@@ -76,13 +76,13 @@
     </div>
 {% endif %}
 
-{% if event.published_registrations(user) %}
+{% if event.get_published_registrations(user) %}
     <div class="event-details-row">
         <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
         <div class="event-details-content">
             <div class="participant-list-wrapper">
                 <ul class="participant-list">
-                    {%- for participant in event.published_registrations(user)|sort(attribute='display_full_name') -%}
+                    {%- for participant in event.get_published_registrations(user)|sort(attribute='display_full_name') -%}
                         <li class="ui image label meeting-participant {% if participant.checked_in and participant.registration_form.publish_checkin_enabled %} checked-in {% endif %}">
                             {%- if not g.static_site -%}
                                 <img src="{{ participant.avatar_url }}" alt="">
