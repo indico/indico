@@ -29,6 +29,8 @@ Bugfixes
 - Restore logical order of registration list columns (:pr:`5240`)
 - Fix a performance issue in the HTTP API when exporting events from a specific category
   while specifying a limit (only affected large databases) (:pr:`5260`)
+- Correctly specify charset in iCalendar files attached to emails (:issue:`5228`,
+  :pr:`5258`, thanks :user:`imranyusuff`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
