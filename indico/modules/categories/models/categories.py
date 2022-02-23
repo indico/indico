@@ -392,6 +392,24 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return cte_query.union_all(rec_query)
 
     @classmethod
+    def get_subtree_ids_cte(cls, ids):
+        """Create a CTE for a category subtree.
+
+        This CTE contains a single ``id`` column that contains all the specified
+        IDs and those of all their subcategories.
+
+        This is likely to be much more performant than `get_tree_cte` when the
+        query is used with LIMIT, especially in large databases.
+        """
+        cat_alias = db.aliased(cls)
+        cte_query = (select([cat_alias.id])
+                     .where(cat_alias.id.in_(ids))
+                     .cte(recursive=True))
+        rec_query = (select([cat_alias.id])
+                     .where(cat_alias.parent_id == cte_query.c.id))
+        return cte_query.union_all(rec_query)
+
+    @classmethod
     def get_protection_cte(cls):
         cat_alias = db.aliased(cls)
         cte_query = (select([cat_alias.id, cat_alias.protection_mode])

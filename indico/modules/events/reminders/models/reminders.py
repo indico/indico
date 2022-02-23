@@ -8,6 +8,7 @@
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -21,6 +22,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import make_reminder_email
 from indico.util.date_time import now_utc
+from indico.util.signals import values_from_signal
 from indico.util.string import format_repr
 
 
@@ -202,6 +204,18 @@ class EventReminder(db.Model):
     def is_overdue(self):
         return not self.is_sent and self.scheduled_dt <= now_utc()
 
+    def _make_email(self, recipient, template, attachments):
+        email_params = {
+            'to_list': recipient,
+            'from_address': self.reply_to_address,
+            'template': template,
+            'attachments': attachments
+        }
+        extra_params = signals.event.reminder.before_reminder_make_email.send(self, **email_params)
+        for param in values_from_signal(extra_params, as_list=True):
+            email_params.update(param)
+        return make_email(**email_params)
+
     def send(self):
         """Send the reminder to its recipients."""
         self.is_sent = True
@@ -217,9 +231,7 @@ class EventReminder(db.Model):
             attachments.append(MIMECalendar('event.ics', event_ical))
 
         for recipient in recipients:
-            email = make_email(
-                to_list=recipient, from_address=self.reply_to_address, template=email_tpl, attachments=attachments
-            )
+            email = self._make_email(recipient, email_tpl, attachments)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
     def __repr__(self):

@@ -53,6 +53,7 @@ Improvements
 - Add the ability to clone abstracts (:pr:`5217`)
 - Add setting to allow submitters to edit their own contributions (:pr:`5213`)
 - Update the editing state color scheme (:pr:`5236`)
+- Include program codes in export API (:pr:`5246`)
 
 Bugfixes
 ^^^^^^^^
@@ -65,12 +66,20 @@ Bugfixes
 - Fix error when exporting registrations to PDFs that contained certain invalid HTML-like
   sequences (:pr:`5233`)
 - Restore logical order of registration list columns (:pr:`5240`)
+- Fix a performance issue in the HTTP API when exporting events from a specific category
+  while specifying a limit (only affected large databases) (:pr:`5260`)
+- Correctly specify charset in iCalendar files attached to emails (:issue:`5228`,
+  :pr:`5258`, thanks :user:`imranyusuff`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Add ``category-sidebar`` template hook and blocks around category sidebar
   sections (:pr:`5237`, thanks :user:`omegak`)
+- Add ``event.reminder.before_reminder_make_email`` signal (:pr:`5242`, thanks
+  :user:`vasantvohra`)
+- Add ``plugin.interceptable_function`` signal to intercept selected function
+  calls (:pr:`5254`)
 
 
 Version 3.1
