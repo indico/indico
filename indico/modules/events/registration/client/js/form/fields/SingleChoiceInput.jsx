@@ -111,7 +111,7 @@ function SingleChoiceDropdown({
           placeholder={Translate.string('Choose an option')}
           options={options}
           disabled={disabled}
-          value={selectedChoice.id}
+          value={selectedChoice.id || ''}
           onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
           clearable={!isRequired}
           search
