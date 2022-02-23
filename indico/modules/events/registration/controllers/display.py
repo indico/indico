@@ -290,11 +290,13 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     }
 
     def _get_user_data(self):
-        user_data = {t.name: getattr(session.user, t.name, t.default)
-                     if session.user else t.default for t in PersonalDataType}
+        user_data = {t.name: getattr(session.user, t.name, None) for t in PersonalDataType
+                     if t.name != 'title' and getattr(session.user, t.name, None) is not None}
         if self.invitation:
             user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
-        user_data['title'] = get_title_uuid(self.regform, user_data['title']) or PersonalDataType.title.default
+        title = getattr(session.user, 'title', None)
+        if title_uuid := get_title_uuid(self.regform, title):
+            user_data['title'] = {title_uuid: 1}
         return user_data
 
     def _check_access(self):

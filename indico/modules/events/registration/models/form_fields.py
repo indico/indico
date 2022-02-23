@@ -109,7 +109,7 @@ class RegistrationFormPersonalDataField(RegistrationFormField):
     def view_data(self):
         data = dict(super().view_data,
                     field_is_required=self.personal_data_type.is_required,
-                    field_is_personal_data=True, default_value=self.personal_data_type.default)
+                    field_is_personal_data=True)
         return camelize_keys(data)
 
     @property

@@ -273,9 +273,11 @@ class RHRegistrationCreate(RHManageRegFormBase):
     def _get_user_data(self, user):
         if user is None:
             return {}
-        user_data = {t.name: getattr(user, t.name, t.default)
-                     if user else t.default for t in PersonalDataType}
-        user_data['title'] = get_title_uuid(self.regform, user_data['title']) or PersonalDataType.title.default
+        user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
+                     if t.name != 'title' and getattr(user, t.name, None) is not None}
+        title = getattr(user, 'title', None)
+        if title_uuid := get_title_uuid(self.regform, title):
+            user_data['title'] = {title_uuid: 1}
         return user_data
 
     def _process_POST(self):

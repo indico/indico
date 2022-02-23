@@ -209,7 +209,7 @@ class DateField(RegistrationFormFieldBase):
 class BooleanFieldSetupSchema(LimitedPlacesBillableFieldDataSchema):
     default_value = fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no']))
 
-    @pre_load()
+    @pre_load
     def _convert_to_yes_no(self, data, **kwargs):
         """
         For historical reasons, the boolean default value is
