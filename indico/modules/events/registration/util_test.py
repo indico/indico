@@ -9,6 +9,7 @@ from datetime import datetime
 from io import BytesIO
 
 import pytest
+from flask import session
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
@@ -442,8 +443,8 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     _fill_form_field_with_data(multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
-            {'caption': 'A', 'id': 'new:AbntJPo-cMPo8SKgcsjAr', 'is_enabled': True},
-            {'caption': 'B', 'id': 'new:H0VRkvScH-NXeL837UGNu', 'is_enabled': True},
+            {'caption': 'A', 'id': 'new:test1', 'is_enabled': True},
+            {'caption': 'B', 'id': 'new:test2', 'is_enabled': True},
         ]
     })
     db.session.add(multi_choice_field)
@@ -451,12 +452,12 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
 
     data = {
         boolean_field.html_field_name: True,
-        multi_choice_field.html_field_name: {'AbntJPo-cMPo8SKgcsjAr': 2},
+        multi_choice_field.html_field_name: {'test1': 2},
         'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
     reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {'AbntJPo-cMPo8SKgcsjAr': 2}
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 2}
     db.session.delete(reg)
     db.session.flush()
 
@@ -506,40 +507,41 @@ def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     assert reg.data_by_field[checkbox_field.id].data
 
 
+@pytest.mark.usefixtures('request_context')
 def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform):
-    class _DummySesssion:
-        user = dummy_user
-    monkeypatch.setattr('indico.modules.events.registration.util.session', _DummySesssion)
+    session.set_session_user(dummy_user)
     monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
 
     # Extend the dummy_regform with more sections and fields
-    section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
-    db.session.add(section)
+    user_section = RegistrationFormSection(registration_form=dummy_regform,
+                                           title='dummy_section', is_manager_only=False)
+    db.session.add(user_section)
     db.session.flush()
 
-    boolean_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    boolean_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
     _fill_form_field_with_data(boolean_field, {
         'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
     })
     db.session.add(boolean_field)
 
-    multi_choice_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    multi_choice_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
     _fill_form_field_with_data(multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
-            {'caption': 'A', 'id': 'new:AbntJPo-cMPo8SKgcsjAr', 'is_enabled': True},
-            {'caption': 'B', 'id': 'new:H0VRkvScH-NXeL837UGNu', 'is_enabled': True},
+            {'caption': 'A', 'id': 'new:test1', 'is_enabled': True},
+            {'caption': 'B', 'id': 'new:test2', 'is_enabled': True},
         ]
     })
     db.session.add(multi_choice_field)
     db.session.flush()
 
     # Add a manager-only section
-    section = RegistrationFormSection(registration_form=dummy_regform, title='manager_section', is_manager_only=True)
-    db.session.add(section)
+    management_section = RegistrationFormSection(registration_form=dummy_regform,
+                                                 title='manager_section', is_manager_only=True)
+    db.session.add(management_section)
     db.session.flush()
 
-    checkbox_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    checkbox_field = RegistrationFormField(parent_id=management_section.id, registration_form=dummy_regform)
     _fill_form_field_with_data(checkbox_field, {
         'input_type': 'checkbox', 'is_required': True, 'title': 'Checkbox'
     })
@@ -549,54 +551,68 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     # Create a registration
     data = {
         boolean_field.html_field_name: True,
-        multi_choice_field.html_field_name: {'AbntJPo-cMPo8SKgcsjAr': 2},
+        multi_choice_field.html_field_name: {'test1': 2},
         checkbox_field.html_field_name: True,
         'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
     reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {'AbntJPo-cMPo8SKgcsjAr': 2}
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 2}
     assert reg.data_by_field[checkbox_field.id].data
 
     # Modify the registration
     data = {
         boolean_field.html_field_name: True,
-        multi_choice_field.html_field_name: {'AbntJPo-cMPo8SKgcsjAr': 1},
+        multi_choice_field.html_field_name: {'test1': 1},
         checkbox_field.html_field_name: False,
     }
     modify_registration(reg, data, management=False, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {'AbntJPo-cMPo8SKgcsjAr': 1}
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 1}
     # Assert that the manager field is not changed
     assert reg.data_by_field[checkbox_field.id].data
 
     # Modify as a manager
     data = {
-        multi_choice_field.html_field_name: {},
+        multi_choice_field.html_field_name: {'test1': 3},
         checkbox_field.html_field_name: False,
     }
     modify_registration(reg, data, management=True, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {}
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
     assert not reg.data_by_field[checkbox_field.id].data
 
     # Add a new field after registering
-    new_multi_choice_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    new_multi_choice_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
     _fill_form_field_with_data(new_multi_choice_field, {
         'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
         'choices': [
-            {'caption': 'A', 'id': 'new:AbntJPo-cMPo8SKgcsjAr', 'is_enabled': True},
+            {'caption': 'A', 'id': 'new:test3', 'is_enabled': True},
         ]
     })
     db.session.add(new_multi_choice_field)
     db.session.flush()
 
-    modify_registration(reg, {}, management=True, notify_user=False)
+    modify_registration(reg, {}, management=False, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {}
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
     assert not reg.data_by_field[checkbox_field.id].data
     # Assert that the new field got a default value
+    assert reg.data_by_field[new_multi_choice_field.id].data == {}
+
+    # Remove a field after registering
+    multi_choice_field.is_deleted = True
+    db.session.flush()
+
+    data = {
+        multi_choice_field.html_field_name: {'test2': 7},
+    }
+    modify_registration(reg, data, management=True, notify_user=False)
+    assert reg.data_by_field[boolean_field.id].data
+    # Assert that the removed field keeps its old value
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
+    assert not reg.data_by_field[checkbox_field.id].data
     assert reg.data_by_field[new_multi_choice_field.id].data == {}
