@@ -48,7 +48,9 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
     <div>
       <div style={{display: 'flex', alignItems: 'center', gap: '0 10px'}}>
         <Form.Field style={{flexBasis: '50%'}}>
-          <label>Visibility to participants</label>
+          <label>
+            <Translate>Visibility to participants</Translate>
+          </label>
           <Dropdown
             fluid
             onChange={(e, {value}) => {
@@ -65,7 +67,9 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
           />
         </Form.Field>
         <Form.Field style={{flexBasis: '50%'}}>
-          <label>Visibility to everyone</label>
+          <label>
+            <Translate>Visibility to everyone</Translate>
+          </label>
           <Dropdown
             disabled={participantVisibility === 'hide_all'}
             fluid

@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask.helpers import flash
-from marshmallow import fields, validate
+from marshmallow_enum import EnumField
 
 from indico.core.db import db
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
@@ -68,9 +68,7 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
 class RHAPIRegistrationChangeConsent(RHRegistrationFormRegistrationBase):
     """Internal API to change registration consent to publish."""
 
-    @use_kwargs({
-        'consent_to_publish': fields.String(validate=validate.OneOf([t.name for t in PublishConsentType])),
-    })
+    @use_kwargs({'consent_to_publish': EnumField(PublishConsentType)})
     def _process_POST(self, consent_to_publish):
-        self.registration.consent_to_publish = PublishConsentType[consent_to_publish]
+        self.registration.consent_to_publish = consent_to_publish
         return '', 204

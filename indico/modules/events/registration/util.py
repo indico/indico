@@ -10,7 +10,8 @@ import itertools
 from operator import attrgetter
 
 from flask import current_app, json, session
-from marshmallow import RAISE, ValidationError, fields, validate, validates
+from marshmallow import RAISE, ValidationError, fields, validates
+from marshmallow_enum import EnumField
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
@@ -290,7 +291,7 @@ def make_registration_schema(regform, management=False, registration=None):
     if management:
         schema['notify_user'] = fields.Boolean()
     elif regform.needs_publish_consent:
-        schema['consent_to_publish'] = fields.String(validate=validate.OneOf([t.name for t in PublishConsentType]))
+        schema['consent_to_publish'] = EnumField(PublishConsentType)
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
@@ -370,7 +371,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
         invitation.state = InvitationState.accepted
         invitation.registration = registration
     if not management and regform.needs_publish_consent:
-        registration.consent_to_publish = PublishConsentType[data.get('consent_to_publish', 'nobody')]
+        registration.consent_to_publish = data.get('consent_to_publish', PublishConsentType.nobody)
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
     signals.event.registration_created.send(registration, management=management, data=data)
@@ -420,7 +421,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
                 personal_data_changes[key] = value
             setattr(registration, key, value)
     if not management and regform.needs_publish_consent:
-        registration.consent_to_publish = PublishConsentType[data.get('consent_to_publish', 'nobody')]
+        registration.consent_to_publish = data.get('consent_to_publish', PublishConsentType.nobody)
     registration.sync_state()
     db.session.flush()
     # sanity check
