@@ -136,7 +136,8 @@ class RegistrationListGenerator(ListGeneratorBase):
         return (Registration.query
                 .with_parent(self.regform)
                 .filter(~Registration.is_deleted)
-                .options(joinedload('data').joinedload('field_data').joinedload('field'))
+                .options(joinedload('data').joinedload('field_data').joinedload('field'),
+                         joinedload('tags'))
                 .order_by(db.func.lower(Registration.last_name), db.func.lower(Registration.first_name)))
 
     def _filter_list_entries(self, query, filters):
