@@ -290,7 +290,7 @@ def make_registration_schema(regform, management=False, registration=None):
 
     if management:
         schema['notify_user'] = fields.Boolean()
-    elif regform.needs_publish_consent:
+    if regform.needs_publish_consent:
         schema['consent_to_publish'] = EnumField(PublishConsentType)
 
     for form_item in regform.active_fields:
@@ -420,8 +420,11 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
-    if not management and regform.needs_publish_consent:
-        registration.consent_to_publish = data.get('consent_to_publish', PublishConsentType.nobody)
+    if regform.needs_publish_consent:
+        new_consent_to_publish = data.get('consent_to_publish', PublishConsentType.nobody)
+        if management and new_consent_to_publish > registration.consent_to_publish:
+            raise Exception('It is not possible to increase the visibility consent level of a participant')
+        registration.consent_to_publish = new_consent_to_publish
     registration.sync_state()
     db.session.flush()
     # sanity check

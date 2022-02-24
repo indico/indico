@@ -24,11 +24,15 @@
     <tr>
         <th class="regform-done-caption">{% trans %}Visibility{% endtrans %}</th>
         <td class="regform-done-data">
-            <div id="registration-summary-consent-to-publish"
-                 data-locator="{{ registration.locator.registrant|tojson|forceescape }}"
-                 data-publish-to-participants="{{ registration.registration_form.publish_registrations_participants.name }}"
-                 data-publish-to-public="{{ registration.registration_form.publish_registrations_public.name }}"
-                 data-initial-consent-to-publish="{{ registration.consent_to_publish.name }}"></div>
+            {% if from_management %}
+                {{ registration.consent_to_publish.title }}
+            {% else %}
+                <div id="registration-summary-consent-to-publish"
+                     data-locator="{{ registration.locator.registrant|tojson|forceescape }}"
+                     data-publish-to-participants="{{ registration.registration_form.publish_registrations_participants.name }}"
+                     data-publish-to-public="{{ registration.registration_form.publish_registrations_public.name }}"
+                     data-initial-consent-to-publish="{{ registration.consent_to_publish.name }}"></div>
+            {% endif %}
         </td>
     </tr>
 {% endmacro %}

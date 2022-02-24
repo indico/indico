@@ -18,6 +18,7 @@ export default function ConsentToPublishDropdown({
   publishToParticipants,
   publishToPublic,
   value,
+  maximumConsentToPublish,
   useFinalForms,
   ...extraProps
 }) {
@@ -47,12 +48,17 @@ export default function ConsentToPublishDropdown({
         disabled: publishToParticipants !== 'show_with_consent',
       });
     }
-    options.push({
-      key: 'participants',
-      value: 'participants',
-      text: Translate.string('Display my participation only to other participants of this event'),
-    });
-    if (publishToPublic === 'show_with_consent' || value === 'all') {
+    if (maximumConsentToPublish !== 'nobody') {
+      options.push({
+        key: 'participants',
+        value: 'participants',
+        text: Translate.string('Display my participation only to other participants of this event'),
+      });
+    }
+    if (
+      maximumConsentToPublish === 'all' &&
+      (publishToPublic === 'show_with_consent' || value === 'all')
+    ) {
       options.push({
         key: 'all',
         value: 'all',
@@ -72,10 +78,12 @@ ConsentToPublishDropdown.propTypes = {
   publishToParticipants: publishModePropType.isRequired,
   publishToPublic: publishModePropType.isRequired,
   value: PropTypes.oneOf(['nobody', 'participants', 'all']),
+  maximumConsentToPublish: PropTypes.oneOf(['nobody', 'participants', 'all']),
   useFinalForms: PropTypes.bool,
 };
 
 ConsentToPublishDropdown.defaultProps = {
-  initialConsentToPublish: null,
+  value: null,
+  maximumConsentToPublish: 'all',
   useFinalForms: false,
 };
