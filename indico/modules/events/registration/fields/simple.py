@@ -50,6 +50,7 @@ class NumberFieldDataSchema(BillableFieldDataSchema):
 class NumberField(RegistrationFormBillableField):
     name = 'number'
     mm_field_class = fields.Integer
+    mm_field_kwargs = {'allow_none': True}
     setup_schema_base_cls = NumberFieldDataSchema
 
     def get_validators(self, existing_registration):
