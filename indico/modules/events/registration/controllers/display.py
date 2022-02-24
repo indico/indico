@@ -26,7 +26,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_event_section_data,
                                                      get_flat_section_submission_data, get_initial_form_values,
-                                                     get_title_uuid, make_registration_schema)
+                                                     get_user_data, make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -289,16 +289,6 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         }
     }
 
-    def _get_user_data(self):
-        user_data = {t.name: getattr(session.user, t.name, None) for t in PersonalDataType
-                     if t.name != 'title' and getattr(session.user, t.name, None) is not None}
-        if self.invitation:
-            user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
-        title = getattr(session.user, 'title', None)
-        if title_uuid := get_title_uuid(self.regform, title):
-            user_data['title'] = {title_uuid: 1}
-        return user_data
-
     def _check_access(self):
         RHRegistrationFormRegistrationBase._check_access(self)
         if self.regform.require_login and not session.user and request.method != 'GET':
@@ -330,13 +320,14 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
 
     def _process_GET(self):
-        initial_values = get_initial_form_values(self.regform) | self._get_user_data()
+        user_data = get_user_data(self.regform, session.user, self.invitation)
+        initial_values = get_initial_form_values(self.regform) | user_data
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
                                                form_data=get_flat_section_submission_data(self.regform),
                                                initial_values=initial_values,
                                                angular_sections=get_event_section_data(self.regform),
-                                               angular_user_data=self._get_user_data(),
+                                               angular_user_data=user_data,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                invitation=self.invitation,

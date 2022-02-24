@@ -151,6 +151,24 @@ def get_initial_form_values(regform, *, management=False):
     return initial_values
 
 
+def get_user_data(regform, user, invitation=None):
+    if user is None:
+        return {}
+
+    user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
+                 if t.name != 'title' and getattr(user, t.name, None)}
+    if invitation:
+        user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
+    title = getattr(user, 'title', None)
+    if title_uuid := get_title_uuid(regform, title):
+        user_data['title'] = title_uuid
+
+    active_fields = {item.personal_data_type.name for item in regform.active_fields
+                     if item.type == RegistrationFormItemType.field_pd}
+
+    return {name: value for name, value in user_data.items() if name in active_fields}
+
+
 def get_form_registration_data(regform, registration, *, management=False):
     """
     Return a mapping from 'html_field_name' to the registration data.
