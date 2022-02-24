@@ -14,6 +14,7 @@ from indico.core.db import db
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
 from indico.modules.events.abstracts.models.reviews import AbstractReview
+from indico.modules.events.abstracts.util import can_create_invited_abstracts
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase
@@ -213,7 +214,8 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         filter_statistics = tpl_lists.render_displayed_entries_fragment(len(list_kwargs['abstracts']),
                                                                         list_kwargs['total_abstracts'])
         return {
-            'html': tpl.render_abstract_list(**list_kwargs),
+            'html': tpl.render_abstract_list(**list_kwargs,
+                                             can_create_invited_abstracts=can_create_invited_abstracts(self.event)),
             'filtering_enabled': filtering_enabled,
             'filter_statistics': filter_statistics,
             'hide_abstract': abstract not in list_kwargs['abstracts'] if abstract else None
