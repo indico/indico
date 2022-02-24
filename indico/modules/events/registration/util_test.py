@@ -17,11 +17,12 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.events.registration.models.items import RegistrationFormSection
+from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
-                                                     get_registered_event_persons, import_invitations_from_csv,
-                                                     import_registrations_from_csv, import_user_records_from_csv,
-                                                     modify_registration)
+                                                     get_registered_event_persons, get_user_data,
+                                                     import_invitations_from_csv, import_registrations_from_csv,
+                                                     import_user_records_from_csv, modify_registration)
+from indico.modules.users.models.users import UserTitle
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -616,3 +617,62 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
     assert not reg.data_by_field[checkbox_field.id].data
     assert reg.data_by_field[new_multi_choice_field.id].data == {}
+
+
+@pytest.mark.usefixtures('request_context')
+def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
+    monkeypatch.setattr('indico.modules.events.registration.util.notify_invitation', lambda *args, **kwargs: None)
+    session.set_session_user(dummy_user)
+
+    assert get_user_data(dummy_regform, None) == {}
+
+    expected = {'email': '1337@example.com', 'first_name': 'Guinea',
+                'last_name': 'Pig'}
+
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert user_data == expected
+
+    user_data = get_user_data(dummy_regform, session.user)
+    assert user_data == expected
+
+    dummy_user.title = UserTitle.mr
+    dummy_user.phone = '+1 22 50 14'
+    dummy_user.address = 'Geneva'
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert type(user_data['title']) is dict
+    assert user_data['phone'] == '+1 22 50 14'
+
+    # Check that data is taken from the invitation
+    invitation = RegistrationInvitation(skip_moderation=True, email='awang@example.com', first_name='Amy',
+                                        last_name='Wang', affiliation='ACME Inc.')
+    dummy_regform.invitations.append(invitation)
+
+    dummy_user.title = None
+    user_data = get_user_data(dummy_regform, dummy_user, invitation)
+    assert user_data == {'email': 'awang@example.com', 'first_name': 'Amy', 'last_name': 'Wang',
+                         'phone': '+1 22 50 14', 'address': 'Geneva'}
+
+    # Check that data from disabled/deleted fields is not used
+    title_field = next(item for item in dummy_regform.active_fields
+                       if item.type == RegistrationFormItemType.field_pd and item.personal_data_type.name == 'title')
+    title_field.is_enabled = False
+
+    dummy_user.title = UserTitle.dr
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert 'title' not in user_data
+
+    phone_field = next(item for item in dummy_regform.active_fields
+                       if item.type == RegistrationFormItemType.field_pd and item.personal_data_type.name == 'phone')
+    phone_field.is_deleted = True
+
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert 'title' not in user_data
+    assert 'phone' not in user_data
+    assert user_data == {'email': '1337@example.com', 'first_name': 'Guinea',
+                         'last_name': 'Pig', 'address': 'Geneva'}
+
+    for item in dummy_regform.active_fields:
+        item.is_enabled = False
+
+    assert get_user_data(dummy_regform, dummy_user) == {}
+    assert get_user_data(dummy_regform, dummy_user, invitation) == {}
