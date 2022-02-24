@@ -345,7 +345,7 @@ class FileField(RegistrationFormFieldBase):
 
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
-    mm_field_class = fields.Email
+    mm_field_class = fields.String
 
     def get_validators(self, existing_registration):
         def _indico_email(value):
