@@ -95,13 +95,10 @@ export default function BooleanInput({
   htmlName,
   disabled,
   isRequired,
-  defaultValue,
   price,
   placesLimit,
   placesUsed,
 }) {
-  defaultValue = {yes: true, no: false}[defaultValue] || null;
-
   return (
     <FinalField
       id={id}
@@ -113,7 +110,6 @@ export default function BooleanInput({
       price={price}
       placesLimit={placesLimit}
       placesUsed={placesUsed}
-      defaultValue={defaultValue}
     />
   );
 }
@@ -123,7 +119,6 @@ BooleanInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.string,
   price: PropTypes.number,
   placesLimit: PropTypes.number,
   placesUsed: PropTypes.number,
@@ -132,7 +127,6 @@ BooleanInput.propTypes = {
 BooleanInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultValue: '',
   price: 0,
   placesLimit: 0,
   placesUsed: 0,
@@ -140,8 +134,8 @@ BooleanInput.defaultProps = {
 
 export function BooleanSettings() {
   const options = [
-    {key: 'yes', value: 'yes', text: Translate.string('Yes')},
-    {key: 'no', value: 'no', text: Translate.string('No')},
+    {key: true, value: true, text: Translate.string('Yes')},
+    {key: false, value: false, text: Translate.string('No')},
   ];
   return (
     <>

@@ -281,6 +281,10 @@
   }
 }
 
+:global(.regform-section).manager-only > :global(.i-box-header) {
+  background-color: lighten($light-yellow, 5%);
+}
+
 .section-actions {
   a {
     font-size: 1.2em;

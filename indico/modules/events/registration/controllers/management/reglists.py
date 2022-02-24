@@ -43,8 +43,9 @@ from indico.modules.events.registration.notifications import notify_registration
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
                                                      get_event_section_data, get_flat_section_submission_data,
-                                                     get_ticket_attachments, get_title_uuid,
-                                                     import_registrations_from_csv, make_registration_schema)
+                                                     get_initial_form_values, get_ticket_attachments, get_title_uuid,
+                                                     get_user_data, import_registrations_from_csv,
+                                                     make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
@@ -271,11 +272,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
         'user': Principal(allow_external_users=True, load_default=None),
     }, location='query')
     def _get_user_data(self, user):
-        if user is None:
-            return {}
-        user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType}
-        user_data['title'] = get_title_uuid(self.regform, user_data['title'])
-        return user_data
+        return get_user_data(self.regform, user)
 
     def _process_POST(self):
         schema = make_registration_schema(self.regform, management=True)()
@@ -286,13 +283,17 @@ class RHRegistrationCreate(RHManageRegFormBase):
         return jsonify({'redirect': url_for('.manage_reglist', self.regform)})
 
     def _process_GET(self):
+        user_data = self._get_user_data()
+        initial_values = get_initial_form_values(self.regform, management=True) | user_data
+        form_data = get_flat_section_submission_data(self.regform, management=True)
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,
-                                                    form_data=get_flat_section_submission_data(self.regform),
+                                                    form_data=form_data,
+                                                    initial_values=initial_values,
                                                     # XXX why don't we include manager-only sections here?!
                                                     angular_sections=get_event_section_data(self.regform),
+                                                    angular_user_data=user_data,
                                                     post_url=url_for('.create_registration', self.regform),
-                                                    user_data=self._get_user_data(),
                                                     invitation=None,
                                                     registration=None,
                                                     management=True,

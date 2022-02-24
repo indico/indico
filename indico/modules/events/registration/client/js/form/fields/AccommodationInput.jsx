@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Form, Label} from 'semantic-ui-react';
 
@@ -52,8 +52,8 @@ function AccommodationInputComponent({
   const makeHandleChange = choice => () => {
     const newValue = {...value, choice: choice.id, isNoAccommodation: choice.isNoAccommodation};
     if (choice.isNoAccommodation) {
-      newValue.arrivalDate = null;
-      newValue.departureDate = null;
+      delete newValue.arrivalDate;
+      delete newValue.departureDate;
     }
     onChange(newValue);
   };
@@ -201,11 +201,6 @@ export default function AccommodationInput({
   placesUsed,
 }) {
   const existingValue = useSelector(state => getFieldValue(state, id)) || {choice: null};
-  const noAccommodationOption = useMemo(
-    () => choices.find(c => c.isNoAccommodation && c.isEnabled),
-    [choices]
-  );
-
   return (
     <FinalField
       name={htmlName}
@@ -213,12 +208,6 @@ export default function AccommodationInput({
       component={AccommodationInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={{
-        choice: noAccommodationOption?.id || null,
-        isNoAccommodation: !!noAccommodationOption,
-        arrivalDate: null,
-        departureDate: null,
-      }}
       choices={choices}
       arrival={arrival}
       departure={departure}
@@ -230,6 +219,7 @@ export default function AccommodationInput({
           return Translate.string('You must select the arrival and departure date');
         }
       }}
+      isEqual={_.isEqual}
     />
   );
 }

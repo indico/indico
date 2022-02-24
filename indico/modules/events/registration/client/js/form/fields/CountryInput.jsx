@@ -17,7 +17,7 @@ import '../../../styles/regform.module.scss';
 const isoToFlag = country =>
   String.fromCodePoint(...country.split('').map(c => c.charCodeAt() + 0x1f1a5));
 
-function CountryInputComponent({value, onChange, disabled, choices}) {
+function CountryInputComponent({value, onChange, disabled, choices, clearable}) {
   return (
     <Dropdown
       styleName="country-dropdown"
@@ -26,8 +26,9 @@ function CountryInputComponent({value, onChange, disabled, choices}) {
       search
       selection
       disabled={disabled}
+      clearable={clearable}
       value={value}
-      onChange={(_, {value: newValue}) => onChange(newValue)}
+      onChange={(_, {value: newValue = ''}) => onChange(newValue)}
       options={choices.map(country => ({
         key: country.countryKey,
         value: country.countryKey,
@@ -42,6 +43,7 @@ CountryInputComponent.propTypes = {
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
+  clearable: PropTypes.bool.isRequired,
 };
 
 export default function CountryInput({htmlName, disabled, isRequired, choices}) {
@@ -51,8 +53,9 @@ export default function CountryInput({htmlName, disabled, isRequired, choices}) 
       component={CountryInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue=""
       choices={choices}
+      clearable={!isRequired}
+      parse={x => x}
     />
   );
 }

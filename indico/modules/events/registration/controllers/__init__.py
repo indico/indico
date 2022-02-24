@@ -12,7 +12,8 @@ from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import (get_event_section_data, get_flat_section_submission_data,
-                                                     make_registration_schema, modify_registration)
+                                                     get_form_registration_data, make_registration_schema,
+                                                     modify_registration)
 from indico.util.string import camelize_keys
 from indico.web.args import parser
 
@@ -40,8 +41,17 @@ class RegistrationEditMixin:
                 for r in self.registration.data
                 if r.field_data.field.field_impl.is_file_field and r.storage_file_id is not None}
 
+    def _get_optional_fields(self):
+        """Get fields for which we already have a value and thus are not required."""
+        data_by_field = self.registration.data_by_field
+        return [form_item.html_field_name for form_item in self.regform.active_fields
+                if data_by_field.get(form_item.id) is not None]
+
     def _process_POST(self):
-        schema = make_registration_schema(self.regform, management=self.management, registration=self.registration)()
+        optional_fields = self._get_optional_fields()
+        schema = make_registration_schema(
+            self.regform, management=self.management, registration=self.registration
+        )(partial=optional_fields)
         form_data = parser.parse(schema)
 
         notify_user = not self.management or form_data.pop('notify_user', False)
@@ -55,10 +65,7 @@ class RegistrationEditMixin:
                                                      registration=self.registration)
         section_data = camelize_keys(get_event_section_data(self.regform, management=self.management,
                                                             registration=self.registration))
-        file_data = self._get_file_data()
-        registration_data = {r.field_data.field.html_field_name: camelize_keys(r.user_data)
-                             for r in self.registration.data
-                             if r.user_data is not None or r.field_data.field.html_field_name in file_data}
+        registration_data = get_form_registration_data(self.regform, self.registration, management=self.management)
 
         # TODO remove with angular
         registration_metadata = {
@@ -67,7 +74,7 @@ class RegistrationEditMixin:
         }
 
         return self.view_class.render_template(self.template_file, self.event,
-                                               sections=section_data, regform=self.regform,
+                                               angular_sections=section_data, regform=self.regform,
                                                form_data=form_data,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
@@ -75,5 +82,5 @@ class RegistrationEditMixin:
                                                management=self.management,
                                                paid=self.registration.is_paid,
                                                registration_data=registration_data,
-                                               file_data=file_data,
+                                               file_data=self._get_file_data(),
                                                registration_metadata=registration_metadata)

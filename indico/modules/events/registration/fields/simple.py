@@ -50,6 +50,7 @@ class NumberFieldDataSchema(BillableFieldDataSchema):
 class NumberField(RegistrationFormBillableField):
     name = 'number'
     mm_field_class = fields.Integer
+    mm_field_kwargs = {'allow_none': True}
     setup_schema_base_cls = NumberFieldDataSchema
 
     def get_validators(self, existing_registration):
@@ -63,6 +64,10 @@ class NumberField(RegistrationFormBillableField):
         if registration_data.data is None:
             return ''
         return str(registration_data.data) if for_humans else registration_data.data
+
+    @property
+    def default_value(self):
+        return None
 
 
 class TextAreaField(RegistrationFormFieldBase):
@@ -122,7 +127,7 @@ class CheckboxField(RegistrationFormBillableField):
 
     @property
     def default_value(self):
-        return None
+        return False
 
 
 class DateFieldDataSchema(mm.Schema):
@@ -202,14 +207,25 @@ class DateField(RegistrationFormFieldBase):
         return dict(super().view_data, has_time=has_time)
 
 
+class BooleanFieldSetupSchema(LimitedPlacesBillableFieldDataSchema):
+    default_value = fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no']))
+
+    @pre_load
+    def _convert_to_yes_no(self, data, **kwargs):
+        """
+        For historical reasons, the boolean default value is
+        saved as 'yes'/'no'/'' instead of True/False/None where the latter
+        is used for the actual value of the field.
+        """
+        data['default_value'] = {True: 'yes', False: 'no'}.get(data['default_value'], '')
+        return data
+
+
 class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     mm_field_class = fields.Boolean
     mm_field_kwargs = {'allow_none': True}
-    setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
-    setup_schema_fields = {
-        'default_value': fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no'])),
-    }
+    setup_schema_base_cls = BooleanFieldSetupSchema
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
@@ -237,7 +253,8 @@ class BooleanField(RegistrationFormBillableField):
 
     @property
     def default_value(self):
-        return None
+        data = self.form_item.data
+        return {'yes': True, 'no': False}.get(data.get('default_value'))
 
     def get_places_used(self):
         places_used = 0
@@ -328,7 +345,7 @@ class FileField(RegistrationFormFieldBase):
 
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
-    mm_field_class = fields.Email
+    mm_field_class = fields.String
 
     def get_validators(self, existing_registration):
         def _indico_email(value):

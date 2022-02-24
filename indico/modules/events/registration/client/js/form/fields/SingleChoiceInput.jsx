@@ -111,7 +111,7 @@ function SingleChoiceDropdown({
           placeholder={Translate.string('Choose an option')}
           options={options}
           disabled={disabled}
-          value={selectedChoice.id}
+          value={selectedChoice.id || ''}
           onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
           clearable={!isRequired}
           search
@@ -340,7 +340,6 @@ export default function SingleChoiceInput({
   htmlName,
   disabled,
   isRequired,
-  defaultItem,
   itemType,
   choices,
   withExtraSlots,
@@ -355,12 +354,12 @@ export default function SingleChoiceInput({
       required={isRequired}
       isRequired={isRequired}
       disabled={disabled}
-      defaultValue={defaultItem ? {[defaultItem]: 1} : {}}
       itemType={itemType}
       choices={choices}
       withExtraSlots={withExtraSlots}
       placesUsed={placesUsed}
       existingValue={existingValue}
+      isEqual={_.isEqual}
     />
   );
 }
@@ -370,7 +369,6 @@ SingleChoiceInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
-  defaultItem: PropTypes.string,
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,
@@ -380,7 +378,6 @@ SingleChoiceInput.propTypes = {
 SingleChoiceInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultItem: null,
   withExtraSlots: false,
 };
 

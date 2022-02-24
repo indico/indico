@@ -11,32 +11,21 @@ import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Message} from 'semantic-ui-react';
 
-import {FinalSubmitButton, handleSubmitError, FinalCheckbox} from 'indico/react/forms';
+import {
+  FinalSubmitButton,
+  handleSubmitError,
+  FinalCheckbox,
+  getChangedValues,
+} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import FormSection from '../form/FormSection';
-import {getItems, getNestedSections, getStaticData} from '../form/selectors';
+import {getNestedSections, getStaticData} from '../form/selectors';
 
-import {getUserInfo, getUpdateMode, getModeration, getManagement} from './selectors';
+import {getUpdateMode, getModeration, getManagement} from './selectors';
 
 import '../../styles/regform.module.scss';
-
-/**
- * The registration Marshmallow schema does not allow
- * unknown fields so we remove disabled personal data fields from the
- * form initial values.
- */
-function getInitialValues(userInfo, items) {
-  return Object.fromEntries(
-    Object.entries(userInfo).filter(([key]) => {
-      return Object.values(items).some(
-        ({htmlName, fieldIsPersonalData, isEnabled}) =>
-          htmlName === key && fieldIsPersonalData && isEnabled
-      );
-    })
-  );
-}
 
 function EmailNotification() {
   return (
@@ -56,19 +45,16 @@ function EmailNotification() {
 }
 
 export default function RegistrationFormSubmission() {
-  const items = useSelector(getItems);
   const sections = useSelector(getNestedSections);
-  const userInfo = useSelector(getUserInfo);
-  const {submitUrl, registrationData} = useSelector(getStaticData);
+  const {submitUrl, registrationData, initialValues} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
   const isManagement = useSelector(getManagement);
 
-  const onSubmit = async data => {
-    console.log(data);
+  const onSubmit = async (data, form) => {
     let resp;
     try {
-      resp = await indicoAxios.post(submitUrl, data);
+      resp = await indicoAxios.post(submitUrl, isUpdateMode ? getChangedValues(data, form) : data);
     } catch (err) {
       return handleSubmitError(err);
     }
@@ -81,7 +67,7 @@ export default function RegistrationFormSubmission() {
   return (
     <FinalForm
       onSubmit={onSubmit}
-      initialValues={isUpdateMode ? registrationData : getInitialValues(userInfo, items)}
+      initialValues={isUpdateMode ? registrationData : initialValues}
       initialValuesEqual={_.isEqual}
       subscription={{}}
     >

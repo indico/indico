@@ -125,21 +125,69 @@ def get_flat_section_positions_setup_data(regform):
 
 
 def get_flat_section_submission_data(regform, *, management=False, registration=None):
-    # TODO: skip disabled sections/items unless there's an active registration? (check current behavior first)
-    section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections
-                    if not s.is_deleted and (management or not s.is_manager_only)}
+    section_data = {s.id: camelize_keys(s.own_data) for s in regform.active_sections
+                    if management or not s.is_manager_only}
 
     item_data = {}
     registration_data = {r.field_data.field.id: r for r in registration.data} if registration else None
-    for item in regform.form_items:
-        if item.is_section or item.is_deleted or (not management and item.parent.is_manager_only):
+    for item in regform.active_fields:
+        can_modify = management or not item.parent.is_manager_only
+        if not can_modify:
             continue
-        if registration and item.is_field and isinstance(item.field_impl, (ChoiceBaseField, AccommodationField)):
+        if registration and isinstance(item.field_impl, (ChoiceBaseField, AccommodationField)):
             field_data = get_field_merged_options(item, registration_data)
         else:
             field_data = item.view_data
         item_data[item.id] = field_data
     return {'sections': section_data, 'items': item_data}
+
+
+def get_initial_form_values(regform, *, management=False):
+    initial_values = {}
+    for item in regform.active_fields:
+        can_modify = management or not item.parent.is_manager_only
+        if can_modify:
+            initial_values[item.html_field_name] = camelize_keys(item.field_impl.default_value)
+    return initial_values
+
+
+def get_user_data(regform, user, invitation=None):
+    if user is None:
+        return {}
+
+    user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
+                 if t.name != 'title' and getattr(user, t.name, None)}
+    if invitation:
+        user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
+        if invitation.affiliation:
+            user_data['affiliation'] = invitation.affiliation
+    title = getattr(user, 'title', None)
+    if title_uuid := get_title_uuid(regform, title):
+        user_data['title'] = title_uuid
+
+    active_fields = {item.personal_data_type.name for item in regform.active_fields
+                     if item.type == RegistrationFormItemType.field_pd}
+
+    return {name: value for name, value in user_data.items() if name in active_fields}
+
+
+def get_form_registration_data(regform, registration, *, management=False):
+    """
+    Return a mapping from 'html_field_name' to the registration data.
+    This also includes default values for any newly added fields since
+    the React frontend requires all initial values to be present.
+    """
+    data_by_field = registration.data_by_field
+    registration_data = {}
+    for item in regform.active_fields:
+        can_modify = management or not item.parent.is_manager_only
+        if not can_modify:
+            continue
+        elif item.id in data_by_field:
+            registration_data[item.html_field_name] = camelize_keys(data_by_field[item.id].user_data)
+        else:
+            registration_data[item.html_field_name] = item.field_impl.default_value
+    return registration_data
 
 
 def get_event_section_data(regform, management=False, registration=None):
@@ -300,10 +348,9 @@ def create_registration(regform, data, invitation=None, management=False, notify
     if skip_moderation is None:
         skip_moderation = management
     for form_item in regform.active_fields:
-        if form_item.parent.is_manager_only:
-            value = form_item.field_impl.default_value
-        else:
-            value = data.get(form_item.html_field_name)
+        default = form_item.field_impl.default_value
+        can_modify = management or not form_item.parent.is_manager_only
+        value = data.get(form_item.html_field_name, default) if can_modify else default
         data_entry = RegistrationData()
         registration.data.append(data_entry)
         for attr, value in form_item.field_impl.process_form_data(registration, value).items():
@@ -336,19 +383,22 @@ def modify_registration(registration, data, management=False, notify_user=True):
     personal_data_changes = {}
     regform = registration.registration_form
     data_by_field = registration.data_by_field
-    if management or not registration.user:
+    if 'email' in data and (management or not registration.user):
         registration.user = get_user_by_email(data['email'])
 
     billable_items_locked = not management and registration.is_paid
     for form_item in regform.active_fields:
         field_impl = form_item.field_impl
-        if management or not form_item.parent.is_manager_only:
+        has_data = form_item.html_field_name in data
+        can_modify = management or not form_item.parent.is_manager_only
+
+        if has_data and can_modify:
             value = data.get(form_item.html_field_name)
-        elif form_item.id not in data_by_field:
-            # set default value for manager-only field if it didn't have one before
+        elif not has_data and form_item.id not in data_by_field:
+            # set default value for a field if it didn't have one before (including manager-only fields)
             value = field_impl.default_value
         else:
-            # manager-only field that has data which should be preserved
+            # keep current value
             continue
 
         if form_item.id not in data_by_field:

@@ -9,14 +9,20 @@ from datetime import datetime
 from io import BytesIO
 
 import pytest
+from flask import session
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
+from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
+from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
-                                                     get_registered_event_persons, import_invitations_from_csv,
-                                                     import_registrations_from_csv, import_user_records_from_csv)
+                                                     get_registered_event_persons, get_user_data,
+                                                     import_invitations_from_csv, import_registrations_from_csv,
+                                                     import_user_records_from_csv, modify_registration)
+from indico.modules.users.models.users import UserTitle
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -418,3 +424,255 @@ def test_get_registered_event_persons(dummy_event, dummy_user, dummy_regform):
 
     registered_persons = get_registered_event_persons(dummy_event)
     assert registered_persons == {user_person, no_user_person}
+
+
+def test_create_registration(monkeypatch, dummy_event, dummy_user, dummy_regform):
+    monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
+
+    # Extend the dummy_regform with more sections and fields
+    section = RegistrationFormSection(registration_form=dummy_regform, title='dummy_section', is_manager_only=False)
+    db.session.add(section)
+    db.session.flush()
+
+    boolean_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field, {
+        'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
+    })
+    db.session.add(boolean_field)
+
+    multi_choice_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    _fill_form_field_with_data(multi_choice_field, {
+        'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
+        'choices': [
+            {'caption': 'A', 'id': 'new:test1', 'is_enabled': True},
+            {'caption': 'B', 'id': 'new:test2', 'is_enabled': True},
+        ]
+    })
+    db.session.add(multi_choice_field)
+    db.session.flush()
+
+    data = {
+        boolean_field.html_field_name: True,
+        multi_choice_field.html_field_name: {'test1': 2},
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 2}
+    db.session.delete(reg)
+    db.session.flush()
+
+    # Make sure that missing data gets default values:
+    data = {
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+
+    assert not reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {}
+    db.session.delete(reg)
+    db.session.flush()
+
+    # Add a manager only section
+    section = RegistrationFormSection(registration_form=dummy_regform, title='manager_section', is_manager_only=True)
+    db.session.add(section)
+    db.session.flush()
+
+    checkbox_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    _fill_form_field_with_data(checkbox_field, {
+        'input_type': 'checkbox', 'title': 'Checkbox'
+    })
+    db.session.add(checkbox_field)
+    db.session.flush()
+
+    data = {
+        checkbox_field.html_field_name: True,
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+    reg = create_registration(dummy_regform, data, invitation=None, management=False, notify_user=False)
+
+    assert not reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {}
+    # Assert that the manager field gets the default value, not the value sent
+    assert not reg.data_by_field[checkbox_field.id].data
+    db.session.delete(reg)
+    db.session.flush()
+
+    # Try again with management=True
+    data = {
+        checkbox_field.html_field_name: True,
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+    reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
+
+    assert not reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {}
+    # Assert that the manager field gets properly set with management=True
+    assert reg.data_by_field[checkbox_field.id].data
+
+
+@pytest.mark.usefixtures('request_context')
+def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform):
+    session.set_session_user(dummy_user)
+    monkeypatch.setattr('indico.modules.users.util.get_user_by_email', lambda *args, **kwargs: dummy_user)
+
+    # Extend the dummy_regform with more sections and fields
+    user_section = RegistrationFormSection(registration_form=dummy_regform,
+                                           title='dummy_section', is_manager_only=False)
+    db.session.add(user_section)
+    db.session.flush()
+
+    boolean_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    _fill_form_field_with_data(boolean_field, {
+        'input_type': 'bool', 'default_value': False, 'title': 'Yes/No'
+    })
+    db.session.add(boolean_field)
+
+    multi_choice_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    _fill_form_field_with_data(multi_choice_field, {
+        'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
+        'choices': [
+            {'caption': 'A', 'id': 'new:test1', 'is_enabled': True},
+            {'caption': 'B', 'id': 'new:test2', 'is_enabled': True},
+        ]
+    })
+    db.session.add(multi_choice_field)
+    db.session.flush()
+
+    # Add a manager-only section
+    management_section = RegistrationFormSection(registration_form=dummy_regform,
+                                                 title='manager_section', is_manager_only=True)
+    db.session.add(management_section)
+    db.session.flush()
+
+    checkbox_field = RegistrationFormField(parent_id=management_section.id, registration_form=dummy_regform)
+    _fill_form_field_with_data(checkbox_field, {
+        'input_type': 'checkbox', 'is_required': True, 'title': 'Checkbox'
+    })
+    db.session.add(checkbox_field)
+    db.session.flush()
+
+    # Create a registration
+    data = {
+        boolean_field.html_field_name: True,
+        multi_choice_field.html_field_name: {'test1': 2},
+        checkbox_field.html_field_name: True,
+        'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
+    reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 2}
+    assert reg.data_by_field[checkbox_field.id].data
+
+    # Modify the registration
+    data = {
+        boolean_field.html_field_name: True,
+        multi_choice_field.html_field_name: {'test1': 1},
+        checkbox_field.html_field_name: False,
+    }
+    modify_registration(reg, data, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 1}
+    # Assert that the manager field is not changed
+    assert reg.data_by_field[checkbox_field.id].data
+
+    # Modify as a manager
+    data = {
+        multi_choice_field.html_field_name: {'test1': 3},
+        checkbox_field.html_field_name: False,
+    }
+    modify_registration(reg, data, management=True, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
+    assert not reg.data_by_field[checkbox_field.id].data
+
+    # Add a new field after registering
+    new_multi_choice_field = RegistrationFormField(parent_id=user_section.id, registration_form=dummy_regform)
+    _fill_form_field_with_data(new_multi_choice_field, {
+        'input_type': 'multi_choice', 'with_extra_slots': False, 'title': 'Multi Choice',
+        'choices': [
+            {'caption': 'A', 'id': 'new:test3', 'is_enabled': True},
+        ]
+    })
+    db.session.add(new_multi_choice_field)
+    db.session.flush()
+
+    modify_registration(reg, {}, management=False, notify_user=False)
+
+    assert reg.data_by_field[boolean_field.id].data
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
+    assert not reg.data_by_field[checkbox_field.id].data
+    # Assert that the new field got a default value
+    assert reg.data_by_field[new_multi_choice_field.id].data == {}
+
+    # Remove a field after registering
+    multi_choice_field.is_deleted = True
+    db.session.flush()
+
+    data = {
+        multi_choice_field.html_field_name: {'test2': 7},
+    }
+    modify_registration(reg, data, management=True, notify_user=False)
+    assert reg.data_by_field[boolean_field.id].data
+    # Assert that the removed field keeps its old value
+    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
+    assert not reg.data_by_field[checkbox_field.id].data
+    assert reg.data_by_field[new_multi_choice_field.id].data == {}
+
+
+@pytest.mark.usefixtures('request_context')
+def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
+    monkeypatch.setattr('indico.modules.events.registration.util.notify_invitation', lambda *args, **kwargs: None)
+    session.set_session_user(dummy_user)
+
+    assert get_user_data(dummy_regform, None) == {}
+
+    expected = {'email': '1337@example.com', 'first_name': 'Guinea',
+                'last_name': 'Pig'}
+
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert user_data == expected
+
+    user_data = get_user_data(dummy_regform, session.user)
+    assert user_data == expected
+
+    dummy_user.title = UserTitle.mr
+    dummy_user.phone = '+1 22 50 14'
+    dummy_user.address = 'Geneva'
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert type(user_data['title']) is dict
+    assert user_data['phone'] == '+1 22 50 14'
+
+    # Check that data is taken from the invitation
+    invitation = RegistrationInvitation(skip_moderation=True, email='awang@example.com', first_name='Amy',
+                                        last_name='Wang', affiliation='ACME Inc.')
+    dummy_regform.invitations.append(invitation)
+
+    dummy_user.title = None
+    user_data = get_user_data(dummy_regform, dummy_user, invitation)
+    assert user_data == {'email': 'awang@example.com', 'first_name': 'Amy', 'last_name': 'Wang',
+                         'phone': '+1 22 50 14', 'address': 'Geneva', 'affiliation': 'ACME Inc.'}
+
+    # Check that data from disabled/deleted fields is not used
+    title_field = next(item for item in dummy_regform.active_fields
+                       if item.type == RegistrationFormItemType.field_pd and item.personal_data_type.name == 'title')
+    title_field.is_enabled = False
+
+    dummy_user.title = UserTitle.dr
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert 'title' not in user_data
+
+    phone_field = next(item for item in dummy_regform.active_fields
+                       if item.type == RegistrationFormItemType.field_pd and item.personal_data_type.name == 'phone')
+    phone_field.is_deleted = True
+
+    user_data = get_user_data(dummy_regform, dummy_user)
+    assert 'title' not in user_data
+    assert 'phone' not in user_data
+    assert user_data == {'email': '1337@example.com', 'first_name': 'Guinea',
+                         'last_name': 'Pig', 'address': 'Geneva'}
+
+    for item in dummy_regform.active_fields:
+        item.is_enabled = False
+
+    assert get_user_data(dummy_regform, dummy_user) == {}
+    assert get_user_data(dummy_regform, dummy_user, invitation) == {}

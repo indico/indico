@@ -183,11 +183,11 @@ export default function MultiChoiceInput({
       component={MultiChoiceInputComponent}
       required={isRequired}
       disabled={disabled}
-      defaultValue={{}}
       choices={choices}
       withExtraSlots={withExtraSlots}
       placesUsed={placesUsed}
       existingValue={existingValue}
+      isEqual={_.isEqual}
     />
   );
 }
