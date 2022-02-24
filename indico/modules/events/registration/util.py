@@ -159,6 +159,8 @@ def get_user_data(regform, user, invitation=None):
                  if t.name != 'title' and getattr(user, t.name, None)}
     if invitation:
         user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
+        if invitation.affiliation:
+            user_data['affiliation'] = invitation.affiliation
     title = getattr(user, 'title', None)
     if title_uuid := get_title_uuid(regform, title):
         user_data['title'] = title_uuid
