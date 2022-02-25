@@ -513,9 +513,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @memoize_request
     def get_published_registrations(self, user):
+        from indico.modules.events.registration.util import get_published_registrations
         is_participant = self.is_user_registered(user)
-        from indico.modules.events.registration.util import get_published_registrations as get_regs
-        return get_regs(self, is_participant)
+        return get_published_registrations(self, is_participant)
 
     @property
     def protection_parent(self):
