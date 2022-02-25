@@ -15,6 +15,7 @@ from marshmallow_enum import EnumField
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
+from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_parse
 
 from indico.core import signals
@@ -423,7 +424,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
     if regform.needs_publish_consent:
         new_consent_to_publish = data.get('consent_to_publish', PublishConsentType.nobody)
         if management and new_consent_to_publish > registration.consent_to_publish:
-            raise Exception('It is not possible to increase the visibility consent level of a participant')
+            raise BadRequest('Cannot increase visibility consent level of a participant')
         registration.consent_to_publish = new_consent_to_publish
     registration.sync_state()
     db.session.flush()
