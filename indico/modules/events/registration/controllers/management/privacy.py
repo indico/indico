@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import redirect
 from flask.helpers import flash
 from marshmallow_enum import EnumField
 
@@ -16,27 +17,24 @@ from indico.modules.events.registration.models.registrations import PublishConse
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
+from indico.web.flask.util import url_for
 
 
 class RHRegistrationPrivacy(RHManageRegFormBase):
     """Change privacy settings of a registration form."""
 
-    def _process_GET(self):
-        form = RegistrationPrivacyForm(event=self.event, regform=self.regform)
-        form.visibility.data = [self.regform.publish_registrations_participants.name,
-                                self.regform.publish_registrations_public.name]
-
-        return WPManageRegistration.render_template('management/regform_privacy.html', self.event,
-                                                    regform=self.regform, form=form)
-
-    def _process_POST(self):
-        form = RegistrationPrivacyForm(event=self.event, regform=self.regform)
+    def _process(self):
+        form = RegistrationPrivacyForm(event=self.event, regform=self.regform, visibility=[
+            self.regform.publish_registrations_participants.name,
+            self.regform.publish_registrations_public.name
+        ])
         if form.validate_on_submit():
             participant_visibility, public_visibility = form.visibility.data
             self.regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
             self.regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
             db.session.flush()
             flash(_('Settings saved'), 'success')
+            return redirect(url_for('.manage_registration_privacy_settings', self.regform))
 
         return WPManageRegistration.render_template('management/regform_privacy.html', self.event,
                                                     regform=self.regform, form=form)
