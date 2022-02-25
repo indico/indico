@@ -483,8 +483,8 @@ class RegistrationPrivacyForm(IndicoForm):
 
     visibility = IndicoParticipantVisibilityField(_('Participant list visibility'),
                                                   description=_('Specify under which conditions the participant list '
-                                                                'will be visible to other participants and '
-                                                                'to everyone else who can access the event'))
+                                                                'will be visible to other participants and everyone '
+                                                                'else who can access the event'))
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
@@ -493,8 +493,8 @@ class RegistrationPrivacyForm(IndicoForm):
     def validate_visibility(self, field):
         participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data)
         if participant_visibility.value < public_visibility.value:
-            raise ValidationError(_('Registrations list visibility can not be more restrictive to participants than '
-                                    'to the public'))
+            raise ValidationError(_('Participant visibility can not be more restrictive for other participants than '
+                                    'for the public'))
         participant_visibility_changed_to_show_all = (
             participant_visibility == PublishRegistrationsMode.show_all and
             self.regform.publish_registrations_participants != PublishRegistrationsMode.show_all
