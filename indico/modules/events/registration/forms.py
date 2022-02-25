@@ -24,8 +24,7 @@ from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.events.registration.models.registrations import (PublishConsentType, PublishRegistrationsMode,
-                                                                     Registration)
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
@@ -474,27 +473,6 @@ class RegistrationTagsAssignForm(IndicoForm):
             raise ValidationError(_('You cannot add and remove the same tag'))
 
     validate_add = validate_remove
-
-    def is_submitted(self):
-        return super().is_submitted() and 'submitted' in request.form
-
-
-class ChangeRegistrationVisibilityForm(IndicoForm):
-    """Form to change visibility of registrations."""
-
-    consent = SelectField(_('Visibility'), [DataRequired()], description=_('Select visibility level'),
-                          choices=[('participants', _('Visible to participants')), ('hidden', _('Hidden'))])
-    registration_id = HiddenFieldList()
-    submitted = HiddenField()
-
-    def __init__(self, *args, **kwargs):
-        self.registrations = kwargs.pop('registrations')
-        super().__init__(*args, **kwargs)
-
-    def validate_consent(self, field):
-        if field.data == 'participants' and any(reg.consent_to_publish == PublishConsentType.nobody
-                                                for reg in self.registrations):
-            raise ValidationError(_('Cannot change visibility without a user consent'))
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form

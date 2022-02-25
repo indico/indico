@@ -154,18 +154,6 @@
                                 {%- trans %}Edit tags{% endtrans -%}
                             </a>
                         </li>
-                        <li>
-                            <a href="#"
-                               class="icon-eye js-requires-selected-row disabled"
-                               data-href="{{ url_for('.manage_registration_change_visibility', regform) }}"
-                               data-title="{% trans %}Change visibility{% endtrans %}"
-                               data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                               data-method="POST"
-                               data-ajax-dialog
-                               data-reload-after>
-                                {%- trans %}Change visibility{% endtrans -%}
-                            </a>
-                        </li>
                     </ul>
                     {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
                     {% if (regform.moderation_enabled or pending_registrations) and not event.is_locked %}
