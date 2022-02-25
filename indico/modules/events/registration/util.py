@@ -421,8 +421,8 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
-    if regform.needs_publish_consent:
-        new_consent_to_publish = data.get('consent_to_publish', PublishConsentType.nobody)
+    if regform.needs_publish_consent and 'consent_to_publish' in data:
+        new_consent_to_publish = data['consent_to_publish']
         if management and new_consent_to_publish > registration.consent_to_publish:
             raise BadRequest('Cannot increase visibility consent level of a participant')
         registration.consent_to_publish = new_consent_to_publish
