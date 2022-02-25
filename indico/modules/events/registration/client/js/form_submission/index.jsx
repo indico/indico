@@ -29,6 +29,9 @@ export default function setupRegformSubmission(root) {
     registrationData = null,
     registrationUuid = null,
     fileData = null,
+    publishToParticipants,
+    publishToPublic,
+    consentToPublish = null,
   } = root.dataset;
 
   const initialData = {
@@ -40,10 +43,14 @@ export default function setupRegformSubmission(root) {
       moderated: JSON.parse(moderated),
       initialValues: JSON.parse(initialValues),
       submitUrl,
-      registrationData: registrationData ? JSON.parse(registrationData) : {},
+      registrationData: registrationData
+        ? {...JSON.parse(registrationData), consent_to_publish: consentToPublish}
+        : {},
       registrationUuid,
       fileData: fileData ? JSON.parse(fileData) : {},
       currency,
+      publishToParticipants,
+      publishToPublic,
     },
   };
   const store = createReduxStore('regform-submission', reducers, initialData);

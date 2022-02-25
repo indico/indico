@@ -71,6 +71,10 @@
                     {% endfor %}
                 </tbody>
             </table>
+        {% elif table.num_participants %}
+            {% call message_box('info', fixed_width=true) %}
+                {% trans %}There are no published registrations.{% endtrans %}
+            {% endcall %}
         {% else %}
             {% call message_box('info', fixed_width=true) %}
                 {% trans %}There are no registrations yet.{% endtrans %}

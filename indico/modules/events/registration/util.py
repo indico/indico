@@ -11,9 +11,11 @@ from operator import attrgetter
 
 from flask import current_app, json, session
 from marshmallow import RAISE, ValidationError, fields, validates
+from marshmallow_enum import EnumField
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
+from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_parse
 
 from indico.core import signals
@@ -36,7 +38,8 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormPersonalDataSection)
-from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
+from indico.modules.events.registration.models.registrations import (PublishConsentType, Registration, RegistrationData,
+                                                                     RegistrationState)
 from indico.modules.events.registration.notifications import (notify_invitation, notify_registration_creation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
@@ -288,6 +291,8 @@ def make_registration_schema(regform, management=False, registration=None):
 
     if management:
         schema['notify_user'] = fields.Boolean()
+    if regform.needs_publish_consent:
+        schema['consent_to_publish'] = EnumField(PublishConsentType)
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
@@ -366,6 +371,8 @@ def create_registration(regform, data, invitation=None, management=False, notify
     if invitation:
         invitation.state = InvitationState.accepted
         invitation.registration = registration
+    if not management and regform.needs_publish_consent:
+        registration.consent_to_publish = data.get('consent_to_publish', PublishConsentType.nobody)
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
     signals.event.registration_created.send(registration, management=management, data=data)
@@ -414,6 +421,11 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
+    if regform.needs_publish_consent and 'consent_to_publish' in data:
+        new_consent_to_publish = data['consent_to_publish']
+        if management and new_consent_to_publish > registration.consent_to_publish:
+            raise BadRequest('Cannot increase visibility consent level of a participant')
+        registration.consent_to_publish = new_consent_to_publish
     registration.sync_state()
     db.session.flush()
     # sanity check
@@ -497,23 +509,24 @@ def get_registrations_with_tickets(user, event):
     return [r for r in query if not r.is_ticket_blocked]
 
 
-def get_published_registrations(event):
+def get_published_registrations(event, is_participant):
     """Get a list of published registrations for an event.
 
     :param event: the `Event` to get registrations for
+    :param is_participant: whether the user accessing the registrations is a participant of the event
     :return: list of `Registration` objects
     """
-    return (Registration.query
-            .filter(Registration.is_publishable,
-                    ~RegistrationForm.is_deleted,
-                    RegistrationForm.event_id == event.id,
-                    RegistrationForm.publish_registrations_enabled)
-            .join(Registration.registration_form)
-            .options(contains_eager(Registration.registration_form))
-            .order_by(db.func.lower(Registration.first_name),
-                      db.func.lower(Registration.last_name),
-                      Registration.friendly_id)
-            .all())
+    query = (Registration.query.with_parent(event)
+             .filter(Registration.is_publishable(is_participant),
+                     ~RegistrationForm.is_deleted,
+                     ~Registration.is_deleted)
+             .join(Registration.registration_form)
+             .options(contains_eager(Registration.registration_form))
+             .order_by(db.func.lower(Registration.first_name),
+                       db.func.lower(Registration.last_name),
+                       Registration.friendly_id))
+
+    return query.all()
 
 
 def get_events_registered(user, dt=None):

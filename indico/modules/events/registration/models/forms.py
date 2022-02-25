@@ -21,7 +21,8 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
-from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
+                                                                     RegistrationState)
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
@@ -46,6 +47,8 @@ class RegistrationForm(db.Model):
     __table_args__ = (db.Index('ix_uq_forms_participation', 'event_id', unique=True,
                                postgresql_where=db.text('is_participation AND NOT is_deleted')),
                       db.UniqueConstraint('id', 'event_id'),  # useless but needed for the registrations fkey
+                      db.CheckConstraint('publish_registrations_public <= publish_registrations_participants',
+                                         name='publish_registrations_more_restrictive_to_public'),
                       {'schema': 'event_registration'})
 
     #: The ID of the object
@@ -127,11 +130,17 @@ class RegistrationForm(db.Model):
         db.Integer,
         nullable=True
     )
-    #: Whether registrations should be displayed in the participant list
-    publish_registrations_enabled = db.Column(
-        db.Boolean,
+    #: Which registrations should be displayed in the public participant list
+    publish_registrations_public = db.Column(
+        PyIntEnum(PublishRegistrationsMode),
         nullable=False,
-        default=False
+        default=PublishRegistrationsMode.hide_all
+    )
+    #: Which registrations should be displayed in the private participant list
+    publish_registrations_participants = db.Column(
+        PyIntEnum(PublishRegistrationsMode),
+        nullable=False,
+        default=PublishRegistrationsMode.show_with_consent
     )
     #: Whether to display the number of registrations
     publish_registration_count = db.Column(
@@ -397,6 +406,11 @@ class RegistrationForm(db.Model):
                 .filter(Registration.is_active)
                 .options(subqueryload('data'))
                 .all())
+
+    @property
+    def needs_publish_consent(self):
+        return (self.publish_registrations_participants == PublishRegistrationsMode.show_with_consent or
+                self.publish_registrations_public == PublishRegistrationsMode.show_with_consent)
 
     def __repr__(self):
         return f'<RegistrationForm({self.id}, {self.event_id}, {self.title})>'

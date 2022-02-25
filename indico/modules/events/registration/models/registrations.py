@@ -14,7 +14,7 @@ from babel.numbers import format_currency
 from flask import has_request_context, request, session
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import mapper
 
 from indico.core import signals
@@ -74,6 +74,20 @@ registrations_tags_table = db.Table(
     ),
     schema='event_registration'
 )
+
+
+class PublishRegistrationsMode(RichIntEnum):
+    __titles__ = [L_('Hide all participants'), L_('Show only consenting participants'), L_('Show all participants')]
+    hide_all = 0
+    show_with_consent = 1
+    show_all = 2
+
+
+class PublishConsentType(RichIntEnum):
+    __titles__ = [L_('Do not display to anyone'), L_('Display to other participants'), L_('Display to everyone')]
+    nobody = 0
+    participants = 1
+    all = 2
 
 
 class Registration(db.Model):
@@ -213,6 +227,12 @@ class Registration(db.Model):
         nullable=False,
         default='',
     )
+    #: Type of consent given to publish this registration
+    consent_to_publish = db.Column(
+        PyIntEnum(PublishConsentType),
+        nullable=False,
+        default=PublishConsentType.nobody
+    )
     #: The Event containing this registration
     event = db.relationship(
         'Event',
@@ -285,6 +305,43 @@ class Registration(db.Model):
             if r.registration_form not in target_regforms_used:
                 r.user = target
 
+    @hybrid_method
+    def is_publishable(self, is_participant):
+        publish_registrations_mode = (
+            self.registration_form.publish_registrations_participants
+            if is_participant else
+            self.registration_form.publish_registrations_public
+        )
+        return (
+            self.is_active
+            and self.state in (RegistrationState.complete, RegistrationState.unpaid)
+            and publish_registrations_mode != PublishRegistrationsMode.hide_all
+            and (
+                publish_registrations_mode == PublishRegistrationsMode.show_all
+                or self.consent_to_publish == PublishConsentType.all
+                or (is_participant and self.consent_to_publish == PublishConsentType.participants)
+            )
+        )
+
+    @is_publishable.expression
+    def is_publishable(cls, is_participant):
+        def _has_regform_publish_mode(mode):
+            if is_participant:
+                return cls.registration_form.has(publish_registrations_participants=mode)
+            else:
+                return cls.registration_form.has(publish_registrations_public=mode)
+        consent_criterion = (
+            cls.consent_to_publish.in_([PublishConsentType.all, PublishConsentType.participants])
+            if is_participant else
+            cls.consent_to_publish == PublishConsentType.all
+        )
+        return db.and_(
+            cls.is_active,
+            cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)),
+            ~_has_regform_publish_mode(PublishRegistrationsMode.hide_all),
+            _has_regform_publish_mode(PublishRegistrationsMode.show_all) | consent_criterion
+        )
+
     @hybrid_property
     def is_active(self):
         return not self.is_cancelled and not self.is_deleted
@@ -292,14 +349,6 @@ class Registration(db.Model):
     @is_active.expression
     def is_active(cls):
         return ~cls.is_cancelled & ~cls.is_deleted
-
-    @hybrid_property
-    def is_publishable(self):
-        return self.is_active and self.state in (RegistrationState.complete, RegistrationState.unpaid)
-
-    @is_publishable.expression
-    def is_publishable(cls):
-        return cls.is_active & (cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)))
 
     @hybrid_property
     def is_cancelled(self):

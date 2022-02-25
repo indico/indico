@@ -24,7 +24,7 @@ from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
@@ -32,7 +32,8 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
 from indico.web.forms.fields.colors import SUIColorPickerField
 from indico.web.forms.fields.principals import PrincipalListField
-from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField, IndicoMultipleTagSelectField
+from indico.web.forms.fields.simple import (HiddenFieldList, IndicoEmailRecipientsField, IndicoMultipleTagSelectField,
+                                            IndicoParticipantVisibilityField)
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
@@ -69,9 +70,6 @@ class RegistrationFormForm(IndicoForm):
                                       description=_('Maximum number of registrations'))
     modification_mode = IndicoEnumSelectField(_('Modification allowed'), enum=ModificationMode,
                                               description=_('Will users be able to modify their data? When?'))
-    publish_registrations_enabled = BooleanField(_('Publish registrations'), widget=SwitchWidget(),
-                                                 description=_('Registrations from this form will be displayed in the '
-                                                               'event page'))
     publish_registration_count = BooleanField(_('Publish number of registrations'), widget=SwitchWidget(),
                                               description=_('Number of registered participants will be displayed in '
                                                             'the event page'))
@@ -110,6 +108,7 @@ class RegistrationFormForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.regform = kwargs.pop('regform', None)
         super().__init__(*args, **kwargs)
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
@@ -289,6 +288,10 @@ class TicketsForm(IndicoForm):
 class ParticipantsDisplayForm(IndicoForm):
     """Form to customize the display of the participant list."""
     json = JSONField()
+
+    def __init__(self, *args, **kwargs):
+        self.regforms = kwargs.pop('regforms')
+        super().__init__(*args, **kwargs)
 
     def validate_json(self, field):
         schema = {
@@ -473,3 +476,36 @@ class RegistrationTagsAssignForm(IndicoForm):
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form
+
+
+class RegistrationPrivacyForm(IndicoForm):
+    """Form to set the privacy settings of a registration form"""
+
+    visibility = IndicoParticipantVisibilityField(_('Participant list visibility'),
+                                                  description=_('Specify under which conditions the participant list '
+                                                                'will be visible to other participants and everyone '
+                                                                'else who can access the event'))
+
+    def __init__(self, *args, **kwargs):
+        self.regform = kwargs.pop('regform')
+        super().__init__(*args, **kwargs)
+
+    def validate_visibility(self, field):
+        participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data)
+        if participant_visibility.value < public_visibility.value:
+            raise ValidationError(_('Participant visibility can not be more restrictive for other participants than '
+                                    'for the public'))
+        participant_visibility_changed_to_show_all = (
+            participant_visibility == PublishRegistrationsMode.show_all and
+            self.regform.publish_registrations_participants != PublishRegistrationsMode.show_all
+        )
+        public_visibility_changed_to_show_all = (
+            public_visibility == PublishRegistrationsMode.show_all and
+            self.regform.publish_registrations_public != PublishRegistrationsMode.show_all
+        )
+        if (
+            self.regform and
+            self.regform.existing_registrations_count > 0 and
+            (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all)
+        ):
+            raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))

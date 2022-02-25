@@ -13,6 +13,7 @@ from wtforms.fields import (BooleanField, Field, HiddenField, PasswordField, Rad
                             TextAreaField)
 from wtforms.widgets import CheckboxInput
 
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
 from indico.util.i18n import _
 from indico.util.string import sanitize_email, validate_email
 from indico.web.forms.fields.util import is_preprocessed_formdata
@@ -188,3 +189,8 @@ class IndicoLinkListField(JSONField):
             raise ValidationError(_('URL is required'))
         if len(self.data) > 1 and not all(x.get('title') for x in self.data):
             raise ValidationError(_('Titles are required when more than one link is specified'))
+
+
+class IndicoParticipantVisibilityField(JSONField):
+    widget = JinjaWidget('forms/participant_visibility_widget.html', single_kwargs=True, single_line=True)
+    choices = [(mode.name, mode.title) for mode in PublishRegistrationsMode]

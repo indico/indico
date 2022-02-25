@@ -23,6 +23,7 @@ import './legacy_form/table';
 
 import './legacy_form/templates';
 
+import ConsentToPublishEditor from './components/ConsentToPublishEditor';
 import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
 import setupRegformSetup from './form_setup';
 import setupRegformSubmission from './form_submission';
@@ -112,6 +113,36 @@ import setupRegformSubmission from './form_submission';
     $('#registration-details')
       .parent()
       .on('indico:htmlUpdated', setupRegistrationTags);
+  });
+
+  function setupConsentToPublish() {
+    const rootElement = document.getElementById('registration-summary-consent-to-publish');
+
+    if (rootElement) {
+      const {
+        locator,
+        publishToParticipants,
+        publishToPublic,
+        initialConsentToPublish,
+      } = rootElement.dataset;
+
+      ReactDOM.render(
+        <ConsentToPublishEditor
+          locator={JSON.parse(locator)}
+          publishToParticipants={publishToParticipants}
+          publishToPublic={publishToPublic}
+          initialConsentToPublish={initialConsentToPublish}
+        />,
+        rootElement
+      );
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupConsentToPublish();
+    $('#registration-info')
+      .parent()
+      .on('indico:htmlUpdated', setupConsentToPublish);
   });
 
   document.addEventListener('DOMContentLoaded', () => {

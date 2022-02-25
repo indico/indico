@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from operator import attrgetter, itemgetter
+from operator import itemgetter
 
 from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
@@ -22,6 +22,7 @@ from indico.modules.events.registration.forms import (ParticipantsDisplayForm, P
                                                       RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (create_personal_data_fields, get_event_section_data,
                                                      get_flat_section_setup_data)
@@ -52,16 +53,17 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
 
     def _process(self):
         regforms = sorted(self.event.registration_forms, key=lambda f: f.title.lower())
-        form = ParticipantsDisplayForm()
+        form = ParticipantsDisplayForm(regforms=regforms)
         if form.validate_on_submit():
             data = form.json.data
             registration_settings.set(self.event, 'merge_registration_forms', data['merge_forms'])
             registration_settings.set_participant_list_form_ids(self.event, data['participant_list_forms'])
             registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
-            for regform in regforms:
-                regform.publish_registrations_enabled = regform.id in data['participant_list_forms']
             flash(_('The participants display settings have been saved.'), 'success')
             return redirect(url_for('.manage_regforms_display', self.event))
+        elif form.is_submitted():
+            for error in form.error_list:
+                flash(error, 'error')
 
         available_columns = {field[0].name: field[1]['title'] for field in PersonalDataType.FIELD_DATA}
         enabled_columns = []
@@ -75,31 +77,23 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
         disabled_columns.sort(key=itemgetter('title'))
 
         available_forms = {regform.id: regform for regform in regforms}
-        enabled_forms = []
-        disabled_forms = []
+        sorted_forms = []
         # Handle forms that have already been sorted by the user.
         for form_id in registration_settings.get_participant_list_form_ids(self.event):
             try:
                 regform = available_forms[form_id]
             except KeyError:
                 continue
-            # Make sure publication was not disabled since the display settings were modified.
-            if regform.publish_registrations_enabled:
-                enabled_forms.append(regform)
-                del available_forms[form_id]
+            sorted_forms.append(regform)
+            del available_forms[form_id]
         for form_id, regform in available_forms.items():
-            # There might be forms with publication enabled that haven't been sorted by the user yet.
-            if regform.publish_registrations_enabled:
-                enabled_forms.append(regform)
-            else:
-                disabled_forms.append(regform)
-        disabled_forms.sort(key=attrgetter('title'))
+            sorted_forms.append(regform)
 
         merge_forms = registration_settings.get(self.event, 'merge_registration_forms')
         return WPManageRegistration.render_template('management/regform_display.html', self.event,
                                                     regforms=regforms, enabled_columns=enabled_columns,
-                                                    disabled_columns=disabled_columns, enabled_forms=enabled_forms,
-                                                    disabled_forms=disabled_forms, merge_forms=merge_forms, form=form)
+                                                    disabled_columns=disabled_columns, sorted_forms=sorted_forms,
+                                                    merge_forms=merge_forms, form=form)
 
 
 class RHManageRegistrationFormDisplay(RHManageRegFormBase):
@@ -138,7 +132,10 @@ class RHManageParticipants(RHManageRegFormsBase):
         set_feature_enabled(self.event, 'registration', True)
         if not regform:
             regform = RegistrationForm(event=self.event, title='Participants', is_participation=True,
-                                       currency=payment_settings.get('currency'))
+                                       currency=payment_settings.get('currency'),
+                                       publish_registrations_public=(PublishRegistrationsMode.hide_all
+                                                                     if self.event.type_ == EventType.conference
+                                                                     else PublishRegistrationsMode.show_with_consent))
             create_personal_data_fields(regform)
             db.session.add(regform)
             db.session.flush()
@@ -160,8 +157,11 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
     """Create a new registration form."""
 
     def _process(self):
+        publish_registrations_participants = (PublishRegistrationsMode.hide_all
+                                              if self.event.type_ == EventType.conference
+                                              else PublishRegistrationsMode.show_with_consent)
         form = RegistrationFormForm(event=self.event, currency=payment_settings.get('currency'),
-                                    publish_registrations_enabled=(self.event.type_ != EventType.conference))
+                                    publish_registrations_participants=publish_registrations_participants)
         if form.validate_on_submit():
             regform = RegistrationForm(event=self.event)
             create_personal_data_fields(regform)
@@ -191,7 +191,7 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
         return FormDefaults(self.regform, limit_registrations=self.regform.registration_limit is not None)
 
     def _process(self):
-        form = RegistrationFormForm(obj=self._get_form_defaults(), event=self.event)
+        form = RegistrationFormForm(obj=self._get_form_defaults(), event=self.event, regform=self.regform)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()

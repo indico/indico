@@ -8,7 +8,7 @@
 from indico.modules.events.registration import api
 from indico.modules.events.registration.controllers import display
 from indico.modules.events.registration.controllers.compat import compat_registration
-from indico.modules.events.registration.controllers.management import (fields, invitations, regforms, reglists,
+from indico.modules.events.registration.controllers.management import (fields, invitations, privacy, regforms, reglists,
                                                                        sections, tags, tickets)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -197,6 +197,8 @@ _bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants',
 _bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api.RHAPIRegistrationForms)
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registration_tags_assign',
                  tags.RHAPIRegistrationTagsAssign, methods=('POST',))
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_registration_change_consent',
+                 privacy.RHAPIRegistrationChangeConsent, methods=('POST',))
 
 # Participants
 _bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<int:event_id>',
@@ -204,6 +206,9 @@ _bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix=
 _bp_participation.add_url_rule('/manage/participants/', 'manage', regforms.RHManageParticipants,
                                methods=('GET', 'POST'))
 
+# Privacy
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/privacy/settings', 'manage_registration_privacy_settings',
+                 privacy.RHRegistrationPrivacy, methods=('GET', 'POST'))
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_event_registration', __name__, url_prefix='/event/<int:event_id>')
