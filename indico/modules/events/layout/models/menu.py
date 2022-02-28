@@ -36,6 +36,13 @@ class MenuEntryType(RichIntEnum):
     page = 5
 
 
+class MenuEntryAccess(RichIntEnum):
+    __titles__ = [None, _('Everyone'), _('Registered participants'), _('Speakers')]
+    everyone = 1
+    registered_participants = 2
+    speakers = 3
+
+
 class MenuEntryMixin:
     def __init__(self, **kwargs):
         event = kwargs.pop('event', kwargs.get('event'))
@@ -125,8 +132,7 @@ class MenuEntryMixin:
     def is_visible(self):
         if not self.is_enabled:
             return False
-        if (self.registered_only and not self.event_ref.is_user_registered(session.user)
-                and not self.event_ref.can_manage(session.user)):
+        if not self.can_access(session.user):
             return False
         if not self.name:
             # we don't have `hide_if_restricted` for custom menu items, so we
@@ -169,6 +175,17 @@ class MenuEntryMixin:
             self.position,
         )
 
+    def can_access(self, user):
+        if self.event_ref.can_manage(user):
+            return True
+        if self.access == MenuEntryAccess.everyone:
+            return True
+        if self.access == MenuEntryAccess.registered_participants:
+            return self.event_ref.is_user_registered(user)
+        if self.access == MenuEntryAccess.speakers:
+            return self.event_ref.is_user_speaker(user)
+        return True
+
 
 class TransientMenuEntry(MenuEntryMixin):
     def __init__(self, event, is_enabled, name, position, children, new_tab=False):
@@ -184,7 +201,7 @@ class TransientMenuEntry(MenuEntryMixin):
         self.link_url = None
         self.page_id = None
         self.is_root = True
-        self.registered_only = False
+        self.access = MenuEntryAccess.everyone
         for child in self.children:
             child.is_root = False
 
@@ -275,11 +292,11 @@ class MenuEntry(MenuEntryMixin, db.Model):
         nullable=False,
         default=False
     )
-    #: Whether the menu entry should be viewable only by registered users
-    registered_only = db.Column(
-        db.Boolean,
+    #: Which group of people should the menu entry be viewable by
+    access = db.Column(
+        PyIntEnum(MenuEntryAccess),
         nullable=False,
-        default=False
+        default=MenuEntryAccess.everyone,
     )
     #: The target URL of a custom link
     link_url = db.Column(

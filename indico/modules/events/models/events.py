@@ -12,7 +12,7 @@ from operator import attrgetter
 import pytz
 from flask import has_request_context, render_template, session
 from markupsafe import Markup
-from sqlalchemy import DDL, orm
+from sqlalchemy import DDL, and_, or_, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -1035,6 +1035,31 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                         Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
                         ~Registration.is_deleted,
                         ~RegistrationForm.is_deleted)
+                .has_rows())
+
+    def is_user_speaker(self, user):
+        from indico.modules.events.contributions import Contribution
+        from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
+        from indico.modules.events.contributions.models.subcontributions import SubContribution
+        from indico.modules.events.models.persons import EventPerson
+        if user is None:
+            return False
+        return (EventPerson.query
+                .with_parent(self)
+                .with_parent(user)
+                .filter(or_(
+                    EventPerson.contribution_links.any(and_(
+                        ContributionPersonLink.is_speaker,
+                        ContributionPersonLink.contribution.has(~Contribution.is_deleted)
+                    )),
+                    EventPerson.subcontribution_links.any(
+                        SubContributionPersonLink.subcontribution.has(and_(
+                            ~SubContribution.is_deleted,
+                            SubContribution.contribution.has(~Contribution.is_deleted)
+                        ))
+                    ),
+                    EventPerson.event_links.any()
+                ))
                 .has_rows())
 
 

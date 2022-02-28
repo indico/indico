@@ -11,11 +11,13 @@ from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.config import config
 from indico.modules.events.layout import theme_settings
+from indico.modules.events.layout.models.menu import MenuEntryAccess
 from indico.modules.events.layout.util import get_css_file_data, get_logo_data, get_plugin_conference_themes
 from indico.modules.users import NameFormat
 from indico.util.i18n import _, orig_string
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EditableFileField, FileField, IndicoEnumSelectField
+from indico.web.forms.fields.enums import IndicoEnumRadioField
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import CKEditorWidget, ColorPickerWidget, SwitchWidget
 
@@ -160,8 +162,8 @@ class MenuUserEntryFormBase(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     is_enabled = BooleanField(_('Show'), widget=SwitchWidget())
     new_tab = BooleanField(_('Open in a new tab'), widget=SwitchWidget())
-    registered_only = BooleanField(_('Restricted'), widget=SwitchWidget(),
-                                   description=_('Visible to registered users only.'))
+    access = IndicoEnumRadioField(_('Visibility'), enum=MenuEntryAccess,
+                                  description=_('Select which group of people can see this entry.'))
 
 
 class MenuLinkForm(MenuUserEntryFormBase):

@@ -28,6 +28,8 @@ Improvements
   customization page (:issue:`5239`, :pr:`5259`)
 - Add more powerful filters to "get next editable" and the list of editables
   (:issue:`5188`, :pr:`5224`, :pr:`5241`)
+- Add the ability to create speaker-only menu entries for conferences (:issue:`5261`,
+  :pr:`5268`)
 
 Bugfixes
 ^^^^^^^^
