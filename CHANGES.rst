@@ -26,6 +26,8 @@ Improvements
   module (:pr:`5212`)
 - Add a link to quickly view the current stylesheet on the conference layout
   customization page (:issue:`5239`, :pr:`5259`)
+- Add more powerful filters to "get next editable" and the list of editables
+  (:issue:`5188`, :pr:`5224`, :pr:`5241`)
 
 Bugfixes
 ^^^^^^^^
