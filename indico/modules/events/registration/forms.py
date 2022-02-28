@@ -45,7 +45,7 @@ def _check_if_payment_required(form, field):
         raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
 
 
-class RegistrationFormForm(IndicoForm):
+class RegistrationFormEditForm(IndicoForm):
     _price_fields = ('currency', 'base_price')
     _registrant_notification_fields = ('notification_sender_address', 'message_pending', 'message_unpaid',
                                        'message_complete', 'attach_ical')
@@ -114,6 +114,26 @@ class RegistrationFormForm(IndicoForm):
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
                                                          'then {email} is used.').format(email=config.NO_REPLY_EMAIL)
+
+    def _set_currencies(self):
+        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
+        self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
+
+
+class RegistrationFormCreateForm(IndicoForm):
+    _meeting_fields = ('visibility',)  # The meeting regform has a default title
+    _conference_fields = ('title', 'visibility')
+    title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
+    visibility = IndicoParticipantVisibilityField(_('Participant list visibility'),
+                                                  description=_('Specify under which conditions the participant list '
+                                                                'will be visible to other participants and everyone '
+                                                                'else who can access the event'))
+    currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super().__init__(*args, **kwargs)
+        self._set_currencies()
 
     def _set_currencies(self):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]

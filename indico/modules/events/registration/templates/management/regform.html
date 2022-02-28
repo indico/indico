@@ -42,6 +42,21 @@
                     </a>
                 </div>
             </div>
+
+            <div class="section">
+                <div class="icon icon-lock-center"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Privacy settings{% endtrans %}
+                    </div>
+                    {% trans %}Choose who can see the participants of this event.{% endtrans %}
+                </div>
+                <div class="toolbar">
+                    <a href="{{ url_for('.manage_registration_privacy_settings', regform) }}" class="i-button icon-settings">
+                        {% trans %}Configure{% endtrans %}
+                    </a>
+                </div>
+            </div>
         </div>
     {% endblock %}
 
