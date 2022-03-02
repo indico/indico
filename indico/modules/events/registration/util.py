@@ -390,6 +390,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
 
 @no_autoflush
 def modify_registration(registration, data, management=False, notify_user=True):
+    old_data = snapshot_registration_data(registration)
     old_price = registration.price
     personal_data_changes = {}
     regform = registration.registration_form
@@ -439,7 +440,10 @@ def modify_registration(registration, data, management=False, notify_user=True):
     if personal_data_changes:
         signals.event.registration_personal_data_modified.send(registration, change=personal_data_changes)
     signals.event.registration_updated.send(registration, management=management, data=data)
-    notify_registration_modification(registration, notify_user)
+
+    new_data = snapshot_registration_data(registration)
+    diff = diff_registration_data(old_data, new_data)
+    notify_registration_modification(registration, notify_user, diff=diff, old_price=old_price)
     logger.info('Registration %s modified by %s', registration, session.user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      LogKind.change, 'Registration',
@@ -802,3 +806,32 @@ def serialize_registration_form(regform):
         'identifier': f'RegistrationForm:{regform.id}',
         '_type': 'RegistrationForm'
     }
+
+
+def snapshot_registration_data(registration):
+    data = {}
+    for regfields in registration.summary_data.values():
+        for field, regdata in regfields.items():
+            data[field.html_field_name] = {'price': regdata.price, 'data': regdata.data,
+                                           'storage_file_id': regdata.storage_file_id,
+                                           'is_file_field': field.field_impl.is_file_field,
+                                           'friendly_data': regdata.friendly_data}
+    return data
+
+
+def diff_registration_data(old_data, new_data):
+    """Compare two sets of registration data.
+
+    :return: A dictionary where the key is the html name of the field and the value is
+             the old and new friendly data and the field price
+    """
+    diff = {}
+    for html_field_name in old_data:
+        old = old_data[html_field_name]
+        new = new_data[html_field_name]
+        if old['data'] != new['data'] or (old['is_file_field'] and old['storage_file_id'] != new['storage_file_id']):
+            diff[html_field_name] = {
+                'old': {'price': old['price'], 'friendly_data': old['friendly_data']},
+                'new': {'price': new['price'], 'friendly_data': new['friendly_data']}
+            }
+    return diff

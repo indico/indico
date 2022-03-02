@@ -1,24 +1,37 @@
 {% extends 'events/registration/emails/base_registration.html' %}
 
 {% block registration_body %}
+    {%- set diff = diff if diff is not none else {} -%}
+    {%- set old_price = old_price if old_price is not none else registration.price -%}
     {% for section, fields in registration.summary_data.items() if not section.is_manager_only %}
         <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
             <h2>{{ section.title }}</h2>
             <dl>
-                {% for field, regdata in fields.items() if regdata.friendly_data %}
+                {% for field, regdata in fields.items() if regdata.friendly_data or field.html_field_name in diff %}
                     {{ render_field(field) }}
-                    {{ render_regdata(regdata) }}
+                    {% if field.html_field_name in diff %}
+                        {{ render_modified_regdata(regdata, diff[field.html_field_name]) }}
+                    {% else %}
+                        {{ render_regdata(regdata) }}
+                    {% endif %}
                 {% endfor %}
             </dl>
             <div style="clear: both;"></div>
         </div>
     {% endfor %}
-    {% if registration.price %}
+    {% if old_price != registration.price or registration.price %}
         <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
             <p style="text-align: right; margin-bottom: 0; font-size: 0.9em;">
                 <strong>Total:</strong>
                 <span style="font-style: italic">
-                    {{- registration.render_price() -}}
+                    {% if old_price != registration.price %}
+                        <s>{{- registration._render_price(old_price) -}}</s>
+                        <span style="background-color: yellow; margin-left: 5px;">
+                            {{- registration.render_price() -}}
+                        </span>
+                    {% else %}
+                        {{- registration.render_price() -}}
+                    {% endif %}
                 </span>
             </p>
         </div>
@@ -36,21 +49,73 @@
 {% macro render_regdata(regdata) %}
     <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; word-break: break-all; padding-left: 20px; box-sizing: border-box;">
         {%- set friendly_data = regdata.friendly_data -%}
-        {%- if regdata.field_data.field.input_type == 'accommodation' and friendly_data -%}
-            {% if friendly_data['is_no_accommodation'] %}
-                {{- friendly_data.choice -}}
-            {% else %}
-                {{- friendly_data.choice }} ({{ friendly_data.arrival_date | format_date(locale='en_GB') }} - {{ friendly_data.departure_date | format_date(locale='en_GB') -}})
-            {% endif %}
-        {%- elif regdata.field_data.field.input_type == 'multi_choice' -%}
-            {{- friendly_data | join(', ') }}
-        {%- else -%}
-            {{- friendly_data -}}
-        {%- endif -%}
+        {%- set type = regdata.field_data.field.input_type -%}
+        <span>
+            {{- render_friendly_data(friendly_data, type) -}}
+        </span>
         {%- if regdata.price -%}
-            <span style="float: right; font-style: italic; font-size: 0.9em;">
-                {{- regdata.render_price() -}}
-            </span>
+            {{- render_price(regdata) -}}
         {%- endif -%}
     </dd>
 {% endmacro %}
+
+
+{% macro render_modified_regdata(regdata, diff) %}
+    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; word-break: break-all; padding-left: 20px; box-sizing: border-box;">
+        {%- set type = regdata.field_data.field.input_type -%}
+        {%- set old = diff.old -%}
+        {%- set new = diff.new -%}
+        {%- set old_friendly_data = render_friendly_data(old.friendly_data, type) -%}
+        {%- set new_friendly_data = render_friendly_data(new.friendly_data, type) -%}
+        <span>{#- -#}
+            {%- if old_friendly_data -%}
+                <s style="margin-right: 5px;">{{ old_friendly_data }}</s>{#- -#}
+            {%- endif -%}
+            {%- if new_friendly_data -%}
+                <span style="background-color: yellow;">{{ new_friendly_data }}</span>{#- -#}
+            {%- endif -%}
+        </span>
+        {%- if old.price != new.price -%}
+            <span style="float: right; font-style: italic; font-size: 0.9em;">{#- -#}
+                <s style="margin-right: 5px;">{{- regdata._render_price(old.price) -}}</s>{#- -#}
+                <span style="background-color: yellow;">{{- regdata._render_price(new.price) -}}</span>{#- -#}
+            </span>
+        {%- elif regdata.price -%}
+            {{- render_price(regdata) -}}
+        {%- endif -%}
+    </dd>
+{% endmacro %}
+
+
+{% macro render_friendly_data(friendly_data, type) %}
+    {%- if type == 'accommodation' and friendly_data -%}
+        {{- render_accommodation(friendly_data) -}}
+    {%- elif type == 'multi_choice' -%}
+        {{- render_multichoice(friendly_data) -}}
+    {%- else -%}
+        {{- friendly_data -}}
+    {%- endif -%}
+{% endmacro %}
+
+
+{% macro render_accommodation(friendly_data) %}
+    {%- if friendly_data['is_no_accommodation'] -%}
+        {{- friendly_data.choice -}}
+    {%- else -%}
+        {{- friendly_data.choice }} {# -#}
+        ({{ friendly_data.arrival_date | format_date(locale='en_GB') }} - {# -#}
+        {{ friendly_data.departure_date | format_date(locale='en_GB') -}})
+    {%- endif -%}
+{% endmacro %}
+
+
+{% macro render_multichoice(friendly_data) %}
+    {{- friendly_data | join(', ') -}}
+{% endmacro %}
+
+
+{%- macro render_price(regdata) -%}
+    <span style="float: right; font-style: italic; font-size: 0.9em;">
+        {{- regdata.render_price() -}}
+    </span>
+{%- endmacro -%}

@@ -764,8 +764,11 @@ class RegistrationData(StoredFileMixin, db.Model):
         path = posixpath.join(*(path_segments + [filename]))
         return config.ATTACHMENT_STORAGE, path
 
+    def _render_price(self, price):
+        return format_currency(price, self.registration.currency, locale=(session.lang or 'en_GB'))
+
     def render_price(self):
-        return format_currency(self.price, self.registration.currency, locale=session.lang or 'en_GB')
+        return self._render_price(self.price)
 
 
 @listens_for(mapper, 'after_configured', once=True)
