@@ -8,195 +8,176 @@
 import pytest
 
 from indico.modules.events.features.util import set_feature_enabled
-from indico.modules.events.registration.models.registrations import (PublishConsentType, PublishRegistrationsMode,
-                                                                     Registration, RegistrationState)
+from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
+                                                                     RegistrationState, RegistrationVisibility)
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
+def assert_visibility(reg, visibility, test_visibility_prop=True):
+    def _is_publishable_query(is_participant):
+        return Registration.query.with_parent(reg.event).filter(Registration.is_publishable(is_participant)).has_rows()
+
+    if test_visibility_prop:
+        assert reg.visibility == visibility
+        assert Registration.query.with_parent(reg.event).filter(Registration.visibility == visibility).has_rows()
+    if visibility == RegistrationVisibility.nobody:
+        assert not reg.is_publishable(True)
+        assert not reg.is_publishable(False)
+        assert not _is_publishable_query(True)
+        assert not _is_publishable_query(False)
+    elif visibility == RegistrationVisibility.participants:
+        assert reg.is_publishable(True)
+        assert not reg.is_publishable(False)
+        assert _is_publishable_query(True)
+        assert not _is_publishable_query(False)
+    elif visibility == RegistrationVisibility.all:
+        assert reg.is_publishable(True)
+        assert reg.is_publishable(False)
+        assert _is_publishable_query(True)
+        assert _is_publishable_query(False)
+
+
 @pytest.mark.usefixtures('dummy_reg')
-def test_registration_publishable(dummy_event, dummy_regform):
+def test_registration_visibility(dummy_event, dummy_regform):
     set_feature_enabled(dummy_event, 'registration', True)
 
     reg = dummy_event.registrations.one()
 
     assert dummy_regform.publish_registrations_public == PublishRegistrationsMode.hide_all
     assert dummy_regform.publish_registrations_participants == PublishRegistrationsMode.show_with_consent
-    assert reg.consent_to_publish == PublishConsentType.nobody
+    assert reg.consent_to_publish == RegistrationVisibility.nobody
+    assert not reg.participant_hidden
     assert reg.is_active
     assert reg.state == RegistrationState.complete
-    assert not reg.is_publishable(True)
-    assert not reg.is_publishable(False)
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
-    reg.consent_to_publish = PublishConsentType.participants
-    assert reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.all
-    assert reg.is_publishable(True)
-    assert not reg.is_publishable(False)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.participants)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.participants)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.participants
-    assert reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.all
-    assert reg.is_publishable(True)
-    assert not reg.is_publishable(False)
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.participants)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.participants)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.participants)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.hide_all
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert not reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.participants
-    assert not reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.all
-    assert not reg.is_publishable(True)
-    assert not reg.is_publishable(False)
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_with_consent
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_with_consent
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert not reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.participants
-    assert reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.all
-    assert reg.is_publishable(True)
-    assert reg.is_publishable(False)
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.participants)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.all)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.participants
-    assert reg.is_publishable(True)
-    assert not reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.all
-    assert reg.is_publishable(True)
-    assert reg.is_publishable(False)
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.participants)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.participants)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.all)
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_all
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert reg.is_publishable(True)
-    assert reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.participants
-    assert reg.is_publishable(True)
-    assert reg.is_publishable(False)
-    reg.consent_to_publish = PublishConsentType.all
-    assert reg.is_publishable(True)
-    assert reg.is_publishable(False)
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.all)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.all)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.all)
 
     reg.state = RegistrationState.rejected
     assert not reg.is_active
-    assert not reg.is_publishable(True)
-    assert not reg.is_publishable(False)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)
     reg.state = RegistrationState.withdrawn
     assert not reg.is_active
-    assert not reg.is_publishable(True)
-    assert not reg.is_publishable(False)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)
     reg.state = RegistrationState.pending
     assert reg.is_active
-    assert not reg.is_publishable(True)
-    assert not reg.is_publishable(False)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)
 
 
 @pytest.mark.usefixtures('dummy_reg')
-def test_registration_publishable_query(dummy_event, dummy_regform):
+def test_registration_visibility_hide_participants(dummy_event, dummy_regform):
     set_feature_enabled(dummy_event, 'registration', True)
 
-    def _get_publishable(is_participant):
-        return Registration.query.with_parent(dummy_event).filter(Registration.is_publishable(is_participant))
-
     reg = dummy_event.registrations.one()
+    reg.participant_hidden = True
 
     assert dummy_regform.publish_registrations_public == PublishRegistrationsMode.hide_all
     assert dummy_regform.publish_registrations_participants == PublishRegistrationsMode.show_with_consent
-    assert not reg.consent_to_publish
+    assert reg.consent_to_publish == RegistrationVisibility.nobody
     assert reg.is_active
     assert reg.state == RegistrationState.complete
-    assert not _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
-    reg.consent_to_publish = PublishConsentType.participants
-    assert _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.all
-    assert _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.participants
-    assert _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.all
-    assert _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.hide_all
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert not _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.participants
-    assert not _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.all
-    assert not _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_with_consent
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_with_consent
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert not _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.participants
-    assert _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.all
-    assert _get_publishable(True).has_rows()
-    assert _get_publishable(False).has_rows()
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.participants
-    assert _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.all
-    assert _get_publishable(True).has_rows()
-    assert _get_publishable(False).has_rows()
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_all
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
-    reg.consent_to_publish = PublishConsentType.nobody
-    assert _get_publishable(True).has_rows()
-    assert _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.participants
-    assert _get_publishable(True).has_rows()
-    assert _get_publishable(False).has_rows()
-    reg.consent_to_publish = PublishConsentType.all
-    assert _get_publishable(True).has_rows()
-    assert _get_publishable(False).has_rows()
+    reg.consent_to_publish = RegistrationVisibility.nobody
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.participants
+    assert_visibility(reg, RegistrationVisibility.nobody)
+    reg.consent_to_publish = RegistrationVisibility.all
+    assert_visibility(reg, RegistrationVisibility.nobody)
 
     reg.state = RegistrationState.rejected
     assert not reg.is_active
-    assert not _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
+    assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)
     reg.state = RegistrationState.withdrawn
     assert not reg.is_active
-    assert not _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
+    assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)
     reg.state = RegistrationState.pending
     assert reg.is_active
-    assert not _get_publishable(True).has_rows()
-    assert not _get_publishable(False).has_rows()
+    assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)

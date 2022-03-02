@@ -25,7 +25,7 @@
         <th class="regform-done-caption">{% trans %}Visibility{% endtrans %}</th>
         <td class="regform-done-data">
             {% if from_management %}
-                {{ registration.consent_to_publish.title }}
+                {{ registration.visibility.title }}
             {% else %}
                 <div id="registration-summary-consent-to-publish"
                      data-locator="{{ registration.locator.registrant|tojson|forceescape }}"

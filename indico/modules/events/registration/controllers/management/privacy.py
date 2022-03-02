@@ -13,7 +13,7 @@ from indico.core.db import db
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import RegistrationPrivacyForm
-from indico.modules.events.registration.models.registrations import PublishConsentType, PublishRegistrationsMode
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationVisibility
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
@@ -43,7 +43,7 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
 class RHAPIRegistrationChangeConsent(RHRegistrationFormRegistrationBase):
     """Internal API to change registration consent to publish."""
 
-    @use_kwargs({'consent_to_publish': EnumField(PublishConsentType)})
+    @use_kwargs({'consent_to_publish': EnumField(RegistrationVisibility)})
     def _process_POST(self, consent_to_publish):
         self.registration.consent_to_publish = consent_to_publish
         return '', 204

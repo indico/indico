@@ -45,7 +45,10 @@ export default function setupRegformSubmission(root) {
       initialValues: JSON.parse(initialValues),
       submitUrl,
       registrationData: registrationData
-        ? {...JSON.parse(registrationData), consent_to_publish: consentToPublish}
+        ? {
+            ...JSON.parse(registrationData),
+            consent_to_publish: consentToPublish,
+          }
         : {},
       registrationUuid,
       fileData: fileData ? JSON.parse(fileData) : {},

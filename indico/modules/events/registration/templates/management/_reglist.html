@@ -86,8 +86,20 @@
                                             {% endfor %}
                                         </td>
                                     {% elif item.id == 'visibility' %}
+                                        <td class="i-table" data-text="{{ registration.visibility }}">
+                                            {{ registration.visibility.title }}
+                                        </td>
+                                    {% elif item.id == 'consent_to_publish' %}
                                         <td class="i-table" data-text="{{ registration.consent_to_publish }}">
                                             {{ registration.consent_to_publish.title }}
+                                        </td>
+                                    {% elif item.id == 'participant_hidden' %}
+                                        <td class="i-table" data-text="{{ registration.participant_hidden }}">
+                                            {% if registration.participant_hidden %}
+                                                {%- trans %}Yes{% endtrans -%}
+                                            {% else %}
+                                                {%- trans %}No{% endtrans -%}
+                                            {% endif %}
                                         </td>
                                     {% else %}
                                         <td class="i-table">{{ data[item.id].friendly_data if item.id in data }}</td>
