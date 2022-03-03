@@ -37,7 +37,9 @@ def validate_with_message(fn, reason):
 
     def validate(args):
         if not fn(args):
-            raise ValidationError(reason)
+            # cast to str since ValidationError only wraps the message in a list
+            # if it's a string, but the babel lazy i18n string isn't a string
+            raise ValidationError(str(reason))
 
     return validate
 
