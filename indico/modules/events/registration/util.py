@@ -275,12 +275,16 @@ def check_registration_email(regform, email, registration=None, management=False
             return dict(status='ok', user=None)
 
 
+class RegistrationSchemaBase(IndicoSchema):
+    # note: this schema is kept outside `make_registration_schema` so plugins can use it in
+    # subclass checks when using signals such as `schema_post_load`
+    class Meta:
+        unknown = RAISE
+
+
 def make_registration_schema(regform, management=False, registration=None):
     """Dynamically create a Marshmallow schema based on the registration form fields."""
-    class RegistrationSchema(IndicoSchema):
-        class Meta:
-            unknown = RAISE
-
+    class RegistrationSchema(RegistrationSchemaBase):
         @validates('email')
         def validate_email(self, email, **kwargs):
             status = check_registration_email(regform, email, registration, management=management)
@@ -303,7 +307,7 @@ def make_registration_schema(regform, management=False, registration=None):
 
     # TODO: what to do with signal -> signals.event.registration_form_wtform_created
 
-    return RegistrationSchema.from_dict(schema)
+    return RegistrationSchema.from_dict(schema, name='RegistrationSchema')
 
 
 def create_personal_data_fields(regform):
