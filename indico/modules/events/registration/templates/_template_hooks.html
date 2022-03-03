@@ -1,0 +1,6 @@
+{%- macro regform_attrs_template_hook(event, regform, management, registration=none) -%}
+    {% for attrs in template_hook('regform-container-attrs', as_list=true, event=event, regform=regform,
+                                  management=management, registration=registration) %}
+        {{ attrs | html_params }}
+    {% endfor %}
+{%- endmacro -%}

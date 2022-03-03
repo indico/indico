@@ -4,6 +4,7 @@
     {% extends 'events/registration/display/_meeting_registration_base.html' %}
 {% endif %}
 
+{% from 'events/registration/_template_hooks.html' import regform_attrs_template_hook %}
 {% from 'message_box.html' import message_box %}
 
 {% block title %}
@@ -28,7 +29,9 @@
          data-paid="{{ paid | tojson | forceescape }}"
          data-publish-to-participants="{{ regform.publish_registrations_participants.name }}"
          data-publish-to-public="{{ regform.publish_registrations_public.name }}"
-         data-consent-to-publish="{{ registration.consent_to_publish.name }}"></div>
+         data-consent-to-publish="{{ registration.consent_to_publish.name }}"
+         {{ regform_attrs_template_hook(event, registration.registration_form, false, registration) }}
+    ></div>
 
     <hr>
     <h1>Warning, angular 💩 below</h1>
@@ -65,6 +68,7 @@
         {{ template_hook('after-regform', event=event, regform=registration.registration_form,
                          registration=registration, management=false) }}
     {% else %}
+        {# TODO remove this - the endpoint rendering this template no longer allows access unless editing is allowed #}
         {% call message_box('error') %}
             {% if not registration.registration_form.is_modification_open -%}
                 {% trans %}The modification period is over{% endtrans %}

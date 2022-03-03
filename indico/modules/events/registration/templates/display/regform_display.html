@@ -6,6 +6,7 @@
     {% extends 'events/registration/display/_meeting_registration_base.html' %}
 {% endif %}
 
+{% from 'events/registration/_template_hooks.html' import regform_attrs_template_hook %}
 {% from 'events/registration/display/_regform_invitation_info.html' import render_invitation_info %}
 {% from 'events/registration/display/_regform_info.html' import render_regform_info %}
 {% from 'message_box.html' import message_box %}
@@ -120,7 +121,9 @@
              data-moderated="{{ moderated | tojson | forceescape }}"
              data-publish-to-participants="{{ regform.publish_registrations_participants.name }}"
              data-publish-to-public="{{ regform.publish_registrations_public.name }}"
-             {% if registration %}data-consent-to-publish="{{ registration.consent_to_publish.name }}"{% endif %}></div>
+             {% if registration %}data-consent-to-publish="{{ registration.consent_to_publish.name }}"{% endif %}
+             {{ regform_attrs_template_hook(event, regform, management) }}
+        ></div>
 
         <hr>
         <h1>Warning, angular 💩 below</h1>

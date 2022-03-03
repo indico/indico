@@ -32,6 +32,7 @@ export default function setupRegformSubmission(root) {
     publishToParticipants,
     publishToPublic,
     consentToPublish = null,
+    ...extraData
   } = root.dataset;
 
   const initialData = {
@@ -51,6 +52,10 @@ export default function setupRegformSubmission(root) {
       currency,
       publishToParticipants,
       publishToPublic,
+      // XXX: do NOT use extraData for anything in the core; this is solely meant as a way to
+      // pass data to plugins injecting custom stuff in the registration form. if you add
+      // something in the core, handle it properly above!
+      extraData,
     },
   };
   const store = createReduxStore('regform-submission', reducers, initialData);

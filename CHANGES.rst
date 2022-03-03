@@ -37,7 +37,8 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Add new ``regform-container-attrs`` template hook to pass additional (data-)attributes
+  to the React registration form containers
 
 
 ----
