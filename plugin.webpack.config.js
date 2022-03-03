@@ -48,12 +48,16 @@ module.exports = env => {
     entry,
     externals: {
       'jquery': 'jQuery',
+      'moment': 'moment',
       'react': '_IndicoCoreReact',
       'react-dom': '_IndicoCoreReactDom',
       'react-redux': '_IndicoCoreReactRedux',
       'prop-types': '_IndicoCorePropTypes',
       'redux': '_IndicoCoreRedux',
       'semantic-ui-react': '_IndicoCoreSUIR',
+      'react-final-form': '_IndicoCoreReactFinalForm',
+      'indico/react/components': '_IndicoReactComponents',
+      'indico/utils/date': '_IndicoUtilsDate',
     },
     module: {
       rules: [
