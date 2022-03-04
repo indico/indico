@@ -596,6 +596,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair', can_manage=can_manage),
             'material': material_data,
             'keywords': event.keywords,
+            'organizer': event.organizer_info,
         })
 
         event_category_path = event.category.chain
