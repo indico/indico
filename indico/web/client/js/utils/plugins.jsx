@@ -7,7 +7,7 @@
 
 import React from 'react';
 
-const registries = new Map();
+export const registries = new Map();
 
 function getRegistry(name, create = false) {
   let registry = registries.get(name);
