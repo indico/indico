@@ -176,15 +176,15 @@ class MenuEntryMixin:
         )
 
     def can_access(self, user):
-        if self.event_ref.can_manage(user):
-            return True
         if self.access == MenuEntryAccess.everyone:
             return True
-        if self.access == MenuEntryAccess.registered_participants:
+        elif self.event_ref.can_manage(user):
+            return True
+        elif self.access == MenuEntryAccess.registered_participants:
             return self.event_ref.is_user_registered(user)
-        if self.access == MenuEntryAccess.speakers:
+        elif self.access == MenuEntryAccess.speakers:
             return self.event_ref.is_user_speaker(user)
-        return True
+        assert False, 'should not happen'
 
 
 class TransientMenuEntry(MenuEntryMixin):
