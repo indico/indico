@@ -67,18 +67,18 @@
         {%- set new = diff.new -%}
         {%- set old_friendly_data = render_friendly_data(old.friendly_data, type) -%}
         {%- set new_friendly_data = render_friendly_data(new.friendly_data, type) -%}
-        <span>{#- -#}
+        <span>
             {%- if old_friendly_data -%}
-                <s style="margin-right: 5px;">{{ old_friendly_data }}</s>{#- -#}
+                <s style="margin-right: 5px;">{{ old_friendly_data }}</s>
             {%- endif -%}
             {%- if new_friendly_data -%}
-                <span style="background-color: yellow;">{{ new_friendly_data }}</span>{#- -#}
+                <span style="background-color: yellow;">{{ new_friendly_data }}</span>
             {%- endif -%}
         </span>
         {%- if old.price != new.price -%}
-            <span style="float: right; font-style: italic; font-size: 0.9em;">{#- -#}
-                <s style="margin-right: 5px;">{{- regdata._render_price(old.price) -}}</s>{#- -#}
-                <span style="background-color: yellow;">{{- regdata._render_price(new.price) -}}</span>{#- -#}
+            <span style="float: right; font-style: italic; font-size: 0.9em;">{#--#}
+                <s style="margin-right: 5px;">{{- regdata._render_price(old.price) -}}</s>{#--#}
+                <span style="background-color: yellow;">{{- regdata._render_price(new.price) -}}</span>{#--#}
             </span>
         {%- elif regdata.price -%}
             {{- render_price(regdata) -}}
