@@ -1,4 +1,4 @@
-"""Add visibility options to menu entries
+"""Add access column to menu entries
 
 Revision ID: ef7a8b2e6737
 Revises: 3dafee32ba7d
