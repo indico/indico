@@ -58,6 +58,7 @@ module.exports = env => {
       'react-final-form': '_IndicoCoreReactFinalForm',
       'indico/react/components': '_IndicoReactComponents',
       'indico/utils/date': '_IndicoUtilsDate',
+      'indico/utils/plugins': '_IndicoUtilsPlugins',
     },
     module: {
       rules: [

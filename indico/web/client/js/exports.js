@@ -16,6 +16,7 @@ import * as SUIR from 'semantic-ui-react';
 
 import * as IndicoReactComponents from 'indico/react/components';
 import * as IndicoUtilsDate from 'indico/utils/date';
+import * as IndicoUtilsPlugins from 'indico/utils/plugins';
 
 // exports for plugins
 window._IndicoCoreReact = React;
@@ -28,3 +29,4 @@ window._IndicoCoreReactFinalForm = ReactFinalForm;
 window._IndicoCoreFinalForm = FinalForm;
 window._IndicoReactComponents = IndicoReactComponents;
 window._IndicoUtilsDate = IndicoUtilsDate;
+window._IndicoUtilsPlugins = IndicoUtilsPlugins;
