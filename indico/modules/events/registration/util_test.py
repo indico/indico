@@ -533,6 +533,7 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
             {'caption': 'B', 'id': 'new:test2', 'is_enabled': True},
         ]
     })
+    choice_uuid = next(k for k, v in multi_choice_field.data['captions'].items() if v == 'A')
     db.session.add(multi_choice_field)
     db.session.flush()
 
@@ -552,37 +553,37 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     # Create a registration
     data = {
         boolean_field.html_field_name: True,
-        multi_choice_field.html_field_name: {'test1': 2},
+        multi_choice_field.html_field_name: {choice_uuid: 2},
         checkbox_field.html_field_name: True,
         'email': dummy_user.email, 'first_name': dummy_user.first_name, 'last_name': dummy_user.last_name}
     reg = create_registration(dummy_regform, data, invitation=None, management=True, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 2}
+    assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 2}
     assert reg.data_by_field[checkbox_field.id].data
 
     # Modify the registration
     data = {
         boolean_field.html_field_name: True,
-        multi_choice_field.html_field_name: {'test1': 1},
+        multi_choice_field.html_field_name: {choice_uuid: 1},
         checkbox_field.html_field_name: False,
     }
     modify_registration(reg, data, management=False, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 1}
+    assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 1}
     # Assert that the manager field is not changed
     assert reg.data_by_field[checkbox_field.id].data
 
     # Modify as a manager
     data = {
-        multi_choice_field.html_field_name: {'test1': 3},
+        multi_choice_field.html_field_name: {choice_uuid: 3},
         checkbox_field.html_field_name: False,
     }
     modify_registration(reg, data, management=True, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
+    assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 3}
     assert not reg.data_by_field[checkbox_field.id].data
 
     # Add a new field after registering
@@ -599,7 +600,7 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     modify_registration(reg, {}, management=False, notify_user=False)
 
     assert reg.data_by_field[boolean_field.id].data
-    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
+    assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 3}
     assert not reg.data_by_field[checkbox_field.id].data
     # Assert that the new field got a default value
     assert reg.data_by_field[new_multi_choice_field.id].data == {}
@@ -609,12 +610,12 @@ def test_modify_registration(monkeypatch, dummy_event, dummy_user, dummy_regform
     db.session.flush()
 
     data = {
-        multi_choice_field.html_field_name: {'test2': 7},
+        multi_choice_field.html_field_name: {choice_uuid: 7},
     }
     modify_registration(reg, data, management=True, notify_user=False)
     assert reg.data_by_field[boolean_field.id].data
     # Assert that the removed field keeps its old value
-    assert reg.data_by_field[multi_choice_field.id].data == {'test1': 3}
+    assert reg.data_by_field[multi_choice_field.id].data == {choice_uuid: 3}
     assert not reg.data_by_field[checkbox_field.id].data
     assert reg.data_by_field[new_multi_choice_field.id].data == {}
 
