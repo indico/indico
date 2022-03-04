@@ -163,7 +163,7 @@ class MenuUserEntryFormBase(IndicoForm):
     is_enabled = BooleanField(_('Show'), widget=SwitchWidget())
     new_tab = BooleanField(_('Open in a new tab'), widget=SwitchWidget())
     access = IndicoEnumRadioField(_('Visibility'), enum=MenuEntryAccess,
-                                  description=_('Select which group of people can see this entry.'))
+                                  description=_('Specify who can see this menu item.'))
 
 
 class MenuLinkForm(MenuUserEntryFormBase):
