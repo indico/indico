@@ -20,6 +20,7 @@ import {
 } from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
 import ConsentToPublishDropdown from '../components/ConsentToPublishDropdown';
 import FormSection from '../form/FormSection';
@@ -111,8 +112,9 @@ export default function RegistrationFormSubmission() {
 
   const onSubmit = async (data, form) => {
     let resp;
+    const formData = isUpdateMode ? getChangedValues(data, form) : data;
     try {
-      resp = await indicoAxios.post(submitUrl, isUpdateMode ? getChangedValues(data, form) : data);
+      resp = await indicoAxios.post(submitUrl, formData);
     } catch (err) {
       return handleSubmitError(err);
     }
@@ -128,12 +130,14 @@ export default function RegistrationFormSubmission() {
       initialValues={isUpdateMode ? registrationData : initialValues}
       initialValuesEqual={_.isEqual}
       subscription={{}}
+      decorators={getPluginObjects('regformFormDecorators')}
     >
       {fprops => (
         <form onSubmit={fprops.handleSubmit}>
           {sections.map(section => (
             <FormSection key={section.id} {...section} />
           ))}
+          {renderPluginComponents('regformAfterSections')}
           <div>
             {isManagement && <EmailNotification />}
             {showConsentToPublish && (

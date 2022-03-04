@@ -38,7 +38,9 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Add new ``regform-container-attrs`` template hook to pass additional (data-)attributes
-  to the React registration form containers
+  to the React registration form containers (:pr:`5271`)
+- Add support for JavaScript plugin hooks to register objects or react components for use
+  by JS code that's in the core (:pr:`5271`)
 
 
 ----
