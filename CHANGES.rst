@@ -30,6 +30,8 @@ Improvements
   (:issue:`5188`, :pr:`5224`, :pr:`5241`)
 - Add the ability to create speaker-only menu entries for conferences (:issue:`5261`,
   :pr:`5268`)
+- Highlight changed fields in notification emails about modified registrations
+  (:issue:`5265`, :pr:`5269`)
 
 Bugfixes
 ^^^^^^^^
