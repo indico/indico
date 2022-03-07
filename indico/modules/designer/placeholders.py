@@ -10,6 +10,7 @@ from io import BytesIO
 from babel.numbers import format_currency
 from PIL import Image
 
+from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime, format_interval
 from indico.util.i18n import _
@@ -26,12 +27,14 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationFriendlyIDPlaceholder', 'RegistrationAffiliationPlaceholder',
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
-           'EventVenuePlaceholder', 'EventSpeakersPlaceholder', 'EventLogoPlaceholder')
+           'EventVenuePlaceholder', 'EventSpeakersPlaceholder', 'EventLogoPlaceholder', 'FixedTextPlaceholder',
+           'FixedImagePlaceholder')
 
 
 GROUP_TITLES = {
     'registrant': _('Registrant Data'),
-    'event': _('Event Data')
+    'event': _('Event Data'),
+    'fixed': _('Fixed Data')
 }
 
 
@@ -319,3 +322,25 @@ class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
     @classmethod
     def render(cls, registration):
         return generate_ticket_qr_code(registration)
+
+
+class FixedTextPlaceholder(DesignerPlaceholder):
+    group = 'fixed'
+    name = 'fixed'
+    description = _('Fixed Text')
+
+    @classmethod
+    def render(cls, item):
+        return item.get('text', cls.description)
+
+
+class FixedImagePlaceholder(DesignerPlaceholder):
+    group = 'fixed'
+    name = 'fixed_image'
+    description = _('Fixed Image')
+    is_image = True
+
+    @classmethod
+    def render(cls, item):
+        buf = DesignerImageFile.get(item['image_id']).open()
+        return Image.open(buf)

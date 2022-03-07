@@ -38,6 +38,10 @@ import {$T} from 'indico/utils/i18n';
 
   let imageTypes = null;
 
+  let images = null;
+
+  let lastSelectedItem = null;
+
   function isImage(type) {
     return imageTypes.includes(type);
   }
@@ -113,7 +117,13 @@ import {$T} from 'indico/utils/i18n';
           zIndex: this.zIndex,
         })
         .attr('data-type', this.type)
-        .text(this.type === 'fixed' ? this.text : itemTitles[this.type]);
+        .text(
+          this.type === 'fixed'
+            ? this.text
+            : this.type === 'fixed_image'
+            ? ''
+            : itemTitles[this.type]
+        );
       return html;
     }.bind(item);
 
@@ -232,10 +242,13 @@ import {$T} from 'indico/utils/i18n';
 
     $('.element-tools').removeClass('hidden');
     $('.second-row').removeClass('disappear');
+    $('.selection-text').html(itemTitles[item.type]);
 
-    $('.selection-text').html(
-      item.type === 'fixed' ? $T.gettext('Fixed text') : itemTitles[item.type]
-    );
+    if (item.type === 'fixed_image') {
+      $('.js-remove-img').prop('disabled', !item.image_id);
+    }
+    const $imageFile = $('#imageFile');
+    $('.js-upload-img').prop('disabled', !$imageFile.val());
 
     deselectItem($('.designer-item.selected'));
     item.selected = true;
@@ -262,21 +275,28 @@ import {$T} from 'indico/utils/i18n';
     var $fixedTextField = $('#fixed-text-field');
     const $itemHeightField = $('#subtool-element-height');
     var $fontTools = $('.font-tools');
+    var $fixedImageTool = $('#fixed-image-tool');
 
     if (item.type === 'fixed') {
       $fontTools.show();
       $fixedTextField.closest('.tool').show();
       $fixedTextField.val(item.text);
       $itemHeightField.hide();
+      $fixedImageTool.hide();
     } else if (isImage(item.type)) {
       $fontTools.hide();
       $fixedTextField.closest('.tool').hide();
       $itemHeightField.show();
+      $fixedImageTool.hide();
+      if (item.type === 'fixed_image') {
+        $fixedImageTool.show();
+      }
     } else {
       $fontTools.show();
       $fixedTextField.closest('.tool').hide();
       $fixedTextField.val('');
       $itemHeightField.hide();
+      $fixedImageTool.hide();
     }
   }
 
@@ -354,6 +374,10 @@ import {$T} from 'indico/utils/i18n';
         zIndex: item.zIndex,
       });
       newDiv.append(item.toHTML());
+      if (item.type === 'fixed_image' && item.image_id) {
+        const $imageElement = createFixedImageElement(item, images[item.image_id]);
+        $imageElement.appendTo(newDiv.find('.designer-item'));
+      }
       if (item.selected && !isBackside) {
         selectItem(newDiv.find('.designer-item'));
       }
@@ -553,6 +577,11 @@ import {$T} from 'indico/utils/i18n';
     }[attribute]());
 
     div.replaceWith(selectedItem.toHTML());
+    if (selectedItem.type === 'fixed_image') {
+      $('.designer-item.selected').append(
+        createFixedImageElement(selectedItem, images[selectedItem.image_id])
+      );
+    }
   }
 
   function save(template) {
@@ -706,6 +735,47 @@ import {$T} from 'indico/utils/i18n';
     }
   }
 
+  function createFixedImageElement(item, imageUrl) {
+    const $imageElement = $('<img/>');
+    $imageElement
+      .attr({
+        src: imageUrl,
+      })
+      .css({
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        height: item.height + 'px',
+        width: item.width + 'px',
+      });
+    return $imageElement;
+  }
+
+  function displayFixedImage(imageUrl) {
+    const $div = $('.ui-draggable[data-id=' + lastSelectedItem.id + '] div');
+    $div.text('');
+    $div.find('img').remove();
+    const $imageElement = createFixedImageElement(lastSelectedItem, imageUrl);
+    $imageElement.appendTo($div);
+    const $imageFile = $('#imageFile');
+    $imageFile.val('');
+    $imageFile
+      .next('label')
+      .addClass('i-button')
+      .text($T.gettext('Choose a file'));
+    $('.js-upload-img').prop('disabled', $imageFile.val());
+    $('.js-remove-img').prop('disabled', !lastSelectedItem.image_id);
+  }
+
+  function removeFixedImage(item) {
+    if (item.image_id) {
+      item.image_id = null;
+      $('.ui-draggable[data-id=' + item.id + '] div').text($T.gettext('Fixed Image'));
+      $('.ui-draggable[data-id=' + item.id + '] img').remove();
+      $('.js-remove-img').prop('disabled', !item.image_id);
+    }
+  }
+
   function unescapeHTML(str) {
     // taken from Prototype
     return str
@@ -836,6 +906,8 @@ import {$T} from 'indico/utils/i18n';
 
     imageTypes = imageTypes_;
 
+    images = {...template.images, ...backsideTemplate.images};
+
     // Item class
     $(document).ready(function() {
       var removeBackgroundQtip = $('.js-remove-bg').qtip();
@@ -849,7 +921,20 @@ import {$T} from 'indico/utils/i18n';
             .text(this.files[0].name);
         }
         $('.js-upload-bg')
-          .attr('disabled', !$this.val())
+          .prop('disabled', !$this.val())
+          .toggleClass('highlight', !!$this.val());
+      });
+
+      $('#img-form input[type="file"]').on('change', function() {
+        var $this = $(this);
+        if (this.files) {
+          $this
+            .next('label')
+            .removeClass('i-button')
+            .text(this.files[0].name);
+        }
+        $('.js-upload-img')
+          .prop('disabled', !$this.val())
           .toggleClass('highlight', !!$this.val());
       });
 
@@ -865,6 +950,14 @@ import {$T} from 'indico/utils/i18n';
       $('.js-upload-bg').click(function() {
         $('.js-toggle-side.front').click();
         $('#bg-form').submit();
+        return false;
+      });
+
+      $('.js-upload-img').click(function() {
+        lastSelectedItem = getSelectedItemData();
+        if (lastSelectedItem.type === 'fixed_image') {
+          $('#img-form').submit();
+        }
         return false;
       });
 
@@ -889,6 +982,21 @@ import {$T} from 'indico/utils/i18n';
         },
       });
 
+      $('#img-form').ajaxForm({
+        dataType: 'json',
+        iframe: false,
+        success: function(data) {
+          if (data.error) {
+            alertPopup(data.error, $T('Error'));
+            return;
+          }
+          if (lastSelectedItem.type === 'fixed_image') {
+            lastSelectedItem.image_id = data.image_id;
+            displayFixedImage(data.image_url);
+          }
+        },
+      });
+
       $('input[name=bg-position]').change(function(e) {
         e.preventDefault();
         var newPosition = $(this).val();
@@ -902,6 +1010,14 @@ import {$T} from 'indico/utils/i18n';
         e.preventDefault();
         removeBackgroundQtip.qtip('api').toggle();
         removeBackground(template);
+      });
+
+      $('.js-remove-img').click(function(e) {
+        e.preventDefault();
+        const selectedItem = getSelectedItemData();
+        if (selectedItem.type === 'fixed_image') {
+          removeFixedImage(selectedItem);
+        }
       });
 
       $('.move-button').click(function(e) {
@@ -999,8 +1115,8 @@ import {$T} from 'indico/utils/i18n';
             .addClass('i-button')
             .text($T.gettext('Choose a file'));
         }
-        $('.js-upload-bg').attr('disabled', !$backgroundFile.val());
-        $('.js-remove-bg').attr('disabled', !template.background_url);
+        $('.js-upload-bg').prop('disabled', !$backgroundFile.val());
+        $('.js-remove-bg').prop('disabled', !template.background_url);
         $('#bg-position-stretch').prop('checked', template.data.background_position === 'stretch');
         $('#bg-position-center').prop('checked', template.data.background_position === 'center');
       });
@@ -1009,6 +1125,7 @@ import {$T} from 'indico/utils/i18n';
 
       $('.template-side.back').on('indico:backsideUpdated', function(evt, data) {
         backsideTemplateID = data.backside_template_id;
+        Object.assign(images, data.template.images);
         clearBacksideTemplate(backsideTemplate);
         displayTemplate(data.template, true);
         backsideTemplate = data.template;
