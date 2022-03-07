@@ -24,7 +24,9 @@
   }
 
   function _applySearchFilters(searchBoxConfig) {
-    const $items = $(searchBoxConfig.listItems);
+    const childHandles = searchBoxConfig.childHandles || '.details-row';
+    const $itemsWithChild = $(searchBoxConfig.listItems);
+    const $items = $itemsWithChild.not(childHandles);
     let term = $(searchBoxConfig.term).val();
     const $state = $(searchBoxConfig.state);
     let $visibleEntries, m;
@@ -32,7 +34,7 @@
 
     if (!term) {
       if ($state.hasClass('active')) {
-        $items.show();
+        $itemsWithChild.show();
       }
 
       $state.removeClass('active');
@@ -68,9 +70,9 @@
 
     setState($state, $visibleEntries, $items);
 
-    $items.hide();
+    $itemsWithChild.hide();
     $visibleEntries.show();
-    $visibleEntries.next(searchBoxConfig.childHandle || '.details-row').show();
+    $visibleEntries.next(childHandles).show();
 
     // Needed because $(window).scroll() is not called when hiding elements
     // causing scrolling elements to be out of place.
