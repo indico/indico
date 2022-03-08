@@ -601,6 +601,10 @@ th.i-table {
       color: $dark-gray !important;
     }
 
+    .text {
+      width: 80%;
+    }
+
     .text,
     .toolbar {
       align-self: flex-start;
@@ -623,6 +627,10 @@ th.i-table {
       &:not(:last-of-type) {
         margin-bottom: 0.3em;
       }
+    }
+
+    .break-word {
+      word-wrap: break-word;
     }
 
     dd {
