@@ -113,7 +113,7 @@
             <dd>{{ with_default(event.address|replace('\n', '<br>'|safe)) }}</dd>
 
             <dt>{% trans %}Map URL{% endtrans %}</dt>
-            <dd>{{ with_default(event.map_url) }}</dd>
+            <dd class="break-word">{{ with_default(event.map_url) }}</dd>
         </dl>
     {% endcall %}
 
