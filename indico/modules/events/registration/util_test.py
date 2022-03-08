@@ -653,6 +653,11 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
     assert user_data == {'email': 'awang@example.com', 'first_name': 'Amy', 'last_name': 'Wang',
                          'phone': '+1 22 50 14', 'address': 'Geneva', 'affiliation': 'ACME Inc.'}
 
+    # Check that data is taken from the invitation when user is missing
+    user_data = get_user_data(dummy_regform, None, invitation)
+    assert user_data == {'email': 'awang@example.com', 'first_name': 'Amy', 'last_name': 'Wang',
+                         'affiliation': 'ACME Inc.'}
+
     # Check that data from disabled/deleted fields is not used
     title_field = next(item for item in dummy_regform.active_fields
                        if item.type == RegistrationFormItemType.field_pd and item.personal_data_type.name == 'title')
