@@ -156,10 +156,10 @@ def get_initial_form_values(regform, *, management=False):
 
 def get_user_data(regform, user, invitation=None):
     if user is None:
-        return {}
-
-    user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
-                 if t.name != 'title' and getattr(user, t.name, None)}
+        user_data = {}
+    else:
+        user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
+                     if t.name != 'title' and getattr(user, t.name, None)}
     if invitation:
         user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         if invitation.affiliation:
