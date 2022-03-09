@@ -50,9 +50,9 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
     def _build_pdf(self, canvas):
         config = self.config
 
-        available_width = self.width - (config.left_margin - config.right_margin + config.margin_columns) * cm
+        available_width = self.width - (config.left_margin + config.right_margin + config.margin_columns) * cm
         n_horizontal = int(available_width / ((self.tpl_data.width_cm + config.margin_columns) * cm))
-        available_height = self.height - (config.top_margin - config.bottom_margin + config.margin_rows) * cm
+        available_height = self.height - (config.top_margin + config.bottom_margin + config.margin_rows) * cm
         n_vertical = int(available_height / ((self.tpl_data.height_cm + config.margin_rows) * cm))
 
         if not n_horizontal or not n_vertical:
