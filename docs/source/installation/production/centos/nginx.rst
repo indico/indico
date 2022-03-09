@@ -41,7 +41,7 @@ Now install all the required packages:
 
     yum install -y postgresql13 postgresql13-server postgresql13-libs postgresql13-devel postgresql13-contrib
     yum install -y git gcc make redis nginx
-    yum install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel findutils libuuid-devel
+    yum install -y bzip2 bzip2-devel findutils libjpeg-turbo-devel libffi-devel libuuid-devel libxslt-devel libxml2-devel libyaml-devel openssl-devel pcre-devel readline-devel sqlite sqlite-devel tar xz xz-devel zlib-devel
     /usr/pgsql-13/bin/postgresql-13-setup initdb
     systemctl start postgresql-13.service redis.service
 
