@@ -16,7 +16,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
 from indico.core.marshmallow import mm
-from indico.modules.events.registration.fields.base import (LimitedPlacesBillableFieldDataSchema,
+from indico.modules.events.registration.fields.base import (FieldDataSchema, LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
@@ -77,7 +77,7 @@ class ChoiceItemSchema(LimitedPlacesBillableFieldDataSchema):
         return data
 
 
-class ChoiceSetupSchema(mm.Schema):
+class ChoiceSetupSchema(FieldDataSchema):
     with_extra_slots = fields.Bool(load_default=False)
     choices = fields.List(fields.Nested(ChoiceItemSchema), required=True, validate=not_empty)
 
@@ -399,7 +399,7 @@ class AccommodationDateRangeSchema(mm.Schema):
             raise ValidationError('The end date cannot be before the start date', 'end_date')
 
 
-class AccommodationSetupSchema(mm.Schema):
+class AccommodationSetupSchema(FieldDataSchema):
     choices = fields.List(fields.Nested(AccommodationItemSchema), required=True, validate=not_empty)
     arrival = fields.Nested(AccommodationDateRangeSchema, required=True)
     departure = fields.Nested(AccommodationDateRangeSchema, required=True)

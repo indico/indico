@@ -56,6 +56,7 @@ Available keys:
 - noRequired: optional; hide the option to make the field required
 - alwaysRequired: optional; always display the field as required
 - hasPrice: optional; show price field if the whole field can have a price attached
+- noRetentionPeriod: optional; hide the retention period setting
 */
 
 const fieldRegistry = {
@@ -63,6 +64,7 @@ const fieldRegistry = {
     title: Translate.string('Static label'),
     inputComponent: LabelInput,
     noRequired: true,
+    noRetentionPeriod: true,
     noLabel: true,
     icon: 'tag',
     customFormItem: true,

@@ -10,8 +10,7 @@ from operator import itemgetter
 
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 
-from indico.core.marshmallow import mm
-from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
+from indico.modules.events.registration.fields.base import (BillableFieldDataSchema, FieldDataSchema,
                                                             LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField, RegistrationFormFieldBase)
 from indico.modules.files.models.files import File
@@ -130,7 +129,7 @@ class CheckboxField(RegistrationFormBillableField):
         return False
 
 
-class DateFieldDataSchema(mm.Schema):
+class DateFieldDataSchema(FieldDataSchema):
     date_format = fields.String(required=True, validate=validate.OneOf([
         '%d/%m/%Y %I:%M %p',
         '%d.%m.%Y %I:%M %p',

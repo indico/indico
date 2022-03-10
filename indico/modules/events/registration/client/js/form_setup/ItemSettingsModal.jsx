@@ -146,6 +146,19 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
             />
           )}
           {SettingsComponent && <SettingsComponent {...itemData} />}
+          {!meta.noRetentionPeriod && !fieldIsRequired && (
+            <FinalInput
+              name="retentionPeriod"
+              type="number"
+              placeholder={Translate.string('Permanent')}
+              step="1"
+              min="1"
+              validate={v.optional(v.min(0))}
+              parse={val => (val === '' ? 0 : val)}
+              format={val => (val === 0 ? '' : val)}
+              label={Translate.string('Retention period (weeks)')}
+            />
+          )}
           {isUnsupportedField && (
             <Message visible warning>
               Unknown input type: {inputType}.<br />

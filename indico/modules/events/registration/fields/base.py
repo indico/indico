@@ -13,7 +13,11 @@ from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
 
 
-class BillableFieldDataSchema(mm.Schema):
+class FieldDataSchema(mm.Schema):
+    retention_period = fields.Integer(load_default=0, validate=validate.Range(0))
+
+
+class BillableFieldDataSchema(FieldDataSchema):
     price = fields.Float(load_default=0)
 
 
@@ -33,7 +37,7 @@ class RegistrationFormFieldBase:
     #: additional options for the marshmallow field
     mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldDataSchema
     #: a dict with extra marshmallow fields to include in the setup schema
     setup_schema_fields = {}
     #: whether this field is assocated with a file instead of normal data
@@ -128,7 +132,8 @@ class RegistrationFormFieldBase:
         """
         data = dict(data)
         if 'places_limit' in data:
-            data['places_limit'] = int(data['places_limit']) if data['places_limit'] else 0
+            data['places_limit'] = data.get('places_limit', 0)
+        data['retention_period'] = data.get('retention_period', 0)
         versioned_data = {k: v for k, v in data.items() if k in cls.versioned_data_fields}
         unversioned_data = {k: v for k, v in data.items() if k not in cls.versioned_data_fields}
         return unversioned_data, versioned_data
