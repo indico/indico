@@ -150,7 +150,9 @@ def get_initial_form_values(regform, *, management=False):
     for item in regform.active_fields:
         can_modify = management or not item.parent.is_manager_only
         if can_modify:
-            initial_values[item.html_field_name] = camelize_keys(item.field_impl.default_value)
+            impl = item.field_impl
+            if not impl.is_invalid_field:
+                initial_values[item.html_field_name] = camelize_keys(impl.default_value)
     return initial_values
 
 
@@ -302,8 +304,8 @@ def make_registration_schema(regform, management=False, registration=None):
         if not management and form_item.parent.is_manager_only:
             continue
 
-        field_impl = form_item.field_impl
-        schema[form_item.html_field_name] = field_impl.create_mm_field(registration=registration)
+        if mm_field := form_item.field_impl.create_mm_field(registration=registration):
+            schema[form_item.html_field_name] = mm_field
 
     # TODO: what to do with signal -> signals.event.registration_form_wtform_created
 

@@ -38,6 +38,8 @@ class RegistrationFormFieldBase:
     setup_schema_fields = {}
     #: whether this field is assocated with a file instead of normal data
     is_file_field = False
+    #: whether this field is invalid and cannot be used
+    is_invalid_field = False
 
     def __init__(self, form_item):
         self.form_item = form_item
@@ -197,3 +199,12 @@ class RegistrationFormBillableItemsField(RegistrationFormBillableField):
     def calculate_price(self, reg_data, versioned_data):
         # billable items need custom logic
         raise NotImplementedError
+
+
+class InvalidRegistrationFormField(RegistrationFormFieldBase):
+    """A field implementation for missing plugin fields."""
+
+    is_invalid_field = True
+
+    def create_mm_field(self, registration=None):
+        return None
