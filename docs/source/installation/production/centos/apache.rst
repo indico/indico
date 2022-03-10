@@ -45,7 +45,7 @@ If you are on CentOS 8, run this instead:
 
     yum install -y postgresql13 postgresql13-server postgresql13-libs postgresql13-devel postgresql13-contrib
     yum install -y git gcc make redis httpd mod_proxy_uwsgi mod_ssl mod_xsendfile
-    yum install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel findutils libuuid-devel
+    yum install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel findutils libuuid-devel tar
     /usr/pgsql-13/bin/postgresql-13-setup initdb
     systemctl start postgresql-13.service redis.service
 
