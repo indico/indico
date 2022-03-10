@@ -15,7 +15,7 @@ DEFAULT_BADGE_SETTINGS = {
     'top_margin': 1.6,
     'bottom_margin': 1.1,
     'left_margin': 1.6,
-    'right_margin': 1.4,
+    'right_margin': 0.4,
     'margin_columns': 1.0,
     'margin_rows': 0.0,
     'page_size': PageSize.A4,
