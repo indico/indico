@@ -15,7 +15,7 @@ import {Markdown, toClasses} from 'indico/react/util';
 
 import {getManagement, isPaidItemLocked} from '../form_submission/selectors';
 
-import {fieldRegistry} from './fields/registry';
+import {getFieldRegistry} from './fields/registry';
 
 import '../../styles/regform.module.scss';
 
@@ -53,6 +53,7 @@ export default function FormItem({
   const paidItemLocked = useSelector(state => isPaidItemLocked(state, rest.id));
   const isManagement = useSelector(getManagement);
 
+  const fieldRegistry = getFieldRegistry();
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};

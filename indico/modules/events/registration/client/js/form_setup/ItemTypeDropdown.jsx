@@ -11,21 +11,12 @@ import {Dropdown} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-import {fieldRegistry} from '../form/fields/registry';
+import {getFieldRegistry} from '../form/fields/registry';
 
 import '../../styles/regform.module.scss';
 
-const staticLabel = fieldRegistry.label;
-const newItemTypeOptions = Object.entries(fieldRegistry)
-  .filter(([name]) => name !== 'label')
-  .map(([name, {title, icon}]) => ({
-    key: name,
-    value: name,
-    text: title,
-    icon,
-  }));
-
 export default function ItemTypeDropdown({newItemType, inModal, onClick}) {
+  const fieldRegistry = getFieldRegistry();
   const dropdownText = newItemType
     ? fieldRegistry[newItemType].title
     : Translate.string('Choose type');
@@ -44,6 +35,14 @@ export default function ItemTypeDropdown({newItemType, inModal, onClick}) {
     };
   }
 
+  const newItemTypeOptions = Object.entries(fieldRegistry)
+    .filter(([name]) => name !== 'label')
+    .map(([name, {title, icon}]) => ({
+      key: name,
+      value: name,
+      text: title,
+      icon,
+    }));
   const middle = Math.ceil(newItemTypeOptions.length / 2);
 
   return (
@@ -51,8 +50,8 @@ export default function ItemTypeDropdown({newItemType, inModal, onClick}) {
       <Dropdown.Menu>
         <DropdownItem
           value="label"
-          text={staticLabel.title}
-          icon={staticLabel.icon}
+          text={fieldRegistry.label.title}
+          icon={fieldRegistry.label.icon}
           centered
           onClick={onClick}
         />

@@ -5,11 +5,37 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.core import signals
+from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
+from indico.web.fields import get_field_definitions
+
+
 def get_field_types():
     """Get a dict with all registration field types."""
+    return get_field_definitions(RegistrationFormFieldBase)
+
+
+@signals.core.get_fields.connect_via(RegistrationFormFieldBase)
+def _get_fields(sender, **kwargs):
     from .choices import AccommodationField, MultiChoiceField, SingleChoiceField
     from .simple import (BooleanField, CheckboxField, CountryField, DateField, EmailField, FileField, NumberField,
                          PhoneField, TextAreaField, TextField)
-    return {field.name: field for field in (TextField, NumberField, TextAreaField, SingleChoiceField, CheckboxField,
-                                            DateField, BooleanField, PhoneField, CountryField, FileField, EmailField,
-                                            AccommodationField, MultiChoiceField)}
+    yield AccommodationField
+    yield MultiChoiceField
+    yield SingleChoiceField
+    yield BooleanField
+    yield CheckboxField
+    yield CountryField
+    yield DateField
+    yield EmailField
+    yield FileField
+    yield NumberField
+    yield PhoneField
+    yield TextAreaField
+    yield TextField
+
+
+@signals.core.app_created.connect
+def _check_field_definitions(app, **kwargs):
+    # This will raise RuntimeError if the field names are not unique
+    get_field_types()

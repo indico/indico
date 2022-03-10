@@ -23,7 +23,7 @@ import {
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, Param} from 'indico/react/i18n';
 
-import {fieldRegistry} from '../form/fields/registry';
+import {getFieldRegistry} from '../form/fields/registry';
 import {getStaticData, getItemById} from '../form/selectors';
 
 import * as actions from './actions';
@@ -38,6 +38,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
     editing ? getItemById(state, id) : {}
   );
   const inputType = editing ? existingInputType : newItemType;
+  const fieldRegistry = getFieldRegistry();
   const isUnsupportedField = !(inputType in fieldRegistry); // TODO remove once no longer needed
   const meta = fieldRegistry[inputType] || {};
   const SettingsComponent = meta.settingsComponent;

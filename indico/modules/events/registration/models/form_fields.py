@@ -64,7 +64,14 @@ class RegistrationFormField(RegistrationFormItem):
 
         :return: An instance of a `RegistrationFormFieldBase` subclass
         """
-        return get_field_types()[self.input_type](self)
+        try:
+            field_cls = get_field_types()[self.input_type]
+        except KeyError:
+            # XXX It'd be nicer to gracefully fail in all places where a missing field is used,
+            # but only few people will use custom fields from plugins, and they are unlikely to
+            # remove the plugin at some point...
+            raise Exception(f'Form field missing: {self.input_type} (plugin not loaded?)')
+        return field_cls(self)
 
     @property
     def versioned_data(self):

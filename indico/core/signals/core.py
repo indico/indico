@@ -77,7 +77,7 @@ the context.
 ''')
 
 get_fields = _signals.signal('get-fields', '''
-Expected to return `BaseField` subclasses.  The *sender* is an object
+Expected to return field classes.  The *sender* is an object
 (or just a string) identifying for what to get fields.  This signal
 should never be registered without restricting the sender to ensure
 only the correct field types are returned.

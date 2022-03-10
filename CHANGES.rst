@@ -45,6 +45,7 @@ Internal Changes
   to the React registration form containers (:pr:`5271`)
 - Add support for JavaScript plugin hooks to register objects or react components for use
   by JS code that's in the core (:pr:`5271`)
+- Plugins can now define custom registration form fields (:pr:`5282`)
 
 
 ----

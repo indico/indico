@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import {Translate} from 'indico/react/i18n';
+import {getPluginObjects} from 'indico/utils/plugins';
 
 import AccommodationInput, {
   AccommodationSettings,
@@ -57,7 +58,7 @@ Available keys:
 - hasPrice: optional; show price field if the whole field can have a price attached
 */
 
-export const fieldRegistry = {
+const fieldRegistry = {
   label: {
     title: Translate.string('Static label'),
     inputComponent: LabelInput,
@@ -159,3 +160,13 @@ export const fieldRegistry = {
     icon: 'home',
   },
 };
+
+export function getFieldRegistry() {
+  const pluginFields = Object.fromEntries(
+    getPluginObjects('regformCustomFields').map(({name, ...rest}) => [name, rest])
+  );
+  if (Object.keys(pluginFields).some(x => !x.startsWith('ext__'))) {
+    throw new Error('Field names from plugins must begin with `ext__`');
+  }
+  return {...fieldRegistry, ...pluginFields};
+}
