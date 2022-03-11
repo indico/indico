@@ -131,6 +131,7 @@ abstracts_reviewing_settings = EventSettingsProxy('abstracts_reviewing', {
     'allow_convener_judgment': False,  # whether track conveners can make a judgment (e.g. accept/reject)
     'allow_convener_track_change': False,
     'allow_contributors_in_comments': False,
+    'notify_on_new_comments': False,
     'reviewing_instructions': '',
     'judgment_instructions': ''
 })

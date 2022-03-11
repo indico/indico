@@ -171,6 +171,10 @@ class AbstractReviewingSettingsForm(IndicoForm):
                                                   widget=SwitchWidget(),
                                                   description=_('Enabling this allows submitters, authors, and '
                                                                 'speakers to also participate in the comments.'))
+    notify_on_new_comments = BooleanField(_('Comment notifications'),
+                                          [HiddenUnless('allow_comments', preserve_data=True)],
+                                          widget=SwitchWidget(),
+                                          description=_('Send email notifications when new comments are posted.'))
     reviewing_instructions = IndicoMarkdownField(_('Reviewing Instructions'), editor=True,
                                                  description=_('These instructions will be displayed right before the '
                                                                'reviewing form.'))

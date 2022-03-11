@@ -9,6 +9,7 @@ from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
+from indico.core.notifications import make_email, send_email
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHAbstractsBase
 from indico.modules.events.abstracts.controllers.common import (AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
                                                                 AbstractsExportExcel, AbstractsExportPDFMixin,
@@ -18,11 +19,12 @@ from indico.modules.events.abstracts.forms import (AbstractCommentForm, Abstract
 from indico.modules.events.abstracts.lists import AbstractListGeneratorDisplay
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.comments import AbstractComment
-from indico.modules.events.abstracts.models.reviews import AbstractReview
+from indico.modules.events.abstracts.models.reviews import AbstractCommentVisibility, AbstractReview
 from indico.modules.events.abstracts.operations import (create_abstract_comment, create_abstract_review,
                                                         delete_abstract_comment, judge_abstract, reset_abstract_state,
                                                         update_abstract_comment, update_abstract_review,
                                                         update_reviewed_for_tracks, withdraw_abstract)
+from indico.modules.events.abstracts.settings import abstracts_reviewing_settings
 from indico.modules.events.abstracts.util import get_track_reviewer_abstract_counts, get_user_tracks
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing, render_abstract_page
 from indico.modules.events.tracks.models.tracks import Track
@@ -183,10 +185,38 @@ class RHSubmitAbstractComment(RHAbstractBase):
     def _check_abstract_protection(self):
         return self.abstract.can_comment(session.user)
 
+    def _get_recipients(self, visibility):
+        recipients = set()
+        for entry in self.abstract.event.acl_entries:
+            if self.abstract.can_judge(entry.user):
+                recipients.add(entry.user)
+            elif self.abstract.can_convene(entry.user) and visibility >= AbstractCommentVisibility.conveners:
+                recipients.add(entry.user)
+            elif self.abstract.can_review(entry.user) and visibility >= AbstractCommentVisibility.reviewers:
+                recipients.add(entry.user)
+        if visibility >= AbstractCommentVisibility.contributors:
+            recipients.add(self.abstract.submitter)
+            for comment in self.abstract.comments:
+                recipients.add(comment.user)
+        return recipients
+
+    def _send_notification(self, recipients, comment):
+        for recipient in recipients:
+            tpl = get_template_module('events/abstracts/emails/comment.html', event=self.event, abstract=self.abstract,
+                                      submitter=session.user, comment=comment, recipient=recipient)
+            email = make_email(to_list=recipient.email, template=tpl, html=True)
+            send_email(email, self.event, 'Abstracts', session.user)
+
     def _process(self):
         form = AbstractCommentForm(abstract=self.abstract, user=session.user)
         if form.validate_on_submit():
             create_abstract_comment(self.abstract, form.data)
+            if abstracts_reviewing_settings.get(self.event, 'notify_on_new_comments'):
+                visibility = form.visibility.data if form.visibility else AbstractCommentVisibility.contributors
+                recipients = self._get_recipients(visibility) - {session.user}
+                comment = form.text.data
+                self._send_notification(recipients, comment)
+
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/reviews/forms.html')
         return jsonify(html=tpl.render_comment_form(form, proposal=self.abstract))
