@@ -32,6 +32,7 @@ Bugfixes
 - Correctly specify charset in iCalendar files attached to emails (:issue:`5228`,
   :pr:`5258`, thanks :user:`imranyusuff`)
 - Fix very long map URLs breaking out of the event management settings box (:pr:`5275`)
+- Fix missing abstract withdrawal notification (:pr:`5281`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
