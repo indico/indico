@@ -25,7 +25,32 @@
         <th class="regform-done-caption">{% trans %}Visibility{% endtrans %}</th>
         <td class="regform-done-data">
             {% if from_management %}
-                {{ registration.visibility.title }}
+                <div class="regform-participant-visibility">
+                    {% if registration.visibility == registration.visibility_before_override %}
+                        <div>{{ registration.visibility_before_override.title }}</div>
+                    {% else %}
+                        <div class="old-visibility">{{ registration.visibility_before_override.title }}</div>
+                        <div>{{ registration.visibility.title }}</div>
+                    {% endif %}
+                    {% set tooltip_text -%}
+                        {%- if registration.participant_hidden -%}
+                            {% trans %}This will restore this participant's visibility based on the form's settings{% endtrans %}
+                        {%- else -%}
+                            {% trans %}This will hide this participant from the list of participants regardless of other settings{% endtrans %}
+                        {%- endif -%}
+                    {%- endset %}
+                    <a class="i-button {% if registration.participant_hidden %}icon-eye{% else %}icon-eye-blocked{% endif %}"
+                       data-update="#registration-details"
+                       data-method="POST"
+                       data-href="{{ url_for('.hide_registration', registration) }}"
+                       title="{{ tooltip_text }}">
+                        {%- if registration.participant_hidden -%}
+                            {% trans %}Show participant{% endtrans %}
+                        {%- else -%}
+                            {% trans %}Hide participant{% endtrans %}
+                        {%- endif -%}
+                    </a>
+                </div>
             {% else %}
                 <div id="registration-summary-consent-to-publish"
                      data-locator="{{ registration.locator.registrant|tojson|forceescape }}"

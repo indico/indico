@@ -593,6 +593,14 @@ class RHRegistrationReset(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
+class RHRegistrationHide(RHManageRegistrationBase):
+    """Hide a registration from the participants lists."""
+
+    def _process(self):
+        self.registration.participant_hidden = not self.registration.participant_hidden
+        return jsonify_data(html=_render_registration_details(self.registration))
+
+
 class RHRegistrationManageWithdraw(RHManageRegistrationBase):
     """Let a manager withdraw a registration."""
 

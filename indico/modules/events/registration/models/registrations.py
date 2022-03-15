@@ -353,21 +353,9 @@ class Registration(db.Model):
 
     @hybrid_property
     def visibility(self):
-        if (
-            self.participant_hidden
-            or self.registration_form.publish_registrations_participants == PublishRegistrationsMode.hide_all
-        ):
+        if self.participant_hidden:
             return RegistrationVisibility.nobody
-        vis = self.consent_to_publish
-        if self.registration_form.publish_registrations_participants == PublishRegistrationsMode.show_all:
-            if self.registration_form.publish_registrations_public == PublishRegistrationsMode.hide_all:
-                return RegistrationVisibility.participants
-            if self.registration_form.publish_registrations_public == PublishRegistrationsMode.show_all:
-                return RegistrationVisibility.all
-            return max(vis, RegistrationVisibility.participants)
-        elif self.registration_form.publish_registrations_public == PublishRegistrationsMode.hide_all:
-            return min(vis, RegistrationVisibility.participants)
-        return vis
+        return self.visibility_before_override
 
     @visibility.expression
     def visibility(cls):
@@ -538,6 +526,21 @@ class Registration(db.Model):
     def sections_with_answered_fields(self):
         return [x for x in self.registration_form.sections
                 if any(child.id in self.data_by_field for child in x.children)]
+
+    @property
+    def visibility_before_override(self):
+        if self.registration_form.publish_registrations_participants == PublishRegistrationsMode.hide_all:
+            return RegistrationVisibility.nobody
+        vis = self.consent_to_publish
+        if self.registration_form.publish_registrations_participants == PublishRegistrationsMode.show_all:
+            if self.registration_form.publish_registrations_public == PublishRegistrationsMode.hide_all:
+                return RegistrationVisibility.participants
+            if self.registration_form.publish_registrations_public == PublishRegistrationsMode.show_all:
+                return RegistrationVisibility.all
+            return max(vis, RegistrationVisibility.participants)
+        elif self.registration_form.publish_registrations_public == PublishRegistrationsMode.hide_all:
+            return min(vis, RegistrationVisibility.participants)
+        return vis
 
     @classproperty
     @classmethod

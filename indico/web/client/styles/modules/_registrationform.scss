@@ -255,6 +255,22 @@
   .regform-done-data {
     padding: 0 0 0 5px;
     vertical-align: top;
+
+    .regform-participant-visibility {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      margin: 2px 0;
+
+      .old-visibility {
+        color: $light-black;
+        text-decoration: line-through;
+      }
+
+      .i-button {
+        margin-left: auto;
+      }
+    }
   }
 
   .regform-done-table-title {
