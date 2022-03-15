@@ -110,8 +110,10 @@ class EditingTagSchema(mm.SQLAlchemyAutoSchema):
 class EditingRevisionFileSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevisionFile
-        fields = ('uuid', 'filename', 'size', 'content_type', 'file_type', 'download_url', 'external_download_url')
+        fields = ('id', 'uuid', 'filename', 'size', 'content_type', 'file_type', 'download_url',
+                  'external_download_url')
 
+    id = fields.Int(attribute='file.id')
     uuid = fields.String(attribute='file.uuid')
     filename = fields.String(attribute='file.filename')
     size = fields.Int(attribute='file.size')

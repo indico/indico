@@ -5,11 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import submitRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
+
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dropdown} from 'semantic-ui-react';
 
+import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Translate} from 'indico/react/i18n';
 
@@ -19,7 +22,7 @@ import {createRevisionComment} from './actions';
 import CommentForm from './CommentForm';
 import JudgmentBox from './judgment/JudgmentBox';
 import JudgmentDropdownItems from './judgment/JudgmentDropdownItems';
-import {getLastRevision, canJudgeLastRevision} from './selectors';
+import {getLastRevision, canJudgeLastRevision, getDetails, getStaticData} from './selectors';
 import {blockPropTypes} from './util';
 
 import './ReviewForm.module.scss';
@@ -51,6 +54,8 @@ export default function ReviewForm({block}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
   const canJudge = useSelector(canJudgeLastRevision);
+  const {editor, contribution} = useSelector(getDetails);
+  const {eventId, editableType, fileTypes} = useSelector(getStaticData);
   const currentUser = {
     fullName: Indico.User.fullName,
     avatarURL: Indico.User.avatarURL,
@@ -71,6 +76,27 @@ export default function ReviewForm({block}) {
   const judgmentForm = (
     <div className="flexrow" styleName="judgment-form">
       <CommentForm onSubmit={createComment} onToggleExpand={setCommentFormVisible} />
+      {!editor && (
+        <>
+          <span className="comment-or-review">
+            <Translate>or</Translate>
+          </span>
+          <EditableSubmissionButton
+            eventId={eventId}
+            contributionId={contribution.id}
+            contributionCode={contribution.code}
+            fileTypes={{[editableType]: fileTypes}}
+            // uploadableFiles={lastRevision.files}
+            text={Translate.string('Submit files')}
+            submitURL={submitRevisionURL({
+              event_id: eventId,
+              contrib_id: contribution.id,
+              type: editableType,
+              revision_id: lastRevision.id,
+            })}
+          />
+        </>
+      )}
       {!commentFormVisible && canJudge && (
         <div className="review-trigger flexrow">
           <span className="comment-or-review">
