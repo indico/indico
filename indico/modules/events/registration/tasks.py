@@ -32,4 +32,6 @@ def delete_field_data():
     for data in registration_data:
         logger.info(f'Deleting registration field data: {data}')
         data.data = None
+        if data.field_data.field.field_impl.is_file_field:
+            data.file = None
     db.session.commit()
