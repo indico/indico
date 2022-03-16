@@ -178,6 +178,7 @@ def withdraw_abstract(abstract):
         delete_contribution(contrib)
     db.session.flush()
     signals.event.abstract_state_changed.send(abstract)
+    send_abstract_notifications(abstract)
     logger.info('Abstract %s withdrawn by %s', abstract, session.user)
     abstract.log(EventLogRealm.reviewing, LogKind.negative, 'Abstracts',
                  f'Abstract {abstract.verbose_title} withdrawn', session.user)
