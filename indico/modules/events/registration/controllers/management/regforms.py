@@ -18,8 +18,8 @@ from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
 from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
-                                                      RegistrationFormForm, RegistrationFormScheduleForm,
-                                                      RegistrationManagersForm)
+                                                      RegistrationFormCreateForm, RegistrationFormEditForm,
+                                                      RegistrationFormScheduleForm, RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
@@ -127,28 +127,36 @@ class RHManageRegistrationFormDisplay(RHManageRegFormBase):
 class RHManageParticipants(RHManageRegFormsBase):
     """Show and enable the dummy registration form for participants."""
 
-    def _process_POST(self):
-        regform = self.event.participation_regform
-        set_feature_enabled(self.event, 'registration', True)
-        if not regform:
-            regform = RegistrationForm(event=self.event, title='Participants', is_participation=True,
-                                       currency=payment_settings.get('currency'),
-                                       publish_registrations_public=(PublishRegistrationsMode.hide_all
-                                                                     if self.event.type_ == EventType.conference
-                                                                     else PublishRegistrationsMode.show_with_consent))
-            create_personal_data_fields(regform)
-            db.session.add(regform)
-            db.session.flush()
-            signals.event.registration_form_created.send(regform)
-            self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
-                           f'Registration form "{regform.title}" has been created', session.user)
-        return redirect(url_for('event_registration.manage_regform', regform))
-
-    def _process_GET(self):
+    def _process(self):
         regform = self.event.participation_regform
         registration_enabled = self.event.has_feature('registration')
+        participant_visibility = (PublishRegistrationsMode.show_with_consent
+                                  if self.event.type_ == EventType.lecture
+                                  else PublishRegistrationsMode.show_all)
+        public_visibility = (PublishRegistrationsMode.show_with_consent
+                             if self.event.type_ == EventType.lecture
+                             else PublishRegistrationsMode.show_all)
+        form = RegistrationFormCreateForm(title='Participants',
+                                          visibility=[participant_visibility.name, public_visibility.name])
+        if form.validate_on_submit():
+            set_feature_enabled(self.event, 'registration', True)
+            if not regform:
+                regform = RegistrationForm(event=self.event, is_participation=True,
+                                           currency=payment_settings.get('currency'))
+                create_personal_data_fields(regform)
+                form.populate_obj(regform, skip=['visibility'])
+                participant_visibility, public_visibility = form.visibility.data
+                regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
+                regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
+                db.session.add(regform)
+                db.session.flush()
+                signals.event.registration_form_created.send(regform)
+                self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
+                               f'Registration form "{regform.title}" has been created', session.user)
+            return redirect(url_for('event_registration.manage_regform', regform))
+
         if not regform or not registration_enabled:
-            return WPManageParticipants.render_template('management/participants.html', self.event,
+            return WPManageParticipants.render_template('management/participants.html', self.event, form=form,
                                                         regform=regform, registration_enabled=registration_enabled)
         return redirect(url_for('event_registration.manage_regform', regform))
 
@@ -157,15 +165,19 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
     """Create a new registration form."""
 
     def _process(self):
-        publish_registrations_participants = (PublishRegistrationsMode.hide_all
-                                              if self.event.type_ == EventType.conference
-                                              else PublishRegistrationsMode.show_with_consent)
-        form = RegistrationFormForm(event=self.event, currency=payment_settings.get('currency'),
-                                    publish_registrations_participants=publish_registrations_participants)
+        participant_visibility = (PublishRegistrationsMode.hide_all
+                                  if self.event.type_ == EventType.conference
+                                  else PublishRegistrationsMode.show_all)
+        public_visibility = PublishRegistrationsMode.hide_all
+        form = RegistrationFormCreateForm(event=self.event,
+                                          visibility=[participant_visibility.name, public_visibility.name])
         if form.validate_on_submit():
-            regform = RegistrationForm(event=self.event)
+            regform = RegistrationForm(event=self.event, currency=payment_settings.get('currency'))
             create_personal_data_fields(regform)
-            form.populate_obj(regform)
+            form.populate_obj(regform, skip=['visibility'])
+            participant_visibility, public_visibility = form.visibility.data
+            regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
+            regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
             db.session.add(regform)
             db.session.flush()
             signals.event.registration_form_created.send(regform)
@@ -173,7 +185,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
                            f'Registration form "{regform.title}" has been created', session.user)
             return redirect(url_for('.manage_regform', regform))
-        return WPManageRegistration.render_template('management/regform_edit.html', self.event,
+        return WPManageRegistration.render_template('management/regform_create.html', self.event,
                                                     form=form, regform=None)
 
 
@@ -191,7 +203,7 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
         return FormDefaults(self.regform, limit_registrations=self.regform.registration_limit is not None)
 
     def _process(self):
-        form = RegistrationFormForm(obj=self._get_form_defaults(), event=self.event, regform=self.regform)
+        form = RegistrationFormEditForm(obj=self._get_form_defaults(), event=self.event, regform=self.regform)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()

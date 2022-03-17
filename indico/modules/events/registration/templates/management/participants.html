@@ -1,4 +1,5 @@
 {% extends 'events/management/base.html' %}
+{% from 'forms/_form.html' import simple_form %}
 
 {% block title %}
     {%- trans %}Participants{% endtrans -%}
@@ -14,6 +15,10 @@
             {% endif %}
         </div>
     </div>
+    {% if not regform %}
+        {{ simple_form(form, fields=form._meeting_fields, submit=_('Create'),
+                       disabled_until_change=false, back_button=false) }}
+    {% endif %}
 {% endblock %}
 
 
@@ -43,14 +48,8 @@
             {% trans %}There is no registration form for participants{% endtrans %}
         </div>
         {% trans -%}
-            Participants are now handled through a registration form.
+            To create a new registration form, specify the participant visibility settings below.
+            These settings can only be changed while there are no registrations.
         {%- endtrans %}
-    </div>
-    <div class="toolbar">
-        <a href="#" class="i-button highlight"
-           data-href="{{ url_for('.manage', event) }}"
-           data-method="POST">
-            {% trans %}Create{% endtrans %}
-        </a>
     </div>
 {% endmacro %}

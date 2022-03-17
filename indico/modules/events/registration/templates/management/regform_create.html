@@ -1,0 +1,23 @@
+{% extends 'events/registration/management/_regform_base.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block subtitle %}{% endblock %}
+
+{% block content %}
+    <div class="action-box highlight">
+        <div class="section">
+            <div class="icon icon-users"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Create a new registration form{% endtrans %}
+                </div>
+                {% trans -%}
+                    To create a new registration form, specify the title and participant visibility settings below.
+                    The visibility settings can only be changed while there are no registrations.
+                {%- endtrans %}
+            </div>
+        </div>
+    </div>
+    {{ simple_form(form, fields=form._conference_fields, submit=_('Create'),
+                   back_url=url_for('.manage_regform_list', event)) }}
+{% endblock %}
