@@ -128,16 +128,6 @@ class RegistrationFormCreateForm(IndicoForm):
                                                   description=_('Specify under which conditions the participant list '
                                                                 'will be visible to other participants and everyone '
                                                                 'else who can access the event'))
-    currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
-
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
-        super().__init__(*args, **kwargs)
-        self._set_currencies()
-
-    def _set_currencies(self):
-        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
-        self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
 
 
 class RegistrationFormScheduleForm(IndicoForm):

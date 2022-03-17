@@ -136,13 +136,13 @@ class RHManageParticipants(RHManageRegFormsBase):
         public_visibility = (PublishRegistrationsMode.show_with_consent
                              if self.event.type_ == EventType.lecture
                              else PublishRegistrationsMode.show_all)
-        form = RegistrationFormCreateForm(event=self.event, title='Participants',
-                                          currency=payment_settings.get('currency'),
+        form = RegistrationFormCreateForm(title='Participants',
                                           visibility=[participant_visibility.name, public_visibility.name])
         if form.validate_on_submit():
             set_feature_enabled(self.event, 'registration', True)
             if not regform:
-                regform = RegistrationForm(event=self.event, is_participation=True)
+                regform = RegistrationForm(event=self.event, is_participation=True,
+                                           currency=payment_settings.get('currency'))
                 create_personal_data_fields(regform)
                 form.populate_obj(regform, skip=['visibility'])
                 participant_visibility, public_visibility = form.visibility.data
@@ -169,10 +169,10 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
                                   if self.event.type_ == EventType.conference
                                   else PublishRegistrationsMode.show_all)
         public_visibility = PublishRegistrationsMode.hide_all
-        form = RegistrationFormCreateForm(event=self.event, currency=payment_settings.get('currency'),
+        form = RegistrationFormCreateForm(event=self.event,
                                           visibility=[participant_visibility.name, public_visibility.name])
         if form.validate_on_submit():
-            regform = RegistrationForm(event=self.event)
+            regform = RegistrationForm(event=self.event, currency=payment_settings.get('currency'))
             create_personal_data_fields(regform)
             form.populate_obj(regform, skip=['visibility'])
             participant_visibility, public_visibility = form.visibility.data
