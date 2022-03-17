@@ -13,7 +13,7 @@ from markupsafe import Markup, escape
 
 from indico.core import signals
 from indico.util.decorators import classproperty
-from indico.util.signals import named_objects_from_signal
+from indico.util.signals import make_interceptable, named_objects_from_signal
 
 
 class Placeholder:
@@ -175,6 +175,7 @@ class ParametrizedPlaceholder(Placeholder):
         raise NotImplementedError
 
 
+@make_interceptable
 def get_placeholders(context, **kwargs):
     return named_objects_from_signal(signals.core.get_placeholders.send(context, **kwargs))
 

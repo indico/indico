@@ -81,7 +81,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             with template.background_image.open() as f:
                 self._draw_background(canvas, ImageReader(self._remove_transparency(f)), tpl_data, *badge_rect)
 
-        placeholders = get_placeholders('designer-fields')
+        placeholders = get_placeholders('designer-fields', registration=registration)
 
         # Print images first
         image_placeholders = {name for name, placeholder in placeholders.items() if placeholder.is_image}
