@@ -16,7 +16,7 @@
         </div>
     </div>
     {% if not regform %}
-        {{ simple_form(form, fields=form._meeting_fields, submit='Create',
+        {{ simple_form(form, fields=form._meeting_fields, submit=_('Create'),
                        disabled_until_change=false, back_button=false) }}
     {% endif %}
 {% endblock %}
