@@ -30,7 +30,7 @@ class GeneralFieldDataSchema(mm.Schema):
     is_required = fields.Bool(load_default=False)
     retention_period = fields.TimeDelta(load_default=None, precision=fields.TimeDelta.WEEKS)
     input_type = fields.String(required=True, validate=not_empty)
-    retention_period = fields.TimeDelta(load_default=None)
+    retention_period = fields.TimeDelta(load_default=None, precision='weeks')
 
     @validates('input_type')
     def _check_input_type(self, input_type, **kwargs):
