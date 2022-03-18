@@ -31,8 +31,9 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
             self.regform.publish_registrations_public.name,
             (self.regform.publish_registrations_duration.days // 30
              if self.regform.publish_registrations_duration is not None else None)
-        ])
+        ], retention_period=self.regform.retention_period)
         if form.validate_on_submit():
+            self.regform.retention_period = form.retention_period.data
             participant_visibility, public_visibility, visibility_duration = form.visibility.data
             self.regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
             self.regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]

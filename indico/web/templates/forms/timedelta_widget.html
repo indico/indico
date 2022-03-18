@@ -9,12 +9,14 @@
         <input type="number" name="{{ field.name }}" id="{{ field.id }}-value" value="{{ current_value }}"
                {% if field.flags.required %} required min="1"{% endif %}
                {{ input_args|html_params }}>
-        <select id="{{ field.id }}-unit" name="{{ field.name }}" data-tooltip-anchor
-                {% if field.flags.required %} required{% endif %}
-                {{ input_args|html_params }}>
-            {% for unit, name in field.choices %}
-                <option value="{{ unit }}" {%- if unit == current_unit %} selected{% endif %}>{{ name }}</option>
-            {% endfor %}
-        </select>
+        {% if field.choices|length > 1 %}
+            <select id="{{ field.id }}-unit" name="{{ field.name }}" data-tooltip-anchor
+                    {% if field.flags.required %} required{% endif %}
+                    {{ input_args|html_params }}>
+                {% for unit, name in field.choices %}
+                    <option value="{{ unit }}" {%- if unit == current_unit %} selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
     </div>
 {% endblock %}
