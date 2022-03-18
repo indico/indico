@@ -177,6 +177,12 @@ class RegistrationFormItem(db.Model):
         db.CheckConstraint('current_data_id IS NULL OR type IN ({t.field}, {t.field_pd})'
                            .format(t=RegistrationFormItemType),
                            name='current_data_id_only_field'),
+        db.CheckConstraint('retention_period IS NULL OR '
+                           'type = {t.field} OR (type = {t.field_pd} AND personal_data_type NOT IN '
+                           '({required_fields}))'
+                           .format(t=RegistrationFormItemType,
+                                   required_fields=','.join([str(f.value) for f in PersonalDataType if f.is_required])),
+                           name='retention_period_allowed_fields'),
         db.Index('ix_uq_form_items_pd_section', 'registration_form_id', unique=True,
                  postgresql_where=db.text(f'type = {RegistrationFormItemType.section_pd}')),
         db.Index('ix_uq_form_items_pd_field', 'registration_form_id', 'personal_data_type', unique=True,
@@ -267,6 +273,17 @@ class RegistrationFormItem(db.Model):
         JSONB,
         nullable=False,
         default=lambda: None
+    )
+    #: period for which the registration data should be kept
+    retention_period = db.Column(
+        db.Interval,
+        nullable=True
+    )
+    #: Whether the registration data has been deleted due to an expired retention period
+    is_purged = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
     )
 
     #: The ID of the latest data
