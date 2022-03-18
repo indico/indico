@@ -60,7 +60,6 @@ class RegistrationListGenerator(ListGeneratorBase):
             },
             'visibility': {
                 'title': _('Visibility'),
-                'filter_choices': {str(visibility.value): visibility.title for visibility in RegistrationVisibility}
             },
             'consent_to_publish': {
                 'title': _('Consent to publish'),
@@ -179,10 +178,6 @@ class RegistrationListGenerator(ListGeneratorBase):
         if 'state' in filters['items']:
             states = [RegistrationState(int(state)) for state in filters['items']['state']]
             items_criteria.append(Registration.state.in_(states))
-
-        if 'visibility' in filters['items']:
-            states = [RegistrationVisibility(int(visibility)) for visibility in filters['items']['visibility']]
-            items_criteria.append(Registration.visibility.in_(states))
 
         if 'consent_to_publish' in filters['items']:
             states = [RegistrationVisibility(int(visibility)) for visibility in filters['items']['consent_to_publish']]

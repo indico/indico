@@ -325,14 +325,22 @@ class Registration(db.Model):
 
     @is_publishable.expression
     def is_publishable(cls, is_participant):
+        def _has_regform_publish_mode(mode):
+            if is_participant:
+                return cls.registration_form.has(publish_registrations_participants=mode)
+            else:
+                return cls.registration_form.has(publish_registrations_public=mode)
+        consent_criterion = (
+            cls.consent_to_publish.in_([RegistrationVisibility.all, RegistrationVisibility.participants])
+            if is_participant else
+            cls.consent_to_publish == RegistrationVisibility.all
+        )
         return db.and_(
+            ~cls.participant_hidden,
             cls.is_active,
             cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)),
-            cls.visibility != RegistrationVisibility.nobody,
-            db.or_(
-                (cls.visibility == RegistrationVisibility.participants) & is_participant,
-                cls.visibility == RegistrationVisibility.all
-            )
+            ~_has_regform_publish_mode(PublishRegistrationsMode.hide_all),
+            _has_regform_publish_mode(PublishRegistrationsMode.show_all) | consent_criterion
         )
 
     @hybrid_property
@@ -350,44 +358,6 @@ class Registration(db.Model):
     @is_cancelled.expression
     def is_cancelled(self):
         return self.state.in_((RegistrationState.rejected, RegistrationState.withdrawn))
-
-    @hybrid_property
-    def visibility(self):
-        if self.participant_hidden:
-            return RegistrationVisibility.nobody
-        return self.visibility_before_override
-
-    @visibility.expression
-    def visibility(cls):
-        def _min(a, b):
-            return db.case([(a < b, a)], else_=b)
-
-        def _max(a, b):
-            return db.case([(a > b, a)], else_=b)
-
-        return db.case([
-            (
-                db.or_(
-                    cls.participant_hidden,
-                    cls.registration_form.has(publish_registrations_participants=PublishRegistrationsMode.hide_all)
-                ),
-                RegistrationVisibility.nobody
-            ),
-            (cls.registration_form.has(publish_registrations_participants=PublishRegistrationsMode.show_all), db.case([
-                (
-                    cls.registration_form.has(publish_registrations_public=PublishRegistrationsMode.hide_all),
-                    RegistrationVisibility.participants
-                ),
-                (
-                    cls.registration_form.has(publish_registrations_public=PublishRegistrationsMode.show_all),
-                    RegistrationVisibility.all
-                )
-            ], else_=_max(cls.consent_to_publish, RegistrationVisibility.participants))),
-            (
-                cls.registration_form.has(publish_registrations_public=PublishRegistrationsMode.hide_all),
-                _min(cls.consent_to_publish, RegistrationVisibility.participants)
-            )
-        ], else_=cls.consent_to_publish)
 
     @locator_property
     def locator(self):
@@ -541,6 +511,12 @@ class Registration(db.Model):
         elif self.registration_form.publish_registrations_public == PublishRegistrationsMode.hide_all:
             return min(vis, RegistrationVisibility.participants)
         return vis
+
+    @property
+    def visibility(self):
+        if self.participant_hidden:
+            return RegistrationVisibility.nobody
+        return self.visibility_before_override
 
     @classproperty
     @classmethod

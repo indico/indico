@@ -21,7 +21,6 @@ def assert_visibility(reg, visibility, test_visibility_prop=True):
 
     if test_visibility_prop:
         assert reg.visibility == visibility
-        assert Registration.query.with_parent(reg.event).filter(Registration.visibility == visibility).has_rows()
     if visibility == RegistrationVisibility.nobody:
         assert not reg.is_publishable(True)
         assert not reg.is_publishable(False)
