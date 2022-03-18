@@ -319,7 +319,6 @@ def create_registration(regform, data, invitation=None, management=False, notify
         value = data.get(form_item.html_field_name, default) if can_modify else default
         data_entry = RegistrationData()
         registration.data.append(data_entry)
-
         if form_item.is_purged:
             # Leave the registration data empty
             continue
