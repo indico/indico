@@ -37,7 +37,7 @@ import SingleChoiceInput, {
   singleChoiceSettingsInitialData,
 } from './SingleChoiceInput';
 import TextAreaInput, {TextAreaSettings} from './TextAreaInput';
-import TextInput, {TextSettings} from './TextInput';
+import TextInput, {TextSettings, textSettingsFormValidator} from './TextInput';
 
 /*
 Available keys:
@@ -74,6 +74,7 @@ const fieldRegistry = {
     title: Translate.string('Text'),
     inputComponent: TextInput,
     settingsComponent: TextSettings,
+    settingsFormValidator: textSettingsFormValidator,
     icon: 'textfield',
   },
   number: {

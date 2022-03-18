@@ -28,13 +28,31 @@ from indico.util.string import validate_email
 KEEP_EXISTING_FILE_UUID = '00000000-0000-0000-0000-000000000001'
 
 
+class TextFieldDataSchema(mm.Schema):
+    min_length = fields.Integer(load_default=0, validate=validate.Range(0), allow_none=True)
+    max_length = fields.Integer(validate=validate.Range(0), allow_none=True)
+
+    @validates_schema(skip_on_field_errors=True)
+    def validate_min_max(self, data, **kwargs):
+        if data['min_length'] and data['max_length'] and data['min_length'] > data['max_length']:
+            raise ValidationError('Maximum value must be less than minimum value.', 'max_length')
+
+
+class TextFieldLengthValidator(validate.Length):
+    def __call__(self, value):
+        if not value:
+            return value
+        return super().__call__(value)
+
+
 class TextField(RegistrationFormFieldBase):
     name = 'text'
     mm_field_class = fields.String
-    setup_schema_fields = {
-        'min_length': fields.Integer(load_default=None, validate=validate.Range(1)),
-        'max_length': fields.Integer(load_default=None, validate=validate.Range(1)),
-    }
+    setup_schema_base_cls = TextFieldDataSchema
+
+    def get_validators(self, existing_registration):
+        return TextFieldLengthValidator(min=self.form_item.data.get('min_length') or None,
+                                        max=self.form_item.data.get('max_length') or None)
 
 
 class NumberFieldDataSchema(BillableFieldDataSchema):
@@ -44,7 +62,7 @@ class NumberFieldDataSchema(BillableFieldDataSchema):
     @validates_schema(skip_on_field_errors=True)
     def validate_min_max(self, data, **kwargs):
         if data['min_value'] and data['max_value'] and data['min_value'] > data['max_value']:
-            raise ValidationError('Maximum value must be less than minimum value', 'max_value')
+            raise ValidationError('Maximum value must be less than minimum value.', 'max_value')
 
 
 class NumberField(RegistrationFormBillableField):

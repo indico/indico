@@ -27,6 +27,7 @@ export default function TextInput({htmlName, disabled, title, isRequired, ...pro
       {...inputProps}
       required={isRequired}
       disabled={disabled}
+      parse={val => val || null}
     />
   );
 }
@@ -54,8 +55,9 @@ export function TextSettings() {
         type="number"
         label={Translate.string('Min. length')}
         step="1"
-        min="1"
-        validate={v.optional(v.min(1))}
+        min="0"
+        validate={v.optional(v.min(0))}
+        format={val => val || ''}
         fluid
       />
       <FinalInput
@@ -69,4 +71,14 @@ export function TextSettings() {
       />
     </Form.Group>
   );
+}
+
+export function textSettingsFormValidator({minLength, maxLength}) {
+  if (minLength && maxLength && minLength > maxLength) {
+    const msg = Translate.string('The minimum length cannot be greater than the maximum length.');
+    return {
+      minLength: msg,
+      maxLength: msg,
+    };
+  }
 }
