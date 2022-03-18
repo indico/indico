@@ -83,7 +83,7 @@ class PublishRegistrationsMode(RichIntEnum):
     show_all = 2
 
 
-class PublishConsentType(RichIntEnum):
+class RegistrationVisibility(RichIntEnum):
     __titles__ = [L_('Do not display to anyone'), L_('Display to other participants'), L_('Display to everyone')]
     nobody = 0
     participants = 1
@@ -229,9 +229,15 @@ class Registration(db.Model):
     )
     #: Type of consent given to publish this registration
     consent_to_publish = db.Column(
-        PyIntEnum(PublishConsentType),
+        PyIntEnum(RegistrationVisibility),
         nullable=False,
-        default=PublishConsentType.nobody
+        default=RegistrationVisibility.nobody
+    )
+    #: Management-set override for visibility
+    participant_hidden = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
     #: The Event containing this registration
     event = db.relationship(
@@ -307,21 +313,15 @@ class Registration(db.Model):
 
     @hybrid_method
     def is_publishable(self, is_participant):
-        publish_registrations_mode = (
-            self.registration_form.publish_registrations_participants
-            if is_participant else
-            self.registration_form.publish_registrations_public
-        )
-        return (
-            self.is_active
-            and self.state in (RegistrationState.complete, RegistrationState.unpaid)
-            and publish_registrations_mode != PublishRegistrationsMode.hide_all
-            and (
-                publish_registrations_mode == PublishRegistrationsMode.show_all
-                or self.consent_to_publish == PublishConsentType.all
-                or (is_participant and self.consent_to_publish == PublishConsentType.participants)
-            )
-        )
+        if (self.visibility == RegistrationVisibility.nobody
+                or not self.is_active
+                or self.state not in (RegistrationState.complete, RegistrationState.unpaid)):
+            return False
+        if self.visibility == RegistrationVisibility.participants:
+            return is_participant
+        if self.visibility == RegistrationVisibility.all:
+            return True
+        return False
 
     @is_publishable.expression
     def is_publishable(cls, is_participant):
@@ -331,11 +331,12 @@ class Registration(db.Model):
             else:
                 return cls.registration_form.has(publish_registrations_public=mode)
         consent_criterion = (
-            cls.consent_to_publish.in_([PublishConsentType.all, PublishConsentType.participants])
+            cls.consent_to_publish.in_([RegistrationVisibility.all, RegistrationVisibility.participants])
             if is_participant else
-            cls.consent_to_publish == PublishConsentType.all
+            cls.consent_to_publish == RegistrationVisibility.all
         )
         return db.and_(
+            ~cls.participant_hidden,
             cls.is_active,
             cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)),
             ~_has_regform_publish_mode(PublishRegistrationsMode.hide_all),
@@ -495,6 +496,27 @@ class Registration(db.Model):
     def sections_with_answered_fields(self):
         return [x for x in self.registration_form.sections
                 if any(child.id in self.data_by_field for child in x.children)]
+
+    @property
+    def visibility_before_override(self):
+        if self.registration_form.publish_registrations_participants == PublishRegistrationsMode.hide_all:
+            return RegistrationVisibility.nobody
+        vis = self.consent_to_publish
+        if self.registration_form.publish_registrations_participants == PublishRegistrationsMode.show_all:
+            if self.registration_form.publish_registrations_public == PublishRegistrationsMode.hide_all:
+                return RegistrationVisibility.participants
+            if self.registration_form.publish_registrations_public == PublishRegistrationsMode.show_all:
+                return RegistrationVisibility.all
+            return max(vis, RegistrationVisibility.participants)
+        elif self.registration_form.publish_registrations_public == PublishRegistrationsMode.hide_all:
+            return min(vis, RegistrationVisibility.participants)
+        return vis
+
+    @property
+    def visibility(self):
+        if self.participant_hidden:
+            return RegistrationVisibility.nobody
+        return self.visibility_before_override
 
     @classproperty
     @classmethod

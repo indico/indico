@@ -22,8 +22,7 @@ from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
-                                                                     RegistrationState)
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_event_section_data,
                                                      get_flat_section_submission_data, get_initial_form_values,
@@ -216,8 +215,9 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             # There might be forms that have not been sorted by the user yet
             tables.extend(map(self._participant_list_table, regforms_dict.values()))
 
+        is_participant = self.event.is_user_registered(session.user)
         published = (RegistrationForm.query.with_parent(self.event)
-                     .filter(RegistrationForm.publish_registrations_public != PublishRegistrationsMode.hide_all)
+                     .filter(RegistrationForm.registrations.any(Registration.is_publishable(is_participant)))
                      .has_rows())
         num_participants = sum(table['num_participants'] for table in tables)
 

@@ -11,7 +11,8 @@ from sqlalchemy.orm import joinedload
 from indico.core.db import db
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItem
-from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
+from indico.modules.events.registration.models.registrations import (Registration, RegistrationData, RegistrationState,
+                                                                     RegistrationVisibility)
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
@@ -59,6 +60,17 @@ class RegistrationListGenerator(ListGeneratorBase):
             },
             'visibility': {
                 'title': _('Visibility'),
+            },
+            'consent_to_publish': {
+                'title': _('Consent to publish'),
+                'filter_choices': {str(visibility.value): visibility.title for visibility in RegistrationVisibility}
+            },
+            'participant_hidden': {
+                'title': _('Participant hidden'),
+                'filter_choices': {
+                    '0': _('No'),
+                    '1': _('Yes')
+                }
             },
             'tags_present': {
                 'title': _('Tags'),
@@ -166,6 +178,16 @@ class RegistrationListGenerator(ListGeneratorBase):
         if 'state' in filters['items']:
             states = [RegistrationState(int(state)) for state in filters['items']['state']]
             items_criteria.append(Registration.state.in_(states))
+
+        if 'consent_to_publish' in filters['items']:
+            states = [RegistrationVisibility(int(visibility)) for visibility in filters['items']['consent_to_publish']]
+            items_criteria.append(Registration.consent_to_publish.in_(states))
+
+        if 'participant_hidden' in filters['items']:
+            participant_hidden_values = filters['items']['participant_hidden']
+            # If both values 'true' and 'false' are selected, there's no point in filtering
+            if len(participant_hidden_values) == 1:
+                items_criteria.append(Registration.participant_hidden == bool(int(participant_hidden_values[0])))
 
         if 'tags_present' in filters['items']:
             tag_ids = [int(tag_id) for tag_id in filters['items']['tags_present']]

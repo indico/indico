@@ -15,7 +15,6 @@ from marshmallow_enum import EnumField
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
-from werkzeug.exceptions import BadRequest
 from werkzeug.urls import url_parse
 
 from indico.core import signals
@@ -38,8 +37,8 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
                                                              RegistrationFormPersonalDataSection)
-from indico.modules.events.registration.models.registrations import (PublishConsentType, Registration, RegistrationData,
-                                                                     RegistrationState)
+from indico.modules.events.registration.models.registrations import (Registration, RegistrationData, RegistrationState,
+                                                                     RegistrationVisibility)
 from indico.modules.events.registration.notifications import (notify_invitation, notify_registration_creation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
@@ -297,8 +296,8 @@ def make_registration_schema(regform, management=False, registration=None):
 
     if management:
         schema['notify_user'] = fields.Boolean()
-    if regform.needs_publish_consent:
-        schema['consent_to_publish'] = EnumField(PublishConsentType)
+    elif regform.needs_publish_consent:
+        schema['consent_to_publish'] = EnumField(RegistrationVisibility)
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
@@ -378,7 +377,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
         invitation.state = InvitationState.accepted
         invitation.registration = registration
     if not management and regform.needs_publish_consent:
-        registration.consent_to_publish = data.get('consent_to_publish', PublishConsentType.nobody)
+        registration.consent_to_publish = data.get('consent_to_publish', RegistrationVisibility.nobody)
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
     signals.event.registration_created.send(registration, management=management, data=data)
@@ -428,11 +427,8 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
-    if regform.needs_publish_consent and 'consent_to_publish' in data:
-        new_consent_to_publish = data['consent_to_publish']
-        if management and new_consent_to_publish > registration.consent_to_publish:
-            raise BadRequest('Cannot increase visibility consent level of a participant')
-        registration.consent_to_publish = new_consent_to_publish
+    if not management and regform.needs_publish_consent:
+        registration.consent_to_publish = data.get('consent_to_publish', RegistrationVisibility.nobody)
     registration.sync_state()
     db.session.flush()
     # sanity check

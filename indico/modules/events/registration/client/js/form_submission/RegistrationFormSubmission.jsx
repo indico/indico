@@ -53,14 +53,8 @@ function EmailNotification() {
   );
 }
 
-function ConsentToPublish({
-  publishToParticipants,
-  publishToPublic,
-  maximumConsentToPublish,
-  management,
-}) {
+function ConsentToPublish({publishToParticipants, publishToPublic}) {
   const isWarning = publishToParticipants === 'show_all' && publishToPublic === 'show_all';
-
   return (
     <Message info={!isWarning} warning={isWarning} style={{marginTop: 25}}>
       <Message.Header>
@@ -69,20 +63,15 @@ function ConsentToPublish({
       {(publishToParticipants === 'show_with_consent' ||
         publishToPublic === 'show_with_consent') && (
         <p>
-          {management
-            ? Translate.string(
-                "Modify the user's consent to being included in the event's list of participants"
-              )
-            : Translate.string(
-                "Specify whether you consent to being included in the event's list of participants"
-              )}
+          <Translate>
+            Specify whether you consent to being included in the event's list of participants
+          </Translate>
         </p>
       )}
       <ConsentToPublishDropdown
         name="consent_to_publish"
         publishToParticipants={publishToParticipants}
         publishToPublic={publishToPublic}
-        maximumConsentToPublish={maximumConsentToPublish}
         useFinalForms
       />
     </Message>
@@ -92,8 +81,6 @@ function ConsentToPublish({
 ConsentToPublish.propTypes = {
   publishToParticipants: PropTypes.oneOf(['hide_all', 'show_with_consent', 'show_all']).isRequired,
   publishToPublic: PropTypes.oneOf(['hide_all', 'show_with_consent', 'show_all']).isRequired,
-  maximumConsentToPublish: PropTypes.oneOf(['nobody', 'participants', 'all']).isRequired,
-  management: PropTypes.bool.isRequired,
 };
 
 export default function RegistrationFormSubmission() {
@@ -104,11 +91,7 @@ export default function RegistrationFormSubmission() {
   const isManagement = useSelector(getManagement);
   const publishToParticipants = useSelector(getPublishToParticipants);
   const publishToPublic = useSelector(getPublishToPublic);
-  const showConsentToPublish = isManagement
-    ? isUpdateMode &&
-      registrationData.consent_to_publish !== 'nobody' &&
-      (publishToParticipants === 'show_with_consent' || publishToPublic === 'show_with_consent')
-    : publishToParticipants !== 'hide_all';
+  const showConsentToPublish = !isManagement && publishToParticipants !== 'hide_all';
 
   const onSubmit = async (data, form) => {
     let resp;
@@ -144,8 +127,6 @@ export default function RegistrationFormSubmission() {
               <ConsentToPublish
                 publishToParticipants={publishToParticipants}
                 publishToPublic={publishToPublic}
-                maximumConsentToPublish={isManagement ? registrationData.consent_to_publish : 'all'}
-                management={isManagement}
               />
             )}
             <FinalSubmitButton
