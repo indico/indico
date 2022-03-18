@@ -25,7 +25,8 @@ def delete_field_data():
                          .join(RegistrationFormField, RegistrationFormFieldData.field_id == RegistrationFormField.id)
                          .join(RegistrationForm)
                          .join(Event)
-                         .filter(RegistrationFormItem.retention_period.isnot(None),
+                         .filter(~RegistrationFormItem.is_purged,
+                                 RegistrationFormItem.retention_period.isnot(None),
                                  Event.end_dt + RegistrationFormItem.retention_period <= now_utc())
                          .all())
 
@@ -33,5 +34,9 @@ def delete_field_data():
         logger.info(f'Deleting registration field data: {data}')
         data.data = None
         if data.field_data.field.field_impl.is_file_field:
-            data.file = None
+            try:
+                data.delete()
+            except Exception as e:
+                logger.error(f'Failed to delete file: {e}')
+        data.field_data.field.is_purged = True
     db.session.commit()

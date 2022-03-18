@@ -13,7 +13,7 @@ import {Form, Icon, Popup} from 'semantic-ui-react';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Markdown, toClasses} from 'indico/react/util';
 
-import {getManagement, isPaidItemLocked} from '../form_submission/selectors';
+import {getManagement, getUpdateMode, isPaidItemLocked} from '../form_submission/selectors';
 
 import {getFieldRegistry} from './fields/registry';
 
@@ -38,6 +38,22 @@ PaidItemLocked.propTypes = {
   management: PropTypes.bool.isRequired,
 };
 
+function PurgedItemLocked({isUpdateMode}) {
+  const purgedMsg = <Translate>This field is locked due to an expired retention period.</Translate>;
+  const msg = !isUpdateMode ? (
+    purgedMsg
+  ) : (
+    <>
+      {purgedMsg} <Translate>The associated registration data has been deleted.</Translate>
+    </>
+  );
+  return <Popup trigger={<Icon name="lock" />}>{msg}</Popup>;
+}
+
+PurgedItemLocked.propTypes = {
+  isUpdateMode: PropTypes.bool.isRequired,
+};
+
 export default function FormItem({
   title,
   description,
@@ -45,6 +61,7 @@ export default function FormItem({
   inputType,
   isEnabled,
   isRequired,
+  isPurged,
   sortHandle,
   setupMode,
   setupActions,
@@ -53,17 +70,19 @@ export default function FormItem({
   // TODO move outside like with setupActions etc?
   const paidItemLocked = useSelector(state => isPaidItemLocked(state, rest.id));
   const isManagement = useSelector(getManagement);
+  const isUpdateMode = useSelector(getUpdateMode);
 
   const fieldRegistry = getFieldRegistry();
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
-  const disabled = !isEnabled || (paidItemLocked && !isManagement);
+  const disabled = !isEnabled || isPurged || (paidItemLocked && !isManagement);
   return (
     <div
       styleName={`form-item ${toClasses({
         'disabled': !isEnabled || paidItemLocked,
-        'paid-disabled': paidItemLocked,
+        'purged-disabled': isPurged,
+        'paid-disabled': !isPurged && paidItemLocked,
         'editable': setupMode,
       })}`}
     >
@@ -109,7 +128,8 @@ export default function FormItem({
         )}
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
-      {paidItemLocked && <PaidItemLocked management={isManagement} />}
+      {isPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
+      {!isPurged && paidItemLocked && <PaidItemLocked management={isManagement} />}
     </div>
   );
 }
@@ -122,6 +142,8 @@ FormItem.propTypes = {
   position: PropTypes.number.isRequired,
   /** Whether the field is required during registration */
   isRequired: PropTypes.bool,
+  /** Whether the field's registration data have been deleted due to an expired retention period */
+  isPurged: PropTypes.bool.isRequired,
   /** The retention period of the field's data in weeks */
   retentionPeriod: PropTypes.number,
   /** Whether the field is a special "personal data" field */

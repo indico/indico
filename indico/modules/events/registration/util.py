@@ -319,6 +319,11 @@ def create_registration(regform, data, invitation=None, management=False, notify
         value = data.get(form_item.html_field_name, default) if can_modify else default
         data_entry = RegistrationData()
         registration.data.append(data_entry)
+
+        if form_item.is_purged:
+            # Leave the registration data empty
+            continue
+
         for attr, value in form_item.field_impl.process_form_data(registration, value).items():
             setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
@@ -357,6 +362,9 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
     billable_items_locked = not management and registration.is_paid
     for form_item in regform.active_fields:
+        if form_item.is_purged:
+            continue
+
         field_impl = form_item.field_impl
         has_data = form_item.html_field_name in data
         can_modify = management or not form_item.parent.is_manager_only
