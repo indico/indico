@@ -50,17 +50,19 @@ class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
         return 'event', self.event.id, 'editing', self.contrib.id, self.editable_type.name
 
 
-class RHEditingUploadPaperLastRevision(RHEditingUploadFile):
+class RHEditingUploadContributionFile(RHEditingUploadFile):
     @use_kwargs({
         'id': fields.Int()
     })
     def _process(self, id):
-        last_rev = self.contrib.paper.get_last_revision()
-        if last_rev:
-            found = next((f for f in last_rev.files if f.id == id), None)
-            if found:
-                with found.open() as stream:
-                    return self._save_file(found, stream)
+        files = []
+        if self.contrib.editables:
+            files = [file.file for e in self.contrib.editables for file in e.revisions[-1].files]
+        if self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
+            files += [f for f in last_rev.files]
+        if found := next((f for f in files if f.id == id), None):
+            with found.open() as stream:
+                return self._save_file(found, stream)
         raise UserValueError(_('No such file was found within the paper'))
 
 

@@ -86,7 +86,7 @@ export default function ReviewForm({block}) {
             contributionId={contribution.id}
             contributionCode={contribution.code}
             fileTypes={{[editableType]: fileTypes}}
-            // uploadableFiles={lastRevision.files}
+            uploadableFiles={lastRevision.files}
             text={Translate.string('Submit files')}
             submitURL={submitRevisionURL({
               event_id: eventId,

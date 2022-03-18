@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import apiUploadExistingURL from 'indico-url:event_editing.api_add_paper_file';
+import apiUploadExistingURL from 'indico-url:event_editing.api_add_contribution_file';
 import submitRevisionURL from 'indico-url:event_editing.api_create_editable';
 import apiUploadURL from 'indico-url:event_editing.api_upload';
 import editableURL from 'indico-url:event_editing.editable';
