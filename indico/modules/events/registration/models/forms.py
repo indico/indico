@@ -248,7 +248,7 @@ class RegistrationForm(db.Model):
         nullable=True,
         index=True
     )
-    #: period for which the registration data of all fields should be kept
+    #: period for which the registration itself should be kept
     retention_period = db.Column(
         db.Interval,
         nullable=True
