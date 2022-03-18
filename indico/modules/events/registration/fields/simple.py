@@ -29,8 +29,8 @@ KEEP_EXISTING_FILE_UUID = '00000000-0000-0000-0000-000000000001'
 
 
 class TextFieldDataSchema(mm.Schema):
-    min_length = fields.Integer(load_default=0, validate=validate.Range(0), allow_none=True)
-    max_length = fields.Integer(validate=validate.Range(0), allow_none=True)
+    min_length = fields.Integer(load_default=0, validate=validate.Range(0))
+    max_length = fields.Integer(load_default=0, validate=validate.Range(0))
 
     @validates_schema(skip_on_field_errors=True)
     def validate_min_max(self, data, **kwargs):
@@ -56,8 +56,8 @@ class TextField(RegistrationFormFieldBase):
 
 
 class NumberFieldDataSchema(BillableFieldDataSchema):
-    min_value = fields.Integer(load_default=0, validate=validate.Range(0), allow_none=True)
-    max_value = fields.Integer(validate=validate.Range(0), allow_none=True)
+    min_value = fields.Integer(load_default=0, validate=validate.Range(0))
+    max_value = fields.Integer(load_default=0, validate=validate.Range(0))
 
     @validates_schema(skip_on_field_errors=True)
     def validate_min_max(self, data, **kwargs):
@@ -72,8 +72,8 @@ class NumberField(RegistrationFormBillableField):
     setup_schema_base_cls = NumberFieldDataSchema
 
     def get_validators(self, existing_registration):
-        return validate.Range(min=self.form_item.data.get('min_value', None) or 0,
-                              max=self.form_item.data.get('max_value', None))
+        return validate.Range(min=self.form_item.data.get('min_value') or 0,
+                              max=self.form_item.data.get('max_value') or None)
 
     def calculate_price(self, reg_data, versioned_data):
         return versioned_data.get('price', 0) * int(reg_data or 0)

@@ -27,7 +27,6 @@ export default function TextInput({htmlName, disabled, title, isRequired, ...pro
       {...inputProps}
       required={isRequired}
       disabled={disabled}
-      parse={val => val || null}
     />
   );
 }
@@ -43,8 +42,8 @@ TextInput.propTypes = {
 
 TextInput.defaultProps = {
   disabled: false,
-  minLength: null,
-  maxLength: null,
+  minLength: 0,
+  maxLength: 0,
 };
 
 export function TextSettings() {
@@ -54,19 +53,24 @@ export function TextSettings() {
         name="minLength"
         type="number"
         label={Translate.string('Min. length')}
+        placeholder={String(TextInput.defaultProps.minLength)}
         step="1"
         min="0"
         validate={v.optional(v.min(0))}
         format={val => val || ''}
+        parse={val => +val || 0}
         fluid
       />
       <FinalInput
         name="maxLength"
         type="number"
         label={Translate.string('Max. length')}
+        placeholder={Translate.string('No maximum')}
         step="1"
-        min="1"
-        validate={v.optional(v.min(1))}
+        min="0"
+        validate={v.optional(v.min(0))}
+        format={val => val || ''}
+        parse={val => +val || 0}
         fluid
       />
     </Form.Group>
