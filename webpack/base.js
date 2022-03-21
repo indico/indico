@@ -373,8 +373,6 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       minimizer: [
         new TerserPlugin({
           exclude: [
-            // minification breaks angularjs :(
-            /js\/module_events\.registration\.[^.]+\.bundle\.js$/,
             // "Unexpected token: punc (:) [js/mathjax/extensions/a11y/mathmaps/fr.js:2,25]"
             /js\/mathjax(\/unpacked)?\/extensions\/a11y\/mathmaps\/.+\.js$/,
           ],
