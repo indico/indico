@@ -2,7 +2,7 @@
 
 {% block subtitle %}
     {% trans title=regform.title -%}
-        Configure questions in form "{{ title }}"
+        Configure fields in form "{{ title }}"
     {%- endtrans %}
 {% endblock %}
 
@@ -15,32 +15,6 @@
          data-currency="{{ regform.currency }}"
          data-form-data="{{ form_data | tojson | forceescape }}"></div>
 
-    <hr>
-    <h1>Warning, angular 💩 below</h1>
-    <button type="button" id="load-legacy-angular">Load legacy form</button>
-    <script>
-        (() => {
-            const btn = document.querySelector('#load-legacy-angular')
-            btn.addEventListener('click', () => {
-                angular.bootstrap(document.querySelector("[ng-controller='AppCtrl']"), ['nd']);
-                btn.remove();
-            });
-        })();
-    </script>
-    <hr>
-
-    <div ng-controller="AppCtrl">
-        {% block regform %}
-            <div nd-reg-form
-                 event-id="{{ event.id }}"
-                 conf-form-id="{{ regform.id }}"
-                 conf-sections="{{ angular_sections | tojson | forceescape }}"
-                 conf-currency="{{ regform.currency }}"
-                 event-start-date="{{ event.start_dt }}"
-                 event-end-date="{{ event.end_dt }}"
-                 edit-mode="true"></div>
-        {% endblock %}
-    </div>
     <div class="toolbar right">
         <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">
             {% trans %}Back{% endtrans %}

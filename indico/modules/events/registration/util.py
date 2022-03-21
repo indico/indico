@@ -9,13 +9,12 @@ import csv
 import itertools
 from operator import attrgetter
 
-from flask import current_app, json, session
+from flask import json, session
 from marshmallow import RAISE, ValidationError, fields, validates
 from marshmallow_enum import EnumField
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
-from werkzeug.urls import url_parse
 
 from indico.core import signals
 from indico.core.config import config
@@ -196,31 +195,6 @@ def get_form_registration_data(regform, registration, *, management=False):
     return registration_data
 
 
-def get_event_section_data(regform, management=False, registration=None):
-    data = []
-    if not registration:
-        return [s.view_data for s in regform.sections if not s.is_deleted and (management or not s.is_manager_only)]
-
-    registration_data = {r.field_data.field.id: r for r in registration.data}
-    for section in regform.sections:
-        if section.is_deleted or (not management and section.is_manager_only):
-            continue
-
-        section_data = section.own_data
-        section_data['items'] = []
-
-        for child in section.children:
-            if child.is_deleted:
-                continue
-            if child.is_field and isinstance(child.field_impl, (ChoiceBaseField, AccommodationField)):
-                field_data = get_field_merged_options(child, registration_data)
-            else:
-                field_data = child.view_data
-            section_data['items'].append(field_data)
-        data.append(section_data)
-    return data
-
-
 def check_registration_email(regform, email, registration=None, management=False):
     """Check whether an email address is suitable for registration.
 
@@ -308,8 +282,6 @@ def make_registration_schema(regform, management=False, registration=None):
         if mm_field := form_item.field_impl.create_mm_field(registration=registration):
             schema[form_item.html_field_name] = mm_field
 
-    # TODO: what to do with signal -> signals.event.registration_form_wtform_created
-
     return RegistrationSchema.from_dict(schema, name='RegistrationSchema')
 
 
@@ -332,24 +304,6 @@ def create_personal_data_fields(regform):
         field.data, versioned_data = field.field_impl.process_field_data(data.pop('data', {}))
         field.current_data = RegistrationFormFieldData(versioned_data=versioned_data)
         section.children.append(field)
-
-
-def url_rule_to_angular(endpoint):
-    """Convert a flask-style rule to angular style."""
-    mapping = {
-        'event_id': 'eventId',
-        'reg_form_id': 'confFormId',
-        'section_id': 'sectionId',
-        'field_id': 'fieldId',
-    }
-    rules = list(current_app.url_map.iter_rules(endpoint))
-    assert len(rules) == 1
-    rule = rules[0]
-    assert not rule.defaults
-    segments = [':' + mapping.get(data, data) if is_dynamic else data
-                for is_dynamic, data in rule._trace]
-    prefix = url_parse(config.BASE_URL).path
-    return prefix + ''.join(segments).split('|', 1)[-1]
 
 
 @no_autoflush

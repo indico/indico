@@ -42,10 +42,9 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
-                                                     get_event_section_data, get_flat_section_submission_data,
-                                                     get_initial_form_values, get_ticket_attachments, get_title_uuid,
-                                                     get_user_data, import_registrations_from_csv,
-                                                     make_registration_schema)
+                                                     get_flat_section_submission_data, get_initial_form_values,
+                                                     get_ticket_attachments, get_title_uuid, get_user_data,
+                                                     import_registrations_from_csv, make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
@@ -290,10 +289,6 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     regform=self.regform,
                                                     form_data=form_data,
                                                     initial_values=initial_values,
-                                                    # XXX why don't we include manager-only sections here?!
-                                                    angular_sections=get_event_section_data(self.regform),
-                                                    angular_user_data=user_data,
-                                                    post_url=url_for('.create_registration', self.regform),
                                                     invitation=None,
                                                     registration=None,
                                                     management=True,

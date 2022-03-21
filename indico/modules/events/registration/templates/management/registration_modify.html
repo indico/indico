@@ -25,37 +25,4 @@
          data-consent-to-publish="{{ registration.consent_to_publish.name }}"
          {{ regform_attrs_template_hook(event, regform, true, registration) }}
     ></div>
-
-    <hr>
-    <h1>Warning, angular 💩 below</h1>
-    <button type="button" id="load-legacy-angular">Load legacy form</button>
-    <script>
-        (() => {
-            const btn = document.querySelector('#load-legacy-angular')
-            btn.addEventListener('click', () => {
-                angular.bootstrap(document.querySelector("[ng-controller='AppCtrl']"), ['nd']);
-                btn.remove();
-            });
-        })();
-    </script>
-    <hr>
-
-    {{ template_hook('before-regform', event=event, regform=regform, registration=registration, management=true) }}
-    <div ng-controller="AppCtrl">
-        {% block regform %}
-            <div nd-reg-form
-                 event-id="{{ event.id }}"
-                 conf-sections="{{ angular_sections | tojson | forceescape }}"
-                 conf-currency="{{ regform.currency }}"
-                 post-url="{{ request.url | tojson | forceescape }}"
-                 check-email-url="{{ url_for('.check_email', regform, management=true) | tojson | forceescape }}"
-                 registration-data="{{ registration_data | tojson | forceescape }}"
-                 registration-meta-data="{{ registration_metadata | tojson | forceescape }}"
-                 registration-uuid="{{ registration.uuid }}"
-                 update-mode="true"
-                 management="true"
-                 notify-default="{{ session.get('registration_notify_user_default', true) | tojson | forceescape }}"></div>
-        {% endblock %}
-    </div>
-    {{ template_hook('after-regform', event=event, regform=regform, registration=registration, management=true) }}
 {% endblock %}

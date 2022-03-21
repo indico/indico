@@ -14,7 +14,6 @@ from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
 from indico.modules.auth.util import url_for_login
-from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import get_all_locales, po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
@@ -110,27 +109,6 @@ def generate_global_file():
 
             'EventCreation': url_rule_to_js('events.create'),
             'PermissionsDialog': url_rule_to_js('event_management.permissions_dialog'),
-
-            'RegistrationForm': {
-                'section': {
-                    'add': url_rule_to_angular('event_registration.add_section'),
-                    'modify': url_rule_to_angular('event_registration.modify_section'),
-                    'toggle': url_rule_to_angular('event_registration.toggle_section'),
-                    'move': url_rule_to_angular('event_registration.move_section')
-                },
-                'field': {
-                    'add': url_rule_to_angular('event_registration.add_field'),
-                    'modify': url_rule_to_angular('event_registration.modify_field'),
-                    'toggle': url_rule_to_angular('event_registration.toggle_field'),
-                    'move': url_rule_to_angular('event_registration.move_field')
-                },
-                'text': {
-                    'add': url_rule_to_angular('event_registration.add_text'),
-                    'modify': url_rule_to_angular('event_registration.modify_text'),
-                    'toggle': url_rule_to_angular('event_registration.toggle_text'),
-                    'move': url_rule_to_angular('event_registration.move_text')
-                }
-            },
 
             'Timetable': {
                 'management': url_rule_to_js('timetable.management'),

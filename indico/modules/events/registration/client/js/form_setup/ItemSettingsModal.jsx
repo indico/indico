@@ -39,7 +39,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
   );
   const inputType = editing ? existingInputType : newItemType;
   const fieldRegistry = getFieldRegistry();
-  const isUnsupportedField = !(inputType in fieldRegistry); // TODO remove once no longer needed
+  const isUnsupportedField = !(inputType in fieldRegistry);
   const meta = fieldRegistry[inputType] || {};
   const SettingsComponent = meta.settingsComponent;
 

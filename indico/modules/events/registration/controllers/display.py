@@ -24,9 +24,8 @@ from indico.modules.events.registration.models.invitations import InvitationStat
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
-                                                     get_event_regforms_registrations, get_event_section_data,
-                                                     get_flat_section_submission_data, get_initial_form_values,
-                                                     get_user_data, make_registration_schema)
+                                                     get_event_regforms_registrations, get_flat_section_submission_data,
+                                                     get_initial_form_values, get_user_data, make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -328,8 +327,6 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                regform=self.regform,
                                                form_data=get_flat_section_submission_data(self.regform),
                                                initial_values=initial_values,
-                                               angular_sections=get_event_section_data(self.regform),
-                                               angular_user_data=user_data,
                                                payment_conditions=payment_event_settings.get(self.event, 'conditions'),
                                                payment_enabled=self.event.has_feature('payment'),
                                                invitation=self.invitation,

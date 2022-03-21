@@ -21,7 +21,7 @@ from indico.modules.events.registration.fields.base import (LimitedPlacesBillabl
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.registrations import RegistrationData
-from indico.util.date_time import format_date, iterdays
+from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.marshmallow import UUIDString, not_empty
 from indico.util.string import camelize_keys, snakify_keys
@@ -30,9 +30,6 @@ from indico.util.string import camelize_keys, snakify_keys
 def get_field_merged_options(field, registration_data):
     rdata = registration_data.get(field.id)
     result = deepcopy(field.view_data)
-    # TODO: remove these two lists when removing angular; the new code uses _deleted and _modified below
-    result['deletedChoice'] = []
-    result['modifiedChoice'] = []
     if not rdata or not rdata.data:
         return result
     values = [rdata.data['choice']] if 'choice' in rdata.data else [k for k, v in rdata.data.items() if v]
@@ -44,7 +41,6 @@ def get_field_merged_options(field, registration_data):
             missing_option = next((choice for choice in merged_data['choices'] if choice['id'] == val), None)
             if missing_option:
                 result['choices'].append(camelize_keys(missing_option) | {'_deleted': True})
-                result['deletedChoice'].append(missing_option['id'])
         else:
             current_choice_data = _get_choice_by_id(val, result['choices'])
             registration_choice_data = dict(camelize_keys(
@@ -53,7 +49,6 @@ def get_field_merged_options(field, registration_data):
             if current_choice_data != registration_choice_data:
                 pos = result['choices'].index(current_choice_data)
                 result['choices'][pos] = registration_choice_data | {'_modified': True}
-                result['modifiedChoice'].append(val)
     return result
 
 
@@ -98,9 +93,7 @@ class ChoiceSetupSchema(mm.Schema):
 
 class SingleChoiceSetupSchema(ChoiceSetupSchema):
     default_item = fields.String(load_default=None)
-    # TODO when moving the frontend to react, make sure it's always sent and make it required.
-    # the legacy angular UI sometimes omits this...
-    item_type = fields.String(load_default='dropdown', validate=validate.OneOf(['dropdown', 'radiogroup']))
+    item_type = fields.String(required=True, validate=validate.OneOf(['dropdown', 'radiogroup']))
 
     @validates_schema(skip_on_field_errors=True)
     def _validate_default_item(self, data, **kwargs):
@@ -169,8 +162,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
             item['price'] = float(item['price']) if item.get('price') else 0
             item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
             item['max_extra_slots'] = int(item['max_extra_slots']) if item.get('max_extra_slots') else 0
-            # TODO remove caption check - new code always sends an ID
-            if cls.has_default_item and unversioned_data['default_item'] in {item['caption'], item['id']}:
+            if cls.has_default_item and unversioned_data['default_item'] == item['id']:
                 unversioned_data['default_item'] = item['id']
             captions[item['id']] = item.pop('caption')
         versioned_data['choices'] = items
@@ -375,13 +367,6 @@ class AccommodationItemSchema(LimitedPlacesBillableFieldDataSchema):
     is_no_accommodation = fields.Bool(load_default=False)
     caption = fields.String(required=True, validate=not_empty)
 
-    @pre_load
-    def _remove_noise(self, data, **kwargs):
-        # TODO remove this once the angular frontend is gone
-        data = data.copy()
-        data.pop('placeholder', None)
-        return data
-
     @post_load
     def _stringify_uuid(self, data, **kwargs):
         if 'id' in data:
@@ -420,22 +405,6 @@ class AccommodationSetupSchema(mm.Schema):
             for c in data['choices']:
                 if c.get('id', '').startswith('new:'):
                     c['id'] = str(uuid4())
-        return data
-
-    @pre_load
-    def _merge_dates(self, data, **kwargs):
-        # TODO remove this function once the angular frontend is gone
-        if not (data.keys() >= {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}):
-            return data
-        data = data.copy()
-        data['arrival'] = {
-            'start_date': datetime.strptime(data.pop('arrival_date_from'), '%d/%m/%Y').date().isoformat(),
-            'end_date': datetime.strptime(data.pop('arrival_date_to'), '%d/%m/%Y').date().isoformat(),
-        }
-        data['departure'] = {
-            'start_date': datetime.strptime(data.pop('departure_date_from'), '%d/%m/%Y').date().isoformat(),
-            'end_date': datetime.strptime(data.pop('departure_date_to'), '%d/%m/%Y').date().isoformat(),
-        }
         return data
 
     @post_load
@@ -506,10 +475,6 @@ class AccommodationField(RegistrationFormBillableItemsField):
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
         data = {}
-        arrival_date_from = _to_date(unversioned_data['arrival_date_from'])
-        arrival_date_to = _to_date(unversioned_data['arrival_date_to'])
-        departure_date_from = _to_date(unversioned_data['departure_date_from'])
-        departure_date_to = _to_date(unversioned_data['departure_date_to'])
         data['arrival'] = {
             'start_date': unversioned_data['arrival_date_from'],
             'end_date': unversioned_data['arrival_date_to'],
@@ -518,11 +483,6 @@ class AccommodationField(RegistrationFormBillableItemsField):
             'start_date': unversioned_data['departure_date_from'],
             'end_date': unversioned_data['departure_date_to'],
         }
-        # TODO: remove this once the angular frontend is gone
-        data['arrival_dates'] = [(dt.date().isoformat(), format_date(dt))
-                                 for dt in iterdays(arrival_date_from, arrival_date_to)]
-        data['departure_dates'] = [(dt.date().isoformat(), format_date(dt))
-                                   for dt in iterdays(departure_date_from, departure_date_to)]
         items = deepcopy(versioned_data['choices'])
         for item in items:
             item['caption'] = unversioned_data['captions'][item['id']]

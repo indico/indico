@@ -15,14 +15,6 @@ import 'indico/legacy/angular';
 import './invitations';
 import './reglists';
 
-import './legacy_form/form';
-import './legacy_form/section';
-import './legacy_form/field';
-import './legacy_form/sectiontoolbar';
-import './legacy_form/table';
-
-import './legacy_form/templates';
-
 import ConsentToPublishEditor from './components/ConsentToPublishEditor';
 import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
 import setupRegformSetup from './form_setup';

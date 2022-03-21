@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask import jsonify, request, session
-from marshmallow import EXCLUDE, ValidationError, fields, post_load, pre_load, validates
+from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -30,14 +30,6 @@ class GeneralFieldDataSchema(mm.Schema):
     is_required = fields.Bool(load_default=False)
     input_type = fields.String(required=True, validate=not_empty)
 
-    @pre_load
-    def _remove_noise(self, data, **kwargs):
-        # TODO remove this once the angular frontend is gone. we never allow enabling
-        # or disabling a field here; that's handled in a separate request
-        data = data.copy()
-        data.pop('is_enabled', None)
-        return data
-
     @validates('input_type')
     def _check_input_type(self, input_type, **kwargs):
         field = self.context['field']
@@ -53,7 +45,6 @@ class GeneralFieldDataSchema(mm.Schema):
     def _split_unknown(self, data, original_data, **kwargs):
         parsed = {k: v for k, v in data.items() if k in self.load_fields}
         unknown = {k: v for k, v in original_data.items() if k not in self.load_fields}
-        unknown.pop('is_enabled', None)  # TODO: remove together with _remove_noise
         return parsed, unknown
 
 
