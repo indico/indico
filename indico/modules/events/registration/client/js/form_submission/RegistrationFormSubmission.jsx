@@ -95,7 +95,7 @@ export default function RegistrationFormSubmission() {
 
   const onSubmit = async (data, form) => {
     let resp;
-    const formData = isUpdateMode ? getChangedValues(data, form) : data;
+    const formData = isUpdateMode ? getChangedValues(data, form, ['notify_user']) : data;
     try {
       resp = await indicoAxios.post(submitUrl, formData);
     } catch (err) {

@@ -20,10 +20,12 @@ import {handleAxiosError} from '../../utils/axios';
 import {handleSubmissionError} from './errors';
 import {FinalUnloadPrompt} from './unload';
 
-export function getChangedValues(data, form) {
+export function getChangedValues(data, form, always = []) {
   const fields = form.getRegisteredFields().filter(x => !x.includes('['));
   return _.fromPairs(
-    fields.filter(name => form.getFieldState(name).dirty).map(name => [name, data[name]])
+    fields
+      .filter(name => form.getFieldState(name).dirty || always.includes(name))
+      .map(name => [name, data[name]])
   );
 }
 

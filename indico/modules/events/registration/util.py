@@ -191,6 +191,8 @@ def get_form_registration_data(regform, registration, *, management=False):
             registration_data[item.html_field_name] = camelize_keys(data_by_field[item.id].user_data)
         else:
             registration_data[item.html_field_name] = item.field_impl.default_value
+    if management:
+        registration_data['notify_user'] = session.get('registration_notify_user_default', True)
     return registration_data
 
 
