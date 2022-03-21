@@ -10,8 +10,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import 'indico/legacy/angular';
-
 import './invitations';
 import './reglists';
 
