@@ -217,7 +217,7 @@ class BooleanFieldSetupSchema(LimitedPlacesBillableFieldDataSchema):
         saved as 'yes'/'no'/'' instead of True/False/None where the latter
         is used for the actual value of the field.
         """
-        data['default_value'] = {True: 'yes', False: 'no'}.get(data['default_value'], '')
+        data['default_value'] = {True: 'yes', False: 'no'}.get(data.get('default_value'), '')
         return data
 
 
