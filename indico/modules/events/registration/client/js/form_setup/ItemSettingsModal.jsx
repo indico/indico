@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {FormSpy} from 'react-final-form';
 import {useSelector, useDispatch} from 'react-redux';
-import {Message} from 'semantic-ui-react';
+import {Icon, Message} from 'semantic-ui-react';
 
 import {
   FinalCheckbox,
@@ -90,7 +90,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
       initialValuesEqual={_.isEqual}
       unloadPrompt
       size={meta.settingsModalSize || 'tiny'}
-      decorators={meta.settingsFormDecorator ? [meta.settingsFormDecorator] : undefined}
+      decorators={meta.settingsFormDecorators ? meta.settingsFormDecorators : undefined}
       validate={meta.settingsFormValidator}
       header={
         editing ? (
@@ -147,17 +147,36 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
           )}
           {SettingsComponent && <SettingsComponent {...itemData} />}
           {!meta.noRetentionPeriod && !fieldIsRequired && (
-            <FinalInput
-              name="retentionPeriod"
-              type="number"
-              placeholder={Translate.string('Permanent')}
-              step="1"
-              min="1"
-              validate={v.optional(v.min(0))}
-              parse={val => (val === '' ? 0 : val)}
-              format={val => (val === 0 ? '' : val)}
-              label={Translate.string('Retention period (weeks)')}
-            />
+            <>
+              <FinalInput
+                name="retentionPeriod"
+                type="number"
+                placeholder={Translate.string('Permanent')}
+                step="1"
+                min="1"
+                validate={v.optional(v.min(0))}
+                parse={val => (val === '' ? 0 : val)}
+                format={val => (val === 0 ? '' : val)}
+                label={Translate.string('Retention period (weeks)')}
+              />
+              <FormSpy subscription={{values: true}}>
+                {({values}) =>
+                  (!!values.price || values.isPriceSet) && !!values.retentionPeriod ? (
+                    <Message visible icon warning>
+                      <Icon name="warning" />
+                      <Message.Content>
+                        <Translate>
+                          Please note that invoice information will be lost as well once a field's
+                          retention period expires.
+                        </Translate>
+                      </Message.Content>
+                    </Message>
+                  ) : (
+                    ''
+                  )
+                }
+              </FormSpy>
+            </>
           )}
           {isUnsupportedField && (
             <Message visible warning>
