@@ -28,6 +28,7 @@ class GeneralFieldDataSchema(mm.Schema):
     title = fields.String(required=True, validate=not_empty)
     description = fields.String(load_default='')
     is_required = fields.Bool(load_default=False)
+    retention_period = fields.TimeDelta(load_default=None, precision=fields.TimeDelta.WEEKS)
     input_type = fields.String(required=True, validate=not_empty)
 
     @validates('input_type')
@@ -41,6 +42,15 @@ class GeneralFieldDataSchema(mm.Schema):
         if input_type not in get_field_types():
             raise ValidationError('Invalid field type')
 
+    @validates('retention_period')
+    def _check_retention_period(self, retention_period, **kwargs):
+        field = self.context['field']
+        if retention_period is not None:
+            if retention_period.days < 7:
+                raise ValidationError('Retention period must be at least 1 week')
+            if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.is_required:
+                raise ValidationError('Cannot add retention period to required field')
+
     @post_load(pass_original=True)
     def _split_unknown(self, data, original_data, **kwargs):
         parsed = {k: v for k, v in data.items() if k in self.load_fields}
@@ -50,7 +60,7 @@ class GeneralFieldDataSchema(mm.Schema):
 
 class TextDataSchema(GeneralFieldDataSchema):
     class Meta(GeneralFieldDataSchema.Meta):
-        exclude = ('is_required', 'input_type')
+        exclude = ('is_required', 'retention_period', 'input_type')
 
 
 def _fill_form_field_with_data(field, field_data, is_static_text=False):

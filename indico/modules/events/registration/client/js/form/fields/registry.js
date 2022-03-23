@@ -15,6 +15,7 @@ import AccommodationInput, {
 } from './AccommodationInput';
 import BooleanInput, {BooleanSettings} from './BooleanInput';
 import CheckboxInput, {CheckboxSettings} from './CheckboxInput';
+import {choiceFieldsSettingsFormDecorator} from './ChoicesSetup';
 import CountryInput from './CountryInput';
 import DateInput, {
   DateSettings,
@@ -46,7 +47,7 @@ Available keys:
 - settingsComponent: optional; used if the field has custom settings
 - settingsModalSize: optional; used if the field has settings which benefit
   from a larger modal size than "tiny"
-- settingsFormDecorator: optional; a final-form decorator to apply to the
+- settingsFormDecorators: optional; the final-form decorators to apply to the
   settings form
 - settingsFormValidator: optional, a function for final-form's form-level validation
 - settingsFormInitialData: optional; initial data to use when creating a new
@@ -56,6 +57,7 @@ Available keys:
 - noRequired: optional; hide the option to make the field required
 - alwaysRequired: optional; always display the field as required
 - hasPrice: optional; show price field if the whole field can have a price attached
+- noRetentionPeriod: optional; hide the retention period setting
 */
 
 const fieldRegistry = {
@@ -63,6 +65,7 @@ const fieldRegistry = {
     title: Translate.string('Static label'),
     inputComponent: LabelInput,
     noRequired: true,
+    noRetentionPeriod: true,
     noLabel: true,
     icon: 'tag',
     customFormItem: true,
@@ -100,7 +103,7 @@ const fieldRegistry = {
     title: Translate.string('Date'),
     inputComponent: DateInput,
     settingsComponent: DateSettings,
-    settingsFormDecorator: dateSettingsFormDecorator,
+    settingsFormDecorators: [dateSettingsFormDecorator],
     settingsFormInitialData: dateSettingsInitialData,
     icon: 'calendar',
   },
@@ -136,7 +139,7 @@ const fieldRegistry = {
     inputComponent: SingleChoiceInput,
     settingsComponent: SingleChoiceSettings,
     settingsModalSize: 'small',
-    settingsFormDecorator: singleChoiceSettingsFormDecorator,
+    settingsFormDecorators: [choiceFieldsSettingsFormDecorator, singleChoiceSettingsFormDecorator],
     settingsFormInitialData: singleChoiceSettingsInitialData,
     icon: 'dropmenu',
   },
@@ -145,6 +148,7 @@ const fieldRegistry = {
     inputComponent: MultiChoiceInput,
     settingsComponent: MultiChoiceSettings,
     settingsModalSize: 'small',
+    settingsFormDecorators: [choiceFieldsSettingsFormDecorator],
     settingsFormInitialData: multiChoiceSettingsInitialData,
     icon: 'list',
   },
@@ -153,6 +157,7 @@ const fieldRegistry = {
     inputComponent: AccommodationInput,
     settingsComponent: AccommodationSettings,
     settingsModalSize: 'small',
+    settingsFormDecorators: [choiceFieldsSettingsFormDecorator],
     settingsFormInitialData: accommodationSettingsInitialData,
     settingsFormValidator: accommodationSettingsFormValidator,
     noRequired: true,

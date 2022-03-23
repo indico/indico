@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import createDecorator from 'final-form-calculate';
 import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -15,6 +16,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 
 import {getCurrency} from '../../form/selectors';
+
 import './ChoicesSetup.module.scss';
 
 export const choiceShape = {
@@ -137,6 +139,11 @@ Choices.defaultProps = {
   withExtraSlots: false,
   forAccommodation: false,
 };
+
+export const choiceFieldsSettingsFormDecorator = createDecorator({
+  field: 'choices',
+  updates: choices => ({isPriceSet: choices.some(c => c.price)}),
+});
 
 function Choice({
   withExtraSlots,

@@ -10,7 +10,7 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import {Form, Icon, Popup} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Markdown, toClasses} from 'indico/react/util';
 
 import {getManagement, isPaidItemLocked} from '../form_submission/selectors';
@@ -41,6 +41,7 @@ PaidItemLocked.propTypes = {
 export default function FormItem({
   title,
   description,
+  retentionPeriod,
   inputType,
   isEnabled,
   isRequired,
@@ -77,7 +78,20 @@ export default function FormItem({
             />
           ) : (
             <Form.Field required={isRequired || meta.alwaysRequired} styleName="field">
-              <label style={disabled ? {opacity: 0.8} : null}>{title}</label>
+              <label style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}>{title}</label>
+              {setupMode && !!retentionPeriod && (
+                <Icon
+                  name="clock outline"
+                  color="red"
+                  style={{marginLeft: '3px'}}
+                  title={PluralTranslate.string(
+                    'Field data will be purged {retentionPeriod} week after the event ended.',
+                    'Field data will be purged {retentionPeriod} weeks after the event ended.',
+                    retentionPeriod,
+                    {retentionPeriod}
+                  )}
+                />
+              )}
               <InputComponent
                 isRequired={isRequired || meta.alwaysRequired}
                 disabled={disabled}
@@ -108,6 +122,8 @@ FormItem.propTypes = {
   position: PropTypes.number.isRequired,
   /** Whether the field is required during registration */
   isRequired: PropTypes.bool,
+  /** The retention period of the field's data in weeks */
+  retentionPeriod: PropTypes.number,
   /** Whether the field is a special "personal data" field */
   fieldIsPersonalData: PropTypes.bool,
   /** Whether the field cannot be disabled */
@@ -129,6 +145,7 @@ FormItem.defaultProps = {
   fieldIsPersonalData: false,
   fieldIsRequired: false,
   isRequired: false,
+  retentionPeriod: null,
   htmlName: null,
   sortHandle: null,
   setupMode: false,
