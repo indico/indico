@@ -45,7 +45,12 @@ def delete_field_data():
         logger.info('Purging fields from registration %r: %r', regform, fields)
         for data in regform_data:
             logger.debug('Deleting registration field data: %r', data)
-            data.data = None
+            # Overwrite with the field's default value.
+            # This is cleaner than setting the data to 'None' since some fields
+            # expect structured data e.g. Accommodation & {Single,Multi}Choice.
+            # This makes the React code relatively simple and we can always distinguish
+            # purged fields since they have the 'is_purged' flag set to True
+            data.data = data.field_data.field.field_impl.default_value
             if data.field_data.field.field_impl.is_file_field:
                 logger.debug('Deleting file: %s', data.filename)
                 try:

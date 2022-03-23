@@ -32,6 +32,7 @@ function AccommodationInputComponent({
   value,
   onChange,
   disabled,
+  isPurged,
   choices,
   arrival,
   departure,
@@ -114,7 +115,7 @@ function AccommodationInputComponent({
                           (placesUsed[c.id] || 0) >= c.placesLimit &&
                           c.id !== existingValue.choice)
                       }
-                      checked={c.id === value.choice}
+                      checked={!isPurged && c.id === value.choice}
                       onChange={makeHandleChange(c)}
                     />
                   </td>
@@ -177,6 +178,7 @@ AccommodationInputComponent.propTypes = {
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
+  isPurged: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   arrival: PropTypes.shape({
     startDate: PropTypes.string.isRequired,
@@ -195,6 +197,7 @@ export default function AccommodationInput({
   htmlName,
   disabled,
   isRequired,
+  isPurged,
   choices,
   arrival,
   departure,
@@ -208,6 +211,7 @@ export default function AccommodationInput({
       component={AccommodationInputComponent}
       required={isRequired}
       disabled={disabled}
+      isPurged={isPurged}
       choices={choices}
       arrival={arrival}
       departure={departure}
@@ -229,6 +233,7 @@ AccommodationInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
+  isPurged: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   arrival: PropTypes.shape({
     startDate: PropTypes.string.isRequired,

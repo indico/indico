@@ -93,6 +93,7 @@ export default function FormItem({
             <InputComponent
               isRequired={isRequired || meta.alwaysRequired}
               disabled={disabled}
+              isPurged={isPurged}
               {...inputProps}
             />
           ) : (
@@ -114,6 +115,7 @@ export default function FormItem({
               <InputComponent
                 isRequired={isRequired || meta.alwaysRequired}
                 disabled={disabled}
+                isPurged={isPurged}
                 {...inputProps}
               />
             </Form.Field>
