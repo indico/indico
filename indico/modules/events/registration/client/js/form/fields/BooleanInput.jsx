@@ -147,7 +147,7 @@ export function BooleanSettings() {
         step="1"
         min="1"
         validate={v.optional(v.min(0))}
-        parse={val => (val === '' ? 0 : val)}
+        parse={val => (val === '' ? 0 : +val)}
         format={val => (val === 0 ? '' : val)}
       />
       <FinalDropdown
