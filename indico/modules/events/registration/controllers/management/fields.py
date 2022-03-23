@@ -28,7 +28,7 @@ class GeneralFieldDataSchema(mm.Schema):
     title = fields.String(required=True, validate=not_empty)
     description = fields.String(load_default='')
     is_required = fields.Bool(load_default=False)
-    retention_period = fields.TimeDelta(load_default=None, precision='weeks')
+    retention_period = fields.TimeDelta(load_default=None, precision=fields.TimeDelta.WEEKS)
     input_type = fields.String(required=True, validate=not_empty)
 
     @pre_load
@@ -53,10 +53,11 @@ class GeneralFieldDataSchema(mm.Schema):
     @validates('retention_period')
     def _check_retention_period(self, retention_period, **kwargs):
         field = self.context['field']
-        if (retention_period
-                and field.type == RegistrationFormItemType.field_pd
-                and field.personal_data_type.is_required):
-            raise ValidationError('Cannot add retention period to required field')
+        if retention_period is not None:
+            if retention_period.days < 7:
+                raise ValidationError('Retention period must be at least 1 week')
+            if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.is_required:
+                raise ValidationError('Cannot add retention period to required field')
 
     @post_load(pass_original=True)
     def _split_unknown(self, data, original_data, **kwargs):

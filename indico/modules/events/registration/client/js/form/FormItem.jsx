@@ -145,7 +145,7 @@ FormItem.defaultProps = {
   fieldIsPersonalData: false,
   fieldIsRequired: false,
   isRequired: false,
-  retentionPeriod: 0,
+  retentionPeriod: null,
   htmlName: null,
   sortHandle: null,
   setupMode: false,
