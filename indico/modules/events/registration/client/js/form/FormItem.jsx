@@ -76,13 +76,14 @@ export default function FormItem({
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
-  const disabled = !isEnabled || isPurged || (paidItemLocked && !isManagement);
+  const showPurged = !setupMode && isPurged;
+  const disabled = !isEnabled || showPurged || (paidItemLocked && !isManagement);
   return (
     <div
       styleName={`form-item ${toClasses({
         'disabled': !isEnabled || paidItemLocked,
-        'purged-disabled': isPurged,
-        'paid-disabled': !isPurged && paidItemLocked,
+        'purged-disabled': showPurged,
+        'paid-disabled': !showPurged && paidItemLocked,
         'editable': setupMode,
       })}`}
     >
@@ -93,7 +94,7 @@ export default function FormItem({
             <InputComponent
               isRequired={isRequired || meta.alwaysRequired}
               disabled={disabled}
-              isPurged={isPurged}
+              isPurged={showPurged}
               {...inputProps}
             />
           ) : (
@@ -115,7 +116,7 @@ export default function FormItem({
               <InputComponent
                 isRequired={isRequired || meta.alwaysRequired}
                 disabled={disabled}
-                isPurged={isPurged}
+                isPurged={showPurged}
                 {...inputProps}
               />
             </Form.Field>
@@ -130,8 +131,8 @@ export default function FormItem({
         )}
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
-      {isPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
-      {!isPurged && paidItemLocked && <PaidItemLocked management={isManagement} />}
+      {showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
+      {!showPurged && paidItemLocked && <PaidItemLocked management={isManagement} />}
     </div>
   );
 }
