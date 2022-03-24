@@ -473,7 +473,8 @@ class Registration(db.Model):
                 for field in section.fields:
                     if not field.is_visible:
                         continue
-                    summary[section][field] = field_summary[field]
+                    if field in field_summary:
+                        summary[section][field] = field_summary[field]
 
         def _fill_from_registration():
             for field, data in field_summary.items():
