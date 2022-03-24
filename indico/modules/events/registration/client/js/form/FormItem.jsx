@@ -78,6 +78,24 @@ export default function FormItem({
   const inputProps = {title, description, isRequired, isEnabled, ...rest};
   const showPurged = !setupMode && isPurged;
   const disabled = !isEnabled || showPurged || (paidItemLocked && !isManagement);
+
+  let retentionPeriodIcon = null;
+  if (setupMode && retentionPeriod) {
+    retentionPeriodIcon = (
+      <Icon
+        name="clock outline"
+        color="red"
+        style={{marginLeft: '3px'}}
+        title={PluralTranslate.string(
+          'Field data will be purged {retentionPeriod} week after the event ended.',
+          'Field data will be purged {retentionPeriod} weeks after the event ended.',
+          retentionPeriod,
+          {retentionPeriod}
+        )}
+      />
+    );
+  }
+
   return (
     <div
       styleName={`form-item ${toClasses({
@@ -95,24 +113,13 @@ export default function FormItem({
               isRequired={isRequired || meta.alwaysRequired}
               disabled={disabled}
               isPurged={showPurged}
+              retentionPeriodIcon={retentionPeriodIcon}
               {...inputProps}
             />
           ) : (
             <Form.Field required={isRequired || meta.alwaysRequired} styleName="field">
               <label style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}>{title}</label>
-              {setupMode && !!retentionPeriod && (
-                <Icon
-                  name="clock outline"
-                  color="red"
-                  style={{marginLeft: '3px'}}
-                  title={PluralTranslate.string(
-                    'Field data will be purged {retentionPeriod} week after the event ended.',
-                    'Field data will be purged {retentionPeriod} weeks after the event ended.',
-                    retentionPeriod,
-                    {retentionPeriod}
-                  )}
-                />
-              )}
+              {retentionPeriodIcon}
               <InputComponent
                 isRequired={isRequired || meta.alwaysRequired}
                 disabled={disabled}

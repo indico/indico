@@ -30,6 +30,7 @@ export default function CheckboxInput({
   price,
   placesLimit,
   placesUsed,
+  retentionPeriodIcon,
 }) {
   const currency = useSelector(getCurrency);
   const existingValue = useSelector(state => getFieldValue(state, id));
@@ -42,6 +43,7 @@ export default function CheckboxInput({
       disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
       required={isRequired}
     >
+      {retentionPeriodIcon}
       {!!price && (
         <Field name={htmlName} subscription={{value: true}}>
           {({input: {value: checked}}) => (
@@ -69,11 +71,13 @@ CheckboxInput.propTypes = {
   price: PropTypes.number,
   placesLimit: PropTypes.number.isRequired,
   placesUsed: PropTypes.number.isRequired,
+  retentionPeriodIcon: PropTypes.element,
 };
 
 CheckboxInput.defaultProps = {
   disabled: false,
   price: 0,
+  retentionPeriodIcon: null,
 };
 
 export function CheckboxSettings() {
