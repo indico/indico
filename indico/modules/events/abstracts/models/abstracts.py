@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from itertools import chain
 from operator import attrgetter
 
@@ -453,11 +453,16 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return AbstractReviewingState.mixed
 
     @property
+    def scores(self):
+        sums = sum((Counter(x.scores) for x in self.reviews), Counter())
+        lens = sum((Counter(x.scores.keys()) for x in self.reviews), Counter())
+        return {k: v / lens[k] for k, v in sums.items()}
+
+    @property
     def score(self):
-        scores = [x.score for x in self.reviews if x.score is not None]
-        if not scores:
+        if not (scores := self.scores):
             return None
-        return sum(scores) / len(scores)
+        return sum(scores.values()) / len(scores)
 
     @property
     def data_by_field(self):

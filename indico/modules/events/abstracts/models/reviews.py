@@ -171,12 +171,15 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
         return AbstractCommentVisibility.conveners
 
     @property
+    def scores(self):
+        return {r.question.id: r.value for r in self.ratings
+                if not r.question.no_score and not r.question.is_deleted and r.value is not None}
+
+    @property
     def score(self):
-        ratings = [r for r in self.ratings if not r.question.no_score and not r.question.is_deleted and
-                   r.value is not None]
-        if not ratings:
+        if not (ratings := self.scores):
             return None
-        return sum(x.value for x in ratings) / len(ratings)
+        return sum(x for x in ratings.values()) / len(ratings)
 
     def can_edit(self, user, check_state=False):
         if user is None:
