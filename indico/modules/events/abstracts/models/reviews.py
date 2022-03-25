@@ -172,7 +172,7 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 
     @property
     def scores(self):
-        return {r.question.id: r.value for r in self.ratings
+        return {r.question: r.value for r in self.ratings
                 if not r.question.no_score and not r.question.is_deleted and r.value is not None}
 
     @property
