@@ -44,23 +44,13 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_score(questions, scores, rating_range, classes='i-tag small') %}
+{% macro render_score(score, rating_range, classes='i-tag outline') %}
+    {% set score = score|round(1) %}
     {% set max_score = rating_range[1]|round(1) %}
-    <ul class="review-questions" style="margin-bottom: 1em">
-        {% for question in questions %}
-            {% if question.id in scores %}
-                {% set score = scores[question.id]|round(1) %}
-                <li class="flexrow f-a-center">
-                    <span class="question-index">{{ question.id }}</span>
-                    <span class="question-text f-self-stretch">{{ question.title }}</span>
-                    <span class="highlight {{ classes }}"
-                          title="{% trans %}Score: {{ score }} / {{ max_score }}{% endtrans %}">
-                        {{ score }}
-                    </span>
-                </li>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    <span class="highlight {{ classes }}"
+          title="{% trans %}Score: {{ score }} / {{ max_score }}{% endtrans %}">
+        {{ score }}
+    </span>
 {% endmacro %}
 
 {% macro render_visibility_hint(visibility) %}

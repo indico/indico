@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import Counter, defaultdict
+from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
@@ -453,16 +453,11 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return AbstractReviewingState.mixed
 
     @property
-    def scores(self):
-        sums = sum((Counter(x.scores) for x in self.reviews), Counter())
-        lens = sum((Counter(x.scores.keys()) for x in self.reviews), Counter())
-        return {k: v / lens[k] for k, v in sums.items()}
-
-    @property
     def score(self):
-        if not (scores := self.scores):
+        scores = [x.score for x in self.reviews if x.score is not None]
+        if not scores:
             return None
-        return sum(scores.values()) / len(scores)
+        return sum(scores) / len(scores)
 
     @property
     def data_by_field(self):
@@ -647,7 +642,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
                  .join(AbstractReviewRating.question)
                  .filter(AbstractReview.abstract == self,
                          AbstractReviewQuestion.field_type == 'rating',
-                         db.func.jsonb_typeof(AbstractReviewRating.value) == 'null',
+                         db.func.jsonb_typeof(AbstractReviewRating.value) != 'null',
                          ~AbstractReviewQuestion.is_deleted,
                          ~AbstractReviewQuestion.no_score)
                  .group_by(AbstractReview.track_id, AbstractReviewQuestion.id))

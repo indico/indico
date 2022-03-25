@@ -59,12 +59,12 @@
             {% if can_judge or visible_tracks.issuperset(abstract.reviewed_for_tracks) %}
                 <div class="global-review-summary flexrow f-a-center">
                     {{ _render_abstract_reviewing_state(abstract) }}
-                </div>
-                {% if abstract.score is not none %}
-                    <div class="group-review-summary__summary">
-                        {{ render_score(event.abstract_review_questions, abstract.scores, event.cfa.rating_range) }}
+                    <div class="abstract-comment-badges flexrow f-a-center">
+                        {% if abstract.score is not none %}
+                            {{ render_score(abstract.score, event.cfa.rating_range, classes='i-tag') }}
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
             {% else %}
                 <div class="global-review-summary flexrow f-a-center">
                     <div class="summary-title">
@@ -100,6 +100,9 @@
                                 </a>
                             {% endif %}
                         {% endif %}
+                        {% if score is not none %}
+                            {{ render_score(score, event.cfa.rating_range) }}
+                        {% endif %}
                     </div>
                     {% if has_reviews %}
                         <div class="group-review-summary__details">
@@ -111,6 +114,9 @@
                                                 <span class="question-index">{{ loop.index }}</span>
                                             </div>
                                             <div class="question-text f-self-stretch">{{ question.title }}</div>
+                                            {% if score is not none %}
+                                                {{ render_score(score, abstract.event.cfa.rating_range) }}
+                                            {% endif %}
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -128,9 +134,9 @@
                                                class="group-review-summary__link js-highlight-review">
                                                 {%- trans %}See review{% endtrans -%}
                                             </a>
-{#                                            {% if review.score is not none %}#}
-{#                                                {{ render_score(event.abstract_review_questions, review.score, abstract.event.cfa.rating_range) }}#}
-{#                                            {% endif %}#}
+                                            {% if review.score is not none %}
+                                                {{ render_score(review.score, abstract.event.cfa.rating_range) }}
+                                            {% endif %}
                                         </div>
                                     {% endfor %}
                                 </div>

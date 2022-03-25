@@ -12,10 +12,6 @@
   font-weight: bold;
   box-sizing: initial;
 
-  &.small {
-    padding: 0 0.5em;
-  }
-
   &.outline {
     @extend %semantic-outline;
     background: transparent;
