@@ -57,9 +57,10 @@ class RHEditingUploadContributionFile(RHEditingUploadFile):
     def _process(self, id):
         files = []
         if self.contrib.editables:
-            files = [file.file for e in self.contrib.editables for file in e.revisions[-1].files]
+            files = [file.file for e in self.contrib.editables
+                     if e.type == self.editable.type for file in e.revisions[-1].files]
         if self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
-            files += [f for f in last_rev.files]
+            files.extend(last_rev.files)
         if found := next((f for f in files if f.id == id), None):
             with found.open() as stream:
                 return self._save_file(found, stream)
