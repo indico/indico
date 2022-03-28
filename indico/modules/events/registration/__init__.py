@@ -16,6 +16,7 @@ from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.logging import connect_log_signals
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.util.signals import values_from_signal
@@ -113,6 +114,12 @@ def _extend_event_menu(sender, **kwargs):
 
     def _visible_participant_list(event):
         if not event.has_feature('registration'):
+            return False
+        if not (RegistrationForm.query.with_parent(event)
+                .filter(RegistrationForm.publish_registrations_participants > PublishRegistrationsMode.hide_all
+                        if event.is_user_registered(session.user)
+                        else RegistrationForm.publish_registrations_public > PublishRegistrationsMode.hide_all)
+                .has_rows()):
             return False
         return not any(values_from_signal(signals.event.hide_participant_list.send(event)))
 

@@ -55,6 +55,7 @@
 
 {% macro participant_table(table) %}
     <section>
+        {% set hidden_participants = table.num_participants - table.rows|length %}
         {% if table.title %}
             <div class="header">
                 <div class="header-row">
@@ -69,11 +70,18 @@
                     {% for row in table.rows %}
                         {{ table_row(row, table.show_checkin) }}
                     {% endfor %}
+                    {% if hidden_participants %}
+                        <tr class="i-table">
+                            <td class="i-table empty" colspan="{{ table.headers|length+1 if table.show_checkin else table.headers|length }}">
+                                {% trans num=hidden_participants %}{{ num }} more participant{% pluralize %}{{ num }} more participants{% endtrans %}
+                            </td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         {% elif table.num_participants %}
             {% call message_box('info', fixed_width=true) %}
-                {% trans %}There are no published registrations.{% endtrans %}
+                {% trans num=hidden_participants %}There is {{ num }} hidden participant{% pluralize %}There are {{ num }} hidden participants{% endtrans %}
             {% endcall %}
         {% else %}
             {% call message_box('info', fixed_width=true) %}
@@ -90,7 +98,7 @@
         {% endcall %}
     {% elif not num_participants %}
         {% call message_box('info', fixed_width=true) %}
-            {% trans %}There are no participants yet.{% endtrans %}
+            {% trans %}There are no registrations yet.{% endtrans %}
         {% endcall %}
     {% else %}
         <div class="registrations list">

@@ -22,7 +22,8 @@ from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
+                                                                     RegistrationState)
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
                                                      get_initial_form_values, get_user_data, make_registration_schema)
@@ -139,13 +140,13 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         headers = [PersonalDataType[column_name].get_title() for column_name in column_names]
 
         query = (Registration.query.with_parent(self.event)
-                 .filter(Registration.is_publishable(self.event.is_user_registered(session.user)),
-                         ~RegistrationForm.is_deleted,
-                         ~Registration.is_deleted)
+                 .filter(~RegistrationForm.is_deleted, ~Registration.is_deleted)
                  .join(Registration.registration_form)
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form')))
-        registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in query),
+        is_participant = self.event.is_user_registered(session.user)
+        registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
+                                                     for reg in query if reg.is_publishable(is_participant)),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']))
         return {'headers': headers,
                 'rows': registrations,
@@ -214,9 +215,10 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             # There might be forms that have not been sorted by the user yet
             tables.extend(map(self._participant_list_table, regforms_dict.values()))
 
-        is_participant = self.event.is_user_registered(session.user)
         published = (RegistrationForm.query.with_parent(self.event)
-                     .filter(RegistrationForm.registrations.any(Registration.is_publishable(is_participant)))
+                     .filter(RegistrationForm.publish_registrations_participants > PublishRegistrationsMode.hide_all
+                             if self.event.is_user_registered(session.user)
+                             else RegistrationForm.publish_registrations_public > PublishRegistrationsMode.hide_all)
                      .has_rows())
         num_participants = sum(table['num_participants'] for table in tables)
 
