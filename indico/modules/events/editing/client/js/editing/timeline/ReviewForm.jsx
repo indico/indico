@@ -15,6 +15,7 @@ import {Dropdown} from 'semantic-ui-react';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
 
 import {EditingReviewAction} from '../../models';
 
@@ -69,9 +70,19 @@ export default function ReviewForm({block}) {
     if (rv.error) {
       return rv.error;
     }
-
     setTimeout(() => form.reset(), 0);
   };
+
+  const onSubmit = (type, formData) =>
+    indicoAxios.post(
+      submitRevisionURL({
+        event_id: eventId,
+        contrib_id: contribution.id,
+        type,
+        revision_id: lastRevision.id,
+      }),
+      formData
+    );
 
   const judgmentForm = (
     <div className="flexrow" styleName="judgment-form">
@@ -88,12 +99,7 @@ export default function ReviewForm({block}) {
             fileTypes={{[editableType]: fileTypes}}
             uploadableFiles={lastRevision.files}
             text={Translate.string('Submit files')}
-            submitURL={submitRevisionURL({
-              event_id: eventId,
-              contrib_id: contribution.id,
-              type: editableType,
-              revision_id: lastRevision.id,
-            })}
+            onSubmit={onSubmit}
           />
         </>
       )}

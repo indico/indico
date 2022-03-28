@@ -33,15 +33,19 @@ export default function EditableSubmissionButton({
   fileTypes,
   uploadableFiles,
   text,
-  submitURL,
+  onSubmit,
 }) {
   const [currentType, setCurrentType] = useState(null);
   const submitRevision = async formData => {
     try {
-      const url =
-        submitURL ||
-        submitRevisionURL({event_id: eventId, contrib_id: contributionId, type: currentType});
-      await indicoAxios.post(url, formData);
+      if (onSubmit) {
+        await onSubmit(currentType, formData);
+      } else {
+        await indicoAxios.put(
+          submitRevisionURL({event_id: eventId, contrib_id: contributionId, type: currentType}),
+          formData
+        );
+      }
     } catch (e) {
       return handleSubmitError(e);
     }
@@ -137,11 +141,11 @@ EditableSubmissionButton.propTypes = {
   contributionId: PropTypes.number.isRequired,
   contributionCode: PropTypes.string.isRequired,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
-  submitURL: PropTypes.string,
+  onSubmit: PropTypes.func,
 };
 
 EditableSubmissionButton.defaultProps = {
   text: undefined,
   uploadableFiles: [],
-  submitURL: undefined,
+  onSubmit: undefined,
 };
