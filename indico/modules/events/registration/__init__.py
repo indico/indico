@@ -16,7 +16,6 @@ from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.logging import connect_log_signals
-from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.util.signals import values_from_signal
@@ -88,8 +87,13 @@ def _inject_event_header(event, **kwargs):
                                                                                   include_scheduled=False)
         # A participant could appear more than once in the list in case he register to multiple registration form.
         # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
-        return render_template('events/registration/display/event_header.html', event=event,
-                               regforms=displayed_regforms, user_registrations=user_registrations)
+        return render_template(
+            'events/registration/display/event_header.html',
+            regforms=displayed_regforms,
+            user_registrations=user_registrations,
+            published_registrations=event.get_published_registrations(session.user),
+            num_hidden_registrations=event.count_hidden_registrations(session.user)
+        )
 
 
 @signals.event.sidemenu.connect
@@ -116,9 +120,7 @@ def _extend_event_menu(sender, **kwargs):
         if not event.has_feature('registration'):
             return False
         if not (RegistrationForm.query.with_parent(event)
-                .filter(RegistrationForm.publish_registrations_participants > PublishRegistrationsMode.hide_all
-                        if event.is_user_registered(session.user)
-                        else RegistrationForm.publish_registrations_public > PublishRegistrationsMode.hide_all)
+                .filter(RegistrationForm.is_participant_list_visible(event.is_user_registered(session.user)))
                 .has_rows()):
             return False
         return not any(values_from_signal(signals.event.hide_participant_list.send(event)))

@@ -12,7 +12,7 @@ from flask import session
 from sqlalchemy import orm, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, subqueryload
 from werkzeug.exceptions import BadRequest
 
@@ -411,6 +411,20 @@ class RegistrationForm(db.Model):
     def needs_publish_consent(self):
         return (self.publish_registrations_participants == PublishRegistrationsMode.show_with_consent or
                 self.publish_registrations_public == PublishRegistrationsMode.show_with_consent)
+
+    @hybrid_method
+    def is_participant_list_visible(self, is_participant):
+        if self.is_deleted:
+            return False
+        if is_participant:
+            return self.publish_registrations_participants != PublishRegistrationsMode.hide_all
+        return self.publish_registrations_public != PublishRegistrationsMode.hide_all
+
+    @is_participant_list_visible.expression
+    def is_participant_list_visible(cls, is_participant):
+        if is_participant:
+            return ~cls.is_deleted & (cls.publish_registrations_participants != PublishRegistrationsMode.hide_all)
+        return ~cls.is_deleted & (cls.publish_registrations_public != PublishRegistrationsMode.hide_all)
 
     def __repr__(self):
         return f'<RegistrationForm({self.id}, {self.event_id}, {self.title})>'

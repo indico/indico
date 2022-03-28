@@ -76,13 +76,13 @@
     </div>
 {% endif %}
 
-{% if event.get_published_registrations(session.user) %}
+{% if published_registrations %}
     <div class="event-details-row">
         <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
         <div class="event-details-content">
             <div class="participant-list-wrapper">
                 <ul class="participant-list">
-                    {%- for participant in event.get_published_registrations(session.user)|sort(attribute='display_full_name') -%}
+                    {%- for participant in published_registrations|sort(attribute='display_full_name') -%}
                         <li class="ui image label meeting-participant {% if participant.checked_in and participant.registration_form.publish_checkin_enabled %} checked-in {% endif %}">
                             {%- if not g.static_site -%}
                                 <img src="{{ participant.avatar_url }}" alt="">
@@ -90,9 +90,21 @@
                             {{ participant.display_full_name }}
                         </li>
                     {%- endfor -%}
+                    {%- if num_hidden_registrations -%}
+                        <li class="ui circular label" title="{% trans num=num_hidden_registrations %}{{ num }} more participant{% pluralize %}{{ num }} more participants{% endtrans %}">
+                            +{{ num_hidden_registrations }}
+                        </li>
+                    {%- endif -%}
                 </ul>
                 <a class="trigger icon-expand" title="{% trans %}See the full list{% endtrans %}"></a>
             </div>
+        </div>
+    </div>
+{% elif num_hidden_registrations %}
+    <div class="event-details-row">
+        <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
+        <div class="event-details-content">
+            {{ num_hidden_registrations }}
         </div>
     </div>
 {% endif %}
