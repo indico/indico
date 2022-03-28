@@ -55,7 +55,7 @@ export default function ReviewForm({block}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
   const canJudge = useSelector(canJudgeLastRevision);
-  const {editor, contribution} = useSelector(getDetails);
+  const {canPerformSubmitterActions, contribution} = useSelector(getDetails);
   const {eventId, editableType, fileTypes} = useSelector(getStaticData);
   const currentUser = {
     fullName: Indico.User.fullName,
@@ -87,7 +87,7 @@ export default function ReviewForm({block}) {
   const judgmentForm = (
     <div className="flexrow" styleName="judgment-form">
       <CommentForm onSubmit={createComment} onToggleExpand={setCommentFormVisible} />
-      {!editor && (
+      {canPerformSubmitterActions && (
         <>
           <span className="comment-or-review">
             <Translate>or</Translate>
