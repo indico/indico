@@ -81,8 +81,9 @@ import {SingleEventMove, EventPublish} from './EventMove';
       })
       .get();
 
-    const visibleEntries = personRows.filter((idx, entry) =>
-      filters.find(filterName => $(entry).data('person-roles')[filterName])
+    const visibleEntries = personRows.filter(
+      (idx, entry) =>
+        !filters.length || filters.find(filterName => $(entry).data('person-roles')[filterName])
     );
 
     personRows.addClass('hidden');
@@ -91,10 +92,10 @@ import {SingleEventMove, EventPublish} from './EventMove';
   }
 
   function toggleResetBtn() {
-    const isInitialState =
-      $('#person-filters [data-filter]:checked').length ===
-      $('#person-filters [data-filter]:not(#filter-no-account,#filter-no-registration)').length;
-    $('.js-reset-role-filter').toggleClass('disabled', isInitialState);
+    $('.js-reset-role-filter').toggleClass(
+      'disabled',
+      $('#person-filters [data-filter]:checked').length === 0
+    );
   }
 
   function initTooltip() {
@@ -256,10 +257,8 @@ import {SingleEventMove, EventPublish} from './EventMove';
     $personFilters.find('.js-reset-role-filter').on('click', function() {
       $('.js-event-person-list [data-filter]').each(function() {
         const $this = $(this);
-        $this.prop('checked', !$this.is('#filter-no-account, #filter-no-registration'));
-        $this
-          .parent()
-          .toggleClass('enabled', !$this.is('#filter-no-account, #filter-no-registration'));
+        $this.prop('checked', false);
+        $this.parent().toggleClass('enabled', false);
       });
       refreshPersonFilters();
       applySearchFilters();
