@@ -33,6 +33,8 @@ Improvements
 - Highlight changed fields in notification emails about modified registrations
   (:issue:`5265`, :pr:`5269`)
 - Add an option to send notifications of new abstract comments (:issue:`5266`, :pr:`5284`)
+- Badge/poster templates can have additional images besides the background image
+  (:pr:`5273`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
