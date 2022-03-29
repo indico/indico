@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from itertools import chain
 from operator import attrgetter
 
@@ -18,9 +18,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
-from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
-from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractReview
+from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import AllowEditingType
 from indico.modules.events.contributions.models.contributions import CustomFieldsMixin, _get_next_friendly_id
 from indico.modules.events.contributions.models.persons import AuthorType
@@ -460,6 +458,17 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         return sum(scores) / len(scores)
 
     @property
+    def track_question_scores(self):
+        sums = defaultdict(Counter)
+        lens = defaultdict(Counter)
+        for r in self.reviews:
+            sums[r.track.id] += Counter(r.scores)
+            lens[r.track.id] += Counter(r.scores.keys())
+        return {track: {question: score / lens[track][question]
+                        for question, score in scores.items()}
+                for track, scores in sums.items()}
+
+    @property
     def data_by_field(self):
         return {value.contribution_field_id: value for value in self.field_values}
 
@@ -633,23 +642,6 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
                 return AbstractReviewingState.conflicting
         else:
             return AbstractReviewingState.mixed
-
-    def get_track_question_scores(self):
-        query = (db.session.query(AbstractReview.track_id,
-                                  AbstractReviewQuestion,
-                                  db.func.avg(AbstractReviewRating.value.op('#>>')('{}').cast(db.Integer)))
-                 .join(AbstractReviewRating.review)
-                 .join(AbstractReviewRating.question)
-                 .filter(AbstractReview.abstract == self,
-                         AbstractReviewQuestion.field_type == 'rating',
-                         db.func.jsonb_typeof(AbstractReviewRating.value) == 'null',
-                         ~AbstractReviewQuestion.is_deleted,
-                         ~AbstractReviewQuestion.no_score)
-                 .group_by(AbstractReview.track_id, AbstractReviewQuestion.id))
-        scores = defaultdict(lambda: defaultdict(lambda: None))
-        for track_id, question, score in query:
-            scores[track_id][question] = score
-        return scores
 
     def get_reviewed_for_groups(self, user, include_reviewed=False):
         already_reviewed = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()
