@@ -67,6 +67,7 @@ Improvements
 - Add setting to allow submitters to edit their own contributions (:pr:`5213`)
 - Update the editing state color scheme (:pr:`5236`)
 - Include program codes in export API (:pr:`5246`)
+- Add abstract rating scores grouped by track (:pr:`5298`)
 
 Bugfixes
 ^^^^^^^^

@@ -72,7 +72,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% set ratings = abstract.get_track_question_scores() %}
+            {% set ratings = abstract.track_question_scores %}
             {% for track in visible_tracks %}
                 {% set has_reviews = track.id in ratings %}
                 <div class="group-review-summary">
