@@ -459,10 +459,14 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
 
     @property
     def track_question_scores(self):
-        track_scores = defaultdict(Counter)
+        sums = defaultdict(Counter)
+        lens = defaultdict(Counter)
         for r in self.reviews:
-            track_scores[r.track.id] += Counter(r.scores)
-        return {track: dict(scores) for track, scores in track_scores.items()}
+            sums[r.track.id] += Counter(r.scores)
+            lens[r.track.id] += Counter(r.scores.keys())
+        return {track: {question: score / lens[track][question]
+                        for question, score in scores.items()}
+                for track, scores in sums.items()}
 
     @property
     def data_by_field(self):
