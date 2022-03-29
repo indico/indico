@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import timedelta
 from operator import itemgetter
 
 from flask import flash, redirect, session
@@ -136,7 +137,7 @@ class RHManageParticipants(RHManageRegFormsBase):
                              if self.event.type_ == EventType.lecture
                              else PublishRegistrationsMode.show_all)
         form = RegistrationFormCreateForm(title='Participants',
-                                          visibility=[participant_visibility.name, public_visibility.name])
+                                          visibility=[participant_visibility.name, public_visibility.name, None])
         if form.validate_on_submit():
             set_feature_enabled(self.event, 'registration', True)
             if not regform:
@@ -144,9 +145,11 @@ class RHManageParticipants(RHManageRegFormsBase):
                                            currency=payment_settings.get('currency'))
                 create_personal_data_fields(regform)
                 form.populate_obj(regform, skip=['visibility'])
-                participant_visibility, public_visibility = form.visibility.data
+                participant_visibility, public_visibility, visibility_duration = form.visibility.data
                 regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
                 regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
+                regform.publish_registrations_duration = (timedelta(days=visibility_duration*30)
+                                                          if visibility_duration is not None else None)
                 db.session.add(regform)
                 db.session.flush()
                 signals.event.registration_form_created.send(regform)
@@ -169,14 +172,16 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
                                   else PublishRegistrationsMode.show_all)
         public_visibility = PublishRegistrationsMode.hide_all
         form = RegistrationFormCreateForm(event=self.event,
-                                          visibility=[participant_visibility.name, public_visibility.name])
+                                          visibility=[participant_visibility.name, public_visibility.name, None])
         if form.validate_on_submit():
             regform = RegistrationForm(event=self.event, currency=payment_settings.get('currency'))
             create_personal_data_fields(regform)
             form.populate_obj(regform, skip=['visibility'])
-            participant_visibility, public_visibility = form.visibility.data
+            participant_visibility, public_visibility, visibility_duration = form.visibility.data
             regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
             regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
+            regform.publish_registrations_duration = (timedelta(days=visibility_duration*30)
+                                                      if visibility_duration is not None else None)
             db.session.add(regform)
             db.session.flush()
             signals.event.registration_form_created.send(regform)

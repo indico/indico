@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import timedelta
+
 from flask import redirect
 from flask.helpers import flash
 from marshmallow_enum import EnumField
@@ -26,12 +28,16 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
     def _process(self):
         form = RegistrationPrivacyForm(event=self.event, regform=self.regform, visibility=[
             self.regform.publish_registrations_participants.name,
-            self.regform.publish_registrations_public.name
+            self.regform.publish_registrations_public.name,
+            (self.regform.publish_registrations_duration.days // 30
+             if self.regform.publish_registrations_duration is not None else None)
         ])
         if form.validate_on_submit():
-            participant_visibility, public_visibility = form.visibility.data
+            participant_visibility, public_visibility, visibility_duration = form.visibility.data
             self.regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
             self.regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
+            self.regform.publish_registrations_duration = (timedelta(days=visibility_duration*30)
+                                                           if visibility_duration is not None else None)
             db.session.flush()
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.manage_registration_privacy_settings', self.regform))

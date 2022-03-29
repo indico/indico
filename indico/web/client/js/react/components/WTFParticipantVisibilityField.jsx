@@ -20,7 +20,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
   // Trigger change only after the DOM has changed
   useEffect(() => {
     parentElement.dispatchEvent(new Event('change', {bubbles: true}));
-  }, [participantVisibility, publicVisibility, parentElement]);
+  }, [participantVisibility, publicVisibility, visibilityDuration, parentElement]);
 
   const choiceMap = {
     hide_all: ['hide_all'],
@@ -48,7 +48,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
   return (
     <div>
       <div style={{display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px'}}>
-        <Form.Field style={{flexBasis: '49%'}}>
+        <Form.Field style={{flex: '1 49%'}}>
           <label>
             <Translate>Visibility to participants</Translate>
           </label>
@@ -67,7 +67,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
             value={participantVisibility}
           />
         </Form.Field>
-        <Form.Field style={{flexBasis: '49%'}}>
+        <Form.Field style={{flex: '1 49%'}}>
           <label>
             <Translate>Visibility to everyone</Translate>
           </label>
@@ -91,8 +91,8 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
             placeholder={Translate.string('Permanent')}
             step="1"
             min="0"
-            value={visibilityDuration}
-            onChange={(evt, {value}) => setVisibilityDuration(value)}
+            value={visibilityDuration === null ? '' : visibilityDuration}
+            onChange={(evt, {value}) => setVisibilityDuration(value === '' ? null : +value)}
             disabled={participantVisibility === 'hide_all'}
             fluid
           />
@@ -116,7 +116,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
         type="hidden"
         id={fieldId}
         name={fieldId}
-        value={JSON.stringify([participantVisibility, publicVisibility])}
+        value={JSON.stringify([participantVisibility, publicVisibility, visibilityDuration])}
       />
     </div>
   );

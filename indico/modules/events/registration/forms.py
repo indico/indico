@@ -501,7 +501,7 @@ class RegistrationPrivacyForm(IndicoForm):
         super().__init__(*args, **kwargs)
 
     def validate_visibility(self, field):
-        participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data)
+        participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data[:-1])
         if participant_visibility.value < public_visibility.value:
             raise ValidationError(_('Participant visibility can not be more restrictive for other participants than '
                                     'for the public'))
