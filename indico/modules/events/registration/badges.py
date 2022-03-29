@@ -94,10 +94,12 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             if placeholder:
                 if placeholder.group == 'registrant':
                     text = placeholder.render(registration)
-                else:
+                elif placeholder.group == 'event':
                     text = placeholder.render(registration.event)
-            elif item['text']:
-                text = item['text']
+                elif placeholder.group == 'fixed':
+                    text = placeholder.render(item)
+                else:
+                    raise ValueError(f'Unknown placeholder group: `{placeholder.group}`')
             else:
                 continue
 

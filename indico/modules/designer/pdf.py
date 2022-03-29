@@ -130,7 +130,7 @@ class DesignerPDFBase:
 
         if isinstance(content, Image.Image):
             canvas.drawImage(ImageReader(content), margin_x + item_x, self.height - margin_y - item_height - item_y,
-                             item_width, item_height)
+                             item_width, item_height, mask='auto')
         else:
             content = strip_tags(content)
             for line in content.splitlines():

@@ -7,10 +7,12 @@
 
 import shutil
 from collections import defaultdict
+from copy import deepcopy
 from io import BytesIO
 
 from flask import flash, jsonify, request, session
 from PIL import Image
+from webargs import fields
 from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
@@ -33,6 +35,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.util import check_event_locked
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -177,8 +180,18 @@ class CloneTemplateMixin(TargetFromURLMixin):
 
     def _process(self):
         title = f'{self.template.title} (copy)'
-        new_template = DesignerTemplate(title=title, type=self.template.type, data=self.template.data,
-                                        **self.target_dict)
+        new_template = DesignerTemplate(title=title, type=self.template.type, **self.target_dict)
+
+        data = deepcopy(self.template.data)
+        image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
+        for image_item in image_items:
+            old_image = DesignerImageFile.get(image_item['image_id'])
+            new_image = DesignerImageFile(filename=old_image.filename, content_type=old_image.content_type,
+                                          template=new_template)
+            with old_image.open() as f:
+                new_image.save(f)
+            image_item['image_id'] = new_image.id
+        new_template.data = data
 
         if self.template.background_image:
             background = self.template.background_image
@@ -256,14 +269,17 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             'title': self.template.title,
             'data': self.template.data,
             'is_clonable': self.template.is_clonable,
-            'background_url': self.template.background_image.download_url if self.template.background_image else None
+            'background_url': self.template.background_image.download_url if self.template.background_image else None,
+            'images': {img.id: img.download_url for img in self.template.images} if self.template.images else None
         }
         backside_template_data = {
             'id': bs_template.id if bs_template else None,
             'title': bs_template.title if bs_template else None,
             'data': bs_template.data if bs_template else None,
             'background_url': (bs_template.background_image.download_url
-                               if bs_template and bs_template.background_image else None)
+                               if bs_template and bs_template.background_image else None),
+            'images': ({img.id: img.download_url for img in bs_template.images}
+                       if bs_template and bs_template.images else None)
         }
         backside_templates = (DesignerTemplate.query
                               .filter(DesignerTemplate.backside_template_id == self.template.id)
@@ -281,9 +297,16 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_POST(self):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
-        invalid_placeholders = {x['type'] for x in data['items']} - set(get_placeholder_options()) - {'fixed'}
+        invalid_placeholders = {x['type'] for x in data['items']} - set(get_placeholder_options())
         if invalid_placeholders:
             raise UserValueError('Invalid item types: {}'.format(', '.join(invalid_placeholders)))
+        image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
+        template_images = {img.id for img in self.template.images}
+        for image_item in image_items:
+            if 'image_id' not in image_item:
+                raise UserValueError(_('A Fixed Image element must contain an image'))
+            if image_item['image_id'] not in template_images:
+                raise UserValueError(_('The image file does not belong to this template'))
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json['backside_template_id'],
                         is_clonable=request.json['is_clonable'],
@@ -308,7 +331,8 @@ class RHDownloadTemplateImage(BacksideTemplateProtectionMixin, RHModifyDesignerT
 
 
 class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
-    def _process(self):
+    @use_kwargs({'background': fields.Bool(load_default=False)}, location='query')
+    def _process(self, background):
         f = request.files['file']
         filename = secure_filename(f.filename, 'image')
         data = BytesIO()
@@ -324,10 +348,11 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
             return jsonify(error='File format not accepted!')
         content_type = 'image/' + image_type
         image = DesignerImageFile(template=self.template, filename=filename, content_type=content_type)
-        self.template.background_image = image
+        if background:
+            self.template.background_image = image
         image.save(data)
         flash(_('The image has been uploaded'), 'success')
-        return jsonify_data(image_url=image.download_url)
+        return jsonify_data(image_id=image.id, image_url=image.download_url)
 
 
 class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
@@ -367,7 +392,8 @@ class RHGetTemplateData(BacksideTemplateProtectionMixin, RHModifyDesignerTemplat
         template_data = {
             'title': self.template.title,
             'data': self.template.data,
-            'background_url': self.template.background_image.download_url if self.template.background_image else None
+            'background_url': self.template.background_image.download_url if self.template.background_image else None,
+            'images': {img.id: img.download_url for img in self.template.images} if self.template.images else None
         }
         return jsonify(template=template_data, backside_template_id=self.template.id)
 

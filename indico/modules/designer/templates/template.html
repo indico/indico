@@ -118,7 +118,7 @@
             <div class="tool js-hide-on-flip">
                 <i class="icon-image" title="{% trans %}Template background{% endtrans %}"></i>
                 <form id="bg-form" class="content flexrow f-a-center"
-                      action="{{ url_for('designer.upload_image', template) }}"
+                      action="{{ url_for('designer.upload_image', template, background=true) }}"
                       enctype="multipart/form-data"
                       method="POST">
                     <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
@@ -271,6 +271,27 @@
                     <label for="fixed-text-field">{% trans %}Text:{% endtrans %}</label>
                     <input type="text" id="fixed-text-field">
                 </div>
+                <div id="fixed-image-tool" class="tool js-hide-on-flip">
+                    <i class="icon-image" title="{% trans %}Fixed Image{% endtrans %}"></i>
+                    <form id="img-form" class="content flexrow f-a-center"
+                          action="{{ url_for('designer.upload_image', template, background=false) }}"
+                          enctype="multipart/form-data"
+                          method="POST">
+                        <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
+                        <input id="imageFile" name="file" type="file">
+                        <label for="imageFile" class="i-button background-label truncate-text">
+                            {%- trans %}Choose a file{% endtrans -%}
+                        </label>
+                        <div class="subtool">
+                            <div class="toolbar">
+                                <button class="i-button icon-upload icon-only js-upload-img"
+                                        title="{% trans %}Upload file{% endtrans %}"></button>
+                                <button class="i-button icon-cross icon-only js-remove-img" disabled
+                                        title="{% trans %}Remove image{% endtrans %}"></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 <div class="tool">
                     <i class="icon-layout" title="{% trans %}Element positioning{% endtrans %}"></i>
                     <div class="toolbar thin">
@@ -330,9 +351,6 @@
                                 </optgroup>
                             {% endif %}
                         {% endfor %}
-                        <optgroup label="{% trans %}Fixed data{% endtrans %}">
-                            <option value="fixed">{% trans %}Fixed text{% endtrans %}</option>
-                        </optgroup>
                     </select>
                     <button id="insert-button" class="insert-element-btn i-button highlight icon-next text-color subtle"
                             title="{% trans %}Insert{% endtrans %}">

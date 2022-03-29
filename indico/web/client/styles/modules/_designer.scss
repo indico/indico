@@ -74,6 +74,10 @@
       border-width: 3px;
       background-color: $pastel-blue;
 
+      &[data-type='fixed_image'] img {
+        padding: 3px;
+      }
+
       &[data-type='fixed'] {
         background-color: lighten($pastel-red, 20%);
       }
