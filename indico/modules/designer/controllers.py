@@ -270,7 +270,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             'data': self.template.data,
             'is_clonable': self.template.is_clonable,
             'background_url': self.template.background_image.download_url if self.template.background_image else None,
-            'images': ({img.id: img.download_url for img in self.template.images} if self.template.images else None)
+            'images': {img.id: img.download_url for img in self.template.images} if self.template.images else None
         }
         backside_template_data = {
             'id': bs_template.id if bs_template else None,
@@ -301,11 +301,11 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         if invalid_placeholders:
             raise UserValueError('Invalid item types: {}'.format(', '.join(invalid_placeholders)))
         image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
-        template_images = ({img.id for img in self.template.images})
+        template_images = {img.id for img in self.template.images}
         for image_item in image_items:
             if 'image_id' not in image_item:
                 raise UserValueError('Invalid: A Fixed Image element should have an image uploaded')
-            if not image_item['image_id'] in template_images:
+            if image_item['image_id'] not in template_images:
                 raise UserValueError('The image file being used does not belong to this template')
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json['backside_template_id'],
@@ -393,7 +393,7 @@ class RHGetTemplateData(BacksideTemplateProtectionMixin, RHModifyDesignerTemplat
             'title': self.template.title,
             'data': self.template.data,
             'background_url': self.template.background_image.download_url if self.template.background_image else None,
-            'images': ({img.id: img.download_url for img in self.template.images} if self.template.images else None)
+            'images': {img.id: img.download_url for img in self.template.images} if self.template.images else None
         }
         return jsonify(template=template_data, backside_template_id=self.template.id)
 
