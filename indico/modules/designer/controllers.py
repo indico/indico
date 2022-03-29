@@ -304,9 +304,9 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         template_images = {img.id for img in self.template.images}
         for image_item in image_items:
             if 'image_id' not in image_item:
-                raise UserValueError('Invalid: A Fixed Image element should have an image uploaded')
+                raise UserValueError(_('A Fixed Image element must contain an image'))
             if image_item['image_id'] not in template_images:
-                raise UserValueError('The image file being used does not belong to this template')
+                raise UserValueError(_('The image file does not belong to this template'))
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json['backside_template_id'],
                         is_clonable=request.json['is_clonable'],
