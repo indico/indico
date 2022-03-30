@@ -25,6 +25,7 @@ from indico.modules.events.models.references import ReferenceType
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import orig_string
+from indico.util.signals import make_interceptable
 
 
 def create_reference_type(data):
@@ -137,6 +138,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     return event
 
 
+@make_interceptable
 def update_event(event, update_timetable=False, **data):
     assert set(data.keys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
                                 'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',

@@ -87,6 +87,8 @@ Bugfixes
 - Fix very long map URLs breaking out of the event management settings box (:pr:`5275`)
 - Fix missing abstract withdrawal notification (:pr:`5281`)
 - Fix downloading files from editables without a published revision (:pr:`5290`)
+- Do not mark participants with deleted/inactive registrations as registered in
+  participant roles list (:pr:`5308`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

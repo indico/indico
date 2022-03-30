@@ -125,7 +125,7 @@ class RHPersonsBase(RHManageEventBase):
         event_person_users = set()
         for event_person, registration in event_persons_query:
             data = persons[event_person.email or event_person.id]
-            if registration:
+            if registration and registration.is_active:
                 data['registrations'].append(registration)
             data['person'] = event_person
             if event_person in chairpersons:
@@ -190,7 +190,8 @@ class RHPersonsBase(RHManageEventBase):
 
         regs = (Registration.query
                 .with_parent(self.event)
-                .filter(Registration.user_id.in_(data['person'].id for data in internal_role_users.values()))
+                .filter(Registration.user_id.in_(data['person'].id for data in internal_role_users.values()),
+                        Registration.is_active)
                 .all())
         for reg in regs:
             internal_role_users[reg.user.email]['registrations'].append(reg)
