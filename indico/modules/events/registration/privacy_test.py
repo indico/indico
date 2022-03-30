@@ -5,7 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime, timedelta
+
 import pytest
+from pytz import utc
 
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
@@ -180,3 +183,30 @@ def test_registration_visibility_hide_participants(dummy_event, dummy_regform):
     reg.state = RegistrationState.pending
     assert reg.is_active
     assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)
+
+
+@pytest.mark.usefixtures('dummy_reg')
+def test_visibility_duration(dummy_event, dummy_regform, freeze_time):
+    set_feature_enabled(dummy_event, 'registration', True)
+
+    reg = dummy_event.registrations.one()
+    dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
+    dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_all
+    freeze_time(datetime(2022, 1, 1, tzinfo=utc))
+    dummy_event.start_dt = datetime(2020, 1, 1, tzinfo=utc)
+    dummy_event.end_dt = datetime(2021, 1, 1, tzinfo=utc)
+
+    assert not reg.participant_hidden
+    assert reg.is_active
+    assert reg.state == RegistrationState.complete
+    assert dummy_regform.publish_registrations_duration is None
+    assert_visibility(reg, RegistrationVisibility.all)
+
+    dummy_regform.publish_registrations_duration = timedelta(days=1*30)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)
+    dummy_regform.publish_registrations_duration = timedelta(days=12*30)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_visibility_prop=False)
+    dummy_regform.publish_registrations_duration = timedelta(days=13*30)
+    assert_visibility(reg, RegistrationVisibility.all)
+    dummy_regform.publish_registrations_duration = timedelta(days=20*30)
+    assert_visibility(reg, RegistrationVisibility.all)
