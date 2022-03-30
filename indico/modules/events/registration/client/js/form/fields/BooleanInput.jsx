@@ -26,6 +26,7 @@ function BooleanInputComponent({
   onChange,
   disabled,
   required,
+  isPurged,
   price,
   placesLimit,
   placesUsed,
@@ -46,7 +47,7 @@ function BooleanInputComponent({
       <Button.Group>
         <Button
           type="button"
-          active={value === true}
+          active={!isPurged && value === true}
           disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
           onClick={makeOnClick(true)}
         >
@@ -54,7 +55,7 @@ function BooleanInputComponent({
         </Button>
         <Button
           type="button"
-          active={value === false}
+          active={!isPurged && value === false}
           disabled={disabled}
           onClick={makeOnClick(false)}
         >
@@ -81,6 +82,7 @@ BooleanInputComponent.propTypes = {
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   required: PropTypes.bool.isRequired,
+  isPurged: PropTypes.bool.isRequired,
   price: PropTypes.number.isRequired,
   placesLimit: PropTypes.number.isRequired,
   placesUsed: PropTypes.number.isRequired,
@@ -95,6 +97,7 @@ export default function BooleanInput({
   htmlName,
   disabled,
   isRequired,
+  isPurged,
   price,
   placesLimit,
   placesUsed,
@@ -106,6 +109,7 @@ export default function BooleanInput({
       component={BooleanInputComponent}
       required={isRequired}
       disabled={disabled}
+      isPurged={isPurged}
       allowNull
       price={price}
       placesLimit={placesLimit}
@@ -119,6 +123,7 @@ BooleanInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
+  isPurged: PropTypes.bool.isRequired,
   price: PropTypes.number,
   placesLimit: PropTypes.number,
   placesUsed: PropTypes.number,

@@ -32,6 +32,7 @@ function SingleChoiceDropdown({
   onChange,
   disabled,
   isRequired,
+  isPurged,
   choices,
   withExtraSlots,
   placesUsed,
@@ -111,7 +112,7 @@ function SingleChoiceDropdown({
           placeholder={Translate.string('Choose an option')}
           options={options}
           disabled={disabled}
-          value={selectedChoice.id || ''}
+          value={(!isPurged && selectedChoice.id) || ''}
           onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
           clearable={!isRequired}
           search
@@ -137,6 +138,7 @@ SingleChoiceDropdown.propTypes = {
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   isRequired: PropTypes.bool.isRequired,
+  isPurged: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
@@ -149,6 +151,7 @@ function SingleChoiceRadioGroup({
   onChange,
   disabled,
   isRequired,
+  isPurged,
   choices,
   withExtraSlots,
   placesUsed,
@@ -200,7 +203,7 @@ function SingleChoiceRadioGroup({
                     (c.placesLimit > 0 &&
                       (placesUsed[c.id] || 0) - (existingValue[c.id] || 0) >= c.placesLimit)
                   }
-                  checked={isChecked(c, idx)}
+                  checked={!isPurged && isChecked(c, idx)}
                   onChange={() => handleChange(c.id)}
                 />
               </td>
@@ -274,6 +277,7 @@ SingleChoiceRadioGroup.propTypes = {
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   isRequired: PropTypes.bool.isRequired,
+  isPurged: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
@@ -286,6 +290,7 @@ function SingleChoiceInputComponent({
   onChange,
   disabled,
   isRequired,
+  isPurged,
   itemType,
   choices,
   withExtraSlots,
@@ -300,6 +305,7 @@ function SingleChoiceInputComponent({
         onChange={onChange}
         disabled={disabled}
         isRequired={isRequired}
+        isPurged={isPurged}
         choices={choices}
         withExtraSlots={withExtraSlots}
         placesUsed={placesUsed}
@@ -313,6 +319,7 @@ function SingleChoiceInputComponent({
         onChange={onChange}
         disabled={disabled}
         isRequired={isRequired}
+        isPurged={isPurged}
         choices={choices}
         withExtraSlots={withExtraSlots}
         placesUsed={placesUsed}
@@ -328,6 +335,7 @@ function SingleChoiceInputComponent({
 SingleChoiceInputComponent.propTypes = {
   disabled: PropTypes.bool.isRequired,
   isRequired: PropTypes.bool.isRequired,
+  isPurged: PropTypes.bool.isRequired,
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
@@ -340,6 +348,7 @@ export default function SingleChoiceInput({
   htmlName,
   disabled,
   isRequired,
+  isPurged,
   itemType,
   choices,
   withExtraSlots,
@@ -354,6 +363,7 @@ export default function SingleChoiceInput({
       required={isRequired}
       isRequired={isRequired}
       disabled={disabled}
+      isPurged={isPurged}
       itemType={itemType}
       choices={choices}
       withExtraSlots={withExtraSlots}
@@ -369,6 +379,7 @@ SingleChoiceInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
+  isPurged: PropTypes.bool.isRequired,
   itemType: PropTypes.oneOf(['dropdown', 'radiogroup']).isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool,

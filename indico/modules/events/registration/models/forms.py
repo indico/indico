@@ -373,11 +373,11 @@ class RegistrationForm(db.Model):
 
     @property
     def active_fields(self):
-        return [field
-                for field in self.form_items
-                if (field.is_field and
-                    field.is_enabled and not field.is_deleted and
-                    field.parent.is_enabled and not field.parent.is_deleted)]
+        return [field for field in self.form_items if field.is_field and field.is_active]
+
+    @property
+    def active_labels(self):
+        return [field for field in self.form_items if field.is_label and field.is_active]
 
     @property
     def sections(self):

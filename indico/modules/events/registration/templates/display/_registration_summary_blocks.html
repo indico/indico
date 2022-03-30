@@ -14,6 +14,12 @@
                               title="{% trans %}This field no longer exists{% endtrans %}">
                         </span>
                     {% endif %}
+                    {% if field.is_purged -%}
+                        <span class="icon-warning purged-field-warning right"
+                              data-qtip-style="warning"
+                              title="{% trans %}The field data has been purged due to an expired retention period{% endtrans %}">
+                        </span>
+                    {% endif %}
                 </td>
             </tr>
         {%- endfor %}

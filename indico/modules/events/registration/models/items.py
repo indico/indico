@@ -337,6 +337,10 @@ class RegistrationFormItem(db.Model):
         """Return object with data that Angular can understand."""
         return dict(id=self.id, description=self.description, position=self.position)
 
+    @property
+    def is_active(self):
+        return self.is_enabled and not self.is_deleted and self.parent.is_enabled and not self.parent.is_deleted
+
     @hybrid_property
     def is_section(self):
         return self.type in {RegistrationFormItemType.section, RegistrationFormItemType.section_pd}
@@ -352,6 +356,14 @@ class RegistrationFormItem(db.Model):
     @is_field.expression
     def is_field(cls):
         return cls.type.in_([RegistrationFormItemType.field, RegistrationFormItemType.field_pd])
+
+    @hybrid_property
+    def is_label(self):
+        return self.type == RegistrationFormItemType.text
+
+    @is_label.expression
+    def is_label(cls):
+        return cls.type == RegistrationFormItemType.text
 
     @hybrid_property
     def is_visible(self):
@@ -431,5 +443,5 @@ class RegistrationFormText(RegistrationFormItem):
     @property
     def view_data(self):
         field_data = dict(super().view_data, section_id=self.parent_id, is_enabled=self.is_enabled, input_type='label',
-                          title=self.title)
+                          title=self.title, is_purged=self.is_purged)
         return camelize_keys(field_data)
