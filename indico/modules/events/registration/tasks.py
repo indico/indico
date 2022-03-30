@@ -15,7 +15,6 @@ from indico.modules.events import Event
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.models.form_fields import RegistrationFormField, RegistrationFormFieldData
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import now_utc
 
@@ -34,9 +33,9 @@ def delete_field_data():
                          .join(RegistrationFormField, RegistrationFormFieldData.field_id == RegistrationFormField.id)
                          .join(RegistrationForm)
                          .join(Event)
-                         .filter(~RegistrationFormItem.is_purged,
-                                 RegistrationFormItem.retention_period.isnot(None),
-                                 Event.end_dt + RegistrationFormItem.retention_period <= now_utc())
+                         .filter(~RegistrationFormField.is_purged,
+                                 RegistrationFormField.retention_period.isnot(None),
+                                 Event.end_dt + RegistrationFormField.retention_period <= now_utc())
                          .all())
 
     data_by_regform = _group_by_regform(registration_data)
