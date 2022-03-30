@@ -27,7 +27,7 @@ def _group_by_regform(registration_data):
     return data_by_regform
 
 
-@celery.periodic_task(name='registration_fields_retention_period', run_every=crontab(hour='*/24'))
+@celery.periodic_task(name='registration_fields_retention_period', run_every=crontab(minute='0', hour='3'))
 def delete_field_data():
     registration_data = (RegistrationData.query
                          .join(RegistrationFormFieldData)
@@ -42,7 +42,7 @@ def delete_field_data():
     data_by_regform = _group_by_regform(registration_data)
     for regform, regform_data in data_by_regform.items():
         fields = [data.field_data.field for data in regform_data]
-        logger.info('Purging fields from registration %r: %r', regform, fields)
+        logger.info('Purging fields from regform %r: %r', regform, fields)
         for data in regform_data:
             logger.debug('Deleting registration field data: %r', data)
             # Overwrite with the field's default value.
@@ -56,6 +56,6 @@ def delete_field_data():
                 try:
                     data.delete()
                 except Exception as e:
-                    logger.error('Failed to delete file: %r', e)
+                    logger.error('Failed to delete file for %r: %s', data, e)
             data.field_data.field.is_purged = True
     db.session.commit()
