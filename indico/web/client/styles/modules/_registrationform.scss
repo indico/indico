@@ -1296,6 +1296,14 @@ textarea.regFormDescriptionInputMgmt {
       }
     }
   }
+
+  tr {
+    td {
+      .purged-field-warning {
+        color: $yellow;
+      }
+    }
+  }
 }
 
 #registration-details {
