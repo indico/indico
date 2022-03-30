@@ -39,6 +39,11 @@ registration_settings = RegistrationSettingsProxy('registrations', {
 })
 
 
+@signals.core.import_tasks.connect
+def _import_tasks(sender, **kwargs):
+    import indico.modules.events.registration.tasks  # noqa: F401
+
+
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     # registrations are unique per user, so we can only update the user
