@@ -510,7 +510,7 @@ def count_hidden_registrations(event, is_participant):
     query = (Registration.query.with_parent(event)
              .filter(Registration.is_state_publishable,
                      ~Registration.is_publishable(is_participant),
-                     ~RegistrationForm.is_deleted)
+                     RegistrationForm.is_participant_list_visible(is_participant))
              .join(Registration.registration_form))
 
     return query.count()

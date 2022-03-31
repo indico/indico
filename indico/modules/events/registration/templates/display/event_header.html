@@ -104,7 +104,9 @@
     <div class="event-details-row">
         <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
         <div class="event-details-content">
-            {{ num_hidden_registrations }}
+            <span class="ui circular label">
+                {{ num_hidden_registrations }}
+            </span>
         </div>
     </div>
 {% endif %}
