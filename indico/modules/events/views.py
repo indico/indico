@@ -202,6 +202,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         attached_items = self.event.attached_items
         folders = [folder for folder in attached_items.get('folders', []) if folder.title != 'Internal Page Files']
         files = attached_items.get('files', [])
+        privacy_info = privacy_settings.get_all(self.event)
 
         lectures = []
         if self.event.series is not None and self.event.series.show_links:
@@ -225,6 +226,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                                theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
                                files=files,
                                folders=folders,
+                               privacy_info=privacy_info,
                                lectures=lectures)
 
 
