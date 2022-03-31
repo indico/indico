@@ -517,6 +517,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         is_participant = self.is_user_registered(user)
         return get_published_registrations(self, is_participant)
 
+    @memoize_request
+    def count_hidden_registrations(self, user):
+        from indico.modules.events.registration.util import count_hidden_registrations
+        is_participant = self.is_user_registered(user)
+        return count_hidden_registrations(self, is_participant)
+
     @property
     def protection_parent(self):
         return self.category

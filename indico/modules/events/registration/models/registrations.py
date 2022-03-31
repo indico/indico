@@ -313,9 +313,7 @@ class Registration(db.Model):
 
     @hybrid_method
     def is_publishable(self, is_participant):
-        if (self.visibility == RegistrationVisibility.nobody
-                or not self.is_active
-                or self.state not in (RegistrationState.complete, RegistrationState.unpaid)):
+        if self.visibility == RegistrationVisibility.nobody or not self.is_state_publishable:
             return False
         if self.visibility == RegistrationVisibility.participants:
             return is_participant
@@ -337,8 +335,7 @@ class Registration(db.Model):
         )
         return db.and_(
             ~cls.participant_hidden,
-            cls.is_active,
-            cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)),
+            cls.is_state_publishable,
             ~_has_regform_publish_mode(PublishRegistrationsMode.hide_all),
             _has_regform_publish_mode(PublishRegistrationsMode.show_all) | consent_criterion
         )
@@ -358,6 +355,14 @@ class Registration(db.Model):
     @is_cancelled.expression
     def is_cancelled(self):
         return self.state.in_((RegistrationState.rejected, RegistrationState.withdrawn))
+
+    @hybrid_property
+    def is_state_publishable(self):
+        return self.is_active and self.state in (RegistrationState.complete, RegistrationState.unpaid)
+
+    @is_state_publishable.expression
+    def is_state_publishable(cls):
+        return cls.is_active & cls.state.in_((RegistrationState.complete, RegistrationState.unpaid))
 
     @locator_property
     def locator(self):

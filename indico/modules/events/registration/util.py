@@ -500,6 +500,22 @@ def get_published_registrations(event, is_participant):
     return query.all()
 
 
+def count_hidden_registrations(event, is_participant):
+    """Get the number of hidden registrations for an event.
+
+    :param event: the `Event` to get registrations for
+    :param is_participant: whether the user accessing the registrations is a participant of the event
+    :return: number of registrations
+    """
+    query = (Registration.query.with_parent(event)
+             .filter(Registration.is_state_publishable,
+                     ~Registration.is_publishable(is_participant),
+                     RegistrationForm.is_participant_list_visible(is_participant))
+             .join(Registration.registration_form))
+
+    return query.count()
+
+
 def get_events_registered(user, dt=None):
     """Get the IDs of events where the user is registered.
 
