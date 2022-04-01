@@ -13,7 +13,7 @@ from flask import jsonify, request, session
 from marshmallow import EXCLUDE, fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import Forbidden, NotFound, ServiceUnavailable
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound, ServiceUnavailable
 
 from indico.core.errors import UserValueError
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase, TokenAccessMixin
@@ -52,14 +52,17 @@ class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
 
 class RHEditingUploadContributionFile(RHEditingUploadFile):
     @use_kwargs({
-        'id': fields.Int()
+        'file_id': fields.Int(),
+        'paper_id': fields.Int()
     })
-    def _process(self, id):
+    def _process(self, file_id, paper_id):
+        if file_id and paper_id:
+            raise BadRequest
         files = []
-        if self.contrib.editables:
+        if file_id and self.contrib.editables:
             files = [file.file for e in self.contrib.editables
                      if e.type == self.editable.type for file in e.revisions[-1].files]
-        if self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
+        if paper_id and self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
             files.extend(last_rev.files)
         if found := next((f for f in files if f.id == id), None):
             with found.open() as stream:
