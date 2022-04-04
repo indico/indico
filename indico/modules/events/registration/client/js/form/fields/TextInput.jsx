@@ -42,8 +42,8 @@ TextInput.propTypes = {
 
 TextInput.defaultProps = {
   disabled: false,
-  minLength: null,
-  maxLength: null,
+  minLength: 0,
+  maxLength: 0,
 };
 
 export function TextSettings() {
@@ -53,20 +53,46 @@ export function TextSettings() {
         name="minLength"
         type="number"
         label={Translate.string('Min. length')}
+        placeholder={String(TextInput.defaultProps.minLength)}
         step="1"
-        min="1"
-        validate={v.optional(v.min(1))}
+        min="0"
+        validate={v.optional(
+          v.chain(val => {
+            if (val === 0) {
+              return v.STOP_VALIDATION;
+            } else if (val === 1) {
+              return Translate.string(
+                'If you want to make the field required, select the "Required field" checkbox. The minimum length only applies if the field is not empty.'
+              );
+            }
+          }, v.min(2))
+        )}
+        format={val => val || ''}
+        parse={val => +val || 0}
         fluid
       />
       <FinalInput
         name="maxLength"
         type="number"
         label={Translate.string('Max. length')}
+        placeholder={Translate.string('No maximum')}
         step="1"
-        min="1"
-        validate={v.optional(v.min(1))}
+        min="0"
+        validate={v.optional(v.min(0))}
+        format={val => val || ''}
+        parse={val => +val || 0}
         fluid
       />
     </Form.Group>
   );
+}
+
+export function textSettingsFormValidator({minLength, maxLength}) {
+  if (minLength && maxLength && minLength > maxLength) {
+    const msg = Translate.string('The minimum length cannot be greater than the maximum length.');
+    return {
+      minLength: msg,
+      maxLength: msg,
+    };
+  }
 }

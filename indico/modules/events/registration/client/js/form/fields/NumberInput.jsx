@@ -88,7 +88,7 @@ NumberInput.defaultProps = {
   isRequired: false,
   price: 0,
   minValue: 0,
-  maxValue: null,
+  maxValue: 0,
 };
 
 export function NumberSettings() {
@@ -103,6 +103,7 @@ export function NumberSettings() {
         min="0"
         validate={v.optional(v.min(0))}
         format={val => val || ''}
+        parse={val => +val || 0}
         fluid
       />
       <FinalInput
@@ -111,8 +112,10 @@ export function NumberSettings() {
         label={Translate.string('Maximum')}
         placeholder={Translate.string('No maximum')}
         step="1"
-        min="1"
-        validate={v.optional(v.min(1))}
+        min="0"
+        validate={v.optional(v.min(0))}
+        format={val => val || ''}
+        parse={val => +val || 0}
         fluid
       />
     </Form.Group>
