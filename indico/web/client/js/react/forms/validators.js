@@ -126,4 +126,5 @@ export default {
   chain,
   or,
   dates,
+  STOP_VALIDATION,
 };

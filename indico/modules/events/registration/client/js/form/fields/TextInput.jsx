@@ -56,7 +56,17 @@ export function TextSettings() {
         placeholder={String(TextInput.defaultProps.minLength)}
         step="1"
         min="0"
-        validate={v.optional(v.or(v.chain(v.min(0), v.max(0)), v.min(2)))}
+        validate={v.optional(
+          v.chain(val => {
+            if (val === 0) {
+              return v.STOP_VALIDATION;
+            } else if (val === 1) {
+              return Translate.string(
+                'If you want to make the field required, select the "Required field" checkbox. The minimum length only applies if the field is not empty.'
+              );
+            }
+          }, v.min(2))
+        )}
         format={val => val || ''}
         parse={val => +val || 0}
         fluid
