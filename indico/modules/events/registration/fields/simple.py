@@ -29,7 +29,7 @@ KEEP_EXISTING_FILE_UUID = '00000000-0000-0000-0000-000000000001'
 
 
 class TextFieldDataSchema(mm.Schema):
-    min_length = fields.Integer(load_default=0, validate=validate.Range(0))
+    min_length = fields.Integer(load_default=0, validate=validate.And(validate.Range(0), validate.NoneOf((1,))))
     max_length = fields.Integer(load_default=0, validate=validate.Range(0))
 
     @validates_schema(skip_on_field_errors=True)

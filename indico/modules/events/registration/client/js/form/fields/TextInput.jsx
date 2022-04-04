@@ -56,7 +56,7 @@ export function TextSettings() {
         placeholder={String(TextInput.defaultProps.minLength)}
         step="1"
         min="0"
-        validate={v.optional(v.min(0))}
+        validate={v.optional(v.or(v.chain(v.min(0), v.max(0)), v.min(2)))}
         format={val => val || ''}
         parse={val => +val || 0}
         fluid
