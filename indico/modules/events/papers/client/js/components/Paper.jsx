@@ -152,7 +152,7 @@ function PaperSteps({
                 contributionId={contribution.id}
                 contributionCode={contribution.code}
                 fileTypes={{[EditableType.paper]: fileTypes}}
-                uploadableFiles={uploadableFiles}
+                uploadableFiles={uploadableFiles.map(({id, ...rest}) => ({...rest, paperId: id}))}
                 text={Translate.string('Submit for editing')}
               />
             )}

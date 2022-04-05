@@ -52,14 +52,14 @@ class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
 
 class RHEditingUploadContributionFile(RHEditingUploadFile):
     @use_kwargs({
-        'file_id': fields.Int(),
-        'paper_id': fields.Int()
+        'id': fields.Int(load_default=None),
+        'paper_id': fields.Int(load_default=None)
     })
-    def _process(self, file_id, paper_id):
-        if file_id and paper_id:
+    def _process(self, id, paper_id):
+        if id and paper_id:
             raise BadRequest
         files = []
-        if file_id and self.contrib.editables:
+        if id and self.contrib.editables:
             files = [file.file for e in self.contrib.editables
                      if e.type == self.editable.type for file in e.revisions[-1].files]
         if paper_id and self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
