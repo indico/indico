@@ -56,7 +56,7 @@ class RHEditingUploadContributionFile(RHEditingUploadFile):
         'paper_id': fields.Int(load_default=None)
     })
     def _process(self, id, paper_id):
-        if id and paper_id:
+        if bool(id) == bool(paper_id):
             raise BadRequest
         files = []
         if id and self.contrib.editables:
