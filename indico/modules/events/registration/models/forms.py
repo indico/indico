@@ -142,6 +142,11 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=PublishRegistrationsMode.show_with_consent
     )
+    #: For how long should the registrations be displayed after the event ends
+    publish_registrations_duration = db.Column(
+        db.Interval,
+        nullable=True
+    )
     #: Whether to display the number of registrations
     publish_registration_count = db.Column(
         db.Boolean,

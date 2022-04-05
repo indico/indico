@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React, {useMemo, useState, useEffect} from 'react';
-import {Dropdown, Form, Icon, Message} from 'semantic-ui-react';
+import {Dropdown, Form, Icon, Input, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -15,11 +15,12 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
   const parentElement = useMemo(() => document.getElementById(wrapperId), [wrapperId]);
   const [participantVisibility, setParticipantVisibility] = useState(values[0]);
   const [publicVisibility, setPublicVisibility] = useState(values[1]);
+  const [visibilityDuration, setVisibilityDuration] = useState(values[2]);
 
   // Trigger change only after the DOM has changed
   useEffect(() => {
     parentElement.dispatchEvent(new Event('change', {bubbles: true}));
-  }, [participantVisibility, publicVisibility, parentElement]);
+  }, [participantVisibility, publicVisibility, visibilityDuration, parentElement]);
 
   const choiceMap = {
     hide_all: ['hide_all'],
@@ -46,8 +47,8 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
 
   return (
     <div>
-      <div style={{display: 'flex', alignItems: 'center', gap: '0 10px'}}>
-        <Form.Field style={{flexBasis: '50%'}}>
+      <div style={{display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px'}}>
+        <Form.Field style={{flex: '1 49%'}}>
           <label>
             <Translate>Visibility to participants</Translate>
           </label>
@@ -66,7 +67,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
             value={participantVisibility}
           />
         </Form.Field>
-        <Form.Field style={{flexBasis: '50%'}}>
+        <Form.Field style={{flex: '1 49%'}}>
           <label>
             <Translate>Visibility to everyone</Translate>
           </label>
@@ -79,6 +80,21 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
             options={publicOptions}
             selection
             value={publicVisibility}
+          />
+        </Form.Field>
+        <Form.Field style={{flexGrow: 1}}>
+          <label>
+            <Translate>Visibility duration (months)</Translate>
+          </label>
+          <Input
+            type="number"
+            placeholder={Translate.string('Permanent')}
+            step="1"
+            min="0"
+            value={visibilityDuration === null ? '' : visibilityDuration}
+            onChange={(evt, {value}) => setVisibilityDuration(value === '' ? null : +value)}
+            disabled={participantVisibility === 'hide_all'}
+            fluid
           />
         </Form.Field>
       </div>
@@ -100,7 +116,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
         type="hidden"
         id={fieldId}
         name={fieldId}
-        value={JSON.stringify([participantVisibility, publicVisibility])}
+        value={JSON.stringify([participantVisibility, publicVisibility, visibilityDuration])}
       />
     </div>
   );

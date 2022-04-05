@@ -315,6 +315,9 @@ class Registration(db.Model):
     def is_publishable(self, is_participant):
         if self.visibility == RegistrationVisibility.nobody or not self.is_state_publishable:
             return False
+        if (self.registration_form.publish_registrations_duration is not None
+                and self.event.end_dt + self.registration_form.publish_registrations_duration <= now_utc()):
+            return False
         if self.visibility == RegistrationVisibility.participants:
             return is_participant
         if self.visibility == RegistrationVisibility.all:
@@ -323,6 +326,9 @@ class Registration(db.Model):
 
     @is_publishable.expression
     def is_publishable(cls, is_participant):
+        from indico.modules.events import Event
+        from indico.modules.events.registration.models.forms import RegistrationForm
+
         def _has_regform_publish_mode(mode):
             if is_participant:
                 return cls.registration_form.has(publish_registrations_participants=mode)
@@ -336,6 +342,10 @@ class Registration(db.Model):
         return db.and_(
             ~cls.participant_hidden,
             cls.is_state_publishable,
+            cls.registration_form.has(db.or_(
+                RegistrationForm.publish_registrations_duration.is_(None),
+                cls.event.has((Event.end_dt + RegistrationForm.publish_registrations_duration) > now_utc())
+            )),
             ~_has_regform_publish_mode(PublishRegistrationsMode.hide_all),
             _has_regform_publish_mode(PublishRegistrationsMode.show_all) | consent_criterion
         )
