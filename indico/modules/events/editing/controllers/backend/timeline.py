@@ -64,7 +64,7 @@ class RHEditingUploadContributionFile(RHEditingUploadFile):
                      if e.type == self.editable.type for file in e.revisions[-1].files]
         if paper_id and self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
             files.extend(last_rev.files)
-        if found := next((f for f in files if f.id == id), None):
+        if found := next((f for f in files if f.id == (id or paper_id)), None):
             with found.open() as stream:
                 return self._save_file(found, stream)
         raise UserValueError(_('No such file was found within the paper'))
