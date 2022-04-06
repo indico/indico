@@ -20,6 +20,7 @@ from indico.util.date_time import now_utc
 
 
 def _delete_file(reg_data):
+    logger.debug('Deleting file: %s', reg_data.filename)
     try:
         reg_data.delete()
     except Exception as e:
@@ -58,7 +59,6 @@ def delete_field_data():
             # purged fields since they have the 'is_purged' flag set to True
             data.data = data.field_data.field.field_impl.default_value
             if data.field_data.field.field_impl.is_file_field:
-                logger.debug('Deleting file: %s', data.filename)
                 _delete_file(data)
             data.field_data.field.is_purged = True
     db.session.commit()
