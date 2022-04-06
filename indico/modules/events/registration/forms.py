@@ -500,7 +500,8 @@ class RegistrationPrivacyForm(IndicoForm):
     retention_period = TimeDeltaField(_('Retention period'), units=('weeks',),
                                       description=_('Specify for how many weeks the registration '
                                                     'data should be stored. Retention periods for individual '
-                                                    'fields can be set in the registration form designer'))
+                                                    'fields can be set in the registration form designer'),
+                                      render_kw={'placeholder': _('Indefinite')})
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
