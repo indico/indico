@@ -528,6 +528,10 @@ class RegistrationPrivacyForm(IndicoForm):
 
     def validate_retention_period(self, field):
         retention_period = field.data
+        if retention_period is None:
+            return
+        elif not retention_period:
+            raise ValidationError(_('The retention period cannot be zero.'))
         fields = (RegistrationFormItem.query
                   .with_parent(self.regform)
                   .filter(RegistrationFormItem.is_enabled,

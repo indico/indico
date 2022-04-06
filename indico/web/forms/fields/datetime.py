@@ -81,13 +81,18 @@ class TimeDeltaField(Field):
 
     def process_formdata(self, valuelist):
         if valuelist:
-            value = int(valuelist[0])
-            unit = valuelist[1] if len(valuelist) == 2 else self.units[0]
-            if unit not in self.magnitudes:
-                raise ValueError('Invalid unit')
-            self.data = timedelta(seconds=self.magnitudes[unit] * value)
+            if valuelist[0]:
+                value = int(valuelist[0])
+                unit = valuelist[1] if len(valuelist) == 2 else self.units[0]
+                if unit not in self.magnitudes:
+                    raise ValueError('Invalid unit')
+                self.data = timedelta(seconds=self.magnitudes[unit] * value)
+            else:
+                self.data = None
 
     def pre_validate(self, form):
+        if len(self.units) == 1:
+            return
         if self.best_unit in self.units:
             return
         if self.object_data is None:
