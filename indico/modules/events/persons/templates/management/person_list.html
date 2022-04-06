@@ -188,6 +188,15 @@
                             <i class="icon-stop colored-square no-registration"></i>
                             <label for="filter-no-registration">{% trans %}Unregistered users{% endtrans %}</label>
                         </li>
+                        <li class="separator">
+                            <span class="titled-rule">{% trans %}or{% endtrans %}</span>
+                        </li>
+                        <li for="filter-no-roles">
+                            <input type="checkbox" id="filter-no-roles" data-filter="no_roles">
+                            <i class="icon-checkmark"></i>
+                            <i class="icon-stop colored-square no-roles"></i>
+                            <label for="filter-no-roles">{% trans %}Users with no roles{% endtrans %}</label>
+                        </li>
                     </ul>
                     <a class="i-button highlight icon-close disabled js-reset-role-filter"
                        title="{% trans %}Reset role filters{% endtrans %}"></a>
@@ -250,7 +259,8 @@
     <script>
         setupEventPersonsList({
             hasNoAccountFilter: true,
-            hasNoRegistrationFilter: true
+            hasNoRegistrationFilter: true,
+            hasNoRolesFilter: true,
         });
     </script>
 {% endblock %}
