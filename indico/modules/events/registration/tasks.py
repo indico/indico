@@ -36,6 +36,7 @@ def _group_by_regform(registration_data):
 
 @celery.periodic_task(name='registration_fields_retention_period', run_every=crontab(minute='0', hour='3'))
 def delete_field_data():
+    today = now_utc().date()
     registration_data = (RegistrationData.query
                          .join(RegistrationFormFieldData)
                          .join(RegistrationFormField, RegistrationFormFieldData.field_id == RegistrationFormField.id)
@@ -43,7 +44,7 @@ def delete_field_data():
                          .join(Event)
                          .filter(~RegistrationFormField.is_purged,
                                  RegistrationFormField.retention_period.isnot(None),
-                                 Event.end_dt + RegistrationFormField.retention_period <= now_utc())
+                                 db.cast(Event.end_dt, db.Date) + RegistrationFormField.retention_period <= today)
                          .all())
 
     data_by_regform = _group_by_regform(registration_data)
