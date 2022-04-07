@@ -274,6 +274,8 @@ class RHRegistrationCreate(RHManageRegFormBase):
         return get_user_data(self.regform, user)
 
     def _process_POST(self):
+        if self.regform.is_purged:
+            raise Forbidden(_('Registration is disabled due to an expired retention period'))
         schema = make_registration_schema(self.regform, management=True)()
         form = parser.parse(schema)
         session['registration_notify_user_default'] = notify_user = form.pop('notify_user', False)
@@ -311,6 +313,8 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
                                                notify_users=session.get('registration_notify_user_default', True))
 
         if form.validate_on_submit():
+            if self.regform.is_purged:
+                raise Forbidden(_('Registration is disabled due to an expired retention period'))
             session['registration_notify_user_default'] = form.notify_users.data
             for user in form.user_principals.data:
                 self._register_user(user, form.notify_users.data)
@@ -380,6 +384,8 @@ class RHRegistrationsImport(RHRegistrationsActionBase):
         form = ImportRegistrationsForm(regform=self.regform)
 
         if form.validate_on_submit():
+            if self.regform.is_purged:
+                raise Forbidden(_('Registration is disabled due to an expired retention period'))
             skip_moderation = self.regform.moderation_enabled and form.skip_moderation.data
             registrations = import_registrations_from_csv(self.regform, form.source_file.data,
                                                           skip_moderation=skip_moderation,

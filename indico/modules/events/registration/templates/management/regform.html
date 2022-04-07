@@ -1,7 +1,11 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% block content %}
-    {% if regform.retention_period %}
+    {% if regform.is_purged %}
+        {%- call message_box('error', fixed_width=true) -%}
+            {% trans %}Registrations have been deleted due to an expired retention period.{% endtrans %}
+        {%- endcall %}
+    {% elif regform.retention_period %}
         {%- call message_box('warning', fixed_width=true) -%}
             {% trans count=(regform.retention_period.days // 7), date=(event.end_dt + regform.retention_period)|format_date %}
                 Registrations will be permanently deleted {{ count }} week after the event ended (on {{ date }}).
@@ -91,7 +95,12 @@
                     {% endblock %}
                 </div>
                 <div class="group">
-                    <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-settings">
+                    {% set purged_title %}
+                        {% trans %}Registration is disabled due to an expired retention period{% endtrans %}
+                    {% endset %}
+                    <a href="{{ url_for('.manage_reglist', regform) }}"
+                       class="i-button icon-settings {% if regform.is_purged %}disabled{% endif %}"
+                       {% if regform.is_purged %}title="{{ purged_title }}"{% endif %}>
                         {% trans %}Manage{% endtrans %}
                     </a>
                 </div>

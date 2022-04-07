@@ -1,5 +1,6 @@
 {% extends 'events/management/full_width_base.html' %}
 {% from 'events/registration/management/_reglist.html' import render_registration_list %}
+{% from 'message_box.html' import message_box %}
 
 {% block title %}
     {%- trans %}Registration{% endtrans -%}
@@ -10,6 +11,18 @@
 {% endblock %}
 
 {% block content %}
+    {% if regform.is_purged %}
+        {% call message_box('error', fixed_width=true, large_icon=true) %}
+            <div class="label">
+                {% trans %}Registration is disabled due to an expired retention period.{% endtrans %}
+            </div>
+        {% endcall %}
+    {% else %}
+        {{ render_registrations() }}
+    {% endif %}
+{% endblock %}
+
+{% macro render_registrations() -%}
     <div class="list registrations">
         <div class="toolbars space-after">
             <div class="toolbar">
@@ -23,11 +36,11 @@
                 </div>
                 <div class="group">
                     <button class="i-button icon-settings js-dialog-action js-customize-list {% if filtering_enabled %} highlight{% endif %}"
-                       data-href="{{ url_for('.customize_reglist', regform) }}"
-                       data-title="{% trans %}Registration list configuration{% endtrans %}"
-                       data-dialog-classes="list-filter-dialog"
-                       data-update='#registration-list'
-                       data-ajax-dialog>
+                            data-href="{{ url_for('.customize_reglist', regform) }}"
+                            data-title="{% trans %}Registration list configuration{% endtrans %}"
+                            data-dialog-classes="list-filter-dialog"
+                            data-update='#registration-list'
+                            data-ajax-dialog>
                         {% trans %}Customize list{% endtrans %}
                     </button>
                 </div>
@@ -242,4 +255,4 @@
     <script>
         setupRegistrationList();
     </script>
-{% endblock %}
+{%- endmacro %}

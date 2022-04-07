@@ -27,7 +27,20 @@
 
 
 {% block content %}
-    {% if is_restricted_access %}
+    {% if regform.is_purged %}
+        {% call message_box('error', fixed_width=true, large_icon=true) %}
+            <div class="label">
+                {% trans %}Registration is disabled due to an expired retention period.{% endtrans %}
+            </div>
+        {% endcall %}
+    {% else %}
+        {{ render_regform() }}
+    {% endif %}
+{% endblock %}
+
+
+{% macro render_regform() %}
+      {% if is_restricted_access %}
         {% call message_box('warning') %}
             {% trans -%}
                 Access to the rest of this event is restricted to registered participants.
@@ -125,4 +138,4 @@
              {{ regform_attrs_template_hook(event, regform, management) }}
         ></div>
     {% endif %}
-{% endblock %}
+{% endmacro %}

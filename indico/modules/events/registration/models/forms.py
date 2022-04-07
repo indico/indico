@@ -253,6 +253,12 @@ class RegistrationForm(db.Model):
         db.Interval,
         nullable=True
     )
+    #: Whether the registrations have been deleted due to an expired retention period
+    is_purged = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
 
     #: The Event containing this registration form
     event = db.relationship(
@@ -407,7 +413,7 @@ class RegistrationForm(db.Model):
 
     @property
     def is_active(self):
-        return self.is_open and not self.limit_reached
+        return self.is_open and not self.limit_reached and not self.is_purged
 
     @property
     @memoize_request

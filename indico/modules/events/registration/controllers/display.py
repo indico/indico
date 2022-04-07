@@ -305,6 +305,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     def _can_register(self):
         if self.regform.limit_reached:
             return False
+        elif self.regform.is_purged:
+            return False
         elif not self.regform.is_active and self.invitation is None:
             return False
         elif session.user and self.regform.get_registration(user=session.user):

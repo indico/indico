@@ -69,6 +69,11 @@
                                title="{% trans %}You have already registered{% endtrans %}">
                                 {% trans %}Check details{% endtrans %}
                             </a>
+                        {% elif regform.is_purged %}
+                            <a class="i-button highlight disabled"
+                               title="{% trans %}Registration is disabled due to an expired retention period{% endtrans %}">
+                                {{ button_text }}
+                            </a>
                         {% elif not regform.is_open %}
                             <a class="i-button highlight disabled"
                                title="{% trans %}Registration is closed{% endtrans %}">

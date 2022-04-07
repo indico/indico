@@ -67,12 +67,14 @@ def delete_field_data():
 
 @celery.periodic_task(name='registration_retention_period', run_every=crontab(minute='0', hour='3'))
 def delete_registrations():
+    is_expired = db.and_(RegistrationForm.retention_period.isnot(None),
+                         db.cast(Event.end_dt, db.Date) + RegistrationForm.retention_period <= now_utc().date())
     registrations = (Registration.query
                      .join(RegistrationForm, RegistrationForm.id == Registration.registration_form_id)
                      .join(Event)
-                     .filter(RegistrationForm.retention_period.isnot(None),
-                             db.cast(Event.end_dt, db.Date) + RegistrationForm.retention_period <= now_utc().date())
+                     .filter(is_expired)
                      .all())
+    regforms = RegistrationForm.query.join(Event).filter(is_expired).all()
 
     for reg in registrations:
         logger.info('Purging registration: %r', reg)
@@ -80,5 +82,8 @@ def delete_registrations():
             if data.field_data.field.field_impl.is_file_field:
                 _delete_file(data)
         db.session.delete(reg)
+
+    for regform in regforms:
+        regform.is_purged = True
 
     db.session.commit()

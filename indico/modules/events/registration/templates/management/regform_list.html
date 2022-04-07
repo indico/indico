@@ -100,7 +100,12 @@
                     </div>
                     <div class="toolbar">
                         <div class="group">
-                            <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-users">
+                            {% set purged_title %}
+                                {% trans %}Registration is disabled due to an expired retention period{% endtrans %}
+                            {% endset %}
+                            <a href="{{ url_for('.manage_reglist', regform) }}"
+                               class="i-button icon-users {% if regform.is_purged %}disabled{% endif %}"
+                               {% if regform.is_purged %}title="{{ purged_title }}"{% endif %}>
                                 {%- trans %}Registrations{% endtrans -%}
                                 {% block existing_count scoped %}
                                     <span class="badge">
