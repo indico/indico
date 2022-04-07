@@ -14,7 +14,9 @@
                         <div class="item">{{ privacy_info.data_controller_name }}</div>
                     {% endif %}
                     {% if privacy_info.data_controller_email %}
-                        <a class="item" href="mailto:{{ privacy_info.data_controller_email }}">{{ privacy_info.data_controller_email }}</a>
+                        <a class="item" href="mailto:{{ privacy_info.data_controller_email }}">
+                            {{ privacy_info.data_controller_email }}
+                        </a>
                     {% endif %}
                     {% if privacy_info.privacy_policy or privacy_info.privacy_policy_urls %}
                         <div class="divider"></div>

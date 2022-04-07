@@ -17,8 +17,7 @@ from indico.modules.events.layout.views import WPPage
 from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import get_theme
-from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
-from indico.modules.legal.views import WPDisplayPrivacyPolicy
+from indico.modules.events.views import WPConferenceDisplay, WPConferencePrivacyDisplay, WPSimpleEventDisplay
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import allow_signed_url
@@ -83,9 +82,11 @@ class RHEventAccessKey(RHEventBase):
 class RHDisplayPrivacyPolicy(RHEventBase):
     """Display event privacy policy."""
 
+    view_class = WPConferencePrivacyDisplay
+
     def _process(self):
-        if urls := privacy_settings.get(self.event, 'privacy_policy_urls'):
-            # There could be multiple urls, redirect to the first one.
-            return redirect(urls[0]['url'])
-        return WPDisplayPrivacyPolicy.render_template('privacy.html',
-                                                      content=privacy_settings.get(self.event, 'privacy_policy'))
+        return self.view_class.render_template(
+            'privacy_policy.html' if request.is_xhr else 'privacy.html',
+            self.event,
+            privacy_info=privacy_settings.get_all(self.event)
+        )

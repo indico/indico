@@ -1,0 +1,81 @@
+{% if event.type == 'conference' %}
+    {% extends 'events/display/conference/base.html' %}
+{% else %}
+    {% extends 'layout/meeting_page_base.html' %}
+{% endif %}
+
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {% trans %}Privacy Information{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% set data_controller_exists = privacy_info.data_controller_name or privacy_info.data_controller_email %}
+    {% set privacy_policy_exists = privacy_info.privacy_policy or privacy_info.privacy_policy_urls %}
+    {% if not data_controller_exists and not privacy_policy_exists %}
+        {% call message_box('info', fixed_width=true) %}
+            {% trans %}There is no privacy information for this event.{% endtrans %}
+        {% endcall %}
+    {% endif %}
+    {% if data_controller_exists %}
+        <div class="infogrid">
+            <div class="infoline date">
+                <span class="icon icon-user-chairperson"></span>
+                <div class="text">
+                    <div>
+                        <span class="label">{% trans %}Data controller{% endtrans %}</span>
+                    </div>
+                    {% if privacy_info.data_controller_name %}
+                        <div>
+                            {{ privacy_info.data_controller_name }}
+                        </div>
+                    {% endif %}
+                    {% if privacy_info.data_controller_email %}
+                        <div>
+                            <a href="mailto:{{ privacy_info.data_controller_email }}">{{ privacy_info.data_controller_email }}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if privacy_info.privacy_policy %}
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{% trans %}Privacy notice{% endtrans %}</h3>
+                </div>
+            </div>
+            {{ privacy_info.privacy_policy|sanitize_html }}
+        </section>
+    {% elif privacy_info.privacy_policy_urls|length == 1 %}
+        <a href="{{ privacy_info.privacy_policy_urls[0].url }}" target="_blank" rel="noopener noreferrer">
+            {% trans %}Privacy notice{% endtrans %}
+        </a>
+    {% elif privacy_info.privacy_policy_urls %}
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{% trans %}Privacy notices{% endtrans %}</h3>
+                </div>
+            </div>
+            <table class="i-table">
+                <tbody>
+                    {% for privacy_url in privacy_info.privacy_policy_urls %}
+                        <tr class="i-table" role="row">
+                            <td class="i-table">
+                                <a class="item"
+                                   href="{{ privacy_url.url }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    {{ privacy_url.title }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
+{% endblock %}

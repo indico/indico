@@ -306,6 +306,12 @@ class WPConferenceDisplay(WPConferenceDisplayBase):
         return render_template('events/display/conference.html', **self._kwargs)
 
 
+class WPConferencePrivacyDisplay(WPConferenceDisplayBase):
+    template_prefix = 'events/display/'
+    sidemenu_option = 'privacy'
+    ALLOW_JSON = True
+
+
 class WPAccessKey(WPJinjaMixin, WPDecorated):
     template_prefix = 'events/'
 

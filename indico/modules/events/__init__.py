@@ -15,6 +15,7 @@ from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.modules.events.cloning import get_event_cloners
+from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.logs import EventLogRealm
@@ -168,8 +169,13 @@ def _extend_event_menu(sender, **kwargs):
         return session.user and (get_menu_entry_by_name('my_contributions', event).is_visible or
                                  get_menu_entry_by_name('my_sessions', event).is_visible)
 
+    def _visible_privacy_information(event):
+        return any(privacy_settings.get_all(event).values())
+
     yield MenuEntryData(_('Overview'), 'overview', 'events.display_overview', position=0, static_site=True)
     yield MenuEntryData(_('My Conference'), 'my_conference', position=7, visible=_my_conference_visible)
+    yield MenuEntryData(_('Privacy Information'), 'privacy', 'events.display_privacy', position=13,
+                        visible=_visible_privacy_information, static_site=True, hide_if_restricted=False)
 
 
 @signals.core.app_created.connect
