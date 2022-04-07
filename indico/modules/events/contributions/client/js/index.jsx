@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         eventId={+eventId}
         contributionId={+contributionId}
         contributionCode={contributionCode}
-        uploadableFiles={lastRevFiles}
+        uploadableFiles={lastRevFiles.map(({id, ...rest}) => ({...rest, paperId: id}))}
       />,
       editableSubmissionButton
     );
