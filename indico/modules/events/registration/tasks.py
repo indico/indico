@@ -76,7 +76,7 @@ def delete_registrations():
     for reg in registrations:
         logger.info('Purging registration: %r', reg)
         for data in reg.data:
-            if data.storage_file_id:
+            if data.field_data.field.field_impl.is_file_field:
                 _delete_file(data)
         db.session.delete(reg)
 

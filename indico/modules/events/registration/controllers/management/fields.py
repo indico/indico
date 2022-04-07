@@ -54,7 +54,7 @@ class GeneralFieldDataSchema(mm.Schema):
 
             regform_retention_period = field.registration_form.retention_period
             if regform_retention_period and retention_period > regform_retention_period:
-                raise ValidationError(_('Retention period cannot be longer than that of registration form'),
+                raise ValidationError(_('Retention period cannot be longer than that of the registration form'),
                                       'retention_period')
 
     @post_load(pass_original=True)
