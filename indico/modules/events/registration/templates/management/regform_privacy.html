@@ -1,6 +1,14 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 {% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_rows %}
 
+{% block back_button_url -%}
+    {{ url_for('.manage_regform', regform) }}
+{%- endblock %}
+
+{% block back_button_title -%}
+    {%- trans %}Back{% endtrans -%}
+{% endblock %}
+
 {% block subtitle %}
     {% trans title=regform.title -%}Privacy settings of form "{{ title }}"{%- endtrans %}
 {% endblock %}

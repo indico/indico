@@ -34,7 +34,7 @@ class TimeDeltaField(Field):
     not be represented otherwise.
 
     :param units: The available units. Must be a tuple containing any
-                  any of 'seconds', 'minutes', 'hours' and 'days'.
+                  any of 'seconds', 'minutes', 'hours', 'days' and 'weeks'.
                   If not specified, ``('hours', 'days')`` is assumed.
     """
 
@@ -44,9 +44,11 @@ class TimeDeltaField(Field):
         'seconds': 'Seconds',
         'minutes': 'Minutes',
         'hours': 'Hours',
-        'days': 'Days'
+        'days': 'Days',
+        'weeks': 'Weeks',
     }
     magnitudes = {
+        'weeks': 7*86400,
         'days': 86400,
         'hours': 3600,
         'minutes': 60,
@@ -78,14 +80,19 @@ class TimeDeltaField(Field):
         return choices
 
     def process_formdata(self, valuelist):
-        if valuelist and len(valuelist) == 2:
-            value = int(valuelist[0])
-            unit = valuelist[1]
-            if unit not in self.magnitudes:
-                raise ValueError('Invalid unit')
-            self.data = timedelta(seconds=self.magnitudes[unit] * value)
+        if valuelist:
+            if valuelist[0]:
+                value = int(valuelist[0])
+                unit = valuelist[1] if len(valuelist) == 2 else self.units[0]
+                if unit not in self.magnitudes:
+                    raise ValueError('Invalid unit')
+                self.data = timedelta(seconds=self.magnitudes[unit] * value)
+            else:
+                self.data = None
 
     def pre_validate(self, form):
+        if len(self.units) == 1:
+            return
         if self.best_unit in self.units:
             return
         if self.object_data is None:

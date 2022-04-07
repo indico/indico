@@ -1,6 +1,16 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% block content %}
+    {% if regform.retention_period %}
+        {%- call message_box('warning', fixed_width=true) -%}
+            {% trans count=(regform.retention_period.days // 7), date=(event.end_dt + regform.retention_period)|format_date %}
+                Registrations will be permanently deleted {{ count }} week after the event ended (on {{ date }}).
+            {% pluralize %}
+                Registrations will be permanently deleted {{ count }} weeks after the event ended (on {{ date }}).
+            {% endtrans %}
+        {%- endcall %}
+    {% endif %}
+
     {% block regform_state %}
         {% if not regform.has_started %}
             {% include 'events/registration/management/regform_actions/not_started.html' %}

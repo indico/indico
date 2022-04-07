@@ -17,6 +17,7 @@ from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
+from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 from indico.util.string import snakify_keys
 
@@ -50,6 +51,11 @@ class GeneralFieldDataSchema(mm.Schema):
                 raise ValidationError('Retention period must be at least 1 week')
             if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.is_required:
                 raise ValidationError('Cannot add retention period to required field')
+
+            regform_retention_period = field.registration_form.retention_period
+            if regform_retention_period and retention_period > regform_retention_period:
+                raise ValidationError(_('Retention period cannot be longer than that of the registration form'),
+                                      'retention_period')
 
     @post_load(pass_original=True)
     def _split_unknown(self, data, original_data, **kwargs):

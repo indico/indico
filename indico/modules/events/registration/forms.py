@@ -24,6 +24,7 @@ from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
+from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.i18n import _
@@ -31,6 +32,7 @@ from indico.util.placeholders import get_missing_placeholders, render_placeholde
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
 from indico.web.forms.fields.colors import SUIColorPickerField
+from indico.web.forms.fields.datetime import TimeDeltaField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import (HiddenFieldList, IndicoEmailRecipientsField, IndicoMultipleTagSelectField,
                                             IndicoParticipantVisibilityField)
@@ -121,13 +123,22 @@ class RegistrationFormEditForm(IndicoForm):
 
 
 class RegistrationFormCreateForm(IndicoForm):
-    _meeting_fields = ('visibility',)  # The meeting regform has a default title
-    _conference_fields = ('title', 'visibility')
+    _meeting_fields = ('visibility', 'retention_period')  # The meeting regform has a default title
+    _conference_fields = ('title', 'visibility', 'retention_period')
     title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
     visibility = IndicoParticipantVisibilityField(_('Participant list visibility'),
                                                   description=_('Specify under which conditions the participant list '
                                                                 'will be visible to other participants and everyone '
                                                                 'else who can access the event'))
+    retention_period = TimeDeltaField(_('Retention period'), units=('weeks',),
+                                      description=_('Specify for how many weeks the registration '
+                                                    'data should be stored. Retention periods for individual '
+                                                    'fields can be set in the registration form designer'))
+
+    def validate_retention_period(self, field):
+        retention_period = field.data
+        if not retention_period and retention_period is not None:
+            raise ValidationError(_('The retention period cannot be zero.'))
 
 
 class RegistrationFormScheduleForm(IndicoForm):
@@ -495,6 +506,11 @@ class RegistrationPrivacyForm(IndicoForm):
                                                   description=_('Specify under which conditions the participant list '
                                                                 'will be visible to other participants and everyone '
                                                                 'else who can access the event'))
+    retention_period = TimeDeltaField(_('Retention period'), units=('weeks',),
+                                      description=_('Specify for how many weeks the registration '
+                                                    'data should be stored. Retention periods for individual '
+                                                    'fields can be set in the registration form designer'),
+                                      render_kw={'placeholder': _('Indefinite')})
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
@@ -519,3 +535,21 @@ class RegistrationPrivacyForm(IndicoForm):
             (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all)
         ):
             raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
+
+    def validate_retention_period(self, field):
+        retention_period = field.data
+        if retention_period is None:
+            return
+        elif not retention_period:
+            raise ValidationError(_('The retention period cannot be zero.'))
+        fields = (RegistrationFormItem.query
+                  .with_parent(self.regform)
+                  .filter(RegistrationFormItem.is_enabled,
+                          ~RegistrationFormItem.is_deleted,
+                          RegistrationFormItem.retention_period.isnot(None),
+                          RegistrationFormItem.retention_period > retention_period)
+                  .all())
+
+        if fields:
+            raise ValidationError(_('The retention period of the whole form cannot be lower than '
+                                    'that of individual fields.'))

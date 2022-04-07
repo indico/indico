@@ -15,8 +15,16 @@ from indico.modules.events import Event
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.models.form_fields import RegistrationFormField, RegistrationFormFieldData
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.util.date_time import now_utc
+
+
+def _delete_file(reg_data):
+    logger.debug('Deleting file: %s', reg_data.filename)
+    try:
+        reg_data.delete()
+    except Exception as e:
+        logger.error('Failed to delete file for %r: %s', reg_data, e)
 
 
 def _group_by_regform(registration_data):
@@ -28,6 +36,7 @@ def _group_by_regform(registration_data):
 
 @celery.periodic_task(name='registration_fields_retention_period', run_every=crontab(minute='0', hour='3'))
 def delete_field_data():
+    today = now_utc().date()
     registration_data = (RegistrationData.query
                          .join(RegistrationFormFieldData)
                          .join(RegistrationFormField, RegistrationFormFieldData.field_id == RegistrationFormField.id)
@@ -35,7 +44,7 @@ def delete_field_data():
                          .join(Event)
                          .filter(~RegistrationFormField.is_purged,
                                  RegistrationFormField.retention_period.isnot(None),
-                                 Event.end_dt + RegistrationFormField.retention_period <= now_utc())
+                                 db.cast(Event.end_dt, db.Date) + RegistrationFormField.retention_period <= today)
                          .all())
 
     data_by_regform = _group_by_regform(registration_data)
@@ -51,10 +60,25 @@ def delete_field_data():
             # purged fields since they have the 'is_purged' flag set to True
             data.data = data.field_data.field.field_impl.default_value
             if data.field_data.field.field_impl.is_file_field:
-                logger.debug('Deleting file: %s', data.filename)
-                try:
-                    data.delete()
-                except Exception as e:
-                    logger.error('Failed to delete file for %r: %s', data, e)
+                _delete_file(data)
             data.field_data.field.is_purged = True
+    db.session.commit()
+
+
+@celery.periodic_task(name='registration_retention_period', run_every=crontab(minute='0', hour='3'))
+def delete_registrations():
+    registrations = (Registration.query
+                     .join(RegistrationForm, RegistrationForm.id == Registration.registration_form_id)
+                     .join(Event)
+                     .filter(RegistrationForm.retention_period.isnot(None),
+                             db.cast(Event.end_dt, db.Date) + RegistrationForm.retention_period <= now_utc().date())
+                     .all())
+
+    for reg in registrations:
+        logger.info('Purging registration: %r', reg)
+        for data in reg.data:
+            if data.field_data.field.field_impl.is_file_field:
+                _delete_file(data)
+        db.session.delete(reg)
+
     db.session.commit()

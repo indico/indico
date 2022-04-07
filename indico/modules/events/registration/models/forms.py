@@ -248,6 +248,11 @@ class RegistrationForm(db.Model):
         nullable=True,
         index=True
     )
+    #: period for which the registration itself should be kept
+    retention_period = db.Column(
+        db.Interval,
+        nullable=True
+    )
 
     #: The Event containing this registration form
     event = db.relationship(
