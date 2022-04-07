@@ -16,6 +16,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.models.form_fields import RegistrationFormField, RegistrationFormFieldData
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
+from indico.modules.events.registration.util import close_registration
 from indico.util.date_time import now_utc
 
 
@@ -84,6 +85,7 @@ def delete_registrations():
         db.session.delete(reg)
 
     for regform in regforms:
+        close_registration(regform)
         regform.is_purged = True
 
     db.session.commit()

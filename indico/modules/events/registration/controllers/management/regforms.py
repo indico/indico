@@ -25,7 +25,8 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
-from indico.modules.events.registration.util import create_personal_data_fields, get_flat_section_setup_data
+from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
+                                                     get_flat_section_setup_data)
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
                                                       WPManageRegistrationStats)
 from indico.modules.events.util import update_object_principals
@@ -258,9 +259,7 @@ class RHRegistrationFormClose(RHManageRegFormBase):
     """Close registrations for a registration form."""
 
     def _process(self):
-        self.regform.end_dt = now_utc()
-        if not self.regform.has_started:
-            self.regform.start_dt = self.regform.end_dt
+        close_registration(self.regform)
         flash(_('Registrations for {} are now closed').format(self.regform.title), 'success')
         logger.info('Registrations for %s closed by %s', self.regform, session.user)
         log_text = f'Registration form "{self.regform.title}" was closed'

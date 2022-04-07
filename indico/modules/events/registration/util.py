@@ -42,7 +42,7 @@ from indico.modules.events.registration.notifications import (notify_invitation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
 from indico.modules.users.util import get_user_by_email
-from indico.util.date_time import format_date
+from indico.util.date_time import format_date, now_utc
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
@@ -814,3 +814,9 @@ def diff_registration_data(old_data, new_data):
                 'new': {'price': new['price'], 'friendly_data': new['friendly_data']}
             }
     return diff
+
+
+def close_registration(regform):
+    regform.end_dt = now_utc()
+    if not regform.has_started:
+        regform.start_dt = regform.end_dt
