@@ -123,13 +123,22 @@ class RegistrationFormEditForm(IndicoForm):
 
 
 class RegistrationFormCreateForm(IndicoForm):
-    _meeting_fields = ('visibility',)  # The meeting regform has a default title
-    _conference_fields = ('title', 'visibility')
+    _meeting_fields = ('visibility', 'retention_period')  # The meeting regform has a default title
+    _conference_fields = ('title', 'visibility', 'retention_period')
     title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
     visibility = IndicoParticipantVisibilityField(_('Participant list visibility'),
                                                   description=_('Specify under which conditions the participant list '
                                                                 'will be visible to other participants and everyone '
                                                                 'else who can access the event'))
+    retention_period = TimeDeltaField(_('Retention period'), units=('weeks',),
+                                      description=_('Specify for how many weeks the registration '
+                                                    'data should be stored. Retention periods for individual '
+                                                    'fields can be set in the registration form designer'))
+
+    def validate_retention_period(self, field):
+        retention_period = field.data
+        if not retention_period and retention_period is not None:
+            raise ValidationError(_('The retention period cannot be zero.'))
 
 
 class RegistrationFormScheduleForm(IndicoForm):
