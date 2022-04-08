@@ -120,7 +120,7 @@ import {$T} from 'indico/utils/i18n';
         .text(
           this.type === 'fixed'
             ? this.text
-            : this.type === 'fixed_image'
+            : this.type === 'fixed_image' && this.image_id
             ? ''
             : itemTitles[this.type]
         );
@@ -375,7 +375,7 @@ import {$T} from 'indico/utils/i18n';
       });
       newDiv.append(item.toHTML());
       if (item.type === 'fixed_image' && item.image_id) {
-        const $imageElement = createFixedImageElement(item, images[item.image_id]);
+        const $imageElement = createFixedImageElement(item);
         $imageElement.appendTo(newDiv.find('.designer-item'));
       }
       if (item.selected && !isBackside) {
@@ -578,9 +578,7 @@ import {$T} from 'indico/utils/i18n';
 
     div.replaceWith(selectedItem.toHTML());
     if (selectedItem.type === 'fixed_image') {
-      $('.designer-item.selected').append(
-        createFixedImageElement(selectedItem, images[selectedItem.image_id])
-      );
+      $('.designer-item.selected').append(createFixedImageElement(selectedItem));
     }
   }
 
@@ -592,6 +590,15 @@ import {$T} from 'indico/utils/i18n';
     if (!Object.keys(items).length && !template.background_url) {
       alertPopup(
         $T.gettext('The template cannot be empty. Add some elements or a background image.'),
+        $T.gettext('Warning')
+      );
+      return;
+    }
+    if (Object.values(items).some(item => item.type === 'fixed_image' && !item.image_id)) {
+      alertPopup(
+        $T.gettext(
+          'The Fixed image element cannot be empty. Upload an image inside it or remove it.'
+        ),
         $T.gettext('Warning')
       );
       return;
@@ -735,11 +742,11 @@ import {$T} from 'indico/utils/i18n';
     }
   }
 
-  function createFixedImageElement(item, imageUrl) {
+  function createFixedImageElement(item) {
     const $imageElement = $('<img/>');
     $imageElement
       .attr({
-        src: imageUrl,
+        src: images[item.image_id],
       })
       .css({
         position: 'absolute',
@@ -751,11 +758,11 @@ import {$T} from 'indico/utils/i18n';
     return $imageElement;
   }
 
-  function displayFixedImage(imageUrl) {
+  function displayFixedImage() {
     const $div = $('.ui-draggable[data-id=' + lastSelectedItem.id + '] div');
     $div.text('');
     $div.find('img').remove();
-    const $imageElement = createFixedImageElement(lastSelectedItem, imageUrl);
+    const $imageElement = createFixedImageElement(lastSelectedItem);
     $imageElement.appendTo($div);
     const $imageFile = $('#imageFile');
     $imageFile.val('');
@@ -992,7 +999,8 @@ import {$T} from 'indico/utils/i18n';
           }
           if (lastSelectedItem.type === 'fixed_image') {
             lastSelectedItem.image_id = data.image_id;
-            displayFixedImage(data.image_url);
+            images[data.image_id] = data.image_url;
+            displayFixedImage();
           }
         },
       });
