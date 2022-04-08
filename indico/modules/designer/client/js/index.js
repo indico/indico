@@ -120,7 +120,7 @@ import {$T} from 'indico/utils/i18n';
         .text(
           this.type === 'fixed'
             ? this.text
-            : this.type === 'fixed_image'
+            : this.type === 'fixed_image' && this.image_id
             ? ''
             : itemTitles[this.type]
         );
@@ -594,16 +594,14 @@ import {$T} from 'indico/utils/i18n';
       );
       return;
     }
-    for (const item of Object.values(items)) {
-      if (item.type === 'fixed_image' && !item.image_id) {
-        alertPopup(
-          $T.gettext(
-            'The Fixed image element cannot be empty. Upload an image inside it or remove it.'
-          ),
-          $T.gettext('Warning')
-        );
-        return;
-      }
+    if (Object.values(items).some(item => item.type === 'fixed_image' && !item.image_id)) {
+      alertPopup(
+        $T.gettext(
+          'The Fixed image element cannot be empty. Upload an image inside it or remove it.'
+        ),
+        $T.gettext('Warning')
+      );
+      return;
     }
     if (removeBackSide) {
       backsideTemplateID = null;
