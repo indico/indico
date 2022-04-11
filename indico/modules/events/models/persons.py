@@ -350,19 +350,14 @@ class EventPerson(PersonMixin, db.Model):
     def has_links(self):
         """Whether the person is an author, speaker, etc., in the event."""
         chairpersons = {link.person for link in self.event.person_links}
-        if self in chairpersons:
-            return True
-        if (
-            self.event.has_feature('abstracts') and
-            {link for link in self.abstract_links if not link.abstract.is_deleted}
-        ):
-            return True
-        if {link for link in self.session_block_links if not link.session_block.session.is_deleted}:
-            return True
-        if {link for link in self.contribution_links if not link.contribution.is_deleted}:
-            return True
-        if {link for link in self.subcontribution_links if not link.subcontribution.contribution.is_deleted}:
-            return True
+        return (
+            self in chairpersons or
+            # Check regardless of the abstract feature being enabled
+            any(link for link in self.abstract_links if not link.abstract.is_deleted) or
+            any(link for link in self.session_block_links if not link.session_block.session.is_deleted) or
+            any(link for link in self.contribution_links if not link.contribution.is_deleted) or
+            any(link for link in self.subcontribution_links if not link.subcontribution.contribution.is_deleted)
+        )
 
 
 class PersonLinkBase(PersonMixin, db.Model):

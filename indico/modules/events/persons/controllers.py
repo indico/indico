@@ -198,11 +198,15 @@ class RHPersonsBase(RHManageEventBase):
         for reg in regs:
             internal_role_users[reg.user.email]['registrations'].append(reg)
 
-        # Some EventPersons will have no roles since they were connected to deleted things
-        for person in persons:
-            if not any(persons[person]['roles'].values()):
-                persons[person]['roles']['no_roles'] = True
         persons = persons | internal_role_users
+        # Some EventPersons will have no built-in roles since they were connected to deleted things
+        builtin_roles = set(BUILTIN_ROLES)
+        for person in persons:
+            roles = set(persons[person]['roles'].keys())
+            if not roles:
+                persons[person]['roles']['no_roles'] = True
+            if not roles & builtin_roles:
+                persons[person]['roles']['no_builtin_roles'] = True
         return persons
 
 
