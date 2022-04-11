@@ -96,7 +96,7 @@ export default function EditableSubmissionButton({
                       contrib_id: contributionId,
                       type: currentType,
                     })}
-                    uploadableFiles={uploadableFiles}
+                    files={uploadableFiles}
                     mustChange
                   />
                 </Form>
