@@ -391,14 +391,9 @@ class RHDeleteUnusedEventPerson(RHPersonsBase):
         RHPersonsBase._process_args(self)
         self.person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
 
-    def _is_unused(self):
-        persons = self.get_persons()
-        person = persons.get(self.person.email or self.person.id)
-        return not person or person['roles'].get('no_roles', False)
-
     def _process(self):
-        if not self._is_unused():
-            raise Forbidden(_('Only users with no roles can be deleted.'))
+        if self.person.has_links:
+            raise Forbidden(_('Only users with no ties to the event can be deleted.'))
         db.session.delete(self.person)
         logger.info('EventPerson deleted from event %r: %r', self.event, self.person)
         return jsonify_data()
