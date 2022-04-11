@@ -28,7 +28,8 @@ node_modules
 # IDE files
 .idea/
 *.sublime-*
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 
 # testing
 .coverage

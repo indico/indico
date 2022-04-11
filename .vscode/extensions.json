@@ -1,0 +1,21 @@
+{
+  "recommendations": [
+    // linters
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "stylelint.vscode-stylelint",
+    // python
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    // other file formwards we use
+    "redhat.vscode-yaml",
+    "samuelcolvin.jinjahtml",
+    // misc
+    "ms-vscode.references-view",
+    "jakearl.search-editor-apply-changes",
+  ],
+  "unwantedRecommendations": [
+    "ms-azuretools.vscode-docker",
+    "ms-edgedevtools.vscode-edge-devtools",
+  ]
+}
