@@ -55,6 +55,7 @@ function SyncedFinalInput({name, syncedValues, readOnly, required, ...rest}) {
               onClick: () => {
                 if (syncedFields.includes(name)) {
                   setSyncedFields(syncedFields.filter(x => x !== name));
+                  form.change(name, form.getFieldState(name).initial);
                 } else {
                   setSyncedFields([...syncedFields, name].sort());
                   form.change(name, syncedValues[name]);
