@@ -28,13 +28,13 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './PersonalDataForm.module.scss';
 
-function SyncedFinalInput({name, syncedValues, readOnly, ...rest}) {
+function SyncedFinalInput({name, syncedValues, readOnly, required, ...rest}) {
   const form = useForm();
   const {
     input: {onChange: setSyncedFields, value: syncedFields},
   } = useField('synced_fields');
 
-  const syncable = syncedValues[name] !== undefined;
+  const syncable = syncedValues[name] !== undefined && (!required || syncedValues[name]);
 
   return (
     <FinalInput
@@ -42,6 +42,7 @@ function SyncedFinalInput({name, syncedValues, readOnly, ...rest}) {
       name={name}
       styleName={syncable ? 'syncable' : ''}
       readOnly={readOnly || syncedFields.includes(name)}
+      required={required}
       action={
         syncable
           ? {
@@ -70,10 +71,12 @@ SyncedFinalInput.propTypes = {
   name: PropTypes.string.isRequired,
   syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
   readOnly: PropTypes.bool,
+  required: PropTypes.bool,
 };
 
 SyncedFinalInput.defaultProps = {
   readOnly: false,
+  required: false,
 };
 
 function PersonalDataForm({userId, userValues, titles, syncedValues}) {
