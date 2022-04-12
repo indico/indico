@@ -207,9 +207,7 @@ class RHPersonalData(RHUserBase):
             flash(_('Your personal data was successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
         titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
-        print(self.user.synced_values)
         user_values = UserPersonalDataSchema().dump(self.user)
-        print(user_values)
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user, form=form,
                                                   titles=titles, user_values=user_values)
 
