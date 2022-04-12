@@ -41,7 +41,7 @@ function SyncedFinalInput({name, syncedValues, readOnly, required, ...rest}) {
       {...rest}
       name={name}
       styleName={syncable ? 'syncable' : ''}
-      readOnly={readOnly || syncedFields.includes(name)}
+      readOnly={readOnly || (syncable && syncedFields.includes(name))}
       required={required}
       action={
         syncable

@@ -218,11 +218,13 @@ class RHPersonalDataUpdate(RHUserBase):
     @use_args(UserPersonalDataSchema, partial=True)
     def _process(self, changes):
         logger.info('Profile of user %r updated by %r: %r', self.user, session.user, changes)
-        if 'synced_fields' in changes:
-            # we set this first so these fields are skipped below and only
-            # get updated during in synchronize_data which will flash a message
-            # informing the user about the changes made by the sync
-            self.user.synced_fields = changes.pop('synced_fields')
+        synced_fields = changes.pop('synced_fields', self.user.synced_fields)
+        syncable_fields = {k for k, v in self.user.synced_values.items()
+                           if v or k not in ('first_name', 'last_name')}
+        # we set this first so these fields are skipped below and only
+        # get updated during in synchronize_data which will flash a message
+        # informing the user about the changes made by the sync
+        self.user.synced_fields = synced_fields & syncable_fields
         for key, value in changes.items():
             if key not in self.user.synced_fields:
                 setattr(self.user, key, value)
