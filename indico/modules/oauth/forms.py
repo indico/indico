@@ -82,11 +82,8 @@ class PersonalTokenForm(IndicoForm):
 
     def validate_name(self, field):
         query = (
-            PersonalToken.query
-            .filter(
-                PersonalToken.revoked_dt.is_(None),
-                db.func.lower(PersonalToken.name) == field.data.lower()
-            )
+            self.user.query_personal_tokens()
+            .filter(db.func.lower(PersonalToken.name) == field.data.lower())
         )
         if self.token:
             query = query.filter(PersonalToken.id != self.token.id)
