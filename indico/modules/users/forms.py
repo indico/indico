@@ -8,8 +8,9 @@
 from operator import itemgetter
 
 from pytz import common_timezones, common_timezones_set
-from wtforms.fields import BooleanField, EmailField, SelectField, StringField
-from wtforms.validators import DataRequired, Email, ValidationError
+
+from wtforms.fields import BooleanField, EmailField, IntegerField, SelectField, StringField
+from wtforms.validators import DataRequired, Email, NumberRange, Optional, ValidationError
 
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
@@ -51,15 +52,12 @@ class UserPreferencesForm(IndicoForm):
         widget=SwitchWidget(),
         description=_('The previewer is used by default for image and text files, but not for PDF files.'))
 
-    add_ical_alerts = StringField(
+    add_ical_alerts = IntegerField(
         _('Add alerts to iCal'),
-        description=_('Add an alert to exported iCal files/URLs. ' +
-                      'Value should be number of minutes to notify before an event. ' +
-                      'A blank field disables this function.'))
-
-    def validate_add_ical_alerts(self, field):
-        if field.data != '' and not field.data.isnumeric():
-            raise ValidationError(_('Alert time must be either a number or blank (to disable).'))
+        [Optional(), NumberRange(min=-1)],
+        description=_('Add an alert to exported iCal files/URLs. '
+                      'Value should be number of minutes to notify before an event. '
+                      'A value of -1 disables this function.'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

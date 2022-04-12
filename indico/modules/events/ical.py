@@ -5,8 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import datetime
 import typing as t
+from datetime import timedelta
 from email import message
 from email.mime.base import MIMEBase
 from email.policy import compat32
@@ -147,11 +147,10 @@ def generate_event_component(
         component['description'] = data['description']
 
     # If the user exists and the add_icloud_alerts preference isn't blank
-    if user and user.settings.get('add_ical_alerts', '') != '':
+    if user and (alerts := user.settings.get('add_ical_alerts', -1)) != -1:
         alarm = icalendar.Alarm()
-        alarm.add('prodid', '-//CERN//INDICO//EN')
-        alarm.add('action', 'AUDIO')
-        alarm.add('trigger', datetime.timedelta(seconds=-60.0 * float(user.settings.get('add_ical_alerts', ''))))
+        alarm.add('action', 'DISPLAY')
+        alarm.add('trigger', timedelta(minutes=-alerts))
         alarm.add('summary', component['summary'])
         if data['description']:
             alarm.add('description', data['description'])
