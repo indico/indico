@@ -35,6 +35,7 @@ Improvements
 - Add an option to send notifications of new abstract comments (:issue:`5266`, :pr:`5284`)
 - Badge/poster templates can have additional images besides the background image
   (:pr:`5273`, thanks :user:`SegiNyn`)
+- Add ability to add alerts to iCal exports (:issue:`5318`  :pr:`5320`)
 
 Bugfixes
 ^^^^^^^^
