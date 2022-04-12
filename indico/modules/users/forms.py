@@ -10,7 +10,7 @@ from operator import itemgetter
 from pytz import common_timezones, common_timezones_set
 
 from wtforms.fields import BooleanField, EmailField, IntegerField, SelectField, StringField
-from wtforms.validators import DataRequired, Email, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, NumberRange, ValidationError
 
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
@@ -58,8 +58,8 @@ class UserPreferencesForm(IndicoForm):
         description=_('Add an event reminder to exported iCal files/URLs.'))
 
     add_ical_alerts_mins = IntegerField(
-        _('Timeout for iCal alerts'),
-        [Optional(), NumberRange(min=0)],
+        _('Calendar notification time in minutes'),
+        [HiddenUnless('add_ical_alerts'), NumberRange(min=0)],
         description=_('Number of minutes to notify before an event.'))
 
     def __init__(self, *args, **kwargs):

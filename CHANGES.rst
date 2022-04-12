@@ -36,7 +36,7 @@ Improvements
 - Badge/poster templates can have additional images besides the background image
   (:pr:`5273`, thanks :user:`SegiNyn`)
 - Add ability to add alerts to iCal exports (:issue:`5318`, :pr:`5320`, thanks
-  :user: `PerilousApricot`)
+  :user:`PerilousApricot`)
 
 Bugfixes
 ^^^^^^^^
