@@ -52,12 +52,15 @@ class UserPreferencesForm(IndicoForm):
         widget=SwitchWidget(),
         description=_('The previewer is used by default for image and text files, but not for PDF files.'))
 
-    add_ical_alerts = IntegerField(
+    add_ical_alerts = BooleanField(
         _('Add alerts to iCal'),
-        [Optional(), NumberRange(min=-1)],
-        description=_('Add an alert to exported iCal files/URLs. '
-                      'Value should be number of minutes to notify before an event. '
-                      'A value of -1 disables this function.'))
+        widget=SwitchWidget(),
+        description=_('Add an event reminder to exported iCal files/URLs.'))
+
+    add_ical_alerts_mins = IntegerField(
+        _('Timeout for iCal alerts'),
+        [Optional(), NumberRange(min=0)],
+        description=_('Number of minutes to notify before an event.'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
