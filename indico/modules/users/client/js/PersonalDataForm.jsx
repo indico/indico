@@ -19,6 +19,7 @@ import {
   FinalDropdown,
   FinalInput,
   FinalSubmitButton,
+  FinalTextArea,
   getChangedValues,
   handleSubmitError,
   parsers as p,
@@ -28,7 +29,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './PersonalDataForm.module.scss';
 
-function SyncedFinalInput({name, syncedValues, readOnly, required, ...rest}) {
+function SyncedFinalField({name, FieldComponent, syncedValues, readOnly, required, ...rest}) {
   const form = useForm();
   const {
     input: {onChange: setSyncedFields, value: syncedFields},
@@ -37,7 +38,7 @@ function SyncedFinalInput({name, syncedValues, readOnly, required, ...rest}) {
   const syncable = syncedValues[name] !== undefined && (!required || syncedValues[name]);
 
   return (
-    <FinalInput
+    <FieldComponent
       {...rest}
       name={name}
       styleName={syncable ? 'syncable' : ''}
@@ -68,17 +69,26 @@ function SyncedFinalInput({name, syncedValues, readOnly, required, ...rest}) {
   );
 }
 
-SyncedFinalInput.propTypes = {
+SyncedFinalField.propTypes = {
   name: PropTypes.string.isRequired,
+  FieldComponent: PropTypes.elementType.isRequired,
   syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
   readOnly: PropTypes.bool,
   required: PropTypes.bool,
 };
 
-SyncedFinalInput.defaultProps = {
+SyncedFinalField.defaultProps = {
   readOnly: false,
   required: false,
 };
+
+function SyncedFinalInput(props) {
+  return <SyncedFinalField FieldComponent={FinalInput} {...props} />;
+}
+
+function SyncedFinalTextArea(props) {
+  return <SyncedFinalField FieldComponent={FinalTextArea} {...props} />;
+}
 
 function PersonalDataForm({userId, userValues, titles, syncedValues}) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
@@ -135,7 +145,7 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
               label={Translate.string('Affiliation')}
               syncedValues={syncedValues}
             />
-            <SyncedFinalInput
+            <SyncedFinalTextArea
               name="address"
               label={Translate.string('Address')}
               syncedValues={syncedValues}

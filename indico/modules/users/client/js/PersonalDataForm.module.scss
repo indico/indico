@@ -9,7 +9,8 @@
 @import 'base/defaults';
 
 .syncable {
-  input[readonly] {
+  input[readonly],
+  textarea[readonly] {
     @include placeholder-color($color: $light-black);
     background: repeating-linear-gradient(
       -40deg,
