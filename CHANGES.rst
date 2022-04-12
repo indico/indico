@@ -37,6 +37,7 @@ Bugfixes
 - Fix downloading files from editables without a published revision (:pr:`5290`)
 - Do not mark participants with deleted/inactive registrations as registered in
   participant roles list (:pr:`5308`)
+- Do not enforce personal token name uniqueness across different users (:pr:`5317`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
