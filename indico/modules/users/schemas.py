@@ -5,12 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from marshmallow import validate
 from marshmallow.fields import Function, List, String
 
 from indico.core.marshmallow import mm
 from indico.modules.categories import Category
 from indico.modules.users import User
-from indico.modules.users.models.users import UserTitle
+from indico.modules.users.models.users import UserTitle, syncable_fields
 from indico.util.marshmallow import NoneValueEnumField
 
 
@@ -25,10 +26,13 @@ class UserSchema(mm.SQLAlchemyAutoSchema):
 
 class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
-    synced_fields = List(String())
+    email = String(dump_only=True)
+    synced_fields = List(String(validate=validate.OneOf(syncable_fields)))
 
     class Meta:
         model = User
+        # XXX: this schema is also used for updating a user's personal data, so the fields here must
+        # under no circumstances include sensitive fields that should not be modifiable by a user!
         fields = ('title', 'first_name', 'last_name', 'email', 'affiliation', 'address', 'phone', 'synced_fields')
 
 

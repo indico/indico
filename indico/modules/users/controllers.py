@@ -219,7 +219,17 @@ class RHPersonalDataUpdate(RHUserBase):
 
     @use_args(UserPersonalDataSchema, partial=True)
     def _process(self, changes):
-        print(changes)
+        logger.info('Profile of user %r updated by %r: %r', self.user, session.user, changes)
+        if 'synced_fields' in changes:
+            # we set this first so these fields are skipped below and only
+            # get updated during in synchronize_data which will flash a message
+            # informing the user about the changes made by the sync
+            self.user.synced_fields = changes.pop('synced_fields')
+        for key, value in changes.items():
+            if key not in self.user.synced_fields:
+                setattr(self.user, key, value)
+        self.user.synchronize_data(refresh=True)
+        flash(_('Your personal data was successfully updated.'), 'success')
         return '', 204
 
 
