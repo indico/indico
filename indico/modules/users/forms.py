@@ -58,7 +58,7 @@ class UserPreferencesForm(IndicoForm):
         description=_('Add an event reminder to exported iCal files/URLs.'))
 
     add_ical_alerts_mins = IntegerField(
-        _('Calendar notification time in minutes'),
+        _('iCal notification time'),
         [HiddenUnless('add_ical_alerts'), NumberRange(min=0)],
         description=_('Number of minutes to notify before an event.'))
 
