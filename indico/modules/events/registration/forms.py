@@ -132,8 +132,9 @@ class RegistrationFormCreateForm(IndicoForm):
                                                                 'else who can access the event'))
     retention_period = TimeDeltaField(_('Retention period'), units=('weeks',),
                                       description=_('Specify for how many weeks the registration '
-                                                    'data should be stored. Retention periods for individual '
-                                                    'fields can be set in the registration form designer'))
+                                                    'data, including the participant list, should be stored. '
+                                                    'Retention periods for individual fields can be set in the '
+                                                    'registration form designer'))
 
     def validate_retention_period(self, field):
         retention_period = field.data
@@ -508,8 +509,9 @@ class RegistrationPrivacyForm(IndicoForm):
                                                                 'else who can access the event'))
     retention_period = TimeDeltaField(_('Retention period'), units=('weeks',),
                                       description=_('Specify for how many weeks the registration '
-                                                    'data should be stored. Retention periods for individual '
-                                                    'fields can be set in the registration form designer'),
+                                                    'data, including the participant list, should be stored. '
+                                                    'Retention periods for individual fields can be set in the '
+                                                    'registration form designer'),
                                       render_kw={'placeholder': _('Indefinite')})
 
     def __init__(self, *args, **kwargs):
