@@ -55,6 +55,10 @@ class WPUserProfilePic(WPUser):
     bundles = ('module_users.profile_picture.js', 'module_users.profile_picture.css')
 
 
+class WPUserPersonalData(WPUser):
+    bundles = ('module_users.personal_data.js', 'module_users.personal_data.css')
+
+
 class WPUserFavorites(WPUser):
     bundles = ('module_users.favorites.js', 'module_users.favorites.css')
 

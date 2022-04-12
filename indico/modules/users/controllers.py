@@ -39,20 +39,21 @@ from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
                                         SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.users import ProfilePictureSource
+from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
-from indico.modules.users.schemas import BasicCategorySchema
+from indico.modules.users.schemas import BasicCategorySchema, UserPersonalDataSchema
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
                                        merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
-from indico.modules.users.views import WPUser, WPUserDashboard, WPUserFavorites, WPUserProfilePic, WPUsersAdmin
+from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserFavorites, WPUserPersonalData, WPUserProfilePic,
+                                        WPUsersAdmin)
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
-from indico.web.args import use_kwargs
+from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -205,7 +206,21 @@ class RHPersonalData(RHUserBase):
             self.user.synchronize_data(refresh=True)
             flash(_('Your personal data was successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
-        return WPUser.render_template('personal_data.html', 'personal_data', user=self.user, form=form)
+        titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
+        print(self.user.synced_values)
+        user_values = UserPersonalDataSchema().dump(self.user)
+        print(user_values)
+        return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user, form=form,
+                                                  titles=titles, user_values=user_values)
+
+
+class RHPersonalDataUpdate(RHUserBase):
+    allow_system_user = True
+
+    @use_args(UserPersonalDataSchema, partial=True)
+    def _process(self, changes):
+        print(changes)
+        return '', 204
 
 
 class RHProfilePicturePage(RHUserBase):

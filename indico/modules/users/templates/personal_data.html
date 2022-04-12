@@ -37,6 +37,9 @@
                 {% endif %}
             </div>
             <div class="i-box-content">
+                <div id="personal-details-form-container"></div>
+            </div>
+            <div class="i-box-content">
                 {# Personal details form #}
                 {{ form_header(form) }}
                 {{ form_rows(form) }}
@@ -49,4 +52,13 @@
             </div>
         </div>
     </div>
+
+    <script>
+        setupPersonalDataForm(
+            {{ (user.id if user != session.user else none) | tojson }},
+            {{ user_values | tojson }},
+            {{ titles | tojson }},
+            {{ user.synced_values | tojson }},
+        );
+    </script>
 {% endblock %}

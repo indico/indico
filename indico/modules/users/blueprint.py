@@ -9,15 +9,15 @@ from flask import request
 
 from indico.modules.users.api import RHUserAPI
 from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHExportDashboardICS,
-                                              RHExportDashboardICSLegacy, RHPersonalData, RHProfilePictureDisplay,
-                                              RHProfilePicturePage, RHProfilePicturePreview, RHRegistrationRequestList,
-                                              RHRejectRegistrationRequest, RHSaveProfilePicture, RHUserBlock,
-                                              RHUserDashboard, RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
-                                              RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesAPI,
-                                              RHUserFavoritesCategoryAPI, RHUserPreferences, RHUsersAdmin,
-                                              RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
-                                              RHUsersAdminSettings, RHUserSearch, RHUserSearchInfo,
-                                              RHUserSuggestionsRemove)
+                                              RHExportDashboardICSLegacy, RHPersonalData, RHPersonalDataUpdate,
+                                              RHProfilePictureDisplay, RHProfilePicturePage, RHProfilePicturePreview,
+                                              RHRegistrationRequestList, RHRejectRegistrationRequest,
+                                              RHSaveProfilePicture, RHUserBlock, RHUserDashboard, RHUserEmails,
+                                              RHUserEmailsDelete, RHUserEmailsSetPrimary, RHUserEmailsVerify,
+                                              RHUserFavorites, RHUserFavoritesAPI, RHUserFavoritesCategoryAPI,
+                                              RHUserPreferences, RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
+                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSearch,
+                                              RHUserSearchInfo, RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -50,6 +50,7 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/suggestions/categories/<int:category_id>', 'user_suggestions_remove', RHUserSuggestionsRemove,
                      methods=('DELETE',))
     _bp.add_url_rule('/profile/', 'user_profile', RHPersonalData, methods=('GET', 'POST'))
+    _bp.add_url_rule('/profile/', 'user_profile_update', RHPersonalDataUpdate, methods=('PATCH',))
     _bp.add_url_rule('/profile/picture', 'user_profile_picture_page', RHProfilePicturePage)
     _bp.add_url_rule('/profile/picture', 'save_profile_picture', RHSaveProfilePicture, methods=('POST',))
     _bp.add_url_rule('/profile/picture/preview/<any(standard,gravatar,identicon,custom):source>',
