@@ -214,7 +214,7 @@ class RHPersonalDataUpdate(RHUserBase):
         syncable_fields = {k for k, v in self.user.synced_values.items()
                            if v or k not in ('first_name', 'last_name')}
         # we set this first so these fields are skipped below and only
-        # get updated during in synchronize_data which will flash a message
+        # get updated in synchronize_data which will flash a message
         # informing the user about the changes made by the sync
         self.user.synced_fields = synced_fields & syncable_fields
         for key, value in changes.items():
