@@ -382,6 +382,7 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
     })}
     setup_schema_fields = {
         'max_persons': fields.Integer(load_default=0, validate=validate.Range(0)),
+        'persons_count_against_limit': fields.Bool(load_default=False),
     }
 
     @property

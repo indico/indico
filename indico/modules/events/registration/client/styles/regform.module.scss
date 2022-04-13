@@ -95,6 +95,10 @@
         margin-left: 2em;
       }
 
+      .places-left {
+        margin-left: 1em;
+      }
+
       .greyed {
         color: rgba(0, 0, 0, 0.2);
       }
@@ -120,6 +124,54 @@
           flex-direction: row;
           align-items: center;
           margin-top: 10px;
+        }
+      }
+
+      .accompanyingpersons-field {
+        display: flex;
+        flex-direction: column;
+
+        ul {
+          max-width: 500px;
+          padding-left: 1.5rem;
+
+          li {
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem;
+            margin-bottom: 0.25rem;
+
+            &:hover > .actions {
+              visibility: visible;
+            }
+
+            &:not(:last-child) {
+              border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+            }
+
+            .light {
+              color: $dark-gray;
+            }
+
+            span {
+              max-width: 93%;
+            }
+
+            .actions {
+              display: flex;
+              width: 7%;
+              justify-content: space-between;
+              align-items: center;
+              visibility: hidden;
+            }
+          }
+        }
+
+        .summary {
+          padding-left: 1rem;
+          display: flex;
+          align-items: center;
         }
       }
 
