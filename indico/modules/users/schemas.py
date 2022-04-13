@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import validate
+from marshmallow import post_dump, validate
 from marshmallow.fields import Function, List, String
 
 from indico.core.marshmallow import mm
@@ -34,6 +34,11 @@ class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
         # XXX: this schema is also used for updating a user's personal data, so the fields here must
         # under no circumstances include sensitive fields that should not be modifiable by a user!
         fields = ('title', 'first_name', 'last_name', 'email', 'affiliation', 'address', 'phone', 'synced_fields')
+
+    @post_dump
+    def sort_synced_fields(self, data, **kwargs):
+        data['synced_fields'].sort()
+        return data
 
 
 class BasicCategorySchema(mm.SQLAlchemyAutoSchema):
