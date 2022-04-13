@@ -12,7 +12,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Field, Form as FinalForm, FormSpy, useField, useForm} from 'react-final-form';
+import {Field, Form as FinalForm, useField, useForm} from 'react-final-form';
 import {Form} from 'semantic-ui-react';
 
 import {
@@ -170,7 +170,6 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
               </Translate>
             </SyncedFinalInput>
             <FinalSubmitButton label={Translate.string('Save changes')} className="submit-button" />
-            <FormSpy>{f => <pre>{JSON.stringify(f.values, null, 2)}</pre>}</FormSpy>
           </Form>
         )}
       </FinalForm>
