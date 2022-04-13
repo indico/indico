@@ -37,22 +37,23 @@ from indico.modules.events import Event
 from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
-                                        SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
+                                        SearchForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.users import ProfilePictureSource
+from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
-from indico.modules.users.schemas import BasicCategorySchema
+from indico.modules.users.schemas import BasicCategorySchema, UserPersonalDataSchema
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
                                        merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
-from indico.modules.users.views import WPUser, WPUserDashboard, WPUserFavorites, WPUserProfilePic, WPUsersAdmin
+from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserFavorites, WPUserPersonalData, WPUserProfilePic,
+                                        WPUsersAdmin)
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
-from indico.web.args import use_kwargs
+from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -197,15 +198,31 @@ class RHPersonalData(RHUserBase):
     allow_system_user = True
 
     def _process(self):
-        form = UserDetailsForm(obj=FormDefaults(self.user, skip_attrs={'title'}, title=self.user._title),
-                               synced_fields=self.user.synced_fields, synced_values=self.user.synced_values)
-        if form.validate_on_submit():
-            self.user.synced_fields = form.synced_fields
-            form.populate_obj(self.user, skip=(self.user.synced_fields | {'email'}))
-            self.user.synchronize_data(refresh=True)
-            flash(_('Your personal data was successfully updated.'), 'success')
-            return redirect(url_for('.user_profile'))
-        return WPUser.render_template('personal_data.html', 'personal_data', user=self.user, form=form)
+        titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
+        user_values = UserPersonalDataSchema().dump(self.user)
+        return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
+                                                  titles=titles, user_values=user_values)
+
+
+class RHPersonalDataUpdate(RHUserBase):
+    allow_system_user = True
+
+    @use_args(UserPersonalDataSchema, partial=True)
+    def _process(self, changes):
+        logger.info('Profile of user %r updated by %r: %r', self.user, session.user, changes)
+        synced_fields = set(changes.pop('synced_fields', self.user.synced_fields))
+        syncable_fields = {k for k, v in self.user.synced_values.items()
+                           if v or k not in ('first_name', 'last_name')}
+        # we set this first so these fields are skipped below and only
+        # get updated in synchronize_data which will flash a message
+        # informing the user about the changes made by the sync
+        self.user.synced_fields = synced_fields & syncable_fields
+        for key, value in changes.items():
+            if key not in self.user.synced_fields:
+                setattr(self.user, key, value)
+        self.user.synchronize_data(refresh=True)
+        flash(_('Your personal data was successfully updated.'), 'success')
+        return '', 204
 
 
 class RHProfilePicturePage(RHUserBase):

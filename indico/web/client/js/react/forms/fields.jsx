@@ -10,7 +10,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Field, useFormState} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
-import {Button, Checkbox, Dropdown, Form, Input, Popup, Radio, TextArea} from 'semantic-ui-react';
+import {
+  Button,
+  Checkbox,
+  Dropdown,
+  Form,
+  Input,
+  Popup,
+  Radio,
+  TextArea,
+  Icon,
+} from 'semantic-ui-react';
 
 import formatters from './formatters';
 import parsers from './parsers';
@@ -339,15 +349,16 @@ FinalInput.defaultProps = {
 /**
  * Like `FinalField` but with extra features for ``<textarea>`` fields.
  */
-export function FinalTextArea({name, label, nullIfEmpty, ...rest}) {
+export function FinalTextArea({name, label, nullIfEmpty, action, ...rest}) {
   return (
     <FinalField
       name={name}
       label={label}
-      component={TextArea}
+      component={action ? TextAreaAction : TextArea}
       format={formatters.trim}
       formatOnBlur
       parse={nullIfEmpty ? parsers.nullIfEmpty : identity}
+      action={action}
       {...rest}
     />
   );
@@ -357,11 +368,13 @@ FinalTextArea.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
   nullIfEmpty: PropTypes.bool,
+  action: PropTypes.object,
 };
 
 FinalTextArea.defaultProps = {
   label: null,
   nullIfEmpty: false,
+  action: null,
 };
 
 /**
@@ -531,4 +544,64 @@ FinalSubmitButton.defaultProps = {
   size: null,
   style: null,
   children: null,
+};
+
+/**
+ * TextArea but with an action button attached.
+ * This is similar to the native SUI functionality which works only for inputs.
+ */
+function TextAreaAction({className, action, ...rest}) {
+  const minHeight = 39; // The height of SUI's input
+  return (
+    <div
+      className={className}
+      style={{
+        display: 'flex',
+      }}
+    >
+      <TextArea
+        {...rest}
+        style={{
+          borderTopRightRadius: 0,
+          borderBottomRightRadius: 0,
+          minHeight,
+        }}
+      />
+      <Button
+        type="button"
+        icon
+        toggle={action.toggle}
+        active={action.active}
+        className={action.className}
+        title={action.title}
+        style={{
+          alignSelf: 'flex-start',
+          borderTopLeftRadius: 0,
+          borderBottomLeftRadius: 0,
+          marginRight: 0,
+          height: minHeight,
+        }}
+        onClick={action.onClick}
+      >
+        <Icon name={action.icon} />
+      </Button>
+    </div>
+  );
+}
+
+TextAreaAction.propTypes = {
+  className: PropTypes.string,
+  action: PropTypes.shape({
+    type: PropTypes.oneOf(['button']).isRequired,
+    active: PropTypes.bool,
+    icon: PropTypes.string.isRequired,
+    toggle: PropTypes.bool,
+    className: PropTypes.string,
+    title: PropTypes.string,
+    onClick: PropTypes.func,
+  }).isRequired,
+};
+
+TextAreaAction.defaultProps = {
+  className: '',
 };

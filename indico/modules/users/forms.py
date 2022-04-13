@@ -9,38 +9,19 @@ from operator import itemgetter
 
 from pytz import common_timezones, common_timezones_set
 from wtforms.fields import BooleanField, EmailField, SelectField, StringField
-from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, Email, ValidationError
 
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.users import NameFormat, UserTitle
+from indico.modules.users.models.users import NameFormat
 from indico.util.i18n import _, get_all_locales
-from indico.web.flask.util import url_for
-from indico.web.forms.base import IndicoForm, SyncedInputsMixin
+from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoEnumSelectField, MultiStringField, PrincipalField, PrincipalListField
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless, used_if_not_synced
-from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
-
-
-class UserDetailsForm(SyncedInputsMixin, IndicoForm):
-    title = IndicoEnumSelectField(_('Title'), enum=UserTitle, sorted=True)
-    first_name = StringField(_('First name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
-    last_name = StringField(_('Family name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
-    affiliation = StringField(_('Affiliation'), widget=SyncedInputWidget())
-    address = TextAreaField(_('Address'), widget=SyncedInputWidget(textarea=True))
-    phone = StringField(_('Phone number'), widget=SyncedInputWidget())
-    email = StringField(_('Email address'), widget=SyncedInputWidget(), render_kw={'disabled': True})
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.email.description = (
-            _('You can manage your email addresses {link}here{endlink}.')
-            .format(link=f'<a href="{url_for(".user_emails")}">', endlink='</a>')
-        )
+from indico.web.forms.validators import HiddenUnless
+from indico.web.forms.widgets import SwitchWidget
 
 
 class UserPreferencesForm(IndicoForm):

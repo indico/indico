@@ -14,6 +14,7 @@ from uuid import UUID
 from dateutil import parser, relativedelta
 from marshmallow import ValidationError, fields
 from marshmallow.utils import from_iso_datetime
+from marshmallow_enum import EnumField
 from pytz import timezone
 from sqlalchemy import inspect
 
@@ -433,3 +434,30 @@ class UUIDString(fields.UUID):
     def _deserialize(self, value, attr, data, **kwargs) -> t.Optional[str]:
         rv = self._validated(value)
         return str(rv) if isinstance(rv, UUID) else rv
+
+
+class NoneValueEnumField(EnumField):
+    """
+    Like the normal EnumField, but when receiving a None value,
+    this is mapped to a specific enum member.
+
+    This is especially useful when using a SUI dropdown on the client side
+    where empty dropdown elements don't look good, and clearing the field
+    results in a null value.
+    """
+
+    def __init__(self, enum, *args, none_value, **kwargs):
+        assert isinstance(none_value, enum)
+        self.none_value = none_value
+        kwargs['allow_none'] = False  # by the time we validate, None is no longer OK!
+        super().__init__(enum, *args, **kwargs)
+
+    def _serialize(self, value, *args, **kwargs):
+        if value == self.none_value:
+            return None
+        return super()._serialize(value, *args, **kwargs)
+
+    def deserialize(self, value, *args, **kwargs):
+        if value is None:
+            return self.none_value
+        return super().deserialize(value, *args, **kwargs)
