@@ -29,7 +29,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './PersonalDataForm.module.scss';
 
-function SyncedFinalField({name, FieldComponent, syncedValues, readOnly, required, ...rest}) {
+function SyncedFinalField({name, as: FieldComponent, syncedValues, readOnly, required, ...rest}) {
   const form = useForm();
   const {
     input: {onChange: setSyncedFields, value: syncedFields},
@@ -71,7 +71,7 @@ function SyncedFinalField({name, FieldComponent, syncedValues, readOnly, require
 
 SyncedFinalField.propTypes = {
   name: PropTypes.string.isRequired,
-  FieldComponent: PropTypes.elementType.isRequired,
+  as: PropTypes.elementType.isRequired,
   syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
   readOnly: PropTypes.bool,
   required: PropTypes.bool,
@@ -83,11 +83,11 @@ SyncedFinalField.defaultProps = {
 };
 
 function SyncedFinalInput(props) {
-  return <SyncedFinalField FieldComponent={FinalInput} {...props} />;
+  return <SyncedFinalField as={FinalInput} {...props} />;
 }
 
 function SyncedFinalTextArea(props) {
-  return <SyncedFinalField FieldComponent={FinalTextArea} {...props} />;
+  return <SyncedFinalField as={FinalTextArea} {...props} />;
 }
 
 function PersonalDataForm({userId, userValues, titles, syncedValues}) {
