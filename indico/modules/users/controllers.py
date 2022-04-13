@@ -37,7 +37,7 @@ from indico.modules.events import Event
 from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
-                                        SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
+                                        SearchForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
@@ -198,17 +198,9 @@ class RHPersonalData(RHUserBase):
     allow_system_user = True
 
     def _process(self):
-        form = UserDetailsForm(obj=FormDefaults(self.user, skip_attrs={'title'}, title=self.user._title),
-                               synced_fields=self.user.synced_fields, synced_values=self.user.synced_values)
-        if form.validate_on_submit():
-            self.user.synced_fields = form.synced_fields
-            form.populate_obj(self.user, skip=(self.user.synced_fields | {'email'}))
-            self.user.synchronize_data(refresh=True)
-            flash(_('Your personal data was successfully updated.'), 'success')
-            return redirect(url_for('.user_profile'))
         titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
         user_values = UserPersonalDataSchema().dump(self.user)
-        return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user, form=form,
+        return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
                                                   titles=titles, user_values=user_values)
 
 

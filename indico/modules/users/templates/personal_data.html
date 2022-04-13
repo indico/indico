@@ -1,6 +1,4 @@
 {% extends 'users/base.html' %}
-{% from 'forms/_form.html' import form_header, form_rows, form_footer  %}
-{% from '_switch.html' import switch %}
 
 {% block user_content %}
     <div class="i-box-group vert">
@@ -38,17 +36,6 @@
             </div>
             <div class="i-box-content">
                 <div id="personal-details-form-container"></div>
-            </div>
-            <div class="i-box-content">
-                {# Personal details form #}
-                {{ form_header(form) }}
-                {{ form_rows(form) }}
-                {% call form_footer(form) %}
-                    <input class="ui primary button"
-                           type="submit"
-                           value="{% trans %}Save{% endtrans %}"
-                           data-disabled-until-change>
-                {% endcall %}
             </div>
         </div>
     </div>
