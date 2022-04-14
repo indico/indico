@@ -10,7 +10,8 @@
 
 .syncable {
   input[readonly],
-  textarea[readonly] {
+  textarea[readonly],
+  div:global(.dropdown.disabled) {
     @include placeholder-color($color: $light-black);
     background: repeating-linear-gradient(
       -40deg,
@@ -21,5 +22,11 @@
     ) !important;
     font-style: italic;
     color: $light-black !important;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  & div:global(.dropdown.disabled) {
+    opacity: unset;
   }
 }

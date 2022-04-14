@@ -10,7 +10,7 @@ import saveURL from 'indico-url:users.user_profile_update';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
 import {Field, Form as FinalForm, useField, useForm} from 'react-final-form';
 import {Form} from 'semantic-ui-react';
@@ -90,8 +90,22 @@ function SyncedFinalTextArea(props) {
   return <SyncedFinalField as={FinalTextArea} {...props} />;
 }
 
+function SyncedFinalDropdown(props) {
+  return <SyncedFinalField as={FinalDropdown} {...props} />;
+}
+
 function PersonalDataForm({userId, userValues, titles, syncedValues}) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
+  // Dummy values for testing
+  const [orgs, setOrgs] = useState([
+    'CERN',
+    'Max Planck',
+    'ESA',
+    'NASA',
+    'UN',
+    'WHO',
+    'CTU Prague',
+  ]);
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
@@ -106,6 +120,7 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
   };
 
   const titleOptions = titles.map(t => ({key: t.name, value: t.name, text: t.title}));
+  const titleOrgs = orgs.map(org => ({key: org, value: org, text: org}));
 
   return (
     <div>
@@ -143,6 +158,20 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
             <SyncedFinalInput
               name="affiliation"
               label={Translate.string('Affiliation')}
+              syncedValues={syncedValues}
+            />
+            <SyncedFinalDropdown
+              name="affiliation-test"
+              options={titleOrgs}
+              selection
+              fluid
+              search
+              allowAdditions
+              additionPosition="bottom"
+              parse={p.nullIfEmpty}
+              onAddItem={(e, {value}) => setOrgs(prevState => [value, ...prevState])}
+              placeholder={Translate.string('Select an affiliation or add your own')}
+              label={Translate.string('Affiliation Test')}
               syncedValues={syncedValues}
             />
             <SyncedFinalTextArea
