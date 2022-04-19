@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import flask
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core import signals
@@ -95,7 +94,6 @@ class AttachmentCloner(EventCloner):
         folder.populate_from_attrs(old_folder, folder_attrs)
         folder.acl_entries = clone_principals(AttachmentFolderPrincipal, old_folder.acl_entries,
                                               self._event_role_map, self._regform_map)
-        signals.attachments.folder_created.send(folder, user=flask.session.user, cloned=folder)
         for old_attachment in old_folder.attachments:
             self._attachment_map[old_attachment] = attachment = Attachment(folder=folder)
             attachment.populate_from_attrs(old_attachment, attachment_attrs)
@@ -107,3 +105,4 @@ class AttachmentCloner(EventCloner):
                                                  content_type=old_file.content_type)
                 with old_file.open() as fd:
                     attachment.file.save(fd)
+        return folder
