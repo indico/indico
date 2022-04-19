@@ -21,6 +21,7 @@ from indico.core.db import db
 from indico.core.errors import NoReportError
 from indico.core.notifications import make_email, send_email
 from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
+from indico.modules.categories.models.categories import Category
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.util import get_badge_format, get_inherited_templates
@@ -415,9 +416,11 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
     def _check_access(self):
         RHRegistrationsActionBase._check_access(self)
 
-        # Check that template belongs to this event or a category that
-        # is a parent
-        if self.template.owner != self.event and self.template.owner.id not in self.event.category_chain:
+        # Check that template belongs to this event or a category that is a parent
+        if self.template.owner == self.event:
+            return
+        valid_category_ids = self.event.category_chain or [Category.get_root().id]
+        if self.template.owner.id not in valid_category_ids:
             raise Forbidden
 
     def _process(self):

@@ -11,6 +11,7 @@ from flask import request
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.cache import make_scoped_cache
+from indico.modules.categories.models.categories import Category
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.forms import PosterPrintingForm
@@ -51,9 +52,11 @@ class RHPrintEventPoster(RHManageEventBase):
     def _check_access(self):
         RHManageEventBase._check_access(self)
 
-        # Check that template belongs to this event or a category that
-        # is a parent
-        if self.template.owner != self.event and self.template.owner.id not in self.event.category_chain:
+        # Check that template belongs to this event or a category that is a parent
+        if self.template.owner == self.event:
+            return
+        valid_category_ids = self.event.category_chain or [Category.get_root().id]
+        if self.template.owner.id not in valid_category_ids:
             raise Forbidden
 
     def _process(self):

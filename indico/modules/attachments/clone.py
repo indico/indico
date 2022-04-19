@@ -105,3 +105,4 @@ class AttachmentCloner(EventCloner):
                                                  content_type=old_file.content_type)
                 with old_file.open() as fd:
                     attachment.file.save(fd)
+        return folder

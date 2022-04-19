@@ -173,7 +173,7 @@ class CategoryTitlePlaceholder(DesignerPlaceholder):
 
     @classmethod
     def render(cls, event):
-        return event.category.title
+        return event.category.title if not event.is_unlisted else ''
 
 
 class RegistrationFullNamePlaceholder(FullNamePlaceholderBase):
