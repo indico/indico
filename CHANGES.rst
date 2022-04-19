@@ -39,6 +39,7 @@ Bugfixes
   participant roles list (:pr:`5308`)
 - Do not enforce personal token name uniqueness across different users (:pr:`5317`)
 - Fix last modification date not updating when an abstract is edited (:pr:`5325`)
+- Fix a bug with poster and badge printing in unlisted events (:pr:`5322`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
