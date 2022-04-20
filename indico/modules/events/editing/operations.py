@@ -185,7 +185,12 @@ def replace_revision(revision, user, comment, files, tags, initial_state=None):
 @no_autoflush
 def create_submitter_revision(prev_revision, user, files):
     ensure_latest_revision(prev_revision)
-    _ensure_state(prev_revision, final=FinalRevisionState.needs_submitter_changes)
+    try:
+        _ensure_state(prev_revision, initial=InitialRevisionState.ready_for_review, final=FinalRevisionState.none)
+        if prev_revision.editable.editor:
+            raise InvalidEditableState
+    except InvalidEditableState:
+        _ensure_state(prev_revision, final=FinalRevisionState.needs_submitter_changes)
     new_revision = EditingRevision(submitter=user,
                                    initial_state=InitialRevisionState.ready_for_review,
                                    files=_make_editable_files(prev_revision.editable, files),

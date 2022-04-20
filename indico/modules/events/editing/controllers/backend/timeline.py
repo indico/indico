@@ -13,7 +13,7 @@ from flask import jsonify, request, session
 from marshmallow import EXCLUDE, fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import Forbidden, NotFound, ServiceUnavailable
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound, ServiceUnavailable
 
 from indico.core.errors import UserValueError
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase, TokenAccessMixin
@@ -50,17 +50,23 @@ class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
         return 'event', self.event.id, 'editing', self.contrib.id, self.editable_type.name
 
 
-class RHEditingUploadPaperLastRevision(RHEditingUploadFile):
+class RHEditingUploadContributionFile(RHEditingUploadFile):
     @use_kwargs({
-        'id': fields.Int()
+        'id': fields.Int(load_default=None),
+        'paper_id': fields.Int(load_default=None)
     })
-    def _process(self, id):
-        last_rev = self.contrib.paper.get_last_revision()
-        if last_rev:
-            found = next((f for f in last_rev.files if f.id == id), None)
-            if found:
-                with found.open() as stream:
-                    return self._save_file(found, stream)
+    def _process(self, id, paper_id):
+        if bool(id) == bool(paper_id):
+            raise BadRequest
+        files = []
+        if id and self.contrib.editables:
+            files = [file.file for e in self.contrib.editables
+                     if e.type == self.editable.type for file in e.revisions[-1].files]
+        if paper_id and self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
+            files = last_rev.files
+        if found := next((f for f in files if f.id == (id or paper_id)), None):
+            with found.open() as stream:
+                return self._save_file(found, stream)
         raise UserValueError(_('No such file was found within the paper'))
 
 

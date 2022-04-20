@@ -34,7 +34,6 @@ export default function TimelineItem({block, index}) {
   const {fileTypes} = useSelector(selectors.getStaticData);
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
-  const headerOnly = !visible || (!isLastBlock && block.items.length === 0 && !block.comment);
 
   useEffect(() => {
     // when undoing a judgment deletes the last revision this revision may become the
@@ -50,9 +49,7 @@ export default function TimelineItem({block, index}) {
         <div className="i-timeline-item">
           <UserAvatar user={block.submitter} />
           <div
-            className={`i-timeline-item-box header-indicator-left ${
-              headerOnly ? 'header-only' : ''
-            }`}
+            className={`i-timeline-item-box header-indicator-left ${!visible ? 'header-only' : ''}`}
             id={`block-info-${block.id}`}
           >
             <div className="i-box-header flexrow">
