@@ -8,7 +8,6 @@
 from operator import itemgetter
 
 from pytz import common_timezones, common_timezones_set
-
 from wtforms.fields import BooleanField, EmailField, IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, NumberRange, ValidationError
 
