@@ -12,7 +12,7 @@ from indico.modules.events.registration.views import WPDisplayRegistrationPartic
 from indico.modules.events.sessions.views import WPDisplaySession
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.tracks.views import WPDisplayTracks
-from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
+from indico.modules.events.views import WPConferenceDisplay, WPConferencePrivacyDisplay, WPSimpleEventDisplay
 
 
 class WPStaticSites(WPEventManagement):
@@ -81,3 +81,7 @@ class WPStaticContributionDisplay(WPStaticEventBase, WPContributions):
 
 class WPStaticSubcontributionDisplay(WPStaticEventBase, WPContributions):
     endpoint = 'contributions.display_subcontribution'
+
+
+class WPStaticConferencePrivacyDisplay(WPStaticEventBase, WPConferencePrivacyDisplay):
+    endpoint = 'events.display_privacy'

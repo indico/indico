@@ -308,7 +308,7 @@ class WPConferenceDisplay(WPConferenceDisplayBase):
 
 class WPConferencePrivacyDisplay(WPConferenceDisplayBase):
     template_prefix = 'events/display/'
-    sidemenu_option = 'privacy'
+    menu_entry_name = 'privacy'
     ALLOW_JSON = True
 
 

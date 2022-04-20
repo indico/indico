@@ -27,6 +27,7 @@ from indico.modules.events.contributions.controllers.display import (RHAuthorLis
                                                                      RHContributionDisplay, RHContributionList,
                                                                      RHSpeakerList, RHSubcontributionDisplay)
 from indico.modules.events.contributions.ical import contribution_to_ical
+from indico.modules.events.controllers.display import RHDisplayPrivacyPolicy
 from indico.modules.events.layout.models.menu import MenuEntryType
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.models.events import EventType
@@ -36,10 +37,10 @@ from indico.modules.events.sessions.ical import session_to_ical
 from indico.modules.events.sessions.util import get_session_timetable_pdf
 from indico.modules.events.static.util import collect_static_files, override_request_endpoint, rewrite_css_urls
 from indico.modules.events.static.views import (WPStaticAuthorList, WPStaticConferenceDisplay,
-                                                WPStaticConferenceProgram, WPStaticContributionDisplay,
-                                                WPStaticContributionList, WPStaticCustomPage,
-                                                WPStaticDisplayRegistrationParticipantList, WPStaticSessionDisplay,
-                                                WPStaticSimpleEventDisplay, WPStaticSpeakerList,
+                                                WPStaticConferencePrivacyDisplay, WPStaticConferenceProgram,
+                                                WPStaticContributionDisplay, WPStaticContributionList,
+                                                WPStaticCustomPage, WPStaticDisplayRegistrationParticipantList,
+                                                WPStaticSessionDisplay, WPStaticSimpleEventDisplay, WPStaticSpeakerList,
                                                 WPStaticSubcontributionDisplay, WPStaticTimetable)
 from indico.modules.events.timetable.controllers.display import RHTimetable
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
@@ -238,7 +239,8 @@ class StaticConferenceCreator(StaticEventCreator):
             RHAuthorList: WPStaticAuthorList,
             RHSpeakerList: WPStaticSpeakerList,
             RHTimetable: WPStaticTimetable,
-            RHDisplayTracks: WPStaticConferenceProgram
+            RHDisplayTracks: WPStaticConferenceProgram,
+            RHDisplayPrivacyPolicy: WPStaticConferencePrivacyDisplay,
         }
         for rh_cls, wp in rhs.items():
             rh = rh_cls()
