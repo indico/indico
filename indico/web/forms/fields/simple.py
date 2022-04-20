@@ -182,7 +182,10 @@ class IndicoLinkListField(JSONField):
         super().process_formdata(valuelist)
         self.data = [link for link in self.data if link.get('title') or link.get('url')]
         if len(self.data) == 1:
-            self.data[0]['title'] = ''
+            if self.data[0]['url']:
+                self.data[0]['title'] = ''
+            else:
+                self.data = []
 
     def pre_validate(self, form):
         if not all(x.get('url') for x in self.data):

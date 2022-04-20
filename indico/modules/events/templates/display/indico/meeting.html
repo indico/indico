@@ -1,5 +1,6 @@
 {% from 'events/display/_event_header_message.html' import render_event_header_msg %}
 {% from 'events/display/common/_manage_button.html' import render_manage_button %}
+{% from 'events/display/common/_privacy_info_button.html' import render_privacy_info_button %}
 {% from 'events/display/indico/_common.html' import render_location, render_users, render_event_time %}
 {% from 'events/timetable/display/indico/_common.html' import render_notes %}
 {% from 'events/notes/_note.html' import render_note %}
@@ -14,6 +15,9 @@
 <div class="event-wrapper">
     {% block header %}
         <div class="event-header {%- if not has_subheader %} round-bottom-corners{% endif %}">
+            <div class="event-privacy-info-button">
+                {{ render_privacy_info_button(event, privacy_info) }}
+            </div>
             {% set show_button = not event.is_locked and event.can_manage_attachments(session.user) %}
             <div class="event-manage-button">
                 {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}

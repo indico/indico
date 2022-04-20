@@ -1,0 +1,73 @@
+{% macro render_privacy_info_button(event, privacy_info) -%}
+    {% set data_controller_exists = privacy_info.data_controller_name or privacy_info.data_controller_email %}
+    {% if data_controller_exists or privacy_info.privacy_policy_urls|length > 1 %}
+        <div class="privacy-dropdown">
+            <a href="#"
+               onclick="return false;"
+               title="{% trans %}Event privacy information{% endtrans %}">
+                <i class="info icon small"></i>
+            </a>
+            <div class="menu">
+                {% if data_controller_exists %}
+                    <div class="header">{% trans %}Data controller{% endtrans %}</div>
+                    {% if privacy_info.data_controller_name %}
+                        <div class="item">{{ privacy_info.data_controller_name }}</div>
+                    {% endif %}
+                    {% if privacy_info.data_controller_email %}
+                        <a class="item" href="mailto:{{ privacy_info.data_controller_email }}">
+                            {{ privacy_info.data_controller_email }}
+                        </a>
+                    {% endif %}
+                    {% if privacy_info.privacy_policy or privacy_info.privacy_policy_urls %}
+                        <div class="divider"></div>
+                    {% endif %}
+                {% endif %}
+                {% if privacy_info.privacy_policy %}
+                    <a class="item"
+                       href="{{ url_for('events.display_privacy', event) }}"
+                       data-title="{% trans %}Event privacy notice{% endtrans %}"
+                       data-href="{{ url_for('events.display_privacy', event) }}"
+                       data-ajax-dialog
+                       data-hide-page-header
+                       data-close-button>
+                        {% trans %}Privacy notice{% endtrans %}
+                    </a>
+                {% elif privacy_info.privacy_policy_urls|length == 1 %}
+                    <a class="item"
+                       href="{{ privacy_info.privacy_policy_urls[0].url }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        {% trans %}Privacy notice{% endtrans %}
+                    </a>
+                {% elif privacy_info.privacy_policy_urls %}
+                    <div class="header">{% trans %}Privacy notices{% endtrans %}</div>
+                    {% for privacy_url in privacy_info.privacy_policy_urls %}
+                        <a class="item"
+                           href="{{ privacy_url.url }}"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            {{ privacy_url.title }}
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    {% elif privacy_info.privacy_policy %}
+        <a href="{{ url_for('events.display_privacy', event) }}"
+           title="{% trans %}Event privacy notice{% endtrans %}"
+           data-title="{% trans %}Event privacy notice{% endtrans %}"
+           data-href="{{ url_for('events.display_privacy', event) }}"
+           data-ajax-dialog
+           data-hide-page-header
+           data-close-button>
+            <i class="info icon small"></i>
+        </a>
+    {% elif privacy_info.privacy_policy_urls %}
+        <a href="{{ privacy_info.privacy_policy_urls[0].url }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           title="{% trans %}Event privacy notice{% endtrans %}">
+            <i class="info icon small"></i>
+        </a>
+    {% endif %}
+{%- endmacro %}

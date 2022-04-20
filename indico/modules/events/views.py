@@ -74,16 +74,12 @@ def render_event_footer(event, dark=False):
 
     social_settings_data = social_settings.get_all()
     show_social = social_settings_data['enabled'] and layout_settings.get(event, 'show_social_badges')
-    privacy_text = privacy_settings.get(event, 'privacy_policy')
-    privacy_urls = privacy_settings.get(event, 'privacy_policy_urls')
     return render_template('events/footer.html',
                            event=event,
                            dark=dark,
                            social_settings=social_settings_data,
                            show_social=show_social,
-                           google_calendar_params=google_calendar_params,
-                           privacy_text=privacy_text,
-                           privacy_urls=privacy_urls)
+                           google_calendar_params=google_calendar_params)
 
 
 class WPEventAdmin(WPAdmin):
@@ -202,6 +198,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         attached_items = self.event.attached_items
         folders = [folder for folder in attached_items.get('folders', []) if folder.title != 'Internal Page Files']
         files = attached_items.get('files', [])
+        privacy_info = privacy_settings.get_all(self.event)
 
         lectures = []
         if self.event.series is not None and self.event.series.show_links:
@@ -225,6 +222,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                                theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
                                files=files,
                                folders=folders,
+                               privacy_info=privacy_info,
                                lectures=lectures)
 
 
@@ -306,6 +304,12 @@ class WPConferenceDisplay(WPConferenceDisplayBase):
 
     def _get_body(self, params):
         return render_template('events/display/conference.html', **self._kwargs)
+
+
+class WPConferencePrivacyDisplay(WPConferenceDisplayBase):
+    template_prefix = 'events/display/'
+    sidemenu_option = 'privacy'
+    ALLOW_JSON = True
 
 
 class WPAccessKey(WPJinjaMixin, WPDecorated):
