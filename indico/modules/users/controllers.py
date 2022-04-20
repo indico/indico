@@ -293,7 +293,7 @@ class RHUserPreferences(RHUserBase):
         extra_preferences = [pref(self.user) for pref in values_from_signal(signals.users.preferences.send(self.user))
                              if pref.is_active(self.user)]
         form_class = UserPreferencesForm
-        defaults = FormDefaults(**self.user.settings.get_all(self.user))
+        defaults = FormDefaults(**self.user.settings.get_all())
         for pref in extra_preferences:
             form_class = pref.extend_form(form_class)
             pref.extend_defaults(defaults)
