@@ -23,7 +23,13 @@ import {createRevisionComment} from './actions';
 import CommentForm from './CommentForm';
 import JudgmentBox from './judgment/JudgmentBox';
 import JudgmentDropdownItems from './judgment/JudgmentDropdownItems';
-import {getLastRevision, canJudgeLastRevision, getDetails, getStaticData} from './selectors';
+import {
+  getLastRevision,
+  canJudgeLastRevision,
+  getDetails,
+  getStaticData,
+  canReviewLastRevision,
+} from './selectors';
 import {blockPropTypes} from './util';
 
 import './ReviewForm.module.scss';
@@ -55,7 +61,8 @@ export default function ReviewForm({block}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
   const canJudge = useSelector(canJudgeLastRevision);
-  const {canPerformSubmitterActions, contribution} = useSelector(getDetails);
+  const canReview = useSelector(canReviewLastRevision);
+  const {canPerformSubmitterActions, contribution, editor} = useSelector(getDetails);
   const {eventId, editableType, fileTypes} = useSelector(getStaticData);
   const currentUser = {
     fullName: Indico.User.fullName,
@@ -87,7 +94,7 @@ export default function ReviewForm({block}) {
   const judgmentForm = (
     <div className="flexrow f-a-center" styleName="judgment-form">
       <CommentForm onSubmit={createComment} onToggleExpand={setCommentFormVisible} />
-      {canPerformSubmitterActions && (
+      {canPerformSubmitterActions && canReview && !editor && (
         <>
           <span className="comment-or-review">
             <Translate>or</Translate>
