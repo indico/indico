@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import apiUploadExistingURL from 'indico-url:event_editing.api_add_paper_file';
+import apiUploadExistingURL from 'indico-url:event_editing.api_add_contribution_file';
 import submitRevisionURL from 'indico-url:event_editing.api_create_editable';
 import apiUploadURL from 'indico-url:event_editing.api_upload';
 import editableURL from 'indico-url:event_editing.editable';
@@ -33,14 +33,19 @@ export default function EditableSubmissionButton({
   fileTypes,
   uploadableFiles,
   text,
+  onSubmit,
 }) {
   const [currentType, setCurrentType] = useState(null);
   const submitRevision = async formData => {
     try {
-      await indicoAxios.put(
-        submitRevisionURL({event_id: eventId, contrib_id: contributionId, type: currentType}),
-        formData
-      );
+      if (onSubmit) {
+        await onSubmit(currentType, formData);
+      } else {
+        await indicoAxios.put(
+          submitRevisionURL({event_id: eventId, contrib_id: contributionId, type: currentType}),
+          formData
+        );
+      }
     } catch (e) {
       return handleSubmitError(e);
     }
@@ -91,7 +96,7 @@ export default function EditableSubmissionButton({
                       contrib_id: contributionId,
                       type: currentType,
                     })}
-                    uploadableFiles={uploadableFiles}
+                    files={uploadableFiles}
                     mustChange
                   />
                 </Form>
@@ -136,9 +141,11 @@ EditableSubmissionButton.propTypes = {
   contributionId: PropTypes.number.isRequired,
   contributionCode: PropTypes.string.isRequired,
   uploadableFiles: PropTypes.arrayOf(PropTypes.shape(uploadablePropTypes)),
+  onSubmit: PropTypes.func,
 };
 
 EditableSubmissionButton.defaultProps = {
   text: undefined,
   uploadableFiles: [],
+  onSubmit: undefined,
 };

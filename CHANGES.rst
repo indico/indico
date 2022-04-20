@@ -68,6 +68,7 @@ Improvements
 - Update the editing state color scheme (:pr:`5236`)
 - Include program codes in export API (:pr:`5246`)
 - Add abstract rating scores grouped by track (:pr:`5298`)
+- Allow uploading revisions when an editor hasn't been assigned (:pr:`5289`)
 
 Bugfixes
 ^^^^^^^^

@@ -28,6 +28,13 @@ export const getLastRevision = createSelector(
   getDetails,
   details => details && details.revisions[details.revisions.length - 1]
 );
+export const canReviewLastRevision = createSelector(
+  getLastRevision,
+  lastRevision =>
+    lastRevision &&
+    lastRevision.initialState.name === InitialRevisionState.ready_for_review &&
+    lastRevision.finalState.name === FinalRevisionState.none
+);
 export const needsSubmitterChanges = createSelector(
   getLastRevision,
   lastRevision =>
