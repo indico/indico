@@ -8,8 +8,8 @@
 from operator import itemgetter
 
 from pytz import common_timezones, common_timezones_set
-from wtforms.fields import BooleanField, EmailField, SelectField, StringField
-from wtforms.validators import DataRequired, Email, ValidationError
+from wtforms.fields import BooleanField, EmailField, IntegerField, SelectField, StringField
+from wtforms.validators import DataRequired, Email, NumberRange, ValidationError
 
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
@@ -50,6 +50,16 @@ class UserPreferencesForm(IndicoForm):
         _('Use previewer for PDF files'),
         widget=SwitchWidget(),
         description=_('The previewer is used by default for image and text files, but not for PDF files.'))
+
+    add_ical_alerts = BooleanField(
+        _('Add alerts to iCal'),
+        widget=SwitchWidget(),
+        description=_('Add an event reminder to exported iCal files/URLs.'))
+
+    add_ical_alerts_mins = IntegerField(
+        _('iCal notification time'),
+        [HiddenUnless('add_ical_alerts'), NumberRange(min=0)],
+        description=_('Number of minutes to notify before an event.'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

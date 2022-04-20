@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import typing as t
+from datetime import timedelta
 from email import message
 from email.mime.base import MIMEBase
 from email.policy import compat32
@@ -144,6 +145,16 @@ def generate_event_component(
         data.update(update)
     if data['description']:
         component['description'] = data['description']
+
+    # If the user exists and the add_icloud_alerts preference isn't blank
+    if user and user.settings.get('add_ical_alerts'):
+        alarm = icalendar.Alarm()
+        alarm.add('action', 'DISPLAY')
+        alarm.add('trigger', timedelta(minutes=-user.settings.get('add_ical_alerts_mins')))
+        alarm.add('summary', component['summary'])
+        if data['description']:
+            alarm.add('description', data['description'])
+        component.add_component(alarm)
 
     return component
 
