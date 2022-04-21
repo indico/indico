@@ -138,6 +138,9 @@
                                                title="{{ tooltip }}"
                                                data-qtip-position="bottom"></i>
                                             {{ speaker.display_full_name }}
+                                            {% if speaker.affiliation %}
+                                                <span class="text-muted">({{ speaker.affiliation }})</span>
+                                            {% endif %}
                                         </div>
                                     {%- endfor %}
                                 </span>

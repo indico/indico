@@ -197,8 +197,18 @@
                         </li>
                         <li>
                             <a href="#"
+                               class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"
+                               data-href="{{ url_for('.abstracts_csv_export', event, affiliations=1) }}">CSV with affiliations</a>
+                        </li>
+                        <li>
+                            <a href="#"
                                class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
                                data-href="{{ url_for('.abstracts_xlsx_export', event) }}">XLSX (Excel)</a>
+                        </li>
+                        <li>
+                            <a href="#"
+                               class="icon-file-excel js-requires-selected-row disabled js-submit-list-form"
+                               data-href="{{ url_for('.abstracts_xlsx_export', event, affiliations=1) }}">XLSX (Excel) with affiliations</a>
                         </li>
                         <li>
                             <a href="#"

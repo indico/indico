@@ -9,6 +9,7 @@ import os
 from operator import attrgetter
 
 from flask import redirect
+from webargs import fields
 from werkzeug.exceptions import NotFound
 
 from indico.core.config import config
@@ -18,6 +19,7 @@ from indico.modules.events.abstracts.util import generate_spreadsheet_from_abstr
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.spreadsheets import send_csv, send_xlsx
+from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -77,24 +79,30 @@ class AbstractsExportPDFMixin:
 class _AbstractsExportBaseMixin:
     """Base mixin for all abstract list spreadsheet export mixins."""
 
-    def _generate_spreadsheet(self):
+    def _generate_spreadsheet(self, affiliations=False):
         export_config = self.list_generator.get_list_export_config()
         return generate_spreadsheet_from_abstracts(self.abstracts, export_config['static_item_ids'],
-                                                   export_config['dynamic_items'])
+                                                   export_config['dynamic_items'], affiliations)
 
 
 class AbstractsExportCSV(_AbstractsExportBaseMixin):
     """Export list of abstracts to CSV."""
 
-    def _process(self):
-        return send_csv('abstracts.csv', *self._generate_spreadsheet())
+    @use_kwargs({
+        'affiliations': fields.Bool(load_default=False)
+    }, location='query')
+    def _process(self, affiliations):
+        return send_csv('abstracts.csv', *self._generate_spreadsheet(affiliations))
 
 
 class AbstractsExportExcel(_AbstractsExportBaseMixin):
     """Export list of abstracts to XLSX."""
 
-    def _process(self):
-        return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet(), tz=self.event.tzinfo)
+    @use_kwargs({
+        'affiliations': fields.Bool(load_default=False)
+    }, location='query')
+    def _process(self, affiliations):
+        return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet(affiliations), tz=self.event.tzinfo)
 
 
 class AbstractsDownloadAttachmentsMixin(ZipGeneratorMixin):

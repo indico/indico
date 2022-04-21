@@ -47,18 +47,25 @@ def build_default_email_template(event, tpl_type):
     return tpl
 
 
-def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_items):
+def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_items, affiliations=False):
     """Generate a spreadsheet data from a given abstract list.
 
     :param abstracts: The list of abstracts to include in the file
     :param static_item_ids: The abstract properties to be used as columns
     :param dynamic_items: Contribution fields as extra columns
+    :param affiliations: Whether to include or not person affiliations
     """
+
+    def _format_person(person):
+        if affiliations and person.affiliation:
+            return f'{person.full_name} ({person.affiliation})'
+        return person.full_name
+
     field_names = ['Id', 'Title']
     static_item_mapping = {
         'state': ('State', lambda x: x.state.title),
-        'submitter': ('Submitter', lambda x: x.submitter.full_name),
-        'authors': ('Primary authors', lambda x: [a.full_name for a in x.primary_authors]),
+        'submitter': ('Submitter', lambda x: _format_person(x.submitter)),
+        'authors': ('Primary authors', lambda x: [_format_person(a) for a in x.primary_authors]),
         'accepted_track': ('Accepted track', lambda x: x.accepted_track.short_title if x.accepted_track else None),
         'submitted_for_tracks': ('Submitted for tracks',
                                  lambda x: [t.short_title for t in x.submitted_for_tracks]),
