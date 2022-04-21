@@ -55,21 +55,10 @@ AccompanyingPersonModal.defaultProps = {
   },
 };
 
-function AccompanyingPersonsComponent({
-  value,
-  disabled,
-  onChange,
-  price,
-  placesLimit,
-  maxPersons,
-  personsCountAgainstLimit,
-}) {
+function AccompanyingPersonsComponent({value, disabled, onChange, price, availablePlaces}) {
   const [operation, setOperation] = useState({type: null, person: null});
   const currency = useSelector(getCurrency);
   const totalPrice = (value.length * price).toFixed(2);
-  const effectiveLimit = personsCountAgainstLimit
-    ? Math.min(placesLimit || Infinity, maxPersons || Infinity)
-    : maxPersons || Infinity;
 
   const changeReducer = action => {
     switch (action.type) {
@@ -130,7 +119,7 @@ function AccompanyingPersonsComponent({
         <Button
           size="small"
           onClick={handleAccompanyingPersonAdd}
-          disabled={disabled || value.length >= effectiveLimit}
+          disabled={disabled || value.length >= availablePlaces}
         >
           <Translate>Add accompanying person</Translate>
         </Button>
@@ -139,10 +128,10 @@ function AccompanyingPersonsComponent({
             {price.toFixed(2)} {currency} (Total: {totalPrice} {currency})
           </Label>
         )}
-        {effectiveLimit !== Infinity && (
+        {availablePlaces !== null && (
           <div styleName="places-left">
             <PlacesLeft
-              placesLimit={effectiveLimit}
+              placesLimit={availablePlaces}
               placesUsed={value.length}
               isEnabled={!disabled}
             />
@@ -178,34 +167,23 @@ AccompanyingPersonsComponent.propTypes = {
   disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   price: PropTypes.number,
-  placesLimit: PropTypes.number.isRequired,
-  maxPersons: PropTypes.number,
-  personsCountAgainstLimit: PropTypes.bool.isRequired,
+  availablePlaces: PropTypes.number,
 };
 
 AccompanyingPersonsComponent.defaultProps = {
   disabled: false,
   price: 0,
-  maxPersons: 1,
+  availablePlaces: null,
 };
 
-export default function AccompanyingPersonsInput({
-  htmlName,
-  disabled,
-  price,
-  placesLimit,
-  maxPersons,
-  personsCountAgainstLimit,
-}) {
+export default function AccompanyingPersonsInput({htmlName, disabled, price, availablePlaces}) {
   return (
     <FinalField
       name={htmlName}
       component={AccompanyingPersonsComponent}
       disabled={disabled}
       price={price}
-      placesLimit={placesLimit}
-      maxPersons={maxPersons}
-      personsCountAgainstLimit={personsCountAgainstLimit}
+      availablePlaces={availablePlaces}
     />
   );
 }
@@ -214,15 +192,13 @@ AccompanyingPersonsInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   price: PropTypes.number,
-  placesLimit: PropTypes.number.isRequired,
-  maxPersons: PropTypes.number,
-  personsCountAgainstLimit: PropTypes.bool.isRequired,
+  availablePlaces: PropTypes.number,
 };
 
 AccompanyingPersonsInput.defaultProps = {
   disabled: false,
   price: 0,
-  maxPersons: 1,
+  availablePlaces: null,
 };
 
 export function AccompanyingPersonsSettings() {
