@@ -240,6 +240,87 @@ DropdownAdapter.defaultProps = {
   action: null,
 };
 
+function ComboDropdownAdapter(props) {
+  const {
+    input,
+    required,
+    clearable,
+    width,
+    action,
+    options,
+    renderCustomOptionContent,
+    ...rest
+  } = props;
+  const fieldProps = width !== null ? {width} : {};
+
+  let fullOptions = options;
+  if (typeof input.value === 'string' && input.value) {
+    fullOptions = [
+      {
+        key: 'custom',
+        value: input.value,
+        text: input.value,
+        content: renderCustomOptionContent(input.value),
+      },
+      ...options,
+    ];
+  }
+
+  return (
+    <FormFieldAdapter
+      input={input}
+      {...rest}
+      options={fullOptions}
+      required={required}
+      as={action ? DropdownAction : Dropdown}
+      clearable={clearable === undefined ? !required : clearable}
+      multiple={false}
+      action={action}
+      undefinedValue={null}
+      selectOnBlur={false}
+      selectOnNavigation={false}
+      fieldProps={fieldProps}
+      getValue={(__, {value}) => {
+        if (typeof value === 'number') {
+          return {
+            id: value,
+            text: options.find(x => x.value === value).text,
+          };
+        } else {
+          return {
+            id: null,
+            text: value,
+          };
+        }
+      }}
+      onAddItem={(e, {value}) => {
+        input.onChange({
+          id: null,
+          text: value,
+        });
+      }}
+    />
+  );
+}
+
+ComboDropdownAdapter.propTypes = {
+  input: PropTypes.object.isRequired,
+  options: PropTypes.array.isRequired,
+  required: PropTypes.bool,
+  clearable: PropTypes.bool,
+  width: PropTypes.number,
+  action: PropTypes.object,
+  renderCustomOptionContent: PropTypes.func,
+};
+
+ComboDropdownAdapter.defaultProps = {
+  required: false,
+  clearable: undefined,
+  width: null,
+  action: null,
+  renderCustomOptionContent: () => undefined,
+};
+
 /**
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
@@ -458,6 +539,34 @@ FinalDropdown.propTypes = {
 FinalDropdown.defaultProps = {
   label: null,
   multiple: false,
+};
+
+/**
+ * Like `FinalField` but for a dropdown with support for adding a custom freetext item.
+ */
+export function FinalComboDropdown({name, label, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      adapter={ComboDropdownAdapter}
+      label={label}
+      format={x => (x.id === null ? x.text : x.id)}
+      parse={identity}
+      allowAdditions
+      search
+      selection
+      {...rest}
+    />
+  );
+}
+
+FinalComboDropdown.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+};
+
+FinalComboDropdown.defaultProps = {
+  label: null,
 };
 
 /**

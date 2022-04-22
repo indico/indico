@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import searchAffiliationURL from 'indico-url:users.api_affiliations';
 import emailsURL from 'indico-url:users.user_emails';
 import saveURL from 'indico-url:users.user_profile_update';
 
@@ -13,9 +14,10 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
 import {Field, Form as FinalForm, useField, useForm} from 'react-final-form';
-import {Form} from 'semantic-ui-react';
+import {Form, Header} from 'semantic-ui-react';
 
 import {
+  FinalComboDropdown,
   FinalDropdown,
   FinalInput,
   FinalSubmitButton,
@@ -25,41 +27,57 @@ import {
   parsers as p,
 } from 'indico/react/forms';
 import {Translate, Param} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {makeAsyncDebounce} from 'indico/utils/debounce';
 
 import './PersonalDataForm.module.scss';
 
-function SyncedFinalField({name, as: FieldComponent, syncedValues, readOnly, required, ...rest}) {
+const debounce = makeAsyncDebounce(250);
+
+function SyncedFinalField({
+  name,
+  syncName,
+  as: FieldComponent,
+  syncedValues,
+  readOnly,
+  required,
+  processSyncedValue,
+  ...rest
+}) {
   const form = useForm();
   const {
     input: {onChange: setSyncedFields, value: syncedFields},
   } = useField('synced_fields');
 
-  const syncable = syncedValues[name] !== undefined && (!required || syncedValues[name]);
+  if (!syncName) {
+    syncName = name;
+  }
+
+  const syncable = syncedValues[syncName] !== undefined && (!required || syncedValues[syncName]);
 
   return (
     <FieldComponent
       {...rest}
       name={name}
       styleName={syncable ? 'syncable' : ''}
-      readOnly={readOnly || (syncable && syncedFields.includes(name))}
+      readOnly={readOnly || (syncable && syncedFields.includes(syncName))}
       required={required}
       action={
         syncable
           ? {
               type: 'button',
-              active: syncedFields.includes(name),
+              active: syncedFields.includes(syncName),
               icon: 'sync',
               toggle: true,
               className: 'ui-qtip',
               title: Translate.string('Toggle synchronization of this field'),
               onClick: () => {
-                if (syncedFields.includes(name)) {
-                  setSyncedFields(syncedFields.filter(x => x !== name));
+                if (syncedFields.includes(syncName)) {
+                  setSyncedFields(syncedFields.filter(x => x !== syncName));
                   form.change(name, form.getFieldState(name).initial);
                 } else {
-                  setSyncedFields([...syncedFields, name].sort());
-                  form.change(name, syncedValues[name]);
+                  setSyncedFields([...syncedFields, syncName].sort());
+                  form.change(name, processSyncedValue(syncedValues[syncName]));
                 }
               },
             }
@@ -71,15 +89,19 @@ function SyncedFinalField({name, as: FieldComponent, syncedValues, readOnly, req
 
 SyncedFinalField.propTypes = {
   name: PropTypes.string.isRequired,
+  syncName: PropTypes.string,
   as: PropTypes.elementType.isRequired,
   syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
   readOnly: PropTypes.bool,
   required: PropTypes.bool,
+  processSyncedValue: PropTypes.func,
 };
 
 SyncedFinalField.defaultProps = {
+  syncName: null,
   readOnly: false,
   required: false,
+  processSyncedValue: x => x,
 };
 
 function SyncedFinalInput(props) {
@@ -90,22 +112,17 @@ function SyncedFinalTextArea(props) {
   return <SyncedFinalField as={FinalTextArea} {...props} />;
 }
 
-function SyncedFinalDropdown(props) {
-  return <SyncedFinalField as={FinalDropdown} {...props} />;
+function SyncedFinalComboDropdown(props) {
+  return <SyncedFinalField as={FinalComboDropdown} {...props} />;
 }
 
-function PersonalDataForm({userId, userValues, titles, syncedValues}) {
+function PersonalDataForm({userId, userValues, currentAffiliation, titles, syncedValues}) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
-  // Dummy values for testing
-  const [orgs, setOrgs] = useState([
-    'CERN',
-    'Max Planck',
-    'ESA',
-    'NASA',
-    'UN',
-    'WHO',
-    'CTU Prague',
-  ]);
+  const [_affiliationResults, setAffiliationResults] = useState([]);
+  const affiliationResults =
+    currentAffiliation && !_affiliationResults.find(x => x.id === currentAffiliation.id)
+      ? [currentAffiliation, ..._affiliationResults]
+      : _affiliationResults;
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
@@ -120,7 +137,40 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
   };
 
   const titleOptions = titles.map(t => ({key: t.name, value: t.name, text: t.title}));
-  const titleOrgs = orgs.map(org => ({key: org, value: org, text: org}));
+  const affiliationOptions = affiliationResults.map(res => ({
+    key: res.id,
+    value: res.id,
+    text: `${res.name} `, // XXX: the space allows addition even if the entered text matches a result item
+    content: (
+      <Header
+        content={res.name}
+        subheader={[res.street, res.postcode, res.city, res.country_code]
+          .filter(x => x)
+          .map((x, i) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <React.Fragment key={i}>
+              {i !== 0 && <br />}
+              {x}
+            </React.Fragment>
+          ))}
+      />
+    ),
+  }));
+
+  const searchAffiliationChange = async (evt, {searchQuery}) => {
+    if (!searchQuery) {
+      setAffiliationResults([]);
+      return;
+    }
+    let resp;
+    try {
+      resp = await debounce(() => indicoAxios.get(searchAffiliationURL({q: searchQuery})));
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    setAffiliationResults(resp.data);
+  };
 
   return (
     <div>
@@ -155,23 +205,23 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
                 syncedValues={syncedValues}
               />
             </Form.Group>
-            <SyncedFinalInput
-              name="affiliation"
-              label={Translate.string('Affiliation')}
-              syncedValues={syncedValues}
-            />
-            <SyncedFinalDropdown
-              name="affiliation-test"
-              options={titleOrgs}
-              selection
+            <SyncedFinalComboDropdown
+              name="affiliation_data"
+              syncName="affiliation"
+              processSyncedValue={x => ({id: null, text: x})}
+              options={affiliationOptions}
               fluid
-              search
-              allowAdditions
-              additionPosition="bottom"
-              parse={p.nullIfEmpty}
-              onAddItem={(e, {value}) => setOrgs(prevState => [value, ...prevState])}
+              additionLabel={Translate.string('Use custom affiliation:') + ' '} // eslint-disable-line prefer-template
+              onSearchChange={searchAffiliationChange}
               placeholder={Translate.string('Select an affiliation or add your own')}
-              label={Translate.string('Affiliation Test')}
+              noResultsMessage={Translate.string('Search an affiliation or enter one manually')}
+              renderCustomOptionContent={value => (
+                <Header
+                  content={value}
+                  subheader={Translate.string('You entered this option manually')}
+                />
+              )}
+              label={Translate.string('Affiliation')}
               syncedValues={syncedValues}
             />
             <SyncedFinalTextArea
@@ -209,6 +259,7 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
 PersonalDataForm.propTypes = {
   userId: PropTypes.number,
   userValues: PropTypes.object.isRequired,
+  currentAffiliation: PropTypes.object,
   titles: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -220,11 +271,13 @@ PersonalDataForm.propTypes = {
 
 PersonalDataForm.defaultProps = {
   userId: null,
+  currentAffiliation: null,
 };
 
 window.setupPersonalDataForm = function setupPersonalDataForm(
   userId,
   userValues,
+  currentAffiliation,
   titles,
   syncedValues
 ) {
@@ -233,6 +286,7 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
       <PersonalDataForm
         userId={userId}
         userValues={userValues}
+        currentAffiliation={currentAffiliation}
         titles={titles}
         syncedValues={syncedValues}
       />,
