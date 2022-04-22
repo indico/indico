@@ -118,6 +118,7 @@ function AccompanyingPersonsComponent({value, disabled, onChange, price, availab
       <div styleName="summary">
         <Button
           size="small"
+          type="button"
           onClick={handleAccompanyingPersonAdd}
           disabled={disabled || value.length >= availablePlaces}
         >
