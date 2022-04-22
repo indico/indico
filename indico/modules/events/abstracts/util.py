@@ -55,18 +55,14 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     :param dynamic_items: Contribution fields as extra columns
     """
 
-    def _format_person(person, affiliation=False):
-        return person.get_full_name(affiliation=affiliation, last_name_first=False,
-                                    last_name_upper=False, abbrev_first_name=False)
-
     field_names = ['Id', 'Title']
     static_item_mapping = {
         'state': ('State', lambda x: x.state.title),
-        'submitter': ('Submitter', lambda x: _format_person(x.submitter)),
-        'submitter_affiliation': ('Submitter (affiliation)', lambda x: _format_person(x.submitter, True)),
-        'authors': ('Primary authors', lambda x: [_format_person(a) for a in x.primary_authors]),
+        'submitter': ('Submitter', lambda x: x.submitter.full_name),
+        'submitter_affiliation': ('Submitter (affiliation)', lambda x: x.submitter.full_name_affiliation),
+        'authors': ('Primary authors', lambda x: [a.full_name for a in x.primary_authors]),
         'authors_affiliation': ('Primary authors (affiliation)',
-                                lambda x: [_format_person(a, True) for a in x.primary_authors]),
+                                lambda x: [a.full_name_affiliation for a in x.primary_authors]),
         'accepted_track': ('Accepted track', lambda x: x.accepted_track.short_title if x.accepted_track else None),
         'submitted_for_tracks': ('Submitted for tracks',
                                  lambda x: [t.short_title for t in x.submitted_for_tracks]),

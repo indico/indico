@@ -124,10 +124,6 @@ def generate_spreadsheet_from_contributions(contributions):
     contribution values.
     """
 
-    def _format_person(person, affiliation=False):
-        return person.get_full_name(affiliation=affiliation, last_name_first=False,
-                                    last_name_upper=False, abbrev_first_name=False)
-
     has_board_number = any(c.board_number for c in contributions)
     has_authors = any(pl.author_type != AuthorType.none for c in contributions for pl in c.person_links)
     headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters',
@@ -145,15 +141,15 @@ def generate_spreadsheet_from_contributions(contributions):
                         'Session': c.session.title if c.session else None,
                         'Track': c.track.title if c.track else None,
                         'Materials': None,
-                        'Presenters': ', '.join(_format_person(speaker) for speaker in c.speakers),
-                        'Presenters (affiliation)': ', '.join(_format_person(speaker, True) for speaker in c.speakers),
+                        'Presenters': ', '.join(speaker.full_name for speaker in c.speakers),
+                        'Presenters (affiliation)': ', '.join(speaker.full_name_affiliation for speaker in c.speakers),
                         'Program Code': c.code}
         if has_authors:
             contrib_data.update({
-                'Authors': ', '.join(_format_person(author) for author in c.primary_authors),
-                'Authors (affiliation)': ', '.join(_format_person(author, True) for author in c.primary_authors),
-                'Co-Authors': ', '.join(_format_person(author) for author in c.secondary_authors),
-                'Co-Authors (affiliation)': ', '.join(_format_person(author, True) for author in c.secondary_authors)
+                'Authors': ', '.join(author.full_name for author in c.primary_authors),
+                'Authors (affiliation)': ', '.join(author.full_name_affiliation for author in c.primary_authors),
+                'Co-Authors': ', '.join(author.full_name for author in c.secondary_authors),
+                'Co-Authors (affiliation)': ', '.join(author.full_name_affiliation for author in c.secondary_authors)
             })
         if has_board_number:
             contrib_data['Board number'] = c.board_number

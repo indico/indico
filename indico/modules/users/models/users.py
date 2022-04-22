@@ -83,14 +83,13 @@ class PersonMixin:
             return get_default_values(type(self)).get('_title', UserTitle.none).title
         return self._title.title
 
-    def get_full_name(self, affiliation=False, show_title=True, last_name_first=True, last_name_upper=True,
+    def get_full_name(self, show_title=True, last_name_first=True, last_name_upper=True,
                       abbrev_first_name=True, _show_empty_names=False):
         """Return the person's name in the specified notation.
 
         Note: Do not use positional arguments when calling this method.
         Always use keyword arguments!
 
-        :param affiliation: if the affiliation should be included
         :param last_name_first: if "lastname, firstname" instead of
                                 "firstname lastname" should be used
         :param last_name_upper: if the last name should be all-uppercase
@@ -101,7 +100,6 @@ class PersonMixin:
         first_name = self.first_name if self.first_name or not _show_empty_names else 'Unknown'
         last_name = self.last_name if self.last_name or not _show_empty_names else 'Unknown'
         return format_full_name(first_name, last_name, self.title if show_title else None,
-                                affiliation=affiliation and self.affiliation,
                                 last_name_first=last_name_first, last_name_upper=last_name_upper,
                                 abbrev_first_name=abbrev_first_name)
 
@@ -120,6 +118,10 @@ class PersonMixin:
     def full_name(self):
         """Return the person's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
+
+    @property
+    def full_name_affiliation(self):
+        return f'{self.full_name} ({self.affiliation})' if self.affiliation else self.full_name
 
     @property
     def display_full_name(self):
