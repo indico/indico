@@ -117,7 +117,8 @@ class PersonMixin:
     @property
     def full_name(self):
         """Return the person's name in 'Firstname Lastname' notation."""
-        return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
+        return self.get_full_name(show_title=False, last_name_first=False, last_name_upper=False,
+                                  abbrev_first_name=False)
 
     @property
     def full_name_affiliation(self):
