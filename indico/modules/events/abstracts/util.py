@@ -47,25 +47,26 @@ def build_default_email_template(event, tpl_type):
     return tpl
 
 
-def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_items, affiliations=False):
+def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_items):
     """Generate a spreadsheet data from a given abstract list.
 
     :param abstracts: The list of abstracts to include in the file
     :param static_item_ids: The abstract properties to be used as columns
     :param dynamic_items: Contribution fields as extra columns
-    :param affiliations: Whether to include or not person affiliations
     """
 
-    def _format_person(person):
-        if affiliations and person.affiliation:
-            return f'{person.full_name} ({person.affiliation})'
-        return person.full_name
+    def _format_person(person, affiliation=False):
+        return person.get_full_name(affiliation=affiliation, last_name_first=False,
+                                    last_name_upper=False, abbrev_first_name=False)
 
     field_names = ['Id', 'Title']
     static_item_mapping = {
         'state': ('State', lambda x: x.state.title),
         'submitter': ('Submitter', lambda x: _format_person(x.submitter)),
+        'submitter_affiliation': ('Submitter (affiliation)', lambda x: _format_person(x.submitter, True)),
         'authors': ('Primary authors', lambda x: [_format_person(a) for a in x.primary_authors]),
+        'authors_affiliation': ('Primary authors (affiliation)',
+                                lambda x: [_format_person(a, True) for a in x.primary_authors]),
         'accepted_track': ('Accepted track', lambda x: x.accepted_track.short_title if x.accepted_track else None),
         'submitted_for_tracks': ('Submitted for tracks',
                                  lambda x: [t.short_title for t in x.submitted_for_tracks]),
@@ -78,6 +79,13 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         'submitted_dt': ('Submission date', lambda x: x.submitted_dt),
         'modified_dt': ('Modification date', lambda x: x.modified_dt if x.modified_dt else ''),
     }
+    field_deps = {
+        'submitter': ['submitter_affiliation'],
+        'authors': ['author_affiliation']
+    }
+    for name, deps in field_deps.items():
+        if name in static_item_ids:
+            static_item_ids.extend(deps)
     field_names.extend(unique_col(item.title, item.id) for item in dynamic_items)
     field_names.extend(title for name, (title, fn) in static_item_mapping.items() if name in static_item_ids)
     rows = []
