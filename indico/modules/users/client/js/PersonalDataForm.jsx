@@ -116,7 +116,14 @@ function SyncedFinalComboDropdown(props) {
   return <SyncedFinalField as={FinalComboDropdown} {...props} />;
 }
 
-function PersonalDataForm({userId, userValues, currentAffiliation, titles, syncedValues}) {
+function PersonalDataForm({
+  userId,
+  userValues,
+  currentAffiliation,
+  titles,
+  syncedValues,
+  hasPredefinedAffiliations,
+}) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
   const [_affiliationResults, setAffiliationResults] = useState([]);
   const affiliationResults =
@@ -205,25 +212,33 @@ function PersonalDataForm({userId, userValues, currentAffiliation, titles, synce
                 syncedValues={syncedValues}
               />
             </Form.Group>
-            <SyncedFinalComboDropdown
-              name="affiliation_data"
-              syncName="affiliation"
-              processSyncedValue={x => ({id: null, text: x})}
-              options={affiliationOptions}
-              fluid
-              additionLabel={Translate.string('Use custom affiliation:') + ' '} // eslint-disable-line prefer-template
-              onSearchChange={searchAffiliationChange}
-              placeholder={Translate.string('Select an affiliation or add your own')}
-              noResultsMessage={Translate.string('Search an affiliation or enter one manually')}
-              renderCustomOptionContent={value => (
-                <Header
-                  content={value}
-                  subheader={Translate.string('You entered this option manually')}
-                />
-              )}
-              label={Translate.string('Affiliation')}
-              syncedValues={syncedValues}
-            />
+            {hasPredefinedAffiliations ? (
+              <SyncedFinalComboDropdown
+                name="affiliation_data"
+                syncName="affiliation"
+                processSyncedValue={x => ({id: null, text: x})}
+                options={affiliationOptions}
+                fluid
+                additionLabel={Translate.string('Use custom affiliation:') + ' '} // eslint-disable-line prefer-template
+                onSearchChange={searchAffiliationChange}
+                placeholder={Translate.string('Select an affiliation or add your own')}
+                noResultsMessage={Translate.string('Search an affiliation or enter one manually')}
+                renderCustomOptionContent={value => (
+                  <Header
+                    content={value}
+                    subheader={Translate.string('You entered this option manually')}
+                  />
+                )}
+                label={Translate.string('Affiliation')}
+                syncedValues={syncedValues}
+              />
+            ) : (
+              <SyncedFinalInput
+                name="affiliation"
+                label={Translate.string('Affiliation')}
+                syncedValues={syncedValues}
+              />
+            )}
             <SyncedFinalTextArea
               name="address"
               label={Translate.string('Address')}
@@ -267,6 +282,7 @@ PersonalDataForm.propTypes = {
     })
   ).isRequired,
   syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
+  hasPredefinedAffiliations: PropTypes.bool.isRequired,
 };
 
 PersonalDataForm.defaultProps = {
@@ -279,7 +295,8 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
   userValues,
   currentAffiliation,
   titles,
-  syncedValues
+  syncedValues,
+  hasPredefinedAffiliations
 ) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
@@ -289,6 +306,7 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
         currentAffiliation={currentAffiliation}
         titles={titles}
         syncedValues={syncedValues}
+        hasPredefinedAffiliations={hasPredefinedAffiliations}
       />,
       document.querySelector('#personal-details-form-container')
     );

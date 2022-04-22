@@ -206,9 +206,11 @@ class RHPersonalData(RHUserBase):
         current_affiliation = None
         if self.user._affiliation.affiliation:
             current_affiliation = AffiliationSchema().dump(self.user._affiliation.affiliation)
+        has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
                                                   titles=titles, user_values=user_values,
-                                                  current_affiliation=current_affiliation)
+                                                  current_affiliation=current_affiliation,
+                                                  has_predefined_affiliations=has_predefined_affiliations)
 
 
 class RHPersonalDataUpdate(RHUserBase):

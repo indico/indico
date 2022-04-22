@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import fields, post_dump, post_load, validate
+from marshmallow import fields, post_dump, post_load, pre_load, validate
 from marshmallow.fields import Function, Integer, List, Nested, String
 
 from indico.core.marshmallow import mm
@@ -41,7 +41,14 @@ class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
         model = User
         # XXX: this schema is also used for updating a user's personal data, so the fields here must
         # under no circumstances include sensitive fields that should not be modifiable by a user!
-        fields = ('title', 'first_name', 'last_name', 'email', 'affiliation_data', 'address', 'phone', 'synced_fields')
+        fields = ('title', 'first_name', 'last_name', 'email', 'affiliation', 'affiliation_data', 'address', 'phone',
+                  'synced_fields')
+
+    @pre_load
+    def wrap_plain_affiliation(self, data, **kwargs):
+        if (affiliation := data.pop('affiliation', None)) is not None:
+            data['affiliation_data'] = {'id': None, 'text': affiliation}
+        return data
 
     @post_dump
     def sort_synced_fields(self, data, **kwargs):
