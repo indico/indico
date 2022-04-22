@@ -976,7 +976,7 @@ class RegistrantToPDF(PDFBase):
         full_name_title = format_full_name(registration.first_name, registration.last_name,
                                            registration.get_personal_data().get('title'),
                                            last_name_first=False, last_name_upper=False,
-                                           abbrev_first_name=False, show_title=True)
+                                           abbrev_first_name=False)
 
         header_style = ParagraphStyle({}, style, fontSize=16)
         header_data = [

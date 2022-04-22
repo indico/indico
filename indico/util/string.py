@@ -433,8 +433,8 @@ def normalize_phone_number(value):
     return re.sub(r'((?!^)\+)|[^0-9x+]', '', value.strip())
 
 
-def format_full_name(first_name, last_name, title=None, last_name_first=True, last_name_upper=True,
-                     abbrev_first_name=True, show_title=False):
+def format_full_name(first_name, last_name, title=None, affiliation=None,
+                     last_name_first=True, last_name_upper=True, abbrev_first_name=True):
     """Return the user's name in the specified notation.
 
     Note: Do not use positional arguments (except for the names/title)
@@ -443,12 +443,12 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     :param first_name: The first name (may be empty)
     :param last_name: The last name
     :param title: The title (may be empty/None)
+    :param affiliation: The affiliation (may be empty/None)
     :param last_name_first: if "lastname, firstname" instead of
                             "firstname lastname" should be used
     :param last_name_upper: if the last name should be all-uppercase
     :param abbrev_first_name: if the first name should be abbreviated to
                               use only the first character
-    :param show_title: if the title should be included
     """
     if last_name_upper:
         last_name = last_name.upper()
@@ -457,7 +457,9 @@ def format_full_name(first_name, last_name, title=None, last_name_first=True, la
     else:
         first_name = f'{first_name[0].upper()}.' if abbrev_first_name else first_name
         full_name = f'{last_name}, {first_name}' if last_name_first else f'{first_name} {last_name}'
-    return full_name if not show_title or not title else f'{title} {full_name}'
+    if affiliation:
+        full_name = f'{full_name} ({affiliation})'
+    return full_name if not title else f'{title} {full_name}'
 
 
 def sanitize_email(email, require_valid=False):
