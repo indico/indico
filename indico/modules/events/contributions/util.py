@@ -118,23 +118,22 @@ def sort_contribs(contribs, sort_by):
     return sorted(contribs, key=key_func)
 
 
-def generate_spreadsheet_from_contributions(contributions, *, affiliations=False):
+def generate_spreadsheet_from_contributions(contributions):
     """
     Return a tuple consisting of spreadsheet columns and respective
     contribution values.
     """
 
-    def _format_person(person):
-        if affiliations and person.affiliation:
-            return f'{person.full_name} ({person.affiliation})'
-        return person.full_name
+    def _format_person(person, affiliation=False):
+        return person.get_full_name(affiliation=affiliation, last_name_first=False,
+                                    last_name_upper=False, abbrev_first_name=False)
 
     has_board_number = any(c.board_number for c in contributions)
     has_authors = any(pl.author_type != AuthorType.none for c in contributions for pl in c.person_links)
-    headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters', 'Materials',
-               'Program Code']
+    headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters',
+               'Presenters (affiliation)', 'Materials', 'Program Code']
     if has_authors:
-        headers += ['Authors', 'Co-Authors']
+        headers += ['Authors', 'Authors (affiliation)', 'Co-Authors', 'Co-Authors (affiliation)']
     if has_board_number:
         headers.append('Board number')
     rows = []
@@ -147,11 +146,14 @@ def generate_spreadsheet_from_contributions(contributions, *, affiliations=False
                         'Track': c.track.title if c.track else None,
                         'Materials': None,
                         'Presenters': ', '.join(_format_person(speaker) for speaker in c.speakers),
+                        'Presenters (affiliation)': ', '.join(_format_person(speaker, True) for speaker in c.speakers),
                         'Program Code': c.code}
         if has_authors:
             contrib_data.update({
                 'Authors': ', '.join(_format_person(author) for author in c.primary_authors),
-                'Co-Authors': ', '.join(_format_person(author) for author in c.secondary_authors)
+                'Authors (affiliation)': ', '.join(_format_person(author, True) for author in c.primary_authors),
+                'Co-Authors': ', '.join(_format_person(author) for author in c.secondary_authors),
+                'Co-Authors (affiliation)': ', '.join(_format_person(author, True) for author in c.secondary_authors)
             })
         if has_board_number:
             contrib_data['Board number'] = c.board_number
