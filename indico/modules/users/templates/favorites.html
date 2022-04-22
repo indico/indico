@@ -2,9 +2,7 @@
 
 {% block user_content %}
     <div class="layout-wrapper">
-        <div class="row">
-            <div id="user-favorites"></div>
-        </div>
+        <div id="user-favorites"></div>
     </div>
     <script>
         setupFavoriteSelection({{ (user.id if user != session.user else none) | tojson }});

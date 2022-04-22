@@ -41,7 +41,7 @@ from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
-from indico.modules.users.schemas import BasicCategorySchema, UserPersonalDataSchema
+from indico.modules.users.schemas import BasicCategorySchema, FavoriteEventSchema, UserPersonalDataSchema
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
                                        merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
@@ -136,7 +136,8 @@ class RHUserDashboard(RHUserBase):
         from_dt = now_utc(False) - relativedelta(weeks=1, hour=0, minute=0, second=0)
         linked_events = [(event, {'management': bool(roles & self.management_roles),
                                   'reviewing': bool(roles & self.reviewer_roles),
-                                  'attendance': bool(roles & self.attendance_roles)})
+                                  'attendance': bool(roles & self.attendance_roles),
+                                  'favorited': 'favorited' in roles})
                          for event, roles in get_linked_events(self.user, from_dt, 10).items()]
         return WPUserDashboard.render_template('dashboard.html', 'dashboard',
                                                user=self.user,
@@ -387,6 +388,36 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
             suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
             if suggestion:
                 self.user.suggested_categories.remove(suggestion)
+        return jsonify(success=True)
+
+
+class RHUserFavoritesEventAPI(RHUserBase):
+    def _process_args(self):
+        RHUserBase._process_args(self)
+        self.event = (
+            Event.get_or_404(request.view_args['event_id']) if 'event_id' in request.view_args else None
+        )
+
+    def _process_GET(self):
+        return jsonify({e.id: FavoriteEventSchema().dump(e) for e in self.user.favorite_events if not e.is_deleted})
+
+    def _process_PUT(self):
+        if self.event not in self.user.favorite_events:
+            if not self.event.can_access(self.user):
+                raise Forbidden()
+            self.user.favorite_events.add(self.event)
+            signals.users.favorite_event_added.send(self.user, event=self.event)
+        return jsonify(success=True)
+
+    def _process_DELETE(self):
+        if self.event in self.user.favorite_events:
+            self.user.favorite_events.discard(self.event)
+            try:
+                db.session.flush()
+            except StaleDataError:
+                # Deleted in another transaction
+                db.session.rollback()
+            signals.users.favorite_event_removed.send(self.user, event=self.event)
         return jsonify(success=True)
 
 

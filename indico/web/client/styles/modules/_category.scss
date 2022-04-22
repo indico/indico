@@ -396,9 +396,13 @@ ul.category-resource-qtip {
       flex-shrink: 0;
     }
 
-    .ical {
+    .event-icons {
       padding: 0 15px;
       font-size: 1.2em;
+      white-space: nowrap;
+      color: $dark-gray;
+      max-width: 56px;
+      min-width: 56px;
 
       a,
       a:hover {

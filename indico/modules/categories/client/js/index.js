@@ -13,6 +13,7 @@ import ReactDOM from 'react-dom';
 
 import './display';
 import './base';
+import './favorite';
 
 import SearchBox from 'indico/modules/search/components/SearchBox';
 

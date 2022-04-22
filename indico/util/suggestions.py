@@ -60,6 +60,11 @@ def _get_category_score(user, categ, attended_events, debug=False):
     score = int(categ in user.favorite_categories)
     if debug:
         print(f'{score:+.3f} - initial')
+    # if there is a favorite event in the category
+    if any(e.category == categ for e in user.favorite_events):
+        score += 0.1
+    if debug:
+        print(f'{score:+.3f} - favorite events')
     # Attendance percentage goes to the score directly. If the attendance is high chances are good that the user
     # is either very interested in whatever goes on in the category or it's something he has to attend regularily.
     total = _query_categ_events(categ, first_event_date, last_event_date).count()

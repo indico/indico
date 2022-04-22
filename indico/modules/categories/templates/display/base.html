@@ -85,10 +85,8 @@
                 {% block cat_user_favorites %}
                     {% if session.user and not category.is_root %}
                         <div class="group">
-                            <button type="button"
-                                    class="i-button fav-button icon-only icon-bookmark {{ 'enabled' if category in session.user.favorite_categories }}"
-                                    data-href="{{ url_for('users.user_favorites_category_api', category) }}"
-                                    data-favorites-href="{{ url_for('users.user_favorites') }}"></button>
+                            <div id="fav-button" data-category-id="{{ category.id }}"
+                                 {{ 'data-favorited' if category in session.user.favorite_categories }}></div>
                         </div>
                     {% endif %}
                 {% endblock %}
@@ -121,7 +119,6 @@
             }
         });
     });
-    setupCategoryDisplay();
 </script>
 <script type="application/ld+json">
 {{ json_ld|tojson }}

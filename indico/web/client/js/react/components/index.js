@@ -52,3 +52,4 @@ export {default as WTFPrincipalField} from './WTFPrincipalField';
 export {default as WTFLinkListField} from './WTFLinkListField';
 export {default as WTFSUIColorPicker} from './WTFSUIColorPicker';
 export {default as ICSCalendarLink} from './ICSCalendarLink';
+export {default as Favorite} from './Favorite';
