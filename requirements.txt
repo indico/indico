@@ -233,7 +233,7 @@ pynpm==0.1.2
     #   pywebpack
 pyparsing==3.0.7
     # via packaging
-pypdf2==1.26.0
+pypdf2==1.27.9
     # via -r requirements.in
 pyrsistent==0.18.1
     # via jsonschema
