@@ -18,7 +18,7 @@ from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
-from indico.util.marshmallow import UUIDString, not_empty
+from indico.util.marshmallow import UUIDString
 from indico.util.string import validate_email
 
 
@@ -371,81 +371,3 @@ class EmailField(RegistrationFormFieldBase):
                 raise ValidationError(_('Invalid email address'))
 
         return _indico_email
-
-
-class AccompanyingPersonsField(RegistrationFormBillableField):
-    name = 'accompanying_persons'
-    mm_field_class = fields.List
-    mm_field_kwargs = {'cls_or_instance': fields.Nested({
-        'first_name': fields.String(required=True, validate=not_empty),
-        'last_name': fields.String(required=True, validate=not_empty),
-    })}
-    setup_schema_fields = {
-        'max_persons': fields.Integer(load_default=0, validate=validate.Range(0)),
-        'persons_count_against_limit': fields.Bool(load_default=False),
-    }
-
-    @property
-    def default_value(self):
-        return []
-
-    @property
-    def view_data(self):
-        available_places = self._get_max_persons()
-        if available_places is not None:
-            available_places -= self.get_places_used()
-            if available_places < 0:
-                available_places = 0
-        return dict(super().view_data, available_places=available_places)
-
-    def get_validators(self, existing_registration):
-        def _check_number_of_places(new_data):
-            if existing_registration:
-                old_data = existing_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(new_data, old_data):
-                    return True
-            if new_data and (max_persons := self._get_max_persons()):
-                places_left = max_persons - self.get_places_used()
-                if not existing_registration and self.form_item.data.get('persons_count_against_limit'):
-                    # TODO remove this once get_places_used's TODO is done
-                    places_left -= 1
-                if new_data and not places_left:
-                    raise ValidationError(_('There are no places left for this option.'))
-        return _check_number_of_places
-
-    def get_places_used(self):
-        places_used = 0
-        # TODO subtract 1 available place if persons_count_against_limit and not existing_registration
-        if self._get_max_persons():
-            for registration in self.form_item.registration_form.active_registrations:
-                if self.form_item.data.get('persons_count_against_limit'):
-                    places_used += 1
-                if self.form_item.id not in registration.data_by_field:
-                    continue
-                reg_data = registration.data_by_field[self.form_item.id].data
-                if reg_data:
-                    places_used += len(reg_data)
-        return places_used
-
-    def calculate_price(self, reg_data, versioned_data):
-        return versioned_data.get('price', 0) * len(reg_data)
-
-    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
-        def _format_person(entry):
-            first_name = entry['first_name']
-            last_name = entry['last_name']
-            return f'{first_name} {last_name}'
-
-        reg_data = registration_data.data
-        if not reg_data:
-            return ''
-        persons = [_format_person(entry) for entry in reg_data]
-
-        return ', '.join(persons) if for_humans or for_search else persons
-
-    def _get_max_persons(self):
-        max_persons = self.form_item.data.get('max_persons') or None
-        if (self.form_item.data.get('persons_count_against_limit')
-                and (registration_limit := self.form_item.registration_form.registration_limit) is not None):
-            return registration_limit-1 if max_persons is None else min(max_persons, registration_limit-1)
-        return max_persons

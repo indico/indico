@@ -30,6 +30,8 @@ class RegistrationFormFieldBase:
     versioned_data_fields = frozenset({'price'})
     #: the marshmallow field class for regform submission
     mm_field_class = None
+    #: required arguments for the marshmallow field
+    mm_field_args = ()
     #: additional options for the marshmallow field
     mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
@@ -90,7 +92,8 @@ class RegistrationFormFieldBase:
 
         :param registration: The previous registration if modifying an existing one, otherwise none
         """
-        return self.mm_field_class(required=self.form_item.is_required,
+        return self.mm_field_class(*self.mm_field_args,
+                                   required=self.form_item.is_required,
                                    validate=self.get_validators(registration),
                                    **self.mm_field_kwargs)
 

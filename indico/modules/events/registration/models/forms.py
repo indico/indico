@@ -409,7 +409,7 @@ class RegistrationForm(db.Model):
 
     @property
     def limit_reached(self):
-        return self.registration_limit and len(self.active_registrations) >= self.registration_limit
+        return self.registration_limit and self.active_registration_count >= self.registration_limit
 
     @property
     def is_active(self):
@@ -490,13 +490,13 @@ class RegistrationForm(db.Model):
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
-    query = (select([db.func.count(Registration.id)])
+    query = (select([db.func.coalesce(db.func.sum(Registration.occupied_slots), 0)])
              .where((Registration.registration_form_id == RegistrationForm.id) & Registration.is_active)
              .correlate_except(Registration)
              .scalar_subquery())
     RegistrationForm.active_registration_count = column_property(query, deferred=True)
 
-    query = (select([db.func.count(Registration.id)])
+    query = (select([db.func.coalesce(db.func.sum(Registration.occupied_slots), 0)])
              .where((Registration.registration_form_id == RegistrationForm.id) & ~Registration.is_deleted)
              .correlate_except(Registration)
              .scalar_subquery())
