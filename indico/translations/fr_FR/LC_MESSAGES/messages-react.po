@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-01-22 12:44+0100\n"
+"POT-Creation-Date: 2022-04-22 12:05+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2022\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -54,7 +54,8 @@ msgid "Approve"
 msgstr "Approuver"
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:187
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:77
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:100
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:116
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:56
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:101
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx:62
@@ -74,7 +75,7 @@ msgstr "et"
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:199
 #: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:72
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:35
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:45
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:35
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:56
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:658
@@ -187,7 +188,7 @@ msgstr "Supprimer le PDF actuel"
 
 #: indico/modules/events/abstracts/client/js/boa.jsx:134
 #: indico/modules/events/abstracts/client/js/boa.jsx:164
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:103
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:108
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:71
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:115
 #: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:80
@@ -373,19 +374,19 @@ msgstr "Brouillon"
 msgid "Contribution"
 msgstr "Contribution"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:51
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:56
 msgid "Submit paper"
 msgstr "Déposer l'article"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:52
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:57
 msgid "Submit poster"
 msgstr "Déposer un poster"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:53
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:58
 msgid "Submit slides"
 msgstr "Déposer les diapositives"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:101
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:106
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:70
 #: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:80
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:116
@@ -393,7 +394,8 @@ msgstr "Déposer les diapositives"
 msgid "Submit"
 msgstr "Déposer"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:116
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:121
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:108
 msgid "Submit files"
 msgstr "Déposer des fichiers"
 
@@ -437,7 +439,7 @@ msgid "You can leave a comment if you wish"
 msgstr "Vous pouvez laisser un commentaire si vous le souhaitez"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:62
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:30
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:40
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:31
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:52
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:688
@@ -584,18 +586,22 @@ msgstr "Réinitialiser la relecture"
 msgid "Are you sure you want to reset the review?"
 msgstr "Voulez-vous vraiment réinitialiser la relecture?"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:40
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:50
 msgid "Make changes"
 msgstr "Faire des changements"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:45
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:55
 msgid "Request changes"
 msgstr "Demander des modifications"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:81
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:120
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:93
 msgid "Judge"
 msgstr "Juger"
+
+#: indico/modules/events/editing/client/js/editing/timeline/StateIndicator.jsx:55
+msgid "Unknown"
+msgstr "Inconnu"
 
 #: indico/modules/events/editing/client/js/editing/timeline/SubmitRevision.jsx:68
 #: indico/modules/events/papers/client/js/components/SubmitRevision.jsx:74
@@ -644,15 +650,15 @@ msgstr "La période d'édition n'a pas encore commencé."
 msgid "Since you are a manager you can edit anyway."
 msgstr "Comme vous êtes un administrateur vous pouvez quand même modifier."
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:65
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:62
 msgid "{submitterName} has submitted files"
 msgstr "{submitterName} a déposé des fichiers"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:75
 msgid "Hide"
 msgstr "Cacher"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:75
 msgid "Show details"
 msgstr "Montrer les détails"
 
@@ -1336,20 +1342,20 @@ msgid "Accepted"
 msgstr "Accepté"
 
 #: indico/modules/events/editing/client/js/models.js:52
-msgid "Assigned"
-msgstr "Assigné"
-
-#: indico/modules/events/editing/client/js/models.js:53
 msgid "Needs submitter changes"
 msgstr "Modifications demandées au déposant"
 
-#: indico/modules/events/editing/client/js/models.js:54
+#: indico/modules/events/editing/client/js/models.js:53
 msgid "Not submitted"
 msgstr "Pas déposé"
 
-#: indico/modules/events/editing/client/js/models.js:55
+#: indico/modules/events/editing/client/js/models.js:54
 msgid "Ready for review"
 msgstr "Prêt pour la relecture"
+
+#: indico/modules/events/editing/client/js/models.js:55
+msgid "New"
+msgstr "Nouveau"
 
 #: indico/modules/events/editing/client/js/models.js:59
 msgid "Paper Editing"
@@ -2357,27 +2363,27 @@ msgid "How many days in advance booking reminders should be sent"
 msgstr ""
 "Combien de jours avant une réservation les rappels doivent être envoyés"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:43
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:41
 msgid "Single/Daily"
 msgstr "Unique/Quotidienne"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:57
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:106
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:54
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:96
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:71
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:120
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:67
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:108
 msgid "Monthly"
 msgstr "Mensuel"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:81
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:77
 msgid "How many days before the end of a booking should reminders be sent"
 msgstr ""
 "Combien de jours avant la fin d'une réservation les rappels doivent-ils être"
 " envoyés"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:92
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:84
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:83
 #: indico/modules/rb/client/js/util.jsx:171
 msgid "Daily"
@@ -2776,7 +2782,7 @@ msgid "Equipment & Features"
 msgstr "Equipement & Fonctions"
 
 #: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:88
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:199
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:236
 msgid "Locations"
 msgstr "Sites"
 
@@ -2882,7 +2888,7 @@ msgstr[1] "{count} salles"
 msgid "Room name format"
 msgstr "Format de nom de salle"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:117
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:118
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:140
 msgid "Missing placeholder: {placeholders}"
 msgid_plural "Missing placeholders: {placeholders}"
@@ -2890,10 +2896,17 @@ msgstr[0] "Paramètre de substitution manquant: {placeholders}"
 msgstr[1] "Paramètres de substitution manquants: {placeholders}"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:128
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:175
+msgid "Invalid placeholder: {placeholders}"
+msgid_plural "Invalid placeholders: {placeholders}"
+msgstr[0] "Paramètre de substitution incorrect: {placeholders}"
+msgstr[1] "Paramètres de substitution incorrects: {placeholders}"
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:139
 msgid "Map URL template"
 msgstr "Modèle d'URL de carte"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:130
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:141
 msgid ""
 "Indico can show a link to an external map when a room is associated to an "
 "event."
@@ -2901,7 +2914,7 @@ msgstr ""
 "Indico peut afficher un lien vers une carte extérieure lorsqu'une salle est "
 "liée à un événement."
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:148
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:185
 msgid ""
 "Specify a custom URL template using any of the following placeholders: "
 "{placeholders}"
@@ -2909,7 +2922,7 @@ msgstr ""
 "Veuillez spécifier un modèle d'URL personnalisé en utilisant les paramètres "
 "de substitution suivants: {placeholders}"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:166
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:203
 msgid ""
 "Are you sure you want to delete the location {name} and all data associated "
 "with it?"
@@ -2917,7 +2930,7 @@ msgstr ""
 "Etes-vous sûr.e de vouloir supprimer le site {name} et toutes les données "
 "associées?"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:200
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:237
 msgid "Add location"
 msgstr "Ajouter un site"
 
@@ -3886,6 +3899,11 @@ msgstr "Événements à portée de main"
 msgid "Everything"
 msgstr "Tout"
 
+#: indico/web/client/js/jquery/utils/forms.js:209
+#: indico/web/client/js/react/forms/unload.jsx:17
+msgid "Are you sure you want to leave this page without saving?"
+msgstr "Etes-vous sûr.e de vouloir quitter cette page sans sauver?"
+
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:477
 #: indico/web/client/js/react/components/principals/Search.jsx:691
 msgid "Group"
@@ -4222,10 +4240,6 @@ msgstr "Faire disparaitre (montrer la prochaine erreur)"
 #: indico/web/client/js/react/errors/component.jsx:156
 msgid "Dismiss"
 msgstr "Ignorer"
-
-#: indico/web/client/js/react/forms/unload.jsx:17
-msgid "Are you sure you want to leave this page without saving?"
-msgstr "Etes-vous sûr.e de vouloir quitter cette page sans sauver?"
 
 #: indico/web/client/js/react/forms/validators.js:16
 msgid "Value must be a number"

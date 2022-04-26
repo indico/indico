@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-13 13:18+0100\n"
-"PO-Revision-Date: 2022-01-06 13:23+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
+"POT-Creation-Date: 2022-04-25 12:05+0200\n"
+"PO-Revision-Date: 2011-07-07 13:45+0000\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2022\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -93,7 +93,7 @@ msgid ""
 msgstr "Ceci fera apparaître les événements de cette catégorie sur votre <a href=\"{0}\">tableau de bord</a>."
 
 #: indico/modules/categories/client/js/management.js:56
-#: indico/modules/events/management/client/js/index.js:291
+#: indico/modules/events/management/client/js/index.js:287
 msgid "Undo"
 msgstr "Annuler"
 
@@ -144,7 +144,7 @@ msgstr "Commencez par sélectionner les catégories à transférer."
 
 #: indico/modules/categories/client/js/management.js:268
 #: indico/modules/vc/client/js/index.js:54
-#: indico/web/client/js/jquery/utils/forms.js:401
+#: indico/web/client/js/jquery/utils/forms.js:415
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "*"
@@ -241,71 +241,71 @@ msgid ""
 msgstr "Votre serveur Indico n'est pas synchronisé avec la plateforme communautaire. Vous pouvez résoudre ce problème <a href=\"{0}\">ici</a>."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:707
+#: indico/modules/designer/client/js/index.js:770
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "Les versos des modèles qui utilisent celui-ci seront supprimés."
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:710
+#: indico/modules/designer/client/js/index.js:773
 msgid "Disassociate back sides"
 msgstr "Dé-lier les versos"
 
-#: indico/modules/designer/client/js/index.js:90
-#: indico/modules/designer/client/js/index.js:233
+#: indico/modules/designer/client/js/index.js:91
+#: indico/modules/designer/client/js/index.js:237
 msgid "Fixed text"
 msgstr "Texte statique"
 
-#: indico/modules/designer/client/js/index.js:497
+#: indico/modules/designer/client/js/index.js:560
 msgid "Please choose a name for the template"
 msgstr "Choisissez un nom pour le modèle"
 
-#: indico/modules/designer/client/js/index.js:497
-#: indico/modules/designer/client/js/index.js:503
+#: indico/modules/designer/client/js/index.js:560
+#: indico/modules/designer/client/js/index.js:566
 #: indico/web/client/js/jquery/widgets/principalfield.js:114
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:165
 msgid "Warning"
 msgstr "Avertissement"
 
-#: indico/modules/designer/client/js/index.js:502
+#: indico/modules/designer/client/js/index.js:565
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "Le modèle ne peut pas être vide. Veuillez ajouter des éléments ou une image de fond."
 
-#: indico/modules/designer/client/js/index.js:529
+#: indico/modules/designer/client/js/index.js:592
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Voulez-vous vraiment modifier les dimensions de ce modèle?"
 
-#: indico/modules/designer/client/js/index.js:698
+#: indico/modules/designer/client/js/index.js:761
 msgid "This back side template will be removed"
 msgstr "Le modèle du verso sera supprimé"
 
-#: indico/modules/designer/client/js/index.js:700
+#: indico/modules/designer/client/js/index.js:763
 msgid "The back side of this template will be removed"
 msgstr "Le verso de ce modèle sera supprimé"
 
-#: indico/modules/designer/client/js/index.js:701
+#: indico/modules/designer/client/js/index.js:764
 msgid "Disassociate back side"
 msgstr "Dé-lier le verso"
 
-#: indico/modules/designer/client/js/index.js:705
+#: indico/modules/designer/client/js/index.js:768
 msgid "The back side is empty."
 msgstr "La face arrière est vide."
 
-#: indico/modules/designer/client/js/index.js:820
+#: indico/modules/designer/client/js/index.js:883
 msgid "Error"
 msgstr "Erreur"
 
-#: indico/modules/designer/client/js/index.js:937
+#: indico/modules/designer/client/js/index.js:1000
 msgid "Choose a file"
 msgstr "Choisissez un fichier"
 
-#: indico/modules/events/abstracts/client/js/index.js:78
-#: indico/modules/events/abstracts/client/js/index.js:91
+#: indico/modules/events/abstracts/client/js/index.js:74
+#: indico/modules/events/abstracts/client/js/index.js:87
 msgid "Show preview"
 msgstr "Montrer l'aperçu"
 
-#: indico/modules/events/abstracts/client/js/index.js:82
+#: indico/modules/events/abstracts/client/js/index.js:78
 msgid "Hide preview"
 msgstr "Cacher l'aperçu"
 
@@ -321,11 +321,11 @@ msgstr "Paramètres de l'entrée du menu"
 msgid "{0} out of {1} displayed"
 msgstr "{0} sur {1} sont affichés"
 
-#: indico/modules/events/client/js/util/static_filters.js:59
+#: indico/modules/events/client/js/util/static_filters.js:61
 msgid "There are no entries that match your search criteria."
 msgstr "Aucune entrée ne correspond à vos critères de recherche."
 
-#: indico/modules/events/management/client/js/index.js:289
+#: indico/modules/events/management/client/js/index.js:285
 msgid "Undoing previous operation..."
 msgstr "Annulation en cours de la dernière opération..."
 
@@ -614,66 +614,66 @@ msgstr "Précédent"
 msgid "Something went wrong"
 msgstr "Une erreur s'est produite"
 
-#: indico/web/client/js/jquery/utils/forms.js:16
+#: indico/web/client/js/jquery/utils/forms.js:19
 msgid "The passwords do not match."
 msgstr "Les mots de passe ne correspondent pas."
 
-#: indico/web/client/js/jquery/utils/forms.js:74
+#: indico/web/client/js/jquery/utils/forms.js:77
 msgid "Field must be at least {0} character long."
 msgid_plural "Field must be at least {0} characters long."
 msgstr[0] "Le champ doit comprendre au moins {0} caractère."
 msgstr[1] "Le champ doit comprendre au moins {0} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:82
+#: indico/web/client/js/jquery/utils/forms.js:85
 msgid "Field cannot be longer than {0} character."
 msgid_plural "Field cannot be longer than {0} characters."
 msgstr[0] "Le champ ne peut pas contenir plus de {0} caractère."
 msgstr[1] "Le champ ne peut pas contenir plus de {0} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:90
+#: indico/web/client/js/jquery/utils/forms.js:93
 msgid "Field must be between {0} and {1} characters long."
 msgstr "Le champ doit comprendre entre {0} et {1} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:96
+#: indico/web/client/js/jquery/utils/forms.js:99
 msgid "Field must contain at least {0} word."
 msgid_plural "Field must contain at least {0} words."
 msgstr[0] "Le champ doit contenir au moins {0} mot."
 msgstr[1] "Le champ doit contenir au moins {0} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:104
+#: indico/web/client/js/jquery/utils/forms.js:107
 msgid "Field cannot contain more than {0} word."
 msgid_plural "Field cannot contain more than {0} words."
 msgstr[0] "Le champ ne peut pas contenir plus de {0} mot."
 msgstr[1] "Le champ ne peut pas contenir plus de {0} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:112
+#: indico/web/client/js/jquery/utils/forms.js:115
 msgid "Field must contain between {0} and {1} words."
 msgstr "Le champ doit contenir entre {0} et {1} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:130
+#: indico/web/client/js/jquery/utils/forms.js:133
 msgid "Save now"
 msgstr "Sauver maintenant"
 
-#: indico/web/client/js/jquery/utils/forms.js:131
+#: indico/web/client/js/jquery/utils/forms.js:134
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "Sauvegarde..."
 
-#: indico/web/client/js/jquery/utils/forms.js:132
+#: indico/web/client/js/jquery/utils/forms.js:135
 msgid "Do not forget to save your changes!"
 msgstr "N'oubliez pas de sauver vos modifications!"
 
-#: indico/web/client/js/jquery/utils/forms.js:407
+#: indico/web/client/js/jquery/utils/forms.js:421
 msgid "Only {0} out of {1} rows is currently selected"
 msgid_plural "Only {0} out of {1} rows are currently selected."
 msgstr[0] "Seuls {0} événement sur {1} est actuellement sélectionné."
 msgstr[1] "Seuls {0} événements sur {1} sont actuellement sélectionnés."
 
-#: indico/web/client/js/jquery/utils/forms.js:446
+#: indico/web/client/js/jquery/utils/forms.js:460
 msgid "Select only the current page."
 msgstr "Choisir seulement la page actuelle."
 
-#: indico/web/client/js/jquery/utils/forms.js:460
+#: indico/web/client/js/jquery/utils/forms.js:474
 msgid "Click here to select them all."
 msgstr "Cliquer ici pour tout sélectionner"
 
