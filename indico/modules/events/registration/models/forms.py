@@ -409,7 +409,8 @@ class RegistrationForm(db.Model):
 
     @property
     def limit_reached(self):
-        return self.registration_limit and self.active_registration_count >= self.registration_limit
+        return (self.registration_limit
+                and sum(reg.occupied_slots for reg in self.active_registrations) >= self.registration_limit)
 
     @property
     def is_active(self):
