@@ -10,9 +10,16 @@ Version 3.2
 Major Features
 ^^^^^^^^^^^^^^
 
-- TODO write something about new regform
-- TODO write something about privacy features
-- TODO write something about conference receipts
+- The registration form frontend has been completely rewritten using modern web
+  technology.
+- Registrations can now have a retention period for the whole registration and
+  individual fields, after which their data is permanently deleted.
+- Te participant list of an event can now use consent to determine whether a
+  participant should be displayed, and its visibility can be different for the
+  general public and other registered participants.
+- An event can now have one or more privacy notices and it's possible to set the
+  name and contact information of the "Data controller" (useful where GDPR or
+  similar legislation applies).
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
