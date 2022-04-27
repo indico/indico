@@ -77,7 +77,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     }
     field_deps = {
         'submitter': ['submitter_affiliation'],
-        'authors': ['author_affiliation']
+        'authors': ['authors_affiliation']
     }
     for name, deps in field_deps.items():
         if name in static_item_ids:
