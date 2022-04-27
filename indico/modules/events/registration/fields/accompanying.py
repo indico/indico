@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import ValidationError, fields, validate
+from marshmallow import ValidationError, fields, pre_load, validate
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import RegistrationFormBillableField
@@ -14,8 +14,13 @@ from indico.util.marshmallow import not_empty
 
 
 class AccompanyingPersonSchema(mm.Schema):
-    first_name = fields.String(required=True, validate=not_empty)
-    last_name = fields.String(required=True, validate=not_empty)
+    firstName = fields.String(required=True, validate=not_empty)
+    lastName = fields.String(required=True, validate=not_empty)
+
+    @pre_load
+    def _delete_id(self, data, **kwrags):
+        del data['id']
+        return data
 
 
 class AccompanyingPersonsField(RegistrationFormBillableField):
@@ -64,8 +69,8 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         def _format_person(entry):
-            first_name = entry['first_name']
-            last_name = entry['last_name']
+            first_name = entry['firstName']
+            last_name = entry['lastName']
             return f'{first_name} {last_name}'
 
         reg_data = registration_data.data
