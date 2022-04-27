@@ -146,7 +146,7 @@
                                         <td class="i-table" data-searchable="{{ abstract.submitter.display_full_name }}">
                                             {{- abstract.submitter.display_full_name }}
                                             {% if abstract.submitter.affiliation %}
-                                                <span class="text-muted">({{ abstract.submitter.affiliation }})</span>
+                                                <span class="text-superfluous">({{ abstract.submitter.affiliation }})</span>
                                             {% endif %}
                                         </td>
                                     {% elif item.id == 'authors' %}
@@ -155,7 +155,7 @@
                                             {% for author in abstract.primary_authors | sort(attribute='display_order_key_lastname') -%}
                                                 <div class="person-row inline icon-user">{{ author.display_full_name }}</div>
                                                 {% if author.affiliation %}
-                                                    <span class="text-muted">({{ author.affiliation }})</span>
+                                                    <span class="text-superfluous">({{ author.affiliation }})</span>
                                                 {% endif %}
                                             {%- endfor %}
                                         </td>
