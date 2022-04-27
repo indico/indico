@@ -67,10 +67,21 @@ Internal Changes
 ----
 
 
-Version 3.1.1
+Version 3.1.2
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far
+
+
+Version 3.1.1
+-------------
+
+*Released on April 27, 2022*
 
 Improvements
 ^^^^^^^^^^^^
