@@ -60,6 +60,9 @@ function AccompanyingPersonsComponent({value, disabled, onChange, price, availab
   const currency = useSelector(getCurrency);
   const totalPrice = (value.length * price).toFixed(2);
 
+  // Add ids for persons coming from the backend (when editing a registration).
+  value = value.map(p => (p.id ? p : {id: nanoid(), ...p}));
+
   const changeReducer = action => {
     switch (action.type) {
       case 'ADD':
