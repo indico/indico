@@ -74,6 +74,10 @@
       color: $gray;
       margin-right: 5px;
     }
+
+    &.inline {
+      display: inline;
+    }
   }
 
   table.i-table {

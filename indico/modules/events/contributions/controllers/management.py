@@ -10,7 +10,6 @@ from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import undefer
-from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.cache import make_scoped_cache
@@ -56,7 +55,6 @@ from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
-from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -469,22 +467,16 @@ class RHContributionsMaterialPackage(RHManageContributionsExportActionsBase, Att
 class RHContributionsExportCSV(RHManageContributionsExportActionsBase):
     """Export list of contributions to CSV."""
 
-    @use_kwargs({
-        'affiliations': fields.Bool(load_default=False)
-    }, location='query')
-    def _process(self, affiliations):
-        headers, rows = generate_spreadsheet_from_contributions(self.contribs, affiliations=affiliations)
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_contributions(self.contribs)
         return send_csv('contributions.csv', headers, rows)
 
 
 class RHContributionsExportExcel(RHManageContributionsExportActionsBase):
     """Export list of contributions to XLSX."""
 
-    @use_kwargs({
-        'affiliations': fields.Bool(load_default=False)
-    }, location='query')
-    def _process(self, affiliations):
-        headers, rows = generate_spreadsheet_from_contributions(self.contribs, affiliations=affiliations)
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_contributions(self.contribs)
         return send_xlsx('contributions.xlsx', headers, rows, tz=self.event.tzinfo)
 
 

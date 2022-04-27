@@ -54,11 +54,15 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     :param static_item_ids: The abstract properties to be used as columns
     :param dynamic_items: Contribution fields as extra columns
     """
+
     field_names = ['Id', 'Title']
     static_item_mapping = {
         'state': ('State', lambda x: x.state.title),
         'submitter': ('Submitter', lambda x: x.submitter.full_name),
+        'submitter_affiliation': ('Submitter (affiliation)', lambda x: x.submitter.full_name_affiliation),
         'authors': ('Primary authors', lambda x: [a.full_name for a in x.primary_authors]),
+        'authors_affiliation': ('Primary authors (affiliation)',
+                                lambda x: [a.full_name_affiliation for a in x.primary_authors]),
         'accepted_track': ('Accepted track', lambda x: x.accepted_track.short_title if x.accepted_track else None),
         'submitted_for_tracks': ('Submitted for tracks',
                                  lambda x: [t.short_title for t in x.submitted_for_tracks]),
@@ -71,6 +75,13 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         'submitted_dt': ('Submission date', lambda x: x.submitted_dt),
         'modified_dt': ('Modification date', lambda x: x.modified_dt if x.modified_dt else ''),
     }
+    field_deps = {
+        'submitter': ['submitter_affiliation'],
+        'authors': ['authors_affiliation']
+    }
+    for name, deps in field_deps.items():
+        if name in static_item_ids:
+            static_item_ids.extend(deps)
     field_names.extend(unique_col(item.title, item.id) for item in dynamic_items)
     field_names.extend(title for name, (title, fn) in static_item_mapping.items() if name in static_item_ids)
     rows = []

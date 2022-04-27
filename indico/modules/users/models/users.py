@@ -83,8 +83,8 @@ class PersonMixin:
             return get_default_values(type(self)).get('_title', UserTitle.none).title
         return self._title.title
 
-    def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True, show_title=False,
-                      _show_empty_names=False):
+    def get_full_name(self, show_title=True, last_name_first=True, last_name_upper=True,
+                      abbrev_first_name=True, _show_empty_names=False):
         """Return the person's name in the specified notation.
 
         Note: Do not use positional arguments when calling this method.
@@ -99,9 +99,9 @@ class PersonMixin:
         """
         first_name = self.first_name if self.first_name or not _show_empty_names else 'Unknown'
         last_name = self.last_name if self.last_name or not _show_empty_names else 'Unknown'
-        return format_full_name(first_name, last_name, self.title,
+        return format_full_name(first_name, last_name, self.title if show_title else None,
                                 last_name_first=last_name_first, last_name_upper=last_name_upper,
-                                abbrev_first_name=abbrev_first_name, show_title=show_title)
+                                abbrev_first_name=abbrev_first_name)
 
     #: The title of the user
     title = hybrid_property(_get_title)
@@ -117,7 +117,12 @@ class PersonMixin:
     @property
     def full_name(self):
         """Return the person's name in 'Firstname Lastname' notation."""
-        return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
+        return self.get_full_name(show_title=False, last_name_first=False, last_name_upper=False,
+                                  abbrev_first_name=False)
+
+    @property
+    def full_name_affiliation(self):
+        return f'{self.full_name} ({self.affiliation})' if self.affiliation else self.full_name
 
     @property
     def display_full_name(self):
