@@ -37,6 +37,8 @@ Improvements
   (:pr:`5273`, thanks :user:`SegiNyn`)
 - Add ability to add alerts to iCal exports (:issue:`5318`, :pr:`5320`, thanks
   :user:`PerilousApricot`)
+- Show affiliations of submitters and authors in abstract/contribution lists and
+  add an extra column with this information to Excel/CSV exports (:pr:`5330`)
 
 Bugfixes
 ^^^^^^^^
