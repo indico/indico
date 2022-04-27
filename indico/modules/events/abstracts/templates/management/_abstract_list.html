@@ -154,7 +154,7 @@
                                             data-searchable="{{ abstract.primary_authors | join(', ', attribute='display_full_name') | lower }}">
                                             {% for author in abstract.primary_authors | sort(attribute='display_order_key_lastname') -%}
                                                 <div class="person-row icon-user">
-                                                    {{ author.display_full_name }}
+                                                    {{- author.display_full_name }}
                                                     {% if author.affiliation %}
                                                         <span class="text-superfluous">({{ author.affiliation }})</span>
                                                     {% endif %}
