@@ -182,7 +182,7 @@
                                     {%- pluralize -%}
                                         {{ choice }} ({{ nights }} nights)
                                     {%- endtrans %}
-                                {% elif item.field_data.field.input_type == 'multi_choice' %}
+                                {% elif item.field_data.field.input_type in ['multi_choice', 'accompanying_persons'] %}
                                     {{ item.friendly_data | join(', ') }}
                                 {% else %}
                                    {{ item.friendly_data }}
