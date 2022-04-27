@@ -10,6 +10,7 @@ from datetime import timedelta
 import pytest
 
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.subcontributions import SubContribution
 
 
 @pytest.fixture
@@ -28,3 +29,16 @@ def create_contribution(db):
 @pytest.fixture
 def dummy_contribution(create_contribution, dummy_event):
     return create_contribution(dummy_event, 'Dummy Contribution')
+
+
+@pytest.fixture
+def create_subcontribution(db):
+    """Return a callable that lets you create a subcontribution."""
+
+    def _create_subcontribution(contribution, title, duration=timedelta(minutes=10), **kwargs):
+        entry = SubContribution(contribution=contribution, title=title, duration=duration, **kwargs)
+        db.session.add(entry)
+        db.session.flush()
+        return entry
+
+    return _create_subcontribution

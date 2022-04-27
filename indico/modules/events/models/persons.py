@@ -346,6 +346,19 @@ class EventPerson(PersonMixin, db.Model):
                    if ((self.user_id is not None and self.user_id == x.user_id) or
                        (self.email is not None and self.email == x.email)))
 
+    @property
+    def has_links(self):
+        """Whether the person is an author, speaker, etc., in the event."""
+        chairpersons = {link.person for link in self.event.person_links}
+        return (
+            self in chairpersons or
+            # Check regardless of the abstract feature being enabled
+            any(link for link in self.abstract_links if not link.abstract.is_deleted) or
+            any(link for link in self.session_block_links if not link.session_block.session.is_deleted) or
+            any(link for link in self.contribution_links if not link.contribution.is_deleted) or
+            any(link for link in self.subcontribution_links if not link.subcontribution.contribution.is_deleted)
+        )
+
 
 class PersonLinkBase(PersonMixin, db.Model):
     """Base class for EventPerson associations."""

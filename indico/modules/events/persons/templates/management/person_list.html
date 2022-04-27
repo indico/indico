@@ -188,6 +188,15 @@
                             <i class="icon-stop colored-square no-registration"></i>
                             <label for="filter-no-registration">{% trans %}Unregistered users{% endtrans %}</label>
                         </li>
+                        <li class="separator">
+                            <span class="titled-rule">{% trans %}or{% endtrans %}</span>
+                        </li>
+                        <li for="filter-no-builtin-roles">
+                            <input type="checkbox" id="filter-no-builtin-roles" data-filter="no_builtin_roles">
+                            <i class="icon-checkmark"></i>
+                            <i class="icon-stop colored-square no-builtin-roles"></i>
+                            <label for="filter-no-builtin-roles">{% trans %}Users with no public roles{% endtrans %}</label>
+                        </li>
                     </ul>
                     <a class="i-button highlight icon-close disabled js-reset-role-filter"
                        title="{% trans %}Reset role filters{% endtrans %}"></a>
@@ -230,7 +239,7 @@
                 <tbody>
                     {% for person_data in persons -%}
                         <tr id="person-{{ person_data.person.id }}"
-                            class="i-table {{ 'untrusted' if person_data.person.is_untrusted }}"
+                            class="i-table {{ 'untrusted' if person_data.person.is_untrusted }} {{ 'no-roles' if person_data.roles.no_roles }}"
                             data-person-roles="{{ person_data.roles | tojson | forceescape }}"
                             {{ 'data-no-account' if person_data.roles.no_account }}>
                             {{ render_person_row(person_data, event_has_registration_forms) }}
@@ -250,7 +259,8 @@
     <script>
         setupEventPersonsList({
             hasNoAccountFilter: true,
-            hasNoRegistrationFilter: true
+            hasNoRegistrationFilter: true,
+            hasNoBuiltinRolesFilter: true,
         });
     </script>
 {% endblock %}

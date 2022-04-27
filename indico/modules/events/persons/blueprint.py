@@ -5,7 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.events.persons.controllers import (RHEditEventPerson, RHEmailEventPersons, RHEventPersonSearch,
+from indico.modules.events.persons.controllers import (RHDeleteUnusedEventPerson, RHEditEventPerson,
+                                                       RHEmailEventPersons, RHEventPersonSearch,
                                                        RHGrantModificationRights, RHGrantSubmissionRights,
                                                        RHPersonsList, RHRevokeSubmissionRights)
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -25,4 +26,6 @@ _bp.add_url_rule('/persons/revoke-submission', 'revoke_submission_rights', RHRev
 
 # EventPerson operations
 _bp.add_url_rule('/persons/<int:person_id>/edit', 'edit_person', RHEditEventPerson, methods=('GET', 'POST'))
+_bp.add_url_rule('/persons/<int:person_id>', 'delete_unused_person', RHDeleteUnusedEventPerson,
+                 methods=('DELETE',))
 _bp.add_url_rule('/api/persons/search', 'event_person_search', RHEventPersonSearch)

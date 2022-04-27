@@ -440,7 +440,8 @@ th.i-table {
     min-width: 20em;
   }
 
-  .untrusted {
+  .untrusted,
+  .no-roles {
     background-color: $light-gray;
 
     td {

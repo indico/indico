@@ -13,6 +13,7 @@ from marshmallow import fields
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload
 from webargs import validate
+from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
@@ -30,6 +31,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
+from indico.modules.events.persons import logger
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.schemas import EventPersonSchema
@@ -196,9 +198,15 @@ class RHPersonsBase(RHManageEventBase):
         for reg in regs:
             internal_role_users[reg.user.email]['registrations'].append(reg)
 
-        # Some EventPersons will have no roles since they were connected to deleted things
-        persons = {email: data for email, data in persons.items() if any(data['roles'].values())}
         persons = persons | internal_role_users
+        # Some EventPersons will have no built-in roles since they were connected to deleted things
+        builtin_roles = set(BUILTIN_ROLES)
+        for person in persons:
+            roles = set(persons[person]['roles'].keys())
+            if not roles:
+                persons[person]['roles']['no_roles'] = True
+            if not roles & builtin_roles:
+                persons[person]['roles']['no_builtin_roles'] = True
         return persons
 
 
@@ -380,6 +388,19 @@ class RHEditEventPerson(RHPersonsBase):
             tpl = get_template_module('events/persons/management/_person_list_row.html')
             return jsonify_data(html=tpl.render_person_row(person_data, bool(self.event.registration_forms)))
         return jsonify_form(form)
+
+
+class RHDeleteUnusedEventPerson(RHPersonsBase):
+    def _process_args(self):
+        RHPersonsBase._process_args(self)
+        self.person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
+
+    def _process(self):
+        if self.person.has_links:
+            raise Forbidden(_('Only users with no ties to the event can be deleted.'))
+        db.session.delete(self.person)
+        logger.info('EventPerson deleted from event %r: %r', self.event, self.person)
+        return jsonify_data()
 
 
 class RHEventPersonSearch(RHAuthenticatedEventBase):

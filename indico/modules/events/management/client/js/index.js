@@ -117,6 +117,7 @@ import {SingleEventMove, EventPublish} from './EventMove';
       {
         hasNoAccountFilter: false,
         hasNoRegistrationFilter: false,
+        hasNoBuiltinRolesFilter: false,
       },
       options
     );
@@ -235,6 +236,27 @@ import {SingleEventMove, EventPublish} from './EventMove';
       $('#filter-no-registration').on('change', function() {
         if (this.checked) {
           $('.js-event-person-list [data-filter]:checked:not(#filter-no-registration)').prop(
+            'checked',
+            false
+          );
+        }
+        refreshPersonFilters();
+        applySearchFilters();
+      });
+    }
+
+    if (options.hasNoBuiltinRolesFilter) {
+      $('.js-event-person-list [data-filter]:not(#filter-no-builtin-roles)').on(
+        'change',
+        function() {
+          $('#filter-no-builtin-roles').prop('checked', false);
+          refreshPersonFilters();
+          applySearchFilters();
+        }
+      );
+      $('#filter-no-builtin-roles').on('change', function() {
+        if (this.checked) {
+          $('.js-event-person-list [data-filter]:checked:not(#filter-no-builtin-roles)').prop(
             'checked',
             false
           );

@@ -26,7 +26,10 @@
     {% endif %}
     <td class="i-table name-column" data-searchable="{{ person.display_full_name|lower }}">
         {{ person.display_full_name }}
-        {% if person.is_untrusted %}
+        {% if person_data.roles.no_roles %}
+            <span class="icon-question"
+                  title="{%- trans %}This person currently has no ties to the event.{% endtrans -%}"></span>
+        {% elif person.is_untrusted %}
             {% set untrusted_tooltip -%}
                 {%- trans -%}
                     This person is currently just an author of an abstract with no other ties to the event.
@@ -44,7 +47,7 @@
     </td>
     <td class="i-table roles-column">
         {% for role, role_data in person_data.roles.items() %}
-            {%- if role not in ('no_account', 'no_registration') %}
+            {%- if role not in ('no_account', 'no_registration', 'no_roles', 'no_builtin_roles') %}
                 {%- if role_data.elements -%}
                     <span class="i-tag outline contrast js-count-label" style="{{ role_data.css }};"
                           data-role-name="{{ role_data.name }}"
@@ -91,6 +94,15 @@
         {% else %}
             <a class="i-link icon-edit disabled"
                title="{%- trans %}This user does not play any public role{% endtrans -%}"></a>
+        {% endif %}
+        {% if person_data.has_event_person and person_data.roles.no_builtin_roles %}
+            <a class="i-link icon-remove"
+               title="{%- trans %}Delete person{% endtrans -%}"
+               data-href="{{ url_for('persons.delete_unused_person', person) }}"
+               data-title="{%- trans %}Delete person{% endtrans -%}"
+               data-method="DELETE"
+               data-update="#person-{{ person.id }}"
+               data-confirm="{% trans %}Do you really want to delete this person from the event?{% endtrans %}"></a>
         {% endif %}
     </td>
 {% endmacro %}
