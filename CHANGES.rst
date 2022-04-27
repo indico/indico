@@ -39,6 +39,8 @@ Improvements
   :user:`PerilousApricot`)
 - Show affiliations of submitters and authors in abstract/contribution lists and
   add an extra column with this information to Excel/CSV exports (:pr:`5330`)
+- Add option to delete persons from the event if they have no roles or other ties
+  to the event anymore (:issue:`5294`, :pr:`5313`)
 
 Bugfixes
 ^^^^^^^^
