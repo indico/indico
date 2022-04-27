@@ -433,16 +433,13 @@ def normalize_phone_number(value):
     return re.sub(r'((?!^)\+)|[^0-9x+]', '', value.strip())
 
 
-def format_full_name(first_name, last_name, title=None, last_name_first=True,
+def format_full_name(first_name, last_name, title=None, *, last_name_first=True,
                      last_name_upper=True, abbrev_first_name=True):
     """Return the user's name in the specified notation.
 
-    Note: Do not use positional arguments (except for the names/title)
-    when calling this method.  Always use keyword arguments!
-
-    :param first_name: The first name (may be empty)
+    :param first_name: The first name
     :param last_name: The last name
-    :param title: The title (may be empty/None)
+    :param title: The title
     :param last_name_first: if "lastname, firstname" instead of
                             "firstname lastname" should be used
     :param last_name_upper: if the last name should be all-uppercase
