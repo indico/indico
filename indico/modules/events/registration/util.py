@@ -140,7 +140,7 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
             field_data = get_field_merged_options(item, registration_data)
         elif registration and isinstance(item.field_impl, AccompanyingPersonsField):
             field_data = item.view_data
-            field_data['availablePlaces'] = item.field_impl.get_available_places(False)
+            field_data['availablePlaces'] = item.field_impl.get_available_places(registration=registration)
         else:
             field_data = item.view_data
         item_data[item.id] = field_data

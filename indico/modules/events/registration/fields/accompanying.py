@@ -38,7 +38,7 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
 
     @property
     def view_data(self):
-        return dict(super().view_data, available_places=self.get_available_places(True))
+        return dict(super().view_data, available_places=self.get_available_places())
 
     def get_validators(self, existing_registration):
         def _check_number_of_places(new_data):
@@ -47,17 +47,19 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
                 if not old_data or len(new_data) <= len(old_data.data):
                     return True
             if (new_data
-                    and (available_places := self.get_available_places(not existing_registration)) is not None
+                    and (available_places := self.get_available_places(registration=existing_registration)) is not None
                     and len(new_data) > available_places):
                 raise ValidationError(_('There are no places left for this option.'))
         return _check_number_of_places
 
-    def get_available_places(self, is_new_registration):
+    def get_available_places(self, registration=None):
         max_persons = self.form_item.data.get('max_persons') or None
         if (self.form_item.data.get('persons_count_against_limit')
                 and (reg_limit := self.form_item.registration_form.registration_limit) is not None):
             reg_count = self.form_item.registration_form.active_registration_count
-            if is_new_registration:
+            if registration and (old_data := registration.data_by_field.get(self.form_item.id)):
+                reg_count -= len(old_data.data)
+            elif not registration:
                 reg_count += 1
             if max_persons is None:
                 return max(0, reg_limit - reg_count)
