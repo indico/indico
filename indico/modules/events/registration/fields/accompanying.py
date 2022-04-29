@@ -44,7 +44,7 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
         def _check_number_of_places(new_data):
             if existing_registration:
                 old_data = existing_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(new_data, old_data):
+                if not old_data or len(new_data) <= len(old_data.data):
                     return True
             if (new_data
                     and (available_places := self.get_available_places(not existing_registration)) is not None
