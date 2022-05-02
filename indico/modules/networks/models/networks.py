@@ -69,6 +69,10 @@ class IPNetworkGroup(db.Model):
     # - in_category_acls (CategoryPrincipal.ip_network_group)
     # - in_event_acls (EventPrincipal.ip_network_group)
 
+    @property
+    def identifier(self):
+        return f'IPNetworkGroup:{self.id}'
+
     def __repr__(self):
         return format_repr(self, 'id', 'name', hidden=False, attachment_access_override=False)
 
