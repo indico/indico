@@ -113,7 +113,7 @@ def test_new_registration(dummy_event, dummy_regform, create_accompanying_person
     validator = field.field_impl.get_validators(None)
     dummy_regform.registration_limit = registration_limit
 
-    assert field.field_impl.get_available_places() == expected_limit
+    assert field.field_impl._get_field_available_places(None) == expected_limit
     assert not dummy_regform.limit_reached
     validator(_create_accompanying_persons(0))
     if expected_limit:
@@ -197,7 +197,7 @@ def test_modifying_registration_field_changed(dummy_event, dummy_regform, create
 
     _assert_occupied_slots(reg, expected_occupied_slots)
     _assert_registration_count(dummy_regform, expected_occupied_slots)
-    assert field.field_impl.get_available_places(registration=reg) == expected_limit
+    assert field.field_impl._get_field_available_places(reg) == expected_limit
     if registration_limit and expected_occupied_slots >= registration_limit:
         assert dummy_regform.limit_reached
     else:
