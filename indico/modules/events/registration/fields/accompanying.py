@@ -75,7 +75,7 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
             return ''
         persons = [_format_person(entry) for entry in reg_data]
 
-        return ', '.join(persons) if for_humans or for_search else persons
+        return ', '.join(persons)
 
     def _get_field_available_places(self, registration):
         max_persons = self.form_item.data.get('max_persons') or None
