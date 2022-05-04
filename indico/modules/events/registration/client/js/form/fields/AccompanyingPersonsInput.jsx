@@ -8,6 +8,7 @@
 import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
+import {useFormState} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Button, Form, Label} from 'semantic-ui-react';
 
@@ -15,7 +16,7 @@ import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/rea
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 
-import {getCurrency} from '../selectors';
+import {getCurrency, getItems} from '../selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
 
@@ -55,10 +56,63 @@ AccompanyingPersonModal.defaultProps = {
   },
 };
 
-function AccompanyingPersonsComponent({value, disabled, onChange, price, availablePlaces}) {
+// Gather all accompanying persons field's counts.
+function countAllAccompanyingPersons(items, formState) {
+  const allAccompanyingPersonFieldNames = Object.keys(items)
+    .map(i => items[i])
+    .filter(f => f.inputType === 'accompanying_persons' && f.personsCountAgainstLimit)
+    .map(apf => apf.htmlName);
+  return allAccompanyingPersonFieldNames.reduce(
+    (count, field) => count + formState.values[field]?.length || 0,
+    0
+  );
+}
+
+function calculatePlaces(availablePlaces, maxPersons, personsInCurrentField, items, formState) {
+  if (availablePlaces === null) {
+    // Field does not count towards registration limit...
+    if (!maxPersons) {
+      // ...and has no person limit.
+      return [null, Infinity];
+    } else {
+      // ...and has a person limit.
+      return [personsInCurrentField, maxPersons];
+    }
+  } else {
+    // Field counts towards registration limit...
+    const personsInAllFieldsCount = countAllAccompanyingPersons(items, formState);
+
+    if (!maxPersons || maxPersons >= availablePlaces - personsInAllFieldsCount) {
+      // ...and has no person limit, or its person limit is greater than the registration limit.
+      return [personsInAllFieldsCount, availablePlaces];
+    } else {
+      // ...and has a person limit lower than the regitration limit.
+      return [personsInCurrentField, maxPersons];
+    }
+  }
+}
+
+function AccompanyingPersonsComponent({
+  value,
+  disabled,
+  onChange,
+  price,
+  availablePlaces,
+  maxPersons,
+}) {
   const [operation, setOperation] = useState({type: null, person: null});
   const currency = useSelector(getCurrency);
   const totalPrice = (value.length * price).toFixed(2);
+  const items = useSelector(getItems);
+  const formState = useFormState();
+
+  const [placesUsed, placesLimit] = calculatePlaces(
+    availablePlaces,
+    maxPersons,
+    value.length,
+    items,
+    formState
+  );
 
   // Add ids for persons coming from the backend (when editing a registration).
   value = value.map(p => (p.id ? p : {id: nanoid(), ...p}));
@@ -123,7 +177,7 @@ function AccompanyingPersonsComponent({value, disabled, onChange, price, availab
           size="small"
           type="button"
           onClick={handleAccompanyingPersonAdd}
-          disabled={disabled || value.length >= availablePlaces}
+          disabled={disabled || placesLimit - placesUsed === 0}
         >
           <Translate>Add accompanying person</Translate>
         </Button>
@@ -132,13 +186,9 @@ function AccompanyingPersonsComponent({value, disabled, onChange, price, availab
             {price.toFixed(2)} {currency} (Total: {totalPrice} {currency})
           </Label>
         )}
-        {availablePlaces !== null && (
+        {placesLimit !== Infinity && (
           <div styleName="places-left">
-            <PlacesLeft
-              placesLimit={availablePlaces}
-              placesUsed={value.length}
-              isEnabled={!disabled}
-            />
+            <PlacesLeft placesLimit={placesLimit} placesUsed={placesUsed} isEnabled={!disabled} />
           </div>
         )}
       </div>
@@ -172,15 +222,23 @@ AccompanyingPersonsComponent.propTypes = {
   onChange: PropTypes.func.isRequired,
   price: PropTypes.number,
   availablePlaces: PropTypes.number,
+  maxPersons: PropTypes.number,
 };
 
 AccompanyingPersonsComponent.defaultProps = {
   disabled: false,
   price: 0,
   availablePlaces: null,
+  maxPersons: null,
 };
 
-export default function AccompanyingPersonsInput({htmlName, disabled, price, availablePlaces}) {
+export default function AccompanyingPersonsInput({
+  htmlName,
+  disabled,
+  price,
+  availablePlaces,
+  maxPersons,
+}) {
   return (
     <FinalField
       name={htmlName}
@@ -188,6 +246,7 @@ export default function AccompanyingPersonsInput({htmlName, disabled, price, ava
       disabled={disabled}
       price={price}
       availablePlaces={availablePlaces}
+      maxPersons={maxPersons}
     />
   );
 }
@@ -197,12 +256,14 @@ AccompanyingPersonsInput.propTypes = {
   disabled: PropTypes.bool,
   price: PropTypes.number,
   availablePlaces: PropTypes.number,
+  maxPersons: PropTypes.number,
 };
 
 AccompanyingPersonsInput.defaultProps = {
   disabled: false,
   price: 0,
   availablePlaces: null,
+  maxPersons: null,
 };
 
 export function AccompanyingPersonsSettings() {
