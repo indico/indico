@@ -58,8 +58,7 @@ AccompanyingPersonModal.defaultProps = {
 
 // Gather all accompanying persons field's counts.
 function countAllAccompanyingPersons(items, formState) {
-  const allAccompanyingPersonFieldNames = Object.keys(items)
-    .map(i => items[i])
+  const allAccompanyingPersonFieldNames = Object.values(items)
     .filter(f => f.inputType === 'accompanying_persons' && f.personsCountAgainstLimit)
     .map(apf => apf.htmlName);
   return allAccompanyingPersonFieldNames.reduce(

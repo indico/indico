@@ -26,7 +26,7 @@ class AccompanyingPersonSchema(mm.Schema):
 class AccompanyingPersonsField(RegistrationFormBillableField):
     name = 'accompanying_persons'
     mm_field_class = fields.List
-    mm_field_args = (fields.Nested(AccompanyingPersonSchema), )
+    mm_field_args = (fields.Nested(AccompanyingPersonSchema),)
     setup_schema_fields = {
         'max_persons': fields.Integer(load_default=0, validate=validate.Range(0)),
         'persons_count_against_limit': fields.Bool(load_default=False),

@@ -30,7 +30,7 @@ class RegistrationFormFieldBase:
     versioned_data_fields = frozenset({'price'})
     #: the marshmallow field class for regform submission
     mm_field_class = None
-    #: required arguments for the marshmallow field
+    #: positional arguments for the marshmallow field
     mm_field_args = ()
     #: additional options for the marshmallow field
     mm_field_kwargs = {}
