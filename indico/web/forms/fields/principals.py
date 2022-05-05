@@ -152,8 +152,7 @@ class PermissionsField(JSONField):
     def __init__(self, *args, **kwargs):
         self.object_type = kwargs.pop('object_type')
         super().__init__(*args, **kwargs)
-        ip_schema = IPNetworkGroupSchema()
-        self.ip_networks = list(map(ip_schema.dump, IPNetworkGroup.query.filter_by(hidden=False)))
+        self.ip_networks = IPNetworkGroupSchema(many=True).dump(IPNetworkGroup.query.filter_by(hidden=False).all())
 
     @property
     def event(self):
