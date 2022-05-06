@@ -556,7 +556,8 @@ const UserSearchFields = () => {
 const InnerUserSearch = searchFactory({
   componentName: 'InnerUserSearch',
   buttonTitle: Translate.string('User'),
-  modalTitle: single => (single ? Translate.string('Select user') : Translate.string('Add users')),
+  modalTitle: single =>
+    single ? Translate.string('Select user') : Translate.string('Select users'),
   resultIcon: 'user',
   favoriteKey: 'userId',
   searchFields: <UserSearchFields />,
