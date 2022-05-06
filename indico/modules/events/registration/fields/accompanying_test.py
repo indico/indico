@@ -18,6 +18,11 @@ from indico.modules.events.registration.models.registrations import Registration
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
+def _id(n):
+    assert 0 <= n < 10000000
+    return f'{n:08d}-0000-0000-0000-000000000000'
+
+
 @pytest.fixture
 def create_accompanying_persons_field(db, dummy_regform):
     def _create_accompanying_persons_field(max_persons, persons_count_against_limit,
@@ -74,7 +79,7 @@ def create_registration(db, dummy_event, dummy_regform, create_user):
 
 
 def _create_accompanying_persons(n):
-    return [{'firstName': 'Guinea', 'lastName': 'Pig'} for _ in range(n)]
+    return [{'id': _id(i), 'firstName': 'Guinea', 'lastName': 'Pig'} for i in range(n)]
 
 
 def _assert_occupied_slots(registration, count):

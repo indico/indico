@@ -5,7 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import ValidationError, fields, pre_load, validate
+from uuid import uuid4
+
+from marshmallow import ValidationError, fields, post_load, pre_load, validate
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import RegistrationFormBillableField
@@ -14,12 +16,20 @@ from indico.util.marshmallow import not_empty
 
 
 class AccompanyingPersonSchema(mm.Schema):
+    id = fields.UUID()
     firstName = fields.String(required=True, validate=not_empty)
     lastName = fields.String(required=True, validate=not_empty)
 
     @pre_load
-    def _delete_id(self, data, **kwrags):
-        del data['id']
+    def _generate_new_uuid(self, data, **kwargs):
+        if data.get('id', '').startswith('new:'):
+            data['id'] = str(uuid4())
+        return data
+
+    @post_load
+    def _stringify_uuid(self, data, **kwargs):
+        if 'id' in data:
+            data['id'] = str(data['id'])
         return data
 
 

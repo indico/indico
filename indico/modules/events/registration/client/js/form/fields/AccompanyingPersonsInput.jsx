@@ -113,13 +113,10 @@ function AccompanyingPersonsComponent({
     formState
   );
 
-  // Add ids for persons coming from the backend (when editing a registration).
-  value = value.map(p => (p.id ? p : {id: nanoid(), ...p}));
-
   const changeReducer = action => {
     switch (action.type) {
       case 'ADD':
-        return [...value, {id: nanoid(), ...action.person}];
+        return [...value, {id: `new:${nanoid()}`, ...action.person}];
       case 'EDIT':
         return [...value.map(p => (p.id === action.person.id ? action.person : p))];
       case 'REMOVE':
@@ -213,6 +210,7 @@ function AccompanyingPersonsComponent({
 AccompanyingPersonsComponent.propTypes = {
   value: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.string.isRequired,
       firstName: PropTypes.string.isRequired,
       lastName: PropTypes.string.isRequired,
     })
