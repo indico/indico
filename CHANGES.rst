@@ -10,7 +10,8 @@ Version 3.1.2
 Bugfixes
 ^^^^^^^^
 
-- None so far
+- Prevent access to a badge design of a deleted category or an event (:issue:`5329`,
+  :pr:`5334`, thanks :user:`vasantvohra`)
 
 
 Version 3.1.1
