@@ -13,7 +13,7 @@ from io import BytesIO
 from flask import flash, jsonify, request, session
 from PIL import Image
 from webargs import fields
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
@@ -132,6 +132,8 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
 
     def _process_args(self):
         self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
+        if self.target.is_deleted:
+            raise NotFound
 
 
 class BacksideTemplateProtectionMixin:
