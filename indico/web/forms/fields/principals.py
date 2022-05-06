@@ -19,7 +19,7 @@ from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.groups.util import serialize_group
 from indico.modules.networks.models.networks import IPNetworkGroup
-from indico.modules.networks.util import serialize_ip_network_group
+from indico.modules.networks.schemas import IPNetworkGroupSchema
 from indico.modules.users.util import serialize_user
 from indico.util.user import principal_from_identifier
 from indico.web.forms.fields import JSONField
@@ -31,7 +31,7 @@ def serialize_principal(principal):
     if principal.principal_type == PrincipalType.email:
         return serialize_email_principal(principal)
     elif principal.principal_type == PrincipalType.network:
-        return serialize_ip_network_group(principal)
+        return IPNetworkGroupSchema().dump(principal)
     elif principal.principal_type == PrincipalType.user:
         return serialize_user(principal)
     elif principal.principal_type == PrincipalType.event_role:
@@ -152,7 +152,7 @@ class PermissionsField(JSONField):
     def __init__(self, *args, **kwargs):
         self.object_type = kwargs.pop('object_type')
         super().__init__(*args, **kwargs)
-        self.ip_networks = list(map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False)))
+        self.ip_networks = IPNetworkGroupSchema(many=True).dump(IPNetworkGroup.query.filter_by(hidden=False).all())
 
     @property
     def event(self):
