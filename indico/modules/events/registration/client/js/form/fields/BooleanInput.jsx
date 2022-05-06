@@ -102,12 +102,19 @@ export default function BooleanInput({
   placesLimit,
   placesUsed,
 }) {
+  const validateBoolean = value => {
+    if (isRequired && value === null) {
+      return Translate.string('This field is required.');
+    }
+  };
+
   return (
     <FinalField
       id={id}
       name={htmlName}
       component={BooleanInputComponent}
-      required={isRequired}
+      required={isRequired ? 'no-validator' : isRequired}
+      validate={validateBoolean}
       disabled={disabled}
       isPurged={isPurged}
       allowNull
