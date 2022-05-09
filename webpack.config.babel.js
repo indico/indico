@@ -40,24 +40,27 @@ const extraResolveAliases = [
 ];
 
 // Add Module Bundles
-glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach(file => {
-  const module = {produceBundle: true, partials: {}, ...require(file)};
-  // eslint-disable-next-line prefer-template
-  const moduleName = 'module_' + (module.parent ? module.parent + '.' : '') + module.name;
-  const dirName = path.join(path.dirname(file), 'client/js');
+glob
+  .sync(path.join(config.build.rootPath, 'modules/**/module.json'))
+  .sort((a, b) => b.split('/').length - a.split('/').length)
+  .forEach(file => {
+    const module = {produceBundle: true, partials: {}, ...require(file)};
+    // eslint-disable-next-line prefer-template
+    const moduleName = 'module_' + (module.parent ? module.parent + '.' : '') + module.name;
+    const dirName = path.join(path.dirname(file), 'client/js');
 
-  if (module.produceBundle) {
-    entryPoints[moduleName] = [dirName];
-  }
-  const modulePath = path.join('indico/modules', module.parent || '', module.name);
-  extraResolveAliases.push({name: modulePath, alias: dirName, onlyModule: false});
-
-  if (module.partials) {
-    for (const partial of Object.entries(module.partials)) {
-      entryPoints[`${moduleName}.${partial[0]}`] = [path.resolve(dirName, partial[1])];
+    if (module.produceBundle) {
+      entryPoints[moduleName] = [dirName];
     }
-  }
-});
+    const modulePath = path.join('indico/modules', module.parent || '', module.name);
+    extraResolveAliases.push({name: modulePath, alias: dirName, onlyModule: false});
+
+    if (module.partials) {
+      for (const partial of Object.entries(module.partials)) {
+        entryPoints[`${moduleName}.${partial[0]}`] = [path.resolve(dirName, partial[1])];
+      }
+    }
+  });
 
 // This has to be last in the array, since it's the most general alias.
 // Otherwise, it would be caught before 'indico/modules/...'
