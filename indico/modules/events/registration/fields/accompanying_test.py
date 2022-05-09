@@ -46,12 +46,11 @@ def create_accompanying_persons_field(db, dummy_regform):
         }
         field.versioned_data = field.field_impl.form_item.data
         if registration:
-            RegistrationData(
-                registration=registration,
+            registration.data.append(RegistrationData(
                 field_data=field.current_data,
-                data=data if data is not None else _create_accompanying_persons(num_persons)
-            )
-            db.session.expire(registration)
+                data=(data if data is not None else _create_accompanying_persons(num_persons))
+            ))
+            db.session.flush()
         return field
 
     return _create_accompanying_persons_field
