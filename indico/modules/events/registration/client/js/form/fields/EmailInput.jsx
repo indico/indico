@@ -33,6 +33,7 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
   ]);
   const validateEmail = useDebouncedAsyncValidate(async email => {
     let msg, response;
+    email = email.trim();
     if (!email) {
       // we disabled the regular required validator in order for this to always run
       msg = Translate.string('This field is required.');
