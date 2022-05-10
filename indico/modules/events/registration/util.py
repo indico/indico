@@ -28,6 +28,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
+from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
@@ -137,6 +138,9 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
             continue
         if registration and isinstance(item.field_impl, (ChoiceBaseField, AccommodationField)):
             field_data = get_field_merged_options(item, registration_data)
+        elif registration and isinstance(item.field_impl, AccompanyingPersonsField):
+            field_data = item.view_data
+            field_data['availablePlaces'] = item.field_impl.get_available_places(registration)
         else:
             field_data = item.view_data
         item_data[item.id] = field_data

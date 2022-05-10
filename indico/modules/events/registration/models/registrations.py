@@ -12,10 +12,11 @@ from uuid import uuid4
 
 from babel.numbers import format_currency
 from flask import has_request_context, request, session
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import column_property, mapper
 
 from indico.core import signals
 from indico.core.config import config
@@ -811,6 +812,9 @@ class RegistrationData(StoredFileMixin, db.Model):
 
 @listens_for(mapper, 'after_configured', once=True)
 def _mapper_configured():
+    from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
+    from indico.modules.events.registration.models.items import RegistrationFormItem
+
     @listens_for(Registration.registration_form, 'set')
     def _set_event_id(target, value, *unused):
         target.event_id = value.event_id
@@ -825,3 +829,13 @@ def _mapper_configured():
     @listens_for(Registration.transaction, 'set')
     def _set_transaction_id(target, value, *unused):
         value.registration = target
+
+    query = (select([db.func.coalesce(db.func.sum(db.func.jsonb_array_length(RegistrationData.data)), 0) + 1])
+             .where(db.and_((RegistrationData.registration_id == Registration.id),
+                            (RegistrationData.field_data_id == RegistrationFormFieldData.id),
+                            (RegistrationFormFieldData.field_id == RegistrationFormItem.id),
+                            (RegistrationFormItem.input_type == 'accompanying_persons'),
+                            db.cast(RegistrationFormItem.data['persons_count_against_limit'].astext, db.Boolean)))
+             .correlate_except(RegistrationData)
+             .scalar_subquery())
+    Registration.occupied_slots = column_property(query, deferred=True)

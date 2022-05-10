@@ -440,7 +440,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
     setup_schema_base_cls = AccommodationSetupSchema
     mm_field_class = fields.Nested
-    mm_field_kwargs = {'nested': AccommodationSchema}
+    mm_field_args = (AccommodationSchema,)
 
     @property
     def default_value(self):
