@@ -183,7 +183,7 @@
                                         {{ choice }} ({{ nights }} nights)
                                     {%- endtrans %}
                                 {% elif item.field_data.field.input_type == 'multi_choice' %}
-                                    {{ item.friendly_data }}
+                                    {{ item.friendly_data | join(', ') }}
                                 {% else %}
                                    {{ item.friendly_data }}
                                 {% endif %}

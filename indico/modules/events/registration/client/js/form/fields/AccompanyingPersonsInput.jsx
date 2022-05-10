@@ -118,9 +118,9 @@ function AccompanyingPersonsComponent({
       case 'ADD':
         return [...value, {id: `new:${nanoid()}`, ...action.person}];
       case 'EDIT':
-        return [...value.map(p => (p.id === action.person.id ? action.person : p))];
+        return value.map(p => (p.id === action.person.id ? action.person : p));
       case 'REMOVE':
-        return [...value.filter(p => p.id !== action.id)];
+        return value.filter(p => p.id !== action.id);
     }
   };
 
