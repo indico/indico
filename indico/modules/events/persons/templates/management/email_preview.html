@@ -1,0 +1,15 @@
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('highlight', fixed_width=true) %}
+    {% trans -%}
+        This preview is only shown for a single recipient.<br>
+        When sending the emails, each recipient will receive an email
+        customized with its associated data.
+    {%- endtrans %}
+{% endcall %}
+
+<strong>{% trans %}Subject{% endtrans %}</strong>
+<pre class="mono">{{ subject | forceescape }}</pre>
+<br>
+<strong>{% trans %}Body{% endtrans %}</strong>
+<div>{{ body }}</div>
