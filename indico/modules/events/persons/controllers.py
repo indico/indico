@@ -8,7 +8,7 @@
 import itertools
 from collections import defaultdict
 
-from flask import flash, jsonify, redirect, request, session
+from flask import flash, jsonify, redirect, render_template, request, session
 from marshmallow import fields
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload
@@ -32,7 +32,6 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons import logger
-from indico.modules.events.persons.forms import EmailEventPersonsForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema
 from indico.modules.events.persons.views import WPManagePersons
@@ -49,7 +48,6 @@ from indico.util.placeholders import replace_placeholders
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
-from indico.web.util import jsonify_form
 
 
 BUILTIN_ROLES = {'chairperson': {'name': _('Chairperson'), 'code': 'CHR', 'color': 'f7b076',
@@ -251,47 +249,67 @@ class RHPersonsList(RHPersonsBase):
                                                has_predefined_affiliations=Affiliation.query.has_rows())
 
 
-class RHEmailEventPersons(RHManageEventBase):
+class RHEmailEventPersonsPreview(RHManageEventBase):
+    """Preview an email with EventPersons associated placeholders."""
+
+    def _process(self):
+        person = self.event.person_links[0]
+        email_body = replace_placeholders('event-persons-email', request.form['body'],
+                                          event=self.event, person=person)
+        email_subject = replace_placeholders('event-persons-email', request.form['subject'],
+                                             event=self.event, person=person)
+        tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
+                                  email_body=email_body)
+        html = render_template('events/persons/management/email_preview.html', subject=tpl.get_subject(),
+                               body=tpl.get_body())
+        return jsonify(html=html)
+
+
+class RHAPIEmailEventPersons(RHManageEventBase):
     """Send emails to selected EventPersons."""
 
     def _process_args(self):
-        self.no_account = request.args.get('no_account') == '1'
         RHManageEventBase._process_args(self)
+        self.no_account = request.args.get('no_account') == '1'
+        self.recipients = set(self._find_event_persons(request.args.getlist('person_id'),
+                                                       request.args.get('not_invited_only') == '1'))
+        self.recipients |= set(self._find_users(request.args.getlist('user_id')))
+        self.recipients |= set(self._find_role_members(request.args.getlist('role_id')))
 
-    def _process(self):
-        person_ids = request.form.getlist('person_id')
-        user_ids = request.form.getlist('user_id')
-        role_ids = request.form.getlist('role_id')
-        recipients = set(self._find_event_persons(person_ids, request.args.get('not_invited_only') == '1'))
-        recipients |= set(self._find_users(user_ids))
-        recipients |= set(self._find_role_members(role_ids))
+    def _process_GET(self):
         if self.no_account:
             tpl = get_template_module('events/persons/emails/invitation.html', event=self.event)
-            disabled_until_change = False
         else:
             tpl = get_template_module('events/persons/emails/generic.html', event=self.event)
-            disabled_until_change = True
-        form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids,
-                                     recipients=sorted(x.email for x in recipients), body=tpl.get_html_body(),
-                                     subject=tpl.get_subject(), register_link=self.no_account, event=self.event)
-        if form.validate_on_submit():
-            self._send_emails(form, recipients)
-            num = len(recipients)
-            flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
-            return jsonify_data()
-        return jsonify_form(form, disabled_until_change=disabled_until_change, submit=_('Send'), back=_('Cancel'))
+        # TODO: disabled until change
+        return {
+            'senders': list(self.event.get_allowed_sender_emails().items()),
+            'recipients': sorted(x.email for x in self.recipients),
+            'body': tpl.get_html_body(),
+            'subject': tpl.get_subject(),
+        }
 
-    def _send_emails(self, form, recipients):
+    @use_kwargs({
+        'from_address': fields.String(required=True),
+        'body': fields.String(required=True),
+        'subject': fields.String(load_default=None),
+        'copy_for_sender': fields.Bool(load_default=False)
+    })
+    def _process_POST(self, from_address, body, subject, copy_for_sender):
+        self._send_emails(from_address, body, subject, self.recipients, copy_for_sender)
+        return '', 204
+
+    def _send_emails(self, from_address, body, subject, recipients, copy_for_sender=False):
         for recipient in recipients:
             if self.no_account and isinstance(recipient, EventPerson):
                 recipient.invited_dt = now_utc()
-            email_body = replace_placeholders('event-persons-email', form.body.data, person=recipient,
+            email_body = replace_placeholders('event-persons-email', body, person=recipient,
                                               event=self.event, register_link=self.no_account)
-            email_subject = replace_placeholders('event-persons-email', form.subject.data, person=recipient,
+            email_subject = replace_placeholders('event-persons-email', subject, person=recipient,
                                                  event=self.event, register_link=self.no_account)
             tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-            bcc = [session.user.email] if form.copy_for_sender.data else []
-            email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=form.from_address.data,
+            bcc = [session.user.email] if copy_for_sender else []
+            email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=from_address,
                                template=tpl, html=True)
             send_email(email, self.event, 'Event Persons')
 

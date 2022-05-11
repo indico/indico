@@ -17,11 +17,21 @@ import 'indico/modules/events/util/static_filters';
 
 import './badges';
 
+import {EmailButton} from 'indico/modules/events/persons/Email';
 import {$T} from 'indico/utils/i18n';
 
 import {SingleEventMove, EventPublish} from './EventMove';
 
 (function(global) {
+  global.setupEmailButton = function setupEmailButton() {
+    const emailBtn = document.querySelector('#persons-email');
+    const selector = emailBtn.dataset.paramsSelector;
+    ReactDOM.render(
+      <EmailButton eventId={+emailBtn.dataset.eventId} personSelector={selector} />,
+      emailBtn
+    );
+  };
+
   global.setupEventManagementActionMenu = function setupEventManagementActionMenu() {
     const moveContainer = document.querySelector('#event-action-move-container');
     if (moveContainer) {

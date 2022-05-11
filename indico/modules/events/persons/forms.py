@@ -29,7 +29,7 @@ class EmailEventPersonsForm(IndicoForm):
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
-        register_link = kwargs.pop('register_link')
+        register_link = kwargs.pop('register_link', True)
         event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
         self.from_address.choices = list(event.get_allowed_sender_emails().items())
