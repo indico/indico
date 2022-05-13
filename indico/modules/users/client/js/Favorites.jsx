@@ -202,7 +202,11 @@ function FavoriteEventManager({userId}) {
                           <br />
                           <TooltipIfTruncated>
                             <span styleName="detail">
-                              {event.chain_titles.slice(0, -1).join(' » ')}
+                              {event.chain_titles ? (
+                                event.chain_titles.join(' » ')
+                              ) : (
+                                <Translate>Unlisted</Translate>
+                              )}
                             </span>
                           </TooltipIfTruncated>
                         </span>
