@@ -1,7 +1,7 @@
 """Add predefined affiliations
 
 Revision ID: c39db219f85a
-Revises: a707753d16e2
+Revises: 812aa90a3660
 Create Date: 2022-04-07 13:33:30.611028
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'c39db219f85a'
-down_revision = 'a707753d16e2'
+down_revision = '812aa90a3660'
 branch_labels = None
 depends_on = None
 
