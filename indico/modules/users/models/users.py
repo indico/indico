@@ -29,7 +29,7 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.favorites import favorite_category_table, favorite_user_table
+from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table, favorite_user_table
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -357,6 +357,14 @@ class User(PersonMixin, db.Model):
         order_by='SuggestedCategory.score.desc()',
         cascade='all, delete-orphan',
         backref=db.backref('user', lazy=True)
+    )
+    #: the users's favorite events
+    favorite_events = db.relationship(
+        'Event',
+        secondary=favorite_event_table,
+        lazy=True,
+        collection_class=set,
+        backref=db.backref('favorite_of', lazy=True, collection_class=set),
     )
     #: the active API key of the user
     api_key = db.relationship(

@@ -6,8 +6,10 @@
 // LICENSE file for more details.
 
 import categoryFavoriteURL from 'indico-url:users.user_favorites_category_api';
+import eventFavoriteURL from 'indico-url:users.user_favorites_event_api';
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState, useCallback} from 'react';
 import ReactDOM from 'react-dom';
@@ -28,8 +30,13 @@ window.setupFavoriteSelection = function setupFavoriteSelection(userId) {
 function FavoriteManager({userId}) {
   return (
     <>
-      <FavoriteUserManager userId={userId} />
-      <FavoriteCatManager userId={userId} />
+      <div className="row">
+        <FavoriteUserManager userId={userId} />
+        <FavoriteCatManager userId={userId} />
+      </div>
+      <div className="row">
+        <FavoriteEventManager userId={userId} />
+      </div>
     </>
   );
 }
@@ -132,6 +139,110 @@ FavoriteCatManager.propTypes = {
 };
 
 FavoriteCatManager.defaultProps = {
+  userId: null,
+};
+
+function FavoriteEventManager({userId}) {
+  const [favoriteEvents, setFavoriteEvents] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const getFavoriteEvents = useCallback(async () => {
+    let res;
+    try {
+      res = await indicoAxios.get(eventFavoriteURL(userId !== null ? {user_id: userId} : {}));
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    setFavoriteEvents(res.data);
+    setLoading(false);
+  }, [userId]);
+
+  useEffect(() => {
+    getFavoriteEvents();
+  }, [getFavoriteEvents]);
+
+  const deleteFavoriteEvent = async id => {
+    try {
+      await indicoAxios.delete(eventFavoriteURL({event_id: id}));
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    setFavoriteEvents(values => _.omit(values, id));
+  };
+
+  return (
+    <div styleName="favorite-event-container">
+      <div className="i-box just-group-list">
+        <div className="i-box-header">
+          <div className="i-box-title">
+            <Translate>Favorite Events</Translate>
+          </div>
+        </div>
+        <div className="i-box-content">
+          {loading ? (
+            <Loader active inline styleName="fav-loader" />
+          ) : favoriteEvents !== null && Object.keys(favoriteEvents).length > 0 ? (
+            <List celled styleName="fav-list">
+              {Object.values(favoriteEvents)
+                .sort((a, b) => moment(b.start_dt) - moment(a.start_dt))
+                .map(event => (
+                  <List.Item key={event.url} styleName="fav-item">
+                    <List.Content>
+                      <div styleName="list-flex">
+                        <span styleName="date-span">
+                          {moment(event.start_dt).format('D MMM YYYY')}
+                        </span>
+                        <span styleName="event-name-box">
+                          <a href={event.url} target="_blank" rel="noopener noreferrer">
+                            {event.title}
+                          </a>
+                          <span dangerouslySetInnerHTML={{__html: event.label_markup}} />
+                          <br />
+                          <TooltipIfTruncated>
+                            <span styleName="detail">
+                              {event.chain_titles ? (
+                                event.chain_titles.join(' » ')
+                              ) : (
+                                <Translate>Unlisted</Translate>
+                              )}
+                            </span>
+                          </TooltipIfTruncated>
+                        </span>
+                        <Popup
+                          trigger={
+                            <Icon
+                              styleName="delete-button"
+                              name="close"
+                              onClick={() => deleteFavoriteEvent(event.id)}
+                              link
+                            />
+                          }
+                          content={Translate.string('Remove from favorites')}
+                          position="bottom center"
+                        />
+                      </div>
+                    </List.Content>
+                  </List.Item>
+                ))}
+            </List>
+          ) : (
+            <div styleName="empty-favorites">
+              <Translate>You have not marked any event as favorite.</Translate>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+FavoriteEventManager.propTypes = {
+  userId: PropTypes.number,
+};
+
+FavoriteEventManager.defaultProps = {
   userId: null,
 };
 

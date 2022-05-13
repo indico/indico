@@ -5,11 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import post_dump, validate
+from marshmallow import fields, post_dump, validate
 from marshmallow.fields import Function, List, String
 
 from indico.core.marshmallow import mm
 from indico.modules.categories import Category
+from indico.modules.events import Event
 from indico.modules.users import User
 from indico.modules.users.models.users import UserTitle, syncable_fields
 from indico.util.marshmallow import NoneValueEnumField
@@ -45,3 +46,13 @@ class BasicCategorySchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Category
         fields = ('id', 'title', 'url', 'chain_titles')
+
+
+class FavoriteEventSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Event
+        fields = ('id', 'title', 'label_markup', 'url', 'location', 'chain_titles', 'start_dt', 'end_dt')
+
+    location = fields.String(attribute='event.location.venue_name')
+    chain_titles = fields.List(fields.String(), attribute='category.chain_titles')
+    label_markup = fields.Function(lambda e: e.get_label_markup('mini'))

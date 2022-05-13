@@ -17,7 +17,7 @@
 
     .list-flex {
       display: flex;
-      justify-content: space-between;
+      justify-content: start;
       margin: 7px 0;
     }
 
@@ -33,6 +33,7 @@
 
     .delete-button {
       align-self: center;
+      margin-left: auto;
     }
   }
 }
@@ -44,4 +45,26 @@
 :global(.ui.inline.loader.active).fav-loader {
   margin: 10px 50%;
   width: auto;
+}
+
+.favorite-event-container {
+  margin-top: 15px;
+}
+
+.date-span {
+  width: 15%;
+  margin-right: 7px;
+  font-size: 12px;
+  color: $dark-gray;
+}
+
+.event-name-box {
+  width: 75%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+
+  a {
+    margin-right: 5px;
+  }
 }

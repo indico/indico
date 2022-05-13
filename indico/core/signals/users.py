@@ -55,3 +55,13 @@ primary_email_changed = _signals.signal('primary-email-changed', '''
 Called when the primary address is changed. The *sender* is
 the user object and the `new` and `old` values are passed as kwargs.
 ''')
+
+favorite_event_added = _signals.signal('favorite-event-added', '''
+Called when a new event is added to a user's favorites. The *sender* is
+the user object and the event is passed in the `event` kwarg.
+''')
+
+favorite_event_removed = _signals.signal('favorite-event-removed', '''
+Called when a new event is removed from a user's favorites. The *sender* is
+the user object and the event is passed in the `event` kwarg.
+''')

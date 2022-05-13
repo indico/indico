@@ -51,3 +51,25 @@ favorite_category_table = db.Table(
     ),
     schema='users'
 )
+
+favorite_event_table = db.Table(
+    'favorite_events',
+    db.metadata,
+    db.Column(
+        'user_id',
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        primary_key=True,
+        nullable=False,
+        index=True
+    ),
+    db.Column(
+        'target_id',
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        primary_key=True,
+        nullable=False,
+        index=True
+    ),
+    schema='users'
+)

@@ -146,6 +146,9 @@ def get_linked_events(user, dt, limit=None, load_also=()):
         links.setdefault(event_id, set()).update(roles)
     for event_id, roles in get_events_with_paper_roles(user, dt).items():
         links.setdefault(event_id, set()).update(roles)
+    for event in user.favorite_events:
+        if event.start_dt >= dt:
+            links.setdefault(event.id, set()).add('favorited')
 
     if not links:
         return {}
@@ -380,6 +383,7 @@ def merge_users(source, target, force=False):
     target.favorite_users |= source.favorite_users
     target.favorite_of |= source.favorite_of
     target.favorite_categories |= source.favorite_categories
+    target.favorite_events |= source.favorite_events
 
     # Update category suggestions
     SuggestedCategory.merge_users(target, source)

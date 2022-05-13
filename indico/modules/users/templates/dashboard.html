@@ -129,6 +129,8 @@
                                             class="icon-user-reading contextHelp {% if roles.reviewing %}active{% endif %}"></span>
                                     <span {% if roles.attendance %}title="{% trans %}You are an attendee{% endtrans %}"{% endif %}
                                             class="icon-ticket contextHelp {% if roles.attendance %}active{% endif %}"></span>
+                                    <span {% if roles.favorited %}title="{% trans %}You have favorited this event{% endtrans %}"{% endif %}
+                                            class="icon-star contextHelp {% if roles.favorited %}active{% endif %}"></span>
                                 </span>
                             </li>
                         {% else %}

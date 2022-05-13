@@ -219,6 +219,13 @@
                    title="{% trans %}Download material{% endtrans %}"></a>
 
                 {{ _render_theme_selector() }}
+                {% if session.user %}
+                    <span class="separator"></span>
+
+                    <div id="favorite-link" data-event-id="{{ event.id }}"
+                        {{ 'data-favorited' if event in session.user.favorite_events }}></div>
+                {% endif %}
+
                 <span class="separator"></span>
             {% endif %}
 

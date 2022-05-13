@@ -490,6 +490,9 @@ i[class^='icon-']::before {
 .icon-star::before {
   content: '\41';
 }
+.icon-star-empty::before {
+  content: '\e9d7';
+}
 .icon-stop::before {
   content: '\e00d';
 }

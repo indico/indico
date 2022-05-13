@@ -15,9 +15,10 @@ from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdm
                                               RHSaveProfilePicture, RHUserBlock, RHUserDashboard, RHUserEmails,
                                               RHUserEmailsDelete, RHUserEmailsSetPrimary, RHUserEmailsVerify,
                                               RHUserFavorites, RHUserFavoritesAPI, RHUserFavoritesCategoryAPI,
-                                              RHUserPreferences, RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
-                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSearch,
-                                              RHUserSearchInfo, RHUserSuggestionsRemove)
+                                              RHUserFavoritesEventAPI, RHUserPreferences, RHUsersAdmin,
+                                              RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
+                                              RHUsersAdminSettings, RHUserSearch, RHUserSearchInfo,
+                                              RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -63,6 +64,9 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/api/favorites/categories', 'user_favorites_category_api', RHUserFavoritesCategoryAPI)
     _bp.add_url_rule('/api/favorites/categories/<int:category_id>', 'user_favorites_category_api',
                      RHUserFavoritesCategoryAPI, methods=('GET', 'PUT', 'DELETE'))
+    _bp.add_url_rule('/api/favorites/events', 'user_favorites_event_api', RHUserFavoritesEventAPI)
+    _bp.add_url_rule('/api/favorites/events/<int:event_id>', 'user_favorites_event_api',
+                     RHUserFavoritesEventAPI, methods=('GET', 'PUT', 'DELETE'))
     _bp.add_url_rule('/emails/', 'user_emails', RHUserEmails, methods=('GET', 'POST'))
     _bp.add_url_rule('/emails/verify/<token>', 'user_emails_verify', RHUserEmailsVerify)
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))

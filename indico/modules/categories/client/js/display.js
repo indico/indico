@@ -135,47 +135,4 @@ import {$T} from 'indico/utils/i18n';
       });
     }
   };
-
-  global.setupCategoryDisplay = function setupCategoryDisplay() {
-    $('.fav-button')
-      .on('click', function() {
-        const $this = $(this);
-        const isFavorite = $this.hasClass('enabled');
-        $this.prop('disabled', true);
-        $.ajax({
-          url: $this.data('href'),
-          method: isFavorite ? 'DELETE' : 'PUT',
-          error: handleAjaxError,
-          success() {
-            $this.toggleClass('enabled', !isFavorite);
-          },
-          complete() {
-            $this.prop('disabled', false);
-          },
-        });
-      })
-      .qtip({
-        hide: {
-          fixed: true,
-          delay: 500,
-        },
-        content: {
-          text() {
-            const $this = $(this);
-            if ($this.hasClass('enabled')) {
-              return $T.gettext('Remove from your favorites');
-            } else {
-              return '<h3>{0}</h3><p>{1}</p>'.format(
-                $T.gettext('Add to your favorites'),
-                $T
-                  .gettext(
-                    'This will make events in this category visible on your <a href="{0}">Dashboard</a>.'
-                  )
-                  .format($this.data('favorites-href'))
-              );
-            }
-          },
-        },
-      });
-  };
 })(window);
