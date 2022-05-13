@@ -50,6 +50,12 @@ class Affiliation(db.Model):
     )
 
     # relationship backrefs:
+    # - abstract_links (AbstractPersonLink._affiliation_link)
+    # - contribution_links (ContributionPersonLink._affiliation_link)
+    # - event_links (EventPersonLink._affiliation_link)
+    # - event_person_affiliations (EventPerson.affiliation_link)
+    # - session_block_links (SessionBlockPersonLink._affiliation_link)
+    # - subcontribution_links (SubContributionPersonLink._affiliation_link)
     # - user_affiliations (UserAffiliation.affiliation)
 
     def __repr__(self):

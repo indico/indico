@@ -5,26 +5,43 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import searchAffiliationURL from 'indico-url:users.api_affiliations';
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
-import {Button, Segment, List, Form, Label, Icon, Popup, Message, Ref} from 'semantic-ui-react';
+import {
+  Button,
+  Segment,
+  List,
+  Form,
+  Label,
+  Icon,
+  Popup,
+  Message,
+  Ref,
+  Header,
+} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
-import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
+import {FinalComboDropdown, FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
+import {makeAsyncDebounce} from 'indico/utils/debounce';
 
 import {Translate} from '../i18n';
 
 import {PrincipalItem} from './principals/items';
 
 import './PersonLinkField.module.scss';
+
+const debounce = makeAsyncDebounce(250);
 
 const titles = [
   {text: Translate.string('Mr'), value: 'mr'},
@@ -35,7 +52,78 @@ const titles = [
   {text: Translate.string('Mx'), value: 'mx'},
 ];
 
-const ExternalPersonModal = ({onSubmit, onClose, person}) => (
+const FinalAffiliationField = ({hasPredefinedAffiliations, currentAffiliation}) => {
+  const [_affiliationResults, setAffiliationResults] = useState([]);
+  const affiliationResults =
+    currentAffiliation && !_affiliationResults.find(x => x.id === currentAffiliation.id)
+      ? [currentAffiliation, ..._affiliationResults]
+      : _affiliationResults;
+
+  const affiliationOptions = affiliationResults.map(res => ({
+    key: res.id,
+    value: res.id,
+    meta: res,
+    text: `${res.name} `, // XXX: the space allows addition even if the entered text matches a result item
+    content: (
+      <Header
+        content={res.name}
+        subheader={[res.street, res.postcode, res.city, res.country_code]
+          .filter(x => x)
+          .map((x, i) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <React.Fragment key={i}>
+              {i !== 0 && <br />}
+              {x}
+            </React.Fragment>
+          ))}
+      />
+    ),
+  }));
+
+  const searchAffiliationChange = async (evt, {searchQuery}) => {
+    if (!searchQuery) {
+      setAffiliationResults([]);
+      return;
+    }
+    let resp;
+    try {
+      resp = await debounce(() => indicoAxios.get(searchAffiliationURL({q: searchQuery})));
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    setAffiliationResults(resp.data);
+  };
+
+  return hasPredefinedAffiliations ? (
+    <FinalComboDropdown
+      name="affiliationData"
+      options={affiliationOptions}
+      fluid
+      includeMeta
+      additionLabel={Translate.string('Use custom affiliation:') + ' '} // eslint-disable-line prefer-template
+      onSearchChange={searchAffiliationChange}
+      placeholder={Translate.string('Select an affiliation or add your own')}
+      noResultsMessage={Translate.string('Search an affiliation or enter one manually')}
+      renderCustomOptionContent={value => (
+        <Header content={value} subheader={Translate.string('You entered this option manually')} />
+      )}
+    />
+  ) : (
+    <FinalInput name="affiliation" />
+  );
+};
+
+FinalAffiliationField.propTypes = {
+  hasPredefinedAffiliations: PropTypes.bool.isRequired,
+  currentAffiliation: PropTypes.object,
+};
+
+FinalAffiliationField.defaultProps = {
+  currentAffiliation: null,
+};
+
+const ExternalPersonModal = ({hasPredefinedAffiliations, onSubmit, onClose, person}) => (
   <FinalModalForm
     id="person-link-details"
     size="tiny"
@@ -43,7 +131,11 @@ const ExternalPersonModal = ({onSubmit, onClose, person}) => (
     onSubmit={onSubmit}
     header={Translate.string('Enter Person')}
     submitLabel={Translate.string('Save')}
-    initialValues={person || {}}
+    initialValues={
+      person
+        ? {...person, affiliationData: {id: person.affiliationId, text: person.affiliation}}
+        : {affiliationData: {id: null, text: ''}}
+    }
   >
     {/* eslint-disable-next-line eqeqeq */}
     {person && person.userId != null && (
@@ -59,7 +151,10 @@ const ExternalPersonModal = ({onSubmit, onClose, person}) => (
       </Form.Field>
       <Form.Field>
         <Translate as="label">Affiliation</Translate>
-        <FinalInput name="affiliation" />
+        <FinalAffiliationField
+          currentAffiliation={person?.affiliationMeta}
+          hasPredefinedAffiliations={hasPredefinedAffiliations}
+        />
       </Form.Field>
     </Form.Group>
     <Form.Group widths="equal">
@@ -93,6 +188,7 @@ ExternalPersonModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   person: PropTypes.object,
+  hasPredefinedAffiliations: PropTypes.bool.isRequired,
 };
 
 ExternalPersonModal.defaultProps = {
@@ -285,7 +381,7 @@ PersonLinkSection.defaultProps = {
   drag: false,
 };
 
-export default function PersonLinkField({
+function PersonLinkField({
   value: persons,
   onChange,
   eventId,
@@ -294,6 +390,7 @@ export default function PersonLinkField({
   emptyMessage,
   autoSort,
   setAutoSort,
+  hasPredefinedAffiliations,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState(false);
@@ -320,6 +417,12 @@ export default function PersonLinkField({
   };
 
   const onSubmit = value => {
+    if (value.affiliationData) {
+      value.affiliation = value.affiliationData.text.trim();
+      value.affiliationId = value.affiliationData.id;
+      value.affiliationMeta = value.affiliationData.meta;
+      delete value.affiliationData;
+    }
     if (selected !== null) {
       value.roles = roles.filter(x => x.default).map(x => x.name);
       onChange(persons.map((v, idx) => (idx === selected ? value : v)));
@@ -399,7 +502,12 @@ export default function PersonLinkField({
             Enter manually
           </Translate>
           {modalOpen && (
-            <ExternalPersonModal onClose={onClose} onSubmit={onSubmit} person={persons[selected]} />
+            <ExternalPersonModal
+              onClose={onClose}
+              onSubmit={onSubmit}
+              person={persons[selected]}
+              hasPredefinedAffiliations={hasPredefinedAffiliations}
+            />
           )}
         </Button.Group>
       </DndProvider>
@@ -416,6 +524,7 @@ PersonLinkField.propTypes = {
   roles: PropTypes.array,
   autoSort: PropTypes.bool,
   setAutoSort: PropTypes.func,
+  hasPredefinedAffiliations: PropTypes.bool,
 };
 
 PersonLinkField.defaultProps = {
@@ -425,6 +534,7 @@ PersonLinkField.defaultProps = {
   roles: [],
   autoSort: true,
   setAutoSort: null,
+  hasPredefinedAffiliations: false,
 };
 
 export function WTFPersonLinkField({
@@ -434,6 +544,7 @@ export function WTFPersonLinkField({
   roles,
   sessionUser,
   emptyMessage,
+  hasPredefinedAffiliations,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -447,6 +558,7 @@ export function WTFPersonLinkField({
         'firstName',
         'lastName',
         'affiliation',
+        'affiliationId',
         'email',
         'address',
         'phone',
@@ -476,6 +588,7 @@ export function WTFPersonLinkField({
       emptyMessage={emptyMessage}
       autoSort={autoSort}
       setAutoSort={setAutoSort}
+      hasPredefinedAffiliations={hasPredefinedAffiliations}
     />
   );
 }
@@ -487,6 +600,7 @@ WTFPersonLinkField.propTypes = {
   roles: PropTypes.array,
   sessionUser: PropTypes.object,
   emptyMessage: PropTypes.string,
+  hasPredefinedAffiliations: PropTypes.bool,
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -495,4 +609,5 @@ WTFPersonLinkField.defaultProps = {
   roles: [],
   sessionUser: null,
   emptyMessage: null,
+  hasPredefinedAffiliations: false,
 };

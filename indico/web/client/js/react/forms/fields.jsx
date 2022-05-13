@@ -249,6 +249,7 @@ function ComboDropdownAdapter(props) {
     action,
     options,
     renderCustomOptionContent,
+    includeMeta,
     ...rest
   } = props;
   const fieldProps = width !== null ? {width} : {};
@@ -282,15 +283,24 @@ function ComboDropdownAdapter(props) {
       fieldProps={fieldProps}
       getValue={(__, {value}) => {
         if (typeof value === 'number') {
-          return {
+          const opt = options.find(x => x.value === value);
+          const rv = {
             id: value,
-            text: options.find(x => x.value === value).text,
+            text: opt.text,
           };
+          if (includeMeta) {
+            rv.meta = opt.meta;
+          }
+          return rv;
         } else {
-          return {
+          const rv = {
             id: null,
             text: value,
           };
+          if (includeMeta) {
+            rv.meta = null;
+          }
+          return rv;
         }
       }}
       onAddItem={(e, {value}) => {
@@ -311,6 +321,7 @@ ComboDropdownAdapter.propTypes = {
   width: PropTypes.number,
   action: PropTypes.object,
   renderCustomOptionContent: PropTypes.func,
+  includeMeta: PropTypes.bool,
 };
 
 ComboDropdownAdapter.defaultProps = {
@@ -319,6 +330,7 @@ ComboDropdownAdapter.defaultProps = {
   width: null,
   action: null,
   renderCustomOptionContent: () => undefined,
+  includeMeta: false,
 };
 
 /**

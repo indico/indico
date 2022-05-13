@@ -31,6 +31,7 @@ from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.legal import legal_settings
 from indico.modules.users.controllers import RHUserBase
+from indico.modules.users.schemas import AffiliationSchema
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalDict, validate_with_message
 from indico.util.string import sanitize_html
@@ -199,6 +200,9 @@ class PrincipalsMixin:
                     'last_name': principal.last_name,
                     'email': principal.email,
                     'affiliation': principal.affiliation,
+                    'affiliation_id': principal._affiliation.affiliation_id,
+                    'affiliation_meta': (AffiliationSchema().dump(principal._affiliation.affiliation)
+                                         if principal._affiliation.affiliation else None),
                     'avatar_url': principal.avatar_url,
                     'detail': (f'{principal.email} ({principal.affiliation})'
                                if principal.affiliation else principal.email)}

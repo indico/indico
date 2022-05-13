@@ -764,9 +764,13 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 
 
 class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
+    affiliation_id = fields.Integer(attribute='_affiliation.affiliation_id')
+    affiliation_meta = fields.Nested(AffiliationSchema, attribute='_affiliation.affiliation')
+
     class Meta:
         model = User
-        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name', 'first_name', 'last_name', 'avatar_url')
+        fields = ('id', 'identifier', 'email', 'affiliation', 'affiliation_id', 'affiliation_meta',
+                  'full_name', 'first_name', 'last_name', 'avatar_url')
 
 
 search_result_schema = UserSearchResultSchema()

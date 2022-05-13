@@ -139,6 +139,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 
 
 @make_interceptable
+@no_autoflush
 def update_event(event, update_timetable=False, **data):
     assert set(data.keys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
                                 'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
