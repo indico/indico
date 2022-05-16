@@ -417,7 +417,10 @@ function PersonLinkField({
   };
 
   const onSubmit = value => {
-    if (value.affiliationData) {
+    if (!hasPredefinedAffiliations) {
+      // value.affiliation is already there and used
+      delete value.affiliationData;
+    } else if (value.affiliationData) {
       value.affiliation = value.affiliationData.text.trim();
       value.affiliationId = value.affiliationData.id;
       value.affiliationMeta = value.affiliationData.meta;
