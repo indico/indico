@@ -54,6 +54,8 @@ class PersonLinkSchema(mm.Schema):
     def dump_type(self, data, **kwargs):
         if not data['person_id']:
             del data['type']
+        if data['title'] == UserTitle.none.name:
+            data['title'] = None
         return data
 
 
@@ -85,12 +87,25 @@ class EventPersonSchema(mm.SQLAlchemyAutoSchema):
 
     @pre_load
     def load_title(self, data, **kwargs):
-        if not data.get('title'):
+        if 'title' in data and not data.get('title'):
             data['title'] = UserTitle.none.name
         return data
 
     @post_load
     def ensure_affiliation_text(self, data, **kwargs):
-        if data['affiliation_link']:
-            data['affiliation'] = data['affiliation_link'].name
+        if affiliation_link := data.get('affiliation_link'):
+            data['affiliation'] = affiliation_link.name
         return data
+
+    @post_dump
+    def handle_no_title(self, data, **kwargs):
+        if data['title'] == UserTitle.none.name:
+            data['title'] = None
+        return data
+
+
+class EventPersonUpdateSchema(EventPersonSchema):
+    class Meta(EventPersonSchema.Meta):
+        fields = ('title', 'first_name', 'last_name', 'address', 'phone', 'affiliation', 'affiliation_link')
+
+    title = EnumField(UserTitle)
