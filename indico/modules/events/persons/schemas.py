@@ -60,8 +60,8 @@ class PersonLinkSchema(mm.Schema):
 class EventPersonSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventPerson
-        public_fields = ('id', 'identifier', '_title', 'email', 'affiliation', 'affiliation_link',
-                         'name', 'first_name', 'last_name', 'user_identifier')
+        public_fields = ('id', 'identifier', '_title', 'email', 'affiliation', 'affiliation_link', 'affiliation_id',
+                         'affiliation_meta', 'name', 'first_name', 'last_name', 'user_identifier')
         fields = public_fields + ('phone', 'address')
 
     type = fields.Constant('EventPerson')
@@ -71,6 +71,8 @@ class EventPersonSchema(mm.SQLAlchemyAutoSchema):
     last_name = fields.String(required=True)
     email = fields.String(load_default='')
     affiliation_link = ModelField(Affiliation, data_key='affiliation_id', load_default=None, load_only=True)
+    affiliation_id = fields.Integer(load_default=None, dump_only=True)
+    affiliation_meta = fields.Nested(AffiliationSchema, attribute='affiliation_link', dump_only=True)
 
     @pre_load
     def handle_affiliation_link(self, data, **kwargs):
