@@ -620,7 +620,7 @@ const InnerUserSearch = searchFactory({
         ({
           identifier,
           id,
-          fullName,
+          name,
           email,
           affiliation,
           affiliationId,
@@ -632,7 +632,7 @@ const InnerUserSearch = searchFactory({
           identifier,
           type: PrincipalType.eventPerson,
           id,
-          name: fullName,
+          name,
           detail: affiliation ? `${email} (${affiliation})` : email,
           firstName,
           lastName,
