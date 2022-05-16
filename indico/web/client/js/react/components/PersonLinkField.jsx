@@ -558,6 +558,7 @@ export function WTFPersonLinkField({
   const onChange = (value, sort = autoSort) => {
     const picked = value.map(p =>
       _.pick(p, [
+        'title',
         'firstName',
         'lastName',
         'affiliation',

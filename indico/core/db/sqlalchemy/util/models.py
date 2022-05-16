@@ -363,7 +363,7 @@ def populate_one_to_one_backrefs(model, *relationships):
                     set_committed_value(getattr(target, name), backref, target)
 
 
-def override_attr(attr_name, parent_name, *, fget=None, check_attr_name=None):
+def override_attr(attr_name, parent_name, *, fget=None, check_attr_name=None, own_attr_name=None):
     """Create property that overrides an attribute coming from parent.
 
     In order to ensure setter functionality at creation time, ``parent`` must be
@@ -375,9 +375,12 @@ def override_attr(attr_name, parent_name, *, fget=None, check_attr_name=None):
     :param check_attr_name: The name of the attribute to check; by default this is `attr_name`,
                             but in case another attribute should be checked to determine whether
                             an override is happening or not, it can be provided here.
+    :param own_attr_name: The name of the attribute on the object that has this property; by default
+                          this is ``_<attr_name>``.
     """
 
-    own_attr_name = '_' + attr_name
+    if own_attr_name is None:
+        own_attr_name = '_' + attr_name
 
     def _get(self):
         parent = getattr(self, parent_name)

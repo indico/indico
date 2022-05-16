@@ -195,6 +195,7 @@ class PrincipalsMixin:
                     'type': 'user',
                     'user_id': principal.id,
                     'invalid': principal.is_deleted,
+                    'title': principal._title.name,
                     'name': principal.display_full_name,
                     'first_name': principal.first_name,
                     'last_name': principal.last_name,

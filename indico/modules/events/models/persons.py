@@ -222,7 +222,7 @@ class EventPerson(PersonMixin, db.Model):
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):
         return EventPerson(user=user, event=event, first_name=user.first_name, last_name=user.last_name,
-                           email=user.email, affiliation=user.affiliation,
+                           title=user._title, email=user.email, affiliation=user.affiliation,
                            affiliation_link=(user._affiliation.affiliation if user._affiliation else None),
                            address=user.address, phone=user.phone, is_untrusted=is_untrusted)
 
@@ -426,7 +426,7 @@ class PersonLinkBase(PersonMixin, db.Model):
         )
 
     @declared_attr
-    def _title(cls):
+    def _title_col(cls):
         return db.Column(
             'title',
             PyIntEnum(UserTitle),
@@ -517,6 +517,7 @@ class PersonLinkBase(PersonMixin, db.Model):
     first_name = override_attr('first_name', 'person')
     last_name = override_attr('last_name', 'person')
     title = override_attr('title', 'person', fget=lambda self, __: self._get_title())
+    _title = override_attr('_title', 'person', own_attr_name='_title_col')
     affiliation = override_attr('affiliation', 'person')
     affiliation_id = override_attr('affiliation_id', 'person', check_attr_name='_affiliation')
     affiliation_link = override_attr('affiliation_link', 'person', check_attr_name='_affiliation')
