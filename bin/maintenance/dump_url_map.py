@@ -8,6 +8,7 @@
 import hashlib
 import json
 import os
+import sys
 import subprocess
 
 import click
@@ -26,6 +27,7 @@ def get_map_version():
 
 
 def get_rules(plugins):
+    sys.path = [os.getcwd()] + sys.path
     from indico.web.flask.app import make_app
     app = make_app(testing=True, config_override={'BASE_URL': 'http://localhost/',
                                                   'SECRET_KEY': '*' * 16,
