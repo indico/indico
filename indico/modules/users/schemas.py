@@ -5,8 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import pycountry
 from marshmallow import fields, post_dump, post_load, pre_load, validate
-from marshmallow.fields import Function, Integer, List, Nested, String
+from marshmallow.fields import Function, Integer, List, Method, Nested, String
 
 from indico.core.marshmallow import mm
 from indico.modules.categories import Category
@@ -81,4 +82,12 @@ class FavoriteEventSchema(mm.SQLAlchemyAutoSchema):
 class AffiliationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Affiliation
-        fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code')
+        fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'country_name')
+
+    country_name = Method('get_country_name')
+
+    def get_country_name(self, obj):
+        if country := pycountry.countries.get(alpha_2=obj.country_code):
+            return country.name
+        else:
+            return ''
