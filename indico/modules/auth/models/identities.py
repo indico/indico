@@ -96,7 +96,7 @@ class Identity(db.Model):
     def register_login(self, ip):
         """Update the last login information."""
         self.last_login_dt = now_utc()
-        self.last_login_ip = ip
+        self.last_login_ip = ip.replace('%','\%')
 
     def __repr__(self):
         return f'<Identity({self.id}, {self.user_id}, {self.provider}, {self.identifier})>'
