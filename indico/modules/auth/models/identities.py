@@ -14,6 +14,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import as_utc, now_utc
 from indico.util.passwords import PasswordProperty
+import re
 
 
 class Identity(db.Model):
@@ -96,7 +97,7 @@ class Identity(db.Model):
     def register_login(self, ip):
         """Update the last login information."""
         self.last_login_dt = now_utc()
-        self.last_login_ip = ip.replace('%','\%')
+        self.last_login_ip = re.split("%",ip)[0]
 
     def __repr__(self):
         return f'<Identity({self.id}, {self.user_id}, {self.provider}, {self.identifier})>'
