@@ -684,7 +684,7 @@ class User(PersonMixin, db.Model):
             if field in ('first_name', 'last_name', 'email') and not new_value:
                 continue
             if field == 'affiliation':
-                self._affiliation.affiliation = None  # clear link to predefined affiliation
+                self._affiliation.affiliation_link = None  # clear link to predefined affiliation
             if old_value == new_value:
                 continue
             logger.info('Syncing %s for %r from %r to %r', field, self, old_value, new_value)

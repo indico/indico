@@ -204,8 +204,8 @@ class RHPersonalData(RHUserBase):
         titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
         user_values = UserPersonalDataSchema().dump(self.user)
         current_affiliation = None
-        if self.user._affiliation.affiliation:
-            current_affiliation = AffiliationSchema().dump(self.user._affiliation.affiliation)
+        if self.user._affiliation.affiliation_link:
+            current_affiliation = AffiliationSchema().dump(self.user._affiliation.affiliation_link)
         has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
                                                   titles=titles, user_values=user_values,
@@ -228,9 +228,9 @@ class RHPersonalDataUpdate(RHUserBase):
         self.user.synced_fields = synced_fields & syncable_fields
         if (affiliation_data := changes.pop('affiliation_data', None)) and 'affiliation' not in self.user.synced_fields:
             if affiliation_data['affiliation_id']:
-                self.user._affiliation.affiliation = Affiliation.get_or_404(affiliation_data['affiliation_id'],
-                                                                            is_deleted=False)
-                self.user._affiliation.name = self.user._affiliation.affiliation.name
+                self.user._affiliation.affiliation_link = Affiliation.get_or_404(affiliation_data['affiliation_id'],
+                                                                                 is_deleted=False)
+                self.user._affiliation.name = self.user._affiliation.affiliation_link.name
             else:
                 self.user._affiliation.affiliation_id = None
                 self.user._affiliation.name = affiliation_data['name']
@@ -765,7 +765,7 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 
 class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
     affiliation_id = fields.Integer(attribute='_affiliation.affiliation_id')
-    affiliation_meta = fields.Nested(AffiliationSchema, attribute='_affiliation.affiliation')
+    affiliation_meta = fields.Nested(AffiliationSchema, attribute='_affiliation.affiliation_link')
     title = EnumField(UserTitle, attribute='_title')
 
     class Meta:

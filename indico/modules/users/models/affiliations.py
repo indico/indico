@@ -56,7 +56,7 @@ class Affiliation(db.Model):
     # - event_person_affiliations (EventPerson.affiliation_link)
     # - session_block_links (SessionBlockPersonLink._affiliation_link)
     # - subcontribution_links (SubContributionPersonLink._affiliation_link)
-    # - user_affiliations (UserAffiliation.affiliation)
+    # - user_affiliations (UserAffiliation.affiliation_link)
 
     def __repr__(self):
         return format_repr(self, 'id', _text=self.name)
@@ -92,7 +92,7 @@ class UserAffiliation(db.Model):
     )
 
     #: the predefined affiliation
-    affiliation = db.relationship(
+    affiliation_link = db.relationship(
         'Affiliation',
         lazy=False,
         backref=db.backref('user_affiliations', lazy='dynamic')
