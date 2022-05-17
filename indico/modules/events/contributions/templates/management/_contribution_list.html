@@ -1,5 +1,6 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
+{% from 'events/management/_affiliation.html' import render_affiliation %}
 
 {% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons) %}
     {% if contribs %}
@@ -139,7 +140,7 @@
                                                data-qtip-position="bottom"></i>
                                             {{ speaker.display_full_name }}
                                             {% if speaker.affiliation %}
-                                                <span class="text-superfluous">({{ speaker.affiliation }})</span>
+                                                <span class="text-superfluous">({{ render_affiliation(speaker) }})</span>
                                             {% endif %}
                                         </div>
                                     {%- endfor %}

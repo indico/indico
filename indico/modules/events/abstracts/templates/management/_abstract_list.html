@@ -1,5 +1,6 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
+{% from 'events/management/_affiliation.html' import render_affiliation %}
 {% from 'events/management/_lists.html' import render_num_reviews_tooltip %}
 
 {% macro _get_track_full_title(track, searchable=false) -%}
@@ -146,7 +147,7 @@
                                         <td class="i-table" data-searchable="{{ abstract.submitter.display_full_name }}">
                                             {{- abstract.submitter.display_full_name }}
                                             {% if abstract.submitter.affiliation %}
-                                                <span class="text-superfluous">({{ abstract.submitter.affiliation }})</span>
+                                                <span class="text-superfluous">({{ render_affiliation(abstract.submitter) }})</span>
                                             {% endif %}
                                         </td>
                                     {% elif item.id == 'authors' %}
@@ -156,7 +157,7 @@
                                                 <div class="person-row icon-user">
                                                     {{- author.display_full_name }}
                                                     {% if author.affiliation %}
-                                                        <span class="text-superfluous">({{ author.affiliation }})</span>
+                                                        <span class="text-superfluous">({{ render_affiliation(author) }})</span>
                                                     {% endif %}
                                                 </div>
                                             {%- endfor %}

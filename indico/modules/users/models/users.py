@@ -135,6 +135,16 @@ class PersonMixin:
     # Convenience property to have a canonical `name` property
     name = full_name
 
+    @property
+    def affiliation_details(self):
+        from indico.modules.users.schemas import AffiliationSchema
+        if link := getattr(self, 'affiliation_link', None):
+            return AffiliationSchema().dump(link)
+        elif hasattr(self, '_affiliation') and (link := self._affiliation.affiliation_link):
+            return AffiliationSchema().dump(link)
+        else:
+            return None
+
 
 #: Fields which can be synced as keys and a mapping to a more human
 #: readable version, used for flashing messages
