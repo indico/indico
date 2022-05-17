@@ -80,5 +80,5 @@ class FavoriteEventSchema(mm.SQLAlchemyAutoSchema):
 
 class AffiliationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
-        modle = Affiliation
+        model = Affiliation
         fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code')
