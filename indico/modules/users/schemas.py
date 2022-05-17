@@ -82,7 +82,7 @@ class FavoriteEventSchema(mm.SQLAlchemyAutoSchema):
 class AffiliationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Affiliation
-        fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'country_name')
+        fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'country_name', 'meta')
 
     country_name = Method('get_country_name')
 

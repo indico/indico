@@ -7,6 +7,7 @@ Create Date: 2022-04-07 13:33:30.611028
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
@@ -26,8 +27,10 @@ def upgrade():
         sa.Column('postcode', sa.String(), nullable=False),
         sa.Column('city', sa.String(), nullable=False),
         sa.Column('country_code', sa.String(), nullable=False),
+        sa.Column('meta', postgresql.JSONB(), nullable=False),
         schema='indico'
     )
+    op.create_index(None, 'affiliations', ['meta'], unique=False, schema='indico', postgresql_using='gin')
     op.add_column('affiliations', sa.Column('affiliation_id', sa.Integer(), nullable=True), schema='users')
     op.create_index(None, 'affiliations', ['affiliation_id'], unique=False, schema='users')
     op.create_foreign_key(None, 'affiliations', 'affiliations', ['affiliation_id'], ['id'],

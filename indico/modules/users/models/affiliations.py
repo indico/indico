@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from sqlalchemy.dialects.postgresql import JSONB
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.util.string import format_repr
@@ -12,7 +14,8 @@ from indico.util.string import format_repr
 
 class Affiliation(db.Model):
     __tablename__ = 'affiliations'
-    __table_args__ = {'schema': 'indico'}
+    __table_args__ = (db.Index(None, 'meta', postgresql_using='gin'),
+                      {'schema': 'indico'})
 
     id = db.Column(
         db.Integer,
@@ -47,6 +50,12 @@ class Affiliation(db.Model):
         db.String,
         nullable=False,
         default='',
+    )
+    #: Opaque external data related to this affiliation
+    meta = db.Column(
+        JSONB,
+        nullable=False,
+        default={},
     )
 
     # relationship backrefs:
