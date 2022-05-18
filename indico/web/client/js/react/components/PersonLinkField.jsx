@@ -108,7 +108,7 @@ const PersonListItem = ({
   onClickRole,
   disabled,
 }) => (
-  <PrincipalItem as={List.Item}>
+  <PrincipalItem as={List.Item} styleName="person-link">
     <PrincipalItem.Icon type={PrincipalType.user} avatarURL={avatarURL} styleName="icon" />
     <PrincipalItem.Content
       name={firstName ? `${firstName} ${lastName}` : lastName}
@@ -364,7 +364,7 @@ export default function PersonLinkField({
           )}
           {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
         </Segment>
-        <Button.Group size="small" attached="bottom" floated="right">
+        <Button.Group size="small" attached="bottom">
           <Button
             toggle
             icon="sort alphabet down"
@@ -373,14 +373,14 @@ export default function PersonLinkField({
             onClick={() => setAutoSort && setAutoSort(!autoSort)}
           />
           {sessionUser && (
-            <Translate
-              as={Button}
+            <Button
               type="button"
               onClick={() => onAdd([sessionUser])}
               disabled={persons.some(p => p.userId === sessionUser.userId)}
             >
-              Add myself
-            </Translate>
+              <Icon name="add user" />
+              <Translate>Add myself</Translate>
+            </Button>
           )}
           <UserSearch
             favorites={favoriteUsers}
@@ -388,6 +388,7 @@ export default function PersonLinkField({
             onAddItems={onAdd}
             triggerFactory={props => (
               <Button type="button" {...props}>
+                <Icon name="search" />
                 <Translate>Search</Translate>
               </Button>
             )}
@@ -395,9 +396,10 @@ export default function PersonLinkField({
             eventId={eventId}
             disabled={!sessionUser}
           />
-          <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
-            Enter manually
-          </Translate>
+          <Button type="button" onClick={() => setModalOpen(true)}>
+            <Icon name="keyboard" />
+            <Translate>Enter manually</Translate>
+          </Button>
           {modalOpen && (
             <ExternalPersonModal onClose={onClose} onSubmit={onSubmit} person={persons[selected]} />
           )}
