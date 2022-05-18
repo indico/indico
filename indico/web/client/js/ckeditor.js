@@ -1,18 +1,6 @@
-// TODO: upload adapter
-// TODO: simple version?
+import './ckeditor.css';
 
-// TODO: move to CSS
-export function onReady(editor, options) {
-  const {width, height} = options;
-  editor.editing.view.change(writer => {
-    writer.setStyle('height', `${height || 400}px`, editor.editing.view.document.getRoot());
-    if (width) {
-      writer.setStyle('width', `${width}px`, editor.editing.view.document.getRoot());
-    }
-  });
-}
-
-export const getConfig = ({images = false} = {}) => ({
+export const getConfig = ({simple = true, images = false} = {}) => ({
   language: 'en_GB',
   fontFamily: {
     options: [
@@ -39,14 +27,14 @@ export const getConfig = ({images = false} = {}) => ({
       'indent',
       '|',
       'link',
-      images && 'imageInsert',
-      'insertTable',
+      !simple && images && 'imageInsert',
+      !simple && 'insertTable',
       '|',
-      'blockQuote',
-      'code',
-      'horizontalLine',
+      !simple && 'blockQuote',
+      !simple && 'code',
+      !simple && 'horizontalLine',
       '|',
-      'findAndReplace',
+      !simple && 'findAndReplace',
       'undo',
       'redo',
       '|',
@@ -79,7 +67,6 @@ export const getConfig = ({images = false} = {}) => ({
     'Italic',
     'Link',
     'List',
-    'Markdown',
     images && 'MediaEmbed',
     'Paragraph',
     'PasteFromOffice',
