@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import './ckeditor.css';
-
 export const getConfig = ({simple = true, images = false} = {}) => ({
   language: 'en_GB',
   fontFamily: {
