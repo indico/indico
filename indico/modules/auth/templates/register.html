@@ -55,8 +55,16 @@
             {% elif moderate_accounts %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Submit registration request{% endtrans %}">
             {% else %}
-                <input class="i-button big highlight" type="submit" value="{% trans %}Create my Indico profile{% endtrans %}">
+                <input id="create-profile-button" class="i-button big highlight" type="submit"
+                       value="{% trans %}Create my Indico profile{% endtrans %}">
             {% endif %}
         {% endcall %}
     {% endif %}
+    {% block javascript %}
+        <script>
+            $('#register-form').on('submit', () => {
+                $('#create-profile-button').prop('disabled', true);
+            });
+        </script>
+    {% endblock %}
 {% endblock %}
