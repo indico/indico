@@ -12,7 +12,7 @@ import {getConfig} from 'indico/ckeditor';
   'use strict';
 
   global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
-    const {fieldId, images = false, height = 475, ...rest} = options;
+    const {fieldId, images = false, width, height = 475, ...rest} = options;
 
     const field = document.getElementById(fieldId);
     const editor = await ClassicEditor.create(field, {...getConfig({images}), ...rest});
@@ -20,6 +20,10 @@ import {getConfig} from 'indico/ckeditor';
     editor.model.document.on('change:data', () => {
       field.value = editor.getData();
       field.dispatchEvent(new Event('change'));
+    });
+    editor.editing.view.change(writer => {
+      writer.setStyle('width', `${width}px` || 'auto', editor.editing.view.document.getRoot());
+      writer.setStyle('height', `${height}px`, editor.editing.view.document.getRoot());
     });
   };
 })(window);
