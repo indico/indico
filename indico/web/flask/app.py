@@ -114,7 +114,7 @@ def configure_multipass(app, config):
     if config.LOCAL_IDENTITIES:
         configure_multipass_local(app)
     app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
-                                                  'address'}
+                                                  'address', 'affiliation_data'}
     app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
     app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
     app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'categories.display'
