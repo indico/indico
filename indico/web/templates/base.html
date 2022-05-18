@@ -11,10 +11,6 @@
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
-    <script>
-        window.CKEDITOR_BASEPATH = {{ url_for('assets.dist', filename='js/ckeditor/')|tojson() }};
-    </script>
-
     {{ webpack['exports.js'] }}
     {{ webpack['common-runtime.js'] }}
     {{ webpack['common.css'] }}
