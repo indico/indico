@@ -60,9 +60,11 @@
             {% endif %}
         {% endcall %}
     {% endif %}
-    <script>
-        $('#register-form').on('submit', () => {
-            $('#create-profile-button').prop('disabled', true);
-        });
-    </script>
+    {% block javascript %}
+        <script>
+            $('#register-form').on('submit', () => {
+                $('#create-profile-button').prop('disabled', true);
+            });
+        </script>
+    {% endblock %}
 {% endblock %}
