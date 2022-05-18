@@ -13,13 +13,12 @@ import {getConfig} from 'indico/ckeditor';
 
   global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
     const {fieldId, images = false, width, height = 475, ...rest} = options;
-
     const field = document.getElementById(fieldId);
     const editor = await ClassicEditor.create(field, {...getConfig({images}), ...rest});
     editor.setData(field.value);
     editor.model.document.on('change:data', () => {
       field.value = editor.getData();
-      field.dispatchEvent(new Event('change'));
+      field.dispatchEvent(new Event('change', {bubbles: true}));
     });
     editor.editing.view.change(writer => {
       writer.setStyle('width', `${width}px` || 'auto', editor.editing.view.document.getRoot());
