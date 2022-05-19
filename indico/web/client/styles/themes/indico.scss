@@ -198,12 +198,24 @@ div.event-header {
   margin: 0;
   padding: 10px 30px 10px;
 
-  h1 {
-    font-size: 20pt;
-    color: $header-text-color;
-    font-weight: normal;
-    margin-top: 10px;
+  .event-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5em;
     margin-bottom: 10px;
+
+    h1 {
+      font-size: 20pt;
+      color: $header-text-color;
+      font-weight: normal;
+      margin-top: 10px;
+    }
+
+    .event-actions {
+      display: flex;
+      gap: 0.5em;
+      margin-top: 10px;
+    }
   }
 
   &.round-bottom-corners {
@@ -373,16 +385,11 @@ ul.day-list {
 }
 
 .event-manage-button {
-  margin-top: 10px;
   font-size: 10pt;
 }
 
 .event-privacy-info-button {
   @extend %font-family-body;
-
-  position: absolute;
-  top: 5px;
-  right: 5px;
   font-size: 12pt;
 
   .privacy-dropdown {
