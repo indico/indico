@@ -15,22 +15,26 @@
 <div class="event-wrapper">
     {% block header %}
         <div class="event-header {%- if not has_subheader %} round-bottom-corners{% endif %}">
-            <div class="event-privacy-info-button">
-                {{ render_privacy_info_button(event, privacy_info) }}
+            <div class="event-title">
+                <div>
+                    {% if theme_settings.logo_link %}
+                        <a href="{{ theme_settings.logo_link }}" class="logo"></a>
+                    {% endif %}
+                    <h1 itemprop="name">
+                        {{- event.title -}}
+                        {{- event.get_label_markup() -}}
+                    </h1>
+                </div>
+                <div class="event-actions">
+                    {% set show_button = not event.is_locked and event.can_manage_attachments(session.user) %}
+                    <div class="event-manage-button">
+                        {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
+                    </div>
+                    <div class="event-privacy-info-button">
+                        {{ render_privacy_info_button(event, privacy_info) }}
+                    </div>
+                </div>
             </div>
-            {% set show_button = not event.is_locked and event.can_manage_attachments(session.user) %}
-            <div class="event-manage-button">
-                {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
-            </div>
-
-            {% if theme_settings.logo_link %}
-                <a href="{{ theme_settings.logo_link }}" class="logo"></a>
-            {% endif %}
-
-            <h1 itemprop="name">
-                {{- event.title -}}
-                {{- event.get_label_markup() -}}
-            </h1>
             <div class="details">
                 <div class="event-date">
                     {{ render_event_time(event, timezone) }}
