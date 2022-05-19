@@ -143,25 +143,19 @@ function PersonalDataForm({
     await new Promise(() => {});
   };
 
+  const getSubheader = ({city, country_name: countryName}) => {
+    if (city && countryName) {
+      return `${city}, ${countryName}`;
+    }
+    return city || countryName;
+  };
+
   const titleOptions = titles.map(t => ({key: t.name, value: t.name, text: t.title}));
   const affiliationOptions = affiliationResults.map(res => ({
     key: res.id,
     value: res.id,
     text: `${res.name} `, // XXX: the space allows addition even if the entered text matches a result item
-    content: (
-      <Header
-        content={res.name}
-        subheader={[res.street, res.postcode, res.city, res.country_code]
-          .filter(x => x)
-          .map((x, i) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <React.Fragment key={i}>
-              {i !== 0 && <br />}
-              {x}
-            </React.Fragment>
-          ))}
-      />
-    ),
+    content: <Header style={{fontSize: 14}} content={res.name} subheader={getSubheader(res)} />,
   }));
 
   const searchAffiliationChange = async (evt, {searchQuery}) => {
