@@ -134,7 +134,8 @@ class RegistrationFormCreateForm(IndicoForm):
                                       description=_('Specify for how many weeks the registration '
                                                     'data, including the participant list, should be stored. '
                                                     'Retention periods for individual fields can be set in the '
-                                                    'registration form designer'))
+                                                    'registration form designer'),
+                                      render_kw={'placeholder': _('Indefinite')})
 
     def validate_retention_period(self, field):
         retention_period = field.data
