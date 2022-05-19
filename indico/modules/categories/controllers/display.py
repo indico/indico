@@ -13,6 +13,7 @@ from operator import attrgetter, itemgetter
 from time import mktime
 
 import dateutil
+from dateutil.parser import ParserError
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
 from pytz import utc
@@ -528,14 +529,22 @@ class _EventProxy:
 
 class RHCategoryCalendarView(RHDisplayCategoryBase):
     def _process(self):
-        if not request.is_xhr:
-            return WPCategoryCalendar.render_template('display/calendar.html', self.category,
-                                                      start_dt=request.args.get('start_dt'))
+        return WPCategoryCalendar.render_template('display/calendar.html', self.category)
+
+
+class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
+    def _process_args(self):
+        RHDisplayCategoryBase._process_args(self)
         tz = self.category.display_tzinfo
-        start = tz.localize(dateutil.parser.parse(request.args['start'])).astimezone(utc)
-        end = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
+        try:
+            self.start_dt = tz.localize(dateutil.parser.parse(request.args['start'])).astimezone(utc)
+            self.end_dt = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
+        except ParserError as e:
+            raise BadRequest(str(e))
+
+    def _process(self):
         query = (Event.query
-                 .filter(Event.starts_between(start, end),
+                 .filter(Event.starts_between(self.start_dt, self.end_dt),
                          Event.is_visible_in(self.category.id),
                          ~Event.is_deleted)
                  .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id')))
@@ -543,8 +552,8 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
         ongoing_events = (Event.query
                           .filter(Event.is_visible_in(self.category.id),
                                   ~Event.is_deleted,
-                                  Event.start_dt < start,
-                                  Event.end_dt > end)
+                                  Event.start_dt < self.start_dt,
+                                  Event.end_dt > self.end_dt)
                           .options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
                           .order_by(Event.title)
                           .all())

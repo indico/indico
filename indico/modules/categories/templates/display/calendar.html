@@ -40,6 +40,6 @@
         <div id="event-calendar"></div>
     </div>
     <script>
-        setupCategoryCalendar('#event-calendar', {{ url_for('categories.calendar', category) | tojson }});
+        setupCategoryCalendar('#event-calendar', {{ url_for('categories.calendar_events', category) | tojson }});
     </script>
 {% endblock %}
