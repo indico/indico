@@ -25,6 +25,8 @@ function CountryInputComponent({value, onChange, disabled, choices, clearable}) 
       fluid
       search
       selection
+      selectOnBlur={false}
+      selectOnNavigation={false}
       disabled={disabled}
       clearable={clearable}
       value={value}
