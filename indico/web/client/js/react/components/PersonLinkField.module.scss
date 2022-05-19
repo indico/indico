@@ -93,11 +93,11 @@
 
 .drag-item {
   display: flex;
-  align-items: center;
 }
 
 .drag-item .handle {
   cursor: pointer;
+  margin-top: 8px;
 }
 
 .drag-item .preview {
