@@ -27,7 +27,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
-from indico.modules.users.models.affiliations import UserAffiliation
+from indico.modules.users.models.affiliations import Affiliation, UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table, favorite_user_table
 from indico.util.enum import RichIntEnum
@@ -134,6 +134,16 @@ class PersonMixin:
 
     # Convenience property to have a canonical `name` property
     name = full_name
+
+    @property
+    def affiliation_details(self):
+        from indico.modules.users.schemas import AffiliationSchema
+        if link := getattr(self, 'affiliation_link', None):
+            return AffiliationSchema().dump(link)
+        elif hasattr(self, '_affiliation') and (link := self._affiliation.affiliation_link):
+            return AffiliationSchema().dump(link)
+        else:
+            return None
 
 
 #: Fields which can be synced as keys and a mapping to a more human
@@ -676,6 +686,7 @@ class User(PersonMixin, db.Model):
             # refuse to sync with empty identities, just in case - if there is no
             # data at all there's a good chance something is wrong!
             return
+        affiliation_data = identity.data.get('affiliation_data')
         for field in self.synced_fields:
             old_value = getattr(self, field)
             new_value = identity.data.get(field) or ''
@@ -683,6 +694,11 @@ class User(PersonMixin, db.Model):
                 new_value = new_value.lower()
             if field in ('first_name', 'last_name', 'email') and not new_value:
                 continue
+            if field == 'affiliation':
+                if affiliation_data:
+                    self._affiliation.affiliation_link = Affiliation.get_or_create_from_data(affiliation_data)
+                else:
+                    self._affiliation.affiliation_link = None  # clear link to predefined affiliation
             if old_value == new_value:
                 continue
             logger.info('Syncing %s for %r from %r to %r', field, self, old_value, new_value)

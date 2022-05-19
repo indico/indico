@@ -38,10 +38,12 @@ from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
                                         SearchForm, UserEmailsForm, UserPreferencesForm)
+from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
-from indico.modules.users.schemas import BasicCategorySchema, FavoriteEventSchema, UserPersonalDataSchema
+from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
+                                          UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
                                        merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
@@ -201,8 +203,14 @@ class RHPersonalData(RHUserBase):
     def _process(self):
         titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
         user_values = UserPersonalDataSchema().dump(self.user)
+        current_affiliation = None
+        if self.user._affiliation.affiliation_link:
+            current_affiliation = AffiliationSchema().dump(self.user._affiliation.affiliation_link)
+        has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
-                                                  titles=titles, user_values=user_values)
+                                                  titles=titles, user_values=user_values,
+                                                  current_affiliation=current_affiliation,
+                                                  has_predefined_affiliations=has_predefined_affiliations)
 
 
 class RHPersonalDataUpdate(RHUserBase):
@@ -218,12 +226,37 @@ class RHPersonalDataUpdate(RHUserBase):
         # get updated in synchronize_data which will flash a message
         # informing the user about the changes made by the sync
         self.user.synced_fields = synced_fields & syncable_fields
+        if (affiliation_data := changes.pop('affiliation_data', None)) and 'affiliation' not in self.user.synced_fields:
+            if affiliation_data['affiliation_id']:
+                self.user._affiliation.affiliation_link = Affiliation.get_or_404(affiliation_data['affiliation_id'],
+                                                                                 is_deleted=False)
+                self.user._affiliation.name = self.user._affiliation.affiliation_link.name
+            else:
+                self.user._affiliation.affiliation_link = None
+                self.user._affiliation.name = affiliation_data['name']
         for key, value in changes.items():
             if key not in self.user.synced_fields:
                 setattr(self.user, key, value)
         self.user.synchronize_data(refresh=True)
         flash(_('Your personal data was successfully updated.'), 'success')
         return '', 204
+
+
+class RHSearchAffiliations(RHProtected):
+    @use_kwargs({'q': fields.String(load_default='')}, location='query')
+    def _process(self, q):
+        exact_match = db.func.lower(Affiliation.name) == q.lower()
+        q_filter = Affiliation.name.ilike(f'%{q}%') if len(q) > 2 else exact_match
+        res = (
+            Affiliation.query
+            .filter(~Affiliation.is_deleted, q_filter)
+            .order_by(
+                exact_match.desc(),
+                db.func.lower(Affiliation.name).startswith(q.lower()).desc(),
+                db.func.lower(Affiliation.name)
+            )
+            .all())
+        return AffiliationSchema(many=True).jsonify(res)
 
 
 class RHProfilePicturePage(RHUserBase):
@@ -731,9 +764,14 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 
 
 class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
+    affiliation_id = fields.Integer(attribute='_affiliation.affiliation_id')
+    affiliation_meta = fields.Nested(AffiliationSchema, attribute='_affiliation.affiliation_link')
+    title = EnumField(UserTitle, attribute='_title')
+
     class Meta:
         model = User
-        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name', 'first_name', 'last_name', 'avatar_url')
+        fields = ('id', 'identifier', 'email', 'affiliation', 'affiliation_id', 'affiliation_meta',
+                  'full_name', 'first_name', 'last_name', 'avatar_url', 'title')
 
 
 search_result_schema = UserSearchResultSchema()

@@ -137,6 +137,12 @@ class EventPerson(PersonMixin, db.Model):
         nullable=False,
         default=UserTitle.none
     )
+    #: the id of the underlying predefined affiliation
+    affiliation_id = db.Column(
+        db.ForeignKey('indico.affiliations.id'),
+        nullable=True,
+        index=True
+    )
     affiliation = db.Column(
         db.String,
         nullable=False,
@@ -181,6 +187,11 @@ class EventPerson(PersonMixin, db.Model):
             lazy='dynamic'
         )
     )
+    affiliation_link = db.relationship(
+        'Affiliation',
+        lazy=False,
+        backref=db.backref('event_person_affiliations', lazy='dynamic')
+    )
 
     # relationship backrefs:
     # - abstract_links (AbstractPersonLink.person)
@@ -211,8 +222,9 @@ class EventPerson(PersonMixin, db.Model):
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):
         return EventPerson(user=user, event=event, first_name=user.first_name, last_name=user.last_name,
-                           email=user.email, affiliation=user.affiliation, address=user.address, phone=user.phone,
-                           is_untrusted=is_untrusted)
+                           title=user._title, email=user.email, affiliation=user.affiliation,
+                           affiliation_link=(user._affiliation.affiliation_link if user._affiliation else None),
+                           address=user.address, phone=user.phone, is_untrusted=is_untrusted)
 
     @classmethod
     def for_user(cls, user, event=None, is_untrusted=False):
@@ -414,11 +426,20 @@ class PersonLinkBase(PersonMixin, db.Model):
         )
 
     @declared_attr
-    def _title(cls):
+    def _title_col(cls):
         return db.Column(
             'title',
             PyIntEnum(UserTitle),
             nullable=True
+        )
+
+    @declared_attr
+    def _affiliation_id(cls):
+        return db.Column(
+            'affiliation_id',
+            db.ForeignKey('indico.affiliations.id'),
+            nullable=True,
+            index=True
         )
 
     @declared_attr
@@ -459,6 +480,17 @@ class PersonLinkBase(PersonMixin, db.Model):
         )
 
     @declared_attr
+    def _affiliation_link(cls):
+        return db.relationship(
+            'Affiliation',
+            lazy=False,
+            backref=db.backref(
+                cls.person_link_backref_name,
+                lazy='dynamic'
+            )
+        )
+
+    @declared_attr
     def display_order(cls):
         return db.Column(
             db.Integer,
@@ -485,7 +517,10 @@ class PersonLinkBase(PersonMixin, db.Model):
     first_name = override_attr('first_name', 'person')
     last_name = override_attr('last_name', 'person')
     title = override_attr('title', 'person', fget=lambda self, __: self._get_title())
+    _title = override_attr('_title', 'person', own_attr_name='_title_col')
     affiliation = override_attr('affiliation', 'person')
+    affiliation_id = override_attr('affiliation_id', 'person', check_attr_name='_affiliation')
+    affiliation_link = override_attr('affiliation_link', 'person', check_attr_name='_affiliation')
     address = override_attr('address', 'person')
     phone = override_attr('phone', 'person')
 

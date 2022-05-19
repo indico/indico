@@ -10,6 +10,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import 'indico/react/components/AffiliationPopup';
+
 import './invitations';
 import './reglists';
 

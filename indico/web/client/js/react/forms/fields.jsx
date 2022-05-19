@@ -202,7 +202,7 @@ CheckboxAdapter.propTypes = {
 };
 
 function DropdownAdapter(props) {
-  const {input, required, clearable, isMultiple, width, ...rest} = props;
+  const {input, required, clearable, isMultiple, width, action, ...rest} = props;
   const fieldProps = width !== null ? {width} : {};
 
   return (
@@ -210,7 +210,7 @@ function DropdownAdapter(props) {
       input={input}
       {...rest}
       required={required}
-      as={Dropdown}
+      as={action ? DropdownAction : Dropdown}
       clearable={clearable === undefined ? !required && !isMultiple : clearable}
       multiple={isMultiple}
       undefinedValue={isMultiple ? [] : null}
@@ -218,6 +218,7 @@ function DropdownAdapter(props) {
       selectOnNavigation={false}
       fieldProps={fieldProps}
       getValue={(__, {value}) => value}
+      action={action}
     />
   );
 }
@@ -228,6 +229,7 @@ DropdownAdapter.propTypes = {
   clearable: PropTypes.bool,
   isMultiple: PropTypes.bool,
   width: PropTypes.number,
+  action: PropTypes.object,
 };
 
 DropdownAdapter.defaultProps = {
@@ -235,6 +237,100 @@ DropdownAdapter.defaultProps = {
   clearable: undefined,
   isMultiple: false,
   width: null,
+  action: null,
+};
+
+function ComboDropdownAdapter(props) {
+  const {
+    input,
+    required,
+    clearable,
+    width,
+    action,
+    options,
+    renderCustomOptionContent,
+    includeMeta,
+    ...rest
+  } = props;
+  const fieldProps = width !== null ? {width} : {};
+
+  let fullOptions = options;
+  if (typeof input.value === 'string' && input.value) {
+    fullOptions = [
+      {
+        key: 'custom',
+        value: input.value,
+        text: input.value,
+        content: renderCustomOptionContent(input.value),
+      },
+      ...options,
+    ];
+  }
+
+  return (
+    <FormFieldAdapter
+      input={input}
+      {...rest}
+      options={fullOptions}
+      required={required}
+      as={action ? DropdownAction : Dropdown}
+      clearable={clearable === undefined ? !required : clearable}
+      multiple={false}
+      action={action}
+      undefinedValue={null}
+      selectOnBlur={false}
+      selectOnNavigation={false}
+      fieldProps={fieldProps}
+      getValue={(__, {value}) => {
+        if (typeof value === 'number') {
+          const opt = options.find(x => x.value === value);
+          const rv = {
+            id: value,
+            text: opt.text,
+          };
+          if (includeMeta) {
+            rv.meta = opt.meta;
+          }
+          return rv;
+        } else {
+          const rv = {
+            id: null,
+            text: value,
+          };
+          if (includeMeta) {
+            rv.meta = null;
+          }
+          return rv;
+        }
+      }}
+      onAddItem={(e, {value}) => {
+        input.onChange({
+          id: null,
+          text: value,
+        });
+      }}
+    />
+  );
+}
+
+ComboDropdownAdapter.propTypes = {
+  input: PropTypes.object.isRequired,
+  options: PropTypes.array.isRequired,
+  required: PropTypes.bool,
+  clearable: PropTypes.bool,
+  width: PropTypes.number,
+  action: PropTypes.object,
+  renderCustomOptionContent: PropTypes.func,
+  includeMeta: PropTypes.bool,
+};
+
+ComboDropdownAdapter.defaultProps = {
+  required: false,
+  clearable: undefined,
+  width: null,
+  action: null,
+  renderCustomOptionContent: () => undefined,
+  includeMeta: false,
 };
 
 /**
@@ -458,6 +554,34 @@ FinalDropdown.defaultProps = {
 };
 
 /**
+ * Like `FinalField` but for a dropdown with support for adding a custom freetext item.
+ */
+export function FinalComboDropdown({name, label, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      adapter={ComboDropdownAdapter}
+      label={label}
+      format={x => (x.id === null ? x.text : x.id)}
+      parse={identity}
+      allowAdditions
+      search
+      selection
+      {...rest}
+    />
+  );
+}
+
+FinalComboDropdown.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+};
+
+FinalComboDropdown.defaultProps = {
+  label: null,
+};
+
+/**
  * A submit button that will update according to the final-form state.
  */
 export function FinalSubmitButton({
@@ -551,7 +675,7 @@ FinalSubmitButton.defaultProps = {
  * This is similar to the native SUI functionality which works only for inputs.
  */
 function TextAreaAction({className, action, ...rest}) {
-  const minHeight = 39; // The height of SUI's input
+  const minHeight = 39; // The height of SUI's <Input />
   return (
     <div
       className={className}
@@ -567,30 +691,84 @@ function TextAreaAction({className, action, ...rest}) {
           minHeight,
         }}
       />
-      <Button
-        type="button"
-        icon
-        toggle={action.toggle}
-        active={action.active}
-        className={action.className}
-        title={action.title}
-        style={{
-          alignSelf: 'flex-start',
-          borderTopLeftRadius: 0,
-          borderBottomLeftRadius: 0,
-          marginRight: 0,
-          height: minHeight,
-        }}
-        onClick={action.onClick}
-      >
-        <Icon name={action.icon} />
-      </Button>
+      <ActionButton action={action} />
     </div>
   );
 }
 
 TextAreaAction.propTypes = {
   className: PropTypes.string,
+  action: PropTypes.object.isRequired,
+};
+
+TextAreaAction.defaultProps = {
+  className: '',
+};
+
+/**
+ * Dropdown but with an action button attached.
+ * This is similar to the native SUI functionality which works only for inputs.
+ */
+function DropdownAction({className, action, readOnly, ...rest}) {
+  return (
+    <div
+      className={className}
+      style={{
+        display: 'flex',
+      }}
+    >
+      <Dropdown
+        {...rest}
+        disabled={readOnly}
+        style={{
+          borderTopRightRadius: 0,
+          borderBottomRightRadius: 0,
+        }}
+      />
+      <ActionButton action={action} />
+    </div>
+  );
+}
+
+DropdownAction.propTypes = {
+  className: PropTypes.string,
+  action: PropTypes.object.isRequired,
+  readOnly: PropTypes.bool,
+};
+
+DropdownAction.defaultProps = {
+  className: '',
+  readOnly: false,
+};
+
+function ActionButton({action}) {
+  // The height of SUI's input
+  // This makes the height of the action button that same as
+  // the SUI's native action button for <Input />
+  const minHeight = 39;
+  return (
+    <Button
+      type="button"
+      icon
+      toggle={action.toggle}
+      active={action.active}
+      className={action.className}
+      title={action.title}
+      style={{
+        alignSelf: 'flex-start',
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        marginRight: 0,
+        height: minHeight,
+      }}
+      onClick={action.onClick}
+    >
+      <Icon name={action.icon} />
+    </Button>
+  );
+}
+
+ActionButton.propTypes = {
   action: PropTypes.shape({
     type: PropTypes.oneOf(['button']).isRequired,
     active: PropTypes.bool,
@@ -600,8 +778,4 @@ TextAreaAction.propTypes = {
     title: PropTypes.string,
     onClick: PropTypes.func,
   }).isRequired,
-};
-
-TextAreaAction.defaultProps = {
-  className: '',
 };

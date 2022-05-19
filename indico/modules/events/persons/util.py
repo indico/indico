@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from marshmallow import EXCLUDE
+
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users import User
 from indico.util.user import principal_from_identifier
@@ -12,8 +14,6 @@ from indico.util.user import principal_from_identifier
 
 def create_event_person(event, create_untrusted_persons=False, **data):
     """Create an event person from data passed as kwargs."""
-    from marshmallow import EXCLUDE
-
     from indico.modules.events.persons.schemas import EventPersonSchema
     event_person = EventPerson(event=event, is_untrusted=create_untrusted_persons)
     event_person.populate_from_dict(EventPersonSchema(unknown=EXCLUDE).load(data))

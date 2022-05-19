@@ -20,6 +20,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.persons.util import get_event_person
+from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.web.forms.fields import MultipleItemsField
@@ -90,6 +91,10 @@ class PersonLinkListFieldBase(PrincipalListField):
         # The event should be a property as it may only be available later, such as, in creation forms
         return getattr(self.get_form(), 'event', None)
 
+    @property
+    def has_predefined_affiliations(self):
+        return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
+
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
@@ -101,8 +106,8 @@ class PersonLinkListFieldBase(PrincipalListField):
             person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
         if not person_link:
             person_link = self.person_link_cls(person=person)
-        person_link.populate_from_dict(data, keys=(
-            'first_name', 'last_name', 'affiliation', 'address', 'phone', '_title', 'display_order'))
+        person_link.populate_from_dict(data, keys=('first_name', 'last_name', 'affiliation', 'affiliation_link',
+                                                   'address', 'phone', '_title', 'display_order'))
         email = data.get('email', '').lower()
         if not email:
             raise UserValueError(_('A valid email address is required'))

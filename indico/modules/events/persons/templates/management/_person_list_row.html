@@ -1,4 +1,6 @@
-{% macro render_person_row(person_data, event_has_registration_forms) %}
+{% from 'events/management/_affiliation.html' import render_affiliation %}
+
+{% macro render_person_row(person_data, event_has_registration_forms, person_schema, has_predefined_affiliations) %}
     {% set person = person_data.person %}
     <td class="i-table thin-column hide-if-locked">
         <input type="checkbox" value="{{ person.id }}" class="select-row id-field"
@@ -43,7 +45,7 @@
         {{ person.email }}
     </td>
     <td class="i-table affiliation-column">
-        {{ person.affiliation }}
+        {{ render_affiliation(person) }}
     </td>
     <td class="i-table roles-column">
         {% for role, role_data in person_data.roles.items() %}
@@ -84,13 +86,14 @@
     </td>
     <td class="i-table edit-column thin-column">
         {% if person_data.has_event_person %}
-            <a class="i-link icon-edit"
-               title="{%- trans %}Edit information{% endtrans -%}"
-               data-href="{{ url_for('persons.edit_person', person) }}"
-               data-title="{%- trans %}Edit information{% endtrans -%}"
-               data-update="#person-{{ person.id }}"
-               data-highlight-update
-               data-ajax-dialog></a>
+            <span id="edit-person-{{ person.id }}"></span>
+            <script>
+                setupEditEventPerson(
+                    {{ person.event_id }},
+                    {{ person_schema.dump(person) | tojson }},
+                    {{ has_predefined_affiliations | tojson }}
+                );
+            </script>
         {% else %}
             <a class="i-link icon-edit disabled"
                title="{%- trans %}This user does not play any public role{% endtrans -%}"></a>

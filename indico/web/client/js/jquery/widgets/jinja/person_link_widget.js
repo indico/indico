@@ -13,21 +13,24 @@ import {camelizeKeys} from 'indico/utils/case';
 
 (function(global) {
   global.setupPersonLinkWidget = function setupPersonLinkWidget(options) {
-    const {fieldId, eventId, roles, sessionUser, ...rest} = options;
+    const {fieldId, eventId, roles, sessionUser, hasPredefinedAffiliations, ...rest} = options;
     const field = document.getElementById(fieldId);
     const persons = JSON.parse(field.value);
-    const user = sessionUser && sessionUser.id && {
-      name: sessionUser.fullName,
-      userId: sessionUser.id,
-      userIdentifier: `User:${sessionUser.id}`,
-      avatarURL: sessionUser.avatarURL,
-      firstName: sessionUser.firstName,
-      lastName: sessionUser.lastName,
-      affiliation: sessionUser.affiliation,
-      email: sessionUser.email,
-      address: sessionUser.address,
-      phone: sessionUser.phone
-    };
+    const user = sessionUser &&
+      sessionUser.id !== undefined && {
+        name: sessionUser.fullName,
+        userId: sessionUser.id,
+        userIdentifier: `User:${sessionUser.id}`,
+        avatarURL: sessionUser.avatarURL,
+        firstName: sessionUser.firstName,
+        lastName: sessionUser.lastName,
+        affiliation: sessionUser.affiliation,
+        affiliationId: sessionUser.affiliationId,
+        affiliationMeta: sessionUser.affiliationMeta,
+        email: sessionUser.email,
+        address: sessionUser.address,
+        phone: sessionUser.phone,
+      };
 
     ReactDOM.render(
       <WTFPersonLinkField
@@ -36,6 +39,7 @@ import {camelizeKeys} from 'indico/utils/case';
         defaultValue={camelizeKeys(persons)}
         roles={roles || []}
         sessionUser={user}
+        hasPredefinedAffiliations={hasPredefinedAffiliations}
         {...rest}
       />,
       document.getElementById(`person-link-field-${fieldId}`)
