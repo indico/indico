@@ -232,7 +232,7 @@ class RHPersonalDataUpdate(RHUserBase):
                                                                                  is_deleted=False)
                 self.user._affiliation.name = self.user._affiliation.affiliation_link.name
             else:
-                self.user._affiliation.affiliation_id = None
+                self.user._affiliation.affiliation_link = None
                 self.user._affiliation.name = affiliation_data['name']
         for key, value in changes.items():
             if key not in self.user.synced_fields:
