@@ -104,7 +104,7 @@ class RegistrationListGenerator(ListGeneratorBase):
         for item_id in [x for x in self.personal_items if x in ids]:
             field = RegistrationFormItem.query.filter_by(registration_form=self.regform,
                                                          personal_data_type=PersonalDataType[item_id]).one()
-            result.append({'id': field.id, 'caption': field.title, 'name': item_id})
+            result.append({'id': field.id, 'caption': field.title})
         for item_id in [x for x in self.static_items if x in ids]:
             result.append({'id': item_id, 'caption': self.static_items[item_id]['title']})
         return result
