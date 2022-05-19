@@ -17,8 +17,7 @@ import {camelizeKeys} from 'indico/utils/case';
     const field = document.getElementById(fieldId);
     const persons = JSON.parse(field.value);
     const user = sessionUser &&
-      sessionUser.id && {
-        // TODO check for uid 0 behavior, legacy instances can have users with that id..
+      sessionUser.id !== undefined && {
         name: sessionUser.fullName,
         userId: sessionUser.id,
         userIdentifier: `User:${sessionUser.id}`,
