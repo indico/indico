@@ -108,7 +108,7 @@ const PersonListItem = ({
   onClickRole,
   disabled,
 }) => (
-  <PrincipalItem as={List.Item} styleName="person-link">
+  <PrincipalItem as={List.Item} styleName="principal">
     <PrincipalItem.Icon type={PrincipalType.user} avatarURL={avatarURL} styleName="icon" />
     <PrincipalItem.Content
       name={firstName ? `${firstName} ${lastName}` : lastName}
@@ -183,15 +183,13 @@ const DraggablePerson = ({drag, dragType, onMove, index, ...props}) => {
     separateHandle: true,
   });
   return (
-    <div ref={itemRef} style={style} styleName="drag-item">
+    <div ref={itemRef} style={style} styleName="person-link">
       {!drag && (
         <Ref innerRef={dragRef}>
           <div className="icon-drag-indicator" styleName="handle" />
         </Ref>
       )}
-      <div styleName="preview">
-        <PersonListItem {...props} />
-      </div>
+      <PersonListItem {...props} />
     </div>
   );
 };

@@ -15,12 +15,26 @@
   max-height: 40vh;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
-  scroll-padding: 0.5em;
+  scroll-padding: 4px;
 }
 
 .person-link {
-  scroll-snap-align: start;
+  display: flex;
   padding: 1px 0;
+  scroll-snap-align: start;
+}
+
+.person-link:first-child {
+  scroll-margin-top: 1em;
+}
+
+.person-link .handle {
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.principal {
+  flex: 1;
 }
 
 .button {
@@ -89,17 +103,4 @@
 
 .icon {
   width: 32px !important;
-}
-
-.drag-item {
-  display: flex;
-}
-
-.drag-item .handle {
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-.drag-item .preview {
-  flex: 1;
 }
