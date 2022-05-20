@@ -13,6 +13,7 @@ from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
 
 from indico.core import signals
+from indico.core.cache import make_scoped_cache
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.modules.events.layout import theme_settings
@@ -98,7 +99,19 @@ class PersonLinkListFieldBase(PrincipalListField):
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
+        identifier = data.get('identifier')
         data = PersonLinkSchema(unknown=EXCLUDE).load(data)
+        if identifier and identifier.startswith('ExternalUser:'):
+            # if the data came from an external user, look up their affiliation if the names still match;
+            # we do not have an affiliation ID yet since it may not exist in the local DB yet
+            cache = make_scoped_cache('external-user')
+            external_user_data = cache.get(identifier.removeprefix('ExternalUser:'), {})
+            if (
+                (affiliation_data := external_user_data.get('affiliation_data')) and
+                data['affiliation'] == affiliation_data['name']
+            ):
+                data['affiliation_link'] = Affiliation.get_or_create_from_data(affiliation_data)
+                data['affiliation'] = data['affiliation_link'].name
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
         person_link = None

@@ -785,6 +785,7 @@ class RHUserSearch(RHProtected):
         last_name = entry.data.get('last_name') or ''
         full_name = f'{first_name} {last_name}'.strip() or 'Unknown'
         affiliation = entry.data.get('affiliation') or ''
+        affiliation_data = entry.data.get('affiliation_data')
         email = entry.data['email'].lower()
         ext_id = f'{entry.provider.name}:{entry.identifier}'
         # IdentityInfo from flask-multipass does not have `avatar_url`
@@ -796,6 +797,7 @@ class RHUserSearch(RHProtected):
             'last_name': last_name,
             'email': email,
             'affiliation': affiliation,
+            'affiliation_data': affiliation_data,
             'phone': entry.data.get('phone') or '',
             'address': entry.data.get('address') or '',
         }
@@ -806,6 +808,8 @@ class RHUserSearch(RHProtected):
             'identifier': f'ExternalUser:{ext_id}',
             'email': email,
             'affiliation': affiliation,
+            'affiliation_id': -1 if affiliation_data else None,
+            'affiliation_meta': (AffiliationSchema().dump(affiliation_data) | {'id': -1}) if affiliation_data else None,
             'full_name': full_name,
             'first_name': first_name,
             'last_name': last_name,

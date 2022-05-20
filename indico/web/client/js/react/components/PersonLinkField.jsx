@@ -399,6 +399,7 @@ export function WTFPersonLinkField({
         'phone',
         'roles',
         'displayOrder',
+        'identifier',
       ])
     );
     inputField.value = JSON.stringify(

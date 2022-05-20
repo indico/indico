@@ -42,6 +42,9 @@ class PersonLinkSchema(mm.Schema):
             data['title'] = UserTitle.none.name
         if not data.get('affiliation'):
             data['affiliation'] = ''
+        if data.get('affiliation_id') == -1:
+            # external search results with a predefined affiliation
+            del data['affiliation_id']
         return data
 
     @post_load

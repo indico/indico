@@ -112,7 +112,9 @@ class UserAffiliation(db.Model):
     affiliation_link = db.relationship(
         'Affiliation',
         lazy=False,
-        backref=db.backref('user_affiliations', lazy='dynamic')
+        # disable backref cascade so the link created in `principal_from_identifier` does not add
+        # the UserAffiliation and thus the User to the session just because it's linked to an Affiliation
+        backref=db.backref('user_affiliations', lazy='dynamic', cascade_backrefs=False)
     )
 
     # relationship backrefs:
