@@ -2,12 +2,11 @@
     {% set data_controller_exists = privacy_info.data_controller_name or privacy_info.data_controller_email %}
     {% if data_controller_exists or privacy_info.privacy_policy_urls|length > 1 %}
         <div class="privacy-dropdown">
-            <a href="#"
-               onclick="return false;"
-               class="i-button highlight"
-               title="{% trans %}Event privacy information{% endtrans %}">
-                <i class="fitted balance scale icon"></i>
-            </a>
+            <button class="small compact ui blue icon button"
+                    title="{% trans %}Event privacy information{% endtrans %}">
+                <i class="balance scale icon"></i>
+                <i class="caret down icon"></i>
+            </button>
             <div class="menu">
                 {% if data_controller_exists %}
                     <div class="header">{% trans %}Data controller{% endtrans %}</div>
@@ -56,7 +55,7 @@
     {% elif privacy_info.privacy_policy %}
         <a href="{{ url_for('events.display_privacy', event) }}"
            title="{% trans %}Event privacy notice{% endtrans %}"
-           class="i-button highlight"
+           class="small compact ui blue icon button"
            data-title="{% trans %}Event privacy notice{% endtrans %}"
            data-href="{{ url_for('events.display_privacy', event) }}"
            data-ajax-dialog
@@ -68,7 +67,7 @@
         <a href="{{ privacy_info.privacy_policy_urls[0].url }}"
            target="_blank"
            rel="noopener noreferrer"
-           class="i-button highlight"
+           class="small compact ui blue icon button"
            title="{% trans %}Event privacy notice{% endtrans %}">
             <i class="fitted balance scale icon"></i>
         </a>

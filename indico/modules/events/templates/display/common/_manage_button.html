@@ -178,7 +178,10 @@
         {% endif %}
         {% if show_button %}
             <div class="group manage-button">
-                <a class="i-button icon-edit arrow js-dropdown" data-toggle="dropdown"></a>
+                <button class="small compact ui icon button js-dropdown" data-toggle="dropdown">
+                    <i class="edit icon"></i>
+                    <i class="caret down icon"></i>
+                </button>
                 {{ _render_dropdown(item, item_type, show_note_operations=show_note_operations) }}
             </div>
         {% endif %}

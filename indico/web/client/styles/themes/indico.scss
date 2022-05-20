@@ -213,7 +213,7 @@ div.event-header {
 
     .event-actions {
       display: flex;
-      gap: 0.5em;
+      gap: 0.2em;
       margin-top: 10px;
     }
   }
@@ -386,6 +386,14 @@ ul.day-list {
 
 .event-manage-button {
   font-size: 10pt;
+
+  button.open {
+    border-bottom-left-radius: 0;
+  }
+
+  .i-dropdown {
+    border-top-left-radius: 0;
+  }
 }
 
 .event-privacy-info-button {
@@ -400,8 +408,8 @@ ul.day-list {
       display: none;
       position: absolute;
       z-index: 1;
-      top: 1.5em;
-      right: 0;
+      top: 1.8em;
+      right: 0.2em;
       min-width: 10em;
       border-radius: 2px;
       background-color: $light-gray;
