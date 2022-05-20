@@ -36,6 +36,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
     from indico.modules.groups import GroupProxy
     from indico.modules.networks.models.networks import IPNetworkGroup
     from indico.modules.users import User
+    from indico.modules.users.models.users import UserTitle
 
     if allow_category_roles and category_id is None and event_id is None:
         raise ValueError('Cannot use category roles without a category/event context')
@@ -74,7 +75,8 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         # the database, which is good!
         return User(first_name=external_user_data['first_name'], last_name=external_user_data['last_name'],
                     email=external_user_data['email'], affiliation=external_user_data['affiliation'],
-                    address=external_user_data['address'], phone=external_user_data['phone'], is_pending=True)
+                    address=external_user_data['address'], phone=external_user_data['phone'], _title=UserTitle.none,
+                    is_pending=True)
     elif type_ == 'Group':
         if not allow_groups:
             raise ValueError('Groups are not allowed')
