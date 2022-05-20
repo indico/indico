@@ -326,6 +326,7 @@ function PersonLinkField({
                 <Translate>Search</Translate>
               </Button>
             )}
+            withExternalUsers
             withEventPersons={eventId !== null}
             eventId={eventId}
             disabled={!sessionUser}
