@@ -22,6 +22,7 @@ export default class IButton extends React.PureComponent {
     icon: PropTypes.string,
     dropdown: PropTypes.bool,
     borderless: PropTypes.bool,
+    style: PropTypes.object,
   };
 
   static defaultProps = {
@@ -35,6 +36,7 @@ export default class IButton extends React.PureComponent {
     icon: '',
     dropdown: false,
     borderless: false,
+    style: {},
   };
 
   render() {
@@ -44,6 +46,7 @@ export default class IButton extends React.PureComponent {
       highlight,
       href,
       title,
+      style,
       children,
       onClick,
       icon,
@@ -62,6 +65,7 @@ export default class IButton extends React.PureComponent {
 
     const attrs = {
       title,
+      style,
       className: toClasses(finalClasses),
     };
 

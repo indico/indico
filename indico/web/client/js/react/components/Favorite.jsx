@@ -13,6 +13,7 @@ import React, {useState} from 'react';
 
 import {IButton} from 'indico/react/components';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import Palette from 'indico/utils/palette';
 
 export default function Favorite({type, id, favorited, setFavText, deleteFavText}) {
   const [fav, setFav] = useState(favorited);
@@ -53,6 +54,7 @@ export default function Favorite({type, id, favorited, setFavText, deleteFavText
     <IButton
       icon="star"
       classes={type === 'event' ? {'height-full': true, 'text-color': true, 'subtle': true} : {}}
+      style={type === 'event' ? {color: Palette.indicoBlue} : {}}
       highlight
       title={deleteFavText}
       onClick={() => deleteFavorite(id)}

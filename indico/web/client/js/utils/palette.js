@@ -19,6 +19,7 @@ const Palette = {
   orange: '#f80',
   olive: '#b5cc18',
   black: '#555',
+  indicoBlue: '#00a4e4',
 };
 
 // colors for specific purposes
