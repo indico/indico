@@ -234,6 +234,12 @@ class EventPerson(PersonMixin, db.Model):
     def for_user(cls, user, event=None, is_untrusted=False):
         """Return EventPerson for a matching User in Event creating if needed."""
         person = event.persons.filter_by(user=user).first() if event else None
+        email_person = event.persons.filter(EventPerson.email.in_(user.all_emails)).first() if event else None
+        if not person and email_person:
+            if email_person.user is None:
+                email_person.user = user
+            assert email_person.user == user
+            person = email_person
         return person or cls.create_from_user(user, event, is_untrusted=is_untrusted)
 
     @classmethod
