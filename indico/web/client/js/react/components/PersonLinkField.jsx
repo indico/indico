@@ -34,7 +34,7 @@ const PersonListItem = ({
   onClickRole,
   disabled,
 }) => (
-  <PrincipalItem as={List.Item}>
+  <PrincipalItem as={List.Item} styleName="principal">
     <PrincipalItem.Icon type={PrincipalType.user} avatarURL={avatarURL} styleName="icon" />
     <PrincipalItem.Content
       name={firstName ? `${firstName} ${lastName}` : lastName}
@@ -109,15 +109,13 @@ const DraggablePerson = ({drag, dragType, onMove, index, ...props}) => {
     separateHandle: true,
   });
   return (
-    <div ref={itemRef} style={style} styleName="drag-item">
+    <div ref={itemRef} style={style} styleName="person-link">
       {!drag && (
         <Ref innerRef={dragRef}>
           <div className="icon-drag-indicator" styleName="handle" />
         </Ref>
       )}
-      <div styleName="preview">
-        <PersonListItem {...props} />
-      </div>
+      <PersonListItem {...props} />
     </div>
   );
 };
@@ -300,7 +298,7 @@ function PersonLinkField({
           )}
           {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
         </Segment>
-        <Button.Group size="small" attached="bottom" floated="right">
+        <Button.Group size="small" attached="bottom">
           <Button
             toggle
             icon="sort alphabet down"
@@ -309,14 +307,14 @@ function PersonLinkField({
             onClick={() => setAutoSort && setAutoSort(!autoSort)}
           />
           {sessionUser && (
-            <Translate
-              as={Button}
+            <Button
               type="button"
               onClick={() => onAdd([sessionUser])}
               disabled={persons.some(p => p.userId === sessionUser.userId)}
             >
-              Add myself
-            </Translate>
+              <Icon name="add user" />
+              <Translate>Add myself</Translate>
+            </Button>
           )}
           <UserSearch
             favorites={favoriteUsers}
@@ -324,6 +322,7 @@ function PersonLinkField({
             onAddItems={onAdd}
             triggerFactory={props => (
               <Button type="button" {...props}>
+                <Icon name="search" />
                 <Translate>Search</Translate>
               </Button>
             )}
@@ -331,9 +330,10 @@ function PersonLinkField({
             eventId={eventId}
             disabled={!sessionUser}
           />
-          <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
-            Enter manually
-          </Translate>
+          <Button type="button" onClick={() => setModalOpen(true)}>
+            <Icon name="keyboard" />
+            <Translate>Enter manually</Translate>
+          </Button>
           {modalOpen && (
             <PersonDetailsModal
               onClose={onClose}
