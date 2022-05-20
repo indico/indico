@@ -5,10 +5,6 @@
     {{ url_for('.manage_regform', regform) }}
 {%- endblock %}
 
-{% block back_button_title -%}
-    {%- trans %}Back{% endtrans -%}
-{% endblock %}
-
 {% block subtitle %}
     {% trans title=regform.title -%}Privacy settings of form "{{ title }}"{%- endtrans %}
 {% endblock %}

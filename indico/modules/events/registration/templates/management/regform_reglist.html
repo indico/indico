@@ -2,6 +2,10 @@
 {% from 'events/registration/management/_reglist.html' import render_registration_list %}
 {% from 'message_box.html' import message_box %}
 
+{% block back_button_url -%}
+    {{ url_for('.manage_regform', regform) }}
+{%- endblock %}
+
 {% block title %}
     {%- trans %}Registration{% endtrans -%}
 {% endblock %}
@@ -244,11 +248,6 @@
         </div>
         <div class="list-content" id="registration-list">
             {{ render_registration_list(regform, registrations, dynamic_columns, static_columns, total_registrations) }}
-        </div>
-        <div class="toolbar right">
-            <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">
-                {% trans %}Back{% endtrans %}
-            </a>
         </div>
     </div>
 
