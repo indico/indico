@@ -190,7 +190,11 @@ class EventPerson(PersonMixin, db.Model):
     affiliation_link = db.relationship(
         'Affiliation',
         lazy=False,
-        backref=db.backref('event_person_affiliations', lazy='dynamic')
+        backref=db.backref(
+            'event_person_affiliations',
+            lazy='dynamic',
+            cascade_backrefs=False
+        )
     )
 
     # relationship backrefs:
@@ -486,7 +490,8 @@ class PersonLinkBase(PersonMixin, db.Model):
             lazy=False,
             backref=db.backref(
                 cls.person_link_backref_name,
-                lazy='dynamic'
+                cascade_backrefs=False,
+                lazy='dynamic',
             )
         )
 
