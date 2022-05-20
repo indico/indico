@@ -63,7 +63,7 @@ Available keys:
 
 const fieldRegistry = {
   label: {
-    title: Translate.string('Static label'),
+    title: Translate.string('Label'),
     inputComponent: LabelInput,
     noRequired: true,
     noRetentionPeriod: true,
@@ -72,11 +72,17 @@ const fieldRegistry = {
     customFormItem: true,
   },
   text: {
-    title: Translate.string('Text'),
+    title: Translate.string('Text field'),
     inputComponent: TextInput,
     settingsComponent: TextSettings,
     settingsFormValidator: textSettingsFormValidator,
     icon: 'textfield',
+  },
+  textarea: {
+    title: Translate.string('Text area'),
+    inputComponent: TextAreaInput,
+    settingsComponent: TextAreaSettings,
+    icon: 'textarea',
   },
   number: {
     title: Translate.string('Number'),
@@ -85,12 +91,6 @@ const fieldRegistry = {
     settingsFormValidator: numberSettingsFormValidator,
     hasPrice: true,
     icon: 'seven-segment9',
-  },
-  textarea: {
-    title: Translate.string('Text area'),
-    inputComponent: TextAreaInput,
-    settingsComponent: TextAreaSettings,
-    icon: 'textarea',
   },
   checkbox: {
     title: Translate.string('Checkbox'),
