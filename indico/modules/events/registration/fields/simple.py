@@ -299,6 +299,9 @@ class PhoneField(RegistrationFormFieldBase):
 class CountryField(RegistrationFormFieldBase):
     name = 'country'
     mm_field_class = fields.String
+    setup_schema_fields = {
+        'use_affiliation_country': fields.Bool(),
+    }
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):

@@ -13,6 +13,7 @@
          data-event-end-date="{{ event.end_dt_local.date() }}"
          data-regform-id="{{ regform.id }}"
          data-currency="{{ regform.currency }}"
+         data-has-predefined-affiliations="{{ has_predefined_affiliations | tojson | forceescape }}"
          data-form-data="{{ form_data | tojson | forceescape }}"></div>
 
     <div class="toolbar right">

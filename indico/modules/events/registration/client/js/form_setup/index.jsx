@@ -16,12 +16,21 @@ import reducers from './reducers';
 import RegistrationFormSetup from './RegistrationFormSetup';
 
 export default function setupRegformSetup(root) {
-  const {eventId, eventStartDate, eventEndDate, regformId, currency, formData} = root.dataset;
+  const {
+    eventId,
+    eventStartDate,
+    eventEndDate,
+    regformId,
+    currency,
+    hasPredefinedAffiliations,
+    formData,
+  } = root.dataset;
 
   const initialData = {
     staticData: {
       eventId: parseInt(eventId, 10),
       regformId: parseInt(regformId, 10),
+      hasPredefinedAffiliations: JSON.parse(hasPredefinedAffiliations),
       eventStartDate,
       eventEndDate,
       currency,

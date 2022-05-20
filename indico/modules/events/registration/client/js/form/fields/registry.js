@@ -17,7 +17,7 @@ import AccompanyingPersonsInput, {AccompanyingPersonsSettings} from './Accompany
 import BooleanInput, {BooleanSettings} from './BooleanInput';
 import CheckboxInput, {CheckboxSettings} from './CheckboxInput';
 import {choiceFieldsSettingsFormDecorator} from './ChoicesSetup';
-import CountryInput from './CountryInput';
+import CountryInput, {CountrySettings} from './CountryInput';
 import DateInput, {
   DateSettings,
   dateSettingsFormDecorator,
@@ -124,6 +124,7 @@ const fieldRegistry = {
   country: {
     title: Translate.string('Country'),
     inputComponent: CountryInput,
+    settingsComponent: CountrySettings,
     icon: 'earth',
   },
   file: {

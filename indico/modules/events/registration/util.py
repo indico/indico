@@ -114,6 +114,14 @@ def get_title_uuid(regform, title):
     return {uuid: 1} if uuid in valid_choices else None
 
 
+def get_country_field(regform):
+    """Get the country personal-data field of a regform"""
+    return next((x
+                 for x in regform.active_fields
+                 if (x.type == RegistrationFormItemType.field_pd and
+                     x.personal_data_type == PersonalDataType.country)), None)
+
+
 def get_flat_section_setup_data(regform):
     section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections if not s.is_deleted}
     item_data = {f.id: f.view_data for f in regform.form_items if not f.is_section and not f.is_deleted}
@@ -166,6 +174,13 @@ def get_user_data(regform, user, invitation=None):
     else:
         user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
                      if t.name != 'title' and getattr(user, t.name, None)}
+        if (
+            (country_field := get_country_field(regform)) and
+            country_field.data.get('use_affiliation_country') and
+            (link := user._affiliation.affiliation_link) and
+            link.country_code
+        ):
+            user_data['country'] = link.country_code
     if invitation:
         user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         if invitation.affiliation:

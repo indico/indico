@@ -31,6 +31,7 @@ from indico.modules.events.registration.views import (WPManageParticipants, WPMa
                                                       WPManageRegistrationStats)
 from indico.modules.events.util import update_object_principals
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
+from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -288,7 +289,8 @@ class RHRegistrationFormModify(RHManageRegFormBase):
     def _process(self):
         return WPManageRegistration.render_template('management/regform_modify.html', self.event,
                                                     form_data=get_flat_section_setup_data(self.regform),
-                                                    regform=self.regform)
+                                                    regform=self.regform,
+                                                    has_predefined_affiliations=Affiliation.query.has_rows())
 
 
 class RHRegistrationFormStats(RHManageRegFormBase):
