@@ -162,7 +162,6 @@ form {
 }
 
 .i-form .form-group .form-label {
-  @extend %form-field-block;
   display: inline-block;
   line-height: $i-form-line-height;
   margin-top: 0;
@@ -170,6 +169,7 @@ form {
   min-height: 2.5em;
   position: relative;
   word-wrap: break-word;
+  padding-right: 1em;
 
   > .required {
     position: absolute;
@@ -202,7 +202,8 @@ form {
 
 // stylelint-disable-next-line no-duplicate-selectors
 .i-form .form-group .form-field {
-  @extend %form-field-block;
+  padding-left: 1em;
+  margin-bottom: 0.7em;
 
   @include apply-to-text-inputs('.i-form-field-fluid');
   @include apply-to-inputs('%form-field-input');
