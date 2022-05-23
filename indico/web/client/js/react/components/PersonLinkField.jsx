@@ -402,6 +402,8 @@ export function WTFPersonLinkField({
         'roles',
         'displayOrder',
         'identifier',
+        'type',
+        'personId',
       ])
     );
     inputField.value = JSON.stringify(

@@ -82,7 +82,8 @@ def generate_user_file(user=None):
             'affiliationMeta': (AffiliationSchema().dump(user._affiliation.affiliation_link)
                                 if user._affiliation.affiliation_link else None),
             'address': user.address,
-            'phone': user.phone
+            'phone': user.phone,
+            'type': user.principal_type.name,  # always 'user'
         }
     return render_template('assets/vars_user.js', user_vars=user_vars, user=user)
 

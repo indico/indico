@@ -17,7 +17,7 @@ from indico.util.marshmallow import ModelField
 
 
 class PersonLinkSchema(mm.Schema):
-    type = fields.String(dump_default='PersonLink')
+    type = fields.String(dump_default='person_link')
     person_id = fields.Int()
     user_id = fields.Int(attribute='person.user_id', dump_only=True)
     user_identifier = fields.String(attribute='person.user.identifier', dump_only=True)
@@ -55,8 +55,9 @@ class PersonLinkSchema(mm.Schema):
 
     @post_dump
     def dump_type(self, data, **kwargs):
-        if not data['person_id']:
+        if data['person_id'] is None:
             del data['type']
+            del data['person_id']
         if data['title'] == UserTitle.none.name:
             data['title'] = None
         return data
