@@ -25,6 +25,8 @@ import {PrincipalItem} from './principals/items';
 
 import './PersonLinkField.module.scss';
 
+const nameFormat = ({firstName, lastName}) => (firstName ? `${firstName} ${lastName}` : lastName);
+
 const PersonListItem = ({
   person: {avatarURL, firstName, lastName, affiliation, email},
   roles,
@@ -37,8 +39,8 @@ const PersonListItem = ({
   <PrincipalItem as={List.Item} styleName="principal">
     <PrincipalItem.Icon type={PrincipalType.user} avatarURL={avatarURL} styleName="icon" />
     <PrincipalItem.Content
-      name={firstName ? `${firstName} ${lastName}` : lastName}
-      detail={affiliation ? `${email} (${affiliation})` : email}
+      name={nameFormat({firstName, lastName})}
+      detail={(email ? `${email} ` : '') + (affiliation ? `(${affiliation})` : '')}
     />
     <div styleName="roles">
       {roles &&
@@ -165,7 +167,7 @@ const PersonLinkSection = ({
         {persons.length > 0 ? (
           persons.map((p, idx) => (
             <DraggablePerson
-              key={p.userId || p.email}
+              key={p.userId || p.email || p.firstName + p.lastName}
               index={idx}
               drag={!drag}
               dragType={dragType}
@@ -239,7 +241,7 @@ function PersonLinkField({
   };
 
   const onAdd = values => {
-    const existing = persons.map(p => p.email);
+    const existing = persons.filter(p => !!p.email).map(p => p.email);
     values.forEach(p => (p.roles = roles.filter(x => x.default).map(x => x.name)));
     onChange([...persons, ...values.filter(v => !existing.includes(v.email))]);
   };
@@ -416,7 +418,11 @@ export function WTFPersonLinkField({
 
   return (
     <PersonLinkField
-      value={!autoSort ? persons : persons.slice().sort((a, b) => a.name.localeCompare(b.name))}
+      value={
+        !autoSort
+          ? persons
+          : persons.slice().sort((a, b) => nameFormat(a).localeCompare(nameFormat(b)))
+      }
       eventId={eventId}
       onChange={onChange}
       roles={roles}

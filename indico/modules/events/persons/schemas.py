@@ -31,7 +31,7 @@ class PersonLinkSchema(mm.Schema):
     affiliation_meta = fields.Nested(AffiliationSchema, attribute='affiliation_link', dump_only=True)
     phone = fields.String(load_default='')
     address = fields.String(load_default='')
-    email = fields.String(required=True)
+    email = fields.String(load_default='')
     display_order = fields.Int(load_default=0, dump_default=0)
     avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None, dump_only=True)
     roles = fields.List(fields.String(), load_only=True)

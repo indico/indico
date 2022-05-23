@@ -122,8 +122,6 @@ class PersonLinkListFieldBase(PrincipalListField):
         person_link.populate_from_dict(data, keys=('first_name', 'last_name', 'affiliation', 'affiliation_link',
                                                    'address', 'phone', '_title', 'display_order'))
         email = data.get('email', '').lower()
-        if not email:
-            raise UserValueError(_('A valid email address is required'))
         if email != person_link.email:
             if not self.event or not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
