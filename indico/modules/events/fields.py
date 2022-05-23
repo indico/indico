@@ -122,8 +122,6 @@ class PersonLinkListFieldBase(PrincipalListField):
         person_link.populate_from_dict(data, keys=('first_name', 'last_name', 'affiliation', 'affiliation_link',
                                                    'address', 'phone', '_title', 'display_order'))
         email = data.get('email', '').lower()
-        if not email:
-            raise UserValueError(_('A valid email address is required'))
         if email != person_link.email:
             if not self.event or not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
@@ -141,12 +139,14 @@ class PersonLinkListFieldBase(PrincipalListField):
         return list({self._get_person_link(x) for x in data})
 
     def _value(self):
+        if submitted_data := getattr(self, '_submitted_data', None):
+            return submitted_data
         return [self._serialize_person_link(person_link)
                 for person_link in sorted(self.data, key=attrgetter('display_order_key'))] if self.data else []
 
     def process_formdata(self, valuelist):
         if valuelist:
-            self.data = json.loads(valuelist[0])
+            self.data = self._submitted_data = json.loads(valuelist[0])
             try:
                 self.data = self._convert_data(self.data)
             except ValueError:

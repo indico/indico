@@ -148,7 +148,7 @@ export default function PersonDetailsModal({
       {!hideEmailField && (
         <Form.Field>
           <Translate as="label">Email</Translate>
-          <FinalInput name="email" required />
+          <FinalInput name="email" />
         </Form.Field>
       )}
       <Form.Group widths="equal">

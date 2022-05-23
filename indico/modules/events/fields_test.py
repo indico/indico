@@ -30,6 +30,7 @@ def test_serialize_principal(app, dummy_event, dummy_user):
     person = EventPerson.create_from_user(dummy_user, dummy_event)
     persons = EventPersonSchema(only=EventPersonSchema.Meta.public_fields).dumps([person], many=True)
     form.person_link_data.process_formdata([persons])
+    del form.person_link_data._submitted_data
     result = form.person_link_data._value()
     assert result[0].get('phone') == ''
     assert result[0].get('address') == ''
