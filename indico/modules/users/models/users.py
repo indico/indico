@@ -83,7 +83,7 @@ class PersonMixin:
             return get_default_values(type(self)).get('_title', UserTitle.none).title
         return self._title.title
 
-    def get_full_name(self, show_title=True, last_name_first=True, last_name_upper=True,
+    def get_full_name(self, show_title=False, last_name_first=True, last_name_upper=True,
                       abbrev_first_name=True, _show_empty_names=False):
         """Return the person's name in the specified notation.
 
