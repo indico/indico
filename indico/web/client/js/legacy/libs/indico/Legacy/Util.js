@@ -5,55 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 /**
  @namespace Utility functions for IndicoUI
 */
 
 var IndicoUtil = {
-  /**
-   * Creates a new DOM-based HTML form from a map specification.
-   * @param {List} map A map, conforming to the described format
-   * @return An element (DIV) containing the form
-   */
-  createFormFromMap: function(map, expand) {
-    expand = any(expand, false);
-    var labelStyle = "style='text-align: right; vertical-align: top;'";
-    var fieldStyle = "style='vertical-align: top;'";
-    if (expand) {
-      labelStyle = "style='white-space:nowrap;'";
-      fieldStyle = "style='width:100%;'";
-    }
-    var table = $('<table></table>');
-    $(map).each(function(key, item) {
-      // if the key is an int, do not print the label
-      if (item.length == 2) {
-        // TO REMOVE: when completed migration to jquery
-        if (!item[1].jquery && item[1].dom) item[1] = $(item[1].dom);
-
-        var row = $("<tr style='margin-top:10px;'></tr>");
-        row.append(
-          $('<td ' + labelStyle + "><label class='popUpLabel'>" + item[0] + '</label></td>')
-        );
-        row.append(
-          $('<td ' + fieldStyle + '></td>').append(
-            $("<div class='popUpTdContent'></div>").append(item[1])
-          )
-        );
-        table.append(row);
-      } else {
-        // TO REMOVE: when completed migration to jquery
-        if (item[0] !== undefined && !item[0].jquery && item[0].dom) item[0] = $(item[0].dom);
-
-        table.append(
-          $("<tr style='margin-top:10px;'><td></td></tr>").append(
-            $('<td ' + fieldStyle + '></td>').append(item[0])
-          )
-        );
-      }
-    });
-    return table;
-  },
-
   /**
    * Formats a JS Date, returning a string (DD/MM/YY HH:MM)
    * @param {Date} date A JS Date

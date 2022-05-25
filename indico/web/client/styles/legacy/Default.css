@@ -36,56 +36,6 @@ li.unselectable {
   color: #888;
 }
 
-div.PluginOptionPeopleListDiv {
-  border: 1px dashed #ccc;
-  min-height: 25px;
-  min-width: 320px;
-}
-
-div.searchUsersButtonDiv {
-  text-align: center;
-  padding-top: 5px;
-  padding-bottom: 15px;
-}
-
-div.suggestedUsersTitle {
-  text-align: center;
-  font-size: 14pt;
-  padding-top: 10px;
-  padding-bottom: 20px;
-}
-
-td.searchUsersGroupsPanel,
-td.suggestedUsersPanel {
-  vertical-align: top;
-  padding-bottom: 10px;
-}
-
-td.searchUsersGroupsPanel {
-  width: 450px;
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-right: 10px;
-}
-
-td.suggestedUsersPanel {
-  width: 250px;
-  background-color: #fcfcfc;
-  border-left: 1px dotted #ccc;
-}
-
-/* TODO: remove when replacing the old search plugin */
-.arrowExpandIcon {
-  background: transparent url('static:images/menu_arrow_black.png') scroll no-repeat center center;
-  font-weight: normal;
-  vertical-align: middle;
-  display: block;
-  width: 20px;
-  height: 17px;
-  float: right;
-  cursor: pointer;
-}
-
 a.active {
   font-weight: bold;
 }
@@ -233,22 +183,6 @@ div.tabBorderGradient {
   background: #555;
 }
 
-.popUpLabel {
-  text-align: right;
-  font-size: 13px;
-  font-family: Verdana, Arial, sans-serif;
-  color: #523d04;
-  font-weight: normal;
-  padding-right: 5px;
-  padding-bottom: 3px;
-}
-
-.popUpTdContent {
-  font-weight: normal;
-  padding-bottom: 3px;
-  color: black;
-}
-
 .tooltip {
   background-color: #fff;
   border: 1px solid #000;
@@ -292,17 +226,6 @@ ul.errorList {
 span.errorTitle {
   font-size: medium;
   font-weight: bold;
-}
-
-ul.warningLevel0 {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-}
-
-ul.warningLevel1 {
-  margin-top: 0;
-  margin-bottom: 0;
 }
 
 div.exclusivePopup {
@@ -642,16 +565,6 @@ body.cke_show_borders {
 
 .social_share_tooltip .social_site * {
   vertical-align: middle !important;
-}
-
-.placesLeft {
-  color: green;
-  font-style: italic;
-  padding-left: 5px;
-}
-
-.noPlacesLeft {
-  color: red;
 }
 
 .sticky-scrolling {

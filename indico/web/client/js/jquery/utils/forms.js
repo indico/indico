@@ -274,7 +274,7 @@ import {Translate} from 'indico/react/i18n';
     }
   };
 
-  global.toggleAclField = function toogleAclField(aclField, state) {
+  global.toggleAclField = function toggleAclField(aclField, state) {
     aclField
       .closest('.form-group')
       .find('input.i-button')
@@ -282,9 +282,7 @@ import {Translate} from 'indico/react/i18n';
       .end()
       .find('a.i-button')
       .toggleClass('disabled', state)
-      .end()
-      .find('.PluginOptionPeopleListDiv')
-      .toggleClass('disabled', state);
+      .end();
   };
 
   global.aclIfProtected = function aclIfProtected(
