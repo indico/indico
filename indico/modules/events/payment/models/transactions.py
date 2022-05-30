@@ -215,6 +215,14 @@ class PaymentTransaction(db.Model):
         with plugin.plugin_context():
             return plugin.render_transaction_details(self)
 
+    def is_pending_expired(self):
+        if self.is_manual:
+            return False
+        if (plugin := self.plugin) is None:
+            return False
+        with plugin.plugin_context():
+            return plugin.is_pending_transaction_expired(self)
+
     @classmethod
     def create_next(cls, registration, amount, currency, action, provider=None, data=None):
         previous_transaction = registration.transaction

@@ -13,6 +13,11 @@ Bugfixes
 - Prevent access to a badge design of a deleted category or an event (:issue:`5329`,
   :pr:`5334`, thanks :user:`vasantvohra`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Let payment plugins ignore pending transactions if they are expired (:pr:`5357`)
+
 
 Version 3.1.1
 -------------
