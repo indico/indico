@@ -689,6 +689,12 @@ class Registration(db.Model):
         """Log with prefilled metadata for the registration."""
         self.event.log(*args, meta={'registration_id': self.id}, **kwargs)
 
+    def is_pending_transaction_expired(self):
+        """Check if the registration has a pending transaction that expired."""
+        if not self.transaction or self.transaction.status != TransactionStatus.pending:
+            return False
+        return self.transaction.is_pending_expired()
+
 
 class RegistrationData(StoredFileMixin, db.Model):
     """Data entry within a registration for a field in a registration form."""
