@@ -73,7 +73,9 @@ class SideMenuItem:
 
     is_section = False
 
-    def __init__(self, name, title, url, weight=-1, active=False, disabled=False, section=None, icon=None, badge=None):
+    def __init__(self, name, title, url, weight=-1, active=False, disabled=False, section=None, icon=None,
+                 sui_icon=None, badge=None):
+        assert not (icon and sui_icon)
         self.name = name
         self.title = title
         self.url = url
@@ -82,6 +84,7 @@ class SideMenuItem:
         self.section = section
         self.weight = weight
         self.icon = ('icon-' + icon) if icon else None
+        self.sui_icon = sui_icon
         self.badge = badge
 
     def __repr__(self):
