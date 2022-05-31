@@ -9,6 +9,9 @@
     <li class="item {{ classes }}">
         {%- if item.disabled %}
             <span class="title {{ icon }}">
+                {%- if item.sui_icon %}
+                    <i class="{{ item.sui_icon }} icon"></i>
+                {%- endif -%}
                 <span class="side-menu-label">
                     {{- item.title -}}
                 </span>
@@ -18,6 +21,9 @@
             </span>
         {%- else -%}
             <a class="title {{ icon }}" href="{{ item.url }}">
+                {%- if item.sui_icon %}
+                    <i class="{{ item.sui_icon }} icon"></i>
+                {%- endif -%}
                 <span class="side-menu-label">
                     {{- item.title -}}
                 </span>
