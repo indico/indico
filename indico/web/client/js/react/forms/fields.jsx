@@ -430,7 +430,7 @@ FinalInput.propTypes = {
   // XXX: just add new <input> types here as soon as you start using them,
   // but make sure to handle it properly above (like adding the trim formatter
   // for a field that lets users enter strings)
-  type: PropTypes.oneOf(['text', 'email', 'number', 'tel']),
+  type: PropTypes.oneOf(['text', 'email', 'number', 'tel', 'password']),
   nullIfEmpty: PropTypes.bool,
   noAutoComplete: PropTypes.bool,
 };
@@ -778,4 +778,26 @@ ActionButton.propTypes = {
     title: PropTypes.string,
     onClick: PropTypes.func,
   }).isRequired,
+};
+
+export function Fieldset({legend, children, active}) {
+  if (!active) {
+    return children;
+  }
+  return (
+    <fieldset styleName="fieldset">
+      <legend>{legend}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+Fieldset.propTypes = {
+  legend: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  active: PropTypes.bool,
+};
+
+Fieldset.defaultProps = {
+  active: true,
 };
