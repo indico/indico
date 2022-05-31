@@ -5,116 +5,30 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import searchAffiliationURL from 'indico-url:users.api_affiliations';
 import emailsURL from 'indico-url:users.user_emails';
 import saveURL from 'indico-url:users.user_profile_update';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import {Field, Form as FinalForm, useField, useForm} from 'react-final-form';
-import {Form, Header} from 'semantic-ui-react';
+import {Field, Form as FinalForm} from 'react-final-form';
+import {Form} from 'semantic-ui-react';
 
 import {
-  FinalComboDropdown,
+  SyncedFinalAffiliationDropdown,
+  SyncedFinalInput,
+  SyncedFinalTextArea,
+} from 'indico/react/components/syncedInputs';
+import {
   FinalDropdown,
-  FinalInput,
   FinalSubmitButton,
-  FinalTextArea,
   getChangedValues,
   handleSubmitError,
   parsers as p,
 } from 'indico/react/forms';
 import {Translate, Param} from 'indico/react/i18n';
-import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
-import {makeAsyncDebounce} from 'indico/utils/debounce';
-
-import './PersonalDataForm.module.scss';
-
-const debounce = makeAsyncDebounce(250);
-
-function SyncedFinalField({
-  name,
-  syncName,
-  as: FieldComponent,
-  syncedValues,
-  readOnly,
-  required,
-  processSyncedValue,
-  ...rest
-}) {
-  const form = useForm();
-  const {
-    input: {onChange: setSyncedFields, value: syncedFields},
-  } = useField('synced_fields');
-
-  if (!syncName) {
-    syncName = name;
-  }
-
-  const syncable = syncedValues[syncName] !== undefined && (!required || syncedValues[syncName]);
-
-  return (
-    <FieldComponent
-      {...rest}
-      name={name}
-      styleName={syncable ? 'syncable' : ''}
-      readOnly={readOnly || (syncable && syncedFields.includes(syncName))}
-      required={required}
-      action={
-        syncable
-          ? {
-              type: 'button',
-              active: syncedFields.includes(syncName),
-              icon: 'sync',
-              toggle: true,
-              className: 'ui-qtip',
-              title: Translate.string('Toggle synchronization of this field'),
-              onClick: () => {
-                if (syncedFields.includes(syncName)) {
-                  setSyncedFields(syncedFields.filter(x => x !== syncName));
-                  form.change(name, form.getFieldState(name).initial);
-                } else {
-                  setSyncedFields([...syncedFields, syncName].sort());
-                  form.change(name, processSyncedValue(syncedValues[syncName]));
-                }
-              },
-            }
-          : undefined
-      }
-    />
-  );
-}
-
-SyncedFinalField.propTypes = {
-  name: PropTypes.string.isRequired,
-  syncName: PropTypes.string,
-  as: PropTypes.elementType.isRequired,
-  syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
-  readOnly: PropTypes.bool,
-  required: PropTypes.bool,
-  processSyncedValue: PropTypes.func,
-};
-
-SyncedFinalField.defaultProps = {
-  syncName: null,
-  readOnly: false,
-  required: false,
-  processSyncedValue: x => x,
-};
-
-function SyncedFinalInput(props) {
-  return <SyncedFinalField as={FinalInput} {...props} />;
-}
-
-function SyncedFinalTextArea(props) {
-  return <SyncedFinalField as={FinalTextArea} {...props} />;
-}
-
-function SyncedFinalComboDropdown(props) {
-  return <SyncedFinalField as={FinalComboDropdown} {...props} />;
-}
+import {indicoAxios} from 'indico/utils/axios';
 
 function PersonalDataForm({
   userId,
@@ -125,11 +39,6 @@ function PersonalDataForm({
   hasPredefinedAffiliations,
 }) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
-  const [_affiliationResults, setAffiliationResults] = useState([]);
-  const affiliationResults =
-    currentAffiliation && !_affiliationResults.find(x => x.id === currentAffiliation.id)
-      ? [currentAffiliation, ..._affiliationResults]
-      : _affiliationResults;
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
@@ -151,35 +60,7 @@ function PersonalDataForm({
     await new Promise(() => {});
   };
 
-  const getSubheader = ({city, country_name: countryName}) => {
-    if (city && countryName) {
-      return `${city}, ${countryName}`;
-    }
-    return city || countryName;
-  };
-
   const titleOptions = titles.map(t => ({key: t.name, value: t.name, text: t.title}));
-  const affiliationOptions = affiliationResults.map(res => ({
-    key: res.id,
-    value: res.id,
-    text: `${res.name} `, // XXX: the space allows addition even if the entered text matches a result item
-    content: <Header style={{fontSize: 14}} content={res.name} subheader={getSubheader(res)} />,
-  }));
-
-  const searchAffiliationChange = async (evt, {searchQuery}) => {
-    if (!searchQuery) {
-      setAffiliationResults([]);
-      return;
-    }
-    let resp;
-    try {
-      resp = await debounce(() => indicoAxios.get(searchAffiliationURL({q: searchQuery})));
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    setAffiliationResults(resp.data);
-  };
 
   return (
     <div>
@@ -215,23 +96,10 @@ function PersonalDataForm({
               />
             </Form.Group>
             {hasPredefinedAffiliations ? (
-              <SyncedFinalComboDropdown
+              <SyncedFinalAffiliationDropdown
                 name="affiliation_data"
                 syncName="affiliation"
-                processSyncedValue={x => ({id: null, text: x})}
-                options={affiliationOptions}
-                fluid
-                additionLabel={Translate.string('Use custom affiliation:') + ' '} // eslint-disable-line prefer-template
-                onSearchChange={searchAffiliationChange}
-                placeholder={Translate.string('Select an affiliation or add your own')}
-                noResultsMessage={Translate.string('Search an affiliation or enter one manually')}
-                renderCustomOptionContent={value => (
-                  <Header
-                    content={value}
-                    subheader={Translate.string('You entered this option manually')}
-                  />
-                )}
-                label={Translate.string('Affiliation')}
+                currentAffiliation={currentAffiliation}
                 syncedValues={syncedValues}
               />
             ) : (
