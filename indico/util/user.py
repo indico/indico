@@ -79,8 +79,8 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
                     address=external_user_data['address'], phone=external_user_data['phone'], _title=UserTitle.none,
                     is_pending=True)
         if affiliation_data := external_user_data.get('affiliation_data'):
-            user._affiliation.affiliation_link = Affiliation.get_or_create_from_data(affiliation_data)
-            user._affiliation.name = user._affiliation.affiliation_link.name
+            user.affiliation_link = Affiliation.get_or_create_from_data(affiliation_data)
+            user.affiliation = user.affiliation_link.name
         return user
     elif type_ == 'Group':
         if not allow_groups:

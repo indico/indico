@@ -133,6 +133,14 @@ function PersonalDataForm({
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
+    if (!hasPredefinedAffiliations) {
+      // value.affiliation is already there and used
+      delete changedValues.affiliation_data;
+    } else if (changedValues.affiliation_data) {
+      changedValues.affiliation = changedValues.affiliation_data.text.trim();
+      changedValues.affiliation_id = changedValues.affiliation_data.id;
+      delete changedValues.affiliation_data;
+    }
     try {
       await indicoAxios.patch(saveURL(userIdArgs), changedValues);
     } catch (e) {

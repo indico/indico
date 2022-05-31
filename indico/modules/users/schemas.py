@@ -6,8 +6,8 @@
 # LICENSE file for more details.
 
 import pycountry
-from marshmallow import fields, post_dump, post_load, pre_load, validate
-from marshmallow.fields import Function, Integer, List, Nested, String
+from marshmallow import fields, post_dump, post_load, validate
+from marshmallow.fields import Function, Integer, List, String
 
 from indico.core.marshmallow import mm
 from indico.modules.categories import Category
@@ -15,7 +15,7 @@ from indico.modules.events import Event
 from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle, syncable_fields
-from indico.util.marshmallow import NoneValueEnumField
+from indico.util.marshmallow import ModelField, NoneValueEnumField
 
 
 class UserSchema(mm.SQLAlchemyAutoSchema):
@@ -32,24 +32,31 @@ class _AffiliationDataSchema(mm.Schema):
     name = String(required=True, data_key='text')
 
 
+class AffiliationSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Affiliation
+        fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'meta')
+
+    @post_dump
+    def add_country_name(self, data, **kwargs):
+        country = pycountry.countries.get(alpha_2=data['country_code'])
+        data['country_name'] = country.name if country else ''
+        return data
+
+
 class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
     email = String(dump_only=True)
     synced_fields = List(String(validate=validate.OneOf(syncable_fields)))
-    affiliation_data = Nested(_AffiliationDataSchema, attribute='_affiliation')
+    affiliation_link = ModelField(Affiliation, data_key='affiliation_id', load_default=None, load_only=True)
+    affiliation_data = fields.Function(lambda u: {'id': u.affiliation_id, 'text': u.affiliation}, dump_only=True)
 
     class Meta:
         model = User
         # XXX: this schema is also used for updating a user's personal data, so the fields here must
         # under no circumstances include sensitive fields that should not be modifiable by a user!
-        fields = ('title', 'first_name', 'last_name', 'email', 'affiliation', 'affiliation_data', 'address', 'phone',
-                  'synced_fields')
-
-    @pre_load
-    def wrap_plain_affiliation(self, data, **kwargs):
-        if (affiliation := data.pop('affiliation', None)) is not None:
-            data['affiliation_data'] = {'id': None, 'text': affiliation}
-        return data
+        fields = ('title', 'first_name', 'last_name', 'email', 'address', 'phone', 'synced_fields',
+                  'affiliation', 'affiliation_data', 'affiliation_link')
 
     @post_dump
     def sort_synced_fields(self, data, **kwargs):
@@ -57,9 +64,12 @@ class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
         return data
 
     @post_load
-    def fix_key(self, data, **kwargs):
-        if affiliation := data.pop('_affiliation', None):
-            data['affiliation_data'] = affiliation
+    def ensure_affiliation_text(self, data, **kwargs):
+        if affiliation_link := data.get('affiliation_link'):
+            data['affiliation'] = affiliation_link.name
+        elif 'affiliation' in data:
+            # clear link if we update only the affiliation text for some reason
+            data['affiliation_link'] = None
         return data
 
 
@@ -77,15 +87,3 @@ class FavoriteEventSchema(mm.SQLAlchemyAutoSchema):
     location = fields.String(attribute='event.location.venue_name')
     chain_titles = fields.List(fields.String(), attribute='category.chain_titles')
     label_markup = fields.Function(lambda e: e.get_label_markup('mini'))
-
-
-class AffiliationSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Affiliation
-        fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code', 'meta')
-
-    @post_dump
-    def add_country_name(self, data, **kwargs):
-        country = pycountry.countries.get(alpha_2=data['country_code'])
-        data['country_name'] = country.name if country else ''
-        return data

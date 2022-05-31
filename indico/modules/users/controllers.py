@@ -204,8 +204,8 @@ class RHPersonalData(RHUserBase):
         titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
         user_values = UserPersonalDataSchema().dump(self.user)
         current_affiliation = None
-        if self.user._affiliation.affiliation_link:
-            current_affiliation = AffiliationSchema().dump(self.user._affiliation.affiliation_link)
+        if self.user.affiliation_link:
+            current_affiliation = AffiliationSchema().dump(self.user.affiliation_link)
         has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
                                                   titles=titles, user_values=user_values,
@@ -226,14 +226,6 @@ class RHPersonalDataUpdate(RHUserBase):
         # get updated in synchronize_data which will flash a message
         # informing the user about the changes made by the sync
         self.user.synced_fields = synced_fields & syncable_fields
-        if (affiliation_data := changes.pop('affiliation_data', None)) and 'affiliation' not in self.user.synced_fields:
-            if affiliation_data['affiliation_id']:
-                self.user._affiliation.affiliation_link = Affiliation.get_or_404(affiliation_data['affiliation_id'],
-                                                                                 is_deleted=False)
-                self.user._affiliation.name = self.user._affiliation.affiliation_link.name
-            else:
-                self.user._affiliation.affiliation_link = None
-                self.user._affiliation.name = affiliation_data['name']
         for key, value in changes.items():
             if key not in self.user.synced_fields:
                 setattr(self.user, key, value)

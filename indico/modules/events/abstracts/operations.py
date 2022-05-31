@@ -268,7 +268,8 @@ def _merge_person_links(target_abstract, source_abstract):
             else:
                 link.display_order = 0
             new_links.add(link)
-            for column_name in {'_title', '_affiliation', '_address', '_phone', '_first_name', '_last_name'}:
+            for column_name in {'_title', '_affiliation', '_affiliation_id', '_address', '_phone', '_first_name',
+                                '_last_name'}:
                 setattr(link, column_name, getattr(source_link, column_name))
 
     # Add new links in order

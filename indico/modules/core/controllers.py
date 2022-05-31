@@ -201,9 +201,9 @@ class PrincipalsMixin:
                     'last_name': principal.last_name,
                     'email': principal.email,
                     'affiliation': principal.affiliation,
-                    'affiliation_id': principal._affiliation.affiliation_id,
-                    'affiliation_meta': (AffiliationSchema().dump(principal._affiliation.affiliation_link)
-                                         if principal._affiliation.affiliation_link else None),
+                    'affiliation_id': principal.affiliation_id,
+                    'affiliation_meta': (AffiliationSchema().dump(principal.affiliation_link)
+                                         if principal.affiliation_link else None),
                     'avatar_url': principal.avatar_url,
                     'detail': (f'{principal.email} ({principal.affiliation})'
                                if principal.affiliation else principal.email)}

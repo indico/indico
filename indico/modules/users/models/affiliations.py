@@ -8,7 +8,6 @@
 from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.util.string import format_repr
 
 
@@ -65,7 +64,7 @@ class Affiliation(db.Model):
     # - event_person_affiliations (EventPerson.affiliation_link)
     # - session_block_links (SessionBlockPersonLink._affiliation_link)
     # - subcontribution_links (SubContributionPersonLink._affiliation_link)
-    # - user_affiliations (UserAffiliation.affiliation_link)
+    # - user_affiliations (User.affiliation_link)
 
     def __repr__(self):
         return format_repr(self, 'id', _text=self.name)
@@ -77,51 +76,3 @@ class Affiliation(db.Model):
         if existing:
             return existing
         return cls(**affiliation_data)
-
-
-class UserAffiliation(db.Model):
-    __tablename__ = 'affiliations'
-    __table_args__ = {'schema': 'users'}
-
-    #: the unique id of the affiliations
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-    #: the id of the associated user
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.users.id'),
-        nullable=False,
-        index=True
-    )
-    #: the id of the underlying predefined affiliation
-    affiliation_id = db.Column(
-        db.ForeignKey('indico.affiliations.id'),
-        nullable=True,
-        index=True
-    )
-    #: the affiliation
-    name = db.Column(
-        db.String,
-        nullable=False,
-        index=True
-    )
-
-    #: the predefined affiliation
-    affiliation_link = db.relationship(
-        'Affiliation',
-        lazy=False,
-        # disable backref cascade so the link created in `principal_from_identifier` does not add
-        # the UserAffiliation and thus the User to the session just because it's linked to an Affiliation
-        backref=db.backref('user_affiliations', lazy='dynamic', cascade_backrefs=False)
-    )
-
-    # relationship backrefs:
-    # - user (User._affiliation)
-
-    def __repr__(self):
-        return format_repr(self, 'id', 'affiliation_id', _text=self.name)
-
-
-define_unaccented_lowercase_index(UserAffiliation.name)

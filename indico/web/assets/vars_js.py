@@ -78,9 +78,8 @@ def generate_user_file(user=None):
             'avatarURL': user.avatar_url,
             'isAdmin': user.is_admin,
             'affiliation': user.affiliation,
-            'affiliationId': user._affiliation.affiliation_id,
-            'affiliationMeta': (AffiliationSchema().dump(user._affiliation.affiliation_link)
-                                if user._affiliation.affiliation_link else None),
+            'affiliationId': user.affiliation_id,
+            'affiliationMeta': AffiliationSchema().dump(user.affiliation_link) if user.affiliation_link else None,
             'address': user.address,
             'phone': user.phone,
             'type': user.principal_type.name,  # always 'user'

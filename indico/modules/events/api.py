@@ -451,7 +451,6 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         # remote group membership checks will trigger a load on _all_emails
         # but not all events use this so there's no need to eager-load them
         # acl_user_strategy.noload('_primary_email')
-        # acl_user_strategy.noload('_affiliation')
         creator_strategy = joinedload('creator')
         contributions_strategy = subqueryload('contributions')
         contributions_strategy.subqueryload('references')

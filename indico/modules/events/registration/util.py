@@ -177,10 +177,10 @@ def get_user_data(regform, user, invitation=None):
         if (
             (country_field := get_country_field(regform)) and
             country_field.data.get('use_affiliation_country') and
-            (link := user._affiliation.affiliation_link) and
-            link.country_code
+            user.affiliation_link and
+            user.affiliation_link.country_code
         ):
-            user_data['country'] = link.country_code
+            user_data['country'] = user.affiliation_link.country_code
     if invitation:
         user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         if invitation.affiliation:

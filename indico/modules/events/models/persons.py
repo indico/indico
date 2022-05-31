@@ -227,8 +227,8 @@ class EventPerson(PersonMixin, db.Model):
     def create_from_user(cls, user, event=None, is_untrusted=False):
         return EventPerson(user=user, event=event, first_name=user.first_name, last_name=user.last_name,
                            title=user._title, email=user.email, affiliation=user.affiliation,
-                           affiliation_link=(user._affiliation.affiliation_link if user._affiliation else None),
-                           address=user.address, phone=user.phone, is_untrusted=is_untrusted)
+                           affiliation_link=user.affiliation_link, address=user.address, phone=user.phone,
+                           is_untrusted=is_untrusted)
 
     @classmethod
     def for_user(cls, user, event=None, is_untrusted=False):
