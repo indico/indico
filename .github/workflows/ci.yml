@@ -197,7 +197,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:11
+        image: postgres:12
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
@@ -241,6 +241,7 @@ jobs:
 
       - name: Setup database
         run: |
+          sudo apt-get update
           sudo apt-get install postgresql-client libpq-dev
           export PGHOST=localhost
           export PGPORT=${{ job.services.postgres.ports[5432] }}
