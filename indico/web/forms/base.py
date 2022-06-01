@@ -18,7 +18,6 @@ from wtforms.widgets.core import HiddenInput
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core import signals
-from indico.core.auth import multipass
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.string import strip_whitespace
@@ -277,48 +276,6 @@ class FormDefaults:
 
     def __contains__(self, item):
         return hasattr(self, item)
-
-
-class SyncedInputsMixin:
-    """Mixin for a form having inputs using the ``SyncedInputWidget``.
-
-    This mixin will process the synced fields, adding them the necessary
-    attributes for them to render and work properly.  The fields which
-    are synced are defined by ``multipass.synced_fields``.
-
-    :param synced_fields: set -- a subset of ``multipass.synced_fields``
-                          which corresponds to the fields currently
-                          being synchronized for the user.
-    :param synced_values: dict -- a map of all the synced fields (as
-                          defined by ``multipass.synced_fields``) and
-                          the values they would have if they were synced
-                          (regardless of whether it is or not).  Fields
-                          not present in this dict do not show the sync
-                          button at all.
-    """
-
-    def __init__(self, *args, **kwargs):
-        synced_fields = kwargs.pop('synced_fields', set())
-        synced_values = kwargs.pop('synced_values', {})
-        super().__init__(*args, **kwargs)
-        self.syncable_fields = set(synced_values)
-        for key in ('first_name', 'last_name'):
-            if not synced_values.get(key):
-                synced_values.pop(key, None)
-                self.syncable_fields.discard(key)
-        if self.is_submitted():
-            synced_fields = self.synced_fields
-        provider = multipass.sync_provider
-        provider_name = provider.title if provider is not None else 'unknown identity provider'
-        for field in multipass.synced_fields:
-            self[field].synced = self[field].short_name in synced_fields
-            self[field].synced_value = synced_values.get(field)
-            self[field].provider_name = provider_name
-
-    @property
-    def synced_fields(self):
-        """The fields which are set as synced for the current request."""
-        return set(request.form.getlist('synced_fields')) & self.syncable_fields
 
 
 class AjaxFieldMixin:

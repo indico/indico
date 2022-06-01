@@ -7,7 +7,7 @@
 
 import pycountry
 from marshmallow import fields, post_dump, post_load, validate
-from marshmallow.fields import Function, Integer, List, String
+from marshmallow.fields import Function, List, String
 
 from indico.core.marshmallow import mm
 from indico.modules.categories import Category
@@ -25,11 +25,6 @@ class UserSchema(mm.SQLAlchemyAutoSchema):
         model = User
         fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'full_name',
                   'phone', 'avatar_url')
-
-
-class _AffiliationDataSchema(mm.Schema):
-    affiliation_id = Integer(required=True, data_key='id', allow_none=True)
-    name = String(required=True, data_key='text')
 
 
 class AffiliationSchema(mm.SQLAlchemyAutoSchema):

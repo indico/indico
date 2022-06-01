@@ -256,12 +256,6 @@ form {
     line-height: $i-form-button-line-height;
   }
 
-  .i-has-action.i-synced-input.i-form-field-fixed-width {
-    > label.i-synced-label {
-      @extend %form-field-button;
-    }
-  }
-
   .cke {
     width: 100% !important;
   }

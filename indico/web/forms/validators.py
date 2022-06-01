@@ -284,17 +284,6 @@ class LinkedDateTime:
             raise ValidationError(_("{} can't be equal to {}").format(field.label, linked_field.label))
 
 
-def used_if_not_synced(form, field):
-    """Validator to prevent validation error on synced inputs.
-
-    Synced inputs are disabled in the form and don't send any value.
-    In that case, we disable validation from the input.
-    """
-    if field.short_name in form.synced_fields:
-        field.errors[:] = []
-        raise StopValidation()
-
-
 class UsedIfChecked(UsedIf):
     def __init__(self, field_name):
         def _condition(form, field):

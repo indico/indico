@@ -8,9 +8,8 @@
 import re
 
 from markupsafe import Markup
-from wtforms.widgets import CheckboxInput, HiddenInput, TextArea, TextInput
+from wtforms.widgets import CheckboxInput, HiddenInput
 
-from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
 from indico.util.string import natural_sort_key
@@ -139,22 +138,6 @@ class SwitchWidget(JinjaWidget):
         })
         return super().__call__(field, kwargs=kwargs, confirm_enable=self.confirm_enable,
                                 confirm_disable=self.confirm_disable)
-
-
-class SyncedInputWidget(JinjaWidget):
-    """Render a text input with a sync button when needed."""
-
-    def __init__(self, textarea=False):
-        super().__init__('forms/synced_input_widget.html', single_line=not textarea)
-        self.textarea = textarea
-        self.default_widget = TextArea() if textarea else TextInput()
-
-    def __call__(self, field, **kwargs):
-        # Render a sync button for fields which can be synced, if the identity provider provides a value for the field.
-        if field.short_name in multipass.synced_fields and field.synced_value is not None:
-            return super().__call__(field, textarea=self.textarea, kwargs=kwargs)
-        else:
-            return self.default_widget(field, **kwargs)
 
 
 class SelectizeWidget(JinjaWidget):

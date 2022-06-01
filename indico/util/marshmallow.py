@@ -436,6 +436,13 @@ class UUIDString(fields.UUID):
         return str(rv) if isinstance(rv, UUID) else rv
 
 
+class LowercaseString(fields.String):
+    """A String field that converts it value to lowercase."""
+
+    def _deserialize(self, value, attr, data, **kwargs) -> t.Optional[str]:
+        return super()._deserialize(value, attr, data, **kwargs).lower()
+
+
 class NoneValueEnumField(EnumField):
     """
     Like the normal EnumField, but when receiving a None value,

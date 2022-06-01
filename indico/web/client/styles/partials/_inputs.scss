@@ -435,37 +435,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 }
 
-.i-has-action.i-synced-input {
-  > input[type='checkbox'] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: none;
-    opacity: 0;
-  }
-
-  > label.i-synced-label::before {
-    // Fixes label vertical-align
-    line-height: 1.4;
-  }
-
-  > input[type='checkbox']:not(:checked) ~ .i-synced-label::before {
-    color: $light-black;
-  }
-
-  > input[type='checkbox']:checked ~ .i-synced-label::before {
-    color: $blue;
-  }
-
-  > input[type='text'],
-  textarea {
-    &[readonly] {
-      @extend %tilted-strips-bg;
-      border-color: $default-border-color;
-    }
-  }
-}
-
 dd > .i-has-action {
   vertical-align: middle;
 

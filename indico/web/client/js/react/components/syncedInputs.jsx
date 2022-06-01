@@ -64,7 +64,7 @@ function SyncedFinalField({
                   form.change(name, form.getFieldState(name).initial);
                 } else {
                   setSyncedFields([...syncedFields, syncName].sort());
-                  form.change(name, processSyncedValue(syncedValues[syncName]));
+                  form.change(name, processSyncedValue(syncedValues[syncName], syncedValues));
                 }
               },
             }
@@ -78,7 +78,7 @@ SyncedFinalField.propTypes = {
   name: PropTypes.string.isRequired,
   syncName: PropTypes.string,
   as: PropTypes.elementType.isRequired,
-  syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
+  syncedValues: PropTypes.object.isRequired,
   readOnly: PropTypes.bool,
   required: PropTypes.bool,
   processSyncedValue: PropTypes.func,
@@ -145,7 +145,7 @@ export function SyncedFinalAffiliationDropdown({name, syncName, syncedValues, cu
       as={FinalComboDropdown}
       name={name}
       syncName={syncName}
-      processSyncedValue={x => ({id: null, text: x})}
+      processSyncedValue={(value, values) => ({id: values.affiliation_id || null, text: value})}
       options={affiliationOptions}
       fluid
       additionLabel={Translate.string('Use custom affiliation:') + ' '} // eslint-disable-line prefer-template
@@ -164,7 +164,7 @@ export function SyncedFinalAffiliationDropdown({name, syncName, syncedValues, cu
 SyncedFinalAffiliationDropdown.propTypes = {
   name: PropTypes.string.isRequired,
   syncName: PropTypes.string,
-  syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
+  syncedValues: PropTypes.object.isRequired,
   currentAffiliation: PropTypes.object,
 };
 

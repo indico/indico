@@ -234,7 +234,7 @@ class RHPersonalDataUpdate(RHUserBase):
         return '', 204
 
 
-class RHSearchAffiliations(RHProtected):
+class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
         exact_match = db.func.lower(Affiliation.name) == q.lower()

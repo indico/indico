@@ -1,0 +1,7 @@
+{
+  "name": "auth",
+  "produceBundle": false,
+  "partials": {
+    "signup": "./signup"
+  }
+}
