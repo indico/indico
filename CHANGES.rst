@@ -53,7 +53,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far
+- Fix selected state filters not showing up as selected in abstract list customization
+  (:pr:`5363`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
