@@ -88,6 +88,9 @@ class AbstractListGeneratorBase(ListGeneratorBase):
                 options = [x if x != 'None' else None for x in request.form.getlist(f'field_{field.id}')]
                 if options:
                     filters['fields'][str(field.id)] = options
+        # Ensure enum filters remain as integers
+        for idx, value in enumerate(filters['items'].get('state', [])):
+            filters['items']['state'][idx] = int(value)
         return filters
 
     def _build_query(self):
