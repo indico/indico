@@ -2,7 +2,7 @@ alembic
 authlib>=1.0.0a1  # new oauth provider needs this prerelease authlib
 babel
 bcrypt
-bleach
+bleach[css]
 blinker
 celery[redis]!=5.2.3  # 5.2.3 pins setuptools which is a mess
 certifi

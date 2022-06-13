@@ -54,7 +54,7 @@ def test_get_event_person(db, dummy_event, dummy_user):
     db.session.flush()
 
     data = {
-        'email': '1337@example.com',
+        'email': '1337@example.test',
         'first_name': 'Sea',
         'last_name': 'Pig',
         'affiliation': 'ACME Inc.'

@@ -36,7 +36,7 @@ def dummy_reg(db, dummy_event, dummy_regform, dummy_user):
         checked_in=True,
         state=RegistrationState.complete,
         currency='USD',
-        email='1337@example.com',
+        email='1337@example.test',
         user=dummy_user
     )
     dummy_event.registrations.append(reg)

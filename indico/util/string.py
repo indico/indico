@@ -9,8 +9,8 @@
 String manipulation functions
 """
 
-
 import binascii
+import os
 import re
 import string
 import unicodedata
@@ -23,6 +23,7 @@ import bleach
 import email_validator
 import markdown
 import translitcodec
+from bleach.css_sanitizer import CSSSanitizer
 from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html
@@ -202,8 +203,9 @@ def validate_email(email, *, check_dns=True):
     This checks both if it looks valid and if it has valid
     MX (or A/AAAA) records.
     """
+    testing = 'PYTEST_CURRENT_TEST' in os.environ
     try:
-        email_validator.validate_email(email, check_deliverability=check_dns)
+        email_validator.validate_email(email, check_deliverability=check_dns, test_environment=testing)
     except email_validator.EmailNotValidError:
         return False
     else:
@@ -467,8 +469,9 @@ def sanitize_email(email, require_valid=False):
 
 
 def sanitize_html(string):
+    css_sanitizer = CSSSanitizer(allowed_css_properties=BLEACH_ALLOWED_STYLES_HTML)
     return bleach.clean(string, tags=BLEACH_ALLOWED_TAGS_HTML, attributes=BLEACH_ALLOWED_ATTRIBUTES_HTML,
-                        styles=BLEACH_ALLOWED_STYLES_HTML)
+                        css_sanitizer=css_sanitizer)
 
 
 def html_to_plaintext(string):

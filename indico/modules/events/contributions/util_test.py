@@ -26,8 +26,8 @@ def test_import_contributions(dummy_event, dummy_user):
     dummy_event.end_dt = as_utc(datetime(2017, 11, 27, 12, 0, 0))
 
     csv = b'\n'.join([b'2017-11-27T08:00,10,First contribution,,,,',
-                      b',,Second contribution,John,Doe,ACME Inc.,jdoe@example.com',
-                      b'2017-11-27T08:30,15,Third contribution,Guinea Albert,Pig,,1337@example.com'])
+                      b',,Second contribution,John,Doe,ACME Inc.,jdoe@example.test',
+                      b'2017-11-27T08:30,15,Third contribution,Guinea Albert,Pig,,1337@example.test'])
 
     contributions, changes = import_contributions_from_csv(dummy_event, BytesIO(csv))
     assert len(contributions) == 3
@@ -44,7 +44,7 @@ def test_import_contributions(dummy_event, dummy_user):
     assert len(speakers) == 1
     assert speakers[0].full_name == 'John Doe'
     assert speakers[0].affiliation == 'ACME Inc.'
-    assert speakers[0].email == 'jdoe@example.com'
+    assert speakers[0].email == 'jdoe@example.test'
 
     assert contributions[2].start_dt == as_utc(datetime(2017, 11, 27, 8, 30, 0))
     assert contributions[2].duration == timedelta(minutes=15)
@@ -54,7 +54,7 @@ def test_import_contributions(dummy_event, dummy_user):
     # name comes from PersonLink, not user
     assert speakers[0].full_name == 'Guinea Albert Pig'
     assert not speakers[0].affiliation
-    assert speakers[0].email == '1337@example.com'
+    assert speakers[0].email == '1337@example.test'
     assert speakers[0].person.user == dummy_user
 
     assert not changes
@@ -68,8 +68,8 @@ def test_import_contributions_changes(db, dummy_event, dummy_user):
 
     # Change of end time
     csv = b'\n'.join([b'2017-11-27T08:00,10,First contribution,,,,',
-                      b'2017-11-27T08:10:00,10,Second contribution,John,Doe,ACME Inc.,jdoe@example.com',
-                      b'2017-11-27T11:30,60,Third contribution,Guinea Albert,Pig,,1337@example.com'])
+                      b'2017-11-27T08:10:00,10,Second contribution,John,Doe,ACME Inc.,jdoe@example.test',
+                      b'2017-11-27T11:30,60,Third contribution,Guinea Albert,Pig,,1337@example.test'])
 
     contributions, changes = import_contributions_from_csv(dummy_event, BytesIO(csv))
     new_end_dt = as_utc(datetime(2017, 11, 27, 12, 30, 0))
@@ -85,8 +85,8 @@ def test_import_contributions_changes(db, dummy_event, dummy_user):
 
     # Change of start/end date
     csv = b'\n'.join([b'2017-11-26T08:00,10,First contribution,,,,',
-                      b'2017-11-27T08:10:00,10,Second contribution,John,Doe,ACME Inc.,jdoe@example.com',
-                      b'2017-11-28T11:30,60,Third contribution,Guinea Albert,Pig,,1337@example.com'])
+                      b'2017-11-27T08:10:00,10,Second contribution,John,Doe,ACME Inc.,jdoe@example.test',
+                      b'2017-11-28T11:30,60,Third contribution,Guinea Albert,Pig,,1337@example.test'])
 
     contributions, changes = import_contributions_from_csv(dummy_event, BytesIO(csv))
     new_start_dt = as_utc(datetime(2017, 11, 26, 8, 0, 0))

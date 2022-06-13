@@ -132,7 +132,7 @@ def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kw
         else:  # everything matched
             found.append(mail)
     found_set = set(found)
-    smtp.outbox = [mail for mail in smtp.outbox if mail not in found_set]
+    smtp.handler.outbox = [mail for mail in smtp.handler.outbox if mail not in found_set]
     __tracebackhide__ = True
     if required:
         assert found, 'No matching emails found'

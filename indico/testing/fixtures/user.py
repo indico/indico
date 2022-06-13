@@ -23,7 +23,7 @@ def create_user(db):
         user.id = id_
         user.first_name = first_name
         user.last_name = last_name
-        user.email = email or f'{id_}@example.com'
+        user.email = email or f'{id_}@example.test'
         user.is_admin = admin
         user.local_groups = {g.group for g in (groups or ())}
         db.session.add(user)
