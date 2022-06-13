@@ -35,7 +35,7 @@ export const getConfig = ({simple = true, images = false} = {}) => ({
       !simple && images && 'imageInsert',
       !simple && 'insertTable',
       '|',
-      !simple && 'blockQuote',
+      'blockQuote',
       !simple && 'code',
       !simple && 'horizontalLine',
       '|',

@@ -12,9 +12,9 @@ import {getConfig} from 'indico/ckeditor';
   'use strict';
 
   global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
-    const {fieldId, images = false, width, height = 475, ...rest} = options;
+    const {fieldId, simple = true, images = false, width, height = 475, ...rest} = options;
     const field = document.getElementById(fieldId);
-    const editor = await ClassicEditor.create(field, {...getConfig({images}), ...rest});
+    const editor = await ClassicEditor.create(field, {...getConfig({simple, images}), ...rest});
     editor.setData(field.value);
     editor.model.document.on('change:data', () => {
       field.value = editor.getData();
@@ -24,5 +24,9 @@ import {getConfig} from 'indico/ckeditor';
       writer.setStyle('width', `${width}px` || 'auto', editor.editing.view.document.getRoot());
       writer.setStyle('height', `${height}px`, editor.editing.view.document.getRoot());
     });
+    const dialog = $(field.closest('.ui-dialog-content'));
+    if (dialog.length) {
+      dialog.dialog('option', 'position', dialog.dialog('option', 'position'));
+    }
   };
 })(window);
