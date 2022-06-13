@@ -14,6 +14,7 @@ import {Form, Message, Header} from 'semantic-ui-react';
 import {FinalComboDropdown, FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {camelizeKeys} from 'indico/utils/case';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
 import {Translate} from '../i18n';
@@ -36,7 +37,7 @@ const FinalAffiliationField = ({hasPredefinedAffiliations, currentAffiliation}) 
       ? [currentAffiliation, ..._affiliationResults]
       : _affiliationResults;
 
-  const getSubheader = ({city, country_name: countryName}) => {
+  const getSubheader = ({city, countryName}) => {
     if (city && countryName) {
       return `${city}, ${countryName}`;
     }
@@ -63,7 +64,7 @@ const FinalAffiliationField = ({hasPredefinedAffiliations, currentAffiliation}) 
       handleAxiosError(error);
       return;
     }
-    setAffiliationResults(resp.data);
+    setAffiliationResults(camelizeKeys(resp.data));
   };
 
   return hasPredefinedAffiliations ? (
