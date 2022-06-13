@@ -69,6 +69,8 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
+colorclass==2.2.2
+    # via -r requirements.in
 commonmark==0.9.1
     # via rich
 cryptography==37.0.2

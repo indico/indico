@@ -15,10 +15,10 @@ from datetime import timedelta
 
 import click
 from click.types import convert_type
+from colorclass import Color
 
 from indico.util.date_time import format_human_timedelta
 from indico.util.string import validate_email
-from indico.vendor.colorclass import Color
 
 
 def prompt_email(prompt='Email', default=None, confirm=False):

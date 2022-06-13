@@ -7,6 +7,7 @@ blinker
 celery[redis]!=5.2.3  # 5.2.3 pins setuptools which is a mess
 certifi
 click
+colorclass
 distro
 email-validator
 feedgen
