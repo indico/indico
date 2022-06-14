@@ -24,9 +24,20 @@ import {getConfig} from 'indico/ckeditor';
       writer.setStyle('width', `${width}px` || 'auto', editor.editing.view.document.getRoot());
       writer.setStyle('height', `${height}px`, editor.editing.view.document.getRoot());
     });
+    // Re-position the dialog if we have one since the initial position is
+    // wrong due to the editor being loaded after the dialog has been opened.
     const dialog = $(field.closest('.ui-dialog-content'));
     if (dialog.length) {
       dialog.dialog('option', 'position', dialog.dialog('option', 'position'));
+    }
+    // Make sure the option dropdowns are displayed above the dialog.
+    const uiDialog = field.closest('.ui-dialog-content');
+    const exPopup = field.closest('.exclusivePopup');
+    if (uiDialog) {
+      uiDialog.style.overflow = 'inherit';
+    }
+    if (exPopup) {
+      exPopup.style.overflow = 'inherit';
     }
   };
 })(window);
