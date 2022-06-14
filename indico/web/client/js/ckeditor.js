@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 export const getConfig = ({simple = true, images = false} = {}) => ({
-  language: 'en_GB',
   fontFamily: {
     options: [
       'Sans Serif/"Liberation Sans", sans-serif',
@@ -28,6 +27,7 @@ export const getConfig = ({simple = true, images = false} = {}) => ({
       '|',
       'bulletedList',
       'numberedList',
+      '-',
       'outdent',
       'indent',
       '|',
