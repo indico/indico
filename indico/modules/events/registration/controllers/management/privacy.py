@@ -7,16 +7,19 @@
 
 from datetime import timedelta
 
-from flask import redirect
+from flask import redirect, session
 from flask.helpers import flash
 from marshmallow_enum import EnumField
 
 from indico.core.db import db
+from indico.modules.events import EventLogRealm
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import RegistrationPrivacyForm
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationVisibility
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.logs.models.entries import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
@@ -24,6 +27,29 @@ from indico.web.flask.util import url_for
 
 class RHRegistrationPrivacy(RHManageRegFormBase):
     """Change privacy settings of a registration form."""
+
+    def _get_changes(self, participant_visibility, public_visibility, visibility_duration, retention_period):
+        log_fields = {
+            'participant_visibility': {'title': 'Visibility to participants'},
+            'public_visibility': {'title': 'Visibility to everyone'},
+            'visibility_duration': {'title': 'Visibility duration', 'type': 'number'},
+            'retention_period': {'title': 'Retention period', 'type': 'number'},
+        }
+
+        changes = {
+            'participant_visibility': (self.regform.publish_registrations_participants,
+                                       PublishRegistrationsMode[participant_visibility]),
+            'public_visibility': (self.regform.publish_registrations_public,
+                                  PublishRegistrationsMode[public_visibility]),
+            'visibility_duration': (self.regform.publish_registrations_duration.days//30
+                                    if self.regform.publish_registrations_duration is not None else None,
+                                    visibility_duration.days//30 if visibility_duration is not None else None),
+            'retention_period': (self.regform.retention_period.days//7
+                                 if self.regform.retention_period is not None else None,
+                                 retention_period.days//7 if retention_period is not None else None),
+        }
+
+        return make_diff_log(changes, log_fields)
 
     def _process(self):
         form = RegistrationPrivacyForm(event=self.event, regform=self.regform, visibility=[
@@ -33,13 +59,21 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
              if self.regform.publish_registrations_duration is not None else None)
         ], retention_period=self.regform.retention_period)
         if form.validate_on_submit():
-            self.regform.retention_period = form.retention_period.data
             participant_visibility, public_visibility, visibility_duration = form.visibility.data
+            visibility_duration = timedelta(days=visibility_duration*30) if visibility_duration is not None else None
+
+            changes = self._get_changes(participant_visibility, public_visibility,
+                                        visibility_duration, form.retention_period.data)
+
+            self.regform.retention_period = form.retention_period.data
             self.regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
             self.regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
-            self.regform.publish_registrations_duration = (timedelta(days=visibility_duration*30)
-                                                           if visibility_duration is not None else None)
+            self.regform.publish_registrations_duration = visibility_duration
             db.session.flush()
+            self.event.log(EventLogRealm.management, LogKind.change, 'Privacy', 'Participant visibility modified',
+                           session.user, data={'Registration form ID': self.regform.id,
+                                               'Registration form title': self.regform.title,
+                                               'Changes': changes})
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.manage_registration_privacy_settings', self.regform))
 
