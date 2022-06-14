@@ -6,11 +6,10 @@
 // LICENSE file for more details.
 
 import ClassicEditor from 'ckeditor';
+
 import {getConfig} from 'indico/ckeditor';
 
 (function(global) {
-  'use strict';
-
   global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
     const {fieldId, simple = true, images = false, width, height = 475, ...rest} = options;
     const field = document.getElementById(fieldId);
