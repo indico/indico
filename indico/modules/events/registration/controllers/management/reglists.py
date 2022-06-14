@@ -600,8 +600,20 @@ class RHRegistrationReset(RHManageRegistrationBase):
 class RHRegistrationHide(RHManageRegistrationBase):
     """Hide a registration from the participants lists."""
 
+    def _log_changes(self):
+        log_data = {'Email': self.registration.email, 'Registration friendly ID': self.registration.friendly_id}
+        if self.registration.participant_hidden:
+            self.registration.log(EventLogRealm.management, LogKind.negative, 'Privacy',
+                                  f'Participant hidden from the participant list: {self.registration.full_name}',
+                                  session.user, data=log_data)
+        else:
+            self.registration.log(EventLogRealm.management, LogKind.positive, 'Privacy',
+                                  f'Participant visibility restored: {self.registration.full_name}',
+                                  session.user, data=log_data)
+
     def _process(self):
         self.registration.participant_hidden = not self.registration.participant_hidden
+        self._log_changes()
         return jsonify_data(html=_render_registration_details(self.registration))
 
 

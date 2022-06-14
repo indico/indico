@@ -42,6 +42,7 @@ from indico.modules.events.registration.models.registrations import (Registratio
 from indico.modules.events.registration.notifications import (notify_invitation, notify_registration_creation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date, now_utc
 from indico.util.i18n import _
@@ -412,7 +413,15 @@ def modify_registration(registration, data, management=False, notify_user=True):
                 personal_data_changes[key] = value
             setattr(registration, key, value)
     if not management and regform.needs_publish_consent:
-        registration.consent_to_publish = data.get('consent_to_publish', RegistrationVisibility.nobody)
+        consent_to_publish = data.get('consent_to_publish', RegistrationVisibility.nobody)
+        if registration.consent_to_publish != consent_to_publish:
+            changes = make_diff_log({'consent_to_publish': (registration.consent_to_publish, consent_to_publish)},
+                                    {'consent_to_publish': {'title': 'Consent to publish'}})
+            registration.log(EventLogRealm.participants, LogKind.change, 'Registration',
+                             f'Consent to publish modified: {registration.full_name}',
+                             session.user, data={'Email': registration.email, 'Changes': changes})
+        registration.consent_to_publish = consent_to_publish
+
     registration.sync_state()
     db.session.flush()
     # sanity check
