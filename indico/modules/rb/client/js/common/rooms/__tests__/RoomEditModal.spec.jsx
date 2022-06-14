@@ -22,6 +22,7 @@ import {FinalField} from 'indico/react/forms';
 
 import RoomEditModal from '../edit/RoomEditModal';
 
+// eslint-disable-next-line react/display-name
 jest.mock('indico/react/components/principals/ACLField', () => () => null);
 
 const whenStable = async () => {
