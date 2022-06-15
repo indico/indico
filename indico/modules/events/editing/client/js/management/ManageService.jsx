@@ -35,11 +35,10 @@ export default function ManageService({eventId}) {
   const [serviceURLInfo, setServiceURLInfo] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
   const [disconnectOpen, setDisconnectOpen] = useState(false);
-  const {data, error, loading, reFetch} = useIndicoAxios({
-    url: checkServiceStatusURL({event_id: eventId}),
-    trigger: eventId,
-    camelize: true,
-  });
+  const {data, error, loading, reFetch} = useIndicoAxios(
+    checkServiceStatusURL({event_id: eventId}),
+    {camelize: true}
+  );
 
   const checkPending = loading || (data === null && error === null);
   let label = Translate.string('Custom editing workflow');

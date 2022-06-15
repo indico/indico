@@ -523,11 +523,9 @@ const WithExternalsContext = React.createContext(false);
 const UserSearchFields = () => {
   const withExternals = useContext(WithExternalsContext);
 
-  const {data} = useIndicoAxios({
-    url: userSearchInfoURL(),
-    trigger: withExternals,
-    forceDispatchEffect: () => withExternals,
+  const {data} = useIndicoAxios(userSearchInfoURL(), {
     camelize: true,
+    manual: !withExternals,
   });
 
   const hasExternals = data && data.externalUsersAvailable;

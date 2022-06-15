@@ -23,10 +23,8 @@ export default function ReviewConditionManagement() {
   const eventId = useNumericParam('event_id');
   const {type} = useParams();
 
-  const {data: fileTypes} = useIndicoAxios({
-    url: fileTypesURL({event_id: eventId, type}),
+  const {data: fileTypes} = useIndicoAxios(fileTypesURL({event_id: eventId, type}), {
     camelize: true,
-    trigger: [eventId, type],
   });
 
   return (

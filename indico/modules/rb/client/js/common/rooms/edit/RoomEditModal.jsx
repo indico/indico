@@ -51,10 +51,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   const equipmentTypes = useSelector(getAllEquipmentTypes);
   const dispatch = useDispatch();
 
-  const {data: globalAttributes} = useIndicoAxios({
-    url: attributesURL(),
-    trigger: 'once',
-  });
+  const {data: globalAttributes} = useIndicoAxios(attributesURL());
   const [newRoomId, setNewRoomId] = useState(null);
   const [wasEverUpdated, setWasEverUpdated] = useState(null);
   const [activeTab, setActiveTab] = useState('basic-details');

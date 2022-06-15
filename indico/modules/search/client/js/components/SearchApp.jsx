@@ -40,12 +40,10 @@ const camelizeValues = obj =>
 function useSearch(url, query, type, scope = {}) {
   const [page, setPage] = useState(undefined);
 
-  const {data, error, loading, lastData} = useIndicoAxios({
-    url,
-    options: {params: {...query, type, page, ...scope}},
-    forceDispatchEffect: () => query?.q,
-    trigger: [url, query, page],
-  });
+  const {data, error, loading, lastData} = useIndicoAxios(
+    {url, params: {...query, type, page, ...scope}},
+    {manual: !query?.q}
+  );
 
   useEffect(() => {
     setPage(undefined);
@@ -223,11 +221,7 @@ export default function SearchApp({category, eventId, isAdmin}) {
   if (!adminOverrideEnabled) {
     delete query.admin_override_enabled;
   }
-  const {data: options} = useIndicoAxios({
-    url: searchOptionsURL(),
-    trigger: 'once',
-    camelize: true,
-  });
+  const {data: options} = useIndicoAxios(searchOptionsURL(), {camelize: true});
   let scope = {};
   if (eventId !== null) {
     scope = {event_id: eventId};

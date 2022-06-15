@@ -45,22 +45,18 @@ import './EditableList.module.scss';
 export default function EditableList({management}) {
   const eventId = useNumericParam('event_id');
   const {type} = useParams();
-  const {data: contribList, loading: isLoadingContribList} = useIndicoAxios({
-    url: editableListURL({event_id: eventId, type}),
-    camelize: true,
-    trigger: [eventId, type],
-  });
-  const {data: editors, loading: isLoadingEditors} = useIndicoAxios({
-    url: editorsURL({event_id: eventId, type}),
-    camelize: true,
-    trigger: [eventId, type],
-    forceDispatchEffect: () => management,
-  });
-  const {data: canAssignSelf, loading: isLoadingCanAssignSelf} = useIndicoAxios({
-    url: canAssignSelfURL({event_id: eventId, type}),
-    trigger: [eventId, type],
-    forceDispatchEffect: () => !management,
-  });
+  const {data: contribList, loading: isLoadingContribList} = useIndicoAxios(
+    editableListURL({event_id: eventId, type}),
+    {camelize: true}
+  );
+  const {data: editors, loading: isLoadingEditors} = useIndicoAxios(
+    editorsURL({event_id: eventId, type}),
+    {camelize: true, manual: !management}
+  );
+  const {data: canAssignSelf, loading: isLoadingCanAssignSelf} = useIndicoAxios(
+    canAssignSelfURL({event_id: eventId, type}),
+    {manual: management}
+  );
 
   if (isLoadingContribList || isLoadingEditors || isLoadingCanAssignSelf) {
     return <Loader inline="centered" active />;

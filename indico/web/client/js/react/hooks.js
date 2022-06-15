@@ -8,7 +8,7 @@
 import principalsURL from 'indico-url:core.principals';
 import favoriteUsersURL from 'indico-url:users.favorites_api';
 
-import useAxios from '@use-hooks/axios';
+import {makeUseAxios} from 'axios-hooks';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -16,6 +16,14 @@ import {useHistory} from 'react-router-dom';
 
 import {handleAxiosError, indicoAxios} from '../utils/axios';
 import {camelizeKeys} from '../utils/case';
+
+const useAxios = makeUseAxios({
+  axios: indicoAxios,
+  defaultOptions: {
+    ssr: false,
+    useCache: false,
+  },
+});
 
 export const useFavoriteUsers = (userId = null, lazy = false) => {
   // XXX: this state should ideally be global so if this hook is used more than
@@ -124,23 +132,33 @@ FavoritesProvider.propTypes = {
   children: PropTypes.func.isRequired,
 };
 
-export function useIndicoAxios({camelize, unhandledErrors = [], options = {}, ...args}) {
+/**
+ * A hook that provides a declarative way to make an HTTP request with Axios.
+ *
+ * @param {object|String} axiosConfig - the url or an axios config object
+ * @param {object} hookConfig - settings for this hook and useAxios
+ *
+ * See https://github.com/simoneb/axios-hooks for details on what can be used in the hookConfig.
+ * The most interesting one is `{manual: true}` if the request should not be sent automatically
+ * but only when `reFetch` is called explicitly; `{useCache: true}` may be useful in some cases
+ * as well.
+ */
+export function useIndicoAxios(
+  axiosConfig,
+  {camelize = false, unhandledErrors = [], ...hookConfig} = {}
+) {
   const lastData = useRef(null);
+  const lastError = useRef(null);
+  if (typeof axiosConfig === 'string') {
+    axiosConfig = {url: axiosConfig};
+  }
   if (unhandledErrors.length) {
-    options.headers = {
-      ...(options.headers || {}),
+    axiosConfig.headers = {
+      ...(axiosConfig.headers || {}),
       'X-Indico-No-Report-Error': unhandledErrors.join(','),
     };
   }
-  const {response, error, loading, reFetch} = useAxios({
-    customHandler: err =>
-      err &&
-      (!err.response || !unhandledErrors.includes(err.response.status)) &&
-      handleAxiosError(err),
-    ...args,
-    options,
-    axios: indicoAxios,
-  });
+  const [{loading, error, response}, reFetch, cancel] = useAxios(axiosConfig, hookConfig);
 
   let data = null;
   if (response) {
@@ -149,8 +167,16 @@ export function useIndicoAxios({camelize, unhandledErrors = [], options = {}, ..
       data = camelizeKeys(data);
     }
     lastData.current = data;
+  } else if (
+    error &&
+    lastError.current !== error &&
+    (!error.response || !unhandledErrors.includes(error.response.status))
+  ) {
+    // only run error handler once even if the component using this hook re-renders
+    lastError.current = error;
+    _.defer(() => handleAxiosError(error));
   }
-  return {response, error, loading, reFetch, data, lastData: lastData.current};
+  return {response, error, loading, reFetch, data, lastData: lastData.current, cancel};
 }
 
 /**
@@ -163,10 +189,7 @@ export function useIndicoAxios({camelize, unhandledErrors = [], options = {}, ..
 export function useTogglableValue(url) {
   const [newState, setNewState] = useState(null);
   const [saving, setSaving] = useState(false);
-  const {data} = useIndicoAxios({
-    url,
-    trigger: url,
-  });
+  const {data} = useIndicoAxios(url);
 
   useEffect(() => {
     // reset the cached new state in case the url changes.
