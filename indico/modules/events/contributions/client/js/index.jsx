@@ -58,7 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const availableTypes = JSON.parse(editableSubmissionButton.dataset.availableTypes);
     const {eventId, contributionId, contributionCode} = editableSubmissionButton.dataset;
 
-    let fileTypeResponses, paperInfoResponse, lastRevFiles;
+    let fileTypeResponses, paperInfoResponse;
+    let lastRevFiles = [];
     try {
       [fileTypeResponses, paperInfoResponse] = await Promise.all([
         Promise.all(
@@ -66,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ),
         indicoAxios.get(paperInfoURL({event_id: eventId, contrib_id: contributionId}), {
           validateStatus: status => (status >= 200 && status < 300) || status === 404,
+          headers: {'X-Indico-No-Report-Error': '404'},
         }),
       ]);
     } catch (e) {
