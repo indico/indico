@@ -23,4 +23,3 @@ sphinx-issues
 sphinx-rtd-theme
 sphinx!=4.0.*  # not compatible with jinja 3 - https://github.com/sphinx-doc/sphinx/issues/9216
 sqlparse
-transifex-client
