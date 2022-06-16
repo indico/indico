@@ -65,6 +65,14 @@ class BookingBootstrapForm extends React.Component {
   constructor(props) {
     super(props);
 
+    const startTime = moment()
+      .startOf('hour')
+      .add(1, 'h');
+    const endTime = moment()
+      .startOf('hour')
+      .add(2, 'h');
+    const startsNextDay = startTime > moment().endOf('day');
+
     const {defaults} = props;
     this.state = _.merge(
       {
@@ -74,18 +82,12 @@ class BookingBootstrapForm extends React.Component {
           interval: 'week',
         },
         dates: {
-          startDate: moment(),
+          startDate: startsNextDay ? moment().add(1, 'd') : moment(),
           endDate: null,
         },
         timeSlot: {
-          startTime: moment()
-            .startOf('hour')
-            .add(1, 'h'),
-          endTime: initialEndTime(
-            moment()
-              .startOf('hour')
-              .add(2, 'h')
-          ),
+          startTime,
+          endTime: startsNextDay ? endTime : initialEndTime(endTime),
         },
       },
       defaults

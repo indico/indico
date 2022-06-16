@@ -55,6 +55,8 @@ Bugfixes
 
 - Fix selected state filters not showing up as selected in abstract list customization
   (:pr:`5363`)
+- Do not propose an impossible date/time in the Room Booking module when accessing it
+  shortly before midnight (:pr:`5371`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
