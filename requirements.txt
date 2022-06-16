@@ -20,7 +20,7 @@ attrs==21.4.0
     # via jsonschema
 authlib==1.0.1
     # via -r requirements.in
-babel==2.10.2
+babel==2.10.3
     # via
     #   -r requirements.in
     #   flask-babel
@@ -44,7 +44,7 @@ celery[redis]==5.2.7
     # via
     #   -r requirements.in
     #   sentry-sdk
-certifi==2022.5.18.1
+certifi==2022.6.15
     # via
     #   -r requirements.in
     #   requests
@@ -119,9 +119,9 @@ flask-marshmallow==0.14.0
     # via -r requirements.in
 flask-migrate==3.1.0
     # via -r requirements.in
-flask-multipass==0.4.6
+flask-multipass==0.4.7
     # via -r requirements.in
-flask-pluginengine==0.4
+flask-pluginengine==0.4.1
     # via -r requirements.in
 flask-sqlalchemy==2.5.1
     # via
@@ -313,7 +313,7 @@ sqlalchemy==1.4.37
     #   marshmallow-sqlalchemy
     #   sentry-sdk
     #   wtforms-sqlalchemy
-stack-data==0.2.0
+stack-data==0.3.0
     # via ipython
 terminaltables==3.1.10
     # via -r requirements.in

@@ -19,11 +19,11 @@ attrs==21.4.0
     #   -c requirements.txt
     #   aiosmtpd
     #   pytest
-babel==2.10.2
+babel==2.10.3
     # via
     #   -c requirements.txt
     #   sphinx
-certifi==2022.5.18.1
+certifi==2022.6.15
     # via
     #   -c requirements.txt
     #   requests
