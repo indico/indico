@@ -412,15 +412,10 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
+
     if not management and regform.needs_publish_consent:
         consent_to_publish = data.get('consent_to_publish', RegistrationVisibility.nobody)
-        if registration.consent_to_publish != consent_to_publish:
-            changes = make_diff_log({'consent_to_publish': (registration.consent_to_publish, consent_to_publish)},
-                                    {'consent_to_publish': {'title': 'Consent to publish'}})
-            registration.log(EventLogRealm.participants, LogKind.change, 'Registration',
-                             f'Consent to publish modified: {registration.full_name}',
-                             session.user, data={'Email': registration.email, 'Changes': changes})
-        registration.consent_to_publish = consent_to_publish
+        update_registration_consent_to_publish(registration, consent_to_publish)
 
     registration.sync_state()
     db.session.flush()
@@ -440,6 +435,17 @@ def modify_registration(registration, data, management=False, notify_user=True):
                      LogKind.change, 'Registration',
                      f'Registration modified: {registration.full_name}',
                      session.user, data={'Email': registration.email})
+
+
+def update_registration_consent_to_publish(registration, consent_to_publish):
+    if registration.consent_to_publish == consent_to_publish:
+        return
+    changes = make_diff_log({'consent_to_publish': (registration.consent_to_publish, consent_to_publish)},
+                            {'consent_to_publish': 'Consent to publish'})
+    registration.log(EventLogRealm.participants, LogKind.change, 'Registration',
+                     f'Consent to publish modified: {registration.full_name}',
+                     session.user, data={'Email': registration.email, 'Changes': changes})
+    registration.consent_to_publish = consent_to_publish
 
 
 def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):
