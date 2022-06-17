@@ -17,6 +17,7 @@ from indico.modules.events.registration.controllers.display import RHRegistratio
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import RegistrationPrivacyForm
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationVisibility
+from indico.modules.events.registration.util import update_registration_consent_to_publish
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.logs.models.entries import LogKind
 from indico.modules.logs.util import make_diff_log
@@ -83,5 +84,5 @@ class RHAPIRegistrationChangeConsent(RHRegistrationFormRegistrationBase):
 
     @use_kwargs({'consent_to_publish': EnumField(RegistrationVisibility)})
     def _process_POST(self, consent_to_publish):
-        self.registration.consent_to_publish = consent_to_publish
+        update_registration_consent_to_publish(self.registration, consent_to_publish)
         return '', 204
