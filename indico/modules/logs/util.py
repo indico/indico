@@ -6,14 +6,15 @@
 # LICENSE file for more details.
 
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 from enum import Enum
 
 from markupsafe import Markup
 
 from indico.core import signals
-from indico.util.i18n import orig_string
+from indico.util.date_time import format_human_timedelta
+from indico.util.i18n import force_locale, orig_string
 from indico.util.signals import named_objects_from_signal
 
 
@@ -71,6 +72,10 @@ def make_diff_log(changes, fields):
         elif all(isinstance(x, datetime) for x in change):
             type_ = 'datetime'
             change = [x.isoformat() for x in change]
+        elif not_none_change and all(isinstance(x, timedelta) for x in not_none_change):
+            type_ = 'timedelta'
+            with force_locale(None):
+                change = [format_human_timedelta(x) if x is not None else default for x in change]
         else:
             type_ = 'text'
             change = list(map(str, map(orig_string, change)))
@@ -85,7 +90,7 @@ def render_changes(a, b, type_):
     :param b: new value
     :param type_: the type determining how the values should be compared
     """
-    if type_ in ('number', 'enum', 'bool', 'datetime'):
+    if type_ in ('number', 'enum', 'bool', 'datetime', 'timedelta'):
         if a in (None, ''):
             a = '\N{EMPTY SET}'
         if b in (None, ''):
