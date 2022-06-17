@@ -15,7 +15,9 @@ from babel.core import LOCALE_ALIASES, Locale
 from babel.messages.pofile import read_po
 from babel.support import NullTranslations
 from flask import current_app, g, has_app_context, has_request_context, request, session
-from flask_babel import Babel, Domain, get_domain
+from flask_babel import Babel, Domain
+from flask_babel import force_locale as _force_locale
+from flask_babel import get_domain
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 from werkzeug.utils import cached_property
@@ -200,6 +202,16 @@ class IndicoLocale(Locale):
 def _remove_locale_script(locale):
     parts = locale.split('_')  # e.g. `en_GB` or `zh_Hans_CN`
     return f'{parts[0]}_{parts[-1]}'
+
+
+def force_locale(locale):
+    """Temporarily override the locale.
+
+    Use this as a context manager in a ``with`` block.
+    `locale` can be set to ``None`` to avoid translation and thus
+    use the hardcoded string which is en_US.
+    """
+    return _force_locale(locale or 'en_US')
 
 
 @babel.localeselector
