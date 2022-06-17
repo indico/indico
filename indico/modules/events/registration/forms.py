@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import time
+from datetime import time, timedelta
 from operator import itemgetter
 
 import jsonschema
@@ -545,6 +545,10 @@ class RegistrationPrivacyForm(IndicoForm):
             return
         elif not retention_period:
             raise ValidationError(_('The retention period cannot be zero.'))
+        visibility_duration = (timedelta(days=self.visibility.data[2]*30) if self.visibility.data[2] is not None
+                               else None)
+        if visibility_duration and visibility_duration > retention_period:
+            raise ValidationError(_('The retention period cannot be lower than the visibility duration.'))
         fields = (RegistrationFormItem.query
                   .with_parent(self.regform)
                   .filter(RegistrationFormItem.is_enabled,
