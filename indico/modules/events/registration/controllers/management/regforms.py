@@ -32,8 +32,8 @@ from indico.modules.events.registration.views import (WPManageParticipants, WPMa
 from indico.modules.events.util import update_object_principals
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.users.models.affiliations import Affiliation
-from indico.util.date_time import now_utc
-from indico.util.i18n import _
+from indico.util.date_time import format_human_timedelta, now_utc
+from indico.util.i18n import _, force_locale, orig_string
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -126,6 +126,18 @@ class RHManageRegistrationFormDisplay(RHManageRegFormBase):
                                 enabled_columns=enabled_fields, disabled_columns=disabled_fields)
 
 
+def _get_regform_creation_log_data(regform):
+    with force_locale(None):
+        return {
+            'Visibility to participants': orig_string(regform.publish_registrations_participants.title),
+            'Visibility to everyone': orig_string(regform.publish_registrations_public.title),
+            'Visibility duration': (format_human_timedelta(regform.publish_registrations_duration)
+                                    if regform.publish_registrations_duration else 'Indefinite'),
+            'Retention period': (format_human_timedelta(regform.retention_period)
+                                 if regform.retention_period else 'Indefinite'),
+        }
+
+
 class RHManageParticipants(RHManageRegFormsBase):
     """Show and enable the dummy registration form for participants."""
 
@@ -156,7 +168,8 @@ class RHManageParticipants(RHManageRegFormsBase):
                 db.session.flush()
                 signals.event.registration_form_created.send(regform)
                 self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
-                               f'Registration form "{regform.title}" has been created', session.user)
+                               f'Registration form "{regform.title}" has been created', session.user,
+                               data=_get_regform_creation_log_data(regform))
             return redirect(url_for('event_registration.manage_regform', regform))
 
         if not regform or not registration_enabled:
@@ -189,7 +202,8 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             signals.event.registration_form_created.send(regform)
             flash(_('Registration form has been successfully created'), 'success')
             self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
-                           f'Registration form "{regform.title}" has been created', session.user)
+                           f'Registration form "{regform.title}" has been created', session.user,
+                           data=_get_regform_creation_log_data(regform))
             return redirect(url_for('.manage_regform', regform))
         return WPManageRegistration.render_template('management/regform_create.html', self.event,
                                                     form=form, regform=None)
