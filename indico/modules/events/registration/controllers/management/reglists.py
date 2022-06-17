@@ -601,15 +601,19 @@ class RHRegistrationHide(RHManageRegistrationBase):
     """Hide a registration from the participants lists."""
 
     def _log_changes(self):
-        log_data = {'Email': self.registration.email, 'Registration friendly ID': self.registration.friendly_id}
+        regform = self.registration.registration_form
         if self.registration.participant_hidden:
-            self.registration.log(EventLogRealm.management, LogKind.negative, 'Privacy',
-                                  f'Participant hidden from the participant list: {self.registration.full_name}',
-                                  session.user, data=log_data)
+            self.registration.log(
+                EventLogRealm.management, LogKind.negative, 'Privacy',
+                f'Participant hidden in "{regform.title}": {self.registration.full_name}',
+                session.user, data={'Email': self.registration.email}
+            )
         else:
-            self.registration.log(EventLogRealm.management, LogKind.positive, 'Privacy',
-                                  f'Participant visibility restored: {self.registration.full_name}',
-                                  session.user, data=log_data)
+            self.registration.log(
+                EventLogRealm.management, LogKind.positive, 'Privacy',
+                f'Participant visibility restored in "{regform.title}": {self.registration.full_name}',
+                session.user, data={'Email': self.registration.email}
+            )
 
     def _process(self):
         self.registration.participant_hidden = not self.registration.participant_hidden
