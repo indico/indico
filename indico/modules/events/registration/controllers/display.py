@@ -33,7 +33,7 @@ from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.marshmallow import UUIDString
+from indico.util.marshmallow import LowercaseString, UUIDString
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
@@ -255,13 +255,13 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
     ALLOW_PROTECTED_EVENT = True
 
     @use_kwargs({
-        'email': fields.String(required=True),
+        'email': LowercaseString(required=True),
         'update': UUIDString(load_default=None),
         'management': fields.Bool(load_default=False),
     }, location='query')
     def _process_args(self, email, update, management):
         RHRegistrationFormBase._process_args(self)
-        self.email = email.lower()
+        self.email = email
         self.update = update
         self.management = management
         self.existing_registration = self.regform.get_registration(uuid=self.update) if self.update else None

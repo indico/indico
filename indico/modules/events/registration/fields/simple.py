@@ -18,7 +18,7 @@ from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
-from indico.util.marshmallow import UUIDString
+from indico.util.marshmallow import LowercaseString, UUIDString
 from indico.util.string import validate_email
 
 
@@ -366,7 +366,7 @@ class FileField(RegistrationFormFieldBase):
 
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
-    mm_field_class = fields.String
+    mm_field_class = LowercaseString
 
     def get_validators(self, existing_registration):
         def _indico_email(value):
