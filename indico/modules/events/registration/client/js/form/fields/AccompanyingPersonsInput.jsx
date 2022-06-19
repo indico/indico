@@ -85,7 +85,7 @@ function calculatePlaces(availablePlaces, maxPersons, personsInCurrentField, ite
       // ...and has no person limit, or its person limit is greater than the registration limit.
       return [personsInAllFieldsCount, availablePlaces];
     } else {
-      // ...and has a person limit lower than the regitration limit.
+      // ...and has a person limit lower than the registration limit.
       return [personsInCurrentField, maxPersons];
     }
   }
