@@ -107,8 +107,8 @@ def _cformat_sub(m):
     if m.group('fg_bold'):
         bold = '{b}'
     if bg_color := m.group('bg'):
-        bg = '{bg%s}' % bg_color
-    fg = '{%s}' % m.group('fg')
+        bg = '{bg%s}' % bg_color.replace('grey', 'white')
+    fg = '{%s}' % m.group('fg').replace('grey', 'white')
     return Color(f'{bold}{bg}{fg}')
 
 
