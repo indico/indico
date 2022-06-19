@@ -446,7 +446,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
     def default_value(self):
         versioned_data = self.form_item.versioned_data
         no_accommodation_option = next(
-            (c for c in versioned_data['choices'] if c['is_no_accommodation'] and c['is_enabled']), None)
+            (c for c in versioned_data['choices'] if c.get('is_no_accommodation') and c['is_enabled']), None)
         return {
             'choice': no_accommodation_option['id'] if no_accommodation_option else None,
             'is_no_accommodation': bool(no_accommodation_option),
