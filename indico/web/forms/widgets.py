@@ -226,7 +226,7 @@ class RemoteDropdownWidget(JinjaWidget):
         self.value_field = value_field
         self.label_field = label_field
         self.search_field = search_field
-        super().__init__('forms/sui_remote_search_dropdown_widget.html', inline_js=inline_js, single_line=True)
+        super().__init__('forms/sui_remote_search_dropdown_widget.html', inline_js=inline_js)
 
     def __call__(self, field, **kwargs):
         return super().__call__(field,
