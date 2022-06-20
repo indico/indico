@@ -466,7 +466,8 @@ Emails
 
 .. data:: EMAIL_BACKEND
 
-    Qualified name for the email back-end which will handle emails.
+    Qualified import name for the email sending backend. It can be set to any email
+    backend compatible with Django Mail.
     
     Default: ``'indico.vendor.django_mail.backends.smtp.EmailBackend'``
 
