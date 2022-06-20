@@ -464,6 +464,12 @@ Directories
 Emails
 ------
 
+.. data:: EMAIL_BACKEND
+
+    Qualified name for the email back-end which will handle emails.
+    
+    Default: ``'indico.vendor.django_mail.backends.smtp.EmailBackend'``
+
 .. data:: SMTP_SERVER
 
     The hostname and port of the SMTP server used for sending emails.
