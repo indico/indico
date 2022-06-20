@@ -505,7 +505,11 @@ class MultipassRegistrationHandler(RegistrationHandler):
 
     def get_signup_config(self):
         emails = sorted(set(self.identity_info['data'].getlist('email')))
-        initial_values = {'email': emails[0] if emails else '', 'synced_fields': []}
+        initial_values = {
+            'email': emails[0] if emails else '',
+            'synced_fields': [],
+            'affiliation_data': {'id': None, 'text': ''}
+        }
         affiliation_meta = None
         pending_data = self.get_pending_initial_data(emails)
         if self.from_sync_provider:
@@ -522,7 +526,6 @@ class MultipassRegistrationHandler(RegistrationHandler):
                                   if k not in synced_fields and k not in initial_values)
         else:
             synced_values = {}
-            initial_values['affiliation_data'] = {'id': None, 'text': ''}
             initial_values.update(pending_data)
 
         return {
