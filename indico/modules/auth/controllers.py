@@ -515,7 +515,8 @@ class MultipassRegistrationHandler(RegistrationHandler):
         if self.from_sync_provider:
             synced_fields = set(multipass.synced_fields)
             synced_values = {k: v or '' for k, v in self.identity_info['data'].items() if k in synced_fields}
-            initial_values['synced_fields'] = sorted(multipass.synced_fields)
+            required_empty_fields = {x for x in ('first_name', 'last_name') if not synced_values.get(x)}
+            initial_values['synced_fields'] = sorted(multipass.synced_fields - required_empty_fields)
             initial_values.update(synced_values)
             if affiliation_data := self.identity_info['data'].get('affiliation_data'):
                 affiliation_meta = affiliation_data | {'id': -1}
