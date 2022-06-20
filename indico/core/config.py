@@ -46,6 +46,7 @@ DEFAULTS = {
     'DEFAULT_TIMEZONE': 'UTC',
     'DISABLE_CELERY_CHECK': None,
     'ENABLE_ROOMBOOKING': False,
+    'EMAIL_BACKEND': 'indico.vendor.django_mail.backends.smtp.EmailBackend',
     'EXPERIMENTAL_EDITING_SERVICE': False,
     'EXTERNAL_REGISTRATION_URL': None,
     'HELP_URL': 'https://learn.getindico.io',
