@@ -30,3 +30,4 @@ import './selectize_widget';
 import './typeahead_widget';
 import './permissions_widget';
 import './sui_color_picker_widget';
+import './sui_remote_search_dropdown_widget';
