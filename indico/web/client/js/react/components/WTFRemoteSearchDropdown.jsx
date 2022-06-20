@@ -194,13 +194,13 @@ export function RemoteSearchDropdown({
 
   return (
     <Dropdown
-      required
       fluid
       selection
+      clearable={!dropdownProps.required}
       selectOnNavigation={false}
       selectOnBlur={false}
-      clearable={false}
       defaultOpen={false}
+      openOnFocus={false}
       value={value}
       options={options}
       onChange={onChange}
