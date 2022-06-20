@@ -420,7 +420,7 @@ class AccommodationSetupSchema(mm.Schema):
 
 class AccommodationSchema(mm.Schema):
     choice = UUIDString()
-    isNoAccommodation = fields.Bool(required=True)
+    isNoAccommodation = fields.Bool(load_default=False)
     arrivalDate = fields.Date(allow_none=True)
     departureDate = fields.Date(allow_none=True)
 
