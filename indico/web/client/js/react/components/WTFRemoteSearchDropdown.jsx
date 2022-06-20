@@ -14,6 +14,21 @@ import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
+const highlightSearch = (text, query = '') => {
+  const index = text.toLowerCase().indexOf(query);
+  if (!query || index === -1) {
+    return text;
+  }
+
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark>{text.slice(index, index + query.length)}</mark>
+      {text.slice(index + query.length)}
+    </>
+  );
+};
+
 export function RemoteSearchDropdown({
   searchUrl,
   searchMethod,
@@ -49,9 +64,15 @@ export function RemoteSearchDropdown({
 
     query = query.toLowerCase();
     const id = getIdFromQuery(query);
-    return opts.filter(opt =>
-      id === null ? opt.search.includes(query) : +opt['friendly-id'] === +id
-    );
+    return opts
+      .filter(opt => (id === null ? opt.search.includes(query) : +opt['friendly-id'] === +id))
+      .map(opt => ({
+        ...opt,
+        // this might lead to some unexpected results when
+        // searchField !== labelField, because the filtering is done
+        // on searchField but highlighting happens on labelField
+        text: highlightSearch(opt.text, query),
+      }));
   };
 
   const transformOptions = useCallback(
@@ -65,7 +86,7 @@ export function RemoteSearchDropdown({
         'value': item[valueField],
         'text': item[labelField],
         // extra values passed to <Dropdown.Item>
-        'search': (item[searchField] || '').toLowerCase(),
+        'search': item[searchField].toLowerCase(),
         'friendly-id': item.friendly_id,
       }));
       return _.sortBy(opts, 'text');
