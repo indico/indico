@@ -59,11 +59,11 @@ export function RemoteSearchDropdown({
     // No need to limit the search length when all data is preloaded
     minTriggerLength = 0;
   }
-  const shouldSearch =
-    searchQuery.length >= minTriggerLength || (allowById && getIdFromQuery(searchQuery) !== null);
+  const searchDisabled =
+    searchQuery.length < minTriggerLength && (!allowById || getIdFromQuery(searchQuery) === null);
 
   const filterOptions = (opts, query) => {
-    if (!shouldSearch) {
+    if (searchDisabled) {
       return [];
     }
 
@@ -167,25 +167,30 @@ export function RemoteSearchDropdown({
     setSearchQuery(newSearchQuery);
   };
 
-  const noResultsMessage = (
-    <PluralTranslate count={minTriggerLength}>
-      {!allowById ? (
-        <Singular>Search requires at least one character</Singular>
-      ) : (
-        <Singular>Search requires at least one character or an id prefixed with #</Singular>
-      )}
-      {!allowById ? (
-        <Plural>
-          Search requires at least <Param name="count" value={minTriggerLength} /> characters
-        </Plural>
-      ) : (
+  const searchDisabledMessage =
+    minTriggerLength === 0 ? (
+      undefined
+    ) : allowById ? (
+      <PluralTranslate count={minTriggerLength}>
+        <Singular>
+          Search requires at least <Param name="count" value={minTriggerLength} /> character or an
+          id prefixed with #
+        </Singular>
         <Plural>
           Search requires at least <Param name="count" value={minTriggerLength} /> characters or an
           id prefixed with #
         </Plural>
-      )}
-    </PluralTranslate>
-  );
+      </PluralTranslate>
+    ) : (
+      <PluralTranslate count={minTriggerLength}>
+        <Singular>
+          Search requires at least <Param name="count" value={minTriggerLength} /> character
+        </Singular>
+        <Plural>
+          Search requires at least <Param name="count" value={minTriggerLength} /> characters
+        </Plural>
+      </PluralTranslate>
+    );
 
   return (
     <Dropdown
@@ -203,7 +208,7 @@ export function RemoteSearchDropdown({
       searchQuery={searchQuery}
       onSearchChange={onSearch}
       noResultsMessage={
-        loading ? Translate.string('Loading..') : !shouldSearch ? noResultsMessage : undefined
+        loading ? Translate.string('Loading…') : searchDisabled ? searchDisabledMessage : undefined
       }
       loading={loading}
       {...dropdownProps}
