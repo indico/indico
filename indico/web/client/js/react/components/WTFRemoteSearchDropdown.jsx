@@ -54,6 +54,11 @@ export function RemoteSearchDropdown({
   const debounce = useMemo(() => makeAsyncDebounce(200), []);
 
   const getIdFromQuery = query => (query.match(/^#(\d+)$/) || {1: null})[1];
+
+  if (preload) {
+    // No need to limit the search length when all data is preloaded
+    minTriggerLength = 0;
+  }
   const shouldSearch =
     searchQuery.length >= minTriggerLength || (allowById && getIdFromQuery(searchQuery) !== null);
 
