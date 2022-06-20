@@ -235,7 +235,7 @@ class RemoteDropdownWidget(JinjaWidget):
                                 search_payload=getattr(field, 'search_payload', None),
                                 min_trigger_length=self.min_trigger_length, preload=self.preload,
                                 allow_by_id=self.allow_by_id, value_field=self.value_field,
-                                label_field=self.label_field, search_field=self.search_field, input_args=kwargs)
+                                label_field=self.label_field, search_field=self.search_field, dropdown_props=kwargs)
 
 
 class TypeaheadWidget(JinjaWidget):

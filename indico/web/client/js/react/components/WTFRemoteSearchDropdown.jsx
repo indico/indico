@@ -41,7 +41,7 @@ export function RemoteSearchDropdown({
   searchField,
   value: valueFromProps,
   onChange: onChangeFromProps,
-  ...dropdownProps
+  dropdownProps,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [options, setOptions] = useState([]);
@@ -228,6 +228,7 @@ RemoteSearchDropdown.propTypes = {
   preload: PropTypes.bool,
   value: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
+  dropdownProps: PropTypes.object,
 };
 
 RemoteSearchDropdown.defaultProps = {
@@ -242,6 +243,7 @@ RemoteSearchDropdown.defaultProps = {
   preload: false,
   value: undefined,
   onChange: () => {},
+  dropdownProps: {},
 };
 
 export default function WTFRemoteSearchDropdown({fieldId, ...rest}) {
