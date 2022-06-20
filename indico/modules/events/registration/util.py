@@ -125,13 +125,15 @@ def get_country_field(regform):
 
 def get_flat_section_setup_data(regform):
     section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections if not s.is_deleted}
-    item_data = {f.id: f.view_data for f in regform.form_items if not f.is_section and not f.is_deleted}
+    item_data = {f.id: f.view_data for f in regform.form_items
+                 if not f.is_section and not f.is_deleted and not f.parent.is_deleted}
     return {'sections': section_data, 'items': item_data}
 
 
 def get_flat_section_positions_setup_data(regform):
     section_data = {s.id: s.position for s in regform.sections if not s.is_deleted}
-    item_data = {f.id: f.position for f in regform.form_items if not f.is_section and not f.is_deleted}
+    item_data = {f.id: f.position for f in regform.form_items
+                 if not f.is_section and not f.is_deleted and not f.parent.is_deleted}
     return {'sections': section_data, 'items': item_data}
 
 
