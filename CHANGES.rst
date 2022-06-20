@@ -63,7 +63,8 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Add EMAIL_BACKEND configuration variable to support different back-ends for development and production
+- Add :data:`EMAIL_BACKEND` configuration variable to support different email sending
+  backends e.g. during development (:issue:`5375`, :pr:`5376`, thanks :user:`Moist-Cat`)
 - Add new ``regform-container-attrs`` template hook to pass additional (data-)attributes
   to the React registration form containers (:pr:`5271`)
 - Add support for JavaScript plugin hooks to register objects or react components for use
