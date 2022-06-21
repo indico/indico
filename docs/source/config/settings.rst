@@ -464,6 +464,13 @@ Directories
 Emails
 ------
 
+.. data:: EMAIL_BACKEND
+
+    Qualified import name for the email sending backend. It can be set to any email
+    backend compatible with Django Mail.
+    
+    Default: ``'indico.vendor.django_mail.backends.smtp.EmailBackend'``
+
 .. data:: SMTP_SERVER
 
     The hostname and port of the SMTP server used for sending emails.

@@ -45,6 +45,7 @@ DEFAULTS = {
     'DEFAULT_LOCALE': 'en_GB',
     'DEFAULT_TIMEZONE': 'UTC',
     'DISABLE_CELERY_CHECK': None,
+    'EMAIL_BACKEND': 'indico.vendor.django_mail.backends.smtp.EmailBackend',
     'ENABLE_ROOMBOOKING': False,
     'EXPERIMENTAL_EDITING_SERVICE': False,
     'EXTERNAL_REGISTRATION_URL': None,
