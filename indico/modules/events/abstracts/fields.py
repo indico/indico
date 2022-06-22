@@ -148,7 +148,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
 
 
 class AbstractField(QuerySelectField):
-    """A selectize-based field to select an abstract from an event."""
+    """A field with dynamic fetching to select an abstract from an event."""
 
     widget = RemoteDropdownWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
                                   search_method='POST', inline_js=True)

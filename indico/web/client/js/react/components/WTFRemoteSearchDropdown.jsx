@@ -29,6 +29,14 @@ const highlightSearch = (text, query = '') => {
   );
 };
 
+/**
+ * Dropdown which can dynamically query the backend
+ * for results using the search input. This is a replacement
+ * for the selectize.js library.
+ *
+ * It can be both controlled and uncontrolled.
+ * To make it controlled pass the value prop to it.
+ */
 export function RemoteSearchDropdown({
   searchUrl,
   searchMethod,
@@ -217,17 +225,31 @@ export function RemoteSearchDropdown({
 }
 
 RemoteSearchDropdown.propTypes = {
+  /** Number of characters needed to start fetching results. */
   minTriggerLength: PropTypes.number,
+  /** The URL used to retrieve items */
   searchUrl: PropTypes.string,
+  /** The method used to retrieve items */
   searchMethod: PropTypes.string,
+  /** Extra params to attach to the request */
   searchPayload: PropTypes.object,
+  /** The property of the response item used as the value */
   valueField: PropTypes.string,
+  /** The property of the response used to display the item */
   labelField: PropTypes.string,
+  /** The property of the response used to filter the items*/
   searchField: PropTypes.string,
+  /** Whether to allow `#123` searches regardless of the trigger length.
+      Such searches will be sent as 'id' instead of 'q' in the AJAX request */
   allowById: PropTypes.bool,
+  /** Whether to preload all data with a single request. All subsequent searches
+      will be done locally on the returned data. This also sets minTriggerLength to zero. */
   preload: PropTypes.bool,
+  /** Use this prop to make the component controlled */
   value: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.number]),
+  /** Called when the value changes with the new value as the first argument */
   onChange: PropTypes.func,
+  /** Extra props to pass to <Dropdown /> */
   dropdownProps: PropTypes.object,
 };
 
@@ -246,6 +268,9 @@ RemoteSearchDropdown.defaultProps = {
   dropdownProps: {},
 };
 
+/**
+ * WTForms wrapper for RemoteSearchDropdown
+ */
 export default function WTFRemoteSearchDropdown({fieldId, ...rest}) {
   const field = useMemo(() => document.getElementById(`${fieldId}-data`), [fieldId]);
   const onChange = value => {
