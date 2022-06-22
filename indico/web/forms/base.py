@@ -8,7 +8,7 @@
 import weakref
 from collections.abc import Mapping
 
-from flask import flash, g, has_request_context, request, session
+from flask import flash, g, has_request_context, session
 from flask_wtf import FlaskForm
 from wtforms import ValidationError
 from wtforms.csrf.core import CSRF
@@ -21,7 +21,6 @@ from indico.core import signals
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.string import strip_whitespace
-from indico.web.flask.util import url_for
 from indico.web.util import get_request_user
 
 
@@ -116,27 +115,6 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
             kwargs['meta'] = kwargs.get('meta') or {}
             kwargs['meta'].setdefault('csrf', csrf_enabled)
         super().__init__(*args, **kwargs)
-        self.ajax_response = None
-
-    def process_ajax(self):
-        """
-        Check if the current request is an AJAX request related to a
-        field in this form and execute the field's AJAX logic.
-
-        The response is available in the `ajax_response` attribute
-        afterwards.
-
-        :return: Whether an AJAX response was processed.
-        """
-        field_id = request.args.get('__wtf_ajax')
-        if not field_id:
-            return False
-        field = next((f for f in self._fields.values() if f.id == field_id and isinstance(f, AjaxFieldMixin)), None)
-        if not field:
-            return False
-        rv = field.process_ajax()
-        self.ajax_response = rv
-        return True
 
     def validate(self):
         valid = super().validate()
@@ -276,32 +254,3 @@ class FormDefaults:
 
     def __contains__(self, item):
         return hasattr(self, item)
-
-
-class AjaxFieldMixin:
-    """Mixin for a Field to be able to handle AJAX requests.
-
-    This mixin will allow you to handle AJAX requests during regular
-    form processing, e.g. when you have a field that needs an AJAX
-    callback to perform search operations.
-
-    To use this mixin, the controllers processing the form must
-    include the following code::
-
-        if form.process_ajax():
-            return form.ajax_response
-
-    It is a good idea to run this code as early as possible to avoid
-    doing expensive operations like loading a big list of objects
-    which may be never used when returning early due to the AJAX
-    request.
-    """
-
-    def process_ajax(self):
-        raise NotImplementedError
-
-    def get_ajax_url(self, **url_args):
-        kwargs = request.view_args | request.args.to_dict(False)
-        kwargs.update(url_args)
-        kwargs['__wtf_ajax'] = self.id
-        return url_for(request.endpoint, **kwargs)
