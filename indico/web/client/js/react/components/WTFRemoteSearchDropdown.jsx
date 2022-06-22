@@ -145,24 +145,6 @@ export function RemoteSearchDropdown({
     }
   }, [preload, fetchData]);
 
-  useEffect(() => {
-    if (preload) {
-      return;
-    }
-
-    let params;
-    const id = getIdFromQuery(searchQuery);
-    if (allowById && id !== null) {
-      params = {id};
-    } else if (searchQuery.length >= minTriggerLength) {
-      params = {q: searchQuery};
-    }
-
-    if (params) {
-      fetchData(params);
-    }
-  }, [preload, allowById, minTriggerLength, searchQuery, fetchData]);
-
   const onChange = (evt, {value: newValue}) => {
     setSearchQuery('');
     onChangeFromProps(newValue);
@@ -173,6 +155,22 @@ export function RemoteSearchDropdown({
 
   const onSearch = (evt, {searchQuery: newSearchQuery}) => {
     setSearchQuery(newSearchQuery);
+
+    if (preload) {
+      return;
+    }
+
+    let params;
+    const id = getIdFromQuery(newSearchQuery);
+    if (allowById && id !== null) {
+      params = {id};
+    } else if (newSearchQuery.length >= minTriggerLength) {
+      params = {q: newSearchQuery};
+    }
+
+    if (params) {
+      fetchData(params);
+    }
   };
 
   const searchDisabledMessage =
