@@ -1,20 +1,21 @@
 import emailAttributesURL from 'indico-url:persons.email_event_persons';
+import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Form, Modal, Button, TextArea, Message} from 'semantic-ui-react';
+import {Form, Modal, Button, TextArea, Message, Input} from 'semantic-ui-react';
 
 import TextEditor from 'indico/react/components/TextEditor';
 import {
   FinalCheckbox,
   FinalDropdown,
   FinalField,
-  FinalInput,
   handleSubmitError,
+  validators,
 } from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
@@ -59,14 +60,24 @@ EmailButton.defaultProps = {
 };
 
 export function EmailForm({eventId, personIds, roleIds, userIds}) {
+  const [preview, setPreview] = useState(null);
   const recipientData = {personId: personIds, roleId: roleIds, userId: userIds};
-  const {data} = useIndicoAxios({
+  const {data, loading} = useIndicoAxios({
     url: emailAttributesURL({event_id: eventId}),
-    trigger: eventId,
-    options: {params: snakifyKeys(recipientData)},
+    params: snakifyKeys(recipientData),
   });
-  const loading = !data;
-  const {senders = [], recipients = [], subject, body} = data || {};
+  const {senders = [], recipients = [], subject: defaultSubject, body: defaultBody} = data || {};
+  // CKEditor5 should not call onChange when the editor data is changed in preview
+  const onEditorChange = onChange => (_, editor) => !preview && onChange(editor.getData());
+
+  const togglePreview = async ({body, subject}) => {
+    if (!preview) {
+      const {data} = await indicoAxios.post(emailPreviewURL({event_id: eventId}), {body, subject});
+      setPreview(data);
+      return;
+    }
+    setPreview(undefined);
+  };
 
   const onSubmit = async data => {
     try {
@@ -78,14 +89,17 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
     }
   };
 
-  const renderForm = ({handleSubmit, submitting, submitSucceeded}) => (
+  const renderForm = ({handleSubmit, submitting, submitSucceeded, values}) => (
     <Form loading={loading} onSubmit={handleSubmit}>
       {submitSucceeded && (
         <Message positive>
           <Translate as={Message.Header}>Your email has been sent.</Translate>
           <Translate as="p">
-            {Object.values(recipientData).reduce((acc, v) => acc + v.length, 0)} emails have been
-            sent.
+            <Param
+              name="count"
+              value={Object.values(recipientData).reduce((acc, v) => acc + v.length, 0)}
+            />{' '}
+            emails have been sent.
           </Translate>
         </Message>
       )}
@@ -100,16 +114,27 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
       </Form.Field>
       <Form.Field>
         <Translate as="label">Subject</Translate>
-        <FinalInput name="subject" />
+        <FinalField name="subject">
+          {({input: {value, ...rest}}) => (
+            <Input value={preview ? preview.subject : value} disabled={!!preview} {...rest} />
+          )}
+        </FinalField>
       </Form.Field>
       <Form.Field>
         <Translate as="label">Email body</Translate>
-        <FinalField name="body">
-          {({input}) => (
-            <TextEditor
-              value={input.value}
-              onChange={(_, editor) => input.onChange(editor.getData())}
-            />
+        <FinalField name="body" validate={validators.required}>
+          {({input, meta}) => (
+            <>
+              {(meta.error || meta.submitError) && meta.touched && (
+                <span>{meta.error || meta.submitError}</span>
+              )}
+              <TextEditor
+                value={preview ? preview.body : input.value}
+                onChange={onEditorChange(input.onChange)}
+                disabled={!!preview}
+                required
+              />
+            </>
           )}
         </FinalField>
       </Form.Field>
@@ -124,9 +149,12 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
           Send copy of each email to my mailbox
         </Translate>
       </Form.Field>
-      <Translate as={Button} type="submit" disabled={submitting || submitSucceeded}>
+      <Translate as={Button} type="submit" disabled={submitting || submitSucceeded} primary>
         Send
       </Translate>
+      <Button type="button" active={!!preview} onClick={() => togglePreview(values)}>
+        {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
+      </Button>
     </Form>
   );
 
@@ -135,8 +163,8 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
       initialValues={{
         recipients: recipients.join(', '),
         fromAddress: senders[0] && senders[0][0],
-        subject,
-        body,
+        subject: defaultSubject,
+        body: defaultBody,
       }}
       onSubmit={onSubmit}
       render={renderForm}

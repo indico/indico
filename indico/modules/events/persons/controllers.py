@@ -8,7 +8,7 @@
 import itertools
 from collections import defaultdict
 
-from flask import flash, jsonify, redirect, render_template, request, session
+from flask import flash, jsonify, redirect, request, session
 from marshmallow import fields
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload
@@ -262,17 +262,20 @@ class RHPersonsList(RHPersonsBase):
 class RHEmailEventPersonsPreview(RHManageEventBase):
     """Preview an email with EventPersons associated placeholders."""
 
-    def _process(self):
+    @use_kwargs({
+        'body': fields.String(required=True),
+        'subject': fields.String(load_default=None),
+    })
+    def _process(self, body, subject):
         person = self.event.person_links[0]
-        email_body = replace_placeholders('event-persons-email', request.form['body'],
-                                          event=self.event, person=person)
-        email_subject = replace_placeholders('event-persons-email', request.form['subject'],
-                                             event=self.event, person=person)
+        email_body = replace_placeholders('event-persons-email', body, event=self.event, person=person)
+        email_subject = replace_placeholders('event-persons-email', subject, event=self.event, person=person)
         tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
                                   email_body=email_body)
-        html = render_template('events/persons/management/email_preview.html', subject=tpl.get_subject(),
-                               body=tpl.get_body())
-        return jsonify(html=html)
+        return {
+            'subject': tpl.get_subject(),
+            'body': tpl.get_body()
+        }
 
 
 class RHAPIEmailEventPersons(RHManageEventBase):
