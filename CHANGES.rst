@@ -59,6 +59,8 @@ Bugfixes
   (:pr:`5363`)
 - Do not propose an impossible date/time in the Room Booking module when accessing it
   shortly before midnight (:pr:`5371`)
+- Do not fail when viewing an abstract that has been reviewed in a track which has
+  been deleted in the meantime (:pr:`5385`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
