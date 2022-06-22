@@ -7,7 +7,7 @@
 
 from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHAbstractsBase
@@ -171,6 +171,8 @@ class RHEditAbstractReview(RHAbstractBase):
     def _process_args(self):
         RHAbstractBase._process_args(self)
         self.review = AbstractReview.get_or_404(request.view_args['review_id'])
+        if self.review.track is None:
+            raise BadRequest(_('Track has been deleted'))
 
     def _process(self):
         form = build_review_form(review=self.review)
