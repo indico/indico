@@ -42,16 +42,8 @@ import {Translate} from 'indico/react/i18n';
         // are visually hidden but not actually disabled
         realField = field.closest('.form-group').find(':input');
       }
-      if (realField.length) {
-        // Selectize clones the field and copies the `required` flag so we need
-        // to make sure to also disable the clone to avoid validation errors!
-        const selectizeField = realField[0].selectize
-          ? $('#{0}-selectized'.format(realField[0].id))
-          : $();
-        if (!field.data('initiallyDisabled')) {
-          realField.prop('disabled', !active);
-          selectizeField.prop('disabled', !active);
-        }
+      if (realField.length && !field.data('initiallyDisabled')) {
+        realField.prop('disabled', !active);
       }
     });
   }

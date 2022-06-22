@@ -240,30 +240,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   );
 }
 
-/* inspired by https://github.com/brianreavis/selectize.js/blob/master/examples/github.html */
-.selectize-control {
-  &::before {
-    @include transition(opacity 0.2s);
-    content: ' ';
-    z-index: 2;
-    position: absolute;
-    display: block;
-    top: 1.2em;
-    right: 2.4em;
-    width: 1.2em;
-    height: 1.2em;
-    background: url(static:images/loading.gif);
-    background-size: 1.2em 1.2em;
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  &.loading::before {
-    opacity: 0.4;
-    visibility: visible;
-  }
-}
-
 .timedelta-widget {
   input[type='number'] {
     display: inline;
