@@ -46,13 +46,12 @@
                 </div>
             </div>
             {% if has_contribs %}
-                <div class="section searchable-field" data-values="{{ contribs_data | tojson | forceescape }}">
+                <div class="section searchable-field" data-values="{{ contribs_data | tojson | forceescape }}" data-link-type="contribution">
                     <div class="text">
                         <div class="label">
                             {%- trans %}Contribution{% endtrans -%}
                         </div>
-                        {{ form_row(form.contribution, skip_label=true, hide_description=true,
-                                    widget_attrs={'data_link_type': 'contribution'}) }}
+                        {{ form_row(form.contribution, skip_label=true, hide_description=true) }}
                     </div>
                     <div class="toolbar">
                         <a href="#" target="_blank" class="i-button highlight js-book-btn disabled">
@@ -62,13 +61,12 @@
                 </div>
             {% endif %}
             {% if has_session_blocks %}
-                <div class="section searchable-field" data-values="{{ session_blocks_data | tojson | forceescape }}">
+                <div class="section searchable-field" data-values="{{ session_blocks_data | tojson | forceescape }}" data-link-type="sessionBlock">
                     <div class="text">
                         <div class="label">
                             {%- trans %}Session block{% endtrans -%}
                         </div>
-                        {{ form_row(form.session_block, skip_label=true, hide_description=true,
-                                    widget_attrs={'data_link_type': 'sessionBlock'}) }}
+                        {{ form_row(form.session_block, skip_label=true, hide_description=true) }}
                     </div>
                     <div class="toolbar">
                         <a href="#" target="_blank" class="i-button highlight js-book-btn disabled">
