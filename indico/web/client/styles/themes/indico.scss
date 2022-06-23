@@ -213,7 +213,11 @@ div.event-header {
 
     .event-actions {
       display: flex;
-      gap: 0.2em;
+
+      @media screen {
+        // XXX somehow this breaks printing in chrome (23k pages)
+        gap: 0.2em;
+      }
       margin-top: 10px;
     }
   }
