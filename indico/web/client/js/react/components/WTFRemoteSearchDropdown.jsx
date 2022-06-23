@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Dropdown} from 'semantic-ui-react';
@@ -13,6 +12,11 @@ import {Dropdown} from 'semantic-ui-react';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
+
+const naturalSort = (options, key = 'text') => {
+  const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+  return options.sort((a, b) => collator.compare(a[key], b[key]));
+};
 
 const highlightSearch = (text, query = '') => {
   const index = text.toLowerCase().indexOf(query);
@@ -102,7 +106,7 @@ export function RemoteSearchDropdown({
         'search': item[searchField].toLowerCase(),
         'friendly-id': item.friendly_id,
       }));
-      return _.sortBy(opts, 'text');
+      return naturalSort(opts);
     },
     [valueField, labelField, searchField]
   );
