@@ -139,6 +139,10 @@ class SessionBlock(LocationMixin, db.Model):
     def __repr__(self):
         return format_repr(self, 'id', _text=self.title or None)
 
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the session block."""
+        return self.event.log(*args, meta={'session_block_id': self.id}, **kwargs)
+
 
 SessionBlock.register_location_events()
 

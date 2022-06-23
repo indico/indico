@@ -680,4 +680,4 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the abstract."""
-        self.event.log(*args, meta={'abstract_id': self.id}, **kwargs)
+        return self.event.log(*args, meta={'abstract_id': self.id}, **kwargs)

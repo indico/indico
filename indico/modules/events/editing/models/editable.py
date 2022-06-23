@@ -248,7 +248,7 @@ class Editable(db.Model):
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the editable."""
-        self.event.log(*args, meta={'editable_id': self.id}, **kwargs)
+        return self.event.log(*args, meta={'editable_id': self.id}, **kwargs)
 
 
 @listens_for(orm.mapper, 'after_configured', once=True)

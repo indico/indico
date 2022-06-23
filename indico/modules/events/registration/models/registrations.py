@@ -687,7 +687,7 @@ class Registration(db.Model):
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the registration."""
-        self.event.log(*args, meta={'registration_id': self.id}, **kwargs)
+        return self.event.log(*args, meta={'registration_id': self.id}, **kwargs)
 
     def is_pending_transaction_expired(self):
         """Check if the registration has a pending transaction that expired."""
