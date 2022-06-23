@@ -1,10 +1,17 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2022 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 import emailAttributesURL from 'indico-url:persons.email_event_persons';
 import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
 import React, {useRef, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Form, Modal, Button, TextArea, Message, Input} from 'semantic-ui-react';
+import {Form, Modal, Button, TextArea, Message, Input, Label} from 'semantic-ui-react';
 
 import TextEditor from 'indico/react/components/TextEditor';
 import {
@@ -18,6 +25,8 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
+
+import './Email.module.scss';
 
 const useIdSelector = selector =>
   Array.from(document.querySelectorAll(selector))
@@ -91,7 +100,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
     }
   };
 
-  const renderForm = ({handleSubmit, submitting, submitSucceeded, values}) => (
+  const renderForm = ({handleSubmit, submitting, submitSucceeded, values, hasValidationErrors}) => (
     <Form loading={loading} onSubmit={handleSubmit}>
       {submitSucceeded && (
         <Message positive>
@@ -127,8 +136,10 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
         <FinalField name="body" validate={validators.required}>
           {({input, meta}) => (
             <>
-              {(meta.error || meta.submitError) && meta.touched && (
-                <span>{meta.error || meta.submitError}</span>
+              {(meta.error || meta.submitError) && (
+                <Label basic color="red" pointing="below">
+                  {meta.error || meta.submitError}
+                </Label>
               )}
               <TextEditor
                 value={preview ? preview.body : input.value}
@@ -151,7 +162,12 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
           Send copy of each email to my mailbox
         </Translate>
       </Form.Field>
-      <Translate as={Button} type="submit" disabled={submitting || submitSucceeded} primary>
+      <Translate
+        as={Button}
+        type="submit"
+        disabled={submitting || submitSucceeded || hasValidationErrors}
+        primary
+      >
         Send
       </Translate>
       <Button type="button" active={!!preview} onClick={() => togglePreview(values)}>
