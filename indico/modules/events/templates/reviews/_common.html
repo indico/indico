@@ -79,7 +79,7 @@
     {% set event = proposal.event %}
     {{ render_user_avatar(user) }}
     <div class="i-timeline-item-box footer-only header-indicator-left review-form">
-        <div class="i-box-footer">
+        <div class="i-box-footer" style="overflow: visible;">
             {% set form_id = 'judgment-form' %}
             {% call form_header(form, action=proposal.get_save_judgment_url(), orientation='vertical', id=form_id) %}
                 data-form-container="#proposal-decision-box"
