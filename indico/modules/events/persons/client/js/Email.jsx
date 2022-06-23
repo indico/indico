@@ -2,7 +2,7 @@ import emailAttributesURL from 'indico-url:persons.email_event_persons';
 import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Form, Modal, Button, TextArea, Message, Input} from 'semantic-ui-react';
 
@@ -61,21 +61,23 @@ EmailButton.defaultProps = {
 
 export function EmailForm({eventId, personIds, roleIds, userIds}) {
   const [preview, setPreview] = useState(null);
+  // Prevents CKEditor5 onChange call when the editor data is updated in preview
+  const disableChange = useRef(false);
   const recipientData = {personId: personIds, roleId: roleIds, userId: userIds};
   const {data, loading} = useIndicoAxios({
     url: emailAttributesURL({event_id: eventId}),
     params: snakifyKeys(recipientData),
   });
   const {senders = [], recipients = [], subject: defaultSubject, body: defaultBody} = data || {};
-  // CKEditor5 should not call onChange when the editor data is changed in preview
-  const onEditorChange = onChange => (_, editor) => !preview && onChange(editor.getData());
 
   const togglePreview = async ({body, subject}) => {
     if (!preview) {
       const {data} = await indicoAxios.post(emailPreviewURL({event_id: eventId}), {body, subject});
+      disableChange.current = true;
       setPreview(data);
       return;
     }
+    disableChange.current = false;
     setPreview(undefined);
   };
 
@@ -130,7 +132,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
               )}
               <TextEditor
                 value={preview ? preview.body : input.value}
-                onChange={onEditorChange(input.onChange)}
+                onChange={(_, editor) => !disableChange.current && input.onChange(editor.getData())}
                 disabled={!!preview}
                 required
               />
