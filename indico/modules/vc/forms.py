@@ -23,11 +23,11 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, IndicoDateField, IndicoRadioField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.validators import Exclusive, UsedIf
-from indico.web.forms.widgets import JinjaWidget, SelectizeWidget, SwitchWidget
+from indico.web.forms.widgets import JinjaWidget, RemoteDropdownWidget, SwitchWidget
 
 
 class VCRoomField(HiddenField):
-    widget = SelectizeWidget(min_trigger_length=3)
+    widget = RemoteDropdownWidget(min_trigger_length=3)
 
     def process_formdata(self, valuelist):
         if valuelist and valuelist[0].isdigit():

@@ -213,10 +213,6 @@ form {
     @extend .i-form-field-fluid;
   }
 
-  .selectize-control input[type='text'] {
-    height: auto;
-  }
-
   textarea {
     @extend %form-field-input;
     height: auto;

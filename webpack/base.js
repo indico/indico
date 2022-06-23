@@ -322,7 +322,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
     },
     externals: ({context, request}, callback) => {
       // tell webpack to make certain packages use window.jQuery (and not load it again)
-      if (/^jquery$/.test(request) && /(selectize|fullcalendar)/.test(context)) {
+      if (/^jquery$/.test(request) && /fullcalendar/.test(context)) {
         return callback(null, 'jQuery');
       }
       return callback();

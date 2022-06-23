@@ -9,12 +9,12 @@ from wtforms import Field
 
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.forms.widgets import SelectizeWidget
+from indico.web.forms.widgets import RemoteDropdownWidget
 
 
 class LinkedObjectField(Field):
-    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
-                             inline_js=True)
+    widget = RemoteDropdownWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
+                                  inline_js=True)
 
     def __init__(self, *args, **kwargs):
         self.ajax_endpoint = kwargs.pop('ajax_endpoint')
@@ -37,7 +37,7 @@ class LinkedObjectField(Field):
 
 class ContributionField(LinkedObjectField):
     """
-    A selectize-based field to select a contribution that has no reservation yet.
+    A field with dynamic fetching to select a contribution that has no reservation yet.
     """
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter contribution title or #id'))
@@ -46,7 +46,7 @@ class ContributionField(LinkedObjectField):
 
 class SessionBlockField(LinkedObjectField):
     """
-    A selectize-based field to select a session block that has no reservation yet.
+    A field with dynamic fetching to select a session block that has no reservation yet.
     """
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter session block title'))
