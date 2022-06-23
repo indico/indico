@@ -15,7 +15,7 @@ $(document).ready(() => {
     const $fieldContainer = $target.closest('.searchable-field');
     const objectId = $target.val();
     const $bookBtn = $fieldContainer.find('.js-book-btn');
-    const linkType = $fieldContainer.data('link-type');
+    const linkType = $target.data('link-type');
     let params = {};
     if (objectId) {
       const values = $fieldContainer.data('values')[objectId];
