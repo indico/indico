@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
 from indico.modules.networks.fields import MultiIPNetworkField
@@ -42,4 +42,4 @@ class IPNetworkGroupForm(IndicoForm):
         if self._network_group_id is not None:
             query = query.filter(IPNetworkGroup.id != self._network_group_id)
         if query.has_rows():
-            raise ValueError(_('An IP network with this name already exists.'))
+            raise ValidationError(_('An IP network with this name already exists.'))

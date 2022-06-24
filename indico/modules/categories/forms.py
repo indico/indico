@@ -213,4 +213,4 @@ class CategoryRoleForm(IndicoForm):
         if self.role is not None:
             query = query.filter(CategoryRole.id != self.role.id)
         if query.has_rows():
-            raise ValueError(_('A role with this code already exists.'))
+            raise ValidationError(_('A role with this code already exists.'))
