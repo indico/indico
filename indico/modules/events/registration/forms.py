@@ -137,10 +137,24 @@ class RegistrationFormCreateForm(IndicoForm):
                                                     'registration form designer'),
                                       render_kw={'placeholder': _('Indefinite')})
 
+    def validate_visibility(self, field):
+        participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data[:-1])
+        if participant_visibility.value < public_visibility.value:
+            raise ValidationError(_('Participant visibility can not be more restrictive for other participants than '
+                                    'for the public'))
+        if field.data[2] is not None and not field.data[2]:
+            raise ValidationError(_('The visibility duration cannot be zero.'))
+
     def validate_retention_period(self, field):
         retention_period = field.data
-        if not retention_period and retention_period is not None:
+        if retention_period is None:
+            return
+        elif not retention_period:
             raise ValidationError(_('The retention period cannot be zero.'))
+        visibility_duration = (timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None
+                               else None)
+        if visibility_duration and visibility_duration > retention_period:
+            raise ValidationError(_('The retention period cannot be lower than the visibility duration.'))
 
 
 class RegistrationFormScheduleForm(IndicoForm):
@@ -538,6 +552,8 @@ class RegistrationPrivacyForm(IndicoForm):
             (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all)
         ):
             raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
+        if field.data[2] is not None and not field.data[2]:
+            raise ValidationError(_('The visibility duration cannot be zero.'))
 
     def validate_retention_period(self, field):
         retention_period = field.data
@@ -545,7 +561,7 @@ class RegistrationPrivacyForm(IndicoForm):
             return
         elif not retention_period:
             raise ValidationError(_('The retention period cannot be zero.'))
-        visibility_duration = (timedelta(days=self.visibility.data[2]*30) if self.visibility.data[2] is not None
+        visibility_duration = (timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None
                                else None)
         if visibility_duration and visibility_duration > retention_period:
             raise ValidationError(_('The retention period cannot be lower than the visibility duration.'))

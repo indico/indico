@@ -56,12 +56,12 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
         form = RegistrationPrivacyForm(event=self.event, regform=self.regform, visibility=[
             self.regform.publish_registrations_participants.name,
             self.regform.publish_registrations_public.name,
-            (self.regform.publish_registrations_duration.days // 30
+            (self.regform.publish_registrations_duration.days // 7
              if self.regform.publish_registrations_duration is not None else None)
         ], retention_period=self.regform.retention_period)
         if form.validate_on_submit():
             participant_visibility, public_visibility, visibility_duration = form.visibility.data
-            visibility_duration = timedelta(days=visibility_duration*30) if visibility_duration is not None else None
+            visibility_duration = timedelta(weeks=visibility_duration) if visibility_duration is not None else None
             changes = self._get_changes(participant_visibility, public_visibility,
                                         visibility_duration, form.retention_period.data)
             self.regform.retention_period = form.retention_period.data

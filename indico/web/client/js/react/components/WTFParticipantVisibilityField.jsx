@@ -84,7 +84,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
         </Form.Field>
         <Form.Field style={{flexGrow: 1}}>
           <label>
-            <Translate>Visibility duration (months)</Translate>
+            <Translate>Visibility duration (weeks)</Translate>
           </label>
           <Input
             type="number"

@@ -162,7 +162,7 @@ class RHManageParticipants(RHManageRegFormsBase):
                 participant_visibility, public_visibility, visibility_duration = form.visibility.data
                 regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
                 regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
-                regform.publish_registrations_duration = (timedelta(days=visibility_duration*30)
+                regform.publish_registrations_duration = (timedelta(weeks=visibility_duration)
                                                           if visibility_duration is not None else None)
                 db.session.add(regform)
                 db.session.flush()
@@ -195,7 +195,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             participant_visibility, public_visibility, visibility_duration = form.visibility.data
             regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
             regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
-            regform.publish_registrations_duration = (timedelta(days=visibility_duration*30)
+            regform.publish_registrations_duration = (timedelta(weeks=visibility_duration)
                                                       if visibility_duration is not None else None)
             db.session.add(regform)
             db.session.flush()
