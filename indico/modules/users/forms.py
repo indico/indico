@@ -118,7 +118,7 @@ class AdminUserSettingsForm(IndicoForm):
                                                        'still be able to regenerate the tokens assigned to them.'))
     if config.data['LOCAL_MODERATION']:
         mandatory_fields_account_request = IndicoSelectMultipleCheckboxField(_('Mandatory fields in account request'),
-                                                                         choices=['Affiliation','Comment'],
+                                                                         choices=[('affiliation',_('Affiliation')),('comment', _('Comment'))],
                                                                          description=_('Fields a new user has to fill in when requesting an account'))
 
 

@@ -142,7 +142,7 @@ function Signup({
               <SyncedFinalInput
                 name="affiliation"
                 label={Translate.string('Affiliation')}
-                required={ moderated && mandatoryFields.includes("Affiliation") }
+                required={moderated && mandatoryFields.includes('affiliation')}
                 syncedValues={syncedValues}
               />
             )}
@@ -191,7 +191,7 @@ function Signup({
                 </Translate>
               </Message>
               <FinalTextArea
-                required={ mandatoryFields.includes("Comment") } 
+                required={mandatoryFields.includes('comment')}
                 name="comment"
                 label={Translate.string('Comment')}
                 description={Translate.string(
