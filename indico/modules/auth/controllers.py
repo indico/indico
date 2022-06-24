@@ -26,7 +26,7 @@ from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import (impersonate_user, load_identity_info, register_user, undo_impersonate_user,
                                       url_for_logout)
 from indico.modules.auth.views import WPAuth, WPAuthUser, WPSignup
-from indico.modules.users import User
+from indico.modules.users import User, user_management_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.i18n import _
@@ -512,6 +512,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
         }
         affiliation_meta = None
         pending_data = self.get_pending_initial_data(emails)
+        mandatory_fields = user_management_settings.get('mandatory_fields_account_request')
         if self.from_sync_provider:
             synced_fields = set(multipass.synced_fields)
             synced_values = {k: v or '' for k, v in self.identity_info['data'].items() if k in synced_fields}
@@ -539,6 +540,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
             'emails': emails,
             'affiliationMeta': affiliation_meta,
             'hasPendingUser': bool(pending_data),
+            'mandatoryFields': mandatory_fields,
         }
 
     def create_schema(self):
@@ -629,6 +631,7 @@ class LocalRegistrationHandler(RegistrationHandler):
         initial_values = {'email': email, 'affiliation_data': {'id': None, 'text': ''}}
         pending_data = self.get_pending_initial_data([email])
         initial_values.update(pending_data)
+        mandatory_fields = user_management_settings.get('mandatory_fields_account_request')
         return {
             'cancelURL': url_for_logout(),
             'moderated': self.moderate_registrations,
@@ -638,6 +641,7 @@ class LocalRegistrationHandler(RegistrationHandler):
             'syncedValues': {},
             'emails': [email],
             'hasPendingUser': bool(pending_data),
+            'mandatoryFields': mandatory_fields,
         }
 
     def create_schema(self):

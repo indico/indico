@@ -38,6 +38,7 @@ function Signup({
   emails,
   affiliationMeta,
   hasPendingUser,
+  mandatoryFields,
 }) {
   const handleSubmit = async (data, form) => {
     const values = getValuesForFields(data, form);
@@ -141,6 +142,7 @@ function Signup({
               <SyncedFinalInput
                 name="affiliation"
                 label={Translate.string('Affiliation')}
+                required={ moderated && mandatoryFields.includes("Affiliation") }
                 syncedValues={syncedValues}
               />
             )}
@@ -189,8 +191,9 @@ function Signup({
                 </Translate>
               </Message>
               <FinalTextArea
+                required={ mandatoryFields.includes("Comment") } 
                 name="comment"
-                initialValue=""
+                label={Translate.string('Comment')}
                 description={Translate.string(
                   'You can provide additional information or a comment for the administrators who will review your registration.'
                 )}
@@ -229,6 +232,7 @@ Signup.propTypes = {
   emails: PropTypes.arrayOf(PropTypes.string).isRequired,
   affiliationMeta: PropTypes.object,
   hasPendingUser: PropTypes.bool,
+  mandatoryFields: PropTypes.arrayOf(PropTypes.string),
 };
 
 Signup.defaultProps = {
