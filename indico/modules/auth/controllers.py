@@ -435,15 +435,15 @@ class RegistrationHandler:
             first_name = fields.String(required=True)
             last_name = fields.String(required=True)
             address = fields.String(load_default='')
-            if 'affiliation' in user_management_settings.get('mandatory_fields_account_request'):
-                affiliation = fields.String(required=True)
+            if self.moderate_registrations and 'affiliation' in user_management_settings.get('mandatory_fields_account_request'):
+                affiliation = fields.String(required=True, validate=not_empty)
             else:
                 affiliation = fields.String(load_default='')
             phone = fields.String(load_default='')
             affiliation_link = ModelField(Affiliation, data_key='affiliation_id', load_default=None)
             if self.moderate_registrations:
                 if 'comment' in user_management_settings.get('mandatory_fields_account_request'):
-                    comment = fields.String(required=True)
+                    comment = fields.String(required=True, validate=not_empty)
                 else:
                     comment = fields.String(load_default='')
 

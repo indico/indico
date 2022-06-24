@@ -116,10 +116,10 @@ class AdminUserSettingsForm(IndicoForm):
                                          description=_('Whether users are allowed to generate personal API tokens. '
                                                        'If disabled, only admins can create them, but users will '
                                                        'still be able to regenerate the tokens assigned to them.'))
-    if config.data['LOCAL_MODERATION']:
+    if config.LOCAL_MODERATION:
         mandatory_fields_account_request = IndicoSelectMultipleCheckboxField(_('Mandatory fields in account request'),
-                                                                         choices=[('affiliation',_('Affiliation')),('comment', _('Comment'))],
-                                                                         description=_('Fields a new user has to fill in when requesting an account'))
+                                                                             choices=[('affiliation', _('Affiliation')), ('comment', _('Comment'))],
+                                                                             description=_('Fields a new user has to fill in when requesting an account'))
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):
