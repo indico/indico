@@ -10,7 +10,7 @@ from operator import itemgetter
 from babel.dates import get_timezone
 from flask import session
 from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
-from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, Pluck, String
+from marshmallow.fields import Boolean, Date, DateTime, Function, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
 from sqlalchemy import func
 
@@ -286,8 +286,8 @@ class BlockingSchema(mm.SQLAlchemyAutoSchema):
 
 
 class NonBookablePeriodSchema(mm.SQLAlchemyAutoSchema):
-    start_dt = NaiveDateTime()
-    end_dt = NaiveDateTime()
+    start_dt = Date()
+    end_dt = Date()
 
     class Meta:
         model = NonBookablePeriod
