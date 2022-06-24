@@ -286,12 +286,27 @@ class BlockingSchema(mm.SQLAlchemyAutoSchema):
 
 
 class NonBookablePeriodSchema(mm.SQLAlchemyAutoSchema):
+    start_dt = NaiveDateTime()
+    end_dt = NaiveDateTime()
+
+    class Meta:
+        model = NonBookablePeriod
+        fields = ('start_dt', 'end_dt')
+
+
+class NonBookablePeriodAdminSchema(mm.SQLAlchemyAutoSchema):
     start_dt = Date()
     end_dt = Date()
 
     class Meta:
         model = NonBookablePeriod
         fields = ('start_dt', 'end_dt')
+
+    @post_dump(pass_many=True)
+    def sort_list(self, data, many, **kwargs):
+        if many:
+            data = sorted(data, key=itemgetter('start_dt', 'end_dt'))
+        return data
 
 
 class BookableHoursSchema(mm.SQLAlchemyAutoSchema):
@@ -513,6 +528,7 @@ reservation_user_event_schema = ReservationUserEventSchema(many=True)
 blockings_schema = BlockingSchema(many=True)
 simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
+nonbookable_periods_admin_schema = NonBookablePeriodAdminSchema(many=True)
 bookable_hours_schema = BookableHoursSchema()
 locations_schema = LocationsSchema(many=True)
 admin_locations_schema = AdminLocationsSchema(many=True)

@@ -33,7 +33,7 @@ from indico.modules.rb.operations.rooms import has_managed_rooms
 from indico.modules.rb.schemas import (AdminRoomSchema, EquipmentTypeArgs, FeatureArgs, LocationArgs, RoomAttributeArgs,
                                        RoomAttributeValuesSchema, RoomUpdateArgsSchema, SettingsSchema,
                                        admin_equipment_type_schema, admin_locations_schema, bookable_hours_schema,
-                                       map_areas_schema, nonbookable_periods_schema, room_attribute_schema,
+                                       map_areas_schema, nonbookable_periods_admin_schema, room_attribute_schema,
                                        room_equipment_schema, room_feature_schema, room_update_schema)
 from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
                                     remove_room_spritesheet_photo)
@@ -305,7 +305,7 @@ class RHUpdateRoomAttributes(RHRoomAdminBase):
 class RHRoomAvailability(RHRoomAdminBase):
     def _process(self):
         return jsonify(
-            nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True),
+            nonbookable_periods=nonbookable_periods_admin_schema.dump(self.room.nonbookable_periods, many=True),
             bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True)
         )
 
@@ -320,7 +320,7 @@ class RHUpdateRoomAvailability(RHRoomAdminBase):
             self._check_invalid_times(args)
         update_room_availability(self.room, args)
         return jsonify(
-            nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True),
+            nonbookable_periods=nonbookable_periods_admin_schema.dump(self.room.nonbookable_periods, many=True),
             bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True)
         )
 
