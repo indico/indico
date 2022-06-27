@@ -82,7 +82,7 @@
 .category-info {
   @extend %font-family-modern-body;
 
-  color: #888;
+  color: $light-black;
   font-size: 1.2em;
   min-height: 0.3em;
   margin: 0 0 2em 0;
@@ -266,7 +266,7 @@ ul.category-list {
     background: #f2f2f2;
     display: block;
     line-height: 2.5em;
-    color: #b3b3b3;
+    color: $dark-gray;
     cursor: pointer;
 
     border-top: 1px solid #fafafa;
@@ -300,20 +300,20 @@ ul.category-list {
     }
 
     &:hover {
-      color: $light-black;
+      color: $black;
 
       a {
         color: darken($dark-blue, 6%);
       }
 
       &::before {
-        color: $light-black;
+        color: $black;
       }
     }
 
     &::before {
       @include transition(color);
-      color: #ccc;
+      color: $dark-gray;
       float: right;
       content: '\46';
       font-family: 'icomoon-ultimate';

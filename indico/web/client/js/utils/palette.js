@@ -18,7 +18,7 @@ const Palette = {
   purple: '#6e5494',
   orange: '#f80',
   olive: '#b5cc18',
-  black: '#555',
+  black: '#444',
   indicoBlue: '#00a4e4',
 };
 
