@@ -140,7 +140,7 @@ class RegistrationFormCreateForm(IndicoForm):
     def validate_visibility(self, field):
         participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data[:-1])
         if participant_visibility.value < public_visibility.value:
-            raise ValidationError(_('Participant visibility can not be more restrictive for other participants than '
+            raise ValidationError(_('Participant visibility cannot be more restrictive for other participants than '
                                     'for the public'))
         if field.data[2] is not None and not field.data[2]:
             raise ValidationError(_('The visibility duration cannot be zero.'))
@@ -536,7 +536,7 @@ class RegistrationPrivacyForm(IndicoForm):
     def validate_visibility(self, field):
         participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data[:-1])
         if participant_visibility.value < public_visibility.value:
-            raise ValidationError(_('Participant visibility can not be more restrictive for other participants than '
+            raise ValidationError(_('Participant visibility cannot be more restrictive for other participants than '
                                     'for the public'))
         participant_visibility_changed_to_show_all = (
             participant_visibility == PublishRegistrationsMode.show_all and
