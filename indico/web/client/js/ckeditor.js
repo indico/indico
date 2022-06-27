@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-export const getConfig = ({simple = true, images = false} = {}) => ({
+export const getConfig = ({images = false} = {}) => ({
   fontFamily: {
     options: [
       'Sans Serif/"Liberation Sans", sans-serif',
@@ -20,8 +20,10 @@ export const getConfig = ({simple = true, images = false} = {}) => ({
       '|',
       'bold',
       'italic',
+      'underline',
       'strikethrough',
       '|',
+      'link',
       'fontColor',
       'removeFormat',
       '|',
@@ -31,15 +33,16 @@ export const getConfig = ({simple = true, images = false} = {}) => ({
       'outdent',
       'indent',
       '|',
-      'link',
-      !simple && images && 'imageInsert',
-      !simple && 'insertTable',
+      images && 'imageInsert',
+      'insertTable',
       '|',
+      'subscript',
+      'superscript',
       'blockQuote',
-      !simple && 'code',
-      !simple && 'horizontalLine',
+      'code',
+      'horizontalLine',
       '|',
-      !simple && 'findAndReplace',
+      'findAndReplace',
       'undo',
       'redo',
       '|',
@@ -57,6 +60,7 @@ export const getConfig = ({simple = true, images = false} = {}) => ({
     'CodeBlock',
     'Essentials',
     'FindAndReplace',
+    'FontBackgroundColor',
     'FontColor',
     'GeneralHtmlSupport',
     'Heading',
@@ -78,8 +82,11 @@ export const getConfig = ({simple = true, images = false} = {}) => ({
     'RemoveFormat',
     'SourceEditing',
     'Strikethrough',
+    'Subscript',
+    'Superscript',
     'Table',
     'TableToolbar',
+    'Underline',
   ].filter(Boolean),
   htmlSupport: {
     allow: [
