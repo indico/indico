@@ -128,7 +128,6 @@ class AdminAccountRegistrationForm(LocalRegistrationForm):
             for field in ('username', 'password', 'confirm_password'):
                 inject_validators(self, field, [HiddenUnless('create_identity')], early=True)
         super().__init__(*args, **kwargs)
-        del self.comment
         if not config.LOCAL_IDENTITIES:
             del self.username
             del self.password
