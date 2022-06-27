@@ -27,7 +27,7 @@ function NumberInputComponent({value, onChange, disabled, price, minValue, maxVa
         type="number"
         value={value !== null ? value : ''}
         min={minValue}
-        max={maxValue}
+        max={maxValue || undefined}
         disabled={disabled}
         onChange={evt => onChange(evt.target.value ? +evt.target.value : null)}
       />
