@@ -18,7 +18,7 @@
     {% if regform.is_purged %}
         {% call message_box('error', fixed_width=true, large_icon=true) %}
             <div class="label">
-                {% trans %}Registration is disabled due to an expired retention period.{% endtrans %}
+                {% trans %}Registration is disabled due to an expired retention period{% endtrans %}
             </div>
         {% endcall %}
     {% else %}
