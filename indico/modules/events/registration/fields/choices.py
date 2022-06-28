@@ -428,11 +428,11 @@ class AccommodationSchema(mm.Schema):
     def validate_everything(self, data, **kwargs):
         if not data['isNoAccommodation']:
             if not data['choice']:
-                raise ValidationError('This field is required', 'choice')
-            elif not data['arrivalDate']:
-                raise ValidationError('This field is required', 'arrivalDate')
-            elif not data['departureDate']:
-                raise ValidationError('This field is required', 'departureDate')
+                raise ValidationError('Choice is required', 'choice')
+            elif not data.get('arrivalDate'):
+                raise ValidationError('Arrival date is required', 'arrivalDate')
+            elif not data.get('departureDate'):
+                raise ValidationError('Departure date is required', 'departureDate')
 
 
 class AccommodationField(RegistrationFormBillableItemsField):
@@ -449,9 +449,9 @@ class AccommodationField(RegistrationFormBillableItemsField):
             (c for c in versioned_data['choices'] if c.get('is_no_accommodation') and c['is_enabled']), None)
         return {
             'choice': no_accommodation_option['id'] if no_accommodation_option else None,
-            'is_no_accommodation': bool(no_accommodation_option),
-            'arrival_date': None,
-            'departure_date': None,
+            'isNoAccommodation': bool(no_accommodation_option),
+            'arrivalDate': None,
+            'departureDate': None,
         }
 
     @classmethod
