@@ -490,6 +490,25 @@ class AccommodationField(RegistrationFormBillableItemsField):
         return data
 
     def get_validators(self, existing_registration):
+        def _check_choice_data(new_data):
+            item = None
+            if existing_registration:
+                old_data = existing_registration.data_by_field.get(self.form_item.id)
+                if old_data and not self.has_data_changed(snakify_keys(new_data), old_data):
+                    return
+                elif old_data:
+                    # try to get choice from existing data
+                    item = next((c for c in old_data.field_data.versioned_data['choices']
+                                 if c['id'] == new_data['choice']), None)
+            if item is None:
+                item = next((c for c in self.form_item.versioned_data['choices'] if c['id'] == new_data['choice']),
+                            None)
+            # this should never happen unless someone tampers with the data
+            if item is None:
+                raise ValidationError('Invalid choice')
+            if item.get('is_no_accommodation', False) != new_data['isNoAccommodation']:
+                raise ValidationError('Invalid data')
+
         def _stay_dates_valid(new_data):
             if not new_data:
                 return True
@@ -518,7 +537,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
                     (item['places_limit'] < places_used_dict.get(new_data['choice'], 0))):
                 raise ValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
 
-        return [_stay_dates_valid, _check_number_of_places]
+        return [_check_choice_data, _stay_dates_valid, _check_number_of_places]
 
     @property
     def view_data(self):
