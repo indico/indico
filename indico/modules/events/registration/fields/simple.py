@@ -135,8 +135,8 @@ class CheckboxField(RegistrationFormBillableField):
         def _check_number_of_places(new_data):
             if existing_registration:
                 old_data = existing_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(new_data, old_data):
-                    return True
+                if old_data and not self.has_data_changed(new_data, old_data):
+                    return
             if new_data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
                 if not places_left:
@@ -261,8 +261,8 @@ class BooleanField(RegistrationFormBillableField):
         def _check_number_of_places(new_data):
             if existing_registration:
                 old_data = existing_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(new_data, old_data):
-                    return True
+                if old_data and not self.has_data_changed(new_data, old_data):
+                    return
             if new_data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
                 if new_data and not places_left:

@@ -130,7 +130,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
             old_data = None
             if existing_registration:
                 old_data = existing_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(new_data, old_data):
+                if old_data and not self.has_data_changed(new_data, old_data):
                     return
             choices = self.form_item.versioned_data['choices']
             captions = self.form_item.data['captions']
@@ -508,8 +508,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
                 return True
             if existing_registration:
                 old_data = existing_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(snakify_keys(new_data), old_data):
-                    return True
+                if old_data and not self.has_data_changed(snakify_keys(new_data), old_data):
+                    return
             item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == new_data['choice']),
                         None)
             captions = self.form_item.data['captions']
