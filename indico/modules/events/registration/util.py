@@ -29,6 +29,7 @@ from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
 from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
+from indico.modules.events.registration.fields.captcha import CaptchaField
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
@@ -283,7 +284,7 @@ class RegistrationSchemaBase(IndicoSchema):
         unknown = RAISE
 
 
-def make_registration_schema(regform, management=False, registration=None):
+def make_registration_schema(regform, management=False, registration=None, captcha_required=False):
     """Dynamically create a Marshmallow schema based on the registration form fields."""
     class RegistrationSchema(RegistrationSchemaBase):
         @validates('email')
@@ -298,6 +299,9 @@ def make_registration_schema(regform, management=False, registration=None):
         schema['notify_user'] = fields.Boolean()
     elif regform.needs_publish_consent:
         schema['consent_to_publish'] = EnumField(RegistrationVisibility)
+
+    if captcha_required:
+        schema['captcha'] = fields.Nested(CaptchaField)
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:

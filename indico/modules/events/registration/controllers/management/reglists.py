@@ -296,7 +296,8 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     registration=None,
                                                     management=True,
                                                     login_required=False,
-                                                    is_restricted_access=False)
+                                                    is_restricted_access=False,
+                                                    captcha_required=False)
 
 
 class RHRegistrationCreateMultiple(RHManageRegFormBase):
