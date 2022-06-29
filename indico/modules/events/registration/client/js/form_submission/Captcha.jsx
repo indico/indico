@@ -72,6 +72,9 @@ export default function Captcha({name, regformId}) {
         )}
         {reloadBtn}
       </div>
+      {/* SUI's .error classes only work when there is a parent with .ui.form class.
+      Using <Form /> would cause a DOM nesting warning since there is already a plain <form>
+      wrapping the whole regform */}
       <div style={{marginTop: 20}} className="ui form">
         <Form.Field>
           <label>Answer</label>
