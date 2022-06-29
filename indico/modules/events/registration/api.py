@@ -5,13 +5,22 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import base64
+import random
+import string
+
+from captcha.audio import AudioCaptcha
+from captcha.image import ImageCaptcha
 from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
+from indico.core.db import db
 from indico.modules.events.controllers.base import RHProtectedEventBase
 from indico.modules.events.models.events import Event
+from indico.modules.events.registration.models.captcha import Captcha
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
 from indico.web.rh import RH, oauth_scope
@@ -72,3 +81,24 @@ class RHAPIRegistrationForms(RHProtectedEventBase):
     def _process(self):
         from indico.modules.events.registration.schemas import RegistrationFormPrincipalSchema
         return RegistrationFormPrincipalSchema(many=True).jsonify(self.event.registration_forms)
+
+
+class RHAPIGenerateCAPTCHA(RH):
+    """Generate CAPTCHA for registration forms."""
+
+    def _get_random_string(self):
+        return ''.join(random.choices(string.digits, k=4))
+
+    def _process_args(self):
+        self.regform = (
+            RegistrationForm.query.filter_by(id=request.view_args['reg_form_id'], is_deleted=False).first_or_404()
+        )
+
+    def _process_GET(self):
+        answer = self._get_random_string()
+        image = ImageCaptcha().generate(answer)
+        audio = AudioCaptcha().generate(answer)
+        captcha = Captcha(answer=answer, registration_form=self.regform)
+        db.session.add(captcha)
+        db.session.commit()
+        return jsonify({'id': captcha.id, 'image': base64.b64encode(image.read()), 'audio': base64.b64encode(audio)})
