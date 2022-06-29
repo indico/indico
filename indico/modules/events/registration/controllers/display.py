@@ -307,7 +307,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
     def _captcha_required(self):
         """Whether a CAPTCHA should be displayed when registering."""
-        return session.user is None and self.regform.captcha_no_user
+        return session.user is None and self.regform.require_captcha
 
     def _can_register(self):
         if self.regform.limit_reached:
