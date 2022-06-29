@@ -1,0 +1,11 @@
+.captcha {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 20px;
+  gap: 40px;
+
+  audio {
+    max-width: 220px;
+  }
+}

@@ -26,6 +26,7 @@ import ConsentToPublishDropdown from '../components/ConsentToPublishDropdown';
 import FormSection from '../form/FormSection';
 import {getNestedSections, getStaticData} from '../form/selectors';
 
+import Captcha from './Captcha';
 import {
   getUpdateMode,
   getModeration,
@@ -87,7 +88,9 @@ ConsentToPublish.propTypes = {
 
 export default function RegistrationFormSubmission() {
   const sections = useSelector(getNestedSections);
-  const {submitUrl, registrationData, initialValues} = useSelector(getStaticData);
+  const {submitUrl, registrationData, initialValues, regformId, captchaRequired} = useSelector(
+    getStaticData
+  );
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
   const isManagement = useSelector(getManagement);
@@ -131,6 +134,7 @@ export default function RegistrationFormSubmission() {
                 publishToPublic={publishToPublic}
               />
             )}
+            {captchaRequired && <Captcha regformId={regformId} />}
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}
