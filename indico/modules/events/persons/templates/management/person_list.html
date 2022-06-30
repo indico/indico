@@ -53,13 +53,12 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <button class="i-button icon-mail highlight disabled js-requires-selected-row"
-                            data-href="{{ url_for('persons.email_event_persons', event) }}"
-                            data-title="{% trans %}Send email{% endtrans %}"
-                            data-method="POST"
-                            data-params-selector="#event-participants-list input.id-field:checkbox:checked:visible"
-                            data-ajax-dialog
-                            data-reload-after>
+                    <div id="persons-email"
+                         data-event-id="{{ event.id }}"
+                         data-person-selector="#event-participants-list input[name=person_id][type=checkbox]:checked">
+                    </div>
+                    <button id="persons-email-trigger"
+                            class="i-button icon-mail right highlight disabled js-requires-selected-row">
                         {%- trans %}Send emails{% endtrans -%}
                     </button>
                 </div>
@@ -283,5 +282,6 @@
             hasNoRegistrationFilter: true,
             hasNoBuiltinRolesFilter: true,
         });
+        setupEmailButton({field: '#persons-email'});
     </script>
 {% endblock %}
