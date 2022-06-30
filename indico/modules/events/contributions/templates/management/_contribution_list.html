@@ -225,6 +225,7 @@
                                     <a href="#" class="icon-edit i-link highlight js-dialog-action"
                                        data-href="{{ url_for('.manage_update_contrib', contrib, flash=true) }}"
                                        data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
+                                       title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
                                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
                                        data-ajax-dialog></a>
                                     <a href="#" class="icon-copy i-link highlight"
@@ -242,6 +243,7 @@
                                        data-ajax-dialog></a>
                                     <a href="#" class="icon-remove i-link danger js-delete"
                                        data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
+                                       title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
                                        data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
                                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
                                        data-method="DELETE"

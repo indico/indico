@@ -7,13 +7,15 @@
             <a class="js-edit-type icon-edit"
                data-ajax-dialog
                data-href="{{ url_for('.manage_type', contrib_type) }}"
-               data-title="{% trans %}Edit contribution type{% endtrans %}">
+               data-title="{% trans %}Edit contribution type{% endtrans %}"
+               title="{% trans %}Edit contribution type{% endtrans %}">
             </a>
             <a class="js-delete-type icon-remove"
                data-method="POST"
                data-href="{{ url_for('.delete_type', contrib_type) }}"
                data-confirm="{% trans %}Do you really want to delete this contribution type?{% endtrans %}"
-               data-title="{% trans %}Confirm deletion{% endtrans %}">
+               data-title="{% trans %}Confirm deletion{% endtrans %}"
+               title="{% trans %}Delete contribution type{% endtrans %}">
             </a>
       </td>
     </tr>

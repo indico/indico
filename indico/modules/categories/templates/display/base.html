@@ -45,7 +45,7 @@
                         {% endif %}
                     {% endblock %}
                     {% block cat_export %}
-                        <div id="category-calendar-link" data-category-id="{{ category.id }}"></div>
+                        <div id="category-calendar-link" data-category-id="{{ category.id }}" title="{% trans %}Export{% endtrans %}"></div>
                     {% endblock %}
                     {% block cat_view_dropdown %}
                         <a href="" class="i-button icon-eye arrow js-dropdown"

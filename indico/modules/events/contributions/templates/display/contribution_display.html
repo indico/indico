@@ -122,7 +122,8 @@
         {% if contribution.can_edit(session.user) -%}
             <a href="#" class="i-button icon-edit"
                data-title="{% trans %}Edit contribution{% endtrans %}"
-               data-href="{{ url_for('contributions.manage_update_contrib', contribution, standalone=true) }}"
+               title="{% trans %}Edit contribution{% endtrans %}"
+               data-href="{{ url_for('contributions.manage_update_contrib', contribution , standalone=true) }}"
                data-ajax-dialog
                data-reload-after></a>
         {%- endif %}
@@ -259,6 +260,7 @@
                                         <a href="#" class="icon-edit"
                                            data-href="{{ url_for('contributions.manage_edit_subcontrib', subcontrib, standalone=true) }}"
                                            data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
+                                           title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
                                            data-ajax-dialog
                                            data-reload-after></a>
                                     </span>

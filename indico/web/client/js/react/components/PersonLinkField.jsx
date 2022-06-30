@@ -67,6 +67,7 @@ const PersonListItem = ({
       <Icon
         styleName="button edit"
         name="pencil alternate"
+        title={Translate.string('Edit person')}
         size="large"
         onClick={onEdit}
         disabled={disabled}
@@ -75,6 +76,7 @@ const PersonListItem = ({
         <Icon
           styleName="button delete"
           name="remove"
+          title={Translate.string('Delete person')}
           size="large"
           onClick={onDelete}
           disabled={disabled}

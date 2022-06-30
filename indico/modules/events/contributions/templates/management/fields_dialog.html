@@ -24,7 +24,8 @@
                                 id='contributions-fixed-fields', classes='tiles') %}
         <a class="icon-edit js-action-button hide-if-locked" data-ajax-dialog
            data-href="{{ url_for('.manage_description_field', event) }}"
-           data-title="{% trans %}Abstracts content{% endtrans %}"></a>
+           data-title="{% trans %}Abstracts content{% endtrans %}"
+           title="{% trans %}Edit abstracts content{% endtrans %}"></a>
         <a class="js-delete-contribution-field icon-remove disabled hide-if-locked"
            title="{% trans %}This field cannot be deleted{% endtrans %}"
            data-qtip-position="right"></a>
@@ -34,12 +35,14 @@
         {% call(custom_field) sortable_list(custom_fields, id="contributions-custom-fields", classes='tiles disable-if-locked') %}
             <a class="icon-edit js-action-button js-edit-contribution-field hide-if-locked" data-ajax-dialog
                data-href="{{ url_for('.manage_field', event, custom_field) }}"
-               data-title="{% trans %}Edit custom field{% endtrans %}"></a>
+               data-title="{% trans %}Edit custom field{% endtrans %}"
+               title="{% trans %}Edit custom field{% endtrans %}"></a>
             <a class="js-delete-contribution-field icon-remove hide-if-locked"
                data-method="POST"
                data-href="{{ url_for('.delete_field', event, custom_field) }}"
                data-confirm="{% trans %}Do you really want to delete this field? Data stored in this field will be lost.{% endtrans %}"
-               data-title="{% trans %}Confirm deletion{% endtrans %}"></a>
+               data-title="{% trans %}Confirm deletion{% endtrans %}"
+               title="{% trans %}Delete custom field{% endtrans %}"></a>
         {% endcall %}
     {% else %}
         {%- call message_box('info') %}

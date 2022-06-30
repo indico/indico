@@ -183,6 +183,7 @@ import Palette from 'indico/utils/palette';
           'class': 'i-button text-color borderless icon-only icon-edit',
           'data-href': build_url(Indico.Urls.PermissionsDialog, {type: this.options.objectType}),
           'data-title': $T.gettext('Assign Permissions'),
+          'title': $T.gettext('Assign Permissions'),
           'data-method': 'POST',
           'data-ajax-dialog': '',
           'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions}),
@@ -193,6 +194,7 @@ import Palette from 'indico/utils/palette';
       const self = this;
       return $('<button>', {
         'type': 'button',
+        'title': $T.gettext("Delete entry '{0}'".format(principal.name || principal.id)),
         'class': 'i-button text-color borderless icon-only icon-remove',
         'data-principal': JSON.stringify(principal),
       }).on('click', function() {

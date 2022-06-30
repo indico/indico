@@ -89,6 +89,7 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
   const copyButton = (
     <Button
       icon="copy"
+      title={Translate.string('Copy to clipboard')}
       onClick={async () => {
         await navigator.clipboard.writeText(popupState.url);
         dispatch({type: 'COPIED'});
@@ -198,6 +199,7 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
           </span>
           <Button
             styleName="download-button"
+            title={Translate.string('Download')}
             as="a"
             href={popupState.url}
             icon="download"

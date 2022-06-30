@@ -153,6 +153,7 @@ export const PrincipalListItem = ({
               styleName="button favorite active"
               name="star"
               size="large"
+              title={Translate.string('Remove from favorites')}
               onClick={onDelFavorite}
               disabled={disabled}
             />
@@ -161,6 +162,7 @@ export const PrincipalListItem = ({
               styleName="button favorite"
               name="star outline"
               size="large"
+              title={Translate.string('Add to favorites')}
               onClick={onAddFavorite}
               disabled={disabled}
             />
@@ -170,6 +172,7 @@ export const PrincipalListItem = ({
             styleName="button delete"
             name="remove"
             size="large"
+            title={Translate.string('Delete')}
             onClick={onDelete}
             disabled={disabled}
           />

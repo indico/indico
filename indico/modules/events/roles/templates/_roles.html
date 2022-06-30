@@ -43,6 +43,7 @@
                         <button class="icon-mail i-button text-color borderless"
                                 data-href="{{ url_for('persons.email_event_persons', role.event) }}"
                                 data-title="{% trans %}Send email{% endtrans %}"
+                                title="{% trans %}Send email{% endtrans %}"
                                 data-method="POST"
                                 data-params="{{ dict(role_id=role.id) | tojson | forceescape }}"
                                 data-ajax-dialog></button>
@@ -50,12 +51,14 @@
                     <button class="icon-edit i-button text-color borderless"
                             data-href="{{ url_for('.edit_role', role) }}"
                             data-title="{% trans %}Edit role{% endtrans %}"
+                            title="{% trans %}Edit role{% endtrans %}"
                             data-update="#event-role-{{ role.id }}"
                             data-ajax-dialog></button>
                     <button class="icon-remove i-button text-color borderless danger"
                             data-href="{{ url_for('.delete_role', role) }}"
                             data-method="DELETE"
                             data-title="{% trans name=role.name %}Delete role '{{ name }}'{% endtrans %}"
+                            title="{% trans name=role.name %}Delete role '{{ name }}'{% endtrans %}"
                             data-confirm="{% trans %}Are you sure you want to permanently delete this role?{% endtrans %}"
                             data-update="#event-roles"
                             data-ajax></button>
