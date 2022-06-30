@@ -23,12 +23,18 @@ import {$T} from 'indico/utils/i18n';
 import {SingleEventMove, EventPublish} from './EventMove';
 
 (function(global) {
-  global.setupEmailButton = function setupEmailButton() {
-    const emailBtn = document.querySelector('#persons-email');
-    const selector = emailBtn.dataset.paramsSelector;
+  global.setupEmailButton = function setupEmailButton({field, trigger}) {
+    const element = document.querySelector(field);
+    const {personSelector, userSelector, roleSelector} = element.dataset;
     ReactDOM.render(
-      <EmailButton eventId={+emailBtn.dataset.eventId} personSelector={selector} />,
-      emailBtn
+      <EmailButton
+        eventId={+element.dataset.eventId}
+        personSelector={personSelector}
+        userSelector={userSelector}
+        roleSelector={roleSelector}
+        triggerSelector={trigger || `${field}-trigger`}
+      />,
+      element
     );
   };
 

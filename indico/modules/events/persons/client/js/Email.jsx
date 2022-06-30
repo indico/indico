@@ -9,7 +9,7 @@ import emailAttributesURL from 'indico-url:persons.email_event_persons';
 import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Form, Modal, Button, TextArea, Message, Input, Label} from 'semantic-ui-react';
 
@@ -33,18 +33,39 @@ const useIdSelector = selector =>
     .filter(e => e.offsetWidth > 0 || e.offsetHeight > 0)
     .map(e => +e.value);
 
-export function EmailButton({eventId, personSelector, userSelector, roleSelector}) {
+// TODO: use existing button
+// TODO: disable if none selected
+export function EmailButton({
+  eventId,
+  personSelector,
+  userSelector,
+  roleSelector,
+  triggerSelector,
+  trigger,
+}) {
   const [open, setOpen] = useState(false);
   const personIds = useIdSelector(personSelector);
   const userIds = useIdSelector(userSelector);
   const roleIds = useIdSelector(roleSelector);
+
+  useEffect(() => {
+    if (!triggerSelector) {
+      return;
+    }
+    const handler = () => setOpen(true);
+    const element = document.querySelector(triggerSelector);
+    element.addEventListener('click', handler);
+    return () => element.removeEventListener('click', handler);
+  }, [triggerSelector]);
 
   return (
     <Modal
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
       open={open}
-      trigger={<Translate as={Button}>Send email</Translate>}
+      trigger={
+        !triggerSelector ? trigger || <Translate as={Button}>Send email</Translate> : undefined
+      }
       closeIcon
     >
       <Translate as={Modal.Header}>Send email</Translate>
@@ -60,12 +81,16 @@ EmailButton.propTypes = {
   personSelector: PropTypes.string,
   userSelector: PropTypes.string,
   roleSelector: PropTypes.string,
+  triggerSelector: PropTypes.string,
+  trigger: PropTypes.node,
 };
 
 EmailButton.defaultProps = {
   personSelector: undefined,
   userSelector: undefined,
   roleSelector: undefined,
+  triggerSelector: undefined,
+  trigger: undefined,
 };
 
 export function EmailForm({eventId, personIds, roleIds, userIds}) {
@@ -136,12 +161,13 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
         <FinalField name="body" validate={validators.required}>
           {({input, meta}) => (
             <>
-              {(meta.error || meta.submitError) && (
+              {meta.touched && (meta.error || meta.submitError) && (
                 <Label basic color="red" pointing="below">
                   {meta.error || meta.submitError}
                 </Label>
               )}
               <TextEditor
+                {...input}
                 value={preview ? preview.body : input.value}
                 onChange={(_, editor) => !disableChange.current && input.onChange(editor.getData())}
                 disabled={!!preview}
@@ -153,7 +179,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
       </Form.Field>
       <Form.Field>
         <Translate as="label">Recipients</Translate>
-        <TextArea value={recipients.join(', ')} readOnly />
+        <TextArea rows={3} value={recipients.join(', ')} readOnly />
       </Form.Field>
       <Form.Field>
         <Translate as="label">Send copy to me</Translate>
@@ -179,7 +205,6 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
   return (
     <FinalForm
       initialValues={{
-        recipients: recipients.join(', '),
         fromAddress: senders[0] && senders[0][0],
         subject: defaultSubject,
         body: defaultBody,
