@@ -86,7 +86,7 @@ export function withHoverListener(RoomComponent) {
 
     shouldComponentUpdate({hoveredRoomId: newId, actions, room, ...restProps}) {
       const {hoveredRoomId: currentId, room: oldRoom, actions: __, ...oldRestProps} = this.props;
-      // IMPORTANT: we only want this update to occurr when really needed
+      // IMPORTANT: we only want this update to occur when really needed
       // - whenever this room is going from hovered -> non-hovered
       // - whenever this room is going from non-hovered -> hovered
       // - whenever any of the other props change (selection)

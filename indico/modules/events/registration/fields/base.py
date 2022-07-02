@@ -38,7 +38,7 @@ class RegistrationFormFieldBase:
     setup_schema_base_cls = mm.Schema
     #: a dict with extra marshmallow fields to include in the setup schema
     setup_schema_fields = {}
-    #: whether this field is assocated with a file instead of normal data
+    #: whether this field is associated with a file instead of normal data
     is_file_field = False
     #: whether this field is invalid and cannot be used
     is_invalid_field = False

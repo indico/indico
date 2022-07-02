@@ -133,7 +133,7 @@ class ScopedCache:
 
 class IndicoCache(Cache):
     """
-    This is basicaly the Cache class from Flask-Caching but it silences all
+    This is basically the Cache class from Flask-Caching but it silences all
     exceptions that happen during a cache operation since cache failures should
     not take down the whole page.
 

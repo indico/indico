@@ -149,7 +149,7 @@ def get_n_matching(query, n, predicate, *, prefetch_factor=5, preload_bulk=None)
     :param predicate: A callable used to filter the found objects
     :param prefetch_factor: Prefetch ``n * factor`` objects in each query
     :param preload_bulk: Function that's called with the full set of objects
-                         to allow for bulk-preloading of data neede in the
+                         to allow for bulk-preloading of data needed in the
                          predicate function
     """
     _offset = 0

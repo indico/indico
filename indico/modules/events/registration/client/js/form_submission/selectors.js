@@ -32,7 +32,7 @@ export const getModeration = createSelector(
   staticData => staticData.moderated
 );
 
-/** Indicates whether this is rendered in the mangement area */
+/** Indicates whether this is rendered in the management area */
 export const getManagement = createSelector(
   getStaticData,
   staticData => staticData.management || false
