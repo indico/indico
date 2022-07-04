@@ -65,6 +65,7 @@
         &.selected {
           color: $indico-blue !important;
           border-color: $indico-blue;
+          border-width: 0.15em;
         }
 
         &:not(.other) {
