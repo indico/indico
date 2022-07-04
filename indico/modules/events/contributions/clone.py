@@ -13,9 +13,8 @@ from sqlalchemy.orm import joinedload, subqueryload, undefer
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions import logger as contributions_logger
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
@@ -48,7 +47,7 @@ class ContributionTypeCloner(EventCloner):
         return {'contrib_type_map': self._contrib_type_map}
 
     def _clone_contrib_types(self, new_event):
-        attrs = get_simple_column_attrs(ContributionType)
+        attrs = get_attrs_to_clone(ContributionType)
         for old_contrib_type in self.old_event.contribution_types:
             contrib_type = ContributionType()
             contrib_type.populate_from_attrs(old_contrib_type, attrs)
@@ -75,7 +74,7 @@ class ContributionFieldCloner(EventCloner):
         return {'contrib_field_map': self._contrib_field_map}
 
     def _clone_contrib_fields(self, new_event):
-        attrs = get_simple_column_attrs(ContributionField) - {'field_data'}
+        attrs = get_attrs_to_clone(ContributionField, skip={'field_data'})
         for old_contrib_field in self.old_event.contribution_fields:
             contrib_field = ContributionField()
             contrib_field.populate_from_attrs(old_contrib_field, attrs)
@@ -163,7 +162,7 @@ class ContributionCloner(EventCloner):
 
     def _create_new_contribution(self, event, old_contrib, preserve_session=True, excluded_attrs=None,
                                  event_exists=False):
-        attrs = (get_simple_column_attrs(Contribution) | {'own_room', 'own_venue'}) - {'abstract_id'}
+        attrs = get_attrs_to_clone(Contribution, add={'own_room', 'own_venue'}, skip={'abstract_id'})
         if excluded_attrs is not None:
             attrs -= excluded_attrs
         new_contrib = Contribution()
@@ -203,7 +202,7 @@ class ContributionCloner(EventCloner):
                                                                            event_exists=event_exists)
 
     def _clone_subcontribs(self, subcontribs, event_exists=False):
-        attrs = get_simple_column_attrs(SubContribution)
+        attrs = get_attrs_to_clone(SubContribution)
         for old_subcontrib in subcontribs:
             subcontrib = SubContribution()
             subcontrib.populate_from_attrs(old_subcontrib, attrs)
@@ -215,14 +214,14 @@ class ContributionCloner(EventCloner):
             yield subcontrib
 
     def _clone_references(self, cls, references):
-        attrs = get_simple_column_attrs(cls) | {'reference_type'}
+        attrs = get_attrs_to_clone(cls, add={'reference_type'})
         for old_ref in references:
             ref = cls()
             ref.populate_from_attrs(old_ref, attrs)
             yield ref
 
     def _clone_person_links(self, cls, person_links, event_exists=False):
-        attrs = get_simple_column_attrs(cls)
+        attrs = get_attrs_to_clone(cls)
         for old_link in person_links:
             link = cls()
             link.populate_from_attrs(old_link, attrs)
@@ -234,7 +233,7 @@ class ContributionCloner(EventCloner):
             yield link
 
     def _clone_fields(self, fields):
-        attrs = get_simple_column_attrs(ContributionFieldValue)
+        attrs = get_attrs_to_clone(ContributionFieldValue)
         for old_field_value in fields:
             field_value = ContributionFieldValue()
             field_value.contribution_field = self._contrib_field_map[old_field_value.contribution_field]

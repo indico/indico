@@ -8,10 +8,11 @@
 from operator import attrgetter
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
 from indico.util.i18n import _
-from indico.util.signals import named_objects_from_signal
+from indico.util.signals import make_interceptable, named_objects_from_signal
 
 
 class EventCloner:
@@ -208,6 +209,18 @@ def _resolve_dependencies(cloners):
         for name in ready:
             yield name, cloners[name]
             del cloner_deps[name]
+
+
+@make_interceptable
+def get_attrs_to_clone(model, add=None, skip=None):
+    """Get the set of attributes that should be cloned from a model class.
+
+    :param add: A set of attribute names to be added.
+    :param skip: A set of attribute names to be skipped.
+    """
+    add = set() if add is None else add
+    skip = set() if skip is None else skip
+    return (get_simple_column_attrs(model) | add) - skip
 
 
 @memoize_request

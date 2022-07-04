@@ -6,9 +6,8 @@
 # LICENSE file for more details.
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.roles import EventRole
 from indico.util.i18n import _
@@ -42,7 +41,7 @@ class EventRoleCloner(EventCloner):
 
     @no_autoflush
     def _clone_event_roles(self, new_event):
-        attrs = get_simple_column_attrs(EventRole) | {'members'}
+        attrs = get_attrs_to_clone(EventRole, add={'members'})
         for old_event_role in self.old_event.roles:
             event_role = EventRole()
             event_role.populate_from_attrs(old_event_role, attrs)

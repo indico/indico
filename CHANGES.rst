@@ -73,6 +73,7 @@ Internal Changes
 - Plugins can now define custom registration form fields (:pr:`5282`)
 - Add :data:`EMAIL_BACKEND` configuration variable to support different email sending
   backends e.g. during development (:issue:`5375`, :pr:`5376`, thanks :user:`Moist-Cat`)
+- Make model attrs to clone interceptable by plugins (:pr:`5403`, thanks :user:`omegak`)
 
 
 ----

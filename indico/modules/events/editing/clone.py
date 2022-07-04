@@ -6,9 +6,8 @@
 # LICENSE file for more details.
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.tags import EditingTag
@@ -34,14 +33,14 @@ class EditingSettingsCloner(EventCloner):
         db.session.flush()
 
     def _clone_tags(self, new_event):
-        attrs = get_simple_column_attrs(EditingTag)
+        attrs = get_attrs_to_clone(EditingTag)
         for old_tag in self.old_event.editing_tags:
             tag = EditingTag()
             tag.populate_from_attrs(old_tag, attrs)
             new_event.editing_tags.append(tag)
 
     def _clone_filetypes(self, new_event):
-        attrs = get_simple_column_attrs(EditingFileType)
+        attrs = get_attrs_to_clone(EditingFileType)
         del new_event.editing_file_types[:]
         db.session.flush()
         for old_filetype in self.old_event.editing_file_types:

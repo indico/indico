@@ -6,12 +6,11 @@
 # LICENSE file for more details.
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings, boa_settings
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 
@@ -59,7 +58,7 @@ class AbstractSettingsCloner(EventCloner):
         boa_settings.set_multi(new_event, boa_settings.get_all(self.old_event, no_defaults=True))
 
     def _clone_email_templates(self, new_event):
-        attrs = get_simple_column_attrs(AbstractEmailTemplate) - {'rules'}
+        attrs = get_attrs_to_clone(AbstractEmailTemplate, skip={'rules'})
         for old_tpl in self.old_event.abstract_email_templates:
             tpl = AbstractEmailTemplate()
             tpl.populate_from_attrs(old_tpl, attrs)
@@ -81,7 +80,7 @@ class AbstractSettingsCloner(EventCloner):
         return rule
 
     def _clone_review_questions(self, new_event):
-        attrs = get_simple_column_attrs(AbstractReviewQuestion)
+        attrs = get_attrs_to_clone(AbstractReviewQuestion)
         for old_question in self.old_event.abstract_review_questions:
             question = AbstractReviewQuestion()
             question.populate_from_attrs(old_question, attrs)

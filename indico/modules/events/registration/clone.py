@@ -7,9 +7,8 @@
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
@@ -40,7 +39,7 @@ class RegistrationFormCloner(EventCloner):
         # if the registration cloner is also enabled, we have to keep
         # all revisions since they are likely to be in use
         clone_all_revisions = 'registrations' in cloners
-        attrs = get_simple_column_attrs(RegistrationForm) - {'start_dt', 'end_dt', 'modification_end_dt'}
+        attrs = get_attrs_to_clone(RegistrationForm, skip={'start_dt', 'end_dt', 'modification_end_dt'})
         self._field_data_map = {}
         self._form_map = {}
         for old_form in self.old_event.registration_forms:
@@ -58,7 +57,7 @@ class RegistrationFormCloner(EventCloner):
 
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
-        items_attrs = get_simple_column_attrs(RegistrationFormSection)
+        items_attrs = get_attrs_to_clone(RegistrationFormSection)
         for old_section in old_sections:
             new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
             for old_item in old_section.children:
@@ -122,18 +121,18 @@ class RegistrationCloner(EventCloner):
                 .has_rows())
 
     def _clone_registrations(self, old_form, new_form, field_data_map):
-        registration_attrs = get_simple_column_attrs(Registration) - {
+        registration_attrs = get_attrs_to_clone(Registration, skip={
             'uuid',
             'ticket_uuid',
             'checked_in',
             'checked_in_dt',
-        }
+        })
         for old_registration in old_form.registrations:
             if old_registration.is_deleted:
                 continue
             new_registration = Registration(user=old_registration.user, registration_form=new_form,
                                             **{attr: getattr(old_registration, attr) for attr in registration_attrs})
-            reg_data_attrs = get_simple_column_attrs(RegistrationData) - {'storage_file_id', 'storage_backend', 'size'}
+            reg_data_attrs = get_attrs_to_clone(RegistrationData, skip={'storage_file_id', 'storage_backend', 'size'})
             for old_registration_data in old_registration.data:
                 new_registration_data = RegistrationData(registration=new_registration,
                                                          **{attr: getattr(old_registration_data, attr)

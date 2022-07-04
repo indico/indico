@@ -6,8 +6,7 @@
 # LICENSE file for more details.
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import EventPage, MenuEntry
@@ -65,7 +64,7 @@ class LayoutCloner(EventCloner):
         db.session.flush()
 
     def _copy_menu_entry(self, menu_entry, new_event, parent=None, include_children=True):
-        base_columns = get_simple_column_attrs(MenuEntry)
+        base_columns = get_attrs_to_clone(MenuEntry)
         new_menu_entry = MenuEntry(**{col: getattr(menu_entry, col) for col in base_columns})
         if menu_entry.is_page:
             with db.session.no_autoflush:  # menu_entry.page is lazy-loaded
