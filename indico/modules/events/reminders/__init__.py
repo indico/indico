@@ -9,10 +9,9 @@ from flask import session
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.logger import Logger
 from indico.modules.events import Event
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -73,8 +72,8 @@ class ReminderCloner(EventCloner):
         return event.reminders.filter(db.m.EventReminder.is_relative)
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
-        attrs = get_simple_column_attrs(db.m.EventReminder) - {'created_dt', 'scheduled_dt', 'is_sent'}
-        attrs |= {'creator_id'}
+        attrs = get_attrs_to_clone(db.m.EventReminder, add={'creator_id'},
+                                   skip={'created_dt', 'scheduled_dt', 'is_sent'})
         for old_reminder in self._find_reminders(self.old_event):
             scheduled_dt = new_event.start_dt - old_reminder.event_start_delta
             # Skip anything that's would have been sent on a past date.

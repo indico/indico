@@ -7,9 +7,8 @@
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.models.events import EventType
 from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.modules.events.tracks.models.principals import TrackPrincipal
@@ -52,7 +51,7 @@ class TrackCloner(EventCloner):
         track_settings.set_multi(new_event, track_settings.get_all(self.old_event, no_defaults=True))
 
     def _clone_tracks(self, new_event):
-        attrs = get_simple_column_attrs(Track)
+        attrs = get_attrs_to_clone(Track)
         for old_track in self.old_event.tracks:
             track = Track()
             track.populate_from_attrs(old_track, attrs)
@@ -62,7 +61,7 @@ class TrackCloner(EventCloner):
             self._track_map[old_track] = track
 
     def _clone_track_groups(self, new_event):
-        attrs = get_simple_column_attrs(TrackGroup)
+        attrs = get_attrs_to_clone(TrackGroup)
         for old_group in self.old_event.track_groups:
             group = TrackGroup()
             group.populate_from_attrs(old_group, attrs)

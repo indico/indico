@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
+from indico.modules.events.cloning import get_attrs_to_clone
 from indico.modules.events.surveys.clone import EventSurveyCloner
 from indico.modules.events.surveys.models.items import SurveyItem, SurveyQuestion, SurveySection, SurveyText
 from indico.modules.events.surveys.models.surveys import Survey
@@ -32,5 +32,5 @@ def test_survey_clone(db, create_event, dummy_event):
     assert len(new_event.surveys) == 1
     assert len(new_event.surveys[0].items) == len(survey.items)
     for i, item in enumerate(new_event.surveys[0].items):
-        for attr in get_simple_column_attrs(SurveyItem):
+        for attr in get_attrs_to_clone(SurveyItem):
             assert getattr(item, attr) == getattr(survey.items[i], attr)

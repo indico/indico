@@ -8,8 +8,7 @@
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.principals import EventPrincipal
@@ -66,7 +65,7 @@ class EventPersonCloner(EventCloner):
         return {'person_map': self._person_map}
 
     def _clone_persons(self, new_event):
-        attrs = get_simple_column_attrs(EventPerson) | {'user'}
+        attrs = get_attrs_to_clone(EventPerson, add={'user'})
         for old_person in self.old_event.persons:
             person = EventPerson(event=new_event)
             person.populate_from_attrs(old_person, attrs)
@@ -107,7 +106,7 @@ class EventPersonLinkCloner(EventCloner):
         return bool(event.person_links)
 
     def _clone_person_links(self, new_event):
-        attrs = get_simple_column_attrs(EventPersonLink)
+        attrs = get_attrs_to_clone(EventPersonLink)
         for old_link in self.old_event.person_links:
             link = EventPersonLink()
             link.populate_from_attrs(old_link, attrs)
