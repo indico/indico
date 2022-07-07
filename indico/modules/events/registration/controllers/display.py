@@ -92,7 +92,7 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
             raise Forbidden
 
     def _check_access(self):
-        if not self.token and self.registration:
+        if not self.token:
             RHRegistrationFormBase._check_access(self)
 
 

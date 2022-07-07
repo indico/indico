@@ -62,6 +62,7 @@ Bugfixes
 - Do not fail when viewing an abstract that has been reviewed in a track which has
   been deleted in the meantime (:pr:`5386`)
 - Fix error when editing a room's nonbookable periods (:pr:`5390`)
+- Fix incorrect access check when directly accessing a registration form (:pr:`5406`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
