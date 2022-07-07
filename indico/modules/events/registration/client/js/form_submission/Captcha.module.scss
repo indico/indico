@@ -7,12 +7,17 @@
 
 .captcha {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
-  margin-top: 20px;
-  gap: 40px;
+  margin-top: 2em;
+  gap: 2em;
+}
 
-  audio {
-    max-width: 220px;
+.error {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+
+  :global(.ui.error.message) {
+    margin-bottom: 0;
   }
 }

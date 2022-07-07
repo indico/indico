@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 class CaptchaPluginMixin:
     #: the readable name of the CAPTCHA plugin
     friendly_name = None
