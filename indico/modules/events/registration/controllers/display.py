@@ -333,7 +333,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         user_data = get_user_data(self.regform, session.user, self.invitation)
         initial_values = get_initial_form_values(self.regform) | user_data
         if self._captcha_required():
-            initial_values |= {'captcha': {'id': None, 'answer': ''}}
+            initial_values |= {'captcha': None}
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
                                                form_data=get_flat_section_submission_data(self.regform),

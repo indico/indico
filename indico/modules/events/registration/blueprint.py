@@ -213,8 +213,7 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/privacy/settings', 'man
                  privacy.RHRegistrationPrivacy, methods=('GET', 'POST'))
 
 # CAPTCHA
-_bp.add_url_rule('!/api/registration/<int:reg_form_id>/captcha/generate', 'api_generate_captcha',
-                 api.RHAPIGenerateCAPTCHA)
+_bp.add_url_rule('!/api/captcha/generate', 'api_generate_captcha', api.RHAPIGenerateCaptcha)
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_event_registration', __name__, url_prefix='/event/<int:event_id>')

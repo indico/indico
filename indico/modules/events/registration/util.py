@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import IndicoSchema
+from indico.core.plugins import plugin_engine
 from indico.modules.events import EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
@@ -29,9 +30,9 @@ from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
 from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
-from indico.modules.events.registration.fields.captcha import CaptchaField
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
+from indico.modules.events.registration.fields.simple import CaptchaField
 from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
                                                                    RegistrationFormPersonalDataField)
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -301,7 +302,7 @@ def make_registration_schema(regform, management=False, registration=None, captc
         schema['consent_to_publish'] = EnumField(RegistrationVisibility)
 
     if captcha_required:
-        schema['captcha'] = fields.Nested(CaptchaField)
+        schema['captcha'] = CaptchaField()
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
@@ -860,3 +861,10 @@ def close_registration(regform):
     regform.end_dt = now_utc()
     if not regform.has_started:
         regform.start_dt = regform.end_dt
+
+
+def get_captcha_plugin():
+    """Return the available captcha plugin."""
+    from indico.modules.events.registration.plugins import CaptchaPluginMixin
+    plugins = [p for p in plugin_engine.get_active_plugins().values() if isinstance(p, CaptchaPluginMixin)]
+    return plugins[0] if plugins else None

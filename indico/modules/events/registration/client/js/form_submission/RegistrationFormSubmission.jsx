@@ -88,15 +88,14 @@ ConsentToPublish.propTypes = {
 
 export default function RegistrationFormSubmission() {
   const sections = useSelector(getNestedSections);
-  const {submitUrl, registrationData, initialValues, regformId, captchaRequired} = useSelector(
-    getStaticData
-  );
+  const {submitUrl, registrationData, initialValues, captchaRequired} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
   const isManagement = useSelector(getManagement);
   const publishToParticipants = useSelector(getPublishToParticipants);
   const publishToPublic = useSelector(getPublishToPublic);
   const showConsentToPublish = !isManagement && publishToParticipants !== 'hide_all';
+  const hasCaptchaPlugin = getPluginObjects('regformCaptcha').length > 0;
 
   const onSubmit = async (data, form) => {
     let resp;
@@ -134,7 +133,8 @@ export default function RegistrationFormSubmission() {
                 publishToPublic={publishToPublic}
               />
             )}
-            {captchaRequired && <Captcha regformId={regformId} />}
+            {captchaRequired &&
+              (hasCaptchaPlugin ? renderPluginComponents('regformCaptcha') : <Captcha />)}
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}

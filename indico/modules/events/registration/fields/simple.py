@@ -8,6 +8,7 @@
 from datetime import datetime
 from operator import itemgetter
 
+from flask import session
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 
 from indico.core.marshmallow import mm
@@ -18,7 +19,7 @@ from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
-from indico.util.marshmallow import LowercaseString, UUIDString
+from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
 from indico.util.string import validate_email
 
 
@@ -384,3 +385,16 @@ class EmailField(RegistrationFormFieldBase):
                 raise ValidationError(_('Invalid email address'))
 
         return _indico_email
+
+
+class CaptchaField(fields.String):
+    """Validates an answer against a CAPTCHA stored in the session."""
+
+    def __init__(self):
+        super().__init__(required=True, validate=not_empty)
+
+    def _validate(self, user_answer):
+        super()._validate(user_answer)
+        answer = session.get('captcha_answer', None)
+        if not answer or answer != user_answer:
+            raise ValidationError(_('Incorrect answer'))

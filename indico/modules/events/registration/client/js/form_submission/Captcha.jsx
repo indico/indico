@@ -9,15 +9,15 @@ import generateCaptcha from 'indico-url:event_registration.api_generate_captcha'
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
-import {Input, Message, Icon, Button, Form} from 'semantic-ui-react';
+import {Message, Icon, Button, Form} from 'semantic-ui-react';
 
-import {FinalField, validators as v} from 'indico/react/forms';
+import {FinalInput} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import './Captcha.module.scss';
 
-export default function Captcha({name, regformId}) {
+export default function Captcha({name}) {
   const [captcha, setCaptcha] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -25,7 +25,7 @@ export default function Captcha({name, regformId}) {
   const fetchCaptcha = () => {
     setLoading(true);
     indicoAxios
-      .get(generateCaptcha({reg_form_id: regformId}))
+      .get(generateCaptcha())
       .then(res => {
         setCaptcha(res.data);
         setError(false);
@@ -33,15 +33,13 @@ export default function Captcha({name, regformId}) {
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   };
-  useEffect(fetchCaptcha, [regformId]);
-
-  const parse = val => ({id: captcha.id, answer: val});
+  useEffect(fetchCaptcha, []);
 
   const reloadBtn = (
     <div style={{marginLeft: 'auto'}}>
       <Button icon labelPosition="right" type="button" loading={loading} onClick={fetchCaptcha}>
         <Icon name="redo" />
-        Reload
+        <Translate>Refresh</Translate>
       </Button>
     </div>
   );
@@ -74,7 +72,6 @@ export default function Captcha({name, regformId}) {
                 <source src={`data:audio/mp3;base64,${captcha.audio}`} type="audio/mpeg" />
               </audio>
             </div>
-            {reloadBtn}
           </>
         )}
         {reloadBtn}
@@ -84,16 +81,10 @@ export default function Captcha({name, regformId}) {
       wrapping the whole regform */}
       <div style={{marginTop: 20}} className="ui form">
         <Form.Field>
-          <label>Answer</label>
-          <FinalField
-            name={name}
-            required
-            parse={parse}
-            format={val => val.answer}
-            validate={val => v.required(val.answer)}
-            component={Input}
-            style={{maxWidth: 200}}
-          />
+          <label>
+            <Translate>Answer</Translate>
+          </label>
+          <FinalInput name={name} required style={{maxWidth: 200}} />
         </Form.Field>
       </div>
     </Message>
@@ -102,7 +93,6 @@ export default function Captcha({name, regformId}) {
 
 Captcha.propTypes = {
   name: PropTypes.string,
-  regformId: PropTypes.number.isRequired,
 };
 
 Captcha.defaultProps = {
