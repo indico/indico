@@ -26,7 +26,7 @@ class AgreementEmailForm(IndicoForm):
     from_address = SelectField(_('From'), [DataRequired()])
     cc_addresses = EmailField(_('CC'), [Optional(), Email()],
                               description=_('Warning: this email address will be able to sign the agreement!'))
-    body = TextAreaField(_('Email body'), widget=CKEditorWidget(simple=True))
+    body = TextAreaField(_('Email body'), widget=CKEditorWidget())
 
     def __init__(self, *args, **kwargs):
         self._definition = kwargs.pop('definition')

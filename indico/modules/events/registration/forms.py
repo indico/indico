@@ -178,7 +178,7 @@ class InvitationFormBase(IndicoForm):
     _email_fields = ('email_from', 'email_subject', 'email_body')
     email_from = SelectField(_('From'), [DataRequired()])
     email_subject = StringField(_('Email subject'), [DataRequired()])
-    email_body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    email_body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget())
     skip_moderation = BooleanField(_('Skip moderation'), widget=SwitchWidget(),
                                    description=_("If enabled, the user's registration will be approved automatically."))
 
@@ -263,7 +263,7 @@ class EmailRegistrantsForm(IndicoForm):
                                   description=_('Beware, addresses in this field will receive one mail per '
                                                 'registrant.'))
     subject = StringField(_('Subject'), [DataRequired()])
-    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget())
     recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
                                    description=_('Send copy of each email to my mailbox'))

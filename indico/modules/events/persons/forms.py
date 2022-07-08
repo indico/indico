@@ -19,7 +19,7 @@ from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 class EmailEventPersonsForm(IndicoForm):
     from_address = SelectField(_('From'), [DataRequired()])
     subject = StringField(_('Subject'), [DataRequired()])
-    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget())
     recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
                                    description=_('Send copy of each email to my mailbox'))
