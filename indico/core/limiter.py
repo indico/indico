@@ -8,9 +8,17 @@
 import time
 from datetime import timedelta
 
+import limits
 from flask import has_request_context, request
 from flask_limiter import Limiter
 from limits import parse_many
+
+
+class IndicoRedisStorage(limits.storage.RedisStorage):
+    # This is needed so redis also works with unix sockets. For details, see:
+    # - https://github.com/indico/indico/issues/5391
+    # - https://github.com/alisaifee/limits/issues/128
+    STORAGE_SCHEME = ['redis', 'rediss', 'unix']
 
 
 class RateLimit:
