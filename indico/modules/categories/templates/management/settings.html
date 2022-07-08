@@ -1,6 +1,6 @@
 {% extends 'categories/management/base.html' %}
 
-{% from 'forms/_form.html' import form_header, form_rows, form_fieldset, form_footer %}
+{% from 'forms/_form.html' import form_header, form_rows, form_row, form_fieldset, form_footer %}
 
 {% macro render_image_form(image_form, type, endpoint, title, deletion_prompt_title, deletion_prompt) %}
     {{ form_header(image_form, classes='image-form', action=url_for(endpoint, category)) }}
@@ -27,6 +27,42 @@
 
 {% block content %}
     {{ form_header(form) }}
+        {{ form_rows(form, fields=form.TITLE_FIELDS) }}
+        {% if untranslated_title_languages != '[]' %}
+            <div id="title-translation-container">
+                <div id="target-new-title-translation-fields"></div>
+            </div>
+            <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-field">
+                    <a class="i-button icon-edit"
+                    onclick="return addTranslateTitleFields('{{untranslated_title_languages}}')"
+                    id="add-title-translation">
+                        {% trans %}Translate title to another language{% endtrans %}
+                    </a>
+                </div>
+            </div>
+            
+        {% endif %}
+        
+        {{ form_rows(form, fields=form.DESCRIPTION_FIELDS) }}
+        {% if untranslated_description_languages != '[]' %}
+            <div id="description-translation-container">
+                <div id="target-new-description-translation-fields"></div>
+            </div>
+            <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-field">
+                    <a class="i-button icon-edit"
+                    onclick="return addTranslateDescriptionFields('{{untranslated_description_languages}}')"
+                    id="add-description-translation">
+                        {% trans %}Translate description to another language{% endtrans %}
+                    </a>
+                </div>
+            </div>
+            
+        {% endif %}
+
         {{ form_rows(form, fields=form.BASIC_FIELDS) }}
         {% call form_fieldset(_('Event Header')) %}
             {{ form_rows(form, fields=form.EVENT_HEADER_FIELDS) }}

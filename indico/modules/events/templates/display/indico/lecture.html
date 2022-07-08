@@ -19,10 +19,10 @@
                     {% if category %}
                         {% if not g.static_site %}
                             <a class="lecture-category" href="{{ url_for('categories.display', event.category) }}">
-                                {{ category }}
+                                {{ event.category.get_title() }}
                             </a>
                         {% else %}
-                            <div>{{ category }}</div>
+                            <div>{{ event.category.get_title() }}</div>
                         {% endif %}
                     {% endif %}
                     <h1>

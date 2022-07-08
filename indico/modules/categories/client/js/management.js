@@ -16,6 +16,9 @@ import {SingleEventMove, BulkEventMove} from 'indico/modules/events/management/E
 import {showUserSearch} from 'indico/react/components/principals/imperative';
 import {$T} from 'indico/utils/i18n';
 
+import DescriptionTranslationFields from './components/CategoryDescriptionTranslations';
+import TitleTranslationFields from './components/CategoryTitleTranslations';
+
 (function(global) {
   // Category cache
   const _categories = {};
@@ -446,5 +449,35 @@ import {$T} from 'indico/utils/i18n';
   global.setupCategoryRolesList = function setupCategoryRolesList() {
     setupRolesToggle();
     setupRolesButtons();
+  };
+  let titleCounter = 0;
+  global.addTranslateTitleFields = function addTranslateTitleFields(untranslatedLanguages) {
+    const target = document.getElementById('target-new-title-translation-fields');
+    const languages = JSON.parse(untranslatedLanguages);
+    ReactDOM.render(
+      <TitleTranslationFields languages={languages} counter={titleCounter} />,
+      target
+    );
+    target.id = '';
+    const newTargetDiv = document.createElement('div');
+    newTargetDiv.id = 'target-new-title-translation-fields';
+    target.parentElement.appendChild(newTargetDiv);
+    titleCounter++;
+  };
+  let descriptionCounter = 0;
+  global.addTranslateDescriptionFields = function addTranslateDescriptionFields(
+    untranslatedLanguages
+  ) {
+    const target = document.getElementById('target-new-description-translation-fields');
+    const languages = JSON.parse(untranslatedLanguages);
+    ReactDOM.render(
+      <DescriptionTranslationFields languages={languages} counter={descriptionCounter} />,
+      target
+    );
+    target.id = '';
+    const newTargetDiv = document.createElement('div');
+    newTargetDiv.id = 'target-new-description-translation-fields';
+    target.parentElement.appendChild(newTargetDiv);
+    descriptionCounter++;
   };
 })(window);

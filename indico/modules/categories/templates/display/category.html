@@ -13,7 +13,7 @@
         {% endif %}
         {% block category_description %}
             <div class="category-description">
-                {{ category.description }}
+                {{ category.get_description() }}
             </div>
         {% endblock %}
     </div>

@@ -190,6 +190,16 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=True,
         index=True
     )
+    title_translations = db.Column(
+        JSONB,
+        nullable=False,
+        default=lambda: {}
+    )
+    description_translations = db.Column(
+        JSONB,
+        nullable=False,
+        default=lambda: {}
+    )
 
     children = db.relationship(
         'Category',
@@ -594,6 +604,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def logo_url(self):
         """Get the HTTP URL of the logo."""
         return url_for('categories.display_logo', self, slug=self.logo_metadata['hash'])
+
+    def get_title(self):
+        return self.title_translations.get(session.lang, self.title)
+
+    def get_description(self):
+        return self.description_translations.get(session.lang, self.description)
 
 
 Category.register_protection_events()

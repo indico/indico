@@ -11,7 +11,7 @@
                         {% trans %}All events{% endtrans %}
                     {% endif %}
                 {% else %}
-                    {{ category.title }}
+                    {{ category.get_title() }}
                 {% endif %}
             {% endblock %}
         </h1>

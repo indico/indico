@@ -9,12 +9,14 @@ import os
 import random
 from io import BytesIO
 
-from flask import flash, redirect, request, session
+from flask import flash, jsonify, redirect, request, session
+from json import dumps
 from marshmallow import EXCLUDE
 from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, undefer_group
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden
+from wtforms.fields import StringField
 
 from indico.core.db import db
 from indico.core.permissions import get_principal_permissions, update_permissions
@@ -39,15 +41,16 @@ from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _, get_all_locales, ngettext
 from indico.util.marshmallow import ModelField, PrincipalList, not_empty
 from indico.util.roles import ExportRoleMembersMixin, ImportRoleMembersMixin
 from indico.util.string import crc32
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-from indico.web.forms.base import FormDefaults
+from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.colors import get_role_colors
+from indico.web.forms.fields import IndicoMarkdownField
 from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template, url_for_index
 
@@ -105,12 +108,66 @@ class RHManageCategorySettings(RHManageCategoryBase):
         defaults = FormDefaults(self.category,
                                 meeting_theme=self.category.default_event_themes['meeting'],
                                 lecture_theme=self.category.default_event_themes['lecture'])
+        
+        # Generate fields for existing translations
+        CategorySettingsForm.TITLE_FIELDS = ['title']
+        title_languages = get_all_locales()
+        for locale, translation in self.category.title_translations.items():
+            language = title_languages[locale]
+            language_text = f'{language[0]} ({language[1]})' if language[2] else language[0]
+            field_name = _('Title in ') + language_text
+            setattr(CategorySettingsForm,
+                    'title_translations/' + locale,
+                    StringField(field_name,
+                                default=translation,
+                                description=_(f'Users with {language_text} as their language see this title.')))
+            CategorySettingsForm.TITLE_FIELDS.append('title_translations/' + locale)
+            defaults.__setitem__('title_translations/' + locale, translation)
+            title_languages.pop(locale)
+
+        CategorySettingsForm.DESCRIPTION_FIELDS = ['description']
+        description_languages = get_all_locales()
+        for locale, translation in self.category.description_translations.items():
+            language = description_languages[locale]
+            language_text = f'{language[0]} ({language[1]})' if language[2] else language[0]
+            field_name = _('Description in ') + language_text
+            setattr(CategorySettingsForm,
+                    'description_translations/' + locale,
+                    IndicoMarkdownField(field_name,
+                                        default=translation,
+                                        description=_(f'Users with {language_text} as their language see this description.')))
+            CategorySettingsForm.DESCRIPTION_FIELDS.append('description_translations/' + locale)
+            defaults.__setitem__('description_translations/' + locale, translation)
+            description_languages.pop(locale)
+
         form = CategorySettingsForm(obj=defaults, category=self.category)
         icon_form = CategoryIconForm(obj=self.category)
         logo_form = CategoryLogoForm(obj=self.category)
 
         if form.validate_on_submit():
-            update_category(self.category, form.data, skip={'meeting_theme', 'lecture_theme'})
+            data = form.data
+            data['title_translations'] = {}
+            data['description_translations'] = {}
+
+            # retrieve the translations of existing languages from the form
+            for key, value in list(data.items()):
+                if key.startswith('title_translations/') or key.startswith('description_translations/'):
+                    data.pop(key)
+                    if value:
+                        data[key.split('/')[0]][key.split('/')[1]] = value
+            
+            # retrieve the translations of new languages from the form
+            for num, language in enumerate(data['title_translation_languages']):
+                if data['title_translation_values'][num]:
+                    data['title_translations'][language] = data['title_translation_values'][num]
+            
+            for num, language in enumerate(data['description_translation_languages']):
+                if data['description_translation_values'][num]:
+                    data['description_translations'][language] = data['description_translation_values'][num]
+            
+            update_category(self.category, data, skip={'meeting_theme', 'lecture_theme',
+                                                       'title_translation_languages','title_translation_values',
+                                                       'description_translation_languages','description_translation_values'})
             self.category.default_event_themes = {
                 'meeting': form.meeting_theme.data,
                 'lecture': form.lecture_theme.data
@@ -122,8 +179,13 @@ class RHManageCategorySettings(RHManageCategoryBase):
                 icon_form.icon.data = self.category
             if self.category.logo_metadata:
                 logo_form.logo.data = self.category
+        
+        untranslated_title_languages = dumps(sorted(title_languages.items(), key=lambda item: item[1]))
+        untranslated_description_languages = dumps(sorted(description_languages.items(), key=lambda item: item[1]))
         return WPCategoryManagement.render_template('management/settings.html', self.category, 'settings', form=form,
-                                                    icon_form=icon_form, logo_form=logo_form)
+                                                    icon_form=icon_form, logo_form=logo_form, 
+                                                    untranslated_title_languages=untranslated_title_languages,
+                                                    untranslated_description_languages=untranslated_description_languages)
 
 
 class RHAPIEventMoveRequests(RHManageCategoryBase):
