@@ -25,6 +25,7 @@ export const getConfig = ({images = false} = {}) => ({
       '|',
       'link',
       'fontColor',
+      'fontBackgroundColor',
       'removeFormat',
       '|',
       'bulletedList',
