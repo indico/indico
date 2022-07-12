@@ -6,55 +6,65 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
 
 import {Translate} from 'indico/react/i18n';
 
-export default function DescriptionTranslationFields({languages, counter}) {
-  const options = [];
+export default function DescriptionTranslation({languages}) {
+  const [fieldList, setFieldList] = useState([]);
+  const addFields = () => {
+    setFieldList([...fieldList, 'field']);
+  };
+  const languageOptions = [];
+  // get the languages in the right format
   for (const lang in languages) {
     let text = languages[lang][1][0];
     if (languages[lang][1][2]) {
       const country = ` (${languages[lang][1][1]})`;
       text = `${text} ${country}`;
     }
-    options.push(
+    languageOptions.push(
       <option key={lang} value={languages[lang][0]}>
         {text}
       </option>
     );
   }
-  const languageName = `description_translation_languages-${counter}`;
-  const translationName = `description_translation_values-${counter}`;
-  let counterText = '';
-  if (counter >= 1) {
-    counterText = ` ${counter + 1}`;
-  }
   return (
     <div>
-      <div className="form-group">
-        <Translate as="label" className="form-label form-label-middle">
-          {`New language${counterText}`}
-        </Translate>
-        <div className="form-field">
-          <select className="description-language-select" name={languageName}>
-            {options}
-          </select>
+      {fieldList.map((_, index) => (
+        <div key={index}>
+          <div className="form-group">
+            <label className="form-label form-label-middle">
+              <Translate>New language</Translate>
+              {index >= 1 && <span> {index + 1}</span>}
+            </label>
+            <div className="form-field">
+              <select name={`description_translation_languages-${index}`}>{languageOptions}</select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label form-label-middle">
+              <Translate>New translation</Translate>
+              {index >= 1 && <span> {index + 1}</span>}
+            </label>
+            <div className="form-field">
+              <textarea rows={5} name={`description_translation_values-${index}`} />
+            </div>
+          </div>
         </div>
-      </div>
+      ))}
       <div className="form-group">
-        <Translate as="label" className="form-label form-label-middle">
-          {`New translation${counterText}`}
-        </Translate>
+        <div className="form-label" />
         <div className="form-field">
-          <textarea name={translationName} rows={5} />
+          <a className="i-button icon-edit" onClick={addFields}>
+            <Translate>Translate description to another language</Translate>
+          </a>
         </div>
       </div>
     </div>
   );
 }
 
-DescriptionTranslationFields.propTypes = {
+DescriptionTranslation.propTypes = {
   languages: PropTypes.array.isRequired,
-  counter: PropTypes.number.isRequired,
 };

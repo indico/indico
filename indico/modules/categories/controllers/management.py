@@ -8,9 +8,9 @@
 import os
 import random
 from io import BytesIO
-
-from flask import flash, jsonify, redirect, request, session
 from json import dumps
+
+from flask import flash, redirect, request, session
 from marshmallow import EXCLUDE
 from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, undefer_group
@@ -48,7 +48,7 @@ from indico.util.string import crc32
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-from indico.web.forms.base import FormDefaults, IndicoForm
+from indico.web.forms.base import FormDefaults
 from indico.web.forms.colors import get_role_colors
 from indico.web.forms.fields import IndicoMarkdownField
 from indico.web.forms.fields.principals import serialize_principal
@@ -108,7 +108,7 @@ class RHManageCategorySettings(RHManageCategoryBase):
         defaults = FormDefaults(self.category,
                                 meeting_theme=self.category.default_event_themes['meeting'],
                                 lecture_theme=self.category.default_event_themes['lecture'])
-        
+
         # Generate fields for existing translations
         CategorySettingsForm.TITLE_FIELDS = ['title']
         title_languages = get_all_locales()
@@ -116,11 +116,12 @@ class RHManageCategorySettings(RHManageCategoryBase):
             language = title_languages[locale]
             language_text = f'{language[0]} ({language[1]})' if language[2] else language[0]
             field_name = _('Title in ') + language_text
+            field_description = _('Users with ') + language_text + _(' as their language see this title.')
             setattr(CategorySettingsForm,
                     'title_translations/' + locale,
                     StringField(field_name,
                                 default=translation,
-                                description=_(f'Users with {language_text} as their language see this title.')))
+                                description=field_description))
             CategorySettingsForm.TITLE_FIELDS.append('title_translations/' + locale)
             defaults.__setitem__('title_translations/' + locale, translation)
             title_languages.pop(locale)
@@ -131,11 +132,12 @@ class RHManageCategorySettings(RHManageCategoryBase):
             language = description_languages[locale]
             language_text = f'{language[0]} ({language[1]})' if language[2] else language[0]
             field_name = _('Description in ') + language_text
+            field_description = _('Users with ') + language_text + _(' as their language see this description.')
             setattr(CategorySettingsForm,
                     'description_translations/' + locale,
                     IndicoMarkdownField(field_name,
                                         default=translation,
-                                        description=_(f'Users with {language_text} as their language see this description.')))
+                                        description=field_description))
             CategorySettingsForm.DESCRIPTION_FIELDS.append('description_translations/' + locale)
             defaults.__setitem__('description_translations/' + locale, translation)
             description_languages.pop(locale)
@@ -155,19 +157,20 @@ class RHManageCategorySettings(RHManageCategoryBase):
                     data.pop(key)
                     if value:
                         data[key.split('/')[0]][key.split('/')[1]] = value
-            
+
             # retrieve the translations of new languages from the form
             for num, language in enumerate(data['title_translation_languages']):
                 if data['title_translation_values'][num]:
                     data['title_translations'][language] = data['title_translation_values'][num]
-            
+
             for num, language in enumerate(data['description_translation_languages']):
                 if data['description_translation_values'][num]:
                     data['description_translations'][language] = data['description_translation_values'][num]
-            
+
             update_category(self.category, data, skip={'meeting_theme', 'lecture_theme',
-                                                       'title_translation_languages','title_translation_values',
-                                                       'description_translation_languages','description_translation_values'})
+                                                       'title_translation_languages', 'title_translation_values',
+                                                       'description_translation_languages',
+                                                       'description_translation_values'})
             self.category.default_event_themes = {
                 'meeting': form.meeting_theme.data,
                 'lecture': form.lecture_theme.data
@@ -179,11 +182,11 @@ class RHManageCategorySettings(RHManageCategoryBase):
                 icon_form.icon.data = self.category
             if self.category.logo_metadata:
                 logo_form.logo.data = self.category
-        
+
         untranslated_title_languages = dumps(sorted(title_languages.items(), key=lambda item: item[1]))
         untranslated_description_languages = dumps(sorted(description_languages.items(), key=lambda item: item[1]))
         return WPCategoryManagement.render_template('management/settings.html', self.category, 'settings', form=form,
-                                                    icon_form=icon_form, logo_form=logo_form, 
+                                                    icon_form=icon_form, logo_form=logo_form,
                                                     untranslated_title_languages=untranslated_title_languages,
                                                     untranslated_description_languages=untranslated_description_languages)
 

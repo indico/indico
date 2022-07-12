@@ -66,7 +66,7 @@ def render_breadcrumbs(*titles, category=None, event=None, management=False, cat
                                                             if management and cat.can_manage(session.user)
                                                             else cat.url)
         for cat in category.chain_query[::-1]:
-            items.append(Breadcrumb(cat.get_title(), category_url_factory(cat, management=management)))
+            items.append(Breadcrumb(cat.i18n_title, category_url_factory(cat, management=management)))
         items.reverse()
 
     items += [Breadcrumb(title) if isinstance(title, str) else title for title in titles]

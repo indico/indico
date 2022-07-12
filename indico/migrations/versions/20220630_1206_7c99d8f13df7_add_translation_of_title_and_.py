@@ -18,13 +18,13 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('categories', sa.Column('title_translations', postgresql.JSONB(astext_type=sa.Text()), nullable=True), schema='categories')
-    op.execute(r"UPDATE categories.categories SET title_translations = '{}'::jsonb")
-    op.alter_column('categories', 'title_translations', nullable=False, schema='categories')
+    op.add_column('categories', sa.Column('title_translations', postgresql.JSONB(astext_type=sa.Text()), nullable=False, server_default='{}'),
+                  schema='categories')
+    op.alter_column('categories', 'title_translations', server_default=None, schema='categories')
 
-    op.add_column('categories', sa.Column('description_translations', postgresql.JSONB(astext_type=sa.Text()), nullable=True), schema='categories')
-    op.execute(r"UPDATE categories.categories SET description_translations = '{}'::jsonb")
-    op.alter_column('categories', 'description_translations', nullable=False, schema='categories')
+    op.add_column('categories', sa.Column('description_translations', postgresql.JSONB(astext_type=sa.Text()), nullable=False, server_default='{}'),
+                  schema='categories')
+    op.alter_column('categories', 'description_translations', server_default=None, schema='categories')
 
 
 def downgrade():

@@ -605,10 +605,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         """Get the HTTP URL of the logo."""
         return url_for('categories.display_logo', self, slug=self.logo_metadata['hash'])
 
-    def get_title(self):
+    @property
+    def i18n_title(self):
         return self.title_translations.get(session.lang, self.title)
 
-    def get_description(self):
+    @property
+    def i18n_description(self):
         return self.description_translations.get(session.lang, self.description)
 
 

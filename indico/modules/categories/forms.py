@@ -41,11 +41,11 @@ class CategorySettingsForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     title_translation_languages = FieldList(StringField(_('New language')))
     title_translation_values = FieldList(StringField(_('New translation')))
-    
+
     description = IndicoMarkdownField(_('Description'))
     description_translation_languages = FieldList(StringField(_('New language')))
     description_translation_values = FieldList(StringField(_('New translation')))
-    
+
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()],
                                          description=_('Default timezone event lists will show up in. It will also be '
                                                        'used as a default for new events.'))
