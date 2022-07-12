@@ -115,8 +115,8 @@ class RHManageCategorySettings(RHManageCategoryBase):
         for locale, translation in self.category.title_translations.items():
             language = title_languages[locale]
             language_text = f'{language[0]} ({language[1]})' if language[2] else language[0]
-            field_name = _('Title in ') + language_text
-            field_description = _('Users with ') + language_text + _(' as their language see this title.')
+            field_name = _('Title in {}').format(language_text)
+            field_description = _('Users with {} as their language see this title.').format(language_text)
             setattr(CategorySettingsForm,
                     'title_translations/' + locale,
                     StringField(field_name,
@@ -131,8 +131,8 @@ class RHManageCategorySettings(RHManageCategoryBase):
         for locale, translation in self.category.description_translations.items():
             language = description_languages[locale]
             language_text = f'{language[0]} ({language[1]})' if language[2] else language[0]
-            field_name = _('Description in ') + language_text
-            field_description = _('Users with ') + language_text + _(' as their language see this description.')
+            field_name = _('Description in {}').format(language_text)
+            field_description = _('Users with {} as their language see this description.').format(language_text )
             setattr(CategorySettingsForm,
                     'description_translations/' + locale,
                     IndicoMarkdownField(field_name,
