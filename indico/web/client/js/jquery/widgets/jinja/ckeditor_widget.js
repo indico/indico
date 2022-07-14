@@ -11,7 +11,7 @@ import {getConfig} from 'indico/ckeditor';
 
 (function(global) {
   global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
-    const {fieldId, images = false, width, height = 475, ...rest} = options;
+    const {fieldId, images = true, width, height = 475, ...rest} = options;
     const field = document.getElementById(fieldId);
     const editor = await ClassicEditor.create(field, {...getConfig({images}), ...rest});
     editor.setData(field.value);

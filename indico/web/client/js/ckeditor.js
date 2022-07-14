@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-export const getConfig = ({images = false} = {}) => ({
+export const getConfig = ({images = true} = {}) => ({
   fontFamily: {
     options: [
       'Sans Serif/"Liberation Sans", sans-serif',
@@ -30,11 +30,10 @@ export const getConfig = ({images = false} = {}) => ({
       '|',
       'bulletedList',
       'numberedList',
-      '-',
       'outdent',
       'indent',
       '|',
-      images && 'imageInsert',
+      images && 'onlyInsertImage',
       'insertTable',
       '|',
       'subscript',
@@ -68,10 +67,9 @@ export const getConfig = ({images = false} = {}) => ({
     'HorizontalLine',
     images && 'Image',
     images && 'ImageCaption',
-    images && 'ImageInsert',
+    images && 'OnlyInsertImage',
     images && 'ImageStyle',
     images && 'ImageToolbar',
-    // images && 'ImageUpload',
     'Indent',
     'IndentBlock',
     'Italic',
