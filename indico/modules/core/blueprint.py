@@ -5,9 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.core.controllers import (RHChangeLanguage, RHChangeTimezone, RHConfig, RHContact, RHPrincipals,
-                                             RHReportErrorAPI, RHResetSignatureTokens, RHSettings, RHSignURL,
-                                             RHVersionCheck)
+from indico.modules.core.controllers import (RHAPIGenerateCaptcha, RHChangeLanguage, RHChangeTimezone, RHConfig,
+                                             RHContact, RHPrincipals, RHReportErrorAPI, RHResetSignatureTokens,
+                                             RHSettings, RHSignURL, RHVersionCheck)
 from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -34,3 +34,6 @@ _bp.add_url_rule('/report-error/api/<error_id>', 'report_error_api', RHReportErr
 
 # Allow loadbalancers etc to easily check whether the service is alive
 _bp.add_url_rule('/ping', 'ping', lambda: ('', 204))
+
+# CAPTCHA
+_bp.add_url_rule('/api/captcha/generate', 'generate_captcha', RHAPIGenerateCaptcha)

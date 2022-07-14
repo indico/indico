@@ -5,12 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import base64
-import random
-import string
-
-from captcha.audio import AudioCaptcha
-from captcha.image import ImageCaptcha
 from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -19,8 +13,7 @@ from indico.core import signals
 from indico.modules.events.controllers.base import RHProtectedEventBase
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.registrations import RegistrationState
-from indico.modules.events.registration.util import (build_registration_api_data, build_registrations_api_data,
-                                                     get_captcha_plugin)
+from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
 from indico.web.rh import RH, oauth_scope
 
 
@@ -79,21 +72,3 @@ class RHAPIRegistrationForms(RHProtectedEventBase):
     def _process(self):
         from indico.modules.events.registration.schemas import RegistrationFormPrincipalSchema
         return RegistrationFormPrincipalSchema(many=True).jsonify(self.event.registration_forms)
-
-
-class RHAPIGenerateCaptcha(RH):
-    """Generate CAPTCHA for registration forms."""
-
-    def _generate_captcha(self):
-        answer = ''.join(random.choices(string.digits, k=4))
-        image = ImageCaptcha().generate(answer).read()
-        audio = AudioCaptcha().generate(answer)
-        return answer, {'image': base64.b64encode(image), 'audio': base64.b64encode(audio)}
-
-    def _process_GET(self):
-        if plugin := get_captcha_plugin():
-            answer, data = plugin.generate_captcha()
-        else:
-            answer, data = self._generate_captcha()
-        session['captcha_answer'] = answer
-        return jsonify(data)

@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import generateCaptcha from 'indico-url:event_registration.api_generate_captcha';
+import generateCaptchaURL from 'indico-url:core.generate_captcha';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
@@ -28,7 +28,7 @@ export default function Captcha({name}) {
     setLoading(true);
     setError(false);
     try {
-      const {data} = await indicoAxios.get(generateCaptcha());
+      const {data} = await indicoAxios.get(generateCaptchaURL());
       setImage(`data:image/png;base64,${data.image}`);
       const newAudio = new Audio(`data:audio/mp3;base64,${data.audio}`);
       newAudio.onended = () => setPlaying(false);
