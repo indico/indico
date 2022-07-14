@@ -305,6 +305,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
             return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
 
+    @property
     def _captcha_required(self):
         """Whether a CAPTCHA should be displayed when registering."""
         return session.user is None and self.regform.require_captcha
@@ -324,7 +325,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if not self._can_register():
             raise ExpectedError(_('You cannot register for this event'))
 
-        schema = make_registration_schema(self.regform, captcha_required=self._captcha_required())()
+        schema = make_registration_schema(self.regform, captcha_required=self._captcha_required)()
         form_data = parser.parse(schema)
         registration = create_registration(self.regform, form_data, self.invitation)
         return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
@@ -332,7 +333,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     def _process_GET(self):
         user_data = get_user_data(self.regform, session.user, self.invitation)
         initial_values = get_initial_form_values(self.regform) | user_data
-        if self._captcha_required():
+        if self._captcha_required:
             initial_values |= {'captcha': None}
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
@@ -345,7 +346,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                management=False,
                                                login_required=self.regform.require_login and not session.user,
                                                is_restricted_access=self.is_restricted_access,
-                                               captcha_required=self._captcha_required())
+                                               captcha_required=self._captcha_required)
 
 
 class RHUploadRegistrationFile(UploadFileMixin, RHRegistrationFormBase):
