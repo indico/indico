@@ -15,7 +15,6 @@ import React, {useReducer} from 'react';
 import {useHistory} from 'react-router';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 
-import {handleSubmitError} from 'indico/react/forms';
 import {routerPathFromFlask, useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios} from 'indico/utils/axios';
 
@@ -56,8 +55,12 @@ function EditTemplatePane({templates, dispatch, targetLocator}) {
       dispatch({type: 'UPDATE_TEMPLATE', id: templateId, changes: data});
       // back to list of templates
       history.push(templateListURL(targetLocator));
-    } catch (err) {
-      return handleSubmitError(err);
+    } catch ({
+      response: {
+        data: {webargs_errors: errors},
+      },
+    }) {
+      return errors;
     }
   };
 
@@ -85,8 +88,12 @@ function NewTemplatePane({dispatch, targetLocator}) {
       dispatch({type: 'ADD_TEMPLATE', template});
       // back to list of templates
       history.push(templateListURL(targetLocator));
-    } catch (err) {
-      return handleSubmitError(err);
+    } catch ({
+      response: {
+        data: {webargs_errors: errors},
+      },
+    }) {
+      return errors;
     }
   };
 

@@ -1,7 +1,7 @@
 """Add receipt data structures
 
 Revision ID: 252d61f890a0
-Revises: b36825c7869e
+Revises: a707753d16e2
 Create Date: 2021-10-01 15:30:14.789502
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '252d61f890a0'
-down_revision = 'b36825c7869e'
+down_revision = '0c4bb2973536'
 branch_labels = None
 depends_on = None
 
