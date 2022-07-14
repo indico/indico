@@ -394,7 +394,12 @@ class CaptchaField(fields.String):
         super().__init__(required=True, validate=not_empty)
 
     def _validate(self, user_answer):
-        super()._validate(user_answer)
-        answer = session.get('captcha_answer', None)
-        if not answer or answer != user_answer:
-            raise ValidationError(_('Incorrect answer'))
+        from indico.modules.events.registration.util import get_captcha_plugin
+        if plugin := get_captcha_plugin():
+            if not plugin.validate_captcha(user_answer):
+                raise ValidationError(_('Incorrect answer'))
+        else:
+            super()._validate(user_answer)
+            answer = session.get('captcha_answer', None)
+            if not answer or answer != user_answer:
+                raise ValidationError(_('Incorrect answer'))
