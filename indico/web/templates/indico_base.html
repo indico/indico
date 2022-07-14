@@ -22,12 +22,6 @@
     {% block extra_meta_tags %}
     {% endblock %}
 
-    {% block early_js %}
-        <script>
-            window.CKEDITOR_BASEPATH = {{ url_for('assets.dist', filename='js/ckeditor/')|tojson() }};
-        </script>
-    {% endblock %}
-
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>

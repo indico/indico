@@ -14,7 +14,6 @@ import './libs/indico/Core/Interaction/Base.js';
 import './libs/indico/Core/Widgets/Base.js';
 import './libs/indico/Core/Widgets/Inline.js';
 import './libs/indico/Core/Widgets/Menu.js';
-import './libs/indico/Core/Widgets/RichText.js';
 import './libs/indico/Core/Dialogs/Popup.js';
 import './libs/indico/Core/Dialogs/Base.js';
 import './libs/indico/Core/Dialogs/Util.js';

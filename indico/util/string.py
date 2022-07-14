@@ -34,7 +34,7 @@ from sqlalchemy import ForeignKeyConstraint, inspect
 # basic list of tags, used for markdown content
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + [
     'sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr', 'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4',
-    'h5', 'h6', 'pre', 'dl', 'dd', 'dt'
+    'h5', 'h6', 'pre', 'dl', 'dd', 'dt', 'figure', 'blockquote'
 ]
 BLEACH_ALLOWED_ATTRIBUTES = {**bleach.ALLOWED_ATTRIBUTES, 'img': ['src', 'alt', 'style']}
 # extended list of tags, used for HTML content

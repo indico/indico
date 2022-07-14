@@ -25,7 +25,6 @@ let entryPoints = {
   jquery: ['./js/jquery/index.js'],
   exports: ['./js/exports.js'],
   main: ['./js/index.js'],
-  ckeditor: ['./js/jquery/ckeditor.js'],
   conferences: ['./styles/legacy/Conf_Basic.scss'],
   markdown: ['./js/jquery/markdown.js'],
   mathjax: ['./js/jquery/compat/mathjax.js'],
@@ -137,14 +136,7 @@ export default env => {
     },
     plugins: [
       new CopyWebpackPlugin({
-        patterns: [
-          {
-            from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'),
-            to: 'js/ckeditor',
-            transform,
-          },
-          {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform},
-        ],
+        patterns: [{from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform}],
       }),
       new webpack.ProvidePlugin({
         _: ['underscore', 'default'],
