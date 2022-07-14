@@ -78,7 +78,9 @@ import 'fullcalendar/dist/fullcalendar.css';
           });
 
           toolbarGroup.find('.ongoing-events-info').remove();
-          toolbarGroup.prepend(ongoingEventsInfo);
+          if (data.ongoing_event_count) {
+            toolbarGroup.prepend(ongoingEventsInfo);
+          }
         }
 
         const key = `${start}-${end}`;
