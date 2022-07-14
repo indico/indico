@@ -24,25 +24,27 @@ export default function Captcha({name}) {
   const [image, setImage] = useState(null);
   const [audio, setAudio] = useState(null);
 
-  const fetchCaptcha = () => {
+  const fetchCaptcha = async () => {
     setLoading(true);
-    indicoAxios
-      .get(generateCaptcha())
-      .then(({data}) => {
-        setImage(`data:image/png;base64,${data.image}`);
-        const newAudio = new Audio(`data:audio/mp3;base64,${data.audio}`);
-        newAudio.onended = () => setPlaying(false);
-        setAudio(newAudio);
-        setError(false);
-      })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
+    setError(false);
+    try {
+      const {data} = await indicoAxios.get(generateCaptcha());
+      setImage(`data:image/png;base64,${data.image}`);
+      const newAudio = new Audio(`data:audio/mp3;base64,${data.audio}`);
+      newAudio.onended = () => setPlaying(false);
+      setAudio(newAudio);
+    } catch (err) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
-  useEffect(fetchCaptcha, []);
+  useEffect(() => fetchCaptcha(), []);
 
   const toggleAudio = () => {
     if (playing) {
       audio.pause();
+      audio.currentTime = 0;
     } else {
       audio.play();
     }
@@ -54,7 +56,7 @@ export default function Captcha({name}) {
       content={playing ? Translate.string('Pause') : Translate.string('Play')}
       trigger={
         <Button icon type="button" disabled={loading || error || !audio} onClick={toggleAudio}>
-          <Icon name={playing ? 'pause' : 'play'} />
+          <Icon name={playing ? 'stop' : 'play'} />
         </Button>
       }
     />
@@ -64,7 +66,18 @@ export default function Captcha({name}) {
     <Popup
       content={Translate.string('Refresh CAPTCHA')}
       trigger={
-        <Button icon type="button" loading={loading} disabled={loading} onClick={fetchCaptcha}>
+        <Button
+          icon
+          type="button"
+          loading={loading}
+          disabled={loading}
+          onClick={() => {
+            if (playing) {
+              toggleAudio();
+            }
+            fetchCaptcha();
+          }}
+        >
           <Icon name="redo" />
         </Button>
       }
