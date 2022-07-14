@@ -18,13 +18,13 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
 from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
-from indico.modules.categories.controllers.base import RHDisplayCategoryBase
+from indico.modules.categories.controllers.base import RHCategoryBase, RHDisplayCategoryBase
 from indico.modules.categories.controllers.util import (get_category_view_params, get_event_query_filter,
                                                         group_by_month, make_format_event_date_func,
                                                         make_happening_now_func, make_is_recent_func)
@@ -37,7 +37,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.news.util import get_recent_news
 from indico.modules.users import User
-from indico.modules.users.models.favorites import favorite_category_table
+from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table
 from indico.util.date_time import format_date, format_number, now_utc
 from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
@@ -185,6 +185,36 @@ class RHCategorySearch(RH):
         query = query.limit(10)
         return jsonify_data(categories=[serialize_category(c, with_favorite=True, with_path=True) for c in query],
                             total_count=total_count, flash=False)
+
+
+class RHCategoryManagedEventSearch(RHCategoryBase):
+    """Search managed events in a category."""
+
+    def _process(self):
+        from indico.modules.events.series.schemas import EventDetailsForSeriesManagementSchema
+        q = request.args['q'].lower()
+        query = (
+            Event.query.with_parent(self.category)
+            .filter(
+                Event.title_matches(q), Event.series == None, ~Event.is_deleted # noqa
+            )
+            .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_chain'))
+        )
+        # Prefer favorite events
+        query = query.order_by(Event.favorite_of.any(favorite_event_table.c.user_id == session.user.id).desc())
+        # Prefer exact matches and matches at the beginning, then order by event title
+        query = query.order_by(
+            (db.func.lower(Event.title) == q).desc(),
+            db.func.lower(Event.title).startswith(q).desc(),
+            db.func.lower(Event.title),
+        )
+        result = [EventDetailsForSeriesManagementSchema().dump(e) for e in query if e.can_manage(session.user)]
+        return jsonify(result[:min(10, len(result))])
+
+    def _check_access(self):
+        if not session.user:
+            raise Forbidden
+        RHCategoryBase._check_access(self)
 
 
 class RHSubcatInfo(RHDisplayCategoryBase):

@@ -1,0 +1,65 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2022 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'base/palette';
+
+:global(.ui.list).evt-list {
+  :global(.item).evt-item {
+    margin: 0 -10px;
+
+    .detail {
+      margin-top: 7px;
+      width: 350px;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: $dark-gray;
+    }
+
+    .delete-button {
+      align-self: center;
+      margin-left: auto;
+    }
+  }
+}
+
+.list-flex {
+  display: flex;
+  justify-content: start;
+  margin: 7px 0;
+
+  &.disabled {
+    background-color: $pastel-gray;
+  }
+}
+
+.date-span {
+  width: 15%;
+  margin-right: 7px;
+  font-size: 12px;
+  color: $dark-gray;
+}
+
+.event-title {
+  width: 75%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+
+  a {
+    margin-right: 5px;
+  }
+}
+
+.warning-reason {
+  color: $red;
+}
+
+.positive-note {
+  color: $dark-green;
+}
