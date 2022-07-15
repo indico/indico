@@ -26,6 +26,8 @@ from indico.core.db import db
 from indico.legacy.pdfinterface.base import PageBreak, Paragraph, PDFBase, PDFWithTOC, Spacer, escape, modifiedFontSize
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.modules.events.tracks.settings import track_settings
@@ -484,9 +486,11 @@ class TimeTablePlain(PDFWithTOC):
                                   ('TOPPADDING', (0, 0), (0, -1), 1),
                                   ('BOTTOMPADDING', (0, 0), (0, -1), 0)])
         entries = (self.event.timetable_entries
+                   .outerjoin(SessionBlock, SessionBlock.id == TimetableEntry.session_block_id)
+                   .outerjoin(Session, Session.id == SessionBlock.session_id)
                    .filter(db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
                            TimetableEntry.parent_id.is_(None))
-                   .order_by(TimetableEntry.start_dt)
+                   .order_by(TimetableEntry.start_dt, Session.title, SessionBlock.title)
                    .all())
         for entry in entries:
             # Session slot
