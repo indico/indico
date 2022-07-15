@@ -72,6 +72,8 @@ Bugfixes
   (:pr:`5425`)
 - Do not return the whole contribution list when editing a contribution from elsewhere
   (:pr:`5425`)
+- Fix session blocks not being sorted properly in a timetable PDF export when they
+  have the same start time (:pr:`5426`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
