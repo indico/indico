@@ -85,8 +85,19 @@ export const getConfig = ({images = true} = {}) => ({
     'Superscript',
     'Table',
     'TableToolbar',
+    'TableProperties',
+    'TableCellProperties',
     'Underline',
   ].filter(Boolean),
+  table: {
+    contentToolbar: [
+      'tableColumn',
+      'tableRow',
+      'mergeTableCells',
+      'tableProperties',
+      'tableCellProperties',
+    ],
+  },
   htmlSupport: {
     allow: [
       {name: 'dl'},
