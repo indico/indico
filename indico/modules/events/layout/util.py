@@ -310,7 +310,10 @@ def is_menu_entry_enabled(entry_name, event):
 
 def get_plugin_conference_themes():
     data = values_from_signal(signals.plugin.get_conference_themes.send(), return_plugins=True)
-    return {':'.join((plugin.name, name)): (path, title) for plugin, (name, path, title) in data}
+    if len(data) == 3:  # for backwards compatibility
+        return {':'.join((plugin.name, name)): (path, title) for plugin, (name, path, title) in data}
+    else:
+        return {':'.join((plugin.name, name)): (path, title, js_path) for plugin, (name, path, title, js_path) in data}
 
 
 def _build_css_url(theme):
@@ -347,6 +350,42 @@ def get_css_url(event, force_theme=None, for_preview=False):
         return url_for('event_layout.css_display', event, slug=event.stylesheet_metadata['hash'])
     elif layout_settings.get(event, 'theme'):
         return _build_css_url(layout_settings.get(event, 'theme'))
+
+
+def _build_js_url(theme):
+    if ':' in theme:
+        try:
+            if len(get_plugin_conference_themes()[theme]) == 3:
+                path = get_plugin_conference_themes()[theme][2]
+            else:
+                return None
+        except KeyError:
+            return None
+        plugin = theme.split(':', 1)[0]
+        return url_for_plugin(plugin + '.static', filename=path)
+    else:
+        return None
+
+
+def get_js_url(event, force_theme=None, for_preview=False):
+    """Build the URL of a JS resource.
+
+    :param event: The `Event` to get the JS url for
+    :param force_theme: The ID of the theme to import the custom JS resource
+                        only if it exists
+    :param for_preview: Whether the URL is used in the JS preview page
+    :return: The URL to the JS resource
+    """
+    from indico.modules.events.layout import layout_settings
+
+    if force_theme and force_theme != '_custom':
+        return _build_js_url(force_theme)
+    elif for_preview and force_theme is None:
+        return None
+    elif force_theme == '_custom' or layout_settings.get(event, 'use_custom_css'):
+        return None
+    elif layout_settings.get(event, 'theme'):
+        return _build_js_url(layout_settings.get(event, 'theme'))
 
 
 def get_logo_data(event):
