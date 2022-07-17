@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from dataclasses import dataclass
+
 from collections import defaultdict
 from itertools import chain, count
 
@@ -24,7 +26,6 @@ from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal, values_from_signal
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
-
 
 _cache = make_scoped_cache('updated-menus')
 
@@ -308,18 +309,44 @@ def is_menu_entry_enabled(entry_name, event):
     return get_menu_entry_by_name(entry_name, event).is_enabled
 
 
+@dataclass(frozen=True)
+class ConferenceTheme:
+    """
+    Holds the values of a given conference theme to be used by Indico.
+
+    Required:
+    - ``name``     -- string indicating the internal name used for the stylesheet which will be
+                      stored when the theme is selected in an event.
+    - ``css_path`` -- string indicating the relative location of the CSS file
+    - ``title``    -- string indicating the title displayed to the user when selecting the theme.
+
+    Optional:
+    - ``js_path``  -- string indicating the relative location for a simple, static javascript file
+    """
+
+    name: str
+    css_path: str
+    title: str
+    js_path: str = None
+
+
 def get_plugin_conference_themes():
     data = values_from_signal(signals.plugin.get_conference_themes.send(), return_plugins=True)
-    if len(data) == 3:  # for backwards compatibility
-        return {':'.join((plugin.name, name)): (path, title) for plugin, (name, path, title) in data}
-    else:
-        return {':'.join((plugin.name, name)): (path, title, js_path) for plugin, (name, path, title, js_path) in data}
+    return {
+        ':'.join((plugin.name, (theme_info.name
+                                if isinstance(theme_info, ConferenceTheme)  # backwards compatibility check
+                                else ConferenceTheme(*theme_info).name))
+                 ): (theme_info
+                     if isinstance(theme_info, ConferenceTheme)  # backwards compatibility check
+                     else ConferenceTheme(*theme_info))
+        for plugin, theme_info in data
+    }
 
 
 def _build_css_url(theme):
     if ':' in theme:
         try:
-            path = get_plugin_conference_themes()[theme][0]
+            path = get_plugin_conference_themes()[theme].css_path
         except KeyError:
             return None
         plugin = theme.split(':', 1)[0]
@@ -355,8 +382,9 @@ def get_css_url(event, force_theme=None, for_preview=False):
 def _build_js_url(theme):
     if ':' in theme:
         try:
-            if len(get_plugin_conference_themes()[theme]) == 3:
-                path = get_plugin_conference_themes()[theme][2]
+            # if the js_path is empty, we don't have a javascript file, so skip
+            if get_plugin_conference_themes()[theme].js_path:
+                path = get_plugin_conference_themes()[theme].js_path
             else:
                 return None
         except KeyError:

@@ -56,14 +56,20 @@ definitions.
 ''')
 
 get_conference_themes = _signals.signal('get-conference-themes', '''
-Expected to return ``(name, css, title)`` or  `(name, css, title, js)``
-tuples for conference stylesheets.
-``name`` is the internal name used for the stylesheet which will be
-stored when the theme is selected in an event.
-``css`` is the location of the CSS file, relative to the plugin's ``static`` folder.
-``title`` is the title displayed to the user when selecting the theme.
-''js'' is an optional entry for a simple, static javascript file to be loaded,
-relative to the plugin's ``static`` folder.
+Expected to return one or more ConferenceTheme classes containing the information
+pertaining to individual conference themes. (When returning more than one ConferenceTheme
+class, use sequential yields in-lou of return statements.)
+
+Required:
+- ``name``     -- string indicating the internal name used for the stylesheet which will be
+                  stored when the theme is selected in an event.
+- ``css_path`` -- string indicating the location of the CSS file, relative to the
+                  plugin's ``static`` folder.
+- ``title``    -- string indicating the title displayed to the user when selecting the theme.
+
+Optional:
+- ``js_path``  -- string indicating the location for a simple, static javascript file to be
+                  loaded, relative to the plugin's ``static`` folder.
 ''')
 
 get_template_customization_paths = _signals.signal('get-template-customization-paths', '''
