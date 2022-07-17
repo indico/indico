@@ -380,7 +380,8 @@ def get_css_url(event, force_theme=None, for_preview=False):
 
 
 def _build_js_url(theme):
-    if ':' in theme:
+    if ':' not in theme:
+        return None
         try:
             # if the js_path is empty, we don't have a javascript file, so skip
             return get_plugin_conference_themes()[theme].js_path
