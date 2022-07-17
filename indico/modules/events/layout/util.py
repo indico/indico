@@ -383,10 +383,7 @@ def _build_js_url(theme):
     if ':' in theme:
         try:
             # if the js_path is empty, we don't have a javascript file, so skip
-            if get_plugin_conference_themes()[theme].js_path:
-                path = get_plugin_conference_themes()[theme].js_path
-            else:
-                return None
+            return get_plugin_conference_themes()[theme].js_path
         except KeyError:
             return None
         plugin = theme.split(':', 1)[0]
