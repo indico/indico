@@ -5,9 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from dataclasses import dataclass
-
 from collections import defaultdict
+from dataclasses import dataclass
 from itertools import chain, count
 
 from sqlalchemy.exc import IntegrityError
@@ -383,8 +382,7 @@ def _build_js_url(theme):
     if ':' not in theme:
         return None
     try:
-        path = get_plugin_conference_themes()[theme].js_path
-        if not path:
+        if not (path := get_plugin_conference_themes()[theme].js_path):
             return None
     except KeyError:
         return None
