@@ -382,15 +382,14 @@ def get_css_url(event, force_theme=None, for_preview=False):
 def _build_js_url(theme):
     if ':' not in theme:
         return None
-        try:
-            # if the js_path is empty, we don't have a javascript file, so skip
-            return get_plugin_conference_themes()[theme].js_path
-        except KeyError:
+    try:
+        path = get_plugin_conference_themes()[theme].js_path
+        if not path:
             return None
-        plugin = theme.split(':', 1)[0]
-        return url_for_plugin(plugin + '.static', filename=path)
-    else:
+    except KeyError:
         return None
+    plugin = theme.split(':', 1)[0]
+    return url_for_plugin(plugin + '.static', filename=path)
 
 
 def get_js_url(event, force_theme=None, for_preview=False):
