@@ -141,15 +141,16 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
         </Message>
       )}
       <Form.Field>
-        <Translate as="label">From</Translate>
         <FinalDropdown
           name="fromAddress"
+          label={Translate.string('From')}
           scrolling
           selection
           options={senders.map(([value, text]) => ({value, text}))}
+          required
         />
       </Form.Field>
-      <Form.Field>
+      <Form.Field required>
         <Translate as="label">Subject</Translate>
         {preview ? (
           <Input value={preview.subject} disabled required />
@@ -157,7 +158,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
           <FinalInput name="subject" required />
         )}
       </Form.Field>
-      <Form.Field>
+      <Form.Field required>
         <Translate as="label">Email body</Translate>
         {preview ? (
           <TextEditor value={preview.body} disabled />
@@ -189,7 +190,6 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
         <TextArea rows={3} value={recipients.join(', ')} readOnly />
       </Form.Field>
       <Form.Field>
-        <Translate as="label">Send copy to me</Translate>
         <FinalCheckbox name="copyForSender" label={Translate.string('Send copy to me')} toggle />
         <Translate as="p" className="field-description">
           Send copy of each email to my mailbox
