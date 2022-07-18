@@ -10,7 +10,7 @@ from marshmallow import fields, validate
 
 from indico.core.marshmallow import mm
 from indico.modules.receipts.models.templates import ReceiptTemplate
-from indico.util.marshmallow import not_empty
+from indico.util.marshmallow import YAML, not_empty
 
 
 class OwnerDataSchema(mm.Schema):
@@ -32,7 +32,7 @@ class ReceiptTplMetadataSchema(mm.Schema):
     custom_fields = fields.Nested(CustomFieldSchema(many=True))
 
 
-class ReceiptTemplateSchema(mm.SQLAlchemyAutoSchema):
+class ReceiptTemplateDBSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ReceiptTemplate
         fields = ('id', 'title', 'html', 'css', 'custom_fields', 'yaml', 'owner')
@@ -40,3 +40,10 @@ class ReceiptTemplateSchema(mm.SQLAlchemyAutoSchema):
     yaml = fields.Function(lambda tpl: (yaml.safe_dump({'custom_fields': tpl.custom_fields})
                                         if tpl.custom_fields else None))
     owner = fields.Nested(OwnerDataSchema)
+
+
+class ReceiptTemplateAPISchema(mm.Schema):
+    title = fields.String(required=True, validate=validate.Length(3))
+    html = fields.String(required=True, validate=validate.Length(3))
+    css = fields.String(load_default='')
+    yaml = YAML(ReceiptTplMetadataSchema, load_default=None, allow_none=True)

@@ -8,7 +8,7 @@
 from indico.modules.receipts.controllers import (RHAddTemplate, RHAllCategoryTemplates, RHAllEventTemplates,
                                                  RHCategoryTemplate, RHCloneTemplate, RHDeleteTemplate, RHEditTemplate,
                                                  RHEventTemplate, RHListCategoryTemplates, RHListEventTemplates,
-                                                 RHPreviewTemplate, RHPrintReceipts)
+                                                 RHLivePreviewTemplate, RHPreviewTemplate, RHPrintReceipts)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -43,6 +43,8 @@ for object_type in ('event', 'category'):
                      defaults={'object_type': object_type}, methods=('GET',))
     _bp.add_url_rule(prefix + '/<int:template_id>/preview', 'template_preview', RHPreviewTemplate,
                      defaults={'object_type': object_type}, methods=('GET',))
+    _bp.add_url_rule(prefix + '/<int:template_id>/live-preview', 'template_live_preview', RHLivePreviewTemplate,
+                     defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/print', 'print_receipts', RHPrintReceipts,
                      defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'edit_template', RHEditTemplate,
