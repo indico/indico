@@ -26,6 +26,7 @@ from indico.util.signals import named_objects_from_signal, values_from_signal
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
 
+
 _cache = make_scoped_cache('updated-menus')
 
 
@@ -331,15 +332,10 @@ class ConferenceTheme:
 
 def get_plugin_conference_themes():
     data = values_from_signal(signals.plugin.get_conference_themes.send(), return_plugins=True)
-    return {
-        ':'.join((plugin.name, (theme_info.name
-                                if isinstance(theme_info, ConferenceTheme)  # backwards compatibility check
-                                else ConferenceTheme(*theme_info).name))
-                 ): (theme_info
-                     if isinstance(theme_info, ConferenceTheme)  # backwards compatibility check
-                     else ConferenceTheme(*theme_info))
-        for plugin, theme_info in data
-    }
+    # backwards compatibility in case theme_info is a tuple instead of type ConferenceTheme
+    data = [(plugin, (theme_info if isinstance(theme_info, ConferenceTheme) else ConferenceTheme(*theme_info)))
+            for plugin, theme_info in data]
+    return {f'{plugin.name}:{theme_info.name}': theme_info for plugin, theme_info in data}
 
 
 def _build_css_url(theme):
@@ -349,7 +345,7 @@ def _build_css_url(theme):
         except KeyError:
             return None
         plugin = theme.split(':', 1)[0]
-        return url_for_plugin(plugin + '.static', filename=path)
+        return url_for_plugin(f'{plugin}.static', filename=path)
     else:
         css_base = url_parse(config.CONFERENCE_CSS_TEMPLATES_BASE_URL).path
         return f'{css_base}/{theme}'
@@ -387,7 +383,7 @@ def _build_js_url(theme):
     except KeyError:
         return None
     plugin = theme.split(':', 1)[0]
-    return url_for_plugin(plugin + '.static', filename=path)
+    return url_for_plugin(f'{plugin}.static', filename=path)
 
 
 def get_js_url(event, force_theme=None, for_preview=False):

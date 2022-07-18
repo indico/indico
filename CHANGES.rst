@@ -54,10 +54,6 @@ Improvements
 - Add the ability to include an optional static javascript file when defining
   custom conference themes from within a plugin.
   (:pr:`5414`, thanks :user:`brittyazel`)
-- Conference themes are now defined using a new ConferenceTheme dataclass as
-  opposed to using a tuple, though we still maintain backwards compatibility
-  with the old way.
-  (:pr:`5414`, thanks :user:`brittyazel`)
 
 Bugfixes
 ^^^^^^^^
