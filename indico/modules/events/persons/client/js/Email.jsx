@@ -10,7 +10,7 @@ import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
-import {Form as FinalForm} from 'react-final-form';
+import {Form as FinalForm, FormSpy} from 'react-final-form';
 import {Form, Modal, Button, TextArea, Message, Input, Label} from 'semantic-ui-react';
 
 import TextEditor from 'indico/react/components/TextEditor';
@@ -18,6 +18,7 @@ import {
   FinalCheckbox,
   FinalDropdown,
   FinalField,
+  FinalInput,
   handleSubmitError,
   validators,
 } from 'indico/react/forms';
@@ -125,7 +126,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
     }
   };
 
-  const renderForm = ({handleSubmit, submitting, submitSucceeded, values, hasValidationErrors}) => (
+  const renderForm = ({handleSubmit, submitting, submitSucceeded, hasValidationErrors}) => (
     <Form loading={loading} onSubmit={handleSubmit}>
       {submitSucceeded && (
         <Message positive>
@@ -150,32 +151,38 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
       </Form.Field>
       <Form.Field>
         <Translate as="label">Subject</Translate>
-        <FinalField name="subject">
-          {({input: {value, ...rest}}) => (
-            <Input value={preview ? preview.subject : value} disabled={!!preview} {...rest} />
-          )}
-        </FinalField>
+        {preview ? (
+          <Input value={preview.subject} disabled required />
+        ) : (
+          <FinalInput name="subject" required />
+        )}
       </Form.Field>
       <Form.Field>
         <Translate as="label">Email body</Translate>
-        <FinalField name="body" validate={validators.required}>
-          {({input, meta}) => (
-            <>
-              {meta.touched && (meta.error || meta.submitError) && (
-                <Label basic color="red" pointing="below">
-                  {meta.error || meta.submitError}
-                </Label>
-              )}
-              <TextEditor
-                {...input}
-                value={preview ? preview.body : input.value}
-                onChange={(_, editor) => !disableChange.current && input.onChange(editor.getData())}
-                disabled={!!preview}
-                required
-              />
-            </>
-          )}
-        </FinalField>
+        {preview ? (
+          <TextEditor value={preview.body} disabled />
+        ) : (
+          <FinalField name="body" validate={validators.required}>
+            {({input, meta}) => (
+              <>
+                {meta.touched && (meta.error || meta.submitError) && (
+                  <Label basic color="red" pointing="below">
+                    {meta.error || meta.submitError}
+                  </Label>
+                )}
+                <TextEditor
+                  {...input}
+                  value={preview ? preview.body : input.value}
+                  onChange={(_, editor) =>
+                    !disableChange.current && input.onChange(editor.getData())
+                  }
+                  disabled={!!preview}
+                  required
+                />
+              </>
+            )}
+          </FinalField>
+        )}
       </Form.Field>
       <Form.Field>
         <Translate as="label">Recipients</Translate>
@@ -196,9 +203,18 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
       >
         Send
       </Translate>
-      <Button type="button" active={!!preview} onClick={() => togglePreview(values)}>
-        {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
-      </Button>
+      <FormSpy subscription={{values: true}}>
+        {({values}) => (
+          <Button
+            type="button"
+            active={!!preview}
+            onClick={() => togglePreview(values)}
+            disabled={submitting || submitSucceeded || hasValidationErrors}
+          >
+            {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
+          </Button>
+        )}
+      </FormSpy>
     </Form>
   );
 
