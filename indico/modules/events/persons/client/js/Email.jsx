@@ -23,7 +23,7 @@ import {
   validators,
 } from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Param, Translate} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
 
@@ -104,6 +104,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
     params: snakifyKeys(recipientData),
   });
   const {senders = [], recipients = [], subject: defaultSubject, body: defaultBody} = data || {};
+  const count = Object.values(recipientData).reduce((acc, v) => acc + v.length, 0);
 
   const togglePreview = async ({body, subject}) => {
     if (!preview) {
@@ -131,13 +132,12 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
       {submitSucceeded && (
         <Message positive>
           <Translate as={Message.Header}>Your email has been sent.</Translate>
-          <Translate as="p">
-            <Param
-              name="count"
-              value={Object.values(recipientData).reduce((acc, v) => acc + v.length, 0)}
-            />{' '}
-            emails have been sent.
-          </Translate>
+          <PluralTranslate count={count} as="p">
+            <Singular>One email has been sent.</Singular>
+            <Plural>
+              <Param name="count" value={count} /> emails have been sent.
+            </Plural>
+          </PluralTranslate>
         </Message>
       )}
       <Form.Field>
