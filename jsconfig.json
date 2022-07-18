@@ -14,6 +14,7 @@
       "indico/modules/events/reviewing/*": ["./indico/modules/events/client/js/reviewing/*"],
       "indico/modules/events/editing/*": ["./indico/modules/events/editing/client/js/*"],
       "indico/modules/events/management/*": ["./indico/modules/events/management/client/js/*"],
+      "indico/modules/events/persons/*": ["./indico/modules/events/persons/client/js/*"],
       "indico/modules/events/*": ["./indico/modules/events/client/js/*"],
       "indico/*": ["./indico/web/client/js/*"]
     }

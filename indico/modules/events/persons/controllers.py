@@ -43,7 +43,7 @@ from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import validate_with_message
+from indico.util.marshmallow import not_empty, validate_with_message
 from indico.util.placeholders import replace_placeholders
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -293,9 +293,9 @@ class RHAPIEmailEventPersons(RHManageEventBase):
         }
 
     @use_kwargs({
-        'from_address': fields.String(required=True),
-        'body': fields.String(required=True),
-        'subject': fields.String(load_default=None),
+        'from_address': fields.String(required=True, validate=not_empty),
+        'body': fields.String(required=True, validate=not_empty),
+        'subject': fields.String(load_default=None, validate=not_empty),
         'copy_for_sender': fields.Bool(load_default=False)
     })
     def _process_POST(self, from_address, body, subject, copy_for_sender):

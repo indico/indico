@@ -23,7 +23,6 @@ import {$T} from '../../utils/i18n';
 
   global.getParamsFromSelectors = function getParamsFromSelectors() {
     var fieldParams = {};
-    console.log(arguments);
     _.each(arguments, function(selector) {
       $(selector).each(function() {
         if (!(this.name in fieldParams)) {
