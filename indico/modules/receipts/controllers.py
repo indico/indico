@@ -10,7 +10,7 @@ import typing as t
 from dataclasses import dataclass, field
 
 from flask import g, json, jsonify, request, session
-from marshmallow import fields, validate
+from marshmallow import fields
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -22,12 +22,11 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.receipts.models.templates import ReceiptTemplate
-from indico.modules.receipts.schemas import ReceiptTemplateSchema, ReceiptTplMetadataSchema
+from indico.modules.receipts.schemas import ReceiptTemplateAPISchema, ReceiptTemplateDBSchema
 from indico.modules.receipts.util import (compile_jinja_code, create_pdf, get_inherited_templates,
                                           get_useful_registration_data)
 from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
 from indico.util.i18n import _
-from indico.util.marshmallow import YAML
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
 
@@ -80,8 +79,8 @@ class ReceiptAreaRenderMixin(ReceiptAreaMixin):
 
 class TemplateListMixin(ReceiptAreaRenderMixin):
     def _process(self):
-        inherited_templates = ReceiptTemplateSchema(many=True).dump(get_inherited_templates(self.target))
-        own_templates = ReceiptTemplateSchema(many=True).dump(self.target.receipt_templates)
+        inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
+        own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
         return self._render_template(
             'list.html',
             inherited_templates=inherited_templates,
@@ -92,8 +91,8 @@ class TemplateListMixin(ReceiptAreaRenderMixin):
 
 class AllTemplateMixin(ReceiptAreaMixin):
     def _process(self, **data):
-        inherited_templates = ReceiptTemplateSchema(many=True).dump(get_inherited_templates(self.target))
-        own_templates = ReceiptTemplateSchema(many=True).dump(self.target.receipt_templates)
+        inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
+        own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
         return jsonify(inherited_templates + own_templates)
 
 
@@ -108,25 +107,20 @@ class RHListCategoryTemplates(TemplateListMixin, RHManageCategoryBase):
 class RHAddTemplate(ReceiptAreaRenderMixin, RHAdminBase):
     always_clonable = False
 
-    @use_kwargs({
-        'title': fields.String(required=True, validate=validate.Length(3)),
-        'html': fields.String(required=True, validate=validate.Length(3)),
-        'css': fields.String(load_default=''),
-        'yaml': YAML(ReceiptTplMetadataSchema, load_default=None)
-    })
+    @use_kwargs(ReceiptTemplateAPISchema)
     def _process(self, title, html, css, yaml):
         if yaml is None:
             yaml = {'custom_fields': []}
         template = ReceiptTemplate(title=title, html=html, css=css, custom_fields=yaml['custom_fields'],
                                    **self.target_dict)
         db.session.flush()
-        return jsonify(ReceiptTemplateSchema().dump(template))
+        return jsonify(ReceiptTemplateDBSchema().dump(template))
 
 
 class DisplayTemplateMixin(ReceiptAreaRenderMixin):
     def _process(self):
-        inherited_templates = ReceiptTemplateSchema(many=True).dump(get_inherited_templates(self.target))
-        own_templates = ReceiptTemplateSchema(many=True).dump(self.target.receipt_templates)
+        inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
+        own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
         return self._render_template(
             'list.html',
             inherited_templates=inherited_templates,
@@ -149,12 +143,7 @@ class RHDeleteTemplate(ReceiptTemplateMixin, RHAdminBase):
 
 
 class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):
-    @use_kwargs({
-        'title': fields.String(validate=validate.Length(3)),
-        'html': fields.String(validate=validate.Length(3)),
-        'css': fields.String(),
-        'yaml': YAML(ReceiptTplMetadataSchema, allow_none=True)
-    })
+    @use_kwargs(ReceiptTemplateAPISchema)
     def _process(self, **data):
         yaml = data.pop('yaml', None)
         for key, value in data.items():
@@ -198,6 +187,40 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
             formatted_price='100 EUR'
         )
         f = create_pdf(self.target, {html}, self.template.css)
+
+        return send_file('receipt.pdf', f, 'application/pdf')
+
+
+class RHLivePreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
+    DENY_FRAMES = False
+
+    @use_kwargs(ReceiptTemplateAPISchema)
+    def _process(self, title, html, css, yaml):
+        # Just some dummy data to test the template
+        compiled_html = compile_jinja_code(
+            html,
+            custom_fields={f['name']: f.get('default') for f in (yaml.get('custom_fields', []) if yaml else [])},
+            event=self.target,
+            personal_data={
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'email': 'john.doe@example.com',
+                'price': 100
+            },
+            fields=[{
+                'title': _('Social Dinner'),
+                'value': True,
+                'field_data': {
+                    'price': 50
+                },
+                'actual_price': 50
+            }],
+            base_price=50,
+            total_price=100,
+            currency='EUR',
+            formatted_price='100 EUR'
+        )
+        f = create_pdf(self.target, {compiled_html}, css)
 
         return send_file('receipt.pdf', f, 'application/pdf')
 
@@ -277,4 +300,4 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
         )
         db.session.add(new_tpl)
         db.session.flush()
-        return jsonify(ReceiptTemplateSchema().dump(new_tpl))
+        return jsonify(ReceiptTemplateDBSchema().dump(new_tpl))
