@@ -116,6 +116,8 @@ function SingleChoiceDropdown({
           onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
           clearable={!isRequired}
           search
+          selectOnNavigation={false}
+          selectOnBlur={false}
         />
       </Form.Field>
       {extraSlotsDropdown}
