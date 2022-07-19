@@ -548,8 +548,9 @@ class RegistrationPrivacyForm(IndicoForm):
         )
         if (
             self.regform and
-            self.regform.existing_registrations_count > 0 and
-            (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all)
+            (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all) and
+            Registration.query.with_parent(self.regform).filter(~Registration.is_deleted,
+                                                                ~Registration.created_by_manager).has_rows()
         ):
             raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
         if field.data[2] is not None and not field.data[2]:
