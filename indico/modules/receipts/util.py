@@ -10,8 +10,10 @@ from io import BytesIO
 
 from flask import g
 from jinja2 import Undefined
+from jinja2.exceptions import TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
 from weasyprint import CSS, HTML, default_url_fetcher
+from werkzeug.exceptions import UnprocessableEntity
 
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
@@ -57,8 +59,11 @@ def get_inherited_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplat
 
 def compile_jinja_code(code: str, use_stack: bool = False, **fields) -> str:
     """Compile Jinja template of receipt in a sandboxed environment."""
-    env = SandboxedEnvironment(undefined=SilentUndefined) if use_stack else SandboxedEnvironment()
-    return env.from_string(code).render(**fields)
+    try:
+        env = SandboxedEnvironment(undefined=SilentUndefined) if use_stack else SandboxedEnvironment()
+        return env.from_string(code).render(**fields)
+    except TemplateSyntaxError as e:
+        raise UnprocessableEntity(e)
 
 
 def sandboxed_url_fetcher(event: Event, **kwargs) -> t.Callable[[str], dict]:
