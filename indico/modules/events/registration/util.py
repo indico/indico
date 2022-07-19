@@ -338,15 +338,14 @@ def create_registration(regform, data, invitation=None, management=False, notify
     if skip_moderation is None:
         skip_moderation = management
     for form_item in regform.active_fields:
+        if form_item.is_purged:
+            # Leave the registration data empty
+            continue
         default = form_item.field_impl.default_value
         can_modify = management or not form_item.parent.is_manager_only
         value = data.get(form_item.html_field_name, default) if can_modify else default
         data_entry = RegistrationData()
         registration.data.append(data_entry)
-        if form_item.is_purged:
-            # Leave the registration data empty
-            continue
-
         for attr, value in form_item.field_impl.process_form_data(registration, value).items():
             setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
