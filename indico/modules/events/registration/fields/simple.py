@@ -68,8 +68,11 @@ class NumberFieldDataSchema(BillableFieldDataSchema):
 class NumberField(RegistrationFormBillableField):
     name = 'number'
     mm_field_class = fields.Integer
-    mm_field_kwargs = {'allow_none': True}
     setup_schema_base_cls = NumberFieldDataSchema
+
+    @property
+    def mm_field_kwargs(self):
+        return {'allow_none': not self.form_item.is_required}
 
     def get_validators(self, existing_registration):
         return validate.Range(min=self.form_item.data.get('min_value') or 0,
@@ -242,11 +245,15 @@ class BooleanFieldSetupSchema(LimitedPlacesBillableFieldDataSchema):
 class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     mm_field_class = fields.Boolean
-    mm_field_kwargs = {'allow_none': True}
     setup_schema_base_cls = BooleanFieldSetupSchema
+    not_empty_if_required = False
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
                              False: L_('No')}
+
+    @property
+    def mm_field_kwargs(self):
+        return {'allow_none': not self.form_item.is_required}
 
     @property
     def filter_choices(self):
@@ -320,8 +327,11 @@ class CountryField(RegistrationFormFieldBase):
 class FileField(RegistrationFormFieldBase):
     name = 'file'
     mm_field_class = UUIDString
-    mm_field_kwargs = {'allow_none': True}
     is_file_field = True
+
+    @property
+    def mm_field_kwargs(self):
+        return {'allow_none': not self.form_item.is_required}
 
     def has_data_changed(self, value, old_data):
         if value == KEEP_EXISTING_FILE_UUID:
