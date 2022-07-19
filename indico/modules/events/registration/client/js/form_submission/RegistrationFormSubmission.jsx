@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
-import {Message} from 'semantic-ui-react';
+import {Form, Message} from 'semantic-ui-react';
 
 import {
   FinalSubmitButton,
@@ -68,12 +68,14 @@ function ConsentToPublish({publishToParticipants, publishToPublic}) {
           </Translate>
         </p>
       )}
-      <ConsentToPublishDropdown
-        name="consent_to_publish"
-        publishToParticipants={publishToParticipants}
-        publishToPublic={publishToPublic}
-        useFinalForms
-      />
+      <Form as="div">
+        <ConsentToPublishDropdown
+          name="consent_to_publish"
+          publishToParticipants={publishToParticipants}
+          publishToPublic={publishToPublic}
+          useFinalForms
+        />
+      </Form>
     </Message>
   );
 }
