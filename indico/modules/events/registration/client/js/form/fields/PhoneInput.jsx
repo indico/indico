@@ -12,12 +12,13 @@ import {FinalInput} from 'indico/react/forms';
 
 import '../../../styles/regform.module.scss';
 
-export default function PhoneInput({htmlName, disabled}) {
-  return <FinalInput type="tel" name={htmlName} disabled={disabled} />;
+export default function PhoneInput({htmlName, isRequired, disabled}) {
+  return <FinalInput type="tel" name={htmlName} required={isRequired} disabled={disabled} />;
 }
 
 PhoneInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
+  isRequired: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
 };
 

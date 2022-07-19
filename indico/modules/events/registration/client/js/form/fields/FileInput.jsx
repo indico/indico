@@ -31,7 +31,6 @@ export default function FileInput({htmlName, disabled, isRequired}) {
       required={isRequired}
       uploadURL={uploadFileURL({event_id: eventId, reg_form_id: regformId})}
       initialFileDetails={initialFileDetails}
-      hideValidationError
     />
   );
 }
