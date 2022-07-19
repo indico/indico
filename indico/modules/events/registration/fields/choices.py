@@ -504,7 +504,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
                 item = next((c for c in self.form_item.versioned_data['choices'] if c['id'] == new_data['choice']),
                             None)
             # this should never happen unless someone tampers with the data
-            if item is None:
+            if item is None or not item['is_enabled']:
                 raise ValidationError('Invalid choice')
             if item.get('is_no_accommodation', False) != new_data['isNoAccommodation']:
                 raise ValidationError('Invalid data')
