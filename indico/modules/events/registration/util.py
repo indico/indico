@@ -334,7 +334,7 @@ def create_personal_data_fields(regform):
 def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
-                                base_price=regform.base_price, currency=regform.currency)
+                                base_price=regform.base_price, currency=regform.currency, created_by_manager=management)
     if skip_moderation is None:
         skip_moderation = management
     for form_item in regform.active_fields:
