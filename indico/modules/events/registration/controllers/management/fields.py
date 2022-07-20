@@ -17,6 +17,8 @@ from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 from indico.util.string import snakify_keys
@@ -73,7 +75,11 @@ def _fill_form_field_with_data(field, field_data, is_static_text=False):
     schema_cls = TextDataSchema if is_static_text else GeneralFieldDataSchema
     schema = schema_cls(context={'field': field})
     general_data, raw_field_specific_data = schema.load(field_data)
+    changes = {}
     for key, value in general_data.items():
+        old_value = getattr(field, key)
+        if old_value != value:
+            changes[key] = (old_value, value)
         setattr(field, key, value)
     if not is_static_text:
         schema = field.field_impl.create_setup_schema()
@@ -83,6 +89,7 @@ def _fill_form_field_with_data(field, field_data, is_static_text=False):
         else:
             field.data, field.versioned_data = field.field_impl.process_field_data(field_specific_data, field.data,
                                                                                    field.versioned_data)
+    return changes
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
@@ -112,6 +119,16 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         update_regform_item_positions(self.regform)
         db.session.flush()
         logger.info('Field %s modified by %s', self.field, session.user)
+        if enabled:
+            self.field.log(
+                EventLogRealm.management, LogKind.positive, 'Registration',
+                f'Field "{self.field.title}" in "{self.regform.title}" enabled', session.user
+            )
+        else:
+            self.field.log(
+                EventLogRealm.management, LogKind.negative, 'Registration',
+                f'Field "{self.field.title}" in "{self.regform.title}" disabled', session.user
+            )
         return jsonify(view_data=self.field.view_data, positions=get_flat_section_positions_setup_data(self.regform))
 
 
@@ -124,6 +141,10 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         self.field.is_deleted = True
         update_regform_item_positions(self.regform)
         db.session.flush()
+        self.field.log(
+            EventLogRealm.management, LogKind.negative, 'Registration',
+            f'Field "{self.field.title}" in "{self.regform.title}" deleted', session.user
+        )
         logger.info('Field %s deleted by %s', self.field, session.user)
         return jsonify()
 
@@ -134,7 +155,18 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif 'input_type' in field_data and self.field.input_type != field_data['input_type']:
             raise BadRequest
         field_data['input_type'] = self.field.input_type
-        _fill_form_field_with_data(self.field, field_data)
+        changes = _fill_form_field_with_data(self.field, field_data)
+        changes = make_diff_log(changes, {
+            'title': {'title': 'Title', 'type': 'string'},
+            'description': {'title': 'Description'},
+            'is_required': {'title': 'Required'},
+            'retention_period': {'title': 'Retention period'},
+        })
+        self.field.log(
+            EventLogRealm.management, LogKind.change, 'Registration',
+            f'Field "{self.field.title}" in "{self.regform.title}" modified', session.user,
+            data={'Changes': changes}
+        )
         return jsonify(view_data=self.field.view_data)
 
 
@@ -173,6 +205,11 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
         _fill_form_field_with_data(form_field, field_data)
         db.session.add(form_field)
         db.session.flush()
+        form_field.log(
+            EventLogRealm.management, LogKind.positive, 'Registration',
+            f'Field "{form_field.title}" in "{self.regform.title}" added', session.user,
+            data={'Type': form_field.input_type}
+        )
         return jsonify(view_data=form_field.view_data)
 
 
@@ -188,7 +225,16 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
     def _process_PATCH(self):
         field_data = snakify_keys(request.json['fieldData'])
         field_data.pop('input_type', None)
-        _fill_form_field_with_data(self.field, field_data, is_static_text=True)
+        changes = _fill_form_field_with_data(self.field, field_data, is_static_text=True)
+        changes = make_diff_log(changes, {
+            'title': {'title': 'Title', 'type': 'string'},
+            'description': {'title': 'Description'},
+        })
+        self.field.log(
+            EventLogRealm.management, LogKind.change, 'Registration',
+            f'Field "{self.field.title}" in "{self.regform.title}" modified', session.user,
+            data={'Changes': changes}
+        )
         return jsonify(view_data=self.field.view_data)
 
 
@@ -207,4 +253,9 @@ class RHRegistrationFormAddText(RHManageRegFormSectionBase):
         _fill_form_field_with_data(form_field, field_data, is_static_text=True)
         db.session.add(form_field)
         db.session.flush()
+        form_field.log(
+            EventLogRealm.management, LogKind.positive, 'Registration',
+            f'Field "{form_field.title}" in "{self.regform.title}" added', session.user,
+            data={'Type': 'label'}
+        )
         return jsonify(view_data=form_field.view_data)

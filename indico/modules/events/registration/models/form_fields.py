@@ -102,6 +102,9 @@ class RegistrationFormField(RegistrationFormItem):
     def calculate_price(self, registration_data):
         return self.field_impl.calculate_price(registration_data.data, registration_data.field_data.versioned_data)
 
+    def _get_default_log_data(self):
+        return {'Field ID': self.id, 'Section': self.parent.title}
+
 
 class RegistrationFormPersonalDataField(RegistrationFormField):
     __mapper_args__ = {

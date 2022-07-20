@@ -13,6 +13,8 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.web.util import jsonify_data
 
 
@@ -40,6 +42,11 @@ class RHRegistrationFormAddSection(RHManageRegFormBase):
         section.is_manager_only = request.json.get('is_manager_only', False)
         db.session.add(section)
         db.session.flush()
+        section.log(
+            EventLogRealm.management, LogKind.positive, 'Registration',
+            f'Section "{section.title}" in "{self.regform.title}" added', session.user,
+            data={'Manager-only': section.is_manager_only}
+        )
         logger.info('Section %s created by %s', section, session.user)
         return jsonify(section.view_data)
 
@@ -52,6 +59,10 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
             raise BadRequest
         self.section.is_deleted = True
         db.session.flush()
+        self.section.log(
+            EventLogRealm.management, LogKind.negative, 'Registration',
+            f'Section "{self.section.title}" in "{self.regform.title}" deleted', session.user
+        )
         logger.info('Section %s deleted by %s', self.section, session.user)
         return jsonify(success=True)
 
@@ -61,9 +72,18 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
             raise BadRequest
         if self.section.type == RegistrationFormItemType.section_pd and changes.get('is_manager_only'):
             raise BadRequest
-        for field, value in changes.items():
-            setattr(self.section, field, value)
+        changes = self.section.populate_from_dict(changes)
         db.session.flush()
+        changes = make_diff_log(changes, {
+            'title': {'title': 'Title', 'type': 'string'},
+            'description': {'title': 'Description'},
+            'is_manager_only': {'title': 'Manager-only'},
+        })
+        self.section.log(
+            EventLogRealm.management, LogKind.change, 'Registration',
+            f'Section "{self.section.title}" in "{self.regform.title}" modified', session.user,
+            data={'Changes': changes}
+        )
         logger.info('Section %s modified by %s: %s', self.section, session.user, changes)
         return jsonify(self.section.view_data)
 
@@ -79,8 +99,16 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
         update_regform_item_positions(self.regform)
         db.session.flush()
         if self.section.is_enabled:
+            self.section.log(
+                EventLogRealm.management, LogKind.positive, 'Registration',
+                f'Section "{self.section.title}" in "{self.regform.title}" enabled', session.user
+            )
             logger.info('Section %s enabled by %s', self.section, session.user)
         else:
+            self.section.log(
+                EventLogRealm.management, LogKind.negative, 'Registration',
+                f'Section "{self.section.title}" in "{self.regform.title}" disabled', session.user
+            )
             logger.info('Section %s disabled by %s', self.section, session.user)
         return jsonify_data(view_data=self.section.view_data,
                             positions=get_flat_section_positions_setup_data(self.regform))
