@@ -332,7 +332,7 @@ class ConferenceTheme:
 
 def get_plugin_conference_themes():
     data = values_from_signal(signals.plugin.get_conference_themes.send(), return_plugins=True)
-    # backwards compatibility in case theme_info is a tuple instead of type ConferenceTheme
+    # backwards compatibility in case theme_info is a tuple instead of a `ConferenceTheme``
     data = [(plugin, (theme_info if isinstance(theme_info, ConferenceTheme) else ConferenceTheme(*theme_info)))
             for plugin, theme_info in data]
     return {f'{plugin.name}:{theme_info.name}': theme_info for plugin, theme_info in data}

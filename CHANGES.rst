@@ -52,8 +52,7 @@ Improvements
 - Include abstract content in CSV/Excel export if enabled in the abstract list
   (:issue:`5356`, :pr:`5372`, thanks :user:`rppt`)
 - Add the ability to include an optional static javascript file when defining
-  custom conference themes from within a plugin.
-  (:pr:`5414`, thanks :user:`brittyazel`)
+  custom conference themes from within a plugin (:pr:`5414`, thanks :user:`brittyazel`)
 
 Bugfixes
 ^^^^^^^^

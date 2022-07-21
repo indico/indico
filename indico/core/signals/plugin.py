@@ -56,9 +56,8 @@ definitions.
 ''')
 
 get_conference_themes = _signals.signal('get-conference-themes', '''
-Expected to return one or more ConferenceTheme classes containing the information
-pertaining to individual conference themes. (When returning more than one ConferenceTheme
-class, use sequential yields in-lou of return statements.)
+Expected to return one or more :class:`indico.modules.events.layout.util.ConferenceTheme`
+objects containing the information about custom conference themes.
 
 Required:
 - ``name``     -- string indicating the internal name used for the stylesheet which will be
