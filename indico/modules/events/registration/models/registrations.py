@@ -408,7 +408,9 @@ class Registration(db.Model):
     @property
     def can_be_modified(self):
         regform = self.registration_form
-        return regform.is_modification_open and regform.is_modification_allowed(self)
+        return (regform.is_modification_open
+                and regform.is_modification_allowed(self)
+                and not any(values_from_signal(signals.event.is_registration_blocked.send(self), single_value=True)))
 
     @property
     def can_be_withdrawn(self):

@@ -79,6 +79,7 @@ Internal Changes
 - Add ``signal_query`` method in the ``IndicoBaseQuery`` class and the ``db_query``
   signal, allowing to intercept and modify queries by signal handlers (:pr:`4981`,
   thanks :user:`omegak`).
+- Add ``event.is_registration_blocked`` signal (:pr:`5421`)
 
 
 ----

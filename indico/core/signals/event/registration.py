@@ -90,6 +90,14 @@ both users trying to get their own ticket and managers trying to get a
 ticket for a registrant.
 ''')
 
+is_registration_blocked = _signals.signal('is-registration-blocked', '''
+Called when resolving whether Indico should let a registrant modify their
+registration details.  The `sender` is the registrant's `Registration` object.
+
+If this signal returns ``True``, the user will not be able to modify their
+registration.
+''')
+
 filter_selectable_badges = _signals.signal('filter-selectable-badges', '''
 Called when composing lists of badge templates. The `sender` may be either
 ``BadgeSettingsForm``, ``RHListEventTemplates`` or ``RHListCategoryTemplates``.
