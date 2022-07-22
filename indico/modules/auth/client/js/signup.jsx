@@ -197,6 +197,7 @@ function Signup({
               <FinalTextArea
                 required={mandatoryFields.includes('comment')}
                 name="comment"
+                initialValue=""
                 label={Translate.string('Comment')}
                 description={Translate.string(
                   'You can provide additional information or a comment for the administrators who will review your registration.'
