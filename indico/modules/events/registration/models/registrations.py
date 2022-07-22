@@ -791,11 +791,6 @@ class RegistrationData(StoredFileMixin, db.Model):
             return KEEP_EXISTING_FILE_UUID if self.storage_file_id is not None else None
         return self.data
 
-    @property
-    def is_locked(self):
-        """Check whether the data is locked by a plugin."""
-        return any(values_from_signal(signals.event.is_field_data_locked.send(self)))
-
     def _set_file(self, file):
         # in case we are deleting/replacing a file
         self.storage_backend = None

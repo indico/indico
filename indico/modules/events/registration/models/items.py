@@ -12,12 +12,14 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import aliased
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import orig_string
+from indico.util.signals import values_from_signal
 from indico.util.string import camelize_keys, format_repr
 
 
@@ -378,6 +380,10 @@ class RegistrationFormItem(db.Model):
                    .filter(sections.is_enabled)
                    .exists())
         return cls.is_enabled & ~cls.is_deleted & ((cls.parent_id == None) | query)  # noqa
+
+    def is_locked(self, registration):
+        """Check whether the data is locked by a plugin."""
+        return any(values_from_signal(signals.event.is_field_data_locked.send(self, registration=registration)))
 
     def _get_default_log_data(self):
         return {}
