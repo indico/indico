@@ -573,6 +573,8 @@ Internal Changes
   thanks :user:`omegak`).
 - Update WYSIWYG editor to CKEditor 5, resulting in a slightly different look for the
   editor controls and removal of some uncommon format options (:pr:`5345`)
+- Add ``event.is_field_data_locked`` signal, allowing plugins to lock registration form
+  fields on a per-registration basis (:pr:`5424`)
 
 
 ----

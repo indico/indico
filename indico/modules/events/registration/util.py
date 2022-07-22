@@ -156,6 +156,7 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
             field_data['availablePlaces'] = item.field_impl.get_available_places(registration)
         else:
             field_data = item.view_data
+        field_data['isLocked'] = registration_data[item.id].is_locked
         item_data[item.id] = field_data
     for item in regform.active_labels:
         if management or not item.parent.is_manager_only:
@@ -414,7 +415,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
     billable_items_locked = not management and registration.is_paid
     for form_item in regform.active_fields:
-        if form_item.is_purged:
+        if form_item.is_purged or form_item.is_locked(registration):
             continue
 
         field_impl = form_item.field_impl

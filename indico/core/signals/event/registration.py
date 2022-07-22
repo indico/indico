@@ -92,6 +92,15 @@ both users trying to get their own ticket and managers trying to get a
 ticket for a registrant.
 ''')
 
+is_field_data_locked = _signals.signal('is-field-data-locked', '''
+Called when resolving whether Indico should let a registrant change a
+data value in their registration.  The `sender` is the`RegistrationData`
+object.
+
+If this signal returns ``True``, the user will not be able to change the
+value given to the designated field.
+''')
+
 filter_selectable_badges = _signals.signal('filter-selectable-badges', '''
 Called when composing lists of badge templates. The `sender` may be either
 ``BadgeSettingsForm``, ``RHListEventTemplates`` or ``RHListCategoryTemplates``.

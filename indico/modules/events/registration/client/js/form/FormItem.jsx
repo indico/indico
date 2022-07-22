@@ -62,6 +62,7 @@ export default function FormItem({
   isEnabled,
   isRequired,
   isPurged,
+  isLocked,
   sortHandle,
   setupMode,
   setupActions,
@@ -77,7 +78,7 @@ export default function FormItem({
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isEnabled, ...rest};
   const showPurged = !setupMode && isPurged;
-  const disabled = !isEnabled || showPurged || (paidItemLocked && !isManagement);
+  const disabled = !isEnabled || showPurged || isLocked || (paidItemLocked && !isManagement);
 
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
@@ -157,6 +158,8 @@ FormItem.propTypes = {
   isRequired: PropTypes.bool,
   /** Whether the field's registration data have been deleted due to an expired retention period */
   isPurged: PropTypes.bool.isRequired,
+  /** Whether the field is locked for modification */
+  isLocked: PropTypes.bool,
   /** The retention period of the field's data in weeks */
   retentionPeriod: PropTypes.number,
   /** Whether the field is a special "personal data" field */
@@ -180,6 +183,7 @@ FormItem.defaultProps = {
   fieldIsPersonalData: false,
   fieldIsRequired: false,
   isRequired: false,
+  isLocked: false,
   retentionPeriod: null,
   htmlName: null,
   sortHandle: null,
