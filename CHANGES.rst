@@ -53,8 +53,8 @@ Improvements
   (:issue:`5356`, :pr:`5372`, thanks :user:`rppt`)
 - Add the ability to include an optional static javascript file when defining
   custom conference themes from within a plugin (:pr:`5414`, thanks :user:`brittyazel`)
-- Add option to make 'Affiliation' and 'Comment' fields mandatory in the account request form
-  (:issue:`4819`, :pr:`5389`, thanks :user:`elsbethe`)
+- Add option to make the 'Affiliation' and 'Comment' fields mandatory in the account
+  request form (:issue:`4819`, :pr:`5389`, thanks :user:`elsbethe`)
 
 Bugfixes
 ^^^^^^^^

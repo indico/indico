@@ -18,7 +18,8 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoEnumSelectField, IndicoSelectMultipleCheckboxField, MultiStringField, PrincipalField, PrincipalListField
+from indico.web.forms.fields import (IndicoEnumSelectField, IndicoSelectMultipleCheckboxField, MultiStringField,
+                                     PrincipalField, PrincipalListField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
@@ -116,10 +117,16 @@ class AdminUserSettingsForm(IndicoForm):
                                          description=_('Whether users are allowed to generate personal API tokens. '
                                                        'If disabled, only admins can create them, but users will '
                                                        'still be able to regenerate the tokens assigned to them.'))
-    if config.LOCAL_MODERATION:
-        mandatory_fields_account_request = IndicoSelectMultipleCheckboxField(_('Mandatory fields in account request'),
-                                                                             choices=[('affiliation', _('Affiliation')), ('comment', _('Comment'))],
-                                                                             description=_('Fields a new user has to fill in when requesting an account'))
+    mandatory_fields_account_request = IndicoSelectMultipleCheckboxField(
+        _('Mandatory fields in account request'),
+        choices=[('affiliation', _('Affiliation')), ('comment', _('Comment'))],
+        description=_('Fields a new user has to fill in when requesting an account')
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not config.LOCAL_MODERATION:
+            del self.mandatory_fields_account_request
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):
