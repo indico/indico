@@ -58,7 +58,7 @@ class ContributionForm(IndicoForm):
     def render_mode(self):
         return RenderMode.markdown
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, submitter_edit=False, **kwargs):
         self.event = kwargs.pop('event')
         self.contrib = kwargs.pop('contrib', None)
         self.session_block = kwargs.get('session_block')
@@ -72,6 +72,10 @@ class ContributionForm(IndicoForm):
             del self.type
         if not to_schedule and (self.contrib is None or not self.contrib.is_scheduled):
             del self.start_dt
+        if submitter_edit:
+            for field in list(self):
+                if field.name != self.meta.csrf_field_name and field.name not in self._submitter_editable_fields:
+                    delattr(self, field.name)
 
     def _get_earliest_start_dt(self):
         return self.session_block.start_dt if self.session_block else self.event.start_dt
@@ -126,10 +130,14 @@ class SubContributionForm(IndicoForm):
     def render_mode(self):
         return RenderMode.markdown
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, submitter_edit=False, **kwargs):
         self.event = kwargs.pop('event')
         self.subcontrib = kwargs.pop('subcontrib', None)
         super().__init__(*args, **kwargs)
+        if submitter_edit:
+            for field in list(self):
+                if field.name != self.meta.csrf_field_name and field.name not in self._submitter_editable_fields:
+                    delattr(self, field.name)
 
 
 class ContributionStartDateForm(IndicoForm):

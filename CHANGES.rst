@@ -68,6 +68,8 @@ Bugfixes
 - Fix error when editing a room's nonbookable periods (:pr:`5390`)
 - Fix incorrect access check when directly accessing a registration form (:pr:`5406`)
 - Fix error in rate limiter when using Redis with a UNIX socket connection (:issue:`5391`)
+- Ensure that submitters with contribution edit privileges can only edit basic fields
+  (:pr:`5425`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
