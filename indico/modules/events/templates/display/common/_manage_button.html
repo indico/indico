@@ -107,7 +107,7 @@
             {% if item.can_edit(session.user) %}
                 <li>
                     <a href="" class="contribution-edit"
-                               data-href="{{ url_for('contributions.manage_update_contrib', item) }}"
+                               data-href="{{ url_for('contributions.manage_update_contrib', item, standalone=true) }}"
                                data-title="{% trans title=item.title %}Edit contribution '{{ title }}'{% endtrans %}">
                         {% trans %}Edit contribution{% endtrans %}
                     </a>
@@ -136,7 +136,7 @@
                        class="subcontribution-edit"
                        data-title="{% trans %}Edit subcontribution{% endtrans %}"
                        data-subtitle="{{ item.title }}"
-                       data-href="{{ url_for('contributions.manage_edit_subcontrib', item) }}">
+                       data-href="{{ url_for('contributions.manage_edit_subcontrib', item, standalone=true) }}">
                         {% trans %}Edit subcontribution{% endtrans %}
                     </a>
                 </li>

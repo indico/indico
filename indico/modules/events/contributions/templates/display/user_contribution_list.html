@@ -21,7 +21,7 @@
                                     <a href="#" class="icon-edit js-edit-contribution"
                                        title="{% trans %}Edit this contribution{% endtrans %}"
                                        data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
-                                       data-href="{{ url_for('.manage_update_contrib', contrib) }}"
+                                       data-href="{{ url_for('.manage_update_contrib', contrib, standalone=true) }}"
                                        data-ajax-dialog
                                        data-reload-after></a>
                                 {%- endif %}

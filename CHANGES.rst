@@ -70,6 +70,8 @@ Bugfixes
 - Fix error in rate limiter when using Redis with a UNIX socket connection (:issue:`5391`)
 - Ensure that submitters with contribution edit privileges can only edit basic fields
   (:pr:`5425`)
+- Do not return the whole contribution list when editing a contribution from elsewhere
+  (:pr:`5425`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

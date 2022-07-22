@@ -218,6 +218,8 @@ class RHEditContribution(RHManageContributionBase):
             ):
                 update_contribution(self.contrib, *get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
+            if not can_manage or request.args.get('standalone') == '1':
+                return jsonify_data(flash=False)
             tpl_components = self.list_generator.render_list(self.contrib)
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(self.contrib)
@@ -369,6 +371,8 @@ class RHEditSubContribution(RHManageSubContributionBase):
         if form.validate_on_submit():
             update_subcontribution(self.subcontrib, form.data)
             flash(_("Subcontribution '{}' updated successfully").format(self.subcontrib.title), 'success')
+            if not can_manage or request.args.get('standalone') == '1':
+                return jsonify_data(flash=False)
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.subcontrib)
