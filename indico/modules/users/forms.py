@@ -11,6 +11,7 @@ from pytz import common_timezones, common_timezones_set
 from wtforms.fields import BooleanField, EmailField, IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, NumberRange, ValidationError
 
+from indico.core.auth import multipass
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.users import User
@@ -125,7 +126,7 @@ class AdminUserSettingsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not config.LOCAL_MODERATION:
+        if not multipass.has_moderated_providers:
             del self.mandatory_fields_account_request
 
 

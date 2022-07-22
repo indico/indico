@@ -616,7 +616,8 @@ class RHUsersAdmin(RHAdminBase):
         num_reg_requests = RegistrationRequest.query.count()
         return WPUsersAdmin.render_template('users_admin.html', 'users', form=form, search_results=search_results,
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users,
-                                            num_reg_requests=num_reg_requests)
+                                            num_reg_requests=num_reg_requests,
+                                            has_moderation=multipass.has_moderated_providers)
 
 
 class RHUsersAdminSettings(RHAdminBase):
