@@ -55,7 +55,10 @@ function Signup({
     try {
       resp = await indicoAxios.post(location.href, values);
     } catch (e) {
-      return handleSubmitError(e);
+      return handleSubmitError(
+        e,
+        hasPredefinedAffiliations ? {affiliation: 'affiliation_data'} : {}
+      );
     }
     location.href = resp.data.redirect;
     // never finish submitting to avoid fields being re-enabled
@@ -134,6 +137,7 @@ function Signup({
             {hasPredefinedAffiliations ? (
               <SyncedFinalAffiliationDropdown
                 name="affiliation_data"
+                required={moderated && mandatoryFields.includes('affiliation')}
                 syncName="affiliation"
                 syncedValues={syncedValues}
                 currentAffiliation={affiliationMeta}
@@ -232,7 +236,7 @@ Signup.propTypes = {
   emails: PropTypes.arrayOf(PropTypes.string).isRequired,
   affiliationMeta: PropTypes.object,
   hasPendingUser: PropTypes.bool,
-  mandatoryFields: PropTypes.arrayOf(PropTypes.string),
+  mandatoryFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 Signup.defaultProps = {
