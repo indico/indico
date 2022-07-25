@@ -369,7 +369,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     if skip_moderation is None:
         skip_moderation = management
     for form_item in regform.active_fields:
-        if form_item.is_purged:
+        if form_item.is_purged or form_item.is_locked(None):
             # Leave the registration data empty
             continue
         default = form_item.field_impl.default_value
