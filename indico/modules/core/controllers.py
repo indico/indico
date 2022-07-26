@@ -349,12 +349,12 @@ class RHAPIGenerateCaptcha(RH):
         answer = ''.join(random.choices(string.digits, k=4))
         image = ImageCaptcha().generate(answer).read()
         audio = AudioCaptcha().generate(answer)
-        return answer, {'image': base64.b64encode(image), 'audio': base64.b64encode(audio)}
+        return {'image': base64.b64encode(image), 'audio': base64.b64encode(audio)}, answer
 
     def _process_GET(self):
         if plugin := get_captcha_plugin():
-            answer, data = plugin.generate_captcha()
+            data = plugin.generate_captcha()
         else:
-            answer, data = self._generate_captcha()
-        session['captcha_answer'] = answer
+            data, answer = self._generate_captcha()
+            session['captcha_state'] = answer
         return jsonify(data)

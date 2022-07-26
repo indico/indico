@@ -22,7 +22,7 @@ class CaptchaField(fields.String):
                 if not plugin.validate_captcha(user_answer):
                     raise ValidationError(_('Incorrect answer'))
             else:
-                answer = session.get('captcha_answer')
+                answer = session.get('captcha_state')
                 if not answer or answer != user_answer:
                     raise ValidationError(_('Incorrect answer'))
 
