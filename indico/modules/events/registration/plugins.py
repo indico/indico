@@ -10,7 +10,7 @@ class CaptchaPluginMixin:
     friendly_name = None
 
     def generate_captcha(self):
-        """Returns a CAPTCHA and the correct answer.
+        """Return a CAPTCHA and the correct answer.
 
         Specifically, the return value is a tuple of `answer, data` where
         `answer` is a string representing the correct answer and `data` is a
@@ -24,7 +24,7 @@ class CaptchaPluginMixin:
         raise NotImplementedError('CAPTCHA plugin must implement generate_captcha()')
 
     def validate_captcha(self, answer):
-        """Validates the answer to a CAPTCHA.
+        """Validate the answer to a CAPTCHA.
 
         This should return True when the answer is correct and False otherwise.
         The built-in CAPTCHA simply compares the user-provided with the answer

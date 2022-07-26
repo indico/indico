@@ -17,7 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('forms', sa.Column('require_captcha', sa.Boolean(), nullable=False, server_default='false'), schema='event_registration')
+    op.add_column('forms', sa.Column('require_captcha', sa.Boolean(), nullable=False, server_default='false'),
+                  schema='event_registration')
     op.alter_column('forms', 'require_captcha', server_default=None, schema='event_registration')
 
 

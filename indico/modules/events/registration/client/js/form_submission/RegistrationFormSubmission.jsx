@@ -95,7 +95,7 @@ export default function RegistrationFormSubmission() {
   const publishToParticipants = useSelector(getPublishToParticipants);
   const publishToPublic = useSelector(getPublishToPublic);
   const showConsentToPublish = !isManagement && publishToParticipants !== 'hide_all';
-  const hasCaptchaPlugin = getPluginObjects('regformCaptcha').length > 0;
+  const pluginCaptcha = renderPluginComponents('regformCaptcha');
 
   const onSubmit = async (data, form) => {
     let resp;
@@ -133,8 +133,7 @@ export default function RegistrationFormSubmission() {
                 publishToPublic={publishToPublic}
               />
             )}
-            {captchaRequired &&
-              (hasCaptchaPlugin ? renderPluginComponents('regformCaptcha') : <Captcha />)}
+            {captchaRequired && (pluginCaptcha.length > 0 ? pluginCaptcha : <Captcha />)}
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}
