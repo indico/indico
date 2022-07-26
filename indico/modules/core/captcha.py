@@ -33,3 +33,11 @@ def get_captcha_plugin():
     """Return the available CAPTCHA plugin."""
     plugins = [p for p in plugin_engine.get_active_plugins().values() if isinstance(p, CaptchaPluginMixin)]
     return plugins[0] if plugins else None
+
+
+def invalidate_captcha():
+    """Invalidate the current CAPTCHA.
+
+    Call this function after a successful request to a CAPTCHA-protected endpoint.
+    """
+    session.pop('captcha_state', None)

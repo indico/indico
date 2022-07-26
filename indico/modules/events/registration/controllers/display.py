@@ -14,6 +14,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.core.captcha import invalidate_captcha
 from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
@@ -328,6 +329,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         schema = make_registration_schema(self.regform, captcha_required=self._captcha_required)()
         form_data = parser.parse(schema)
         registration = create_registration(self.regform, form_data, self.invitation)
+        invalidate_captcha()
         return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
 
     def _process_GET(self):
