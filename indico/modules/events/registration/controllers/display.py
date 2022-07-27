@@ -143,7 +143,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .join(Registration.registration_form)
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form'))
-                 .signal_query('merged-participant-list-publishable-registrations'))
+                 .signal_query('merged-participant-list-publishable-registrations', event=self.event))
         is_participant = self.event.is_user_registered(session.user)
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
                                                      for reg in query if reg.is_publishable(is_participant)),
@@ -204,7 +204,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         regforms = (RegistrationForm.query.with_parent(self.event)
                     .filter(RegistrationForm.is_participant_list_visible(self.event.is_user_registered(session.user)))
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
-                    .signal_query('participant-list-publishable-regforms')
+                    .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())
         if registration_settings.get(self.event, 'merge_registration_forms'):
             tables = [self._merged_participant_list_table()]
