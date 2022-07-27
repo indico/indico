@@ -1,0 +1,55 @@
+{% from 'forms/_form.html' import simple_form, form_fieldset, form_rows, form_row %}
+
+{% macro render_badge_print_settings_form(form, submit=_('Download PDF'), fields=none, templates=none, registrations=()) %}
+    {% set fields = fields or ('save_values', 'dashed_border', 'page_size', 'page_orientation', 'page_layout') %}
+    {% call simple_form(form, form_header_kwargs={'id': 'badge-settings-form'}, back=_('Cancel'),
+                        submit=submit, disabled_until_change=false, disable_if_locked=false) %}
+        {{ form_rows(form, fields=('template',)) }}
+        {% call form_fieldset(_('Page configuration')) %}
+            {{ form_rows(form, fields=fields) }}
+        {% endcall %}
+
+        <div class="flexrow margin-editor f-j-center">
+            <div class="flexcol f-a-center">
+                {{ form_row(form.top_margin, orientation='vertical') }}
+                <div class="flexrow f-a-center">
+                    {{ form_row(form.left_margin, orientation='vertical') }}
+                    <img src="{{ url_for('assets.image', filename='badge_margins.png') }}">
+                    {{ form_row(form.right_margin, orientation='vertical') }}
+                </div>
+                {{ form_row(form.bottom_margin, orientation='vertical') }}
+            </div>
+            <div class="flexcol margins-between">
+                {{ form_rows(form, ('margin_columns', 'margin_rows'), orientation='vertical') }}
+            </div>
+        </div>
+        <div class="message info">
+            <div>
+                {% trans -%}
+                    <strong>Tip</strong>: if your printer does not align the badges correctly, you can tweak the margins.
+                {%- endtrans %}
+            </div>
+            <div>
+                {% trans -%}
+                    <strong>Example</strong>: If your left and right margins are 1.5 cm each, but your printer prints
+                    everything 1 mm to the left, you could use a left margin of 1.6 cm and a right margin of 1.4 cm to
+                    compensate. If you increase a margin, do not forget to decrease the opposing one to avoid Indico
+                    thinking there is less space for printing badges, and the number of rows / columns will change.
+                {%- endtrans %}
+            </div>
+        </div>
+        {% for registration in registrations %}
+            <input type="hidden" name="registration_id" value="{{ registration.id }}">
+        {% endfor %}
+    {% endcall %}
+
+    {% if templates %}
+        <script>
+            (function() {
+                'use strict';
+
+                setupBadgePrinting({{ templates | tojson }});
+            })();
+        </script>
+    {% endif %}
+{% endmacro %}
