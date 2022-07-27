@@ -35,6 +35,11 @@ def get_captcha_plugin():
     return plugins[0] if plugins else None
 
 
+def get_captcha_settings():
+    """Return CAPTCHA plugin settings."""
+    return plugin.get_captcha_settings() if (plugin := get_captcha_plugin()) else None
+
+
 def invalidate_captcha():
     """Invalidate the current CAPTCHA.
 

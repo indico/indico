@@ -14,7 +14,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
-from indico.modules.core.captcha import invalidate_captcha
+from indico.modules.core.captcha import get_captcha_settings, invalidate_captcha
 from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
@@ -348,7 +348,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                management=False,
                                                login_required=self.regform.require_login and not session.user,
                                                is_restricted_access=self.is_restricted_access,
-                                               captcha_required=self._captcha_required)
+                                               captcha_required=self._captcha_required,
+                                               captcha_settings=get_captcha_settings())
 
 
 class RHUploadRegistrationFile(UploadFileMixin, RHRegistrationFormBase):

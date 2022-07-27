@@ -22,11 +22,10 @@ class CaptchaPluginMixin:
         with `get_captcha_state`.
 
         As an example, the built-in CAPTCHA generator
-        returns a dictionary with a base64 encoded image and audio data.
-        For reCAPTCHA, the `answer` may be `None` as the validation is done externally and
-        the `data` will contain the Site key needed to render the reCAPTCHA widget.
+        returns a dictionary with a base64 encoded image and audio data, while
+        the reCAPTCHA plugin does not use this method at all.
         """
-        raise NotImplementedError('CAPTCHA plugin must implement generate_captcha()')
+        return None
 
     def validate_captcha(self, answer):
         """Validate the answer to a CAPTCHA.
@@ -40,6 +39,18 @@ class CaptchaPluginMixin:
         an external service instead e.g. with reCAPTCHA.
         """
         raise NotImplementedError('CAPTCHA plugin must implement validate_captcha(answer)')
+
+    def get_captcha_settings(self):
+        """Return CAPTCHA settings.
+
+        Use this method if you need to pass some static data to
+        your React component. The settings will be passed via as
+        a `settings` prop to your React component.
+        The return value must be JSON-serializable.
+
+        For example, the reCAPTCHA plugin uses this to pass the site key.
+        """
+        return {}
 
     def get_captcha_state(self):
         return session.get('captcha_state')

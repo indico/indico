@@ -88,14 +88,20 @@ ConsentToPublish.propTypes = {
 
 export default function RegistrationFormSubmission() {
   const sections = useSelector(getNestedSections);
-  const {submitUrl, registrationData, initialValues, captchaRequired} = useSelector(getStaticData);
+  const {
+    submitUrl,
+    registrationData,
+    initialValues,
+    captchaRequired,
+    captchaSettings,
+  } = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
   const isManagement = useSelector(getManagement);
   const publishToParticipants = useSelector(getPublishToParticipants);
   const publishToPublic = useSelector(getPublishToPublic);
   const showConsentToPublish = !isManagement && publishToParticipants !== 'hide_all';
-  const pluginCaptcha = renderPluginComponents('regformCaptcha');
+  const pluginCaptcha = renderPluginComponents('captcha', {settings: captchaSettings});
 
   const onSubmit = async (data, form) => {
     let resp;
