@@ -8,7 +8,7 @@
 from functools import partial
 
 from flask import request
-from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField
+from wtforms.fields import BooleanField, FieldList, HiddenField, IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
@@ -31,13 +31,21 @@ from indico.web.forms.widgets import HiddenCheckbox, SwitchWidget
 
 
 class CategorySettingsForm(IndicoForm):
-    BASIC_FIELDS = ('title', 'description', 'timezone', 'lecture_theme', 'meeting_theme', 'visibility',
+    TITLE_FIELDS = ['title']
+    DESCRIPTION_FIELDS = ['description']
+    BASIC_FIELDS = ('timezone', 'lecture_theme', 'meeting_theme', 'visibility',
                     'suggestions_disabled', 'is_flat_view_enabled', 'event_creation_notification_emails',
                     'notify_managers')
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_('Title'), [DataRequired()])
+    title_translation_languages = FieldList(StringField(_('New language')))
+    title_translation_values = FieldList(StringField(_('New translation')))
+
     description = IndicoMarkdownField(_('Description'))
+    description_translation_languages = FieldList(StringField(_('New language')))
+    description_translation_values = FieldList(StringField(_('New translation')))
+
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()],
                                          description=_('Default timezone event lists will show up in. It will also be '
                                                        'used as a default for new events.'))

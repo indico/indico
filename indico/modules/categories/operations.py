@@ -53,7 +53,7 @@ def update_category(category, data, skip=()):
     assert set(data) <= {
         'title', 'description', 'timezone', 'suggestions_disabled', 'is_flat_view_enabled',
         'event_message_mode', 'event_message', 'notify_managers', 'event_creation_notification_emails',
-        *skip
+        'title_translations', 'description_translations', *skip
     }
     changes = category.populate_from_dict(data, skip=skip)
     db.session.flush()
@@ -88,7 +88,9 @@ def _log_category_update(category, changes):
         'event_message_mode': 'Event header message type',
         'event_message': 'Event header message',
         'notify_managers': 'Notify managers about event creation',
-        'event_creation_notification_emails': 'Event creation notification emails'
+        'event_creation_notification_emails': 'Event creation notification emails',
+        'title_translations': 'Translations of the title',
+        'description_translations': 'Translations of the description'
     }
     if changes:
         what = 'Settings'

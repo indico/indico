@@ -55,6 +55,8 @@ Improvements
   custom conference themes from within a plugin (:pr:`5414`, thanks :user:`brittyazel`)
 - Add option to make the 'Affiliation' and 'Comment' fields mandatory in the account
   request form (:issue:`4819`, :pr:`5389`, thanks :user:`elsbethe`)
+- Add option to translate title and description of categories (:issue:`5353`, 
+  :pr:`5408`, thanks :user:`elsbethe`)
 
 Bugfixes
 ^^^^^^^^

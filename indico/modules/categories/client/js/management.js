@@ -16,6 +16,9 @@ import {SingleEventMove, BulkEventMove} from 'indico/modules/events/management/E
 import {showUserSearch} from 'indico/react/components/principals/imperative';
 import {$T} from 'indico/utils/i18n';
 
+import DescriptionTranslation from './components/CategoryDescriptionTranslations';
+import TitleTranslation from './components/CategoryTitleTranslations';
+
 (function(global) {
   // Category cache
   const _categories = {};
@@ -446,5 +449,21 @@ import {$T} from 'indico/utils/i18n';
   global.setupCategoryRolesList = function setupCategoryRolesList() {
     setupRolesToggle();
     setupRolesButtons();
+  };
+  global.setupCategoryTranslations = function setupCategoryTranslations(
+    titleLanguages,
+    descriptionLanguages
+  ) {
+    if (titleLanguages.length) {
+      const titleTarget = document.getElementById('title-translation-container');
+      ReactDOM.render(<TitleTranslation languages={titleLanguages} />, titleTarget);
+    }
+    if (descriptionLanguages.length) {
+      const descriptionTarget = document.getElementById('description-translation-container');
+      ReactDOM.render(
+        <DescriptionTranslation languages={descriptionLanguages} />,
+        descriptionTarget
+      );
+    }
   };
 })(window);

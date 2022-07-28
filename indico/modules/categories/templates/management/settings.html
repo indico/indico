@@ -1,6 +1,6 @@
 {% extends 'categories/management/base.html' %}
 
-{% from 'forms/_form.html' import form_header, form_rows, form_fieldset, form_footer %}
+{% from 'forms/_form.html' import form_header, form_rows, form_row, form_fieldset, form_footer %}
 
 {% macro render_image_form(image_form, type, endpoint, title, deletion_prompt_title, deletion_prompt) %}
     {{ form_header(image_form, classes='image-form', action=url_for(endpoint, category)) }}
@@ -27,6 +27,12 @@
 
 {% block content %}
     {{ form_header(form) }}
+        {{ form_rows(form, fields=form.TITLE_FIELDS) }}
+        <div id="title-translation-container"></div>
+        
+        {{ form_rows(form, fields=form.DESCRIPTION_FIELDS) }}
+        <div id="description-translation-container"></div>
+
         {{ form_rows(form, fields=form.BASIC_FIELDS) }}
         {% call form_fieldset(_('Event Header')) %}
             {{ form_rows(form, fields=form.EVENT_HEADER_FIELDS) }}
@@ -44,6 +50,10 @@
     {% block after_forms %}{% endblock %}
 
     <script>
+        let titleLanguages = JSON.parse('{{ untranslated_title_languages | safe }}')
+        let descriptionLanguages = JSON.parse('{{ untranslated_description_languages | safe }}')
+        setupCategoryTranslations(titleLanguages, descriptionLanguages);
+
         (function() {
             'use strict';
 
