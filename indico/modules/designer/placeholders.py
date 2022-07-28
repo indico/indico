@@ -15,6 +15,7 @@ from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime, format_interval
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
+from indico.util.string import format_full_name
 
 
 __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'RegistrationFullNamePlaceholder',
@@ -41,12 +42,23 @@ GROUP_TITLES = {
 class DesignerPlaceholder(Placeholder):
     #: The group of the placeholder. Must be a valid key from `GROUP_TITLES`.
     group = None
+    #: Data source for the placeholder.
+    data_source = None
     #: Whether the placeholder can only be added to a template by an admin
     admin_only = False
     #: Whether a template containing this placeholder is considered a ticket
     is_ticket = False
     #: Whether this placeholder is rendering an image
     is_image = False
+
+
+class PersonPlaceholder(DesignerPlaceholder):
+    group = 'registrant'
+    data_source = 'person'
+
+    @classmethod
+    def render(cls, person):
+        return person.get(cls.field, '')
 
 
 class RegistrationPlaceholder(DesignerPlaceholder):
@@ -67,12 +79,14 @@ class RegistrationPDPlaceholder(DesignerPlaceholder):
 
 class FullNamePlaceholderBase(DesignerPlaceholder):
     group = 'registrant'
+    data_source = 'person'
     name_options = None
 
     @classmethod
-    def render(cls, registration):
-        name = (registration.get_personal_data().get('title', '') + ' ') if cls.with_title else ''
-        name += registration.get_full_name(**cls.name_options)
+    def render(cls, person):
+        name = ((person['registration'].get_personal_data().get('title', '') + ' ')
+                if cls.with_title and not person['is_accompanying'] else '')
+        name += format_full_name(person['first_name'], person['last_name'], **cls.name_options)
         return name
 
 
@@ -238,13 +252,13 @@ class RegistrationTitlePlaceholder(RegistrationPDPlaceholder):
     field = 'title'
 
 
-class RegistrationFirstNamePlaceholder(RegistrationPlaceholder):
+class RegistrationFirstNamePlaceholder(PersonPlaceholder):
     name = 'first_name'
     description = _('First Name')
     field = 'first_name'
 
 
-class RegistrationLastNamePlaceholder(RegistrationPlaceholder):
+class RegistrationLastNamePlaceholder(PersonPlaceholder):
     name = 'last_name'
     description = _('Last Name')
     field = 'last_name'
@@ -314,14 +328,15 @@ class RegistrationPhonePlaceholder(RegistrationPDPlaceholder):
 
 class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
     group = 'registrant'
+    data_source = 'person'
     name = 'ticket_qr_code'
     description = _('Ticket QR Code')
     is_ticket = True
     is_image = True
 
     @classmethod
-    def render(cls, registration):
-        return generate_ticket_qr_code(registration)
+    def render(cls, person):
+        return generate_ticket_qr_code(person)
 
 
 class FixedTextPlaceholder(DesignerPlaceholder):

@@ -247,6 +247,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=True
     )
+    #: Whether to create tickets for the registrant's accompanying persons
+    tickets_for_accompanying_persons = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     #: The ID of the template used to generate tickets
     ticket_template_id = db.Column(
         db.Integer,

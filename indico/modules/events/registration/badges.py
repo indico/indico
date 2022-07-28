@@ -30,9 +30,25 @@ def _get_font_size(text):
 
 
 class RegistrantsListToBadgesPDF(DesignerPDFBase):
-    def __init__(self, template, config, event, registrations):
+    def __init__(self, template, config, event, registrations, include_accompanying_persons):
         super().__init__(template, config)
-        self.registrations = registrations
+        self.persons = []
+        for registration in registrations:
+            self.persons.append({
+                'id': registration.id,
+                'first_name': registration.first_name,
+                'last_name': registration.last_name,
+                'registration': registration,
+                'is_accompanying': False,
+            })
+            if include_accompanying_persons:
+                self.persons.extend({
+                    'id': person['id'],
+                    'first_name': person['firstName'],
+                    'last_name': person['lastName'],
+                    'registration': registration,
+                    'is_accompanying': True,
+                } for person in registration.accompanying_persons)
 
     def _build_config(self, config_data):
         return ConfigData(**config_data)
@@ -61,10 +77,10 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             raise BadRequest(_('The template dimensions are too large for the page size you selected'))
 
         # Print a badge for each registration
-        for registration, (x, y) in zip(self.registrations, self._iter_position(canvas, n_horizontal, n_vertical)):
-            self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
+        for person, (x, y) in zip(self.persons, self._iter_position(canvas, n_horizontal, n_vertical)):
+            self._draw_badge(canvas, person, self.template, self.tpl_data, x * cm, y * cm)
 
-    def _draw_badge(self, canvas, registration, template, tpl_data, pos_x, pos_y):
+    def _draw_badge(self, canvas, person, template, tpl_data, pos_x, pos_y):
         """
         Draw a badge for a given registration, at position pos_x,
         pos_y (top-left corner).
@@ -95,9 +111,14 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
 
             if placeholder:
                 if placeholder.group == 'registrant':
-                    text = placeholder.render(registration)
+                    if placeholder.data_source == 'person':
+                        text = placeholder.render(person)
+                    elif person['is_accompanying']:
+                        continue
+                    else:
+                        text = placeholder.render(person['registration'])
                 elif placeholder.group == 'event':
-                    text = placeholder.render(registration.event)
+                    text = placeholder.render(person['registration'].event)
                 elif placeholder.group == 'fixed':
                     text = placeholder.render(item)
                 else:
@@ -107,7 +128,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
 
             item_data = {'item': item, 'text': text, 'pos_x': pos_x, 'pos_y': pos_y}
             for update in values_from_signal(
-                signals.event.designer.draw_item_on_badge.send(registration, items=items, height=self.height,
+                signals.event.designer.draw_item_on_badge.send(person['registration'], items=items, height=self.height,
                                                                width=self.width, data=item_data),
                 as_list=True
             ):
@@ -122,17 +143,17 @@ class RegistrantsListToBadgesPDFFoldable(RegistrantsListToBadgesPDF):
         n_horizontal = 1
         n_vertical = 1
 
-        for registration, (x, y) in zip(self.registrations, self._iter_position(canvas, n_horizontal, n_vertical)):
-            self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
+        for person, (x, y) in zip(self.persons, self._iter_position(canvas, n_horizontal, n_vertical)):
+            self._draw_badge(canvas, person, self.template, self.tpl_data, x * cm, y * cm)
             if self.tpl_data.width > self.tpl_data.height:
                 canvas.translate(self.width, self.height)
                 canvas.rotate(180)
-                self._draw_badge(canvas, registration, self.template.backside_template, self.backside_tpl_data,
+                self._draw_badge(canvas, person, self.template.backside_template, self.backside_tpl_data,
                                  self.width - self.tpl_data.width_cm * cm, y * cm)
                 canvas.translate(0, 0)
                 canvas.rotate(180)
             else:
-                self._draw_badge(canvas, registration, self.template.backside_template, self.backside_tpl_data,
+                self._draw_badge(canvas, person, self.template.backside_template, self.backside_tpl_data,
                                  self.tpl_data.width_cm * cm, y * cm)
 
             tpl_data = self.tpl_data
@@ -162,8 +183,8 @@ class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
         # make batch of as many badges as we can fit into one page and add duplicates for printing back sides
         page_used = 0
         badges_mix = []
-        for i, reg in enumerate(self.registrations, 1):
-            badges_mix.append(reg)
+        for i, person in enumerate(self.persons, 1):
+            badges_mix.append(person)
             page_used += 1
             # create another page with the same registrations for the back side
             if (i % per_page) == 0:
@@ -175,16 +196,16 @@ class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
             badges_mix += ([None] * (per_page - page_used)) + badges_mix[-page_used:]
 
         positioned_badges = zip(badges_mix, self._iter_position(canvas, n_horizontal, n_vertical))
-        for i, (registration, (x, y)) in enumerate(positioned_badges):
-            if registration is None:
+        for i, (person, (x, y)) in enumerate(positioned_badges):
+            if person is None:
                 # blank item for an incomplete last page
                 continue
             current_page = (i // per_page) + 1
             # odd pages contain front sides, even pages back sides
             if current_page % 2:
-                self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
+                self._draw_badge(canvas, person, self.template, self.tpl_data, x * cm, y * cm)
             else:
                 # mirror badge coordinates
                 x_cm = (self.width - x*cm - self.tpl_data.width_cm*cm)
-                self._draw_badge(canvas, registration, self.template.backside_template,
+                self._draw_badge(canvas, person, self.template.backside_template,
                                  self.backside_tpl_data, x_cm, y * cm)

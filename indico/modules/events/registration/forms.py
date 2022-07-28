@@ -317,6 +317,12 @@ class TicketsForm(IndicoForm):
                                           description=_('Allow users to download their ticket from the registration '
                                                         'summary page.'))
 
+    tickets_for_accompanying_persons = BooleanField(_('Tickets for accompanying persons'),
+                                                    [HiddenUnless('tickets_enabled', preserve_data=True)],
+                                                    widget=SwitchWidget(),
+                                                    description=_("Create tickets for each of the user's accompanying "
+                                                                  'persons.'))
+
     ticket_template_id = SelectField(_('Ticket template'), [HiddenUnless('tickets_enabled', preserve_data=True),
                                                             Optional()], coerce=int)
 

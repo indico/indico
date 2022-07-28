@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import itertools
 import posixpath
 import time
 from decimal import Decimal
@@ -549,6 +550,16 @@ class Registration(db.Model):
         if self.participant_hidden:
             return RegistrationVisibility.nobody
         return self.visibility_before_override
+
+    @property
+    def accompanying_persons(self):
+        from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
+        query = (RegistrationData.query
+                 .with_parent(self)
+                 .join(RegistrationFormFieldData)
+                 .filter(RegistrationFormFieldData.field.has(input_type='accompanying_persons')))
+        return list(itertools.chain.from_iterable(d.data for d in query.all()
+                                                  if d.field_data.field.is_active))
 
     @classproperty
     @classmethod

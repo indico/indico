@@ -647,7 +647,7 @@ def build_registration_api_data(registration):
     return registration_info
 
 
-def generate_ticket_qr_code(registration):
+def generate_ticket_qr_code(person):
     """Generate a Pillow `Image` with a QR Code encoding a check-in ticket.
 
     :param registration: corresponding `Registration` object
@@ -658,15 +658,18 @@ def generate_ticket_qr_code(registration):
         box_size=3,
         border=1
     )
+    registration = person['registration']
+    # accompanying persons check-in is not supported
+    checkin_secret = person['registration'].ticket_uuid if not person['is_accompanying'] else ''
     qr_data = {
-        'registrant_id': registration.id,
+        'registrant_id': person['id'],
         'regform_id': registration.registration_form_id,
-        'checkin_secret': registration.ticket_uuid,
+        'checkin_secret': checkin_secret,
         'event_id': str(registration.event.id),
         'server_url': config.BASE_URL,
         'version': 1
     }
-    signals.event.registration.generate_ticket_qr_code.send(registration, ticket_data=qr_data)
+    signals.event.registration.generate_ticket_qr_code.send(registration, person=person, ticket_data=qr_data)
     json_qr_data = json.dumps(qr_data)
     qr.add_data(json_qr_data)
     qr.make(fit=True)
@@ -736,7 +739,8 @@ def generate_ticket(registration):
     signals.event.designer.print_badge_template.send(template, regform=registration.registration_form,
                                                      registrations=registrations)
     pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
-    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event, registrations)
+    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event, registrations,
+                    registration.registration_form.tickets_for_accompanying_persons)
     return pdf.get_pdf()
 
 

@@ -450,7 +450,8 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
                          .all())
         signals.event.designer.print_badge_template.send(self.template, regform=self.regform,
                                                          registrations=registrations)
-        pdf = pdf_class(self.template, config_params, self.event, registrations)
+        pdf = pdf_class(self.template, config_params, self.event, registrations,
+                        self.regform.tickets_for_accompanying_persons)
         return send_file(f'Badges-{self.event.id}.pdf', pdf.get_pdf(), 'application/pdf')
 
 

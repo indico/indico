@@ -529,6 +529,8 @@ Improvements
 - Images can now be uploaded by pasting or dropping them into the editor for minutes
   or the event description (:pr:`5458`)
 - Add JSON export for contribution details (:pr:`5460`)
+- Support generating tickets for each of the registrant's accompanying persons
+  (:pr:`5424`)
 
 Bugfixes
 ^^^^^^^^
