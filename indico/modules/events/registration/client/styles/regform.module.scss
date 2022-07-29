@@ -328,9 +328,7 @@
 
   .section-sortable-handle {
     font-size: 1.2em;
-    width: 15px;
-    position: relative;
-    left: -3px;
+    flex-basis: 20px;
   }
 
   &:hover .section-sortable-handle {
