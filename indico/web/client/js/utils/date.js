@@ -33,7 +33,7 @@ export async function setMomentLocale(locale) {
   const territory = parts[parts.length - 1];
   let momentLocale;
 
-  if (language === territory || language === 'uk') {
+  if (language === territory || language === 'ja' || language === 'uk') {
     // XXX: see the comment on `moment_lang` in Python regarding this ugly hack
     momentLocale = language;
   } else {
