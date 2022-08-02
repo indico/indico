@@ -329,6 +329,7 @@
   .section-sortable-handle {
     font-size: 1.2em;
     flex-basis: 20px;
+    align-self: flex-start;
   }
 
   &:hover .section-sortable-handle {
@@ -346,6 +347,7 @@
 }
 
 .section-actions {
+  align-self: flex-start;
   white-space: nowrap;
 
   a {
