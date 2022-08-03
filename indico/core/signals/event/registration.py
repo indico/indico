@@ -121,3 +121,9 @@ Executed after a registration form is cloned. The sender is the old ``Registrati
 object being cloned. The new ``RegistrationForm`` object is passed in the ``new_form``
 kwarg.
 ''')
+
+generate_accompanying_person_id = _signals.signal('generate-accompanying-person-id', '''
+Called after a permanent UUID is assigned to an accompanying person. The sender is the
+``AccompanyingPersonSchema`` object. The temporary ID is passed in the ``temporary_id``
+kwarg and the permanent UUID is passed in the ``permanent_id`` kwarg.
+''')
