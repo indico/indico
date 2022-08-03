@@ -6,17 +6,12 @@ nginx
 1. Install Packages
 -------------------
 
-PostgreSQL and nginx are installed from their upstream repos to get
-much more recent versions.
+The minimal recommended version is debian 11 (buster).
 
 .. code-block:: shell
 
     apt install -y lsb-release wget curl gnupg
-    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-    echo "deb http://nginx.org/packages/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/ $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-    wget --quiet -O - https://nginx.org/keys/nginx_signing.key | apt-key add -
-    apt update
+
     apt install -y --install-recommends postgresql-13 libpq-dev nginx libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils liblzma-dev uuid-dev build-essential redis-server
 
 
@@ -38,6 +33,7 @@ Afterwards, make sure the services you just installed are running:
 .. code-block:: shell
 
     systemctl start postgresql.service redis-server.service
+    pg_ctlcluster 13 main start
 
 
 2. Create a Database
@@ -69,13 +65,13 @@ most cases.
     cat > /etc/uwsgi-indico.ini <<'EOF'
     [uwsgi]
     uid = indico
-    gid = nginx
+    gid = www-data
     umask = 027
 
     processes = 4
     enable-threads = true
     chmod-socket = 770
-    chown-socket = indico:nginx
+    chown-socket = indico:www-data
     socket = /opt/indico/web/uwsgi.sock
     stats = /opt/indico/web/uwsgi-stats.sock
     protocol = uwsgi
@@ -116,7 +112,7 @@ We also need a systemd unit to start uWSGI.
     Restart=always
     SyslogIdentifier=indico-uwsgi
     User=indico
-    Group=nginx
+    Group=www-data
     UMask=0027
     Type=notify
     NotifyAccess=all
@@ -277,7 +273,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     Restart=always
     SyslogIdentifier=indico-celery
     User=indico
-    Group=nginx
+    Group=www-data
     UMask=0027
     Type=simple
     KillMode=mixed
