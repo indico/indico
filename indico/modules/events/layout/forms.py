@@ -171,7 +171,7 @@ class MenuLinkForm(MenuUserEntryFormBase):
 
 
 class MenuPageForm(MenuUserEntryFormBase):
-    html = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget())
+    html = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget(images=True))
 
 
 class AddImagesForm(IndicoForm):
