@@ -39,7 +39,7 @@ import './SeriesManagement.module.scss';
 const debounce = makeAsyncDebounce(250);
 const debounceSingle = makeAsyncDebounce(250);
 
-export function SeriesManagement({eventId, categoryId, hasSeries, seriesId}) {
+export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, timezone}) {
   const [open, setOpen] = useState(false);
   const [currentEvents, setCurrentEvents] = useState([]);
   const [keyword, setKeyword] = useState(undefined);
@@ -50,6 +50,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId}) {
   const [denialReason, setDenialReason] = useState(null);
   const [showSequenceInTitle, setShowSequenceInTitle] = useState(true);
   const [showLinksToOtherEvents, setShowLinksToOtherEvents] = useState(true);
+  const localMoment = dt => moment(dt).tz(timezone);
 
   const onClose = () => {
     setOpen(false);
@@ -147,7 +148,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId}) {
       evt.canManage !== true || evt.seriesId !== null || !!currentEvents.find(e => e.id === evt.id),
     content: (
       <div styleName="list-flex">
-        <span styleName="date-span">{moment(evt.startDt).format('ll')}</span>
+        <span styleName="date-span">{localMoment(evt.startDt).format('ll')}</span>
         <span styleName="event-title">
           {evt.title}
           <br />
@@ -301,7 +302,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId}) {
                     <List.Content>
                       <div styleName="list-flex">
                         <span styleName="date-span">
-                          {moment(e.startDt).format('ll')}
+                          {localMoment(e.startDt).format('ll')}
                           <br />
                           {eventId === e.id && (
                             <span styleName="positive-note">
@@ -390,6 +391,7 @@ SeriesManagement.propTypes = {
   eventId: PropTypes.number.isRequired,
   categoryId: PropTypes.number.isRequired,
   hasSeries: PropTypes.bool.isRequired,
+  timezone: PropTypes.string.isRequired,
   seriesId: PropTypes.number,
 };
 

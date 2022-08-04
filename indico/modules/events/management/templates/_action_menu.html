@@ -75,8 +75,9 @@
     <span id="event-action-manage-series-container"
           data-event-id="{{ event.id }}"
           data-category-id="{{ event.category_id }}"
+          data-timezone="{{ event.timezone }}"
           {{ 'data-has-series' if event.series }}
-          {% if event.series %} data-series-id="{{ event.series.id }}" {% endif %}></span>
+          {% if event.series %}data-series-id="{{ event.series.id }}"{% endif %}></span>
 {% endmacro %}
 
 

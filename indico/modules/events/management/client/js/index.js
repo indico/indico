@@ -45,6 +45,7 @@ import {SeriesManagement} from './SeriesManagement';
             categoryId: +manageSeriesContainer.dataset.categoryId,
             hasSeries: true,
             seriesId: +manageSeriesContainer.dataset.seriesId,
+            timezone: manageSeriesContainer.dataset.timezone,
           }),
           manageSeriesContainer
         );
@@ -54,6 +55,7 @@ import {SeriesManagement} from './SeriesManagement';
             eventId: +manageSeriesContainer.dataset.eventId,
             categoryId: +manageSeriesContainer.dataset.categoryId,
             hasSeries: false,
+            timezone: manageSeriesContainer.dataset.timezone,
           }),
           manageSeriesContainer
         );
