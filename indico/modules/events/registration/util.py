@@ -157,6 +157,7 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
         else:
             field_data = item.view_data
         field_data['isLocked'] = item.is_locked(registration)
+        field_data['lockedReason'] = item.get_locked_reason(registration)
         item_data[item.id] = field_data
     for item in regform.active_labels:
         if management or not item.parent.is_manager_only:

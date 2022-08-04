@@ -383,7 +383,15 @@ class RegistrationFormItem(db.Model):
 
     def is_locked(self, registration):
         """Check whether the data is locked by a plugin."""
-        return any(values_from_signal(signals.event.is_field_data_locked.send(self, registration=registration)))
+        values = values_from_signal(signals.event.is_field_data_locked.send(self, registration=registration))
+        return any(locked for locked, _ in values)
+
+    def get_locked_reason(self, registration):
+        """Get the reason for the field being locked."""
+        values = values_from_signal(signals.event.is_field_data_locked.send(self, registration=registration))
+        for locked, reason in values:
+            if locked:
+                return reason
 
     def _get_default_log_data(self):
         return {}

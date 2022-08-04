@@ -54,6 +54,14 @@ PurgedItemLocked.propTypes = {
   isUpdateMode: PropTypes.bool.isRequired,
 };
 
+function ItemLocked({reason}) {
+  return <Popup trigger={<Icon name="lock" />}>{reason}</Popup>;
+}
+
+ItemLocked.propTypes = {
+  reason: PropTypes.string.isRequired,
+};
+
 export default function FormItem({
   title,
   description,
@@ -63,6 +71,7 @@ export default function FormItem({
   isRequired,
   isPurged,
   isLocked,
+  lockedReason,
   sortHandle,
   setupMode,
   setupActions,
@@ -142,8 +151,9 @@ export default function FormItem({
         )}
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
-      {showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
-      {!showPurged && paidItemLocked && <PaidItemLocked management={isManagement} />}
+      {isLocked && <ItemLocked reason={lockedReason} />}
+      {!isLocked && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
+      {!isLocked && !showPurged && paidItemLocked && <PaidItemLocked management={isManagement} />}
     </div>
   );
 }
@@ -160,6 +170,8 @@ FormItem.propTypes = {
   isPurged: PropTypes.bool.isRequired,
   /** Whether the field is locked for modification */
   isLocked: PropTypes.bool,
+  /** The reason for the field being locked */
+  lockedReason: PropTypes.string,
   /** The retention period of the field's data in weeks */
   retentionPeriod: PropTypes.number,
   /** Whether the field is a special "personal data" field */
@@ -184,6 +196,7 @@ FormItem.defaultProps = {
   fieldIsRequired: false,
   isRequired: false,
   isLocked: false,
+  lockedReason: '',
   retentionPeriod: null,
   htmlName: null,
   sortHandle: null,

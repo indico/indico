@@ -97,8 +97,8 @@ Called when resolving whether Indico should let a registrant change a data value
 in their registration.  The participant's `Registration` is passed as `registration`.
 The `sender` is the `RegistrationFormItem` object.
 
-If this signal returns ``True``, the user will not be able to change the
-value given to the designated field.
+This signal returns a tuple ``(is_locked, reason)`` where `is_locked` is ``True`` if
+the item should be locked and `reason` contains a string giving the reason.
 ''')
 
 filter_selectable_badges = _signals.signal('filter-selectable-badges', '''
