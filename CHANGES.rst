@@ -74,6 +74,8 @@ Bugfixes
   (:pr:`5425`)
 - Fix session blocks not being sorted properly in a timetable PDF export when they
   have the same start time (:pr:`5426`)
+- Fix printing badges containing text elements with malformed HTML (:pr:`5437`,
+  thanks :user:`omegak`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
