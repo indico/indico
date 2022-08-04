@@ -68,6 +68,7 @@ export const getConfig = ({images = true} = {}) => ({
     images && 'Image',
     images && 'ImageCaption',
     images && 'OnlyInsertImage',
+    images && 'ImageResize',
     images && 'ImageStyle',
     images && 'ImageToolbar',
     'Indent',
