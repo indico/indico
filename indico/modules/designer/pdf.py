@@ -22,7 +22,7 @@ from indico.core import signals
 from indico.legacy.pdfinterface.base import setTTFonts
 from indico.modules.designer import PageOrientation
 from indico.util.signals import values_from_signal
-from indico.util.string import strip_tags
+from indico.util.string import RichMarkup, sanitize_html, strip_tags
 
 
 FONT_STYLES = {
@@ -132,7 +132,8 @@ class DesignerPDFBase:
             canvas.drawImage(ImageReader(content), margin_x + item_x, self.height - margin_y - item_height - item_y,
                              item_width, item_height, mask='auto')
         else:
-            content = strip_tags(content)
+            content = content.unescape() if isinstance(content, RichMarkup) else content
+            content = sanitize_html(strip_tags(content))
             for line in content.splitlines():
                 p = Paragraph(line, style)
                 available_height = (tpl_data.height_cm - (item_y / PIXELS_CM)) * cm
