@@ -55,6 +55,7 @@ Improvements
   custom conference themes from within a plugin (:pr:`5414`, thanks :user:`brittyazel`)
 - Add option to make the 'Affiliation' and 'Comment' fields mandatory in the account
   request form (:issue:`4819`, :pr:`5389`, thanks :user:`elsbethe`)
+- Include tags in registrant API (:pr:`5441`)
 
 Bugfixes
 ^^^^^^^^
