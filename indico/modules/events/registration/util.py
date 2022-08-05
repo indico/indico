@@ -587,7 +587,8 @@ def _build_base_registration_info(registration):
         'checked_in': registration.checked_in,
         'checkin_secret': registration.ticket_uuid,
         'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name).strip(),
-        'personal_data': personal_data
+        'personal_data': personal_data,
+        'tags': sorted(t.title for t in registration.tags),
     }
 
 
