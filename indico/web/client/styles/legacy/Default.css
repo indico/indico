@@ -792,6 +792,8 @@ body.cke_show_borders {
 
 .material_tip .qtip-content {
   background: #f8f8f8;
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 ul.material_list {
