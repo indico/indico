@@ -129,7 +129,11 @@ def _update_header(file_path, config, substring, regex, data, ci):
                 found = True
                 match_end = content[match.end():].lstrip()
                 match_end = f'\n{match_end}' if match_end else match_end
-                content = content[:match.start()] + gen_header(data | config) + match_end
+                if not content[:match.start()].strip() and not match_end.strip():
+                    # file is otherwise empty, we do not want a header in there
+                    content = ''
+                else:
+                    content = content[:match.start()] + gen_header(data | config) + match_end
         if shebang_line:
             content = shebang_line + '\n' + content
     if content != orig_content:
