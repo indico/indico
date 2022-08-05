@@ -73,7 +73,7 @@ class RegistrationFormEditForm(IndicoForm):
     modification_mode = IndicoEnumSelectField(_('Modification allowed'), enum=ModificationMode,
                                               description=_('Will users be able to modify their data? When?'))
     publish_registration_count = BooleanField(_('Publish number of registrations'), widget=SwitchWidget(),
-                                              description=_('Number of registered participants will be displayed in '
+                                              description=_('Number of registered participants will be displayed on '
                                                             'the event page'))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_('Check-in status will be shown publicly on the event page'))
