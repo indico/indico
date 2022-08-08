@@ -3,15 +3,17 @@
         {% for contribution in contributions %}
             <li>
                 <a href="{{ url_for('contributions.display_contribution', contribution, _external=true) }}">{{ contribution.title }}</a>
-                (
-                {%- if contribution.timetable_entry -%}
-                    {{ contribution.timetable_entry.start_dt | format_datetime(format='EEEE', timezone=timezone) }}
-                    {{ contribution.timetable_entry.start_dt | format_datetime(format='medium', timezone=timezone) }}
-                    - {{ contribution.timetable_entry.end_dt | format_time(timezone=timezone) }}
-                {%- else -%}
-                    Not scheduled yet
-                {%- endif -%}
-                )
+                {% if not contribution.session or not contribution.session.is_poster %}
+                    (
+                    {%- if contribution.timetable_entry -%}
+                        {{ contribution.timetable_entry.start_dt | format_datetime(format='EEEE', timezone=timezone) }}
+                        {{ contribution.timetable_entry.start_dt | format_datetime(format='medium', timezone=timezone) }}
+                        - {{ contribution.timetable_entry.end_dt | format_time(timezone=timezone) }}
+                    {%- else -%}
+                        Not scheduled yet
+                    {%- endif -%}
+                    )
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
