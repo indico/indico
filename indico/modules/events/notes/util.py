@@ -81,5 +81,9 @@ def can_edit_note(obj, user):
     if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit'):
         return True
     if isinstance(obj, db.m.SubContribution):
+        from indico.modules.events.contributions import subcontribution_settings
+        speakers_can_edit = subcontribution_settings.get(obj.contribution.event, 'speakers_can_edit')
+        if speakers_can_edit and any(speaker.person.user == user for speaker in obj.speakers):
+            return True
         return can_edit_note(obj.contribution, user)
     return False
