@@ -105,7 +105,7 @@ class RHEventProtection(RHManageEventBase):
         permissions = [[serialize_principal(p.principal), list(get_principal_permissions(p, Event))]
                        for p in self.event.acl_entries]
         permissions = [item for item in permissions if item[1]]
-        subcontrib_speakers = subcontribution_settings.get(self.event, 'speakers_can_edit')
+        subcontrib_speakers = subcontribution_settings.get(self.event, 'speakers_can_submit')
 
         return dict({'protection_mode': self.event.protection_mode, 'registration_managers': registration_managers,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,
@@ -120,7 +120,7 @@ class RHEventProtection(RHManageEventBase):
         update_session_coordinator_privs(self.event, data)
 
     def _update_subcontrib_settings(self, form):
-        subcontribution_settings.set(self.event, 'speakers_can_edit', form.subcontrib_speakers.data)
+        subcontribution_settings.set(self.event, 'speakers_can_submit', form.subcontrib_speakers.data)
 
 
 class RHPermissionsDialog(RH):

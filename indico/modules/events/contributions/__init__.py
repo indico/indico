@@ -137,5 +137,5 @@ contribution_settings = EventSettingsProxy('contributions', {
 })
 
 subcontribution_settings = EventSettingsProxy('subcontributions', {
-    'speakers_can_edit': False,  # Speakers can edit minutes and upload attachments
+    'speakers_can_submit': False,  # Speakers can edit minutes and upload attachments
 })
