@@ -42,7 +42,9 @@ from indico.util.date_time import format_date, format_number, now_utc
 from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.marshmallow import LowercaseString, not_empty
 from indico.util.signals import values_from_signal
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import RH, allow_signed_url
@@ -190,14 +192,17 @@ class RHCategorySearch(RH):
 class RHCategoryManagedEventSearch(RHCategoryBase):
     """Search managed events in a category."""
 
-    def _process(self):
+    def _check_access(self):
+        if not session.user:
+            raise Forbidden
+        RHCategoryBase._check_access(self)
+
+    @use_kwargs({'q': LowercaseString(required=True, validate=not_empty)}, location='query')
+    def _process(self, q):
         from indico.modules.events.series.schemas import EventDetailsForSeriesManagementSchema
-        q = request.args['q'].lower()
         query = (
             Event.query.with_parent(self.category)
-            .filter(
-                Event.title_matches(q), Event.series == None, ~Event.is_deleted # noqa
-            )
+            .filter(Event.title_matches(q), Event.series_id.is_(None), ~Event.is_deleted)
             .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_chain'))
         )
         # Prefer favorite events
@@ -208,13 +213,8 @@ class RHCategoryManagedEventSearch(RHCategoryBase):
             db.func.lower(Event.title).startswith(q).desc(),
             db.func.lower(Event.title),
         )
-        result = [EventDetailsForSeriesManagementSchema().dump(e) for e in query if e.can_manage(session.user)]
-        return jsonify(result[:min(10, len(result))])
-
-    def _check_access(self):
-        if not session.user:
-            raise Forbidden
-        RHCategoryBase._check_access(self)
+        events = get_n_matching(query, 10, lambda event: event.can_manage(session.user))
+        return EventDetailsForSeriesManagementSchema(many=True).jsonify(events)
 
 
 class RHSubcatInfo(RHDisplayCategoryBase):

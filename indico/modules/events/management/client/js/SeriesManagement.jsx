@@ -39,7 +39,7 @@ import './SeriesManagement.module.scss';
 const debounce = makeAsyncDebounce(250);
 const debounceSingle = makeAsyncDebounce(250);
 
-export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, timezone}) {
+export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
   const [open, setOpen] = useState(false);
   const [currentEvents, setCurrentEvents] = useState([]);
   const [keyword, setKeyword] = useState(undefined);
@@ -51,6 +51,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
   const [showSequenceInTitle, setShowSequenceInTitle] = useState(true);
   const [showLinksToOtherEvents, setShowLinksToOtherEvents] = useState(true);
   const localMoment = dt => moment(dt).tz(timezone);
+  const hasSeries = seriesId !== null;
 
   const onClose = () => {
     setOpen(false);
@@ -75,7 +76,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
     }
     const data = camelizeKeys(resp.data);
     setCurrentEvents(camelizeKeys(data.events));
-    setShowLinksToOtherEvents(data.showLinksToOtherEvents);
+    setShowLinksToOtherEvents(data.showLinks);
     setShowSequenceInTitle(data.showSequenceInTitle);
     setLoading(false);
   };
@@ -91,8 +92,6 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
     }
     if (resp.data === null) {
       setDenialReason(Translate.string('No event found with this ID.'));
-    } else if (resp.data.isDeleted) {
-      setDenialReason(Translate.string('You cannot add a deleted event to the series.'));
     } else if (!resp.data.canAccess) {
       setDenialReason(Translate.string("You don't have rights to access this event."));
     } else {
@@ -144,8 +143,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
     value: evt.id,
     meta: evt,
     text: evt.title,
-    disabled:
-      evt.canManage !== true || evt.seriesId !== null || !!currentEvents.find(e => e.id === evt.id),
+    disabled: !evt.canManage || evt.seriesId !== null || !!currentEvents.find(e => e.id === evt.id),
     content: (
       <div styleName="list-flex">
         <span styleName="date-span">{localMoment(evt.startDt).format('ll')}</span>
@@ -157,7 +155,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
               {evt.categoryChain ? evt.categoryChain.join(' » ') : <Translate>Unlisted</Translate>}
             </span>
           </TooltipIfTruncated>
-          {evt.canManage !== true && (
+          {!evt.canManage && (
             <span styleName="warning-reason">
               <br />
               <Translate>You do not have editing rights for this event.</Translate>
@@ -188,16 +186,16 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
   }));
 
   const submitSeries = async () => {
-    const eventIds = currentEvents.map(x => x.id);
+    const data = {
+      event_ids: currentEvents.map(x => x.id),
+      show_sequence_in_title: showSequenceInTitle,
+      show_links: showLinksToOtherEvents,
+    };
     try {
       if (hasSeries) {
-        await indicoAxios.patch(eventSeriesURL({series_id: seriesId}), {
-          event_ids: eventIds,
-          show_sequence_in_title: showSequenceInTitle,
-          show_links: showLinksToOtherEvents,
-        });
+        await indicoAxios.patch(eventSeriesURL({series_id: seriesId}), data);
       } else {
-        await indicoAxios.post(eventSeriesURL(), {event_ids: eventIds});
+        await indicoAxios.post(eventSeriesURL(), data);
       }
     } catch (e) {
       return handleSubmitError(e);
@@ -306,7 +304,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
                           <br />
                           {eventId === e.id && (
                             <span styleName="positive-note">
-                              <Translate>(this event!)</Translate>
+                              (<Translate>this event</Translate>)
                             </span>
                           )}
                         </span>
@@ -372,7 +370,7 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
           )}
           <Button
             content={
-              hasSeries ? Translate.string('Edit series') : Translate.string('Create series')
+              hasSeries ? Translate.string('Update series') : Translate.string('Create series')
             }
             onClick={submitSeries}
             color="blue"
@@ -390,7 +388,6 @@ export function SeriesManagement({eventId, categoryId, hasSeries, seriesId, time
 SeriesManagement.propTypes = {
   eventId: PropTypes.number.isRequired,
   categoryId: PropTypes.number.isRequired,
-  hasSeries: PropTypes.bool.isRequired,
   timezone: PropTypes.string.isRequired,
   seriesId: PropTypes.number,
 };

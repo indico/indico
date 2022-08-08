@@ -11,6 +11,7 @@ from marshmallow import ValidationError, fields, validates
 from indico.core.marshmallow import mm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.series import EventSeries
+from indico.modules.events.schemas import EventDetailsSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList, not_empty
 
@@ -21,6 +22,7 @@ class EventSeriesSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'events', 'show_sequence_in_title', 'show_links')
 
     id = fields.Int(data_key='series_id')
+    events = fields.List(fields.Nested(EventDetailsSchema))
 
 
 class EventSeriesUpdateSchema(EventSeriesSchema):
@@ -32,27 +34,18 @@ class EventSeriesUpdateSchema(EventSeriesSchema):
 
     @validates('events')
     def _check_event_ids(self, events, **kwargs):
-        series_id = (
-            self.context['series'].id if 'series' in self.context and self.context['series'] is not None else None
-        )
-        if events is None:
-            raise ValidationError(_('No event IDs provided.'))
-        event_ids = [e.id for e in events]
+        series_id = series.id if (series := self.context.get('series')) is not None else None
 
-        if set(event_ids) - {e.id for e in events}:
-            raise ValidationError(_('Invalid event IDs provided.'))
-        elif series_id is None and [e for e in events if e.series]:
+        if series_id is None and any(e.series for e in events):
             raise ValidationError(_('At least one event is already in a series.'))
-        elif [e for e in events if e.series and e.series_id is not series_id]:
+        elif any(e.series and e.series_id != series_id for e in events):
             raise ValidationError(_('At least one event is already in a different series.'))
 
-        for event in events:
-            if not event.can_manage(session.user):
-                raise ValidationError(_('You are not allowed to manage all of these events.'))
+        if not all(e.can_manage(session.user) for e in events):
+            raise ValidationError(_('You must be a manager of all chosen events.'))
 
 
 class EventDetailsForSeriesManagementSchema(mm.SQLAlchemyAutoSchema):
-    """Please someone just choose a better name for this oh my god."""
     class Meta:
         model = Event
         fields = ('id', 'category_chain', 'title', 'start_dt', 'end_dt', 'can_manage', 'series_id', 'can_access')

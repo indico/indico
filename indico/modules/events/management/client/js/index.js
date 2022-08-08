@@ -38,28 +38,19 @@ import {SeriesManagement} from './SeriesManagement';
 
     const manageSeriesContainer = document.querySelector('#event-action-manage-series-container');
     if (manageSeriesContainer) {
-      if (manageSeriesContainer.dataset.hasSeries !== undefined) {
-        ReactDOM.render(
-          React.createElement(SeriesManagement, {
-            eventId: +manageSeriesContainer.dataset.eventId,
-            categoryId: +manageSeriesContainer.dataset.categoryId,
-            hasSeries: true,
-            seriesId: +manageSeriesContainer.dataset.seriesId,
-            timezone: manageSeriesContainer.dataset.timezone,
-          }),
-          manageSeriesContainer
-        );
-      } else {
-        ReactDOM.render(
-          React.createElement(SeriesManagement, {
-            eventId: +manageSeriesContainer.dataset.eventId,
-            categoryId: +manageSeriesContainer.dataset.categoryId,
-            hasSeries: false,
-            timezone: manageSeriesContainer.dataset.timezone,
-          }),
-          manageSeriesContainer
-        );
-      }
+      const seriesId =
+        manageSeriesContainer.dataset.seriesId !== undefined
+          ? +manageSeriesContainer.dataset.seriesId
+          : null;
+      ReactDOM.render(
+        React.createElement(SeriesManagement, {
+          eventId: +manageSeriesContainer.dataset.eventId,
+          categoryId: +manageSeriesContainer.dataset.categoryId,
+          timezone: manageSeriesContainer.dataset.timezone,
+          seriesId,
+        }),
+        manageSeriesContainer
+      );
     }
 
     const publishContainer = document.querySelector('#event-action-publish-container');

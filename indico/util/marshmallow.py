@@ -160,10 +160,11 @@ class ModelField(fields.Field):
     }
 
     def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, filter_deleted=False,
-                 **kwargs):
+                 none_if_missing=False, **kwargs):
         self.model = model
         self.get_query = get_query
         self.filter_deleted = filter_deleted
+        self.none_if_missing = none_if_missing
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -191,6 +192,8 @@ class ModelField(fields.Field):
             query = query.filter(~self.model.is_deleted)
         obj = query.one_or_none()
         if obj is None:
+            if self.none_if_missing:
+                return None
             self.fail('not_found', value=value)
         return obj
 

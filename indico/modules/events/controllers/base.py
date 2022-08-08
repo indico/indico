@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, jsonify, redirect, request, session
+from flask import flash, redirect, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events import Event
@@ -94,20 +94,6 @@ class RHDisplayEventBase(RHProtectedEventBase):
             if request.is_xhr:
                 raise
             return self._show_registration_form()
-
-
-class RHSingleEventAPI(RH):
-    """Return info about a single event."""
-    def _process(self):
-        from indico.modules.events.series.schemas import EventDetailsForSeriesManagementSchema
-        self.event = Event.get(request.view_args['event_id'])
-        if self.event is None:
-            return jsonify(None)
-        elif not self.event.can_access(session.user):
-            return jsonify({'can_access': False})
-        elif self.event.is_deleted:
-            return jsonify({'is_deleted': True})
-        return EventDetailsForSeriesManagementSchema().jsonify(self.event)
 
 
 class AccessKeyRequired(Forbidden):

@@ -8,7 +8,7 @@
 from indico.modules.events.controllers.admin import (RHCreateEventLabel, RHCreateReferenceType, RHDeleteEventLabel,
                                                      RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
                                                      RHEventLabels, RHReferenceTypes, RHUnlistedEvents)
-from indico.modules.events.controllers.base import RHSingleEventAPI
+from indico.modules.events.controllers.api import RHSingleEventAPI
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import RHDisplayPrivacyPolicy, RHEventAccessKey, RHExportEventICAL
 from indico.modules.events.controllers.entry import event_or_shorturl
@@ -59,7 +59,7 @@ _bp.add_url_rule('/event/<int:event_id>/other-view', 'display_other', redirect_v
 
 # Misc
 _bp.add_url_rule('/event/<int:event_id>/key-access', 'key_access', RHEventAccessKey, methods=('POST',))
-_bp.add_url_rule('/api/event/<int:event_id>', 'single_event_api', RHSingleEventAPI, methods=('GET',))
+_bp.add_url_rule('/event/<int:event_id>/api/info-for-series', 'single_event_api', RHSingleEventAPI)
 
 # Privacy policy
 _bp.add_url_rule('/event/<int:event_id>/privacy', 'display_privacy', RHDisplayPrivacyPolicy)

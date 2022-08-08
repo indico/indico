@@ -76,7 +76,6 @@
           data-event-id="{{ event.id }}"
           data-category-id="{{ event.category_id }}"
           data-timezone="{{ event.timezone }}"
-          {{ 'data-has-series' if event.series }}
           {% if event.series %}data-series-id="{{ event.series.id }}"{% endif %}></span>
 {% endmacro %}
 
@@ -149,7 +148,7 @@
                     <div class="action-menu-buttons {{ 'event-locked' if event.is_locked }}">
                         {{ _render_move_event(event) }}
                         {{ _render_import_event(event) }}
-                        {% if event.category.id %} {{ _render_manage_series(event) }} {% endif %}
+                        {% if not event.is_unlisted %}{{ _render_manage_series(event) }}{% endif %}
                         {{ _render_lock_event(event) }}
                         {{ _render_delete_event(event) }}
                         {{ _render_change_event_type(event, event_types) }}
