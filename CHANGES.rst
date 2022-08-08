@@ -56,6 +56,8 @@ Improvements
 - Add option to make the 'Affiliation' and 'Comment' fields mandatory in the account
   request form (:issue:`4819`, :pr:`5389`, thanks :user:`elsbethe`)
 - Include tags in registrant API (:pr:`5441`)
+- Subcontribution speakers can now be granted submission privileges in the event's
+  protection settings (:issue:`2363`, :pr:`5444`)
 
 Bugfixes
 ^^^^^^^^
