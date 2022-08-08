@@ -271,6 +271,8 @@ class EventProtectionForm(IndicoForm):
                                                        'expose open registration forms to anyone with a link to the '
                                                        'event, so you can let users register without giving access '
                                                        'to anything else in your event.'))
+    subcontrib_speakers = BooleanField(_('Speakers can edit'), widget=SwitchWidget(),
+                                       description=_('Subcontribution speakers can edit minutes and upload materials.'))
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):

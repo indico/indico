@@ -6,7 +6,7 @@
 {% block content %}
     {{ form_header(form, id='event-protection-form', extra_attrs={'data-confirm-close-unsaved': True}) }}
     {{ form_row(form.permissions, skip_label=true) }}
-    {{ form_rows(form, skip=form.priv_fields.union(['permissions']),
+    {{ form_rows(form, skip=form.priv_fields.union(['permissions', 'subcontrib_speakers']),
                  widget_attrs={'own_no_access_contact': {'placeholder': event.no_access_contact}}) }}
     {% call form_fieldset(_("Session coordinator rights"), collapsible=true, initially_collapsed=true) %}
         <div class="action-box highlight">
@@ -24,6 +24,9 @@
             </div>
         </div>
         {{ form_rows(form, fields=form.priv_fields) }}
+    {% endcall %}
+    {% call form_fieldset(_("Subcontribution rights"), collapsible=true, initially_collapsed=true) %}
+        {{ form_rows(form, fields=["subcontrib_speakers"]) }}
     {% endcall %}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
