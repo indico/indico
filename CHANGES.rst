@@ -77,6 +77,8 @@ Bugfixes
   have the same start time (:pr:`5426`)
 - Fix printing badges containing text elements with malformed HTML (:pr:`5437`,
   thanks :user:`omegak`)
+- Fix misleading start and end times for Poster contributions in the timetable HTTP API
+  and the contributions placeholder in emails (:pr:`5443`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
