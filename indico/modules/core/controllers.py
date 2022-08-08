@@ -357,4 +357,11 @@ class RHAPIGenerateCaptcha(RH):
         else:
             data, answer = self._generate_captcha()
             session['captcha_state'] = answer
-        return jsonify(data)
+        rv = jsonify(data)
+        # make sure browsers don't cache this. otherwise using the back button after successfully
+        # using the old captcha code will go back to the page showing the already-used code instead
+        # of fetching a new one
+        rv.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        rv.headers['Pragma'] = 'no-cache'
+        rv.headers['Expires'] = '0'
+        return rv
