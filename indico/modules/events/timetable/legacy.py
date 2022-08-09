@@ -12,7 +12,6 @@ from itertools import chain
 from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 
-from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
@@ -227,9 +226,9 @@ class TimetableSerializer:
             tzinfo = entry.event.tzinfo
         else:
             tzinfo = entry.event.display_tzinfo
-        if isinstance(entry, Contribution):
-            start_dt = entry.start_dt_display
-            end_dt = entry.end_dt_display
+        if entry.type == TimetableEntryType.CONTRIBUTION:
+            start_dt = entry.contribution.start_dt_display
+            end_dt = entry.contribution.end_dt_display
         else:
             start_dt = entry.start_dt
             end_dt = entry.end_dt
