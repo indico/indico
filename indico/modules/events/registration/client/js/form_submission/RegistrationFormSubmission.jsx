@@ -12,6 +12,7 @@ import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Message} from 'semantic-ui-react';
 
+import Captcha from 'indico/react/components/Captcha';
 import {
   FinalSubmitButton,
   handleSubmitError,
@@ -87,13 +88,20 @@ ConsentToPublish.propTypes = {
 
 export default function RegistrationFormSubmission() {
   const sections = useSelector(getNestedSections);
-  const {submitUrl, registrationData, initialValues} = useSelector(getStaticData);
+  const {
+    submitUrl,
+    registrationData,
+    initialValues,
+    captchaRequired,
+    captchaSettings,
+  } = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
   const isManagement = useSelector(getManagement);
   const publishToParticipants = useSelector(getPublishToParticipants);
   const publishToPublic = useSelector(getPublishToPublic);
   const showConsentToPublish = !isManagement && publishToParticipants !== 'hide_all';
+  const pluginCaptcha = renderPluginComponents('captcha', {settings: captchaSettings});
 
   const onSubmit = async (data, form) => {
     let resp;
@@ -131,6 +139,7 @@ export default function RegistrationFormSubmission() {
                 publishToPublic={publishToPublic}
               />
             )}
+            {captchaRequired && (pluginCaptcha.length > 0 ? pluginCaptcha : <Captcha />)}
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}

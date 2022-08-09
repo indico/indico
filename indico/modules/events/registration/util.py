@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import IndicoSchema
+from indico.modules.core.captcha import CaptchaField
 from indico.modules.events import EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
@@ -283,7 +284,7 @@ class RegistrationSchemaBase(IndicoSchema):
         unknown = RAISE
 
 
-def make_registration_schema(regform, management=False, registration=None):
+def make_registration_schema(regform, management=False, registration=None, captcha_required=False):
     """Dynamically create a Marshmallow schema based on the registration form fields."""
     class RegistrationSchema(RegistrationSchemaBase):
         @validates('email')
@@ -298,6 +299,9 @@ def make_registration_schema(regform, management=False, registration=None):
         schema['notify_user'] = fields.Boolean()
     elif regform.needs_publish_consent:
         schema['consent_to_publish'] = EnumField(RegistrationVisibility)
+
+    if captcha_required:
+        schema['captcha'] = CaptchaField()
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:

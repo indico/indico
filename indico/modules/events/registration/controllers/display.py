@@ -14,6 +14,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.core.captcha import get_captcha_settings, invalidate_captcha
 from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
@@ -305,6 +306,11 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
             return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
 
+    @property
+    def _captcha_required(self):
+        """Whether a CAPTCHA should be displayed when registering."""
+        return session.user is None and self.regform.require_captcha
+
     def _can_register(self):
         if self.regform.limit_reached:
             return False
@@ -320,14 +326,17 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if not self._can_register():
             raise ExpectedError(_('You cannot register for this event'))
 
-        schema = make_registration_schema(self.regform)()
+        schema = make_registration_schema(self.regform, captcha_required=self._captcha_required)()
         form_data = parser.parse(schema)
         registration = create_registration(self.regform, form_data, self.invitation)
+        invalidate_captcha()
         return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
 
     def _process_GET(self):
         user_data = get_user_data(self.regform, session.user, self.invitation)
         initial_values = get_initial_form_values(self.regform) | user_data
+        if self._captcha_required:
+            initial_values |= {'captcha': None}
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
                                                form_data=get_flat_section_submission_data(self.regform),
@@ -338,7 +347,9 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                registration=self.registration,
                                                management=False,
                                                login_required=self.regform.require_login and not session.user,
-                                               is_restricted_access=self.is_restricted_access)
+                                               is_restricted_access=self.is_restricted_access,
+                                               captcha_required=self._captcha_required,
+                                               captcha_settings=get_captcha_settings())
 
 
 class RHUploadRegistrationFile(UploadFileMixin, RHRegistrationFormBase):
