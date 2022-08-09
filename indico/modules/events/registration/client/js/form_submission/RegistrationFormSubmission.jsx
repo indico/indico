@@ -113,6 +113,8 @@ export default function RegistrationFormSubmission() {
 
     if (resp.data.redirect) {
       location.href = resp.data.redirect;
+      // never finish submitting to avoid fields being re-enabled
+      await new Promise(() => {});
     }
   };
 
