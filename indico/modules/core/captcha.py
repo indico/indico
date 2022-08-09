@@ -32,13 +32,16 @@ class CaptchaField(fields.String):
 
 def get_captcha_plugin():
     """Return the available CAPTCHA plugin."""
-    plugins = [p for p in plugin_engine.get_active_plugins().values() if isinstance(p, CaptchaPluginMixin)]
+    plugins = [p for p in plugin_engine.get_active_plugins().values()
+               if isinstance(p, CaptchaPluginMixin) and p.is_captcha_available()]
     return plugins[0] if plugins else None
 
 
 def get_captcha_settings():
     """Return CAPTCHA plugin settings."""
-    return plugin.get_captcha_settings() if (plugin := get_captcha_plugin()) else None
+    if plugin := get_captcha_plugin():
+        return plugin.get_captcha_settings()
+    return None
 
 
 def invalidate_captcha():

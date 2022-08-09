@@ -12,6 +12,15 @@ class CaptchaPluginMixin:
     #: the readable name of the CAPTCHA plugin
     friendly_name = None
 
+    def is_captcha_available(self):
+        """Whether this plugin's CAPTCHA is available.
+
+        In case the plugin requires configuration (e.g. an API key in case of
+        a cloud-based CAPTCHA) this should return False so no broken CAPTCHA
+        is shown to users.
+        """
+        return True
+
     def generate_captcha(self):
         """Return a generated CAPTCHA.
 
