@@ -14,10 +14,29 @@ import {Message, Icon, Button, Form, Popup, Placeholder} from 'semantic-ui-react
 import {FinalInput} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import './Captcha.module.scss';
 
-export default function Captcha({name}) {
+export default function Captcha({name, settings}) {
+  const pluginCaptcha = renderPluginComponents('captcha', {settings});
+  if (pluginCaptcha.length) {
+    return pluginCaptcha;
+  }
+  return <IndicoCaptcha name={name} />;
+}
+
+Captcha.propTypes = {
+  name: PropTypes.string,
+  settings: PropTypes.object,
+};
+
+Captcha.defaultProps = {
+  name: 'captcha',
+  settings: {},
+};
+
+function IndicoCaptcha({name}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -128,10 +147,6 @@ export default function Captcha({name}) {
   );
 }
 
-Captcha.propTypes = {
-  name: PropTypes.string,
-};
-
-Captcha.defaultProps = {
-  name: 'captcha',
+IndicoCaptcha.propTypes = {
+  name: PropTypes.string.isRequired,
 };
