@@ -30,9 +30,9 @@ class CaptchaPluginMixin:
         which saves the answer in the user's session. You can later retrieve it
         with `get_captcha_state`.
 
-        As an example, the built-in CAPTCHA generator
-        returns a dictionary with a base64 encoded image and audio data, while
-        the reCAPTCHA plugin does not use this method at all.
+        As an example, the built-in CAPTCHA generator returns a dictionary with a
+        base64 encoded image and audio data, while a cloud-based CAPTCHA plugin may
+        not need this method at all.
         """
         return None
 
@@ -41,23 +41,23 @@ class CaptchaPluginMixin:
 
         This should return True when the answer is correct and False otherwise.
         The built-in CAPTCHA simply compares the user-provided value with the answer
-        stored in the session. If you store the answer in a session,
-        you can use `get_captcha_state` to retrieve it.
+        stored in the session. If you store the answer in a session, you can use
+        `get_captcha_state` to retrieve it.
 
-        Other implementations might need to send a request to
-        an external service instead e.g. with reCAPTCHA.
+        Other implementations might need to send a request to a cloud-based API to validate
+        the CAPTCHA.
         """
         raise NotImplementedError('CAPTCHA plugin must implement validate_captcha(answer)')
 
     def get_captcha_settings(self):
         """Return CAPTCHA settings.
 
-        Use this method if you need to pass some static data to
-        your React component. The settings will be passed via as
-        a `settings` prop to your React component.
-        The return value must be JSON-serializable.
+        Use this method if you need to pass some static data to your CAPTCHA React component.
+        The return value must be JSON-serializable. The settings will be passed via as a
+        `settings` prop to the component.
 
-        For example, the reCAPTCHA plugin uses this to pass the site key.
+        For example, a cloud-based CAPTCHA plugin can use this to pass the client-side API key
+        (but no secrets!) to the React component displaying the CAPTCHA.
         """
         return {}
 
