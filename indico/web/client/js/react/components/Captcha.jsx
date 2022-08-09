@@ -9,8 +9,8 @@ import generateCaptchaURL from 'indico-url:core.generate_captcha';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
-import {Message, Icon, Button, Form, Popup, Placeholder} from 'semantic-ui-react';
 import {useFormState} from 'react-final-form';
+import {Message, Icon, Button, Form, Popup, Placeholder, Input} from 'semantic-ui-react';
 
 import {FinalInput} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -19,25 +19,27 @@ import {renderPluginComponents} from 'indico/utils/plugins';
 
 import './Captcha.module.scss';
 
-export default function Captcha({name, settings}) {
-  const pluginCaptcha = renderPluginComponents('captcha', {settings});
+export default function Captcha({name, settings, wtf}) {
+  const pluginCaptcha = renderPluginComponents('captcha', {settings, wtf});
   if (pluginCaptcha.length) {
     return pluginCaptcha;
   }
-  return <IndicoCaptcha name={name} />;
+  return <IndicoCaptcha name={name} wtf={wtf} />;
 }
 
 Captcha.propTypes = {
   name: PropTypes.string,
+  wtf: PropTypes.bool,
   settings: PropTypes.object,
 };
 
 Captcha.defaultProps = {
   name: 'captcha',
+  wtf: false,
   settings: {},
 };
 
-function IndicoCaptcha({name}) {
+function IndicoCaptcha({name, wtf}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -118,7 +120,7 @@ function IndicoCaptcha({name}) {
   );
 
   return (
-    <Message info style={{marginTop: 25}}>
+    <Message info style={wtf ? {marginTop: 0} : {marginTop: 25}}>
       <Message.Header>
         <Translate>Confirm that you are not a robot</Translate> 🤖
       </Message.Header>
@@ -152,7 +154,11 @@ function IndicoCaptcha({name}) {
               <label>
                 <Translate>Answer</Translate>
               </label>
-              <FinalInput name={name} required style={{maxWidth: 200}} />
+              {wtf ? (
+                <Input name={name} required style={{maxWidth: 200}} />
+              ) : (
+                <FinalInput name={name} required style={{maxWidth: 200}} />
+              )}
             </Form.Field>
           </div>
         </>
@@ -163,4 +169,5 @@ function IndicoCaptcha({name}) {
 
 IndicoCaptcha.propTypes = {
   name: PropTypes.string.isRequired,
+  wtf: PropTypes.bool.isRequired,
 };

@@ -7,6 +7,7 @@
 
 import './buttons_boolean_widget';
 import './category_picker_widget';
+import './captcha_widget';
 import './ckeditor_widget';
 import './color_picker_widget';
 import './date_widget';
