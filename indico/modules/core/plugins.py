@@ -9,9 +9,6 @@ from flask import session
 
 
 class CaptchaPluginMixin:
-    #: the readable name of the CAPTCHA plugin
-    friendly_name = None
-
     def is_captcha_available(self):
         """Whether this plugin's CAPTCHA is available.
 
