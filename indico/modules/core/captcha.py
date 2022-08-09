@@ -16,17 +16,18 @@ from indico.util.i18n import _
 class CaptchaField(fields.String):
     """Validates an answer to a CAPTCHA."""
 
-    def __init__(self):
-        def validate(user_answer):
-            if plugin := get_captcha_plugin():
-                if not plugin.validate_captcha(user_answer):
-                    raise ValidationError(_('Incorrect answer'))
-            else:
-                answer = session.get('captcha_state')
-                if not answer or answer != user_answer:
-                    raise ValidationError(_('Incorrect answer'))
+    def _deserialize(self, value, attr, data, **kwargs):
+        user_answer = super()._deserialize(value, attr, data, **kwargs)
 
-        super().__init__(required=True, validate=validate)
+        if plugin := get_captcha_plugin():
+            if not plugin.validate_captcha(user_answer):
+                raise ValidationError(_('Incorrect answer'))
+        else:
+            answer = session.get('captcha_state')
+            if not answer or answer != user_answer:
+                raise ValidationError(_('Incorrect answer'))
+
+        return user_answer
 
 
 def get_captcha_plugin():
