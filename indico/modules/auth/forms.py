@@ -10,7 +10,9 @@ from fnmatch import fnmatch
 from wtforms.fields import EmailField, PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
+from indico.core.config import config
 from indico.modules.auth import Identity
+from indico.modules.core.captcha import WTFCaptchaField
 from indico.modules.users import User, user_management_settings
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -91,6 +93,12 @@ class RegistrationEmailForm(IndicoForm):
     email = EmailField(_('Email address'),
                        [DataRequired(), Email(), _check_not_blacklisted, _check_existing_email],
                        filters=[_tolower])
+    captcha = WTFCaptchaField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not config.SIGNUP_CAPTCHA:
+            del self.captcha
 
 
 # only used on bootstrap+admin pages

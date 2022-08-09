@@ -60,6 +60,8 @@ Improvements
   protection settings (:issue:`2363`, :pr:`5444`)
 - Registration forms can now require a CAPTCHA when the user is not logged in
   (:issue:`4698`, :pr:`5400`)
+- Account creation now requires a CAPTCHA by default to prevent spam account creation
+  (:issue:`4698`, :pr:`5446`)
 
 Bugfixes
 ^^^^^^^^
