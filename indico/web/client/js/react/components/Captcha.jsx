@@ -10,6 +10,7 @@ import generateCaptchaURL from 'indico-url:core.generate_captcha';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {Message, Icon, Button, Form, Popup, Placeholder} from 'semantic-ui-react';
+import {useFormState} from 'react-final-form';
 
 import {FinalInput} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -42,6 +43,14 @@ function IndicoCaptcha({name}) {
   const [playing, setPlaying] = useState(false);
   const [image, setImage] = useState(null);
   const [audio, setAudio] = useState(null);
+  const {submitting} = wtf
+    ? {submitting: false}
+    : // eslint-disable-next-line react-hooks/rules-of-hooks
+      useFormState({
+        subscription: {
+          submitting: true,
+        },
+      });
 
   const fetchCaptcha = async () => {
     setLoading(true);
@@ -74,7 +83,12 @@ function IndicoCaptcha({name}) {
     <Popup
       content={playing ? Translate.string('Pause') : Translate.string('Play')}
       trigger={
-        <Button icon type="button" disabled={loading || error || !audio} onClick={toggleAudio}>
+        <Button
+          icon
+          type="button"
+          disabled={loading || error || !audio || submitting}
+          onClick={toggleAudio}
+        >
           <Icon name={playing ? 'stop' : 'play'} />
         </Button>
       }
@@ -89,7 +103,7 @@ function IndicoCaptcha({name}) {
           icon
           type="button"
           loading={loading}
-          disabled={loading}
+          disabled={loading || submitting}
           onClick={() => {
             if (playing) {
               toggleAudio();
