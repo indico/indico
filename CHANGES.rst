@@ -58,6 +58,8 @@ Improvements
 - Include tags in registrant API (:pr:`5441`)
 - Subcontribution speakers can now be granted submission privileges in the event's
   protection settings (:issue:`2363`, :pr:`5444`)
+- Registration forms can now require a CAPTCHA when the user is not logged in
+  (:issue:`4698`, :pr:`5400`)
 
 Bugfixes
 ^^^^^^^^
