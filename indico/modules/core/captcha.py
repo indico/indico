@@ -9,7 +9,7 @@ from flask import session
 from marshmallow import ValidationError, fields
 
 from indico.core.plugins import plugin_engine
-from indico.modules.events.registration.plugins import CaptchaPluginMixin
+from indico.modules.core.plugins import CaptchaPluginMixin
 from indico.util.i18n import _
 
 

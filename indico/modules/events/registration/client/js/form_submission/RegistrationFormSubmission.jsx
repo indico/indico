@@ -12,6 +12,7 @@ import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Message} from 'semantic-ui-react';
 
+import Captcha from 'indico/react/components/Captcha';
 import {
   FinalSubmitButton,
   handleSubmitError,
@@ -26,7 +27,6 @@ import ConsentToPublishDropdown from '../components/ConsentToPublishDropdown';
 import FormSection from '../form/FormSection';
 import {getNestedSections, getStaticData} from '../form/selectors';
 
-import Captcha from './Captcha';
 import {
   getUpdateMode,
   getModeration,
