@@ -85,6 +85,7 @@ Bugfixes
   thanks :user:`omegak`)
 - Fix misleading start and end times for Poster contributions in the timetable HTTP API
   and the contributions placeholder in emails (:pr:`5443`)
+- Do not mark persons as registered if the registration form has been deleted (:pr:`5448`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

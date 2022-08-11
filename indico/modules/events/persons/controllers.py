@@ -36,6 +36,7 @@ from indico.modules.events.persons.forms import EmailEventPersonsForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema
 from indico.modules.events.persons.views import WPManagePersons
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
@@ -111,7 +112,11 @@ class RHPersonsBase(RHManageEventBase):
                                           EventPerson.email == Registration.email))
         event_persons_query = (db.session.query(EventPerson, Registration)
                                .filter(EventPerson.event_id == self.event.id)
-                               .outerjoin(Registration, (Registration.event_id == self.event.id) & _reg_person_join)
+                               .outerjoin(Registration, db.and_(
+                                   Registration.event_id == self.event.id,
+                                   Registration.registration_form.has(~RegistrationForm.is_deleted),
+                                   _reg_person_join
+                               ))
                                .options(abstract_strategy,
                                         event_strategy,
                                         contribution_strategy,
@@ -192,8 +197,9 @@ class RHPersonsBase(RHManageEventBase):
 
         regs = (Registration.query
                 .with_parent(self.event)
+                .join(Registration.registration_form)
                 .filter(Registration.user_id.in_(data['person'].id for data in internal_role_users.values()),
-                        Registration.is_active)
+                        Registration.is_active, ~RegistrationForm.is_deleted)
                 .all())
         for reg in regs:
             internal_role_users[reg.user.email]['registrations'].append(reg)

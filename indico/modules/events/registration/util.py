@@ -811,10 +811,13 @@ def import_invitations_from_csv(regform, fileobj, email_from, email_subject, ema
 
 def get_registered_event_persons(event):
     """Get all registered EventPersons of an event."""
-    query = event.persons.join(Registration, and_(Registration.event_id == EventPerson.event_id,
-                                                  Registration.is_active,
-                                                  or_(Registration.user_id == EventPerson.user_id,
-                                                      Registration.email == EventPerson.email)))
+    query = (event.persons
+             .join(Registration, and_(Registration.event_id == EventPerson.event_id,
+                                      Registration.is_active,
+                                      or_(Registration.user_id == EventPerson.user_id,
+                                          Registration.email == EventPerson.email)))
+             .join(RegistrationForm, and_(RegistrationForm.id == Registration.registration_form_id,
+                                          ~RegistrationForm.is_deleted)))
     return set(query)
 
 
