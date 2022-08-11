@@ -157,7 +157,8 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
             field_data = item.view_data
         item_data[item.id] = field_data
     for item in regform.active_labels:
-        item_data[item.id] = item.view_data
+        if management or not item.parent.is_manager_only:
+            item_data[item.id] = item.view_data
     return {'sections': section_data, 'items': item_data}
 
 
