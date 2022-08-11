@@ -5,13 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import base64
-import random
-import string
-
 import requests
-from captcha.audio import AudioCaptcha
-from captcha.image import ImageCaptcha
 from flask import current_app, flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
@@ -32,7 +26,7 @@ from indico.core.sentry import submit_user_feedback
 from indico.core.settings import PrefixSettingsProxy
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
-from indico.modules.core.captcha import get_captcha_plugin
+from indico.modules.core.captcha import generate_captcha_challenge, get_captcha_plugin
 from indico.modules.core.forms import SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
@@ -344,18 +338,11 @@ class RHAPIGenerateCaptcha(RH):
     custom CAPTCHA plugins.
     """
 
-    def _generate_captcha(self):
-        """Built-in 4-digit CAPTCHA which supports both image and audio"""
-        answer = ''.join(random.choices(string.digits, k=4))
-        image = ImageCaptcha().generate(answer).read()
-        audio = AudioCaptcha().generate(answer)
-        return {'image': base64.b64encode(image), 'audio': base64.b64encode(audio)}, answer
-
     def _process_GET(self):
         if plugin := get_captcha_plugin():
             data = plugin.generate_captcha()
         else:
-            data, answer = self._generate_captcha()
+            data, answer = generate_captcha_challenge()
             session['captcha_state'] = answer
         rv = jsonify(data)
         # make sure browsers don't cache this. otherwise using the back button after successfully

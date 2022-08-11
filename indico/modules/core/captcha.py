@@ -5,6 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import base64
+import random
+
+from captcha.audio import AudioCaptcha
+from captcha.image import ImageCaptcha
 from flask import session
 from marshmallow import ValidationError, fields
 from wtforms.fields import StringField
@@ -21,7 +26,17 @@ def _verify_captcha(user_answer):
         return plugin.validate_captcha(user_answer)
     else:
         answer = session.get('captcha_state')
-        return bool(answer) and answer == user_answer
+        # 1 and 7 are too similar and we never use 1 in a challenge
+        return bool(answer) and answer == user_answer.replace('1', '7')
+
+
+def generate_captcha_challenge():
+    """Generate 4-digit CAPTCHA as image and audio"""
+    # we skip 1 since it's too similar to 7; when verifying we accept both digits
+    answer = ''.join(random.choices('023456789', k=4))
+    image = ImageCaptcha().generate(answer).read()
+    audio = AudioCaptcha().generate(answer)
+    return {'image': base64.b64encode(image), 'audio': base64.b64encode(audio)}, answer
 
 
 class CaptchaField(fields.String):
