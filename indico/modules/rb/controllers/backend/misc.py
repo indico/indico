@@ -69,6 +69,7 @@ class RHUserInfo(RHRoomBookingBase):
     def _process(self):
         data = rb_user_schema.dump(session.user)
         data['language'] = session.lang
+        data['momentLanguage'] = session.moment_lang
         return jsonify(data)
 
 
