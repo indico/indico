@@ -65,6 +65,8 @@ class RegistrationFormEditForm(IndicoForm):
                                  description=_('Users must be logged in to register'))
     require_user = BooleanField(_('Registrant must have account'), widget=SwitchWidget(),
                                 description=_('Registrations emails must be associated with an Indico account'))
+    require_captcha = BooleanField(_('Require CAPTCHA'), widget=SwitchWidget(),
+                                   description=_('When registering, users with no account have to answer a CAPTCHA'))
     limit_registrations = BooleanField(_('Limit registrations'), widget=SwitchWidget(),
                                        description=_('Whether there is a limit of registrations'))
     registration_limit = IntegerField(_('Capacity'), [HiddenUnless('limit_registrations'), DataRequired(),
@@ -73,7 +75,7 @@ class RegistrationFormEditForm(IndicoForm):
     modification_mode = IndicoEnumSelectField(_('Modification allowed'), enum=ModificationMode,
                                               description=_('Will users be able to modify their data? When?'))
     publish_registration_count = BooleanField(_('Publish number of registrations'), widget=SwitchWidget(),
-                                              description=_('Number of registered participants will be displayed in '
+                                              description=_('Number of registered participants will be displayed on '
                                                             'the event page'))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_('Check-in status will be shown publicly on the event page'))
@@ -548,8 +550,9 @@ class RegistrationPrivacyForm(IndicoForm):
         )
         if (
             self.regform and
-            self.regform.existing_registrations_count > 0 and
-            (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all)
+            (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all) and
+            Registration.query.with_parent(self.regform).filter(~Registration.is_deleted,
+                                                                ~Registration.created_by_manager).has_rows()
         ):
             raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
         if field.data[2] is not None and not field.data[2]:

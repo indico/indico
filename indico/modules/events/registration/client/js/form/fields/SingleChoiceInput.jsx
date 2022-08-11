@@ -116,6 +116,8 @@ function SingleChoiceDropdown({
           onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
           clearable={!isRequired}
           search
+          selectOnNavigation={false}
+          selectOnBlur={false}
         />
       </Form.Field>
       {extraSlotsDropdown}
@@ -159,7 +161,7 @@ function SingleChoiceRadioGroup({
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
-  const selectedChoice = choices.find(c => c.id in value) || {};
+  const selectedChoice = choices.find(c => c.id in value) || {id: ''};
   const radioChoices = [...choices];
   if (!isRequired) {
     radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
@@ -173,8 +175,7 @@ function SingleChoiceRadioGroup({
     }
   };
 
-  const isChecked = (currentChoice, idx) =>
-    currentChoice.id === selectedChoice.id || (idx === 0 && !selectedChoice.id);
+  const isChecked = currentChoice => currentChoice.id === selectedChoice.id;
 
   const isPaidChoice = choice => choice.price > 0 && paid;
   const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
@@ -182,7 +183,7 @@ function SingleChoiceRadioGroup({
   return (
     <table styleName="choice-table">
       <tbody>
-        {radioChoices.map((c, idx) => {
+        {radioChoices.map(c => {
           return (
             <tr key={c.id} styleName="row">
               <td>
@@ -203,7 +204,7 @@ function SingleChoiceRadioGroup({
                     (c.placesLimit > 0 &&
                       (placesUsed[c.id] || 0) - (existingValue[c.id] || 0) >= c.placesLimit)
                   }
-                  checked={!isPurged && isChecked(c, idx)}
+                  checked={!isPurged && isChecked(c)}
                   onChange={() => handleChange(c.id)}
                 />
               </td>
@@ -362,6 +363,11 @@ export default function SingleChoiceInput({
       format={v => v || {}}
       required={isRequired}
       isRequired={isRequired}
+      validate={v =>
+        isRequired && (!v || !Object.keys(v).length)
+          ? Translate.string('This field is required.')
+          : undefined
+      }
       disabled={disabled}
       isPurged={isPurged}
       itemType={itemType}

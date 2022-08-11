@@ -40,6 +40,8 @@ blinker==1.4
     #   sentry-sdk
 cachelib==0.9.0
     # via flask-caching
+captcha==0.4
+    # via -r requirements.in
 celery[redis]==5.2.7
     # via
     #   -r requirements.in
@@ -227,6 +229,7 @@ pickleshare==0.7.5
 pillow==9.2.0
     # via
     #   -r requirements.in
+    #   captcha
     #   reportlab
 prompt-toolkit==3.0.30
     # via

@@ -38,6 +38,7 @@ function Signup({
   emails,
   affiliationMeta,
   hasPendingUser,
+  mandatoryFields,
 }) {
   const handleSubmit = async (data, form) => {
     const values = getValuesForFields(data, form);
@@ -54,7 +55,10 @@ function Signup({
     try {
       resp = await indicoAxios.post(location.href, values);
     } catch (e) {
-      return handleSubmitError(e);
+      return handleSubmitError(
+        e,
+        hasPredefinedAffiliations ? {affiliation: 'affiliation_data'} : {}
+      );
     }
     location.href = resp.data.redirect;
     // never finish submitting to avoid fields being re-enabled
@@ -133,6 +137,7 @@ function Signup({
             {hasPredefinedAffiliations ? (
               <SyncedFinalAffiliationDropdown
                 name="affiliation_data"
+                required={moderated && mandatoryFields.includes('affiliation')}
                 syncName="affiliation"
                 syncedValues={syncedValues}
                 currentAffiliation={affiliationMeta}
@@ -141,6 +146,7 @@ function Signup({
               <SyncedFinalInput
                 name="affiliation"
                 label={Translate.string('Affiliation')}
+                required={moderated && mandatoryFields.includes('affiliation')}
                 syncedValues={syncedValues}
               />
             )}
@@ -189,8 +195,10 @@ function Signup({
                 </Translate>
               </Message>
               <FinalTextArea
+                required={mandatoryFields.includes('comment')}
                 name="comment"
                 initialValue=""
+                label={Translate.string('Comment')}
                 description={Translate.string(
                   'You can provide additional information or a comment for the administrators who will review your registration.'
                 )}
@@ -229,6 +237,7 @@ Signup.propTypes = {
   emails: PropTypes.arrayOf(PropTypes.string).isRequired,
   affiliationMeta: PropTypes.object,
   hasPendingUser: PropTypes.bool,
+  mandatoryFields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 Signup.defaultProps = {

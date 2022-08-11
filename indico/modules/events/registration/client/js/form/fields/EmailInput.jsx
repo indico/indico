@@ -12,7 +12,7 @@ import React, {useMemo, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Message} from 'semantic-ui-react';
 
-import {FinalInput} from 'indico/react/forms';
+import {FinalInput, validators as v} from 'indico/react/forms';
 import {useDebouncedAsyncValidate} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -123,7 +123,7 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
       name={htmlName}
       required={isRequired && isMainEmailField ? 'no-validator' : isRequired}
       disabled={disabled}
-      validate={isMainEmailField ? validateEmail : undefined}
+      validate={isMainEmailField ? validateEmail : isRequired ? v.required : undefined}
       // hide the normal error tooltip if we have an error from our async validation
       hideValidationError={
         isMainEmailField && message.status === 'error' && message.forEmail ? 'message' : false

@@ -51,6 +51,17 @@ Improvements
 - Allow events to be favorited (:issue:`1662`, :pr:`5338`, thanks :user:`Leats`)
 - Include abstract content in CSV/Excel export if enabled in the abstract list
   (:issue:`5356`, :pr:`5372`, thanks :user:`rppt`)
+- Add the ability to include an optional static javascript file when defining
+  custom conference themes from within a plugin (:pr:`5414`, thanks :user:`brittyazel`)
+- Add option to make the 'Affiliation' and 'Comment' fields mandatory in the account
+  request form (:issue:`4819`, :pr:`5389`, thanks :user:`elsbethe`)
+- Include tags in registrant API (:pr:`5441`)
+- Subcontribution speakers can now be granted submission privileges in the event's
+  protection settings (:issue:`2363`, :pr:`5444`)
+- Registration forms can now require a CAPTCHA when the user is not logged in
+  (:issue:`4698`, :pr:`5400`)
+- Account creation now requires a CAPTCHA by default to prevent spam account creation
+  (:issue:`4698`, :pr:`5446`)
 
 Bugfixes
 ^^^^^^^^
@@ -64,6 +75,17 @@ Bugfixes
 - Fix error when editing a room's nonbookable periods (:pr:`5390`)
 - Fix incorrect access check when directly accessing a registration form (:pr:`5406`)
 - Fix error in rate limiter when using Redis with a UNIX socket connection (:issue:`5391`)
+- Ensure that submitters with contribution edit privileges can only edit basic fields
+  (:pr:`5425`)
+- Do not return the whole contribution list when editing a contribution from elsewhere
+  (:pr:`5425`)
+- Fix session blocks not being sorted properly in a timetable PDF export when they
+  have the same start time (:pr:`5426`)
+- Fix printing badges containing text elements with malformed HTML (:pr:`5437`,
+  thanks :user:`omegak`)
+- Fix misleading start and end times for Poster contributions in the timetable HTTP API
+  and the contributions placeholder in emails (:pr:`5443`)
+- Do not mark persons as registered if the registration form has been deleted (:pr:`5448`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -76,6 +98,9 @@ Internal Changes
 - Add :data:`EMAIL_BACKEND` configuration variable to support different email sending
   backends e.g. during development (:issue:`5375`, :pr:`5376`, thanks :user:`Moist-Cat`)
 - Make model attrs to clone interceptable by plugins (:pr:`5403`, thanks :user:`omegak`)
+- Add ``signal_query`` method in the ``IndicoBaseQuery`` class and the ``db_query``
+  signal, allowing to intercept and modify queries by signal handlers (:pr:`4981`,
+  thanks :user:`omegak`).
 
 
 ----

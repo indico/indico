@@ -211,6 +211,10 @@ class WPBase(WPBundleMixin):
         """Return CSS urls that will be included after all other CSS."""
         return []
 
+    def get_extra_js_files(self):
+        """Return JS urls that will be included after all other JS."""
+        return []
+
     @classproperty
     @classmethod
     def bundles(cls):
@@ -258,7 +262,7 @@ class WPBase(WPBundleMixin):
         custom_js = list(current_app.manifest['__custom.js'])
         custom_css = list(current_app.manifest['__custom.css'])
         css_files = list(map(self._fix_path, self.get_extra_css_files() + custom_css))
-        js_files = list(map(self._fix_path, custom_js))
+        js_files = list(map(self._fix_path, self.get_extra_js_files() + custom_js))
 
         body = self._display(params)
         bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()

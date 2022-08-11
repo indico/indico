@@ -1,0 +1,15 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div id="{{ field.id }}"></div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupCaptchaWidget({
+            containerId: {{ field.id | tojson }},
+            name: {{ field.name | tojson }},
+            settings: {{ field.captcha_settings | tojson }},
+        });
+    </script>
+{% endblock %}

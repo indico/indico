@@ -104,7 +104,13 @@ export function SyncedFinalDropdown(props) {
 }
 
 // TODO: see if we can't converge with FinalAffiliationField to remove the duplicated code...
-export function SyncedFinalAffiliationDropdown({name, syncName, syncedValues, currentAffiliation}) {
+export function SyncedFinalAffiliationDropdown({
+  name,
+  required,
+  syncName,
+  syncedValues,
+  currentAffiliation,
+}) {
   const [_affiliationResults, setAffiliationResults] = useState([]);
   const affiliationResults =
     currentAffiliation && !_affiliationResults.find(x => x.id === currentAffiliation.id)
@@ -144,6 +150,10 @@ export function SyncedFinalAffiliationDropdown({name, syncName, syncedValues, cu
     <SyncedFinalField
       as={FinalComboDropdown}
       name={name}
+      required={required}
+      validate={v =>
+        required && !v?.text ? Translate.string('This field is required.') : undefined
+      }
       syncName={syncName}
       processSyncedValue={(value, values) => ({id: values.affiliation_id || null, text: value})}
       options={affiliationOptions}
@@ -163,12 +173,14 @@ export function SyncedFinalAffiliationDropdown({name, syncName, syncedValues, cu
 
 SyncedFinalAffiliationDropdown.propTypes = {
   name: PropTypes.string.isRequired,
+  required: PropTypes.bool,
   syncName: PropTypes.string,
   syncedValues: PropTypes.object.isRequired,
   currentAffiliation: PropTypes.object,
 };
 
 SyncedFinalAffiliationDropdown.defaultProps = {
+  required: false,
   syncName: null,
   currentAffiliation: null,
 };

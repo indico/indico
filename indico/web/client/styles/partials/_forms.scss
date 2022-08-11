@@ -154,6 +154,7 @@ form {
       input,
       select,
       textarea,
+      .ui.dropdown,
       .i-table-widget {
         @extend %input-invalid;
       }

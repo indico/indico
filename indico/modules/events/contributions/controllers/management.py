@@ -201,13 +201,15 @@ class RHEditContribution(RHManageContributionBase):
         check_event_locked(self, self.event)
 
     def _process(self):
+        can_manage = self.contrib.can_manage(session.user)
         contrib_form_class = make_contribution_form(self.event)
         custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.contrib.field_values}
         parent_session_block = (self.contrib.timetable_entry.parent.session_block
                                 if (self.contrib.timetable_entry and self.contrib.timetable_entry.parent) else None)
         form = contrib_form_class(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt,
                                                    **custom_field_values),
-                                  event=self.event, contrib=self.contrib, session_block=parent_session_block)
+                                  event=self.event, contrib=self.contrib, session_block=parent_session_block,
+                                  submitter_edit=(not can_manage))
         if form.validate_on_submit():
             with (
                 track_time_changes(),
@@ -216,13 +218,14 @@ class RHEditContribution(RHManageContributionBase):
             ):
                 update_contribution(self.contrib, *get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
+            if not can_manage or request.args.get('standalone') == '1':
+                return jsonify_data(flash=False)
             tpl_components = self.list_generator.render_list(self.contrib)
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(self.contrib)
             return jsonify_data(flash=(request.args.get('flash') == '1'), **tpl_components)
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.contrib)
-        can_manage = self.contrib.can_manage(session.user)
         self.commit = False
         return jsonify_template('events/contributions/forms/contribution.html', form=form, can_manage=can_manage)
 
@@ -362,14 +365,17 @@ class RHEditSubContribution(RHManageSubContributionBase):
         check_event_locked(self, self.event)
 
     def _process(self):
-        form = SubContributionForm(obj=FormDefaults(self.subcontrib), event=self.event, subcontrib=self.subcontrib)
+        can_manage = self.subcontrib.can_manage(session.user)
+        form = SubContributionForm(obj=FormDefaults(self.subcontrib), event=self.event, subcontrib=self.subcontrib,
+                                   submitter_edit=(not can_manage))
         if form.validate_on_submit():
             update_subcontribution(self.subcontrib, form.data)
             flash(_("Subcontribution '{}' updated successfully").format(self.subcontrib.title), 'success')
+            if not can_manage or request.args.get('standalone') == '1':
+                return jsonify_data(flash=False)
             return jsonify_data(html=_render_subcontribution_list(self.contrib))
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.subcontrib)
-        can_manage = self.subcontrib.can_manage(session.user)
         self.commit = False
         return jsonify_template('events/contributions/forms/subcontribution.html', form=form, can_manage=can_manage)
 

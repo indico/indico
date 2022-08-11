@@ -48,6 +48,9 @@
                                        {% if registration.state.name in ('rejected', 'withdrawn') %}style="text-decoration: line-through;"{% endif %}>
                                         {{- registration.display_full_name -}}
                                     </a>
+                                    {%- if registration.created_by_manager %}
+                                        <i class="icon-user-chairperson text-not-important" title="{% trans %}This user has been registered by an event manager.{% endtrans %}"></i>
+                                    {%- endif -%}
                                 </td>
                                 {% for item in static_columns if not item.get('filter_only') %}
                                     {% if item.id == 'reg_date' %}

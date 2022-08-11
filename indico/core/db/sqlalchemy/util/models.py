@@ -19,7 +19,9 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
+from indico.core import signals
 from indico.util.packaging import get_package_root_path
+from indico.util.signals import values_from_signal
 
 
 _ModelT = t.TypeVar('_ModelT', bound='IndicoModel')
@@ -59,6 +61,20 @@ class IndicoBaseQuery(BaseQuery):
         returns either `True` or `False`.
         """
         return self.session.query(self.enable_eagerloads(False).exists()).scalar()
+
+    def signal_query(self, query_name, **kwargs):
+        """Return a query object that may have been modified by a signal handler.
+
+        :param query_name: A descriptive name to provide context to signal handlers.
+        :return: A query object.
+        """
+        queries = values_from_signal(signals.core.db_query.send(query_name, query=self, **kwargs), as_list=True)
+        if not queries:
+            return self
+        elif len(queries) == 1:
+            return queries[0]
+        else:
+            raise RuntimeError(f'Only one subscriber can customize the "{query_name}" query ({len(queries)} found)')
 
 
 class IndicoModel(Model):

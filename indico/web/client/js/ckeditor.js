@@ -68,6 +68,7 @@ export const getConfig = ({images = true} = {}) => ({
     images && 'Image',
     images && 'ImageCaption',
     images && 'OnlyInsertImage',
+    images && 'ImageResize',
     images && 'ImageStyle',
     images && 'ImageToolbar',
     'Indent',
@@ -85,8 +86,19 @@ export const getConfig = ({images = true} = {}) => ({
     'Superscript',
     'Table',
     'TableToolbar',
+    'TableProperties',
+    'TableCellProperties',
     'Underline',
   ].filter(Boolean),
+  table: {
+    contentToolbar: [
+      'tableColumn',
+      'tableRow',
+      'mergeTableCells',
+      'tableProperties',
+      'tableCellProperties',
+    ],
+  },
   htmlSupport: {
     allow: [
       {name: 'dl'},

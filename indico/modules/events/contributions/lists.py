@@ -15,6 +15,7 @@ from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import ListGeneratorBase
@@ -80,7 +81,9 @@ class ContributionListGenerator(ListGeneratorBase):
                 .filter(Contribution.event_id == self.event.id)
                 .join(ContributionPersonLink)
                 .join(EventPerson)
-                .join(Registration, db.and_(*registration_join_criteria)))
+                .join(Registration, db.and_(*registration_join_criteria))
+                .join(RegistrationForm, db.and_(RegistrationForm.id == Registration.registration_form_id,
+                                                ~RegistrationForm.is_deleted)))
 
     def _filter_list_entries(self, query, filters):
         if not filters.get('items'):

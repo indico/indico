@@ -42,7 +42,7 @@
                             {% trans %}Create new account{% endtrans %}
                         </a>
                     </div>
-                    {% if num_reg_requests or indico_config.LOCAL_MODERATION %}
+                    {% if num_reg_requests or has_moderation %}
                         <div class="group">
                             <a class="i-button icon-info" href="{{ url_for('.registration_request_list') }}">
                                 {% trans %}Registration requests{% endtrans %}

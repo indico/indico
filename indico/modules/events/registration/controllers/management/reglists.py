@@ -296,7 +296,8 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     registration=None,
                                                     management=True,
                                                     login_required=False,
-                                                    is_restricted_access=False)
+                                                    is_restricted_access=False,
+                                                    captcha_required=False)
 
 
 class RHRegistrationCreateMultiple(RHManageRegFormBase):
@@ -469,6 +470,9 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     def _filter_registrations(self, registrations):
         return registrations
 
+    def _get_event_badge_settings(self, event):
+        return event_badge_settings.get_all(event.id)
+
     def _process(self):
         all_templates = set(self.event.designer_templates) | get_inherited_templates(self.event)
         badge_templates = {tpl.id: {
@@ -477,7 +481,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             'orientation': 'landscape' if tpl.data['width'] > tpl.data['height'] else 'portrait',
             'format': get_badge_format(tpl)
         } for tpl in all_templates if tpl.type.name == 'badge'}
-        settings = event_badge_settings.get_all(self.event.id)
+        settings = self._get_event_badge_settings(self.event)
         form = BadgeSettingsForm(self.event, template=self.template_id, tickets=self.TICKET_BADGES, **settings)
         all_registrations = [r for r in (self.registrations or self.regform.registrations) if r.is_active]
         registrations = self._filter_registrations(all_registrations)

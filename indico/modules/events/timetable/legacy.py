@@ -156,7 +156,7 @@ class TimetableSerializer:
                      'contributionId': contribution.id,
                      'attachments': self._get_attachment_data(contribution),
                      'description': contribution.description,
-                     'duration': contribution.duration.seconds / 60,
+                     'duration': contribution.duration_display.seconds / 60,
                      'pdf': url_for('contributions.export_pdf', entry.contribution),
                      'presenters': list(map(self._get_person_data,
                                             sorted((p for p in contribution.person_links if p.is_speaker),
@@ -226,8 +226,14 @@ class TimetableSerializer:
             tzinfo = entry.event.tzinfo
         else:
             tzinfo = entry.event.display_tzinfo
-        return {'startDate': self._get_entry_date_dt(entry.start_dt, tzinfo),
-                'endDate': self._get_entry_date_dt(entry.end_dt, tzinfo)}
+        if entry.type == TimetableEntryType.CONTRIBUTION:
+            start_dt = entry.contribution.start_dt_display
+            end_dt = entry.contribution.end_dt_display
+        else:
+            start_dt = entry.start_dt
+            end_dt = entry.end_dt
+        return {'startDate': self._get_entry_date_dt(start_dt, tzinfo),
+                'endDate': self._get_entry_date_dt(end_dt, tzinfo)}
 
     def _get_entry_data(self, entry):
         from indico.modules.events.timetable.operations import can_swap_entry

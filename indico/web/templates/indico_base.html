@@ -7,7 +7,7 @@
     <title>
         {%- if page_title %}{{ page_title }} · {% endif %}
         {{- site_name -}}
-        {% if site_name != 'Indico' %} (Indico){% endif -%}
+        {% if 'Indico' not in site_name %} (Indico){% endif -%}
     </title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

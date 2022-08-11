@@ -1,0 +1,23 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2022 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.captcha {
+  display: flex;
+  align-items: center;
+  margin-top: 2em;
+  gap: 2em;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+
+  :global(.ui.error.message) {
+    margin-bottom: 0;
+  }
+}

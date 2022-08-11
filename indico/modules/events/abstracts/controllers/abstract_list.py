@@ -46,6 +46,7 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
     """Base class for RHs performing actions on selected abstracts."""
 
     _abstract_query_options = ()
+    _allow_get_all = False
 
     @property
     def _abstract_query(self):
@@ -56,8 +57,13 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
 
     def _process_args(self):
         RHAbstractListBase._process_args(self)
-        ids = request.form.getlist('abstract_id', type=int)
-        self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
+        query = self._abstract_query
+        if request.method == 'POST' or not self._allow_get_all:
+            # if it's POST we filter by abstract ids; otherwise we assume
+            # the user wants everything (e.g. API-like usage via personal token)
+            ids = request.form.getlist('abstract_id', type=int)
+            query = query.filter(Abstract.id.in_(ids))
+        self.abstracts = query.all()
 
 
 class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
@@ -227,6 +233,7 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
 
 class RHManageAbstractsExportActionsBase(RHManageAbstractsActionsBase):
     ALLOW_LOCKED = True
+    _allow_get_all = True
 
 
 class RHAbstractsDownloadAttachments(AbstractsDownloadAttachmentsMixin, RHManageAbstractsExportActionsBase):

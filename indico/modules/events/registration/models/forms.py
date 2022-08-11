@@ -125,6 +125,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether to show captcha for users without an account
+    require_captcha = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     #: Maximum number of registrations allowed
     registration_limit = db.Column(
         db.Integer,

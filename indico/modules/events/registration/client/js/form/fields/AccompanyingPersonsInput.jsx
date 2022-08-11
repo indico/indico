@@ -263,6 +263,11 @@ AccompanyingPersonsInput.defaultProps = {
   maxPersons: null,
 };
 
+export const accompanyingPersonsSettingsInitialData = {
+  maxPersons: 1,
+  personsCountAgainstLimit: false,
+};
+
 export function AccompanyingPersonsSettings() {
   return (
     <>
@@ -274,7 +279,6 @@ export function AccompanyingPersonsSettings() {
         step="1"
         min="0"
         validate={v.optional(v.min(0))}
-        defaultValue="1"
         fluid
         format={val => val || ''}
         parse={val => +val || 0}

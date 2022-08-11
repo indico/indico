@@ -240,6 +240,13 @@ class Registration(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether the registration was created by a manager
+    created_by_manager = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
     #: The Event containing this registration
     event = db.relationship(
         'Event',

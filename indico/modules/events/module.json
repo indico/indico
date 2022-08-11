@@ -1,14 +1,14 @@
 {
-    "name": "events",
-    "produceBundle": false,
-    "partials": {
-        "cloning": "./cloning",
-        "creation": "./creation",
-        "display": "./display",
-        "header": "./header",
-        "importing": "./importing",
-        "layout": "./layout",
-        "roles": "./roles",
-        "search": "./search"
-    }
+  "name": "events",
+  "produceBundle": false,
+  "partials": {
+    "cloning": "./cloning",
+    "creation": "./creation",
+    "display": "./display",
+    "header": "./header",
+    "importing": "./importing",
+    "layout": "./layout",
+    "roles": "./roles",
+    "search": "./search"
+  }
 }

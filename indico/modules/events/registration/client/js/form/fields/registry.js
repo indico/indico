@@ -13,7 +13,10 @@ import AccommodationInput, {
   accommodationSettingsInitialData,
   accommodationSettingsFormValidator,
 } from './AccommodationInput';
-import AccompanyingPersonsInput, {AccompanyingPersonsSettings} from './AccompanyingPersonsInput';
+import AccompanyingPersonsInput, {
+  AccompanyingPersonsSettings,
+  accompanyingPersonsSettingsInitialData,
+} from './AccompanyingPersonsInput';
 import BooleanInput, {BooleanSettings} from './BooleanInput';
 import CheckboxInput, {CheckboxSettings} from './CheckboxInput';
 import {choiceFieldsSettingsFormDecorator} from './ChoicesSetup';
@@ -171,6 +174,7 @@ const fieldRegistry = {
     title: Translate.string('Accompanying Persons'),
     inputComponent: AccompanyingPersonsInput,
     settingsComponent: AccompanyingPersonsSettings,
+    settingsFormInitialData: accompanyingPersonsSettingsInitialData,
     settingsModalSize: 'tiny',
     noRequired: true,
     hasPrice: true,

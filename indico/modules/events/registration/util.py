@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import IndicoSchema
+from indico.modules.core.captcha import CaptchaField
 from indico.modules.events import EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
@@ -156,7 +157,8 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
             field_data = item.view_data
         item_data[item.id] = field_data
     for item in regform.active_labels:
-        item_data[item.id] = item.view_data
+        if management or not item.parent.is_manager_only:
+            item_data[item.id] = item.view_data
     return {'sections': section_data, 'items': item_data}
 
 
@@ -283,7 +285,7 @@ class RegistrationSchemaBase(IndicoSchema):
         unknown = RAISE
 
 
-def make_registration_schema(regform, management=False, registration=None):
+def make_registration_schema(regform, management=False, registration=None, captcha_required=False):
     """Dynamically create a Marshmallow schema based on the registration form fields."""
     class RegistrationSchema(RegistrationSchemaBase):
         @validates('email')
@@ -298,6 +300,9 @@ def make_registration_schema(regform, management=False, registration=None):
         schema['notify_user'] = fields.Boolean()
     elif regform.needs_publish_consent:
         schema['consent_to_publish'] = EnumField(RegistrationVisibility)
+
+    if captcha_required:
+        schema['captcha'] = CaptchaField()
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
@@ -334,19 +339,18 @@ def create_personal_data_fields(regform):
 def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
-                                base_price=regform.base_price, currency=regform.currency)
+                                base_price=regform.base_price, currency=regform.currency, created_by_manager=management)
     if skip_moderation is None:
         skip_moderation = management
     for form_item in regform.active_fields:
+        if form_item.is_purged:
+            # Leave the registration data empty
+            continue
         default = form_item.field_impl.default_value
         can_modify = management or not form_item.parent.is_manager_only
         value = data.get(form_item.html_field_name, default) if can_modify else default
         data_entry = RegistrationData()
         registration.data.append(data_entry)
-        if form_item.is_purged:
-            # Leave the registration data empty
-            continue
-
         for attr, value in form_item.field_impl.process_form_data(registration, value).items():
             setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
@@ -588,7 +592,8 @@ def _build_base_registration_info(registration):
         'checked_in': registration.checked_in,
         'checkin_secret': registration.ticket_uuid,
         'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name).strip(),
-        'personal_data': personal_data
+        'personal_data': personal_data,
+        'tags': sorted(t.title for t in registration.tags),
     }
 
 
@@ -806,10 +811,13 @@ def import_invitations_from_csv(regform, fileobj, email_from, email_subject, ema
 
 def get_registered_event_persons(event):
     """Get all registered EventPersons of an event."""
-    query = event.persons.join(Registration, and_(Registration.event_id == EventPerson.event_id,
-                                                  Registration.is_active,
-                                                  or_(Registration.user_id == EventPerson.user_id,
-                                                      Registration.email == EventPerson.email)))
+    query = (event.persons
+             .join(Registration, and_(Registration.event_id == EventPerson.event_id,
+                                      Registration.is_active,
+                                      or_(Registration.user_id == EventPerson.user_id,
+                                          Registration.email == EventPerson.email)))
+             .join(RegistrationForm, and_(RegistrationForm.id == Registration.registration_form_id,
+                                          ~RegistrationForm.is_deleted)))
     return set(query)
 
 

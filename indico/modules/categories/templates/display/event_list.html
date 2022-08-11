@@ -122,7 +122,7 @@
                                     </span>
                                 {% endif %}
                                 {% if event.is_self_protected %}
-                                    <span data-type="restricted">({% trans %}protected{% endtrans %})</span>
+                                    <span class="icon-shield" data-type="restricted" title="{% trans %}Protected{% endtrans %}"></span>
                                 {% endif %}
 
                                 {% if is_recent(event.created_dt) %}
