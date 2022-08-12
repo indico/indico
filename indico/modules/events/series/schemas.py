@@ -21,7 +21,7 @@ class EventSeriesSchema(mm.SQLAlchemyAutoSchema):
         model = EventSeries
         fields = ('id', 'events', 'show_sequence_in_title', 'show_links')
 
-    id = fields.Int(data_key='series_id')
+    id = fields.Int()
     events = fields.List(fields.Nested(EventDetailsSchema))
 
 

@@ -25,7 +25,7 @@ class RHEventSeries(RH):
                 raise NotFound(_('A series with this ID does not exist.'))
 
     def _process_GET(self):
-        return EventSeriesSchema(exclude=('id',)).dump(self.series)
+        return EventSeriesSchema().dump(self.series)
 
     @use_rh_args(EventSeriesUpdateSchema)
     def _process_PATCH(self, changes):
