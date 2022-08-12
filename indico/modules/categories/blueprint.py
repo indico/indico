@@ -11,7 +11,8 @@ from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryCalendarView, RHCategoryCalendarViewEvents,
                                                            RHCategoryIcon, RHCategoryInfo, RHCategoryLogo,
-                                                           RHCategoryOverview, RHCategorySearch, RHCategoryStatistics,
+                                                           RHCategoryManagedEventSearch, RHCategoryOverview,
+                                                           RHCategorySearch, RHCategoryStatistics,
                                                            RHCategoryStatisticsJSON, RHCategoryUpcomingEvent,
                                                            RHDisplayCategory, RHEventList, RHExportCategoryAtom,
                                                            RHExportCategoryICAL, RHReachableCategoriesInfo,
@@ -106,6 +107,7 @@ _bp.add_url_rule('!/c/<int:category_id>', view_func=redirect_view('.display'), s
 # Internal API
 _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
 _bp.add_url_rule('/api/event-move-requests', 'api_event_move_requests', RHAPIEventMoveRequests, methods=('GET', 'POST'))
+_bp.add_url_rule('/api/events/search-for-series', 'event_search', RHCategoryManagedEventSearch)
 
 # Administration
 _bp.add_url_rule('!/admin/upcoming-events', 'manage_upcoming', RHManageUpcomingEvents, methods=('GET', 'POST'))

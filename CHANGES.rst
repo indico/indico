@@ -63,6 +63,7 @@ Improvements
 - Account creation now requires a CAPTCHA by default to prevent spam account creation
   (:issue:`4698`, :pr:`5446`)
 - Add contribution's program code to revision's "Download ZIP" filename (:pr:`5449`)
+- Add UI to manage series of events (:issue:`4048`, :pr:`5436`, thanks :user:`Leats`)
 
 Bugfixes
 ^^^^^^^^

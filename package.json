@@ -45,6 +45,7 @@
     "lodash": "^4.17.21",
     "mathjax": "^2.7.9",
     "moment": "^2.29.4",
+    "moment-timezone": "^0.5.34",
     "nanoid": "^3.3.4",
     "pagedown": "^1.1.0",
     "pagedown-editor": "0.0.10",

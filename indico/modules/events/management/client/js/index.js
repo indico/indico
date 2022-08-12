@@ -20,6 +20,7 @@ import './badges';
 import {$T} from 'indico/utils/i18n';
 
 import {SingleEventMove, EventPublish} from './EventMove';
+import {SeriesManagement} from './SeriesManagement';
 
 (function(global) {
   global.setupEventManagementActionMenu = function setupEventManagementActionMenu() {
@@ -32,6 +33,23 @@ import {SingleEventMove, EventPublish} from './EventMove';
           hasPendingMoveRequest: moveContainer.dataset.pendingRequest !== undefined,
         }),
         moveContainer
+      );
+    }
+
+    const manageSeriesContainer = document.querySelector('#event-action-manage-series-container');
+    if (manageSeriesContainer) {
+      const seriesId =
+        manageSeriesContainer.dataset.seriesId !== undefined
+          ? +manageSeriesContainer.dataset.seriesId
+          : null;
+      ReactDOM.render(
+        React.createElement(SeriesManagement, {
+          eventId: +manageSeriesContainer.dataset.eventId,
+          categoryId: +manageSeriesContainer.dataset.categoryId,
+          timezone: manageSeriesContainer.dataset.timezone,
+          seriesId,
+        }),
+        manageSeriesContainer
       );
     }
 
