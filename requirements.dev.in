@@ -1,5 +1,4 @@
 -c requirements.txt
-flake8-colors
 flake8-quotes
 flake8
 flask-url-map-serializer
