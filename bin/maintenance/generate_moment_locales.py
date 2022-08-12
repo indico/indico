@@ -47,9 +47,11 @@ The list of moment locales is read from the current version of moment installed
 in Indico's node_modules directory.
 
 You can specify the output file:
+
     ./bin/maintenance/generate_moment_locales.py -o moment_locales.yaml
 
-The generated file should be placed in the Indico root directory.
+The generated file should be placed in the Indico root directory (which is done
+by default).
 '''
 
 
@@ -75,7 +77,7 @@ def to_moment(locale):
 
 
 @click.command(help=USAGE)
-@click.option('--output', '-o', type=click.Path(), help='Output file')
+@click.option('--output', '-o', type=click.Path(), default='indico/moment_locales.yaml', help='Output file')
 def generate(output):
     canonical = load_canonical_locales()
     moment = load_moment_locales()
