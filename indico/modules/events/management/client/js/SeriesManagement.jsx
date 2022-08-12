@@ -19,7 +19,6 @@ import {
   Dimmer,
   Divider,
   Dropdown,
-  Form,
   Icon,
   List,
   Loader,
@@ -42,9 +41,8 @@ const debounceSingle = makeAsyncDebounce(250);
 export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
   const [open, setOpen] = useState(false);
   const [currentEvents, setCurrentEvents] = useState([]);
-  const [keyword, setKeyword] = useState(undefined);
+  const [searchQuery, setSearchQuery] = useState(undefined);
   const [results, setResults] = useState([]);
-  const [isSearchOpen, setSearchOpen] = useState(false);
   const [isSearching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -57,14 +55,7 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
 
   const onClose = () => {
     setOpen(false);
-    setKeyword(undefined);
     setCurrentEvents([]);
-    setResults([]);
-  };
-
-  const onSearchClose = () => {
-    setKeyword(undefined);
-    setSearchOpen(false);
     setResults([]);
   };
 
@@ -119,31 +110,26 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
     setSearching(false);
   };
 
-  const onSearch = async (evt, {searchQuery}) => {
-    if (!searchQuery) {
+  const onSearch = async (evt, {searchQuery: query}) => {
+    query = query.trim();
+    setSearchQuery(query);
+    setDenialReason(null);
+    if (!query) {
       setSearching(false);
       setResults([]);
-      setDenialReason(null);
       return;
     }
     const regexUrl = new RegExp(`^${location.origin.replace('/', '\\/')}\\/event\\/([0-9]+)`);
-    const match = searchQuery.match(regexUrl);
+    const match = query.match(regexUrl);
     if (match) {
       setSearching(true);
       getSingleEventInfo(match[1], setResults);
-    } else if (/^#([0-9])+$/.test(searchQuery)) {
+    } else if (/^#([0-9])+$/.test(query)) {
       setSearching(true);
-      getSingleEventInfo(searchQuery.substr(1), setResults);
-    } else if (searchQuery !== '#') {
+      getSingleEventInfo(query.substr(1), setResults);
+    } else if (query !== '#') {
       setSearching(true);
-      getEventsSearch(searchQuery);
-    }
-    setSearchOpen(true);
-  };
-
-  const handleSubmit = () => {
-    if (keyword.trim()) {
-      onSearch(keyword.trim());
+      getEventsSearch(query);
     }
   };
 
@@ -162,7 +148,7 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
           {evt.title}
           <br />
           <TooltipIfTruncated>
-            <span>
+            <span styleName="category-chain">
               {evt.categoryChain ? evt.categoryChain.join(' » ') : <Translate>Unlisted</Translate>}
             </span>
           </TooltipIfTruncated>
@@ -189,13 +175,6 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
         </span>
       </div>
     ),
-    onClick: (_, {disabled}) => {
-      if (!disabled) {
-        setCurrentEvents(
-          [...currentEvents, evt].sort((a, b) => moment(a.startDt) - moment(b.startDt))
-        );
-      }
-    },
   }));
 
   const submitSeries = async () => {
@@ -270,34 +249,37 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
           <Translate>Manage series</Translate>
         </Modal.Header>
         <Modal.Content>
-          <Form onSubmit={handleSubmit}>
-            <Dropdown
-              fluid
-              selection
-              search={x => x}
-              icon="search"
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              placeholder={Translate.string(
-                'Search for an event title or paste an event URL or event ID (#123)'
-              )}
-              options={eventOptions}
-              value={null}
-              open={isSearchOpen}
-              loading={isSearching}
-              onSearchChange={onSearch}
-              onFocus={() => setSearchOpen(true)}
-              onBlur={() => setSearchOpen(false)}
-              onClose={onSearchClose}
-              noResultsMessage={
-                isSearching
-                  ? Translate.string('Searching...')
-                  : denialReason !== null
-                  ? denialReason
-                  : Translate.string('No results found.')
-              }
-            />
-          </Form>
+          <Dropdown
+            fluid
+            selection
+            search={x => x}
+            icon="search"
+            selectOnBlur={false}
+            selectOnNavigation={false}
+            placeholder={Translate.string(
+              'Search for an event title or paste an event URL or event ID (#123)'
+            )}
+            options={eventOptions}
+            value={null}
+            loading={isSearching}
+            onSearchChange={onSearch}
+            searchQuery={searchQuery}
+            onChange={(_, {value}) => {
+              const event = results.find(evt => evt.id === value);
+              setCurrentEvents(
+                [...currentEvents, event].sort((a, b) => moment(a.startDt) - moment(b.startDt))
+              );
+            }}
+            noResultsMessage={
+              isSearching
+                ? Translate.string('Searching...')
+                : denialReason !== null
+                ? denialReason
+                : searchQuery
+                ? Translate.string('No results found.')
+                : Translate.string('Enter search term')
+            }
+          />
           <Divider horizontal>
             {hasSeries ? (
               <Translate>Events in series</Translate>

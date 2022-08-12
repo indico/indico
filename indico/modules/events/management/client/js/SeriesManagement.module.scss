@@ -8,11 +8,12 @@
 @import 'base/palette';
 
 :global(.ui.list).evt-list {
-  :global(.item).evt-item {
-    margin: 0 -10px;
+  max-height: 30vh;
+  overflow-y: auto;
 
+  :global(.item).evt-item {
     .detail {
-      margin-top: 7px;
+      margin-top: 2px;
       width: 350px;
       display: inline-block;
       overflow: hidden;
@@ -22,8 +23,7 @@
     }
 
     .delete-button {
-      align-self: center;
-      margin-left: auto;
+      flex-shrink: 0;
     }
   }
 }
@@ -31,7 +31,7 @@
 .list-flex {
   display: flex;
   justify-content: start;
-  margin: 7px 0;
+  gap: 15px;
 
   &.disabled {
     background-color: $pastel-gray;
@@ -39,14 +39,18 @@
 }
 
 .date-span {
-  width: 15%;
-  margin-right: 7px;
+  flex-basis: 10%;
+  flex-shrink: 0;
   font-size: 12px;
   color: $dark-gray;
 }
 
+.category-chain {
+  color: $dark-gray;
+}
+
 .event-title {
-  width: 75%;
+  flex-grow: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
