@@ -45,11 +45,13 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
   const [keyword, setKeyword] = useState(undefined);
   const [results, setResults] = useState([]);
   const [isSearchOpen, setSearchOpen] = useState(false);
+  const [isSearching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [denialReason, setDenialReason] = useState(null);
   const [showSequenceInTitle, setShowSequenceInTitle] = useState(true);
   const [showLinksToOtherEvents, setShowLinksToOtherEvents] = useState(true);
+
   const localMoment = dt => moment(dt).tz(timezone);
   const hasSeries = seriesId !== null;
 
@@ -97,8 +99,10 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
     } else {
       r([resp.data]);
       setDenialReason(null);
+      setSearching(false);
       return;
     }
+    setSearching(false);
     r([]);
   };
 
@@ -112,21 +116,26 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
     }
     setResults(camelizeKeys(resp.data));
     setDenialReason(null);
+    setSearching(false);
   };
 
   const onSearch = async (evt, {searchQuery}) => {
     if (!searchQuery) {
+      setSearching(false);
       setResults([]);
       setDenialReason(null);
       return;
     }
-    const regexUrl = new RegExp(`^${location.origin.replace('/', '\\/')}\\/event\\/[0-9]+`);
+    const regexUrl = new RegExp(`^${location.origin.replace('/', '\\/')}\\/event\\/([0-9]+)`);
     const match = searchQuery.match(regexUrl);
     if (match) {
+      setSearching(true);
       getSingleEventInfo(match[1], setResults);
     } else if (/^#([0-9])+$/.test(searchQuery)) {
+      setSearching(true);
       getSingleEventInfo(searchQuery.substr(1), setResults);
-    } else {
+    } else if (searchQuery !== '#') {
+      setSearching(true);
       getEventsSearch(searchQuery);
     }
     setSearchOpen(true);
@@ -141,9 +150,11 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
   const eventOptions = results.map(evt => ({
     key: evt.id,
     value: evt.id,
-    meta: evt,
     text: evt.title,
-    disabled: !evt.canManage || evt.seriesId !== null || !!currentEvents.find(e => e.id === evt.id),
+    disabled:
+      !evt.canManage ||
+      (evt.seriesId !== seriesId && evt.seriesId !== null) ||
+      currentEvents.some(e => e.id === evt.id),
     content: (
       <div styleName="list-flex">
         <span styleName="date-span">{localMoment(evt.startDt).format('ll')}</span>
@@ -161,12 +172,14 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
               <Translate>You do not have editing rights for this event.</Translate>
             </span>
           )}
-          {evt.seriesId !== null && !currentEvents.find(e => e.id === evt.id) && (
-            <span styleName="warning-reason">
-              <br />
-              <Translate>This event is already part of a different series.</Translate>
-            </span>
-          )}
+          {evt.seriesId !== seriesId &&
+            evt.seriesId !== null &&
+            !currentEvents.find(e => e.id === evt.id) && (
+              <span styleName="warning-reason">
+                <br />
+                <Translate>This event is already part of a different series.</Translate>
+              </span>
+            )}
           {currentEvents.find(e => e.id === evt.id) && (
             <span styleName="positive-note">
               <br />
@@ -176,10 +189,10 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
         </span>
       </div>
     ),
-    onClick: (_, e) => {
-      if (evt.canManage && evt.seriesId === null && !currentEvents.find(ee => ee.id === evt.id)) {
+    onClick: (_, {disabled}) => {
+      if (!disabled) {
         setCurrentEvents(
-          [...currentEvents, e.meta].sort((a, b) => moment(a.startDt) - moment(b.startDt))
+          [...currentEvents, evt].sort((a, b) => moment(a.startDt) - moment(b.startDt))
         );
       }
     },
@@ -271,14 +284,18 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
               options={eventOptions}
               value={null}
               open={isSearchOpen}
+              loading={isSearching}
               onSearchChange={onSearch}
               onFocus={() => setSearchOpen(true)}
               onBlur={() => setSearchOpen(false)}
               onClose={onSearchClose}
               noResultsMessage={
-                denialReason !== null ? denialReason : Translate.string('No results found.')
+                isSearching
+                  ? Translate.string('Searching...')
+                  : denialReason !== null
+                  ? denialReason
+                  : Translate.string('No results found.')
               }
-              minCharacters={3}
             />
           </Form>
           <Divider horizontal>
