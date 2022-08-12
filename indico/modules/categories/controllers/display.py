@@ -202,7 +202,7 @@ class RHCategoryManagedEventSearch(RHCategoryBase):
         from indico.modules.events.series.schemas import EventDetailsForSeriesManagementSchema
         query = (
             Event.query.with_parent(self.category)
-            .filter(Event.title_matches(q), Event.series_id.is_(None), ~Event.is_deleted)
+            .filter(Event.title_matches(q), ~Event.is_deleted)
             .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_chain'))
         )
         # Prefer favorite events
