@@ -8,7 +8,7 @@
 
 {% macro _render_change_event_type(event, event_types) %}
     <button class="i-button borderless icon-wrench arrow js-dropdown hide-if-locked" data-toggle="dropdown">
-        {% trans %}Change type{% endtrans %}
+        {%- trans %}Change type{% endtrans -%}
     </button>
     <ul class="i-dropdown">
         {% for type, title in event_types %}
@@ -38,12 +38,12 @@
         {% if event.is_locked %}
             <button class="i-button borderless icon-lock-center disabled"
                     title="{% trans %}Only the event creator and category managers may unlock an event.{% endtrans %}">
-                {% trans %}Unlock{% endtrans %}
+                {%- trans %}Unlock{% endtrans -%}
             </button>
         {% else %}
             <button class="i-button borderless icon-lock-center disabled"
                     title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}">
-                {% trans %}Lock{% endtrans %}
+                {%- trans %}Lock{% endtrans -%}
             </button>
         {% endif %}
     {% else %}
@@ -55,7 +55,7 @@
                     data-method="POST"
                     data-reload-after
                     data-ajax>
-                {% trans %}Unlock{% endtrans %}
+                {%- trans %}Unlock{% endtrans -%}
             </button>
         {% else %}
             <button class="i-button borderless icon-lock-center warning"
@@ -64,7 +64,7 @@
                     data-href="{{ url_for('event_management.lock', event) }}"
                     data-reload-after
                     data-ajax-dialog>
-                {% trans %}Lock{% endtrans %}
+                {%- trans %}Lock{% endtrans -%}
             </button>
         {% endif %}
     {% endif %}
@@ -97,7 +97,7 @@
             data-qtip-style="danger"
             data-href="{{ url_for('event_management.delete', event) }}"
             data-ajax-dialog>
-        {% trans %}Delete{% endtrans %}
+        {%- trans %}Delete{% endtrans -%}
     </button>
 {% endmacro %}
 
@@ -108,7 +108,7 @@
             data-title="{% trans %}Import from other event{% endtrans %}"
             data-href="{{ url_for('event_management.import', event) }}"
             data-ajax-dialog>
-        {% trans %}Import{% endtrans %}
+        {%- trans %}Import{% endtrans -%}
     </button>
 {% endmacro %}
 
