@@ -77,7 +77,7 @@ export function SeriesManagement({eventId, categoryId, seriesId, timezone}) {
   const getSingleEventInfo = async (evtId, r) => {
     let resp;
     try {
-      resp = await debounceSingle(() => indicoAxios.get(singleEventAPI({event_id: evtId})));
+      resp = await debounceSingle(() => indicoAxios.get(singleEventAPI({event_id: +evtId})));
       resp = camelizeKeys(resp);
     } catch (error) {
       handleAxiosError(error);
