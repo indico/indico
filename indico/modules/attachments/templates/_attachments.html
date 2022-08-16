@@ -47,7 +47,7 @@
                         {% trans name=attachment.title %}Edit file &quot;{{ name }}&quot;{% endtrans %}
                     {% else %}
                         {% trans name=attachment.title %}Edit link &quot;{{ name }}&quot;{% endtrans %}
-                    {% endif -%}"></a>></a>
+                    {% endif -%}"></a>
                 <a href="#" class="icon-remove js-delete"
                    data-method="DELETE"
                    data-href="{{ url_for('attachments.delete_attachment', attachment) }}"
