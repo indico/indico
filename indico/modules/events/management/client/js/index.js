@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global setupSearchBox:false, strnatcmp:false, cornerMessage:false, handleAjaxError:false,
+/* global setupSearchBox:false, cornerMessage:false, handleAjaxError:false,
           enableIfChecked:false */
 
 import _ from 'lodash';
@@ -18,6 +18,7 @@ import 'indico/modules/events/util/static_filters';
 import './badges';
 
 import {$T} from 'indico/utils/i18n';
+import {natSortCompare} from 'indico/utils/sort';
 
 import {SingleEventMove, EventPublish} from './EventMove';
 import {SeriesManagement} from './SeriesManagement';
@@ -198,7 +199,7 @@ import {SeriesManagement} from './SeriesManagement';
           if ($this.is('.js-count-label')) {
             const list = $('<ul>', {class: 'qbubble-item-list'});
             const items = _.values($this.data('items')).sort(function(a, b) {
-              return strnatcmp(a.title.toLowerCase(), b.title.toLowerCase());
+              return natSortCompare(a.title.toLowerCase(), b.title.toLowerCase());
             });
 
             $.each(items, function() {
