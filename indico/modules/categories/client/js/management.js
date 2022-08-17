@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global strnatcmp:false, paginatedSelectAll:false, handleAjaxError:false, cornerMessage:false,
+/* global paginatedSelectAll:false, handleAjaxError:false, cornerMessage:false,
           enableIfChecked:false, build_url:false, ajaxDialog:false, updateHtml:false */
 
 import _ from 'lodash';
@@ -15,6 +15,7 @@ import ReactDOM from 'react-dom';
 import {SingleEventMove, BulkEventMove} from 'indico/modules/events/management/EventMove';
 import {showUserSearch} from 'indico/react/components/principals/imperative';
 import {$T} from 'indico/utils/i18n';
+import {natSortCompare} from 'indico/utils/sort';
 
 (function(global) {
   // Category cache
@@ -138,19 +139,24 @@ import {$T} from 'indico/utils/i18n';
       });
     }
 
+    function compareCategories(a, b) {
+      const cmp = natSortCompare(a.title.toLowerCase(), b.title.toLowerCase());
+      if (cmp === 0) {
+        return a.id < b.id ? -1 : 1;
+      }
+      return cmp;
+    }
+
     function sortCategories(sortOrder) {
       $tbody
         .find(categoryRowSelector)
         .sort(function(a, b) {
+          [a, b] = [$(a), $(b)];
           return (
             sortOrder *
-            strnatcmp(
-              $(a)
-                .data('category-title')
-                .toLowerCase(),
-              $(b)
-                .data('category-title')
-                .toLowerCase()
+            compareCategories(
+              {title: a.data('category-title'), id: a.data('category-id')},
+              {title: b.data('category-title'), id: b.data('category-id')}
             )
           );
         })
