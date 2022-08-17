@@ -34,6 +34,13 @@ class EventSeries(db.Model):
         nullable=False,
         default=True
     )
+    #: A pattern to auto-generate event titles when cloning events from
+    #: the series.
+    event_title_pattern = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
 
     # relationship backrefs:
     # - events (Event.series)

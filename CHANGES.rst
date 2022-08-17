@@ -64,6 +64,8 @@ Improvements
   (:issue:`4698`, :pr:`5446`)
 - Add contribution's program code to revision's "Download ZIP" filename (:pr:`5449`)
 - Add UI to manage series of events (:issue:`4048`, :pr:`5436`, thanks :user:`Leats`)
+- Event series can now specify a title pattern to use when cloning an event in the
+  series (:pr:`5456`)
 
 Bugfixes
 ^^^^^^^^

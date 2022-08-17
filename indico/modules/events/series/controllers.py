@@ -27,12 +27,12 @@ class RHEventSeries(RH):
     def _process_GET(self):
         return EventSeriesSchema().dump(self.series)
 
-    @use_rh_args(EventSeriesUpdateSchema)
+    @use_rh_args(EventSeriesUpdateSchema, partial=True)
     def _process_PATCH(self, changes):
         self.series.populate_from_dict(changes)
         return '', 204
 
-    @use_rh_args(EventSeriesUpdateSchema, partial=True)
+    @use_rh_args(EventSeriesUpdateSchema)
     def _process_POST(self, data):
         series = EventSeries()
         series.populate_from_dict(data)

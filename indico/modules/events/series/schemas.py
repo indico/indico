@@ -19,7 +19,7 @@ from indico.util.marshmallow import ModelList, not_empty
 class EventSeriesSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventSeries
-        fields = ('id', 'events', 'show_sequence_in_title', 'show_links')
+        fields = ('id', 'events', 'show_sequence_in_title', 'show_links', 'event_title_pattern')
 
     id = fields.Int()
     events = fields.List(fields.Nested(EventDetailsSchema))
@@ -27,7 +27,7 @@ class EventSeriesSchema(mm.SQLAlchemyAutoSchema):
 
 class EventSeriesUpdateSchema(EventSeriesSchema):
     class Meta(EventSeriesSchema.Meta):
-        fields = ('events', 'show_sequence_in_title', 'show_links')
+        fields = ('events', 'show_sequence_in_title', 'show_links', 'event_title_pattern')
         rh_context = ('series',)
 
     events = ModelList(Event, filter_deleted=True, data_key='event_ids', required=True, validate=not_empty)
@@ -43,6 +43,18 @@ class EventSeriesUpdateSchema(EventSeriesSchema):
 
         if not all(e.can_manage(session.user) for e in events):
             raise ValidationError(_('You must be a manager of all chosen events.'))
+        if any(e.is_unlisted for e in events):
+            raise ValidationError(_('At least one event is unlisted.'))
+
+    @validates('event_title_pattern')
+    def _check_title_pattern(self, event_title_pattern, **kwargs):
+        if not event_title_pattern:
+            return
+        # XXX: we do not use validate_placeholders here since it's just this one and in
+        # addition we do not want to prohibit using `{` literally (in case someone wants
+        # to use it in the event title for whatever reason)
+        if '{n}' not in event_title_pattern:
+            raise ValidationError('Title pattern must contain the {n} placeholder')
 
 
 class EventDetailsForSeriesManagementSchema(mm.SQLAlchemyAutoSchema):

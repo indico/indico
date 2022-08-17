@@ -169,3 +169,27 @@ class EventProtectionCloner(EventCloner):
         else:
             new_event.acl_entries = clone_principals(EventPrincipal, self.old_event.acl_entries,
                                                      self._event_role_map, self._regform_map)
+
+
+class EventSeriesCloner(EventCloner):
+    name = 'event_series'
+    friendly_name = _('Add to event series')
+    new_event_only = True
+
+    @property
+    def is_default(self):
+        return bool(self.old_event.series and self.old_event.series.event_title_pattern)
+
+    @property
+    def is_available(self):
+        return bool(self.old_event.series)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
+        series = self.old_event.series
+        new_event.series = series
+        if series.event_title_pattern:
+            n = series.events.index(new_event) + 1
+            # XXX not using .format() here to avoid errors if someone adds other
+            # placeholder-like stuff in the pattern
+            new_event.title = series.event_title_pattern.replace('{n}', str(n))
+        db.session.flush()
