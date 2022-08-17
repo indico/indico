@@ -22,6 +22,7 @@ from indico.core.config import config
 from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.string import get_format_placeholders
 from indico.util.user import principal_from_identifier
 
 
@@ -53,6 +54,23 @@ def not_empty(value):
 
     if not value:
         raise ValidationError(_('This field cannot be empty.'))
+
+
+def validate_placeholders(format_string, valid_placeholders, required_placeholders=None):
+    """Validate that a string contains only the correct format placeholders.
+
+    This MUST ALWAYS be used when accepting format strings from users or other
+    untrustworthy sources.
+    """
+    try:
+        placeholders = set(get_format_placeholders(format_string))
+    except ValueError:
+        raise ValidationError(_('Invalid placeholder format'))
+    # placeholders should always be validated client-side as well, so no i18n needed here
+    if required_placeholders and (missing := required_placeholders - placeholders):
+        raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
+    if invalid := placeholders - valid_placeholders:
+        raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
 
 
 def file_extension(*exts):

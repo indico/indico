@@ -547,3 +547,8 @@ def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mod
         if RichMarkup(desc)._preformatted:
             desc = desc.replace('\n', '<br>\n')
         field.data = ht.handle(desc)
+
+
+def get_format_placeholders(format_str):
+    """Get the format placeholders from a string."""
+    return [name for text, name, spec, conv in string.Formatter().parse(format_str) if name is not None]
