@@ -42,7 +42,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import ModelField, PrincipalList, not_empty
 from indico.util.roles import ExportRoleMembersMixin, ImportRoleMembersMixin
-from indico.util.string import crc32
+from indico.util.string import crc32, natural_sort_key
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -263,10 +263,27 @@ class RHManageCategoryProtection(RHManageCategoryBase):
 
 
 class RHCreateCategory(RHManageCategoryBase):
+    def _sort_key(self, category):
+        return natural_sort_key(category.title), category.id
+
+    def _get_sort_order(self, categories):
+        sorted_categories = sorted(self.category.children, key=self._sort_key)
+        if categories == sorted_categories:
+            return 'asc'
+        elif categories == sorted_categories[::-1]:
+            return 'desc'
+        return None
+
     def _process(self):
         form = CreateCategoryForm()
         if form.validate_on_submit():
+            sort_order = self._get_sort_order(self.category.children)
             new_category = create_category(self.category, form.data)
+            if sort_order is not None:
+                reverse = sort_order == 'desc'
+                subcategories = sorted(self.category.children, key=self._sort_key, reverse=reverse)
+                for position, category in enumerate(subcategories, start=1):
+                    category.position = position
             flash(_('Category "{}" has been created.').format(new_category.title), 'success')
             return jsonify_data(flash=False, redirect=url_for('.manage_settings', new_category))
         return jsonify_form(form)
@@ -370,9 +387,13 @@ class RHMoveSubcategories(RHMoveCategoryBase):
 
 
 class RHSortSubcategories(RHManageCategoryBase):
-    def _process(self):
+
+    @use_kwargs({
+        'categories': fields.List(fields.Int(), required=True)
+    })
+    def _process(self, categories):
         subcategories = {category.id: category for category in self.category.children}
-        for position, id_ in enumerate(request.json['categories'], 1):
+        for position, id_ in enumerate(categories, start=1):
             subcategories[id_].position = position
         self.category.log(CategoryLogRealm.category, LogKind.change, 'Content', 'Subcategories sorted', session.user)
         return jsonify_data(flash=False)
