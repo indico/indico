@@ -188,7 +188,7 @@ class EventSeriesCloner(EventCloner):
         series = self.old_event.series
         new_event.series = series
         if series.event_title_pattern:
-            n = series.events.index(new_event) + 1
+            n = len(series.events)
             # XXX not using .format() here to avoid errors if someone adds other
             # placeholder-like stuff in the pattern
             new_event.title = series.event_title_pattern.replace('{n}', str(n))
