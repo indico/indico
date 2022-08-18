@@ -203,7 +203,7 @@ class RHCategoryManagedEventSearch(RHCategoryBase):
         query = (
             Event.query.with_parent(self.category)
             .filter(Event.title_matches(q), ~Event.is_deleted)
-            .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_chain'))
+            .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'category_chain', 'series_id'))
         )
         # Prefer favorite events
         query = query.order_by(Event.favorite_of.any(favorite_event_table.c.user_id == session.user.id).desc())
@@ -211,6 +211,7 @@ class RHCategoryManagedEventSearch(RHCategoryBase):
         query = query.order_by(
             (db.func.lower(Event.title) == q).desc(),
             db.func.lower(Event.title).startswith(q).desc(),
+            Event.start_dt,
             db.func.lower(Event.title),
         )
         events = get_n_matching(query, 10, lambda event: event.can_manage(session.user))
