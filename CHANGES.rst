@@ -66,6 +66,7 @@ Improvements
 - Add UI to manage series of events (:issue:`4048`, :pr:`5436`, thanks :user:`Leats`)
 - Event series can now specify a title pattern to use when cloning an event in the
   series (:pr:`5456`)
+- Insert new categories into the correct position if the list is already sorted (:pr:`5455`)
 
 Bugfixes
 ^^^^^^^^
