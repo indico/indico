@@ -9,6 +9,7 @@ from flask import request, session
 from marshmallow import EXCLUDE
 from werkzeug.exceptions import NotFound, Unauthorized
 
+from indico.core.oauth.util import TOKEN_PREFIX_SERVICE
 from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.editing.fields import EditableList
@@ -29,7 +30,11 @@ class TokenAccessMixin:
         # we need to "fish" the event here because at this point _check_params
         # hasn't run yet
         event = Event.get_or_404(request.view_args['event_id'], is_deleted=False)
-        if not self.SERVICE_ALLOWED or not request.bearer_token:
+        if (
+            not self.SERVICE_ALLOWED or
+            not request.bearer_token or
+            not request.bearer_token.startswith(TOKEN_PREFIX_SERVICE)
+        ):
             return False
 
         event_token = editing_settings.get(event, 'service_token')
