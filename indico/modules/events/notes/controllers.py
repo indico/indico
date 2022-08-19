@@ -61,7 +61,8 @@ class RHEditNote(RHManageNoteBase):
         note = None
         if not source:
             note = EventNote.get_for_linked_object(self.object, preload_event=False)
-        return NoteForm(obj=self._get_defaults(note=note, source=source))
+        return NoteForm(obj=self._get_defaults(note=note, source=source),
+                        ckeditor_upload_url=url_for('attachments.upload_ckeditor', self.object))
 
     def _process_form(self, form, **kwargs):
         saved = False

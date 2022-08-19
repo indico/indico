@@ -12,6 +12,7 @@
         setupCKEditorWidget({
             fieldId: {{ field.id | tojson }},
             images: {{ images | tojson }},
+            imageUploadURL: {{ field.get_form().ckeditor_upload_url|default(none) | tojson }},
             height: {{ height | tojson }}
         });
     </script>

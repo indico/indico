@@ -22,6 +22,7 @@ html_comment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
 
 class ConcatWidget:
     """Render a list of fields as a simple string joined by an optional separator."""
+
     def __init__(self, separator='', prefix_label=True):
         self.separator = separator
         self.prefix_label = prefix_label
@@ -38,6 +39,7 @@ class ConcatWidget:
 
 class HiddenInputs(HiddenInput):
     """Render hidden inputs for list elements."""
+
     item_widget = HiddenInput()
 
     def __call__(self, field, **kwargs):
@@ -112,10 +114,14 @@ class PasswordWidget(JinjaWidget):
 class CKEditorWidget(JinjaWidget):
     """Render a CKEditor WYSIWYG editor.
 
-    :param images: Whether to allow images in simple mode.
+    :param images: Whether to allow images.
     :param height: The height of the editor.
+
+    If the form has a ``ckeditor_upload_url`` attribute and images are enabled,
+    the editor will allow pasting/selecting images and upload them using that URL.
     """
-    def __init__(self, images=False, height=475):
+
+    def __init__(self, *, images=False, height=475):
         super().__init__('forms/ckeditor_widget.html', images=images, height=height)
 
 

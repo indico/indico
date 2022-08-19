@@ -67,6 +67,8 @@ Improvements
 - Event series can now specify a title pattern to use when cloning an event in the
   series (:pr:`5456`)
 - Insert new categories into the correct position if the list is already sorted (:pr:`5455`)
+- Images can now be uploaded by pasting or dropping them into the editor for minutes
+  or the event description (:pr:`5458`)
 
 Bugfixes
 ^^^^^^^^

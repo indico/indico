@@ -173,6 +173,10 @@ class MenuLinkForm(MenuUserEntryFormBase):
 class MenuPageForm(MenuUserEntryFormBase):
     html = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget(images=True))
 
+    def __init__(self, *args, ckeditor_upload_url, **kwargs):
+        self.ckeditor_upload_url = ckeditor_upload_url
+        super().__init__(*args, **kwargs)
+
 
 class AddImagesForm(IndicoForm):
     image = FileField('Image', multiple_files=True, accepted_file_types='image/jpeg,image/jpg,image/png,image/gif')

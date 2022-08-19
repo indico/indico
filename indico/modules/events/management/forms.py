@@ -61,8 +61,9 @@ class EventDataForm(IndicoForm):
     description = TextAreaField(_('Description'), widget=CKEditorWidget(images=True, height=250))
     url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, **kwargs):
+        self.event = event
+        self.ckeditor_upload_url = url_for('attachments.upload_ckeditor', event)
         super().__init__(*args, **kwargs)
         prefix = f'{config.BASE_URL}/e/'
         self.url_shortcut.description = _('The URL shortcut must be unique within this Indico instance and '
@@ -198,8 +199,9 @@ class EventContactInfoForm(IndicoForm):
                                     widget=CKEditorWidget(images=True, height=250),
                                     description=_('This text is displayed on the main conference page.'))
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, **kwargs):
+        self.event = event
+        self.ckeditor_upload_url = url_for('attachments.upload_ckeditor', event)
         super().__init__(*args, **kwargs)
         if self.event.type_ != EventType.lecture:
             del self.organizer_info

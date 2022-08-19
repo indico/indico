@@ -22,6 +22,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
@@ -90,17 +91,19 @@ class RHMenuEntryEditBase(RHMenuBase):
 class RHMenuEntryEdit(RHMenuEntryEditBase):
     def _process(self):
         defaults = FormDefaults(self.entry)
+        form_kwargs = {}
         if self.entry.is_user_link:
             form_cls = MenuLinkForm
         elif self.entry.is_page:
             form_cls = MenuPageForm
+            form_kwargs['ckeditor_upload_url'] = url_for('attachments.upload_ckeditor', self.event)
             defaults['html'] = self.entry.page.html
         else:
             form_cls = MenuBuiltinEntryForm
             defaults = FormDefaults(self.entry, skip_attrs={'title'},
                                     title=self.entry.title or self.entry.default_data.title,
                                     custom_title=self.entry.title is not None)
-        form = form_cls(entry=self.entry, obj=defaults)
+        form = form_cls(entry=self.entry, obj=defaults, **form_kwargs)
         if form.validate_on_submit():
             form.populate_obj(self.entry, skip={'html', 'custom_title'})
             if self.entry.is_page:
@@ -175,6 +178,7 @@ class RHMenuAddEntry(RHMenuBase):
 
     def _process(self):
         defaults = FormDefaults(get_default_values(MenuEntry))
+        form_kwargs = {}
         entry_type = request.args['type']
 
         if entry_type == MenuEntryType.separator.name:
@@ -187,10 +191,11 @@ class RHMenuAddEntry(RHMenuBase):
             form_cls = MenuLinkForm
         elif entry_type == MenuEntryType.page.name:
             form_cls = MenuPageForm
+            form_kwargs['ckeditor_upload_url'] = url_for('attachments.upload_ckeditor', self.event)
         else:
             raise BadRequest
 
-        form = form_cls(obj=defaults)
+        form = form_cls(obj=defaults, **form_kwargs)
         if form.validate_on_submit():
             entry = MenuEntry(event=self.event, type=MenuEntryType[entry_type])
             form.populate_obj(entry, skip={'html'})

@@ -15,3 +15,7 @@ from indico.web.forms.widgets import CKEditorWidget
 class NoteForm(IndicoForm):
     # TODO: use something switchable
     source = TextAreaField(_('Minutes'), widget=CKEditorWidget(images=True))
+
+    def __init__(self, *args, ckeditor_upload_url, **kwargs):
+        self.ckeditor_upload_url = ckeditor_upload_url
+        super().__init__(*args, **kwargs)

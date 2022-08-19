@@ -5,7 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-export const getConfig = ({images = true} = {}) => ({
+export const getConfig = ({images = true, imageUploadURL = null} = {}) => ({
+  removePlugins: images && imageUploadURL ? [] : ['ImageInsert', 'ImageUpload'],
   fontFamily: {
     options: [
       'Sans Serif/"Liberation Sans", sans-serif',
@@ -69,7 +70,8 @@ export const getConfig = ({images = true} = {}) => ({
     'HorizontalLine',
     images && 'Image',
     images && 'ImageCaption',
-    images && 'ImageInsertViaUrl',
+    images && !imageUploadURL && 'ImageInsertViaUrl',
+    images && imageUploadURL && 'ImageInsert',
     images && 'ImageResize',
     images && 'ImageStyle',
     images && 'ImageToolbar',
@@ -82,6 +84,7 @@ export const getConfig = ({images = true} = {}) => ({
     'Paragraph',
     'PasteFromOffice',
     'RemoveFormat',
+    images && imageUploadURL && 'SimpleUploadAdapter',
     'SourceEditing',
     'Strikethrough',
     'Subscript',
@@ -140,4 +143,14 @@ export const getConfig = ({images = true} = {}) => ({
       'imageStyle:alignRight',
     ],
   },
+  simpleUpload:
+    images && imageUploadURL
+      ? {
+          uploadUrl: imageUploadURL,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-Token': document.getElementById('csrf-token').getAttribute('content'),
+          },
+        }
+      : undefined,
 });

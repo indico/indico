@@ -7,7 +7,8 @@
 
 import mimetypes
 
-from flask import flash, render_template, request, session
+from flask import flash, jsonify, render_template, request, session
+from marshmallow import fields
 
 from indico.core import signals
 from indico.core.db import db
@@ -21,6 +22,7 @@ from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import _, ngettext
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -70,6 +72,28 @@ class ManageAttachmentsMixin:
             return self.wp.render_template('management/attachments.html', self.category, 'attachments', **tpl_args)
         else:
             return jsonify_template('attachments/attachments.html', **tpl_args)
+
+
+class AddAttachmentCKEditorMixin:
+    """Upload image attachment from CKEditor."""
+
+    @use_kwargs({'upload': fields.Field(required=True)}, location='files')
+    def _process(self, upload):
+        folder = AttachmentFolder.get_or_create(self.object, 'Editor uploads', is_always_visible=False, is_hidden=True)
+        # Commit the folder creation quickly to make it less likely to end up with two folders having
+        # the same name in case multiple images where uploaded in parallel (in case of someone dropping
+        # two files at the same time onto the editor)
+        db.session.commit()
+        filename = secure_client_filename(upload.filename)
+        attachment = Attachment(folder=folder, user=session.user, title=upload.filename, type=AttachmentType.file)
+        content_type = mimetypes.guess_type(upload.filename)[0] or upload.mimetype or 'application/octet-stream'
+        attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=content_type)
+        attachment.file.save(upload.stream)
+        db.session.add(attachment)
+        db.session.flush()
+        logger.info('Attachment %s uploaded by %s', attachment, session.user)
+        signals.attachments.attachment_created.send(attachment, user=session.user)
+        return jsonify(url=attachment.download_url)
 
 
 class AddAttachmentFilesMixin:

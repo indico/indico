@@ -8,10 +8,11 @@
 from flask import session
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.attachments.controllers.management.base import (AddAttachmentFilesMixin, AddAttachmentLinkMixin,
-                                                                    CreateFolderMixin, DeleteAttachmentMixin,
-                                                                    DeleteFolderMixin, EditAttachmentMixin,
-                                                                    EditFolderMixin, ManageAttachmentsMixin)
+from indico.modules.attachments.controllers.management.base import (AddAttachmentCKEditorMixin, AddAttachmentFilesMixin,
+                                                                    AddAttachmentLinkMixin, CreateFolderMixin,
+                                                                    DeleteAttachmentMixin, DeleteFolderMixin,
+                                                                    EditAttachmentMixin, EditFolderMixin,
+                                                                    ManageAttachmentsMixin)
 from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.views import WPCategoryManagement
@@ -33,6 +34,10 @@ class RHCategoryAttachmentManagementBase(RHManageCategoryBase):
 
 class RHManageCategoryAttachments(ManageAttachmentsMixin, RHCategoryAttachmentManagementBase):
     wp = WPCategoryManagement
+
+
+class RHAddCategoryAttachmentCKEditor(AddAttachmentCKEditorMixin, RHCategoryAttachmentManagementBase):
+    pass
 
 
 class RHAddCategoryAttachmentFiles(AddAttachmentFilesMixin, RHCategoryAttachmentManagementBase):
