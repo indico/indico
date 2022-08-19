@@ -91,6 +91,7 @@ Bugfixes
 - Fix misleading start and end times for Poster contributions in the timetable HTTP API
   and the contributions placeholder in emails (:pr:`5443`)
 - Do not mark persons as registered if the registration form has been deleted (:pr:`5448`)
+- Fix error when a room owner who is not an admin edits their room (:pr:`5457`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

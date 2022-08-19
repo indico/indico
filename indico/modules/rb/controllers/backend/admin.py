@@ -67,6 +67,11 @@ class RHSettings(RHRoomBookingAdminBase):
 
 
 class RHLocations(RHRoomBookingAdminBase):
+    def _skip_admin_check(self):
+        # GET on this endpoint does not expose anything sensitive, so
+        # we allow any room manager to use it if they can edit rooms
+        return request.method == 'GET' and rb_settings.get('managers_edit_rooms') and has_managed_rooms(session.user)
+
     def _process_args(self):
         id_ = request.view_args.get('location_id')
         self.location = Location.get_or_404(id_, is_deleted=False) if id_ is not None else None
