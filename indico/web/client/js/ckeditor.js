@@ -133,6 +133,19 @@ export const getConfig = ({images = true, imageUploadURL = null} = {}) => ({
       },
     ],
   },
+  link: {
+    decorators: {
+      openInNewTab: {
+        mode: 'manual',
+        label: 'Open in a new tab',
+        defaultValue: false,
+        attributes: {
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        },
+      },
+    },
+  },
   image: {
     toolbar: [
       'imageTextAlternative',
