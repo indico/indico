@@ -473,6 +473,8 @@ function EditableListDisplay({
         <ListFilter
           list={filterableContribs}
           filterOptions={filterOptions}
+          searchableId={e => e.searchableId}
+          searchableFields={e => e.searchableFields}
           onChangeList={onChangeList}
         />
       </div>
