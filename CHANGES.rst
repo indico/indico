@@ -69,6 +69,7 @@ Improvements
 - Insert new categories into the correct position if the list is already sorted (:pr:`5455`)
 - Images can now be uploaded by pasting or dropping them into the editor for minutes
   or the event description (:pr:`5458`)
+- Add JSON export for contribution details (:pr:`5460`)
 
 Bugfixes
 ^^^^^^^^

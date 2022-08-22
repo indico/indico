@@ -134,6 +134,7 @@ _bp.add_url_rule('/contributions/customize', 'customize_contribution_list', disp
 _bp.add_url_rule('/contributions/static-url', 'contribution_list_static_url',
                  display.RHContributionListDisplayStaticURL, methods=('POST',))
 _bp.add_url_rule('/contributions/<int:contrib_id>/', 'display_contribution', display.RHContributionDisplay)
+_bp.add_url_rule('/contributions/<int:contrib_id>.json', 'display_contrib_json', display.RHContributionJSON)
 _bp.add_url_rule('/contributions/<int:contrib_id>/author/<int:person_id>', 'display_author',
                  display.RHContributionAuthor)
 _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.pdf', 'export_pdf', display.RHContributionExportToPDF)

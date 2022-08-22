@@ -25,4 +25,4 @@ class BasicSessionSchema(mm.SQLAlchemyAutoSchema):
 
     class Meta:
         model = Session
-        fields = ('id', 'title', 'friendly_id', 'blocks')
+        fields = ('id', 'title', 'friendly_id', 'code', 'blocks')
