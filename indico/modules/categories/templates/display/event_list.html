@@ -131,6 +131,7 @@
                                         {%- trans %}new{% endtrans -%}
                                     </span>
                                 {% endif %}
+                                {{ template_hook('event-status-labels', event=event) }}
                             </span>
                             {% if event.label %}
                                 <span class="ui label basic mini {{ event.label.color }}"
