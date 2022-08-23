@@ -22,10 +22,8 @@
 // https://ckeditor.com/docs/ckeditor5/latest/features/images/images-styles.html
 // Inspired by the default ckeditor styles:
 // https://github.com/ckeditor/ckeditor5/blob/06d11a85d01aece904a6bdd25e72abd94a4dd314/packages/ckeditor5-image/theme/imagestyle.css
-// Applies to conference & event description and minutes
-.conferenceDetails .description,
-div.event-details .event-details-content,
-.note-area-wrapper .note-text {
+// Applies to conference & event description, minutes and custom conference pages
+.ck-output {
   $image-spacing: 1.5em;
   display: flow-root;
 

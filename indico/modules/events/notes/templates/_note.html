@@ -30,7 +30,7 @@
         <div class="padded-box-pad icon-file-text"></div>
         <div class="padded-box-content">
             {{ _render_note_actions(note=note, event=event, hidden=hidden, can_edit=can_edit, anchor=anchor) }}
-            <div class="note-text {% if event %}{{ _togglable_classes(hidden=hidden) }}{% endif %}">
+            <div class="note-text ck-output {% if event %}{{ _togglable_classes(hidden=hidden) }}{% endif %}">
                 {{ note.html|sanitize_html }}
             </div>
             {% if event %}
