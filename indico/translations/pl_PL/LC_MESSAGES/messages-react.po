@@ -1,15 +1,17 @@
 # 
 # Translators:
 # Michito <crossner90@gmail.com>, 2019
-# Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
-# Marcin Miłek, 2021
 # Adrian, 2021
-# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021
+# Pedro Ferreira <pedro.ferreira@cern.ch>, 2022
+# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022
+# Patryk Bełzak <patryk.belzak@pwr.edu.pl>, 2022
+# Marcin Miłek, 2022
+# Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2022
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-01-22 12:44+0100\n"
-"Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021\n"
+"POT-Creation-Date: 2022-08-22 18:00+0200\n"
+"Last-Translator: Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2022\n"
 "Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,6 +19,139 @@ msgstr ""
 "Generated-By: react-jsx-i18n-extract\n"
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+#: indico/modules/auth/client/js/signup.jsx:81
+msgid "Passwords must match"
+msgstr ""
+
+#: indico/modules/auth/client/js/signup.jsx:93
+msgid ""
+"There is already some information in Indico that concerns you. We are going "
+"to link it automatically."
+msgstr ""
+"Indico posiada już pewne informacje o Tobie. Dołączymy je automatycznie."
+
+#: indico/modules/auth/client/js/signup.jsx:100
+msgid "User information"
+msgstr "Informacje użytkownika"
+
+#: indico/modules/auth/client/js/signup.jsx:106
+#: indico/modules/auth/client/js/signup.jsx:118
+#: indico/modules/users/client/js/PersonalDataForm.jsx:124
+#: indico/web/client/js/react/components/principals/Search.jsx:541
+#: indico/web/client/js/react/errors/component.jsx:78
+msgid "Email address"
+msgstr "Adres email"
+
+#: indico/modules/auth/client/js/signup.jsx:126
+#: indico/modules/users/client/js/PersonalDataForm.jsx:87
+msgid "First name"
+msgstr "Imię"
+
+#: indico/modules/auth/client/js/signup.jsx:132
+#: indico/modules/users/client/js/PersonalDataForm.jsx:93
+msgid "Last name"
+msgstr "Nazwisko"
+
+#: indico/modules/auth/client/js/signup.jsx:148
+#: indico/modules/users/client/js/PersonalDataForm.jsx:108
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:132
+#: indico/web/client/js/react/components/principals/Search.jsx:542
+#: indico/web/client/js/react/components/syncedInputs.jsx:168
+msgid "Affiliation"
+msgstr "Afiliacja"
+
+#: indico/modules/auth/client/js/signup.jsx:156
+#: indico/modules/users/client/js/PersonalDataForm.jsx:114
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:157
+msgid "Address"
+msgstr "Adres"
+
+#: indico/modules/auth/client/js/signup.jsx:163
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:163
+#: indico/modules/users/client/js/PersonalDataForm.jsx:119
+msgid "Phone number"
+msgstr "Numer telefonu"
+
+#: indico/modules/auth/client/js/signup.jsx:169
+msgid "Login details"
+msgstr "Dane dostępowe"
+
+#: indico/modules/auth/client/js/signup.jsx:170
+msgid "Username"
+msgstr "Nazwa użytkownika"
+
+#: indico/modules/auth/client/js/signup.jsx:175
+msgid "Password"
+msgstr "Hasło"
+
+#: indico/modules/auth/client/js/signup.jsx:182
+msgid "Confirm password"
+msgstr "Potwierdź hasło"
+
+#: indico/modules/auth/client/js/signup.jsx:190
+msgid "Account moderation"
+msgstr "Moderacja konta"
+
+#: indico/modules/auth/client/js/signup.jsx:192
+msgid ""
+"Each new account needs to be approved by an administrator. We will send you "
+"an email as soon as your request has been approved."
+msgstr ""
+
+#: indico/modules/auth/client/js/signup.jsx:201
+#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
+#: indico/modules/events/management/client/js/EventMove.jsx:158
+#: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
+#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
+msgid "Comment"
+msgstr "Komentarz"
+
+#: indico/modules/auth/client/js/signup.jsx:202
+msgid ""
+"You can provide additional information or a comment for the administrators "
+"who will review your registration."
+msgstr ""
+"Możesz podać dodatkową informację lub komentarz dla administratora, który "
+"sprawdzi Twoją rejestrację."
+
+#: indico/modules/auth/client/js/signup.jsx:213
+msgid "Submit registration request"
+msgstr "Wyślij żądanie rejestracji"
+
+#: indico/modules/auth/client/js/signup.jsx:214
+msgid "Create my Indico profile"
+msgstr "Utwórz mój profil Indico"
+
+#: indico/modules/auth/client/js/signup.jsx:220
+#: indico/modules/events/abstracts/client/js/boa.jsx:146
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:108
+#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:71
+#: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:115
+#: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:80
+#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:81
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:253
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:238
+#: indico/modules/events/management/client/js/EventMove.jsx:180
+#: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
+#: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
+#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:89
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:512
+#: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:170
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:360
+#: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:131
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:56
+#: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:147
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:312
+#: indico/web/client/js/react/components/RequestConfirm.jsx:92
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:107
+#: indico/web/client/js/react/components/principals/Search.jsx:481
+#: indico/web/client/js/react/forms/final-form.jsx:149
+msgid "Cancel"
+msgstr "Anuluj"
 
 #: indico/modules/categories/client/js/base.jsx:28
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:155
@@ -33,7 +168,7 @@ msgstr "Nie ma próśb o przenisienie wydarzenia. "
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:153
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:471
-#: indico/web/client/js/react/components/principals/Search.jsx:558
+#: indico/web/client/js/react/components/principals/Search.jsx:556
 msgid "User"
 msgstr "Użytkownik"
 
@@ -55,7 +190,8 @@ msgid "Approve"
 msgstr "Zatwierdź"
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:187
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:77
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:100
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:116
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:56
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:101
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx:62
@@ -75,7 +211,7 @@ msgstr "i"
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:199
 #: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:72
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:35
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:45
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:35
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:56
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:658
@@ -84,57 +220,67 @@ msgstr "i"
 msgid "Reject"
 msgstr "Odrzuć"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:67
-#: indico/modules/search/client/js/components/SearchApp.jsx:268
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:66
+#: indico/modules/search/client/js/components/SearchApp.jsx:262
 msgid "Events"
 msgstr "Wydarzenia"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:73
-#: indico/modules/search/client/js/components/SearchApp.jsx:264
-#: indico/modules/search/client/js/components/SearchApp.jsx:269
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:72
+#: indico/modules/search/client/js/components/SearchApp.jsx:258
+#: indico/modules/search/client/js/components/SearchApp.jsx:263
 msgid "Contributions"
 msgstr "Kontrybucje"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:104
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:103
 msgid "Number of events"
 msgstr "Liczba wydarzeń"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:106
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:105
 msgid "The year is the one of the start date of the event."
 msgstr "Rok rozpoczęcia wydarzenia."
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:113
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:140
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:112
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:139
 msgid "No data available"
 msgstr "Brak danych"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:131
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:130
 msgid "Number of contributions"
 msgstr "Liczba kontrybucji"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:133
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:132
 msgid "The year is the one of the start date of the contribution."
 msgstr "Rok rozpoczęcia kontrybucji"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:161
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:160
 msgid "Total number of events"
 msgstr "Całkowita liczba wydarzeń"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:169
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:168
 msgid "Total number of contributions"
 msgstr "Całkowita liczba kontrybucji"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:177
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:176
 msgid "Number of attachments"
 msgstr "Liczba załączników"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:186
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:185
 msgid "Number of users"
 msgstr "Liczba użytkowników"
 
-#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:192
+#: indico/modules/categories/client/js/components/CategoryStatistics.jsx:191
 msgid "Last updated on: {time}"
 msgstr "Ostatnio zaktualizowano: {time}"
+
+#: indico/modules/categories/client/js/favorite.jsx:29
+msgid ""
+"Add category to favorites (This will make events in this category visible on"
+" your Dashboard.)"
+msgstr ""
+
+#: indico/modules/categories/client/js/favorite.jsx:32
+msgid "Delete category from favorites."
+msgstr ""
 
 #: indico/modules/core/client/js/impersonation.js:33
 msgid "Login as..."
@@ -156,15 +302,27 @@ msgstr "Zarządzaj PDF"
 msgid "Upload PDF"
 msgstr "Załaduj PDF"
 
-#: indico/modules/events/abstracts/client/js/boa.jsx:87
+#: indico/modules/events/abstracts/client/js/boa.jsx:74
+msgid "Upload BoA"
+msgstr "Załaduj BoA"
+
+#: indico/modules/events/abstracts/client/js/boa.jsx:79
 msgid "Manage custom Book of Abstracts"
 msgstr "Zarządzaj spersonalizowaną książką abstraktów"
 
-#: indico/modules/events/abstracts/client/js/boa.jsx:88
+#: indico/modules/events/abstracts/client/js/boa.jsx:81
 msgid "Manage Book of Abstracts"
 msgstr "Zarządzaj książką abstraktów"
 
-#: indico/modules/events/abstracts/client/js/boa.jsx:105
+#: indico/modules/events/abstracts/client/js/boa.jsx:93
+msgid "Delete custom PDF"
+msgstr "Usuń spersonalizowany PDF"
+
+#: indico/modules/events/abstracts/client/js/boa.jsx:95
+msgid "Delete current PDF"
+msgstr "Usuń bieżący PDF"
+
+#: indico/modules/events/abstracts/client/js/boa.jsx:113
 msgid ""
 "You can upload a custom PDF for your Book of Abstracts. Please note that "
 "this overrides the autogenerated file. To switch back to the default book of"
@@ -174,62 +332,20 @@ msgstr ""
 "pamiętać, że taki plik zastępuje automatycznie wygenerowaną książkę. Aby "
 "przywrócić domyślną książkę abstraktów, należy usunąć plik spersonalizowany."
 
-#: indico/modules/events/abstracts/client/js/boa.jsx:111
+#: indico/modules/events/abstracts/client/js/boa.jsx:119
 msgid "You can upload a PDF file with the Book of Abstracts here."
 msgstr "Możesz załadować plik PDF zawierający książkę abstraktów."
 
-#: indico/modules/events/abstracts/client/js/boa.jsx:127
-msgid "Delete custom PDF"
-msgstr "Usuń spersonalizowany PDF"
-
-#: indico/modules/events/abstracts/client/js/boa.jsx:129
-msgid "Delete current PDF"
-msgstr "Usuń bieżący PDF"
-
-#: indico/modules/events/abstracts/client/js/boa.jsx:134
-#: indico/modules/events/abstracts/client/js/boa.jsx:164
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:103
-#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:71
-#: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:115
-#: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:80
-#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:85
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:254
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:200
-#: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:82
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:118
-#: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:65
-#: indico/modules/events/management/client/js/EventMove.jsx:180
-#: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
-#: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
-#: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:89
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:512
-#: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:170
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:357
-#: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:131
-#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:54
-#: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:147
-#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:312
-#: indico/web/client/js/react/components/RequestConfirm.jsx:61
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:107
-#: indico/web/client/js/react/components/principals/Search.jsx:481
-msgid "Cancel"
-msgstr "Anuluj"
-
-#: indico/modules/events/abstracts/client/js/boa.jsx:136
-msgid "Upload BoA"
-msgstr "Załaduj BoA"
-
-#: indico/modules/events/abstracts/client/js/boa.jsx:148
+#: indico/modules/events/abstracts/client/js/boa.jsx:130
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:509
-#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:51
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:53
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:144
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:309
+#: indico/web/client/js/react/components/RequestConfirm.jsx:102
 msgid "Confirm deletion"
 msgstr "Potwierdź usunięcie"
 
-#: indico/modules/events/abstracts/client/js/boa.jsx:151
+#: indico/modules/events/abstracts/client/js/boa.jsx:133
 msgid ""
 "Do you really want to delete the custom Book of Abstracts? This will revert "
 "to the default auto-generated one."
@@ -237,7 +353,7 @@ msgstr ""
 "Czy chcesz usunąć spersonalizowaną książkę abstraktów? W ten sposób "
 "powrócisz do automatycznie wygenerowanej."
 
-#: indico/modules/events/abstracts/client/js/boa.jsx:156
+#: indico/modules/events/abstracts/client/js/boa.jsx:138
 msgid ""
 "Do you really want to delete the Book of Abstracts? This will disable the "
 "Book of Abstracts until you upload a new one."
@@ -245,14 +361,24 @@ msgstr ""
 "Czy chcesz usunąć tę książkę abstraktów? W ten sposób usuniesz książkę "
 "abstraktów do czasu załadowania nowej."
 
-#: indico/modules/events/abstracts/client/js/boa.jsx:167
+#: indico/modules/events/abstracts/client/js/boa.jsx:149
+#: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx:51
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:511
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:119
-#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:53
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:55
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:146
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:311
+#: indico/web/client/js/react/components/RequestConfirm.jsx:103
 msgid "Delete"
 msgstr "Usuń"
+
+#: indico/modules/events/client/js/favorite.jsx:29
+msgid "Add event to favorites"
+msgstr ""
+
+#: indico/modules/events/client/js/favorite.jsx:30
+msgid "Delete event from favorites"
+msgstr ""
 
 #: indico/modules/events/client/js/header.jsx:25
 msgid "Basic"
@@ -284,7 +410,7 @@ msgstr ""
 "Szczegółowy harmonogram zawierający wszystkie indywidualne kontrybucje. "
 
 #: indico/modules/events/client/js/header.jsx:60
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:85
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:84
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx:57
 msgid "Export"
 msgstr "Eksport"
@@ -341,23 +467,19 @@ msgid "Book of Abstracts"
 msgstr "Książka abstraktów"
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:69
-#: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:67
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:218
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:95
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:169
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:67
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:43
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:62
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:150
 #: indico/web/client/js/react/components/WTFButtonsBooleanField.jsx:55
 msgid "No"
 msgstr "Nie"
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:72
-#: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:66
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:217
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:94
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:168
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:61
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:43
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:54
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:149
 #: indico/web/client/js/react/components/WTFButtonsBooleanField.jsx:54
 msgid "Yes"
 msgstr "Tak"
@@ -370,31 +492,30 @@ msgstr "Opublikowana"
 msgid "Draft"
 msgstr "Szkic"
 
-#: indico/modules/events/contributions/client/js/index.jsx:45
+#: indico/modules/events/contributions/client/js/index.jsx:46
 msgid "Contribution"
 msgstr "Kontrybucja"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:51
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:56
 msgid "Submit paper"
 msgstr "Złóż artykuł"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:52
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:57
 msgid "Submit poster"
 msgstr "Złóż poster"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:53
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:58
 msgid "Submit slides"
 msgstr "Złóż slajdy"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:101
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:106
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:70
-#: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:80
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:116
-#: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:63
+#: indico/web/client/js/react/forms/final-form.jsx:144
 msgid "Submit"
 msgstr "Złóż"
 
-#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:116
+#: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:121
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:108
 msgid "Submit files"
 msgstr "Złóż pliki"
 
@@ -438,7 +559,7 @@ msgid "You can leave a comment if you wish"
 msgstr "Możesz zostawić komentarz"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:62
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:30
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:40
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:31
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:52
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:688
@@ -456,14 +577,6 @@ msgstr "Zostaw komentarz..."
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:62
 msgid "Restrict visibility of this comment to other editors"
 msgstr "Ogranicz innym redaktorom widoczność tego komentarza"
-
-#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
-#: indico/modules/events/management/client/js/EventMove.jsx:158
-#: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
-#: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
-msgid "Comment"
-msgstr "Komentarz"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:59
 #: indico/modules/events/papers/client/js/components/RevisionComment.jsx:55
@@ -557,7 +670,7 @@ msgid "Filename pattern: {pattern}"
 msgstr "Wzór nazwy pliku: [pattern]"
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:345
-#: indico/web/client/js/react/components/files/SingleFileManager.jsx:177
+#: indico/web/client/js/react/components/files/SingleFileManager.jsx:181
 msgid "Upload in progress"
 msgstr "Ładowanie trwa"
 
@@ -585,22 +698,30 @@ msgstr[3] "Brak żądanych typów: {types}"
 msgid "Reset review"
 msgstr "Zresetuj sprawdzenie"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:71
+#: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:66
+msgid "Reset"
+msgstr "Wyczyść"
+
+#: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:72
 msgid "Are you sure you want to reset the review?"
 msgstr "Czy chcesz zresetować to sprawdzenie?"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:40
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:50
 msgid "Make changes"
 msgstr "Zmień"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:45
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:55
 msgid "Request changes"
 msgstr "Zażądaj zmian"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:81
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:120
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:93
 msgid "Judge"
 msgstr "Zatwierdź"
+
+#: indico/modules/events/editing/client/js/editing/timeline/StateIndicator.jsx:55
+msgid "Unknown"
+msgstr "Nieznany"
 
 #: indico/modules/events/editing/client/js/editing/timeline/SubmitRevision.jsx:68
 #: indico/modules/events/papers/client/js/components/SubmitRevision.jsx:74
@@ -649,17 +770,17 @@ msgstr "Okres redagowania jeszcze się nie rozpoczął."
 msgid "Since you are a manager you can edit anyway."
 msgstr "Możesz redagować jako zarządca."
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:65
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:62
 msgid "{submitterName} has submitted files"
-msgstr ""
+msgstr "{submitterName} przesłał pliki"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:75
 msgid "Hide"
-msgstr ""
+msgstr "Ukryj"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:78
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:75
 msgid "Show details"
-msgstr ""
+msgstr "Pokaż szczegóły"
 
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx:63
 msgid "This revision has been updated"
@@ -672,7 +793,7 @@ msgstr "{link}Kliknij tutaj, aby odświeżyć{/link} i ujrzeć najnowszą wersj�
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:67
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:33
 #: indico/modules/events/management/client/js/EventMove.jsx:172
-#: indico/web/client/js/react/components/RequestConfirm.jsx:60
+#: indico/web/client/js/react/components/RequestConfirm.jsx:91
 #: indico/web/client/js/react/components/principals/Search.jsx:477
 msgid "Confirm"
 msgstr "Potwierdź"
@@ -746,15 +867,16 @@ msgstr "Składającego poproszono o zmiany"
 msgid "{editorName} (editor) has made some changes to the paper"
 msgstr " (Redaktor) {editorName} wprowadził poprawki do artykułu"
 
-#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:87
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:368
+#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:83
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:371
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:106
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:118
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:271
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:112
 msgid "Save"
 msgstr "Zapamiętaj"
 
-#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:98
+#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:94
 msgid ""
 "No editable types enabled yet. Click the toggle to enable any editable "
 "types."
@@ -762,20 +884,20 @@ msgstr ""
 "Nie ma jeszcze edytowalnych typów. Kliknij klawisz przełączający, aby takie "
 "typy udostępnić."
 
-#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:115
+#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:111
 #: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:177
 msgid "List"
 msgstr "Listuj"
 
-#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:121
+#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:117
 msgid "Manage"
 msgstr "Zarządzaj"
 
-#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:134
+#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:130
 msgid "List of editable types"
 msgstr "Lista typów edytowalnych"
 
-#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:137
+#: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:133
 msgid "Toggle editable types"
 msgstr "Przełącz typy edytowalne"
 
@@ -795,50 +917,50 @@ msgstr "Skonfiguruj tagi dla wersji"
 msgid "Configure"
 msgstr "Skonfiguruj"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:45
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:44
 msgid "Custom editing workflow"
 msgstr "Spersonalizowana usługa redagowania"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:52
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:51
 msgid "Checking custom editing workflow status"
 msgstr "Sprawdzanie statusu spersonalizowanej usługi redagowania"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:54
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:53
 msgid "Workflow service unavailable: {error}"
 msgstr "Usługa redagowania nie jest dostępna: {error}"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:63
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:62
 msgid "Use a custom editing workflow provided by an external service"
 msgstr ""
 "Wykorzystaj spersonalizowaną usługę redagowania świadczoną przez "
 "zewnętrznego dostawcę"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:67
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:66
 msgid "Custom editing workflow: {name} ({version})"
 msgstr "Usługa spersonalizowanego redagowania: {name} ({version})"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:72
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:71
 msgid "Connected to a custom editing workflow service"
 msgstr "Połączony z usługą spersonalizowanego redagowania"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:81
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:80
 msgid "disconnect"
 msgstr "rozłącz"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:118
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:251
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:117
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:250
 msgid "Connect"
 msgstr "Przyłącz"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:127
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:126
 msgid "Disconnect"
 msgstr "Rozłącz"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:128
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:127
 msgid "Disconnect editing workflow service"
 msgstr "Rozłącz z usługą redagowania"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:132
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:131
 msgid ""
 "Disconnecting the editing workflow service while it is unavailable may leave"
 " your editing process in an inconsistent state. Do not perform this action "
@@ -852,7 +974,7 @@ msgstr ""
 "najprawdopodobniej przejściowy. Rozłączenie i połączenie prawdopodobnie nie "
 "pomoże.{/strong}"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:142
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:141
 msgid ""
 "Do you really want to disconnect from the editing workflow service? If your "
 "editing process has already started (e.g. people submitted content to be "
@@ -864,24 +986,24 @@ msgstr ""
 "najprawdopodobniej złym pomysłem, dopuszczalnym tylko wtedy, jeżeli nie "
 "planujesz powrotu do tej usługi dla tego wydarzenia."
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:156
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:155
 msgid "Connect to editing workflow service"
 msgstr "Połącz się z usługą redagowania"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:167
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:166
 msgid "Service URL"
 msgstr "URL usługi"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:169
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:168
 msgid ""
 "Provide the URL for the service implementing your custom editing workflow."
 msgstr "Podaj URL spersonalizowanej usługi redakcji."
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:211
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:210
 msgid "Your editing workflow will be managed by {service} ({version})."
 msgstr "Twoje redagowanie będzie zarządzane przez {service} ({version})."
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:218
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:217
 msgid ""
 "Please note that connecting to this service may immediately update your "
 "editing settings and create e.g. new tags and file types. Only connect if "
@@ -891,7 +1013,7 @@ msgstr ""
 "twoje ustawienia redakcyjne i utworzyć np. nowe tagi i typy plików. Połącz "
 "się więc tylko wtedy, gdy chcesz skorzystać z tej usługi w twoim wydarzeniu!"
 
-#: indico/modules/events/editing/client/js/management/ManageService.jsx:226
+#: indico/modules/events/editing/client/js/management/ManageService.jsx:225
 msgid ""
 "If you are a developer looking to implement a custom workflow, head over to "
 "the {link}reference implementation of the OpenReferee spec on GitHub{/link}."
@@ -900,77 +1022,106 @@ msgstr ""
 "pracy, przejdź do {link}referencyjnej implementacji specyfikacji OpenReferee"
 " w serwisie GitHub{/link}."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:131
-msgid "List of papers"
-msgstr "Lista artykułów"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:132
-msgid "List of slides"
-msgstr "Lista slajdów"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:133
-msgid "List of posters"
-msgstr "Lista posterów"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:137
-msgid "ID"
-msgstr "ID"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:138
-#: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:51
-msgid "Code"
-msgstr "Kod"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:139
-#: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:52
-#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:83
-#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:85
-msgid "Title"
-msgstr "Tytuł"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:140
-msgid "Rev."
-msgstr "Wersja"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:141
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:130
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:189
 msgid "Status"
 msgstr "Status"
 
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:132
+#: indico/modules/events/editing/client/js/models.js:51
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:482
+msgid "Accepted"
+msgstr "Zaakceptowane"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:133
+#: indico/modules/events/editing/client/js/models.js:54
+msgid "Ready for review"
+msgstr "Gotowy do oceny"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:134
+#: indico/modules/events/editing/client/js/models.js:53
+msgid "Not submitted"
+msgstr "Nie złożony"
+
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:142
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:190
 msgid "Editor"
 msgstr "Redaktor"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:221
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:251
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:157
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:99
+msgid "Program code"
+msgstr "Kod programu"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:166
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:108
+msgid "Keywords"
+msgstr "Słowa kluczowe"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:179
+msgid "List of papers"
+msgstr "Lista artykułów"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:180
+msgid "List of slides"
+msgstr "Lista slajdów"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:181
+msgid "List of posters"
+msgstr "Lista posterów"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:185
+msgid "ID"
+msgstr "ID"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:186
+#: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:45
+msgid "Code"
+msgstr "Kod"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:187
+#: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:46
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:124
+#: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:53
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:83
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:85
+#: indico/modules/users/client/js/PersonalDataForm.jsx:81
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:128
+#: indico/web/client/js/react/components/WTFLinkListField.jsx:101
+msgid "Title"
+msgstr "Tytuł"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:188
+msgid "Rev."
+msgstr "Wersja"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:263
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:289
 msgid "n/a"
 msgstr "nie dotyczy"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:393
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:435
 msgid "Assign"
 msgstr "Przydziel"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:401
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:203
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:443
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:241
 msgid "Assign to myself"
 msgstr "Przydziel mi"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:409
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:451
 msgid "Unassign"
 msgstr "Odłącz"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:417
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:459
 msgid "Download all files"
 msgstr "Ściągnij wszystkie pliki"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:423
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:465
 msgid "Export as JSON"
 msgstr "Eksportuj jako JSON"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:432
-msgid "Enter #id or search string"
-msgstr "Wprowadź #id lub poszukiwany łańcuch"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:522
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:556
 msgid "There are no editables yet."
 msgstr "Jeszcze nie ma plików do redagowania."
 
@@ -1076,23 +1227,23 @@ msgstr "Pozwól redaktorom samodzielnie rozdzielić pliki edytowalne"
 msgid "Editing ({type})"
 msgstr "Redaguj ({type})"
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:168
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:122
 msgid "has files"
 msgstr "zawiera pliki"
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:177
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:125
 msgid "has no files"
 msgstr "nie zawiera plików"
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:266
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:304
 msgid "There are no editables available."
 msgstr "Nie ma plików edytowalnych."
 
-#: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:63
+#: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:53
 msgid "Set editors"
 msgstr "Ustaw redaktorów"
 
-#: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:73
+#: indico/modules/events/editing/client/js/management/editable_type/TeamManager.jsx:65
 msgid "Editors"
 msgstr "Redaktorzy"
 
@@ -1104,65 +1255,61 @@ msgstr "Wprowadź rozszerzenie"
 msgid "Add extension"
 msgstr "Dodaj rozszerzenie"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:120
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:119
 msgid "This type has files attached"
 msgstr "Ten typ ma załączniki"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:122
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:121
 msgid "This type is used in a review condition"
 msgstr "Ten typ występuje w warunku edycji"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:124
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:123
 msgid "Cannot delete the only publishable type"
 msgstr "Nie można usunąć jedynego typu do publikacji"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:132
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:131
 msgid "There are no file types defined for this event"
 msgstr "Dla tego wydarzenia nie określono typów pliku"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:141
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:98
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:140
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:81
 msgid "File required"
 msgstr "Wymagany plik"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:146
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:145
 msgid "Multiple files allowed"
 msgstr "Dozwolone są wielokrotne pliki"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:151
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:150
 msgid "File publishable"
 msgstr "Pliki do publikacji"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:188
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:187
 msgid "(no extension restrictions)"
 msgstr "(brak ograniczeń na rozszerzenie)"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:195
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:194
 msgid "Add a new file type"
 msgstr "Dodaj nowy typ pliku"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:201
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:200
 msgid "Edit file type"
 msgstr "Redaguj typ pliku"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:202
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:201
 msgid "Create a new file type"
 msgstr "Utwórz nowy typ pliku"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:216
-msgid "Delete file type"
-msgstr "Usuń typ pliku"
-
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:223
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeManager.jsx:220
 msgid "Are you sure you want to delete the file type {fileType}?"
 msgstr "Czy chcesz usunąć typ pliku {fileType}?"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:61
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:47
 msgid "Take into account that this file type has files attached to it."
 msgstr "Pamiętaj, że ten typ pliku ma załączniki."
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:68
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:24
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:51
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:26
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:80
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:81
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:105
@@ -1170,11 +1317,11 @@ msgstr "Pamiętaj, że ten typ pliku ma załączniki."
 msgid "Name"
 msgstr "Nazwa"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:71
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:54
 msgid "Filename template"
 msgstr "Szablon nazwa pliku"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:73
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:56
 msgid ""
 "Glob-style filename template that all files of this type have to conform to "
 "(e.g. {example}). No dots allowed. It is possible to use {placeholder} as a "
@@ -1184,32 +1331,32 @@ msgstr ""
 "tego typu (np. {example}). Bez kropek. Można używać {placeholder} jako "
 "symbol zastępczy dla kodu kontrybucji."
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:87
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:70
 msgid "Extensions"
 msgstr "Rozszerzenia"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:90
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:73
 msgid ""
 "Allowed file extensions. If left empty, there are no extension restrictions"
 msgstr "Dozwolone rozszerzenia pliku. Jeżeli puste, to brak ograniczeń."
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:99
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:82
 msgid "Whether the file type is mandatory"
 msgstr "Czy typ pliku jest obowiązkowy"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:103
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:86
 msgid "Multiple files"
 msgstr "Wielokrotne pliki"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:105
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:87
 msgid "Whether the file type allows uploading multiple files"
 msgstr "Czy ten typ pliku zezwala na ładowanie wielokrotnych plików"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:110
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:91
 msgid "Publishable"
 msgstr "Do publikacji"
 
-#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:111
+#: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:92
 msgid "Whether the files of this type can be published"
 msgstr "Czy pliki tego typu mogą być publikowane"
 
@@ -1217,11 +1364,7 @@ msgstr "Czy pliki tego typu mogą być publikowane"
 msgid "AND"
 msgstr "i"
 
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:93
-msgid "Delete review condition"
-msgstr "Usuń warunek oceniania"
-
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:99
+#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ConditionInfo.jsx:97
 msgid "Are you sure you want to delete this condition?"
 msgstr "Czy chcesz usunąć ten warunek?"
 
@@ -1229,7 +1372,7 @@ msgstr "Czy chcesz usunąć ten warunek?"
 msgid "Select filetypes to create a condition"
 msgstr "Wybierz typy plików, aby utworzyć warunek"
 
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:60
+#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:59
 msgid ""
 "Here you can define what filetype-related conditions have to be met for a "
 "submission to be eligible for review. In order to start the review process, "
@@ -1239,28 +1382,28 @@ msgstr ""
 " plik mógł być sprawdzony. Aby rozpocząć proces sprawdzenia, załadowane "
 "pliki muszą spełniać jedno z określonych kryteriów."
 
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:68
+#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:67
 msgid "No reviewing conditions have been defined"
 msgstr "Nie określono warunków opiniowania"
 
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:85
+#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:84
 msgid "OR"
 msgstr "LUB"
 
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:92
+#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:91
 #: indico/web/client/js/react/components/files/FileArea.jsx:128
 msgid "Or"
 msgstr "lub"
 
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:109
+#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/ReviewConditionsManager.jsx:108
 msgid "Create new filetype condition"
 msgstr "Utwórz nowy warunek dla typu pliku"
 
-#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/index.jsx:34
+#: indico/modules/events/editing/client/js/management/editable_type/review_conditions/index.jsx:32
 msgid "Review conditions"
 msgstr "Warunki oceniania"
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:127
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:126
 msgid ""
 "System tags are managed by the editing workflow service and cannot be "
 "modified."
@@ -1268,35 +1411,29 @@ msgstr ""
 "Tagi systemowe są zarządzane przez usługę redagowania i nie mogą być "
 "zmieniane."
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:136
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:135
 msgid "There are no tags defined for this event"
 msgstr ""
 "Brak tagów określonych dla tego wydarzenia"
 "                                                    "
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:146
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:145
 msgid "Add new tag"
 msgstr "Dodaj nowy tag"
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:152
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:151
 msgid "Edit tag"
 msgstr "Edytuj tag"
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:153
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:152
 msgid "Create a new tag"
 msgstr "Utwórz nowy tag"
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:167
-msgid "Delete tag"
-msgstr ""
-"Usuń tag"
-"                                                                                                                                                                     "
-
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:174
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:171
 msgid "Are you sure you want to delete the tag {tag}?"
 msgstr "Czy chcesz usunąć tag {tag}?"
 
-#: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:55
+#: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:49
 msgid "Color"
 msgstr "Kolor"
 
@@ -1327,28 +1464,15 @@ msgstr "Wymaga potwierdzenia składającego"
 msgid "Rejected"
 msgstr "Odrzucone"
 
-#: indico/modules/events/editing/client/js/models.js:51
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:482
-msgid "Accepted"
-msgstr "Zaakceptowane"
-
 #: indico/modules/events/editing/client/js/models.js:52
-msgid "Assigned"
-msgstr "Przydzielony"
-
-#: indico/modules/events/editing/client/js/models.js:53
 msgid "Needs submitter changes"
 msgstr ""
 "Potrzebne zmiany składającego"
 "                                                                                                                                                                "
 
-#: indico/modules/events/editing/client/js/models.js:54
-msgid "Not submitted"
-msgstr "Nie złożony"
-
 #: indico/modules/events/editing/client/js/models.js:55
-msgid "Ready for review"
-msgstr "Gotowy do oceny"
+msgid "New"
+msgstr "Nowy"
 
 #: indico/modules/events/editing/client/js/models.js:59
 msgid "Paper Editing"
@@ -1424,9 +1548,21 @@ msgid_plural ""
 "Moving events there {strong}requires approval{/strong} by a category "
 "manager. Until approved, the events will remain in their current category."
 msgstr[0] ""
+"Przeniesienie wydarzenia tam {strong}wymaga zatwierdzenia{/strong} przez "
+"menedżera kategorii. Do czasu zatwierdzenia, wydarzenie pozostaną w swojej "
+"obecnej kategorii."
 msgstr[1] ""
+"Przeniesienie wydarzeń tam {strong}wymaga zatwierdzenia{/strong} przez "
+"menedżera kategorii. Do czasu zatwierdzenia, wydarzenia pozostaną w swojej "
+"obecnej kategorii."
 msgstr[2] ""
+"Przeniesienie wydarzeń tam {strong}wymaga zatwierdzenia{/strong} przez "
+"menedżera kategorii. Do czasu zatwierdzenia, wydarzenia pozostaną w swojej "
+"obecnej kategorii."
 msgstr[3] ""
+"Przeniesienie wydarzeń tam {strong}wymaga zatwierdzenia{/strong} przez "
+"menedżera kategorii. Do czasu zatwierdzenia, wydarzenia pozostaną w swojej "
+"obecnej kategorii."
 
 #: indico/modules/events/management/client/js/EventMove.jsx:160
 msgid ""
@@ -1468,6 +1604,132 @@ msgstr "Opublikuj wydarzenie w kategorii"
 #: indico/modules/events/management/client/js/EventMove.jsx:339
 msgid "Publish"
 msgstr "Opublikuj"
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:67
+msgid "Manage event series"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:70
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:152
+msgid "Manage series"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:76
+msgid "Create event series"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:79
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:152
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:173
+msgid "Create series"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:168
+msgid "Delete series"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:173
+msgid "Update series"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:183
+msgid "A series needs to contain at least one event."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:194
+msgid "Events in series"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:196
+msgid "Events to add"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:202
+msgid "Series options"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:206
+msgid "Show the sequence number in the event titles (lectures only)"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:212
+msgid "Show links to the other events of the series on the main event page"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:218
+msgid "Event title pattern"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:220
+msgid ""
+"Title pattern for cloned events. Must contain the {placeholder} placeholder "
+"which will indicate the new event's position in the series."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:228
+msgid "Title pattern must contain the {placeholder} placeholder"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:244
+msgid ""
+"Do you really want to delete this series? The associated events will not be "
+"deleted."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:299
+msgid "No event found with this ID."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:301
+msgid "You don't have rights to access this event."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:303
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:385
+msgid "This event is unlisted."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:372
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:465
+#: indico/modules/users/client/js/Favorites.jsx:208
+msgid "Unlisted"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:379
+msgid "You do not have editing rights for this event."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:391
+msgid "This event is already part of a different series."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:397
+msgid "This event is already part of this series."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:414
+msgid "Search for an event title or paste an event URL or event ID (#123)"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:433
+msgid "Searching..."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:437
+msgid "No results found."
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:438
+msgid "Enter search term"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:452
+msgid "this event"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:484
+msgid "Remove from event series"
+msgstr ""
 
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:56
 msgid "Visible only to judges"
@@ -1525,27 +1787,27 @@ msgstr "Zmień recenzję"
 msgid "Submit review"
 msgstr "Zgłoś recenzję"
 
-#: indico/modules/events/papers/client/js/components/Paper.jsx:132
+#: indico/modules/events/papers/client/js/components/Paper.jsx:134
 msgid "Peer Reviewing"
 msgstr "Recenzowanie"
 
-#: indico/modules/events/papers/client/js/components/Paper.jsx:136
+#: indico/modules/events/papers/client/js/components/Paper.jsx:138
 msgid "The paper was reviewed"
 msgstr "Artykuł zrecenzowano"
 
-#: indico/modules/events/papers/client/js/components/Paper.jsx:138
+#: indico/modules/events/papers/client/js/components/Paper.jsx:140
 msgid "Your paper is under review"
 msgstr "Twój artykuł jest recenzowany"
 
-#: indico/modules/events/papers/client/js/components/Paper.jsx:148
+#: indico/modules/events/papers/client/js/components/Paper.jsx:150
 msgid "Submit for Editing"
 msgstr "Dostarcz do redakcji"
 
-#: indico/modules/events/papers/client/js/components/Paper.jsx:156
+#: indico/modules/events/papers/client/js/components/Paper.jsx:158
 msgid "Submit for editing"
 msgstr "Dostarcz do redakcji"
 
-#: indico/modules/events/papers/client/js/components/Paper.jsx:162
+#: indico/modules/events/papers/client/js/components/Paper.jsx:164
 msgid "The paper was {url}submitted{/url} for editing"
 msgstr "Artykuł był {url}dostarczony{/url} do redakcji"
 
@@ -1664,9 +1926,40 @@ msgstr "Ukryj starą wersję"
 msgid "Show old revision"
 msgstr "Pokaż starą wersję"
 
+#: indico/modules/events/persons/client/js/EditEventPerson.jsx:51
+msgid "Edit person information"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:26
+msgid "Your participation will only be visible to organizers of this event."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:30
+msgid ""
+"Your participation will be displayed to other participants of this event."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:36
+msgid ""
+"Your participation will be displayed to everyone who can see this event."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:46
+msgid "Do not display my participation to anyone"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:53
+msgid "Display my participation only to other participants of this event"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:59
+msgid "Display my participation to everyone who can see this event"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:60
 #: indico/modules/rb/client/js/modules/admin/EditableList.jsx:60
 #: indico/modules/rb/client/js/modules/admin/EditableList.jsx:147
+#: indico/web/client/js/react/components/WTFLinkListField.jsx:77
 msgid "Add"
 msgstr "Dodaj"
 
@@ -1677,6 +1970,602 @@ msgstr "Brak przypisanych tagów."
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:105
 msgid "Add tags"
 msgstr "Dodaj tagi"
+
+#: indico/modules/events/registration/client/js/form/FormItem.jsx:24
+msgid "This field is locked since changing it could trigger a price change."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormItem.jsx:30
+msgid "As a manager you can modify it nonetheless."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormItem.jsx:42
+msgid "This field is locked due to an expired retention period."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormItem.jsx:47
+msgid "The associated registration data has been deleted."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormItem.jsx:89
+msgid ""
+"Field data will be purged {retentionPeriod} week after the event ended."
+msgid_plural ""
+"Field data will be purged {retentionPeriod} weeks after the event ended."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/registration/client/js/form/FormSection.jsx:35
+msgid "This section is only visible to managers."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormSection.jsx:72
+msgid "Disabled fields"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormSection.jsx:75
+msgid "These fields won't be displayed to registrants"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:125
+msgid "{price} {currency} per night"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:159
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:307
+msgid "Arrival"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:160
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:314
+msgid "Departure"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:165
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:144
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:126
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:259
+msgid "Total: {total} {currency}"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:221
+msgid "You must select an option"
+msgstr "Musisz wybrać opcję"
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:223
+msgid "You must select the arrival and departure date"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:292
+msgid "The departure period cannot begin before the arrival period."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:297
+msgid "The arrival period cannot end after the departure period."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:321
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:224
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:451
+msgid "Choices"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:328
+msgid "You need to have at least one enabled option."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:34
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:141
+msgid "First Name"
+msgstr "Imię "
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:35
+msgid "Last Name"
+msgstr "Nazwisko"
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:148
+msgid "No accompanying persons registered"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:159
+msgid "Edit this person"
+msgstr "Edytuj tę osobę"
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:164
+msgid "Remove this person"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:178
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:196
+msgid "Add accompanying person"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:195
+msgid "Edit accompanying person"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:277
+msgid "Maximum per registrant"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:278
+#: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:113
+#: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:78
+msgid "No maximum"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:288
+msgid "Accompanying persons count against registration limit"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:107
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:39
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:368
+#: indico/web/client/js/react/components/syncedInputs.jsx:155
+#: indico/web/client/js/react/forms/validators.js:58
+msgid "This field is required."
+msgstr "To pole jest wymagane"
+
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:157
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:88
+msgid "Places limit"
+msgstr "Liczba miejsc"
+
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:158
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:169
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:89
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:241
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:167
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:30
+#: indico/modules/users/client/js/PersonalDataForm.jsx:82
+msgid "None"
+msgstr "Żaden"
+
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:167
+msgid "Default value"
+msgstr "Domyślna wartość"
+
+#: indico/modules/events/registration/client/js/form/fields/ChoiceLabel.jsx:20
+msgid ""
+"The currently chosen option is not available anymore. If you unselect it you"
+" won't be able to choose it back."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoiceLabel.jsx:27
+msgid ""
+"The currently chosen option has been modified. If you unselect it you may "
+"not be able to select it again for the same price."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoiceLabel.jsx:32
+msgid ""
+"The currently chosen option has been modified. If you unselect it you may "
+"not be able to select it again."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoiceLabel.jsx:41
+msgid "This option could trigger a price change and has been blocked."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoiceLabel.jsx:44
+msgid "Choosing this option will result in a price change."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:78
+msgid "Caption"
+msgstr "Podpis"
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:81
+msgid "Price ({currency})"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:86
+msgid "Limit"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:90
+msgid "Max. extra slots"
+msgstr "Maksimum dodatkowych okienek"
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:118
+msgid "All prices are per night"
+msgstr "Wszystkie ceny są za noc"
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:122
+msgid "Add new"
+msgstr "Dodaj nowy"
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:196
+msgid "No accommodation"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:236
+msgid "Extra slots pay"
+msgstr "Cena za dodatkowe okno"
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:248
+#: indico/web/client/js/react/components/WTFLinkListField.jsx:121
+msgid "Remove row"
+msgstr "Usuń wiersz"
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:255
+msgid "Disable choice"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:261
+msgid "Enable choice"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:27
+msgid "Select a country"
+msgstr "Wybierz kraj"
+
+#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:88
+msgid "Default to affiliation country"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:101
+msgid "The provided date is invalid."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:222
+msgid "12 hours"
+msgstr "12 godzin"
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:223
+msgid "24 hours"
+msgstr "24 godziny"
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:229
+msgid "Date format"
+msgstr "Format daty"
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:239
+msgid "Time format"
+msgstr "Format czasu"
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:50
+msgid "Checking email address..."
+msgstr "Sprawdzanie adresu email..."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:62
+msgid "There is already a registration with this email address."
+msgstr "Dla tego adresu e-mail jest już rejestracja."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:64
+msgid "The user associated with this email address is already registered."
+msgstr "Użytkownik związany z tym adresem email jest już zarejestrowany."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:66
+msgid "There is no Indico user associated with this email address."
+msgstr "Nie ma użytkownika Indico z tym adresem email."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:71
+msgid "This email address is not associated with your Indico account."
+msgstr "Ten adres email nie jest związany z Twoim kontem Indico."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:74
+msgid "The registration will be re-associated to a different user ({name})."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:82
+msgid "The registration will be disassociated from the current user ({name})."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:90
+msgid "The domain used in the email address does not exist."
+msgstr "Domena użyta w tym adresie email nie istnieje."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:92
+msgid "This email address is invalid."
+msgstr "Ten adres email jest błędny."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:95
+msgid "The registration will not be associated with any Indico account."
+msgstr "Ta rejestracja nie będzie związana z żadnym kontem Indico."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:97
+msgid "The registration will be associated with your Indico account."
+msgstr "Ta rejestracja zostanie powiązana z Twoim kontem Indico."
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:100
+msgid ""
+"The registration will remain associated with the Indico account {name}."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:107
+msgid "The registration will be associated with the Indico account {name}."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:219
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:446
+msgid "Enable extra slots"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:100
+msgid "Minimum"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:112
+msgid "Maximum"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:127
+msgid "The minimum value cannot be greater than the maximum value."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/PlacesLeftLabel.jsx:21
+msgid "1 place left"
+msgid_plural "{count} places left"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/registration/client/js/form/fields/PlacesLeftLabel.jsx:28
+msgid "No places left"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:112
+#: indico/web/client/js/react/components/WTFMultipleTagSelectField.jsx:51
+msgid "Choose an option"
+msgstr "Wybierz opcję"
+
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:424
+msgid "Widget type"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:426
+msgid "Drop-down list"
+msgstr "Lista rozwijana"
+
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:427
+msgid "Radio buttons"
+msgstr "Przyciski opcji"
+
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:436
+msgid "Default option"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/TextAreaInput.jsx:55
+msgid "Rows"
+msgstr "Wiersze"
+
+#: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:55
+msgid "Min. length"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:64
+msgid ""
+"If you want to make the field required, select the \"Required field\" "
+"checkbox. The minimum length only applies if the field is not empty."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:77
+msgid "Max. length"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:92
+msgid "The minimum length cannot be greater than the maximum length."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:69
+msgid "Label"
+msgstr "Etykieta"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:78
+msgid "Text field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:85
+msgid "Text area"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:91
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:50
+msgid "Number"
+msgstr "Numer"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:99
+msgid "Checkbox"
+msgstr "Pole wyboru"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:108
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:99
+msgid "Date"
+msgstr "Data"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:116
+msgid "Yes/No"
+msgstr "Tak/Nie"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:123
+msgid "Phone"
+msgstr "Telefon"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:128
+msgid "Country"
+msgstr "Państwo"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:134
+msgid "File"
+msgstr "Plik"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:139
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:151
+msgid "Email"
+msgstr "E-mail"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:144
+msgid "Single Choice"
+msgstr "Wybór jednokrotny"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:153
+msgid "Multiple Choice"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:162
+msgid "Accommodation"
+msgstr "Zakwaterowanie"
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:174
+msgid "Accompanying Persons"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx:38
+msgid "Restore"
+msgstr "Przywróć"
+
+#: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx:71
+msgid "Are you sure you want to delete the section \"{field}\"?"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx:99
+#: indico/modules/events/registration/client/js/form_setup/RegistrationFormSetup.jsx:49
+msgid "Disabled sections"
+msgstr "Sekcje wyłączone"
+
+#: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx:105
+msgid "There are no disabled sections."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:50
+msgid "Remove field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:57
+msgid "Enable field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:64
+msgid "Disable field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:70
+msgid "Configure field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:82
+msgid "Are you sure you want to delete the field \"{field}\"?"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormSectionSetupActions.jsx:38
+msgid "Disable section"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/FormSectionSetupActions.jsx:44
+msgid "Configure section"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:97
+msgid "Configure field \"{section}\""
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:102
+msgid "Add new field"
+msgstr "Dodaj nowe pole"
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:120
+msgid "Please choose a field type."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:127
+#: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:56
+msgid "Description"
+msgstr "Opis"
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:128
+#: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:57
+msgid "You can use Markdown or basic HTML formatting tags."
+msgstr "Możesz używać znaczników Markdown lub podstawowego HTML."
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:138
+msgid "Price"
+msgstr "Cena"
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:144
+msgid "Required field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:154
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:91
+msgid "Permanent"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:158
+msgid "Retention period (weeks)"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:166
+msgid ""
+"Please note that invoice information will be lost as well once a field's "
+"retention period expires."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx:22
+msgid "Choose type"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx:34
+msgid "Add field"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/RegistrationFormSetup.jsx:45
+msgid "Add section"
+msgstr "Dodaj sekcję"
+
+#: indico/modules/events/registration/client/js/form_setup/RegistrationFormSetup.jsx:98
+msgid "Saving..."
+msgstr "Składuję..."
+
+#: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:45
+msgid "Configure section \"{section}\""
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:49
+msgid "Add new section"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:62
+msgid "Manager-only"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:63
+msgid "Whether the section is only visible for managers."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:44
+msgid "Email notifications"
+msgstr "Powiadomienia e-mail"
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:48
+msgid "Send an email notification to the user"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:62
+msgid "Participant list"
+msgstr "Lista uczestników"
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:67
+msgid ""
+"Specify whether you consent to being included in the event's list of "
+"participants"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:149
+msgid "Modify"
+msgstr "Zmodyfikuj"
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:151
+#: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:164
+msgid "Apply"
+msgstr "Zastosuj"
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:152
+msgid "Register"
+msgstr "Zarejestruj się"
 
 #: indico/modules/events/sessions/client/js/session_display.jsx:22
 msgid "Session"
@@ -1759,8 +2648,8 @@ msgstr "Nie ma wystąpienia dnia ({date})."
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:257
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:735
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:232
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:87
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:357
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:86
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:360
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
@@ -1931,6 +2820,7 @@ msgid "This booking has already started."
 msgstr "Ta rezerwacja już trwa"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:229
+#: indico/modules/users/client/js/PersonalDataForm.jsx:136
 #: indico/modules/users/client/js/ProfilePicture.jsx:207
 msgid "Save changes"
 msgstr "Zapamiętaj zmiany"
@@ -1982,30 +2872,30 @@ msgid "Booking after changes"
 msgstr "Rezerwacja po zmianach"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:134
-#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:243
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:245
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:74
 msgid "Single booking"
 msgstr "Pojedyncza rezerwacja"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:143
-#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:252
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:254
 msgid "Daily booking"
 msgstr "Dzienna rezerwacja"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:152
-#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:261
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:263
 msgid "Recurring booking"
 msgstr "Powtarzalna rezerwacja"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:163
-#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:272
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:274
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:93
 msgid "Every"
 msgstr "każdy"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:192
 #: indico/modules/rb/client/js/common/timeline/DateNavigator.jsx:177
-#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:225
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:227
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:59
 msgid "Week"
 msgid_plural "Weeks"
@@ -2016,7 +2906,7 @@ msgstr[3] "Tygodni"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:196
 #: indico/modules/rb/client/js/common/timeline/DateNavigator.jsx:183
-#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:226
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:228
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:63
 msgid "Month"
 msgid_plural "Months"
@@ -2062,11 +2952,11 @@ msgstr "Format pliku"
 msgid "Period"
 msgstr "Okres"
 
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:74
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:73
 msgid "Rooms to export"
 msgstr "Pokoje do eksportu"
 
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:77
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:76
 msgid "Please choose at least one room."
 msgstr "Proszę wybrać przynajmniej jeden pokój"
 
@@ -2106,10 +2996,6 @@ msgstr "Liczba poprzednich wystąpień, które nie zostaną zmodyfikowane"
 msgid "Number of new occurrences after changes"
 msgstr "Liczba nowych wystąpień po zmianach"
 
-#: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:164
-msgid "Apply"
-msgstr "Zastosuj"
-
 #: indico/modules/rb/client/js/common/filters/validation.js:43
 msgid "Something went wrong"
 msgstr "Coś się nie udało "
@@ -2146,44 +3032,44 @@ msgstr "Wybierz obszar"
 msgid "Zoom out to include all listed rooms"
 msgstr "Pomniejsz, aby uwzględnić wszystkie wymienione pokoje"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:204
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:210
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:588
 msgid "Usage"
 msgstr "Wykorzystanie"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:226
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:232
 msgid "See all bookings"
 msgstr "Zobacz wszystkie rezerwacje"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:240
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:246
 msgid "Would you like to use this space?"
 msgstr "Czy chcesz wykorzystać tę przestrzeń?"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:246
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:252
 msgid "Start booking"
 msgstr "Rozpocznij rezerwację"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:252
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:258
 msgid "Start pre-booking"
 msgstr "Rozpocznij wstępną rezerwację"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:284
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:290
 msgid "Anyone can book this space."
 msgstr "Każdy może zarezerwować tę przestrzeń."
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:286
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:292
 msgid "You can book this space."
 msgstr "Możesz zarezerwować tę przestrzeń."
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:291
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:297
 msgid "Max. {max_advance_days} days in advance"
 msgstr "Co najwyżej {max_advance_days} dni wcześniej"
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:306
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:312
 msgid "This space cannot be booked at the moment."
 msgstr "W tym momencie nie można zarezerwować tej przestrzeni."
 
-#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:315
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:321
 msgid "You are not authorized to book this space."
 msgstr "Nie masz uprawnień do rezerwacji tej przestrzeni."
 
@@ -2244,6 +3130,7 @@ msgid "Where is the key?"
 msgstr "Gdzie jest klucz?"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:31
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:161
 msgid "Telephone"
 msgstr "Telefon"
 
@@ -2264,88 +3151,84 @@ msgstr "Podział"
 msgid "Comments"
 msgstr "Komentarze"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:19
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:121
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:21
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:120
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:141
 msgid "Location"
 msgstr "Miejsce"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:30
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:34
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:151
 msgid "Site"
 msgstr "Siedziba"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:32
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:40
 #: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:169
 #: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:55
 msgid "Building"
 msgstr "Budynek"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:33
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:45
 msgid "Floor"
 msgstr "Piętro"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:34
-msgid "Number"
-msgstr "Numer"
-
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:41
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:59
 msgid "Surface Area (m²)"
 msgstr "Powierzchnia (m²)"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:49
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:67
 msgid "Latitude"
 msgstr "Szerokość"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:57
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:75
 msgid "Longitude"
 msgstr "Długość"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:110
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:109
 msgid "Basic Details"
 msgstr "Podstawowe szczegóły"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:136
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:135
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx:26
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx:51
 msgid "Permissions"
 msgstr "Pozwolenia"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:149
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:148
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:20
 msgid "Notifications"
 msgstr "Potwierdzenia"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:165
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:164
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditOptions.jsx:106
 msgid "Options"
 msgstr "Wybór"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:273
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:276
 msgid "Both latitude and longitude need to be set (or omitted)."
 msgstr "Należy określić (lub pominąć) szerokość i długość geograficzną."
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:296
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:299
 msgid "Add Room"
 msgstr "Dodaj pokój"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:296
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:299
 msgid "Edit Room Details"
 msgstr "Edytuj opis pokoju"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:300
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:303
 msgid "Room has been successfully created."
 msgstr "Pokój utworzono."
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:310
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:313
 msgid "Room has been successfully updated."
 msgstr "Pokój zaktualizowano."
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:320
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:323
 msgid "Room could not be updated."
 msgstr "Pokoju nie można zaktualizować."
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:327
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:330
 msgid "Reset form"
 msgstr "Resetuj formularz"
 
@@ -2365,25 +3248,25 @@ msgstr "Przypomnienia o kończących się rezerwacjach działają"
 msgid "How many days in advance booking reminders should be sent"
 msgstr "Z jakim wyprzedzeniem wysłać przypomnienia rezerwacji"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:43
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:41
 msgid "Single/Daily"
 msgstr "raz na dobę"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:57
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:106
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:54
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:96
 msgid "Weekly"
 msgstr "Tygodniowo"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:71
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:120
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:67
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:108
 msgid "Monthly"
 msgstr "Miesięcznie"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:81
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:77
 msgid "How many days before the end of a booking should reminders be sent"
 msgstr "Na ile dni przed końcem rezerwacji należy wysłać przypomnienia"
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:92
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditNotifications.jsx:84
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:83
 #: indico/modules/rb/client/js/util.jsx:171
 msgid "Daily"
@@ -2598,7 +3481,7 @@ msgid "Room Booking"
 msgstr "Rezerwowanie pokoju"
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:55
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:496
+#: indico/web/client/js/react/components/PersonLinkField.jsx:328
 #: indico/web/client/js/react/components/principals/Search.jsx:126
 msgid "Search"
 msgstr "Poszukiwanie"
@@ -2629,8 +3512,9 @@ msgid "This space is not publicly available"
 msgstr "Ta przestrzeń nie jest publiczna"
 
 #: indico/modules/rb/client/js/components/Room.jsx:71
-#: indico/modules/users/client/js/Favorites.jsx:111
-#: indico/modules/users/client/js/Favorites.jsx:178
+#: indico/modules/users/client/js/Favorites.jsx:118
+#: indico/modules/users/client/js/Favorites.jsx:222
+#: indico/modules/users/client/js/Favorites.jsx:289
 msgid "Remove from favorites"
 msgstr "Usuń z ulubionych"
 
@@ -2645,10 +3529,6 @@ msgstr "Nie określony"
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:157
 msgid "Room Owner"
 msgstr "Właściciel pokoju"
-
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:163
-msgid "Phone number"
-msgstr "Numer telefonu"
 
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:172
 msgid "1 {label}seat{/label}"
@@ -2780,11 +3660,11 @@ msgid "Equipment & Features"
 msgstr "Sprzęt i cechy"
 
 #: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:88
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:199
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:240
 msgid "Locations"
 msgstr "Miejsca"
 
-#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:52
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:54
 msgid "Are you sure you want to delete this room?"
 msgstr "Czy potwierdzasz usunięcie tego pokoju?"
 
@@ -2872,10 +3752,6 @@ msgstr "Typy sprzętu"
 msgid "Add equipment type"
 msgstr "Dodaj typ sprzętu"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:30
-msgid "None"
-msgstr "Żaden"
-
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:34
 msgid "Custom"
 msgstr "Spersonalizowany"
@@ -2896,20 +3772,30 @@ msgstr[3] "{count} pokojów"
 msgid "Room name format"
 msgstr "Format nazwy pokoju"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:117
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:140
-msgid "Missing placeholder: {placeholders}"
-msgid_plural "Missing placeholders: {placeholders}"
-msgstr[0] "Brakujący symbol zastępczy: {placeholders}"
-msgstr[1] "Brakujące symbole zastępcze: {placeholders}"
-msgstr[2] "Brakujące symbole zastępcze: {placeholders}"
-msgstr[3] "Brakujące symbole zastępcze:  {placeholders}"
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:116
+msgid "Missing placeholder: number"
+msgstr ""
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:128
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:122
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:179
+msgid "Invalid placeholder: {placeholders}"
+msgid_plural "Invalid placeholders: {placeholders}"
+msgstr[0] "Nieprawidłowy symbol zastępczy: {placeholders}"
+msgstr[1] "Nieprawidłowe symbole zastępcze: {placeholders}"
+msgstr[2] "Nieprawidłowe symbole zastępcze: {placeholders}"
+msgstr[3] "Nieprawidłowe symbole zastępcze: {placeholders}"
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:131
+msgid ""
+"Specify the room name format using any of the following placeholders: "
+"{placeholders}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:143
 msgid "Map URL template"
 msgstr "Zmapuj szablon URL"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:130
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:145
 msgid ""
 "Indico can show a link to an external map when a room is associated to an "
 "event."
@@ -2917,7 +3803,7 @@ msgstr ""
 "Indico może pokazać link do zewnętrznej mapy, jeżeli pokój jest związany z "
 "wydarzeniem."
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:148
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:189
 msgid ""
 "Specify a custom URL template using any of the following placeholders: "
 "{placeholders}"
@@ -2925,13 +3811,13 @@ msgstr ""
 "Określ szablon URL spersonalizowanego używając jednego z poniższych symboli "
 "zastępczych: {placeholders}"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:166
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:207
 msgid ""
 "Are you sure you want to delete the location {name} and all data associated "
 "with it?"
 msgstr "Czy chcesz skasować miejsce {name} i wszystkie dane z nim związane?"
 
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:200
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:241
 msgid "Add location"
 msgstr "Dodaj miejsce"
 
@@ -3062,6 +3948,14 @@ msgstr ""
 msgid "Please provide a valid URL"
 msgstr "Proszę podać prawidłowy URL"
 
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:140
+msgid "Missing placeholder: {placeholders}"
+msgid_plural "Missing placeholders: {placeholders}"
+msgstr[0] "Brakujący symbol zastępczy: {placeholders}"
+msgstr[1] "Brakujące symbole zastępcze: {placeholders}"
+msgstr[2] "Brakujące symbole zastępcze: {placeholders}"
+msgstr[3] "Brakujące symbole zastępcze:  {placeholders}"
+
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:155
 msgid "Max. booking length"
 msgstr "Maksymalna długość rezerwacji"
@@ -3183,7 +4077,7 @@ msgid "There are no blockings."
 msgstr "Brak blokad."
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:31
-#: indico/web/client/js/react/forms/validators.js:94
+#: indico/web/client/js/react/forms/validators.js:112
 msgid "Please choose a valid period."
 msgstr "Proszę podać właściwy okres."
 
@@ -3503,10 +4397,6 @@ msgstr "Utwórz wstępną rezerwację"
 msgid "Recurrence"
 msgstr "Powtarzalność"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:99
-msgid "Date"
-msgstr "Data"
-
 #: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:117
 msgid "Time"
 msgstr "Czas"
@@ -3604,18 +4494,18 @@ msgid "Spaces unavailable during that time slot (click for details)."
 msgstr "Przestrzenie niedostępne w podanym okresie (kliknąć po szczegóły)"
 
 #: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:162
-msgid "Unauthorized{count}"
-msgstr "Niedozwolone{count}"
+msgid "Unauthorized"
+msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:171
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:169
 msgid "Spaces you are not authorized to book."
 msgstr "Nie masz uprawnień do zarezerwowania tych przestrzeni"
 
-#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:181
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:179
 msgid "No known spaces match your query"
 msgstr "Żadna znana przestrzeń nie spełnia warunków"
 
-#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:191
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:189
 msgid "No spaces are available during that time slot"
 msgstr "Żadne przestrzenie nie są dostępne w podanym okresie"
 
@@ -3806,11 +4696,11 @@ msgstr "⟨ Poprzednia strona"
 msgid "Next page ⟩"
 msgstr "Następna strona ⟩"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:110
+#: indico/modules/search/client/js/components/SearchApp.jsx:108
 msgid "Enter a term above to begin searching."
 msgstr "Wpisz termin powyżej, aby rozpocząć wyszukiwanie. "
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:112
+#: indico/modules/search/client/js/components/SearchApp.jsx:110
 msgid ""
 "Enter a term above to begin searching inside the {categoryTitle} category. "
 "You can {link}search all of Indico instead{/link}."
@@ -3818,15 +4708,15 @@ msgstr ""
 "Wpisz termin powyżej, aby rozpocząć wyszukiwanie w kategorii "
 "{categoryTitle}. Zamiast tego możesz {link}przeszukać całe Indico{/link}."
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:131
+#: indico/modules/search/client/js/components/SearchApp.jsx:129
 msgid "No Results"
 msgstr "Brak wyników"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:134
+#: indico/modules/search/client/js/components/SearchApp.jsx:132
 msgid "Your search - {query} - did not match any results."
 msgstr "Twoje wyszukanie - {query} - nie przyniosło żadnych wyników. "
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:138
+#: indico/modules/search/client/js/components/SearchApp.jsx:136
 msgid ""
 "Your search - {query} - did not match any results. You could try "
 "{link}searching all of Indico instead{/link}."
@@ -3834,31 +4724,31 @@ msgstr ""
 "Twoje wyszukanie - {query} - nie przyniosło żadnych wyników. Możesz "
 "spróbować {link}, any przeszukać całe Indico zamiast{/link}."
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:190
+#: indico/modules/search/client/js/components/SearchApp.jsx:188
 msgid "Sort by: {value}"
 msgstr "Sortuj według: {value}"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:265
-#: indico/modules/search/client/js/components/SearchApp.jsx:270
+#: indico/modules/search/client/js/components/SearchApp.jsx:259
+#: indico/modules/search/client/js/components/SearchApp.jsx:264
 msgid "Materials"
 msgstr "Materiały"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:271
+#: indico/modules/search/client/js/components/SearchApp.jsx:265
 #: indico/modules/search/client/js/components/results/EventNote.jsx:24
 msgid "Notes"
 msgstr "Uwagi"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:272
+#: indico/modules/search/client/js/components/SearchApp.jsx:266
 #: indico/modules/users/client/js/dashboard.jsx:22
 msgid "Categories"
 msgstr "Kategorie"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:297
+#: indico/modules/search/client/js/components/SearchApp.jsx:291
 #: indico/modules/search/client/js/components/SearchBox.jsx:55
 msgid "ADMIN"
 msgstr "ADMIN"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:299
+#: indico/modules/search/client/js/components/SearchApp.jsx:293
 #: indico/modules/search/client/js/components/SearchBox.jsx:58
 msgid "Skip access checks"
 msgstr "Pomiń kontrole dostępu"
@@ -3880,25 +4770,37 @@ msgstr "Wszystko w Indico  "
 msgid "et al."
 msgstr "i in."
 
-#: indico/modules/users/client/js/Favorites.jsx:79
+#: indico/modules/users/client/js/Favorites.jsx:86
 msgid "Favorite Categories"
 msgstr "Ulubione kategorie"
 
-#: indico/modules/users/client/js/Favorites.jsx:121
+#: indico/modules/users/client/js/Favorites.jsx:128
 msgid "You have not marked any category as favorite."
 msgstr "NIe oznaczyłeś żadnej kategorii jako ulubionej. "
 
-#: indico/modules/users/client/js/Favorites.jsx:143
+#: indico/modules/users/client/js/Favorites.jsx:180
+msgid "Favorite Events"
+msgstr ""
+
+#: indico/modules/users/client/js/Favorites.jsx:232
+msgid "You have not marked any event as favorite."
+msgstr ""
+
+#: indico/modules/users/client/js/Favorites.jsx:254
 msgid "Add Indico user"
 msgstr "Dodaj użytkownika Indico"
 
-#: indico/modules/users/client/js/Favorites.jsx:151
+#: indico/modules/users/client/js/Favorites.jsx:262
 msgid "Favorite Users"
 msgstr "Ulubieni użytkownicy"
 
-#: indico/modules/users/client/js/Favorites.jsx:187
+#: indico/modules/users/client/js/Favorites.jsx:298
 msgid "You have not marked any user as favorite."
 msgstr "Nie oznaczyłeś żadnego użytkownika jako ulubionego. "
+
+#: indico/modules/users/client/js/PersonalDataForm.jsx:128
+msgid "You can manage your email addresses {link}here{/link}."
+msgstr ""
 
 #: indico/modules/users/client/js/ProfilePicture.jsx:49
 msgid "Based on {email}"
@@ -3920,10 +4822,45 @@ msgstr "Bliskie wydarzenia"
 msgid "Everything"
 msgstr "Wszystko"
 
+#: indico/web/client/js/jquery/utils/forms.js:201
+#: indico/web/client/js/react/forms/unload.jsx:17
+msgid "Are you sure you want to leave this page without saving?"
+msgstr "Czy chcesz opuścić tę stronę bez składowania?"
+
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:477
-#: indico/web/client/js/react/components/principals/Search.jsx:691
+#: indico/web/client/js/react/components/principals/Search.jsx:721
 msgid "Group"
 msgstr "Grupa"
+
+#: indico/web/client/js/react/components/Captcha.jsx:86
+msgid "Pause"
+msgstr ""
+
+#: indico/web/client/js/react/components/Captcha.jsx:86
+msgid "Play"
+msgstr ""
+
+#: indico/web/client/js/react/components/Captcha.jsx:102
+msgid "Refresh CAPTCHA"
+msgstr ""
+
+#: indico/web/client/js/react/components/Captcha.jsx:125
+msgid "Confirm that you are not a robot"
+msgstr ""
+
+#: indico/web/client/js/react/components/Captcha.jsx:128
+msgid ""
+"Type the characters you see in the image. You can also listen to the audio "
+"instead"
+msgstr ""
+
+#: indico/web/client/js/react/components/Captcha.jsx:135
+msgid "Failed to load CAPTCHA, try refreshing it"
+msgstr ""
+
+#: indico/web/client/js/react/components/Captcha.jsx:155
+msgid "Answer"
+msgstr "Odpowiedź"
 
 #: indico/web/client/js/react/components/ClipboardButton.jsx:45
 msgid "Text copied"
@@ -3947,6 +4884,7 @@ msgstr ""
 "kalendarza. Zawartość zostanie automatycznie zsynchronizowana. "
 
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx:175
+#: indico/web/client/js/react/components/WTFRemoteSearchDropdown.jsx:221
 msgid "Loading…"
 msgstr "Ładowanie..."
 
@@ -3959,6 +4897,101 @@ msgid ""
 "Download an iCalendar file that you can use in calendaring applications."
 msgstr ""
 "Pobierz plik iCalendar, którego możesz używać w aplikacjach kalendarzowych."
+
+#: indico/web/client/js/react/components/ListFilter.jsx:113
+msgid "Filter"
+msgstr "Filtr"
+
+#: indico/web/client/js/react/components/ListFilter.jsx:141
+msgid "Clear all filters"
+msgstr ""
+
+#: indico/web/client/js/react/components/ListFilter.jsx:146
+msgid "No filters were added yet"
+msgstr ""
+
+#: indico/web/client/js/react/components/ListFilter.jsx:194
+msgid "Enter #id or search string"
+msgstr "Wprowadź #id lub poszukiwany łańcuch"
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:25
+msgid "Mr"
+msgstr "Pan"
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:26
+msgid "Ms"
+msgstr "Pani"
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:27
+msgid "Mrs"
+msgstr "Pani"
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:28
+msgid "Dr"
+msgstr "Dr"
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:29
+msgid "Prof"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:30
+msgid "Mx"
+msgstr "Mx"
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:76
+#: indico/web/client/js/react/components/syncedInputs.jsx:161
+msgid "Use custom affiliation:"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:78
+#: indico/web/client/js/react/components/syncedInputs.jsx:163
+msgid "Select an affiliation or add your own"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:79
+#: indico/web/client/js/react/components/syncedInputs.jsx:164
+msgid "Search an affiliation or enter one manually"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:81
+#: indico/web/client/js/react/components/syncedInputs.jsx:166
+msgid "You entered this option manually"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:111
+msgid "Edit Person"
+msgstr "Edytuj osobę"
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:111
+msgid "Enter Person"
+msgstr "Wprowadź osobę"
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:121
+msgid ""
+"You are updating details that were originally linked to a user. Please note "
+"that its identity will remain the same."
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:145
+msgid "Family Name"
+msgstr "Nazwisko"
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:188
+#: indico/web/client/js/react/components/PersonLinkField.jsx:301
+msgid "There are no persons"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:294
+msgid "Others"
+msgstr "Inni"
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:318
+msgid "Add myself"
+msgstr "Dopisz mnie"
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:338
+msgid "Enter manually"
+msgstr "Wprowadź ręcznie"
 
 #: indico/web/client/js/react/components/ScrollButton.jsx:31
 msgid "Back to top"
@@ -3988,9 +5021,10 @@ msgstr "Wyczyść datę"
 msgid "Clear date and time"
 msgstr "Wyczyść datę i czas"
 
-#: indico/web/client/js/react/components/WTFMultipleTagSelectField.jsx:51
-msgid "Choose an option"
-msgstr "Wybierz opcję"
+#: indico/web/client/js/react/components/WTFLinkListField.jsx:46
+#: indico/web/client/js/react/components/WTFLinkListField.jsx:111
+msgid "URL"
+msgstr "URL"
 
 #: indico/web/client/js/react/components/WTFOccurrencesField.jsx:82
 msgid "Add occurrence"
@@ -4003,6 +5037,42 @@ msgstr "Czas trwania w minutach"
 #: indico/web/client/js/react/components/WTFOccurrencesField.jsx:152
 msgid "Remove occurrence"
 msgstr "Usuń wystąpienie"
+
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:53
+msgid "Visibility to participants"
+msgstr ""
+
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:72
+msgid "Visibility to everyone"
+msgstr ""
+
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:87
+msgid "Visibility duration (weeks)"
+msgstr ""
+
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:106
+msgid ""
+"Setting 'Visibility to everyone' to 'Show all participants' is discouraged "
+"as everyone who can access this event can see the participant list "
+"regardless of the participants' consent."
+msgstr ""
+
+#: indico/web/client/js/react/components/WTFRemoteSearchDropdown.jsx:184
+msgid "Search requires at least {count} character or an id prefixed with #"
+msgid_plural ""
+"Search requires at least {count} characters or an id prefixed with #"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/web/client/js/react/components/WTFRemoteSearchDropdown.jsx:195
+msgid "Search requires at least {count} character"
+msgid_plural "Search requires at least {count} characters"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: indico/web/client/js/react/components/files/FileArea.jsx:25
 msgid "{size} bytes"
@@ -4037,7 +5107,7 @@ msgstr "Przeciągnij plik tutaj"
 msgid "Choose new file from your computer"
 msgstr "Wybierz nowy plik z komputera"
 
-#: indico/web/client/js/react/components/files/SingleFileManager.jsx:184
+#: indico/web/client/js/react/components/files/SingleFileManager.jsx:183
 msgid "Upload failed"
 msgstr "Ładowanie nieudane"
 
@@ -4084,52 +5154,43 @@ msgstr[1] "{total} ulubionych"
 msgstr[2] "{total} ulubionych"
 msgstr[3] "{total}  ulubionych"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:540
+#: indico/web/client/js/react/components/principals/Search.jsx:538
 msgid "Family name"
 msgstr "Nazwisko"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:542
+#: indico/web/client/js/react/components/principals/Search.jsx:540
 msgid "Given name"
 msgstr "Imię"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:543
-#: indico/web/client/js/react/errors/component.jsx:78
-msgid "Email address"
-msgstr "Adres email"
-
-#: indico/web/client/js/react/components/principals/Search.jsx:544
-msgid "Affiliation"
-msgstr "Afiliacja"
-
-#: indico/web/client/js/react/components/principals/Search.jsx:548
+#: indico/web/client/js/react/components/principals/Search.jsx:546
 msgid "Include users with no Indico account"
 msgstr "Dodać użytkowników niemających konta Indico"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:551
-#: indico/web/client/js/react/components/principals/Search.jsx:705
+#: indico/web/client/js/react/components/principals/Search.jsx:549
+#: indico/web/client/js/react/components/principals/Search.jsx:735
 msgid "Exact matches only"
 msgstr "Tylko dokładne trafienia"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:559
+#: indico/web/client/js/react/components/principals/Search.jsx:558
 msgid "Select user"
 msgstr "Wybierz użytkownika"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:559
-msgid "Add users"
-msgstr "Dodaj użytkownika"
+#: indico/web/client/js/react/components/principals/Search.jsx:558
+msgid "Select users"
+msgstr "Wybierz użytkowników"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:636
+#: indico/web/client/js/react/components/principals/Search.jsx:666
 msgid ""
 "Your query matched too many users. Please try more specific search criteria."
 msgstr ""
 "Twoje zapytanie dotyczy zbyt wielu użytkowników. Proszę zawęzić kryteria "
 "wyszukiwania."
 
-#: indico/web/client/js/react/components/principals/Search.jsx:639
+#: indico/web/client/js/react/components/principals/Search.jsx:669
 msgid "No users found"
 msgstr "Nie znaleziono użytkowników"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:642
+#: indico/web/client/js/react/components/principals/Search.jsx:672
 msgid "{count} user found"
 msgid_plural "{count} users found"
 msgstr[0] "Znaleziono {count} użytkownika"
@@ -4137,29 +5198,29 @@ msgstr[1] "Znaleziono {count} użytkowników"
 msgstr[2] "Znaleziono {count} użytkowników"
 msgstr[3] "Znaleziono {count} użytkowników"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:693
+#: indico/web/client/js/react/components/principals/Search.jsx:723
 msgid "Select group"
 msgstr "Wybierz grupę"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:693
+#: indico/web/client/js/react/components/principals/Search.jsx:723
 msgid "Add groups"
 msgstr "Dodaj grupy"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:703
+#: indico/web/client/js/react/components/principals/Search.jsx:733
 msgid "Group name"
 msgstr "Nazwa grupy"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:728
+#: indico/web/client/js/react/components/principals/Search.jsx:758
 msgid ""
 "Your query matched too many groups. Please try more specific search "
 "criteria."
 msgstr "Twoje wyszukiwanie dotyczy zbyt wielu grup. Proszę zawęzić kryteria."
 
-#: indico/web/client/js/react/components/principals/Search.jsx:731
+#: indico/web/client/js/react/components/principals/Search.jsx:761
 msgid "No groups found"
 msgstr "Nie znaleziono żadnej grupy"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:734
+#: indico/web/client/js/react/components/principals/Search.jsx:764
 msgid "{count} group found"
 msgid_plural "{count} groups found"
 msgstr[0] "Znaleziono {count} grupę"
@@ -4167,11 +5228,11 @@ msgstr[1] "Znaleziono {count} grupy"
 msgstr[2] "Znaleziono {count} grup"
 msgstr[3] "Znaleziono {count} grupy"
 
-#: indico/web/client/js/react/components/principals/items.jsx:168
+#: indico/web/client/js/react/components/principals/items.jsx:226
 msgid "Nobody"
 msgstr "Nikt"
 
-#: indico/web/client/js/react/components/principals/items.jsx:172
+#: indico/web/client/js/react/components/principals/items.jsx:227
 msgid "Select a user"
 msgstr "Wybierz użytkownika"
 
@@ -4212,6 +5273,10 @@ msgstr "Ta grupa już nie istnieje. Proszę wybrać inną."
 #: indico/web/client/js/react/components/principals/util.js:141
 msgid "This form does not exist anymore. Please choose a different one."
 msgstr "Ten formularz już nie istnieje. Proszę wybrać inny."
+
+#: indico/web/client/js/react/components/syncedInputs.jsx:60
+msgid "Toggle synchronization of this field"
+msgstr ""
 
 #: indico/web/client/js/react/errors/component.jsx:58
 msgid "Submitting your error report failed"
@@ -4260,9 +5325,9 @@ msgstr "Pomiń (pokaż następny błąd)"
 msgid "Dismiss"
 msgstr "Pomiń"
 
-#: indico/web/client/js/react/forms/unload.jsx:17
-msgid "Are you sure you want to leave this page without saving?"
-msgstr "Czy chcesz opuścić tę stronę bez składowania?"
+#: indico/web/client/js/react/forms/final-form.jsx:104
+msgid "Are you sure you want to close this dialog without saving?"
+msgstr ""
 
 #: indico/web/client/js/react/forms/validators.js:16
 msgid "Value must be a number"
@@ -4280,59 +5345,55 @@ msgstr "Wartość może wynieść co najwyżej {maxValue}"
 msgid "Value must be at least {length} chars"
 msgstr "Wartość musi zawierać przynajmniej  {length} znaków"
 
-#: indico/web/client/js/react/forms/validators.js:58
-msgid "This field is required."
-msgstr "To pole jest wymagane"
-
-#: indico/web/client/js/utils/palette.js:28
+#: indico/web/client/js/utils/palette.js:29
 msgid "Red"
 msgstr "Czerwony"
 
-#: indico/web/client/js/utils/palette.js:29
+#: indico/web/client/js/utils/palette.js:30
 msgid "Orange"
 msgstr "Pomarańczowy"
 
-#: indico/web/client/js/utils/palette.js:30
+#: indico/web/client/js/utils/palette.js:31
 msgid "Yellow"
 msgstr "Żółty"
 
-#: indico/web/client/js/utils/palette.js:31
+#: indico/web/client/js/utils/palette.js:32
 msgid "Olive"
 msgstr "Oliwkowy"
 
-#: indico/web/client/js/utils/palette.js:32
+#: indico/web/client/js/utils/palette.js:33
 msgid "Green"
 msgstr "Zielony"
 
-#: indico/web/client/js/utils/palette.js:33
+#: indico/web/client/js/utils/palette.js:34
 msgid "Teal"
 msgstr "Zielononiebieski"
 
-#: indico/web/client/js/utils/palette.js:34
+#: indico/web/client/js/utils/palette.js:35
 msgid "Blue"
 msgstr "Niebieski"
 
-#: indico/web/client/js/utils/palette.js:35
+#: indico/web/client/js/utils/palette.js:36
 msgid "Violet"
 msgstr "Fioletowy"
 
-#: indico/web/client/js/utils/palette.js:36
+#: indico/web/client/js/utils/palette.js:37
 msgid "Purple"
 msgstr "Purpurowy"
 
-#: indico/web/client/js/utils/palette.js:37
+#: indico/web/client/js/utils/palette.js:38
 msgid "Pink"
 msgstr "Różowy"
 
-#: indico/web/client/js/utils/palette.js:38
+#: indico/web/client/js/utils/palette.js:39
 msgid "Brown"
 msgstr "Brązowy"
 
-#: indico/web/client/js/utils/palette.js:39
+#: indico/web/client/js/utils/palette.js:40
 msgid "Gray"
 msgstr "Szary"
 
-#: indico/web/client/js/utils/palette.js:40
+#: indico/web/client/js/utils/palette.js:41
 msgid "Black"
 msgstr "Czarny"
 

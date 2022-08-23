@@ -14,14 +14,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-06-14 13:07+0200\n"
+"POT-Creation-Date: 2022-08-18 18:00+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2022\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.2\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -80,100 +80,100 @@ msgstr[0] "{0} événement"
 msgstr[1] "{0} événements"
 msgstr[2] "{0} événements"
 
-#: indico/modules/categories/client/js/management.js:56
-#: indico/modules/events/management/client/js/index.js:308
+#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/events/management/client/js/index.js:327
 msgid "Undo"
 msgstr "Annuler"
 
-#: indico/modules/categories/client/js/management.js:58
+#: indico/modules/categories/client/js/management.js:59
 msgid "The category order has been restored."
 msgstr "L'ordre de la catégorie a été restauré."
 
-#: indico/modules/categories/client/js/management.js:60
+#: indico/modules/categories/client/js/management.js:61
 msgid "The category list has been sorted."
 msgstr "La liste des catégories a été triée."
 
-#: indico/modules/categories/client/js/management.js:178
+#: indico/modules/categories/client/js/management.js:184
 msgid "Delete category"
 msgstr "Supprimer la catégorie"
 
-#: indico/modules/categories/client/js/management.js:182
+#: indico/modules/categories/client/js/management.js:188
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Cette catégorie ne peut pas être supprimée car elle n'est pas vide."
 
-#: indico/modules/categories/client/js/management.js:190
+#: indico/modules/categories/client/js/management.js:196
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "Au moins une des catégories sélectionnée ne peut pas être supprimée car elle n'est pas vide."
 
-#: indico/modules/categories/client/js/management.js:195
+#: indico/modules/categories/client/js/management.js:201
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "Supprimer la catégorie sélectionnée"
 msgstr[1] "Supprimer les {0} catégories sélectionnées"
 msgstr[2] "Supprimer les {0} catégories sélectionnées"
 
-#: indico/modules/categories/client/js/management.js:203
+#: indico/modules/categories/client/js/management.js:209
 msgid "Select the categories to delete first."
 msgstr "Commencez par sélectionner les catégories à supprimer."
 
-#: indico/modules/categories/client/js/management.js:212
+#: indico/modules/categories/client/js/management.js:218
 msgid "Delete categories"
 msgstr "Supprimer les catégories"
 
-#: indico/modules/categories/client/js/management.js:232
+#: indico/modules/categories/client/js/management.js:238
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "Transférer la catégorie sélectionnée"
 msgstr[1] "Transférer les {0} catégories sélectionnées"
 msgstr[2] "Transférer les {0} catégories sélectionnées"
 
-#: indico/modules/categories/client/js/management.js:239
+#: indico/modules/categories/client/js/management.js:245
 msgid "Select the categories to move first."
 msgstr "Commencez par sélectionner les catégories à transférer."
 
-#: indico/modules/categories/client/js/management.js:268
+#: indico/modules/categories/client/js/management.js:274
 #: indico/modules/vc/client/js/index.js:54
-#: indico/web/client/js/jquery/utils/forms.js:413
+#: indico/web/client/js/jquery/utils/forms.js:405
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "*"
 msgstr[1] "Tous les {0} événements de cette catégorie sont actuellement sélectionnés."
 msgstr[2] "Tous les {0} événements de cette catégorie sont actuellement sélectionnés."
 
-#: indico/modules/categories/client/js/management.js:273
+#: indico/modules/categories/client/js/management.js:279
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "Seuls {0} événement sur {1} est actuellement sélectionné."
 msgstr[1] "Seuls {0} événements sur {1} sont actuellement sélectionnés."
 msgstr[2] "Seuls {0} événements sur {1} sont actuellement sélectionnés."
 
-#: indico/modules/categories/client/js/management.js:352
+#: indico/modules/categories/client/js/management.js:358
 msgid "Move here"
 msgstr "Déplacer ici"
 
-#: indico/modules/categories/client/js/management.js:353
+#: indico/modules/categories/client/js/management.js:359
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "Transférer la catégorie"
 msgstr[1] "Déplacer les catégories"
 msgstr[2] "Déplacer les catégories"
 
-#: indico/modules/categories/client/js/management.js:355
+#: indico/modules/categories/client/js/management.js:361
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Sélectionnez la nouvelle catégorie mère pour la catégorie sélectionnée"
 msgstr[1] "Sélectionnez la nouvelle catégorie mère pour les {0} catégories sélectionnées"
 msgstr[2] "Sélectionnez la nouvelle catégorie mère pour les {0} catégories sélectionnées"
 
-#: indico/modules/categories/client/js/management.js:371
+#: indico/modules/categories/client/js/management.js:377
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "La catégorie sélectionnée se trouve déjà à cet endroit"
 msgstr[1] "Les catégories sélectionnées se trouvent déjà à cet endroit"
 msgstr[2] "Les catégories sélectionnées se trouvent déjà à cet endroit"
 
-#: indico/modules/categories/client/js/management.js:379
+#: indico/modules/categories/client/js/management.js:385
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Ceci est la catégorie que vous essayez de transférer"
@@ -331,7 +331,7 @@ msgstr "{0} sur {1} sont affichés"
 msgid "There are no entries that match your search criteria."
 msgstr "Aucune entrée ne correspond à vos critères de recherche."
 
-#: indico/modules/events/management/client/js/index.js:306
+#: indico/modules/events/management/client/js/index.js:325
 msgid "Undoing previous operation..."
 msgstr "Annulation en cours de la dernière opération..."
 
@@ -442,67 +442,67 @@ msgstr "Une erreur s'est produite"
 msgid "The passwords do not match."
 msgstr "Les mots de passe ne correspondent pas."
 
-#: indico/web/client/js/jquery/utils/forms.js:77
+#: indico/web/client/js/jquery/utils/forms.js:69
 msgid "Field must be at least {0} character long."
 msgid_plural "Field must be at least {0} characters long."
 msgstr[0] "Le champ doit comprendre au moins {0} caractère."
 msgstr[1] "Le champ doit comprendre au moins {0} caractères."
 msgstr[2] "Le champ doit comprendre au moins {0} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:85
+#: indico/web/client/js/jquery/utils/forms.js:77
 msgid "Field cannot be longer than {0} character."
 msgid_plural "Field cannot be longer than {0} characters."
 msgstr[0] "Le champ ne peut pas contenir plus de {0} caractère."
 msgstr[1] "Le champ ne peut pas contenir plus de {0} caractères."
 msgstr[2] "Le champ ne peut pas contenir plus de {0} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:93
+#: indico/web/client/js/jquery/utils/forms.js:85
 msgid "Field must be between {0} and {1} characters long."
 msgstr "Le champ doit comprendre entre {0} et {1} caractères."
 
-#: indico/web/client/js/jquery/utils/forms.js:99
+#: indico/web/client/js/jquery/utils/forms.js:91
 msgid "Field must contain at least {0} word."
 msgid_plural "Field must contain at least {0} words."
 msgstr[0] "Le champ doit contenir au moins {0} mot."
 msgstr[1] "Le champ doit contenir au moins {0} mots."
 msgstr[2] "Le champ doit contenir au moins {0} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:107
+#: indico/web/client/js/jquery/utils/forms.js:99
 msgid "Field cannot contain more than {0} word."
 msgid_plural "Field cannot contain more than {0} words."
 msgstr[0] "Le champ ne peut pas contenir plus de {0} mot."
 msgstr[1] "Le champ ne peut pas contenir plus de {0} mots."
 msgstr[2] "Le champ ne peut pas contenir plus de {0} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:115
+#: indico/web/client/js/jquery/utils/forms.js:107
 msgid "Field must contain between {0} and {1} words."
 msgstr "Le champ doit contenir entre {0} et {1} mots."
 
-#: indico/web/client/js/jquery/utils/forms.js:133
+#: indico/web/client/js/jquery/utils/forms.js:125
 msgid "Save now"
 msgstr "Sauver maintenant"
 
-#: indico/web/client/js/jquery/utils/forms.js:134
+#: indico/web/client/js/jquery/utils/forms.js:126
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "Sauvegarde..."
 
-#: indico/web/client/js/jquery/utils/forms.js:135
+#: indico/web/client/js/jquery/utils/forms.js:127
 msgid "Do not forget to save your changes!"
 msgstr "N'oubliez pas de sauver vos modifications!"
 
-#: indico/web/client/js/jquery/utils/forms.js:419
+#: indico/web/client/js/jquery/utils/forms.js:411
 msgid "Only {0} out of {1} rows is currently selected"
 msgid_plural "Only {0} out of {1} rows are currently selected."
 msgstr[0] "Seuls {0} événement sur {1} est actuellement sélectionné."
 msgstr[1] "Seuls {0} événements sur {1} sont actuellement sélectionnés."
 msgstr[2] "Seuls {0} événements sur {1} sont actuellement sélectionnés."
 
-#: indico/web/client/js/jquery/utils/forms.js:458
+#: indico/web/client/js/jquery/utils/forms.js:450
 msgid "Select only the current page."
 msgstr "Choisir seulement la page actuelle."
 
-#: indico/web/client/js/jquery/utils/forms.js:472
+#: indico/web/client/js/jquery/utils/forms.js:464
 msgid "Click here to select them all."
 msgstr "Cliquer ici pour tout sélectionner"
 
@@ -637,7 +637,7 @@ msgstr "Vider la recherche"
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Vous avez sélectionné la catégorie <em>{0}</em>. Etes-vous sûr de vouloir continuer?"
 
-#: indico/web/client/js/jquery/widgets/itempicker.js:21
+#: indico/web/client/js/jquery/widgets/itempicker.js:23
 msgid "Type to filter..."
 msgstr "Tapez du texte pour filtrer..."
 
@@ -788,14 +788,6 @@ msgstr "Onglet précédent"
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:492
 msgid "Next tab"
 msgstr "Onglet suivant"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Widgets/RichText.js:212
-msgid "switch to plain text"
-msgstr "changer pour texte brut"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Widgets/RichText.js:213
-msgid "switch to rich text"
-msgstr "changer pour texte enrichi"
 
 #: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:267
 msgid "At least one must be selected"
