@@ -8,7 +8,7 @@
     {% if event.description %}
         <div class="event-details-row">
             <div class="event-details-label">{% trans %}Description{% endtrans %}</div>
-            <div class="event-details-content">{{ render_description(event, class='event-description') }}</div>
+            <div class="event-details-content">{{ render_description(event, class='event-description ck-output') }}</div>
         </div>
     {% endif %}
     {% if event.references and event.type_.name == "meeting" %}

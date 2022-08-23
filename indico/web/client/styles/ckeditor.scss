@@ -17,3 +17,44 @@
 .ck-source-editing-area textarea {
   height: 100% !important; /* overrides i-form auto height */
 }
+
+// When positioning images, ckeditor5 just applies certain classes that have to be manually implemented:
+// https://ckeditor.com/docs/ckeditor5/latest/features/images/images-styles.html
+// Inspired by the default ckeditor styles:
+// https://github.com/ckeditor/ckeditor5/blob/06d11a85d01aece904a6bdd25e72abd94a4dd314/packages/ckeditor5-image/theme/imagestyle.css
+// Applies to conference & event description, minutes and custom conference pages
+.ck-output {
+  $image-spacing: 1.5em;
+  display: flow-root;
+
+  img {
+    max-width: 100%;
+  }
+
+  // Applies to centered images, which by default have no class added
+  figure {
+    margin: $image-spacing auto;
+  }
+
+  .image-style-align-left,
+  .image-style-align-right,
+  .image-style-side {
+    margin-top: $image-spacing;
+    margin-bottom: $image-spacing;
+  }
+
+  .image-style-align-left {
+    float: left;
+    margin-right: $image-spacing;
+  }
+
+  .image-style-align-right,
+  .image-style-side {
+    float: right;
+    margin-left: $image-spacing;
+  }
+
+  .image-style-side {
+    max-width: 50%;
+  }
+}
