@@ -24,7 +24,7 @@ Major Features
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- New translation: German
 
 Improvements
 ^^^^^^^^^^^^
