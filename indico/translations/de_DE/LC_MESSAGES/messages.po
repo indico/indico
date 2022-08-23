@@ -29,7 +29,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-08-18 18:00+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
-"Last-Translator: Adrian, 2022\n"
+"Last-Translator: bbb user, 2022\n"
 "Language-Team: German (Germany) (http://www.transifex.com/indico/indico/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4485,7 +4485,7 @@ msgstr "Regeln dürfen nicht leer sein"
 #: indico/modules/events/contributions/fields.py:33
 #: indico/modules/events/persons/controllers.py:58
 msgid "Author"
-msgstr "Autor/in"
+msgstr "Autor"
 
 #: indico/modules/events/abstracts/fields.py:106
 #: indico/modules/events/abstracts/forms.py:466
@@ -9826,7 +9826,7 @@ msgstr "Erteilt Beurteilungsrechte für zugeordnete Paper"
 #: indico/modules/events/papers/__init__.py:113
 #: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html:14
 msgid "Content reviewer"
-msgstr "Inhalt Begutacher/in"
+msgstr "Inhalt Begutacher"
 
 #: indico/modules/events/papers/__init__.py:114
 msgid "Grants content reviewing rights for assigned papers."
@@ -9835,7 +9835,7 @@ msgstr "Erteilt das Recht zur inhaltlichen Überprüfung der zugewiesenen Paper.
 #: indico/modules/events/papers/__init__.py:119
 #: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html:17
 msgid "Layout reviewer"
-msgstr "Layout Begutachter/in"
+msgstr "Layout Begutachter"
 
 #: indico/modules/events/papers/__init__.py:120
 msgid "Grants layout reviewing rights for assigned papers."
@@ -9871,7 +9871,7 @@ msgstr "Liste der Nutzer, die Paper beurteilen können"
 #: indico/modules/events/papers/templates/_paper_list.html:295
 #: indico/modules/events/papers/templates/management/paper_person_list.html:8
 msgid "Content reviewers"
-msgstr "Inhalt Begutacher/innen"
+msgstr "Inhalt Begutacher"
 
 #: indico/modules/events/papers/forms.py:42
 msgid "List of users allowed to review the content of the assigned papers"
@@ -9883,7 +9883,7 @@ msgstr "Liste aller Nutzer, die Begutachtungen für den Inhalt der zugeordneten 
 #: indico/modules/events/papers/templates/_paper_list.html:308
 #: indico/modules/events/papers/templates/management/paper_person_list.html:12
 msgid "Layout reviewers"
-msgstr "Layout Begutachter/innen"
+msgstr "Layout Begutachter"
 
 #: indico/modules/events/papers/forms.py:45
 msgid "List of users allowed to review the layout of the assigned papers"
@@ -9925,11 +9925,11 @@ msgstr "Nicht zugeordnet"
 
 #: indico/modules/events/papers/settings.py:16
 msgid "Layout Reviewer"
-msgstr "Layout Begutachter/in"
+msgstr "Layout Begutachter"
 
 #: indico/modules/events/papers/settings.py:16
 msgid "Content Reviewer"
-msgstr "Inhalt Begutacher/in"
+msgstr "Inhalt Begutacher"
 
 #: indico/modules/events/papers/controllers/api.py:168
 #: indico/modules/events/papers/controllers/api.py:199
@@ -10026,11 +10026,11 @@ msgstr "Zum korrigiert werden"
 
 #: indico/modules/events/papers/models/reviews.py:58
 msgid "Visible to reviewers and judges"
-msgstr "Sichtbar für Begutachter/innen und Juroren"
+msgstr "Sichtbar für Begutachter und Juroren"
 
 #: indico/modules/events/papers/models/reviews.py:59
 msgid "Visible to contributors, reviewers, and judges"
-msgstr "Sichtbar für Beitragende, Begutachter/innen und Juroren"
+msgstr "Sichtbar für Beitragende, Begutachter und Juroren"
 
 #: indico/modules/events/papers/templates/_contributions.html:14
 msgid "Peer reviewing"
@@ -10554,7 +10554,7 @@ msgstr "Diese Person ist ein Juror"
 
 #: indico/modules/events/papers/templates/management/paper_person_list.html:39
 msgid "This person is not a judge"
-msgstr "Diese Person ist kein/e Juror/in"
+msgstr "Diese Person ist kein Juror"
 
 #: indico/modules/events/papers/templates/management/paper_person_list.html:45
 msgid "This person is a content reviewer"
