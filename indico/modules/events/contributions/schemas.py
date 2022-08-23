@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import hashlib
+from operator import attrgetter
 
 from marshmallow import fields, post_dump
 from marshmallow_sqlalchemy import column2field
@@ -19,6 +20,7 @@ from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.schemas import BasicSessionSchema, SessionBlockSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
+from indico.util.marshmallow import SortedList
 
 
 class BasicContributionSchema(mm.SQLAlchemyAutoSchema):
@@ -73,8 +75,9 @@ class FullContributionSchema(mm.SQLAlchemyAutoSchema):
     session_block = fields.Nested(SessionBlockSchema, only=('id', 'title', 'code'))
     track = fields.Nested(TrackSchema, only=('id', 'title', 'code'))
     type = fields.Nested(ContributionTypeSchema, only=('id', 'name'))
-    custom_fields = fields.Nested(ContributionFieldValueSchema, attribute='field_values', many=True)
-    persons = fields.Nested(ContributionPersonLinkSchema, attribute='person_links', many=True)
+    custom_fields = fields.List(fields.Nested(ContributionFieldValueSchema), attribute='field_values')
+    persons = SortedList(fields.Nested(ContributionPersonLinkSchema), attribute='person_links',
+                         sort_key=attrgetter('display_order_key'))
 
     @post_dump(pass_original=True)
     def _hide_restricted_fields(self, data, orig, **kwargs):
