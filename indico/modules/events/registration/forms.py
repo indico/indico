@@ -381,8 +381,8 @@ class RegistrationManagersForm(IndicoForm):
     Form to manage users with privileges to modify registration-related items.
     """
 
-    managers = PrincipalListField(_('Registration managers'), allow_groups=True, allow_emails=True,
-                                  allow_external_users=True,
+    managers = PrincipalListField(_('Registration managers'), allow_groups=True, allow_event_roles=True,
+                                  allow_category_roles=True, allow_emails=True, allow_external_users=True,
                                   description=_('List of users allowed to modify registrations'),
                                   event=lambda form: form.event)
 
