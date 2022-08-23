@@ -489,3 +489,21 @@ class NoneValueEnumField(EnumField):
         if value is None:
             return self.none_value
         return super().deserialize(value, *args, **kwargs)
+
+
+class SortedList(fields.List):
+    """
+    Like the normal List, but when dumping a sort key can be specified.
+    This allows sorting the data even without having the information needed
+    for sorting in the final dumped data.
+    """
+
+    def __init__(self, *args, sort_key, **kwargs):
+        self.sort_key = sort_key
+        super().__init__(*args, **kwargs)
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value is None:
+            return None
+        value = sorted(value, key=self.sort_key)
+        return super()._serialize(value, attr, obj, **kwargs)
