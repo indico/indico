@@ -1749,11 +1749,11 @@ msgstr "Nur für Juroren sichtbar"
 
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:60
 msgid "Visible to reviewers and judges"
-msgstr "Sichtbar für Gutachtende und Juroren"
+msgstr "Sichtbar für Gutachter und Juroren"
 
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:64
 msgid "Visible to contributors, reviewers and judges"
-msgstr "Sichtbar für Beitragende, Begutachter und Juroren"
+msgstr "Sichtbar für Beitragende, Gutachter und Juroren"
 
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
 msgid "Update comment"
