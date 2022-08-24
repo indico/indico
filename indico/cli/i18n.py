@@ -38,7 +38,7 @@ DEFAULT_OPTIONS = {
         'output_dir': TRANSLATIONS_DIR
     },
     'extract_messages': {
-        'keywords': 'N_:1,2',
+        'keywords': 'L_',
         'width': '120',
         'output_file': MESSAGES_POT,
         'mapping_file': 'babel.cfg'
