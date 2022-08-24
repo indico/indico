@@ -110,6 +110,8 @@ Internal Changes
 - Add ``signal_query`` method in the ``IndicoBaseQuery`` class and the ``db_query``
   signal, allowing to intercept and modify queries by signal handlers (:pr:`4981`,
   thanks :user:`omegak`).
+- Update WYSIWYG editor to CKEditor 5, resulting in a slightly different look for the
+  editor controls and removal of some uncommon format options (:pr:`5345`)
 
 
 ----
