@@ -5,7 +5,7 @@ Changelog
 Version 3.2
 -----------
 
-*Unreleased*
+*Released on August 25, 2022*
 
 Major Features
 ^^^^^^^^^^^^^^
