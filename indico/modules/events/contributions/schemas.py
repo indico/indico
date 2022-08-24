@@ -47,7 +47,7 @@ class ContributionFieldValueSchema(mm.Schema):
 
 class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
     affiliation_link = fields.Nested(AffiliationSchema)
-    email_hash = fields.Function(lambda x: hashlib.md5(x.email.encode()).hexdigest() if x else None)
+    email_hash = fields.Function(lambda x: hashlib.md5(x.email.encode()).hexdigest() if x.email else None)
 
     class Meta:
         model = ContributionPersonLink
