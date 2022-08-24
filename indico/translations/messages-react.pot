@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-08-22 18:00+0200\n"
+"POT-Creation-Date: 2022-08-22 11:33+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -1057,7 +1057,7 @@ msgstr ""
 msgid "Export as JSON"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:556
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:558
 msgid "There are no editables yet."
 msgstr ""
 
