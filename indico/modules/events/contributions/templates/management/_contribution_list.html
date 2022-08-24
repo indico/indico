@@ -147,7 +147,7 @@
                                 </span>
                             </td>
                             {% if has_codes %}
-                                <td class="i-table code-column" data-text="{{ contrib.code }}">
+                                <td class="i-table code-column" data-text="{{ contrib.code }}" data-searchable="{{ contrib.code|lower }}">
                                     <span class="vertical-aligner">
                                         {% if contrib.code -%}
                                             {{ contrib.code }}
