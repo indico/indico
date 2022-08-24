@@ -29,7 +29,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-08-24 11:33+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
-"Last-Translator: bbb user, 2022\n"
+"Last-Translator: Adrian, 2022\n"
 "Language-Team: German (Germany) (http://www.transifex.com/indico/indico/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1039,7 +1039,7 @@ msgid ""
 "HMAC signature) and you can (and should!) create one token for each "
 "script/application where you need to access the Indico API. To reduce the "
 "risk from a leaked token they also let you specify more fine-grained scopes."
-msgstr "Bitte stattdessen %(link_start)sAPI tokens%(link_end)s erzeugen. Diese stellen eine üblichere Methode zur Authentifizierung dar (Bearer token statt HMAC-Signatur). Uns Sie können (und sollten!) ein Token für jedes Skript / jede Applikation erzeugen, mit dem auf die API zugegriffen wird. Zur Verringerung des Risikos mit verlorenen Tokens kann auch eine begrenzte Reichweite definiert werden."
+msgstr "Bitte stattdessen %(link_start)sAPI tokens%(link_end)s erzeugen. Diese stellen eine üblichere Methode zur Authentifizierung dar (Bearer token statt HMAC-Signatur). Und Sie können (und sollten!) ein Token für jedes Skript / jede Applikation erzeugen, mit dem auf die API zugegriffen wird. Zur Verringerung des Risikos mit verlorenen Tokens kann auch eine begrenzte Reichweite definiert werden."
 
 #: indico/modules/api/templates/user_profile.html:39
 msgid "API Key"
@@ -3521,11 +3521,11 @@ msgstr "Nur Vorderseite"
 #: indico/modules/designer/__init__.py:94
 #: indico/modules/designer/__init__.py:101
 msgid "Posters/Badges"
-msgstr "Poster / Namensschilder"
+msgstr "Poster/Namensschilder"
 
 #: indico/modules/designer/controllers.py:209
 msgid "Created copy of template '{}'"
-msgstr "Kopie von Vorlage \"{}\" erstellt"
+msgstr "Kopie von Vorlage '{}' erstellt"
 
 #: indico/modules/designer/controllers.py:228
 msgid "Added new template '{}'"
@@ -3744,15 +3744,15 @@ msgstr "von Kategorie \"%(title)s\""
 
 #: indico/modules/designer/templates/_list.html:75
 msgid "This is the inherited default ticket template"
-msgstr "Dies ist die geerbte Standardticketvorlage"
+msgstr "Dies ist die geerbte Standard Ticketvorlage"
 
 #: indico/modules/designer/templates/_list.html:77
 msgid "This is the global default ticket template"
-msgstr "Dies ist die globale Standardticketvorlage"
+msgstr "Dies ist die globale Standard Ticketvorlage"
 
 #: indico/modules/designer/templates/_list.html:79
 msgid "Toggle default ticket template for this category"
-msgstr "Als Standardvorlage für diese Kategorie festlegen"
+msgstr "Als Standard Ticketvorlage für diese Kategorie festlegen"
 
 #: indico/modules/designer/templates/_list.html:95
 msgid "This is the inherited default badge template"
@@ -3777,7 +3777,7 @@ msgstr "Diese Vorlage klonen"
 #: indico/modules/designer/templates/_list.html:116
 #, python-format
 msgid "Are you sure you want to clone template '%(title)s'?"
-msgstr "Sind Sie sicher, dass Sie die Vorlage \"%(title)s\" klonen möchten?"
+msgstr "Sind Sie sicher, dass Sie die Vorlage '%(title)s' klonen möchten?"
 
 #: indico/modules/designer/templates/_list.html:124
 msgid "Edit template"
@@ -3802,7 +3802,7 @@ msgstr "Dokumentenvorlage löschen"
 #: indico/modules/designer/templates/_list.html:140
 #, python-format
 msgid "Are you sure you want to delete the template '%(title)s'?"
-msgstr "Sind Sie sicher, dass Sie die Vorlage \"%(title)s\" löschen möchten?"
+msgstr "Sind Sie sicher, dass Sie die Vorlage '%(title)s' löschen möchten?"
 
 #: indico/modules/designer/templates/_list.html:150
 msgid "Print poster for the event"
@@ -4262,7 +4262,7 @@ msgstr "URL-Vorlage"
 
 #: indico/modules/events/forms.py:36
 msgid "The URL template must contain the '{value}' placeholder."
-msgstr "Die URL-Vorlage muss den \"{value}\" Platzhalter beinhalten."
+msgstr "Die URL-Vorlage muss den '{value}' Platzhalter beinhalten."
 
 #: indico/modules/events/forms.py:37
 #: indico/modules/events/templates/admin/_reference_type_list.html:8
@@ -4279,7 +4279,7 @@ msgstr "Dieser Name ist schon vergeben"
 
 #: indico/modules/events/forms.py:53
 msgid "The URL template must contain the placeholder '{value}'."
-msgstr "Die URL-Vorlage muss den Platzhalter \"{value}\" beinhalten."
+msgstr "Die URL-Vorlage muss den Platzhalter '{value}' beinhalten."
 
 #: indico/modules/events/forms.py:69
 #: indico/modules/events/registration/forms.py:499
@@ -7782,7 +7782,7 @@ msgstr "Eigene Felder"
 #: indico/modules/events/contributions/templates/management/contributions.html:48
 #: indico/modules/events/contributions/templates/management/contributions.html:51
 msgid "Submitter privileges"
-msgstr "Privilegien für Einreicher"
+msgstr "Privilegien für Einreichende"
 
 #: indico/modules/events/contributions/templates/management/contributions.html:59
 msgid ""
@@ -11845,7 +11845,7 @@ msgstr "Die Anmeldung wurde erstellt"
 msgid ""
 "Text too large to generate a PDF with table style. Please try again "
 "generating with book style."
-msgstr "Text ist zu groß um eine PDF mit Tabellen zu erstellen. Bitte erneut versuchen mit dem \"Buch\"-Format."
+msgstr "Text ist zu groß um eine PDF mit Tabellen zu erstellen. Bitte erneut versuchen mit dem Bücherstil."
 
 #: indico/modules/events/registration/controllers/management/reglists.py:397
 msgid "{} registration has been imported."
@@ -13024,11 +13024,11 @@ msgstr "Anpassen"
 #: indico/modules/events/registration/templates/management/regform_list.html:79
 #: indico/modules/events/registration/templates/management/registration_tags.html:5
 msgid "Registration tags"
-msgstr "Registrierung Tags"
+msgstr "Registrierungs Tags"
 
 #: indico/modules/events/registration/templates/management/regform_list.html:80
 msgid "Create tags to mark and filter registrations"
-msgstr "Erstellen Tags zum Markieren und Filtern von Registrierungen"
+msgstr "Erstelle Tags zum Markieren und Filtern von Registrierungen"
 
 #: indico/modules/events/registration/templates/management/regform_list.html:93
 msgid "List of registration forms"
@@ -14400,7 +14400,7 @@ msgstr "Antwort entfernen?"
 msgid ""
 "Surveys can be used to make questionnaires for the event and collect "
 "people's answers."
-msgstr "Die Funktion \"Umfragen\" kann genutzt werden, um Fragebögen zur Veranstaltung zu erstellen."
+msgstr "Mit Hilfe von Umfragen können Sie Fragebögen für die Veranstaltung erstellen und die Antworten der Teilnehmer sammeln."
 
 #: indico/modules/events/surveys/templates/management/survey_list.html:26
 msgid "The survey is live."
@@ -14944,7 +14944,7 @@ msgstr "%(start)s bis %(end)s"
 #: indico/modules/events/templates/display/conference/base.html:37
 #, python-format
 msgid "%(tz)s timezone"
-msgstr "%(tz)sZeitzone"
+msgstr "%(tz)s Zeitzone"
 
 #: indico/modules/events/templates/display/indico/_common.html:22
 msgid "Show room on map"
@@ -15412,7 +15412,7 @@ msgstr "Pause bearbeiten"
 #: indico/modules/events/timetable/templates/balloons/break.html:11
 #, python-format
 msgid "Edit break '%(title)s'"
-msgstr "Pause \"%(title)s\" bearbeiten"
+msgstr "Pause '%(title)s' bearbeiten"
 
 #: indico/modules/events/timetable/templates/balloons/break.html:14
 msgid "Move break"

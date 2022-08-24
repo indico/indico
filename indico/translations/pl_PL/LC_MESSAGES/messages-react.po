@@ -3,15 +3,15 @@
 # Michito <crossner90@gmail.com>, 2019
 # Adrian, 2021
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2022
-# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022
 # Patryk Bełzak <patryk.belzak@pwr.edu.pl>, 2022
 # Marcin Miłek, 2022
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2022
+# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-08-22 18:00+0200\n"
-"Last-Translator: Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2022\n"
+"POT-Creation-Date: 2022-08-22 11:33+0200\n"
+"Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022\n"
 "Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,7 +22,7 @@ msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx:81
 msgid "Passwords must match"
-msgstr ""
+msgstr "Hasła muszą być zgodne"
 
 #: indico/modules/auth/client/js/signup.jsx:93
 msgid ""
@@ -98,6 +98,8 @@ msgid ""
 "Each new account needs to be approved by an administrator. We will send you "
 "an email as soon as your request has been approved."
 msgstr ""
+"Każde nowe konto musi być zatwierdzone przez administratora. Wyślemy Ci "
+"wiadomość e-mail, gdy tylko Twoja prośba zostanie zatwierdzona."
 
 #: indico/modules/auth/client/js/signup.jsx:201
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
@@ -277,10 +279,12 @@ msgid ""
 "Add category to favorites (This will make events in this category visible on"
 " your Dashboard.)"
 msgstr ""
+"Dodaj kategorię do ulubionych (To sprawi, że wydarzenia z tej kategorii będą"
+" widoczne na Twoim pulpicie)"
 
 #: indico/modules/categories/client/js/favorite.jsx:32
 msgid "Delete category from favorites."
-msgstr ""
+msgstr "Usuń kategorię z ulubionych"
 
 #: indico/modules/core/client/js/impersonation.js:33
 msgid "Login as..."
@@ -374,11 +378,11 @@ msgstr "Usuń"
 
 #: indico/modules/events/client/js/favorite.jsx:29
 msgid "Add event to favorites"
-msgstr ""
+msgstr "Dodaj wydarzenie do ulubionych"
 
 #: indico/modules/events/client/js/favorite.jsx:30
 msgid "Delete event from favorites"
-msgstr ""
+msgstr "Usuń wydarzenie z ulubionych"
 
 #: indico/modules/events/client/js/header.jsx:25
 msgid "Basic"
@@ -1121,7 +1125,7 @@ msgstr "Ściągnij wszystkie pliki"
 msgid "Export as JSON"
 msgstr "Eksportuj jako JSON"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:556
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:558
 msgid "There are no editables yet."
 msgstr "Jeszcze nie ma plików do redagowania."
 
@@ -1928,11 +1932,11 @@ msgstr "Pokaż starą wersję"
 
 #: indico/modules/events/persons/client/js/EditEventPerson.jsx:51
 msgid "Edit person information"
-msgstr ""
+msgstr "Edytuj informacje o osobie "
 
 #: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:26
 msgid "Your participation will only be visible to organizers of this event."
-msgstr ""
+msgstr "Twój udział będzie widoczny tylko dla organizatorów tego wydarzenia."
 
 #: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:30
 msgid ""
