@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-18 18:00+0200\n"
+"POT-Creation-Date: 2022-08-24 11:33+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2019-2022\n"
 "Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
@@ -115,7 +115,7 @@ msgstr "周期性任务"
 #: indico/modules/events/editing/templates/management/editor_list.html:5
 #: indico/modules/events/forms.py:34
 #: indico/modules/events/management/templates/_event_person_list.html:17
-#: indico/modules/events/papers/forms.py:123
+#: indico/modules/events/papers/forms.py:125
 #: indico/modules/events/papers/templates/assign_role.html:14
 #: indico/modules/events/papers/templates/management/_templates.html:9
 #: indico/modules/events/papers/templates/management/competences.html:18
@@ -170,16 +170,16 @@ msgid "default"
 msgstr "默认的"
 
 #: indico/core/db/sqlalchemy/links.py:23
-#: indico/modules/attachments/controllers/management/base.py:51
+#: indico/modules/attachments/controllers/management/base.py:53
 #: indico/modules/categories/forms.py:177 indico/modules/events/forms.py:76
-#: indico/modules/events/management/forms.py:365
+#: indico/modules/events/management/forms.py:367
 #: indico/modules/logs/models/entries.py:31
 #: indico/web/forms/fields/protection.py:41
 msgid "Category"
 msgstr "类别"
 
 #: indico/core/db/sqlalchemy/links.py:23
-#: indico/modules/attachments/controllers/management/base.py:43
+#: indico/modules/attachments/controllers/management/base.py:45
 #: indico/modules/categories/forms.py:179
 #: indico/modules/categories/templates/display/overview/base.html:35
 #: indico/modules/logs/models/entries.py:22
@@ -193,7 +193,7 @@ msgstr "事件"
 
 #: indico/core/db/sqlalchemy/links.py:23
 #: indico/legacy/pdfinterface/conference.py:859
-#: indico/modules/attachments/controllers/management/base.py:47
+#: indico/modules/attachments/controllers/management/base.py:49
 #: indico/modules/categories/templates/display/overview/base.html:41
 #: indico/modules/events/management/util.py:38
 #: indico/modules/events/timetable/models/entries.py:27
@@ -211,7 +211,7 @@ msgstr "子报告"
 
 #: indico/core/db/sqlalchemy/links.py:23
 #: indico/legacy/pdfinterface/conference.py:838
-#: indico/modules/attachments/controllers/management/base.py:45
+#: indico/modules/attachments/controllers/management/base.py:47
 #: indico/modules/categories/templates/display/overview/base.html:38
 #: indico/modules/events/abstracts/forms.py:218
 #: indico/modules/events/contributions/lists.py:44
@@ -792,7 +792,7 @@ msgstr "只有 Indico 管理员可以访问这个页面。"
 #: indico/modules/events/abstracts/forms.py:107
 #: indico/modules/events/layout/forms.py:83
 #: indico/modules/events/layout/templates/layout_conference.html:18
-#: indico/modules/events/papers/forms.py:86
+#: indico/modules/events/papers/forms.py:88
 msgid "Announcement"
 msgstr "公告"
 
@@ -1205,7 +1205,7 @@ msgstr "此列表里的用户和组允许访问此材料"
 #: indico/modules/events/contributions/templates/management/import_contributions.html:21
 #: indico/modules/events/forms.py:57 indico/modules/events/layout/forms.py:146
 #: indico/modules/events/layout/forms.py:162
-#: indico/modules/events/management/forms.py:192
+#: indico/modules/events/management/forms.py:193
 #: indico/modules/events/management/templates/_settings.html:41
 #: indico/modules/events/management/templates/assign_program_codes.html:77
 #: indico/modules/events/papers/templates/_paper_list.html:42
@@ -1242,7 +1242,7 @@ msgstr "名称"
 #: indico/modules/events/forms.py:105
 #: indico/modules/events/management/forms.py:61
 #: indico/modules/events/management/templates/_settings.html:44
-#: indico/modules/events/papers/forms.py:124
+#: indico/modules/events/papers/forms.py:126
 #: indico/modules/events/papers/templates/management/_templates.html:10
 #: indico/modules/events/sessions/forms.py:32
 #: indico/modules/events/sessions/templates/display/session_display.html:116
@@ -1260,7 +1260,7 @@ msgid "Description"
 msgstr "说明"
 
 #: indico/modules/attachments/forms.py:58
-#: indico/modules/events/papers/forms.py:110
+#: indico/modules/events/papers/forms.py:112
 msgid "Files"
 msgstr "文件"
 
@@ -1330,7 +1330,7 @@ msgid "Include"
 msgstr "包含"
 
 #: indico/modules/attachments/forms.py:146
-#: indico/modules/events/management/forms.py:432
+#: indico/modules/events/management/forms.py:434
 #: indico/modules/events/management/templates/program_codes.html:22
 #: indico/modules/events/sessions/__init__.py:62
 #: indico/modules/events/sessions/clone.py:22
@@ -1346,7 +1346,7 @@ msgstr "包含选中分会中的材料"
 #: indico/modules/events/contributions/__init__.py:34
 #: indico/modules/events/contributions/clone.py:88
 #: indico/modules/events/contributions/templates/management/contributions.html:6
-#: indico/modules/events/management/forms.py:434
+#: indico/modules/events/management/forms.py:436
 #: indico/modules/events/management/templates/program_codes.html:47
 #: indico/modules/events/sessions/__init__.py:32
 #: indico/modules/events/sessions/templates/management/session_blocks.html:7
@@ -1402,36 +1402,36 @@ msgid ""
 "There is no preview available for this file type. Please refresh the page."
 msgstr "此文件类型没有可用的预览。请刷新页面。"
 
-#: indico/modules/attachments/controllers/management/base.py:49
+#: indico/modules/attachments/controllers/management/base.py:51
 msgid "Sub contribution"
 msgstr "子报告"
 
-#: indico/modules/attachments/controllers/management/base.py:96
+#: indico/modules/attachments/controllers/management/base.py:120
 msgid "The attachment has been uploaded"
 msgid_plural "{count} attachments have been uploaded"
 msgstr[0] "{count} 个附件已上传"
 
-#: indico/modules/attachments/controllers/management/base.py:112
+#: indico/modules/attachments/controllers/management/base.py:136
 msgid "The link has been added"
 msgstr "连接已添加"
 
-#: indico/modules/attachments/controllers/management/base.py:147
+#: indico/modules/attachments/controllers/management/base.py:171
 msgid "The attachment \"{name}\" has been updated"
 msgstr "附件 \"{name}\" 已更新"
 
-#: indico/modules/attachments/controllers/management/base.py:171
+#: indico/modules/attachments/controllers/management/base.py:195
 msgid "Folder \"{name}\" created"
 msgstr "文件夹 \"{name}\" 已创建"
 
-#: indico/modules/attachments/controllers/management/base.py:191
+#: indico/modules/attachments/controllers/management/base.py:215
 msgid "Folder \"{name}\" updated"
 msgstr "文件夹 \"{name}\" 已更新"
 
-#: indico/modules/attachments/controllers/management/base.py:204
+#: indico/modules/attachments/controllers/management/base.py:228
 msgid "Folder \"{name}\" deleted"
 msgstr "文件夹 “{name}” 已删除"
 
-#: indico/modules/attachments/controllers/management/base.py:215
+#: indico/modules/attachments/controllers/management/base.py:239
 msgid "Attachment \"{name}\" deleted"
 msgstr "附件\"{name}\"已删除"
 
@@ -1878,6 +1878,7 @@ msgstr "上次登录："
 
 #: indico/modules/auth/templates/accounts.html:81
 #: indico/modules/auth/templates/accounts.html:133
+#: indico/modules/events/registration/models/forms.py:33
 #: indico/modules/oauth/templates/user_apps.html:32
 #: indico/modules/oauth/templates/user_tokens.html:82
 #: indico/modules/users/templates/dashboard.html:59
@@ -2316,7 +2317,7 @@ msgid "Allows requesting for an event to be moved to this category"
 msgstr "允许请求将事件移至此类别"
 
 #: indico/modules/categories/forms.py:41 indico/modules/events/forms.py:80
-#: indico/modules/events/management/forms.py:101
+#: indico/modules/events/management/forms.py:102
 #: indico/modules/events/management/templates/_settings.html:84
 #: indico/modules/users/forms.py:31
 msgid "Timezone"
@@ -2410,7 +2411,7 @@ msgstr "显示在类别说明旁边的徽标。将自动调整大小为最多200
 
 #: indico/modules/categories/forms.py:87
 #: indico/modules/events/contributions/forms.py:101
-#: indico/modules/events/management/forms.py:251
+#: indico/modules/events/management/forms.py:253
 #: indico/modules/events/sessions/forms.py:56
 msgid "Permissions"
 msgstr "权限"
@@ -2418,13 +2419,13 @@ msgstr "权限"
 #: indico/modules/categories/forms.py:88
 #: indico/modules/events/contributions/forms.py:102
 #: indico/modules/events/forms.py:82
-#: indico/modules/events/management/forms.py:252
+#: indico/modules/events/management/forms.py:254
 #: indico/modules/events/sessions/forms.py:57
 msgid "Protection mode"
 msgstr "保护模式"
 
 #: indico/modules/categories/forms.py:89
-#: indico/modules/events/management/forms.py:260
+#: indico/modules/events/management/forms.py:262
 msgid "No access contact"
 msgstr "无法访问时联系人"
 
@@ -2960,7 +2961,7 @@ msgid "Period:"
 msgstr "期间："
 
 #: indico/modules/categories/templates/display/overview/base.html:17
-#: indico/modules/events/management/forms.py:404
+#: indico/modules/events/management/forms.py:406
 msgid "Day"
 msgstr "天"
 
@@ -3513,8 +3514,8 @@ msgid "The template has been deleted"
 msgstr "模板已删除"
 
 #: indico/modules/designer/forms.py:20
-#: indico/modules/events/management/forms.py:321
-#: indico/modules/events/papers/forms.py:125
+#: indico/modules/events/management/forms.py:323
+#: indico/modules/events/papers/forms.py:127
 #: indico/modules/events/registration/forms.py:420
 msgid "Template"
 msgstr "模板"
@@ -4128,7 +4129,7 @@ msgstr "目标事件已有人"
 #: indico/modules/events/contributions/lists.py:54
 #: indico/modules/events/forms.py:104
 #: indico/modules/events/layout/models/menu.py:40
-#: indico/modules/events/management/forms.py:186
+#: indico/modules/events/management/forms.py:187
 #: indico/modules/events/management/templates/_event_person_list.html:5
 #: indico/modules/events/management/templates/_settings.html:130
 #: indico/modules/events/persons/templates/management/person_list.html:139
@@ -4138,7 +4139,7 @@ msgid "Speakers"
 msgstr "报告人"
 
 #: indico/modules/events/clone.py:86
-#: indico/modules/events/management/forms.py:180
+#: indico/modules/events/management/forms.py:181
 #: indico/modules/events/management/templates/_settings.html:132
 #: indico/modules/events/persons/templates/management/person_list.html:132
 #: indico/modules/events/templates/display/conference.html:61
@@ -4261,7 +4262,7 @@ msgstr "事件名称"
 
 #: indico/modules/events/contributions/forms.py:50
 #: indico/modules/events/forms.py:81
-#: indico/modules/events/management/forms.py:169
+#: indico/modules/events/management/forms.py:170
 #: indico/modules/events/sessions/forms.py:74
 #: indico/modules/events/sessions/forms.py:85
 #: indico/modules/events/templates/display/conference.html:34
@@ -4275,9 +4276,9 @@ msgstr "你不能在此类别建立事件。"
 
 #: indico/modules/events/abstracts/forms.py:644
 #: indico/modules/events/forms.py:94
-#: indico/modules/events/management/forms.py:102
-#: indico/modules/events/management/forms.py:108
-#: indico/modules/events/papers/forms.py:58
+#: indico/modules/events/management/forms.py:103
+#: indico/modules/events/management/forms.py:109
+#: indico/modules/events/papers/forms.py:60
 #: indico/modules/events/registration/forms.py:163
 #: indico/modules/events/surveys/forms.py:75
 msgid "Start"
@@ -4285,9 +4286,9 @@ msgstr "开始"
 
 #: indico/modules/events/abstracts/forms.py:646
 #: indico/modules/events/forms.py:95
-#: indico/modules/events/management/forms.py:103
-#: indico/modules/events/management/forms.py:111
-#: indico/modules/events/papers/forms.py:60
+#: indico/modules/events/management/forms.py:104
+#: indico/modules/events/management/forms.py:112
+#: indico/modules/events/papers/forms.py:62
 #: indico/modules/events/registration/forms.py:165
 #: indico/modules/events/surveys/forms.py:78
 msgid "End"
@@ -4299,7 +4300,7 @@ msgstr "日期"
 
 #: indico/modules/events/forms.py:106 indico/modules/events/layout/forms.py:94
 #: indico/modules/events/layout/forms.py:99
-#: indico/modules/events/layout/forms.py:182
+#: indico/modules/events/layout/forms.py:186
 #: indico/modules/events/layout/templates/layout_conference.html:27
 msgid "Theme"
 msgstr "主题"
@@ -4654,12 +4655,12 @@ msgid "The event has no contribution types defined."
 msgstr "事件没有定义的报告类型。"
 
 #: indico/modules/events/abstracts/forms.py:155
-#: indico/modules/events/papers/forms.py:87
+#: indico/modules/events/papers/forms.py:89
 msgid "Scale (from)"
 msgstr "等级(从)"
 
 #: indico/modules/events/abstracts/forms.py:156
-#: indico/modules/events/papers/forms.py:88
+#: indico/modules/events/papers/forms.py:90
 msgid "Scale (to)"
 msgstr "等级(到)"
 
@@ -4728,18 +4729,18 @@ msgid "These instructions will be displayed right before the decision box."
 msgstr "这些说明将显示在决定框的前面。"
 
 #: indico/modules/events/abstracts/forms.py:190
-#: indico/modules/events/papers/forms.py:96
+#: indico/modules/events/papers/forms.py:98
 msgid ""
 "Changing the ratings scale will proportionally affect existing ratings."
 msgstr "更改评分等级将按比例影响现有评级。"
 
 #: indico/modules/events/abstracts/forms.py:198
-#: indico/modules/events/papers/forms.py:104
+#: indico/modules/events/papers/forms.py:106
 msgid "The scale's 'to' value must be greater than the 'from' value."
 msgstr "等级的 'to' 值必须大于 'from' 值。"
 
 #: indico/modules/events/abstracts/forms.py:200
-#: indico/modules/events/papers/forms.py:106
+#: indico/modules/events/papers/forms.py:108
 msgid "The difference between 'to' and' from' may not be greater than 20."
 msgstr "'to'和'from'之间的差异不能大于20。"
 
@@ -4814,7 +4815,7 @@ msgstr "当前摘要的作者和报告人将被添加到选定的摘要中"
 #: indico/modules/events/abstracts/templates/reviewing/public.html:382
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75
-#: indico/modules/events/papers/forms.py:72
+#: indico/modules/events/papers/forms.py:74
 #: indico/modules/events/requests/base.py:32
 #: indico/modules/events/requests/templates/event_request_details.html:42
 #: indico/modules/events/requests/templates/event_request_details.html:53
@@ -4826,7 +4827,7 @@ msgid "Comment"
 msgstr "评论"
 
 #: indico/modules/events/abstracts/forms.py:231
-#: indico/modules/events/papers/forms.py:72
+#: indico/modules/events/papers/forms.py:74
 msgid "Leave a comment for the submitter..."
 msgstr "给提交人发表评论…"
 
@@ -5075,7 +5076,7 @@ msgstr "留下评论..."
 #: indico/modules/events/abstracts/forms.py:661
 #: indico/modules/events/contributions/contrib_fields.py:34
 #: indico/modules/events/layout/forms.py:165
-#: indico/modules/events/management/forms.py:263
+#: indico/modules/events/management/forms.py:265
 #: indico/modules/events/registration/lists.py:62
 #: indico/modules/events/registration/templates/display/_registration_summary_blocks.html:31
 msgid "Visibility"
@@ -5469,6 +5470,7 @@ msgid "Submitted"
 msgstr "已提交"
 
 #: indico/modules/events/abstracts/models/abstracts.py:35
+#: indico/modules/events/registration/models/registrations.py:41
 #: indico/modules/events/requests/models/requests.py:20
 #: indico/modules/events/requests/templates/event_requests.html:29
 msgid "Withdrawn"
@@ -5480,6 +5482,7 @@ msgstr "已撤回"
 #: indico/modules/events/editing/models/revisions.py:33
 #: indico/modules/events/papers/models/revisions.py:24
 #: indico/modules/events/papers/templates/_paper_list.html:327
+#: indico/modules/events/registration/models/invitations.py:21
 #: indico/modules/events/requests/models/requests.py:20
 #: indico/modules/events/requests/templates/event_requests.html:25
 msgid "Accepted"
@@ -5491,6 +5494,7 @@ msgstr "已接收"
 #: indico/modules/events/editing/models/revisions.py:33
 #: indico/modules/events/papers/models/revisions.py:24
 #: indico/modules/events/papers/templates/_paper_list.html:339
+#: indico/modules/events/registration/models/registrations.py:41
 #: indico/modules/events/requests/models/requests.py:20
 #: indico/modules/events/requests/templates/event_requests.html:27
 msgid "Rejected"
@@ -5825,7 +5829,7 @@ msgid "Go to contribution"
 msgstr "转到报告"
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:250
-#: indico/modules/events/management/forms.py:401
+#: indico/modules/events/management/forms.py:403
 #: indico/modules/events/management/templates/_action_menu.html:135
 #: indico/modules/events/management/templates/clone_event.html:111
 msgid "Clone"
@@ -6865,6 +6869,8 @@ msgid "Link to the agreement page"
 msgstr "连接到协议页"
 
 #: indico/modules/events/agreements/models/agreements.py:22
+#: indico/modules/events/registration/models/invitations.py:21
+#: indico/modules/events/registration/models/registrations.py:41
 #: indico/modules/events/registration/templates/display/_registration_summary_blocks.html:154
 #: indico/modules/events/requests/models/requests.py:20
 #: indico/modules/events/requests/templates/event_requests.html:23
@@ -7139,14 +7145,14 @@ msgid "People"
 msgstr "人"
 
 #: indico/modules/events/contributions/forms.py:51
-#: indico/modules/events/management/forms.py:216
+#: indico/modules/events/management/forms.py:218
 #: indico/modules/events/management/templates/_settings.html:184
 msgid "Keywords"
 msgstr "关键字"
 
 #: indico/modules/events/contributions/forms.py:52
 #: indico/modules/events/contributions/forms.py:125
-#: indico/modules/events/management/forms.py:217
+#: indico/modules/events/management/forms.py:219
 #: indico/modules/events/management/templates/_settings.html:193
 msgid "External IDs"
 msgstr "外部 IDs"
@@ -7294,7 +7300,7 @@ msgstr "TeX 档案"
 
 #: indico/modules/events/contributions/controllers/display.py:70
 #: indico/modules/events/contributions/controllers/display.py:83
-#: indico/modules/events/contributions/controllers/display.py:266
+#: indico/modules/events/contributions/controllers/display.py:279
 msgid "The contributions of this event have not been published yet."
 msgstr "此事件的报告尚未公布。"
 
@@ -7436,7 +7442,7 @@ msgstr "外部参照"
 #: indico/modules/events/contributions/templates/display/contribution_display.html:243
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:43
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:178
-#: indico/modules/events/management/forms.py:435
+#: indico/modules/events/management/forms.py:437
 #: indico/modules/events/management/templates/program_codes.html:60
 #: indico/modules/events/timetable/templates/balloons/contribution.html:81
 msgid "Subcontributions"
@@ -7641,6 +7647,8 @@ msgid "There are no subcontributions in this contribution yet"
 msgstr "这个报告还没有子报告"
 
 #: indico/modules/events/contributions/templates/management/_types_table.html:5
+#: indico/modules/events/registration/fields/simple.py:107
+#: indico/modules/events/registration/fields/simple.py:251
 #: indico/modules/events/registration/lists.py:52
 #: indico/modules/events/registration/lists.py:72
 #: indico/modules/events/registration/templates/management/_reglist.html:67
@@ -7658,6 +7666,8 @@ msgid "Yes"
 msgstr "是"
 
 #: indico/modules/events/contributions/templates/management/_types_table.html:5
+#: indico/modules/events/registration/fields/simple.py:108
+#: indico/modules/events/registration/fields/simple.py:252
 #: indico/modules/events/registration/lists.py:51
 #: indico/modules/events/registration/lists.py:71
 #: indico/modules/events/registration/templates/management/_reglist.html:69
@@ -8018,12 +8028,12 @@ msgstr "使用的文件类型无效"
 msgid "Conditions have to be unique"
 msgstr "条件必须是唯一的"
 
-#: indico/modules/events/editing/service.py:50
-#: indico/modules/events/editing/service.py:129
+#: indico/modules/events/editing/service.py:51
+#: indico/modules/events/editing/service.py:130
 msgid "Connection failed"
 msgstr "连接失败"
 
-#: indico/modules/events/editing/service.py:54
+#: indico/modules/events/editing/service.py:55
 msgid "Invalid response"
 msgstr "无效的响应"
 
@@ -8364,7 +8374,7 @@ msgstr "在新选项卡中打开"
 msgid "Specify who can see this menu item."
 msgstr "指定谁可以看到此菜单项。"
 
-#: indico/modules/events/layout/forms.py:189
+#: indico/modules/events/layout/forms.py:193
 msgid "Custom CSS file ({name})"
 msgstr "自定义 CSS 文件 ({name})"
 
@@ -8399,11 +8409,11 @@ msgstr "新的 CSS 文件已保存。在使用预览验证它是否正确后，�
 msgid "CSS file deleted"
 msgstr "CSS 文件已删除"
 
-#: indico/modules/events/layout/controllers/menu.py:63
+#: indico/modules/events/layout/controllers/menu.py:64
 msgid "Menu customization has been enabled."
 msgstr "菜单自定义已启用。"
 
-#: indico/modules/events/layout/controllers/menu.py:67
+#: indico/modules/events/layout/controllers/menu.py:68
 msgid "Menu customization has been disabled."
 msgstr "菜单自定义已禁用。"
 
@@ -8624,177 +8634,177 @@ msgstr "重复模式克隆"
 msgid "URL shortcut"
 msgstr "URL短链接"
 
-#: indico/modules/events/management/forms.py:68
+#: indico/modules/events/management/forms.py:69
 msgid ""
 "The URL shortcut must be unique within this Indico instance and is not case "
 "sensitive."
 msgstr "URL快捷方式在此Indico中必须是唯一的，并且不区分大小写。"
 
-#: indico/modules/events/management/forms.py:77
+#: indico/modules/events/management/forms.py:78
 msgid ""
 "The URL shortcut must contain at least one character that is not a digit."
 msgstr "URL短链接必须至少包含一个不是数字的字符。"
 
-#: indico/modules/events/management/forms.py:79
+#: indico/modules/events/management/forms.py:80
 msgid "The URL shortcut contains an invalid character."
 msgstr "URL 短链接包含非法字符。"
 
-#: indico/modules/events/management/forms.py:81
+#: indico/modules/events/management/forms.py:82
 msgid "The URL shortcut may not contain two consecutive slashes."
 msgstr "URL短链接不能包含两个连续的斜杠。"
 
-#: indico/modules/events/management/forms.py:83
+#: indico/modules/events/management/forms.py:84
 msgid "The URL shortcut may not begin/end with a slash."
 msgstr "URL短链接不能用斜杠开始/结束。"
 
-#: indico/modules/events/management/forms.py:90
+#: indico/modules/events/management/forms.py:91
 msgid "The URL shortcut is already used in another event."
 msgstr "此URL短链接已在其它事件中使用。"
 
-#: indico/modules/events/management/forms.py:94
+#: indico/modules/events/management/forms.py:95
 msgid "This URL shortcut is not available."
 msgstr "URL 短链接不可用。"
 
-#: indico/modules/events/management/forms.py:105
+#: indico/modules/events/management/forms.py:106
 msgid "Update timetable"
 msgstr "更新日程表"
 
-#: indico/modules/events/management/forms.py:106
+#: indico/modules/events/management/forms.py:107
 msgid ""
 "Move sessions/contributions/breaks in the timetable according to the new "
 "event start time."
 msgstr "根据新的事件开始时间在日程表中移动分会/报告/间歇。"
 
-#: indico/modules/events/management/forms.py:109
+#: indico/modules/events/management/forms.py:110
 msgid ""
 "Specifying this date overrides the start date displayed on the main "
 "conference page."
 msgstr "指定此日期将覆盖会议主页上显示的开始日期。"
 
-#: indico/modules/events/management/forms.py:113
+#: indico/modules/events/management/forms.py:114
 msgid ""
 "Specifying this date overrides the end date displayed on the main conference"
 " page."
 msgstr "指定此日期将覆盖会议主页上显示的结束日期。"
 
-#: indico/modules/events/management/forms.py:142
+#: indico/modules/events/management/forms.py:143
 msgid "To use this start date the timetable must be updated."
 msgstr "要使用此开始日期，必须更新日程表。"
 
-#: indico/modules/events/management/forms.py:155
+#: indico/modules/events/management/forms.py:156
 msgid ""
 "The event is too short to fit all timetable entries. It must be at least {} "
 "longer."
 msgstr "事件太短，无法容纳所有的日程表条目。它必须至少 {} 长。"
 
-#: indico/modules/events/management/forms.py:164
+#: indico/modules/events/management/forms.py:165
 msgid "The event cannot end before its last timetable entry, which is at {}."
 msgstr "事件不能在其最后一个日程表项之前结束， 它是 {}。"
 
-#: indico/modules/events/management/forms.py:170
+#: indico/modules/events/management/forms.py:171
 #: indico/modules/events/management/templates/_settings.html:115
 msgid "Map URL"
 msgstr "地图URL"
 
-#: indico/modules/events/management/forms.py:193
+#: indico/modules/events/management/forms.py:194
 #: indico/modules/logs/models/entries.py:22
 #: indico/modules/users/__init__.py:70
 #: indico/modules/users/templates/emails.html:9
 msgid "Emails"
 msgstr "电子邮件"
 
-#: indico/modules/events/management/forms.py:193
+#: indico/modules/events/management/forms.py:194
 #: indico/modules/users/forms.py:113
 msgid "email"
 msgstr "电子邮件"
 
-#: indico/modules/events/management/forms.py:194
+#: indico/modules/events/management/forms.py:195
 msgid "Phone numbers"
 msgstr "电话号码"
 
-#: indico/modules/events/management/forms.py:194
+#: indico/modules/events/management/forms.py:195
 msgid "number"
 msgstr "号码"
 
-#: indico/modules/events/management/forms.py:196
+#: indico/modules/events/management/forms.py:197
 msgid "Organizers"
 msgstr "组织者"
 
-#: indico/modules/events/management/forms.py:197
+#: indico/modules/events/management/forms.py:198
 msgid "Additional information"
 msgstr "附加信息"
 
-#: indico/modules/events/management/forms.py:199
+#: indico/modules/events/management/forms.py:200
 msgid "This text is displayed on the main conference page."
 msgstr "这段文本显示在会议主页。"
 
-#: indico/modules/events/management/forms.py:212
+#: indico/modules/events/management/forms.py:214
 #: indico/web/forms/fields/simple.py:132
 msgid "Invalid email address: {}"
 msgstr "非法的电子邮件地址: {}"
 
-#: indico/modules/events/management/forms.py:218
+#: indico/modules/events/management/forms.py:220
 #: indico/modules/events/management/templates/_settings.html:207
 #: indico/modules/events/templates/admin/_event_label_list.html:6
 msgid "Label"
 msgstr "标签"
 
-#: indico/modules/events/management/forms.py:219
+#: indico/modules/events/management/forms.py:221
 msgid "Label message"
 msgstr "标签信息"
 
-#: indico/modules/events/management/forms.py:220
+#: indico/modules/events/management/forms.py:222
 msgid ""
 "You can optionally provide a message that is shown when hovering the "
 "selected label."
 msgstr "您可以选择提供信息，当光标悬停在标签上时显示。"
 
-#: indico/modules/events/management/forms.py:237
+#: indico/modules/events/management/forms.py:239
 msgid "Person/Institution"
 msgstr "个人/机构"
 
-#: indico/modules/events/management/forms.py:238
+#: indico/modules/events/management/forms.py:240
 msgid "Contact email"
 msgstr "联系邮件"
 
-#: indico/modules/events/management/forms.py:239
+#: indico/modules/events/management/forms.py:241
 msgid "External page"
 msgstr "外部页面"
 
-#: indico/modules/events/management/forms.py:240
+#: indico/modules/events/management/forms.py:242
 msgid "List of URLs to external pages containing privacy notices."
 msgstr "包含隐私声明的外部页面的URL列表。"
 
-#: indico/modules/events/management/forms.py:242
+#: indico/modules/events/management/forms.py:244
 #: indico/modules/events/surveys/forms.py:103 indico/modules/legal/forms.py:21
 #: indico/modules/legal/forms.py:25 indico/web/fields/simple.py:27
 msgid "Text"
 msgstr "文本"
 
-#: indico/modules/events/management/forms.py:243
+#: indico/modules/events/management/forms.py:245
 #: indico/modules/legal/forms.py:22 indico/modules/legal/forms.py:26
 msgid "Only used if no URL is provided"
 msgstr "仅在未提供URL时使用"
 
-#: indico/modules/events/management/forms.py:247
+#: indico/modules/events/management/forms.py:249
 msgid "Define either a privacy notice text or URLs"
 msgstr "定义隐私声明文本或 URL"
 
-#: indico/modules/events/management/forms.py:256
+#: indico/modules/events/management/forms.py:258
 msgid "Access key"
 msgstr "访问密码"
 
-#: indico/modules/events/management/forms.py:257
+#: indico/modules/events/management/forms.py:259
 msgid ""
 "It is more secure to use only the ACL and not set an access key. <strong>It "
 "will have no effect if the event is not protected</strong>"
 msgstr "只使用 ACL 而不设置访问密钥更安全。<strong>如果事件不受保护，它将不起作用</strong>"
 
-#: indico/modules/events/management/forms.py:261
+#: indico/modules/events/management/forms.py:263
 msgid "Contact information shown when someone lacks access to the event"
 msgstr "当某人无法访问事件时显示的联系人信息"
 
-#: indico/modules/events/management/forms.py:264
+#: indico/modules/events/management/forms.py:266
 msgid ""
 "From which point in the category tree this event will be visible from "
 "(number of categories upwards). Applies to \"Today's events\", Calendar. If "
@@ -8802,123 +8812,123 @@ msgid ""
 "will also hide the event from the category's event list except for managers."
 msgstr "从类别树中的哪个点开始可以看到此事件（类别编号向上）。适用于“今天的事件”，日历。如果事件被移动，此数字将被保留。“不可见”选项还将从类别的事件列表中隐藏事件，但管理员除外。"
 
-#: indico/modules/events/management/forms.py:269
+#: indico/modules/events/management/forms.py:271
 msgid "Public registration"
 msgstr "公开注册"
 
-#: indico/modules/events/management/forms.py:270
+#: indico/modules/events/management/forms.py:272
 msgid ""
 "Allow users who cannot access the event to register. This will expose open "
 "registration forms to anyone with a link to the event, so you can let users "
 "register without giving access to anything else in your event."
 msgstr "允许无法访问事件的用户进行注册。 这会将公开的注册表格公开给具有该事件链接的任何人，因此您可以让用户进行注册而无需访问您事件中的其他任何内容。"
 
-#: indico/modules/events/management/forms.py:274
+#: indico/modules/events/management/forms.py:276
 msgid "Speakers can submit"
 msgstr ""
 
-#: indico/modules/events/management/forms.py:275
+#: indico/modules/events/management/forms.py:277
 msgid "Subcontribution speakers can edit minutes and upload materials."
 msgstr ""
 
-#: indico/modules/events/management/forms.py:302
+#: indico/modules/events/management/forms.py:304
 msgid "This event's visibility is currently limited by that of '{}'."
 msgstr "此事件的可见性当前受 '{}' 的限制。"
 
-#: indico/modules/events/management/forms.py:322
+#: indico/modules/events/management/forms.py:324
 msgid "Horizontal margins"
 msgstr "水平边距"
 
-#: indico/modules/events/management/forms.py:323
+#: indico/modules/events/management/forms.py:325
 msgid "Vertical margins"
 msgstr "垂直边距"
 
-#: indico/modules/events/management/forms.py:324
+#: indico/modules/events/management/forms.py:326
 #: indico/modules/events/registration/forms.py:425
 #: indico/modules/events/timetable/forms.py:181
 msgid "Page size"
 msgstr "页面尺寸"
 
-#: indico/modules/events/management/forms.py:334
+#: indico/modules/events/management/forms.py:336
 msgid "How to repeat"
 msgstr "如何重复"
 
-#: indico/modules/events/management/forms.py:338
-#: indico/modules/events/management/forms.py:443
+#: indico/modules/events/management/forms.py:340
+#: indico/modules/events/management/forms.py:445
 msgid "What to clone"
 msgstr "克隆什么"
 
-#: indico/modules/events/management/forms.py:339
+#: indico/modules/events/management/forms.py:341
 msgid "Refresh user information"
 msgstr "刷新用户信息"
 
-#: indico/modules/events/management/forms.py:340
+#: indico/modules/events/management/forms.py:342
 msgid ""
 "When checked, names and affiliations of users in the cloned event will be "
 "synchronized with their Indico user profiles."
 msgstr "选中后，克隆时间中用户名和从属关系将和他们的用户个人资料同步。"
 
-#: indico/modules/events/management/forms.py:369
+#: indico/modules/events/management/forms.py:371
 msgid "You have to select a category"
 msgstr "你必须选择类别"
 
-#: indico/modules/events/management/forms.py:371
+#: indico/modules/events/management/forms.py:373
 msgid "You can't create events in this category"
 msgstr "您不能在此类别下创建事件"
 
-#: indico/modules/events/management/forms.py:397
+#: indico/modules/events/management/forms.py:399
 msgid "Starting"
 msgstr "开始"
 
-#: indico/modules/events/management/forms.py:402
+#: indico/modules/events/management/forms.py:404
 msgid "Until a given day (inclusive)"
 msgstr "直到指定日（含）"
 
-#: indico/modules/events/management/forms.py:403
+#: indico/modules/events/management/forms.py:405
 msgid "A number of times"
 msgstr "次数"
 
-#: indico/modules/events/management/forms.py:405
+#: indico/modules/events/management/forms.py:407
 msgid "Number of times"
 msgstr "次数"
 
-#: indico/modules/events/management/forms.py:407
+#: indico/modules/events/management/forms.py:409
 msgid "You can clone a maximum of 100 times"
 msgstr "最多可以克隆100次。"
 
-#: indico/modules/events/management/forms.py:416
-#: indico/modules/events/management/forms.py:426
+#: indico/modules/events/management/forms.py:418
+#: indico/modules/events/management/forms.py:428
 msgid "Every"
 msgstr "每"
 
-#: indico/modules/events/management/forms.py:422
+#: indico/modules/events/management/forms.py:424
 msgid "The time period must be positive"
 msgstr "时间段必须为正"
 
-#: indico/modules/events/management/forms.py:427
+#: indico/modules/events/management/forms.py:429
 msgid "Months"
 msgstr "月"
 
-#: indico/modules/events/management/forms.py:428
+#: indico/modules/events/management/forms.py:430
 msgid "Number of months between repetitions"
 msgstr "重复之间的月数"
 
-#: indico/modules/events/management/forms.py:433
+#: indico/modules/events/management/forms.py:435
 #: indico/modules/events/management/templates/program_codes.html:35
 #: indico/modules/events/sessions/__init__.py:33
 #: indico/modules/events/sessions/templates/management/_session_list.html:65
 msgid "Session blocks"
 msgstr "分会块"
 
-#: indico/modules/events/management/forms.py:439
+#: indico/modules/events/management/forms.py:441
 msgid "Event URL"
 msgstr "事件URL"
 
-#: indico/modules/events/management/forms.py:468
+#: indico/modules/events/management/forms.py:470
 msgid "There is nothing to import"
 msgstr "没有可导入的"
 
-#: indico/modules/events/management/forms.py:474
+#: indico/modules/events/management/forms.py:476
 msgid "This option depends on other options which are unavailable"
 msgstr "此选项取决于其他不可用的选项"
 
@@ -9779,11 +9789,11 @@ msgstr "评判区"
 msgid "Paper managers"
 msgstr "论文管理员"
 
-#: indico/modules/events/papers/forms.py:38
+#: indico/modules/events/papers/forms.py:40
 msgid "List of users allowed to manage the call for papers"
 msgstr "允许管理征集论文的用户列表"
 
-#: indico/modules/events/papers/forms.py:39
+#: indico/modules/events/papers/forms.py:41
 #: indico/modules/events/papers/templates/_paper_list.html:52
 #: indico/modules/events/papers/templates/_paper_list.html:238
 #: indico/modules/events/papers/templates/_paper_list.html:282
@@ -9791,11 +9801,11 @@ msgstr "允许管理征集论文的用户列表"
 msgid "Judges"
 msgstr "评委"
 
-#: indico/modules/events/papers/forms.py:40
+#: indico/modules/events/papers/forms.py:42
 msgid "List of users allowed to judge papers"
 msgstr "允许评判论文的用户列表"
 
-#: indico/modules/events/papers/forms.py:41
+#: indico/modules/events/papers/forms.py:43
 #: indico/modules/events/papers/templates/_paper_list.html:57
 #: indico/modules/events/papers/templates/_paper_list.html:251
 #: indico/modules/events/papers/templates/_paper_list.html:295
@@ -9803,11 +9813,11 @@ msgstr "允许评判论文的用户列表"
 msgid "Content reviewers"
 msgstr "内容审核人"
 
-#: indico/modules/events/papers/forms.py:42
+#: indico/modules/events/papers/forms.py:44
 msgid "List of users allowed to review the content of the assigned papers"
 msgstr "允许审核指定的论文内容的用户列表"
 
-#: indico/modules/events/papers/forms.py:44
+#: indico/modules/events/papers/forms.py:46
 #: indico/modules/events/papers/templates/_paper_list.html:62
 #: indico/modules/events/papers/templates/_paper_list.html:264
 #: indico/modules/events/papers/templates/_paper_list.html:308
@@ -9815,23 +9825,23 @@ msgstr "允许审核指定的论文内容的用户列表"
 msgid "Layout reviewers"
 msgstr "布局审核人"
 
-#: indico/modules/events/papers/forms.py:45
+#: indico/modules/events/papers/forms.py:47
 msgid "List of users allowed to review the layout of the assigned papers"
 msgstr "允许审核指派的论文布局的用户列表"
 
-#: indico/modules/events/papers/forms.py:59
+#: indico/modules/events/papers/forms.py:61
 msgid "The moment users can start submitting papers"
 msgstr "用户可以开始提交论文的时间"
 
-#: indico/modules/events/papers/forms.py:61
+#: indico/modules/events/papers/forms.py:63
 msgid "The moment the submission process ends"
 msgstr "提交结束时间"
 
-#: indico/modules/events/papers/forms.py:89
+#: indico/modules/events/papers/forms.py:91
 msgid "Email notifications"
 msgstr "电子邮件通知"
 
-#: indico/modules/events/papers/forms.py:136
+#: indico/modules/events/papers/forms.py:138
 #: indico/modules/events/papers/templates/management/overview.html:38
 #: indico/modules/events/papers/templates/management/overview.html:90
 #: indico/modules/events/papers/templates/management/overview.html:139
@@ -9840,7 +9850,7 @@ msgstr "电子邮件通知"
 msgid "Deadline"
 msgstr "最后期限"
 
-#: indico/modules/events/papers/forms.py:137
+#: indico/modules/events/papers/forms.py:139
 msgid "Enforce deadline"
 msgstr "执行截止日期"
 
@@ -11847,6 +11857,54 @@ msgstr "无效文件 UUID"
 #: indico/web/forms/validators.py:121
 msgid "Invalid email address"
 msgstr "无效的电子邮件地址"
+
+#: indico/modules/events/registration/models/forms.py:33
+msgid "Until modification deadline"
+msgstr ""
+
+#: indico/modules/events/registration/models/forms.py:33
+msgid "Until payment"
+msgstr ""
+
+#: indico/modules/events/registration/models/forms.py:33
+msgid "Until approved"
+msgstr ""
+
+#: indico/modules/events/registration/models/invitations.py:21
+msgid "Declined"
+msgstr ""
+
+#: indico/modules/events/registration/models/registrations.py:41
+msgid "Completed"
+msgstr ""
+
+#: indico/modules/events/registration/models/registrations.py:41
+msgid "Awaiting payment"
+msgstr ""
+
+#: indico/modules/events/registration/models/registrations.py:81
+msgid "Hide all participants"
+msgstr ""
+
+#: indico/modules/events/registration/models/registrations.py:81
+msgid "Show only consenting participants"
+msgstr ""
+
+#: indico/modules/events/registration/models/registrations.py:81
+msgid "Show all participants"
+msgstr ""
+
+#: indico/modules/events/registration/models/registrations.py:88
+msgid "Do not display to anyone"
+msgstr ""
+
+#: indico/modules/events/registration/models/registrations.py:88
+msgid "Display to other participants"
+msgstr ""
+
+#: indico/modules/events/registration/models/registrations.py:88
+msgid "Display to everyone"
+msgstr ""
 
 #: indico/modules/events/registration/placeholders/invitations.py:35
 msgid "Link to accept/decline the invitation"
@@ -16239,19 +16297,19 @@ msgstr "会议室预订模块没有开启。"
 msgid "You are not authorized to access the room booking system."
 msgstr "你没有权限访问会议室预订系统。"
 
-#: indico/modules/rb/controllers/backend/admin.py:92
+#: indico/modules/rb/controllers/backend/admin.py:97
 msgid "Cannot delete location with active rooms"
 msgstr "无法删除在用会议室的地点"
 
-#: indico/modules/rb/controllers/backend/admin.py:329
+#: indico/modules/rb/controllers/backend/admin.py:334
 msgid "Start time should not be later than end time"
 msgstr "开始时间不能晚于结束时间"
 
-#: indico/modules/rb/controllers/backend/admin.py:380
+#: indico/modules/rb/controllers/backend/admin.py:385
 msgid "You cannot upload this file as a room picture."
 msgstr "无法将此文件作为会议室图片上传。"
 
-#: indico/modules/rb/controllers/backend/admin.py:382
+#: indico/modules/rb/controllers/backend/admin.py:387
 #: indico/modules/users/controllers.py:316
 msgid "The file has an invalid format ({format})."
 msgstr "此文件的格式无效 ({format})。"
