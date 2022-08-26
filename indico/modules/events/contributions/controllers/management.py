@@ -768,7 +768,7 @@ class RHManageDescriptionField(RHManageContributionsBase):
 
 class RHCreateReferenceMixin:
     """
-    Common methods for RH class creating a ContibutionReference
+    Common methods for RH class creating a ContributionReference
     or SubContributionReference.
     """
 

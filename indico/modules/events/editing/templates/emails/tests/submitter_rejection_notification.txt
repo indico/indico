@@ -1,0 +1,10 @@
+Dear John Doe,
+
+Your revision changes have been rejected by Jane Doe.
+
+You can view details on the following URL:
+http://localhost/timeline-url
+
+--
+Indico :: Email Notifier
+http://localhost/

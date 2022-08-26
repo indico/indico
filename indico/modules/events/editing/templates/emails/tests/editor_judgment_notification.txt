@@ -1,0 +1,10 @@
+Dear John Doe,
+
+Jane Doe has left a judgment to an editable you are submitter of.
+
+You can view details on the following URL:
+http://localhost/timeline-url
+
+--
+Indico :: Email Notifier
+http://localhost/

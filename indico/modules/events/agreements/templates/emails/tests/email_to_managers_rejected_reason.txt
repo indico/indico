@@ -1,0 +1,18 @@
+Dear event managers,
+
+A new agreement has been rejected for the event:
+dummy#0
+
+Person Info
+-----------
+Name:  dummy
+Email: dummy@test.com
+
+Reason
+------
+I do not accept this.
+>:(
+
+--
+Indico :: Agreements
+http://localhost/
