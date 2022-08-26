@@ -1,0 +1,9 @@
+Dear Guinea,
+
+The offline copy of the event "dummy#0" is ready for download.
+
+Download link: http://localhost/
+
+--
+Indico :: Email Notifier
+http://localhost/event/0/

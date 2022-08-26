@@ -1,0 +1,12 @@
+Dear event managers,
+
+The More cats request for your event has been withdrawn.
+
+Event: dummy#0
+Requested by: Arthas Menethil
+Details: http://localhost/event/0/manage/requests/meeting/?comment=Meow&created_by_user=%7B'full_name'%3A+'Arthas+Menethil',+'phone'%3A+'1337',+'email'%3A+'arthas%40frozenthrone.wow'%7D&definition=%7B'title'%3A+'More+cats'%7D
+
+
+--
+Indico :: Service Requests
+http://localhost/
