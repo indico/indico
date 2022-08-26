@@ -360,6 +360,12 @@ function PersonLinkField({
               onClose={onClose}
               onSubmit={onSubmit}
               person={persons[selected]}
+              eventId={eventId}
+              otherPersons={
+                selected !== null
+                  ? persons.filter(p => p.email !== persons[selected].email)
+                  : persons
+              }
               hasPredefinedAffiliations={hasPredefinedAffiliations}
             />
           )}

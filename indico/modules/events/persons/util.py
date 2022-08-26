@@ -9,6 +9,8 @@ from marshmallow import EXCLUDE
 
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users import User
+from indico.modules.users.util import get_user_by_email
+from indico.util.string import validate_email_verbose
 
 
 def create_event_person(event, create_untrusted_persons=False, **data):
@@ -49,3 +51,29 @@ def get_event_person(event, data, create_untrusted_persons=False, allow_external
         return event.persons.filter_by(id=data['person_id']).one()
     else:
         raise ValueError(f"Unknown person type '{person_type}'")
+
+
+def check_person_link_email(event, email):
+    """Check whether an email can be used in a person link.
+
+    :param event: The event
+    :param email: The email address
+    """
+    from indico.modules.events.persons.schemas import EventPersonSchema
+    from indico.modules.users.schemas import UserSchema
+    email = email.lower().strip()
+    person = event.persons.filter_by(email=email).first()
+    user = get_user_by_email(email)
+
+    if user and person:
+        return dict(status='warning', conflict='user-and-person-already-exists',
+                    event_person=EventPersonSchema().dump(person),
+                    user=UserSchema().dump(user))
+    if person:
+        return dict(status='warning', conflict='person-already-exists', event_person=EventPersonSchema().dump(person))
+    elif user:
+        return dict(status='warning', conflict='user-already-exists', user=UserSchema().dump(user))
+    if email_err := validate_email_verbose(email):
+        return dict(status='error', conflict='email-invalid', email_error=email_err)
+    else:
+        return dict(status='ok')

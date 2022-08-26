@@ -8,7 +8,9 @@
 from flask import jsonify, session
 
 from indico.modules.events import Event
-from indico.util.marshmallow import ModelField
+from indico.modules.events.controllers.base import RHEventBase
+from indico.modules.events.persons.util import check_person_link_email
+from indico.util.marshmallow import LowercaseString, ModelField
 from indico.web.args import use_kwargs
 from indico.web.rh import RH
 
@@ -25,3 +27,13 @@ class RHSingleEventAPI(RH):
         elif not event.can_access(session.user):
             return jsonify(can_access=False)
         return EventDetailsForSeriesManagementSchema().jsonify(event)
+
+
+class RHEventCheckEmail(RHEventBase):
+    """Check a person's email when editing a person link."""
+
+    @use_kwargs({
+        'email': LowercaseString(required=True),
+    }, location='query')
+    def _process(self, email):
+        return jsonify(check_person_link_email(self.event, email))

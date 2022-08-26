@@ -7,7 +7,7 @@
 
 import pycountry
 from marshmallow import fields, post_dump, post_load, validate
-from marshmallow.fields import Function, List, String
+from marshmallow.fields import List, String
 
 from indico.core.marshmallow import mm
 from indico.modules.categories import Category
@@ -16,15 +16,6 @@ from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle, syncable_fields
 from indico.util.marshmallow import ModelField, NoneValueEnumField
-
-
-class UserSchema(mm.SQLAlchemyAutoSchema):
-    identifier = Function(lambda user: user.identifier)
-
-    class Meta:
-        model = User
-        fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'full_name',
-                  'phone', 'avatar_url')
 
 
 class AffiliationSchema(mm.SQLAlchemyAutoSchema):
@@ -37,6 +28,16 @@ class AffiliationSchema(mm.SQLAlchemyAutoSchema):
         country = pycountry.countries.get(alpha_2=data['country_code'])
         data['country_name'] = country.name if country else ''
         return data
+
+
+class UserSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'affiliation_id',
+                  'affiliation_meta', 'full_name', 'phone', 'avatar_url')
+
+    affiliation_id = fields.Integer(load_default=None, dump_only=True)
+    affiliation_meta = fields.Nested(AffiliationSchema, attribute='affiliation_link', dump_only=True)
 
 
 class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
