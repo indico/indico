@@ -21,7 +21,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.core.notifications import flush_email_queue, init_email_queue
+from indico.core.notifications import flush_notification_queues, init_notification_queues
 from indico.util.date_time import now_utc
 from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededException
 from indico.web.http_api.metadata import Serializer
@@ -186,11 +186,11 @@ class HTTPAPIHook:
             db.session.rollback()
         else:
             try:
-                init_email_queue()
+                init_notification_queues()
                 is_response, resultList, complete, extra = self._perform(user, func, extra_func)
                 signals.core.after_process.send()
                 db.session.commit()
-                flush_email_queue()
+                flush_notification_queues()
             except Exception:
                 db.session.rollback()
                 raise

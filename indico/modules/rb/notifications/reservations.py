@@ -10,6 +10,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import load_only
 
 from indico.core.notifications import email_sender, make_email
+from indico.modules.notifications.util import make_notification, notification_sender
 from indico.modules.rb.settings import RoomEmailMode, rb_user_settings
 from indico.modules.users import User, UserSetting
 from indico.util.date_time import format_datetime
@@ -176,8 +177,8 @@ def notify_modification(reservation, changes):
     ] if _f]
 
 
-@email_sender
+@notification_sender
 def notify_about_finishing_bookings(user, reservations):
     tpl = get_template_module('rb/emails/reservations/reminders/finishing_bookings.html',
                               reservations=reservations, user=user)
-    return make_email(to_list={user.email}, template=tpl, html=True)
+    return make_notification({user}, template=tpl, content_type='html')

@@ -20,7 +20,7 @@ from terminaltables import AsciiTable
 from indico.core.celery.util import locked_task
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.notifications import flush_email_queue, init_email_queue
+from indico.core.notifications import flush_notification_queues, init_notification_queues
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
 from indico.web.flask.stats import request_stats_request_started
@@ -134,9 +134,9 @@ class IndicoCelery(Celery):
                 stack.enter_context(plugin_context(plugin))
                 with stack:
                     request_stats_request_started()
-                    init_email_queue()
+                    init_notification_queues()
                     rv = super().__call__(*args, **kwargs)
-                    flush_email_queue()
+                    flush_notification_queues()
                     return rv
 
         self.Task = IndicoTask

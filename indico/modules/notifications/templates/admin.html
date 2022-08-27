@@ -1,0 +1,20 @@
+{% extends 'layout/admin_page.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}
+    {% trans %}Notification Settings{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ simple_form(form) }}
+    {% if form.webhook_url.data %}
+        <h2>Test</h2>
+        <button class="i-button icon-bullhorn"
+                data-href="{{ url_for('notifications.send_test') }}"
+                data-method="POST"
+                data-ajax
+                data-update="#dummy">
+            Send test message
+        </button>
+    {% endif %}
+{% endblock %}
