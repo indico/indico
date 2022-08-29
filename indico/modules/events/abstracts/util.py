@@ -27,6 +27,7 @@ from indico.modules.events.contributions.models.fields import ContributionFieldV
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
+from indico.util.i18n import force_locale
 from indico.util.spreadsheets import unique_col
 from indico.web.flask.templating import get_template_module
 
@@ -301,8 +302,9 @@ def create_boa(event):
             # update file mtime so it's not deleted during cache cleanup
             os.utime(path, None)
             return path
-    pdf = AbstractBook(event)
-    tmp_path = pdf.generate()
+    with force_locale(config.DEFAULT_LOCALE):
+        pdf = AbstractBook(event)
+        tmp_path = pdf.generate()
     filename = f'boa-{event.id}.pdf'
     full_path = os.path.join(config.CACHE_DIR, filename)
     shutil.move(tmp_path, full_path)
@@ -315,8 +317,9 @@ def create_boa_tex(event):
 
     :return: A `BytesIO` containing the zip file.
     """
-    tex = AbstractBook(event)
-    return tex.generate_source_archive()
+    with force_locale(config.DEFAULT_LOCALE):
+        tex = AbstractBook(event)
+        return tex.generate_source_archive()
 
 
 def clear_boa_cache(event):

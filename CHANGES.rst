@@ -16,6 +16,7 @@ Bugfixes
 ^^^^^^^^
 
 - Fix meeting minutes being shown when they are expected to be hidden (:pr:`5475`)
+- Force default locale when generating Book of Abstracts (:pr:`5477`)
 
 
 Version 3.2
