@@ -1,17 +1,17 @@
 # 
 # Translators:
-# Adrian, 2021
 # Andre Garcia <sambombe@gmail.com>, 2022
 # Thayana Correa Mamore <thayanacmamore@gmail.com>, 2022
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2022
 # Sedir G. Morais <philippi.sedir@gmail.com>, 2022
 # Tulio Pulgrossi <tuliopulgrossi91@gmail.com>, 2022
 # Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2022
+# Adrian, 2022
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-08-22 18:00+0200\n"
-"Last-Translator: Fernanda Paulo Ramos <fernanda.ramos+transifex@gmail.com>, 2022\n"
+"POT-Creation-Date: 2022-08-22 11:33+0200\n"
+"Last-Translator: Adrian, 2022\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/indico/teams/6478/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -624,7 +624,7 @@ msgstr "Ações"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:77
 msgid "Confirm action: {action}"
-msgstr "Confirme a ação: (action)"
+msgstr "Confirme a ação: {action}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:79
 msgid "OK"
@@ -1126,7 +1126,7 @@ msgstr "Baixar todos os arquivos"
 msgid "Export as JSON"
 msgstr "Exportar como JSON"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:556
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:558
 msgid "There are no editables yet."
 msgstr "Ainda não há editáveis."
 
@@ -3805,7 +3805,7 @@ msgid ""
 "Are you sure you want to delete the location {name} and all data associated "
 "with it?"
 msgstr ""
-"Você tem certeza que deseja apagar a localização [name] e todos os dados "
+"Você tem certeza que deseja apagar a localização {name} e todos os dados "
 "associados com ela?"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:241

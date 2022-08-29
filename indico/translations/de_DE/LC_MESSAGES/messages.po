@@ -23,6 +23,7 @@
 # Oliver Freyermuth <o.freyermuth@googlemail.com>, 2019,2022
 # Peter Trueb <ptr885@hotmail.com>, 2021
 # Reiko Kaps <kaps@luis.uni-hannover.de>, 2019-2020
+# Richard Chojetzki, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
@@ -17697,7 +17698,7 @@ msgstr "Ja/Nein"
 
 #: indico/web/flask/app.py:121
 msgid "Login failed: {error}"
-msgstr "Anmeldung fehlgeschlagen: [error]"
+msgstr "Anmeldung fehlgeschlagen: {error}"
 
 #: indico/web/flask/errors.py:36
 msgid "Please log in to access this page."
@@ -18200,7 +18201,7 @@ msgstr "Dieser Raum kann nicht gebucht werden."
 
 #: indico/web/templates/forms/location_widget.html:164
 msgid "You are not authorized to book this room."
-msgstr "Sie sind nicht berechtigt diesen Raum zu buchen"
+msgstr "Sie haben keine Berichtigung, diesen Raum zu buchen."
 
 #: indico/web/templates/forms/markdown_widget.html:28
 #, python-format
@@ -18274,7 +18275,7 @@ msgstr "Liste anzeigen"
 #: indico/web/templates/overview/base.html:22
 #: indico/web/templates/overview/base.html:24
 msgid "Generate iCalendar link"
-msgstr "Erstelle iCalendar Link"
+msgstr "iCalendar-Link erstellen"
 
 #: indico/web/templates/overview/base.html:45
 #, python-format

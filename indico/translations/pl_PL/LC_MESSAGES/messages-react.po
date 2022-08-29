@@ -1,17 +1,17 @@
 # 
 # Translators:
 # Michito <crossner90@gmail.com>, 2019
-# Adrian, 2021
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2022
 # Patryk Bełzak <patryk.belzak@pwr.edu.pl>, 2022
 # Marcin Miłek, 2022
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2022
 # Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022
+# Adrian, 2022
 # 
 msgid ""
 msgstr ""
 "POT-Creation-Date: 2022-08-22 11:33+0200\n"
-"Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022\n"
+"Last-Translator: Adrian, 2022\n"
 "Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -671,7 +671,7 @@ msgstr "Wykorzystaj istniejący plik"
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:245
 msgid "Filename pattern: {pattern}"
-msgstr "Wzór nazwy pliku: [pattern]"
+msgstr "Wzór nazwy pliku: {pattern}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:345
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx:181

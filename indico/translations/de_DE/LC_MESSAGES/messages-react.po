@@ -20,7 +20,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-08-22 18:00+0200\n"
+"POT-Creation-Date: 2022-08-22 11:33+0200\n"
 "Last-Translator: bbb user, 2022\n"
 "Language-Team: German (Germany) (https://www.transifex.com/indico/teams/6478/de_DE/)\n"
 "MIME-Version: 1.0\n"
@@ -1136,7 +1136,7 @@ msgstr "Alle Dateien herunterladen "
 msgid "Export as JSON"
 msgstr "Als JSON exportieren"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:556
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:558
 msgid "There are no editables yet."
 msgstr "Es gibt bisher nichts editierbares."
 
@@ -3191,7 +3191,7 @@ msgstr "Ort"
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:34
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:151
 msgid "Site"
-msgstr "Website"
+msgstr "Standort"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:40
 #: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:169
