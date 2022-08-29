@@ -17,7 +17,7 @@ from babel.support import NullTranslations
 from flask import current_app, g, has_app_context, has_request_context, request, session
 from flask_babel import Babel, Domain
 from flask_babel import force_locale as _force_locale
-from flask_babel import get_domain
+from flask_babel import get_domain, get_locale
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 from werkzeug.utils import cached_property
@@ -267,9 +267,13 @@ def set_best_lang(check_session=True):
     return resolved_lang
 
 
-@memoize_request
 def get_current_locale():
-    return IndicoLocale.parse(set_best_lang())
+    return _get_current_locale(str(get_locale()))
+
+
+@memoize_request
+def _get_current_locale(locale):
+    return IndicoLocale.parse(locale)
 
 
 def get_all_locales():
