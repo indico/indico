@@ -6,18 +6,20 @@
 # LICENSE file for more details.
 
 import os
+from datetime import datetime
 
 import pytest
 from babel.messages import Catalog
 from babel.messages.mofile import write_mo
 from babel.support import Translations
 from flask import has_request_context, request, session
-from flask_babel import get_domain
+from flask_babel import get_domain, get_locale
 from speaklater import _LazyString
 from werkzeug.datastructures import LanguageAccept
 
 from indico.core.plugins import IndicoPlugin, plugin_engine
-from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, ngettext, pgettext, session_language
+from indico.util.date_time import format_datetime
+from indico.util.i18n import _, force_locale, gettext_context, make_bound_gettext, ngettext, pgettext
 
 
 def _to_msgid(context, message):
@@ -29,14 +31,15 @@ DICTIONARIES = {
         'This is not a string': "Ceci n'est pas une cha\u00cene"
     },
 
-    'fr_MP': {
+    'fr_CH': {  # monty python french (some of it), but babel doesn't like fr_MP :(
         'Fetch the cow': 'Fetchez la vache',
         'The wheels': 'Les wheels',
         ('{} cow', 0): '{} vache',
         ('{} cow', 1): '{} vaches',
+        'I need a drink.': 'Booze, svp.',
     },
 
-    'en_PI': {
+    'en_AU': {  # pirate english, but babel doesn't like en_PI :(
         'I need a drink.': "I be needin' a bottle of rhum!"
     },
 
@@ -57,7 +60,7 @@ class MockTranslations(Translations):
 
     def __init__(self):
         super().__init__()
-        self._catalog = DICTIONARIES[babel.locale_selector_func()]
+        self._catalog = DICTIONARIES[str(get_locale())]
 
 
 class MockPlugin(IndicoPlugin):
@@ -76,7 +79,7 @@ def mock_translations(monkeypatch, request_context):
 
 @pytest.mark.usefixtures('mock_translations')
 def test_straight_translation():
-    session.lang = 'fr_MP'  # 'Monty Python' French
+    session.lang = 'fr_CH'  # 'Monty Python' French
 
     a = _('Fetch the cow')
     b = _('The wheels')
@@ -95,7 +98,7 @@ def test_lazy_translation(monkeypatch):
     assert isinstance(a, _LazyString)
     assert isinstance(b, _LazyString)
 
-    session.lang = 'fr_MP'
+    session.lang = 'fr_CH'
 
     assert str(a) == 'Fetchez la vache'
     assert str(b) == 'Les wheels'
@@ -103,7 +106,7 @@ def test_lazy_translation(monkeypatch):
 
 @pytest.mark.usefixtures('mock_translations')
 def test_ngettext():
-    session.lang = 'fr_MP'
+    session.lang = 'fr_CH'
 
     assert ngettext('{} cow', '{} cows', 1).format(1) == '1 vache'
     assert ngettext('{} cow', '{} cows', 42).format(42) == '42 vaches'
@@ -111,40 +114,48 @@ def test_ngettext():
 
 @pytest.mark.usefixtures('mock_translations')
 def test_translate_bytes():
-    session.lang = 'fr_MP'
+    session.lang = 'fr_CH'
 
     assert _('Fetch the cow') == 'Fetchez la vache'
     assert _('The wheels') == 'Les wheels'
 
 
 @pytest.mark.usefixtures('mock_translations')
-def test_context_manager():
-    session.lang = 'fr_MP'
-    with session_language('en_PI'):
-        assert session.lang == 'en_PI'
-        assert _('I need a drink.') == "I be needin' a bottle of rhum!"
+def test_force_locale():
+    session.lang = 'en_AU'
+    dt = datetime(2022, 8, 29, 13, 37)
 
-    assert session.lang == 'fr_MP'
+    assert format_datetime(dt, timezone='UTC') == '29 Aug 2022, 1:37 pm'
+    assert _('I need a drink.') == "I be needin' a bottle of rhum!"
+
+    with force_locale('fr_CH'):
+        assert format_datetime(dt, timezone='UTC') == '29 août 2022, 13:37'
+        assert _('I need a drink.') == 'Booze, svp.'
+
+    assert format_datetime(dt, timezone='UTC') == '29 Aug 2022, 1:37 pm'
+    assert _('I need a drink.') == "I be needin' a bottle of rhum!"
+
+    assert session.lang == 'en_AU'
 
 
 def test_set_best_lang_no_request():
     assert not has_request_context()
-    assert babel.locale_selector_func() == 'en_GB'
+    assert str(get_locale()) == 'en_GB'
 
 
 @pytest.mark.usefixtures('mock_translations')
 def test_set_best_lang_request():
-    with session_language('en_PI'):
-        assert babel.locale_selector_func() == 'en_PI'
+    with force_locale('en_AU'):
+        assert str(get_locale()) == 'en_AU'
 
 
 @pytest.mark.usefixtures('mock_translations')
 def test_set_best_lang_no_session_lang():
     request.accept_languages = LanguageAccept([('en-PI', 1), ('fr_FR', 0.7)])
-    assert babel.locale_selector_func() == 'fr_FR'
+    assert str(get_locale()) == 'fr_FR'
 
     request.accept_languages = LanguageAccept([('fr-FR', 1)])
-    assert babel.locale_selector_func() == 'fr_FR'
+    assert str(get_locale()) == 'fr_FR'
 
 
 @pytest.mark.usefixtures('mock_translations')

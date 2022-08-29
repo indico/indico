@@ -8,7 +8,6 @@
 import ast
 import re
 from collections import Counter
-from contextlib import contextmanager
 
 from babel import negotiate_locale
 from babel.core import LOCALE_ALIASES, Locale
@@ -294,16 +293,6 @@ def get_all_locales():
 def set_session_lang(lang):
     """Set the current language in the current request context."""
     session.lang = lang
-
-
-@contextmanager
-def session_language(lang):
-    """Context manager that temporarily sets session language."""
-    old_lang = session.lang
-
-    set_session_lang(lang)
-    yield
-    set_session_lang(old_lang)
 
 
 def parse_locale(locale):
