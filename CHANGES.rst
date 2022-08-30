@@ -17,6 +17,7 @@ Bugfixes
 
 - Fix meeting minutes being shown when they are expected to be hidden (:pr:`5475`)
 - Force default locale when generating Book of Abstracts (:pr:`5477`)
+- Fix width and height calculation when printing badges (:pr:`5479`)
 
 
 Version 3.2
