@@ -431,6 +431,8 @@ Improvements
   thanks :user:`omegak`)
 - Include emails of submitters, speakers and authors in abstract/contribution
   Excel/CSV exports (:pr:`5565`)
+- Support generating tickets and badges for each of the registrant's accompanying
+  persons (:pr:`5424`)
 
 Bugfixes
 ^^^^^^^^
@@ -459,6 +461,12 @@ Internal Changes
   thanks :user:`omegak`)
 - Indicate in the ``registration_deleted`` signal whether it's a permanent deletion
   from the database or just a soft-deletion (:pr:`5559`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``event.is_field_data_locked`` signal, allowing plugins to lock registration form
+  fields on a per-registration basis (:pr:`5424`)
 
 
 Version 3.2
@@ -529,8 +537,6 @@ Improvements
 - Images can now be uploaded by pasting or dropping them into the editor for minutes
   or the event description (:pr:`5458`)
 - Add JSON export for contribution details (:pr:`5460`)
-- Support generating tickets for each of the registrant's accompanying persons
-  (:pr:`5424`)
 
 Bugfixes
 ^^^^^^^^
@@ -575,8 +581,6 @@ Internal Changes
   thanks :user:`omegak`).
 - Update WYSIWYG editor to CKEditor 5, resulting in a slightly different look for the
   editor controls and removal of some uncommon format options (:pr:`5345`)
-- Add ``event.is_field_data_locked`` signal, allowing plugins to lock registration form
-  fields on a per-registration basis (:pr:`5424`)
 
 
 ----
