@@ -10,7 +10,7 @@ import templateLivePreviewURL from 'indico-url:receipts.template_live_preview';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Grid} from 'semantic-ui-react';
+import {Grid, Header, Icon, Segment} from 'semantic-ui-react';
 
 import {ManagementPageSubTitle} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -24,7 +24,8 @@ export default function TemplatePane({template, onSubmit, targetLocator, editorH
     title: template.title,
     ..._.pick(template, ['html', 'css', 'yaml']),
   });
-  const previewUrl = templateLivePreviewURL({template_id: template.id, ...targetLocator});
+  const previewUrl = templateLivePreviewURL(targetLocator);
+
   return (
     <>
       <ManagementPageSubTitle title={Translate.string('Add Receipt / Certificate template')} />
@@ -40,7 +41,16 @@ export default function TemplatePane({template, onSubmit, targetLocator, editorH
             />
           </Grid.Column>
           <Grid.Column>
-            <Previewer url={previewUrl} data={data} />
+            {data.html && data.html.length >= 3 ? (
+              <Previewer url={previewUrl} data={data} />
+            ) : (
+              <Segment placeholder>
+                <Header icon>
+                  <Icon name="eye" />
+                  <Translate>Start writing a template to see the preview here...</Translate>
+                </Header>
+              </Segment>
+            )}
           </Grid.Column>
         </Grid.Row>
       </Grid>

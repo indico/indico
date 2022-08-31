@@ -14,59 +14,8 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import {printReceipt} from './print.jsx';
-
 import './PrintReceiptsModal.module.scss';
-
-/**
- * This component represents a custom field which can contain a "text" (str), "choice" or "yes/no" (boolean).
- */
-function CustomField({name, value, type, options, onChange}) {
-  if (type === 'str') {
-    return (
-      <Form.Input
-        label={name}
-        name={name}
-        value={value}
-        onChange={(_, {value: v}) => onChange(v)}
-      />
-    );
-  } else if (type === 'choice') {
-    return (
-      <Form.Dropdown
-        label={name}
-        name={name}
-        options={options.map(option => ({value: option, key: option, text: option}))}
-        value={value}
-        selection
-        onChange={(_, {value: v}) => onChange(v)}
-      />
-    );
-  } else {
-    return (
-      <Form.Checkbox
-        label={name}
-        name={name}
-        onChange={(_, {checked}) => onChange(checked)}
-        checked={value}
-      />
-    );
-  }
-}
-
-function TemplateParameterEditor({customFields, values, onChange}) {
-  return customFields.map(({name, type, options}) => (
-    <CustomField
-      key={name}
-      type={type}
-      value={values[name]}
-      onChange={value => {
-        onChange({...values, [name]: value});
-      }}
-      name={name}
-      options={options}
-    />
-  ));
-}
+import TemplateParameterEditor from './TemplateParameterEditor.jsx';
 
 /**
  * This modal presents the user with a structured interface to download, e-mail or publish
@@ -80,11 +29,12 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
   const [notifyEmail, setNotifyEmail] = useState(false);
   const [customFieldValues, setCustomFieldValues] = useState({});
 
-  const {data, loading} = useIndicoAxios({
-    url: allTemplatesURL({event_id: eventId}),
+  const {data, loading} = useIndicoAxios(allTemplatesURL({event_id: eventId}), {
     trigger: eventId,
     camelize: true,
   });
+
+  console.log('->', data);
 
   const ready = !loading && !!data;
   const selectedTemplate = ready && data.find(tpl => tpl.id === selectedTemplateId);
@@ -120,9 +70,13 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
               value={selectedTemplateId}
               options={ready ? data.map(({id, title}) => ({key: id, text: title, value: id})) : []}
               onChange={(_, {value}) => {
+                console.log(value, data);
                 const {customFields} = data.find(t => t.id === value);
+                console.log(customFields);
                 setCustomFieldValues(
-                  Object.assign({}, ...customFields.map(f => ({[f.name]: f.default || null})))
+                  customFields
+                    ? Object.assign({}, ...customFields.map(f => ({[f.name]: f.default || null})))
+                    : {}
                 );
                 setSelectedTemplateId(value);
               }}
