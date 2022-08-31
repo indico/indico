@@ -1,0 +1,13 @@
+A new Indico profile has been registered.
+
+First name: Guinea
+Last name: Pig
+Email address: 1337@example.test
+Affiliation: Illuminyati
+
+User details:
+http://localhost/user/1337/profile/
+
+--
+Indico :: Email Notifier
+http://localhost/

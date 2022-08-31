@@ -1,0 +1,12 @@
+Dear Guinea,
+
+The date Friday 11/11/2022 from a booking that concerns one of your rooms has been CANCELLED by the user.
+
+You can check the details of the booking here:
+http://localhost/rooms/booking/0
+
+
+--
+Best regards,
+Indico :: Room Booking
+http://localhost/rooms/
