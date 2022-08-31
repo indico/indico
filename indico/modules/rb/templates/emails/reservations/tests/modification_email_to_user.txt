@@ -1,0 +1,21 @@
+Dear Guinea,
+
+Your booking has been MODIFIED.
+
+Room:   1/2-3
+For:    Guinea Pig
+Reason: Testing
+Dates:  Friday 11/11/2022 - Friday 11/11/2022
+Hours:  13:37 - 14:37
+
+Booking details:
+http://localhost/rooms/booking/0
+
+Remember you can always check your bookings here:
+http://localhost/rooms/my-bookings
+
+
+--
+Best regards,
+Indico :: Room Booking
+http://localhost/rooms/

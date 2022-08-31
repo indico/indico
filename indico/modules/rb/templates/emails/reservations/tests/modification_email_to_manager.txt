@@ -1,0 +1,12 @@
+Dear Guinea,
+
+A booking in a room you manage has been MODIFIED.
+
+You can check the details of the booking here:
+http://localhost/rooms/booking/0
+
+
+--
+Best regards,
+Indico :: Room Booking
+http://localhost/rooms/
