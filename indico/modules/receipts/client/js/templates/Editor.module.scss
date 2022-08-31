@@ -1,0 +1,56 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2021 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'base/palette';
+
+:global(.ui.form) .buttons:global(.fields) {
+  justify-content: flex-end;
+  margin-top: 1em;
+}
+
+:global(.react-pdf) {
+  &__Document {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  &__Page {
+    max-width: calc('100% - 2em');
+    border: 1px solid $pastel-gray;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    margin: 1em 0 0 0;
+
+    canvas {
+      max-width: 100%;
+      height: auto !important;
+    }
+  }
+}
+
+.var-entry {
+  padding-bottom: 0.5em;
+
+  .key {
+    background-color: $blue;
+    color: $white;
+    padding: 0.2em;
+    border-radius: 0.2em;
+  }
+
+  .nested-value {
+    padding-top: 0.4em;
+    font-size: 0.9em;
+  }
+
+  .value {
+    background-color: $gray;
+    color: $white;
+    padding: 0.2em;
+    border-radius: 0.2em;
+  }
+}

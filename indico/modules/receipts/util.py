@@ -10,7 +10,7 @@ from io import BytesIO
 
 from flask import g
 from jinja2 import Undefined
-from jinja2.exceptions import TemplateSyntaxError
+from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
 from weasyprint import CSS, HTML, default_url_fetcher
 from werkzeug.exceptions import UnprocessableEntity
@@ -20,6 +20,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.receipts.models.templates import ReceiptTemplate
+from indico.util.date_time import format_date, format_datetime, format_time, now_utc
 
 
 DEFAULT_CSS = '''
@@ -61,8 +62,16 @@ def compile_jinja_code(code: str, use_stack: bool = False, **fields) -> str:
     """Compile Jinja template of receipt in a sandboxed environment."""
     try:
         env = SandboxedEnvironment(undefined=SilentUndefined) if use_stack else SandboxedEnvironment()
-        return env.from_string(code).render(**fields)
-    except TemplateSyntaxError as e:
+        env.filters.update({
+            'format_date': format_date,
+            'format_datetime': format_datetime,
+            'format_time': format_time,
+        })
+        return env.from_string(code).render(
+            **fields,
+            now_utc=now_utc
+        )
+    except (TemplateSyntaxError, SecurityError, LookupError) as e:
         raise UnprocessableEntity(e)
 
 

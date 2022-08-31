@@ -11,10 +11,12 @@ import templateURL from 'indico-url:receipts.template';
 import templateListURL from 'indico-url:receipts.template_list';
 
 import PropTypes from 'prop-types';
-import React, {useReducer} from 'react';
+import React, {useReducer, useEffect} from 'react';
 import {useHistory} from 'react-router';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import {Message} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
 import {routerPathFromFlask, useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios} from 'indico/utils/axios';
 
@@ -30,16 +32,30 @@ const targetLocatorSchema = PropTypes.shape({
 function reducer(state, action) {
   switch (action.type) {
     case 'ADD_TEMPLATE':
-      return {...state, ownTemplates: [...state.ownTemplates, action.template]};
+      return {
+        ...state,
+        ownTemplates: [...state.ownTemplates, action.template],
+        message: Translate.string(`Template "${action.template.title}" was added`),
+      };
     case 'UPDATE_TEMPLATE':
       return {
         ...state,
         ownTemplates: state.ownTemplates.map(tpl =>
           tpl.id === action.id ? {...tpl, ...action.changes} : tpl
         ),
+        message: Translate.string(`Template "${action.changes.title}" was updated`),
       };
     case 'DELETE_TEMPLATE':
-      return {...state, ownTemplates: state.ownTemplates.filter(tpl => tpl.id !== action.id)};
+      return {
+        ...state,
+        ownTemplates: state.ownTemplates.filter(tpl => tpl.id !== action.id),
+        message: Translate.string('Template deleted'),
+      };
+    case 'RESET_MESSAGE':
+      return {
+        ...state,
+        message: null,
+      };
     default:
       return state;
   }
@@ -108,34 +124,49 @@ NewTemplatePane.propTypes = {
 export default function ReceiptTemplateManagement({initialState, targetLocator}) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const targetIdParams = Object.keys(targetLocator);
+
+  // hide success messages after 5 seconds
+  useEffect(() => {
+    if (state.message) {
+      setTimeout(() => dispatch({type: 'RESET_MESSAGE'}), 5000);
+    }
+  }, [state.message]);
+
   return (
-    <Router>
-      <Switch>
-        <Route
-          exact
-          path={routerPathFromFlask(addTemplateURL, targetIdParams)}
-          render={() => <NewTemplatePane dispatch={dispatch} targetLocator={targetLocator} />}
-        />
-        <Route
-          exact
-          path={[routerPathFromFlask(templateURL, [...targetIdParams, 'template_id'])]}
-          render={() => (
-            <EditTemplatePane
-              templates={state.ownTemplates}
-              dispatch={dispatch}
-              targetLocator={targetLocator}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={routerPathFromFlask(templateListURL, targetIdParams)}
-          component={() => (
-            <TemplateListPane dispatch={dispatch} targetLocator={targetLocator} {...state} />
-          )}
-        />
-      </Switch>
-    </Router>
+    <>
+      {state.message && (
+        <Message success>
+          <Message.Content>{state.message}</Message.Content>
+        </Message>
+      )}
+      <Router>
+        <Switch>
+          <Route
+            exact
+            path={routerPathFromFlask(addTemplateURL, targetIdParams)}
+            render={() => <NewTemplatePane dispatch={dispatch} targetLocator={targetLocator} />}
+          />
+          <Route
+            exact
+            path={[routerPathFromFlask(templateURL, [...targetIdParams, 'template_id'])]}
+            render={() => (
+              <EditTemplatePane
+                templates={state.ownTemplates}
+                dispatch={dispatch}
+                targetLocator={targetLocator}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={routerPathFromFlask(templateListURL, targetIdParams)}
+            component={() => (
+              <TemplateListPane dispatch={dispatch} targetLocator={targetLocator} {...state} />
+            )}
+          />
+        </Switch>
+      </Router>
+    </>
   );
 }
 
