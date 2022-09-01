@@ -36,7 +36,8 @@
                            data-title="{% trans %}Submit new abstract{% endtrans %}"
                            data-href="{{ url_for('abstracts.submit', event) }}"
                            data-confirm-close-unsaved
-                           data-ajax-dialog>
+                           data-ajax-dialog
+                           href="#">
                             {%- trans %}Submit new abstract{% endtrans -%}
                         </a>
                     {% else %}
