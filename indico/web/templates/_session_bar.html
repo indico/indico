@@ -30,7 +30,7 @@
         {% endif %}
     </div>
 
-    <button id="protection-details-link"
+    <a id="protection-details-link"
        class="arrow i-button protection-{{ mode }} {{ 'icon-shield' if mode != 'public' else 'icon-earth' }}">
         {% if mode == 'public' %}
             {% trans %}Public{% endtrans %}
@@ -43,7 +43,7 @@
         {% elif mode == 'restricted' %}
             {% trans %}Restricted{% endtrans %}
         {% endif %}
-    </button>
+    </a>
 {% endmacro %}
 
 
@@ -107,7 +107,7 @@
             </div>
         </div>
 
-        <button id="tz-selector-link" class="i-button icon-time arrow">{{ timezone_data.active_tz }}</button>
+        <a id="tz-selector-link" class="i-button icon-time arrow">{{ timezone_data.active_tz }}</a>
     {% endif %}
 {% endmacro %}
 
@@ -154,9 +154,9 @@
         </div>
     </div>
 
-    <button id="user-settings-link" class="i-button icon icon-user arrow">
+    <a id="user-settings-link" class="i-button icon icon-user arrow">
         {{ session.user.get_full_name(last_name_first=false, last_name_upper=false, abbrev_first_name=true) }}
-    </button>
+    </a>
 {% endmacro %}
 
 
