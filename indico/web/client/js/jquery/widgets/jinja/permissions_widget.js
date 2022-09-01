@@ -469,13 +469,13 @@ import Palette from 'indico/utils/palette';
 
       // Manage adding users/groups to the acl
       const userSearchTrigger = triggerProps => (
-        <a className="i-button" {...triggerProps}>
+        <a className="i-button" {...triggerProps} href="#">
           <Translate>User</Translate>
         </a>
       );
 
       const groupSearchTrigger = triggerProps => (
-        <a className="i-button" {...triggerProps}>
+        <a className="i-button" {...triggerProps} href="#">
           <Translate>Group</Translate>
         </a>
       );

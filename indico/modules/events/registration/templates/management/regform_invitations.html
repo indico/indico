@@ -26,25 +26,25 @@
                 </div>
                 <div class="toolbar">
                     {{ template_hook('registration-invite-options', event=event, regform=regform) }}
-                    <a class="i-button icon-user arrow js-dropdown" data-toggle="dropdown">
+                    <a class="i-button icon-user arrow js-dropdown" data-toggle="dropdown" href="#">
                         {% trans %}Invite{% endtrans %}
                     </a>
                     <ul class="i-dropdown">
                         <li>
                             <a class="js-invite-user" data-href="{{ url_for('.invite', regform) }}"
-                               data-title="{% trans %}Invite user to register{% endtrans %}">
+                               data-title="{% trans %}Invite user to register{% endtrans %}" href="#">
                                 {% trans %}New user{% endtrans %}
                             </a>
                         </li>
                         <li>
                             <a class="js-invite-user" data-href="{{ url_for('.invite', regform, existing=True) }}"
-                               data-title="{% trans %}Invite user to register{% endtrans %}">
+                               data-title="{% trans %}Invite user to register{% endtrans %}" href="#">
                                 {% trans %}Indico users{% endtrans %}
                             </a>
                         </li>
                     </ul>
                     <a class="i-button js-invite-user" data-href="{{ url_for('.import', regform) }}"
-                       data-title="{% trans %}Import invitations from a CSV File{% endtrans %}">
+                       data-title="{% trans %}Import invitations from a CSV File{% endtrans %}" href="#">
                         {% trans %}Import{% endtrans %}
                     </a>
                 </div>

@@ -50,7 +50,7 @@
                 </div>
                 <div class="group hide-if-locked">
                     <div id="indico-user-to-add" class="hidden"></div>
-                    <a class="i-button arrow icon-plus" data-toggle="dropdown">
+                    <a class="i-button arrow icon-plus" data-toggle="dropdown" href="#">
                         {% trans %}Register{% endtrans %}
                     </a>
                     <ul class="i-dropdown">
@@ -77,12 +77,13 @@
                     </ul>
                     <a class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
                        data-href="{{ url_for('.delete_registrations', regform) }}"
-                       data-method="POST">
+                       data-method="POST"
+                       href="#">
                         {%- trans %}Remove{% endtrans -%}
                     </a>
                 </div>
                 <div class="group">
-                    <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown" href="#">
                         {%- trans %}Export{% endtrans -%}
                     </a>
                     <ul class="i-dropdown">
@@ -200,7 +201,7 @@
                         </ul>
                     {% endif %}
                     {% if not event.is_locked %}
-                        <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                        <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown" href="#">
                             {%- trans %}Check-in control{% endtrans -%}
                         </a>
                         <ul class="i-dropdown">
@@ -227,14 +228,14 @@
                     {{ template_hook('registration-status-action-button', regform=regform) }}
                 </div>
                 <div class="group">
-                    <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></a>
+                    <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}" href="#"></a>
                 </div>
             </div>
             <div class="toolbar">
                 <div class="group">
                     <a class="i-button icon-link js-static-url"
                        data-href="{{ url_for('.generate_static_url', regform) }}"
-                       title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></a>
+                       title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}" href="#"></a>
                 </div>
                 <div class="group">
                     <span class="i-button label icon-user" title="{% trans %}Total registrations{% endtrans %}">

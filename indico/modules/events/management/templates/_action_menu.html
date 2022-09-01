@@ -131,7 +131,8 @@
                     <a class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
                        data-href="{{ url_for('event_management.clone', event) }}"
                        data-title="{% trans %}Clone Event{% endtrans %}"
-                       data-ajax-dialog>
+                       data-ajax-dialog
+                       href="#">
                         {% trans %}Clone{% endtrans %}
                    </a>
                     {% if clones %}
@@ -141,7 +142,7 @@
                     {% endif %}
                 </div>
 
-                <a id="event-action-menu-actions-target" class="i-button icon-settings i-button arrow"
+                <a href="#" id="event-action-menu-actions-target" class="i-button icon-settings i-button arrow"
                    title="{% trans %}Event actions{% endtrans %}"></a>
 
                 <div id="event-action-menu-actions">
