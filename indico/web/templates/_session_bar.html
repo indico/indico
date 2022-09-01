@@ -30,7 +30,7 @@
         {% endif %}
     </div>
 
-    <a id="protection-details-link"
+    <button id="protection-details-link"
        class="arrow i-button protection-{{ mode }} {{ 'icon-shield' if mode != 'public' else 'icon-earth' }}">
         {% if mode == 'public' %}
             {% trans %}Public{% endtrans %}
@@ -43,7 +43,7 @@
         {% elif mode == 'restricted' %}
             {% trans %}Restricted{% endtrans %}
         {% endif %}
-    </a>
+    </button>
 {% endmacro %}
 
 
@@ -107,7 +107,7 @@
             </div>
         </div>
 
-        <a id="tz-selector-link" class="i-button icon-time arrow">{{ timezone_data.active_tz }}</a>
+        <button id="tz-selector-link" class="i-button icon-time arrow">{{ timezone_data.active_tz }}</button>
     {% endif %}
 {% endmacro %}
 
@@ -154,9 +154,9 @@
         </div>
     </div>
 
-    <a id="user-settings-link" class="i-button icon icon-user arrow">
+    <button id="user-settings-link" class="i-button icon icon-user arrow">
         {{ session.user.get_full_name(last_name_first=false, last_name_upper=false, abbrev_first_name=true) }}
-    </a>
+    </button>
 {% endmacro %}
 
 
@@ -167,11 +167,11 @@
         {%- if ambiguous and territory %} ({{ territory }}){% endif -%}
     {%- endset %}
     {% if lightweight %}
-        <a id="language-selector-link" class="arrow js-dropdown" data-toggle="dropdown">
+        <a id="language-selector-link" class="arrow js-dropdown" data-toggle="dropdown" href="#">
             {%- trans %}My language ({{ language }}){% endtrans %}
         </a>
     {% else %}
-        <a id="language-selector-link" class="arrow icon-earth i-button js-dropdown" data-toggle="dropdown">
+        <a id="language-selector-link" class="arrow icon-earth i-button js-dropdown" data-toggle="dropdown" href="#">
             {{- language -}}
         </a>
     {% endif %}
