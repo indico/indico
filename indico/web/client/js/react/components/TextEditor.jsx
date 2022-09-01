@@ -13,6 +13,8 @@ import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {getConfig} from 'indico/ckeditor';
 
+import {FinalField} from '../forms';
+
 export default function TextEditor({
   value,
   width,
@@ -20,6 +22,9 @@ export default function TextEditor({
   onReady: _onReady,
   config: _config,
   loading,
+  onChange,
+  onFocus,
+  onBlur,
   ...rest
 }) {
   const config = useMemo(() => getConfig(_config), [_config]);
@@ -38,7 +43,18 @@ export default function TextEditor({
       <Dimmer inverted active={loading}>
         <Loader />
       </Dimmer>
-      <CKEditor editor={ClassicEditor} data={value} onReady={onReady} config={config} {...rest} />
+      <CKEditor
+        editor={ClassicEditor}
+        data={value}
+        onReady={onReady}
+        config={config}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        onChange={(evt, editor) => {
+          onChange(editor.getData());
+        }}
+        {...rest}
+      />
     </Dimmer.Dimmable>
   );
 }
@@ -47,7 +63,10 @@ TextEditor.propTypes = {
   width: PropTypes.string,
   height: PropTypes.string,
   onReady: PropTypes.func,
-  value: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
   config: PropTypes.object,
   loading: PropTypes.bool,
 };
@@ -56,7 +75,14 @@ TextEditor.defaultProps = {
   height: '400px',
   width: undefined,
   onReady: undefined,
-  value: undefined,
   config: undefined,
   loading: false,
+};
+
+export function FinalTextEditor({name, ...rest}) {
+  return <FinalField name={name} component={TextEditor} {...rest} />;
+}
+
+FinalTextEditor.propTypes = {
+  name: PropTypes.string.isRequired,
 };
