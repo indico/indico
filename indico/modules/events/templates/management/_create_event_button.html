@@ -1,5 +1,5 @@
 {% macro create_event_button(category, classes="", text="", with_tooltip=true) %}
-    <a class="{{ classes }} i-button arrow js-dropdown"
+    <a href="" class="{{ classes }} i-button arrow js-dropdown"
        {% if with_tooltip %}title="{% trans %}Create event{% endtrans %}"{% endif %}
        data-toggle="dropdown">
         {{- text -}}
