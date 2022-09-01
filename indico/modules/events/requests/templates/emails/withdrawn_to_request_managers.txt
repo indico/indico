@@ -1,9 +1,9 @@
 {% extends 'events/requests/emails/base_to_request_managers.txt' %}
 
 {% block request_subject -%}
-    Withdrawn service request
+    {% trans %}Withdrawn service request{% endtrans %}
 {%- endblock %}
 
 {% block request_message -%}
-    A {{ req.definition.title }} request has been withdrawn.
+    {% trans title=req.definition.title %}A {{ title }} request has been withdrawn.{% endtrans %}
 {%- endblock %}

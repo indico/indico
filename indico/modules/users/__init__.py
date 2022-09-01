@@ -15,7 +15,7 @@ from indico.core.settings.converters import EnumConverter
 from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 from indico.modules.users.models.users import NameFormat, User
-from indico.util.i18n import _
+from indico.util.i18n import _, force_locale
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
@@ -82,8 +82,10 @@ def _topmenu_items(sender, **kwargs):
 @signals.users.registration_requested.connect
 def _registration_requested(req, **kwargs):
     from indico.modules.users.util import get_admin_emails
-    tpl = get_template_module('users/emails/profile_requested_admins.txt', req=req)
-    send_email(make_email(get_admin_emails(), template=tpl))
+    with force_locale(None):
+        tpl = get_template_module('users/emails/profile_requested_admins.txt', req=req)
+        email = make_email(get_admin_emails(), template=tpl)
+    send_email(email)
 
 
 @signals.users.registered.connect
@@ -92,8 +94,10 @@ def _registered(user, identity, from_moderation, **kwargs):
     if (from_moderation or identity is None or identity.provider != 'indico' or
             not user_management_settings.get('notify_account_creation')):
         return
-    tpl = get_template_module('users/emails/profile_registered_admins.txt', user=user)
-    send_email(make_email(get_admin_emails(), template=tpl))
+    with force_locale(None):
+        tpl = get_template_module('users/emails/profile_registered_admins.txt', user=user)
+        email = make_email(get_admin_emails(), template=tpl)
+    send_email(email)
 
 
 @signals.core.import_tasks.connect

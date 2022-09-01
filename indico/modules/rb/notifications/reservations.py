@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import render_template
 from sqlalchemy import and_
 from sqlalchemy.orm import load_only
 
@@ -13,6 +12,7 @@ from indico.core.notifications import email_sender, make_email
 from indico.modules.rb.settings import RoomEmailMode, rb_user_settings
 from indico.modules.users import User, UserSetting
 from indico.util.date_time import format_datetime
+from indico.util.i18n import force_locale
 from indico.web.flask.templating import get_template_module
 
 
@@ -46,50 +46,36 @@ class ReservationNotification:
         self.reservation = reservation
         self.start_dt = format_datetime(reservation.start_dt)
 
-    def _get_email_subject(self, **mail_params):
-        return '{prefix}[{room}] {subject} ({date}) {suffix}'.format(
-            prefix=mail_params.get('subject_prefix', ''),
-            room=self.reservation.room.full_name,
-            subject=mail_params.get('subject', ''),
-            date=self.start_dt,
-            suffix=mail_params.get('subject_suffix', '')
-        ).strip()
-
-    def _make_body(self, mail_params, **body_params):
+    def _make_template(self, mail_params, **body_params):
         from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping
         template_params = mail_params | body_params
         template_params['RepeatFrequency'] = RepeatFrequency
         template_params['RepeatMapping'] = RepeatMapping
-        return render_template('rb/emails/reservations/{}.txt'.format(mail_params['template_name']), **template_params)
+        return get_template_module('rb/emails/reservations/{}.txt'.format(mail_params['template_name']),
+                                   **template_params)
 
     def compose_email_to_user(self, **mail_params):
         creator = self.reservation.created_by_user
         to_list = {creator.email}
         if self.reservation.contact_email:
             to_list.add(self.reservation.contact_email)
-        subject = self._get_email_subject(**mail_params)
-        body = self._make_body(mail_params, reservation=self.reservation)
-        return make_email(to_list=to_list, subject=subject, body=body)
+        with force_locale(None):
+            template = self._make_template(mail_params, reservation=self.reservation)
+            return make_email(to_list=to_list, template=template)
 
     def compose_email_to_manager(self, **mail_params):
         room = self.reservation.room
-        subject = self._get_email_subject(**mail_params)
-        body = self._make_body(mail_params, reservation=self.reservation)
-        return make_email(to_list=get_manager_emails(room), subject=subject, body=body)
+        with force_locale(None):  # No event, and managers are sent in one mail together
+            template = self._make_template(mail_params, reservation=self.reservation)
+            return make_email(to_list=get_manager_emails(room), template=template)
 
 
 @email_sender
 def notify_reset_approval(reservation):
     notification = ReservationNotification(reservation)
     return [_f for _f in [
-        notification.compose_email_to_user(
-            subject='Booking approval changed state on',
-            template_name='change_state_email_to_user'
-        ),
-        notification.compose_email_to_manager(
-            subject='Booking approval changed state on',
-            template_name='change_state_email_to_manager'
-        )
+        notification.compose_email_to_user(template_name='change_state_email_to_user'),
+        notification.compose_email_to_manager(template_name='change_state_email_to_manager')
     ] if _f]
 
 
@@ -99,14 +85,8 @@ def notify_cancellation(reservation):
         raise ValueError('Reservation is not cancelled')
     notification = ReservationNotification(reservation)
     return [_f for _f in [
-        notification.compose_email_to_user(
-            subject='Booking cancelled',
-            template_name='cancellation_email_to_user'
-        ),
-        notification.compose_email_to_manager(
-            subject='Booking cancelled',
-            template_name='cancellation_email_to_manager'
-        ),
+        notification.compose_email_to_user(template_name='cancellation_email_to_user'),
+        notification.compose_email_to_manager(template_name='cancellation_email_to_manager'),
     ] if _f]
 
 
@@ -116,16 +96,8 @@ def notify_confirmation(reservation, reason=None):
         raise ValueError('Reservation is not confirmed')
     notification = ReservationNotification(reservation)
     return [_f for _f in [
-        notification.compose_email_to_user(
-            subject='Booking confirmed',
-            template_name='confirmation_email_to_user',
-            reason=reason
-        ),
-        notification.compose_email_to_manager(
-            subject='Booking confirmed',
-            template_name='confirmation_email_to_manager',
-            reason=reason
-        ),
+        notification.compose_email_to_user(template_name='confirmation_email_to_user', reason=reason),
+        notification.compose_email_to_manager(template_name='confirmation_email_to_manager', reason=reason),
     ] if _f]
 
 
@@ -133,14 +105,8 @@ def notify_confirmation(reservation, reason=None):
 def notify_creation(reservation):
     notification = ReservationNotification(reservation)
     return [_f for _f in [
-        notification.compose_email_to_user(
-            subject='New Booking' if reservation.is_accepted else 'Pre-Booking awaiting acceptance',
-            template_name='creation_email_to_user' if reservation.is_accepted else 'creation_pre_email_to_user'
-        ),
-        notification.compose_email_to_manager(
-            subject='New booking on' if reservation.is_accepted else 'New Pre-Booking on',
-            template_name='creation_email_to_manager' if reservation.is_accepted else 'creation_pre_email_to_manager'
-        ),
+        notification.compose_email_to_user(template_name='creation_email_to_user'),
+        notification.compose_email_to_manager(template_name='creation_email_to_manager'),
     ] if _f]
 
 
@@ -150,14 +116,8 @@ def notify_rejection(reservation):
         raise ValueError('Reservation is not rejected')
     notification = ReservationNotification(reservation)
     return [_f for _f in [
-        notification.compose_email_to_user(
-            subject='Booking rejected',
-            template_name='rejection_email_to_user',
-        ),
-        notification.compose_email_to_manager(
-            subject='Booking rejected',
-            template_name='rejection_email_to_manager',
-        )
+        notification.compose_email_to_user(template_name='rejection_email_to_user'),
+        notification.compose_email_to_manager(template_name='rejection_email_to_manager')
     ] if _f]
 
 
@@ -165,19 +125,14 @@ def notify_rejection(reservation):
 def notify_modification(reservation, changes):
     notification = ReservationNotification(reservation)
     return [_f for _f in [
-        notification.compose_email_to_user(
-            subject='Booking modified',
-            template_name='modification_email_to_user'
-        ),
-        notification.compose_email_to_manager(
-            subject='Booking modified',
-            template_name='modification_email_to_manager'
-        ),
+        notification.compose_email_to_user(template_name='modification_email_to_user'),
+        notification.compose_email_to_manager(template_name='modification_email_to_manager'),
     ] if _f]
 
 
 @email_sender
 def notify_about_finishing_bookings(user, reservations):
-    tpl = get_template_module('rb/emails/reservations/reminders/finishing_bookings.html',
-                              reservations=reservations, user=user)
-    return make_email(to_list={user.email}, template=tpl, html=True)
+    with user.force_user_locale():
+        tpl = get_template_module('rb/emails/reservations/reminders/finishing_bookings.html',
+                                  reservations=reservations, user=user)
+        return make_email(to_list={user.email}, template=tpl, html=True)

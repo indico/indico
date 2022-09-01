@@ -9,6 +9,7 @@ from flask import session
 
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
+from indico.modules.users.models.users import User
 from indico.web.flask.templating import get_template_module
 
 
@@ -17,9 +18,10 @@ def notify_paper_revision_submission(revision):
     roles_to_notify = paper_reviewing_settings.get(event, 'notify_on_paper_submission')
     if PaperReviewingRole.judge in roles_to_notify:
         for judge in revision.paper.contribution.paper_judges:
-            template = get_template_module('events/papers/emails/revision_submission_to_judge.html', event=event,
-                                           revision=revision, receiver=judge)
-            email = make_email(to_list=judge.email, template=template, html=True)
+            with judge.force_user_locale():
+                template = get_template_module('events/papers/emails/revision_submission_to_judge.html', event=event,
+                                               revision=revision, receiver=judge)
+                email = make_email(to_list=judge.email, template=template, html=True)
             send_email(email, event=event, module='Papers', user=session.user)
     reviewers = set()
     if PaperReviewingRole.layout_reviewer in roles_to_notify:
@@ -29,9 +31,10 @@ def notify_paper_revision_submission(revision):
         if revision.paper.cfp.content_reviewing_enabled:
             reviewers |= revision.paper.contribution.paper_content_reviewers
     for reviewer in reviewers:
-        template = get_template_module('events/papers/emails/revision_submission_to_reviewer.html', event=event,
-                                       revision=revision, receiver=reviewer)
-        email = make_email(to_list=reviewer.email, template=template, html=True)
+        with reviewer.force_user_locale():
+            template = get_template_module('events/papers/emails/revision_submission_to_reviewer.html', event=event,
+                                           revision=revision, receiver=reviewer)
+            email = make_email(to_list=reviewer.email, template=template, html=True)
         send_email(email, event=event, module='Papers', user=session.user)
 
 
@@ -40,9 +43,11 @@ def notify_paper_review_submission(review):
     if not paper_reviewing_settings.get(event, 'notify_judge_on_review'):
         return
     for judge in review.revision.paper.contribution.paper_judges:
-        template = get_template_module('events/papers/emails/review_submission_to_judge.html', event=event,
-                                       review=review, contribution=review.revision.paper.contribution, receiver=judge)
-        email = make_email(to_list=judge.email, template=template, html=True)
+        with judge.force_user_locale():
+            template = get_template_module('events/papers/emails/review_submission_to_judge.html', event=event,
+                                           review=review, contribution=review.revision.paper.contribution,
+                                           receiver=judge)
+            email = make_email(to_list=judge.email, template=template, html=True)
         send_email(email, event=event, module='Papers', user=session.user)
 
 
@@ -60,15 +65,17 @@ def notify_paper_judgment(paper, reset=False):
     if not template_file:
         return
     for receiver in recipients:
-        template = get_template_module(template_file, event=event, paper=paper, contribution=paper.contribution,
-                                       receiver=receiver)
-        email = make_email(to_list=receiver.email, template=template, html=True)
+        with receiver.force_user_locale():
+            template = get_template_module(template_file, event=event, paper=paper, contribution=paper.contribution,
+                                           receiver=receiver)
+            email = make_email(to_list=receiver.email, template=template, html=True)
         send_email(email, event=event, module='Papers', user=session.user)
 
 
 def _notify_changes_in_reviewing_team(user, template, event, role):
-    template = get_template_module(template, event=event, receiver=user, role=role)
-    email = make_email(to_list=user.email, template=template, html=True)
+    with user.force_user_locale():
+        template = get_template_module(template, event=event, receiver=user, role=role)
+        email = make_email(to_list=user.email, template=template, html=True)
     send_email(email, event=event, module='Papers', user=session.user)
 
 
@@ -83,16 +90,18 @@ def notify_removed_from_reviewing_team(user, role, event):
 
 
 def notify_paper_assignment(user, role, contributions, event, assign):
-    template = get_template_module('events/papers/emails/paper_assignment.html', event=event, contribs=contributions,
-                                   receiver=user, assign=assign, role=role)
-    email = make_email(to_list=user.email, template=template, html=True)
+    with user.force_user_locale():
+        template = get_template_module('events/papers/emails/paper_assignment.html', event=event,
+                                       contribs=contributions, receiver=user, assign=assign, role=role)
+        email = make_email(to_list=user.email, template=template, html=True)
     send_email(email, event=event, module='Papers', user=session.user)
 
 
 def notify_comment(person, paper, comment, submitter):
     event = paper.event
     receiver_name = person.first_name or 'user'
-    template = get_template_module('events/papers/emails/comment.html', event=event, receiver=receiver_name,
-                                   contribution=paper.contribution, comment=comment, submitter=submitter)
-    email = make_email(to_list=person.email, template=template, html=True)
+    with person.force_user_locale() if type(person) == User else event.force_event_locale():
+        template = get_template_module('events/papers/emails/comment.html', event=event, receiver=receiver_name,
+                                       contribution=paper.contribution, comment=comment, submitter=submitter)
+        email = make_email(to_list=person.email, template=template, html=True)
     send_email(email, event=event, module='Papers', user=session.user)

@@ -1,14 +1,20 @@
 {% extends 'events/registration/emails/base_registration_details.html' %}
 
 {% block subject_message -%}
-    New {%- if registration.state.name == 'pending' %} pending{% endif %} registration
+    {% if registration.state.name == 'pending' -%}
+        {% trans title=event.title %}New pending registration for {{ title }}{% endtrans %}
+    {%- else -%}
+        {% trans title=event.title %}New registration for {{ title }}{% endtrans %}
+    {%- endif %}
 {%- endblock %}
 
 {% block registration_header -%}
-    <p>Dear organizer,</p>
+    <p>{% trans %}Dear organizer,{% endtrans %}</p>
     <p>
         {% block registration_header_text %}
-            There is a new registration {{ render_registration_info() }}.
+            {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+                There is a new registration for the event {{ strong }}{{ title }}{{ endstrong }} under {{ strong }}{{ name }}{{ endstrong }}.
+            {% endtrans %}
             {{ render_text_pending() }}
             {{ render_text_manage() }}
         {% endblock %}
@@ -17,35 +23,30 @@
 
 {% block registration_footer %}
     <p>
-        To manage this registration form follow this link:
+        {% trans %}To manage this registration form follow this link:{% endtrans %}
         <a href="{{ url_for('event_registration.manage_regform', registration.registration_form, _external=true) }}">
-            Manage registration form
+            {% trans %}Manage registration form{% endtrans %}
         </a>
     </p>
 {% endblock %}
 
 
-{% macro render_registration_info() -%}
-    for the event <strong>{{ event.title }}</strong>
-    under <strong>{{ registration.full_name }}</strong>
-{%- endmacro %}
-
-
 {% macro render_rejection_reason() %}
     {% if registration.state.name == 'rejected' and registration.rejection_reason %}
-        <br>Rejection reason: {{ registration.rejection_reason }}<br>
+        <br>{% trans %}Rejection reason:{% endtrans %} {{ registration.rejection_reason }}<br>
     {% endif %}
 {% endmacro %}
 
 
 {% macro render_text_pending() %}
     {% if registration.state.name == 'pending' %}
-        Please note that it's waiting for manual approval by a manager.
+        {% trans %}Please note that it's waiting for manual approval by a manager.{% endtrans %}
     {% endif %}
 {% endmacro %}
 
 
 {% macro render_text_manage() %}
-    You can manage this registration
-    <a href="{{ url_for('event_registration.registration_details', registration, _external=true) }}">here</a>.
+    {% trans link='<a href="{{ registration.external_registration_details_url }}">'|safe, endlink='</a>'|safe -%}
+        You can manage this registration {{ link }}here{{ endlink }}.
+    {%- endtrans %}
 {% endmacro %}

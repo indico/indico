@@ -2,7 +2,7 @@ Dear Guinea,
 
 The conference room 1/2-3
 has been pre-booked for Guinea Pig
-on Friday 11/11/2022 from 13:37 to 14:37.
+on Friday, 11/11/2022 from 13:37 to 14:37.
 Reason: Testing
 
 Note:
@@ -17,8 +17,6 @@ http://localhost/rooms/booking/1337
 Remember you can always check your bookings here:
 http://localhost/rooms/my-bookings
 
-
 --
-Best regards,
 Indico :: Room Booking
 http://localhost/rooms/

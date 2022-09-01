@@ -13,6 +13,7 @@ from sqlalchemy.orm import joinedload
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import make_email, send_email
 from indico.modules.categories.models.categories import Category
+from indico.util.i18n import force_locale
 from indico.web.flask.templating import get_template_module
 
 
@@ -49,8 +50,10 @@ def notify_event_creation(event, occurrences=None):
         emails.update(_get_emails_from_category(cat))
 
     if emails:
-        template = get_template_module('events/emails/event_creation.txt', event=event, occurrences=occurrences)
-        send_email(make_email(bcc_list=emails, template=template))
+        with force_locale(None):
+            template = get_template_module('events/emails/event_creation.txt', event=event, occurrences=occurrences)
+            email = make_email(bcc_list=emails, template=template)
+        send_email(email)
 
 
 def notify_move_request_creation(events, target_category, comment=''):
@@ -70,9 +73,11 @@ def notify_move_request_creation(events, target_category, comment=''):
         emails.update(_get_emails_from_category(cat, ignore_notify_managers=True))
 
         if emails:
-            template = get_template_module('events/emails/move_request_creation.txt',
-                                           events=events, target_category=target_category, comment=comment)
-            send_email(make_email(bcc_list=emails, template=template))
+            with force_locale(None):
+                template = get_template_module('events/emails/move_request_creation.txt',
+                                               events=events, target_category=target_category, comment=comment)
+                email = make_email(bcc_list=emails, template=template)
+            send_email(email)
             break
 
 
@@ -87,6 +92,8 @@ def notify_move_request_closure(move_requests, accept, reason=''):
     move_requests = sorted(move_requests, key=attrgetter('requestor.id', 'category.id'))
     for (requestor, category), requests in itertools.groupby(move_requests, attrgetter('requestor', 'category')):
         events = [rq.event for rq in requests]
-        template = get_template_module('events/emails/move_request_closure.txt',
-                                       events=events, target_category=category, accept=accept, reason=reason)
-        send_email(make_email(to_list=requestor.email, template=template))
+        with requestor.force_user_locale():
+            template = get_template_module('events/emails/move_request_closure.txt',
+                                           events=events, target_category=category, accept=accept, reason=reason)
+            email = make_email(to_list=requestor.email, template=template)
+        send_email(email)

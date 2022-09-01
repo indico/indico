@@ -45,12 +45,14 @@ def _notify_registration(registration, template_name, to_managers=False, attach_
         event_ical = event_to_ical(registration.event, method='REQUEST',
                                    organizer=(core_settings.get('site_title'), config.NO_REPLY_EMAIL))
         attachments.append(MIMECalendar('event.ics', event_ical))
-
-    tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
-                              attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price)
-    to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
+    to_list = (
+        registration.email if not to_managers else registration.registration_form.manager_notification_recipients
+    )
     from_address = registration.registration_form.notification_sender_address if not to_managers else None
-    mail = make_email(to_list=to_list, template=tpl, html=True, from_address=from_address, attachments=attachments)
+    with registration.event.force_event_locale():
+        tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
+                                  attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price)
+        mail = make_email(to_list=to_list, template=tpl, html=True, from_address=from_address, attachments=attachments)
     user = session.user if session else None
     signals.core.before_notification_send.send('notify-registration', email=mail, registration=registration,
                                                template_name=template_name, to_managers=to_managers,

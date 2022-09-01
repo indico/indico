@@ -1,7 +1,11 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
-{% block subject -%}New comment{%- endblock %}
+{% block subject -%}{% trans %}New comment{% endtrans %}{%- endblock %}
 
 {% block body_text -%}
-{{ author_name or 'Someone' }} has posted a new comment.
+{% if author_name -%}
+    {% trans name=author_name %}{{ name }} has posted a new comment.{% endtrans %}
+{%- else -%}
+    {% trans %}Someone has posted a new comment.{% endtrans %}
+{%- endif %}
 {% endblock %}

@@ -4,7 +4,7 @@
 
 {% macro get_body() -%}
     {%- filter dedent -%}
-        Dear {submitter_name},
+        {% trans %}Dear {submitter_name},{% endtrans %}
 
         {% block body %}{% endblock %}
     {%- endfilter -%}

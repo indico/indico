@@ -41,12 +41,13 @@ def notify_comment(comment):
     recipients.discard(author)  # never bother people about their own comments
     for recipient in recipients:
         author_name = author.first_name if editable.can_see_editor_names(recipient, author) else None
-        tpl = get_template_module('events/editing/emails/comment_notification.txt',
-                                  author_name=author_name,
-                                  timeline_url=editable.external_timeline_url,
-                                  recipient_name=recipient.first_name)
-        send_email(make_email(recipient.email, template=tpl), editable.event, 'Editing',
-                   log_metadata={'editable_id': editable.id})
+        with recipient.force_user_locale():
+            tpl = get_template_module('events/editing/emails/comment_notification.txt',
+                                      author_name=author_name,
+                                      timeline_url=editable.external_timeline_url,
+                                      recipient_name=recipient.first_name)
+            email = make_email(recipient.email, template=tpl)
+        send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
 
 def notify_editor_judgment(revision, editor):
@@ -54,12 +55,13 @@ def notify_editor_judgment(revision, editor):
     submitter = revision.submitter
     editable = revision.editable
     editor_name = editor.first_name if editable.can_see_editor_names(submitter) else None
-    tpl = get_template_module('events/editing/emails/editor_judgment_notification.txt',
-                              editor_name=editor_name,
-                              timeline_url=editable.external_timeline_url,
-                              recipient_name=submitter.first_name)
-    send_email(make_email(submitter.email, template=tpl), editable.event, 'Editing',
-               log_metadata={'editable_id': editable.id})
+    with submitter.force_user_locale():
+        tpl = get_template_module('events/editing/emails/editor_judgment_notification.txt',
+                                  editor_name=editor_name,
+                                  timeline_url=editable.external_timeline_url,
+                                  recipient_name=submitter.first_name)
+        email = make_email(submitter.email, template=tpl)
+    send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
 
 def notify_submitter_upload(revision):
@@ -69,12 +71,13 @@ def notify_submitter_upload(revision):
     editor = revision.editable.editor
     if not editor:
         return
-    tpl = get_template_module('events/editing/emails/submitter_upload_notification.txt',
-                              submitter_name=submitter.first_name,
-                              timeline_url=editable.external_timeline_url,
-                              recipient_name=editor.first_name)
-    send_email(make_email(editor.email, template=tpl), editable.event, 'Editing',
-               log_metadata={'editable_id': editable.id})
+    with editor.force_user_locale():
+        tpl = get_template_module('events/editing/emails/submitter_upload_notification.txt',
+                                  submitter_name=submitter.first_name,
+                                  timeline_url=editable.external_timeline_url,
+                                  recipient_name=editor.first_name)
+        email = make_email(editor.email, template=tpl)
+    send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
 
 def notify_submitter_confirmation(revision, submitter, action):
@@ -89,9 +92,10 @@ def notify_submitter_confirmation(revision, submitter, action):
     else:
         template_path = 'events/editing/emails/submitter_rejection_notification.txt'
     for recipient in recipients:
-        tpl = get_template_module(template_path,
-                                  submitter_name=submitter.first_name,
-                                  timeline_url=revision.editable.external_timeline_url,
-                                  recipient_name=recipient.first_name)
-        send_email(make_email(recipient.email, template=tpl), editable.event, 'Editing',
-                   log_metadata={'editable_id': editable.id})
+        with recipient.force_user_locale():
+            tpl = get_template_module(template_path,
+                                      submitter_name=submitter.first_name,
+                                      timeline_url=revision.editable.external_timeline_url,
+                                      recipient_name=recipient.first_name)
+            email = make_email(recipient.email, template=tpl)
+        send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})

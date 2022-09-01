@@ -51,10 +51,11 @@ def build_static_site(static_site):
 
 @email_sender
 def notify_static_site_success(static_site):
-    template = get_template_module('events/static/emails/download_notification_email.txt',
-                                   user=static_site.creator, event=static_site.event,
-                                   link=url_for('static_site.download', static_site, _external=True))
-    return make_email({static_site.creator.email}, template=template, html=False)
+    with static_site.creator.force_user_locale():
+        template = get_template_module('events/static/emails/download_notification_email.txt',
+                                       user=static_site.creator, event=static_site.event,
+                                       link=url_for('static_site.download', static_site, _external=True))
+        return make_email({static_site.creator.email}, template=template, html=False)
 
 
 @celery.periodic_task(name='static_sites_cleanup', run_every=crontab(minute='30', hour='3', day_of_week='monday'))

@@ -204,9 +204,11 @@ class RHSubmitAbstractComment(RHAbstractBase):
 
     def _send_notification(self, recipients, comment):
         for recipient in recipients:
-            tpl = get_template_module('events/abstracts/emails/comment.html', event=self.event, abstract=self.abstract,
-                                      submitter=session.user, comment=comment, recipient=recipient)
-            email = make_email(to_list=recipient.email, template=tpl, html=True)
+            with recipient.force_user_locale():
+                tpl = get_template_module('events/abstracts/emails/comment.html', event=self.event,
+                                          abstract=self.abstract, submitter=session.user, comment=comment,
+                                          recipient=recipient)
+                email = make_email(to_list=recipient.email, template=tpl, html=True)
             send_email(email, self.event, 'Abstracts', session.user)
 
     def _process(self):

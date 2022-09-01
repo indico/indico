@@ -1,7 +1,7 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
 {% block subject -%}
-    Event move request created
+    {% trans %}Event move request created{% endtrans %}
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
@@ -9,30 +9,30 @@
 {% block body -%}
     {%- filter dedent -%}
         {%- if events|length == 1 -%}
-            There is a new move request for the category:
+            {% trans %}There is a new move request for the category:{% endtrans %}
         {%- else -%}
-            There are new move requests for the category:
+            {% trans %}There are new move requests for the category:{% endtrans %}
         {%- endif %}
         {{ target_category.chain_titles|join(' » ') }}
 
-        {% filter underline %}Requested events{% endfilter %}
+        {% filter underline %}{% trans %}Requested events{% endtrans %}{% endfilter %}
         {%- for evt in events %}
             {{ evt.title }} ({{ evt.external_url }})
         {%- endfor -%}
 
         {% if comment %}
 
-            {% filter underline %}Comment{% endfilter %}
+            {% filter underline %}{% trans %}Comment{% endtrans %}{% endfilter %}
             {{ comment }}
         {%- endif %}
 
-        View all move requests here:
+        {% trans %}View all move requests here:{% endtrans %}
         {{ url_for('categories.manage_moderation', target_category, _external=true) }}
     {%- endfilter -%}
 {%- endblock %}
 
 {% block footer_title -%}
-    Event notifications
+    {% trans %}Event notifications{% endtrans %}
 {%- endblock %}
 
 {% block footer_url %}{% endblock %}

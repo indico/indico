@@ -33,7 +33,8 @@ def test_reject(dummy_user, dummy_blocking, smtp, with_user, with_reason):
         kwargs['reason'] = 'foo'
     br.reject(**kwargs)
     assert br.state == BlockedRoom.State.rejected
-    mail = extract_emails(smtp, one=True, to=dummy_blocking.created_by_user.email, subject='Room blocking REJECTED')
+    mail = extract_emails(smtp, one=True, to=dummy_blocking.created_by_user.email,
+                          subject='[Indico] Room blocking REJECTED')
     if with_reason:
         assert kwargs['reason'] in mail.as_string()
     assert not smtp.outbox
@@ -64,7 +65,8 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     for occ in resv2.occurrences:
         assert occ.is_rejected == (colliding_occurrence and blocking.is_active_at(occ.date))
     if notify_blocker:
-        extract_emails(smtp, one=True, to=blocking.created_by_user.email, subject='Room blocking ACCEPTED')
+        extract_emails(smtp, one=True, to=blocking.created_by_user.email,
+                       subject='[Indico] Room blocking ACCEPTED')
     assert len(smtp.outbox) == 2 * (colliding_occurrence + colliding_reservation)  # 2 emails per rejection
 
 

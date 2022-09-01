@@ -1,21 +1,23 @@
 {% extends 'events/papers/emails/base.html' %}
 
-{% block subject_message %}New paper comment{% endblock %}
+{% block subject_message %}{% trans %}New paper comment{% endtrans %}{% endblock %}
 
-{% block header_subtitle %}New paper comment{% endblock %}
+{% block header_subtitle %}{% trans %}New paper comment{% endtrans %}{% endblock %}
 
-{% block header_subtitle_ref %}ref #{{ contribution.friendly_id }}{% endblock %}
+{% block header_subtitle_ref %}{% trans id=contribution.friendly_id %}ref #{{ id }}{% endtrans %}{% endblock %}
 
 {% block content_header %}
-    <p>Dear {{ receiver }},</p>
-    <p>{{ submitter.full_name }} commented on the paper <strong>{{ contribution.title }}</strong>:</p>
+    <p>{% trans receiver=receiver %}Dear {{ receiver }},{% endtrans %}</p>
+    <p>{% trans name=submitter.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe, title=contribution.title -%}
+        {{ name }} commented on the paper {{ strong }}{{ title }}{{ endstrong }}:
+    {% endtrans %}</p>
     <blockquote style="border-left: 5px solid #dfdfdf; padding-left: 10px; font-style: italic; color: #999;">
         {{ comment }}
     </blockquote>
 {% endblock %}
 
 {% block content_body %}
-    <p>You can reply to this comment from within the paper page:</p>
+    <p>{% trans %}You can reply to this comment from within the paper page:{% endtrans %}</p>
     <p>
         <a href="{{ url_for('papers.paper_timeline', contribution, _external=true) }}">
             {{- url_for('papers.paper_timeline', contribution, _external=true) -}}

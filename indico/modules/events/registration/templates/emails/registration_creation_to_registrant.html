@@ -2,16 +2,18 @@
 {% block subject_name %}{% endblock %}
 
 {% block subject_message -%}
-    Registration
+    {% trans title=event.title %}Registration for {{ title }}{% endtrans %}
 {%- endblock %}
 
 {% block registration_header -%}
     {% set event = registration.registration_form.event %}
-    <p>Dear {{ registration.full_name }},</p>
+    <p>{% trans name=registration.full_name %}Dear {{ name }},{% endtrans %}</p>
     <p>
         {% block registration_header_text %}
-            Thank you! Your registration {{ render_registration_info() }}
-            has been received.
+            {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
+                Thank you! Your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
+                has been received.
+            {%- endtrans %}
             {{ render_text_pending() }}
             {{ render_text_unpaid() }}
         {% endblock %}
@@ -27,16 +29,15 @@
 
 {% block registration_footer %}
     <p>
-        To manage your registration follow this link:
+        {% trans %}To manage your registration follow this link:{% endtrans %}
         <a href="{{ url_for('event_registration.display_regform', registration.locator.registrant, _external=true) }}">
-            Manage my registration
+            {% trans %}Manage my registration{% endtrans %}
         </a>
     </p>
 {% endblock %}
 
 
 {% macro render_registration_info() %}
-    for the event <strong>{{ event.title }}</strong>
     {% if event.start_dt_local.date() == event.end_dt_local.date() %}
         ({{ event.start_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }}
         -
@@ -51,21 +52,23 @@
 
 {% macro render_rejection_reason() %}
     {% if registration.state.name == 'rejected' and registration.rejection_reason %}
-        <br>Rejection reason: {{ registration.rejection_reason }}<br>
+        <br>{% trans %}Rejection reason:{% endtrans %} {{ registration.rejection_reason }}<br>
     {% endif %}
 {% endmacro %}
 
 
 {% macro render_text_pending() %}
     {% if registration.state.name == 'pending' %}
-        Please note that this event requires manual approval.
-        You will be notified when the registration process is complete.
+        {% trans -%}Please note that this event requires manual approval.{%- endtrans %}
+        {% trans -%}You will be notified when the registration process is complete.{%- endtrans %}
     {% endif %}
 {% endmacro %}
 
 
 {% macro render_text_unpaid() %}
     {% if registration.state.name == 'unpaid' %}
-        Please proceed to the checkout <a href="{{ url_for('event_registration.display_regform', registration.locator.registrant, _external=true) }}">here</a> in order to complete it.
+        {% trans link='<a href="{{ registration.display_regform_url }}">'|safe, endlink='</a>'|safe -%}
+            Please proceed to the checkout {{ link }}here{{ endlink }} in order to complete it.
+        {%- endtrans %}
     {% endif %}
 {% endmacro %}

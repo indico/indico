@@ -1,12 +1,16 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ reservation.created_by_user.first_name }}{% endblock %}
+{% block header_recipient -%}
+    {% trans name=reservation.created_by_user.first_name -%}Dear {{ name }},{%- endtrans %}
+{%- endblock %}
 
-{% block email_body -%}
-{% block body %}{% endblock %}
+{% block body -%}
+    {%- filter dedent -%}
+        {% block email_body %}{% endblock %}
 
-Booking details:
-{{ reservation.external_details_url }}
+        {% trans %}Booking details:{% endtrans %}
+        {{ reservation.external_details_url }}
 
-Remember you can always check your bookings here:
-{{ url_for('rb.my_bookings_link', _external=true) }}
+        {% trans %}Remember you can always check your bookings here:{% endtrans %}
+        {{ url_for('rb.my_bookings_link', _external=true) }}
+    {%- endfilter -%}
 {%- endblock %}

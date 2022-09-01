@@ -1,10 +1,12 @@
 {% extends 'events/papers/emails/base.html' %}
 
-{% block subject_message %}Removed from paper reviewing team{% endblock %}
+{% block subject_message %}{% trans %}Removed from paper reviewing team{% endtrans %}{% endblock %}
 
-{% block header_subtitle %}Removed from paper reviewing team{% endblock %}
+{% block header_subtitle %}{% trans %}Removed from paper reviewing team{% endtrans %}{% endblock %}
 
 {% block content %}
-    <p>Dear {{ receiver.first_name }},</p>
-    <p>Please, be aware that you are no longer a <strong>{{ role.title }}</strong> for the conference <strong>{{ event.title }}</strong></p>
+    <p>{% trans name=receiver.first_name %}Dear {{ name }},{% endtrans %}</p>
+    <p>{% trans strong='<strong>'|safe, endstrong='</strong>'|safe, role_title=role.title, event_title=event.title -%}
+        Please, be aware that you are no longer a {{ strong }}{{ role_title }}{{ endstrong }} for the conference {{ strong }}{{ event_title }}{{ endstrong }}.
+    {%- endtrans %}</p>
 {% endblock %}

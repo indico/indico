@@ -1,5 +1,5 @@
 {% if reservation.room.key_location %}
 
-How to find a key:
+{% trans %}How to find a key:{% endtrans %}
 {{ reservation.room.key_location | striptags }}
 {%- endif %}

@@ -22,7 +22,7 @@
     {% if old_price != registration.price or registration.price %}
         <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
             <p style="text-align: right; margin-bottom: 0; font-size: 0.9em;">
-                <strong>Total:</strong>
+                <strong>{% trans %}Total:{% endtrans %}</strong>
                 <span style="font-style: italic">
                     {% if old_price != registration.price %}
                         <s>{{- registration._render_price(old_price) -}}</s>

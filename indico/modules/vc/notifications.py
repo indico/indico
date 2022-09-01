@@ -17,10 +17,10 @@ def notify_created(plugin, room, room_assoc, event, user):
     :param event: the event
     :param user: the user performing the action
     """
-
     name = get_overridable_template_name('emails/created.html', plugin, core_prefix='vc/')
-    tpl = get_template_module(name, plugin=plugin, vc_room=room, event=event, vc_room_event=room_assoc, user=user,
-                              linked_to_title=get_linked_to_description(room_assoc))
+    with user.force_user_locale():
+        tpl = get_template_module(name, plugin=plugin, vc_room=room, event=event, vc_room_event=room_assoc, user=user,
+                                  linked_to_title=get_linked_to_description(room_assoc))
     _send('create', user, plugin, event, room, tpl)
 
 
@@ -32,7 +32,8 @@ def notify_deleted(plugin, room, room_assoc, event, user):
     :param user: the user performing the action
     """
     name = get_overridable_template_name('emails/deleted.html', plugin, core_prefix='vc/')
-    tpl = get_template_module(name, plugin=plugin, vc_room=room, event=event, vc_room_event=room_assoc, user=user)
+    with user.force_user_locale():
+        tpl = get_template_module(name, plugin=plugin, vc_room=room, event=event, vc_room_event=room_assoc, user=user)
     _send('delete', user, plugin, event, room, tpl)
 
 
@@ -40,6 +41,6 @@ def _send(action, user, plugin, event, room, template_module):
     to_list = {user.email}
     cc_list = plugin.get_notification_cc_list(action, room, event) - to_list
     bcc_list = plugin.get_notification_bcc_list(action, room, event) - cc_list - to_list
-
-    email = make_email(to_list, cc_list, bcc_list, template=template_module, html=True)
+    with user.force_user_locale():
+        email = make_email(to_list, cc_list, bcc_list, template=template_module, html=True)
     send_email(email, event, plugin.friendly_name)

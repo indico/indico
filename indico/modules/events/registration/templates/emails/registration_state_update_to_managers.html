@@ -2,12 +2,46 @@
 {% block registration_body %}{% endblock %}
 
 {% block subject_message -%}
-    Registration {{ registration.state.title|lower }}
+    {% if registration.state.name == 'complete' -%}
+        {% trans title=event.title %}Registration complete for {{ title }}{% endtrans %}
+    {%- elif registration.state.name == 'pending' -%}
+        {% trans title=event.title %}Registration pending for {{ title }}{% endtrans %}
+    {%- elif registration.state.name == 'rejected' -%}
+        {% trans title=event.title %}Registration rejected for {{ title }}{% endtrans %}
+    {%- elif registration.state.name == 'withdrawn' -%}
+        {% trans title=event.title %}Registration withdrawns for {{ title }}{% endtrans %}
+    {%- else -%}
+        {% trans title=event.title %}Registration unpaid for {{ title }}{% endtrans %}
+    {%- endif %}
 {%- endblock %}
 
 {% block registration_header_text %}
-    The registration {{ render_registration_info() }}
-    is now <strong>{{ registration.state.title|lower }}</strong>.
+    {% if registration.state.name == 'complete' -%}
+        {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            The registration for the event {{ strong }}{{ title }}{{ endstrong }} under {{ strong }}{{ name }}{{ endstrong }}
+            is now {{ strong }}complete{{ endstrong }}.
+        {%- endtrans %}
+    {%- elif registration.state.name == 'pending' -%}
+        {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            The registration for the event {{ strong }}{{ title }}{{ endstrong }} under {{ strong }}{{ name }}{{ endstrong }}
+            is now {{ strong }}pending{{ endstrong }}.
+        {%- endtrans %}
+    {%- elif registration.state.name == 'rejected' -%}
+        {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            The registration for the event {{ strong }}{{ title }}{{ endstrong }} under {{ strong }}{{ name }}{{ endstrong }}
+            is now {{ strong }}rejected{{ endstrong }}.
+        {%- endtrans %}
+    {%- elif registration.state.name == 'withdrawn' -%}
+        {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            The registration for the event {{ strong }}{{ title }}{{ endstrong }} under {{ strong }}{{ name }}{{ endstrong }}
+            is now {{ strong }}withdrawn{{ endstrong }}.
+        {%- endtrans %}
+    {%- else -%}
+        {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            The registration for the event {{ strong }}{{ title }}{{ endstrong }} under {{ strong }}{{ name }}{{ endstrong }}
+            is now {{ strong }}unpaid{{ endstrong }}.
+        {%- endtrans %}
+    {%- endif %}
     {{ render_rejection_reason() }}
     {{ render_text_pending() }}
     {{ render_text_manage() }}

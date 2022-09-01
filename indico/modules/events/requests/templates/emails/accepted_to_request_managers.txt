@@ -1,12 +1,12 @@
 {% extends 'events/requests/emails/base_to_request_managers.txt' %}
 
 {% block request_subject -%}
-    Accepted service request
+    {% trans %}Accepted service request{% endtrans %}
 {%- endblock %}
 
 {% block request_message -%}
-    A {{ req.definition.title }} request has been accepted.
+    {% trans title=req.definition.title %}A {{ title }} request has been accepted.{% endtrans %}
     {%- if req.comment %}
-        Comment: {{ req.comment }}
+        {% trans %}Comment:{% endtrans %} {{ req.comment }}
     {%- endif -%}
 {%- endblock %}

@@ -5,17 +5,15 @@ A booking has been REJECTED by the manager of the room '1/2-3'.
 Rejection reason:
 None
 
-Room:   1/2-3
-For:    Guinea Pig
+Room: 1/2-3
+For: Guinea Pig
 Reason: Testing
-Dates:  Friday 11/11/2022 - Friday 11/11/2022
-Hours:  13:37 - 14:37
+Dates: Friday 11/11/2022 - Friday 11/11/2022
+Hours: 13:37 - 14:37
 
 You can check the details of the booking here:
 http://localhost/rooms/booking/0
 
-
 --
-Best regards,
 Indico :: Room Booking
 http://localhost/rooms/

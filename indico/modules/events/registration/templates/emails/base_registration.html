@@ -1,4 +1,4 @@
-{% extends 'emails/base.html' %}
+{% extends 'emails/base_i18n.html' %}
 {% block header %}{% endblock %}
 {% block footer %}{% endblock %}
 
@@ -6,7 +6,7 @@
 
 {% block subject -%}
     {% autoescape false -%}
-        {% block subject_message %}{% endblock %} for {{ event.title }}
+        {% block subject_message %}{% endblock %}
         {%- block subject_name %}: {{ registration.full_name }}{% endblock %}
     {%- endautoescape %}
 {%- endblock %}
@@ -20,7 +20,7 @@
             <h3 style="margin: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
                 {{ registration.registration_form.title }}
                 <span style="float: right; font-style: italic;">
-                    ref: #{{ registration.friendly_id }}
+                    {% trans id=registration.friendly_id %}ref: #{{ id }}{% endtrans %}
                 </span>
             </h3>
         </div>
@@ -34,7 +34,7 @@
             </div>
         </div>
         <div style="text-align: center; padding: 10px; background: #EBEBEB; font-size: small; color: #999;">
-            Indico :: Event Registration
+            Indico :: {% trans %}Event Registration{% endtrans %}
         </div>
     </div>
 {% endblock %}

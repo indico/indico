@@ -1,0 +1,53 @@
+{% extends 'emails/base_i18n.txt' %}
+
+{% macro get_comments() %}
+    {% filter dedent -%}
+        {% trans %}Please see the comments from the reviewing team below:{% endtrans %}
+
+        {{ paper.judgment_comment }}
+    {%- endfilter %}
+{% endmacro %}
+
+{% block subject -%}
+    {% if paper.state.name == 'accepted' -%}
+        {% trans title=contribution.title %}Your paper "{{ title}}" was accepted.{% endtrans %}
+    {% elif paper.state.name == 'rejected' -%}
+        {% trans title=contribution.title %}Your paper "{{ title}}" was rejected.{% endtrans %}
+    {% elif paper.state.name == 'to_be_corrected' -%}
+        {% trans title=contribution.title %}Your paper "{{ title }}" requires changes.{% endtrans %}
+    {% endif %}
+{%- endblock %}
+
+{% block header_recipient -%}
+    {% trans name=paper.submitter.first_name %}Dear {{ name }},{% endtrans %}
+{%- endblock %}
+
+{% block body -%}
+    {% filter dedent -%}
+        {% if paper.state.name == 'accepted' -%}
+            {%- trans title=contribution.title, id=contribution.friendly_id, event_title=contribution.event.title -%}
+                After the reviewing process your paper "{{ title }} (#{{ id }})", submitted for "{{ event_title }}" has been accepted.
+            {%- endtrans %}
+            {{ get_comments() }}
+            {% trans %}You may proceed to your paper page:{%- endtrans -%}
+        {%- elif paper.state.name == 'rejected' -%}
+            {%- trans title=contribution.title, id=contribution.friendly_id, event_title=contribution.event.title -%}
+                After the reviewing process your paper "{{ title }} (#{{ id }})", submitted for "{{ event_title }}" has been rejected.
+            {%- endtrans %}
+            {{ get_comments() }}
+            {% trans %}You may proceed to your paper page:{%- endtrans -%}
+        {%- elif paper.state.name == 'to_be_corrected' -%}
+            {%- trans title=contribution.title, id=contribution.friendly_id, event_title=contribution.event.title -%}
+                After the reviewing process your paper "{{ title }} (#{{ id }})", submitted for "{{ event_title }}" is required to be corrected.
+            {%- endtrans %}
+            {{ get_comments() }}
+            {% trans -%}
+                You may then apply the requested modifications to your paper and submit the modified version for review.
+                In order to do so, please proceed to your paper page:
+            {%- endtrans -%}
+        {%- endif %}
+        {{ url_for('papers.paper_timeline', contribution, _external=true) }}
+    {%- endfilter %}
+{%- endblock %}
+
+{% block footer_url %}{{ contribution.event.external_url }}{% endblock %}

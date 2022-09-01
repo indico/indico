@@ -1,11 +1,11 @@
 {% extends 'rb/emails/base_email.html' %}
 
-{% block header_recipient %}{{ user.first_name }}{% endblock %}
+{% block header_recipient %}{% trans name=user.first_name %}Dear {{ name }},{% endtrans %}{% endblock %}
 {% block subject -%}
     {% if reservations|length == 1 -%}
-        One of your bookings will come to an end soon
+        {% trans %}One of your bookings will come to an end soon{% endtrans %}
     {%- else -%}
-        Some of your bookings will come to an end soon
+        {% trans %}Some of your bookings will come to an end soon{% endtrans %}
     {%- endif %}
 {%- endblock %}
 
@@ -13,9 +13,9 @@
 {% block body -%}
     {% block message %}
         {%- if reservations|length == 1 -%}
-            There is a booking under your name that will soon come to an end:<br>
+            {% trans %}There is a booking under your name that will soon come to an end:{% endtrans %}<br>
         {%- else -%}
-            There are bookings under your name that will soon come to an end:<br>
+            {% trans %}There are bookings under your name that will soon come to an end:{% endtrans %}<br>
         {%- endif %}
     {% endblock %}
     <ul>
@@ -34,7 +34,7 @@
 
 
 {% macro _render_finishing_reservation(reservation) -%}
-    Dates: {{ _render_dates(reservation) }}<br>
-    Room: <strong>{{ reservation.room.full_name }}</strong><br>
-    Reason of the booking: <strong>{{ reservation.booking_reason }}</strong><br>
+    {% trans %}Dates:{% endtrans %} {{ _render_dates(reservation) }}<br>
+    {% trans %}Room:{% endtrans %} <strong>{{ reservation.room.full_name }}</strong><br>
+    {% trans %}Reason of the booking:{% endtrans %} <strong>{{ reservation.booking_reason }}</strong><br>
 {%- endmacro %}

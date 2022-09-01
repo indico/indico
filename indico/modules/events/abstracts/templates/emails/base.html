@@ -1,11 +1,11 @@
-{% extends 'emails/base.html' %}
+{% extends 'emails/base_i18n.html' %}
 
 {% block header %}{% endblock %}
 
 {% block footer %}{% endblock %}
 
 {% block subject -%}
-    {% block subject_message %}Call for Abstracts{% endblock %}
+    {% block subject_message %}{% trans %}Call for Abstracts{% endtrans %}{% endblock %}
     {%- block subject_name %}{% endblock %}
 {%- endblock %}
 
@@ -34,7 +34,7 @@
             {% endblock %}
         </div>
         <div style="text-align: center; padding: 10px; background: #ebebeb; font-size: small; color: #999;">
-            Indico :: Call for Abstracts
+            Indico :: {% trans %}Call for Abstracts{% endtrans %}
         </div>
     </div>
 {% endblock %}

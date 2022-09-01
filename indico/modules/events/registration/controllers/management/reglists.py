@@ -199,10 +199,11 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
                                           registration=registration)
         email_subject = replace_placeholders('registration-email', request.form['subject'], regform=self.regform,
                                              registration=registration)
-        tpl = get_template_module('events/registration/emails/custom_email.html', email_subject=email_subject,
-                                  email_body=email_body)
-        html = render_template('events/registration/management/email_preview.html', subject=tpl.get_subject(),
-                               body=tpl.get_body())
+        with self.regform.event.force_event_locale():
+            tpl = get_template_module('events/registration/emails/custom_email.html', email_subject=email_subject,
+                                      email_body=email_body)
+            html = render_template('events/registration/management/email_preview.html', subject=tpl.get_subject(),
+                                   body=tpl.get_body())
         return jsonify(html=html)
 
 
@@ -215,20 +216,24 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                                               registration=registration)
             email_subject = replace_placeholders('registration-email', form.subject.data, regform=self.regform,
                                                  registration=registration)
-            template = get_template_module('events/registration/emails/custom_email.html',
-                                           email_subject=email_subject, email_body=email_body)
-            bcc = [session.user.email] if form.copy_for_sender.data else []
-            attach_ticket = 'attach_ticket' in form and form.attach_ticket.data and not registration.is_ticket_blocked
-            attachments = get_ticket_attachments(registration) if attach_ticket else None
-            email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
-                               from_address=form.from_address.data, template=template, html=True,
-                               attachments=attachments)
+            with self.regform.event.force_event_locale():
+                template = get_template_module('events/registration/emails/custom_email.html',
+                                               email_subject=email_subject, email_body=email_body)
+                bcc = [session.user.email] if form.copy_for_sender.data else []
+                attach_ticket = (
+                    'attach_ticket' in form and form.attach_ticket.data and not registration.is_ticket_blocked
+                )
+                attachments = get_ticket_attachments(registration) if attach_ticket else None
+                email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
+                                   from_address=form.from_address.data, template=template, html=True,
+                                   attachments=attachments)
             signals.core.before_notification_send.send('registration-custom-email', email=email,
                                                        registration=registration, form=form)
             send_email(email, self.event, 'Registration', log_metadata={'registration_id': registration.id})
 
     def _process(self):
-        tpl = get_template_module('events/registration/emails/custom_email_default.html')
+        with self.regform.event.force_event_locale():
+            tpl = get_template_module('events/registration/emails/custom_email_default.html')
         default_body = tpl.get_html_body()
         registration_ids = request.form.getlist('registration_id')
         form = EmailRegistrantsForm(body=default_body, regform=self.regform, registration_id=registration_ids,

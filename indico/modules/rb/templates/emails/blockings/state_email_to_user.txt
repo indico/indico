@@ -1,15 +1,33 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ blocking.created_by_user.first_name }}{% endblock %}
+{% block subject -%}
+    {% if blocked_room.state.name == 'accepted' -%}
+        {% trans %}Room blocking ACCEPTED{% endtrans %}
+    {%- else -%}
+        {% trans %}Room blocking REJECTED{% endtrans %}
+    {%- endif %}
+{%- endblock %}
 
-{% block email_body -%}
-Your room blocking request has been {{ verb }} by a room manager.
+{% block header_recipient -%}
+    {% trans name=blocking.created_by_user.first_name -%}Dear {{ name }},{%- endtrans %}
+{%- endblock %}
 
-Room: {{ blocked_room.room.full_name }}
-Action: {{ verb }}
-{%- if blocked_room.state == blocked_room.State.rejected %}
-Reason: {{ blocked_room.rejection_reason or '(none)' }}
+{% block body -%}
+{% if blocked_room.state.name == 'accepted' -%}
+    {% trans %}Your room blocking request has been ACCEPTED by a room manager.{% endtrans %}
+{%- else -%}
+    {% trans %}Your room blocking request has been REJECTED by a room manager.{% endtrans %}
 {%- endif %}
 
-You can view the details of your blocking here:
+{% trans %}Room:{% endtrans %} {{ blocked_room.room.full_name }}
+{% filter dedent -%}
+    {%- if blocked_room.state.name == 'accepted' -%}
+        {%- trans %}Action: ACCEPTED{% endtrans -%}
+    {%- else -%}
+        {% trans %}Action: REJECTED{% endtrans %}
+        {% trans %}Reason:{% endtrans %} {{ blocked_room.rejection_reason or '(none)' }}
+    {%- endif -%}
+{%- endfilter %}
+
+{% trans %}You can view the details of your blocking here:{% endtrans %}
 {{ blocking.external_details_url }}
 {%- endblock %}

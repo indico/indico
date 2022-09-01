@@ -1,26 +1,28 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
-{% block subject -%}Indico profile requested{%- endblock %}
+{% block subject -%}{% trans %}Indico profile requested{% endtrans %}{%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
     {%- filter dedent -%}
-        Someone has requested to register a new indico profile.
-        Please review their registration request and approve/reject it accordingly.
+        {% trans linebreak='\n' -%}
+            Someone has requested to register a new indico profile.{{ linebreak }}
+            Please review their registration request and approve/reject it accordingly.
+        {%- endtrans %}
 
-        First name: {{ req.user_data.first_name }}
-        Last name: {{ req.user_data.last_name }}
-        Email address: {{ req.email }}
+        {% trans %}First name:{% endtrans %} {{ req.user_data.first_name }}
+        {% trans %}Last name:{% endtrans %} {{ req.user_data.last_name }}
+        {% trans %}Email address:{% endtrans %} {{ req.email }}
         {%- if req.user_data.affiliation %}
-            Affiliation: {{ req.user_data.affiliation }}
+            {% trans %}Affiliation:{% endtrans %} {{ req.user_data.affiliation }}
         {%- endif %}
         {%- if req.comment %}
-            Comment:
+            {% trans %}Comment:{% endtrans %}
             {{ req.comment }}
         {%- endif %}
 
-        Manage pending requests:
+        {% trans %}Manage pending requests:{% endtrans %}
         {{ url_for('users.registration_request_list', _external=true) }}
     {%- endfilter -%}
 {%- endblock %}

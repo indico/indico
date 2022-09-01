@@ -1,31 +1,91 @@
 {% extends 'rb/emails/reservations/base_email_to_user.txt' %}
 {% set excluded_days = reservation.find_excluded_days().count() %}
+{%- set prebooking = not reservation.is_accepted -%}
+{% block subject_prefix %}{% endblock %}
+{% block subject -%}
+    {% if prebooking -%}
+        {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm') -%}
+            [{{ room }}] Pre-Booking awaiting acceptance ({{ start }})
+        {%- endtrans %}
+    {%- else -%}
+        {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm') -%}
+            [{{ room }}] Booking confirmed ({{ start }})
+        {%- endtrans %}
+    {%- endif %}
+{%- endblock %}
 
-{% block body -%}
-{%- block booking_details -%}
-The conference room {{ reservation.room.full_name }}
-has been {% block prebooked_prefix %}{% endblock %}booked for {{ reservation.booked_for_name }}
-{% if reservation.repeat_frequency == RepeatFrequency.NEVER -%}
-    on {{ reservation.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} from {{ reservation.start_dt | format_time(locale='en_GB') }} to {{ reservation.end_dt | format_time(locale='en_GB') }}.
-{%- else -%}
-    {{ RepeatMapping.get_message(reservation.repeat_frequency, reservation.repeat_interval) }} from {{ reservation.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} to {{ reservation.end_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} between {{ reservation.start_dt | format_time(locale='en_GB') }} and {{ reservation.end_dt | format_time(locale='en_GB') }}.
-{%- endif %}
-Reason: {{ reservation.booking_reason }}
+{% block email_body -%}
+    {%- filter dedent -%}
+        {%- block booking_details -%}
+            {% if prebooking -%}
+                {% if reservation.repeat_frequency == RepeatFrequency.NEVER -%}
+                    {% trans room=reservation.room.full_name, name=reservation.booked_for_name, date=reservation.start_dt|format_skeleton('EEEEddMMyyyy'),
+                             from=reservation.start_dt|format_time(), to=reservation.end_dt|format_time(), linebreak='\n' -%}
+                        The conference room {{ room }}{{ linebreak }}
+                        has been pre-booked for {{ name }}{{ linebreak }}
+                        on {{ date }} from {{ from }} to {{ to }}.
+                    {%- endtrans %}
+                {%- else -%}
+                    {% trans room=reservation.room.full_name, name=reservation.booked_for_name, map=RepeatMapping.get_message(reservation.repeat_frequency,
+                             reservation.repeat_interval), from=reservation.start_dt|format_skeleton('EEEEddMMyyyy'), to=reservation.end_dt|format_skeleton('EEEEddMMyyyy'),
+                             start=reservation.start_dt|format_time(), end=reservation.end_dt|format_time(), linebreak='\n' -%}
+                        The conference room {{ room }}{{ linebreak }}
+                        has been pre-booked for {{ name }}{{ linebreak }}
+                        {{ map }} from {{ from }} to {{ to }} between {{ start }} and {{ end }}.
+                    {%- endtrans %}
+                {%- endif %}
+            {%- else -%}
+                {% if reservation.repeat_frequency == RepeatFrequency.NEVER -%}
+                    {% trans room=reservation.room.full_name, name=reservation.booked_for_name, date=reservation.start_dt|format_skeleton('EEEEddMMyyyy'),
+                             from=reservation.start_dt|format_time(), to=reservation.end_dt|format_time(), linebreak='\n' -%}
+                        The conference room {{ room }}{{ linebreak }}
+                        has been booked for {{ name }}{{ linebreak }}
+                        on {{ date }} from {{ from }} to {{ to }}.
+                    {%- endtrans %}
+                {%- else -%}
+                    {% trans room=reservation.room.full_name, name=reservation.booked_for_name, map=RepeatMapping.get_message(reservation.repeat_frequency,
+                             reservation.repeat_interval), from=reservation.start_dt|format_skeleton('EEEEddMMyyyy'), to=reservation.end_dt|format_skeleton('EEEEddMMyyyy'),
+                             start=reservation.start_dt|format_time(), end=reservation.end_dt|format_time(), linebreak='\n' -%}
+                        The conference room {{ room }}{{ linebreak }}
+                        has been booked for {{ name }}{{ linebreak }}
+                        {{ map }} from {{ from }} to {{ to }} between {{ start }} and {{ end }}.
+                    {%- endtrans %}
+                {%- endif %}
+            {%- endif %}
+            {% trans %}Reason:{% endtrans %} {{ reservation.booking_reason }}
+        {%- endblock -%}
+        {%- if not prebooking -%}
+            {%- if excluded_days %}
+                {% trans excluded=excluded_days %}
+                    (Note that there are {{ excluded }} excluded days. For further info, check your reservation.)
+                {% endtrans %}
+            {%- endif %}
+            {% filter wordwrap(width=72, break_long_words=False) %}
+                {% trans %}
+                    If you end up not needing this room, please cancel the booking from the
+                    booking details so that the room can be booked by somebody else.
+                {% endtrans %}
+            {%- endfilter %}
+            {% filter wordwrap(width=72, break_long_words=False) %}
+                {% trans %}
+                    Please be aware that in special (rare) cases the person responsible
+                    for this room may reject your booking. Should that happen you will
+                    be instantly notified by e-mail.
+                {%- endtrans -%}
+            {%- endfilter -%}
+        {%- endif -%}
+        {% include 'rb/emails/reservations/reservation_key_info.txt' -%}
+        {%- if prebooking %}
+
+            {% trans %}Note:{% endtrans %}
+            {% filter wordwrap(width=60, break_long_words=False) -%}
+                {% trans %}
+                    Your pre-booking is NOT YET ACCEPTED by a room manager.
+                    Please be aware that pre-bookings are subject to acceptance
+                    or rejection. Expect an e-mail with acceptance/rejection
+                    information.
+                {%- endtrans -%}
+            {%- endfilter -%}
+        {%- endif -%}
+    {%- endfilter -%}
 {%- endblock -%}
-{%- block confirmed_booking -%}
-{%- if excluded_days %}
-    (Note that there are {{ excluded_days }} excluded days. For further info, check your reservation)
-{%- endif %}
-
-If you end up not needing this room, please cancel the booking from the
-booking details so that the room can be booked by somebody else.
-
-Please be aware that in special (rare) cases the person responsible
-for this room may reject your booking. Should that happen you will
-be instantly notified by e-mail.
-{%- endblock %}
-
-{%- include 'rb/emails/reservations/reservation_key_info.txt' %}
-
-{%- block prebooking_warning %}{% endblock %}
-{%- endblock %}

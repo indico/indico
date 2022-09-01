@@ -272,14 +272,20 @@ class RHEmailEventPersons(RHManageEventBase):
         recipients |= set(self._find_users(user_ids))
         recipients |= set(self._find_role_members(role_ids))
         if self.no_account:
-            tpl = get_template_module('events/persons/emails/invitation.html', event=self.event)
+            with self.event.force_event_locale():
+                tpl = get_template_module('events/persons/emails/invitation.html', event=self.event)
+                subject = tpl.get_subject()
+                body = tpl.get_html_body()
             disabled_until_change = False
         else:
-            tpl = get_template_module('events/persons/emails/generic.html', event=self.event)
+            with self.event.force_event_locale():
+                tpl = get_template_module('events/persons/emails/generic.html', event=self.event)
+                subject = tpl.get_subject()
+                body = tpl.get_html_body()
             disabled_until_change = True
         form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids,
-                                     recipients=sorted(x.email for x in recipients), body=tpl.get_html_body(),
-                                     subject=tpl.get_subject(), register_link=self.no_account, event=self.event)
+                                     recipients=sorted(x.email for x in recipients), body=body,
+                                     subject=subject, register_link=self.no_account, event=self.event)
         if form.validate_on_submit():
             self._send_emails(form, recipients)
             num = len(recipients)
@@ -297,8 +303,9 @@ class RHEmailEventPersons(RHManageEventBase):
                                                  event=self.event, register_link=self.no_account)
             tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
             bcc = [session.user.email] if form.copy_for_sender.data else []
-            email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=form.from_address.data,
-                               template=tpl, html=True)
+            with self.event.force_event_locale():
+                email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=form.from_address.data,
+                                   template=tpl, html=True)
             send_email(email, self.event, 'Event Persons')
 
     def _find_event_persons(self, person_ids, not_invited_only):

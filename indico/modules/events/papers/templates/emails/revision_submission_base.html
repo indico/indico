@@ -1,14 +1,16 @@
 {% extends 'events/papers/emails/base.html' %}
 
-{% block subject_message %}Paper submitted{% endblock %}
+{% block subject_message %}{% trans %}Paper submitted{% endtrans %}{% endblock %}
 
-{% block header_subtitle %}Paper submission{% endblock %}
+{% block header_subtitle %}{% trans %}Paper submission{% endtrans %}{% endblock %}
 
-{% block header_subtitle_ref %}ref #{{ revision.paper.contribution.friendly_id }}{% endblock %}
+{% block header_subtitle_ref %}{% trans id=revision.paper.contribution.friendly_id %}ref #{{ id }}{% endtrans %}{% endblock %}
 
 {% block content %}
-    <p>Dear {{ receiver.first_name }},</p>
-    <p>An author has submitted a new revision for the paper <strong>"{{ revision.paper.contribution.title }}"</strong>.</p>
+    <p>{% trans name=receiver.first_name %}Dear {{ name }},{% endtrans %}</p>
+    <p>{% trans strong='<strong>'|safe, endstrong='</strong>'|safe, title=revision.paper.contribution.title -%}
+        An author has submitted a new revision for the paper {{ strong }}"{{ title }}"{{ endstrong }}.
+    {%- endtrans %}</p>
     {% block role_message %}{% endblock %}
     <p>
         <a href="{{ url_for('papers.paper_timeline', revision.paper.contribution, _external=true) }}">

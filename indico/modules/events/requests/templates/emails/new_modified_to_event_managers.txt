@@ -1,9 +1,13 @@
 {% extends 'events/requests/emails/base_to_event_managers.txt' %}
 
 {% block request_subject -%}
-    {% if new %}New request{% else %}Request modified{% endif %}
+    {% if new -%}{% trans %}New request{% endtrans %}{%- else -%}{% trans %}Request modified{% endtrans %}{%- endif %}
 {%- endblock %}
 
 {% block request_message -%}
-    A {{ req.definition.title }} request for your event has been {% if new %}sent{% else %}modified{% endif %}.
+    {% if new -%}
+        {% trans title=req.definition.title %}A {{ title }} request for your event has been sent.{% endtrans %}
+    {%- else -%}
+        {% trans title=req.definition.title %}A {{ title }} request for your event has been modified.{% endtrans %}
+    {%- endif %}
 {%- endblock %}

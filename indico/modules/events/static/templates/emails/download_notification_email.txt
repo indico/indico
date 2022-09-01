@@ -1,15 +1,15 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
-{% block subject %}Offline copy of an event ready for download{% endblock %}
+{% block subject %}{% trans %}Offline copy of an event ready for download{% endtrans %}{% endblock %}
 
 {% block header_recipient -%}
-    {{ user.first_name }}
+    {% trans name=user.first_name %}Dear {{ name }},{% endtrans %}
 {%- endblock %}
 
 {% block body -%}
-The offline copy of the event "{{ event.title }}" is ready for download.
+{% trans title=event.title %}The offline copy of the event "{{ title }}" is ready for download.{% endtrans %}
 
-Download link: {{ link }}
+{% trans %}Download link:{% endtrans %} {{ link }}
 {%- endblock %}
 
 {% block footer_url %}{{ event.external_url }}{% endblock %}

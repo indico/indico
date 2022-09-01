@@ -1,9 +1,13 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ reservation.room.owner.first_name }}{% endblock %}
+{% block header_recipient -%}
+    {% trans name=reservation.room.owner.first_name -%}Dear {{ name }},{%- endtrans %}
+{%- endblock %}
 
-{% block email_body -%}
-{% block body %}{% endblock %}
+{% block body -%}
+    {%- filter dedent -%}
+        {% block email_body %}{% endblock %}
 
-You can check the details of the booking here:
-{{ reservation.external_details_url }}
+        {% trans %}You can check the details of the booking here:{% endtrans %}
+        {{ reservation.external_details_url }}
+    {%- endfilter -%}
 {%- endblock %}

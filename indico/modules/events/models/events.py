@@ -1069,6 +1069,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                 ))
                 .has_rows())
 
+    @contextmanager
+    def force_event_locale(self):
+        # TODO: Implement force event locale
+        yield None
+
 
 Event.register_location_events()
 Event.register_protection_events()

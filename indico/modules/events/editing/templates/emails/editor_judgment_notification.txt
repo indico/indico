@@ -1,7 +1,11 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
-{% block subject -%}New editor judgment{%- endblock %}
+{% block subject -%}{% trans %}New editor judgment{% endtrans %}{%- endblock %}
 
 {% block body_text -%}
-{{ editor_name or 'Someone' }} has left a judgment to an editable you are submitter of.
+{% if editor_name -%}
+    {% trans name=editor_name %}{{ name }} has left a judgment to an editable you are submitter of.{% endtrans %}
+{%- else -%}
+    {% trans %}Someone has left a judgment to an editable you are submitter of.{% endtrans %}
+{%- endif %}
 {% endblock %}

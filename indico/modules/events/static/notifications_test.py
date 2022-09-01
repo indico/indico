@@ -7,7 +7,6 @@
 
 from pathlib import Path
 
-from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.web.flask.templating import get_template_module
 
 
@@ -16,13 +15,3 @@ def test_download_notification_email_plaintext(snapshot, dummy_event, dummy_user
                                    event=dummy_event, link='http://localhost/', user=dummy_user)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     snapshot.assert_match(template.get_body(), 'download_notification_email.txt')
-
-
-def test_paper_judgement_email_plaintext(snapshot, dummy_user, dummy_contribution):
-    revision = {'submitter': dummy_user, 'state': PaperRevisionState.accepted,
-                'judgment_comment': 'This is a\n comment!'}
-    dummy_contribution.id = 0
-    template = get_template_module('events/static/emails/paper_judgment_notification_email.txt',
-                                   paper=revision, contribution=dummy_contribution)
-    snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
-    snapshot.assert_match(template.get_body(), 'paper_judgment_notification_email.txt')

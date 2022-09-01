@@ -85,7 +85,7 @@
                     {% endif %}
                     {% if not event and tpl.type.name == 'badge' and not tpl.is_ticket %}
                         {% set inherited_default = default_badge == tpl and tpl.category != target and
-                                not target.default_badge_template%}
+                                not target.default_badge_template %}
                         {% set global_default = default_badge == tpl and target.is_root %}
                         <a class="i-button icon-tag icon-only borderless hide-if-locked toggle-default
                             {{ 'default-on-category' if default_badge == tpl }}

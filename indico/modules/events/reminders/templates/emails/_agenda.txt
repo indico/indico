@@ -1,9 +1,9 @@
 {%- macro render_agenda(event, agenda) -%}
     {%- filter underline -%}
-        Agenda for {{ event.title }}
+        {% trans title=event.title %}Agenda for {{ title }}{% endtrans %}
     {%- endfilter %}
 {% if not agenda -%}
-    There are no events scheduled.
+    {% trans %}There are no events scheduled.{% endtrans %}
 {%- endif -%}
 
     {%- for item in agenda %}

@@ -215,7 +215,7 @@
                         {% set start_time_minutes = (start_time.strftime('%-H')|int*60 + start_time.strftime('%-M')|int) %}
                         {% set next_entry = (day_entries.keys()|list)[loop.index] %}
                         {% if next_entry %}
-                            {% set next_start_minutes = (next_entry.strftime('%-H')|int*60 + next_entry.strftime('%-M')|int)%}
+                            {% set next_start_minutes = (next_entry.strftime('%-H')|int*60 + next_entry.strftime('%-M')|int) %}
                         {% else %}
                             {% set next_start_minutes = start_time_minutes %}
                         {% endif %}

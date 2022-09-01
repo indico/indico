@@ -17,12 +17,9 @@ class ReservationOccurrenceNotification(ReservationNotification):
         self.occurrence = occurrence
         self.start_dt = format_datetime(occurrence.start_dt)
 
-    def _get_email_subject(self, **mail_params):
-        return super()._get_email_subject(**mail_params, subject_suffix='(SINGLE OCCURRENCE)')
-
-    def _make_body(self, mail_params, **body_params):
+    def _make_template(self, mail_params, **body_params):
         body_params['occurrence'] = self.occurrence
-        return super()._make_body(mail_params, **body_params)
+        return super()._make_template(mail_params, **body_params)
 
 
 @email_sender
@@ -31,14 +28,8 @@ def notify_cancellation(occurrence):
         raise ValueError('Occurrence is not cancelled')
     notification = ReservationOccurrenceNotification(occurrence)
     return [_f for _f in [
-        notification.compose_email_to_user(
-            subject='Booking cancelled on',
-            template_name='occurrence_cancellation_email_to_user'
-        ),
-        notification.compose_email_to_manager(
-            subject='Booking cancelled on',
-            template_name='occurrence_cancellation_email_to_manager'
-        ),
+        notification.compose_email_to_user(template_name='occurrence_cancellation_email_to_user'),
+        notification.compose_email_to_manager(template_name='occurrence_cancellation_email_to_manager'),
     ] if _f]
 
 
@@ -48,19 +39,14 @@ def notify_rejection(occurrence):
         raise ValueError('Occurrence is not rejected')
     notification = ReservationOccurrenceNotification(occurrence)
     return [_f for _f in [
-        notification.compose_email_to_user(
-            subject='Booking rejected on',
-            template_name='occurrence_rejection_email_to_user'
-        ),
-        notification.compose_email_to_manager(
-            subject='Booking rejected on',
-            template_name='occurrence_rejection_email_to_manager'
-        )
+        notification.compose_email_to_user(template_name='occurrence_rejection_email_to_user'),
+        notification.compose_email_to_manager(template_name='occurrence_rejection_email_to_manager')
     ] if _f]
 
 
 @email_sender
 def notify_upcoming_occurrences(user, occurrences):
-    tpl = get_template_module('rb/emails/reservations/reminders/upcoming_occurrence.html',
-                              occurrences=occurrences, user=user)
-    return make_email(to_list={user.email}, template=tpl, html=True)
+    with user.force_user_locale():
+        tpl = get_template_module('rb/emails/reservations/reminders/upcoming_occurrence.html',
+                                  occurrences=occurrences, user=user)
+        return make_email(to_list={user.email}, template=tpl, html=True)

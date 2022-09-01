@@ -1,22 +1,22 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
 {% block subject -%}
-    Survey "{{ survey.title }}" started on the event "{{ survey.event.title }}"
+    {% trans sur=survey.title, evt=survey.event.title %}Survey "{{ sur }}" started on the event "{{ evt }}"{% endtrans %}
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
     {%- filter dedent -%}
-        The survey "{{ survey.title }}" on the event "{{ survey.event.title }}" is now open.
+        {% trans sur=survey.title, evt=survey.event.title %}The survey "{{ sur }}" on the event "{{ evt }}" is now open.{% endtrans %}
 
-        You may answer the survey by clicking the link below:
+        {% trans %}You may answer the survey by clicking the link below:{% endtrans %}
         {{ url_for('surveys.display_survey_form', survey, _external=true) }}
     {%- endfilter -%}
 {%- endblock %}
 
 {% block footer_title -%}
-    Surveys
+    {% trans %}Surveys{% endtrans %}
 {%- endblock %}
 
 {% block footer_url -%}

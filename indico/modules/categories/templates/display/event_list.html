@@ -104,7 +104,7 @@
                         <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}" title="{% trans %}Export{% endtrans %}"></a>
                         {% if session.user and event in session.user.favorite_events %}
                             <i class="icon-star" title="{% trans %}You have favorited this event.{% endtrans %}"></i>
-                        {% endif%}
+                        {% endif %}
                     </span>
                     <span class="list-name">
                         <span class="date {% if happening_now(event) %}today{% endif %}">

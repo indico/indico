@@ -1,15 +1,15 @@
 {% extends 'rb/emails/base_email.html' %}
 
 
-{% block header_recipient %}{{ user.first_name }}{% endblock %}
-{% block subject %}Reservation reminder{% endblock %}
+{% block header_recipient %}{% trans name=user.first_name %}Dear {{ name }},{% endtrans %}{% endblock %}
+{% block subject %}{% trans %}Reservation reminder{% endtrans %}{% endblock %}
 
 
 {% block body -%}
     {%- if occurrences | length == 1 -%}
-        This is a reminder about a booking under your name:<br>
+        {% trans %}This is a reminder about a booking under your name:{% endtrans %}<br>
     {%- else -%}
-        This is a reminder about bookings under your name:<br>
+        {% trans %}This is a reminder about bookings under your name:{% endtrans %}<br>
     {%- endif %}
     <ul>
         {% for occurrence in occurrences %}
@@ -30,14 +30,18 @@
     {% set reservation = occurrence.reservation -%}
 
     <strong>{{ occurrence.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }}</strong> (<strong>{{ _render_time(occurrence) }}</strong>)<br>
-    Room: <strong>{{ reservation.room.full_name }}</strong><br>
-    Reason: <strong>{{ reservation.booking_reason }}</strong><br>
+    {% trans %}Room:{% endtrans %} <strong>{{ reservation.room.full_name }}</strong><br>
+    {% trans %}Reason:{% endtrans %} <strong>{{ reservation.booking_reason }}</strong><br>
     <br>
     {%- if reservation.repeat_frequency.name == 'NEVER' -%}
-        If you do not need to use the room, please
-        <a href="{{ reservation.external_details_url }}">cancel the reservation in Indico</a>.
+        {% trans link='<a href="{{ reservation.external_details_url }}">'|safe endlink='</a>'|safe %}
+            If you do not need to use the room, please
+            {{ link }}cancel the reservation in Indico{{ endlink }}.
+        {%- endtrans -%}
     {%- else -%}
-        If you do not need to use the room, please
-        <a href="{{ occurrence.external_cancellation_url }}">cancel the occurrence in Indico</a>.
+        {% trans link='<a href="{{ occurrence.external_cancellation_url }}">'|safe endlink='</a>'|safe %}
+            If you do not need to use the room, please
+            {{ link }}cancel the occurrence in Indico{{ endlink }}.
+        {%- endtrans -%}
     {%- endif -%}
 {%- endmacro %}
