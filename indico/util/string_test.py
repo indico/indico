@@ -238,3 +238,16 @@ def test_sanitize_for_platypus_relative_urls():
         </p>
     ''').strip()
     assert sanitize_for_platypus(html) == expected
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    ('<span style=\'font-family:"Liberation Serif",serif;\'>test</span>',
+     '<span style=\'font-family:"Liberation Serif",serif;\'>test</span>'),
+    ('<span style="font-family:&quot;Liberation Serif&quot;,serif">test</span>',
+     '<span style=\'font-family:"Liberation Serif",serif;\'>test</span>'),
+    ('<span style="font-family:&quot;Liberation Serif&quot;,serif;font-size:14px">test</span>',
+     '<span style=\'font-family:"Liberation Serif",serif;font-size:14px;\'>test</span>'),
+    ('<span>test &quot;</span>', '<span>test &quot;</span>'),  # Only convert escaped quotes inside style attributes
+))
+def test_sanitize_html_escaped_quotes(input, output):
+    assert sanitize_html(input) == output
