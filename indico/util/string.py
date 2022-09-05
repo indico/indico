@@ -468,8 +468,23 @@ def sanitize_email(email, require_valid=False):
         return None
 
 
+class IndicoCSSSanitizer(CSSSanitizer):
+    """Correctly parses escaped quotes.
+
+    ckeditor puts `&quot;` around font family names:
+    https://github.com/ckeditor/ckeditor4/issues/2750
+
+    However, the css parser used by bleach cannot handle escaped quotes inside
+    the style attribute and filters them out which breaks the styling.
+    """
+
+    def sanitize_css(self, style):
+        style = style.replace('&quot;', '"')
+        return super().sanitize_css(style)
+
+
 def sanitize_html(string):
-    css_sanitizer = CSSSanitizer(allowed_css_properties=BLEACH_ALLOWED_STYLES_HTML)
+    css_sanitizer = IndicoCSSSanitizer(allowed_css_properties=BLEACH_ALLOWED_STYLES_HTML)
     return bleach.clean(string, tags=BLEACH_ALLOWED_TAGS_HTML, attributes=BLEACH_ALLOWED_ATTRIBUTES_HTML,
                         css_sanitizer=css_sanitizer)
 
