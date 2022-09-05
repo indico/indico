@@ -53,7 +53,7 @@
         <td class="actions">
             <a class="icon-edit"
                data-ajax-dialog
-               data-title="{% trans %}Edit news{% endtrans %}"
+               data-title
                title="{% trans %}Edit news{% endtrans %}"
                data-href="{{ url_for('.edit_news', item) }}"
                data-confirm-close-unsaved
@@ -62,7 +62,7 @@
             <a class="icon-remove"
                data-href="{{ url_for('.delete_news', item) }}"
                data-method="POST"
-               data-title="{% trans %}Delete news{% endtrans %}"
+               data-title
                title="{% trans %}Delete news{% endtrans %}"
                data-confirm="{% trans title=item.title %}Do you really want to delete the news '{{ title }}'?{% endtrans %}">
             </a>

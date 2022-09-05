@@ -35,7 +35,7 @@
         {% call(custom_field) sortable_list(custom_fields, id="contributions-custom-fields", classes='tiles disable-if-locked') %}
             <a class="icon-edit js-action-button js-edit-contribution-field hide-if-locked" data-ajax-dialog
                data-href="{{ url_for('.manage_field', event, custom_field) }}"
-               data-title="{% trans %}Edit custom field{% endtrans %}"
+               data-title
                title="{% trans %}Edit custom field{% endtrans %}"></a>
             <a class="js-delete-contribution-field icon-remove hide-if-locked"
                data-method="POST"

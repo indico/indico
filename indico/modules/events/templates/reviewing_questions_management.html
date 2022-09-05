@@ -24,7 +24,7 @@
         {% call(reviewing_question) sortable_list(reviewing_questions, id="reviewing-questions-list", classes='tiles disable-if-locked') %}
             <a class="icon-edit js-action-button hide-if-locked"
                data-href="{{ url_for(endpoints.edit, reviewing_question) }}"
-               data-title="{% trans %}Edit the reviewing question{% endtrans %}"
+               data-title
                title="{% trans %}Edit the reviewing question{% endtrans %}"
                data-ajax-dialog>
             </a>

@@ -27,14 +27,14 @@
                    data-method="POST"
                 ></a>
                 {% if not entry.is_separator %}
-                    <a href="#" title="{% trans%}Edit entry{% endtrans %}" data-href="{{ url_for('.menu_entry_edit', entry) }}" class="edit-entry"></a>
+                    <a href="#" title="{% trans %}Edit entry{% endtrans %}" data-href="{{ url_for('.menu_entry_edit', entry) }}" class="edit-entry"></a>
                 {% endif %}
                 {% if entry.type.name in ('user_link', 'page', 'separator') %}
                     <a href="#" class="delete-entry"
                          data-method="DELETE"
                          data-href="{{ url_for('.menu_delete_entry', entry) }}"
                          data-title="{% trans%}Remove the menu entry?{% endtrans %}"
-                         title="{% trans%}Remove the menu entry{% endtrans %}"
+                         title="{% trans %}Remove the menu entry{% endtrans %}"
                          data-confirm="
                             {%- if not entry.is_separator -%}
                                 {%- trans name='&quot;%s&quot;'|format(entry.localized_title) -%}

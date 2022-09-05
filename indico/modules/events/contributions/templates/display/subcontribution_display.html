@@ -34,7 +34,7 @@
         {% if subcontrib.can_edit(session.user) -%}
             <a href="#" class="i-button icon-edit"
                data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
-               title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
+               title="{% trans %}Edit subcontribution{% endtrans %}"
                data-href="{{ url_for('.manage_edit_subcontrib', subcontrib, standalone=true) }}"
                data-ajax-dialog
                data-reload-after></a>

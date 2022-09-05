@@ -184,10 +184,15 @@
       .on('click', '.js-dialog-action', function(e) {
         e.preventDefault();
         const $this = $(this);
+        let title = $this.data('title');
+        if (!title && title !== undefined) {
+         // if `data-title` is present without a value, fall back to the title attr
+         title = $this.attr('title') || $this.data('qtip-oldtitle');
+        }
         ajaxDialog({
           trigger: this,
           url: $this.data('href'),
-          title: $this.data('title'),
+          title,
           hidePageHeader: true,
           onClose(data) {
             if (data) {

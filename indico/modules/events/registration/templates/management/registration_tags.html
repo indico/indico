@@ -20,13 +20,13 @@
                 </span>
                 <span class="right hide-if-locked">
                     <button class="icon-edit i-button text-color borderless" data-href="{{ url_for('.manage_registration_tags_edit', tag) }}"
-                            data-title="{% trans %}Edit tag{% endtrans %}"
+                            data-title
                             title="{% trans %}Edit tag{% endtrans %}"
                             data-ajax-dialog
                             data-reload-after></button>
                     <button class="icon-remove i-button text-color borderless danger"
                             data-method="POST" data-href="{{ url_for('.manage_registration_tags_delete', tag) }}"
-                            data-title="{% trans %}Delete tag{% endtrans %}"
+                            data-title
                             title="{% trans %}Delete tag{% endtrans %}"
                             data-confirm="{% trans %}Do you really want to delete this tag?{% endtrans %}"></button>
                 </span>

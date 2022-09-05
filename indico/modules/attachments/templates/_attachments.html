@@ -42,17 +42,17 @@
                     {% else %}
                         {% trans name=attachment.title %}Edit link &quot;{{ name }}&quot;{% endtrans %}
                     {% endif -%}"
-                    title="
+                   title="
                     {%- if attachment.type.name == 'file' -%}
-                        {% trans name=attachment.title %}Edit file &quot;{{ name }}&quot;{% endtrans %}
+                        {% trans %}Edit file{% endtrans %}
                     {% else %}
-                        {% trans name=attachment.title %}Edit link &quot;{{ name }}&quot;{% endtrans %}
+                        {% trans %}Edit link{% endtrans %}
                     {% endif -%}"></a>
                 <a href="#" class="icon-remove js-delete"
                    data-method="DELETE"
                    data-href="{{ url_for('attachments.delete_attachment', attachment) }}"
                    data-title="{% trans name=attachment.title %}Remove {{ name }}?{% endtrans %}"
-                   title="{% trans name=attachment.title %}Remove {{ name }}?{% endtrans %}"
+                   title="{% trans %}Remove{% endtrans %}"
                    data-confirm="{% trans name=attachment.title -%}
                        Are you sure you want to remove &quot;{{ name }}&quot;?<br>
                        This will remove the attachment permanently.
@@ -87,12 +87,12 @@
                 <a class="icon-edit js-dialog-action"
                            data-href="{{ url_for('attachments.edit_folder', folder) }}"
                            data-title="{% trans name=folder.title %}Edit folder: {{ name }}{% endtrans %}"
-                           title="{% trans name=folder.title %}Edit folder: {{ name }}{% endtrans %}"></a>
+                           title="{% trans %}Edit folder{% endtrans %}"></a>
                 <a href="#" class="icon-remove js-delete"
                    data-method="DELETE"
                    data-href="{{ url_for('attachments.delete_folder', folder) }}"
                    data-title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
-                   title="{% trans name=folder.title %}Remove {{ name }}?{% endtrans %}"
+                   title="{% trans %}Remove{% endtrans %}"
                    data-confirm="{% trans name=folder.title -%}
                        Are you sure you want to remove &quot;{{ name }}&quot;?<br>
                        This will remove the folder and its contents permanently.

@@ -138,7 +138,7 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
         renderButton ? (
           renderButton({open: popupState.open})
         ) : (
-          <Button icon size="small">
+          <Button icon size="small" title={Translate.string('Export')}>
             <Icon name="calendar alternate outline" />
             <Icon name="caret down" />
           </Button>
