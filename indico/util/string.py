@@ -469,7 +469,7 @@ def sanitize_email(email, require_valid=False):
 
 
 class IndicoCSSSanitizer(CSSSanitizer):
-    """Correctly parses escaped quotes.
+    """Correctly parse escaped quotes.
 
     ckeditor puts `&quot;` around font family names:
     https://github.com/ckeditor/ckeditor4/issues/2750
