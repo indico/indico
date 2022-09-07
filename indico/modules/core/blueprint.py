@@ -6,8 +6,8 @@
 # LICENSE file for more details.
 
 from indico.modules.core.controllers import (RHAPIGenerateCaptcha, RHChangeLanguage, RHChangeTimezone, RHConfig,
-                                             RHContact, RHPrincipals, RHReportErrorAPI, RHResetSignatureTokens,
-                                             RHSettings, RHSignURL, RHVersionCheck)
+                                             RHContact, RHPrincipals, RHRenderMarkdown, RHReportErrorAPI,
+                                             RHResetSignatureTokens, RHSettings, RHSignURL, RHVersionCheck)
 from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -27,6 +27,7 @@ _bp.add_url_rule('/api/principals', 'principals', RHPrincipals, methods=('POST',
 _bp.add_url_rule('/api/sign-url', 'sign_url', RHSignURL, methods=('POST',))
 _bp.add_url_rule('/api/reset-signature-tokens', 'reset_signature_tokens', RHResetSignatureTokens, methods=('POST',))
 _bp.add_url_rule('/api/config', 'config', RHConfig)
+_bp.add_url_rule('/api/render-markdown', 'markdown', RHRenderMarkdown, methods=('POST',))
 
 # Misc pages
 _bp.add_url_rule('/contact', 'contact', RHContact)

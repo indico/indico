@@ -160,7 +160,9 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
         text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, text)
 
     if md is None:
-        result = bleach.clean(markdown.markdown(text, **kwargs), tags=BLEACH_ALLOWED_TAGS,
+        extensions = set(kwargs.pop('extensions', ()))
+        extensions.add('fenced_code')
+        result = bleach.clean(markdown.markdown(text, extensions=tuple(extensions), **kwargs), tags=BLEACH_ALLOWED_TAGS,
                               attributes=BLEACH_ALLOWED_ATTRIBUTES)
     else:
         result = md(text, **kwargs)

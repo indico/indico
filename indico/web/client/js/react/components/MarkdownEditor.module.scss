@@ -1,0 +1,21 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2022 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.markdown-editor {
+  :global(.rc-md-editor .editor-container .sec-md .input) {
+    font-family: 'Liberation Mono', monospace;
+    max-height: 100%;
+  }
+
+  :global(.custom-html-style) ul {
+    margin: 0;
+  }
+
+  :global(.custom-html-style) li {
+    margin-bottom: 0;
+  }
+}
