@@ -39,6 +39,8 @@ export {default as ReviewRating} from './ReviewRating';
 export {default as ManagementPageBackButton} from './ManagementPageBackButton';
 export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';
 export {default as ManagementPageTitle} from './ManagementPageTitle';
+export {default as ManageNotes} from './notes/ManageNotes';
+export {default as TextEditor} from './TextEditor';
 export {default as WTFButtonsBooleanField} from './WTFButtonsBooleanField';
 export {default as WTFDateField} from './WTFDateField';
 export {default as WTFDateTimeField} from './WTFDateTimeField';

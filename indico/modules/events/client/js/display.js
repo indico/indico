@@ -5,6 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import {ManageNotes} from 'indico/react/components';
+
 import './util/list_generator';
 import './util/static_filters';
 import './util/social';
@@ -26,9 +31,19 @@ import './favorite';
       });
     }
 
-    $(document).on('click', '[data-note-editor]', function(evt) {
-      evt.preventDefault();
-      openAjaxDialog($(this));
+    const containers = document.querySelectorAll('.manage-notes-container');
+    containers.forEach(container => {
+      ReactDOM.render(
+        React.createElement(ManageNotes, {
+          icon: container.dataset.icon !== undefined,
+          title: container.dataset.title,
+          compile: container.CDATA_SECTION_NODE.icon !== undefined,
+          apiURL: container.dataset.apiUrl,
+          imageUploadURL: container.dataset.imageUploadUrl,
+          getNoteURL: container.dataset.getNoteUrl,
+        }),
+        container
+      );
     });
 
     $('.js-go-to-day')
@@ -170,16 +185,6 @@ import './favorite';
     });
 
     $('input.js-toggle-note-cb').trigger('change', [true]);
-
-    $('.js-note-editor').ajaxDialog({
-      title: $T('Edit minutes'),
-      confirmCloseUnsaved: true,
-      onClose(data, customData) {
-        if (data || customData) {
-          location.reload();
-        }
-      },
-    });
 
     setupEventDisplay();
   });
