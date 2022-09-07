@@ -9,7 +9,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-08-22 18:00+0200\n"
+"POT-Creation-Date: 2022-08-22 11:33+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2022\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -1130,7 +1130,7 @@ msgstr "Télécharger tous les fichiers"
 msgid "Export as JSON"
 msgstr "Exporter en JSON"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:556
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:558
 msgid "There are no editables yet."
 msgstr "Encore aucun éditable."
 
@@ -1613,87 +1613,97 @@ msgstr "Publier"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:67
 msgid "Manage event series"
-msgstr ""
+msgstr "Gérer une série d'événements"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:70
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:152
 msgid "Manage series"
-msgstr ""
+msgstr "Gérer une série"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:76
 msgid "Create event series"
-msgstr ""
+msgstr "Créer une série d'événements"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:79
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:152
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:173
 msgid "Create series"
-msgstr ""
+msgstr "Créer une série"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:168
 msgid "Delete series"
-msgstr ""
+msgstr "Effacer une série"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:173
 msgid "Update series"
-msgstr ""
+msgstr "Mettre à jour une série"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:183
 msgid "A series needs to contain at least one event."
-msgstr ""
+msgstr "Une série doit contenir au moins un événement."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:194
 msgid "Events in series"
-msgstr ""
+msgstr "Événements dans la série"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:196
 msgid "Events to add"
-msgstr ""
+msgstr "Événements à ajouter"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:202
 msgid "Series options"
-msgstr ""
+msgstr "Options de la série"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:206
 msgid "Show the sequence number in the event titles (lectures only)"
 msgstr ""
+"Montrer le numéro de séquence dans le titre des événements (seulement pour "
+"les présentations)"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:212
 msgid "Show links to the other events of the series on the main event page"
 msgstr ""
+"Afficher les liens vers les autres événements de la série sur la page "
+"principale de l'événement"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:218
 msgid "Event title pattern"
-msgstr ""
+msgstr "Modèle du titre d'événement"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:220
 msgid ""
 "Title pattern for cloned events. Must contain the {placeholder} placeholder "
 "which will indicate the new event's position in the series."
 msgstr ""
+"Modèle du titre des événements clonés. Doit contenir le paramètre de "
+"substitution {placeholder} qui indiquera la position des nouveaux événements"
+" dans la série."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:228
 msgid "Title pattern must contain the {placeholder} placeholder"
 msgstr ""
+"Le modèle de titre doit contenir le paramètre de substitution {placeholder}"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:244
 msgid ""
 "Do you really want to delete this series? The associated events will not be "
 "deleted."
 msgstr ""
+"Voulez-vous vraiment supprimer cette série ? Les événements associés ne "
+"seront pas supprimés."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:299
 msgid "No event found with this ID."
-msgstr ""
+msgstr "Aucun événement trouvé avec cet identifiant."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:301
 msgid "You don't have rights to access this event."
-msgstr ""
+msgstr "Vous n'avez pas les droits d'accès à cet événement."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:303
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:385
 msgid "This event is unlisted."
-msgstr ""
+msgstr "Cet événement est non listé."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:372
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:465
@@ -1703,39 +1713,41 @@ msgstr "Non listé"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:379
 msgid "You do not have editing rights for this event."
-msgstr ""
+msgstr "Vous n'avez pas les droits de modification sur cet événement."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:391
 msgid "This event is already part of a different series."
-msgstr ""
+msgstr "Cet événement fait déjà partie d'une autre série."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:397
 msgid "This event is already part of this series."
-msgstr ""
+msgstr "Cet événement fait déjà partie de cette série."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:414
 msgid "Search for an event title or paste an event URL or event ID (#123)"
 msgstr ""
+"Rechercher un titre d'événement ou coller un URL ou un identifiant "
+"d'événement (#123)"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:433
 msgid "Searching..."
-msgstr ""
+msgstr "Recherche en cours..."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:437
 msgid "No results found."
-msgstr ""
+msgstr "Aucun résultat."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:438
 msgid "Enter search term"
-msgstr ""
+msgstr "Entrer le texte à rechercher"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:452
 msgid "this event"
-msgstr ""
+msgstr "cet événement"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:484
 msgid "Remove from event series"
-msgstr ""
+msgstr "Retirer de la série d'événements"
 
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:56
 msgid "Visible only to judges"
@@ -4875,29 +4887,31 @@ msgstr "Groupe"
 
 #: indico/web/client/js/react/components/Captcha.jsx:86
 msgid "Pause"
-msgstr ""
+msgstr "Pause"
 
 #: indico/web/client/js/react/components/Captcha.jsx:86
 msgid "Play"
-msgstr ""
+msgstr "Jouer"
 
 #: indico/web/client/js/react/components/Captcha.jsx:102
 msgid "Refresh CAPTCHA"
-msgstr ""
+msgstr "Recharger le CAPTCHA"
 
 #: indico/web/client/js/react/components/Captcha.jsx:125
 msgid "Confirm that you are not a robot"
-msgstr ""
+msgstr "Confirmez que vous n'êtes pas un robot, svp."
 
 #: indico/web/client/js/react/components/Captcha.jsx:128
 msgid ""
 "Type the characters you see in the image. You can also listen to the audio "
 "instead"
 msgstr ""
+"Entrez les caractères que vous voyez dans l'image. Vous pouvez aussi écouter"
+" l'audio à la place."
 
 #: indico/web/client/js/react/components/Captcha.jsx:135
 msgid "Failed to load CAPTCHA, try refreshing it"
-msgstr ""
+msgstr "Impossible de charger le CAPTCHA, veuillez essayer de le rafraichir"
 
 #: indico/web/client/js/react/components/Captcha.jsx:155
 msgid "Answer"

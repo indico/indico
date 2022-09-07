@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-08-24 11:33+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
-"Last-Translator: Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012-2014,2020,2022\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2022\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3389,11 +3389,11 @@ msgstr "Configuration générale"
 
 #: indico/modules/core/captcha.py:48 indico/modules/core/captcha.py:68
 msgid "Incorrect answer"
-msgstr ""
+msgstr "Réponse incorrecte"
 
 #: indico/modules/core/captcha.py:58
 msgid "CAPTCHA"
-msgstr ""
+msgstr "CAPTCHA"
 
 #: indico/modules/core/controllers.py:306
 msgid "All your token-based links have been invalidated"
@@ -4228,7 +4228,7 @@ msgstr "L'événement cible a déjà une ACL personnalisée"
 
 #: indico/modules/events/clone.py:176
 msgid "Add to event series"
-msgstr ""
+msgstr "Ajouter à la série d'événements"
 
 #: indico/modules/events/cloning.py:188
 msgid "Importing data is not supported"
@@ -8933,11 +8933,11 @@ msgstr "Autoriser les utilisateurs qui ne peuvent pas accéder à l'évènement 
 
 #: indico/modules/events/management/forms.py:276
 msgid "Speakers can submit"
-msgstr ""
+msgstr "Les orateurs peuvent déposer"
 
 #: indico/modules/events/management/forms.py:277
 msgid "Subcontribution speakers can edit minutes and upload materials."
-msgstr ""
+msgstr "Les orateurs de sous-contribution peuvent modifier les compte-rendus et télécharger des documents."
 
 #: indico/modules/events/management/forms.py:304
 msgid "This event's visibility is currently limited by that of '{}'."
@@ -9658,7 +9658,7 @@ msgstr "Voir les données principales de la session (pas de modification)"
 
 #: indico/modules/events/management/templates/event_protection.html:29
 msgid "Subcontribution rights"
-msgstr ""
+msgstr "Droits sur la sous-contribution"
 
 #: indico/modules/events/management/templates/import_event.html:31
 msgid "1. Select event"
@@ -11228,11 +11228,11 @@ msgstr "Les adresses électroniques des inscrits doivent être associées à un 
 
 #: indico/modules/events/registration/forms.py:68
 msgid "Require CAPTCHA"
-msgstr ""
+msgstr "CAPTCHA requise"
 
 #: indico/modules/events/registration/forms.py:69
 msgid "When registering, users with no account have to answer a CAPTCHA"
-msgstr ""
+msgstr "A l'inscription, les utilisateurs sans compte doivent répondre à une CAPTCHA"
 
 #: indico/modules/events/registration/forms.py:70
 msgid "Limit registrations"
@@ -11265,7 +11265,7 @@ msgstr "Publier le nombre d'inscrits"
 
 #: indico/modules/events/registration/forms.py:78
 msgid "Number of registered participants will be displayed on the event page"
-msgstr ""
+msgstr "Le nombre de participants inscrits sera affiché sur la page de l'événement"
 
 #: indico/modules/events/registration/forms.py:80
 msgid "Publish check-in status"
@@ -12006,15 +12006,15 @@ msgstr "Adresse électronique incorrecte"
 
 #: indico/modules/events/registration/models/forms.py:33
 msgid "Until modification deadline"
-msgstr ""
+msgstr "Jusqu'à la date limite de modification"
 
 #: indico/modules/events/registration/models/forms.py:33
 msgid "Until payment"
-msgstr ""
+msgstr "Jusqu'au paiement"
 
 #: indico/modules/events/registration/models/forms.py:33
 msgid "Until approved"
-msgstr ""
+msgstr "Jusqu'à l'approbation"
 
 #: indico/modules/events/registration/models/invitations.py:21
 msgid "Declined"
@@ -12022,35 +12022,35 @@ msgstr "Décliné"
 
 #: indico/modules/events/registration/models/registrations.py:41
 msgid "Completed"
-msgstr ""
+msgstr "Terminé"
 
 #: indico/modules/events/registration/models/registrations.py:41
 msgid "Awaiting payment"
-msgstr ""
+msgstr "En attente du paiement"
 
 #: indico/modules/events/registration/models/registrations.py:81
 msgid "Hide all participants"
-msgstr ""
+msgstr "Cacher les participants"
 
 #: indico/modules/events/registration/models/registrations.py:81
 msgid "Show only consenting participants"
-msgstr ""
+msgstr "Montrer seulement les participants ayant consenti"
 
 #: indico/modules/events/registration/models/registrations.py:81
 msgid "Show all participants"
-msgstr ""
+msgstr "Montrer tous les participants"
 
 #: indico/modules/events/registration/models/registrations.py:88
 msgid "Do not display to anyone"
-msgstr ""
+msgstr "Ne montrer personne"
 
 #: indico/modules/events/registration/models/registrations.py:88
 msgid "Display to other participants"
-msgstr ""
+msgstr "Montrer aux autres participants"
 
 #: indico/modules/events/registration/models/registrations.py:88
 msgid "Display to everyone"
-msgstr ""
+msgstr "Montrer à tout le monde"
 
 #: indico/modules/events/registration/placeholders/invitations.py:35
 msgid "Link to accept/decline the invitation"
@@ -12764,7 +12764,7 @@ msgstr "Nom complet"
 
 #: indico/modules/events/registration/templates/management/_reglist.html:52
 msgid "This user has been registered by an event manager."
-msgstr ""
+msgstr "Cet utilisateur a été inscrit par un administrateur de l'événement."
 
 #: indico/modules/events/registration/templates/management/_reglist.html:154
 msgid ""
@@ -13668,23 +13668,23 @@ msgstr "Vous devez télécharger un fichier CSV ou TXT contenant une adresse él
 
 #: indico/modules/events/series/controllers.py:25
 msgid "A series with this ID does not exist."
-msgstr ""
+msgstr "Pas de série avec cet identifiant."
 
 #: indico/modules/events/series/schemas.py:40
 msgid "At least one event is already in a series."
-msgstr ""
+msgstr "Au moins un événement est déjà dans une série."
 
 #: indico/modules/events/series/schemas.py:42
 msgid "At least one event is already in a different series."
-msgstr ""
+msgstr "Au moins un événement est déjà dans une série différente."
 
 #: indico/modules/events/series/schemas.py:45
 msgid "You must be a manager of all chosen events."
-msgstr ""
+msgstr "Vous devez être l'administrateur de tous les événements sélectionnés."
 
 #: indico/modules/events/series/schemas.py:47
 msgid "At least one event is unlisted."
-msgstr ""
+msgstr "Au moins un événement est non listé."
 
 #: indico/modules/events/sessions/__init__.py:34
 msgid "Allows coordinators to modify contributions in their sessions."
@@ -16882,11 +16882,11 @@ msgstr "Si les utilisateurs sont autorisés à générer des jetons d'API person
 
 #: indico/modules/users/forms.py:122
 msgid "Mandatory fields in account request"
-msgstr ""
+msgstr "Champs obligatoires dans la demande de compte"
 
 #: indico/modules/users/forms.py:124
 msgid "Fields a new user has to fill in when requesting an account"
-msgstr ""
+msgstr "Champs qu'un nouvel utilisateur doit remplir lorsqu'il demande un compte"
 
 #: indico/modules/users/forms.py:136
 msgid "Set login details"

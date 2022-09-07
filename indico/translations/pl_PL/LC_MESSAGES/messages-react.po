@@ -3,15 +3,15 @@
 # Michito <crossner90@gmail.com>, 2019
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2022
 # Patryk Bełzak <patryk.belzak@pwr.edu.pl>, 2022
-# Marcin Miłek, 2022
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2022
-# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022
 # Adrian, 2022
+# Marcin Miłek, 2022
+# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022
 # 
 msgid ""
 msgstr ""
 "POT-Creation-Date: 2022-08-22 11:33+0200\n"
-"Last-Translator: Adrian, 2022\n"
+"Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2022\n"
 "Language-Team: Polish (Poland) (https://www.transifex.com/indico/teams/6478/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1611,12 +1611,12 @@ msgstr "Opublikuj"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:67
 msgid "Manage event series"
-msgstr ""
+msgstr "Zarządzaj seriami zdarzeń"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:70
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:152
 msgid "Manage series"
-msgstr ""
+msgstr "Zarządzaj seriami"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:76
 msgid "Create event series"
@@ -1626,31 +1626,31 @@ msgstr ""
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:152
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:173
 msgid "Create series"
-msgstr ""
+msgstr "Utwórz serie"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:168
 msgid "Delete series"
-msgstr ""
+msgstr "Usuń serie"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:173
 msgid "Update series"
-msgstr ""
+msgstr "Zaktualizuj serie"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:183
 msgid "A series needs to contain at least one event."
-msgstr ""
+msgstr "Serie muszą zawierać co najmniej jedno wydarzenie."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:194
 msgid "Events in series"
-msgstr ""
+msgstr "Wydarzenia w serii"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:196
 msgid "Events to add"
-msgstr ""
+msgstr "Wydarzenia do dodania"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:202
 msgid "Series options"
-msgstr ""
+msgstr "Opcje serii"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:206
 msgid "Show the sequence number in the event titles (lectures only)"
@@ -1717,23 +1717,23 @@ msgstr ""
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:433
 msgid "Searching..."
-msgstr ""
+msgstr "Wyszukiwanie..."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:437
 msgid "No results found."
-msgstr ""
+msgstr "Nie znaleziono żadnych wyników."
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:438
 msgid "Enter search term"
-msgstr ""
+msgstr "Wpisz hasło wyszukiwania"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:452
 msgid "this event"
-msgstr ""
+msgstr "to wydarzenie"
 
 #: indico/modules/events/management/client/js/SeriesManagement.jsx:484
 msgid "Remove from event series"
-msgstr ""
+msgstr "Usuń z serii wydarzeń"
 
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:56
 msgid "Visible only to judges"
@@ -2007,32 +2007,32 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/FormSection.jsx:72
 msgid "Disabled fields"
-msgstr ""
+msgstr "Pola wyłączone"
 
 #: indico/modules/events/registration/client/js/form/FormSection.jsx:75
 msgid "These fields won't be displayed to registrants"
-msgstr ""
+msgstr "Te pola nie będą wyświetlane dla rejestrujących się"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:125
 msgid "{price} {currency} per night"
-msgstr ""
+msgstr "Cena {price} {currency} za noc"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:159
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:307
 msgid "Arrival"
-msgstr ""
+msgstr "Przyjazd"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:160
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:314
 msgid "Departure"
-msgstr ""
+msgstr "Odjazd"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:165
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:144
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:126
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:259
 msgid "Total: {total} {currency}"
-msgstr ""
+msgstr "Razem: {total} {currency}"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:221
 msgid "You must select an option"
@@ -2054,11 +2054,11 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:224
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:451
 msgid "Choices"
-msgstr ""
+msgstr "Wybór"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:328
 msgid "You need to have at least one enabled option."
-msgstr ""
+msgstr "Musisz mieć co najmniej jedną włączoną opcję."
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:34
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:141
@@ -2079,16 +2079,16 @@ msgstr "Edytuj tę osobę"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:164
 msgid "Remove this person"
-msgstr ""
+msgstr "Usuń tę osobę"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:178
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:196
 msgid "Add accompanying person"
-msgstr ""
+msgstr "Dodaj osobę towarzyszącą"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:195
 msgid "Edit accompanying person"
-msgstr ""
+msgstr "Edytuj osobę towarzyszącą"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:277
 msgid "Maximum per registrant"
@@ -2098,7 +2098,7 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:113
 #: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:78
 msgid "No maximum"
-msgstr ""
+msgstr "Brak maksimum"
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:288
 msgid "Accompanying persons count against registration limit"
@@ -2155,7 +2155,7 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/ChoiceLabel.jsx:44
 msgid "Choosing this option will result in a price change."
-msgstr ""
+msgstr "Wybranie tej opcji spowoduje zmianę ceny."
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:78
 msgid "Caption"
@@ -2163,11 +2163,11 @@ msgstr "Podpis"
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:81
 msgid "Price ({currency})"
-msgstr ""
+msgstr "Cena ({currency})"
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:86
 msgid "Limit"
-msgstr ""
+msgstr "Limit"
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:90
 msgid "Max. extra slots"
@@ -2183,7 +2183,7 @@ msgstr "Dodaj nowy"
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:196
 msgid "No accommodation"
-msgstr ""
+msgstr "Brak zakwaterowania"
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:236
 msgid "Extra slots pay"
@@ -2196,11 +2196,11 @@ msgstr "Usuń wiersz"
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:255
 msgid "Disable choice"
-msgstr ""
+msgstr "Brak możliwości wyboru"
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx:261
 msgid "Enable choice"
-msgstr ""
+msgstr "Wybór możliwy"
 
 #: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:27
 msgid "Select a country"
@@ -2290,11 +2290,11 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:100
 msgid "Minimum"
-msgstr ""
+msgstr "Minimum"
 
 #: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:112
 msgid "Maximum"
-msgstr ""
+msgstr "Maksimum"
 
 #: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:127
 msgid "The minimum value cannot be greater than the maximum value."
@@ -2310,7 +2310,7 @@ msgstr[3] ""
 
 #: indico/modules/events/registration/client/js/form/fields/PlacesLeftLabel.jsx:28
 msgid "No places left"
-msgstr ""
+msgstr "Nie pozostało żadnych miejsc"
 
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:112
 #: indico/web/client/js/react/components/WTFMultipleTagSelectField.jsx:51
@@ -2331,7 +2331,7 @@ msgstr "Przyciski opcji"
 
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:436
 msgid "Default option"
-msgstr ""
+msgstr "Opcja domyślna"
 
 #: indico/modules/events/registration/client/js/form/fields/TextAreaInput.jsx:55
 msgid "Rows"
@@ -2339,7 +2339,7 @@ msgstr "Wiersze"
 
 #: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:55
 msgid "Min. length"
-msgstr ""
+msgstr "Minimalna długość"
 
 #: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:64
 msgid ""
@@ -2349,7 +2349,7 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:77
 msgid "Max. length"
-msgstr ""
+msgstr "Maksymalna długość"
 
 #: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:92
 msgid "The minimum length cannot be greater than the maximum length."
@@ -2361,11 +2361,11 @@ msgstr "Etykieta"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:78
 msgid "Text field"
-msgstr ""
+msgstr "Pole tekstowe"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:85
 msgid "Text area"
-msgstr ""
+msgstr "Obszar tekstowy"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:91
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:50
@@ -2408,7 +2408,7 @@ msgstr "Wybór jednokrotny"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:153
 msgid "Multiple Choice"
-msgstr ""
+msgstr "Wybór wielokrotny"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:162
 msgid "Accommodation"
@@ -2416,7 +2416,7 @@ msgstr "Zakwaterowanie"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:174
 msgid "Accompanying Persons"
-msgstr ""
+msgstr "Osoby towarzyszące"
 
 #: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx:38
 msgid "Restore"
@@ -2437,35 +2437,35 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:50
 msgid "Remove field"
-msgstr ""
+msgstr "Usuń pole"
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:57
 msgid "Enable field"
-msgstr ""
+msgstr "Włącz pole"
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:64
 msgid "Disable field"
-msgstr ""
+msgstr "Wyłącz pole"
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:70
 msgid "Configure field"
-msgstr ""
+msgstr "Konfiguruj pole"
 
 #: indico/modules/events/registration/client/js/form_setup/FormItemSetupActions.jsx:82
 msgid "Are you sure you want to delete the field \"{field}\"?"
-msgstr ""
+msgstr "Czy jesteś pewien, że chcesz usunąć pole \"{field}\"?"
 
 #: indico/modules/events/registration/client/js/form_setup/FormSectionSetupActions.jsx:38
 msgid "Disable section"
-msgstr ""
+msgstr "Wyłącz sekcję"
 
 #: indico/modules/events/registration/client/js/form_setup/FormSectionSetupActions.jsx:44
 msgid "Configure section"
-msgstr ""
+msgstr "Skonfiguruj sekcję"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:97
 msgid "Configure field \"{section}\""
-msgstr ""
+msgstr "Skonfiguruj pole \"{section}\""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:102
 msgid "Add new field"
@@ -2473,7 +2473,7 @@ msgstr "Dodaj nowe pole"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:120
 msgid "Please choose a field type."
-msgstr ""
+msgstr "Proszę wybrac typ pola."
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:127
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:56
@@ -2491,16 +2491,16 @@ msgstr "Cena"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:144
 msgid "Required field"
-msgstr ""
+msgstr "Wymagane pole"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:154
 #: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:91
 msgid "Permanent"
-msgstr ""
+msgstr "Stałe"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:158
 msgid "Retention period (weeks)"
-msgstr ""
+msgstr "Okres przechowywania (tygodnie)"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:166
 msgid ""
@@ -2510,11 +2510,11 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx:22
 msgid "Choose type"
-msgstr ""
+msgstr "Wybierz typ"
 
 #: indico/modules/events/registration/client/js/form_setup/ItemTypeDropdown.jsx:34
 msgid "Add field"
-msgstr ""
+msgstr "Dodaj pole"
 
 #: indico/modules/events/registration/client/js/form_setup/RegistrationFormSetup.jsx:45
 msgid "Add section"
@@ -2526,15 +2526,15 @@ msgstr "Składuję..."
 
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:45
 msgid "Configure section \"{section}\""
-msgstr ""
+msgstr "Skonfiguruj sekcję  \"{section}\""
 
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:49
 msgid "Add new section"
-msgstr ""
+msgstr "Dodaj nową sekcję"
 
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:62
 msgid "Manager-only"
-msgstr ""
+msgstr "Tylko dla menedżerów"
 
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:63
 msgid "Whether the section is only visible for managers."
@@ -2546,7 +2546,7 @@ msgstr "Powiadomienia e-mail"
 
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:48
 msgid "Send an email notification to the user"
-msgstr ""
+msgstr "Wyślij powiadomienie e-mail do użytkownika"
 
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:62
 msgid "Participant list"
@@ -4499,7 +4499,7 @@ msgstr "Przestrzenie niedostępne w podanym okresie (kliknąć po szczegóły)"
 
 #: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:162
 msgid "Unauthorized"
-msgstr ""
+msgstr "Nieautoryzowane"
 
 #: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:169
 msgid "Spaces you are not authorized to book."
@@ -4788,7 +4788,7 @@ msgstr ""
 
 #: indico/modules/users/client/js/Favorites.jsx:232
 msgid "You have not marked any event as favorite."
-msgstr ""
+msgstr "Nie zaznaczyłeś żadnego wydarzenia jako ulubione,"
 
 #: indico/modules/users/client/js/Favorites.jsx:254
 msgid "Add Indico user"
@@ -4838,19 +4838,19 @@ msgstr "Grupa"
 
 #: indico/web/client/js/react/components/Captcha.jsx:86
 msgid "Pause"
-msgstr ""
+msgstr "Zatrzymaj"
 
 #: indico/web/client/js/react/components/Captcha.jsx:86
 msgid "Play"
-msgstr ""
+msgstr "Odtwórz"
 
 #: indico/web/client/js/react/components/Captcha.jsx:102
 msgid "Refresh CAPTCHA"
-msgstr ""
+msgstr "Odśwież CAPTCHA"
 
 #: indico/web/client/js/react/components/Captcha.jsx:125
 msgid "Confirm that you are not a robot"
-msgstr ""
+msgstr "Potwierdź, że nie jesteś robotem"
 
 #: indico/web/client/js/react/components/Captcha.jsx:128
 msgid ""
@@ -4860,7 +4860,7 @@ msgstr ""
 
 #: indico/web/client/js/react/components/Captcha.jsx:135
 msgid "Failed to load CAPTCHA, try refreshing it"
-msgstr ""
+msgstr "Nie udało się załadować CAPTCHA, spróbuj odświeżyć"
 
 #: indico/web/client/js/react/components/Captcha.jsx:155
 msgid "Answer"
@@ -4908,11 +4908,11 @@ msgstr "Filtr"
 
 #: indico/web/client/js/react/components/ListFilter.jsx:141
 msgid "Clear all filters"
-msgstr ""
+msgstr "Wyczyść wszystkie filtry"
 
 #: indico/web/client/js/react/components/ListFilter.jsx:146
 msgid "No filters were added yet"
-msgstr ""
+msgstr "Nie dodano jeszcze żadnych filtrów"
 
 #: indico/web/client/js/react/components/ListFilter.jsx:194
 msgid "Enter #id or search string"

@@ -121,7 +121,7 @@ msgstr "Der Celery-Aufgabenplaner läuft auf einer anderen Indico-Version."
 
 #: indico/core/celery/templates/celery_tasks.html:9
 msgid "Periodic Tasks"
-msgstr "wiederkehrende Aufgaben"
+msgstr "Wiederkehrende Aufgaben"
 
 #: indico/core/celery/templates/celery_tasks.html:13
 #: indico/legacy/pdfinterface/conference.py:1156
@@ -181,7 +181,7 @@ msgstr "nicht aktiviert"
 
 #: indico/core/celery/templates/celery_tasks.html:46
 msgid "custom schedule"
-msgstr "spezielle Programmierung"
+msgstr "spezielle Planung"
 
 #: indico/core/celery/templates/celery_tasks.html:48
 msgid "default"
@@ -9837,7 +9837,7 @@ msgstr "Erteilt Beurteilungsrechte für zugeordnete Paper"
 #: indico/modules/events/papers/__init__.py:113
 #: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html:14
 msgid "Content reviewer"
-msgstr "Inhaltgutacher"
+msgstr "Gutacher (Inhalt)"
 
 #: indico/modules/events/papers/__init__.py:114
 msgid "Grants content reviewing rights for assigned papers."
@@ -9846,7 +9846,7 @@ msgstr "Erteilt das Recht zur inhaltlichen Überprüfung der zugewiesenen Paper.
 #: indico/modules/events/papers/__init__.py:119
 #: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html:17
 msgid "Layout reviewer"
-msgstr "Layoutgutachter"
+msgstr "Gutachter (Layout)"
 
 #: indico/modules/events/papers/__init__.py:120
 msgid "Grants layout reviewing rights for assigned papers."
@@ -9882,7 +9882,7 @@ msgstr "Liste der Nutzer, die Paper beurteilen können"
 #: indico/modules/events/papers/templates/_paper_list.html:295
 #: indico/modules/events/papers/templates/management/paper_person_list.html:8
 msgid "Content reviewers"
-msgstr "Inhaltgutacher"
+msgstr "Gutacher (Inhalt)"
 
 #: indico/modules/events/papers/forms.py:44
 msgid "List of users allowed to review the content of the assigned papers"
@@ -9894,7 +9894,7 @@ msgstr "Liste aller Nutzer, die Begutachtungen für den Inhalt der zugeordneten 
 #: indico/modules/events/papers/templates/_paper_list.html:308
 #: indico/modules/events/papers/templates/management/paper_person_list.html:12
 msgid "Layout reviewers"
-msgstr "Layoutgutachter"
+msgstr "Gutachter (Layout)"
 
 #: indico/modules/events/papers/forms.py:47
 msgid "List of users allowed to review the layout of the assigned papers"
@@ -9936,11 +9936,11 @@ msgstr "Nicht zugeordnet"
 
 #: indico/modules/events/papers/settings.py:16
 msgid "Layout Reviewer"
-msgstr "Layoutgutachter"
+msgstr "Gutachter (Layout)"
 
 #: indico/modules/events/papers/settings.py:16
 msgid "Content Reviewer"
-msgstr "Inhaltgutacher"
+msgstr "Gutacher (Inhalt)"
 
 #: indico/modules/events/papers/controllers/api.py:168
 #: indico/modules/events/papers/controllers/api.py:199
@@ -10137,11 +10137,11 @@ msgstr "Juroren gewählten Beiträgen zuordnen"
 
 #: indico/modules/events/papers/templates/_paper_list.html:245
 msgid "Assign content reviewers to selected contributions"
-msgstr "Inhaltsgutachter zu gewählten Beiträgen zuordnen"
+msgstr "Gutacher (Inhalt) zu gewählten Beiträgen zuordnen"
 
 #: indico/modules/events/papers/templates/_paper_list.html:258
 msgid "Assign layout reviewers to selected contributions"
-msgstr "Layoutgutachter zu gewählten Beiträgen zuordnen"
+msgstr "Gutachter (Layout) zu gewählten Beiträgen zuordnen"
 
 #: indico/modules/events/papers/templates/_paper_list.html:270
 #: indico/modules/events/papers/templates/assign_role.html:80
@@ -10154,11 +10154,11 @@ msgstr "Juroren nicht mehr den gewählten Beiträgen zuordnen"
 
 #: indico/modules/events/papers/templates/_paper_list.html:289
 msgid "Unassign content reviewers from selected contributions"
-msgstr "Inhaltsgutacher nicht mehr den gewählten Beiträgen zuordnen"
+msgstr "Gutacher (Inhalt) nicht mehr den gewählten Beiträgen zuordnen"
 
 #: indico/modules/events/papers/templates/_paper_list.html:302
 msgid "Unassign layout reviewers from selected contributions"
-msgstr "Layoutgutachtern nicht mehr den gewählten Beiträgen zuordnen"
+msgstr "Gutachter (Layout) nicht mehr den gewählten Beiträgen zuordnen"
 
 #: indico/modules/events/papers/templates/_paper_list.html:321
 msgid "Accept selected papers"
@@ -10197,11 +10197,11 @@ msgstr "Es gibt noch keine Juroren."
 
 #: indico/modules/events/papers/templates/assign_role.html:59
 msgid "There are no content reviewers yet."
-msgstr "Es gibt noch keine Inhaltsgutachter."
+msgstr "Es gibt noch keine Gutacher (Inhalt)."
 
 #: indico/modules/events/papers/templates/assign_role.html:61
 msgid "There are no layout reviewers yet."
-msgstr "Es gibt noch keine Layoutgutachter."
+msgstr "Es gibt noch keine Gutachter (Layout)."
 
 #: indico/modules/events/papers/templates/assign_role.html:65
 msgid "There are no judges assigned to the selected contributions."
@@ -10209,11 +10209,11 @@ msgstr "Es wurden keine Juroren den ausgewählten Bedingungen zugeordnet."
 
 #: indico/modules/events/papers/templates/assign_role.html:67
 msgid "There are no content reviewers assigned to the selected contributions."
-msgstr "Es wurden keine Inhaltsgutachter den gewählten Beiträgen zugeordnet."
+msgstr "Es wurden keine Gutacher (Inhalt) den gewählten Beiträgen zugeordnet."
 
 #: indico/modules/events/papers/templates/assign_role.html:69
 msgid "There are no layout reviewers assigned to the selected contributions."
-msgstr "Es wurden keine Layoutgutachter zu den gewählten Beiträgen zugeordnet."
+msgstr "Es wurden keine Gutachter (Layout) zu den gewählten Beiträgen zugeordnet."
 
 #: indico/modules/events/papers/templates/paper_list_filter.html:40
 msgid "Customize paper assignment list"
@@ -10267,11 +10267,11 @@ msgstr "Ihre Begutachtung zu einem Beitrag ist ausstehend"
 
 #: indico/modules/events/papers/templates/display/_paper_list.html:58
 msgid "You have submitted a layout review"
-msgstr "Sie haben eine Layout-Überprüfung eingereicht"
+msgstr "Sie haben eine Layoutbegutachtung eingereicht"
 
 #: indico/modules/events/papers/templates/display/_paper_list.html:64
 msgid "Your layout review is pending"
-msgstr "Ihre Layout-Überprüfung ist noch nicht abgeschlossen"
+msgstr "Ihre Layoutbegutachtung ist noch nicht abgeschlossen"
 
 #: indico/modules/events/papers/templates/display/call_for_papers.html:29
 #: indico/modules/events/papers/templates/management/overview.html:149
@@ -10569,19 +10569,19 @@ msgstr "Diese Person ist kein Juror"
 
 #: indico/modules/events/papers/templates/management/paper_person_list.html:45
 msgid "This person is a content reviewer"
-msgstr "Diese Person ist ein Inhaltsgutachter"
+msgstr "Diese Person ist ein Gutacher (Inhalt)"
 
 #: indico/modules/events/papers/templates/management/paper_person_list.html:47
 msgid "This person is not a content reviewer"
-msgstr "Diese Person ist kein Inhaltsgutachter"
+msgstr "Diese Person ist kein Gutacher (Inhalt)"
 
 #: indico/modules/events/papers/templates/management/paper_person_list.html:54
 msgid "This person is a layout reviewer"
-msgstr "Diese Person ist ein Layoutgutachter"
+msgstr "Diese Person ist ein Gutachter (Layout)"
 
 #: indico/modules/events/papers/templates/management/paper_person_list.html:56
 msgid "This person is not a layout reviewer"
-msgstr "Diese Person ist kein Layoutgutachter"
+msgstr "Diese Person ist kein Gutachter (Layout)"
 
 #: indico/modules/events/papers/templates/management/paper_person_list.html:65
 msgid "There is no reviewing team assigned yet"
