@@ -69,14 +69,10 @@
         <a href="{{ _note_link(note, anchor) }}" target="_blank"
            class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
         {% if can_edit %}
-            <a href="#" class="icon-edit js-note-editor hide-if-locked"
-               title="{% trans %}Edit minutes{% endtrans %}"
-               data-href="{{ url_for('event_notes.edit', note) }}"></a>
-            <a href="#" class="icon-remove hide-if-locked"
-               title="{% trans %}Delete minutes{% endtrans %}"
-               data-href="{{ url_for('event_notes.delete', note) }}" data-method="POST"
-               data-title="{% trans %}Delete minutes?{% endtrans %}"
-               data-confirm="{% trans %}Do you want to delete the attached minutes?{% endtrans %}"></a>
+            <span class="manage-notes-container hide-if-locked"
+                  data-icon
+                  data-api-url="{{ url_for('event_notes.api', note) }}"
+                  data-image-upload-url="{{ url_for('attachments.upload_ckeditor', note) }}"></span>
         {% endif %}
     </div>
 {% endmacro %}

@@ -7,12 +7,10 @@
         {% else %}
             {% set title = _('Add minutes') %}
         {% endif %}
-        <a href="#"
-           data-href="{{ url_for('event_notes.edit', item) }}"
-           data-title="{{ title }}"
-           data-note-editor>
-            {{- title -}}
-        </a>
+        <div class="manage-notes-container"
+             data-api-url="{{ url_for('event_notes.api', item) }}"
+             data-image-upload-url="{{ url_for('attachments.upload_ckeditor', item) }}"
+             data-title="{{ title }}"></div>
     </li>
 {%- endmacro %}
 
@@ -38,13 +36,11 @@
                     {{ _render_note_editor(item) }}
                     {% if item.scheduled_notes %}
                         <li>
-                            <a href=""
-                               data-locator="{{ item.locator | tojson | forceescape }}"
-                               class="notes-compile"
-                               data-href="{{ url_for('event_notes.compile', item) }}"
-                               data-title="{% trans %}Edit minutes{% endtrans %}">
-                                {% trans %}Compile Minutes{% endtrans %}
-                            </a>
+                            <div class="manage-notes-container"
+                                 data-get-note-url="{{ url_for('event_notes.compile', item) }}"
+                                 data-api-url="{{ url_for('event_notes.api', item) }}"
+                                 data-image-upload-url="{{ url_for('attachments.upload_ckeditor', item) }}"
+                                 data-title="{% trans %}Compile minutes{% endtrans %}"></div>
                         </li>
                     {% endif %}
                 {% endif %}

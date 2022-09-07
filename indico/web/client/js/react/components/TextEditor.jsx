@@ -9,9 +9,11 @@ import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from 'ckeditor';
 import PropTypes from 'prop-types';
 import React, {useMemo} from 'react';
+import {Field} from 'react-final-form';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {getConfig} from 'indico/ckeditor';
+import {Translate} from 'indico/react/i18n';
 
 import {FinalField} from '../forms';
 
@@ -25,6 +27,7 @@ export default function TextEditor({
   onChange,
   onFocus,
   onBlur,
+  setValidationError,
   ...rest
 }) {
   const config = useMemo(() => getConfig(_config), [_config]);
@@ -33,6 +36,15 @@ export default function TextEditor({
       writer.setStyle('width', width, editor.editing.view.document.getRoot());
       writer.setStyle('height', height, editor.editing.view.document.getRoot());
     });
+    if (setValidationError) {
+      editor.plugins._plugins.get('SourceEditing').on('change:isSourceEditingMode', evt => {
+        if (evt.source.isSourceEditingMode) {
+          setValidationError(Translate.string('Please exit source editing mode'));
+        } else {
+          setValidationError(undefined);
+        }
+      });
+    }
     if (_onReady) {
       _onReady(editor);
     }
@@ -69,6 +81,7 @@ TextEditor.propTypes = {
   value: PropTypes.string.isRequired,
   config: PropTypes.object,
   loading: PropTypes.bool,
+  setValidationError: PropTypes.func,
 };
 
 TextEditor.defaultProps = {
@@ -77,10 +90,24 @@ TextEditor.defaultProps = {
   onReady: undefined,
   config: undefined,
   loading: false,
+  setValidationError: null,
 };
 
 export function FinalTextEditor({name, ...rest}) {
-  return <FinalField name={name} component={TextEditor} {...rest} />;
+  return (
+    <Field
+      name={`_${name}_invalidator`}
+      validate={value => value || undefined}
+      render={({input: {onChange: setDummyValue}}) => (
+        <FinalField
+          name={name}
+          component={TextEditor}
+          setValidationError={setDummyValue}
+          {...rest}
+        />
+      )}
+    />
+  );
 }
 
 FinalTextEditor.propTypes = {
