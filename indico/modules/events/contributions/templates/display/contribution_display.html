@@ -130,12 +130,12 @@
         {{ template_hook('url-shortener', target=url_for('contributions.display_contribution', contribution),
                          classes='i-button icon-link') }}
         {% if indico_config.LATEX_ENABLED %}
-            <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
+            <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"></a>
         {% endif %}
         {% if contribution.timetable_entry -%}
             {% if g.static_site %}
                 <a href="{{ url_for('contributions.export_ics', contribution) }}"
-                   class="i-button icon-calendar"></a>
+                   class="i-button icon-calendar" title="{% trans %}Export{% endtrans %}"></a>
             {% else %}
                 <div id="contribution-calendar-link" data-event-id="{{ contribution.event_id }}"
                      data-contribution-id="{{ contribution.id }}"></div>
