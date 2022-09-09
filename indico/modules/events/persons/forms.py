@@ -38,3 +38,9 @@ class EmailEventPersonsForm(IndicoForm):
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form
+
+
+class ManagePersonListsForm(IndicoForm):
+    allow_custom_persons = BooleanField(_('Submitters can enter persons manually'), widget=SwitchWidget(),
+                                        description=_('If disabled, submitters can only list existing Indico users on '
+                                                      'person lists.'))

@@ -9,6 +9,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -38,3 +39,8 @@ def _get_placeholders(sender, person, event, register_link=False, **kwargs):
     yield ContributionsPlaceholder
     if register_link:
         yield RegisterLinkPlaceholder
+
+
+persons_settings = EventSettingsProxy('persons', {
+    'allow_custom_persons': True,  # Submitters can enter persons manually on person lists
+})

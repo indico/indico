@@ -8,6 +8,7 @@
 import json
 from operator import attrgetter
 
+from flask import session
 from marshmallow import EXCLUDE
 from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
@@ -20,6 +21,7 @@ from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.persons import persons_settings
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.util import get_user_by_email
@@ -95,6 +97,10 @@ class PersonLinkListFieldBase(PrincipalListField):
     @property
     def has_predefined_affiliations(self):
         return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
+
+    @property
+    def can_enter_manually(self):
+        return persons_settings.get(self.event, 'allow_custom_persons') or self.event.can_manage(session.user)
 
     @no_autoflush
     def _get_person_link(self, data):
