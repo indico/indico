@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.add_column('forms', sa.Column('tickets_for_accompanying_persons', sa.Boolean(), nullable=False,
-                                     server_default='true'), schema='event_registration')
+                                     server_default='false'), schema='event_registration')
     op.alter_column('forms', 'tickets_for_accompanying_persons', server_default=None, schema='event_registration')
 
 

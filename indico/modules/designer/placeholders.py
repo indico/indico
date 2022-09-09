@@ -84,10 +84,10 @@ class FullNamePlaceholderBase(DesignerPlaceholder):
 
     @classmethod
     def render(cls, person):
-        name = ((person['registration'].get_personal_data().get('title', '') + ' ')
-                if cls.with_title and not person['is_accompanying'] else '')
-        name += format_full_name(person['first_name'], person['last_name'], **cls.name_options)
-        return name
+        title = ''
+        if cls.with_title and not person['is_accompanying']:
+            title = person['registration'].get_personal_data().get('title', '')
+        return format_full_name(person['first_name'], person['last_name'], title=title, **cls.name_options)
 
 
 class EventLogoPlaceholder(DesignerPlaceholder):

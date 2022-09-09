@@ -156,7 +156,6 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
             field_data['availablePlaces'] = item.field_impl.get_available_places(registration)
         else:
             field_data = item.view_data
-        field_data['isLocked'] = item.is_locked(registration)
         field_data['lockedReason'] = item.get_locked_reason(registration)
         item_data[item.id] = field_data
     for item in regform.active_labels:
@@ -370,7 +369,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     if skip_moderation is None:
         skip_moderation = management
     for form_item in regform.active_fields:
-        if form_item.is_purged or form_item.is_locked(None):
+        if form_item.is_purged or form_item.get_locked_reason(None):
             # Leave the registration data empty
             continue
         default = form_item.field_impl.default_value
@@ -416,7 +415,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
     billable_items_locked = not management and registration.is_paid
     for form_item in regform.active_fields:
-        if form_item.is_purged or form_item.is_locked(registration):
+        if form_item.is_purged or form_item.get_locked_reason(registration):
             continue
 
         field_impl = form_item.field_impl

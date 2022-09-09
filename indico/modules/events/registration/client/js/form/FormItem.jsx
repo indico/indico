@@ -70,7 +70,6 @@ export default function FormItem({
   isEnabled,
   isRequired,
   isPurged,
-  isLocked,
   lockedReason,
   sortHandle,
   setupMode,
@@ -87,7 +86,7 @@ export default function FormItem({
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isEnabled, ...rest};
   const showPurged = !setupMode && isPurged;
-  const disabled = !isEnabled || showPurged || isLocked || (paidItemLocked && !isManagement);
+  const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
 
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
@@ -151,9 +150,11 @@ export default function FormItem({
         )}
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
-      {isLocked && <ItemLocked reason={lockedReason} />}
-      {!isLocked && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
-      {!isLocked && !showPurged && paidItemLocked && <PaidItemLocked management={isManagement} />}
+      {lockedReason && <ItemLocked reason={lockedReason} />}
+      {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
+      {!lockedReason && !showPurged && paidItemLocked && (
+        <PaidItemLocked management={isManagement} />
+      )}
     </div>
   );
 }
@@ -168,9 +169,7 @@ FormItem.propTypes = {
   isRequired: PropTypes.bool,
   /** Whether the field's registration data have been deleted due to an expired retention period */
   isPurged: PropTypes.bool.isRequired,
-  /** Whether the field is locked for modification */
-  isLocked: PropTypes.bool,
-  /** The reason for the field being locked */
+  /** If the field is locked for some external reason, the reason for it */
   lockedReason: PropTypes.string,
   /** The retention period of the field's data in weeks */
   retentionPeriod: PropTypes.number,
@@ -195,7 +194,6 @@ FormItem.defaultProps = {
   fieldIsPersonalData: false,
   fieldIsRequired: false,
   isRequired: false,
-  isLocked: false,
   lockedReason: '',
   retentionPeriod: null,
   htmlName: null,
