@@ -10,7 +10,7 @@ Version 3.2.1
 Improvements
 ^^^^^^^^^^^^
 
-- None so far :(
+- Enable better image linking UI in CKEditor (:pr:`5492`)
 
 Bugfixes
 ^^^^^^^^
