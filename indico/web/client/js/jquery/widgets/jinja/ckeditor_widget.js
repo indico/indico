@@ -23,7 +23,11 @@ import {getConfig} from 'indico/ckeditor';
       field.dispatchEvent(new Event('change', {bubbles: true}));
     });
     editor.editing.view.change(writer => {
-      writer.setStyle('width', `${width}px` || 'auto', editor.editing.view.document.getRoot());
+      writer.setStyle(
+        'width',
+        width ? `${width}px` : 'auto',
+        editor.editing.view.document.getRoot()
+      );
       writer.setStyle('height', `${height}px`, editor.editing.view.document.getRoot());
     });
     // Re-position the dialog if we have one since the initial position is
