@@ -225,7 +225,7 @@ class LocationWidget(JinjaWidget):
         rooms = {'data': []}
         venues = {'data': []}
         venue_map = {}
-        if config.ENABLE_ROOMBOOKING:
+        if config.ENABLE_ROOMBOOKING and field.locations:
             rooms = {loc.name: {'data': self.get_sorted_rooms(loc)} for loc in field.locations}
             venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
             venue_map = {loc['id']: loc['name'] for loc in venues['data']}

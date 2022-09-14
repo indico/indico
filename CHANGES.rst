@@ -19,6 +19,7 @@ Bugfixes
 - Force default locale when generating Book of Abstracts (:pr:`5477`)
 - Fix width and height calculation when printing badges (:pr:`5479`)
 - Parse escaped quotes (``&quot;``) in ckeditor output correctly (:pr:`5487`)
+- Fix entering room name if room booking is enabled but has no locations (:pr:`5495`)
 
 
 Version 3.2
