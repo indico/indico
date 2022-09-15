@@ -29,6 +29,8 @@ Internal Changes
 - Require at least Postgres 13 during new installations. This check can be
   forced on older Postgres versions (11+ should work), but we make no guarantees
   that nothing is broken (the latest version we test with is 12) (:pr:`5503`)
+- Refactor service request email generation so plugins can override sender and
+  reply-to addresses for these emails (:pr:`5501`)
 
 
 Version 3.2
