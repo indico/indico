@@ -194,7 +194,7 @@ import Palette from 'indico/utils/palette';
       const self = this;
       return $('<button>', {
         'type': 'button',
-        'title': $T.gettext("Delete entry '{0}'".format(principal.name || principal.id)),
+        'title': $T.gettext("Delete entry '{0}'").format(principal.name || principal.id),
         'class': 'i-button text-color borderless icon-only icon-remove',
         'data-principal': JSON.stringify(principal),
       }).on('click', function() {
