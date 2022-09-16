@@ -42,9 +42,10 @@ def cli(ctx, plugin=None, all_plugins=False):
 
 
 @cli.command()
-def prepare():
+@click.option('--force', is_flag=True, help='Force using an older Postgres version')
+def prepare(force=False):
     """Initialize a new database (creates tables, sets alembic rev to HEAD)."""
-    return prepare_db()
+    return prepare_db(force=force)
 
 
 def _stamp(plugin=None, revision=None):

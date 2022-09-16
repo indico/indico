@@ -21,6 +21,13 @@ Bugfixes
 - Parse escaped quotes (``&quot;``) in ckeditor output correctly (:pr:`5487`)
 - Fix entering room name if room booking is enabled but has no locations (:pr:`5495`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Require at least Postgres 13 during new installations. This check can be
+  forced on older Postgres versions (11+ should work), but we make no guarantees
+  that nothing is broken (the latest version we test with is 12) (:pr:`5503`)
+
 
 Version 3.2
 -----------
@@ -119,6 +126,8 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
+- When upgrading an existing instance, Postgres 11 or newer is required. The upgrade will
+  fail on Postgres 9.6 (or 10).
 - Add new ``regform-container-attrs`` template hook to pass additional (data-)attributes
   to the React registration form containers (:pr:`5271`)
 - Add support for JavaScript plugin hooks to register objects or react components for use
