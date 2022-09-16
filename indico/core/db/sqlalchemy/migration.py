@@ -58,17 +58,14 @@ def _require_extensions(*names):
     return False
 
 
-def _require_pg_version(version):
-    # convert version string such as '9.4.10' to `90410` which is the
-    # format used by server_version_num
-    # FIXME: this will not work for versions >= 10, since the second segment there is the patch version
-    # but once we require a newer postgres, we can ditch the logic here and only use the major version
-    # since that will be the only relevant version number
-    req_version = sum(segment * 10**(4 - 2*i) for i, segment in enumerate(map(int, version.split('.'))))
-    cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
+def _require_pg_version(req_version, *, force=False):
+    cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int / 10000").scalar()
     if cur_version >= req_version:
         return True
-    click.secho(f'Postgres version too old; you need at least {version} (or newer)', fg='red')
+    click.secho(f'Postgres version {cur_version} too old; you need at least {req_version} (or newer)', fg='red')
+    if force:
+        click.secho('Continuing anyway, you have been warned.', fg='yellow')
+        return True
     return False
 
 
@@ -81,9 +78,9 @@ def _require_encoding(encoding):
     return False
 
 
-def prepare_db(empty=False, root_path=None, verbose=True):
+def prepare_db(empty=False, root_path=None, verbose=True, force=False):
     """Initialize an empty database (create tables, set alembic rev to HEAD)."""
-    if not _require_pg_version('9.6'):
+    if not _require_pg_version(13, force=force):
         return
     if not _require_encoding('UTF8'):
         return
