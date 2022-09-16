@@ -178,7 +178,7 @@ lxml[html5]==4.9.1
     # via
     #   -r requirements.in
     #   feedgen
-mako==1.2.1
+mako==1.2.2
     # via alembic
 markdown==3.4.1
     # via -r requirements.in
