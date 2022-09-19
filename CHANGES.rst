@@ -12,6 +12,7 @@ Improvements
 
 - Enable better image linking UI in CKEditor (:pr:`5492`)
 - Restore the "fullscreen view" option in CKEditor (:pr:`5505`)
+- Display & enforce judging deadline (:pr:`5506`)
 
 Bugfixes
 ^^^^^^^^
