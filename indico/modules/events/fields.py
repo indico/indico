@@ -107,6 +107,8 @@ class PersonLinkListFieldBase(PrincipalListField):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         identifier = data.get('identifier')
         data = PersonLinkSchema(unknown=EXCLUDE).load(data)
+        if not self.can_enter_manually and not data.get('type'):
+            raise UserValueError('Manually entered persons are not allowed')
         if identifier and identifier.startswith('ExternalUser:'):
             # if the data came from an external user, look up their affiliation if the names still match;
             # we do not have an affiliation ID yet since it may not exist in the local DB yet
