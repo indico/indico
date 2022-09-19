@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <ICSCalendarLink
       endpoint="sessions.export_ics"
       params={{event_id: eventId, session_id: sessionId}}
-      renderButton={classes => <IButton icon="calendar" classes={classes} />}
+      renderButton={classes => (
+        <IButton icon="calendar" classes={classes} title={Translate.string('Export')} />
+      )}
       options={options}
     />,
     calendarContainer

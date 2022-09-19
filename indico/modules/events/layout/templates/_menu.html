@@ -22,17 +22,19 @@
                     ></a>
                 {% endif %}
                 <a class="{% if not entry.is_enabled %}not-{% endif %}enabled" href="#"
+                   title="{% trans %}Toggle visibility{% endtrans %}"
                    data-href="{{ url_for('.menu_entry_toggle_enabled', entry) }}"
                    data-method="POST"
                 ></a>
                 {% if not entry.is_separator %}
-                    <a href="#" data-href="{{ url_for('.menu_entry_edit', entry) }}" class="edit-entry"></a>
+                    <a href="#" title="{% trans %}Edit entry{% endtrans %}" data-href="{{ url_for('.menu_entry_edit', entry) }}" class="edit-entry"></a>
                 {% endif %}
                 {% if entry.type.name in ('user_link', 'page', 'separator') %}
                     <a href="#" class="delete-entry"
                          data-method="DELETE"
                          data-href="{{ url_for('.menu_delete_entry', entry) }}"
                          data-title="{% trans%}Remove the menu entry?{% endtrans %}"
+                         title="{% trans %}Remove the menu entry{% endtrans %}"
                          data-confirm="
                             {%- if not entry.is_separator -%}
                                 {%- trans name='&quot;%s&quot;'|format(entry.localized_title) -%}

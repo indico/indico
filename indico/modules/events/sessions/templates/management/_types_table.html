@@ -6,12 +6,14 @@
             <a class="js-edit-type icon-edit"
                data-ajax-dialog
                data-href="{{ url_for('.manage_type', session_type) }}"
-               data-title="{% trans %}Edit session type{% endtrans %}"></a>
+               data-title
+               title="{% trans %}Edit session type{% endtrans %}"></a>
             <a class="js-delete-type icon-remove"
                data-method="POST"
                data-href="{{ url_for('.delete_type', session_type) }}"
                data-confirm="{% trans %}Do you really want to delete this session type?{% endtrans %}"
-               data-title="{% trans %}Confirm deletion{% endtrans %}"></a>
+               data-title="{% trans %}Confirm deletion{% endtrans %}"
+               title="{% trans %}Delete session type{% endtrans %}"></a>
         </td>
     </tr>
 {% endmacro %}

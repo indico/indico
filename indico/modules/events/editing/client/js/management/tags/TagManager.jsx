@@ -106,6 +106,7 @@ export default function TagManager({eventId}) {
                     name="pencil"
                     color="grey"
                     size="small"
+                    title={Translate.string('Edit tag')}
                     onClick={() => dispatch({type: 'EDIT_TAG', tag})}
                     disabled={tag.system}
                     circular
@@ -115,6 +116,7 @@ export default function TagManager({eventId}) {
                     name="remove"
                     color="red"
                     size="small"
+                    title={Translate.string('Delete tag')}
                     onClick={() => dispatch({type: 'DELETE_TAG', tag})}
                     disabled={tag.system}
                     circular
