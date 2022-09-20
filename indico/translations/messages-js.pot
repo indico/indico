@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.2.1.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-24 11:33+0200\n"
+"POT-Creation-Date: 2022-09-20 15:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,7 @@ msgstr ""
 msgid "This file is protected. You will be redirected to the login page."
 msgstr ""
 
-#: indico/modules/attachments/client/js/legacy.js:228
+#: indico/modules/attachments/client/js/legacy.js:233
 msgid "Manage material"
 msgstr ""
 
@@ -279,10 +279,6 @@ msgstr ""
 msgid "Hide preview"
 msgstr ""
 
-#: indico/modules/events/client/js/display.js:175
-msgid "Edit minutes"
-msgstr ""
-
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
 msgstr ""
@@ -371,11 +367,11 @@ msgstr ""
 msgid "You have unsaved changes that will be lost."
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/declarative.js:251 indico/web/client/js/jquery/widgets/categorynavigator.js:704
+#: indico/web/client/js/jquery/utils/declarative.js:256 indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/declarative.js:361
+#: indico/web/client/js/jquery/utils/declarative.js:366
 msgid "Direct link to this item"
 msgstr ""
 
@@ -662,52 +658,54 @@ msgid "Registrants cannot have management permissions"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:186
 msgid "Assign Permissions"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:204
 msgid "Delete entry '{0}'"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:289
 msgid "All options have been added"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:320
 msgid "This entry was already added"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
 msgid "Anonymous"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:364
 msgid "Additional users"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:368
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Category Managers"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Parent Category Managers"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:388
 msgid "Event Managers"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
 msgid "Registrants in \"{0}\""
 msgstr ""
 

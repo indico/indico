@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-08-22 11:33+0200\n"
+"POT-Creation-Date: 2022-09-22 15:13+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -130,13 +130,23 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:312
 #: indico/web/client/js/react/components/RequestConfirm.jsx:92
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:107
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:108
 #: indico/web/client/js/react/components/principals/Search.jsx:481
 #: indico/web/client/js/react/forms/final-form.jsx:149
 msgid "Cancel"
 msgstr ""
 
 #: indico/modules/categories/client/js/base.jsx:28
+#: indico/modules/events/client/js/header.jsx:60
+#: indico/modules/events/contributions/client/js/index.jsx:46
+#: indico/modules/events/sessions/client/js/session_display.jsx:36
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:84
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:57
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:141
+msgid "Export"
+msgstr ""
+
+#: indico/modules/categories/client/js/base.jsx:30
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:155
 msgid "Category"
 msgstr ""
@@ -150,7 +160,7 @@ msgid "There are no event move requests."
 msgstr ""
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:153
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:471
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:473
 #: indico/web/client/js/react/components/principals/Search.jsx:556
 msgid "User"
 msgstr ""
@@ -345,6 +355,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:146
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:311
 #: indico/web/client/js/react/components/RequestConfirm.jsx:103
+#: indico/web/client/js/react/components/principals/items.jsx:175
 msgid "Delete"
 msgstr ""
 
@@ -380,12 +391,6 @@ msgstr ""
 
 #: indico/modules/events/client/js/header.jsx:44
 msgid "A detailed timetable containing all individual contributions."
-msgstr ""
-
-#: indico/modules/events/client/js/header.jsx:60
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:84
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:57
-msgid "Export"
 msgstr ""
 
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
@@ -463,7 +468,7 @@ msgstr ""
 msgid "Draft"
 msgstr ""
 
-#: indico/modules/events/contributions/client/js/index.jsx:46
+#: indico/modules/events/contributions/client/js/index.jsx:48
 msgid "Contribution"
 msgstr ""
 
@@ -828,6 +833,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:118
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:271
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:112
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:81
 msgid "Save"
 msgstr ""
 
@@ -1332,29 +1338,34 @@ msgstr ""
 msgid "Review conditions"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:126
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:109
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:153
+msgid "Edit tag"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:119
+msgid "Delete tag"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:128
 msgid ""
 "System tags are managed by the editing workflow service and cannot be "
 "modified."
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:135
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:137
 msgid "There are no tags defined for this event"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:145
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:147
 msgid "Add new tag"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:151
-msgid "Edit tag"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:152
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:154
 msgid "Create a new tag"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:171
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:173
 msgid "Are you sure you want to delete the tag {tag}?"
 msgstr ""
 
@@ -3339,7 +3350,7 @@ msgid "Room Booking"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:55
-#: indico/web/client/js/react/components/PersonLinkField.jsx:328
+#: indico/web/client/js/react/components/PersonLinkField.jsx:330
 #: indico/web/client/js/react/components/principals/Search.jsx:126
 msgid "Search"
 msgstr ""
@@ -3373,10 +3384,12 @@ msgstr ""
 #: indico/modules/users/client/js/Favorites.jsx:118
 #: indico/modules/users/client/js/Favorites.jsx:222
 #: indico/modules/users/client/js/Favorites.jsx:289
+#: indico/web/client/js/react/components/principals/items.jsx:156
 msgid "Remove from favorites"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/Room.jsx:72
+#: indico/web/client/js/react/components/principals/items.jsx:165
 msgid "Add to favorites"
 msgstr ""
 
@@ -4590,7 +4603,7 @@ msgstr ""
 msgid "Are you sure you want to leave this page without saving?"
 msgstr ""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:477
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:479
 #: indico/web/client/js/react/components/principals/Search.jsx:721
 msgid "Group"
 msgstr ""
@@ -4638,23 +4651,31 @@ msgstr ""
 msgid "Add email"
 msgstr ""
 
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:169
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:92
+msgid "Copy to clipboard"
+msgstr ""
+
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:170
 msgid ""
 "You may copy-paste the following URL into your scheduling application. "
 "Contents will be automatically synchronized."
 msgstr ""
 
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:175
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:176
 #: indico/web/client/js/react/components/WTFRemoteSearchDropdown.jsx:221
 msgid "Loading…"
 msgstr ""
 
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:187
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:188
 msgid "Copied!"
 msgstr ""
 
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:195
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:196
 msgid "Download an iCalendar file that you can use in calendaring applications."
+msgstr ""
+
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:202
+msgid "Download"
 msgstr ""
 
 #: indico/web/client/js/react/components/ListFilter.jsx:113
@@ -4735,25 +4756,37 @@ msgstr ""
 msgid "Family Name"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:188
-#: indico/web/client/js/react/components/PersonLinkField.jsx:301
+#: indico/web/client/js/react/components/PersonLinkField.jsx:70
+msgid "Edit person"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:79
+msgid "Delete person"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:190
+#: indico/web/client/js/react/components/PersonLinkField.jsx:303
 msgid "There are no persons"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:294
+#: indico/web/client/js/react/components/PersonLinkField.jsx:296
 msgid "Others"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:318
+#: indico/web/client/js/react/components/PersonLinkField.jsx:320
 msgid "Add myself"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:338
+#: indico/web/client/js/react/components/PersonLinkField.jsx:340
 msgid "Enter manually"
 msgstr ""
 
 #: indico/web/client/js/react/components/ScrollButton.jsx:31
 msgid "Back to top"
+msgstr ""
+
+#: indico/web/client/js/react/components/TextEditor.jsx:42
+msgid "Please exit source editing mode"
 msgstr ""
 
 #: indico/web/client/js/react/components/UserMenu.jsx:45
@@ -4865,6 +4898,22 @@ msgstr ""
 msgid "Upload failed"
 msgstr ""
 
+#: indico/web/client/js/react/components/notes/ManageNotes.jsx:37
+msgid "Edit minutes"
+msgstr ""
+
+#: indico/web/client/js/react/components/notes/ManageNotes.jsx:42
+msgid "Delete minutes"
+msgstr ""
+
+#: indico/web/client/js/react/components/notes/ManageNotes.jsx:50
+msgid "Are you sure you want to delete these minutes?"
+msgstr ""
+
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:80
+msgid "Edit Minutes"
+msgstr ""
+
 #: indico/web/client/js/react/components/principals/ACLField.jsx:165
 #: indico/web/client/js/react/components/principals/PrincipalListField.jsx:112
 msgid "This list is currently empty"
@@ -4888,7 +4937,8 @@ msgstr ""
 msgid "Registrants in \"{form}\""
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:94
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:37
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:95
 msgid "Add permission"
 msgstr ""
 
@@ -4973,11 +5023,11 @@ msgid_plural "{count} groups found"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/react/components/principals/items.jsx:226
+#: indico/web/client/js/react/components/principals/items.jsx:229
 msgid "Nobody"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/items.jsx:227
+#: indico/web/client/js/react/components/principals/items.jsx:230
 msgid "Select a user"
 msgstr ""
 
