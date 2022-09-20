@@ -42,5 +42,5 @@ def _get_placeholders(sender, person, event, register_link=False, **kwargs):
 
 
 persons_settings = EventSettingsProxy('persons', {
-    'allow_custom_persons': True,  # Submitters can enter persons manually on person lists
+    'disallow_custom_persons': False,  # Disallow manually entering persons on person lists
 })

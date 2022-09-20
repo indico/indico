@@ -466,9 +466,10 @@ class RHManagePersonLists(RHManageEventBase):
     """Dialog to configure person list settings."""
 
     def _process(self):
-        form = ManagePersonListsForm(allow_custom_persons=persons_settings.get(self.event, 'allow_custom_persons'))
+        form = ManagePersonListsForm(disallow_custom_persons=persons_settings.get(self.event,
+                                                                                  'disallow_custom_persons'))
         if form.validate_on_submit():
-            persons_settings.set(self.event, 'allow_custom_persons', form.allow_custom_persons.data)
-            flash(_('Submitter edit settings changed successfully'), 'success')
+            persons_settings.set(self.event, 'disallow_custom_persons', form.disallow_custom_persons.data)
+            flash(_('Person lists settings changed successfully'), 'success')
             return jsonify_data()
         return jsonify_form(form)

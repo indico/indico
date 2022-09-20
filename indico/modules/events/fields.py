@@ -100,7 +100,7 @@ class PersonLinkListFieldBase(PrincipalListField):
 
     @property
     def can_enter_manually(self):
-        return persons_settings.get(self.event, 'allow_custom_persons') or self.event.can_manage(session.user)
+        return self.event.can_manage(session.user) or not persons_settings.get(self.event, 'disallow_custom_persons')
 
     @no_autoflush
     def _get_person_link(self, data):

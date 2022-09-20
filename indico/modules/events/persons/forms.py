@@ -41,6 +41,6 @@ class EmailEventPersonsForm(IndicoForm):
 
 
 class ManagePersonListsForm(IndicoForm):
-    allow_custom_persons = BooleanField(_('Submitters can enter persons manually'), widget=SwitchWidget(),
-                                        description=_('If disabled, submitters can only list existing Indico users on '
-                                                      'person lists.'))
+    disallow_custom_persons = BooleanField(_('Disallow manually entering persons'), widget=SwitchWidget(),
+                                           description=_('Only allow submitters to list existing Indico users as '
+                                                         'speakers/authors.'))
