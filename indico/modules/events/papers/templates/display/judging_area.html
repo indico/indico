@@ -27,5 +27,23 @@
         {% endcall %}
     {% endif %}
 
-    {{ render_paper_assignment_content(event, total_entries, contribs, static_columns, selected_entry) }}
+    {% set judge_deadline = event.cfp.judge_deadline %}
+    {% if judge_deadline %}
+        <div class="deadline-info">
+            {% set tz = event.timezone %}
+            <span class="icon icon-calendar"></span>
+            <div class="label">{% trans %}Judging deadline{% endtrans %}</div>
+            <div class="text">
+                <span>
+                    {% trans date=judge_deadline|format_date(timezone=tz), time=judge_deadline|format_time(timezone=tz) -%}
+                        Paper judging ends on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
+                    {%- endtrans %}
+                </span>
+            </div>
+        </div>
+    {% endif %}
+
+    <section>
+        {{ render_paper_assignment_content(event, total_entries, contribs, static_columns, selected_entry) }}
+    </section>
 {% endblock %}

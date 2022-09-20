@@ -28,6 +28,7 @@ class CallForPapers:
     content_reviewing_enabled = EventSettingProperty(paper_reviewing_settings, 'content_reviewing_enabled')
     layout_reviewing_enabled = EventSettingProperty(paper_reviewing_settings, 'layout_reviewing_enabled')
     judge_deadline = EventSettingProperty(paper_reviewing_settings, 'judge_deadline')
+    judge_deadline_enforced = EventSettingProperty(paper_reviewing_settings, 'enforce_judge_deadline')
     layout_reviewer_deadline = EventSettingProperty(paper_reviewing_settings, 'layout_reviewer_deadline')
     content_reviewer_deadline = EventSettingProperty(paper_reviewing_settings, 'content_reviewer_deadline')
     content_reviewer_deadline_enforced = EventSettingProperty(paper_reviewing_settings,

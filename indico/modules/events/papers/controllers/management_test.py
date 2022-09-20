@@ -7,17 +7,11 @@
 
 import pytest
 
-from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.reviews import PaperAction, PaperReview, PaperReviewType
 from indico.modules.events.papers.models.revisions import PaperRevision
 from indico.modules.events.papers.settings import paper_reviewing_settings
-
-
-@pytest.fixture
-def dummy_paper(dummy_contribution):
-    return Paper(dummy_contribution)
 
 
 @pytest.mark.parametrize(('value', 'scale_min', 'scale_max', 'expected'), (
