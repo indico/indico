@@ -22,6 +22,7 @@ Bugfixes
 - Fix width and height calculation when printing badges (:pr:`5479`)
 - Parse escaped quotes (``&quot;``) in ckeditor output correctly (:pr:`5487`)
 - Fix entering room name if room booking is enabled but has no locations (:pr:`5495`)
+- Fix privacy information dropdown not opening on Safari (:pr:`5507`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
