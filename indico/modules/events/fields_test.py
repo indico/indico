@@ -7,6 +7,8 @@
 
 import json
 
+import pytest
+
 from indico.modules.events.fields import EventPersonLinkListField
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.web.forms.base import IndicoForm
@@ -20,6 +22,7 @@ class MockForm(IndicoForm):
         super().__init__(*args, **kwargs)
 
 
+@pytest.mark.usefixtures('request_context')
 def test_serialize_principal(app, dummy_event, dummy_user):
     from indico.modules.events.persons.schemas import EventPersonSchema
     with app.test_request_context():
@@ -37,6 +40,7 @@ def test_serialize_principal(app, dummy_event, dummy_user):
     assert result[0].get('affiliation') == 'Test'
 
 
+@pytest.mark.usefixtures('request_context')
 def test_submitter_permissions(app, db, dummy_event, dummy_user):
     from indico.modules.events.persons.schemas import PersonLinkSchema
     person = EventPerson.create_from_user(dummy_user, dummy_event)
