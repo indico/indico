@@ -65,7 +65,7 @@ export default function RevisionJudgment({revision}) {
                   position="bottom center"
                   content={Translate.string('Reset judgment')}
                   trigger={
-                    <Icon link className="undo" color="grey" onClick={() => setConfirmOpen(true)} />
+                    <Icon link className="undo" color="red" onClick={() => setConfirmOpen(true)} />
                   }
                 />
               </div>
