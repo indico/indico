@@ -248,7 +248,6 @@ div.event-header {
   &.break-description,
   &.contrib-description,
   &.subcontrib-description {
-    font-size: 0.9em;
     padding: 0.5em 0;
   }
 
@@ -373,7 +372,7 @@ ul.day-list {
     .timetable-item-actions {
       flex-shrink: 0;
       padding-top: 0.25rem;
-      max-height: 2em;
+      max-height: 2.2em;
 
       .manage-button {
         .i-button {
@@ -458,8 +457,6 @@ ul.day-list {
 .subcontrib-list {
   list-style-type: none;
   padding: 0;
-
-  font-size: 0.9em;
 
   .timetable-item.timetable-subcontrib {
     border-left: 2px dotted $gray;
