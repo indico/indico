@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-18 18:00+0200\n"
+"POT-Creation-Date: 2022-09-20 15:13+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: bbb user, 2022\n"
 "Language-Team: German (Germany) (http://www.transifex.com/indico/indico/language/de_DE/)\n"
@@ -51,7 +51,7 @@ msgstr "Zugriff verweigert"
 msgid "This file is protected. You will be redirected to the login page."
 msgstr "Diese Datei ist geschützt. Sie werden auf die Anmeldeseite weitergeleitet."
 
-#: indico/modules/attachments/client/js/legacy.js:228
+#: indico/modules/attachments/client/js/legacy.js:233
 msgid "Manage material"
 msgstr "Materialien verwalten"
 
@@ -314,10 +314,6 @@ msgstr "Vorschau anzeigen"
 msgid "Hide preview"
 msgstr "Vorschau ausblenden"
 
-#: indico/modules/events/client/js/display.js:175
-msgid "Edit minutes"
-msgstr "Sitzungsprotokoll bearbeiten"
-
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
 msgstr "Einstellungen für Menüeinträge"
@@ -414,12 +410,12 @@ msgstr "Schließen"
 msgid "You have unsaved changes that will be lost."
 msgstr "Ungespeicherte Änderungen gehen verloren."
 
-#: indico/web/client/js/jquery/utils/declarative.js:251
+#: indico/web/client/js/jquery/utils/declarative.js:256
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "Vorgang bestätigen"
 
-#: indico/web/client/js/jquery/utils/declarative.js:361
+#: indico/web/client/js/jquery/utils/declarative.js:366
 msgid "Direct link to this item"
 msgstr "Verknüpfung zu diesem Eintrag"
 
@@ -716,52 +712,54 @@ msgid "Registrants cannot have management permissions"
 msgstr "Teilnehmer können keine Management-Rechte besitzen"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:186
 msgid "Assign Permissions"
 msgstr "Rechte zuweisen"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:204
 msgid "Delete entry '{0}'"
 msgstr "Eintrag '{0}' löschen"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Sind Sie sicher, dass Sie sich selbst von der Liste entfernen möchten?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:289
 msgid "All options have been added"
 msgstr "Alle Optionen wurden hinzugefügt"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:320
 msgid "This entry was already added"
 msgstr "Dieser Eintrag wurde bereits hinzugefügt"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
 msgid "Anonymous"
 msgstr "Anonym"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:364
 msgid "Additional users"
 msgstr "Zusätzliche Benutzer"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:368
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} Nutzer haben implizit Lesezugriff wegen anderer Rollen"
 msgstr[1] "{0} Benutzer haben implizit Lesezugriff wegen anderer Rollen"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Category Managers"
 msgstr "Kategoriemanager"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Parent Category Managers"
 msgstr "Übergeordnete Kategoriemanager"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:388
 msgid "Event Managers"
 msgstr "Veranstaltungsmanager"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
 msgid "Registrants in \"{0}\""
 msgstr "Teilnehmer in \"{0}\""
 
