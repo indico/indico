@@ -57,6 +57,16 @@
             </td>
         </tr>
     {% endif %}
+    {% if data.reply_to %}
+        <tr class="i-table content">
+            <td class="i-table caption log-caption">
+                Reply-to
+            </td>
+            <td class="i-table value searchable">
+                {{ data.reply_to|join(', ') }}
+            </td>
+        </tr>
+    {% endif %}
     <tr class="i-table content">
         <td class="i-table caption log-caption">
             {% trans %}Subject{% endtrans %}

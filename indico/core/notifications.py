@@ -71,6 +71,7 @@ def _log_email(email, event, module, user, meta=None):
         'to': sorted(email['to']),
         'cc': sorted(email['cc']),
         'bcc': sorted(email['bcc']),
+        'reply_to': sorted(email['reply_to']),
         'subject': email['subject'],
         'body': email['body'].strip(),
         'state': 'pending',
