@@ -12,8 +12,9 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState, useEffect, useCallback} from 'react';
 import {Field} from 'react-final-form';
-import {Button, Dimmer, Loader} from 'semantic-ui-react';
+import {Dimmer, Loader} from 'semantic-ui-react';
 
+import {ConfirmButton} from 'indico/react/components';
 import {handleSubmitError} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
@@ -23,13 +24,13 @@ import {camelizeKeys} from 'indico/utils/case';
 import {FinalMarkdownEditor} from '../MarkdownEditor';
 import {FinalTextEditor} from '../TextEditor';
 
-// import style manually
 import 'react-markdown-editor-lite/lib/index.css';
 
 export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   const [currentInput, setCurrentInput] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [allowWithoutChange, setAllowWithoutChange] = useState(false);
+  const [converting, setConverting] = useState(false);
   const [renderMode, setRenderMode] = useState(undefined);
 
   const combineNotes = (resp, mode) => {
@@ -121,6 +122,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   };
 
   const convertToHTML = markdownSource => async () => {
+    setConverting(true);
     let resp;
     try {
       resp = await indicoAxios.post(renderMarkdownURL(), {source: markdownSource});
@@ -157,14 +159,17 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
             renderMode === 'markdown' && (
               <Field name="source" subscription={{value: true}}>
                 {({input: {value: markdownSource}}) => (
-                  <Button
+                  <ConfirmButton
                     style={{marginRight: 'auto'}}
                     onClick={convertToHTML(markdownSource)}
-                    disabled={fprops.submitting}
+                    disabled={fprops.submitting || converting}
                     basic
+                    popupContent={Translate.string(
+                      'You cannot switch back to Markdown after switching to HTML.'
+                    )}
                   >
-                    <Translate>Change editor to HTML</Translate>
-                  </Button>
+                    <Translate>Use rich-text (HTML) editor</Translate>
+                  </ConfirmButton>
                 )}
               </Field>
             )
