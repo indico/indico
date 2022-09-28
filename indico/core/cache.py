@@ -7,6 +7,7 @@
 
 from datetime import timedelta
 
+from cachelib.serializers import RedisSerializer
 from flask_caching import Cache
 from flask_caching.backends.rediscache import RedisCache
 from redis import RedisError
@@ -36,6 +37,11 @@ class CachedNone:
             return value
 
 
+class NoneWrappingRedisSerializer(RedisSerializer):
+    def dumps(self, value, *args, **kwargs):
+        return super().dumps(CachedNone.wrap(value), *args, **kwargs)
+
+
 class IndicoRedisCache(RedisCache):
     """
     This is similar to the original RedisCache from Flask-Caching, but it
@@ -43,17 +49,13 @@ class IndicoRedisCache(RedisCache):
     distinguishing between a cached ``None`` value and a cache miss.
     """
 
-    def dump_object(self, value):
-        # We are not overriding the `load_object` counterpart to this method o
-        # purpose because we need to have access to the wrapped value in `get`
-        # and `get_many`.
-        return super().dump_object(CachedNone.wrap(value))
+    serializer = NoneWrappingRedisSerializer()
 
     def add(self, key, value, timeout=None):
-        # XXX: remove this once there's a release contining the fix from
-        # https://github.com/sh4nks/flask-caching/pull/218
+        # XXX: remove this once there's a release with this issue fixed:
+        # https://github.com/pallets-eco/cachelib/issues/156
         timeout = self._normalize_timeout(timeout)
-        dump = self.dump_object(value)
+        dump = self.serializer.dumps(value)
         created = self._write_client.setnx(
             name=self._get_prefix() + key, value=dump
         )
@@ -131,7 +133,7 @@ class ScopedCache:
 
 class IndicoCache(Cache):
     """
-    This is basicaly the Cache class from Flask-Caching but it silences all
+    This is basically the Cache class from Flask-Caching but it silences all
     exceptions that happen during a cache operation since cache failures should
     not take down the whole page.
 

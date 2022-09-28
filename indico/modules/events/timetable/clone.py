@@ -8,8 +8,7 @@
 from sqlalchemy.orm import defaultload, joinedload
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
@@ -56,7 +55,7 @@ class TimetableCloner(EventCloner):
     def _clone_timetable(self, new_event):
         offset = new_event.start_dt - self.old_event.start_dt
         # no need to copy the type; it's set automatically based on the object
-        attrs = get_simple_column_attrs(TimetableEntry) - {'type', 'start_dt'}
+        attrs = get_attrs_to_clone(TimetableEntry, skip={'type', 'start_dt'})
         break_strategy = defaultload('break_')
         break_strategy.joinedload('own_venue')
         break_strategy.joinedload('own_room').lazyload('*')
@@ -89,7 +88,7 @@ class TimetableCloner(EventCloner):
             entry_map[old_entry] = entry
 
     def _clone_break(self, old_break):
-        attrs = get_simple_column_attrs(Break) | {'own_room', 'own_venue'}
+        attrs = get_attrs_to_clone(Break, add={'own_room', 'own_venue'})
         break_ = Break()
         break_.populate_from_attrs(old_break, attrs)
         return break_

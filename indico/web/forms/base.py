@@ -8,7 +8,7 @@
 import weakref
 from collections.abc import Mapping
 
-from flask import flash, g, has_request_context, request, session
+from flask import flash, g, has_request_context, session
 from flask_wtf import FlaskForm
 from wtforms import ValidationError
 from wtforms.csrf.core import CSRF
@@ -18,11 +18,9 @@ from wtforms.widgets.core import HiddenInput
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core import signals
-from indico.core.auth import multipass
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.string import strip_whitespace
-from indico.web.flask.util import url_for
 from indico.web.util import get_request_user
 
 
@@ -117,27 +115,6 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
             kwargs['meta'] = kwargs.get('meta') or {}
             kwargs['meta'].setdefault('csrf', csrf_enabled)
         super().__init__(*args, **kwargs)
-        self.ajax_response = None
-
-    def process_ajax(self):
-        """
-        Check if the current request is an AJAX request related to a
-        field in this form and execute the field's AJAX logic.
-
-        The response is available in the `ajax_response` attribute
-        afterwards.
-
-        :return: Whether an AJAX response was processed.
-        """
-        field_id = request.args.get('__wtf_ajax')
-        if not field_id:
-            return False
-        field = next((f for f in self._fields.values() if f.id == field_id and isinstance(f, AjaxFieldMixin)), None)
-        if not field:
-            return False
-        rv = field.process_ajax()
-        self.ajax_response = rv
-        return True
 
     def validate(self):
         valid = super().validate()
@@ -277,74 +254,3 @@ class FormDefaults:
 
     def __contains__(self, item):
         return hasattr(self, item)
-
-
-class SyncedInputsMixin:
-    """Mixin for a form having inputs using the ``SyncedInputWidget``.
-
-    This mixin will process the synced fields, adding them the necessary
-    attributes for them to render and work properly.  The fields which
-    are synced are defined by ``multipass.synced_fields``.
-
-    :param synced_fields: set -- a subset of ``multipass.synced_fields``
-                          which corresponds to the fields currently
-                          being synchronized for the user.
-    :param synced_values: dict -- a map of all the synced fields (as
-                          defined by ``multipass.synced_fields``) and
-                          the values they would have if they were synced
-                          (regardless of whether it is or not).  Fields
-                          not present in this dict do not show the sync
-                          button at all.
-    """
-
-    def __init__(self, *args, **kwargs):
-        synced_fields = kwargs.pop('synced_fields', set())
-        synced_values = kwargs.pop('synced_values', {})
-        super().__init__(*args, **kwargs)
-        self.syncable_fields = set(synced_values)
-        for key in ('first_name', 'last_name'):
-            if not synced_values.get(key):
-                synced_values.pop(key, None)
-                self.syncable_fields.discard(key)
-        if self.is_submitted():
-            synced_fields = self.synced_fields
-        provider = multipass.sync_provider
-        provider_name = provider.title if provider is not None else 'unknown identity provider'
-        for field in multipass.synced_fields:
-            self[field].synced = self[field].short_name in synced_fields
-            self[field].synced_value = synced_values.get(field)
-            self[field].provider_name = provider_name
-
-    @property
-    def synced_fields(self):
-        """The fields which are set as synced for the current request."""
-        return set(request.form.getlist('synced_fields')) & self.syncable_fields
-
-
-class AjaxFieldMixin:
-    """Mixin for a Field to be able to handle AJAX requests.
-
-    This mixin will allow you to handle AJAX requests during regular
-    form processing, e.g. when you have a field that needs an AJAX
-    callback to perform search operations.
-
-    To use this mixin, the controllers processing the form must
-    include the following code::
-
-        if form.process_ajax():
-            return form.ajax_response
-
-    It is a good idea to run this code as early as possible to avoid
-    doing expensive operations like loading a big list of objects
-    which may be never used when returning early due to the AJAX
-    request.
-    """
-
-    def process_ajax(self):
-        raise NotImplementedError
-
-    def get_ajax_url(self, **url_args):
-        kwargs = request.view_args | request.args.to_dict(False)
-        kwargs.update(url_args)
-        kwargs['__wtf_ajax'] = self.id
-        return url_for(request.endpoint, **kwargs)

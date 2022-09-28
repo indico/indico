@@ -36,6 +36,13 @@ class IndicoMultipass(Multipass):
         return next((p for p in self.identity_providers.values() if p.settings.get('synced_fields')), None)
 
     @property
+    def has_moderated_providers(self):
+        return (
+            config.LOCAL_MODERATION or
+            any(p for p in self.identity_providers.values() if p.settings.get('moderated'))
+        )
+
+    @property
     def synced_fields(self):
         """The keys to be synchronized.
 

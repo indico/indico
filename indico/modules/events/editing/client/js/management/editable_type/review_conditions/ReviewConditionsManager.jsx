@@ -24,10 +24,9 @@ import './ReviewConditionsManager.module.scss';
 export default function ReviewConditionsManager() {
   const {eventId, fileTypes, editableType} = useContext(ReviewConditionsContext);
   const [isAdding, setIsAdding] = useState(false);
-  const {loading, reFetch, data: eventConditionsSetting, lastData} = useIndicoAxios({
-    url: reviewConditionsURL({event_id: eventId, type: editableType}),
-    trigger: eventId,
-  });
+  const {loading, reFetch, data: eventConditionsSetting, lastData} = useIndicoAxios(
+    reviewConditionsURL({event_id: eventId, type: editableType})
+  );
 
   const eventConditions = eventConditionsSetting || lastData;
   if (loading && !lastData) {

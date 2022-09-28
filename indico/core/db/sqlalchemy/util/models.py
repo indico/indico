@@ -19,7 +19,9 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
+from indico.core import signals
 from indico.util.packaging import get_package_root_path
+from indico.util.signals import values_from_signal
 
 
 _ModelT = t.TypeVar('_ModelT', bound='IndicoModel')
@@ -59,6 +61,20 @@ class IndicoBaseQuery(BaseQuery):
         returns either `True` or `False`.
         """
         return self.session.query(self.enable_eagerloads(False).exists()).scalar()
+
+    def signal_query(self, query_name, **kwargs):
+        """Return a query object that may have been modified by a signal handler.
+
+        :param query_name: A descriptive name to provide context to signal handlers.
+        :return: A query object.
+        """
+        queries = values_from_signal(signals.core.db_query.send(query_name, query=self, **kwargs), as_list=True)
+        if not queries:
+            return self
+        elif len(queries) == 1:
+            return queries[0]
+        else:
+            raise RuntimeError(f'Only one subscriber can customize the "{query_name}" query ({len(queries)} found)')
 
 
 class IndicoModel(Model):
@@ -363,7 +379,7 @@ def populate_one_to_one_backrefs(model, *relationships):
                     set_committed_value(getattr(target, name), backref, target)
 
 
-def override_attr(attr_name, parent_name, fget=None):
+def override_attr(attr_name, parent_name, *, fget=None, check_attr_name=None, own_attr_name=None):
     """Create property that overrides an attribute coming from parent.
 
     In order to ensure setter functionality at creation time, ``parent`` must be
@@ -372,20 +388,28 @@ def override_attr(attr_name, parent_name, fget=None):
     :param attr_name: The name of the attribute to be overriden.
     :param parent_name: The name of the attribute from which to override the attribute.
     :param fget: Getter for own property
+    :param check_attr_name: The name of the attribute to check; by default this is `attr_name`,
+                            but in case another attribute should be checked to determine whether
+                            an override is happening or not, it can be provided here.
+    :param own_attr_name: The name of the attribute on the object that has this property; by default
+                          this is ``_<attr_name>``.
     """
 
-    own_attr_name = '_' + attr_name
+    if own_attr_name is None:
+        own_attr_name = '_' + attr_name
 
     def _get(self):
         parent = getattr(self, parent_name)
         attr = getattr(self, own_attr_name)
+        check_attr = getattr(self, check_attr_name or own_attr_name)
         fget_ = (lambda self, __: attr) if fget is None else fget
-        return fget_(self, own_attr_name) if attr is not None or not parent else getattr(parent, attr_name)
+        return fget_(self, own_attr_name) if check_attr is not None or not parent else getattr(parent, attr_name)
 
     def _set(self, value):
         parent = getattr(self, parent_name)
         own_value = getattr(self, own_attr_name)
-        if not parent or own_value is not None or value != getattr(parent, attr_name):
+        always_set = check_attr_name and getattr(self, check_attr_name) is not None
+        if not parent or own_value is not None or value != getattr(parent, attr_name) or always_set:
             setattr(self, own_attr_name, value)
 
     def _expr(cls):

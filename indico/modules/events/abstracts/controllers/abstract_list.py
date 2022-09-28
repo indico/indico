@@ -13,7 +13,6 @@ from sqlalchemy.orm import joinedload, subqueryload
 from webargs import fields
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.controllers.common import (AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
                                                                 AbstractsExportExcel, AbstractsExportPDFMixin,
@@ -26,6 +25,7 @@ from indico.modules.events.abstracts.operations import create_abstract, delete_a
 from indico.modules.events.abstracts.schemas import abstract_review_questions_schema, abstracts_schema
 from indico.modules.events.abstracts.util import can_create_invited_abstracts, make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
+from indico.modules.events.cloning import get_attrs_to_clone
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.util import get_field_values
 from indico.modules.users.models.users import User
@@ -46,6 +46,7 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
     """Base class for RHs performing actions on selected abstracts."""
 
     _abstract_query_options = ()
+    _allow_get_all = False
 
     @property
     def _abstract_query(self):
@@ -56,8 +57,13 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
 
     def _process_args(self):
         RHAbstractListBase._process_args(self)
-        ids = request.form.getlist('abstract_id', type=int)
-        self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
+        query = self._abstract_query
+        if request.method == 'POST' or not self._allow_get_all:
+            # if it's POST we filter by abstract ids; otherwise we assume
+            # the user wants everything (e.g. API-like usage via personal token)
+            ids = request.form.getlist('abstract_id', type=int)
+            query = query.filter(Abstract.id.in_(ids))
+        self.abstracts = query.all()
 
 
 class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
@@ -116,7 +122,7 @@ class RHCreateAbstract(RHAbstractListBase):
         field_names = ['title', 'description', 'submission_comment', 'submitted_for_tracks', 'submitted_contrib_type']
         field_data = {f: getattr(abstract, f) for f in field_names}
         person_links = []
-        link_attrs = get_simple_column_attrs(AbstractPersonLink)
+        link_attrs = get_attrs_to_clone(AbstractPersonLink)
         for old_link in abstract.person_links:
             link = AbstractPersonLink(person=old_link.person)
             link.populate_from_attrs(old_link, link_attrs)
@@ -227,6 +233,7 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
 
 class RHManageAbstractsExportActionsBase(RHManageAbstractsActionsBase):
     ALLOW_LOCKED = True
+    _allow_get_all = True
 
 
 class RHAbstractsDownloadAttachments(AbstractsDownloadAttachmentsMixin, RHManageAbstractsExportActionsBase):

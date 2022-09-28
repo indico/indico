@@ -13,11 +13,14 @@ import AccommodationInput, {
   accommodationSettingsInitialData,
   accommodationSettingsFormValidator,
 } from './AccommodationInput';
-import AccompanyingPersonsInput, {AccompanyingPersonsSettings} from './AccompanyingPersonsInput';
+import AccompanyingPersonsInput, {
+  AccompanyingPersonsSettings,
+  accompanyingPersonsSettingsInitialData,
+} from './AccompanyingPersonsInput';
 import BooleanInput, {BooleanSettings} from './BooleanInput';
 import CheckboxInput, {CheckboxSettings} from './CheckboxInput';
 import {choiceFieldsSettingsFormDecorator} from './ChoicesSetup';
-import CountryInput from './CountryInput';
+import CountryInput, {CountrySettings} from './CountryInput';
 import DateInput, {
   DateSettings,
   dateSettingsFormDecorator,
@@ -63,7 +66,7 @@ Available keys:
 
 const fieldRegistry = {
   label: {
-    title: Translate.string('Static label'),
+    title: Translate.string('Label'),
     inputComponent: LabelInput,
     noRequired: true,
     noRetentionPeriod: true,
@@ -72,11 +75,17 @@ const fieldRegistry = {
     customFormItem: true,
   },
   text: {
-    title: Translate.string('Text'),
+    title: Translate.string('Text field'),
     inputComponent: TextInput,
     settingsComponent: TextSettings,
     settingsFormValidator: textSettingsFormValidator,
     icon: 'textfield',
+  },
+  textarea: {
+    title: Translate.string('Text area'),
+    inputComponent: TextAreaInput,
+    settingsComponent: TextAreaSettings,
+    icon: 'textarea',
   },
   number: {
     title: Translate.string('Number'),
@@ -85,12 +94,6 @@ const fieldRegistry = {
     settingsFormValidator: numberSettingsFormValidator,
     hasPrice: true,
     icon: 'seven-segment9',
-  },
-  textarea: {
-    title: Translate.string('Text area'),
-    inputComponent: TextAreaInput,
-    settingsComponent: TextAreaSettings,
-    icon: 'textarea',
   },
   checkbox: {
     title: Translate.string('Checkbox'),
@@ -124,6 +127,7 @@ const fieldRegistry = {
   country: {
     title: Translate.string('Country'),
     inputComponent: CountryInput,
+    settingsComponent: CountrySettings,
     icon: 'earth',
   },
   file: {
@@ -170,6 +174,7 @@ const fieldRegistry = {
     title: Translate.string('Accompanying Persons'),
     inputComponent: AccompanyingPersonsInput,
     settingsComponent: AccompanyingPersonsSettings,
+    settingsFormInitialData: accompanyingPersonsSettingsInitialData,
     settingsModalSize: 'tiny',
     noRequired: true,
     hasPrice: true,

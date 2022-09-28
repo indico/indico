@@ -18,6 +18,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/util/types_dialog';
+import 'indico/react/components/AffiliationPopup';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import {IButton, ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -41,7 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <ICSCalendarLink
       endpoint="contributions.export_ics"
       params={{event_id: eventId, contrib_id: contributionId}}
-      renderButton={classes => <IButton icon="calendar" classes={classes} />}
+      renderButton={classes => (
+        <IButton icon="calendar" classes={classes} title={Translate.string('Export')} />
+      )}
       options={[{key: 'contribution', text: Translate.string('Contribution'), extraParams: {}}]}
     />,
     calendarContainer
@@ -57,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const availableTypes = JSON.parse(editableSubmissionButton.dataset.availableTypes);
     const {eventId, contributionId, contributionCode} = editableSubmissionButton.dataset;
 
-    let fileTypeResponses, paperInfoResponse, lastRevFiles;
+    let fileTypeResponses, paperInfoResponse;
+    let lastRevFiles = [];
     try {
       [fileTypeResponses, paperInfoResponse] = await Promise.all([
         Promise.all(
@@ -65,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ),
         indicoAxios.get(paperInfoURL({event_id: eventId, contrib_id: contributionId}), {
           validateStatus: status => (status >= 200 && status < 300) || status === 404,
+          headers: {'X-Indico-No-Report-Error': '404'},
         }),
       ]);
     } catch (e) {

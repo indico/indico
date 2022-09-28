@@ -289,7 +289,6 @@ ul.category-list {
       display: block;
       color: lighten($dark-blue, 6%);
       padding: 0 0 0 1em;
-      outline: none;
 
       &.invisible-block {
         color: inherit !important;
@@ -423,7 +422,6 @@ ul.category-resource-qtip {
 
     .protected {
       font-weight: normal;
-      font-size: smaller;
       color: $dark-gray;
     }
 

@@ -27,11 +27,10 @@ import {EditableType, GetNextEditableTitles} from '../../models';
 import './NextEditable.module.scss';
 
 export default function NextEditable({eventId, editableType, onClose, management}) {
-  const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios({
-    url: fileTypesURL({event_id: eventId, type: editableType}),
-    camelize: true,
-    trigger: [eventId, editableType],
-  });
+  const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios(
+    fileTypesURL({event_id: eventId, type: editableType}),
+    {camelize: true}
+  );
 
   if (isLoadingFileTypes) {
     return <Loader active />;

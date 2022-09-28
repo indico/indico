@@ -2,10 +2,42 @@ Changelog
 =========
 
 
+Version 3.2.1
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Enable better image linking UI in CKEditor (:pr:`5492`)
+- Restore the "fullscreen view" option in CKEditor (:pr:`5505`)
+- Display & enforce judging deadline (:pr:`5506`)
+
+Bugfixes
+^^^^^^^^
+
+- Fix meeting minutes being shown when they are expected to be hidden (:pr:`5475`)
+- Force default locale when generating Book of Abstracts (:pr:`5477`)
+- Fix width and height calculation when printing badges (:pr:`5479`)
+- Parse escaped quotes (``&quot;``) in ckeditor output correctly (:pr:`5487`)
+- Fix entering room name if room booking is enabled but has no locations (:pr:`5495`)
+- Fix privacy information dropdown not opening on Safari (:pr:`5507`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Require at least Postgres 13 during new installations. This check can be
+  forced on older Postgres versions (11+ should work), but we make no guarantees
+  that nothing is broken (the latest version we test with is 12) (:pr:`5503`)
+- Refactor service request email generation so plugins can override sender and
+  reply-to addresses for these emails (:pr:`5501`)
+
+
 Version 3.2
 -----------
 
-*Unreleased*
+*Released on August 25, 2022*
 
 Major Features
 ^^^^^^^^^^^^^^
@@ -14,7 +46,7 @@ Major Features
   technology.
 - Registrations can now have a retention period for the whole registration and
   individual fields, after which their data is permanently deleted.
-- Te participant list of an event can now use consent to determine whether a
+- The participant list of an event can now use consent to determine whether a
   participant should be displayed, and its visibility can be different for the
   general public and other registered participants.
 - An event can now have one or more privacy notices and it's possible to set the
@@ -24,7 +56,7 @@ Major Features
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- New translation: German
 
 Improvements
 ^^^^^^^^^^^^
@@ -49,20 +81,71 @@ Improvements
 - Add option to delete persons from the event if they have no roles or other ties
   to the event anymore (:issue:`5294`, :pr:`5313`)
 - Allow events to be favorited (:issue:`1662`, :pr:`5338`, thanks :user:`Leats`)
+- Include abstract content in CSV/Excel export if enabled in the abstract list
+  (:issue:`5356`, :pr:`5372`, thanks :user:`rppt`)
+- Add the ability to include an optional static javascript file when defining
+  custom conference themes from within a plugin (:pr:`5414`, thanks :user:`brittyazel`)
+- Add option to make the 'Affiliation' and 'Comment' fields mandatory in the account
+  request form (:issue:`4819`, :pr:`5389`, thanks :user:`elsbethe`)
+- Include tags in registrant API (:pr:`5441`)
+- Subcontribution speakers can now be granted submission privileges in the event's
+  protection settings (:issue:`2363`, :pr:`5444`)
+- Registration forms can now require a CAPTCHA when the user is not logged in
+  (:issue:`4698`, :pr:`5400`)
+- Account creation now requires a CAPTCHA by default to prevent spam account creation
+  (:issue:`4698`, :pr:`5446`)
+- Add contribution's program code to revision's "Download ZIP" filename (:pr:`5449`)
+- Add UI to manage series of events (:issue:`4048`, :pr:`5436`, thanks :user:`Leats`)
+- Event series can now specify a title pattern to use when cloning an event in the
+  series (:pr:`5456`)
+- Insert new categories into the correct position if the list is already sorted (:pr:`5455`)
+- Images can now be uploaded by pasting or dropping them into the editor for minutes
+  or the event description (:pr:`5458`)
+- Add JSON export for contribution details (:pr:`5460`)
 
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far
+- Fix selected state filters not showing up as selected in abstract list customization
+  (:pr:`5363`)
+- Do not propose an impossible date/time in the Room Booking module when accessing it
+  shortly before midnight (:pr:`5371`)
+- Do not fail when viewing an abstract that has been reviewed in a track which has
+  been deleted in the meantime (:pr:`5386`)
+- Fix error when editing a room's nonbookable periods (:pr:`5390`)
+- Fix incorrect access check when directly accessing a registration form (:pr:`5406`)
+- Fix error in rate limiter when using Redis with a UNIX socket connection (:issue:`5391`)
+- Ensure that submitters with contribution edit privileges can only edit basic fields
+  (:pr:`5425`)
+- Do not return the whole contribution list when editing a contribution from elsewhere
+  (:pr:`5425`)
+- Fix session blocks not being sorted properly in a timetable PDF export when they
+  have the same start time (:pr:`5426`)
+- Fix printing badges containing text elements with malformed HTML (:pr:`5437`,
+  thanks :user:`omegak`)
+- Fix misleading start and end times for Poster contributions in the timetable HTTP API
+  and the contributions placeholder in emails (:pr:`5443`)
+- Do not mark persons as registered if the registration form has been deleted (:pr:`5448`)
+- Fix error when a room owner who is not an admin edits their room (:pr:`5457`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
+- When upgrading an existing instance, Postgres 11 or newer is required. The upgrade will
+  fail on Postgres 9.6 (or 10).
 - Add new ``regform-container-attrs`` template hook to pass additional (data-)attributes
   to the React registration form containers (:pr:`5271`)
 - Add support for JavaScript plugin hooks to register objects or react components for use
   by JS code that's in the core (:pr:`5271`)
 - Plugins can now define custom registration form fields (:pr:`5282`)
+- Add :data:`EMAIL_BACKEND` configuration variable to support different email sending
+  backends e.g. during development (:issue:`5375`, :pr:`5376`, thanks :user:`Moist-Cat`)
+- Make model attrs to clone interceptable by plugins (:pr:`5403`, thanks :user:`omegak`)
+- Add ``signal_query`` method in the ``IndicoBaseQuery`` class and the ``db_query``
+  signal, allowing to intercept and modify queries by signal handlers (:pr:`4981`,
+  thanks :user:`omegak`).
+- Update WYSIWYG editor to CKEditor 5, resulting in a slightly different look for the
+  editor controls and removal of some uncommon format options (:pr:`5345`)
 
 
 ----
@@ -78,6 +161,11 @@ Bugfixes
 
 - Prevent access to a badge design of a deleted category or an event (:issue:`5329`,
   :pr:`5334`, thanks :user:`vasantvohra`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Let payment plugins ignore pending transactions if they are expired (:pr:`5357`)
 
 
 Version 3.1.1

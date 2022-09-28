@@ -24,10 +24,9 @@ export default function TeamManager({editableType, onClose}) {
   const eventId = useNumericParam('event_id');
   const favoriteUsersController = useFavoriteUsers();
 
-  const {data: principals, loading: isLoadingPrincipals} = useIndicoAxios({
-    url: principalsURL({event_id: eventId, type: editableType}),
-    trigger: [eventId, editableType],
-  });
+  const {data: principals, loading: isLoadingPrincipals} = useIndicoAxios(
+    principalsURL({event_id: eventId, type: editableType})
+  );
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);

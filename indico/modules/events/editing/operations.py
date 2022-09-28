@@ -136,6 +136,8 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                        final_state=final_state,
                                        files=_make_editable_files(revision.editable, files),
                                        tags=revision.tags)
+        if action == EditingReviewAction.update_accept:
+            new_revision.reviewed_dt = revision.reviewed_dt
         _ensure_publishable_files(new_revision)
         revision.editable.revisions.append(new_revision)
     db.session.flush()

@@ -29,9 +29,9 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 def test_import_users(dummy_regform):
-    csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com',
-                      b'Jane,Smith,ACME Inc.,CEO,,jane@example.com',
-                      b'Billy Bob,Doe,,,,1337@example.COM'])
+    csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.test',
+                      b'Jane,Smith,ACME Inc.,CEO,,jane@example.test',
+                      b'Billy Bob,Doe,,,,1337@EXAMPLE.test'])
 
     columns = ['first_name', 'last_name', 'affiliation', 'position', 'phone', 'email']
     users = import_user_records_from_csv(BytesIO(csv), columns)
@@ -43,7 +43,7 @@ def test_import_users(dummy_regform):
         'affiliation': 'ACME Inc.',
         'position': 'Regional Manager',
         'phone': '+1-202-555-0140',
-        'email': 'jdoe@example.com',
+        'email': 'jdoe@example.test',
     }
 
     assert users[1] == {
@@ -52,7 +52,7 @@ def test_import_users(dummy_regform):
         'affiliation': 'ACME Inc.',
         'position': 'CEO',
         'phone': '',
-        'email': 'jane@example.com',
+        'email': 'jane@example.test',
     }
 
     assert users[2] == {
@@ -61,17 +61,17 @@ def test_import_users(dummy_regform):
         'affiliation': '',
         'position': '',
         'phone': '',
-        'email': '1337@example.com',
+        'email': '1337@example.test',
     }
 
 
 def test_import_users_error(create_user):
     columns = ['first_name', 'last_name', 'affiliation', 'position', 'phone', 'email']
-    user = create_user(123, email='test1@example.com')
-    user.secondary_emails.add('test2@example.com')
+    user = create_user(123, email='test1@example.test')
+    user.secondary_emails.add('test2@example.test')
 
     # missing column
-    csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com',
+    csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.test',
                       b'Buggy,Entry,ACME Inc.,CEO,'])
 
     with pytest.raises(UserValueError) as e:
@@ -80,7 +80,7 @@ def test_import_users_error(create_user):
     assert 'Row 2' in str(e.value)
 
     # missing e-mail
-    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
+    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.test',
                       b'Buggy,Entry,ACME Inc.,CEO,,'])
 
     with pytest.raises(UserValueError) as e:
@@ -89,7 +89,7 @@ def test_import_users_error(create_user):
     assert 'Row 2' in str(e.value)
 
     # bad e-mail
-    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
+    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.test',
                       b'Buggy,Entry,ACME Inc.,CEO,,not-an-email'])
 
     with pytest.raises(UserValueError) as e:
@@ -98,8 +98,8 @@ def test_import_users_error(create_user):
     assert 'Row 2' in str(e.value)
 
     # duplicate e-mail
-    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.com',
-                      b'Bob,Doe,ACME Inc.,Boss,,bdoe@example.com'])
+    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,bdoe@example.test',
+                      b'Bob,Doe,ACME Inc.,Boss,,bdoe@example.test'])
 
     with pytest.raises(UserValueError) as e:
         import_user_records_from_csv(BytesIO(csv), columns)
@@ -107,16 +107,16 @@ def test_import_users_error(create_user):
     assert 'Row 2' in str(e.value)
 
     # duplicate user
-    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,test1@example.com',
-                      b'Little,Boss,ACME Inc.,Wannabe Leader,+1-202-555-1338,test2@EXAMPLE.com'])
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,test1@example.test',
+                      b'Little,Boss,ACME Inc.,Wannabe Leader,+1-202-555-1338,test2@EXAMPLE.test'])
 
     with pytest.raises(UserValueError) as e:
         import_user_records_from_csv(BytesIO(csv), columns)
     assert 'Row 2: email address belongs to the same user as in row 1' in str(e.value)
 
     # missing first name
-    csv = b'\n'.join([b'Ray,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,rdoe@example.com',
-                      b',Buggy,ACME Inc.,CEO,,buggy@example.com'])
+    csv = b'\n'.join([b'Ray,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,rdoe@example.test',
+                      b',Buggy,ACME Inc.,CEO,,buggy@example.test'])
 
     with pytest.raises(UserValueError) as e:
         import_user_records_from_csv(BytesIO(csv), columns)
@@ -125,9 +125,9 @@ def test_import_users_error(create_user):
 
 
 def test_import_registrations(dummy_regform, dummy_user):
-    csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.com',
-                      b'Jane,Smith,ACME Inc.,CEO,,jane@example.com',
-                      b'Billy Bob,Doe,,,,1337@example.COM'])
+    csv = b'\n'.join([b'John,Doe,ACME Inc.,Regional Manager,+1-202-555-0140,jdoe@example.test',
+                      b'Jane,Smith,ACME Inc.,CEO,,jane@example.test',
+                      b'Billy Bob,Doe,,,,1337@EXAMPLE.test'])
     registrations = import_registrations_from_csv(dummy_regform, BytesIO(csv))
     assert len(registrations) == 3
 
@@ -135,7 +135,7 @@ def test_import_registrations(dummy_regform, dummy_user):
     assert registrations[0].user is None
     data = registrations[0].get_personal_data()
     assert data['affiliation'] == 'ACME Inc.'
-    assert data['email'] == 'jdoe@example.com'
+    assert data['email'] == 'jdoe@example.test'
     assert data['position'] == 'Regional Manager'
     assert data['phone'] == '+1-202-555-0140'
 
@@ -143,7 +143,7 @@ def test_import_registrations(dummy_regform, dummy_user):
     assert registrations[1].user is None
     data = registrations[1].get_personal_data()
     assert data['affiliation'] == 'ACME Inc.'
-    assert data['email'] == 'jane@example.com'
+    assert data['email'] == 'jane@example.test'
     assert data['position'] == 'CEO'
     assert 'phone' not in data
 
@@ -151,13 +151,13 @@ def test_import_registrations(dummy_regform, dummy_user):
     assert registrations[2].user == dummy_user
     data = registrations[2].get_personal_data()
     assert 'affiliation' not in data
-    assert data['email'] == '1337@example.com'
+    assert data['email'] == '1337@example.test'
     assert 'position' not in data
     assert 'phone' not in data
 
 
 def test_import_registrations_error(dummy_regform, dummy_user):
-    dummy_user.secondary_emails.add('dummy@example.com')
+    dummy_user.secondary_emails.add('dummy@example.test')
 
     create_registration(dummy_regform, {
         'email': dummy_user.email,
@@ -166,13 +166,13 @@ def test_import_registrations_error(dummy_regform, dummy_user):
     }, notify_user=False)
 
     create_registration(dummy_regform, {
-        'email': 'boss@example.com',
+        'email': 'boss@example.test',
         'first_name': 'Big',
         'last_name': 'Boss'
     }, notify_user=False)
 
     # duplicate e-mail
-    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,boss@example.com'])
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,boss@example.test'])
 
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
@@ -180,7 +180,7 @@ def test_import_registrations_error(dummy_regform, dummy_user):
     assert 'Row 1' in str(e.value)
 
     # duplicate user
-    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,dummy@example.com'])
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,Supreme Leader,+1-202-555-1337,dummy@example.test'])
 
     with pytest.raises(UserValueError) as e:
         import_registrations_from_csv(dummy_regform, BytesIO(csv))
@@ -192,10 +192,10 @@ def test_import_invitations(monkeypatch, dummy_regform, dummy_user):
     monkeypatch.setattr('indico.modules.events.registration.util.notify_invitation', lambda *args, **kwargs: None)
 
     # normal import with no conflicts
-    csv = b'\n'.join([b'Bob,Doe,ACME Inc.,bdoe@example.com',
-                      b'Jane,Smith,ACME Inc.,jsmith@example.com'])
+    csv = b'\n'.join([b'Bob,Doe,ACME Inc.,bdoe@example.test',
+                      b'Jane,Smith,ACME Inc.,jsmith@example.test'])
     invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                                       email_from='noreply@example.com', email_subject='invitation',
+                                                       email_from='noreply@example.test', email_subject='invitation',
                                                        email_body='Invitation to event',
                                                        skip_moderation=False, skip_existing=True)
     assert len(invitations) == 2
@@ -204,28 +204,28 @@ def test_import_invitations(monkeypatch, dummy_regform, dummy_user):
     assert invitations[0].first_name == 'Bob'
     assert invitations[0].last_name == 'Doe'
     assert invitations[0].affiliation == 'ACME Inc.'
-    assert invitations[0].email == 'bdoe@example.com'
+    assert invitations[0].email == 'bdoe@example.test'
     assert not invitations[0].skip_moderation
 
     assert invitations[1].first_name == 'Jane'
     assert invitations[1].last_name == 'Smith'
     assert invitations[1].affiliation == 'ACME Inc.'
-    assert invitations[1].email == 'jsmith@example.com'
+    assert invitations[1].email == 'jsmith@example.test'
     assert not invitations[1].skip_moderation
 
 
 def test_import_invitations_duplicate_invitation(monkeypatch, dummy_regform, dummy_user):
     monkeypatch.setattr('indico.modules.events.registration.util.notify_invitation', lambda *args, **kwargs: None)
 
-    invitation = RegistrationInvitation(skip_moderation=True, email='awang@example.com', first_name='Amy',
+    invitation = RegistrationInvitation(skip_moderation=True, email='awang@example.test', first_name='Amy',
                                         last_name='Wang', affiliation='ACME Inc.')
     dummy_regform.invitations.append(invitation)
 
     # duplicate invitation with 'skip_existing=True'
-    csv = b'\n'.join([b'Amy,Wang,ACME Inc.,awang@example.com',
-                      b'Jane,Smith,ACME Inc.,jsmith@example.com'])
+    csv = b'\n'.join([b'Amy,Wang,ACME Inc.,awang@example.test',
+                      b'Jane,Smith,ACME Inc.,jsmith@example.test'])
     invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                                       email_from='noreply@example.com', email_subject='invitation',
+                                                       email_from='noreply@example.test', email_subject='invitation',
                                                        email_body='Invitation to event',
                                                        skip_moderation=True, skip_existing=True)
     assert len(invitations) == 1
@@ -234,7 +234,7 @@ def test_import_invitations_duplicate_invitation(monkeypatch, dummy_regform, dum
     assert invitations[0].first_name == 'Jane'
     assert invitations[0].last_name == 'Smith'
     assert invitations[0].affiliation == 'ACME Inc.'
-    assert invitations[0].email == 'jsmith@example.com'
+    assert invitations[0].email == 'jsmith@example.test'
     assert invitations[0].skip_moderation
 
 
@@ -242,16 +242,16 @@ def test_import_invitations_duplicate_registration(monkeypatch, dummy_regform):
     monkeypatch.setattr('indico.modules.events.registration.util.notify_invitation', lambda *args, **kwargs: None)
 
     create_registration(dummy_regform, {
-        'email': 'boss@example.com',
+        'email': 'boss@example.test',
         'first_name': 'Big',
         'last_name': 'Boss'
     }, notify_user=False)
 
     # duplicate registration with 'skip_existing=True'
-    csv = b'\n'.join([b'Big,Boss,ACME Inc.,boss@example.com',
-                      b'Jane,Smith,ACME Inc.,jsmith@example.com'])
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,boss@example.test',
+                      b'Jane,Smith,ACME Inc.,jsmith@example.test'])
     invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                                       email_from='noreply@example.com', email_subject='invitation',
+                                                       email_from='noreply@example.test', email_subject='invitation',
                                                        email_body='Invitation to event',
                                                        skip_moderation=True, skip_existing=True)
     assert len(invitations) == 1
@@ -260,14 +260,14 @@ def test_import_invitations_duplicate_registration(monkeypatch, dummy_regform):
     assert invitations[0].first_name == 'Jane'
     assert invitations[0].last_name == 'Smith'
     assert invitations[0].affiliation == 'ACME Inc.'
-    assert invitations[0].email == 'jsmith@example.com'
+    assert invitations[0].email == 'jsmith@example.test'
     assert invitations[0].skip_moderation
 
 
 def test_import_invitations_duplicate_user(monkeypatch, dummy_regform, dummy_user):
     monkeypatch.setattr('indico.modules.events.registration.util.notify_invitation', lambda *args, **kwargs: None)
 
-    dummy_user.secondary_emails.add('dummy@example.com')
+    dummy_user.secondary_emails.add('dummy@example.test')
     create_registration(dummy_regform, {
         'email': dummy_user.email,
         'first_name': dummy_user.first_name,
@@ -275,10 +275,10 @@ def test_import_invitations_duplicate_user(monkeypatch, dummy_regform, dummy_use
     }, notify_user=False)
 
     # duplicate user with 'skip_existing=True'
-    csv = b'\n'.join([b'Big,Boss,ACME Inc.,dummy@example.com',
-                      b'Jane,Smith,ACME Inc.,jsmith@example.com'])
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,dummy@example.test',
+                      b'Jane,Smith,ACME Inc.,jsmith@example.test'])
     invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                                       email_from='noreply@example.com', email_subject='invitation',
+                                                       email_from='noreply@example.test', email_subject='invitation',
                                                        email_body='Invitation to event',
                                                        skip_moderation=True, skip_existing=True)
     assert len(invitations) == 1
@@ -287,12 +287,12 @@ def test_import_invitations_duplicate_user(monkeypatch, dummy_regform, dummy_use
     assert invitations[0].first_name == 'Jane'
     assert invitations[0].last_name == 'Smith'
     assert invitations[0].affiliation == 'ACME Inc.'
-    assert invitations[0].email == 'jsmith@example.com'
+    assert invitations[0].email == 'jsmith@example.test'
     assert invitations[0].skip_moderation
 
 
 def test_import_invitations_error(dummy_regform, dummy_user):
-    dummy_user.secondary_emails.add('dummy@example.com')
+    dummy_user.secondary_emails.add('dummy@example.test')
 
     create_registration(dummy_regform, {
         'email': dummy_user.email,
@@ -301,42 +301,42 @@ def test_import_invitations_error(dummy_regform, dummy_user):
     }, notify_user=False)
 
     create_registration(dummy_regform, {
-        'email': 'boss@example.com',
+        'email': 'boss@example.test',
         'first_name': 'Big',
         'last_name': 'Boss'
     }, notify_user=False)
 
-    invitation = RegistrationInvitation(skip_moderation=True, email='bdoe@example.com', first_name='Bill',
+    invitation = RegistrationInvitation(skip_moderation=True, email='bdoe@example.test', first_name='Bill',
                                         last_name='Doe', affiliation='ACME Inc.')
     dummy_regform.invitations.append(invitation)
 
     # duplicate e-mail (registration)
-    csv = b'\n'.join([b'Big,Boss,ACME Inc.,boss@example.com'])
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,boss@example.test'])
 
     with pytest.raises(UserValueError) as e:
         import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                    email_from='noreply@example.com', email_subject='invitation',
+                                    email_from='noreply@example.test', email_subject='invitation',
                                     email_body='Invitation to event',
                                     skip_moderation=False, skip_existing=False)
     assert 'a registration with this email already exists' in str(e.value)
     assert 'Row 1' in str(e.value)
 
     # duplicate user
-    csv = b'\n'.join([b'Big,Boss,ACME Inc.,dummy@example.com'])
+    csv = b'\n'.join([b'Big,Boss,ACME Inc.,dummy@example.test'])
 
     with pytest.raises(UserValueError) as e:
         import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                    email_from='noreply@example.com', email_subject='invitation',
+                                    email_from='noreply@example.test', email_subject='invitation',
                                     email_body='Invitation to event',
                                     skip_moderation=False, skip_existing=False)
     assert 'a registration for this user already exists' in str(e.value)
     assert 'Row 1' in str(e.value)
 
     # duplicate email (invitation)
-    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,bdoe@example.com'])
+    csv = b'\n'.join([b'Bill,Doe,ACME Inc.,bdoe@example.test'])
     with pytest.raises(UserValueError) as e:
         import_invitations_from_csv(dummy_regform, BytesIO(csv),
-                                    email_from='noreply@example.com', email_subject='invitation',
+                                    email_from='noreply@example.test', email_subject='invitation',
                                     email_body='Invitation to event',
                                     skip_moderation=False, skip_existing=False)
     assert 'an invitation for this user already exists' in str(e.value)
@@ -394,26 +394,26 @@ def test_get_event_regforms_registration(dummy_event, dummy_user, dummy_regform,
 @pytest.mark.usefixtures('dummy_reg')
 def test_get_registered_event_persons(dummy_event, dummy_user, dummy_regform):
     create_registration(dummy_regform, {
-        'email': 'john@example.com',
+        'email': 'john@example.test',
         'first_name': 'John',
         'last_name': 'Doe',
     }, notify_user=False)
 
     user_person = EventPerson.create_from_user(dummy_user, dummy_event)
     no_user_person = EventPerson(
-        email='john@example.com',
+        email='john@example.test',
         first_name='John',
         last_name='Doe'
     )
 
     create_registration(dummy_regform, {
-        'email': 'jane@example.com',
+        'email': 'jane@example.test',
         'first_name': 'Jane',
         'last_name': 'Doe',
     }, notify_user=False)
 
     no_user_no_reg = EventPerson(
-        email='noshow@example.com',
+        email='noshow@example.test',
         first_name='No',
         last_name='Show'
     )
@@ -627,7 +627,7 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
 
     assert get_user_data(dummy_regform, None) == {}
 
-    expected = {'email': '1337@example.com', 'first_name': 'Guinea',
+    expected = {'email': '1337@example.test', 'first_name': 'Guinea',
                 'last_name': 'Pig'}
 
     user_data = get_user_data(dummy_regform, dummy_user)
@@ -644,18 +644,18 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
     assert user_data['phone'] == '+1 22 50 14'
 
     # Check that data is taken from the invitation
-    invitation = RegistrationInvitation(skip_moderation=True, email='awang@example.com', first_name='Amy',
+    invitation = RegistrationInvitation(skip_moderation=True, email='awang@example.test', first_name='Amy',
                                         last_name='Wang', affiliation='ACME Inc.')
     dummy_regform.invitations.append(invitation)
 
     dummy_user.title = None
     user_data = get_user_data(dummy_regform, dummy_user, invitation)
-    assert user_data == {'email': 'awang@example.com', 'first_name': 'Amy', 'last_name': 'Wang',
+    assert user_data == {'email': 'awang@example.test', 'first_name': 'Amy', 'last_name': 'Wang',
                          'phone': '+1 22 50 14', 'address': 'Geneva', 'affiliation': 'ACME Inc.'}
 
     # Check that data is taken from the invitation when user is missing
     user_data = get_user_data(dummy_regform, None, invitation)
-    assert user_data == {'email': 'awang@example.com', 'first_name': 'Amy', 'last_name': 'Wang',
+    assert user_data == {'email': 'awang@example.test', 'first_name': 'Amy', 'last_name': 'Wang',
                          'affiliation': 'ACME Inc.'}
 
     # Check that data from disabled/deleted fields is not used
@@ -674,7 +674,7 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
     user_data = get_user_data(dummy_regform, dummy_user)
     assert 'title' not in user_data
     assert 'phone' not in user_data
-    assert user_data == {'email': '1337@example.com', 'first_name': 'Guinea',
+    assert user_data == {'email': '1337@example.test', 'first_name': 'Guinea',
                          'last_name': 'Pig', 'address': 'Geneva'}
 
     for item in dummy_regform.active_fields:

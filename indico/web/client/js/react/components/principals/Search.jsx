@@ -523,11 +523,9 @@ const WithExternalsContext = React.createContext(false);
 const UserSearchFields = () => {
   const withExternals = useContext(WithExternalsContext);
 
-  const {data} = useIndicoAxios({
-    url: userSearchInfoURL(),
-    trigger: withExternals,
-    forceDispatchEffect: () => withExternals,
+  const {data} = useIndicoAxios(userSearchInfoURL(), {
     camelize: true,
+    manual: !withExternals,
   });
 
   const hasExternals = data && data.externalUsersAvailable;
@@ -579,11 +577,24 @@ const InnerUserSearch = searchFactory({
     }
     const resultData = camelizeKeys(response.data);
     resultData.results = resultData.users.map(
-      ({identifier, id, fullName, email, affiliation, firstName, lastName, avatarURL}) => ({
+      ({
+        identifier,
+        id,
+        title,
+        fullName,
+        email,
+        affiliation,
+        affiliationId,
+        affiliationMeta,
+        firstName,
+        lastName,
+        avatarURL,
+      }) => ({
         identifier,
         type: PrincipalType.user,
         userId: id,
         id,
+        title,
         name: fullName,
         detail: affiliation ? `${email} (${affiliation})` : email,
         firstName,
@@ -591,6 +602,8 @@ const InnerUserSearch = searchFactory({
         existsInEvent: false,
         email,
         affiliation,
+        affiliationId,
+        affiliationMeta,
         avatarURL,
       })
     );
@@ -604,17 +617,33 @@ const InnerUserSearch = searchFactory({
       }
       const epResultData = camelizeKeys(epResponse.data);
       epResultData.results = epResultData.users.map(
-        ({identifier, id, fullName, email, affiliation, firstName, lastName, userIdentifier}) => ({
+        ({
+          identifier,
+          id,
+          title,
+          name,
+          email,
+          affiliation,
+          affiliationId,
+          affiliationMeta,
+          firstName,
+          lastName,
+          userIdentifier,
+        }) => ({
           identifier,
           type: PrincipalType.eventPerson,
           id,
-          name: fullName,
+          personId: id,
+          title,
+          name,
           detail: affiliation ? `${email} (${affiliation})` : email,
           firstName,
           lastName,
           existsInEvent: true,
           email,
           affiliation,
+          affiliationId,
+          affiliationMeta,
           userIdentifier,
         })
       );

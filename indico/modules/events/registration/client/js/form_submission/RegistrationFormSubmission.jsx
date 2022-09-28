@@ -10,8 +10,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
-import {Message} from 'semantic-ui-react';
+import {Form, Message} from 'semantic-ui-react';
 
+import {Captcha} from 'indico/react/components';
 import {
   FinalSubmitButton,
   handleSubmitError,
@@ -68,12 +69,14 @@ function ConsentToPublish({publishToParticipants, publishToPublic}) {
           </Translate>
         </p>
       )}
-      <ConsentToPublishDropdown
-        name="consent_to_publish"
-        publishToParticipants={publishToParticipants}
-        publishToPublic={publishToPublic}
-        useFinalForms
-      />
+      <Form as="div">
+        <ConsentToPublishDropdown
+          name="consent_to_publish"
+          publishToParticipants={publishToParticipants}
+          publishToPublic={publishToPublic}
+          useFinalForms
+        />
+      </Form>
     </Message>
   );
 }
@@ -85,7 +88,13 @@ ConsentToPublish.propTypes = {
 
 export default function RegistrationFormSubmission() {
   const sections = useSelector(getNestedSections);
-  const {submitUrl, registrationData, initialValues} = useSelector(getStaticData);
+  const {
+    submitUrl,
+    registrationData,
+    initialValues,
+    captchaRequired,
+    captchaSettings,
+  } = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
   const isManagement = useSelector(getManagement);
@@ -104,6 +113,8 @@ export default function RegistrationFormSubmission() {
 
     if (resp.data.redirect) {
       location.href = resp.data.redirect;
+      // never finish submitting to avoid fields being re-enabled
+      await new Promise(() => {});
     }
   };
 
@@ -129,6 +140,7 @@ export default function RegistrationFormSubmission() {
                 publishToPublic={publishToPublic}
               />
             )}
+            {captchaRequired && <Captcha settings={captchaSettings} />}
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}

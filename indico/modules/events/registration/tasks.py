@@ -66,7 +66,7 @@ def delete_field_data():
     db.session.commit()
 
 
-@celery.periodic_task(name='registration_retention_period', run_every=crontab(minute='0', hour='3'))
+@celery.periodic_task(name='registration_retention_period', run_every=crontab(minute='30', hour='3'))
 def delete_registrations():
     is_expired = db.and_(RegistrationForm.retention_period.isnot(None),
                          db.cast(Event.end_dt, db.Date) + RegistrationForm.retention_period <= now_utc().date())

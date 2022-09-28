@@ -240,6 +240,13 @@ class Registration(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether the registration was created by a manager
+    created_by_manager = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
     #: The Event containing this registration
     event = db.relationship(
         'Event',
@@ -687,7 +694,13 @@ class Registration(db.Model):
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the registration."""
-        self.event.log(*args, meta={'registration_id': self.id}, **kwargs)
+        return self.event.log(*args, meta={'registration_id': self.id}, **kwargs)
+
+    def is_pending_transaction_expired(self):
+        """Check if the registration has a pending transaction that expired."""
+        if not self.transaction or self.transaction.status != TransactionStatus.pending:
+            return False
+        return self.transaction.is_pending_expired()
 
 
 class RegistrationData(StoredFileMixin, db.Model):

@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -11,14 +11,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-11-23 13:42+0100\n"
-"PO-Revision-Date: 2021-11-23 12:43+0000\n"
-"Last-Translator: Adrian\n"
+"POT-Creation-Date: 2022-08-18 18:00+0200\n"
+"PO-Revision-Date: 2011-07-07 13:45+0000\n"
+"Last-Translator: Adrian, 2021\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
@@ -79,47 +79,33 @@ msgstr[1] "{0} події"
 msgstr[2] "{0} подій"
 msgstr[3] "{0} подій"
 
-#: indico/modules/categories/client/js/display.js:166
-msgid "Remove from your favorites"
-msgstr "Видалити з вибраного"
-
-#: indico/modules/categories/client/js/display.js:169
-msgid "Add to your favorites"
-msgstr "Додати до вибраного"
-
-#: indico/modules/categories/client/js/display.js:171
-msgid ""
-"This will make events in this category visible on your <a "
-"href=\"{0}\">Dashboard</a>."
-msgstr "Це зробить події у даній категорії видимими у вашій <a href=\"{0}\">Інформаційній панелі</a>."
-
-#: indico/modules/categories/client/js/management.js:56
-#: indico/modules/events/management/client/js/index.js:295
+#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/events/management/client/js/index.js:327
 msgid "Undo"
 msgstr "Відкотити"
 
-#: indico/modules/categories/client/js/management.js:58
+#: indico/modules/categories/client/js/management.js:59
 msgid "The category order has been restored."
 msgstr "Порядок категорії було відновлено."
 
-#: indico/modules/categories/client/js/management.js:60
+#: indico/modules/categories/client/js/management.js:61
 msgid "The category list has been sorted."
 msgstr "Список категорій відсортовано"
 
-#: indico/modules/categories/client/js/management.js:178
+#: indico/modules/categories/client/js/management.js:184
 msgid "Delete category"
 msgstr "Видалити категорію"
 
-#: indico/modules/categories/client/js/management.js:182
+#: indico/modules/categories/client/js/management.js:188
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Категорію неможливо видалити, оскільки вона не порожня."
 
-#: indico/modules/categories/client/js/management.js:190
+#: indico/modules/categories/client/js/management.js:196
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "Принаймні одна з вибраних категорій не може бути видалена, оскільки вона не порожня."
 
-#: indico/modules/categories/client/js/management.js:195
+#: indico/modules/categories/client/js/management.js:201
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "Видалити вибрану категорію"
@@ -127,15 +113,15 @@ msgstr[1] "Видалити {0} вибрані категорії"
 msgstr[2] "Видалити {0} вибраних категорій"
 msgstr[3] "Видалити {0} вибраних категорій"
 
-#: indico/modules/categories/client/js/management.js:203
+#: indico/modules/categories/client/js/management.js:209
 msgid "Select the categories to delete first."
 msgstr "Виберіть категорію перш ніж видалити."
 
-#: indico/modules/categories/client/js/management.js:212
+#: indico/modules/categories/client/js/management.js:218
 msgid "Delete categories"
 msgstr "Видалити категорії"
 
-#: indico/modules/categories/client/js/management.js:232
+#: indico/modules/categories/client/js/management.js:238
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "Перемістити вибрану категорію"
@@ -143,13 +129,13 @@ msgstr[1] "Перемістити {0} вибрані категорії"
 msgstr[2] "Перемістити {0} вибраних категорій"
 msgstr[3] "Перемістити {0} вибраних категорій"
 
-#: indico/modules/categories/client/js/management.js:239
+#: indico/modules/categories/client/js/management.js:245
 msgid "Select the categories to move first."
 msgstr "Вибрати категорії для переміщення."
 
-#: indico/modules/categories/client/js/management.js:268
+#: indico/modules/categories/client/js/management.js:274
 #: indico/modules/vc/client/js/index.js:54
-#: indico/web/client/js/jquery/utils/forms.js:401
+#: indico/web/client/js/jquery/utils/forms.js:405
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "Захід в цій категорії вибрано."
@@ -157,7 +143,7 @@ msgstr[1] "Всі {0} заходи в цій категорії вибрано."
 msgstr[2] "Всі {0} заходів в цій категорії вибрано."
 msgstr[3] "Всі {0} заходів в цій категорії вибрано."
 
-#: indico/modules/categories/client/js/management.js:273
+#: indico/modules/categories/client/js/management.js:279
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "Лише {0} з {1} заходів зараз вибрано."
@@ -165,11 +151,11 @@ msgstr[1] "Лише {0} з {1} заходів зараз вибрано."
 msgstr[2] "Лише {0} з {1} заходів зараз вибрано."
 msgstr[3] "Лише {0} з {1} заходів зараз вибрано."
 
-#: indico/modules/categories/client/js/management.js:352
+#: indico/modules/categories/client/js/management.js:358
 msgid "Move here"
 msgstr "Перемістити сюди"
 
-#: indico/modules/categories/client/js/management.js:353
+#: indico/modules/categories/client/js/management.js:359
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "Перемістити категорію"
@@ -177,7 +163,7 @@ msgstr[1] "Перемістити категорії"
 msgstr[2] "Перемістити категорії"
 msgstr[3] "Перемістити категорії"
 
-#: indico/modules/categories/client/js/management.js:355
+#: indico/modules/categories/client/js/management.js:361
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Виберіть батьківську категорію для вибраної категорії"
@@ -185,7 +171,7 @@ msgstr[1] "Виберіть батьківську категорію для {0}
 msgstr[2] "Виберіть батьківську категорію для {0} вибраних категорій"
 msgstr[3] "Виберіть батьківську категорію для {0} вибраних категорій"
 
-#: indico/modules/categories/client/js/management.js:371
+#: indico/modules/categories/client/js/management.js:377
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Вибрана категорія вже тут"
@@ -193,7 +179,7 @@ msgstr[1] "Вибрані категорії вже тут"
 msgstr[2] "Вибрані категорії вже тут"
 msgstr[3] "Вибрані категорії вже тут"
 
-#: indico/modules/categories/client/js/management.js:379
+#: indico/modules/categories/client/js/management.js:385
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Це категорія, яку ви намагаєтесь перемістити"
@@ -258,75 +244,85 @@ msgid ""
 msgstr "Ваш сервер Indico не синхронізований з мережевим вузлом! Ви можете вирішити цю проблему <a href=\"{0}\"> тут </a>."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:707
+#: indico/modules/designer/client/js/index.js:847
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "Звороти шаблонів, що містять це, буде видалено."
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:710
+#: indico/modules/designer/client/js/index.js:850
 msgid "Disassociate back sides"
 msgstr "Роз'єднати звороти"
 
-#: indico/modules/designer/client/js/index.js:90
-#: indico/modules/designer/client/js/index.js:233
+#: indico/modules/designer/client/js/index.js:95
 msgid "Fixed text"
 msgstr "Фіксований текст"
 
-#: indico/modules/designer/client/js/index.js:497
+#: indico/modules/designer/client/js/index.js:587
 msgid "Please choose a name for the template"
 msgstr "Будь ласка, виберіть назву  для шаблону"
 
-#: indico/modules/designer/client/js/index.js:497
-#: indico/modules/designer/client/js/index.js:503
-#: indico/web/client/js/jquery/widgets/principalfield.js:114
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:165
+#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:593
+#: indico/modules/designer/client/js/index.js:602
 msgid "Warning"
 msgstr "Увага"
 
-#: indico/modules/designer/client/js/index.js:502
+#: indico/modules/designer/client/js/index.js:592
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "Шаблон не може пустим. Додайте кілька елементів або фонове зображення."
 
-#: indico/modules/designer/client/js/index.js:529
+#: indico/modules/designer/client/js/index.js:599
+msgid ""
+"The Fixed image element cannot be empty. Upload an image inside it or remove"
+" it."
+msgstr ""
+
+#: indico/modules/designer/client/js/index.js:628
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Ви впевнені, що хочете змінити розміри цього шаблону?"
 
-#: indico/modules/designer/client/js/index.js:698
-msgid "This back side template will be removed"
-msgstr "Цей шаблон звороту буде видалено."
-
-#: indico/modules/designer/client/js/index.js:700
-msgid "The back side of this template will be removed"
-msgstr "Шаблон цього звороту буде видалено"
-
-#: indico/modules/designer/client/js/index.js:701
-msgid "Disassociate back side"
-msgstr "Відділити зворот"
-
-#: indico/modules/designer/client/js/index.js:705
-msgid "The back side is empty."
-msgstr "Цей зворот порожній."
-
-#: indico/modules/designer/client/js/index.js:820
-msgid "Error"
-msgstr "Помилка"
-
-#: indico/modules/designer/client/js/index.js:937
+#: indico/modules/designer/client/js/index.js:772
+#: indico/modules/designer/client/js/index.js:1124
 msgid "Choose a file"
 msgstr "Вибрати файл"
 
-#: indico/modules/events/abstracts/client/js/index.js:78
-#: indico/modules/events/abstracts/client/js/index.js:91
+#: indico/modules/designer/client/js/index.js:780
+msgid "Fixed Image"
+msgstr ""
+
+#: indico/modules/designer/client/js/index.js:838
+msgid "This back side template will be removed"
+msgstr "Цей шаблон звороту буде видалено."
+
+#: indico/modules/designer/client/js/index.js:840
+msgid "The back side of this template will be removed"
+msgstr "Шаблон цього звороту буде видалено"
+
+#: indico/modules/designer/client/js/index.js:841
+msgid "Disassociate back side"
+msgstr "Відділити зворот"
+
+#: indico/modules/designer/client/js/index.js:845
+msgid "The back side is empty."
+msgstr "Цей зворот порожній."
+
+#: indico/modules/designer/client/js/index.js:983
+#: indico/modules/designer/client/js/index.js:997
+msgid "Error"
+msgstr "Помилка"
+
+#: indico/modules/events/abstracts/client/js/index.js:75
+#: indico/modules/events/abstracts/client/js/index.js:88
 msgid "Show preview"
 msgstr "Показати попередній варіант"
 
-#: indico/modules/events/abstracts/client/js/index.js:82
+#: indico/modules/events/abstracts/client/js/index.js:79
 msgid "Hide preview"
 msgstr "Сховати попередній варіант"
 
-#: indico/modules/events/client/js/display.js:174
+#: indico/modules/events/client/js/display.js:175
 msgid "Edit minutes"
 msgstr "Редагувати протокол"
 
@@ -338,16 +334,16 @@ msgstr "Налаштування елементів меню"
 msgid "{0} out of {1} displayed"
 msgstr "Показано {0} з {1}"
 
-#: indico/modules/events/client/js/util/static_filters.js:59
+#: indico/modules/events/client/js/util/static_filters.js:61
 msgid "There are no entries that match your search criteria."
 msgstr "Жодних елементів, які підходять під пошуковий запит, не знайдено."
 
-#: indico/modules/events/management/client/js/index.js:293
+#: indico/modules/events/management/client/js/index.js:325
 msgid "Undoing previous operation..."
 msgstr "Скасування попередньої операції..."
 
-#: indico/modules/events/registration/client/js/index.js:59
-#: indico/modules/events/registration/client/js/registration.js:39
+#: indico/modules/events/registration/client/js/index.js:54
+#: indico/modules/events/registration/client/js/registration.js:42
 msgid "Terms and Conditions"
 msgstr "Правила та умови"
 
@@ -362,189 +358,6 @@ msgstr[0] "Ви дійсно бажаєте видалити  вибрану р�
 msgstr[1] "Ви дійсно бажаєте видалити {0} вибраних реєстрацій?"
 msgstr[2] "Ви дійсно бажаєте видалити {0} вибраних реєстрацій?"
 msgstr[3] "Ви дійсно бажаєте видалити {0} вибраних реєстрацій?"
-
-#: indico/modules/events/registration/client/js/form/field.js:144
-msgid "New Field"
-msgstr "Нове поле"
-
-#: indico/modules/events/registration/client/js/form/field.js:144
-msgid "Edit Field"
-msgstr "Редагувати поле"
-
-#: indico/modules/events/registration/client/js/form/field.js:147
-msgid "Add"
-msgstr "Додати "
-
-#: indico/modules/events/registration/client/js/form/field.js:147
-msgid "Update"
-msgstr "Оновити"
-
-#: indico/modules/events/registration/client/js/form/field.js:181
-msgid "There is already a registration with this email address."
-msgstr "Уже наявна реєстрація з цією електронною поштою."
-
-#: indico/modules/events/registration/client/js/form/field.js:183
-msgid "The user associated with this email address is already registered."
-msgstr "Користувач, пов'язаний з цією електронною поштою, вже зареєстрований."
-
-#: indico/modules/events/registration/client/js/form/field.js:185
-msgid "There is no Indico user associated with this email address."
-msgstr "Користувачі Indico з цією електронною поштою відсутні."
-
-#: indico/modules/events/registration/client/js/form/field.js:190
-msgid "This email address is not associated with your Indico account."
-msgstr "Цю електронну пошту не пов'язано із вашим профілем Indico"
-
-#: indico/modules/events/registration/client/js/form/field.js:193
-msgid ""
-"The registration will be re-associated to a different user "
-"(<strong>{0}</strong>)."
-msgstr "Реєстрацію буде перепов'язано із іншим користувачем (<strong>{0}</strong>)."
-
-#: indico/modules/events/registration/client/js/form/field.js:199
-msgid ""
-"The registration will be disassociated from the current user "
-"(<strong>{0}</strong>)."
-msgstr "Реєстрацію буде відв'язано від  поточного користувача (<strong>{0}</strong>)."
-
-#: indico/modules/events/registration/client/js/form/field.js:205
-msgid "The domain used in the email address does not exist."
-msgstr "Домену цієї електронної пошти не існує"
-
-#: indico/modules/events/registration/client/js/form/field.js:207
-msgid "This email address is invalid."
-msgstr "Неправильна адреса електронної пошти"
-
-#: indico/modules/events/registration/client/js/form/field.js:210
-msgid "The registration will not be associated with any Indico account."
-msgstr "Ця реєстрація не буде прив'язана до жодного профілю Indico"
-
-#: indico/modules/events/registration/client/js/form/field.js:212
-msgid "The registration will be associated with your Indico account."
-msgstr "Ця реєстрація буде прив'язана  до вашого профілю Indico"
-
-#: indico/modules/events/registration/client/js/form/field.js:215
-msgid ""
-"The registration will remain associated with the Indico account "
-"<strong>{0}</strong>."
-msgstr "Реєстрація залишиться пов'язаною з акаунтом Indico  <strong>{0}</strong>."
-
-#: indico/modules/events/registration/client/js/form/field.js:221
-msgid ""
-"The registration will be associated with the Indico account "
-"<strong>{0}</strong>."
-msgstr "Реєстрація буде пов'язана з акаунтом Indico <strong>{0}</strong>."
-
-#: indico/modules/events/registration/client/js/form/field.js:242
-msgid "Checking email address..."
-msgstr "Перевірка адреси електронної пошти..."
-
-#: indico/modules/events/registration/client/js/form/field.js:398
-msgid "Checkbox"
-msgstr "Галочка"
-
-#: indico/modules/events/registration/client/js/form/field.js:421
-msgid "Country"
-msgstr "Країна"
-
-#: indico/modules/events/registration/client/js/form/field.js:453
-msgid "Date"
-msgstr "Дата"
-
-#: indico/modules/events/registration/client/js/form/field.js:469
-msgid "File"
-msgstr "Файл"
-
-#: indico/modules/events/registration/client/js/form/field.js:485
-msgid "Free Text"
-msgstr "Довільний текст"
-
-#: indico/modules/events/registration/client/js/form/field.js:501
-msgid "Number"
-msgstr "Число"
-
-#: indico/modules/events/registration/client/js/form/field.js:640
-msgid "Choice"
-msgstr "Вибір"
-
-#: indico/modules/events/registration/client/js/form/field.js:700
-#: indico/modules/events/registration/client/js/form/field.js:1155
-msgid "Caption"
-msgstr "Назва"
-
-#: indico/modules/events/registration/client/js/form/field.js:701
-#: indico/modules/events/registration/client/js/form/field.js:1078
-#: indico/modules/events/registration/client/js/form/field.js:1156
-msgid "Billable"
-msgstr "Тарифікований"
-
-#: indico/modules/events/registration/client/js/form/field.js:702
-#: indico/modules/events/registration/client/js/form/field.js:1079
-#: indico/modules/events/registration/client/js/form/field.js:1157
-msgid "Price"
-msgstr "Вартість"
-
-#: indico/modules/events/registration/client/js/form/field.js:703
-#: indico/modules/events/registration/client/js/form/field.js:1080
-#: indico/modules/events/registration/client/js/form/field.js:1158
-msgid "Places limit"
-msgstr "Обмеження місць"
-
-#: indico/modules/events/registration/client/js/form/field.js:704
-#: indico/modules/events/registration/client/js/form/field.js:1159
-msgid "Max. extra slots"
-msgstr "Макс. дод. слотів"
-
-#: indico/modules/events/registration/client/js/form/field.js:705
-#: indico/modules/events/registration/client/js/form/field.js:1160
-msgid "Extra slots pay"
-msgstr "Плата за дод. слоти"
-
-#: indico/modules/events/registration/client/js/form/field.js:706
-#: indico/modules/events/registration/client/js/form/field.js:1081
-#: indico/modules/events/registration/client/js/form/field.js:1161
-msgid "Enabled"
-msgstr "Доступно"
-
-#: indico/modules/events/registration/client/js/form/field.js:803
-msgid "Phone"
-msgstr "Номер телефону"
-
-#: indico/modules/events/registration/client/js/form/field.js:817
-msgid "Text"
-msgstr "Текст"
-
-#: indico/modules/events/registration/client/js/form/field.js:834
-msgid "Textarea"
-msgstr "Текстова область"
-
-#: indico/modules/events/registration/client/js/form/field.js:850
-msgid "Yes/No"
-msgstr "Так/Ні"
-
-#: indico/modules/events/registration/client/js/form/field.js:869
-msgid "Email address"
-msgstr "Адреса електронної пошти"
-
-#: indico/modules/events/registration/client/js/form/field.js:992
-msgid "Title of the \"None\" option"
-msgstr "Назва для опції “Нічого”"
-
-#: indico/modules/events/registration/client/js/form/field.js:999
-msgid "Accommodation"
-msgstr "Розміщення"
-
-#: indico/modules/events/registration/client/js/form/field.js:1077
-msgid "Accommodation option"
-msgstr "Варіант розміщення"
-
-#: indico/modules/events/registration/client/js/form/field.js:1144
-msgid "Multi choice"
-msgstr "Множинний вибір"
-
-#: indico/modules/events/registration/client/js/form/sectiontoolbar.js:44
-msgid "Add new field"
-msgstr "Додати нове поле"
 
 #: indico/modules/events/sessions/client/js/index.js:118
 msgid "Filter types"
@@ -633,11 +446,11 @@ msgstr "Попередній"
 msgid "Something went wrong"
 msgstr "Щось пішло не так"
 
-#: indico/web/client/js/jquery/utils/forms.js:16
+#: indico/web/client/js/jquery/utils/forms.js:19
 msgid "The passwords do not match."
 msgstr "Паролі не співпадають"
 
-#: indico/web/client/js/jquery/utils/forms.js:74
+#: indico/web/client/js/jquery/utils/forms.js:69
 msgid "Field must be at least {0} character long."
 msgid_plural "Field must be at least {0} characters long."
 msgstr[0] "Поле повинно містити щонайменше {0} літеру."
@@ -645,7 +458,7 @@ msgstr[1] "Поле повинно містити щонайменше {0} лі�
 msgstr[2] "Поле повинно містити щонайменше {0} літер."
 msgstr[3] "Поле повинно містити щонайменше {0} літер."
 
-#: indico/web/client/js/jquery/utils/forms.js:82
+#: indico/web/client/js/jquery/utils/forms.js:77
 msgid "Field cannot be longer than {0} character."
 msgid_plural "Field cannot be longer than {0} characters."
 msgstr[0] "Поле не може містити більше ніж {0} літеру."
@@ -653,11 +466,11 @@ msgstr[1] "Поле не може містити більше ніж {0} літ�
 msgstr[2] "Поле не може містити більше ніж {0} літер."
 msgstr[3] "Поле не може містити більше ніж {0} літер."
 
-#: indico/web/client/js/jquery/utils/forms.js:90
+#: indico/web/client/js/jquery/utils/forms.js:85
 msgid "Field must be between {0} and {1} characters long."
 msgstr "Поле повинно містити щонайменше {0}  та щонайбільше {1} літер."
 
-#: indico/web/client/js/jquery/utils/forms.js:96
+#: indico/web/client/js/jquery/utils/forms.js:91
 msgid "Field must contain at least {0} word."
 msgid_plural "Field must contain at least {0} words."
 msgstr[0] "Поле має містити принаймні {0} слово. "
@@ -665,7 +478,7 @@ msgstr[1] "Поле має містити принаймні {0} слова. "
 msgstr[2] "Поле має містити принаймні {0} слів. "
 msgstr[3] "Поле має містити принаймні {0} слів.  "
 
-#: indico/web/client/js/jquery/utils/forms.js:104
+#: indico/web/client/js/jquery/utils/forms.js:99
 msgid "Field cannot contain more than {0} word."
 msgid_plural "Field cannot contain more than {0} words."
 msgstr[0] "Поле має містити більше, ніж {0} слово. "
@@ -673,24 +486,24 @@ msgstr[1] "Поле має містити більше, ніж {0} слів. "
 msgstr[2] "Поле має містити більше, ніж {0} слів. "
 msgstr[3] "Поле має містити більше, ніж {0} слів. "
 
-#: indico/web/client/js/jquery/utils/forms.js:112
+#: indico/web/client/js/jquery/utils/forms.js:107
 msgid "Field must contain between {0} and {1} words."
 msgstr "Поле повинно містити щонайменше {0}  та щонайбільше {1} слів."
 
-#: indico/web/client/js/jquery/utils/forms.js:130
+#: indico/web/client/js/jquery/utils/forms.js:125
 msgid "Save now"
 msgstr "Зберегти зараз"
 
-#: indico/web/client/js/jquery/utils/forms.js:131
+#: indico/web/client/js/jquery/utils/forms.js:126
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "Збереження..."
 
-#: indico/web/client/js/jquery/utils/forms.js:132
+#: indico/web/client/js/jquery/utils/forms.js:127
 msgid "Do not forget to save your changes!"
 msgstr "Не забудьте зберегти ваші зміни!"
 
-#: indico/web/client/js/jquery/utils/forms.js:407
+#: indico/web/client/js/jquery/utils/forms.js:411
 msgid "Only {0} out of {1} rows is currently selected"
 msgid_plural "Only {0} out of {1} rows are currently selected."
 msgstr[0] "Лише {0} з {1} зараз вибрано."
@@ -698,11 +511,11 @@ msgstr[1] "Лише {0} з {1} зараз вибрано."
 msgstr[2] "Лише {0} з {1} зараз вибрано."
 msgstr[3] "Лише {0} з {1}  зараз вибрано."
 
-#: indico/web/client/js/jquery/utils/forms.js:446
+#: indico/web/client/js/jquery/utils/forms.js:450
 msgid "Select only the current page."
 msgstr "Вибрати лише поточну сторінку"
 
-#: indico/web/client/js/jquery/utils/forms.js:460
+#: indico/web/client/js/jquery/utils/forms.js:464
 msgid "Click here to select them all."
 msgstr "Натистіть тут щоб виділити всіх."
 
@@ -729,7 +542,6 @@ msgstr "Збережено"
 
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:161
 msgid "Save"
 msgstr "Зберегти"
 
@@ -838,11 +650,11 @@ msgstr "Очистити пошук"
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Ви вибрали категорію <em> {0} </em>. Ви впевнені, що хочете продовжити? "
 
-#: indico/web/client/js/jquery/widgets/itempicker.js:21
+#: indico/web/client/js/jquery/widgets/itempicker.js:23
 msgid "Type to filter..."
 msgstr "Вкажіть фільтр..."
 
-#: indico/web/client/js/jquery/widgets/misc.js:89
+#: indico/web/client/js/jquery/widgets/misc.js:58
 msgid "You can copy the URL below using CTRL + C (&#8984; + C on OSX):"
 msgstr "Ви можете скопіювати URL-адресу нижче, використовуючи CTRL + C(&#8984; + C для OSX):"
 
@@ -859,19 +671,6 @@ msgstr "Видалити"
 #: indico/web/client/js/jquery/widgets/multitextfield.js:353
 msgid "Empty values are not allowed."
 msgstr "Пусті значення не допускаються."
-
-#: indico/web/client/js/jquery/widgets/principalfield.js:113
-msgid "There is already another person with this email address."
-msgstr "Уже існує користувач із заданою адресою електронної пошти."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:193
-#: indico/web/client/js/jquery/widgets/principalfield.js:121
-msgid "Edit information"
-msgstr "Редагувати інформацію"
-
-#: indico/web/client/js/jquery/widgets/principalfield.js:140
-msgid "Enter person"
-msgstr "Вписати людину"
 
 #: indico/web/client/js/jquery/widgets/rulelistwidget.js:60
 msgid "Select an option"
@@ -911,9 +710,7 @@ msgid "Edit"
 msgstr "Редагувати"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:49
-#: indico/web/client/js/legacy/angular/directives.js:68
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:413
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:186
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:354
 #: indico/web/client/js/legacy/libs/timetable/Management.js:670
 msgid "Cancel"
 msgstr "Відміна"
@@ -994,217 +791,9 @@ msgstr "Керівники заходу"
 msgid "Registrants in \"{0}\""
 msgstr "Реєстранти в \"{0}\""
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:179
-msgid "Speaker"
-msgstr "Доповідач"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:190
-msgid "Remove person"
-msgstr "Видалити особу"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:196
-msgid "Configure roles"
-msgstr "Налаштувати ролі"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:211
-msgid "Submitter"
-msgstr "Подавач"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:259
-msgid "or"
-msgstr "або"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:280
-msgid "Move to authors"
-msgstr "Перемістити до авторів"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:286
-msgid "Move to co-authors"
-msgstr "Перемістити до співавторів"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:293
-msgid "Move to others"
-msgstr "Перемістити до інших"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:299
-msgid "Not a speaker anymore"
-msgstr "Більше не доповідач"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
-msgid "Make a speaker"
-msgstr "Зробити доповідачем"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:311
-msgid "People in the 'Others' section <strong>must</strong> be speakers."
-msgstr "Люди у секції “Інші” <strong>повинні</strong> бути доповідачами."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:331
-msgid "Revoke submission rights"
-msgstr "Відкликати права подачі"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:332
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:32
-msgid "Grant submission rights"
-msgstr "Дозволити подачу"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:398
-msgid "Custom sorting has been applied. Click to restore alphabetical order."
-msgstr "Застосовано користувацьке сортування. Натисніть для повернення впорядкування за абеткою."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:400
-msgid "Alphabetical sorting is ON. Click to turn it off."
-msgstr "Ввімкнено сортування за абеткою. Клікніть для вимкнення."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
-msgid "You must add at least one speaker"
-msgstr "Ви маєте додати хоча б одного доповідача"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
-msgid "You must add at least one submitter"
-msgstr "Ви маєте додати хоча б одного подавача"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:451
-msgid "You must add at least one co-author"
-msgstr "Ви маєте додати хоча б одного співавтора"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:454
-msgid "You must add at least one author"
-msgstr "Ви маєте додати хоча б одного автора"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:459
-msgid ""
-"You cannot have users in the Other section, please make them authors or co-"
-"authors"
-msgstr "Ви не можете мати користувачів у секції “Інші”, зробіть їх авторами або співавторами"
-
-#: indico/web/client/js/legacy/angular/directives.js:67
-msgid "Ok"
-msgstr "Гаразд"
-
-#: indico/web/client/js/legacy/angular/directives.js:115
-msgid "The content of this dialog is currently unavailable."
-msgstr "Вміст цього діалогового вікна наразі недоступний."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:243
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:245
 msgid "OK"
 msgstr "Гаразд"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:367
-msgid "Reason: "
-msgstr "Причина:"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:38
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:57
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:77
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:92
-msgid "Note:"
-msgstr "Примітка:"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:39
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:58
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:78
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:93
-msgid " If this person does not already have an Indico account, "
-msgstr "Якщо в цього користувача немає акаунта в Indico,"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:41
-msgid "he or she will be sent an email asking to register as a user."
-msgstr "то, аби пройти реєстрацію, він/вона отримає лист на електронну пошту."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:43
-msgid " After the registration the user will automatically be given"
-msgstr "Після реєстрації користувачу автоматично буде надано"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:45
-msgid " submission rights."
-msgstr "дозвіл на подачу."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:51
-msgid "Give management rights"
-msgstr "Надати права на керування"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:60
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:80
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:95
-msgid "he or she will be sent an email asking to create an account."
-msgstr "він або вона отримає на електронну пошту листа із запрошенням створити акаунт."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:62
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:82
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:97
-msgid " After the account creation the user will automatically be"
-msgstr "Після створення акаунта користувачу автоматично буде"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:64
-msgid " given management rights."
-msgstr "надано права керування."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:71
-msgid "Give coordination rights"
-msgstr "Надати координаційні права"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:84
-msgid " given coordination rights."
-msgstr "надано координаціні права."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:99
-msgid " given the rights."
-msgstr "надано права."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:106
-#: indico/web/client/js/legacy/libs/timetable/Management.js:21
-msgid "Title"
-msgstr "Звернення"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:111
-msgid "Mr"
-msgstr "Пан"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:112
-msgid "Mrs"
-msgstr "Пані"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:113
-msgid "Ms"
-msgstr "Пані"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:114
-msgid "Dr"
-msgstr "Д-р."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:115
-msgid "Prof."
-msgstr "Проф."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:121
-msgid "Family Name"
-msgstr "Прізвище"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:128
-msgid "First Name"
-msgstr "Ім'я"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:132
-msgid "Affiliation"
-msgstr "Організація"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:136
-msgid "Email"
-msgstr "Адреса електронної пошти"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:146
-msgid "Address"
-msgstr "Адреса"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:147
-msgid "Telephone"
-msgstr "Номер телефону"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:166
-msgid ""
-"It is not possible to grant submission rights to a participant without an "
-"email address. Please set an email address."
-msgstr "Неможливо дозволити подачу учасникам без адреси електронної пошти. Будь ласка, вкажіть цю адресу."
 
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:465
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:473
@@ -1216,52 +805,44 @@ msgstr "Попередній рядок"
 msgid "Next tab"
 msgstr "Наступна вкладка"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Widgets/RichText.js:212
-msgid "switch to plain text"
-msgstr "переключитись на вихідний текст"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Widgets/RichText.js:213
-msgid "switch to rich text"
-msgstr "переключитись на редагований текст"
-
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:309
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:267
 msgid "At least one must be selected"
 msgstr "Потрібно вибрати хоча б одну опцію"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:313
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:271
 msgid "Please enable the checkbox"
 msgstr "Будь ласка, поставте галочку"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:317
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:321
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:275
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:279
 msgid "Please choose an option"
 msgstr "Будь ласка, виберіть опцію"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:328
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:286
 msgid "Field must be a number"
 msgstr "Поле має містити число"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:340
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:298
 msgid "Field must be a positive number"
 msgstr "Поле має містити додатне число"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:346
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:304
 msgid "Date format is not valid. It should be dd/mm/yyyy hh:mm"
 msgstr "Неправильний формат дати. Рекомендований формат - dd/mm/yyyy hh:mm"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:352
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:310
 msgid "Invalid e-mail address"
 msgstr "Неіснуюча адреса електронної пошти"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:358
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:316
 msgid "Invalid URL"
 msgstr "Неіснуючий URL"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:360
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:318
 msgid "Time format is not valid. It should be hh:mm"
 msgstr "Неправильний формат часу. Рекомендований формат - hh:mm"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:366
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:324
 msgid "Field is mandatory"
 msgstr "Обов'язкове поле"
 
@@ -1573,6 +1154,10 @@ msgstr "Немає"
 #: indico/web/client/js/legacy/libs/timetable/Management.js:19
 msgid "ID"
 msgstr "ID"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:21
+msgid "Title"
+msgstr "Звернення"
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:24
 msgid "Sort by: "

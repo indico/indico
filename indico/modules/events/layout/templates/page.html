@@ -11,7 +11,8 @@
             <a href="#"
                class="i-button icon-edit"
                data-href="{{ url_for('event_layout.menu_entry_edit', page.menu_entry) }}"
-               data-title="{% trans %}Edit page{% endtrans %}"
+               data-title
+               title="{% trans %}Edit page{% endtrans %}"
                data-ajax-dialog
                data-reload-after></a>
         </div>
@@ -19,5 +20,5 @@
 {% endblock %}
 
 {% block content %}
-    {{ page.html|sanitize_html }}
+    <div class="ck-output">{{ page.html|sanitize_html }}</div>
 {% endblock %}

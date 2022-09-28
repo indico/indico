@@ -9,10 +9,11 @@ from flask import jsonify, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
-from indico.modules.attachments.controllers.management.base import (AddAttachmentFilesMixin, AddAttachmentLinkMixin,
-                                                                    CreateFolderMixin, DeleteAttachmentMixin,
-                                                                    DeleteFolderMixin, EditAttachmentMixin,
-                                                                    EditFolderMixin, ManageAttachmentsMixin)
+from indico.modules.attachments.controllers.management.base import (AddAttachmentCKEditorMixin, AddAttachmentFilesMixin,
+                                                                    AddAttachmentLinkMixin, CreateFolderMixin,
+                                                                    DeleteAttachmentMixin, DeleteFolderMixin,
+                                                                    EditAttachmentMixin, EditFolderMixin,
+                                                                    ManageAttachmentsMixin)
 from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.attachments.views import WPEventAttachments, WPPackageEventAttachmentsManagement
 from indico.modules.events.controllers.base import RHEventBase
@@ -50,6 +51,10 @@ class RHAttachmentManagementInfoColumn(RHEventAttachmentManagementBase):
     def _process(self):
         tpl = get_template_module('attachments/_management_info_column.html')
         return jsonify(html=tpl.render_attachment_info(self.object))
+
+
+class RHAddEventAttachmentCKEditor(AddAttachmentCKEditorMixin, RHEventAttachmentManagementBase):
+    pass
 
 
 class RHAddEventAttachmentFiles(AddAttachmentFilesMixin, RHEventAttachmentManagementBase):

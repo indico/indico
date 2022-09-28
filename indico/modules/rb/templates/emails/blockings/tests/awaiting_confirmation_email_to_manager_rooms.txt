@@ -1,0 +1,19 @@
+Dear Guinea,
+
+Guinea Pig has created a blocking for some rooms you manage.
+
+Rooms:
+    1/2-3
+    1/2-3
+    
+Reason: Blocked
+Dates: 11 Nov 2022 - 11 Nov 2022
+
+You can approve or reject this blocking request here:
+http://localhost/rooms/blocking/1
+
+
+--
+Best regards,
+Indico :: Room Booking
+http://localhost/rooms/

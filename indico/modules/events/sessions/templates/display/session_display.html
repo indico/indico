@@ -60,10 +60,10 @@
             </div>
         {%- endif %}
         <div class="group">
-            <a href="{{ url_for('sessions.export_session_timetable', sess) }}" class="i-button icon-file-pdf"></a>
+            <a href="{{ url_for('sessions.export_session_timetable', sess) }}" class="i-button icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"></a>
             {% if sess.start_dt -%}
                 {% if g.static_site %}
-                    <a href="{{ url_for('sessions.export_ics', sess) }}" class="i-button icon-calendar"></a>
+                    <a href="{{ url_for('sessions.export_ics', sess) }}" class="i-button icon-calendar" title="{% trans %}Export{% endtrans %}"></a>
                 {% else %}
                     <div id="session-calendar-link" data-session-id="{{ sess.id }}" data-event-id="{{ sess.event_id }}"
                          data-session-contrib-count="{{ sess.contributions|length }}"></div>

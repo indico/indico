@@ -9,8 +9,8 @@
 String manipulation functions
 """
 
-
 import binascii
+import os
 import re
 import string
 import unicodedata
@@ -23,6 +23,7 @@ import bleach
 import email_validator
 import markdown
 import translitcodec
+from bleach.css_sanitizer import CSSSanitizer
 from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html
@@ -33,7 +34,7 @@ from sqlalchemy import ForeignKeyConstraint, inspect
 # basic list of tags, used for markdown content
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + [
     'sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr', 'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4',
-    'h5', 'h6', 'pre', 'dl', 'dd', 'dt'
+    'h5', 'h6', 'pre', 'dl', 'dd', 'dt', 'figure', 'blockquote'
 ]
 BLEACH_ALLOWED_ATTRIBUTES = {**bleach.ALLOWED_ATTRIBUTES, 'img': ['src', 'alt', 'style']}
 # extended list of tags, used for HTML content
@@ -202,8 +203,9 @@ def validate_email(email, *, check_dns=True):
     This checks both if it looks valid and if it has valid
     MX (or A/AAAA) records.
     """
+    testing = 'PYTEST_CURRENT_TEST' in os.environ
     try:
-        email_validator.validate_email(email, check_deliverability=check_dns)
+        email_validator.validate_email(email, check_deliverability=check_dns, test_environment=testing)
     except email_validator.EmailNotValidError:
         return False
     else:
@@ -466,9 +468,25 @@ def sanitize_email(email, require_valid=False):
         return None
 
 
+class IndicoCSSSanitizer(CSSSanitizer):
+    """Correctly parse escaped quotes.
+
+    ckeditor puts `&quot;` around font family names:
+    https://github.com/ckeditor/ckeditor4/issues/2750
+
+    However, the css parser used by bleach cannot handle escaped quotes inside
+    the style attribute and filters them out which breaks the styling.
+    """
+
+    def sanitize_css(self, style):
+        style = style.replace('&quot;', '"')
+        return super().sanitize_css(style)
+
+
 def sanitize_html(string):
+    css_sanitizer = IndicoCSSSanitizer(allowed_css_properties=BLEACH_ALLOWED_STYLES_HTML)
     return bleach.clean(string, tags=BLEACH_ALLOWED_TAGS_HTML, attributes=BLEACH_ALLOWED_ATTRIBUTES_HTML,
-                        styles=BLEACH_ALLOWED_STYLES_HTML)
+                        css_sanitizer=css_sanitizer)
 
 
 def html_to_plaintext(string):
@@ -544,3 +562,8 @@ def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mod
         if RichMarkup(desc)._preformatted:
             desc = desc.replace('\n', '<br>\n')
         field.data = ht.handle(desc)
+
+
+def get_format_placeholders(format_str):
+    """Get the format placeholders from a string."""
+    return [name for text, name, spec, conv in string.Formatter().parse(format_str) if name is not None]

@@ -26,16 +26,13 @@ export default function ReduxTimeline() {
   const contributionId = useNumericParam('contrib_id');
   const {type: editableType} = useParams();
 
-  const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios({
-    url: fileTypesURL({event_id: eventId, type: editableType}),
-    camelize: true,
-    trigger: [eventId, editableType],
-  });
+  const {data: fileTypes, loading: isLoadingFileTypes} = useIndicoAxios(
+    fileTypesURL({event_id: eventId, type: editableType}),
+    {camelize: true}
+  );
 
-  const {data: tags, loading: isLoadingTags} = useIndicoAxios({
-    url: tagsURL({event_id: eventId}),
+  const {data: tags, loading: isLoadingTags} = useIndicoAxios(tagsURL({event_id: eventId}), {
     camelize: true,
-    trigger: [eventId],
   });
 
   if (isLoadingFileTypes || isLoadingTags) {

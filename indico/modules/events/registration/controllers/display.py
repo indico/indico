@@ -14,6 +14,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.core.captcha import get_captcha_settings, invalidate_captcha
 from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
@@ -33,7 +34,7 @@ from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.marshmallow import UUIDString
+from indico.util.marshmallow import LowercaseString, UUIDString
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
@@ -92,7 +93,7 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
             raise Forbidden
 
     def _check_access(self):
-        if not self.token and self.registration:
+        if not self.token:
             RHRegistrationFormBase._check_access(self)
 
 
@@ -142,7 +143,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .filter(Registration.is_state_publishable, ~RegistrationForm.is_deleted)
                  .join(Registration.registration_form)
                  .options(subqueryload('data').joinedload('field_data'),
-                          contains_eager('registration_form')))
+                          contains_eager('registration_form'))
+                 .signal_query('merged-participant-list-publishable-registrations', event=self.event))
         is_participant = self.event.is_user_registered(session.user)
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
                                                      for reg in query if reg.is_publishable(is_participant)),
@@ -188,7 +190,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .options(subqueryload('data'))
                  .order_by(db.func.lower(Registration.first_name),
                            db.func.lower(Registration.last_name),
-                           Registration.friendly_id))
+                           Registration.friendly_id)
+                 .signal_query('participant-list-publishable-registrations', regform=regform))
         is_participant = self.event.is_user_registered(session.user)
         registrations = [_process_registration(reg, column_ids, active_fields) for reg in query
                          if reg.is_publishable(is_participant)]
@@ -202,6 +205,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         regforms = (RegistrationForm.query.with_parent(self.event)
                     .filter(RegistrationForm.is_participant_list_visible(self.event.is_user_registered(session.user)))
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
+                    .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())
         if registration_settings.get(self.event, 'merge_registration_forms'):
             tables = [self._merged_participant_list_table()]
@@ -255,13 +259,13 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
     ALLOW_PROTECTED_EVENT = True
 
     @use_kwargs({
-        'email': fields.String(required=True),
+        'email': LowercaseString(required=True),
         'update': UUIDString(load_default=None),
         'management': fields.Bool(load_default=False),
     }, location='query')
     def _process_args(self, email, update, management):
         RHRegistrationFormBase._process_args(self)
-        self.email = email.lower()
+        self.email = email
         self.update = update
         self.management = management
         self.existing_registration = self.regform.get_registration(uuid=self.update) if self.update else None
@@ -302,6 +306,11 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
             return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
 
+    @property
+    def _captcha_required(self):
+        """Whether a CAPTCHA should be displayed when registering."""
+        return session.user is None and self.regform.require_captcha
+
     def _can_register(self):
         if self.regform.limit_reached:
             return False
@@ -317,14 +326,17 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if not self._can_register():
             raise ExpectedError(_('You cannot register for this event'))
 
-        schema = make_registration_schema(self.regform)()
+        schema = make_registration_schema(self.regform, captcha_required=self._captcha_required)()
         form_data = parser.parse(schema)
         registration = create_registration(self.regform, form_data, self.invitation)
+        invalidate_captcha()
         return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
 
     def _process_GET(self):
         user_data = get_user_data(self.regform, session.user, self.invitation)
         initial_values = get_initial_form_values(self.regform) | user_data
+        if self._captcha_required:
+            initial_values |= {'captcha': None}
         return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
                                                form_data=get_flat_section_submission_data(self.regform),
@@ -335,7 +347,9 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                registration=self.registration,
                                                management=False,
                                                login_required=self.regform.require_login and not session.user,
-                                               is_restricted_access=self.is_restricted_access)
+                                               is_restricted_access=self.is_restricted_access,
+                                               captcha_required=self._captcha_required,
+                                               captcha_settings=get_captcha_settings())
 
 
 class RHUploadRegistrationFile(UploadFileMixin, RHRegistrationFormBase):

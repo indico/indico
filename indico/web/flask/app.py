@@ -114,7 +114,7 @@ def configure_multipass(app, config):
     if config.LOCAL_IDENTITIES:
         configure_multipass_local(app)
     app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
-                                                  'address'}
+                                                  'address', 'affiliation_data'}
     app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
     app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
     app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'categories.display'
@@ -145,7 +145,7 @@ def configure_webpack(app):
 
 def configure_emails(app, config):
     # TODO: use more straightforward mapping between EMAIL_* app settings and indico.conf settings
-    app.config['EMAIL_BACKEND'] = 'indico.vendor.django_mail.backends.smtp.EmailBackend'
+    app.config['EMAIL_BACKEND'] = config.EMAIL_BACKEND
     app.config['EMAIL_HOST'] = config.SMTP_SERVER[0]
     app.config['EMAIL_PORT'] = config.SMTP_SERVER[1]
     app.config['EMAIL_HOST_USER'] = config.SMTP_LOGIN

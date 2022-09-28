@@ -151,13 +151,18 @@ import {$T} from '../../utils/i18n';
         // Handle AJAX dialog
         if (dialog) {
           var closeButton = $this.data('close-button');
+          let title = $this.data('title');
+          if (!title && title !== undefined) {
+          // if `data-title` is present without a value, fall back to the title attr
+          title = $this.attr('title') || $this.data('qtip-oldtitle');
+          }
           ajaxDialog({
             trigger: $this,
             url: url,
             method: method,
             data: params,
             content: $(content).html(),
-            title: $this.data('title'),
+            title,
             subtitle: $this.data('subtitle'),
             closeButton: closeButton === undefined ? false : closeButton || true,
             dialogClasses: $this.data('dialog-classes'),

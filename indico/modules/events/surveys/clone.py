@@ -6,8 +6,7 @@
 # LICENSE file for more details.
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.util.i18n import _
 
@@ -34,7 +33,7 @@ class EventSurveyCloner(EventCloner):
         return any(survey for survey in event.surveys if not survey.is_deleted)
 
     def _clone_surveys(self, new_event):
-        survey_attrs = get_simple_column_attrs(Survey) - {'uuid', 'start_dt', 'end_dt', '_last_friendly_submission_id'}
+        survey_attrs = get_attrs_to_clone(Survey, skip={'uuid', 'start_dt', 'end_dt', '_last_friendly_submission_id'})
         for old_survey in self.old_event.surveys:
             if old_survey.is_deleted:
                 continue
@@ -55,5 +54,5 @@ class EventSurveyCloner(EventCloner):
     def _clone_item(self, survey, old_item):
         item_cls = type(old_item)
         item = item_cls(survey=survey)
-        item.populate_from_attrs(old_item, get_simple_column_attrs(item_cls))
+        item.populate_from_attrs(old_item, get_attrs_to_clone(item_cls))
         return item

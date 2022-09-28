@@ -7,6 +7,7 @@
 
 import _ from 'lodash';
 import moment from 'moment';
+import 'moment-timezone';
 
 export function toMoment(dt, format, strict = false) {
   if (!dt) {
@@ -28,22 +29,10 @@ export function serializeTime(dt, format = moment.HTML5_FMT.TIME) {
 }
 
 export async function setMomentLocale(locale) {
-  const parts = locale.toLowerCase().split('_'); // e.g. `en_GB` or `zh_Hans_CN`
-  const language = parts[0];
-  const territory = parts[parts.length - 1];
-  let momentLocale;
-
-  if (language === territory || language === 'uk') {
-    // XXX: see the comment on `moment_lang` in Python regarding this ugly hack
-    momentLocale = language;
-  } else {
-    momentLocale = `${language}-${territory}`;
+  if (locale !== 'en' && locale !== 'en-us') {
+    await import(/* webpackChunkName: "moment-locale/[request]" */ `moment/locale/${locale}`);
   }
-
-  if (momentLocale !== 'en' && momentLocale !== 'en-us') {
-    await import(/* webpackChunkName: "moment-locale/[request]" */ `moment/locale/${momentLocale}`);
-  }
-  moment.locale([momentLocale, 'en']);
+  moment.locale([locale, 'en']);
 }
 
 export function dayRange(start, end, step = 1) {

@@ -137,6 +137,12 @@ class EventPerson(PersonMixin, db.Model):
         nullable=False,
         default=UserTitle.none
     )
+    #: the id of the underlying predefined affiliation
+    affiliation_id = db.Column(
+        db.ForeignKey('indico.affiliations.id'),
+        nullable=True,
+        index=True
+    )
     affiliation = db.Column(
         db.String,
         nullable=False,
@@ -181,6 +187,15 @@ class EventPerson(PersonMixin, db.Model):
             lazy='dynamic'
         )
     )
+    affiliation_link = db.relationship(
+        'Affiliation',
+        lazy=False,
+        backref=db.backref(
+            'event_person_affiliations',
+            lazy='dynamic',
+            cascade_backrefs=False
+        )
+    )
 
     # relationship backrefs:
     # - abstract_links (AbstractPersonLink.person)
@@ -211,13 +226,20 @@ class EventPerson(PersonMixin, db.Model):
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):
         return EventPerson(user=user, event=event, first_name=user.first_name, last_name=user.last_name,
-                           email=user.email, affiliation=user.affiliation, address=user.address, phone=user.phone,
+                           title=user._title, email=user.email, affiliation=user.affiliation,
+                           affiliation_link=user.affiliation_link, address=user.address, phone=user.phone,
                            is_untrusted=is_untrusted)
 
     @classmethod
     def for_user(cls, user, event=None, is_untrusted=False):
         """Return EventPerson for a matching User in Event creating if needed."""
         person = event.persons.filter_by(user=user).first() if event else None
+        email_person = event.persons.filter(EventPerson.email.in_(user.all_emails)).first() if event else None
+        if not person and email_person:
+            if email_person.user is None:
+                email_person.user = user
+            assert email_person.user == user
+            person = email_person
         return person or cls.create_from_user(user, event, is_untrusted=is_untrusted)
 
     @classmethod
@@ -414,11 +436,20 @@ class PersonLinkBase(PersonMixin, db.Model):
         )
 
     @declared_attr
-    def _title(cls):
+    def _title_col(cls):
         return db.Column(
             'title',
             PyIntEnum(UserTitle),
             nullable=True
+        )
+
+    @declared_attr
+    def _affiliation_id(cls):
+        return db.Column(
+            'affiliation_id',
+            db.ForeignKey('indico.affiliations.id'),
+            nullable=True,
+            index=True
         )
 
     @declared_attr
@@ -459,6 +490,18 @@ class PersonLinkBase(PersonMixin, db.Model):
         )
 
     @declared_attr
+    def _affiliation_link(cls):
+        return db.relationship(
+            'Affiliation',
+            lazy=False,
+            backref=db.backref(
+                cls.person_link_backref_name,
+                cascade_backrefs=False,
+                lazy='dynamic',
+            )
+        )
+
+    @declared_attr
     def display_order(cls):
         return db.Column(
             db.Integer,
@@ -485,7 +528,10 @@ class PersonLinkBase(PersonMixin, db.Model):
     first_name = override_attr('first_name', 'person')
     last_name = override_attr('last_name', 'person')
     title = override_attr('title', 'person', fget=lambda self, __: self._get_title())
+    _title = override_attr('_title', 'person', own_attr_name='_title_col')
     affiliation = override_attr('affiliation', 'person')
+    affiliation_id = override_attr('affiliation_id', 'person', check_attr_name='_affiliation')
+    affiliation_link = override_attr('affiliation_link', 'person', check_attr_name='_affiliation')
     address = override_attr('address', 'person')
     phone = override_attr('phone', 'person')
 

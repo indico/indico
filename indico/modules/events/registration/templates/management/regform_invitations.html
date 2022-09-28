@@ -1,6 +1,10 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 {% from 'events/registration/management/_invitation_list.html' import render_invitation_list %}
 
+{% block back_button_url -%}
+    {{ url_for('.manage_regform', regform) }}
+{%- endblock %}
+
 {% block subtitle %}
     {% trans title=regform.title -%}
         Invitations for "{{ title }}"
@@ -50,12 +54,6 @@
 
     <div id="invitation-list">
         {{ render_invitation_list(invitations) }}
-    </div>
-
-    <div class="toolbar right">
-        <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">
-            {% trans %}Back{% endtrans %}
-        </a>
     </div>
 
     <script>

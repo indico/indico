@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import time
+from datetime import time, timedelta
 from operator import itemgetter
 
 import jsonschema
@@ -65,6 +65,8 @@ class RegistrationFormEditForm(IndicoForm):
                                  description=_('Users must be logged in to register'))
     require_user = BooleanField(_('Registrant must have account'), widget=SwitchWidget(),
                                 description=_('Registrations emails must be associated with an Indico account'))
+    require_captcha = BooleanField(_('Require CAPTCHA'), widget=SwitchWidget(),
+                                   description=_('When registering, users with no account have to answer a CAPTCHA'))
     limit_registrations = BooleanField(_('Limit registrations'), widget=SwitchWidget(),
                                        description=_('Whether there is a limit of registrations'))
     registration_limit = IntegerField(_('Capacity'), [HiddenUnless('limit_registrations'), DataRequired(),
@@ -73,7 +75,7 @@ class RegistrationFormEditForm(IndicoForm):
     modification_mode = IndicoEnumSelectField(_('Modification allowed'), enum=ModificationMode,
                                               description=_('Will users be able to modify their data? When?'))
     publish_registration_count = BooleanField(_('Publish number of registrations'), widget=SwitchWidget(),
-                                              description=_('Number of registered participants will be displayed in '
+                                              description=_('Number of registered participants will be displayed on '
                                                             'the event page'))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_('Check-in status will be shown publicly on the event page'))
@@ -134,12 +136,27 @@ class RegistrationFormCreateForm(IndicoForm):
                                       description=_('Specify for how many weeks the registration '
                                                     'data, including the participant list, should be stored. '
                                                     'Retention periods for individual fields can be set in the '
-                                                    'registration form designer'))
+                                                    'registration form designer'),
+                                      render_kw={'placeholder': _('Indefinite')})
+
+    def validate_visibility(self, field):
+        participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data[:-1])
+        if participant_visibility.value < public_visibility.value:
+            raise ValidationError(_('Participant visibility cannot be more restrictive for other participants than '
+                                    'for the public'))
+        if field.data[2] is not None and not field.data[2]:
+            raise ValidationError(_('The visibility duration cannot be zero.'))
 
     def validate_retention_period(self, field):
         retention_period = field.data
-        if not retention_period and retention_period is not None:
+        if retention_period is None:
+            return
+        elif not retention_period:
             raise ValidationError(_('The retention period cannot be zero.'))
+        visibility_duration = (timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None
+                               else None)
+        if visibility_duration and visibility_duration > retention_period:
+            raise ValidationError(_('The retention period cannot be lower than the visibility duration.'))
 
 
 class RegistrationFormScheduleForm(IndicoForm):
@@ -163,7 +180,7 @@ class InvitationFormBase(IndicoForm):
     _email_fields = ('email_from', 'email_subject', 'email_body')
     email_from = SelectField(_('From'), [DataRequired()])
     email_subject = StringField(_('Email subject'), [DataRequired()])
-    email_body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    email_body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget())
     skip_moderation = BooleanField(_('Skip moderation'), widget=SwitchWidget(),
                                    description=_("If enabled, the user's registration will be approved automatically."))
 
@@ -248,7 +265,7 @@ class EmailRegistrantsForm(IndicoForm):
                                   description=_('Beware, addresses in this field will receive one mail per '
                                                 'registrant.'))
     subject = StringField(_('Subject'), [DataRequired()])
-    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget())
     recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
                                    description=_('Send copy of each email to my mailbox'))
@@ -364,8 +381,8 @@ class RegistrationManagersForm(IndicoForm):
     Form to manage users with privileges to modify registration-related items.
     """
 
-    managers = PrincipalListField(_('Registration managers'), allow_groups=True, allow_emails=True,
-                                  allow_external_users=True,
+    managers = PrincipalListField(_('Registration managers'), allow_groups=True, allow_event_roles=True,
+                                  allow_category_roles=True, allow_emails=True, allow_external_users=True,
                                   description=_('List of users allowed to modify registrations'),
                                   event=lambda form: form.event)
 
@@ -521,7 +538,7 @@ class RegistrationPrivacyForm(IndicoForm):
     def validate_visibility(self, field):
         participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data[:-1])
         if participant_visibility.value < public_visibility.value:
-            raise ValidationError(_('Participant visibility can not be more restrictive for other participants than '
+            raise ValidationError(_('Participant visibility cannot be more restrictive for other participants than '
                                     'for the public'))
         participant_visibility_changed_to_show_all = (
             participant_visibility == PublishRegistrationsMode.show_all and
@@ -533,10 +550,13 @@ class RegistrationPrivacyForm(IndicoForm):
         )
         if (
             self.regform and
-            self.regform.existing_registrations_count > 0 and
-            (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all)
+            (participant_visibility_changed_to_show_all or public_visibility_changed_to_show_all) and
+            Registration.query.with_parent(self.regform).filter(~Registration.is_deleted,
+                                                                ~Registration.created_by_manager).has_rows()
         ):
             raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
+        if field.data[2] is not None and not field.data[2]:
+            raise ValidationError(_('The visibility duration cannot be zero.'))
 
     def validate_retention_period(self, field):
         retention_period = field.data
@@ -544,6 +564,10 @@ class RegistrationPrivacyForm(IndicoForm):
             return
         elif not retention_period:
             raise ValidationError(_('The retention period cannot be zero.'))
+        visibility_duration = (timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None
+                               else None)
+        if visibility_duration and visibility_duration > retention_period:
+            raise ValidationError(_('The retention period cannot be lower than the visibility duration.'))
         fields = (RegistrationFormItem.query
                   .with_parent(self.regform)
                   .filter(RegistrationFormItem.is_enabled,

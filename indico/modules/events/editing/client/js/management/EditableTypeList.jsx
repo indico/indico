@@ -30,11 +30,7 @@ export default function EditableTypeList({eventId}) {
     data: enabledEditableTypes,
     loading: isLoadingEnabledEditableTypes,
     reFetch,
-  } = useIndicoAxios({
-    url: enabledEditableTypesURL({event_id: eventId}),
-    camelize: true,
-    trigger: eventId,
-  });
+  } = useIndicoAxios(enabledEditableTypesURL({event_id: eventId}), {camelize: true});
 
   if (isLoadingEnabledEditableTypes) {
     return <Loader inline="centered" active />;

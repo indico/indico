@@ -14,6 +14,7 @@
 :global(.ui.list.list) > .item {
   display: flex;
   align-items: center;
+  min-height: 32px;
 }
 
 .event-role {
@@ -42,6 +43,7 @@
   text-align: center;
   color: $light-black;
   flex-shrink: 0;
+  align-self: start;
 }
 
 .content {

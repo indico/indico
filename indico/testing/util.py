@@ -7,6 +7,8 @@
 
 import operator
 import re
+from email import message_from_string
+from email.policy import SMTPUTF8
 from itertools import product
 
 
@@ -125,14 +127,16 @@ def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kw
         count = 1
     compare = re.search if regex else operator.eq
     found = []
+    orig_found = set()
     for mail in smtp.outbox:
+        parsed_mail = message_from_string(str(mail), policy=SMTPUTF8)
         for header, value in kwargs.items():
-            if not compare(value, mail[header]):
+            if not compare(value, parsed_mail[header]):
                 break
         else:  # everything matched
-            found.append(mail)
-    found_set = set(found)
-    smtp.outbox = [mail for mail in smtp.outbox if mail not in found_set]
+            found.append(parsed_mail)
+            orig_found.add(mail)
+    smtp.handler.outbox = [mail for mail in smtp.handler.outbox if mail not in orig_found]
     __tracebackhide__ = True
     if required:
         assert found, 'No matching emails found'

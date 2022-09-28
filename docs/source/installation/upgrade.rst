@@ -91,14 +91,12 @@ Upgrading from 2.x to 3.x
 -------------------------
 
 The upgrade from 2.x to 3.x is a major change since Indico now requires
-Python 3. We also strongly recommend upgrading your database to PostgreSQL 13.
+Python 3. We also strongly recommend upgrading your database to PostgreSQL 13
+or newer.
 
 .. note::
 
-    There are no changes that require the newer Postgres version immediately,
-    but we no longer test on versions older than Postgres 12, and thus can
-    give you no guarantees that things will keep working on older versions such
-    as 9.6.
+    As of Indico 3.2, the upgrade **will fail** on Postgres 10 and older.
 
 .. warning::
 

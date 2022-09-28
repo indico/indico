@@ -28,7 +28,7 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import JSONField
-from indico.web.forms.widgets import JinjaWidget, SelectizeWidget
+from indico.web.forms.widgets import JinjaWidget, RemoteDropdownWidget
 
 
 def _serialize_user(user):
@@ -148,10 +148,10 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
 
 
 class AbstractField(QuerySelectField):
-    """A selectize-based field to select an abstract from an event."""
+    """A field with dynamic fetching to select an abstract from an event."""
 
-    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
-                             search_method='POST', inline_js=True)
+    widget = RemoteDropdownWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
+                                  search_method='POST', inline_js=True)
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('allow_blank', True)

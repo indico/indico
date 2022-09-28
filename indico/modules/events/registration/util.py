@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import IndicoSchema
+from indico.modules.core.captcha import CaptchaField
 from indico.modules.events import EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
@@ -42,6 +43,7 @@ from indico.modules.events.registration.models.registrations import (Registratio
 from indico.modules.events.registration.notifications import (notify_invitation, notify_registration_creation,
                                                               notify_registration_modification)
 from indico.modules.logs import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date, now_utc
 from indico.util.i18n import _
@@ -114,15 +116,25 @@ def get_title_uuid(regform, title):
     return {uuid: 1} if uuid in valid_choices else None
 
 
+def get_country_field(regform):
+    """Get the country personal-data field of a regform"""
+    return next((x
+                 for x in regform.active_fields
+                 if (x.type == RegistrationFormItemType.field_pd and
+                     x.personal_data_type == PersonalDataType.country)), None)
+
+
 def get_flat_section_setup_data(regform):
     section_data = {s.id: camelize_keys(s.own_data) for s in regform.sections if not s.is_deleted}
-    item_data = {f.id: f.view_data for f in regform.form_items if not f.is_section and not f.is_deleted}
+    item_data = {f.id: f.view_data for f in regform.form_items
+                 if not f.is_section and not f.is_deleted and not f.parent.is_deleted}
     return {'sections': section_data, 'items': item_data}
 
 
 def get_flat_section_positions_setup_data(regform):
     section_data = {s.id: s.position for s in regform.sections if not s.is_deleted}
-    item_data = {f.id: f.position for f in regform.form_items if not f.is_section and not f.is_deleted}
+    item_data = {f.id: f.position for f in regform.form_items
+                 if not f.is_section and not f.is_deleted and not f.parent.is_deleted}
     return {'sections': section_data, 'items': item_data}
 
 
@@ -145,7 +157,8 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
             field_data = item.view_data
         item_data[item.id] = field_data
     for item in regform.active_labels:
-        item_data[item.id] = item.view_data
+        if management or not item.parent.is_manager_only:
+            item_data[item.id] = item.view_data
     return {'sections': section_data, 'items': item_data}
 
 
@@ -166,6 +179,13 @@ def get_user_data(regform, user, invitation=None):
     else:
         user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
                      if t.name != 'title' and getattr(user, t.name, None)}
+        if (
+            (country_field := get_country_field(regform)) and
+            country_field.data.get('use_affiliation_country') and
+            user.affiliation_link and
+            user.affiliation_link.country_code
+        ):
+            user_data['country'] = user.affiliation_link.country_code
     if invitation:
         user_data.update((attr, getattr(invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         if invitation.affiliation:
@@ -265,7 +285,7 @@ class RegistrationSchemaBase(IndicoSchema):
         unknown = RAISE
 
 
-def make_registration_schema(regform, management=False, registration=None):
+def make_registration_schema(regform, management=False, registration=None, captcha_required=False):
     """Dynamically create a Marshmallow schema based on the registration form fields."""
     class RegistrationSchema(RegistrationSchemaBase):
         @validates('email')
@@ -280,6 +300,9 @@ def make_registration_schema(regform, management=False, registration=None):
         schema['notify_user'] = fields.Boolean()
     elif regform.needs_publish_consent:
         schema['consent_to_publish'] = EnumField(RegistrationVisibility)
+
+    if captcha_required:
+        schema['captcha'] = CaptchaField()
 
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
@@ -316,19 +339,18 @@ def create_personal_data_fields(regform):
 def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
-                                base_price=regform.base_price, currency=regform.currency)
+                                base_price=regform.base_price, currency=regform.currency, created_by_manager=management)
     if skip_moderation is None:
         skip_moderation = management
     for form_item in regform.active_fields:
+        if form_item.is_purged:
+            # Leave the registration data empty
+            continue
         default = form_item.field_impl.default_value
         can_modify = management or not form_item.parent.is_manager_only
         value = data.get(form_item.html_field_name, default) if can_modify else default
         data_entry = RegistrationData()
         registration.data.append(data_entry)
-        if form_item.is_purged:
-            # Leave the registration data empty
-            continue
-
         for attr, value in form_item.field_impl.process_form_data(registration, value).items():
             setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
@@ -396,8 +418,11 @@ def modify_registration(registration, data, management=False, notify_user=True):
             if getattr(registration, key) != value:
                 personal_data_changes[key] = value
             setattr(registration, key, value)
+
     if not management and regform.needs_publish_consent:
-        registration.consent_to_publish = data.get('consent_to_publish', RegistrationVisibility.nobody)
+        consent_to_publish = data.get('consent_to_publish', RegistrationVisibility.nobody)
+        update_registration_consent_to_publish(registration, consent_to_publish)
+
     registration.sync_state()
     db.session.flush()
     # sanity check
@@ -416,6 +441,17 @@ def modify_registration(registration, data, management=False, notify_user=True):
                      LogKind.change, 'Registration',
                      f'Registration modified: {registration.full_name}',
                      session.user, data={'Email': registration.email})
+
+
+def update_registration_consent_to_publish(registration, consent_to_publish):
+    if registration.consent_to_publish == consent_to_publish:
+        return
+    changes = make_diff_log({'consent_to_publish': (registration.consent_to_publish, consent_to_publish)},
+                            {'consent_to_publish': 'Consent to publish'})
+    registration.log(EventLogRealm.participants, LogKind.change, 'Registration',
+                     f'Consent to publish modified: {registration.full_name}',
+                     session.user, data={'Email': registration.email, 'Changes': changes})
+    registration.consent_to_publish = consent_to_publish
 
 
 def generate_spreadsheet_from_registrations(registrations, regform_items, static_items):
@@ -556,7 +592,8 @@ def _build_base_registration_info(registration):
         'checked_in': registration.checked_in,
         'checkin_secret': registration.ticket_uuid,
         'full_name': '{} {}'.format(personal_data.get('title', ''), registration.full_name).strip(),
-        'personal_data': personal_data
+        'personal_data': personal_data,
+        'tags': sorted(t.title for t in registration.tags),
     }
 
 
@@ -774,10 +811,13 @@ def import_invitations_from_csv(regform, fileobj, email_from, email_subject, ema
 
 def get_registered_event_persons(event):
     """Get all registered EventPersons of an event."""
-    query = event.persons.join(Registration, and_(Registration.event_id == EventPerson.event_id,
-                                                  Registration.is_active,
-                                                  or_(Registration.user_id == EventPerson.user_id,
-                                                      Registration.email == EventPerson.email)))
+    query = (event.persons
+             .join(Registration, and_(Registration.event_id == EventPerson.event_id,
+                                      Registration.is_active,
+                                      or_(Registration.user_id == EventPerson.user_id,
+                                          Registration.email == EventPerson.email)))
+             .join(RegistrationForm, and_(RegistrationForm.id == Registration.registration_form_id,
+                                          ~RegistrationForm.is_deleted)))
     return set(query)
 
 

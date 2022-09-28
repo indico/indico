@@ -88,6 +88,12 @@ Executed when a new database schema is created.  The *sender* is the
 name of the schema.
 ''')
 
+db_query = _signals.signal('db-query', '''
+Expected to return exactly one single `Query` object.  The *sender* is a string
+identifying the context.  The *query* kwarg contains the query object to be
+customized.  The additional kwargs passed to this signal depend on the context.
+''')
+
 check_password_secure = _signals.signal('check-password-secure', '''
 Check whether a password is secure. The *sender* is a string indicating
 the context where the password check happens, the plaintext password is

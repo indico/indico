@@ -1,0 +1,27 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="i-form-field-fixed-width">
+        <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-data"
+               {% if field.data is not none %}value="{{ field.data }}"{% endif %} {{ input_args | html_params }}>
+        <span id="{{ field.id }}"></span>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupRemoteSearchDropdownWidget({
+            fieldId: {{ field.id | tojson }},
+            minTriggerLength: {{ min_trigger_length | tojson }},
+            searchUrl: {{ search_url | tojson }},
+            searchMethod: {{ search_method | tojson }},
+            searchPayload: {{ search_payload | tojson }},
+            valueField: {{ value_field | tojson }},
+            labelField: {{ label_field | tojson }},
+            searchField: {{ search_field | tojson }},
+            allowById: {{ allow_by_id | tojson }},
+            preload: {{ preload | tojson }},
+            dropdownProps: {{ input_args | tojson }}
+        });
+    </script>
+{% endblock %}

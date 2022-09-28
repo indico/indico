@@ -20,7 +20,7 @@ from indico.modules.events.controllers.base import RegistrationRequired, RHDispl
 from indico.modules.events.layout import layout_settings, logger, theme_settings
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
                                                 LectureMeetingLayoutForm, LogoForm)
-from indico.modules.events.layout.util import get_css_file_data, get_css_url, get_logo_data
+from indico.modules.events.layout.util import get_css_file_data, get_css_url, get_js_url, get_logo_data
 from indico.modules.events.layout.views import WPLayoutEdit
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
@@ -215,9 +215,12 @@ class RHLayoutCSSPreview(RHLayoutBase):
     def _process(self):
         form = CSSSelectionForm(event=self.event, formdata=request.args, csrf_enabled=False)
         css_url = None
+        js_url = None
         if form.validate():
             css_url = get_css_url(self.event, force_theme=form.theme.data, for_preview=True)
-        return WPConferenceDisplay(self, self.event, css_override_form=form, css_url_override=css_url).display()
+            js_url = get_js_url(self.event, force_theme=form.theme.data, for_preview=True)
+        return WPConferenceDisplay(self, self.event, css_override_form=form, css_url_override=css_url,
+                                   js_url_override=js_url).display()
 
 
 class RHLayoutViewStylesheet(RHLayoutBase):

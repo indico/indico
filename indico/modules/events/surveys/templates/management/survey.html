@@ -200,7 +200,8 @@
             <a href="#" class="icon-remove right js-delete-submission hide-if-locked"
                data-href="{{ url_for('.delete_submissions', survey) }}"
                data-method="DELETE"
-               data-title="{% trans %}Remove submission?{% endtrans %}"
+               data-title
+               title="{% trans %}Remove submission{% endtrans %}"
                data-confirm="{{ data_confirm }}"
                data-submission-id="{{ submission.id }}"></a>
         </td>

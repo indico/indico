@@ -574,7 +574,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the contribution."""
-        self.event.log(*args, meta={'contribution_id': self.id}, **kwargs)
+        return self.event.log(*args, meta={'contribution_id': self.id}, **kwargs)
 
 
 Contribution.register_protection_events()

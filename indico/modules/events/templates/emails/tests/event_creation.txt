@@ -1,0 +1,27 @@
+Title
+-----
+dummy#0
+
+Category
+--------
+Home » dummy
+
+Creator
+-------
+Guinea Pig
+
+Date
+----
+11 Nov 2022
+
+Time
+----
+13:37 - 22:22 (UTC)
+
+URL
+---
+http://localhost/event/0/
+
+--
+Indico :: Event notifications
+

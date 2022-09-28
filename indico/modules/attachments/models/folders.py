@@ -122,20 +122,24 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         return folder
 
     @classmethod
-    def get_or_create(cls, linked_object, title=None):
+    def get_or_create(cls, linked_object, title=None, **create_kwargs):
         """Get a folder for the given object or create it.
 
         If no folder title is specified, the default folder will be
         used.  It is the caller's responsibility to add the folder
         or an object (such as an attachment) associated with it
         to the SQLAlchemy session using ``db.session.add(...)``.
+
+        Additional kwargs will be used when creating a custom folder;
+        in case of a default folder they must not be used.
         """
         if title is None:
+            assert not create_kwargs
             return AttachmentFolder.get_or_create_default(linked_object)
         else:
             folder = AttachmentFolder.query.filter_by(object=linked_object, is_default=False, is_deleted=False,
                                                       title=title).first()
-            return folder or AttachmentFolder(object=linked_object, title=title)
+            return folder or AttachmentFolder(object=linked_object, title=title, **create_kwargs)
 
     @locator_property
     def locator(self):

@@ -7,12 +7,15 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import {useSelector} from 'react-redux';
 import {Dropdown} from 'semantic-ui-react';
 
-import {FinalField} from 'indico/react/forms';
+import {FinalCheckbox, FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
+
+import {getStaticData} from '../selectors';
 
 const isoToFlag = country =>
   String.fromCodePoint(...country.split('').map(c => c.charCodeAt() + 0x1f1a5));
@@ -25,6 +28,8 @@ function CountryInputComponent({value, onChange, disabled, choices, clearable}) 
       fluid
       search
       selection
+      selectOnBlur={false}
+      selectOnNavigation={false}
       disabled={disabled}
       clearable={clearable}
       value={value}
@@ -70,4 +75,21 @@ CountryInput.propTypes = {
 CountryInput.defaultProps = {
   disabled: false,
   isRequired: false,
+};
+
+export function CountrySettings({htmlName}) {
+  const {hasPredefinedAffiliations} = useSelector(getStaticData);
+  if (htmlName !== 'country' || !hasPredefinedAffiliations) {
+    return null;
+  }
+  return (
+    <FinalCheckbox
+      name="useAffiliationCountry"
+      label={Translate.string('Default to affiliation country')}
+    />
+  );
+}
+
+CountrySettings.propTypes = {
+  htmlName: PropTypes.string.isRequired,
 };

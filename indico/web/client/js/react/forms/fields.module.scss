@@ -19,3 +19,24 @@
   font-size: 0.9em;
   color: $dark-gray;
 }
+
+.fieldset {
+  border: 0;
+  margin-bottom: 0.5em;
+  padding: 0;
+
+  legend {
+    font-weight: bold;
+    font-size: 1.3em;
+    border-bottom: 1px solid $separator-color;
+    width: 100%;
+    padding-left: 0;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.3em;
+    color: $light-black;
+  }
+
+  & + .fieldset {
+    margin-top: 2em;
+  }
+}

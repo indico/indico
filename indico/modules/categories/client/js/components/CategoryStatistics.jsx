@@ -20,11 +20,10 @@ import {LocaleContext} from '../context.js';
 import './CategoryStatistics.module.scss';
 
 export default function CategoryStatistics({categoryId}) {
-  const {data, loading: isLoading} = useIndicoAxios({
-    url: categoryStatisticsURL({category_id: categoryId}),
-    camelize: true,
-    trigger: categoryId,
-  });
+  const {data, loading: isLoading} = useIndicoAxios(
+    {url: categoryStatisticsURL({category_id: categoryId})},
+    {camelize: true}
+  );
 
   if (isLoading) {
     return <Loader size="massive" active />;

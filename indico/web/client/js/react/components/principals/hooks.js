@@ -28,18 +28,16 @@ export const useFetchPrincipals = (principalIds, eventId = null) => {
   const [informationMap, setInformationMap] = useState({});
   const missingPrincipalIds = _.difference(principalIds, Object.keys(informationMap));
 
-  const {data} = useIndicoAxios({
-    url: eventId === null ? principalsURL() : eventPrincipalsURL({event_id: eventId}),
-    forceDispatchEffect: () => !!missingPrincipalIds.length,
-    trigger: principalIds,
-    camelize: true,
-    method: 'POST',
-    options: {
+  const {data} = useIndicoAxios(
+    {
+      url: eventId === null ? principalsURL() : eventPrincipalsURL({event_id: eventId}),
+      method: 'POST',
       data: {
         values: missingPrincipalIds,
       },
     },
-  });
+    {camelize: true, manual: !missingPrincipalIds.length}
+  );
 
   useEffect(() => {
     if (missingPrincipalIds.length && data) {
@@ -58,12 +56,7 @@ export const usePermissionInfo = () => {
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState(null);
 
-  const {data: reqData} = useIndicoAxios({
-    url: permissionInfoURL(),
-    camelize: true,
-    // run only once
-    trigger: 'once',
-  });
+  const {data: reqData} = useIndicoAxios(permissionInfoURL(), {camelize: true});
 
   if (!loaded && reqData) {
     setData({...reqData});
@@ -74,10 +67,8 @@ export const usePermissionInfo = () => {
 };
 
 const _useFetchPrincipalList = (eventId, enabled, urlFunc, options = {}) => {
-  const {data, loading} = useIndicoAxios({
-    url: urlFunc({event_id: eventId}),
-    trigger: enabled ? eventId : null,
-    forceDispatchEffect: () => enabled && eventId !== null,
+  const {data, loading} = useIndicoAxios(urlFunc({event_id: eventId}), {
+    manual: !enabled || eventId === null,
     camelize: true,
     ...options,
   });

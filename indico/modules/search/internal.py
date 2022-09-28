@@ -389,7 +389,7 @@ class InternalSearch(IndicoSearchProvider):
             Attachment.query
             .join(Attachment.folder)
             .filter(*attachment_filters)
-            .options(folder_strategy, attachment_strategy, joinedload(Attachment.user).joinedload('_affiliation'))
+            .options(folder_strategy, attachment_strategy, joinedload(Attachment.user))
             .outerjoin(AttachmentFolder.linked_event)
             .outerjoin(AttachmentFolder.contribution)
             .outerjoin(Contribution.event.of_type(contrib_event))
@@ -529,7 +529,7 @@ class InternalSearch(IndicoSearchProvider):
                 joinedload(EventNote.contribution),
                 joinedload(EventNote.subcontribution).joinedload(SubContribution.contribution),
                 joinedload(EventNote.event).options(undefer(Event.detailed_category_chain)),
-                joinedload(EventNote.current_revision).joinedload(EventNoteRevision.user).joinedload('_affiliation'),
+                joinedload(EventNote.current_revision).joinedload(EventNoteRevision.user),
             )
         )
         notes_by_id = {n.id: n for n in query}

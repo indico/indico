@@ -34,7 +34,7 @@ def _get_timetable_theme_choices(event):
 
 
 def _get_conference_theme_choices():
-    plugin_themes = [(k, v[1]) for k, v in get_plugin_conference_themes().items()]
+    plugin_themes = [(k, v.title) for k, v in get_plugin_conference_themes().items()]
     return THEMES + sorted(plugin_themes, key=lambda x: x[1].lower())
 
 
@@ -171,7 +171,11 @@ class MenuLinkForm(MenuUserEntryFormBase):
 
 
 class MenuPageForm(MenuUserEntryFormBase):
-    html = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget())
+    html = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget(images=True))
+
+    def __init__(self, *args, ckeditor_upload_url, **kwargs):
+        self.ckeditor_upload_url = ckeditor_upload_url
+        super().__init__(*args, **kwargs)
 
 
 class AddImagesForm(IndicoForm):

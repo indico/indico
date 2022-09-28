@@ -148,6 +148,13 @@
       &.active a.title {
         color: $darker-blue;
       }
+
+      i.icon {
+        width: 14.3px;
+        height: auto;
+        margin-right: 7.15px;
+        font-size: 0.83em;
+      }
     }
   }
 }

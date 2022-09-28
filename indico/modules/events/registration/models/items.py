@@ -379,6 +379,14 @@ class RegistrationFormItem(db.Model):
                    .exists())
         return cls.is_enabled & ~cls.is_deleted & ((cls.parent_id == None) | query)  # noqa
 
+    def _get_default_log_data(self):
+        return {}
+
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the item."""
+        kwargs.setdefault('data', {}).update(self._get_default_log_data())
+        return self.registration_form.event.log(*args, meta={'registration_form_item_id': self.id}, **kwargs)
+
     def __repr__(self):
         return format_repr(self, 'id', 'registration_form_id', is_enabled=True, is_deleted=False, is_manager_only=False,
                            _text=self.title)
@@ -418,6 +426,9 @@ class RegistrationFormSection(RegistrationFormItem):
                           items=[child.view_data for child in self.children if not child.is_deleted])
         return camelize_keys(field_data)
 
+    def _get_default_log_data(self):
+        return {'Section ID': self.id}
+
 
 class RegistrationFormPersonalDataSection(RegistrationFormSection):
     __mapper_args__ = {
@@ -445,3 +456,6 @@ class RegistrationFormText(RegistrationFormItem):
         field_data = dict(super().view_data, section_id=self.parent_id, is_enabled=self.is_enabled, input_type='label',
                           title=self.title, is_purged=self.is_purged)
         return camelize_keys(field_data)
+
+    def _get_default_log_data(self):
+        return {'Field ID': self.id, 'Section': self.parent.title}

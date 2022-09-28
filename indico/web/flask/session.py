@@ -5,10 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import functools
 import pickle
 import uuid
 from datetime import datetime, timedelta
+from pathlib import Path
 
+import yaml
 from flask import current_app, request
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
@@ -20,6 +23,12 @@ from indico.modules.users import User
 from indico.util.date_time import get_display_tz
 from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_user
+
+
+@functools.cache
+def load_moment_locales():
+    path = Path(current_app.root_path) / 'moment_locales.yaml'
+    return yaml.safe_load(path.read_text())
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -80,19 +89,17 @@ class IndicoSession(BaseSession):
 
     @property
     def moment_lang(self):
-        parts = self.lang.lower().split('_')  # e.g. `en_GB` or `zh_Hans_CN`
-        lang = parts[0]
-        territory = parts[-1]
-        if lang == territory or lang == 'uk' or self.lang == 'en_US':
-            # TODO we should add some metadata that stores the canonical locale name and
-            # the name of the moment locale to avoid hacks like the one here. for example,
-            # fr_FR is handled somewhat nicely, but ukrainian (uk_UA) needs an explicit check
-            # since it's a single-country locale but locale and territory name are different..
-            # `setMomentLocale` in JS has the same problem, so any fix here should be applied
-            # over there as well.
-            return lang
-        else:
-            return f'{lang}-{territory}'
+        """Convert canonical locale identifiers to moment identifiers.
+
+        Examples:
+            fr_CA -> fr-ca
+            fr_FR -> fr
+            uk_UA -> uk
+            zh_Hans_CN -> zh-cn
+
+        If the corresponding moment locale is not found, 'en' is returned.
+        """
+        return load_moment_locales().get(self.lang, 'en')
 
     @cached_property
     def csrf_token(self):

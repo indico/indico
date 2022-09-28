@@ -1,0 +1,18 @@
+{%- macro render_affiliation(person) -%}
+    {% set details = person.affiliation_details %}
+    {%- if details -%}
+        {%- set uuid = uuid() -%}
+        <span id="affiliation-popup-container-{{ uuid }}">{#--#}
+            <span id="affiliation-popup-{{ uuid }}"></span>{#--#}
+            <span>{{ details.name }}</span>{#--#}
+        </span>{#--#}
+        <script>
+            setupAffiliationPopup(
+                {{ uuid|tojson }},
+                {{ person.affiliation_details|tojson }}
+            );
+        </script>
+    {%- elif person.affiliation -%}
+        <span>{{ person.affiliation }}</span>
+    {%- endif -%}
+{%- endmacro -%}

@@ -38,10 +38,12 @@ from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
                                         SearchForm, UserEmailsForm, UserPreferencesForm)
+from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
-from indico.modules.users.schemas import BasicCategorySchema, FavoriteEventSchema, UserPersonalDataSchema
+from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
+                                          UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
                                        merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
@@ -201,8 +203,14 @@ class RHPersonalData(RHUserBase):
     def _process(self):
         titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
         user_values = UserPersonalDataSchema().dump(self.user)
+        current_affiliation = None
+        if self.user.affiliation_link:
+            current_affiliation = AffiliationSchema().dump(self.user.affiliation_link)
+        has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
-                                                  titles=titles, user_values=user_values)
+                                                  titles=titles, user_values=user_values,
+                                                  current_affiliation=current_affiliation,
+                                                  has_predefined_affiliations=has_predefined_affiliations)
 
 
 class RHPersonalDataUpdate(RHUserBase):
@@ -224,6 +232,23 @@ class RHPersonalDataUpdate(RHUserBase):
         self.user.synchronize_data(refresh=True)
         flash(_('Your personal data was successfully updated.'), 'success')
         return '', 204
+
+
+class RHSearchAffiliations(RH):
+    @use_kwargs({'q': fields.String(load_default='')}, location='query')
+    def _process(self, q):
+        exact_match = db.func.lower(Affiliation.name) == q.lower()
+        q_filter = Affiliation.name.ilike(f'%{q}%') if len(q) > 2 else exact_match
+        res = (
+            Affiliation.query
+            .filter(~Affiliation.is_deleted, q_filter)
+            .order_by(
+                exact_match.desc(),
+                db.func.lower(Affiliation.name).startswith(q.lower()).desc(),
+                db.func.lower(Affiliation.name)
+            )
+            .all())
+        return AffiliationSchema(many=True).jsonify(res)
 
 
 class RHProfilePicturePage(RHUserBase):
@@ -591,7 +616,8 @@ class RHUsersAdmin(RHAdminBase):
         num_reg_requests = RegistrationRequest.query.count()
         return WPUsersAdmin.render_template('users_admin.html', 'users', form=form, search_results=search_results,
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users,
-                                            num_reg_requests=num_reg_requests)
+                                            num_reg_requests=num_reg_requests,
+                                            has_moderation=multipass.has_moderated_providers)
 
 
 class RHUsersAdminSettings(RHAdminBase):
@@ -731,9 +757,14 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 
 
 class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
+    affiliation_id = fields.Integer(attribute='_affiliation.affiliation_id')
+    affiliation_meta = fields.Nested(AffiliationSchema, attribute='_affiliation.affiliation_link')
+    title = EnumField(UserTitle, attribute='_title')
+
     class Meta:
         model = User
-        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name', 'first_name', 'last_name', 'avatar_url')
+        fields = ('id', 'identifier', 'email', 'affiliation', 'affiliation_id', 'affiliation_meta',
+                  'full_name', 'first_name', 'last_name', 'avatar_url', 'title')
 
 
 search_result_schema = UserSearchResultSchema()
@@ -747,6 +778,7 @@ class RHUserSearch(RHProtected):
         last_name = entry.data.get('last_name') or ''
         full_name = f'{first_name} {last_name}'.strip() or 'Unknown'
         affiliation = entry.data.get('affiliation') or ''
+        affiliation_data = entry.data.get('affiliation_data')
         email = entry.data['email'].lower()
         ext_id = f'{entry.provider.name}:{entry.identifier}'
         # IdentityInfo from flask-multipass does not have `avatar_url`
@@ -758,6 +790,7 @@ class RHUserSearch(RHProtected):
             'last_name': last_name,
             'email': email,
             'affiliation': affiliation,
+            'affiliation_data': affiliation_data,
             'phone': entry.data.get('phone') or '',
             'address': entry.data.get('address') or '',
         }
@@ -768,6 +801,8 @@ class RHUserSearch(RHProtected):
             'identifier': f'ExternalUser:{ext_id}',
             'email': email,
             'affiliation': affiliation,
+            'affiliation_id': -1 if affiliation_data else None,
+            'affiliation_meta': (AffiliationSchema().dump(affiliation_data) | {'id': -1}) if affiliation_data else None,
             'full_name': full_name,
             'first_name': first_name,
             'last_name': last_name,

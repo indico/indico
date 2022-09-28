@@ -38,7 +38,7 @@ def test_serialize_reservation(dummy_reservation):
     from indico.modules.rb.schemas import ReservationLegacyAPISchema
     assert ReservationLegacyAPISchema().dump(dummy_reservation) == {
         'bookedForName': 'Guinea Pig',
-        'booked_for_user_email': '1337@example.com',
+        'booked_for_user_email': '1337@example.test',
         'bookingUrl': 'http://localhost/rooms/booking/1',
         'endDT': dummy_reservation.end_dt.replace(tzinfo=pytz.utc),
         'id': dummy_reservation.id,

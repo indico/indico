@@ -75,7 +75,7 @@ export default function FormItem({
   const fieldRegistry = getFieldRegistry();
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
-  const inputProps = {title, description, isRequired, isEnabled, ...rest};
+  const inputProps = {title, description, isEnabled, ...rest};
   const showPurged = !setupMode && isPurged;
   const disabled = !isEnabled || showPurged || (paidItemLocked && !isManagement);
 
@@ -96,6 +96,7 @@ export default function FormItem({
     );
   }
 
+  const required = meta.alwaysRequired || isRequired;
   return (
     <div
       styleName={`form-item ${toClasses({
@@ -110,18 +111,18 @@ export default function FormItem({
         {InputComponent ? (
           meta.customFormItem ? (
             <InputComponent
-              isRequired={isRequired || meta.alwaysRequired}
+              isRequired={required}
               disabled={disabled}
               isPurged={showPurged}
               retentionPeriodIcon={retentionPeriodIcon}
               {...inputProps}
             />
           ) : (
-            <Form.Field required={isRequired || meta.alwaysRequired} styleName="field">
+            <Form.Field required={required} styleName="field">
               <label style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}>{title}</label>
               {retentionPeriodIcon}
               <InputComponent
-                isRequired={isRequired || meta.alwaysRequired}
+                isRequired={required}
                 disabled={disabled}
                 isPurged={showPurged}
                 {...inputProps}

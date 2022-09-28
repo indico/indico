@@ -43,14 +43,16 @@
             <a href="#"
                class="icon-edit"
                data-ajax-dialog
-               data-title="{% trans %}Edit network{% endtrans %}"
+               data-title
+               title="{% trans %}Edit network{% endtrans %}"
                data-href="{{ url_for('.edit_group', network_group) }}"
                data-reload-after>
             </a>
             <a href="#"
                class="icon-remove"
                data-ajax-dialog
-               data-title="{% trans %}Delete network{% endtrans %}"
+               data-title
+               title="{% trans %}Delete network{% endtrans %}"
                data-href="{{ url_for('.delete_group', network_group) }}"
                data-reload-after>
             </a>

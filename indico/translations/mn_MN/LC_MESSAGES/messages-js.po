@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -10,14 +10,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-11-23 13:42+0100\n"
-"PO-Revision-Date: 2021-11-23 12:43+0000\n"
-"Last-Translator: Adrian\n"
+"POT-Creation-Date: 2022-08-18 18:00+0200\n"
+"PO-Revision-Date: 2011-07-07 13:45+0000\n"
+"Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>, 2021\n"
 "Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.3\n"
 "Language: mn_MN\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -74,107 +74,93 @@ msgid_plural "{0} events"
 msgstr[0] "{0} үйл явдал"
 msgstr[1] "{0} үйл явдлууд"
 
-#: indico/modules/categories/client/js/display.js:166
-msgid "Remove from your favorites"
-msgstr "Өөрийн дуртай зүйлсээс хасах"
-
-#: indico/modules/categories/client/js/display.js:169
-msgid "Add to your favorites"
-msgstr "Дуртай зүйл дээрээ нэмэх"
-
-#: indico/modules/categories/client/js/display.js:171
-msgid ""
-"This will make events in this category visible on your <a "
-"href=\"{0}\">Dashboard</a>."
-msgstr " <a href=\"{0}\">Хянах самбар</a> дээр тань харагдах энэхүү ангилал дотор үйл явдлуудыг үүсгэх болно."
-
-#: indico/modules/categories/client/js/management.js:56
-#: indico/modules/events/management/client/js/index.js:295
+#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/events/management/client/js/index.js:327
 msgid "Undo"
 msgstr "Буцах"
 
-#: indico/modules/categories/client/js/management.js:58
+#: indico/modules/categories/client/js/management.js:59
 msgid "The category order has been restored."
 msgstr "Ангилалын дарааллыг анхны төлөвт нь оруулсан"
 
-#: indico/modules/categories/client/js/management.js:60
+#: indico/modules/categories/client/js/management.js:61
 msgid "The category list has been sorted."
 msgstr "Ангилалын жагсаалтыг эрэмбэлсэн"
 
-#: indico/modules/categories/client/js/management.js:178
+#: indico/modules/categories/client/js/management.js:184
 msgid "Delete category"
 msgstr "Ангилалыг устгах"
 
-#: indico/modules/categories/client/js/management.js:182
+#: indico/modules/categories/client/js/management.js:188
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Энэхүү ангилал нь хоосон биш учир устгах боломжгүй"
 
-#: indico/modules/categories/client/js/management.js:190
+#: indico/modules/categories/client/js/management.js:196
 msgid ""
 "At least one selected category cannot be deleted because it is not empty."
 msgstr "Сонгосон ангилалуудаас дор хаяж нэг нь хоосон биш тул устгах боломжгүй."
 
-#: indico/modules/categories/client/js/management.js:195
+#: indico/modules/categories/client/js/management.js:201
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] "Сонгосон ангиллыг устгах"
 msgstr[1] "{0} сонгосон ангиллуудыг устгах"
 
-#: indico/modules/categories/client/js/management.js:203
+#: indico/modules/categories/client/js/management.js:209
 msgid "Select the categories to delete first."
 msgstr "Эхлээд устгах ангилалуудыг сонгоно уу"
 
-#: indico/modules/categories/client/js/management.js:212
+#: indico/modules/categories/client/js/management.js:218
 msgid "Delete categories"
 msgstr "Ангилалуудыг устгах"
 
-#: indico/modules/categories/client/js/management.js:232
+#: indico/modules/categories/client/js/management.js:238
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] "Сонгосон ангиллыг шилжүүлэх"
 msgstr[1] "{0} сонгосон ангиллуудыг шилжүүлэх"
 
-#: indico/modules/categories/client/js/management.js:239
+#: indico/modules/categories/client/js/management.js:245
 msgid "Select the categories to move first."
 msgstr "Зөөх ангилалуудыг эхлээд сонгоно уу"
 
-#: indico/modules/categories/client/js/management.js:268
+#: indico/modules/categories/client/js/management.js:274
 #: indico/modules/vc/client/js/index.js:54
-#: indico/web/client/js/jquery/utils/forms.js:401
+#: indico/web/client/js/jquery/utils/forms.js:405
 msgid "*"
 msgid_plural "All {0} events in this category are currently selected."
 msgstr[0] "*"
 msgstr[1] "Энэхүү ангилал дээрх {0} үйл явдлуудыг одоо сонгосон."
 
-#: indico/modules/categories/client/js/management.js:273
+#: indico/modules/categories/client/js/management.js:279
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] "{1} үйл явдлуудаас {0}-г одоогоор сонгосон."
 msgstr[1] "{1} үйл явдлуудаас {0}-уудыг одоогоор сонгосон."
 
-#: indico/modules/categories/client/js/management.js:352
+#: indico/modules/categories/client/js/management.js:358
 msgid "Move here"
 msgstr "Энд зөөх"
 
-#: indico/modules/categories/client/js/management.js:353
+#: indico/modules/categories/client/js/management.js:359
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] "Ангиллыг шилжүүлэх"
 msgstr[1] "Ангиллуудыг шилжүүлэх"
 
-#: indico/modules/categories/client/js/management.js:355
+#: indico/modules/categories/client/js/management.js:361
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Ангилалд зориулж шинэ ангиллын эхийг сонгох"
 msgstr[1] "{0} сонгосон ангиллуудад зориулж шинэ ангиллын эхийг сонгох"
 
-#: indico/modules/categories/client/js/management.js:371
+#: indico/modules/categories/client/js/management.js:377
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Сонгосон ангилал аль хэдийнэ энд байна"
 msgstr[1] "Сонгосон ангиллууд аль хэдийнэ энд байна"
 
-#: indico/modules/categories/client/js/management.js:379
+#: indico/modules/categories/client/js/management.js:385
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Энэ нь таны шилжүүлэхийг оролдож буй ангилал юм"
@@ -237,75 +223,85 @@ msgid ""
 msgstr "Таны Indico сервер Олон нийтийн хабаар синхронжуулаагүй! Та үүнийг <a href=\"{0}\">энд</a> дээр шийдвэрлэж чадна."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:707
+#: indico/modules/designer/client/js/index.js:847
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "Үүнийг ар талаа болгон ашиглаж байгаа загваруудын ар талыг мөн устгах болно."
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:710
+#: indico/modules/designer/client/js/index.js:850
 msgid "Disassociate back sides"
 msgstr "Ар талуудыг салгах"
 
-#: indico/modules/designer/client/js/index.js:90
-#: indico/modules/designer/client/js/index.js:233
+#: indico/modules/designer/client/js/index.js:95
 msgid "Fixed text"
 msgstr "Тогтмол текст"
 
-#: indico/modules/designer/client/js/index.js:497
+#: indico/modules/designer/client/js/index.js:587
 msgid "Please choose a name for the template"
 msgstr "Загварт зориулж нэр сонгоно уу"
 
-#: indico/modules/designer/client/js/index.js:497
-#: indico/modules/designer/client/js/index.js:503
-#: indico/web/client/js/jquery/widgets/principalfield.js:114
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:165
+#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:593
+#: indico/modules/designer/client/js/index.js:602
 msgid "Warning"
 msgstr "Анхааруулга"
 
-#: indico/modules/designer/client/js/index.js:502
+#: indico/modules/designer/client/js/index.js:592
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "Загвар хоосон байж болохгүй. Зарим элементүүд эсвэл суурь зургийг нэмнэ үү."
 
-#: indico/modules/designer/client/js/index.js:529
+#: indico/modules/designer/client/js/index.js:599
+msgid ""
+"The Fixed image element cannot be empty. Upload an image inside it or remove"
+" it."
+msgstr ""
+
+#: indico/modules/designer/client/js/index.js:628
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Та энэхүү загварын хэмжээсийг өөрчлөхдөө итгэлтэй байна уу?"
 
-#: indico/modules/designer/client/js/index.js:698
-msgid "This back side template will be removed"
-msgstr "Энэхүү ар талын загварыг устгах болно"
-
-#: indico/modules/designer/client/js/index.js:700
-msgid "The back side of this template will be removed"
-msgstr "Энэхүү загварын ар талыг устгах болно"
-
-#: indico/modules/designer/client/js/index.js:701
-msgid "Disassociate back side"
-msgstr "Ар талыг салгах"
-
-#: indico/modules/designer/client/js/index.js:705
-msgid "The back side is empty."
-msgstr "Ар тал хоосон байна."
-
-#: indico/modules/designer/client/js/index.js:820
-msgid "Error"
-msgstr "Алдаа"
-
-#: indico/modules/designer/client/js/index.js:937
+#: indico/modules/designer/client/js/index.js:772
+#: indico/modules/designer/client/js/index.js:1124
 msgid "Choose a file"
 msgstr "Файл сонгох"
 
-#: indico/modules/events/abstracts/client/js/index.js:78
-#: indico/modules/events/abstracts/client/js/index.js:91
+#: indico/modules/designer/client/js/index.js:780
+msgid "Fixed Image"
+msgstr ""
+
+#: indico/modules/designer/client/js/index.js:838
+msgid "This back side template will be removed"
+msgstr "Энэхүү ар талын загварыг устгах болно"
+
+#: indico/modules/designer/client/js/index.js:840
+msgid "The back side of this template will be removed"
+msgstr "Энэхүү загварын ар талыг устгах болно"
+
+#: indico/modules/designer/client/js/index.js:841
+msgid "Disassociate back side"
+msgstr "Ар талыг салгах"
+
+#: indico/modules/designer/client/js/index.js:845
+msgid "The back side is empty."
+msgstr "Ар тал хоосон байна."
+
+#: indico/modules/designer/client/js/index.js:983
+#: indico/modules/designer/client/js/index.js:997
+msgid "Error"
+msgstr "Алдаа"
+
+#: indico/modules/events/abstracts/client/js/index.js:75
+#: indico/modules/events/abstracts/client/js/index.js:88
 msgid "Show preview"
 msgstr "Урьдчилсан харагдацыг үзүүлэх"
 
-#: indico/modules/events/abstracts/client/js/index.js:82
+#: indico/modules/events/abstracts/client/js/index.js:79
 msgid "Hide preview"
 msgstr "Урьдчилсан харагдацыг нуух"
 
-#: indico/modules/events/client/js/display.js:174
+#: indico/modules/events/client/js/display.js:175
 msgid "Edit minutes"
 msgstr "Хурлын тэмдэглэлийг засварлах"
 
@@ -317,16 +313,16 @@ msgstr "Цэсийн нэвтрэх тохиргоо"
 msgid "{0} out of {1} displayed"
 msgstr "{1}-с {0}-г харуулах"
 
-#: indico/modules/events/client/js/util/static_filters.js:59
+#: indico/modules/events/client/js/util/static_filters.js:61
 msgid "There are no entries that match your search criteria."
 msgstr "Таны хайлтын шүүлтүүртэй тохирох мэдээлэл байхгүй байна."
 
-#: indico/modules/events/management/client/js/index.js:293
+#: indico/modules/events/management/client/js/index.js:325
 msgid "Undoing previous operation..."
 msgstr "Өмнөх үйл ажиллагааг цуцалж байна..."
 
-#: indico/modules/events/registration/client/js/index.js:59
-#: indico/modules/events/registration/client/js/registration.js:39
+#: indico/modules/events/registration/client/js/index.js:54
+#: indico/modules/events/registration/client/js/registration.js:42
 msgid "Terms and Conditions"
 msgstr "Үйлчилнгээний Нөхцөлүүд"
 
@@ -339,189 +335,6 @@ msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
 msgstr[0] "Та {0} сонгосон бүртгэлийг устгахыг үнэхээр хүсэж байна уу?"
 msgstr[1] "Та {0} сонгосон бүртгэлүүдийг устгахыг үнэхээр хүсэж байна уу?"
-
-#: indico/modules/events/registration/client/js/form/field.js:144
-msgid "New Field"
-msgstr "Шинэ талбар"
-
-#: indico/modules/events/registration/client/js/form/field.js:144
-msgid "Edit Field"
-msgstr "Талбарыг засварлах"
-
-#: indico/modules/events/registration/client/js/form/field.js:147
-msgid "Add"
-msgstr "Нэмэх"
-
-#: indico/modules/events/registration/client/js/form/field.js:147
-msgid "Update"
-msgstr "Шинэчлэх"
-
-#: indico/modules/events/registration/client/js/form/field.js:181
-msgid "There is already a registration with this email address."
-msgstr "Энэхүү цахим шуудангийн хаягтай холбоотой бүртгэл үүссэн байна."
-
-#: indico/modules/events/registration/client/js/form/field.js:183
-msgid "The user associated with this email address is already registered."
-msgstr "Энэхүү цахим шуудангийн хаягтай холбоотой хэрэглэгч аль хэдийнэ бүртгэгдсэн байна."
-
-#: indico/modules/events/registration/client/js/form/field.js:185
-msgid "There is no Indico user associated with this email address."
-msgstr "Энэхүү цахим шуудангийн хаягтай холбоотой Indico хэрэглэгч байхгүй байна."
-
-#: indico/modules/events/registration/client/js/form/field.js:190
-msgid "This email address is not associated with your Indico account."
-msgstr "Энэхүү цахим шуудангийн хаяг Indico бүртгэлтэй тань холбогдоогүй байна."
-
-#: indico/modules/events/registration/client/js/form/field.js:193
-msgid ""
-"The registration will be re-associated to a different user "
-"(<strong>{0}</strong>)."
-msgstr "Бүртгэлийг өөр хэрэглэгч (<strong>{0}</strong>) рүү дахин холбох болно."
-
-#: indico/modules/events/registration/client/js/form/field.js:199
-msgid ""
-"The registration will be disassociated from the current user "
-"(<strong>{0}</strong>)."
-msgstr "Бүртгэлийг одоогийн хэрэглэгч (<strong>{0}</strong>)-с салгах болно."
-
-#: indico/modules/events/registration/client/js/form/field.js:205
-msgid "The domain used in the email address does not exist."
-msgstr "Энэхүү цахим шуудангийн хаяг дээр ашигласан домэйн байхгүй байна."
-
-#: indico/modules/events/registration/client/js/form/field.js:207
-msgid "This email address is invalid."
-msgstr "Энэхүү цахим шуудангийн хаяг хүчингүй."
-
-#: indico/modules/events/registration/client/js/form/field.js:210
-msgid "The registration will not be associated with any Indico account."
-msgstr "Бүртгэл нь аливаа Indico бүртгэлтэй холбогдохгүй болно."
-
-#: indico/modules/events/registration/client/js/form/field.js:212
-msgid "The registration will be associated with your Indico account."
-msgstr "Бүртгэл нь таны Indico данстай холбогдох болно."
-
-#: indico/modules/events/registration/client/js/form/field.js:215
-msgid ""
-"The registration will remain associated with the Indico account "
-"<strong>{0}</strong>."
-msgstr "Бүртгэл нь Indico данс <strong>{0}</strong>-тай холбогдсон хэвээр үлдэх болно."
-
-#: indico/modules/events/registration/client/js/form/field.js:221
-msgid ""
-"The registration will be associated with the Indico account "
-"<strong>{0}</strong>."
-msgstr "Бүртгэл нь Indico данс<strong>{0}</strong>-тай холбогдох болно."
-
-#: indico/modules/events/registration/client/js/form/field.js:242
-msgid "Checking email address..."
-msgstr "Цахим шуудангийн хаяг шалгаж байна..."
-
-#: indico/modules/events/registration/client/js/form/field.js:398
-msgid "Checkbox"
-msgstr "Чагт"
-
-#: indico/modules/events/registration/client/js/form/field.js:421
-msgid "Country"
-msgstr "Улс"
-
-#: indico/modules/events/registration/client/js/form/field.js:453
-msgid "Date"
-msgstr "Огноо"
-
-#: indico/modules/events/registration/client/js/form/field.js:469
-msgid "File"
-msgstr "Файл"
-
-#: indico/modules/events/registration/client/js/form/field.js:485
-msgid "Free Text"
-msgstr "Дурын текст"
-
-#: indico/modules/events/registration/client/js/form/field.js:501
-msgid "Number"
-msgstr "Тоо"
-
-#: indico/modules/events/registration/client/js/form/field.js:640
-msgid "Choice"
-msgstr "Сонголт"
-
-#: indico/modules/events/registration/client/js/form/field.js:700
-#: indico/modules/events/registration/client/js/form/field.js:1155
-msgid "Caption"
-msgstr "Тайлбар"
-
-#: indico/modules/events/registration/client/js/form/field.js:701
-#: indico/modules/events/registration/client/js/form/field.js:1078
-#: indico/modules/events/registration/client/js/form/field.js:1156
-msgid "Billable"
-msgstr "Төлбөр авч болох"
-
-#: indico/modules/events/registration/client/js/form/field.js:702
-#: indico/modules/events/registration/client/js/form/field.js:1079
-#: indico/modules/events/registration/client/js/form/field.js:1157
-msgid "Price"
-msgstr "Үнэ"
-
-#: indico/modules/events/registration/client/js/form/field.js:703
-#: indico/modules/events/registration/client/js/form/field.js:1080
-#: indico/modules/events/registration/client/js/form/field.js:1158
-msgid "Places limit"
-msgstr "Хязгаар тавина"
-
-#: indico/modules/events/registration/client/js/form/field.js:704
-#: indico/modules/events/registration/client/js/form/field.js:1159
-msgid "Max. extra slots"
-msgstr "Хамгийн их нэмэлт нүд"
-
-#: indico/modules/events/registration/client/js/form/field.js:705
-#: indico/modules/events/registration/client/js/form/field.js:1160
-msgid "Extra slots pay"
-msgstr "Нэмэлт нүдний төлбөр"
-
-#: indico/modules/events/registration/client/js/form/field.js:706
-#: indico/modules/events/registration/client/js/form/field.js:1081
-#: indico/modules/events/registration/client/js/form/field.js:1161
-msgid "Enabled"
-msgstr "Идэвхжүүлсэн"
-
-#: indico/modules/events/registration/client/js/form/field.js:803
-msgid "Phone"
-msgstr "Утас"
-
-#: indico/modules/events/registration/client/js/form/field.js:817
-msgid "Text"
-msgstr "Текст"
-
-#: indico/modules/events/registration/client/js/form/field.js:834
-msgid "Textarea"
-msgstr "Текстийн хэсэг"
-
-#: indico/modules/events/registration/client/js/form/field.js:850
-msgid "Yes/No"
-msgstr "Тийм/Үгүй"
-
-#: indico/modules/events/registration/client/js/form/field.js:869
-msgid "Email address"
-msgstr "Цахим шуудангийн хаяг"
-
-#: indico/modules/events/registration/client/js/form/field.js:992
-msgid "Title of the \"None\" option"
-msgstr "\"Байхгүй\" сонголтын гарчиг"
-
-#: indico/modules/events/registration/client/js/form/field.js:999
-msgid "Accommodation"
-msgstr "Орон байр"
-
-#: indico/modules/events/registration/client/js/form/field.js:1077
-msgid "Accommodation option"
-msgstr "Орон байрны сонголт"
-
-#: indico/modules/events/registration/client/js/form/field.js:1144
-msgid "Multi choice"
-msgstr "Олон сонголт"
-
-#: indico/modules/events/registration/client/js/form/sectiontoolbar.js:44
-msgid "Add new field"
-msgstr "Шинэ талбар нэмэх"
 
 #: indico/modules/events/sessions/client/js/index.js:118
 msgid "Filter types"
@@ -610,66 +423,66 @@ msgstr "Өмнөх"
 msgid "Something went wrong"
 msgstr "Нэг зүйл буруу ажиллалаа"
 
-#: indico/web/client/js/jquery/utils/forms.js:16
+#: indico/web/client/js/jquery/utils/forms.js:19
 msgid "The passwords do not match."
 msgstr "Нууц үг тохирохгүй байна."
 
-#: indico/web/client/js/jquery/utils/forms.js:74
+#: indico/web/client/js/jquery/utils/forms.js:69
 msgid "Field must be at least {0} character long."
 msgid_plural "Field must be at least {0} characters long."
 msgstr[0] "Талбар нь {0} тэмдэгтээс доошгүй урттай байна."
 msgstr[1] "Талбар нь {0} тэмдэгтүүдээс доошгүй урттай байна."
 
-#: indico/web/client/js/jquery/utils/forms.js:82
+#: indico/web/client/js/jquery/utils/forms.js:77
 msgid "Field cannot be longer than {0} character."
 msgid_plural "Field cannot be longer than {0} characters."
 msgstr[0] "Талбар нь {0} тэмдэгтээс урт байж болохгүй"
 msgstr[1] "Талбар нь {0} тэмдэгтүүдээс урт байж болохгүй."
 
-#: indico/web/client/js/jquery/utils/forms.js:90
+#: indico/web/client/js/jquery/utils/forms.js:85
 msgid "Field must be between {0} and {1} characters long."
 msgstr "Талбар нь {0} ба {1}-н хоорондох тэмдгийн урттай байна."
 
-#: indico/web/client/js/jquery/utils/forms.js:96
+#: indico/web/client/js/jquery/utils/forms.js:91
 msgid "Field must contain at least {0} word."
 msgid_plural "Field must contain at least {0} words."
 msgstr[0] "Талбар нь {0} үгээс ихийг агуулна."
 msgstr[1] "Талбар нь {0} үгүүдээс ихийг агуулна."
 
-#: indico/web/client/js/jquery/utils/forms.js:104
+#: indico/web/client/js/jquery/utils/forms.js:99
 msgid "Field cannot contain more than {0} word."
 msgid_plural "Field cannot contain more than {0} words."
 msgstr[0] "Талбар нь {0} үгээс ихийг агуулж болохгүй."
 msgstr[1] "Талбар нь {0} үгүүдээс ихийг агуулж болохгүй."
 
-#: indico/web/client/js/jquery/utils/forms.js:112
+#: indico/web/client/js/jquery/utils/forms.js:107
 msgid "Field must contain between {0} and {1} words."
 msgstr "Талбар нь {0} ба {1}-н хоорондох үгнүүдийг агуулах ёстой."
 
-#: indico/web/client/js/jquery/utils/forms.js:130
+#: indico/web/client/js/jquery/utils/forms.js:125
 msgid "Save now"
 msgstr "Одоо хадгалах"
 
-#: indico/web/client/js/jquery/utils/forms.js:131
+#: indico/web/client/js/jquery/utils/forms.js:126
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "Хадгалж байна..."
 
-#: indico/web/client/js/jquery/utils/forms.js:132
+#: indico/web/client/js/jquery/utils/forms.js:127
 msgid "Do not forget to save your changes!"
 msgstr "Өөрчлөлтүүдээ хадгалахаа бүү мартаарай"
 
-#: indico/web/client/js/jquery/utils/forms.js:407
+#: indico/web/client/js/jquery/utils/forms.js:411
 msgid "Only {0} out of {1} rows is currently selected"
 msgid_plural "Only {0} out of {1} rows are currently selected."
 msgstr[0] "Зөвхөн {1}-с зөвхөн {0} мөрийг одоогоор сонгосон."
 msgstr[1] "Зөвхөн {1}-с зөвхөн {0} мөрүүдийг одоогоор сонгосон."
 
-#: indico/web/client/js/jquery/utils/forms.js:446
+#: indico/web/client/js/jquery/utils/forms.js:450
 msgid "Select only the current page."
 msgstr "Одоогийн хуудсыг зөвхөн сонгох."
 
-#: indico/web/client/js/jquery/utils/forms.js:460
+#: indico/web/client/js/jquery/utils/forms.js:464
 msgid "Click here to select them all."
 msgstr "Тэдгээрийг бүгдийг сонгохын тулд энд дарна уу."
 
@@ -696,7 +509,6 @@ msgstr "Хадгалсан"
 
 #: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:161
 msgid "Save"
 msgstr "Хадгалах"
 
@@ -805,11 +617,11 @@ msgstr "Хайлтаа арилгах"
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Та ангилал <em>{0}</em>-г сонгосон. Та үргэлжлүүлэхийг хүсэж байгаадаа итгэлтэй байна уу?"
 
-#: indico/web/client/js/jquery/widgets/itempicker.js:21
+#: indico/web/client/js/jquery/widgets/itempicker.js:23
 msgid "Type to filter..."
 msgstr "Шүүлтүүр хийхийн тулд шивэх..."
 
-#: indico/web/client/js/jquery/widgets/misc.js:89
+#: indico/web/client/js/jquery/widgets/misc.js:58
 msgid "You can copy the URL below using CTRL + C (&#8984; + C on OSX):"
 msgstr "Та CTRL + C (&#8984; + C on OSX)-г ашиглан доорх URL-г хуулж болно:"
 
@@ -826,19 +638,6 @@ msgstr "Устгах"
 #: indico/web/client/js/jquery/widgets/multitextfield.js:353
 msgid "Empty values are not allowed."
 msgstr "Хоосон утгыг зөвшөөрөхгүй."
-
-#: indico/web/client/js/jquery/widgets/principalfield.js:113
-msgid "There is already another person with this email address."
-msgstr "Энэхүү цахим шуудангийн хаяг бүхий өөр нэг хүн аль хэдийнэ оршин байна."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:193
-#: indico/web/client/js/jquery/widgets/principalfield.js:121
-msgid "Edit information"
-msgstr "Мэдээлэл засварлах"
-
-#: indico/web/client/js/jquery/widgets/principalfield.js:140
-msgid "Enter person"
-msgstr "Хүн оруулах"
 
 #: indico/web/client/js/jquery/widgets/rulelistwidget.js:60
 msgid "Select an option"
@@ -874,9 +673,7 @@ msgid "Edit"
 msgstr "Засварлах"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:49
-#: indico/web/client/js/legacy/angular/directives.js:68
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:413
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:186
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:354
 #: indico/web/client/js/legacy/libs/timetable/Management.js:670
 msgid "Cancel"
 msgstr "Цуцлах"
@@ -955,217 +752,9 @@ msgstr "Үйл явдлын менежерүүд"
 msgid "Registrants in \"{0}\""
 msgstr "\"{0}\" дээрх бүртгүүлэгчид"
 
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:179
-msgid "Speaker"
-msgstr "Илтгэгч"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:190
-msgid "Remove person"
-msgstr "Хүнийг устгах"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:196
-msgid "Configure roles"
-msgstr "Ажил үүргийг тохируулах"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:211
-msgid "Submitter"
-msgstr "Хүргүүлэгч"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:259
-msgid "or"
-msgstr "эсвэл"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:280
-msgid "Move to authors"
-msgstr "Зохиогчид руу шилжүүлэх"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:286
-msgid "Move to co-authors"
-msgstr "Хамтран зохиогчид руу шилжүүлэх"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:293
-msgid "Move to others"
-msgstr "Бусад руу шилжүүлэх"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:299
-msgid "Not a speaker anymore"
-msgstr "Илтгэгч байхаа больсон"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:300
-msgid "Make a speaker"
-msgstr "Илтгэгч болгох"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:311
-msgid "People in the 'Others' section <strong>must</strong> be speakers."
-msgstr "\"Бусад\" хэсэгт буй хүмүүст илтгэгч байх <strong>ёстой</strong>."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:331
-msgid "Revoke submission rights"
-msgstr "Хүргүүлэх эрхийг буцаах"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:332
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:32
-msgid "Grant submission rights"
-msgstr "Хүргүүлэх эрхийг олгох"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:398
-msgid "Custom sorting has been applied. Click to restore alphabetical order."
-msgstr "Тохируулсан ангиллыг хэрэглэлээ. Үсгийн дарааллыг сэргээхийн тулд дарна уу."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:400
-msgid "Alphabetical sorting is ON. Click to turn it off."
-msgstr "Үсгээр ангилахыг асаасан байна. Унтраахын тулд дарна уу."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:445
-msgid "You must add at least one speaker"
-msgstr "Та нэгээс доошгүй илтгэгчийг нэмэх ёстой."
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:448
-msgid "You must add at least one submitter"
-msgstr "Та нэгээс доошгүй хүргүүлэгчийг нэмэх ёстой"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:451
-msgid "You must add at least one co-author"
-msgstr "Та нэгээс доошгүй хамтран зохиогчийг нэмэх ёстой"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:454
-msgid "You must add at least one author"
-msgstr "Та нэгээс доошгүй зохиогчийг нэмэх ёстой"
-
-#: indico/web/client/js/jquery/widgets/jinja/person_link_widget.js:459
-msgid ""
-"You cannot have users in the Other section, please make them authors or co-"
-"authors"
-msgstr "Та Бусад хэсэгт хэрэглэгч нэмж болохгүй, тэдгээрийг зохиогч, эсвэл хамтран зохиогч болгоно уу"
-
-#: indico/web/client/js/legacy/angular/directives.js:67
-msgid "Ok"
-msgstr "Тийм"
-
-#: indico/web/client/js/legacy/angular/directives.js:115
-msgid "The content of this dialog is currently unavailable."
-msgstr "Энэ харилцах самбарын агуулга одоогоор байхгүй байна."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:243
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:245
 msgid "OK"
 msgstr "Тийм"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:367
-msgid "Reason: "
-msgstr "Шалтгаан:"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:38
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:57
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:77
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:92
-msgid "Note:"
-msgstr "Тэмдэглэл:"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:39
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:58
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:78
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:93
-msgid " If this person does not already have an Indico account, "
-msgstr "Энэ хүнд Indico бүртгэл аль хэдийнэ байхгүй тохиолдолд,"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:41
-msgid "he or she will be sent an email asking to register as a user."
-msgstr "хэрэглэгчээр бүртгүүлэхийг асуухаар тэр эрэгтэй, эсвэл тэр эмэгтэйд цахим шуудан илгээх болно"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:43
-msgid " After the registration the user will automatically be given"
-msgstr "Бүртгэлийн дараа хэрэглэгчид автоматаар шилжүүлэх болно"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:45
-msgid " submission rights."
-msgstr "хүргүүлэх эрхийг."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:51
-msgid "Give management rights"
-msgstr "Удирдах эрхийг өгөх"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:60
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:80
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:95
-msgid "he or she will be sent an email asking to create an account."
-msgstr "бүртгэл үүсгэхийг асуухаар тэр эрэгтэй, эсвэл тэр эмэгтэйд цахим шуудан илгээх болно"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:62
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:82
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:97
-msgid " After the account creation the user will automatically be"
-msgstr "Бүртгэл үүсгэсний дараа хэрэглэгчид автоматаар шилжүүлэх болно"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:64
-msgid " given management rights."
-msgstr "удирдлагын эрхийг өгөх."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:71
-msgid "Give coordination rights"
-msgstr "Зохицуулах эрхийг өгөх"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:84
-msgid " given coordination rights."
-msgstr "зохицуулах эрхийг өгөх"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:99
-msgid " given the rights."
-msgstr "эрх өгөх."
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:106
-#: indico/web/client/js/legacy/libs/timetable/Management.js:21
-msgid "Title"
-msgstr "Хэргэм"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:111
-msgid "Mr"
-msgstr "Ноён"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:112
-msgid "Mrs"
-msgstr "Хатагтай"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:113
-msgid "Ms"
-msgstr "Хатагтай"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:114
-msgid "Dr"
-msgstr "Доктор"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:115
-msgid "Prof."
-msgstr "Профессор"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:121
-msgid "Family Name"
-msgstr "Овог"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:128
-msgid "First Name"
-msgstr "Нэр"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:132
-msgid "Affiliation"
-msgstr "Харьяалал"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:136
-msgid "Email"
-msgstr "Цахим шуудан"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:146
-msgid "Address"
-msgstr "Хаяг"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:147
-msgid "Telephone"
-msgstr "Утас"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Users.js:166
-msgid ""
-"It is not possible to grant submission rights to a participant without an "
-"email address. Please set an email address."
-msgstr "Цахим шуудангийн хаяггүй оролцогчид хүргүүлэх эрх олгох боломжгүй. Цахим шуудан нээнэ үү."
 
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:465
 #: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:473
@@ -1177,52 +766,44 @@ msgstr "Өмнөх таб"
 msgid "Next tab"
 msgstr "Дараагийн таб"
 
-#: indico/web/client/js/legacy/libs/indico/Core/Widgets/RichText.js:212
-msgid "switch to plain text"
-msgstr "энгийн текст рүү шилжих"
-
-#: indico/web/client/js/legacy/libs/indico/Core/Widgets/RichText.js:213
-msgid "switch to rich text"
-msgstr "рич текст рүү шилжих"
-
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:309
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:267
 msgid "At least one must be selected"
 msgstr "Нэгээс доошгүйг сонгох ёстой"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:313
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:271
 msgid "Please enable the checkbox"
 msgstr "Сонгох хайрцгийг идэвхжүүлнэ үү"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:317
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:321
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:275
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:279
 msgid "Please choose an option"
 msgstr "Сонголт хийнэ үү"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:328
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:286
 msgid "Field must be a number"
 msgstr "Талбарт тоо байх ёстой"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:340
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:298
 msgid "Field must be a positive number"
 msgstr "Талбарт эерэг тоо байх ёстой"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:346
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:304
 msgid "Date format is not valid. It should be dd/mm/yyyy hh:mm"
 msgstr "Огнооны формат хүчинтэй биш байна. Энэ нь өө/сс/жжжж цц:мм хэлбэртэй байх ёстой. "
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:352
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:310
 msgid "Invalid e-mail address"
 msgstr "Хүчингүй цахим шуудангийн хаяг"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:358
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:316
 msgid "Invalid URL"
 msgstr "Хүчингүй URL"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:360
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:318
 msgid "Time format is not valid. It should be hh:mm"
 msgstr "Цагийн формат хүчингүй байна. Энэ нь цц:мм байх ёстой"
 
-#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:366
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:324
 msgid "Field is mandatory"
 msgstr "Энэхүү талбарыг заавал бөглөнө"
 
@@ -1534,6 +1115,10 @@ msgstr "Юу ч байхгүй"
 #: indico/web/client/js/legacy/libs/timetable/Management.js:19
 msgid "ID"
 msgstr "ID"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:21
+msgid "Title"
+msgstr "Хэргэм"
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js:24
 msgid "Sort by: "

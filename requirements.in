@@ -2,11 +2,13 @@ alembic
 authlib>=1.0.0a1  # new oauth provider needs this prerelease authlib
 babel
 bcrypt
-bleach
+bleach[css]
 blinker
+captcha
 celery[redis]!=5.2.3  # 5.2.3 pins setuptools which is a mess
 certifi
 click
+colorclass
 distro
 email-validator
 feedgen
@@ -20,7 +22,7 @@ flask-pluginengine
 flask-sqlalchemy
 flask-webpackext
 flask-wtf
-flask
+flask<2.2  # causes some annoying errors i don't want to debug now, will update later :)
 html2text
 icalendar
 indico-fonts
@@ -59,7 +61,7 @@ terminaltables
 translitcodec
 ua-parser
 webargs
-werkzeug
+werkzeug<2.2  # because we pin flask
 wtforms[email]
 wtforms-dateutil
 wtforms-sqlalchemy

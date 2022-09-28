@@ -9,8 +9,7 @@ from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
@@ -49,7 +48,7 @@ class SessionCloner(EventCloner):
         return {'session_map': self._session_map, 'session_block_map': self._session_block_map}
 
     def _clone_sessions(self, new_event, event_exists=False):
-        attrs = get_simple_column_attrs(Session) | {'own_room', 'own_venue'}
+        attrs = get_attrs_to_clone(Session, add={'own_room', 'own_venue'})
         query = (Session.query.with_parent(self.old_event)
                  .options(joinedload('blocks'),
                           joinedload('own_venue'),
@@ -65,7 +64,7 @@ class SessionCloner(EventCloner):
             self._session_map[old_sess] = sess
 
     def _clone_session_blocks(self, blocks, event_exists=False):
-        attrs = get_simple_column_attrs(SessionBlock) | {'own_room', 'own_venue'}
+        attrs = get_attrs_to_clone(SessionBlock, add={'own_room', 'own_venue'})
         for old_block in blocks:
             block = SessionBlock()
             block.populate_from_attrs(old_block, attrs)
@@ -75,7 +74,7 @@ class SessionCloner(EventCloner):
             yield block
 
     def _clone_person_links(self, person_links, event_exists=False):
-        attrs = get_simple_column_attrs(SessionBlockPersonLink)
+        attrs = get_attrs_to_clone(SessionBlockPersonLink)
         for old_link in person_links:
             link = SessionBlockPersonLink()
             link.populate_from_attrs(old_link, attrs)

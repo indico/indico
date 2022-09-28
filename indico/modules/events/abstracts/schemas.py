@@ -16,7 +16,7 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.contributions.schemas import ContributionFieldValueSchema, contribution_type_schema_basic
 from indico.modules.events.tracks.schemas import track_schema_basic
-from indico.modules.users.schemas import UserSchema
+from indico.modules.users.schemas import AffiliationSchema, UserSchema
 
 
 _basic_abstract_fields = ('id', 'friendly_id', 'title')
@@ -61,10 +61,12 @@ class AbstractReviewSchema(mm.SQLAlchemyAutoSchema):
 
 
 class AbstractPersonLinkSchema(mm.SQLAlchemyAutoSchema):
+    affiliation_link = Nested(AffiliationSchema)
+
     class Meta:
         model = AbstractPersonLink
-        fields = ('id', 'person_id', 'email', 'first_name', 'last_name', 'title', 'affiliation', 'address', 'phone',
-                  'is_speaker', 'author_type')
+        fields = ('id', 'person_id', 'email', 'first_name', 'last_name', 'title', 'affiliation', 'affiliation_link',
+                  'address', 'phone', 'is_speaker', 'author_type')
 
 
 class AbstractSchema(mm.SQLAlchemyAutoSchema):

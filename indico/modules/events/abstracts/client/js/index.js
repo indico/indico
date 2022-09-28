@@ -13,6 +13,7 @@ import {$T} from 'indico/utils/i18n';
 
 import 'indico/modules/events/reviews';
 import 'indico/modules/events/util/types_dialog';
+import 'indico/react/components/AffiliationPopup';
 
 import './boa';
 

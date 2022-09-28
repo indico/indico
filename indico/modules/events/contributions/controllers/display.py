@@ -145,6 +145,19 @@ class RHContributionDisplay(RHContributionDisplayBase):
                                                published=contribution_settings.get(self.event, 'published'))
 
 
+class RHContributionJSON(RHContributionDisplayBase):
+    """Return JSON data for a contribution."""
+
+    def _process(self):
+        from indico.modules.events.contributions.schemas import FullContributionSchema
+        can_manage = self.contrib.can_manage(session.user)
+        return FullContributionSchema(context={
+            'hide_restricted_data': not can_manage,
+            'user_can_manage': can_manage,
+            'user_owns_abstract': self.contrib.abstract.user_owns(session.user) if self.contrib.abstract else None,
+        }).jsonify(self.contrib)
+
+
 class RHAuthorList(RHDisplayProtectionBase):
     MENU_ENTRY_NAME = 'author_index'
     view_class = WPAuthorList

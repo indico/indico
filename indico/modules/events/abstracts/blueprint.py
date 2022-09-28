@@ -85,13 +85,13 @@ _bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', 
 _bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', abstract_list.RHAbstractListStaticURL,
                  methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/abstracts.pdf', 'abstracts_pdf_export', abstract_list.RHAbstractsExportPDF,
-                 methods=('POST',))
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/abstracts.csv', 'abstracts_csv_export', abstract_list.RHAbstractsExportCSV,
-                 methods=('POST',))
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/abstracts.xlsx', 'abstracts_xlsx_export', abstract_list.RHAbstractsExportExcel,
-                 methods=('POST',))
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/abstracts.json', 'abstracts_json_export', abstract_list.RHAbstractsExportJSON,
-                 methods=('POST',))
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/create', 'manage_create_abstract', abstract_list.RHCreateAbstract,
                  methods=('GET', 'POST'))
 
@@ -100,7 +100,7 @@ _bp.add_url_rule('/manage/abstracts/delete', 'manage_delete_abstracts', abstract
                  methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/person-list', 'person_list', abstract_list.RHAbstractPersonList, methods=('POST',))
 _bp.add_url_rule('/manage/abstracts/attachments', 'download_attachments', abstract_list.RHAbstractsDownloadAttachments,
-                 methods=('POST',))
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/judge', 'manage_judge_abstracts', abstract_list.RHBulkAbstractJudgment,
                  methods=('POST',))
 

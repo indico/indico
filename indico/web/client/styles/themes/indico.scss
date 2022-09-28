@@ -198,12 +198,28 @@ div.event-header {
   margin: 0;
   padding: 10px 30px 10px;
 
-  h1 {
-    font-size: 20pt;
-    color: $header-text-color;
-    font-weight: normal;
-    margin-top: 10px;
+  .event-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5em;
     margin-bottom: 10px;
+
+    h1 {
+      font-size: 20pt;
+      color: $header-text-color;
+      font-weight: normal;
+      margin-top: 10px;
+    }
+
+    .event-actions {
+      display: flex;
+
+      @media screen {
+        // XXX somehow this breaks printing in chrome (23k pages)
+        gap: 0.2em;
+      }
+      margin-top: 10px;
+    }
   }
 
   &.round-bottom-corners {
@@ -232,7 +248,6 @@ div.event-header {
   &.break-description,
   &.contrib-description,
   &.subcontrib-description {
-    font-size: 0.9em;
     padding: 0.5em 0;
   }
 
@@ -357,7 +372,7 @@ ul.day-list {
     .timetable-item-actions {
       flex-shrink: 0;
       padding-top: 0.25rem;
-      max-height: 2em;
+      max-height: 2.2em;
 
       .manage-button {
         .i-button {
@@ -373,28 +388,32 @@ ul.day-list {
 }
 
 .event-manage-button {
-  margin-top: 10px;
   font-size: 10pt;
+
+  button.open {
+    border-bottom-left-radius: 0;
+  }
+
+  .i-dropdown {
+    border-top-left-radius: 0;
+  }
 }
 
 .event-privacy-info-button {
   @extend %font-family-body;
-
-  position: absolute;
-  top: 5px;
-  right: 5px;
   font-size: 12pt;
 
   .privacy-dropdown {
     display: inline-block;
     position: relative;
+    outline: none;
 
     .menu {
       display: none;
       position: absolute;
       z-index: 1;
-      top: 1.5em;
-      right: 0;
+      top: 1.8em;
+      right: 0.2em;
       min-width: 10em;
       border-radius: 2px;
       background-color: $light-gray;
@@ -439,8 +458,6 @@ ul.day-list {
 .subcontrib-list {
   list-style-type: none;
   padding: 0;
-
-  font-size: 0.9em;
 
   .timetable-item.timetable-subcontrib {
     border-left: 2px dotted $gray;

@@ -5,37 +5,49 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global RichTextEditor:false, $E:false */
+import ClassicEditor from 'ckeditor';
+import _ from 'lodash';
+
+import {getConfig} from 'indico/ckeditor';
 
 (function(global) {
-  'use strict';
-
-  global.setupCKEditorWidget = function setupCKEditorWidget(options) {
-    options = $.extend(
-      true,
-      {
-        fieldId: null,
-        simple: false,
-        images: false,
-        height: 475,
-      },
-      options
-    );
-
-    var field = $('#' + options.fieldId);
-    var editor = new RichTextEditor(600, options.height, options.simple, options.images);
-    editor.set(field.val());
-    editor.onLoad(function() {
-      editor.onChange(function() {
-        field.val(editor.get()).trigger('change');
-      });
+  global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
+    const {fieldId, images = true, imageUploadURL = null, width, height = 475, ...rest} = options;
+    const field = document.getElementById(fieldId);
+    const editor = await ClassicEditor.create(field, {
+      ...getConfig({images, imageUploadURL}),
+      ...rest,
     });
-    $E(options.fieldId + '-editor').set(editor.draw());
+    editor.setData(field.value);
+    editor.model.document.on(
+      'change:data',
+      _.debounce(() => {
+        field.value = editor.getData();
+        field.dispatchEvent(new Event('change', {bubbles: true}));
+      }, 250)
+    );
+    editor.editing.view.change(writer => {
+      writer.setStyle(
+        'width',
+        width ? `${width}px` : 'auto',
+        editor.editing.view.document.getRoot()
+      );
+      writer.setStyle('height', `${height}px`, editor.editing.view.document.getRoot());
+    });
     // Re-position the dialog if we have one since the initial position is
     // wrong due to the editor being loaded after the dialog has been opened.
-    var dialog = field.closest('.ui-dialog-content');
+    const dialog = $(field.closest('.ui-dialog-content'));
     if (dialog.length) {
       dialog.dialog('option', 'position', dialog.dialog('option', 'position'));
+    }
+    // Make sure the option dropdowns are displayed above the dialog.
+    const uiDialog = field.closest('.ui-dialog-content');
+    const exPopup = field.closest('.exclusivePopup');
+    if (uiDialog) {
+      uiDialog.style.overflow = 'inherit';
+    }
+    if (exPopup) {
+      exPopup.style.overflow = 'inherit';
     }
   };
 })(window);

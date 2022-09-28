@@ -11,7 +11,6 @@ from sqlalchemy.ext.hybrid import Comparator, hybrid_method, hybrid_property
 from sqlalchemy.orm import joinedload, noload
 
 from indico.core.db.sqlalchemy import PyIntEnum, db
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.permissions import get_available_permissions
 from indico.util.decorators import classproperty, strict_classproperty
 from indico.util.enum import IndicoEnum
@@ -669,9 +668,10 @@ def clone_principals(cls, principals, event_role_map=None, regform_map=None):
     :param regform_map: if omitted, registration forms are skipped
     :return: A new set of principals that can be added to an object
     """
+    from indico.modules.events.cloning import get_attrs_to_clone
     rv = set()
     assert all(isinstance(x, cls) for x in principals)
-    attrs = get_simple_column_attrs(cls) | {'user', 'local_group', 'ip_network_group', 'category_role'}
+    attrs = get_attrs_to_clone(cls, add={'user', 'local_group', 'ip_network_group', 'category_role'})
     for old_principal in principals:
         event_role = None
         registration_form = None

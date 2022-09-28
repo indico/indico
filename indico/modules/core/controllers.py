@@ -26,11 +26,13 @@ from indico.core.sentry import submit_user_feedback
 from indico.core.settings import PrefixSettingsProxy
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
+from indico.modules.core.captcha import generate_captcha_challenge, get_captcha_plugin
 from indico.modules.core.forms import SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.legal import legal_settings
 from indico.modules.users.controllers import RHUserBase
+from indico.modules.users.schemas import AffiliationSchema
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalDict, validate_with_message
 from indico.util.string import sanitize_html
@@ -194,11 +196,15 @@ class PrincipalsMixin:
                     'type': 'user',
                     'user_id': principal.id,
                     'invalid': principal.is_deleted,
+                    'title': principal._title.name,
                     'name': principal.display_full_name,
                     'first_name': principal.first_name,
                     'last_name': principal.last_name,
                     'email': principal.email,
                     'affiliation': principal.affiliation,
+                    'affiliation_id': principal.affiliation_id,
+                    'affiliation_meta': (AffiliationSchema().dump(principal.affiliation_link)
+                                         if principal.affiliation_link else None),
                     'avatar_url': principal.avatar_url,
                     'detail': (f'{principal.email} ({principal.affiliation})'
                                if principal.affiliation else principal.email)}
@@ -320,3 +326,29 @@ class RHConfig(RH):
                        has_privacy_policy=bool(privacy_policy_url or privacy_policy_html),
                        privacy_policy_html=privacy_policy_html,
                        privacy_policy_url=privacy_policy_url)
+
+
+class RHAPIGenerateCaptcha(RH):
+    """Generate a CAPTCHA.
+
+    If a CAPTCHA plugin is available it is used,
+    otherwise we fallback to the built-in CAPTCHA.
+
+    See `CaptchaPluginMixin` for more information about
+    custom CAPTCHA plugins.
+    """
+
+    def _process_GET(self):
+        if plugin := get_captcha_plugin():
+            data = plugin.generate_captcha()
+        else:
+            data, answer = generate_captcha_challenge()
+            session['captcha_state'] = answer
+        rv = jsonify(data)
+        # make sure browsers don't cache this. otherwise using the back button after successfully
+        # using the old captcha code will go back to the page showing the already-used code instead
+        # of fetching a new one
+        rv.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        rv.headers['Pragma'] = 'no-cache'
+        rv.headers['Expires'] = '0'
+        return rv

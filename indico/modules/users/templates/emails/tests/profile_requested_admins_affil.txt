@@ -1,0 +1,14 @@
+Someone has requested to register a new indico profile.
+Please review their registration request and approve/reject it accordingly.
+
+First name: Guinea
+Last name: Pig
+Email address: cat@meow.cat
+Affiliation: Illuminyati
+
+Manage pending requests:
+http://localhost/admin/users/registration-requests/
+
+--
+Indico :: Email Notifier
+http://localhost/

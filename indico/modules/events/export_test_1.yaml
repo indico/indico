@@ -141,10 +141,10 @@ timestamp: 2017-08-24 09:00:00+00:00
 users:
   00000000-0000-4000-8000-000000000001:
     address: ''
-    affiliation: null
+    affiliation: ''
     all_emails:
-    - 1337@example.com
-    email: 1337@example.com
+    - 1337@example.test
+    email: 1337@example.test
     first_name: Guinea
     last_name: Pig
     phone: ''

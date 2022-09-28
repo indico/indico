@@ -13,6 +13,7 @@ from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
 
 from indico.core import signals
+from indico.core.cache import make_scoped_cache
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.modules.events.layout import theme_settings
@@ -20,6 +21,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.persons.util import get_event_person
+from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.web.forms.fields import MultipleItemsField
@@ -90,10 +92,26 @@ class PersonLinkListFieldBase(PrincipalListField):
         # The event should be a property as it may only be available later, such as, in creation forms
         return getattr(self.get_form(), 'event', None)
 
+    @property
+    def has_predefined_affiliations(self):
+        return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
+
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
+        identifier = data.get('identifier')
         data = PersonLinkSchema(unknown=EXCLUDE).load(data)
+        if identifier and identifier.startswith('ExternalUser:'):
+            # if the data came from an external user, look up their affiliation if the names still match;
+            # we do not have an affiliation ID yet since it may not exist in the local DB yet
+            cache = make_scoped_cache('external-user')
+            external_user_data = cache.get(identifier.removeprefix('ExternalUser:'), {})
+            if (
+                (affiliation_data := external_user_data.get('affiliation_data')) and
+                data['affiliation'] == affiliation_data['name']
+            ):
+                data['affiliation_link'] = Affiliation.get_or_create_from_data(affiliation_data)
+                data['affiliation'] = data['affiliation_link'].name
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
         person_link = None
@@ -101,11 +119,9 @@ class PersonLinkListFieldBase(PrincipalListField):
             person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
         if not person_link:
             person_link = self.person_link_cls(person=person)
-        person_link.populate_from_dict(data, keys=(
-            'first_name', 'last_name', 'affiliation', 'address', 'phone', '_title', 'display_order'))
+        person_link.populate_from_dict(data, keys=('first_name', 'last_name', 'affiliation', 'affiliation_link',
+                                                   'address', 'phone', '_title', 'display_order'))
         email = data.get('email', '').lower()
-        if not email:
-            raise UserValueError(_('A valid email address is required'))
         if email != person_link.email:
             if not self.event or not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
@@ -123,12 +139,14 @@ class PersonLinkListFieldBase(PrincipalListField):
         return list({self._get_person_link(x) for x in data})
 
     def _value(self):
+        if submitted_data := getattr(self, '_submitted_data', None):
+            return submitted_data
         return [self._serialize_person_link(person_link)
                 for person_link in sorted(self.data, key=attrgetter('display_order_key'))] if self.data else []
 
     def process_formdata(self, valuelist):
         if valuelist:
-            self.data = json.loads(valuelist[0])
+            self.data = self._submitted_data = json.loads(valuelist[0])
             try:
                 self.data = self._convert_data(self.data)
             except ValueError:

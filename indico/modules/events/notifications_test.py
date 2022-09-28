@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -44,3 +45,12 @@ def test_move_request_closed_email_plaintext(snapshot, create_category, create_e
                                    events=events, target_category=cat, accept=accept, reason=reason)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     snapshot.assert_match(template.get_body(), snapshot_name)
+
+
+def test_event_creation_email_plaintext(snapshot, dummy_event):
+    dummy_event.start_dt = datetime(2022, 11, 11, 13, 37)
+    dummy_event.end_dt = datetime(2022, 11, 11, 22, 22)
+    template = get_template_module('events/emails/event_creation.txt',
+                                   event=dummy_event, occurrences=None)
+    snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
+    snapshot.assert_match(template.get_body(), 'event_creation.txt')

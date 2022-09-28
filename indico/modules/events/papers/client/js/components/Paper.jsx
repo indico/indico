@@ -37,22 +37,24 @@ export default function Paper({eventId, contributionId}) {
   const dispatch = useDispatch();
   const paper = useSelector(getPaperDetails);
   const isInitialPaperDetailsLoading = useSelector(isFetchingInitialPaperDetails);
-  const {data: fileTypes, loading: isFileTypesLoading} = useIndicoAxios({
-    url: fileTypesURL({event_id: eventId, type: EditableType.paper}),
-    trigger: eventId,
-    unhandledErrors: [404], // if editing module is disabled
-    camelize: true,
-  });
-  const {data: editable, loading: isEditableLoading} = useIndicoAxios({
-    url: editableDetailsURL({
+  const {data: fileTypes, loading: isFileTypesLoading} = useIndicoAxios(
+    fileTypesURL({event_id: eventId, type: EditableType.paper}),
+    {
+      unhandledErrors: [404], // if editing module is disabled
+      camelize: true,
+    }
+  );
+  const {data: editable, loading: isEditableLoading} = useIndicoAxios(
+    editableDetailsURL({
       event_id: eventId,
       contrib_id: contributionId,
       type: EditableType.paper,
     }),
-    trigger: [eventId, contributionId],
-    unhandledErrors: [404, 403], // if there is no editable yet (404) or viewed by a paper reviewer (403)
-    camelize: true,
-  });
+    {
+      unhandledErrors: [404, 403], // if there is no editable yet (404) or viewed by a paper reviewer (403)
+      camelize: true,
+    }
+  );
 
   useEffect(() => {
     dispatch(fetchPaperDetails(eventId, contributionId));

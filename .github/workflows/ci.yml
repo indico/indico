@@ -12,7 +12,16 @@ on:
 
 jobs:
   setup:
+    name: setup-${{ matrix.name }}
     runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: '3.9', python: '3.9', tox: py39 }
+          - { name: '3.10', python: '3.10', tox: py310 }
+
     steps:
       - uses: actions/checkout@v2
 
@@ -25,7 +34,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: ${{ matrix.python }}
 
       - name: Setup Node
         uses: actions/setup-node@v1
@@ -38,7 +47,7 @@ jobs:
 
       - name: Create virtualenv
         run: |
-          python3.9 -m venv .venv
+          python${{ matrix.python }} -m venv .venv
           source .venv/bin/activate
           pip install -U pip setuptools wheel
 
@@ -55,7 +64,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: pip|${{ runner.os }}|3.9|${{ hashFiles('requirements*.txt') }}
+          key: pip|${{ runner.os }}|${{ matrix.python }}|${{ hashFiles('requirements*.txt') }}
 
       - name: Install python dependencies
         run: |
@@ -72,7 +81,7 @@ jobs:
       - name: Upload environment
         uses: actions/upload-artifact@v2
         with:
-          name: environment
+          name: environment-${{ matrix.name }}
           retention-days: 1
           path: /tmp/env.tar
 
@@ -87,7 +96,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: '3.10'
 
       - name: Setup Node
         uses: actions/setup-node@v1
@@ -97,7 +106,7 @@ jobs:
       - name: Download environment
         uses: actions/download-artifact@v2
         with:
-          name: environment
+          name: environment-3.10
           path: /tmp
 
       - name: Restore environment
@@ -192,12 +201,20 @@ jobs:
 
 
   test-python:
+    name: test-python-${{ matrix.name }}
     needs: setup
     runs-on: ubuntu-20.04
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: '3.9', python: '3.9', tox: py39 }
+          - { name: '3.10', python: '3.10', tox: py310 }
+
     services:
       postgres:
-        image: postgres:11
+        image: postgres:12
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
@@ -211,7 +228,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: ${{ matrix.python }}
 
       - name: Setup Node
         uses: actions/setup-node@v1
@@ -221,7 +238,7 @@ jobs:
       - name: Download environment
         uses: actions/download-artifact@v2
         with:
-          name: environment
+          name: environment-${{ matrix.name }}
           path: /tmp
 
       - name: Restore environment
@@ -241,6 +258,7 @@ jobs:
 
       - name: Setup database
         run: |
+          sudo apt-get update
           sudo apt-get install postgresql-client libpq-dev
           export PGHOST=localhost
           export PGPORT=${{ job.services.postgres.ports[5432] }}
@@ -266,7 +284,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: '3.10'
 
       - name: Setup Node
         uses: actions/setup-node@v1
@@ -276,7 +294,7 @@ jobs:
       - name: Download environment
         uses: actions/download-artifact@v2
         with:
-          name: environment
+          name: environment-3.10
           path: /tmp
 
       - name: Restore environment

@@ -47,4 +47,5 @@ def test_legacy_ids(db, dummy_event, test_client, url, legacy_id):
     db.session.add(LegacyEventMapping(legacy_event_id=legacy_id, event=dummy_event))
     rv = test_client.get(url.format(legacy_id))
     assert rv.status_code == 301
-    assert rv.headers['Location'] == 'http://localhost' + url.format(dummy_event.id)
+    url = url.format(dummy_event.id)
+    assert rv.headers['Location'] in (url, f'http://localhost{url}')

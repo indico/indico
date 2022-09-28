@@ -5,40 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 (function($, undefined) {
-  // Serialize a form to an object with the input names as the keys
-  $.fn.serializeObject = function() {
-    var obj = {};
-    $.each(this.serializeArray(), function(i, pair) {
-      obj[pair.name] = pair.value;
-    });
-    return obj;
-  };
-
-  $.fn.textContains = function(term) {
-    term = term.toLowerCase();
-    return this.filter(function() {
-      return (
-        $(this)
-          .text()
-          .toLowerCase()
-          .indexOf(term) > -1
-      );
-    });
-  };
-
-  $.fn.valueContains = function(term) {
-    term = term.toLowerCase();
-    return this.filter(function() {
-      return (
-        $(this)
-          .val()
-          .toLowerCase()
-          .indexOf(term) > -1
-      );
-    });
-  };
-
   $.fn.hasCSS = function(propertyName, value) {
     return this.css(propertyName) === value;
   };

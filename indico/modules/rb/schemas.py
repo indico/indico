@@ -10,7 +10,7 @@ from operator import itemgetter
 from babel.dates import get_timezone
 from flask import session
 from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
-from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, Pluck, String
+from marshmallow.fields import Boolean, Date, DateTime, Function, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
 from sqlalchemy import func
 
@@ -34,11 +34,11 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import get_format_placeholders, rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList,
-                                     not_empty)
+                                     not_empty, validate_placeholders)
 from indico.util.string import natural_sort_key
 
 
@@ -294,6 +294,21 @@ class NonBookablePeriodSchema(mm.SQLAlchemyAutoSchema):
         fields = ('start_dt', 'end_dt')
 
 
+class NonBookablePeriodAdminSchema(mm.SQLAlchemyAutoSchema):
+    start_dt = Date()
+    end_dt = Date()
+
+    class Meta:
+        model = NonBookablePeriod
+        fields = ('start_dt', 'end_dt')
+
+    @post_dump(pass_many=True)
+    def sort_list(self, data, many, **kwargs):
+        if many:
+            data = sorted(data, key=itemgetter('start_dt', 'end_dt'))
+        return data
+
+
 class BookableHoursSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = BookableHours
@@ -396,24 +411,13 @@ class LocationArgs(mm.Schema):
 
     @validates('room_name_format')
     def _check_room_name_format_placeholders(self, room_name_format, **kwargs):
-        self._validate_placeholders(room_name_format, {'site', 'building', 'floor', 'number'}, {'number'})
+        validate_placeholders(room_name_format, {'site', 'building', 'floor', 'number'}, {'number'})
 
     @validates('map_url_template')
     def _check_map_url_template_placeholders(self, map_url_template, **kwargs):
         if not map_url_template:
             return
-        self._validate_placeholders(map_url_template, {'id', 'building', 'floor', 'number', 'lat', 'lng'})
-
-    def _validate_placeholders(self, format_string, valid_placeholders, required_placeholders=None):
-        try:
-            placeholders = set(get_format_placeholders(format_string))
-        except ValueError:
-            raise ValidationError(_('Invalid placeholder format'))
-        # placeholders are already validated client-side, no i18n needed here
-        if required_placeholders and (missing := required_placeholders - placeholders):
-            raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
-        if invalid := placeholders - valid_placeholders:
-            raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
+        validate_placeholders(map_url_template, {'id', 'building', 'floor', 'number', 'lat', 'lng'})
 
 
 class FeatureArgs(mm.Schema):
@@ -513,6 +517,7 @@ reservation_user_event_schema = ReservationUserEventSchema(many=True)
 blockings_schema = BlockingSchema(many=True)
 simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
+nonbookable_periods_admin_schema = NonBookablePeriodAdminSchema(many=True)
 bookable_hours_schema = BookableHoursSchema()
 locations_schema = LocationsSchema(many=True)
 admin_locations_schema = AdminLocationsSchema(many=True)

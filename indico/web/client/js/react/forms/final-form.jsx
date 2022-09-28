@@ -119,7 +119,7 @@ export function FinalModalForm({
       {fprops => (
         <Modal
           onClose={unloadPrompt ? confirmingOnClose(fprops.dirty) : onClose}
-          size={size}
+          size={size === 'standard' ? undefined : size}
           closeIcon={!fprops.submitting}
           closeOnEscape={!fprops.submitting}
           closeOnDimmerClick={!fprops.submitting}
@@ -183,7 +183,7 @@ FinalModalForm.propTypes = {
   /** Form-level validator to apply to the final-form. */
   validate: PropTypes.func,
   /** The size of the modal. */
-  size: PropTypes.oneOf(['mini', 'tiny', 'small', 'large', 'fullscreen']),
+  size: PropTypes.oneOf(['mini', 'tiny', 'small', 'standard', 'large', 'fullscreen']),
   /** The header of the modal (typically a title). */
   header: PropTypes.node.isRequired,
   /** Whether the submit button should remain disabled as long as the form is in pristine state. */

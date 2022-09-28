@@ -209,8 +209,8 @@ users:
     address: ''
     affiliation: null
     all_emails:
-    - 1337@example.com
-    email: 1337@example.com
+    - 1337@example.test
+    email: 1337@example.test
     first_name: Guinea
     last_name: Pig
     phone: ''

@@ -15,10 +15,10 @@ from datetime import timedelta
 
 import click
 from click.types import convert_type
+from colorclass import Color
 
 from indico.util.date_time import format_human_timedelta
 from indico.util.string import validate_email
-from indico.vendor.colorclass import Color
 
 
 def prompt_email(prompt='Email', default=None, confirm=False):
@@ -107,8 +107,8 @@ def _cformat_sub(m):
     if m.group('fg_bold'):
         bold = '{b}'
     if bg_color := m.group('bg'):
-        bg = '{bg%s}' % bg_color
-    fg = '{%s}' % m.group('fg')
+        bg = '{bg%s}' % bg_color.replace('grey', 'white')
+    fg = '{%s}' % m.group('fg').replace('grey', 'white')
     return Color(f'{bold}{bg}{fg}')
 
 

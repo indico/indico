@@ -11,7 +11,7 @@ from marshmallow.fields import Boolean, Decimal, Field, Function, Integer, List,
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
-from indico.modules.events.contributions.schemas import ContributionSchema
+from indico.modules.events.contributions.schemas import BasicContributionSchema
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.modules.events.models.events import Event
@@ -197,7 +197,7 @@ class PaperReviewCommentSchema(mm.SQLAlchemyAutoSchema):
 
 class PaperSchema(mm.Schema):
     is_in_final_state = Boolean()
-    contribution = Nested(ContributionSchema)
+    contribution = Nested(BasicContributionSchema)
     event = Nested(PaperEventSchema)
     revisions = List(Nested(PaperRevisionSchema))
     last_revision = Nested(PaperRevisionSchema)

@@ -27,7 +27,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
-from indico.modules.users.models.affiliations import UserAffiliation
+from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table, favorite_user_table
 from indico.util.enum import RichIntEnum
@@ -83,7 +83,7 @@ class PersonMixin:
             return get_default_values(type(self)).get('_title', UserTitle.none).title
         return self._title.title
 
-    def get_full_name(self, show_title=True, last_name_first=True, last_name_upper=True,
+    def get_full_name(self, show_title=False, last_name_first=True, last_name_upper=True,
                       abbrev_first_name=True, _show_empty_names=False):
         """Return the person's name in the specified notation.
 
@@ -134,6 +134,14 @@ class PersonMixin:
 
     # Convenience property to have a canonical `name` property
     name = full_name
+
+    @property
+    def affiliation_details(self):
+        from indico.modules.users.schemas import AffiliationSchema
+        if link := getattr(self, 'affiliation_link', None):
+            return AffiliationSchema().dump(link)
+        else:
+            return None
 
 
 #: Fields which can be synced as keys and a mapping to a more human
@@ -206,6 +214,19 @@ class User(PersonMixin, db.Model):
         PyIntEnum(UserTitle),
         nullable=False,
         default=UserTitle.none
+    )
+    #: the name of the affiliation (regardless if predefined or manually-entered)
+    affiliation = db.Column(
+        db.String,
+        nullable=False,
+        index=True,
+        default=''
+    )
+    #: the id of the underlying predefined affiliation
+    affiliation_id = db.Column(
+        db.ForeignKey('indico.affiliations.id'),
+        nullable=True,
+        index=True
     )
     #: the phone number of the user
     phone = db.Column(
@@ -282,14 +303,6 @@ class User(PersonMixin, db.Model):
         default=ProfilePictureSource.standard,
     )
 
-    _affiliation = db.relationship(
-        'UserAffiliation',
-        lazy=False,
-        uselist=False,
-        cascade='all, delete-orphan',
-        backref=db.backref('user', lazy=True)
-    )
-
     _primary_email = db.relationship(
         'UserEmail',
         lazy=False,
@@ -315,8 +328,7 @@ class User(PersonMixin, db.Model):
         collection_class=set,
         backref=db.backref('user', lazy=False)
     )
-    #: the affiliation of the user
-    affiliation = association_proxy('_affiliation', 'name', creator=lambda v: UserAffiliation(name=v))
+
     #: the primary email address of the user
     email = association_proxy('_primary_email', 'email', creator=lambda v: UserEmail(email=v, is_primary=True))
     #: any additional emails the user might have
@@ -331,6 +343,18 @@ class User(PersonMixin, db.Model):
         lazy=True,
         backref=db.backref('merged_from_users', lazy=True),
         remote_side='User.id',
+    )
+    #: the predefined affiliation of the user
+    affiliation_link = db.relationship(
+        'Affiliation',
+        lazy=False,
+        backref=db.backref(
+            'user_affiliations',
+            lazy='dynamic',
+            # disable backref cascade so the link created in `principal_from_identifier` does not
+            # add the User to the session just because it's linked to an Affiliation
+            cascade_backrefs=False
+        )
     )
     #: the users's favorite users
     favorite_users = db.relationship(
@@ -676,6 +700,7 @@ class User(PersonMixin, db.Model):
             # refuse to sync with empty identities, just in case - if there is no
             # data at all there's a good chance something is wrong!
             return
+        affiliation_data = identity.data.get('affiliation_data')
         for field in self.synced_fields:
             old_value = getattr(self, field)
             new_value = identity.data.get(field) or ''
@@ -683,6 +708,11 @@ class User(PersonMixin, db.Model):
                 new_value = new_value.lower()
             if field in ('first_name', 'last_name', 'email') and not new_value:
                 continue
+            if field == 'affiliation':
+                if affiliation_data:
+                    self.affiliation_link = Affiliation.get_or_create_from_data(affiliation_data)
+                else:
+                    self.affiliation_link = None  # clear link to predefined affiliation
             if old_value == new_value:
                 continue
             logger.info('Syncing %s for %r from %r to %r', field, self, old_value, new_value)
@@ -783,5 +813,6 @@ def _user_deleted(target, value, *unused):
 
 define_unaccented_lowercase_index(User.first_name)
 define_unaccented_lowercase_index(User.last_name)
+define_unaccented_lowercase_index(User.affiliation)
 define_unaccented_lowercase_index(User.phone)
 define_unaccented_lowercase_index(User.address)

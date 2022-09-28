@@ -10,94 +10,22 @@ import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
-import {Button, Segment, List, Form, Label, Icon, Popup, Message, Ref} from 'semantic-ui-react';
+import {Button, Segment, List, Label, Icon, Popup, Ref} from 'semantic-ui-react';
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
-import {FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
-import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 import {snakifyKeys} from 'indico/utils/case';
 
 import {Translate} from '../i18n';
 
+import PersonDetailsModal from './PersonDetailsModal';
 import {PrincipalItem} from './principals/items';
 
 import './PersonLinkField.module.scss';
 
-const titles = [
-  {text: Translate.string('Mr'), value: 'mr'},
-  {text: Translate.string('Ms'), value: 'ms'},
-  {text: Translate.string('Mrs'), value: 'mrs'},
-  {text: Translate.string('Dr'), value: 'dr'},
-  {text: Translate.string('Prof'), value: 'prof'},
-  {text: Translate.string('Mx'), value: 'mx'},
-];
-
-const ExternalPersonModal = ({onSubmit, onClose, person}) => (
-  <FinalModalForm
-    id="person-link-details"
-    size="tiny"
-    onClose={onClose}
-    onSubmit={onSubmit}
-    header={Translate.string('Enter Person')}
-    submitLabel={Translate.string('Save')}
-    initialValues={person || {}}
-  >
-    {/* eslint-disable-next-line eqeqeq */}
-    {person && person.userId != null && (
-      <Translate as={Message}>
-        You are updating details that were originally linked to a user. Please note that its
-        identity will remain the same.
-      </Translate>
-    )}
-    <Form.Group widths="equal">
-      <Form.Field>
-        <Translate as="label">Title</Translate>
-        <FinalDropdown name="title" fluid search selection options={titles} />
-      </Form.Field>
-      <Form.Field>
-        <Translate as="label">Affiliation</Translate>
-        <FinalInput name="affiliation" />
-      </Form.Field>
-    </Form.Group>
-    <Form.Group widths="equal">
-      <Form.Field>
-        <Translate as="label">First Name</Translate>
-        <FinalInput name="firstName" />
-      </Form.Field>
-      <Form.Field>
-        <Translate as="label">Family Name</Translate>
-        <FinalInput name="lastName" required />
-      </Form.Field>
-    </Form.Group>
-    <Form.Field>
-      <Translate as="label">Email</Translate>
-      <FinalInput name="email" required />
-    </Form.Field>
-    <Form.Group widths="equal">
-      <Form.Field>
-        <Translate as="label">Address</Translate>
-        <FinalTextArea name="address" />
-      </Form.Field>
-      <Form.Field>
-        <Translate as="label">Telephone</Translate>
-        <FinalInput name="telephone" />
-      </Form.Field>
-    </Form.Group>
-  </FinalModalForm>
-);
-
-ExternalPersonModal.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-  person: PropTypes.object,
-};
-
-ExternalPersonModal.defaultProps = {
-  person: undefined,
-};
+const nameFormat = ({firstName, lastName}) => (firstName ? `${firstName} ${lastName}` : lastName);
 
 const PersonListItem = ({
   person: {avatarURL, firstName, lastName, affiliation, email},
@@ -108,11 +36,11 @@ const PersonListItem = ({
   onClickRole,
   disabled,
 }) => (
-  <PrincipalItem as={List.Item}>
+  <PrincipalItem as={List.Item} styleName="principal">
     <PrincipalItem.Icon type={PrincipalType.user} avatarURL={avatarURL} styleName="icon" />
     <PrincipalItem.Content
-      name={firstName ? `${firstName} ${lastName}` : lastName}
-      detail={affiliation ? `${email} (${affiliation})` : email}
+      name={nameFormat({firstName, lastName})}
+      detail={(email ? `${email} ` : '') + (affiliation ? `(${affiliation})` : '')}
     />
     <div styleName="roles">
       {roles &&
@@ -139,6 +67,7 @@ const PersonListItem = ({
       <Icon
         styleName="button edit"
         name="pencil alternate"
+        title={Translate.string('Edit person')}
         size="large"
         onClick={onEdit}
         disabled={disabled}
@@ -147,6 +76,7 @@ const PersonListItem = ({
         <Icon
           styleName="button delete"
           name="remove"
+          title={Translate.string('Delete person')}
           size="large"
           onClick={onDelete}
           disabled={disabled}
@@ -183,15 +113,13 @@ const DraggablePerson = ({drag, dragType, onMove, index, ...props}) => {
     separateHandle: true,
   });
   return (
-    <div ref={itemRef} style={style} styleName="drag-item">
+    <div ref={itemRef} style={style} styleName="person-link">
       {!drag && (
         <Ref innerRef={dragRef}>
           <div className="icon-drag-indicator" styleName="handle" />
         </Ref>
       )}
-      <div styleName="preview">
-        <PersonListItem {...props} />
-      </div>
+      <PersonListItem {...props} />
     </div>
   );
 };
@@ -241,7 +169,7 @@ const PersonLinkSection = ({
         {persons.length > 0 ? (
           persons.map((p, idx) => (
             <DraggablePerson
-              key={p.userId || p.email}
+              key={p.userId || p.email || p.firstName + p.lastName}
               index={idx}
               drag={!drag}
               dragType={dragType}
@@ -285,7 +213,7 @@ PersonLinkSection.defaultProps = {
   drag: false,
 };
 
-export default function PersonLinkField({
+function PersonLinkField({
   value: persons,
   onChange,
   eventId,
@@ -294,6 +222,7 @@ export default function PersonLinkField({
   emptyMessage,
   autoSort,
   setAutoSort,
+  hasPredefinedAffiliations,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState(false);
@@ -314,12 +243,21 @@ export default function PersonLinkField({
   };
 
   const onAdd = values => {
-    const existing = persons.map(p => p.email);
+    const existing = persons.filter(p => !!p.email).map(p => p.email);
     values.forEach(p => (p.roles = roles.filter(x => x.default).map(x => x.name)));
     onChange([...persons, ...values.filter(v => !existing.includes(v.email))]);
   };
 
   const onSubmit = value => {
+    if (!hasPredefinedAffiliations) {
+      // value.affiliation is already there and used
+      delete value.affiliationData;
+    } else if (value.affiliationData) {
+      value.affiliation = value.affiliationData.text.trim();
+      value.affiliationId = value.affiliationData.id;
+      value.affiliationMeta = value.affiliationData.meta;
+      delete value.affiliationData;
+    }
     if (selected !== null) {
       value.roles = roles.filter(x => x.default).map(x => x.name);
       onChange(persons.map((v, idx) => (idx === selected ? value : v)));
@@ -364,7 +302,7 @@ export default function PersonLinkField({
           )}
           {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
         </Segment>
-        <Button.Group size="small" attached="bottom" floated="right">
+        <Button.Group size="small" attached="bottom">
           <Button
             toggle
             icon="sort alphabet down"
@@ -373,14 +311,14 @@ export default function PersonLinkField({
             onClick={() => setAutoSort && setAutoSort(!autoSort)}
           />
           {sessionUser && (
-            <Translate
-              as={Button}
+            <Button
               type="button"
               onClick={() => onAdd([sessionUser])}
               disabled={persons.some(p => p.userId === sessionUser.userId)}
             >
-              Add myself
-            </Translate>
+              <Icon name="add user" />
+              <Translate>Add myself</Translate>
+            </Button>
           )}
           <UserSearch
             favorites={favoriteUsers}
@@ -388,18 +326,26 @@ export default function PersonLinkField({
             onAddItems={onAdd}
             triggerFactory={props => (
               <Button type="button" {...props}>
+                <Icon name="search" />
                 <Translate>Search</Translate>
               </Button>
             )}
+            withExternalUsers
             withEventPersons={eventId !== null}
             eventId={eventId}
             disabled={!sessionUser}
           />
-          <Translate as={Button} type="button" onClick={() => setModalOpen(true)}>
-            Enter manually
-          </Translate>
+          <Button type="button" onClick={() => setModalOpen(true)}>
+            <Icon name="keyboard" />
+            <Translate>Enter manually</Translate>
+          </Button>
           {modalOpen && (
-            <ExternalPersonModal onClose={onClose} onSubmit={onSubmit} person={persons[selected]} />
+            <PersonDetailsModal
+              onClose={onClose}
+              onSubmit={onSubmit}
+              person={persons[selected]}
+              hasPredefinedAffiliations={hasPredefinedAffiliations}
+            />
           )}
         </Button.Group>
       </DndProvider>
@@ -416,6 +362,7 @@ PersonLinkField.propTypes = {
   roles: PropTypes.array,
   autoSort: PropTypes.bool,
   setAutoSort: PropTypes.func,
+  hasPredefinedAffiliations: PropTypes.bool,
 };
 
 PersonLinkField.defaultProps = {
@@ -425,6 +372,7 @@ PersonLinkField.defaultProps = {
   roles: [],
   autoSort: true,
   setAutoSort: null,
+  hasPredefinedAffiliations: false,
 };
 
 export function WTFPersonLinkField({
@@ -434,6 +382,7 @@ export function WTFPersonLinkField({
   roles,
   sessionUser,
   emptyMessage,
+  hasPredefinedAffiliations,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -444,14 +393,19 @@ export function WTFPersonLinkField({
   const onChange = (value, sort = autoSort) => {
     const picked = value.map(p =>
       _.pick(p, [
+        'title',
         'firstName',
         'lastName',
         'affiliation',
+        'affiliationId',
         'email',
         'address',
         'phone',
         'roles',
         'displayOrder',
+        'identifier',
+        'type',
+        'personId',
       ])
     );
     inputField.value = JSON.stringify(
@@ -468,7 +422,11 @@ export function WTFPersonLinkField({
 
   return (
     <PersonLinkField
-      value={!autoSort ? persons : persons.slice().sort((a, b) => a.name.localeCompare(b.name))}
+      value={
+        !autoSort
+          ? persons
+          : persons.slice().sort((a, b) => nameFormat(a).localeCompare(nameFormat(b)))
+      }
       eventId={eventId}
       onChange={onChange}
       roles={roles}
@@ -476,6 +434,7 @@ export function WTFPersonLinkField({
       emptyMessage={emptyMessage}
       autoSort={autoSort}
       setAutoSort={setAutoSort}
+      hasPredefinedAffiliations={hasPredefinedAffiliations}
     />
   );
 }
@@ -487,6 +446,7 @@ WTFPersonLinkField.propTypes = {
   roles: PropTypes.array,
   sessionUser: PropTypes.object,
   emptyMessage: PropTypes.string,
+  hasPredefinedAffiliations: PropTypes.bool,
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -495,4 +455,5 @@ WTFPersonLinkField.defaultProps = {
   roles: [],
   sessionUser: null,
   emptyMessage: null,
+  hasPredefinedAffiliations: false,
 };

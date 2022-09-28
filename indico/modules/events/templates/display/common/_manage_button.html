@@ -7,12 +7,10 @@
         {% else %}
             {% set title = _('Add minutes') %}
         {% endif %}
-        <a href="#"
-           data-href="{{ url_for('event_notes.edit', item) }}"
-           data-title="{{ title }}"
-           data-note-editor>
-            {{- title -}}
-        </a>
+        <div class="manage-notes-container"
+             data-api-url="{{ url_for('event_notes.api', item) }}"
+             data-image-upload-url="{{ url_for('attachments.upload_ckeditor', item) }}"
+             data-title="{{ title }}"></div>
     </li>
 {%- endmacro %}
 
@@ -38,13 +36,11 @@
                     {{ _render_note_editor(item) }}
                     {% if item.scheduled_notes %}
                         <li>
-                            <a href=""
-                               data-locator="{{ item.locator | tojson | forceescape }}"
-                               class="notes-compile"
-                               data-href="{{ url_for('event_notes.compile', item) }}"
-                               data-title="{% trans %}Edit minutes{% endtrans %}">
-                                {% trans %}Compile Minutes{% endtrans %}
-                            </a>
+                            <div class="manage-notes-container"
+                                 data-get-note-url="{{ url_for('event_notes.compile', item) }}"
+                                 data-api-url="{{ url_for('event_notes.api', item) }}"
+                                 data-image-upload-url="{{ url_for('attachments.upload_ckeditor', item) }}"
+                                 data-title="{% trans %}Compile minutes{% endtrans %}"></div>
                         </li>
                     {% endif %}
                 {% endif %}
@@ -107,7 +103,7 @@
             {% if item.can_edit(session.user) %}
                 <li>
                     <a href="" class="contribution-edit"
-                               data-href="{{ url_for('contributions.manage_update_contrib', item) }}"
+                               data-href="{{ url_for('contributions.manage_update_contrib', item, standalone=true) }}"
                                data-title="{% trans title=item.title %}Edit contribution '{{ title }}'{% endtrans %}">
                         {% trans %}Edit contribution{% endtrans %}
                     </a>
@@ -136,7 +132,7 @@
                        class="subcontribution-edit"
                        data-title="{% trans %}Edit subcontribution{% endtrans %}"
                        data-subtitle="{{ item.title }}"
-                       data-href="{{ url_for('contributions.manage_edit_subcontrib', item) }}">
+                       data-href="{{ url_for('contributions.manage_edit_subcontrib', item, standalone=true) }}">
                         {% trans %}Edit subcontribution{% endtrans %}
                     </a>
                 </li>
@@ -178,7 +174,10 @@
         {% endif %}
         {% if show_button %}
             <div class="group manage-button">
-                <a class="i-button icon-edit arrow js-dropdown" data-toggle="dropdown"></a>
+                <button class="tiny compact ui icon button js-dropdown" data-toggle="dropdown" title="{% trans %}Manage{% endtrans %}">
+                    <i class="edit icon"></i>
+                    <i class="caret down icon"></i>
+                </button>
                 {{ _render_dropdown(item, item_type, show_note_operations=show_note_operations) }}
             </div>
         {% endif %}

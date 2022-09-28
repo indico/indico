@@ -1,0 +1,7 @@
+Dear Guinea,
+
+Unfortunately your request to create an Indico profile has been denied.
+
+--
+Indico :: Email Notifier
+http://localhost/

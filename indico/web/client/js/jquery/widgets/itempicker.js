@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {natSortCompare} from 'indico/utils/sort';
+
 import {$T} from '../../utils/i18n';
 
 (function($) {
@@ -216,7 +218,7 @@ import {$T} from '../../utils/i18n';
           if (self.selectedItem && $a.data('id') == self.selectedItem.id) return -1;
           if (self.selectedItem && $b.data('id') == self.selectedItem.id) return 1;
 
-          return strnatcmp($a.text().toLowerCase(), $b.text().toLowerCase());
+          return natSortCompare($a.text().toLowerCase(), $b.text().toLowerCase());
         })
         .appendTo(dropdownContainer);
     },

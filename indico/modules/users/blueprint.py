@@ -12,13 +12,13 @@ from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdm
                                               RHExportDashboardICSLegacy, RHPersonalData, RHPersonalDataUpdate,
                                               RHProfilePictureDisplay, RHProfilePicturePage, RHProfilePicturePreview,
                                               RHRegistrationRequestList, RHRejectRegistrationRequest,
-                                              RHSaveProfilePicture, RHUserBlock, RHUserDashboard, RHUserEmails,
-                                              RHUserEmailsDelete, RHUserEmailsSetPrimary, RHUserEmailsVerify,
-                                              RHUserFavorites, RHUserFavoritesAPI, RHUserFavoritesCategoryAPI,
-                                              RHUserFavoritesEventAPI, RHUserPreferences, RHUsersAdmin,
-                                              RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
-                                              RHUsersAdminSettings, RHUserSearch, RHUserSearchInfo,
-                                              RHUserSuggestionsRemove)
+                                              RHSaveProfilePicture, RHSearchAffiliations, RHUserBlock, RHUserDashboard,
+                                              RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
+                                              RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesAPI,
+                                              RHUserFavoritesCategoryAPI, RHUserFavoritesEventAPI, RHUserPreferences,
+                                              RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
+                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSearch,
+                                              RHUserSearchInfo, RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -83,6 +83,7 @@ _bp.add_url_rule('/search/', 'user_search', RHUserSearch)
 
 # Users API
 _bp.add_url_rule('!/api/user/', 'authenticated_user', RHUserAPI)
+_bp.add_url_rule('!/api/affiliations/', 'api_affiliations', RHSearchAffiliations)
 
 
 @_bp.url_defaults

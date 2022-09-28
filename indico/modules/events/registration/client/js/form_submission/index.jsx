@@ -32,6 +32,8 @@ export default function setupRegformSubmission(root) {
     publishToParticipants,
     publishToPublic,
     consentToPublish = null,
+    captchaRequired = false,
+    captchaSettings = null,
     ...extraData
   } = root.dataset;
 
@@ -52,6 +54,8 @@ export default function setupRegformSubmission(root) {
       currency,
       publishToParticipants,
       publishToPublic,
+      captchaRequired: JSON.parse(captchaRequired),
+      captchaSettings: JSON.parse(captchaSettings),
       // XXX: do NOT use extraData for anything in the core; this is solely meant as a way to
       // pass data to plugins injecting custom stuff in the registration form. if you add
       // something in the core, handle it properly above!

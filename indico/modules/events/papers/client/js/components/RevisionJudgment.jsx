@@ -63,9 +63,10 @@ export default function RevisionJudgment({revision}) {
               <div>
                 <Popup
                   position="bottom center"
+                  offset={[0, 5]}
                   content={Translate.string('Reset judgment')}
                   trigger={
-                    <Icon link className="undo" color="grey" onClick={() => setConfirmOpen(true)} />
+                    <Icon link className="undo" color="red" onClick={() => setConfirmOpen(true)} />
                   }
                 />
               </div>

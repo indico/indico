@@ -45,11 +45,10 @@ function tagsReducer(state, action) {
 
 export default function TagManager({eventId}) {
   const [state, dispatch] = useReducer(tagsReducer, initialState);
-  const {data, loading: isLoadingTags, reFetch, lastData} = useIndicoAxios({
-    url: tagsURL({event_id: eventId}),
-    camelize: true,
-    trigger: eventId,
-  });
+  const {data, loading: isLoadingTags, reFetch, lastData} = useIndicoAxios(
+    tagsURL({event_id: eventId}),
+    {camelize: true}
+  );
 
   const createTag = async formData => {
     try {
@@ -107,6 +106,7 @@ export default function TagManager({eventId}) {
                     name="pencil"
                     color="grey"
                     size="small"
+                    title={Translate.string('Edit tag')}
                     onClick={() => dispatch({type: 'EDIT_TAG', tag})}
                     disabled={tag.system}
                     circular
@@ -116,6 +116,7 @@ export default function TagManager({eventId}) {
                     name="remove"
                     color="red"
                     size="small"
+                    title={Translate.string('Delete tag')}
                     onClick={() => dispatch({type: 'DELETE_TAG', tag})}
                     disabled={tag.system}
                     circular

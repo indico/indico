@@ -14,6 +14,7 @@ from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
 from indico.modules.auth.util import url_for_login
+from indico.modules.users.schemas import AffiliationSchema
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import get_all_locales, po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
@@ -77,8 +78,11 @@ def generate_user_file(user=None):
             'avatarURL': user.avatar_url,
             'isAdmin': user.is_admin,
             'affiliation': user.affiliation,
+            'affiliationId': user.affiliation_id,
+            'affiliationMeta': AffiliationSchema().dump(user.affiliation_link) if user.affiliation_link else None,
             'address': user.address,
-            'phone': user.phone
+            'phone': user.phone,
+            'type': user.principal_type.name,  # always 'user'
         }
     return render_template('assets/vars_user.js', user_vars=user_vars, user=user)
 

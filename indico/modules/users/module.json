@@ -1,9 +1,9 @@
 {
-    "name": "users",
-    "partials": {
-        "dashboard": "./dashboard.jsx",
-        "profile_picture": "./ProfilePicture.jsx",
-        "personal_data": "./PersonalDataForm.jsx",
-        "favorites": "./Favorites.jsx"
-    }
+  "name": "users",
+  "partials": {
+    "dashboard": "./dashboard.jsx",
+    "profile_picture": "./ProfilePicture.jsx",
+    "personal_data": "./PersonalDataForm.jsx",
+    "favorites": "./Favorites.jsx"
+  }
 }

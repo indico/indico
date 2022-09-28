@@ -15,7 +15,7 @@ from indico.modules.admin.views import WPAdmin
 from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
 from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
+from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_js_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
 from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
@@ -181,6 +181,10 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         custom_url = get_css_url(self.event)
         return [custom_url] if custom_url else []
 
+    def get_extra_js_files(self):
+        custom_url = get_js_url(self.event)
+        return [custom_url] if custom_url else []
+
     def _apply_decoration(self, body):
         if request.args.get('frame') == 'no' or request.args.get('fr') == 'no' or request.args.get('print') == '1':
             return render_template('events/display/print.html', content=body)
@@ -254,6 +258,10 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
 
     def get_extra_css_files(self):
         theme_url = self._kwargs.get('css_url_override', get_css_url(self.event))
+        return [theme_url] if theme_url else []
+
+    def get_extra_js_files(self):
+        theme_url = self._kwargs.get('js_url_override', get_js_url(self.event))
         return [theme_url] if theme_url else []
 
     def _get_header(self):

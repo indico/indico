@@ -34,6 +34,7 @@ const PrincipalPermissions = ({
     <Icon
       size="small"
       name="plus"
+      title={Translate.string('Add permission')}
       circular
       styleName="permission-add-button"
       color={open ? 'blue' : null}

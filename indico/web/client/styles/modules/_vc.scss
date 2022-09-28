@@ -56,7 +56,3 @@ input[type='radio']:disabled + label {
 input[type='text']#vc-name.highlight {
   animation: text-changed 0.75s linear;
 }
-
-.selectize-dropdown {
-  z-index: 101 !important;
-}

@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from wtforms.fields import BooleanField, StringField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, ValidationError
 
 from indico.modules.events.models.roles import EventRole
 from indico.util.i18n import _
@@ -35,7 +35,7 @@ class EventRoleForm(IndicoForm):
         if self.role is not None:
             query = query.filter(EventRole.id != self.role.id)
         if query.has_rows():
-            raise ValueError(_('A role with this code already exists.'))
+            raise ValidationError(_('A role with this code already exists.'))
 
 
 class ImportMembersCSVForm(IndicoForm):

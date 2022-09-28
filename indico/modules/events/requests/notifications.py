@@ -7,23 +7,12 @@
 
 from flask_pluginengine import plugin_context
 
-from indico.core.config import config
-from indico.core.notifications import email_sender, make_email
+from indico.core.notifications import email_sender
 
 
-def _get_request_manager_emails(req):
-    """Get set of request manager emails."""
+def _make_email(req, template, *, to_request_managers: bool):
     with plugin_context(req.definition.plugin):
-        return req.definition.get_manager_notification_emails()
-
-
-def _get_notification_reply_email(req):
-    """
-    Get the e-mail address that should be the `Reply-To:` of
-    user notifications.
-    """
-    with plugin_context(req.definition.plugin):
-        return req.definition.get_notification_reply_email()
+        return req.definition.make_notification_email(req, template, to_request_managers=to_request_managers)
 
 
 def _get_template_module(name, req, **context):
@@ -44,16 +33,10 @@ def notify_request_managers(req, template, **context):
     :param template: the template for the notification
     :param context: data passed to the template
     """
-    event = req.event
-    reply_addr = config.SUPPORT_EMAIL
-    request_manager_emails = _get_request_manager_emails(req)
-    if not request_manager_emails:
-        return
-    context['event'] = event
+    context['event'] = req.event
     context['req'] = req
     tpl_request_managers = _get_template_module(template, **context)
-    return make_email(request_manager_emails, from_address=config.NO_REPLY_EMAIL, reply_address=reply_addr,
-                      subject=tpl_request_managers.get_subject(), body=tpl_request_managers.get_body())
+    return _make_email(req, tpl_request_managers, to_request_managers=True)
 
 
 def notify_event_managers(req, template, **context):
@@ -63,13 +46,10 @@ def notify_event_managers(req, template, **context):
     :param template: the template for the notification
     :param context: data passed to the template
     """
-    event = req.event
-    reply_addr = _get_notification_reply_email(req)
-    context['event'] = event
+    context['event'] = req.event
     context['req'] = req
     tpl_event_managers = _get_template_module(template, **context)
-    return make_email(event.all_manager_emails, from_address=config.NO_REPLY_EMAIL, reply_address=reply_addr,
-                      subject=tpl_event_managers.get_subject(), body=tpl_event_managers.get_body())
+    return _make_email(req, tpl_event_managers, to_request_managers=False)
 
 
 @email_sender

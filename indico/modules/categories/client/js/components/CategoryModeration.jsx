@@ -218,11 +218,10 @@ RequestList.defaultProps = {
 };
 
 export default function CategoryModeration({categoryId}) {
-  const {data, lastData, loading, reFetch} = useIndicoAxios({
-    url: eventRequestsURL({category_id: categoryId}),
-    trigger: categoryId,
-    camelize: true,
-  });
+  const {data, lastData, loading, reFetch} = useIndicoAxios(
+    {url: eventRequestsURL({category_id: categoryId})},
+    {camelize: true}
+  );
 
   const setRequestsState = async (requests, accept, reason) => {
     const url = eventRequestsURL({category_id: categoryId});

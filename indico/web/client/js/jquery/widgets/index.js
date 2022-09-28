@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import './clearableinput';
-import './actioninput';
 import './ajaxcheckbox';
 import './ajaxqbubble';
 import './categorynavigator';
@@ -19,7 +18,6 @@ import './multitextfield';
 import './nullableselector';
 import './palettepicker';
 import './paper_email_settings_widget';
-import './principalfield';
 import './qbubble';
 import './realtimefilter';
 import './rulelistwidget';

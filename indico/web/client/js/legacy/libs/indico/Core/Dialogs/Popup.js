@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 type(
   'ExclusivePopup',
   ['Printable'],
@@ -313,67 +315,6 @@ type(
   }
 );
 
-/**
- * Works exactly the same as the ConfirmPopup, but includes a parametermanager to perform checks when pressing OK
- */
-type(
-  'ConfirmPopupWithPM',
-  ['ConfirmPopup'],
-  {
-    _getButtons: function() {
-      var self = this;
-      return [
-        [
-          $T(this.buttonTitle),
-          function() {
-            if (self.parameterManager.check()) {
-              self.handler(true);
-            }
-          },
-        ],
-        [
-          $T(this.cancelButtonTitle),
-          function() {
-            self.close();
-            self.handler(false);
-          },
-        ],
-      ];
-    },
-  },
-
-  function(title, content, handler, buttonTitle, cancelButtonTitle) {
-    this.parameterManager = new IndicoUtil.parameterManager();
-    this.ConfirmPopup(title, content, handler, buttonTitle, cancelButtonTitle);
-  }
-);
-
-type('ConfirmPopupWithReason', ['ConfirmPopupWithPM'], {}, function(
-  title,
-  content,
-  handler,
-  buttonTitle,
-  cancelButtonTitle
-) {
-  this.reason = Html.textarea({style: {width: '100%'}});
-
-  this.ConfirmPopupWithPM(
-    title,
-    Html.div(
-      {},
-      content,
-      Html.div(
-        {style: {marginTop: pixels(10)}},
-        Html.div({style: {fontWeight: 'bold'}}, $T('Reason: ')),
-        this.reason
-      )
-    ),
-    handler,
-    buttonTitle,
-    cancelButtonTitle
-  );
-  this.parameterManager.add(this.reason, 'text', false);
-});
 
 /**
  * Utility function to display a three buttons popup.
@@ -431,66 +372,6 @@ type(
       self.handler(0);
       return true;
     });
-  }
-);
-
-type(
-  'WarningPopup',
-  ['AlertPopup'],
-  {
-    _formatLine: function(line) {
-      var result = Html.div({paddingBottom: pixels(2)});
-
-      var linkStart = 0;
-      var linkMiddle;
-      var linkEnd = 0;
-
-      while (linkStart >= 0) {
-        linkStart = line.indexOf('[[', linkEnd);
-
-        if (linkStart >= 0) {
-          result.append(Html.span('', line.substring(linkEnd, linkStart)));
-
-          linkMiddle = line.indexOf(' ', linkStart);
-          linkEnd = line.indexOf(']]', linkStart);
-
-          result.append(
-            Html.a(
-              {href: line.substring(linkStart + 2, linkMiddle)},
-              line.substring(linkMiddle + 1, linkEnd)
-            )
-          );
-          linkEnd += 2;
-        } else {
-          result.append(Html.span('', line.substring(linkEnd, line.length)));
-        }
-      }
-
-      return result;
-    },
-
-    _formatContent: function(content, level) {
-      var self = this;
-
-      if (isString(content)) {
-        return Html.span('', self._formatLine(content));
-      } else if (isArray(content)) {
-        var result = Html.ul(level === 0 ? 'warningLevel0' : 'warningLevel1');
-        each(content, function(line) {
-          if (isString(line)) {
-            result.append(Html.li({}, self._formatLine(line)));
-          } else if (isArray(line)) {
-            result.append(self._formatContent(line, level + 1));
-          } else {
-            result.append(Html.li({}, line));
-          }
-        });
-        return result;
-      }
-    },
-  },
-  function(title, lines) {
-    this.AlertPopup(title, this._formatContent(lines, 0).dom);
   }
 );
 

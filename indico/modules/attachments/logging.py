@@ -43,11 +43,15 @@ def _get_folder_data(folder, for_attachment=False):
     data = folder.link_event_log_data
     if for_attachment and not folder.is_default:
         data['Folder'] = folder.title
+        data['Folder ID'] = folder.id
+    elif not folder.is_default:
+        data['ID'] = folder.id
     return data
 
 
 def _get_attachment_data(attachment):
     data = _get_folder_data(attachment.folder, True)
+    data['ID'] = attachment.id
     data['Type'] = str(attachment.type.title)
     data['Title'] = attachment.title
     if attachment.type == AttachmentType.link:
@@ -59,26 +63,29 @@ def _get_attachment_data(attachment):
     return data
 
 
-def _log(folder, kind, msg, user, data):
+def _log(folder, kind, msg, user, data, meta=None):
     if folder.link_type == LinkType.category:
-        folder.category.log(CategoryLogRealm.category, kind, 'Materials', msg, user, data=data)
+        folder.category.log(CategoryLogRealm.category, kind, 'Materials', msg, user, data=data, meta=meta)
     else:
-        folder.event.log(EventLogRealm.management, kind, 'Materials', msg, user, data=data)
+        folder.event.log(EventLogRealm.management, kind, 'Materials', msg, user, data=data, meta=meta)
 
 
 @_ignore_non_loggable
 def _log_folder_created(folder, user, **kwargs):
-    _log(folder, LogKind.positive, f'Created folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(folder, LogKind.positive, f'Created folder "{folder.title}"', user, _get_folder_data(folder),
+         meta={'folder_id': folder.id})
 
 
 @_ignore_non_loggable
 def _log_folder_deleted(folder, user, **kwargs):
-    _log(folder, LogKind.negative, f'Deleted folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(folder, LogKind.negative, f'Deleted folder "{folder.title}"', user, _get_folder_data(folder),
+         meta={'folder_id': folder.id})
 
 
 @_ignore_non_loggable
 def _log_folder_updated(folder, user, **kwargs):
-    _log(folder, LogKind.change, f'Updated folder "{folder.title}"', user, _get_folder_data(folder))
+    _log(folder, LogKind.change, f'Updated folder "{folder.title}"', user, _get_folder_data(folder),
+         meta={'folder_id': folder.id})
 
 
 @_ignore_non_loggable
@@ -86,16 +93,16 @@ def _log_attachment_created(attachment, user, **kwargs):
     if g.get('importing_event'):
         return
     _log(attachment.folder, LogKind.positive, f'Added material "{attachment.title}"', user,
-         _get_attachment_data(attachment))
+         _get_attachment_data(attachment), meta={'attachment_id': attachment.id})
 
 
 @_ignore_non_loggable
 def _log_attachment_deleted(attachment, user, **kwargs):
     _log(attachment.folder, LogKind.negative, f'Deleted material "{attachment.title}"', user,
-         _get_attachment_data(attachment))
+         _get_attachment_data(attachment), meta={'attachment_id': attachment.id})
 
 
 @_ignore_non_loggable
 def _log_attachment_updated(attachment, user, **kwargs):
     _log(attachment.folder, LogKind.change, f'Updated material "{attachment.title}"', user,
-         _get_attachment_data(attachment))
+         _get_attachment_data(attachment), meta={'attachment_id': attachment.id})

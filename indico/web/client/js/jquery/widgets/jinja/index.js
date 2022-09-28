@@ -7,6 +7,7 @@
 
 import './buttons_boolean_widget';
 import './category_picker_widget';
+import './captcha_widget';
 import './ckeditor_widget';
 import './color_picker_widget';
 import './date_widget';
@@ -26,8 +27,7 @@ import './person_link_widget';
 import './principal_list_widget';
 import './principal_widget';
 import './protection_widget';
-import './selectize_widget';
-import './synced_input_widget';
 import './typeahead_widget';
 import './permissions_widget';
 import './sui_color_picker_widget';
+import './sui_remote_search_dropdown_widget';

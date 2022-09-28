@@ -168,6 +168,10 @@
         justUse.remove();
       }
 
+      if (!resultHtmlList) {
+        return;
+      }
+
       /* Always mark the first option as active in order for the keyboard inputs to work */
       var firstOption = resultHtmlList.find('li.typeahead__item').first();
       if (!firstOption.length) {

@@ -11,6 +11,7 @@ from pytz import common_timezones, common_timezones_set
 from wtforms.fields import BooleanField, EmailField, IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, NumberRange, ValidationError
 
+from indico.core.auth import multipass
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.users import User
@@ -18,7 +19,8 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoEnumSelectField, MultiStringField, PrincipalField, PrincipalListField
+from indico.web.forms.fields import (IndicoEnumSelectField, IndicoSelectMultipleCheckboxField, MultiStringField,
+                                     PrincipalField, PrincipalListField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
@@ -116,6 +118,16 @@ class AdminUserSettingsForm(IndicoForm):
                                          description=_('Whether users are allowed to generate personal API tokens. '
                                                        'If disabled, only admins can create them, but users will '
                                                        'still be able to regenerate the tokens assigned to them.'))
+    mandatory_fields_account_request = IndicoSelectMultipleCheckboxField(
+        _('Mandatory fields in account request'),
+        choices=[('affiliation', _('Affiliation')), ('comment', _('Comment'))],
+        description=_('Fields a new user has to fill in when requesting an account')
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not multipass.has_moderated_providers:
+            del self.mandatory_fields_account_request
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):
@@ -128,7 +140,6 @@ class AdminAccountRegistrationForm(LocalRegistrationForm):
             for field in ('username', 'password', 'confirm_password'):
                 inject_validators(self, field, [HiddenUnless('create_identity')], early=True)
         super().__init__(*args, **kwargs)
-        del self.comment
         if not config.LOCAL_IDENTITIES:
             del self.username
             del self.password

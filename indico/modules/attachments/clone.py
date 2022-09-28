@@ -11,11 +11,10 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.principals import clone_principals
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.util.i18n import _
 
 
@@ -88,8 +87,8 @@ class AttachmentCloner(EventCloner):
                 self._clone_attachment_folder(old_folder, mapping[old_folder.link_type][obj])
 
     def _clone_attachment_folder(self, old_folder, new_object):
-        folder_attrs = get_simple_column_attrs(AttachmentFolder)
-        attachment_attrs = (get_simple_column_attrs(Attachment) | {'user'}) - {'modified_dt'}
+        folder_attrs = get_attrs_to_clone(AttachmentFolder)
+        attachment_attrs = get_attrs_to_clone(Attachment, add={'user'}, skip={'modified_dt'})
         folder = AttachmentFolder(object=new_object)
         folder.populate_from_attrs(old_folder, folder_attrs)
         folder.acl_entries = clone_principals(AttachmentFolderPrincipal, old_folder.acl_entries,

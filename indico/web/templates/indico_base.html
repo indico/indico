@@ -7,7 +7,7 @@
     <title>
         {%- if page_title %}{{ page_title }} · {% endif %}
         {{- site_name -}}
-        {% if site_name != 'Indico' %} (Indico){% endif -%}
+        {% if 'Indico' not in site_name %} (Indico){% endif -%}
     </title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,12 +20,6 @@
         <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
     {% endif %}
     {% block extra_meta_tags %}
-    {% endblock %}
-
-    {% block early_js %}
-        <script>
-            window.CKEDITOR_BASEPATH = {{ url_for('assets.dist', filename='js/ckeditor/')|tojson() }};
-        </script>
     {% endblock %}
 
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>

@@ -13,6 +13,7 @@ import 'jquery-colorbox/example1/colorbox.css';
 import 'jquery-form';
 
 // moment.js locales
+import 'moment/locale/de';
 import 'moment/locale/tr';
 import 'moment/locale/mn';
 import 'moment/locale/pl';
@@ -30,10 +31,6 @@ import 'qtip2/dist/jquery.qtip.css';
 
 import 'vanderlee-colorpicker';
 import 'vanderlee-colorpicker/jquery.colorpicker.css';
-
-import 'selectize';
-import 'selectize/dist/css/selectize.css';
-import 'selectize/dist/css/selectize.default.css';
 
 import './widgets';
 

@@ -12,14 +12,17 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Field, Form as FinalForm, useField, useForm} from 'react-final-form';
+import {Field, Form as FinalForm} from 'react-final-form';
 import {Form} from 'semantic-ui-react';
 
 import {
+  SyncedFinalAffiliationDropdown,
+  SyncedFinalInput,
+  SyncedFinalTextArea,
+} from 'indico/react/components/syncedInputs';
+import {
   FinalDropdown,
-  FinalInput,
   FinalSubmitButton,
-  FinalTextArea,
   getChangedValues,
   handleSubmitError,
   parsers as p,
@@ -27,74 +30,26 @@ import {
 import {Translate, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
-import './PersonalDataForm.module.scss';
-
-function SyncedFinalField({name, as: FieldComponent, syncedValues, readOnly, required, ...rest}) {
-  const form = useForm();
-  const {
-    input: {onChange: setSyncedFields, value: syncedFields},
-  } = useField('synced_fields');
-
-  const syncable = syncedValues[name] !== undefined && (!required || syncedValues[name]);
-
-  return (
-    <FieldComponent
-      {...rest}
-      name={name}
-      styleName={syncable ? 'syncable' : ''}
-      readOnly={readOnly || (syncable && syncedFields.includes(name))}
-      required={required}
-      action={
-        syncable
-          ? {
-              type: 'button',
-              active: syncedFields.includes(name),
-              icon: 'sync',
-              toggle: true,
-              className: 'ui-qtip',
-              title: Translate.string('Toggle synchronization of this field'),
-              onClick: () => {
-                if (syncedFields.includes(name)) {
-                  setSyncedFields(syncedFields.filter(x => x !== name));
-                  form.change(name, form.getFieldState(name).initial);
-                } else {
-                  setSyncedFields([...syncedFields, name].sort());
-                  form.change(name, syncedValues[name]);
-                }
-              },
-            }
-          : undefined
-      }
-    />
-  );
-}
-
-SyncedFinalField.propTypes = {
-  name: PropTypes.string.isRequired,
-  as: PropTypes.elementType.isRequired,
-  syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
-  readOnly: PropTypes.bool,
-  required: PropTypes.bool,
-};
-
-SyncedFinalField.defaultProps = {
-  readOnly: false,
-  required: false,
-};
-
-function SyncedFinalInput(props) {
-  return <SyncedFinalField as={FinalInput} {...props} />;
-}
-
-function SyncedFinalTextArea(props) {
-  return <SyncedFinalField as={FinalTextArea} {...props} />;
-}
-
-function PersonalDataForm({userId, userValues, titles, syncedValues}) {
+function PersonalDataForm({
+  userId,
+  userValues,
+  currentAffiliation,
+  titles,
+  syncedValues,
+  hasPredefinedAffiliations,
+}) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
+    if (!hasPredefinedAffiliations) {
+      // value.affiliation is already there and used
+      delete changedValues.affiliation_data;
+    } else if (changedValues.affiliation_data) {
+      changedValues.affiliation = changedValues.affiliation_data.text.trim();
+      changedValues.affiliation_id = changedValues.affiliation_data.id;
+      delete changedValues.affiliation_data;
+    }
     try {
       await indicoAxios.patch(saveURL(userIdArgs), changedValues);
     } catch (e) {
@@ -140,11 +95,20 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
                 syncedValues={syncedValues}
               />
             </Form.Group>
-            <SyncedFinalInput
-              name="affiliation"
-              label={Translate.string('Affiliation')}
-              syncedValues={syncedValues}
-            />
+            {hasPredefinedAffiliations ? (
+              <SyncedFinalAffiliationDropdown
+                name="affiliation_data"
+                syncName="affiliation"
+                currentAffiliation={currentAffiliation}
+                syncedValues={syncedValues}
+              />
+            ) : (
+              <SyncedFinalInput
+                name="affiliation"
+                label={Translate.string('Affiliation')}
+                syncedValues={syncedValues}
+              />
+            )}
             <SyncedFinalTextArea
               name="address"
               label={Translate.string('Address')}
@@ -180,6 +144,7 @@ function PersonalDataForm({userId, userValues, titles, syncedValues}) {
 PersonalDataForm.propTypes = {
   userId: PropTypes.number,
   userValues: PropTypes.object.isRequired,
+  currentAffiliation: PropTypes.object,
   titles: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -187,25 +152,31 @@ PersonalDataForm.propTypes = {
     })
   ).isRequired,
   syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
+  hasPredefinedAffiliations: PropTypes.bool.isRequired,
 };
 
 PersonalDataForm.defaultProps = {
   userId: null,
+  currentAffiliation: null,
 };
 
 window.setupPersonalDataForm = function setupPersonalDataForm(
   userId,
   userValues,
+  currentAffiliation,
   titles,
-  syncedValues
+  syncedValues,
+  hasPredefinedAffiliations
 ) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
       <PersonalDataForm
         userId={userId}
         userValues={userValues}
+        currentAffiliation={currentAffiliation}
         titles={titles}
         syncedValues={syncedValues}
+        hasPredefinedAffiliations={hasPredefinedAffiliations}
       />,
       document.querySelector('#personal-details-form-container')
     );

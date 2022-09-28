@@ -15,7 +15,7 @@ from sqlalchemy import func
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.schemas import ContributionSchema
+from indico.modules.events.contributions.schemas import BasicContributionSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable, EditableState, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
@@ -207,7 +207,7 @@ class EditableSchema(mm.SQLAlchemyAutoSchema):
                   'can_perform_editor_actions', 'can_perform_submitter_actions', 'can_create_internal_comments',
                   'can_unassign', 'can_assign_self', 'editing_enabled', 'state')
 
-    contribution = fields.Nested(ContributionSchema)
+    contribution = fields.Nested(BasicContributionSchema)
     editor = fields.Nested(EditingUserSchema)
     revisions = fields.List(fields.Nested(EditingRevisionSchema))
     can_perform_editor_actions = fields.Function(

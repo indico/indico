@@ -18,3 +18,7 @@ class WPAuth(WPJinjaMixin, WPDecorated):
 
 class WPAuthUser(WPUser):
     template_prefix = 'auth/'
+
+
+class WPSignup(WPAuth):
+    bundles = ('module_auth.signup.js',)

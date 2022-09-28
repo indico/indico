@@ -10,14 +10,15 @@ import rbURL from 'indico-url:rb.roombooking';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 
 $(document).ready(() => {
-  $('#contribution, #session_block').on('change', e => {
+  $('#contribution-data, #session_block-data').on('change', e => {
     const $target = $(e.currentTarget);
+    const $fieldContainer = $target.closest('.searchable-field');
     const objectId = $target.val();
-    const $bookBtn = $target.closest('.searchable-field').find('.js-book-btn');
+    const $bookBtn = $fieldContainer.find('.js-book-btn');
     const linkType = $target.data('link-type');
     let params = {};
     if (objectId) {
-      const values = $target.closest('.searchable-field').data('values')[objectId];
+      const values = $fieldContainer.data('values')[objectId];
       params = {
         link_type: linkType,
         link_id: objectId,

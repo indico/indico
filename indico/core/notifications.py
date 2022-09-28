@@ -15,6 +15,7 @@ from flask import g
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.util.signals import make_interceptable
 from indico.util.string import truncate
 
 
@@ -70,6 +71,7 @@ def _log_email(email, event, module, user, meta=None):
         'to': sorted(email['to']),
         'cc': sorted(email['cc']),
         'bcc': sorted(email['bcc']),
+        'reply_to': sorted(email['reply_to']),
         'subject': email['subject'],
         'body': email['body'].strip(),
         'state': 'pending',
@@ -118,6 +120,7 @@ def flush_email_queue():
     db.session.commit()
 
 
+@make_interceptable
 def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,
                subject=None, body=None, template=None, html=False):
     """Create an email.

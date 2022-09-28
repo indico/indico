@@ -45,6 +45,7 @@ user_management_settings = SettingsProxy('user_management', {
     'notify_account_creation': False,
     'email_blacklist': [],
     'allow_personal_tokens': True,
+    'mandatory_fields_account_request': []
 })
 
 

@@ -23,11 +23,7 @@ export default function EditingView({eventTitle, children}) {
   const eventId = useNumericParam('event_id');
   const contribId = useNumericParam('contrib_id');
   const {type} = useParams();
-  const {data, lastData} = useIndicoAxios({
-    url: menuEntriesURL({event_id: eventId}),
-    trigger: eventId,
-    camelize: true,
-  });
+  const {data, lastData} = useIndicoAxios(menuEntriesURL({event_id: eventId}), {camelize: true});
 
   const menuData = data || lastData;
   if (!menuData) {

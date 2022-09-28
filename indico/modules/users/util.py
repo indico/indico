@@ -30,7 +30,6 @@ from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
 from indico.modules.users import User, logger
-from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
 from indico.modules.users.models.suggestions import SuggestedCategory
@@ -209,10 +208,6 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
         query = query.filter(~User.is_deleted)
     if not include_blocked:
         query = query.filter(~User.is_blocked)
-
-    affiliation = criteria.pop('affiliation', unspecified)
-    if affiliation is not unspecified:
-        query = query.join(UserAffiliation).filter(unaccent_match(UserAffiliation.name, affiliation, exact))
 
     email = criteria.pop('email', unspecified)
     if email is not unspecified:

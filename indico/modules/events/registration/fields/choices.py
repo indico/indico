@@ -130,7 +130,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
             old_data = None
             if existing_registration:
                 old_data = existing_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(new_data, old_data):
+                if old_data and not self.has_data_changed(new_data, old_data):
                     return
             choices = self.form_item.versioned_data['choices']
             captions = self.form_item.data['captions']
@@ -420,7 +420,7 @@ class AccommodationSetupSchema(mm.Schema):
 
 class AccommodationSchema(mm.Schema):
     choice = UUIDString()
-    isNoAccommodation = fields.Bool(required=True)
+    isNoAccommodation = fields.Bool(load_default=False)
     arrivalDate = fields.Date(allow_none=True)
     departureDate = fields.Date(allow_none=True)
 
@@ -428,11 +428,11 @@ class AccommodationSchema(mm.Schema):
     def validate_everything(self, data, **kwargs):
         if not data['isNoAccommodation']:
             if not data['choice']:
-                raise ValidationError('This field is required', 'choice')
-            elif not data['arrivalDate']:
-                raise ValidationError('This field is required', 'arrivalDate')
-            elif not data['departureDate']:
-                raise ValidationError('This field is required', 'departureDate')
+                raise ValidationError('Choice is required', 'choice')
+            elif not data.get('arrivalDate'):
+                raise ValidationError('Arrival date is required', 'arrivalDate')
+            elif not data.get('departureDate'):
+                raise ValidationError('Departure date is required', 'departureDate')
 
 
 class AccommodationField(RegistrationFormBillableItemsField):
@@ -446,12 +446,12 @@ class AccommodationField(RegistrationFormBillableItemsField):
     def default_value(self):
         versioned_data = self.form_item.versioned_data
         no_accommodation_option = next(
-            (c for c in versioned_data['choices'] if c['is_no_accommodation'] and c['is_enabled']), None)
+            (c for c in versioned_data['choices'] if c.get('is_no_accommodation') and c['is_enabled']), None)
         return {
             'choice': no_accommodation_option['id'] if no_accommodation_option else None,
-            'is_no_accommodation': bool(no_accommodation_option),
-            'arrival_date': None,
-            'departure_date': None,
+            'isNoAccommodation': bool(no_accommodation_option),
+            'arrivalDate': None,
+            'departureDate': None,
         }
 
     @classmethod
@@ -490,6 +490,25 @@ class AccommodationField(RegistrationFormBillableItemsField):
         return data
 
     def get_validators(self, existing_registration):
+        def _check_choice_data(new_data):
+            item = None
+            if existing_registration:
+                old_data = existing_registration.data_by_field.get(self.form_item.id)
+                if old_data and not self.has_data_changed(snakify_keys(new_data), old_data):
+                    return
+                elif old_data:
+                    # try to get choice from existing data
+                    item = next((c for c in old_data.field_data.versioned_data['choices']
+                                 if c['id'] == new_data['choice']), None)
+            if item is None:
+                item = next((c for c in self.form_item.versioned_data['choices'] if c['id'] == new_data['choice']),
+                            None)
+            # this should never happen unless someone tampers with the data
+            if item is None or not item['is_enabled']:
+                raise ValidationError('Invalid choice')
+            if item.get('is_no_accommodation', False) != new_data['isNoAccommodation']:
+                raise ValidationError('Invalid data')
+
         def _stay_dates_valid(new_data):
             if not new_data:
                 return True
@@ -508,8 +527,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
                 return True
             if existing_registration:
                 old_data = existing_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(snakify_keys(new_data), old_data):
-                    return True
+                if old_data and not self.has_data_changed(snakify_keys(new_data), old_data):
+                    return
             item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == new_data['choice']),
                         None)
             captions = self.form_item.data['captions']
@@ -518,7 +537,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
                     (item['places_limit'] < places_used_dict.get(new_data['choice'], 0))):
                 raise ValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
 
-        return [_stay_dates_valid, _check_number_of_places]
+        return [_check_choice_data, _stay_dates_valid, _check_number_of_places]
 
     @property
     def view_data(self):

@@ -8,9 +8,8 @@
 import re
 
 from markupsafe import Markup
-from wtforms.widgets import CheckboxInput, HiddenInput, TextArea, TextInput
+from wtforms.widgets import CheckboxInput, HiddenInput
 
-from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
 from indico.util.string import natural_sort_key
@@ -23,6 +22,7 @@ html_comment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
 
 class ConcatWidget:
     """Render a list of fields as a simple string joined by an optional separator."""
+
     def __init__(self, separator='', prefix_label=True):
         self.separator = separator
         self.prefix_label = prefix_label
@@ -39,6 +39,7 @@ class ConcatWidget:
 
 class HiddenInputs(HiddenInput):
     """Render hidden inputs for list elements."""
+
     item_widget = HiddenInput()
 
     def __call__(self, field, **kwargs):
@@ -113,12 +114,15 @@ class PasswordWidget(JinjaWidget):
 class CKEditorWidget(JinjaWidget):
     """Render a CKEditor WYSIWYG editor.
 
-    :param simple: Use a simpler version with less options.
-    :param images: Whether to allow images in simple mode.
+    :param images: Whether to allow images.
     :param height: The height of the editor.
+
+    If the form has a ``ckeditor_upload_url`` attribute and images are enabled,
+    the editor will allow pasting/selecting images and upload them using that URL.
     """
-    def __init__(self, simple=False, images=False, height=475):
-        super().__init__('forms/ckeditor_widget.html', simple=simple, images=images, height=height)
+
+    def __init__(self, *, images=False, height=475):
+        super().__init__('forms/ckeditor_widget.html', images=images, height=height)
 
 
 class SwitchWidget(JinjaWidget):
@@ -141,24 +145,8 @@ class SwitchWidget(JinjaWidget):
                                 confirm_disable=self.confirm_disable)
 
 
-class SyncedInputWidget(JinjaWidget):
-    """Render a text input with a sync button when needed."""
-
-    def __init__(self, textarea=False):
-        super().__init__('forms/synced_input_widget.html', single_line=not textarea)
-        self.textarea = textarea
-        self.default_widget = TextArea() if textarea else TextInput()
-
-    def __call__(self, field, **kwargs):
-        # Render a sync button for fields which can be synced, if the identity provider provides a value for the field.
-        if field.short_name in multipass.synced_fields and field.synced_value is not None:
-            return super().__call__(field, textarea=self.textarea, kwargs=kwargs)
-        else:
-            return self.default_widget(field, **kwargs)
-
-
-class SelectizeWidget(JinjaWidget):
-    """Render a selectize-based widget.
+class RemoteDropdownWidget(JinjaWidget):
+    """Render a SUI Dropdown which can dynamically fetch results.
 
     :param search_url: The URL used to retrieve items.
     :param search_method: The method used to retrieve items.
@@ -187,30 +175,16 @@ class SelectizeWidget(JinjaWidget):
         self.value_field = value_field
         self.label_field = label_field
         self.search_field = search_field
-        super().__init__('forms/selectize_widget.html', inline_js=inline_js)
+        super().__init__('forms/sui_remote_search_dropdown_widget.html', inline_js=inline_js)
 
     def __call__(self, field, **kwargs):
-        choices = ([{'name': getattr(field.data, self.search_field), 'id': field.data.id}]
-                   if field.data is not None else [])
-        options = {
-            'valueField': self.value_field,
-            'labelField': self.label_field,
-            'searchField': self.search_field,
-            'persist': False,
-            'items': choices,
-            'create': False,
-            'maxItems': 1,
-            'closeAfterSelect': True,
-            'preload': self.preload
-        }
-
-        options.update(kwargs.pop('options', {}))
-        return super().__call__(field, options=options,
+        return super().__call__(field,
                                 search_url=getattr(field, 'search_url', self.search_url),
                                 search_method=self.search_method,
                                 search_payload=getattr(field, 'search_payload', None),
                                 min_trigger_length=self.min_trigger_length, preload=self.preload,
-                                allow_by_id=self.allow_by_id, input_args=kwargs)
+                                allow_by_id=self.allow_by_id, value_field=self.value_field,
+                                label_field=self.label_field, search_field=self.search_field, input_args=kwargs)
 
 
 class TypeaheadWidget(JinjaWidget):
@@ -251,7 +225,7 @@ class LocationWidget(JinjaWidget):
         rooms = {'data': []}
         venues = {'data': []}
         venue_map = {}
-        if config.ENABLE_ROOMBOOKING:
+        if config.ENABLE_ROOMBOOKING and field.locations:
             rooms = {loc.name: {'data': self.get_sorted_rooms(loc)} for loc in field.locations}
             venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
             venue_map = {loc['id']: loc['name'] for loc in venues['data']}

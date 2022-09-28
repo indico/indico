@@ -10,10 +10,14 @@
 {%- endmacro %}
 
 {% macro render_track(track, full_title=false) -%}
-    {%- set title = track.full_title_with_group if full_title else track.short_title_with_group -%}
-    {%- set url = none -%}
-    {%- if track.can_review_abstracts(session.user) or track.can_convene(session.user) -%}
-        {%- set url = url_for('.display_reviewable_track_abstracts', track) -%}
+    {%- if track is none -%}
+        {{- render_group('⚠ ' + _('Deleted track'), long_title=_('This track has been deleted.')) -}}
+    {%- else -%}
+        {%- set title = track.full_title_with_group if full_title else track.short_title_with_group -%}
+        {%- set url = none -%}
+        {%- if track.can_review_abstracts(session.user) or track.can_convene(session.user) -%}
+            {%- set url = url_for('.display_reviewable_track_abstracts', track) -%}
+        {%- endif -%}
+        {{- render_group(title, url, long_title=track.full_title_with_group) -}}
     {%- endif -%}
-    {{- render_group(title, url, long_title=track.full_title_with_group) -}}
 {%- endmacro %}

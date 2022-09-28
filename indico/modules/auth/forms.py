@@ -7,15 +7,16 @@
 
 from fnmatch import fnmatch
 
-from wtforms.fields import EmailField, PasswordField, SelectField, StringField, TextAreaField
+from wtforms.fields import EmailField, PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
+from indico.core.config import config
 from indico.modules.auth import Identity
+from indico.modules.core.captcha import WTFCaptchaField
 from indico.modules.users import User, user_management_settings
 from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm, SyncedInputsMixin
-from indico.web.forms.validators import ConfirmPassword, SecurePassword, used_if_not_synced
-from indico.web.forms.widgets import SyncedInputWidget
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.validators import ConfirmPassword, SecurePassword
 
 
 def _tolower(s):
@@ -92,26 +93,19 @@ class RegistrationEmailForm(IndicoForm):
     email = EmailField(_('Email address'),
                        [DataRequired(), Email(), _check_not_blacklisted, _check_existing_email],
                        filters=[_tolower])
+    captcha = WTFCaptchaField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not config.SIGNUP_CAPTCHA:
+            del self.captcha
 
 
-class RegistrationForm(IndicoForm):
+# only used on bootstrap+admin pages
+class LocalRegistrationForm(IndicoForm):
     first_name = StringField(_('First name'), [DataRequired()])
     last_name = StringField(_('Family name'), [DataRequired()])
     affiliation = StringField(_('Affiliation'))
-
-
-class MultipassRegistrationForm(SyncedInputsMixin, IndicoForm):
-    first_name = StringField(_('First Name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
-    last_name = StringField(_('Family name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
-    affiliation = StringField(_('Affiliation'), widget=SyncedInputWidget())
-    email = SelectField(_('Email address'), [DataRequired(), _check_existing_email])
-    address = StringField(_('Address'), widget=SyncedInputWidget(textarea=True))
-    phone = StringField(_('Phone number'), widget=SyncedInputWidget())
-    comment = TextAreaField(_('Comment'), description=_('You can provide additional information or a comment for the '
-                                                        'administrators who will review your registration.'))
-
-
-class LocalRegistrationForm(RegistrationForm):
     email = EmailField(_('Email address'), [Email(), _check_existing_email])
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
@@ -119,8 +113,6 @@ class LocalRegistrationForm(RegistrationForm):
                              render_kw={'autocomplete': 'new-password'})
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')],
                                      render_kw={'autocomplete': 'new-password'})
-    comment = TextAreaField(_('Comment'), description=_('You can provide additional information or a comment for the '
-                                                        'administrators who will review your registration.'))
 
     @property
     def data(self):

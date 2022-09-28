@@ -121,20 +121,21 @@
     <div class="toolbar">
         {% if contribution.can_edit(session.user) -%}
             <a href="#" class="i-button icon-edit"
-               data-title="{% trans %}Edit contribution{% endtrans %}"
-               data-href="{{ url_for('contributions.manage_update_contrib', contribution) }}"
+               data-title
+               title="{% trans %}Edit contribution{% endtrans %}"
+               data-href="{{ url_for('contributions.manage_update_contrib', contribution, standalone=true) }}"
                data-ajax-dialog
                data-reload-after></a>
         {%- endif %}
         {{ template_hook('url-shortener', target=url_for('contributions.display_contribution', contribution),
                          classes='i-button icon-link') }}
         {% if indico_config.LATEX_ENABLED %}
-            <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
+            <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"></a>
         {% endif %}
         {% if contribution.timetable_entry -%}
             {% if g.static_site %}
                 <a href="{{ url_for('contributions.export_ics', contribution) }}"
-                   class="i-button icon-calendar"></a>
+                   class="i-button icon-calendar" title="{% trans %}Export{% endtrans %}"></a>
             {% else %}
                 <div id="contribution-calendar-link" data-event-id="{{ contribution.event_id }}"
                      data-contribution-id="{{ contribution.id }}"></div>
@@ -257,8 +258,9 @@
                                 {% if subcontrib.can_edit(session.user) -%}
                                     <span>
                                         <a href="#" class="icon-edit"
-                                           data-href="{{ url_for('contributions.manage_edit_subcontrib', subcontrib) }}"
+                                           data-href="{{ url_for('contributions.manage_edit_subcontrib', subcontrib, standalone=true) }}"
                                            data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
+                                           title="{% trans %}Edit subcontribution{% endtrans %}"
                                            data-ajax-dialog
                                            data-reload-after></a>
                                     </span>

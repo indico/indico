@@ -25,14 +25,15 @@ export default function FileInput({htmlName, disabled, isRequired}) {
   const initialFileDetails = isUpdateMode ? fileData[htmlName] || null : null;
 
   return (
-    <FinalSingleFileManager
-      name={htmlName}
-      disabled={disabled}
-      required={isRequired}
-      uploadURL={uploadFileURL({event_id: eventId, reg_form_id: regformId})}
-      initialFileDetails={initialFileDetails}
-      hideValidationError
-    />
+    <div styleName="file-field">
+      <FinalSingleFileManager
+        name={htmlName}
+        disabled={disabled}
+        required={isRequired}
+        uploadURL={uploadFileURL({event_id: eventId, reg_form_id: regformId})}
+        initialFileDetails={initialFileDetails}
+      />
+    </div>
   );
 }
 

@@ -8,8 +8,7 @@
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
-from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.modules.events.cloning import EventCloner
+from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.principals import EventPrincipal
@@ -66,7 +65,7 @@ class EventPersonCloner(EventCloner):
         return {'person_map': self._person_map}
 
     def _clone_persons(self, new_event):
-        attrs = get_simple_column_attrs(EventPerson) | {'user'}
+        attrs = get_attrs_to_clone(EventPerson, add={'user'})
         for old_person in self.old_event.persons:
             person = EventPerson(event=new_event)
             person.populate_from_attrs(old_person, attrs)
@@ -107,7 +106,7 @@ class EventPersonLinkCloner(EventCloner):
         return bool(event.person_links)
 
     def _clone_person_links(self, new_event):
-        attrs = get_simple_column_attrs(EventPersonLink)
+        attrs = get_attrs_to_clone(EventPersonLink)
         for old_link in self.old_event.person_links:
             link = EventPersonLink()
             link.populate_from_attrs(old_link, attrs)
@@ -170,3 +169,27 @@ class EventProtectionCloner(EventCloner):
         else:
             new_event.acl_entries = clone_principals(EventPrincipal, self.old_event.acl_entries,
                                                      self._event_role_map, self._regform_map)
+
+
+class EventSeriesCloner(EventCloner):
+    name = 'event_series'
+    friendly_name = _('Add to event series')
+    new_event_only = True
+
+    @property
+    def is_default(self):
+        return bool(self.old_event.series and self.old_event.series.event_title_pattern)
+
+    @property
+    def is_available(self):
+        return bool(self.old_event.series)
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
+        series = self.old_event.series
+        new_event.series = series
+        if series.event_title_pattern:
+            n = len(series.events)
+            # XXX not using .format() here to avoid errors if someone adds other
+            # placeholder-like stuff in the pattern
+            new_event.title = series.event_title_pattern.replace('{n}', str(n))
+        db.session.flush()

@@ -120,6 +120,15 @@ Authentication
 
     Default: ``{}``
 
+.. data:: SIGNUP_CAPTCHA
+
+    If enabled, a CAPTCHA is required when creating an Indico account to prevent
+    spam bots from registering accounts automatically.  Signups through external
+    authentication systems (LDAP, SSO etc.) are not affected by this; they are
+    expected to have their own protection in place to prevent spam signups.
+
+    Default: ``True``
+
 
 Cache
 -----
@@ -463,6 +472,13 @@ Directories
 
 Emails
 ------
+
+.. data:: EMAIL_BACKEND
+
+    Qualified import name for the email sending backend. It can be set to any email
+    backend compatible with Django Mail.
+
+    Default: ``'indico.vendor.django_mail.backends.smtp.EmailBackend'``
 
 .. data:: SMTP_SERVER
 

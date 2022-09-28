@@ -21,8 +21,8 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
 
 
 class BasicSessionSchema(mm.SQLAlchemyAutoSchema):
-    blocks = fields.Nested(SessionBlockSchema, many=True)
+    blocks = fields.List(fields.Nested(SessionBlockSchema))
 
     class Meta:
         model = Session
-        fields = ('id', 'title', 'friendly_id', 'blocks')
+        fields = ('id', 'title', 'friendly_id', 'code', 'blocks')

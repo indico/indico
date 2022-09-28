@@ -8,6 +8,7 @@
 from indico.core.settings import AttributeProxyProperty
 from indico.modules.events.models.reviews import ProposalMixin
 from indico.modules.events.papers.models.revisions import PaperRevisionState
+from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 
 
@@ -79,6 +80,8 @@ class Paper(ProposalMixin):
         if not user:
             return False
         elif check_state and self.is_in_final_state:
+            return False
+        elif self.cfp.judge_deadline_enforced and self.cfp.judge_deadline < now_utc():
             return False
         elif self.can_manage(user):
             return True

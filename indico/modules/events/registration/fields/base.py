@@ -11,6 +11,7 @@ from marshmallow import fields, validate
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.util.marshmallow import not_empty
 
 
 class BillableFieldDataSchema(mm.Schema):
@@ -38,10 +39,12 @@ class RegistrationFormFieldBase:
     setup_schema_base_cls = mm.Schema
     #: a dict with extra marshmallow fields to include in the setup schema
     setup_schema_fields = {}
-    #: whether this field is assocated with a file instead of normal data
+    #: whether this field is associated with a file instead of normal data
     is_file_field = False
     #: whether this field is invalid and cannot be used
     is_invalid_field = False
+    #: whether this field must not be "empty" (falsy value) if required
+    not_empty_if_required = True
 
     def __init__(self, form_item):
         self.form_item = form_item
@@ -92,9 +95,14 @@ class RegistrationFormFieldBase:
 
         :param registration: The previous registration if modifying an existing one, otherwise none
         """
+        validators = self.get_validators(registration) or []
+        if not isinstance(validators, list):
+            validators = [validators]
+        if self.form_item.is_required and self.not_empty_if_required:
+            validators.append(not_empty)
         return self.mm_field_class(*self.mm_field_args,
                                    required=self.form_item.is_required,
-                                   validate=self.get_validators(registration),
+                                   validate=validators,
                                    **self.mm_field_kwargs)
 
     def has_data_changed(self, value, old_data):

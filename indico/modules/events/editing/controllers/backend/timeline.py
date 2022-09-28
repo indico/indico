@@ -388,9 +388,12 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
 
                 with file.storage.get_local_path(file.storage_file_id) as filepath:
                     zip_handler.write(filepath, os.path.join(folder_name, filename))
+        zip_filename = f'revision-{self.revision.id}.zip'
+        if self.contrib.code:
+            zip_filename = f'{self.contrib.code}-{zip_filename}'
 
         buf.seek(0)
-        return send_file(f'revision-{self.revision.id}.zip', buf, 'application/zip', inline=False)
+        return send_file(zip_filename, buf, 'application/zip', inline=False)
 
 
 class RHDownloadRevisionFile(RHContributionEditableRevisionBase):

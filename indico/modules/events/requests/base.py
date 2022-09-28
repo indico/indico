@@ -10,6 +10,7 @@ from wtforms.fields import SubmitField, TextAreaField
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.notifications import make_email
 from indico.modules.events.requests.notifications import (notify_accepted_request, notify_new_modified_request,
                                                           notify_rejected_request, notify_withdrawn_request)
 from indico.modules.events.requests.views import WPRequestsEventManagement
@@ -97,29 +98,61 @@ class RequestDefinitionBase:
         return get_template_module(tpl, **context)
 
     @classmethod
-    def can_be_managed(cls, user):
-        """Check whether the user is allowed to manage this request type.
+    def make_notification_email(cls, req, template, *, to_request_managers: bool):
+        """Make a notification email.
 
-        :param user: a :class:`.User`
+        :param req: the :class:`Request` of the request
+        :param template: the template module for the notification
+        :param to_request_managers: whether the email is sent to request managers
+                                    (event managers if False)
         """
-        raise NotImplementedError
+        recipients = cls.get_manager_notification_emails(req) if to_request_managers else req.event.all_manager_emails
+        from_addr = cls.get_notification_from_email(req, to_request_managers=to_request_managers)
+        reply_addr = cls.get_notification_reply_email(req, to_request_managers=to_request_managers)
+        if not recipients:
+            return None
+        return make_email(recipients, from_address=from_addr, reply_address=reply_addr, template=template)
 
     @classmethod
-    def get_manager_notification_emails(cls):
+    def get_manager_notification_emails(cls, req):
         """Return the email addresses of users who manage requests of this type.
 
         The email addresses are used only for notifications.
         It usually makes sense to return the email addresses of the users who
         pass the :method:`can_be_managed` check.
 
+        :param req: the :class:`Request` of the request
         :return: set of email addresses
         """
         return set()
 
     @classmethod
-    def get_notification_reply_email(cls):
-        """Return the *Reply-To* e-mail address for notifications."""
+    def get_notification_from_email(cls, req, *, to_request_managers: bool):
+        """Return the *From* e-mail address for notifications.
+
+        :param req: the :class:`Request` of the request
+        :param to_request_managers: whether the email is sent to request managers
+                                    (event managers if False)
+        """
+        return config.NO_REPLY_EMAIL
+
+    @classmethod
+    def get_notification_reply_email(cls, req, *, to_request_managers: bool):
+        """Return the *Reply-To* e-mail address for notifications.
+
+        :param req: the :class:`Request` of the request
+        :param to_request_managers: whether the email is sent to request managers
+                                    (event managers if False)
+        """
         return config.SUPPORT_EMAIL
+
+    @classmethod
+    def can_be_managed(cls, user):
+        """Check whether the user is allowed to manage this request type.
+
+        :param user: a :class:`.User`
+        """
+        raise NotImplementedError
 
     @classmethod
     def send(cls, req, data):

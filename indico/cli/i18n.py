@@ -38,7 +38,7 @@ DEFAULT_OPTIONS = {
         'output_dir': TRANSLATIONS_DIR
     },
     'extract_messages': {
-        'keywords': 'N_:1,2',
+        'keywords': 'L_',
         'width': '120',
         'output_file': MESSAGES_POT,
         'mapping_file': 'babel.cfg'
@@ -212,7 +212,11 @@ def _get_invalid_po_format_strings(path):
             # the placeholder, so we need to consider those as well
             orig_plural_placeholders = set(chain.from_iterable(map(_extract_placeholders, all_orig[1:])))
             trans_placeholders = _extract_placeholders(trans)
-            if trans_placeholders not in (orig_placeholders, orig_plural_placeholders):
+            if (
+                trans_placeholders not in (orig_placeholders, orig_plural_placeholders) or
+                (not orig_plural_placeholders and trans_placeholders != orig_placeholders) or
+                (not orig_placeholders and trans_placeholders and trans_placeholders != orig_plural_placeholders)
+            ):
                 invalid.append({
                     'orig': orig,
                     'trans': trans,

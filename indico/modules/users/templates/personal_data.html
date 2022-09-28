@@ -44,8 +44,10 @@
         setupPersonalDataForm(
             {{ (user.id if user != session.user else none) | tojson }},
             {{ user_values | tojson }},
+            {{ current_affiliation | tojson }},
             {{ titles | tojson }},
             {{ user.synced_values | tojson }},
+            {{ has_predefined_affiliations | tojson }}
         );
     </script>
 {% endblock %}

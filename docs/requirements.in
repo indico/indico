@@ -1,0 +1,8 @@
+babel
+docutils<0.17  # bullet lists broken >=0.17
+flask
+flask-babel
+plantweb
+sphinx
+sphinx-issues
+sphinx-rtd-theme

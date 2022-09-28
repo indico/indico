@@ -32,23 +32,24 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons import logger
-from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
+from indico.modules.events.persons.forms import EmailEventPersonsForm
 from indico.modules.events.persons.operations import update_person
-from indico.modules.events.persons.schemas import EventPersonSchema
+from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema
 from indico.modules.events.persons.views import WPManagePersons
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.logs import LogKind
 from indico.modules.users import User
+from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import validate_with_message
 from indico.util.placeholders import replace_placeholders
-from indico.web.args import use_kwargs
+from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
-from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form
 
 
@@ -111,7 +112,11 @@ class RHPersonsBase(RHManageEventBase):
                                           EventPerson.email == Registration.email))
         event_persons_query = (db.session.query(EventPerson, Registration)
                                .filter(EventPerson.event_id == self.event.id)
-                               .outerjoin(Registration, (Registration.event_id == self.event.id) & _reg_person_join)
+                               .outerjoin(Registration, db.and_(
+                                   Registration.event_id == self.event.id,
+                                   Registration.registration_form.has(~RegistrationForm.is_deleted),
+                                   _reg_person_join
+                               ))
                                .options(abstract_strategy,
                                         event_strategy,
                                         contribution_strategy,
@@ -192,8 +197,9 @@ class RHPersonsBase(RHManageEventBase):
 
         regs = (Registration.query
                 .with_parent(self.event)
+                .join(Registration.registration_form)
                 .filter(Registration.user_id.in_(data['person'].id for data in internal_role_users.values()),
-                        Registration.is_active)
+                        Registration.is_active, ~RegistrationForm.is_deleted)
                 .all())
         for reg in regs:
             internal_role_users[reg.user.email]['registrations'].append(reg)
@@ -247,7 +253,8 @@ class RHPersonsList(RHPersonsBase):
                 person_data['roles']['no_registration'] = True
         return WPManagePersons.render_template('management/person_list.html', self.event, persons=person_list,
                                                num_no_account=num_no_account, builtin_roles=BUILTIN_ROLES,
-                                               custom_roles=custom_roles)
+                                               custom_roles=custom_roles, person_schema=EventPersonSchema(),
+                                               has_predefined_affiliations=Affiliation.query.has_rows())
 
 
 class RHEmailEventPersons(RHManageEventBase):
@@ -375,19 +382,18 @@ class RHRevokeSubmissionRights(RHManageEventBase):
         return redirect(url_for('.person_list', self.event))
 
 
-class RHEditEventPerson(RHPersonsBase):
+class RHUpdateEventPerson(RHPersonsBase):
     def _process_args(self):
         RHPersonsBase._process_args(self)
         self.person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
 
-    def _process(self):
-        form = EventPersonForm(obj=FormDefaults(self.person, skip_attrs={'title'}, title=self.person._title))
-        if form.validate_on_submit():
-            update_person(self.person, form.data)
-            person_data = self.get_persons()[self.person.email or self.person.id]
-            tpl = get_template_module('events/persons/management/_person_list_row.html')
-            return jsonify_data(html=tpl.render_person_row(person_data, bool(self.event.registration_forms)))
-        return jsonify_form(form)
+    @use_args(EventPersonUpdateSchema, partial=True)
+    def _process(self, args):
+        update_person(self.person, args)
+        person_data = self.get_persons()[self.person.email or self.person.id]
+        tpl = get_template_module('events/persons/management/_person_list_row.html')
+        return jsonify(html=tpl.render_person_row(person_data, bool(self.event.registration_forms),
+                                                  EventPersonSchema(), Affiliation.query.has_rows()))
 
 
 class RHDeleteUnusedEventPerson(RHPersonsBase):

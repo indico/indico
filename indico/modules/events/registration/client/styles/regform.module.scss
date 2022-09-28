@@ -35,7 +35,7 @@
 
 .form-item {
   display: flex;
-  margin-top: 4px;
+  margin-top: 10px;
   padding-top: 3px;
 
   &:last-child {
@@ -116,6 +116,10 @@
 
       .date-field {
         margin-bottom: 0;
+      }
+
+      .file-field :global(.ui.segment) {
+        margin-top: 0;
       }
 
       .accommodation-field {
@@ -236,7 +240,7 @@
 
     > .description {
       max-width: 500px;
-      padding: 3px 0 0 2px;
+      padding-left: 2px;
       text-align: justify;
       font-style: italic;
       font-size: 0.9em;
@@ -328,9 +332,8 @@
 
   .section-sortable-handle {
     font-size: 1.2em;
-    width: 15px;
-    position: relative;
-    left: -3px;
+    flex-basis: 20px;
+    align-self: flex-start;
   }
 
   &:hover .section-sortable-handle {
@@ -348,6 +351,9 @@
 }
 
 .section-actions {
+  align-self: flex-start;
+  white-space: nowrap;
+
   a {
     font-size: 1.2em;
   }

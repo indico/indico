@@ -8,6 +8,7 @@
 export {handleSubmissionError} from './errors';
 export {
   FinalCheckbox,
+  FinalComboDropdown,
   FinalDropdown,
   FinalField,
   FinalInput,

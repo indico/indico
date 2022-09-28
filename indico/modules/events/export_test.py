@@ -119,7 +119,7 @@ def test_event_import(db, dummy_user):
     tar_buffer = BytesIO()
 
     # User should be matched by e-mail
-    dummy_user.email = '1337@example.com'
+    dummy_user.email = '1337@example.test'
     db.session.flush()
 
     # create a tar file artificially, using the provided YAML

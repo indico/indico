@@ -29,4 +29,4 @@ class NewsSettingsForm(IndicoForm):
 
 class NewsForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
-    content = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget())
+    content = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget(images=True))

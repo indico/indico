@@ -140,3 +140,11 @@ class PaymentPluginMixin:
         return render_template([f'{transaction.plugin.name}:transaction_details.html',
                                 'events/payment/transaction_details.html'],
                                plugin=transaction.plugin, transaction=transaction)
+
+    def is_pending_transaction_expired(self, transaction):
+        """Check if the transaction is pending but expired.
+
+        If this returns true, it will show up as unpaid instead of pending
+        for the user and they can proceed to payment once again.
+        """
+        return False

@@ -15,7 +15,7 @@ from operator import attrgetter
 import pytz
 from flask import request
 from sqlalchemy import Date, cast
-from sqlalchemy.orm import joinedload, subqueryload, undefer
+from sqlalchemy.orm import joinedload, selectinload, subqueryload, undefer
 from werkzeug.exceptions import ServiceUnavailable
 
 from indico.core import signals
@@ -447,11 +447,10 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         ]
 
     def _get_query_options(self, detail_level):
-        acl_user_strategy = joinedload('acl_entries').joinedload('user')
+        acl_user_strategy = selectinload('acl_entries').joinedload('user')
         # remote group membership checks will trigger a load on _all_emails
         # but not all events use this so there's no need to eager-load them
         # acl_user_strategy.noload('_primary_email')
-        # acl_user_strategy.noload('_affiliation')
         creator_strategy = joinedload('creator')
         contributions_strategy = subqueryload('contributions')
         contributions_strategy.subqueryload('references')

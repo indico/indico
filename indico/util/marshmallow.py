@@ -22,6 +22,7 @@ from indico.core.config import config
 from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.string import get_format_placeholders
 from indico.util.user import principal_from_identifier
 
 
@@ -53,6 +54,23 @@ def not_empty(value):
 
     if not value:
         raise ValidationError(_('This field cannot be empty.'))
+
+
+def validate_placeholders(format_string, valid_placeholders, required_placeholders=None):
+    """Validate that a string contains only the correct format placeholders.
+
+    This MUST ALWAYS be used when accepting format strings from users or other
+    untrustworthy sources.
+    """
+    try:
+        placeholders = set(get_format_placeholders(format_string))
+    except ValueError:
+        raise ValidationError(_('Invalid placeholder format'))
+    # placeholders should always be validated client-side as well, so no i18n needed here
+    if required_placeholders and (missing := required_placeholders - placeholders):
+        raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
+    if invalid := placeholders - valid_placeholders:
+        raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
 
 
 def file_extension(*exts):
@@ -160,10 +178,11 @@ class ModelField(fields.Field):
     }
 
     def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, filter_deleted=False,
-                 **kwargs):
+                 none_if_missing=False, **kwargs):
         self.model = model
         self.get_query = get_query
         self.filter_deleted = filter_deleted
+        self.none_if_missing = none_if_missing
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -191,6 +210,8 @@ class ModelField(fields.Field):
             query = query.filter(~self.model.is_deleted)
         obj = query.one_or_none()
         if obj is None:
+            if self.none_if_missing:
+                return None
             self.fail('not_found', value=value)
         return obj
 
@@ -436,6 +457,13 @@ class UUIDString(fields.UUID):
         return str(rv) if isinstance(rv, UUID) else rv
 
 
+class LowercaseString(fields.String):
+    """A String field that converts it value to lowercase."""
+
+    def _deserialize(self, value, attr, data, **kwargs) -> t.Optional[str]:
+        return super()._deserialize(value, attr, data, **kwargs).lower()
+
+
 class NoneValueEnumField(EnumField):
     """
     Like the normal EnumField, but when receiving a None value,
@@ -461,3 +489,21 @@ class NoneValueEnumField(EnumField):
         if value is None:
             return self.none_value
         return super().deserialize(value, *args, **kwargs)
+
+
+class SortedList(fields.List):
+    """
+    Like the normal List, but when dumping a sort key can be specified.
+    This allows sorting the data even without having the information needed
+    for sorting in the final dumped data.
+    """
+
+    def __init__(self, *args, sort_key, **kwargs):
+        self.sort_key = sort_key
+        super().__init__(*args, **kwargs)
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value is None:
+            return None
+        value = sorted(value, key=self.sort_key)
+        return super()._serialize(value, attr, obj, **kwargs)

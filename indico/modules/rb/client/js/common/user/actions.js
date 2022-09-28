@@ -48,7 +48,7 @@ export function fetchUserInfo() {
     )(dispatch);
 
     if (result.data) {
-      await setMomentLocale(result.data.language);
+      await setMomentLocale(result.data.momentLanguage);
       // dispatch this explicitly after the async setMomentLocale to ensure
       // we don't render something without the moment locale being loaded
       dispatch({type: FETCH_USER_INFO_SUCCESS, data: result.data});

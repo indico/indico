@@ -101,7 +101,7 @@
                 {% set is_lecture = (event.type == 'lecture') %}
                 <li>
                     <span class="event-icons">
-                        <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}"></a>
+                        <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}" title="{% trans %}Export{% endtrans %}"></a>
                         {% if session.user and event in session.user.favorite_events %}
                             <i class="icon-star" title="{% trans %}You have favorited this event.{% endtrans %}"></i>
                         {% endif%}
@@ -122,7 +122,7 @@
                                     </span>
                                 {% endif %}
                                 {% if event.is_self_protected %}
-                                    <span data-type="restricted">({% trans %}protected{% endtrans %})</span>
+                                    <span class="icon-shield" data-type="restricted" title="{% trans %}Protected{% endtrans %}"></span>
                                 {% endif %}
 
                                 {% if is_recent(event.created_dt) %}
@@ -131,6 +131,7 @@
                                         {%- trans %}new{% endtrans -%}
                                     </span>
                                 {% endif %}
+                                {{ template_hook('event-status-labels', event=event) }}
                             </span>
                             {% if event.label %}
                                 <span class="ui label basic mini {{ event.label.color }}"
