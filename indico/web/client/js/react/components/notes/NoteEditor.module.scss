@@ -1,0 +1,14 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2022 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+// Fix for the ckeditor full screen plugin when rendered inside SUI's <Modal>.
+// Removes 'transform' from the 'will-change' property. This makes the
+// fixed positioning of the '.ck-plugin-full-screen' class work again.
+// https://stackoverflow.com/a/37953806
+:global(.ui.page.modals.dimmer > .ui.modal.transition) {
+  will-change: top, left, margin, opacity;
+}

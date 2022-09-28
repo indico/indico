@@ -17,6 +17,8 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {FinalTextEditor} from '../TextEditor';
 
+import './NoteEditor.module.scss';
+
 export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   const [currentInput, setCurrentInput] = useState(undefined);
   const [loading, setLoading] = useState(false);
