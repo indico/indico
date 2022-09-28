@@ -7,6 +7,7 @@
 
 import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from 'ckeditor';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useMemo} from 'react';
 import {Field} from 'react-final-form';
@@ -62,9 +63,9 @@ export default function TextEditor({
         config={config}
         onFocus={onFocus}
         onBlur={onBlur}
-        onChange={(evt, editor) => {
+        onChange={_.debounce((evt, editor) => {
           onChange(editor.getData());
-        }}
+        }, 250)}
         {...rest}
       />
     </Dimmer.Dimmable>

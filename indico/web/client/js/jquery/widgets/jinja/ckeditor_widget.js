@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import ClassicEditor from 'ckeditor';
+import _ from 'lodash';
 
 import {getConfig} from 'indico/ckeditor';
 
@@ -18,10 +19,13 @@ import {getConfig} from 'indico/ckeditor';
       ...rest,
     });
     editor.setData(field.value);
-    editor.model.document.on('change:data', () => {
-      field.value = editor.getData();
-      field.dispatchEvent(new Event('change', {bubbles: true}));
-    });
+    editor.model.document.on(
+      'change:data',
+      _.debounce(() => {
+        field.value = editor.getData();
+        field.dispatchEvent(new Event('change', {bubbles: true}));
+      }, 250)
+    );
     editor.editing.view.change(writer => {
       writer.setStyle(
         'width',
