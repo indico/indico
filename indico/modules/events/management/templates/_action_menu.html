@@ -128,13 +128,12 @@
                 {% endif %}
 
                 <div class="group">
-                    <a class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
+                    <button class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
                        data-href="{{ url_for('event_management.clone', event) }}"
                        data-title="{% trans %}Clone Event{% endtrans %}"
-                       data-ajax-dialog
-                       href="#">
+                       data-ajax-dialog>
                         {% trans %}Clone{% endtrans %}
-                   </a>
+                    </button>
                     {% if clones %}
                         <a id="event-action-menu-clones-target" class="i-button label clickable arrow">
                             {{- clones|length -}}
@@ -142,8 +141,8 @@
                     {% endif %}
                 </div>
 
-                <a href="#" id="event-action-menu-actions-target" class="i-button icon-settings i-button arrow"
-                   title="{% trans %}Event actions{% endtrans %}"></a>
+                <button id="event-action-menu-actions-target" class="i-button icon-settings i-button arrow"
+                   title="{% trans %}Event actions{% endtrans %}"></button>
 
                 <div id="event-action-menu-actions">
                     <div class="action-menu-buttons {{ 'event-locked' if event.is_locked }}">

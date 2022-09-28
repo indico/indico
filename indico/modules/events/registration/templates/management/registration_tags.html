@@ -41,13 +41,12 @@
             <div class="i-box-header" style="margin-bottom: 0;">
                 <div class="i-box-title">{%- trans %}Registration Tags{% endtrans -%}</div>
                 <div class="i-box-buttons hide-if-locked">
-                    <a class="i-button icon-plus" data-href="{{ url_for('.manage_registration_tags_add', event) }}"
+                    <button class="i-button icon-plus" data-href="{{ url_for('.manage_registration_tags_add', event) }}"
                        data-title="{%- trans %}Add a tag{% endtrans -%}"
                        data-ajax-dialog
-                       data-reload-after
-                       href="#">
+                       data-reload-after>
                         {%- trans %}Add a tag{% endtrans -%}
-                    </a>
+                    </button>
                 </div>
             </div>
             {% if event.registration_tags %}

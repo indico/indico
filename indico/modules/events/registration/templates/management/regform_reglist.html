@@ -50,9 +50,9 @@
                 </div>
                 <div class="group hide-if-locked">
                     <div id="indico-user-to-add" class="hidden"></div>
-                    <a class="i-button arrow icon-plus" data-toggle="dropdown" href="#">
+                    <button class="i-button arrow icon-plus" data-toggle="dropdown">
                         {% trans %}Register{% endtrans %}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="{{ url_for('.create_registration', regform) }}"
@@ -75,17 +75,16 @@
                             </a>
                         </li>
                     </ul>
-                    <a class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
+                    <button class="i-button icon-remove js-requires-selected-row disabled js-delete-registrations"
                        data-href="{{ url_for('.delete_registrations', regform) }}"
-                       data-method="POST"
-                       href="#">
+                       data-method="POST">
                         {%- trans %}Remove{% endtrans -%}
-                    </a>
+                    </button>
                 </div>
                 <div class="group">
-                    <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown" href="#">
+                    <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
@@ -201,9 +200,9 @@
                         </ul>
                     {% endif %}
                     {% if not event.is_locked %}
-                        <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown" href="#">
+                        <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                             {%- trans %}Check-in control{% endtrans -%}
-                        </a>
+                        </button>
                         <ul class="i-dropdown">
                             <li>
                                 <a href="#" class="icon-location js-requires-selected-row disabled js-modify-status"
@@ -228,14 +227,14 @@
                     {{ template_hook('registration-status-action-button', regform=regform) }}
                 </div>
                 <div class="group">
-                    <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}" href="#"></a>
+                    <button class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></button>
                 </div>
             </div>
             <div class="toolbar">
                 <div class="group">
-                    <a class="i-button icon-link js-static-url"
+                    <button class="i-button icon-link js-static-url"
                        data-href="{{ url_for('.generate_static_url', regform) }}"
-                       title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}" href="#"></a>
+                       title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></button>
                 </div>
                 <div class="group">
                     <span class="i-button label icon-user" title="{% trans %}Total registrations{% endtrans %}">

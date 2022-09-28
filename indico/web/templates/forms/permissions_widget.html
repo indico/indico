@@ -12,7 +12,7 @@
                 </a>
                 <span id="js-add-user-group"></span>
                 {% if field.object_type == 'event' %}
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown" href="#">{% trans %}Event Role{% endtrans %}</a>
+                    <button class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Event Role{% endtrans %}</button>
                     <ul class="i-dropdown entry-role-dropdown" data-items='{{ field.event_roles|tojson|forceescape }}'>
                         <li class="separator default"></li>
                         <li class="entry-item new-role-btn default">
@@ -28,23 +28,23 @@
                 {% endif %}
                 {% set category_roles = field.category_roles %}
                 {% if category_roles %}
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown" href="#">
+                    <button class="i-button arrow js-dropdown" data-toggle="dropdown">
                         {% trans %}Category role{% endtrans %}
-                    </a>
+                    </button>
                     <ul class="i-dropdown entry-category-role-dropdown"
                         data-items='{{ category_roles|tojson|forceescape }}'></ul>
                 {% endif %}
                 {% if field.object_type in ('event', 'category') and field.ip_networks %}
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown" href="#">
+                    <button class="i-button arrow js-dropdown" data-toggle="dropdown">
                         {%- trans %}IP Network{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown entry-ip-network-dropdown"
                         data-items='{{ field.ip_networks|tojson|forceescape }}'></ul>
                 {% endif %}
                 {% if field.registration_forms %}
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown" href="#">
+                    <button class="i-button arrow js-dropdown" data-toggle="dropdown">
                         {%- trans %}Registrants{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown entry-reg-form-dropdown"
                         data-items='{{ field.registration_forms|tojson|forceescape }}'></ul>
                 {% endif %}

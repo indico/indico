@@ -121,7 +121,7 @@
             <div class="toolbar">
                 {{ render_displayed_entries_fragment(persons|length, persons|length) }}
                 <div id="person-filters" class="group list-filter">
-                    <a class="i-button arrow highlight js-dropdown" data-toggle="dropdown" href="#">Filter role</a>
+                    <button class="i-button arrow highlight js-dropdown" data-toggle="dropdown">Filter role</button>
                     <ul class="i-dropdown">
                         {% if event.type != 'lecture' %}
                             <li class="enabled">
@@ -198,8 +198,8 @@
                             <label for="filter-no-builtin-roles">{% trans %}Users with no public roles{% endtrans %}</label>
                         </li>
                     </ul>
-                    <a class="i-button highlight icon-close disabled js-reset-role-filter"
-                       title="{% trans %}Reset role filters{% endtrans %}" href="#"></a>
+                    <button class="i-button highlight icon-close disabled js-reset-role-filter"
+                       title="{% trans %}Reset role filters{% endtrans %}"></button>
                 </div>
                 <div class="group">
                     <span class="i-button label icon-search"></span>

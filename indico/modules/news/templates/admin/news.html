@@ -9,23 +9,21 @@
             </div>
             <div class="i-box-buttons toolbar right">
                 <div class="group">
-                    <a class="i-button icon-settings"
+                    <button class="i-button icon-settings"
                        data-href="{{ url_for('.settings') }}"
                        data-qtip-position="right"
                        data-ajax-dialog
-                       data-title="{% trans %}Settings{% endtrans %}"
-                       href="#">
+                       data-title="{% trans %}Settings{% endtrans %}">
                         {% trans %}Settings{% endtrans %}
-                    </a>
-                    <a class="i-button icon-plus"
+                    </button>
+                    <button class="i-button icon-plus"
                        data-ajax-dialog
                        data-title="{% trans %}Post news{% endtrans %}"
                        data-href="{{ url_for('.create_news') }}"
                        data-confirm-close-unsaved
-                       data-reload-after
-                       href="#">
+                       data-reload-after>
                         {% trans %}Post news{% endtrans %}
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>

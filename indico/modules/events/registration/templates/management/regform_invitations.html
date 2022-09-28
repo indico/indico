@@ -26,9 +26,9 @@
                 </div>
                 <div class="toolbar">
                     {{ template_hook('registration-invite-options', event=event, regform=regform) }}
-                    <a class="i-button icon-user arrow js-dropdown" data-toggle="dropdown" href="#">
+                    <button class="i-button icon-user arrow js-dropdown" data-toggle="dropdown">
                         {% trans %}Invite{% endtrans %}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a class="js-invite-user" data-href="{{ url_for('.invite', regform) }}"

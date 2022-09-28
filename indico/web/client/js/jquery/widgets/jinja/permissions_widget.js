@@ -469,15 +469,15 @@ import Palette from 'indico/utils/palette';
 
       // Manage adding users/groups to the acl
       const userSearchTrigger = triggerProps => (
-        <a className="i-button" {...triggerProps} href="#">
+        <button className="i-button" {...triggerProps}>
           <Translate>User</Translate>
-        </a>
+        </button>
       );
 
       const groupSearchTrigger = triggerProps => (
-        <a className="i-button" {...triggerProps} href="#">
+        <button className="i-button" {...triggerProps}>
           <Translate>Group</Translate>
-        </a>
+        </button>
       );
 
       const existing = JSON.parse(this.$dataField.val()).map(e => e[0].identifier);
