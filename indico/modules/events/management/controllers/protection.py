@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import json
 from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request
@@ -27,7 +28,6 @@ from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, session_settings
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
 from indico.modules.events.util import get_object_from_args
-from indico.util import json
 from indico.util.i18n import _
 from indico.util.marshmallow import PrincipalDict
 from indico.web.args import use_rh_kwargs

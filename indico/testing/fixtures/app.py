@@ -37,6 +37,12 @@ def app_context(app):
     """Create a flask app context."""
     with app.app_context():
         yield app
+        # flask 2.2 applies setupmethod checks even outside debug mode, so we can no longer
+        # add new endpoints (specific to some test) whenever we want. by resetting it we
+        # avoid the error. of course any of those endpoints added during test leak to other
+        # tests but that can't be avoided without adding the overhead of creating a new app
+        # for every single test.
+        app._got_first_request = False
 
 
 @pytest.fixture

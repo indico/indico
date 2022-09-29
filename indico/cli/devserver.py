@@ -6,8 +6,10 @@
 # LICENSE file for more details.
 
 import os
+import traceback
+from threading import Lock, Thread
 
-from flask.cli import DispatchingApp
+import click
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
@@ -120,7 +122,7 @@ def _make_wsgi_app(info, url, evalex_whitelist, proxy):
         return info.load_app()
 
     url_data = url_parse(url)
-    app = DispatchingApp(_load_app, use_eager_loading=False)
+    app = DispatchingApp(_load_app)
     app = DebuggedIndico(app, evalex_whitelist)
     app = _make_indico_dispatcher(app, url_data.path)
     if proxy:
@@ -138,6 +140,71 @@ def _make_indico_dispatcher(wsgi_app, path):
         return DispatcherMiddleware(NotFound(), {
             path: wsgi_app
         })
+
+
+# Taken from Flask - it was removed, but we want to keep the initial-lazy-loading
+# behavior to ensure fast startup e.g. after a watchman reload
+class DispatchingApp:
+    """
+    Special application that dispatches to a Flask application which
+    is imported by name in a background thread.  If an error happens
+    it is recorded and shown as part of the WSGI handling which in case
+    of the Werkzeug debugger means that it shows up in the browser.
+    """
+
+    def __init__(self, loader):
+        self.loader = loader
+        self._app = None
+        self._lock = Lock()
+        self._bg_loading_exc = None
+        self._load_in_background()
+
+    def _load_in_background(self):
+        # Store the Click context and push it in the loader thread so
+        # script_info is still available.
+        ctx = click.get_current_context(silent=True)
+
+        def _load_app():
+            __traceback_hide__ = True  # noqa: F841
+
+            with self._lock:
+                if ctx is not None:
+                    click.globals.push_context(ctx)
+
+                try:
+                    self._load_unlocked()
+                except Exception as e:
+                    traceback.print_exc()
+                    self._bg_loading_exc = e
+
+        t = Thread(target=_load_app, args=())
+        t.start()
+
+    def _flush_bg_loading_exception(self):
+        __traceback_hide__ = True  # noqa: F841
+        exc = self._bg_loading_exc
+
+        if exc is not None:
+            self._bg_loading_exc = None
+            raise exc
+
+    def _load_unlocked(self):
+        __traceback_hide__ = True  # noqa: F841
+        self._app = rv = self.loader()
+        self._bg_loading_exc = None
+        return rv
+
+    def __call__(self, environ, start_response):
+        __traceback_hide__ = True  # noqa: F841
+        if self._app is not None:
+            return self._app(environ, start_response)
+        self._flush_bg_loading_exception()
+        with self._lock:
+            if self._app is not None:
+                rv = self._app
+            else:
+                rv = self._load_unlocked()
+            return rv(environ, start_response)
 
 
 class DebuggedIndico(DebuggedApplication):

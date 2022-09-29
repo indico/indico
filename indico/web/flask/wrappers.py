@@ -10,8 +10,9 @@ import re
 from contextlib import contextmanager
 from uuid import uuid4
 
-from flask import Blueprint, Flask, current_app, g, request
+from flask import Blueprint, Flask, g, request
 from flask.blueprints import BlueprintSetupState
+from flask.globals import _cv_app
 from flask.helpers import locked_cached_property
 from flask.testing import FlaskClient
 from flask.wrappers import Request
@@ -25,7 +26,7 @@ from werkzeug.user_agent import UserAgent
 from werkzeug.utils import cached_property
 
 from indico.core.config import config
-from indico.util.json import IndicoJSONEncoder
+from indico.util.json import IndicoJSONProvider
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.templating import CustomizationLoader, IndicoEnvironment
 from indico.web.flask.util import make_view_func
@@ -94,15 +95,31 @@ class IndicoRequest(Request):
 
 
 class IndicoFlaskClient(FlaskClient):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__pristine = True
+        self.__contexts = []
+
     def open(self, *args, **kwargs):
-        # our tests always push an app context, but we do not want to leak `g` between
-        # test client calls, so we always use a throwaway app context for the requests
-        with current_app.app_context():
-            return super().open(*args, **kwargs)
+        # if we open a request for the first time, get rid of all active contexts
+        # so each requests gets its own context
+        if self.__pristine and self.preserve_context:
+            self.__pristine = False
+            while (ctx := _cv_app.get(None)):
+                self.__contexts.append(ctx)
+                ctx.pop()
+        return super().open(*args, **kwargs)
+
+    def __exit__(self, exc_type, exc_value, tb):
+        super().__exit__(exc_type, exc_value, tb)
+        # when cleaning up the test client, all contexts from the test clients have
+        # been popped at this point, so we bring back the ones we saved before
+        for ctx in self.__contexts[::-1]:
+            ctx.push()
 
 
 class IndicoFlask(PluginFlaskMixin, Flask):
-    json_encoder = IndicoJSONEncoder
+    json_provider_class = IndicoJSONProvider
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
     test_client_class = IndicoFlaskClient
@@ -111,7 +128,7 @@ class IndicoFlask(PluginFlaskMixin, Flask):
 
     @property
     def session_cookie_name(self):
-        name = super().session_cookie_name
+        name = self.config['SESSION_COOKIE_NAME']
         if not request.is_secure:
             name += '_http'
         return name

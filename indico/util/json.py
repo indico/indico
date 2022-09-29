@@ -5,23 +5,19 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from __future__ import annotations
+
+import typing as t
 from collections import UserDict
 from datetime import date, datetime
 
+import simplejson
+from flask.json.provider import JSONProvider
 from speaklater import _LazyString
 
 
-try:
-    import simplejson as _json
-except ImportError:
-    import json as _json
-
-
-class IndicoJSONEncoder(_json.JSONEncoder):
-    """Custom JSON encoder that supports more types.
-
-     * datetime objects
-    """
+class IndicoJSONEncoder(simplejson.JSONEncoder):
+    """Custom JSON encoder that supports more types."""
     def __init__(self, *args, **kwargs):
         if kwargs.get('separators') is None:
             kwargs['separators'] = (',', ':')
@@ -36,22 +32,14 @@ class IndicoJSONEncoder(_json.JSONEncoder):
             return {'date': str(o.date()), 'time': str(o.time()), 'tz': str(o.tzinfo)}
         elif isinstance(o, date):
             return str(o)
-        return _json.JSONEncoder.default(self, o)
+        return simplejson.JSONEncoder.default(self, o)
 
 
-def dumps(obj, **kwargs):
-    """Simple wrapper around json.dumps()."""
-    if kwargs.pop('pretty', False):
-        kwargs['indent'] = 4 * ' '
-    textarea = kwargs.pop('textarea', False)
-    ret = _json.dumps(obj, cls=IndicoJSONEncoder, **kwargs).replace('/', '\\/')
+class IndicoJSONProvider(JSONProvider):
+    def dumps(self, obj: t.Any, **kwargs: t.Any) -> str:
+        kwargs.setdefault('cls', IndicoJSONEncoder)
+        kwargs.setdefault('sort_keys', True)  # XXX not sure if we need it, but it was on before
+        return simplejson.dumps(obj, **kwargs)
 
-    if textarea:
-        return '<html><head></head><body><textarea>%s</textarea></body></html>' % ret
-    else:
-        return ret
-
-
-def loads(string):
-    """Simple wrapper around json.decode()."""
-    return _json.loads(string)
+    def loads(self, s: str | bytes, **kwargs: t.Any) -> t.Any:
+        return simplejson.loads(s, **kwargs)
