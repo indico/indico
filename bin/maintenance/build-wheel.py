@@ -240,8 +240,8 @@ def cli(obj, target_dir):
 def build_indico(obj, assets, add_version_suffix, ignore_unclean, assume_clean):
     """Build the indico wheel."""
     target_dir = obj['target_dir']
-    if  assume_clean:
-        clean, output =  True, None
+    if assume_clean:
+        clean, output = True, None
         warn('Assuming clean working tree')
     else:
         # check for unclean git status
@@ -250,14 +250,14 @@ def build_indico(obj, assets, add_version_suffix, ignore_unclean, assume_clean):
             warn('working tree is not clean [ignored]')
         elif not clean:
             fail('working tree is not clean', verbose_msg=output)
-    if  assume_clean:
-        clean, output =  True, None
+    if assume_clean:
+        clean, output = True, None
         warn('Assuming clean package')
     else:
         # check for git-ignored files included in the package
         clean, output = package_is_clean_indico()
         if not clean and ignore_unclean:
-         warn('package contains unexpected files listed in git exclusions [ignored]')
+            warn('package contains unexpected files listed in git exclusions [ignored]')
         elif not clean:
             fail('package contains unexpected files listed in git exclusions', verbose_msg=output)
     if assets:
@@ -296,15 +296,15 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, as
     """
     target_dir = obj['target_dir']
     with _chdir(plugin_dir):
-        if  assume_clean:
-            clean, output =  True, None
+        if assume_clean:
+            clean, output = True, None
             warn('Assuming clean working tree')
         else:
             clean, output = git_is_clean_plugin()
             if not clean and ignore_unclean:
-               warn('working tree is not clean, but ignored')
+                warn('working tree is not clean, but ignored')
             elif not clean:
-               fail('working tree is not clean', verbose_msg=output)
+                fail('working tree is not clean', verbose_msg=output)
     if assets:
         if not _plugin_has_assets(plugin_dir):
             noop('plugin has no assets')
