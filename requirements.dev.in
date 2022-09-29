@@ -9,7 +9,7 @@ pip-tools
 plantweb
 pygments
 pytest-cov
-pytest-localserver
+pytest-localserver[smtp]
 pytest-mock
 pytest-redis
 pytest-snapshot
