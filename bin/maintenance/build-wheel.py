@@ -289,7 +289,7 @@ def _plugin_has_assets(plugin_dir):
 @click.option('--no-assets', 'assets', is_flag=True, flag_value=False, default=True, help='skip building assets')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
-@click.option('--no-git', is_flag=True, help='Skip checks and assume clean non-git working tree')
+@click.option('--no-git', is_flag=True, help='Skip git checks and assume clean working tree')
 @click.pass_obj
 def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no_git):
     """Build a plugin wheel.
