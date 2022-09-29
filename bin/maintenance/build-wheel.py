@@ -243,7 +243,7 @@ def build_indico(obj, assets, add_version_suffix, ignore_unclean, no_git):
     if no_git:
         clean, output = True, None
         warn('Assuming clean non-git working tree')
-        if add_version_suffix: 
+        if add_version_suffix:
             fail('The --no-git option cannot be used with --add-version-suffix')
     else:
         # check for unclean git status
@@ -255,7 +255,7 @@ def build_indico(obj, assets, add_version_suffix, ignore_unclean, no_git):
     if no_git:
         clean, output = True, None
         warn('Assuming clean non-git package')
-        if add_version_suffix: 
+        if add_version_suffix:
             fail('The --no-git option cannot be used with --add-version-suffix', verbose_msg=output)
     else:
         # check for git-ignored files included in the package
@@ -303,7 +303,7 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no
         if no_git:
             clean, output = True, None
             warn('Assuming clean non-git working tree')
-            if add_version_suffix: 
+            if add_version_suffix:
                 fail('The --no-git option cannot be used with --add-version-suffix')
         else:
             clean, output = git_is_clean_plugin()
