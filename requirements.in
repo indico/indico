@@ -22,7 +22,7 @@ flask-pluginengine
 flask-sqlalchemy
 flask-webpackext
 flask-wtf
-flask<2.2  # causes some annoying errors i don't want to debug now, will update later :)
+flask
 html2text
 icalendar
 indico-fonts
@@ -61,7 +61,7 @@ terminaltables
 translitcodec
 ua-parser
 webargs
-werkzeug<2.2  # because we pin flask
+werkzeug
 wtforms[email]
 wtforms-dateutil
 wtforms-sqlalchemy

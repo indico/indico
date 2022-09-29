@@ -5,7 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.util import json
+import simplejson
+
+from indico.util.json import IndicoJSONEncoder
 from indico.web.http_api.metadata.serializer import Serializer
 
 
@@ -15,7 +17,8 @@ class JSONSerializer(Serializer):
     _mime = 'application/json'
 
     def _execute(self, fossil):
-        return json.dumps(fossil, pretty=self.pretty)
+        indent = ' ' * 4 if self.pretty else None
+        return simplejson.dumps(fossil, cls=IndicoJSONEncoder, indent=indent).replace('/', '\\/')
 
 
 Serializer.register('json', JSONSerializer)

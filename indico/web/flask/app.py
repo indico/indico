@@ -9,7 +9,8 @@ import os
 import uuid
 
 from babel.numbers import format_currency, get_currency_name
-from flask import _app_ctx_stack, render_template, request
+from flask import has_app_context, render_template, request
+from flask.globals import app_ctx
 from flask.helpers import get_root_path
 from flask_pluginengine import current_plugin, plugins_loaded
 from markupsafe import Markup
@@ -390,9 +391,9 @@ def make_app(testing=False, config_override=None):
     # This only works while inside an application context but you really shouldn't have any
     # reason to access it outside this method without being inside an application context.
 
-    if _app_ctx_stack.top:
+    if has_app_context():
         Logger.get('flask').warning('make_app called within app context, using existing app')
-        return _app_ctx_stack.top.app
+        return app_ctx.app
     app = IndicoFlask('indico', static_folder='web/static', static_url_path='/', template_folder='web/templates')
     app.config['TESTING'] = testing
     app.config['INDICO'] = load_config(only_defaults=testing, override=config_override)
