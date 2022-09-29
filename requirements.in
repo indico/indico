@@ -1,11 +1,11 @@
 alembic
-authlib>=1.0.0a1  # new oauth provider needs this prerelease authlib
+authlib
 babel
 bcrypt
 bleach[css]
 blinker
 captcha
-celery[redis]!=5.2.3  # 5.2.3 pins setuptools which is a mess
+celery[redis]
 certifi
 click
 colorclass
@@ -26,7 +26,7 @@ flask<2.2  # causes some annoying errors i don't want to debug now, will update 
 html2text
 icalendar
 indico-fonts
-ipython!=8.0.*  # 8.0 auto-blacks the code and has kind of broken autocompletion
+ipython
 itsdangerous
 jinja2
 jsonschema
