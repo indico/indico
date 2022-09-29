@@ -30,6 +30,7 @@ const nameFormat = ({firstName, lastName}) => (firstName ? `${firstName} ${lastN
 const PersonListItem = ({
   person: {avatarURL, firstName, lastName, affiliation, email},
   roles,
+  canEdit,
   canDelete,
   onDelete,
   onEdit,
@@ -64,14 +65,16 @@ const PersonListItem = ({
         ))}
     </div>
     <div styleName="actions">
-      <Icon
-        styleName="button edit"
-        name="pencil alternate"
-        title={Translate.string('Edit person')}
-        size="large"
-        onClick={onEdit}
-        disabled={disabled}
-      />
+      {canEdit && (
+        <Icon
+          styleName="button edit"
+          name="pencil alternate"
+          title={Translate.string('Edit person')}
+          size="large"
+          onClick={onEdit}
+          disabled={disabled}
+        />
+      )}
       {canDelete && (
         <Icon
           styleName="button delete"
@@ -92,12 +95,14 @@ PersonListItem.propTypes = {
   onDelete: PropTypes.func,
   canDelete: PropTypes.bool,
   onEdit: PropTypes.func.isRequired,
+  canEdit: PropTypes.bool,
   disabled: PropTypes.bool,
   avatarURL: PropTypes.string,
   onClickRole: PropTypes.func,
 };
 
 PersonListItem.defaultProps = {
+  canEdit: true,
   canDelete: true,
   disabled: false,
   avatarURL: null,
@@ -141,6 +146,7 @@ const PersonLinkSection = ({
   defaultRoles,
   onChange,
   onEdit,
+  canEdit,
   canDelete,
   drag,
   dragType,
@@ -179,6 +185,7 @@ const PersonLinkSection = ({
               onEdit={() => onEdit(idx)}
               onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
               canDelete={canDelete}
+              canEdit={canEdit}
               roles={defaultRoles.map(({name, ...rest}) => ({
                 ...rest,
                 name,
@@ -200,6 +207,7 @@ PersonLinkSection.propTypes = {
   defaultRoles: PropTypes.array,
   onChange: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
+  canEdit: PropTypes.bool,
   canDelete: PropTypes.bool,
   drag: PropTypes.bool,
   dragType: PropTypes.string.isRequired,
@@ -209,6 +217,7 @@ PersonLinkSection.defaultProps = {
   label: undefined,
   persons: [],
   defaultRoles: [],
+  canEdit: true,
   canDelete: true,
   drag: false,
 };
@@ -287,6 +296,7 @@ function PersonLinkField({
                 onChange={values =>
                   onChange(persons.filter(p => !filterCondition(p)).concat(values))
                 }
+                canEdit={canEnterManually}
               />
             );
           })}
@@ -299,6 +309,7 @@ function PersonLinkField({
               defaultRoles={roles}
               onEdit={idx => onEdit(persons.findIndex(p => p === others[idx]))}
               onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
+              canEdit={canEnterManually}
             />
           )}
           {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}

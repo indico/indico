@@ -24,6 +24,7 @@ from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.persons import persons_settings
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.users.models.affiliations import Affiliation
+from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.web.forms.fields import MultipleItemsField
@@ -114,6 +115,11 @@ class PersonLinkListFieldBase(PrincipalListField):
             # we do not have an affiliation ID yet since it may not exist in the local DB yet
             cache = make_scoped_cache('external-user')
             external_user_data = cache.get(identifier.removeprefix('ExternalUser:'), {})
+            if not self.can_enter_manually:
+                for key in ('first_name', 'last_name', 'email', 'affiliation', 'phone', 'address'):
+                    data[key] = external_user_data.get(key, '')
+                data['_title'] = UserTitle.none
+                data['affiliation_link'] = None
             if (
                 (affiliation_data := external_user_data.get('affiliation_data')) and
                 data['affiliation'] == affiliation_data['name']
@@ -127,6 +133,9 @@ class PersonLinkListFieldBase(PrincipalListField):
             person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
         if not person_link:
             person_link = self.person_link_cls(person=person)
+        if not self.can_enter_manually:
+            person_link.populate_from_dict(data, keys=('display_order',))
+            return person_link
         person_link.populate_from_dict(data, keys=('first_name', 'last_name', 'affiliation', 'affiliation_link',
                                                    'address', 'phone', '_title', 'display_order'))
         email = data.get('email', '').lower()
