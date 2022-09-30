@@ -67,17 +67,21 @@ def export(event_id, target_file):
 @cli.command('import')
 @click.argument('source_file', type=click.File('rb'))
 @click.option('--create-users/--no-create-users', default=None,
-              help='Whether to create missing user or skip them.  By default a confirmation prompt is shown when '
+              help='Whether to create missing users or skip them.  By default a confirmation prompt is shown when '
                    'the archive contains such users')
+@click.option('--create-affiliations/--no-create-affiliations', default=None,
+              help='Whether to create missing affiliations or skip them.  By default a confirmation prompt is shown '
+                   'when the archive contains such affiliations')
 @click.option('--force', is_flag=True, help='Ignore Indico version mismatches (DANGER)')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on what is being imported')
 @click.option('-y', '--yes', is_flag=True, help='Always commit the imported event without prompting')
 @click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',
               help='ID of the target category. Defaults to the root category.')
-def import_(source_file, create_users, force, verbose, yes, category_id):
+def import_(source_file, create_users, create_affiliations, force, verbose, yes, category_id):
     """Import an event exported from another Indico instance."""
     click.echo('Importing event...')
-    event = import_event(source_file, category_id, create_users=create_users, verbose=verbose, force=force)
+    event = import_event(source_file, category_id, create_users=create_users, create_affiliations=create_affiliations,
+                         verbose=verbose, force=force)
     if event is None:
         click.secho('Import failed.', fg='red')
         sys.exit(1)
