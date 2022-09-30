@@ -33,14 +33,22 @@ export default function ManageNotes({icon, title, apiURL, imageUploadURL, getNot
       {icon ? (
         <>
           <a
+            href=""
             className="i-link icon-edit"
             title={Translate.string('Edit minutes')}
-            onClick={() => setModalOpen(true)}
+            onClick={evt => {
+              evt.preventDefault();
+              setModalOpen(true);
+            }}
           />{' '}
           <a
+            href=""
             className="i-link icon-remove"
             title={Translate.string('Delete minutes')}
-            onClick={() => setIsDeleting(true)}
+            onClick={evt => {
+              evt.preventDefault();
+              setIsDeleting(true);
+            }}
           />
           <RequestConfirmDelete
             onClose={() => setIsDeleting(false)}
@@ -51,7 +59,15 @@ export default function ManageNotes({icon, title, apiURL, imageUploadURL, getNot
           </RequestConfirmDelete>
         </>
       ) : (
-        <a onClick={() => setModalOpen(true)}>{title}</a>
+        <a
+          href=""
+          onClick={evt => {
+            evt.preventDefault();
+            setModalOpen(true);
+          }}
+        >
+          {title}
+        </a>
       )}
       {modalOpen && (
         <NoteEditor

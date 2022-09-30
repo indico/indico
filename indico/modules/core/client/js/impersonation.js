@@ -29,7 +29,7 @@ export function impersonateUser(id) {
 }
 
 const searchTrigger = triggerProps => (
-  <a {...triggerProps}>
+  <a href="" {...triggerProps}>
     <Translate>Login as...</Translate>
   </a>
 );
