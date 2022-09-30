@@ -43,3 +43,8 @@ class IndicoJSONProvider(JSONProvider):
 
     def loads(self, s: str | bytes, **kwargs: t.Any) -> t.Any:
         return simplejson.loads(s, **kwargs)
+
+    def _prepare_response_obj(self, args: t.Tuple[t.Any, ...], kwargs: t.Dict[str, t.Any]) -> t.Any:
+        if not args and not kwargs:
+            return {}
+        return super()._prepare_response_obj(args, kwargs)
