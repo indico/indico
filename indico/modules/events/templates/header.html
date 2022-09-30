@@ -41,8 +41,8 @@
 
 
 {%- macro _render_theme_selector() -%}
-    <a class="i-button text-color subtle icon-layout arrow js-dropdown" data-toggle="dropdown"
-       title="{% trans %}Change theme{% endtrans %}"></a>
+    <button class="i-button text-color subtle icon-layout arrow js-dropdown" data-toggle="dropdown"
+       title="{% trans %}Change theme{% endtrans %}"></button>
     <ul class="i-dropdown">
         {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
         {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
@@ -73,8 +73,8 @@
         {%- endif -%}
     {%- endset -%}
 
-    <a class="i-button text-color subtle icon-filter filter-link {{ 'active' if filters_active }}"
-       title="{{ filter_link_tooltip|forceescape }}"></a>
+    <button class="i-button text-color subtle icon-filter filter-link {{ 'active' if filters_active }}"
+       title="{{ filter_link_tooltip|forceescape }}"></button>
 
     <div id="event-filters" class="event-filters">
         <form id="filterForm" style="margin: 0;">
@@ -210,9 +210,9 @@
                      data-event-session-block-count="{{ event.session_block_count }}"></div>
 
                 {% if event.type == 'meeting' %}
-                    <a class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
+                    <button class="i-button text-color subtle icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
                        data-href="{{ url_for('timetable.export_pdf', event) }}"
-                       data-ajax-dialog></a>
+                       data-ajax-dialog></button>
                 {% endif %}
 
                 <a class="i-button text-color subtle icon-package-download" href="{{ url_for('attachments.package', event) }}"

@@ -32,13 +32,13 @@
             {% if can_submit_abstracts %}
                 <div class="toolbar">
                     {% if session.user and not redirect_first %}
-                        <a class="i-button highlight js-show-abstract-form"
+                        <button class="i-button highlight js-show-abstract-form"
                            data-title="{% trans %}Submit new abstract{% endtrans %}"
                            data-href="{{ url_for('abstracts.submit', event) }}"
                            data-confirm-close-unsaved
                            data-ajax-dialog>
                             {%- trans %}Submit new abstract{% endtrans -%}
-                        </a>
+                        </button>
                     {% else %}
                         {% set submit_url = url_for('abstracts.call_for_abstracts', event, _anchor='submit-abstract') %}
                         {% set url = submit_url if session.user else url_for_login(submit_url) %}

@@ -48,12 +48,12 @@
             <div class="i-box-header">
                 <div class="i-box-title">{%- trans %}Pending Reminders{% endtrans -%}</div>
                 <div class="i-box-buttons hide-if-locked">
-                    <a class="i-button icon-plus" data-href="{{ url_for('.add', event) }}"
+                    <button class="i-button icon-plus" data-href="{{ url_for('.add', event) }}"
                         data-title="{%- trans %}Add Reminder{% endtrans -%}"
                         data-ajax-dialog
                         data-reload-after>
                         {%- trans %}Add Reminder{% endtrans -%}
-                    </a>
+                    </button>
                 </div>
             </div>
             <div class="i-box-content">

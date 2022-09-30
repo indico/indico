@@ -7,19 +7,20 @@
         <ul class="permissions-widget-list"></ul>
         <div class="toolbar">
             <div class="group">
-                <a href="#" class="i-button label text-color outline add-entry-decoration">
+                <a class="i-button label text-color outline add-entry-decoration">
                     {%- trans %}Add{% endtrans -%}
                 </a>
                 <span id="js-add-user-group"></span>
                 {% if field.object_type == 'event' %}
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Event Role{% endtrans %}</a>
+                    <button class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Event Role{% endtrans %}</button>
                     <ul class="i-dropdown entry-role-dropdown" data-items='{{ field.event_roles|tojson|forceescape }}'>
                         <li class="separator default"></li>
                         <li class="entry-item new-role-btn default">
                             <a class="js-new-role"
-                            data-href="{{ url_for('event_roles.add_role', field.event) }}"
-                            data-title="{% trans %}Add a new role{% endtrans %}"
-                            data-ajax-dialog>
+                               data-href="{{ url_for('event_roles.add_role', field.event) }}"
+                               data-title="{% trans %}Add a new role{% endtrans %}"
+                               data-ajax-dialog
+                               href="">
                                 <span class="icon-medal dropdown-icon"></span>
                                 <span>{% trans %}New role{% endtrans %}</span>
                             </a>
@@ -28,23 +29,23 @@
                 {% endif %}
                 {% set category_roles = field.category_roles %}
                 {% if category_roles %}
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown">
+                    <button class="i-button arrow js-dropdown" data-toggle="dropdown">
                         {% trans %}Category role{% endtrans %}
-                    </a>
+                    </button>
                     <ul class="i-dropdown entry-category-role-dropdown"
                         data-items='{{ category_roles|tojson|forceescape }}'></ul>
                 {% endif %}
                 {% if field.object_type in ('event', 'category') and field.ip_networks %}
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown">
+                    <button class="i-button arrow js-dropdown" data-toggle="dropdown">
                         {%- trans %}IP Network{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown entry-ip-network-dropdown"
                         data-items='{{ field.ip_networks|tojson|forceescape }}'></ul>
                 {% endif %}
                 {% if field.registration_forms %}
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown">
+                    <button class="i-button arrow js-dropdown" data-toggle="dropdown">
                         {%- trans %}Registrants{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown entry-reg-form-dropdown"
                         data-items='{{ field.registration_forms|tojson|forceescape }}'></ul>
                 {% endif %}

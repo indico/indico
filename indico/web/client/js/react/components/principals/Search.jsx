@@ -404,7 +404,8 @@ const searchFactory = config => {
       setOpen(false);
     };
 
-    const handleOpenClick = () => {
+    const handleOpenClick = evt => {
+      evt.preventDefault();
       if (disabled) {
         return;
       }

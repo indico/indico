@@ -36,9 +36,9 @@
                            data-title="{% trans %}Add text item{% endtrans %}">
                             {% trans %}Add text item{% endtrans %}
                         </a>
-                        <a class="i-button arrow js-add-question-dropdown" data-toggle="dropdown">
+                        <button class="i-button arrow js-add-question-dropdown" data-toggle="dropdown">
                             {% trans %}Add question{% endtrans %}
-                        </a>
+                        </button>
                         <ul class="i-dropdown">
                             {% for field_type in field_types.values()|sort(attribute='friendly_name') %}
                                 <li>
