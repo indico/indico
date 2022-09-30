@@ -223,6 +223,7 @@ function PersonLinkField({
   autoSort,
   setAutoSort,
   hasPredefinedAffiliations,
+  canEnterManually,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState(false);
@@ -335,10 +336,12 @@ function PersonLinkField({
             eventId={eventId}
             disabled={!sessionUser}
           />
-          <Button type="button" onClick={() => setModalOpen(true)}>
-            <Icon name="keyboard" />
-            <Translate>Enter manually</Translate>
-          </Button>
+          {canEnterManually && (
+            <Button type="button" onClick={() => setModalOpen(true)}>
+              <Icon name="keyboard" />
+              <Translate>Enter manually</Translate>
+            </Button>
+          )}
           {modalOpen && (
             <PersonDetailsModal
               onClose={onClose}
@@ -363,6 +366,7 @@ PersonLinkField.propTypes = {
   autoSort: PropTypes.bool,
   setAutoSort: PropTypes.func,
   hasPredefinedAffiliations: PropTypes.bool,
+  canEnterManually: PropTypes.bool,
 };
 
 PersonLinkField.defaultProps = {
@@ -373,6 +377,7 @@ PersonLinkField.defaultProps = {
   autoSort: true,
   setAutoSort: null,
   hasPredefinedAffiliations: false,
+  canEnterManually: true,
 };
 
 export function WTFPersonLinkField({
@@ -383,6 +388,7 @@ export function WTFPersonLinkField({
   sessionUser,
   emptyMessage,
   hasPredefinedAffiliations,
+  canEnterManually,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -435,6 +441,7 @@ export function WTFPersonLinkField({
       autoSort={autoSort}
       setAutoSort={setAutoSort}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
+      canEnterManually={canEnterManually}
     />
   );
 }
@@ -447,6 +454,7 @@ WTFPersonLinkField.propTypes = {
   sessionUser: PropTypes.object,
   emptyMessage: PropTypes.string,
   hasPredefinedAffiliations: PropTypes.bool,
+  canEnterManually: PropTypes.bool,
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -456,4 +464,5 @@ WTFPersonLinkField.defaultProps = {
   sessionUser: null,
   emptyMessage: null,
   hasPredefinedAffiliations: false,
+  canEnterManually: true,
 };

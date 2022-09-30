@@ -13,7 +13,15 @@ import {camelizeKeys} from 'indico/utils/case';
 
 (function(global) {
   global.setupPersonLinkWidget = function setupPersonLinkWidget(options) {
-    const {fieldId, eventId, roles, sessionUser, hasPredefinedAffiliations, ...rest} = options;
+    const {
+      fieldId,
+      eventId,
+      roles,
+      sessionUser,
+      hasPredefinedAffiliations,
+      canEnterManually,
+      ...rest
+    } = options;
     const field = document.getElementById(fieldId);
     const persons = JSON.parse(field.value);
     const user = sessionUser &&
@@ -41,6 +49,7 @@ import {camelizeKeys} from 'indico/utils/case';
         roles={roles || []}
         sessionUser={user}
         hasPredefinedAffiliations={hasPredefinedAffiliations}
+        canEnterManually={canEnterManually}
         {...rest}
       />,
       document.getElementById(`person-link-field-${fieldId}`)

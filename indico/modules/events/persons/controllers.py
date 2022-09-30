@@ -31,8 +31,8 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
-from indico.modules.events.persons import logger
-from indico.modules.events.persons.forms import EmailEventPersonsForm
+from indico.modules.events.persons import logger, persons_settings
+from indico.modules.events.persons.forms import EmailEventPersonsForm, ManagePersonListsForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.schemas import EventPersonSchema, EventPersonUpdateSchema
 from indico.modules.events.persons.views import WPManagePersons
@@ -460,3 +460,16 @@ class RHEventPersonSearch(RHAuthenticatedEventBase):
             users=EventPersonSchema(only=EventPersonSchema.Meta.public_fields).dump(matches, many=True),
             total=total
         )
+
+
+class RHManagePersonLists(RHManageEventBase):
+    """Dialog to configure person list settings."""
+
+    def _process(self):
+        form = ManagePersonListsForm(disallow_custom_persons=persons_settings.get(self.event,
+                                                                                  'disallow_custom_persons'))
+        if form.validate_on_submit():
+            persons_settings.set(self.event, 'disallow_custom_persons', form.disallow_custom_persons.data)
+            flash(_('Person lists settings changed successfully'), 'success')
+            return jsonify_data()
+        return jsonify_form(form)

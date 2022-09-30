@@ -38,3 +38,9 @@ class EmailEventPersonsForm(IndicoForm):
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form
+
+
+class ManagePersonListsForm(IndicoForm):
+    disallow_custom_persons = BooleanField(_('Disallow manually entering persons'), widget=SwitchWidget(),
+                                           description=_('Prohibit submitters from adding new speakers/authors '
+                                                         'manually and only allow searching for existing users.'))

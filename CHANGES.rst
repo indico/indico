@@ -13,6 +13,7 @@ Improvements
 - Enable better image linking UI in CKEditor (:pr:`5492`)
 - Restore the "fullscreen view" option in CKEditor (:pr:`5505`)
 - Display & enforce judging deadline (:pr:`5506`)
+- Add a setting to disable entering persons in person link fields manually (:pr:`5499`)
 
 Bugfixes
 ^^^^^^^^

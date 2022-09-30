@@ -8,6 +8,25 @@
     {% trans %}Participant Roles{% endtrans %}
 {% endblock %}
 
+{% block title_actions %}
+    {%- if event.type == 'conference' -%}
+        <a class="i-button borderless icon-settings arrow js-dropdown"
+           data-toggle="dropdown">{% trans %}Settings{% endtrans %}</a>
+        <ul class="i-dropdown">
+            <li>
+                <a href="#"
+                   title="{% trans %}Manage person lists{% endtrans %}"
+                   data-reload-after="customData"
+                   data-title="{% trans %}Manage person lists{% endtrans %}"
+                   data-href="{{ url_for('.manage_person_lists', event) }}"
+                   data-qtip-position="right"
+                   data-ajax-dialog>
+                    {% trans %}Person lists{% endtrans %}</a>
+            </li>
+        </ul>
+    {%- endif -%}
+{% endblock %}
+
 {% block content %}
     {%- set has_no_account = persons|selectattr('roles.no_account')|any -%}
     {%- set has_uninvited = persons|selectattr('roles.no_account')|selectattr('person.invited_dt', 'none')|any -%}

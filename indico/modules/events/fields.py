@@ -8,6 +8,7 @@
 import json
 from operator import attrgetter
 
+from flask import session
 from marshmallow import EXCLUDE
 from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
@@ -20,6 +21,7 @@ from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.persons import persons_settings
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.util import get_user_by_email
@@ -96,11 +98,17 @@ class PersonLinkListFieldBase(PrincipalListField):
     def has_predefined_affiliations(self):
         return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
 
+    @property
+    def can_enter_manually(self):
+        return self.event.can_manage(session.user) or not persons_settings.get(self.event, 'disallow_custom_persons')
+
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         identifier = data.get('identifier')
         data = PersonLinkSchema(unknown=EXCLUDE).load(data)
+        if not self.can_enter_manually and not data.get('type'):
+            raise UserValueError('Manually entered persons are not allowed')
         if identifier and identifier.startswith('ExternalUser:'):
             # if the data came from an external user, look up their affiliation if the names still match;
             # we do not have an affiliation ID yet since it may not exist in the local DB yet
