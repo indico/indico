@@ -91,9 +91,15 @@ class Watchman:
         self._client.capabilityCheck(required=['wildmatch', 'cmd-watch-project'])
         indico_project_root = os.path.realpath(os.path.join(get_root_path('indico'), '..'))
         paths = sorted({os.path.realpath(p) for p in _find_watchdog_paths(set(), set()) if os.path.exists(p)})
+        if env_config := os.environ.get('INDICO_CONFIG'):
+            env_config = os.path.expanduser(env_config)
+            env_config_path, env_config_name = os.path.split(env_config)
+            watcher = Watcher(env_config_path, [env_config_name, 'logging.yaml'])
+            watcher.start(self._client)
+            self._watchers.add(watcher)
         for path in paths:
             patterns = ['**/*.py', '**/entry_points.txt']
-            if path == indico_project_root:
+            if path == indico_project_root and not env_config:
                 patterns += ['indico/indico.conf', 'indico/logging.yaml']
             watcher = Watcher(path, patterns)
             watcher.start(self._client)
