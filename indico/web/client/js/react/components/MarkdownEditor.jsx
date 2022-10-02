@@ -61,7 +61,7 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
         renderHTML={text => <Markdown>{text.replace(/\n/gi, '  \n')}</Markdown>}
         canView={{menu: true, md: true, html: false, fullScreen: false, hideMenu: false}}
         plugins={plugins.filter(p => imageUploadURL || p !== 'image')}
-        style={{height: `${height}px`}}
+        style={{height}}
         onImageUpload={imageUploadURL ? onImageUpload : undefined}
         {...rest}
       />
@@ -70,12 +70,12 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
 }
 
 MarkdownEditor.propTypes = {
-  height: PropTypes.number,
+  height: PropTypes.string,
   imageUploadURL: PropTypes.string,
 };
 
 MarkdownEditor.defaultProps = {
-  height: 475,
+  height: '475px',
   imageUploadURL: null,
 };
 

@@ -149,6 +149,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
           id="edit-minutes"
           header={Translate.string('Edit Minutes')}
           submitLabel={Translate.string('Save')}
+          style={{minWidth: '65vw'}}
           size="large"
           initialValues={{source: currentInput}}
           onClose={closeModal}
@@ -176,7 +177,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
           }
         >
           {renderMode === 'markdown' ? (
-            <FinalMarkdownEditor name="source" imageUploadURL={imageUploadURL} />
+            <FinalMarkdownEditor name="source" imageUploadURL={imageUploadURL} height="70vh" />
           ) : (
             <FinalTextEditor
               name="source"
@@ -184,6 +185,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
               value={currentInput}
               parse={v => v}
               config={{images: true, imageUploadURL}}
+              height="70vh"
             />
           )}
         </FinalModalForm>

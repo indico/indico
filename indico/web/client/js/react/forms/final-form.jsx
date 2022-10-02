@@ -96,6 +96,7 @@ export function FinalModalForm({
   className,
   decorators,
   validate,
+  style,
 }) {
   const confirmingOnClose = dirty => () => {
     if (
@@ -124,6 +125,7 @@ export function FinalModalForm({
           closeOnEscape={!fprops.submitting}
           closeOnDimmerClick={!fprops.submitting}
           centered={!alignTop}
+          style={style}
           open
         >
           <Modal.Header>{header}</Modal.Header>
@@ -216,6 +218,8 @@ FinalModalForm.propTypes = {
    * submitted, you may pass a callable here.
    */
   extraActions: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+  /** Custom style for the modal, e.g. to change the width. */
+  style: PropTypes.object,
 };
 
 FinalModalForm.defaultProps = {
@@ -231,4 +235,5 @@ FinalModalForm.defaultProps = {
   submitLabel: null,
   className: null,
   extraActions: null,
+  style: null,
 };
