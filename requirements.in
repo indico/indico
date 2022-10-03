@@ -19,7 +19,7 @@ flask-marshmallow
 flask-migrate
 flask-multipass
 flask-pluginengine
-flask-sqlalchemy<3  # separate PR: https://github.com/indico/indico/pull/5522
+flask-sqlalchemy
 flask-webpackext
 flask-wtf
 flask

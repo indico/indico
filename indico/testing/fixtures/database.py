@@ -92,8 +92,8 @@ def database(app, postgresql):
     with app.app_context():
         create_all_tables(db_)
     yield db_
-    db_.session.remove()
     with app.app_context():
+        db_.session.remove()
         delete_all_tables(db_)
 
 

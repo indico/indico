@@ -9,6 +9,7 @@ import sys
 import typing as t
 from contextlib import contextmanager
 from functools import partial
+from threading import get_ident
 
 from flask import g
 from flask_sqlalchemy import SQLAlchemy
@@ -175,7 +176,8 @@ naming_convention = {
 }
 
 db = IndicoSQLAlchemy(model_class=declarative_base(cls=IndicoModel, metaclass=NoNameGenMeta, name='Model'),
-                      query_class=IndicoBaseQuery)
+                      query_class=IndicoBaseQuery, session_options={'scopefunc': get_ident})
 db.Model.metadata.naming_convention = naming_convention
+assert db.Model.metadata is db.metadata
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)
