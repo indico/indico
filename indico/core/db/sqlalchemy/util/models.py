@@ -11,7 +11,9 @@ from copy import copy
 from importlib import import_module
 
 from flask import g
-from flask_sqlalchemy import BaseQuery, Model, Pagination
+from flask_sqlalchemy.model import Model
+from flask_sqlalchemy.pagination import Pagination, QueryPagination
+from flask_sqlalchemy.query import Query as BaseQuery
 from sqlalchemy import Column, inspect, orm
 from sqlalchemy.event import listen, listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -27,8 +29,25 @@ from indico.util.signals import values_from_signal
 _ModelT = t.TypeVar('_ModelT', bound='IndicoModel')
 
 
+class IndicoQueryPagination(QueryPagination):
+    def __init__(self, *args, **kwargs):
+        self.show_all = kwargs.pop('show_all', False)
+        super().__init__(*args, **kwargs)
+
+    def _query_items(self):
+        query = self._query_args['query']
+        if not self.show_all:
+            query = query.limit(self.per_page).offset(self._query_offset)
+        return query.all()
+
+    def _query_count(self):
+        if self.show_all:
+            return len(self.items)
+        return super()._query_count()
+
+
 class IndicoBaseQuery(BaseQuery):
-    def paginate(self, page=1, per_page=25, show_all=False):
+    def paginate(self, *, page=1, per_page=25, show_all=False) -> Pagination:
         """Paginate a query object.
 
         This behaves almost like the default `paginate` method from
@@ -39,20 +58,9 @@ class IndicoBaseQuery(BaseQuery):
         :param show_all: Whether to show all the elements on one page.
         :return: a :class:`Pagination` object
         """
-        if page < 1 or show_all:
-            page = 1
-
         if show_all:
-            items = self.all()
-            per_page = total = len(items)
-        else:
-            items = self.limit(per_page).offset((page - 1) * per_page).all()
-            if page == 1 and len(items) < per_page:
-                total = len(items)
-            else:
-                total = self.order_by(None).count()
-
-        return Pagination(self, page, per_page, total, items)
+            page = 1
+        return IndicoQueryPagination(query=self, page=page, per_page=per_page, max_per_page=None, show_all=show_all)
 
     def has_rows(self):
         """Check whether a query yields any rows.

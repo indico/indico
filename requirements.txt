@@ -111,7 +111,7 @@ flask-caching==2.0.2
     # via -r requirements.in
 flask-limiter==3.3.0
     # via -r requirements.in
-flask-marshmallow==0.14.0
+flask-marshmallow==0.15.0
     # via -r requirements.in
 flask-migrate==4.0.4
     # via -r requirements.in
@@ -119,7 +119,7 @@ flask-multipass==0.4.9
     # via -r requirements.in
 flask-pluginengine==0.4.1
     # via -r requirements.in
-flask-sqlalchemy==2.5.1
+flask-sqlalchemy==3.0.3
     # via
     #   -r requirements.in
     #   flask-migrate
@@ -219,6 +219,7 @@ ordered-set==4.1.0
 packaging==23.0
     # via
     #   -r requirements.in
+    #   flask-marshmallow
     #   limits
     #   marshmallow
     #   marshmallow-sqlalchemy
@@ -305,7 +306,6 @@ six==1.16.0
     #   asttokens
     #   bleach
     #   click-repl
-    #   flask-marshmallow
     #   html5lib
     #   python-dateutil
 speaklater==1.3

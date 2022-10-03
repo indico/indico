@@ -273,6 +273,9 @@ def configure_db(app):
         # a dummy uri explicitly instead of letting flask-sqlalchemy do
         # the exact same thing we avoid a warning when running tests.
         app.config.setdefault('SQLALCHEMY_DATABASE_URI', 'sqlite:///:memory:')
+        # the app factory calls this once (which calls db.init_app()), but any test that
+        # uses the db fixture will also call it again in order to set the correct test db URI
+        app.extensions.pop('sqlalchemy', None)
     else:
         if config.SQLALCHEMY_DATABASE_URI is None:
             raise Exception('No proper SQLAlchemy store has been configured. Please edit your indico.conf')

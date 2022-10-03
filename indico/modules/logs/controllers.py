@@ -90,7 +90,7 @@ class LogsAPIMixin:
         if metadata_query:
             query = query.filter(self.model.meta.contains(metadata_query))
 
-        query = query.paginate(page, LOG_PAGE_SIZE)
+        query = query.paginate(page=page, per_page=LOG_PAGE_SIZE)
         entries = [dict(serialize_log_entry(entry), index=index, html=entry.render())
                    for index, entry in enumerate(query.items)]
         return jsonify(current_page=page, pages=list(query.iter_pages()), total_page_count=query.pages, entries=entries)

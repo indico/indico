@@ -9,6 +9,7 @@ import sys
 import typing as t
 from contextlib import contextmanager
 from functools import partial
+from threading import get_ident
 
 from flask import g
 from flask_sqlalchemy import SQLAlchemy
@@ -70,10 +71,10 @@ class IndicoSQLAlchemy(SQLAlchemy):
         super().__init__(*args, **kwargs)
         self.m = type('_Models', (object,), {})
 
-    def create_session(self, *args, **kwargs):
-        session = super().create_session(*args, **kwargs)
-        listen(session, 'after_commit', _after_commit)
-        return session
+    def _make_session_factory(self, *args, **kwargs):
+        factory = super()._make_session_factory(*args, **kwargs)
+        listen(factory, 'after_commit', _after_commit)
+        return factory
 
     def enforce_constraints(self):
         """Enable immediate enforcing of deferred constraints.
@@ -102,10 +103,9 @@ class IndicoSQLAlchemy(SQLAlchemy):
         """Provide a contextmanager with a temporary SQLAlchemy session.
 
         This allows you to use SQLAlchemy e.g. in a `after_this_request`
-        callback without having to worry about things like the ZODB extension,
-        implicit commits, etc.
+        callback without having to worry about things like implicit commits
         """
-        session = db.create_session({'query_cls': IndicoBaseQuery})()
+        session = db._make_session_factory({'query_cls': IndicoBaseQuery})()
         try:
             yield session
         except Exception:
@@ -175,7 +175,8 @@ naming_convention = {
 }
 
 db = IndicoSQLAlchemy(model_class=declarative_base(cls=IndicoModel, metaclass=NoNameGenMeta, name='Model'),
-                      query_class=IndicoBaseQuery)
+                      query_class=IndicoBaseQuery, session_options={'scopefunc': get_ident})
 db.Model.metadata.naming_convention = naming_convention
+assert db.Model.metadata is db.metadata
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)
