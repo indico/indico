@@ -356,7 +356,7 @@ class RHUserPreferences(RHUserBase):
 
 class RHUserPreferencesMarkdownAPI(RHUserBase):
     def _process(self):
-        return jsonify(session.user.settings.get('use_markdown_for_minutes'))
+        return jsonify(self.user.settings.get('use_markdown_for_minutes'))
 
 
 class RHUserFavorites(RHUserBase):

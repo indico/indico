@@ -36,7 +36,7 @@ from indico.modules.users.schemas import AffiliationSchema
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalDict, validate_with_message
 from indico.util.string import render_markdown, sanitize_html
-from indico.web.args import use_args, use_kwargs
+from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -355,10 +355,9 @@ class RHAPIGenerateCaptcha(RH):
 
 
 class RHRenderMarkdown(RH):
-    """Render Markdown."""
+    """Render Markdown to HTML."""
 
-    @use_args({'source': fields.String()})
-    def _process_POST(self, args):
-        source = args['source']
+    @use_kwargs({'source': fields.String(required=True)})
+    def _process_POST(self, source):
         html = render_markdown(source, extensions=('nl2br',))
         return jsonify(html=html)

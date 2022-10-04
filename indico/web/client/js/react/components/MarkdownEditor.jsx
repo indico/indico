@@ -14,7 +14,6 @@ import {Markdown} from 'indico/react/util';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import './MarkdownEditor.module.scss';
-// import style manually
 import 'react-markdown-editor-lite/lib/index.css';
 
 export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
