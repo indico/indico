@@ -354,6 +354,11 @@ class RHUserPreferences(RHUserBase):
         return WPUser.render_template('preferences.html', 'preferences', user=self.user, form=form)
 
 
+class RHUserPreferencesMarkdownAPI(RHUserBase):
+    def _process(self):
+        return jsonify(self.user.settings.get('use_markdown_for_minutes'))
+
+
 class RHUserFavorites(RHUserBase):
     def _process(self):
         return WPUserFavorites.render_template('favorites.html', 'favorites', user=self.user)

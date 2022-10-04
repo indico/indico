@@ -35,7 +35,7 @@ from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalDict, validate_with_message
-from indico.util.string import sanitize_html
+from indico.util.string import render_markdown, sanitize_html
 from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
@@ -352,3 +352,12 @@ class RHAPIGenerateCaptcha(RH):
         rv.headers['Pragma'] = 'no-cache'
         rv.headers['Expires'] = '0'
         return rv
+
+
+class RHRenderMarkdown(RH):
+    """Render Markdown to HTML."""
+
+    @use_kwargs({'source': fields.String(required=True)})
+    def _process_POST(self, source):
+        html = render_markdown(source, extensions=('nl2br',))
+        return jsonify(html=html)

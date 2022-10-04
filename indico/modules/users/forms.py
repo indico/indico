@@ -63,6 +63,11 @@ class UserPreferencesForm(IndicoForm):
         [HiddenUnless('add_ical_alerts'), NumberRange(min=0)],
         description=_('Number of minutes to notify before an event.'))
 
+    use_markdown_for_minutes = BooleanField(
+        _('Markdown editor for minutes'),
+        widget=SwitchWidget(),
+        description=_('Use Markdown editor instead of HTML editor when editing the minutes of a meeting.'))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
