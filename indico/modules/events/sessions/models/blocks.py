@@ -8,6 +8,7 @@
 from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core.db import db
@@ -124,13 +125,23 @@ class SessionBlock(LocationMixin, db.Model):
     def can_edit_note(self, user):
         return self.session.can_edit_note(user)
 
-    @property
+    @hybrid_property
     def start_dt(self):
         return self.timetable_entry.start_dt if self.timetable_entry else None
 
-    @property
+    @start_dt.expression
+    def start_dt(cls):
+        return (db.session.query(db.m.TimetableEntry.start_dt)
+                .filter(db.m.TimetableEntry.session_block_id == cls.id)
+                .as_scalar())
+
+    @hybrid_property
     def end_dt(self):
         return self.timetable_entry.start_dt + self.duration if self.timetable_entry else None
+
+    @end_dt.expression
+    def end_dt(cls):
+        return cls.start_dt + cls.duration
 
     @property
     def slug(self):
