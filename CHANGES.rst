@@ -25,6 +25,7 @@ Bugfixes
 - Parse escaped quotes (``&quot;``) in ckeditor output correctly (:pr:`5487`)
 - Fix entering room name if room booking is enabled but has no locations (:pr:`5495`)
 - Fix privacy information dropdown not opening on Safari (:pr:`5507`)
+- Only let explicitly assigned reviewers review papers (:pr:`5527`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
