@@ -185,12 +185,13 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
         from indico.modules.events.papers.util import is_type_reviewing_possible
 
         cfp = self.paper.cfp
+        contrib = self.paper.contribution
         reviewed_for = set()
         if include_reviewed:
             reviewed_for = {x.type for x in self.reviews if x.user == user and is_type_reviewing_possible(cfp, x.type)}
-        if is_type_reviewing_possible(cfp, PaperReviewType.content) and user in self.paper.cfp.content_reviewers:
+        if is_type_reviewing_possible(cfp, PaperReviewType.content) and user in contrib.paper_content_reviewers:
             reviewed_for.add(PaperReviewType.content)
-        if is_type_reviewing_possible(cfp, PaperReviewType.layout) and user in self.paper.cfp.layout_reviewers:
+        if is_type_reviewing_possible(cfp, PaperReviewType.layout) and user in contrib.paper_layout_reviewers:
             reviewed_for.add(PaperReviewType.layout)
         return set(map(PaperTypeProxy, reviewed_for))
 
