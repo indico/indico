@@ -152,7 +152,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         return {'headers': headers,
                 'rows': registrations,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
-                'num_participants': query.count()}
+                'num_participants': len(registrations),
+                'num_hidden_participants': query.count() - len(registrations)}
 
     def _participant_list_table(self, regform):
         def _process_registration(reg, column_ids, active_fields):
@@ -199,7 +200,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 'rows': registrations,
                 'title': regform.title,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
-                'num_participants': query.count()}
+                'num_participants': len(registrations),
+                'num_hidden_participants': query.count() - len(registrations)}
 
     def _process(self):
         regforms = (RegistrationForm.query.with_parent(self.event)
@@ -224,13 +226,15 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             tables.extend(map(self._participant_list_table, regforms_dict.values()))
 
         num_participants = sum(table['num_participants'] for table in tables)
+        num_hidden_participants = sum(table['num_hidden_participants'] for table in tables)
 
         return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
             tables=tables,
             published=bool(regforms),
-            num_participants=num_participants
+            num_participants=num_participants,
+            num_hidden_participants=num_hidden_participants,
         )
 
 
