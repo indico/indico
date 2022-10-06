@@ -184,7 +184,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
               loading={loading}
               value={currentInput}
               parse={v => v}
-              config={{images: true, imageUploadURL}}
+              config={{images: true, imageUploadURL, fullScreen: false}}
               height="70vh"
             />
           )}

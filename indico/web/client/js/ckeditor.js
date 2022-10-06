@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-export const getConfig = ({images = true, imageUploadURL = null} = {}) => ({
+export const getConfig = ({images = true, imageUploadURL = null, fullScreen = true} = {}) => ({
   removePlugins: images && imageUploadURL ? [] : ['ImageInsert', 'ImageUpload'],
   fontFamily: {
     options: [
@@ -48,8 +48,8 @@ export const getConfig = ({images = true, imageUploadURL = null} = {}) => ({
       'undo',
       'redo',
       '|',
-      'fullscreen',
-      '|',
+      fullScreen && 'fullscreen',
+      fullScreen && '|',
       'sourceEditing',
     ].filter(Boolean),
   },
@@ -67,7 +67,7 @@ export const getConfig = ({images = true, imageUploadURL = null} = {}) => ({
     'FindAndReplace',
     'FontBackgroundColor',
     'FontColor',
-    'FullScreen',
+    fullScreen && 'FullScreen',
     'GeneralHtmlSupport',
     'Heading',
     'HorizontalLine',
