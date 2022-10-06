@@ -251,7 +251,7 @@ class RegistrationForm(db.Model):
     tickets_for_accompanying_persons = db.Column(
         db.Boolean,
         nullable=False,
-        default=True
+        default=False
     )
     #: The ID of the template used to generate tickets
     ticket_template_id = db.Column(
