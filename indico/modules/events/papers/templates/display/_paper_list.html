@@ -43,7 +43,7 @@
                                                 <div class="icon-checkmark align-icon semantic-text success">
                                                     {%- trans -%}You have submitted a content review{%- endtrans -%}
                                                 </div>
-                                            {% else %}
+                                            {% elif contribution.paper.cfp.is_content_reviewing_possible %}
                                                 <div class="icon-hour-glass2 align-icon semantic-text warning">
                                                     <a href="{{ url_for('.paper_timeline', contribution) }}"
                                                        class="submission-link">
@@ -57,7 +57,7 @@
                                                 <div class="icon-checkmark align-icon semantic-text success">
                                                     {%- trans -%}You have submitted a layout review{%- endtrans -%}
                                                 </div>
-                                            {% else %}
+                                            {% elif contribution.paper.cfp.is_layout_reviewing_possible %}
                                                 <div class="icon-hour-glass2 align-icon semantic-text warning">
                                                     <a href="{{ url_for('.paper_timeline', contribution) }}"
                                                        class="submission-link">

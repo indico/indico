@@ -8,6 +8,7 @@
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
+from indico.modules.events.papers.util import is_type_reviewing_possible
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
@@ -166,3 +167,11 @@ class CallForPapers:
 
     def can_access_judging_area(self, user):
         return self.is_manager(user) or self.is_judge(user)
+
+    @property
+    def is_content_reviewing_possible(self):
+        return is_type_reviewing_possible(self, PaperReviewType.content)
+
+    @property
+    def is_layout_reviewing_possible(self):
+        return is_type_reviewing_possible(self, PaperReviewType.layout)
