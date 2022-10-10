@@ -14,6 +14,7 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify
 
@@ -131,8 +132,8 @@ class SessionBlock(LocationMixin, db.Model):
 
     @start_dt.expression
     def start_dt(cls):
-        return (db.session.query(db.m.TimetableEntry.start_dt)
-                .filter(db.m.TimetableEntry.session_block_id == cls.id)
+        return (db.select([TimetableEntry.start_dt])
+                .where(TimetableEntry.session_block_id == cls.id)
                 .as_scalar())
 
     @hybrid_property
