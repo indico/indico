@@ -55,24 +55,13 @@ def update_session(event_session, data):
     logger.info('Session %s modified by %s', event_session, session.user)
 
 
-def _delete_session_timetable_entries(event_session):
-    for block in event_session.blocks:
-        for contribution in block.contributions:
-            if contribution.timetable_entry:
-                db.session.delete(contribution.timetable_entry)
-        if not block.timetable_entry:
-            continue
-        for child_block in block.timetable_entry.children:
-            db.session.delete(child_block)
-        db.session.delete(block.timetable_entry)
-
-
 def delete_session(event_session):
     """Delete session from the event."""
     event_session.is_deleted = True
     for contribution in event_session.contributions[:]:
         contribution.session = None
-    _delete_session_timetable_entries(event_session)
+    for block in list(event_session.blocks):
+        delete_session_block(block, delete_empty_session=False, log=False)
     signals.event.session_deleted.send(event_session)
     event_session.event.log(EventLogRealm.management, LogKind.negative, 'Sessions',
                             f'Session "{event_session.title}" has been deleted', session.user,
@@ -97,11 +86,10 @@ def update_session_block(session_block, data):
     logger.info('Session block %s modified by %s', session_block, session.user)
 
 
-def delete_session_block(session_block):
+def delete_session_block(session_block, *, delete_empty_session=True, log=True):
     from indico.modules.events.contributions.operations import delete_contribution
     from indico.modules.events.timetable.operations import delete_timetable_entry
     session_ = session_block.session
-    event = session_.event
     unschedule_contribs = session_.event.type_ == EventType.conference
     for contribution in session_block.contributions[:]:
         contribution.session_block = None
@@ -115,13 +103,14 @@ def delete_session_block(session_block):
     signals.event.session_block_deleted.send(session_block)
     if session_block in session_.blocks:
         session_.blocks.remove(session_block)
-    if not session_.blocks and session_.event.type != 'conference':
+    if delete_empty_session and not session_.blocks and session_.event.type_ != EventType.conference:
         delete_session(session_)
     db.session.flush()
-    event.log(EventLogRealm.management, LogKind.negative, 'Sessions',
-              f'Session block "{session_block.title}" has been deleted', session.user,
-              meta={'session_block_id': session_block.id})
-    logger.info('Session block %s deleted by %s', session_block, session.user)
+    if log:
+        session_.event.log(EventLogRealm.management, LogKind.negative, 'Sessions',
+                           f'Session block "{session_block.title}" has been deleted', session.user,
+                           meta={'session_block_id': session_block.id})
+        logger.info('Session block %s deleted by %s', session_block, session.user)
 
 
 def update_session_coordinator_privs(event, data):
