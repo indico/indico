@@ -38,6 +38,8 @@ Internal Changes
   that nothing is broken (the latest version we test with is 12) (:pr:`5503`)
 - Refactor service request email generation so plugins can override sender and
   reply-to addresses for these emails (:pr:`5501`)
+- Deleting a session no longer leaves orphaned session blocks (:pr:`5533`,
+  thanks :user:`omegak`)
 
 
 Version 3.2
