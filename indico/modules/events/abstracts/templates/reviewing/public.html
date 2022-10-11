@@ -200,14 +200,15 @@
                 </div>
                 {% if abstract.event.can_manage(session.user, permission='abstracts') %}
                     <div class="hide-if-locked">
-                        <i class="red link icon undo"
-                           title="{% trans %}Reset judgment{% endtrans %}"
+                        <a title="{% trans %}Reset judgment{% endtrans %}"
                            data-href="{{ url_for('.reset_abstract_state', abstract) }}"
                            data-method="POST"
                            data-update="#reviewing-page"
                            data-replace-update
                            data-title="{% trans %}Reset judgment{% endtrans %}"
-                           data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}"></i>
+                           data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}">
+                            <i class="red link icon undo"></i>   
+                        </a>
                     </div>
                 {% endif %}
             </div>
