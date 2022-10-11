@@ -140,7 +140,9 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         headers = [PersonalDataType[column_name].get_title() for column_name in column_names]
 
         query = (Registration.query.with_parent(self.event)
-                 .filter(Registration.is_state_publishable, ~RegistrationForm.is_deleted)
+                 .filter(Registration.is_state_publishable,
+                         ~RegistrationForm.is_deleted,
+                         ~RegistrationForm.participant_list_disabled)
                  .join(Registration.registration_form)
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form'))
@@ -203,7 +205,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
     def _process(self):
         regforms = (RegistrationForm.query.with_parent(self.event)
-                    .filter(RegistrationForm.is_participant_list_visible(self.event.is_user_registered(session.user)))
+                    .filter(RegistrationForm.is_participant_list_visible(self.event.is_user_registered(session.user)),
+                            ~RegistrationForm.participant_list_disabled)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())

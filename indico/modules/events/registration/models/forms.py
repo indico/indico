@@ -348,6 +348,20 @@ class RegistrationForm(db.Model):
         return f'RegistrationForm:{self.id}'
 
     @hybrid_property
+    def participant_list_disabled(self):
+        return (
+            self.publish_registrations_participants == PublishRegistrationsMode.hide_all and
+            self.publish_registrations_public == PublishRegistrationsMode.hide_all
+        )
+
+    @participant_list_disabled.expression
+    def participant_list_disabled(cls):
+        return db.and_(
+            cls.publish_registrations_participants == PublishRegistrationsMode.hide_all,
+            cls.publish_registrations_public == PublishRegistrationsMode.hide_all
+        )
+
+    @hybrid_property
     def has_ended(self):
         return self.end_dt is not None and self.end_dt <= now_utc()
 
