@@ -45,6 +45,7 @@ from indico.modules.events.registration.notifications import (notify_invitation,
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.util import get_user_by_email
+from indico.util.countries import get_country_reverse
 from indico.util.date_time import format_date, now_utc
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
@@ -602,6 +603,7 @@ def _build_personal_data(registration):
     personal_data['firstName'] = personal_data.pop('first_name')
     personal_data['surname'] = personal_data.pop('last_name')
     personal_data['country'] = personal_data.pop('country', '')
+    personal_data['country_code'] = get_country_reverse(personal_data['country']) or ''
     personal_data['phone'] = personal_data.pop('phone', '')
     return personal_data
 
