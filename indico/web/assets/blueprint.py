@@ -27,8 +27,8 @@ assets_blueprint.add_url_rule('!/fonts/<path:filename>', 'fonts', build_only=Tru
 assets_blueprint.add_url_rule('!/dist/<path:filename>', 'dist', build_only=True)
 
 
-@assets_blueprint.route('!/<any(images,fonts):folder>/<path:filename>__v<version>.<fileext>')
 @assets_blueprint.route('!/<any(css,dist,images,fonts):folder>/<path:filename>.<fileext>')
+@assets_blueprint.route('!/<any(images,fonts):folder>/<path:filename>__v<version>.<fileext>')
 def folder_file(folder, filename, fileext, version=None):
     assets_dir = os.path.join(current_app.root_path, 'web', 'static')
     return send_from_directory(assets_dir, os.path.join(folder, filename + '.' + fileext))
