@@ -111,7 +111,7 @@ export function FinalModalForm({
   return (
     <FinalForm
       onSubmit={onSubmit}
-      subscription={{submitting: true, dirty: unloadPrompt}}
+      subscription={{submitting: true, dirty: true}}
       initialValues={initialValues}
       initialValuesEqual={initialValuesEqual}
       decorators={decorators}
@@ -148,7 +148,7 @@ export function FinalModalForm({
             />
             <Form.Field disabled={fprops.submitting}>
               <Button onClick={onClose} disabled={fprops.submitting}>
-                <Translate>Cancel</Translate>
+                {fprops.dirty ? <Translate>Cancel</Translate> : <Translate>Close</Translate>}
               </Button>
             </Form.Field>
           </Modal.Actions>

@@ -31,6 +31,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   const [loading, setLoading] = useState(false);
   const [allowWithoutChange, setAllowWithoutChange] = useState(false);
   const [converting, setConverting] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [renderMode, setRenderMode] = useState(undefined);
 
   const combineNotes = (resp, mode) => {
@@ -116,9 +117,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       return handleSubmitError(e);
     }
     setCurrentInput(data.source);
-    setTimeout(() => location.reload(), 10);
-    // never finish submitting to avoid fields being re-enabled
-    await new Promise(() => {});
+    setSaved(true);
   };
 
   const convertToHTML = markdownSource => async () => {
@@ -152,7 +151,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
           style={{minWidth: '65vw'}}
           size="large"
           initialValues={{source: currentInput}}
-          onClose={closeModal}
+          onClose={() => closeModal(saved)}
           onSubmit={handleSubmit}
           disabledUntilChange={!allowWithoutChange}
           unloadPrompt

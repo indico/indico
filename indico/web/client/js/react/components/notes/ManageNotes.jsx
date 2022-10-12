@@ -73,7 +73,13 @@ export default function ManageNotes({icon, title, apiURL, imageUploadURL, getNot
         <NoteEditor
           apiURL={apiURL}
           imageUploadURL={imageUploadURL}
-          closeModal={() => setModalOpen(false)}
+          closeModal={saved => {
+            if (saved) {
+              location.reload();
+            } else {
+              setModalOpen(false);
+            }
+          }}
           getNoteURL={getNoteURL}
         />
       )}
