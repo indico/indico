@@ -387,6 +387,12 @@ def merge_users(source, target, force=False):
     for identity in set(source.identities):
         identity.user = target
 
+    if target.identities:
+        # In case the target user has identities, make sure they aren't pending as
+        # otherwise logging in would fail (a pending user is not suppoed to have an
+        # identity)
+        target.is_pending = False
+
     # Notify signal listeners about the merge
     signals.users.merged.send(target, source=source)
     db.session.flush()
