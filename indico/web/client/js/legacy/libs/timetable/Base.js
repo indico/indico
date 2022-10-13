@@ -1373,7 +1373,7 @@ type(
       });
 
       // for "all days", put it all together
-      days['all'] = _(days)
+      days['all'] = _(Object.values(days))
         .chain()
         .flatten(true)
         .groupBy(function(e) {
