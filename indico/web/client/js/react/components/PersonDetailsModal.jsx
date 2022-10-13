@@ -11,7 +11,7 @@ import searchAffiliationURL from 'indico-url:users.api_affiliations';
 import PropTypes from 'prop-types';
 import React, {useState, useMemo} from 'react';
 import {useForm, useFormState} from 'react-final-form';
-import {Form, Message, Header, Button} from 'semantic-ui-react';
+import {Form, Message, Header, Button, Icon} from 'semantic-ui-react';
 
 import {FinalComboDropdown, FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
@@ -21,6 +21,8 @@ import {camelizeKeys} from 'indico/utils/case';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
 import {Param, Translate} from '../i18n';
+
+import './PersonDetailsModal.module.scss';
 
 const debounce = makeAsyncDebounce(250);
 
@@ -292,14 +294,16 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
     form.change('affiliationMeta', obj.affiliation_meta);
   };
 
-  const emailBtn = (
-    <div style={{textAlign: 'right'}}>
+  const emailBtns = (
+    <div styleName="email-buttons">
       {!isUpdate && (
-        <Button type="submit" primary size="tiny" onClick={onClick}>
+        <Button icon type="submit" primary size="tiny" labelPosition="right" onClick={onClick}>
+          <Icon name="add" />
           <Translate>Add</Translate>
         </Button>
       )}
-      <Button type="button" size="tiny" onClick={onClick}>
+      <Button icon type="button" size="tiny" labelPosition="right" onClick={onClick}>
+        <Icon name="sync" />
         <Translate>Update</Translate>
       </Button>
     </div>
@@ -322,7 +326,7 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
           positive={message.status === 'ok'}
         >
           <div>{message.message}</div>
-          {(!!user || !!eventPerson) && emailBtn}
+          {(!!user || !!eventPerson) && emailBtns}
         </Message>
       )}
     </FinalInput>
