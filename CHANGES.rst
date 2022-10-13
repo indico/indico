@@ -28,6 +28,7 @@ Bugfixes
 - Only let explicitly assigned reviewers review papers (:pr:`5527`)
 - Never count participants from a registration forms with a fully hidden participant
   list for the total count on the participant page (:pr:`5532`)
+- Fix "Session Legend" not working in all-days timetable view (:pr:`5539`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
