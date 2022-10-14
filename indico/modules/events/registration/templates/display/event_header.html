@@ -51,10 +51,10 @@
                                            </a>
                                        {% endif %}
                                    {% elif regform.limit_reached %}
-                                       <a class="i-button i-button-small highlight disabled"
+                                       <button class="i-button i-button-small highlight disabled"
                                           title="{% trans %}There are no more places available.{% endtrans %}">
                                            <strong>{% trans %}Register{% endtrans %}</strong>
-                                       </a>
+                                       </button>
                                    {% elif regform.moderation_enabled %}
                                        <a class="i-button i-button-small highlight icon-question"
                                           href="{{ url_for('event_registration.display_regform', regform) }}">

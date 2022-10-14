@@ -6,7 +6,7 @@
 {{ form_rows(form, skip=('tickets_enabled',)) }}
 {% call form_footer(form) %}
     <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
-    <a class="i-button big" data-button-back>
+    <button class="i-button big" data-button-back>
         {% trans %}Back{% endtrans %}
-    </a>
+    </button>
 {% endcall %}

@@ -183,7 +183,7 @@
                                 </a>
                             </td>
                             <td class="i-table">
-                                <a class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
+                                <button class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
                                    style="{{ contrib.session.colors.css if contrib.session }}"
                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
                                    data-method="PATCH"
@@ -199,10 +199,10 @@
                                         {% endif %}
                                     </span>
                                     {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                </a>
+                                </button>
                             </td>
                             <td class="i-table">
-                                <a class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
+                                <button class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
                                    data-method="PATCH"
                                    data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
@@ -217,7 +217,7 @@
                                         {% endif %}
                                     </span>
                                     {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                </a>
+                                </button>
                             </td>
                             {{ render_attachment_info(contrib) }}
                             <td class="i-table actions-column hide-if-locked">

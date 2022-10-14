@@ -174,9 +174,9 @@
                     </ul>
                     {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
                     {% if (regform.moderation_enabled or pending_registrations) and not event.is_locked %}
-                        <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                        <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                             {%- trans %}Moderation{% endtrans -%}
-                        </a>
+                        </button>
                         <ul class="i-dropdown">
                             <li>
                                 <a href="#" class="icon-checkmark js-requires-selected-row disabled js-modify-status"

@@ -108,10 +108,10 @@
                             </div>
                         </div>
                         <div class="toolbar">
-                            <a class="i-button icon-alarm js-ajax-dialog"
-                               href="#" data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
+                            <button class="i-button icon-alarm js-ajax-dialog"
+                               data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
                                 {% trans %}Remind all{% endtrans %}
-                            </a>
+                            </button>
                         </div>
                     </div>
                 {% endif %}

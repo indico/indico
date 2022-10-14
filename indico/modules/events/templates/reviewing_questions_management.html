@@ -3,9 +3,9 @@
 
 <div class="manage-reviewing-questions">
     <div class="toolbar space-after hide-if-locked">
-        <a class="i-button arrow icon-plus highlight" data-toggle="dropdown">
+        <button class="i-button arrow icon-plus highlight" data-toggle="dropdown">
             {%- trans %}Add new question{% endtrans -%}
-        </a>
+        </button>
         <ul class="i-dropdown">
             {% for name, field_type in field_types.items() -%}
                 <li>

@@ -28,15 +28,15 @@
                     <td>{{ survey.end_dt | format_datetime(timezone=event.display_tzinfo) if survey.end_dt else _('No deadline') }}</td>
                     <td class="survey-actions">
                         {% if was_survey_submitted(survey) %}
-                            <a class="i-button highlight disabled"
+                            <button class="i-button highlight disabled"
                                title="{% trans %}Survey already filled out{% endtrans %}">
                                 {%- trans %}Fill out{% endtrans -%}
-                            </a>
+                            </button>
                         {% elif not survey.is_active %}
-                            <a class="i-button highlight disabled"
+                            <button class="i-button highlight disabled"
                                title="{% trans %}Survey is closed{% endtrans %}">
                                 {%- trans %}Fill out{% endtrans -%}
-                            </a>
+                            </button>
                         {% elif is_submission_in_progress(survey) %}
                             <a href="{{ url_for('.display_survey_form', survey) }}"
                                class="i-button text-color highlight outline">

@@ -66,7 +66,7 @@
     <div class="list-section">
         <div class="toolbars space-after">
             <div class="toolbar">
-                <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
                 <ul class="i-dropdown">
                     <li>
                         <a href="#" data-select-all="#contribution-list input:checkbox">{% trans %}All{% endtrans %}</a>
@@ -106,11 +106,11 @@
                     {%- trans %}Material package{% endtrans -%}
                 </button>
                 <div class="group">
-                    <a class="i-button js-enable-if-checked arrow disabled"
+                    <button class="i-button js-enable-if-checked arrow disabled"
                        title="{% trans %}Export data{% endtrans %}"
                        data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         {% if indico_config.LATEX_ENABLED %}
                             <li>
@@ -148,13 +148,13 @@
                             </a>
                         </li>
                     </ul>
-                    <a class="i-button"
+                    <button class="i-button"
                        title="{% trans %}Import contributions from CSV file{% endtrans %}"
                        data-href="{{ url_for('.contributions_import', event) }}"
                        data-title="{% trans %}Import contributions from CSV File{% endtrans %}"
                        data-ajax-dialog>
                         {%- trans %}Import{% endtrans -%}
-                    </a>
+                    </button>
                 </div>
                 <button class="i-button js-enable-if-checked disabled"
                         data-title="{% trans %}Assign program codes{% endtrans %}"

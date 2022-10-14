@@ -43,7 +43,7 @@
                                 <span class="vertical-aligner">{{ sess.code }}</span>
                             </td>
                             <td class="i-table">
-                                <a class="i-button {{ 'session-type-picker' if not event.is_locked else 'disabled' }}"
+                                <button class="i-button {{ 'session-type-picker' if not event.is_locked else 'disabled' }}"
                                    data-items="{{ types | tojson | forceescape }}"
                                    data-href="{{ url_for('.session_rest', sess) }}"
                                    data-method="PATCH"
@@ -56,7 +56,7 @@
                                         {% endif %}
                                     </span>
                                     {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                </a>
+                                </button>
                             </td>
                             <td class="i-table">
                                 <span class="i-label show-session-blocks" data-count="{{ sess.blocks | length }}"
@@ -69,14 +69,14 @@
                             {{ render_attachment_info(sess) }}
                             <td class="i-table">
                                 <div class="group right entry-action-buttons vertical-aligner">
-                                    <a class="i-button color-button
+                                    <button class="i-button color-button
                                               {{ 'palette-picker-trigger' if not event.is_locked else 'disabled' }}"
                                        style="{{ sess.colors.css }}"
                                        data-method="PATCH"
                                        data-href="{{ url_for('.session_rest', sess) }}"
                                        data-colors="{{ default_colors | tojson | forceescape }}"
                                        data-color="{{ sess.colors | tojson | forceescape }}"
-                                       title="{% if not event.is_locked %}{% trans %}Change color{% endtrans %}{% endif %}"></a>
+                                       title="{% if not event.is_locked %}{% trans %}Change color{% endtrans %}{% endif %}"></button>
                                     <a href="#" class="i-link highlight icon-edit edit-session hide-if-locked"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"

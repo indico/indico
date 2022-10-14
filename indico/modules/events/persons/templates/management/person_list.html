@@ -10,8 +10,8 @@
 
 {% block title_actions %}
     {%- if event.type == 'conference' -%}
-        <a class="i-button borderless icon-settings arrow js-dropdown"
-           data-toggle="dropdown">{% trans %}Settings{% endtrans %}</a>
+        <button class="i-button borderless icon-settings arrow js-dropdown"
+           data-toggle="dropdown">{% trans %}Settings{% endtrans %}</button>
         <ul class="i-dropdown">
             <li>
                 <a href="#"

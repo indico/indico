@@ -70,20 +70,20 @@
                                 {% trans %}Check details{% endtrans %}
                             </a>
                         {% elif regform.is_purged %}
-                            <a class="i-button highlight disabled"
+                            <button class="i-button highlight disabled"
                                title="{% trans %}Registration is disabled due to an expired retention period{% endtrans %}">
                                 {{ button_text }}
-                            </a>
+                            </button>
                         {% elif not regform.is_open %}
-                            <a class="i-button highlight disabled"
+                            <button class="i-button highlight disabled"
                                title="{% trans %}Registration is closed{% endtrans %}">
                                 {{ button_text }}
-                            </a>
+                            </button>
                         {% elif regform.limit_reached %}
-                            <a class="i-button highlight disabled"
+                            <button class="i-button highlight disabled"
                                title="{% trans %}The maximum number of registrations has been reached{% endtrans %}">
                                 {{ button_text }}
-                            </a>
+                            </button>
                         {% else %}
                             <a href="{{ url_for('.display_regform', regform) }}" class="i-button highlight">
                                 {{ button_text }}

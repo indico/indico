@@ -35,14 +35,14 @@
     {% endfor %}
     {% call form_footer(form) %}
         {% if partial_completion and session.user %}
-            <a class="i-button big js-save-answers"
+            <button class="i-button big js-save-answers"
                data-href="{{ url_for('.display_save_answers', survey.locator.token) }}"
                data-method="POST"
                data-params-selector="#survey-questionnaire input[name^=question_]:checked,
                                      #survey-questionnaire [name^=question_]:not(:radio):not(:checkbox)"
                data-ajax>
                 {%- trans %}Save answers{% endtrans -%}
-            </a>
+            </button>
         {% endif %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
         {% if back_button_endpoint is not none %}

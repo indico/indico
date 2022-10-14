@@ -37,11 +37,11 @@
 {% endmacro %}
 
 {% macro render_palette_picker(obj, endpoint, color_list, is_session_timetable) %}
-    <a class="i-button color-button palette-picker palette-picker-trigger"
+    <button class="i-button color-button palette-picker palette-picker-trigger"
        style="{{ obj.colors.css }}"
        data-method="PATCH"
        data-href="{{ url_for(endpoint, obj, is_session_timetable=is_session_timetable|int) }}"
        data-palette="{{ color_list | tojson | forceescape }}"
        data-initial-color="{{ obj.colors | tojson | forceescape }}"
-       title="{% trans %}Change color{% endtrans %}"></a>
+       title="{% trans %}Change color{% endtrans %}"></button>
 {% endmacro %}
