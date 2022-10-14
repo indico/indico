@@ -40,14 +40,14 @@
                         {%- trans %}Customize list{% endtrans -%}
                     </button>
                     {% if can_download_attachments %}
-                        <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+                        <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
                            data-href="{{ url_for('.display_download_attachments', track) }}">
                             {%- trans %}Download attachments{%- endtrans %}
-                        </a>
+                        </button>
                     {% endif %}
-                    <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         {% if indico_config.LATEX_ENABLED %}
                             <li>

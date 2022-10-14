@@ -41,9 +41,9 @@
                     </button>
                 </div>
                 <div class="group">
-                    <a class="i-button arrow icon-plus hide-if-locked" data-toggle="dropdown">
+                    <button class="i-button arrow icon-plus hide-if-locked" data-toggle="dropdown">
                         {% trans %}New{% endtrans %}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a class="js-dialog-action"
@@ -75,10 +75,10 @@
                     </ul>
                 </div>
                 <div class="group hide-if-locked">
-                    <a class="i-button arrow icon-remove js-requires-selected-row disabled"
+                    <button class="i-button arrow icon-remove js-requires-selected-row disabled"
                        data-toggle="dropdown">
                         {%- trans %}Remove{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="#" class="js-requires-selected-row"
@@ -105,10 +105,10 @@
                     </ul>
                 </div>
                 <div class="group hide-if-locked">
-                    <a class="i-button arrow icon-hammer js-requires-selected-row disabled"
+                    <button class="i-button arrow icon-hammer js-requires-selected-row disabled"
                        data-toggle="dropdown">
                         {%- trans %}Judge{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a class="accept js-requires-selected-row"
@@ -179,9 +179,9 @@
                     </div>
                 {% endif %}
                 <div class="group">
-                    <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         {% if indico_config.LATEX_ENABLED %}
                             <li>
@@ -209,14 +209,14 @@
                 </div>
                 {{ template_hook('abstract-list-options', event=event) }}
                 <div class="group">
-                    <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></a>
+                    <button class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></button>
                 </div>
             </div>
             <div class="toolbar">
                 <div class="group">
-                    <a class="i-button icon-link js-static-url"
+                    <button class="i-button icon-link js-static-url"
                        data-href="{{ url_for('.generate_static_url', event) }}"
-                       title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></a>
+                       title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></button>
                 </div>
                 <div class="group">
                     <div id="filter-statistics">

@@ -67,7 +67,7 @@
                         {% set inherited_default = default_ticket == tpl and tpl.category != target and
                                 not target.default_ticket_template %}
                         {% set global_default = default_ticket == tpl and target.is_root %}
-                        <a class="i-button icon-ticket icon-only borderless hide-if-locked toggle-default
+                        <button class="i-button icon-ticket icon-only borderless hide-if-locked toggle-default
                             {{ 'default-on-category' if default_ticket == tpl }}
                             {{ 'inherited' if inherited_default }}
                             {{ 'global-default' if global_default }}"
@@ -81,13 +81,13 @@
                                 data-method="POST"
                                 data-update="#template-list"
                             {% endif %}>
-                        </a>
+                        </button>
                     {% endif %}
                     {% if not event and tpl.type.name == 'badge' and not tpl.is_ticket %}
                         {% set inherited_default = default_badge == tpl and tpl.category != target and
                                 not target.default_badge_template %}
                         {% set global_default = default_badge == tpl and target.is_root %}
-                        <a class="i-button icon-tag icon-only borderless hide-if-locked toggle-default
+                        <button class="i-button icon-tag icon-only borderless hide-if-locked toggle-default
                             {{ 'default-on-category' if default_badge == tpl }}
                             {{ 'inherited' if inherited_default }}
                             {{ 'global-default' if global_default }}"
@@ -101,7 +101,7 @@
                                 data-method="POST"
                                 data-update="#template-list"
                             {% endif %}>
-                        </a>
+                        </button>
                     {% endif %}
                     {% set clonable = tpl.is_clonable or (not event and tpl.owner == target) %}
                     <button class="i-button icon-copy icon-only text-color borderless hide-if-locked
