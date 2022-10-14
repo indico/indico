@@ -31,8 +31,8 @@
         <div class="toolbars space-after">
             <div class="toolbar">
                 <div class="group">
-                    <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
-                       data-toggle="dropdown"></a>
+                    <button class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true"
+                       data-toggle="dropdown"></button>
                     <ul class="i-dropdown">
                         <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
                         <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
@@ -107,15 +107,15 @@
                                data-href="{{ url_for('.registrations_excel_export', regform) }}">XLSX (Excel)</a>
                         </li>
                     </ul>
-                    <a href="#" class="i-button"
+                    <button class="i-button"
                        data-href="{{ url_for('.registrations_import', regform) }}"
                        data-title="{% trans %}Import registrants from CSV File{% endtrans %}"
                        data-ajax-dialog>
                         {%- trans %}Import{% endtrans -%}
-                    </a>
-                    <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    </button>
+                    <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Actions{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         <li class="hide-if-locked">
                             <a href="#" class="icon-mail js-requires-selected-row disabled"

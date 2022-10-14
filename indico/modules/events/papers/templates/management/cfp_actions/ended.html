@@ -13,12 +13,12 @@
 
 {% block buttons %}
     {{ super() }}
-    <a href="#" class="i-button"
+    <button class="i-button"
        data-href="{{ url_for('.open_cfp', event) }}"
        data-method="POST"
        data-update="#paper-page"
        data-confirm="{% trans %}The call for papers is already finished. Do you want to open it again?{% endtrans %}"
        data-replace-update>
         {%- trans %}Reopen now{% endtrans -%}
-    </a>
+    </button>
 {% endblock %}

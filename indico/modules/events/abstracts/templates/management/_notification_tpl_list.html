@@ -59,7 +59,7 @@
                                                 </a>
                                             </li>
                                         </ul>
-                                        <a href="#" class="i-button js-delete-item icon-remove icon-only"
+                                        <button class="i-button js-delete-item icon-remove icon-only"
                                            title="{% trans %}Delete template{% endtrans %}"
                                            data-qtip-style="danger"
                                            data-href="{{ url_for('.email_tpl_delete', tpl) }}"
@@ -67,7 +67,7 @@
                                            data-confirm="{% trans %}Are you sure you want to delete this template?{% endtrans %}"
                                            data-title="{% trans %}Delete template{% endtrans %}"
                                            data-update="#email-template-manager">
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -153,13 +153,13 @@
 
     <div class="toolbar f-j-end hide-if-locked">
         <div class="group">
-            <a href="#" class="i-button icon-plus highlight"
+            <button class="i-button icon-plus highlight"
                data-href="{{ url_for('.email_tpl_add', event) }}"
                data-title="{% trans %}Add a new notification ruleset{% endtrans %}"
                data-update="#email-template-manager"
                data-ajax-dialog>
                 {% trans %}Add new one{% endtrans %}
-            </a>
+            </button>
         </div>
     </div>
     <script>

@@ -19,18 +19,18 @@
                 {%- trans %}Configure general submission settings and email notification templates.{% endtrans -%}
             </div>
             <div class="toolbar">
-                <a href="#" class="i-button icon-mail"
+                <button class="i-button icon-mail"
                    data-href="{{ url_for('.email_tpl_list', event) }}"
                    data-title="{% trans %}Configure e-mail notifications{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}Notifications{% endtrans -%}
-                </a>
-                <a href="#" class="i-button icon-settings"
+                </button>
+                <button class="i-button icon-settings"
                    data-href="{{ url_for('.manage_submission_settings', event) }}"
                    data-title="{% trans %}Configure abstract submission{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}Settings{% endtrans -%}
-                </a>
+                </button>
             </div>
         </div>
 
@@ -45,18 +45,18 @@
                     {%- trans %}Configure the contribution types and abstract fields.{% endtrans -%}
                 </div>
                 <div class="toolbar">
-                    <a href="#" class="i-button"
+                    <button class="i-button"
                     data-href="{{ url_for('contributions.manage_types', event) }}"
                     data-title="{% trans %}Manage contribution types{% endtrans %}"
                     data-ajax-dialog>
                         {%- trans %}Contribution types{% endtrans -%}
-                    </a>
-                    <a href="#" class="i-button js-dialog-action"
+                    </button>
+                    <button class="i-button js-dialog-action"
                     data-title="{% trans %}Manage fields{% endtrans %}"
                     data-href="{{ url_for('contributions.manage_fields', event) }}"
                     data-ajax-dialog>
                         {%- trans %}Abstract fields{% endtrans -%}
-                    </a>
+                    </button>
                 </div>
             </div>
         {% endif %}
@@ -70,24 +70,24 @@
                 {%- trans %}Configure the reviewing questions and answers, the reviewing teams, etc.{% endtrans -%}
             </div>
             <div class="toolbar">
-                <a href="#" class="i-button icon-users"
+                <button class="i-button icon-users"
                    data-href="{{ url_for('.manage_reviewing_roles', event) }}"
                    data-title="{% trans %}Abstract Reviewing Roles{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}Roles{% endtrans -%}
-                </a>
-                <a href="#" class="i-button icon-settings"
+                </button>
+                <button class="i-button icon-settings"
                    data-href="{{ url_for('.manage_reviewing_settings', event) }}"
                    data-title="{% trans %}Configure abstract reviewing{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}Settings{% endtrans -%}
-                </a>
-                <a href="#" class="i-button icon-question"
+                </button>
+                <button class="i-button icon-question"
                    data-href="{{ url_for('.manage_reviewing_questions', event) }}"
                    data-title="{% trans %}Configure abstract reviewing questions{% endtrans %}"
                    data-ajax-dialog>
                  {%- trans %}Questions{% endtrans -%}
-                </a>
+                </button>
             </div>
         </div>
 
@@ -131,12 +131,12 @@
                      data-event-id="{{ event.id }}"
                      data-file="{{ custom_boa|tojson|forceescape }}"
                      {{ 'data-has-latex' if indico_config.LATEX_ENABLED }}></div>
-                <a href="#" class="i-button icon-settings"
+                <button class="i-button icon-settings"
                    data-href="{{ url_for('.manage_boa_settings', event) }}"
                    data-title="{% trans %}Configure the book of abstracts{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}LaTeX Settings{% endtrans -%}
-                </a>
+                </button>
             </div>
         </div>
     </div>

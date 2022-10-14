@@ -29,15 +29,15 @@
             </div>
             <div class="toolbar hide-if-locked">
                 {% if cfp.content_reviewing_enabled %}
-                    <a href="#" class="i-button icon-time"
+                    <button class="i-button icon-time"
                        data-href="{{ url_for('.manage_deadline', event, role='content_reviewer') }}"
                        data-title="{% trans %}Set content reviewing deadline{% endtrans %}"
                        data-update="#paper-page"
                        data-replace-update
                        data-ajax-dialog>
                         {% trans %}Deadline{% endtrans %}
-                    </a>
-                    <a href="#" class="i-button icon-switchoff"
+                    </button>
+                    <button class="i-button icon-switchoff"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='content') }}"
                        data-method="DELETE"
                        {% if cfp.is_open %}
@@ -46,21 +46,21 @@
                        data-update="#paper-page"
                        data-replace-update>
                         {%- trans %}Disable{% endtrans -%}
-                    </a>
-                    <a href="#" class="i-button icon-question"
+                    </button>
+                    <button class="i-button icon-question"
                        data-href="{{ url_for('.manage_reviewing_questions', event, review_type='content') }}"
                        data-title="{% trans %}Configure content reviewing questions{% endtrans %}"
                        data-ajax-dialog>
                         {%- trans %}Questions{% endtrans -%}
-                    </a>
+                    </button>
                 {% else %}
-                    <a href="#" class="i-button icon-switchon"
+                    <button class="i-button icon-switchon"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='content') }}"
                        data-method="PUT"
                        data-update="#paper-page"
                        data-replace-update>
                         {%- trans %}Enable{% endtrans -%}
-                    </a>
+                    </button>
                 {% endif %}
             </div>
         </div>
@@ -81,15 +81,15 @@
             </div>
             <div class="toolbar hide-if-locked">
                 {% if cfp.layout_reviewing_enabled %}
-                    <a href="#" class="i-button icon-time"
+                    <button class="i-button icon-time"
                        data-href="{{ url_for('.manage_deadline', event, role='layout_reviewer') }}"
                        data-title="{% trans %}Set layout reviewing deadline{% endtrans %}"
                        data-update="#paper-page"
                        data-replace-update
                        data-ajax-dialog>
                         {% trans %}Deadline{% endtrans %}
-                    </a>
-                    <a href="#" class="i-button icon-switchoff"
+                    </button>
+                    <button class="i-button icon-switchoff"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='layout') }}"
                        data-method="DELETE"
                        {% if cfp.is_open %}
@@ -98,21 +98,21 @@
                        data-update="#paper-page"
                        data-replace-update>
                         {%- trans %}Disable{% endtrans -%}
-                    </a>
-                    <a href="#" class="i-button icon-question"
+                    </button>
+                    <button class="i-button icon-question"
                        data-href="{{ url_for('.manage_reviewing_questions', event, review_type='layout') }}"
                        data-title="{% trans %}Configure layout reviewing questions{% endtrans %}"
                        data-ajax-dialog>
                         {%- trans %}Questions{% endtrans -%}
-                    </a>
+                    </button>
                 {% else %}
-                    <a href="#" class="i-button icon-switchon"
+                    <button class="i-button icon-switchon"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='layout') }}"
                        data-method="PUT"
                        data-update="#paper-page"
                        data-replace-update>
                         {%- trans %}Enable{% endtrans -%}
-                    </a>
+                    </button>
                 {% endif %}
             </div>
         </div>
@@ -130,14 +130,14 @@
                 {% endif %}
             </div>
             <div class="toolbar hide-if-locked">
-                <a href="#" class="i-button icon-time"
+                <button class="i-button icon-time"
                    data-href="{{ url_for('.manage_deadline', event, role='judge') }}"
                    data-title="{% trans %}Set paper judging deadline{% endtrans %}"
                    data-update="#paper-page"
                    data-replace-update
                    data-ajax-dialog>
                     {% trans %}Deadline{% endtrans %}
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -150,13 +150,13 @@
                 {%- trans %}Manage paper templates that can be downloaded in the event area{% endtrans -%}
             </div>
             <div class="toolbar">
-                <a class="i-button icon-settings" href="#"
+                <button class="i-button icon-settings"
                    data-href="{{ url_for('.manage_templates', event) }}"
                    data-title="{% trans %}Manage paper templates{% endtrans %}"
                    data-close-button
                    data-ajax-dialog>
                     {%- trans %}Manage{% endtrans -%}
-                </a>
+                </button>
             </div>
         </div>
         <div class="section">
@@ -166,12 +166,12 @@
                 {%- trans %}Configure reviewing questions, email notifications, etc.{% endtrans -%}
             </div>
             <div class="toolbar">
-                <a class="i-button icon-settings" href="#"
+                <button class="i-button icon-settings"
                    data-href="{{ url_for('.manage_reviewing_settings', event) }}"
                    data-title="{% trans %}Manage reviewing settings{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}Settings{% endtrans -%}
-                </a>
+                </button>
             </div>
         </div>
         <div class="section">
@@ -181,24 +181,24 @@
                 {%- trans %}Configure teams and competences{% endtrans -%}
             </div>
             <div class="toolbar">
-                <a class="i-button icon-mail hide-if-locked" href="#"
+                <button class="i-button icon-mail hide-if-locked"
                    data-href="{{ url_for('.contact_staff', event) }}"
                    data-title="{% trans %}Send emails to paper reviewers and judges{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}Contact{% endtrans -%}
-                </a>
-                <a class="i-button icon-users" href="#"
+                </button>
+                <button class="i-button icon-users"
                    data-href="{{ url_for('.manage_teams', event) }}"
                    data-title="{% trans %}Manage paper reviewing managers, reviewers and judges{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}Teams{% endtrans -%}
-                </a>
-                <a class="i-button icon-settings" href="#"
+                </button>
+                <button class="i-button icon-settings"
                    data-href="{{ url_for('.manage_competences', event) }}"
                    data-title="{% trans %}Competences{% endtrans %}"
                    data-ajax-dialog>
                     {%- trans %}Competences{% endtrans -%}
-                </a>
+                </button>
             </div>
         </div>
         <div class="section">

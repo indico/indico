@@ -43,13 +43,13 @@
                                                    title="{% trans %}Check videoconference status{% endtrans %}"
                                                    data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}">
                                                 </a>
-                                                <a href="#" class="i-button icon-edit js-vcroom-edit hide-if-locked"
+                                                <button class="i-button icon-edit js-vcroom-edit hide-if-locked"
                                                    data-href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"
                                                    title="{% trans %}Edit{% endtrans %}"
                                                    data-title="{% trans %}Edit room{% endtrans %}"
                                                    data-ajax-dialog
                                                    data-reload-after>
-                                                </a>
+                                                </button>
                                             {% endif %}
                                             <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}"
                                                data-num-events="{{ vc_room.events | count }}"
@@ -90,13 +90,13 @@
                         {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}
                     </a>
                 {% elif plugins|length > 1 %}
-                    <a class="i-button icon-plus js-create-room" href="#"
+                    <button class="i-button icon-plus js-create-room"
                        data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create', attach=False) }}"
                        data-title="{% trans %}Create videoconference{% endtrans %}"
                        data-ajax-dialog
                        data-reload-after>
                         {%- trans %}Create new room{% endtrans -%}
-                    </a>
+                    </button>
                 {% endif %}
                 <span>
                     <a href="#" id="btn-add-existing"

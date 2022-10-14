@@ -7,14 +7,14 @@
                 </div>
             </div>
             <div class="toolbar">
-                <a href="#" class="i-button highlight"
+                <button class="i-button highlight"
                    data-href="{{ url_for(endpoint, object) }}"
                    data-title="{% trans %}Inherited access list{% endtrans %}"
                    data-subtitle="{{ object.title }}"
                    data-close-button
                    data-ajax-dialog>
                     {% trans %}View list{% endtrans %}
-                </a>
+                </button>
             </div>
         </div>
     </div>

@@ -64,12 +64,12 @@
             {% if can_manage or abstract.user_owns(session.user) %}
                 <div class="group">
                     {% if abstract.can_edit(session.user) %}
-                        <a href="#" class="i-button icon-edit hide-if-locked"
+                        <button class="i-button icon-edit hide-if-locked"
                            title="{% trans %}Edit abstract{% endtrans %}"
                            data-href="{{ url_for('.edit_abstract', abstract) }}"
                            data-title="{% trans %}Edit abstract{% endtrans %}"
                            data-ajax-dialog
-                           data-reload-after></a>
+                           data-reload-after></button>
                     {% elif abstract.public_state.name == 'withdrawn' %}
                         <a class="i-button icon-edit disabled"
                            title="{% trans %}The abstract cannot be edited because it was withdrawn{% endtrans %}"></a>

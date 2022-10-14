@@ -7,12 +7,12 @@
             <h2 class="icon-attachment">{% trans %}Materials{% endtrans %}</h2>
             {% if can_manage %}
                 <div class="actions">
-                    <a href="#" class="i-button text-color subtle icon-edit js-manage-attachments"
+                    <button href="#" class="i-button text-color subtle icon-edit js-manage-attachments"
                        title="{% trans %}Manage materials{% endtrans %}"
                        data-title="{% trans title=category.title %}Manage category materials{% endtrans %}"
                        data-locator="{{ category.locator|tojson|forceescape }}"
                        data-attachment-editor
-                       data-reload-on-change></a>
+                       data-reload-on-change></button>
                 </div>
             {% endif %}
         </div>

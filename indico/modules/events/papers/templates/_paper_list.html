@@ -360,15 +360,15 @@
                     data-ajax-dialog>
                      {%- trans %}Author list{% endtrans -%}
             </button>
-            <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+            <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
                data-href="{{ url_for('.download_papers', event) }}">
                 {%- trans %}Download papers{% endtrans -%}
-            </a>
+            </button>
             {% if management %}
-                <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+                <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
                    data-href="{{ url_for('.export_json', event) }}">
                     {%- trans %}Export as JSON{% endtrans -%}
-                </a>
+                </button>
             {% endif %}
         </div>
         <div class="toolbar">

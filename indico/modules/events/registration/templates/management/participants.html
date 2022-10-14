@@ -33,11 +33,11 @@
         {%- endtrans %}
     </div>
     <div class="toolbar">
-        <a href="#" class="i-button highlight"
+        <button class="i-button highlight"
            data-href="{{ url_for('.manage', event) }}"
            data-method="POST">
             {% trans %}Enable{% endtrans %}
-        </a>
+        </button>
     </div>
 {% endmacro %}
 

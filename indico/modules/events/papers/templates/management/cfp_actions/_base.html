@@ -10,7 +10,7 @@
             {% trans %}Schedule call for papers{% endtrans -%}
         {% endif -%}
     {% endset -%}
-        <a href="#" class="i-button icon-time"
+        <button class="i-button icon-time"
            data-href="{{ url_for('.schedule_cfp', event) }}"
            data-title="{{ title }}"
            data-update="#paper-page"
@@ -21,5 +21,5 @@
             {% else %}
                 {% trans %}Schedule{% endtrans %}
             {% endif %}
-        </a>
+        </button>
 {% endblock %}

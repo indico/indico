@@ -14,7 +14,7 @@
                             {% if page != pagination.page %}
                                 <a href="{{ caller(page)|trim }}" class="i-button js-pagination-element">{{ page }}</a>
                             {% else %}
-                                <a href="#" class="i-button highlight">{{ page }}</a>
+                                <button class="i-button highlight">{{ page }}</button>
                             {% endif %}
                         </span>
                     {% else %}
