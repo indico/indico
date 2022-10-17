@@ -18,12 +18,13 @@
   height: 100% !important; /* overrides i-form auto height */
 }
 
-// When positioning images, ckeditor5 just applies certain classes that have to be manually implemented:
-// https://ckeditor.com/docs/ckeditor5/latest/features/images/images-styles.html
-// Inspired by the default ckeditor styles:
-// https://github.com/ckeditor/ckeditor5/blob/06d11a85d01aece904a6bdd25e72abd94a4dd314/packages/ckeditor5-image/theme/imagestyle.css
-// Applies to conference & event description, minutes and custom conference pages
-.ck-output {
+// Neither ckeditor nor the markdown editor implement the styles shown in their preview - they need to be manually implemented.
+// These styles apply to the generated output in conference & event description, minutes and custom conference pages.
+.editor-output {
+  // Image positioning for ckeditor5
+  // https://ckeditor.com/docs/ckeditor5/latest/features/images/images-styles.html
+  // Inspired by the default ckeditor styles:
+  // https://github.com/ckeditor/ckeditor5/blob/06d11a85d01aece904a6bdd25e72abd94a4dd314/packages/ckeditor5-image/theme/imagestyle.css
   $image-spacing: 1.5em;
   display: flow-root;
 
@@ -60,5 +61,17 @@
 
   &.weak-hidden {
     display: none;
+  }
+
+  // Nicer quote & code formatting
+  blockquote {
+    padding: 5px 8px 5px 30px;
+    background-color: rgba(102, 128, 153, 0.05);
+    border-left: 10px solid #d6dbdf;
+  }
+
+  pre,
+  code {
+    background-color: #f5f5f5;
   }
 }
