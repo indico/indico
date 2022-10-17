@@ -129,9 +129,20 @@ function EditableListDisplay({
         key: 'state',
         text: Translate.string('Status'),
         options: [
-          {value: 'accepted', text: Translate.string('Accepted'), exclusive: true},
-          {value: 'ready_for_review', text: Translate.string('Ready for review')},
           {value: 'not_submitted', text: Translate.string('Not submitted')},
+          {value: 'ready_for_review', text: Translate.string('Ready for review')},
+          {value: 'accepted', text: Translate.string('Accepted'), exclusive: true},
+          {value: 'rejected', text: Translate.string('Rejected'), exclusive: true},
+          {
+            value: 'needs_submitter_changes',
+            text: Translate.string('Needs submitter changes'),
+            exclusive: true,
+          },
+          {
+            value: 'needs_submitter_confirmation',
+            text: Translate.string('Needs submitter confirmation'),
+            exclusive: true,
+          },
         ],
         isMatch: (contrib, selectedOptions) =>
           (contrib.c.editable && selectedOptions.includes(contrib.c.editable.state)) ||
