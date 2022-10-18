@@ -10,8 +10,8 @@ import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
-import {Form as FinalForm, FormSpy} from 'react-final-form';
-import {Form, Modal, Button, TextArea, Message, Input, Label} from 'semantic-ui-react';
+import {FormSpy} from 'react-final-form';
+import {Form, Button, TextArea, Message, Input, Label, Dimmer, Loader} from 'semantic-ui-react';
 
 import TextEditor from 'indico/react/components/TextEditor';
 import {
@@ -22,6 +22,7 @@ import {
   handleSubmitError,
   validators,
 } from 'indico/react/forms';
+import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
@@ -60,20 +61,22 @@ export function EmailButton({
   }, [triggerSelector]);
 
   return (
-    <Modal
-      onClose={() => setOpen(false)}
-      onOpen={() => setOpen(true)}
-      open={open}
-      trigger={
-        !triggerSelector ? trigger || <Translate as={Button}>Send email</Translate> : undefined
-      }
-      closeIcon
-    >
-      <Translate as={Modal.Header}>Send email</Translate>
-      <Modal.Content>
-        <EmailForm eventId={eventId} personIds={personIds} userIds={userIds} roleIds={roleIds} />
-      </Modal.Content>
-    </Modal>
+    <>
+      {!triggerSelector && !trigger && (
+        <Translate as={Button} onClick={() => setOpen(true)}>
+          Send email
+        </Translate>
+      )}
+      {open && (
+        <EmailForm
+          eventId={eventId}
+          personIds={personIds}
+          userIds={userIds}
+          roleIds={roleIds}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -94,7 +97,7 @@ EmailButton.defaultProps = {
   trigger: undefined,
 };
 
-export function EmailForm({eventId, personIds, roleIds, userIds}) {
+export function EmailForm({eventId, personIds, roleIds, userIds, onClose}) {
   const [preview, setPreview] = useState(null);
   // Prevents CKEditor5 onChange call when the editor data is updated in preview
   const disableChange = useRef(false);
@@ -127,9 +130,24 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
     }
   };
 
-  const renderForm = ({handleSubmit, submitting, submitSucceeded, hasValidationErrors}) => (
-    <Form loading={loading} onSubmit={handleSubmit}>
-      {submitSucceeded && (
+  const extraActions = fprops => (
+    <FormSpy subscription={{values: true}}>
+      {({values}) => (
+        <Button
+          type="button"
+          active={!!preview}
+          onClick={() => togglePreview(values)}
+          disabled={fprops.submitting || fprops.submitSucceeded || fprops.hasValidationErrors}
+        >
+          {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
+        </Button>
+      )}
+    </FormSpy>
+  );
+
+  const form = fprops => (
+    <>
+      {fprops.submitSucceeded && (
         <Message positive>
           <Translate as={Message.Header}>Your email has been sent.</Translate>
           <PluralTranslate count={count} as="p">
@@ -174,9 +192,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
                 <TextEditor
                   {...input}
                   value={preview ? preview.body : input.value}
-                  onChange={(_, editor) =>
-                    !disableChange.current && input.onChange(editor.getData())
-                  }
+                  onChange={value => !disableChange.current && input.onChange(value)}
                   disabled={!!preview}
                   required
                 />
@@ -195,39 +211,32 @@ export function EmailForm({eventId, personIds, roleIds, userIds}) {
           Send copy of each email to my mailbox
         </Translate>
       </Form.Field>
-      <Translate
-        as={Button}
-        type="submit"
-        disabled={submitting || submitSucceeded || hasValidationErrors}
-        primary
-      >
-        Send
-      </Translate>
-      <FormSpy subscription={{values: true}}>
-        {({values}) => (
-          <Button
-            type="button"
-            active={!!preview}
-            onClick={() => togglePreview(values)}
-            disabled={submitting || submitSucceeded || hasValidationErrors}
-          >
-            {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
-          </Button>
-        )}
-      </FormSpy>
-    </Form>
+    </>
   );
 
   return (
-    <FinalForm
-      initialValues={{
-        fromAddress: senders[0] && senders[0][0],
-        subject: defaultSubject,
-        body: defaultBody,
-      }}
-      onSubmit={onSubmit}
-      render={renderForm}
-    />
+    <>
+      <Dimmer active={loading} page inverted>
+        <Loader />
+      </Dimmer>
+      {!loading && (
+        <FinalModalForm
+          id="send-email"
+          header={Translate.string('Send email')}
+          initialValues={{
+            fromAddress: senders[0] && senders[0][0],
+            subject: defaultSubject,
+            body: defaultBody,
+          }}
+          onClose={onClose}
+          onSubmit={onSubmit}
+          submitLabel={Translate.string('Send')}
+          extraActions={extraActions}
+        >
+          {form}
+        </FinalModalForm>
+      )}
+    </>
   );
 }
 
@@ -236,6 +245,7 @@ EmailForm.propTypes = {
   personIds: PropTypes.arrayOf(PropTypes.number),
   userIds: PropTypes.arrayOf(PropTypes.number),
   roleIds: PropTypes.arrayOf(PropTypes.number),
+  onClose: PropTypes.func.isRequired,
 };
 
 EmailForm.defaultProps = {
