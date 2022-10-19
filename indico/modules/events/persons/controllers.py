@@ -263,11 +263,11 @@ class RHEmailEventPersonsPreview(RHManageEventBase):
     """Preview an email with EventPersons associated placeholders."""
 
     @use_kwargs({
-        'body': fields.String(required=True),
-        'subject': fields.String(load_default=None),
+        'body': fields.String(load_default=''),
+        'subject': fields.String(load_default=''),
     })
     def _process(self, body, subject):
-        person = self.event.person_links[0]
+        person = self.event.persons[0]
         email_body = replace_placeholders('event-persons-email', body, event=self.event, person=person)
         email_subject = replace_placeholders('event-persons-email', subject, event=self.event, person=person)
         tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
