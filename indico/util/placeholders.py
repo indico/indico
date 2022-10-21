@@ -100,6 +100,16 @@ class Placeholder:
         """
         raise NotImplementedError
 
+    @classmethod
+    def serialize(cls, **kwargs):
+        return {
+            'name': cls.name,
+            'required': cls.required,
+            'description': cls.description,
+            'advanced': cls.advanced,
+            'parametrized': False,
+        }
+
 
 class ParametrizedPlaceholder(Placeholder):
     """Base class for placeholders that can take an argument.
@@ -174,9 +184,19 @@ class ParametrizedPlaceholder(Placeholder):
     def render(cls, param, **kwargs):
         raise NotImplementedError
 
+    @classmethod
+    def serialize(cls, **kwargs):
+        params = [{'param': param, 'description': description}
+                  for param, description in cls.iter_param_info(**kwargs)]
+        return dict(super().serialize(), parametrized=True, params=params)
+
 
 def get_placeholders(context, **kwargs):
     return named_objects_from_signal(signals.core.get_placeholders.send(context, **kwargs))
+
+
+def get_sorted_placeholders(context, **kwargs):
+    return sorted(list(get_placeholders(context, **kwargs).values()), key=attrgetter('name'))
 
 
 def replace_placeholders(context, text, escape_html=True, **kwargs):
@@ -223,6 +243,6 @@ def render_placeholder_info(context, **kwargs):
     :param context: the context where the placeholders are used
     :param kwargs: arguments specific to the context
     """
-    placeholders = sorted(list(get_placeholders(context, **kwargs).values()), key=attrgetter('name'))
-    return Markup(render_template('placeholder_info.html', placeholder_kwargs=kwargs, placeholders=placeholders,
+    return Markup(render_template('placeholder_info.html', placeholder_kwargs=kwargs,
+                                  placeholders=get_sorted_placeholders(context, **kwargs),
                                   ParametrizedPlaceholder=ParametrizedPlaceholder))

@@ -47,7 +47,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import not_empty, validate_with_message
-from indico.util.placeholders import replace_placeholders
+from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
@@ -298,11 +298,14 @@ class RHAPIEmailEventPersons(RHManageEventBase):
             subject = tpl.get_subject()
             body = tpl.get_html_body()
         # TODO: disabled until change
+        placeholders = get_sorted_placeholders('event-persons-email', event=None, person=None,
+                                               register_link=self.no_account)
         return {
             'senders': list(self.event.get_allowed_sender_emails().items()),
             'recipients': sorted(x.email for x in self.recipients),
             'body': body,
             'subject': subject,
+            'placeholders': [p.serialize(event=None, person=None) for p in placeholders],
         }
 
     @use_kwargs({

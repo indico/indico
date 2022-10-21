@@ -13,6 +13,7 @@ import React, {useEffect, useState} from 'react';
 import {FormSpy} from 'react-final-form';
 import {Form, Button, TextArea, Message, Dimmer, Loader} from 'semantic-ui-react';
 
+import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
 import TextEditor, {FinalTextEditor} from 'indico/react/components/TextEditor';
 import {FinalCheckbox, FinalDropdown, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
@@ -97,7 +98,13 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose}) {
     url: emailAttributesURL({event_id: eventId}),
     params: snakifyKeys(recipientData),
   });
-  const {senders = [], recipients = [], subject: defaultSubject, body: defaultBody} = data || {};
+  const {
+    senders = [],
+    recipients = [],
+    subject: defaultSubject,
+    body: defaultBody,
+    placeholders = [],
+  } = data || {};
   const count = Object.values(recipientData).reduce((acc, v) => acc + v.length, 0);
 
   const togglePreview = async ({body, subject}) => {
@@ -114,6 +121,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose}) {
       await indicoAxios.post(emailAttributesURL({event_id: eventId}), snakifyKeys(data), {
         params: snakifyKeys(recipientData),
       });
+      onClose(); // TODO display success message
     } catch (err) {
       return handleSubmitError(err);
     }
@@ -194,6 +202,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose}) {
           <Translate as="label">Email body</Translate>
           <FinalTextEditor name="body" required />
         </Form.Field>
+        {placeholders.length > 0 && <PlaceholderInfo placeholders={placeholders} />}
       </Form.Field>
       {previewRender}
       <Form.Field>
