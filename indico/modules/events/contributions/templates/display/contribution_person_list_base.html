@@ -1,6 +1,7 @@
 {% extends 'events/display/conference/base.html' %}
 
 {% from 'events/display/indico/_common.html' import render_users %}
+{% from 'events/management/_affiliation.html' import render_affiliation %}
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
@@ -42,9 +43,9 @@
                 <span class="name">
                     {{ user_data.display_full_name }}
                 </span>
-                {% if user_data.affiliation -%}
+                {% if user_data.affiliation %}
                     <span class="affiliation" data-searchable="{{ user_data.affiliation | lower }}">
-                        <span class="text">{{ user_data.affiliation }}</span>
+                        <span class="text">({{ render_affiliation(user_data) }})</span>
                     </span>
                 {% endif %}
             </span>

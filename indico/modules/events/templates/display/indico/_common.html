@@ -1,3 +1,5 @@
+{% from 'events/management/_affiliation.html' import render_affiliation %}
+
 {% macro _render_location_tip(item) -%}
     {% set show_url = item.room and item.room.map_url %}
     <div class="location-info-tip">
@@ -49,35 +51,27 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro render_user_data(user_data, show_title=true, italic_affiliation=false) -%}
+{% macro render_user_data(user_data, show_title=true) -%}
     {% if user_data.title and show_title -%}
         <span class="speaker-title">
             {{- user_data.title -}}
         </span>
     {%- endif %}
     <span>{{ user_data.display_full_name }}</span>
-    {%- if user_data.affiliation -%}
+    {% if user_data.affiliation %}
         <span class="affiliation">
-            <span class="text">
-                ({#--#}
-                {%- if italic_affiliation -%}
-                    <em>{{ user_data.affiliation }}</em>
-                {%- else -%}
-                    {{ user_data.affiliation }}
-                {%- endif -%}
-                {#--#}){#--#}
-            </span>{#--#}
+            <span class="text">({{ render_affiliation(user_data) }})</span>
         </span>
-    {%- endif -%}
+    {% endif %}
 {%- endmacro %}
 
-{% macro render_users(user_list, span_class='', title=true, italic_affiliation=false, separator=', ') -%}
+{% macro render_users(user_list, span_class='', title=true, separator=', ') -%}
     {%- for link in user_list -%}
         {%- if caller is defined -%}
             {{- caller(link) -}}
         {%- else -%}
             <span class="{{ span_class }}">
-                {{- render_user_data(link, show_title=title, italic_affiliation=italic_affiliation) -}}
+                {{- render_user_data(link, show_title=title) -}}
             </span>
         {%- endif -%}
         {%- if not loop.last -%}

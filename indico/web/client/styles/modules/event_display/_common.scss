@@ -11,6 +11,22 @@
   }
 }
 
+.speaker-list .speaker-item,
+.session-conveners {
+  .affiliation {
+    color: $dark-gray;
+    font-size: 0.8em;
+
+    .text {
+      @include ellipsis();
+
+      display: inline-block;
+      max-width: 10em;
+      vertical-align: bottom;
+    }
+  }
+}
+
 .speaker-list {
   @extend %font-family-modern-body;
 
@@ -22,19 +38,6 @@
     &::before {
       color: $dark-blue;
       margin-right: 0.2em;
-    }
-
-    .affiliation {
-      color: $dark-gray;
-      font-size: 0.8em;
-
-      .text {
-        @include ellipsis();
-
-        display: inline-block;
-        max-width: 10em;
-        vertical-align: bottom;
-      }
     }
   }
 
