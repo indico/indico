@@ -101,6 +101,21 @@
                     </div>
                 {% endif %}
                 <div class="group">
+                    <div
+                        id="invitation-email-all"
+                        data-event-id="{{ event.id }}"
+                        data-person-selector="#event-participants-list tr[data-no-account] input[name=person_id][type=checkbox]"
+                        data-no-account="1">
+                    </div>
+                    {% if has_uninvited %}
+                        <div
+                            id="invitation-email-not-invited"
+                            data-event-id="{{ event.id }}"
+                            data-person-selector="#event-participants-list tr[data-no-account] input[name=person_id][type=checkbox]"
+                            data-no-account="1"
+                            data-not-invited-only="1">
+                        </div>
+                    {% endif %}
                     <a href="#"
                        class="i-button arrow highlight js-dropdown {{ 'disabled' if not has_no_account }}"
                        data-toggle="dropdown">
@@ -110,12 +125,7 @@
                         <li>
                             <a href="#"
                                title="{% trans %}Send an email to all users with no Indico account{% endtrans %}"
-                               data-href="{{ url_for('persons.email_event_persons', event, no_account=true) }}"
-                               data-params-selector="#event-participants-list [data-no-account] input.id-field:checkbox"
-                               data-title="{% trans %}Send email{% endtrans %}"
-                               data-method="POST"
-                               data-ajax-dialog
-                               data-reload-after>
+                               id="invitation-email-all-trigger">
                                 {% trans %}To all users with no account{% endtrans %}
                             </a>
                         </li>
@@ -124,13 +134,7 @@
                                 <a href="#"
                                    title="{% trans %}Send an email to all users with no Indico account who have not
                                          received an invitation email yet{% endtrans %}"
-                                   data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
-                                                          not_invited_only=true) }}"
-                                   data-params-selector="#event-participants-list [data-no-account] input.id-field:checkbox"
-                                   data-title="{% trans %}Send email{% endtrans %}"
-                                   data-method="POST"
-                                   data-ajax-dialog
-                                   data-reload-after>
+                                   id="invitation-email-not-invited-trigger">
                                     {% trans %}To users not invited yet{% endtrans %}
                                 </a>
                             </li>
@@ -283,5 +287,9 @@
             hasNoBuiltinRolesFilter: true,
         });
         setupEmailButton('#persons-email');
+        setupEmailButton('#invitation-email-all');
+        {% if has_uninvited %}
+            setupEmailButton('#invitation-email-not-invited');
+        {% endif %}
     </script>
 {% endblock %}

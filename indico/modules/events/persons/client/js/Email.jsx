@@ -38,6 +38,7 @@ export function EmailButton({
   roleSelector,
   triggerSelector,
   trigger,
+  extraParams,
 }) {
   const [open, setOpen] = useState(false);
   const personIds = useIdSelector(personSelector);
@@ -68,6 +69,7 @@ export function EmailButton({
           userIds={userIds}
           roleIds={roleIds}
           onClose={() => setOpen(false)}
+          extraParams={extraParams}
         />
       )}
     </>
@@ -81,6 +83,7 @@ EmailButton.propTypes = {
   roleSelector: PropTypes.string,
   triggerSelector: PropTypes.string,
   trigger: PropTypes.node,
+  extraParams: PropTypes.object,
 };
 
 EmailButton.defaultProps = {
@@ -89,11 +92,12 @@ EmailButton.defaultProps = {
   roleSelector: undefined,
   triggerSelector: undefined,
   trigger: undefined,
+  extraParams: undefined,
 };
 
-export function EmailForm({eventId, personIds, roleIds, userIds, onClose}) {
+export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraParams}) {
   const [preview, setPreview] = useState(null);
-  const recipientData = {personId: personIds, roleId: roleIds, userId: userIds};
+  const recipientData = {personId: personIds, roleId: roleIds, userId: userIds, ...extraParams};
   const {data, loading} = useIndicoAxios({
     url: emailAttributesURL({event_id: eventId}),
     params: snakifyKeys(recipientData),
@@ -253,10 +257,12 @@ EmailForm.propTypes = {
   userIds: PropTypes.arrayOf(PropTypes.number),
   roleIds: PropTypes.arrayOf(PropTypes.number),
   onClose: PropTypes.func.isRequired,
+  extraParams: PropTypes.object,
 };
 
 EmailForm.defaultProps = {
   personIds: [],
   userIds: [],
   roleIds: [],
+  extraParams: {},
 };
