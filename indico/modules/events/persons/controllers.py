@@ -297,7 +297,6 @@ class RHAPIEmailEventPersons(RHManageEventBase):
                 tpl = get_template_module('events/persons/emails/generic.html', event=self.event)
             subject = tpl.get_subject()
             body = tpl.get_html_body()
-        # TODO: disabled until change
         placeholders = get_sorted_placeholders('event-persons-email', event=None, person=None,
                                                register_link=self.no_account)
         return {
@@ -311,7 +310,7 @@ class RHAPIEmailEventPersons(RHManageEventBase):
     @use_kwargs({
         'from_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=not_empty),
-        'subject': fields.String(load_default=None, validate=not_empty),
+        'subject': fields.String(required=True, validate=not_empty),
         'copy_for_sender': fields.Bool(load_default=False)
     })
     def _process_POST(self, from_address, body, subject, copy_for_sender):

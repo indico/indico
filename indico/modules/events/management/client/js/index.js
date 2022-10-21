@@ -25,7 +25,7 @@ import {SingleEventMove, EventPublish} from './EventMove';
 import {SeriesManagement} from './SeriesManagement';
 
 (function(global) {
-  global.setupEmailButton = function setupEmailButton({field, trigger}) {
+  global.setupEmailButton = function setupEmailButton(field, trigger = null) {
     const element = document.querySelector(field);
     const {personSelector, userSelector, roleSelector} = element.dataset;
     ReactDOM.render(

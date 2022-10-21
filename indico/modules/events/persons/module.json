@@ -1,4 +1,4 @@
 {
-    "parent": "events",
-    "name": "persons"
+  "parent": "events",
+  "name": "persons"
 }

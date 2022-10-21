@@ -229,7 +229,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose}) {
           size="small"
           header={Translate.string('Send email')}
           initialValues={{
-            fromAddress: senders[0] && senders[0][0],
+            fromAddress: senders[0][0],
             subject: defaultSubject,
             body: defaultBody,
           }}
@@ -237,6 +237,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose}) {
           onSubmit={onSubmit}
           submitLabel={Translate.string('Send')}
           extraActions={extraActions}
+          disabledUntilChange={false}
           unloadPrompt
         >
           {form}
