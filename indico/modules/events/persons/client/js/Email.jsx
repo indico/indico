@@ -33,9 +33,9 @@ const useIdSelector = selector =>
 // TODO: disable if none selected
 export function EmailButton({
   eventId,
+  roleId,
   personSelector,
   userSelector,
-  roleSelector,
   triggerSelector,
   trigger,
   extraParams,
@@ -43,7 +43,6 @@ export function EmailButton({
   const [open, setOpen] = useState(false);
   const personIds = useIdSelector(personSelector);
   const userIds = useIdSelector(userSelector);
-  const roleIds = useIdSelector(roleSelector);
 
   useEffect(() => {
     if (!triggerSelector) {
@@ -67,7 +66,7 @@ export function EmailButton({
           eventId={eventId}
           personIds={personIds}
           userIds={userIds}
-          roleIds={roleIds}
+          roleIds={[roleId]}
           onClose={() => setOpen(false)}
           extraParams={extraParams}
         />
@@ -78,18 +77,18 @@ export function EmailButton({
 
 EmailButton.propTypes = {
   eventId: PropTypes.number.isRequired,
+  roleId: PropTypes.number,
   personSelector: PropTypes.string,
   userSelector: PropTypes.string,
-  roleSelector: PropTypes.string,
   triggerSelector: PropTypes.string,
   trigger: PropTypes.node,
   extraParams: PropTypes.object,
 };
 
 EmailButton.defaultProps = {
+  roleId: undefined,
   personSelector: undefined,
   userSelector: undefined,
-  roleSelector: undefined,
   triggerSelector: undefined,
   trigger: undefined,
   extraParams: undefined,

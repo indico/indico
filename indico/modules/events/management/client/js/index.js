@@ -27,13 +27,13 @@ import {SeriesManagement} from './SeriesManagement';
 (function(global) {
   global.setupEmailButton = function setupEmailButton(field, trigger = null) {
     const element = document.querySelector(field);
-    const {eventId, personSelector, userSelector, roleSelector, ...extraParams} = element.dataset;
+    const {eventId, roleId, personSelector, userSelector, ...extraParams} = element.dataset;
     ReactDOM.render(
       <EmailButton
         eventId={+eventId}
+        roleId={roleId && +roleId}
         personSelector={personSelector}
         userSelector={userSelector}
-        roleSelector={roleSelector}
         triggerSelector={trigger || `${field}-trigger`}
         extraParams={extraParams}
       />,
