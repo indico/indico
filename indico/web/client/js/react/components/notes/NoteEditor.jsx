@@ -103,20 +103,21 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
     }
   }, [apiURL, getNoteURL]);
 
-  const handleSubmit = async data => {
+  const handleSubmit = async ({source}) => {
+    const currentValue = renderMode === 'markdown' ? source : source.getData();
     try {
-      if (!data.source) {
+      if (!currentValue) {
         await indicoAxios.delete(apiURL);
       } else {
         await indicoAxios.post(apiURL, {
-          source: data.source,
+          source: currentValue,
           render_mode: renderMode,
         });
       }
     } catch (e) {
       return handleSubmitError(e);
     }
-    setCurrentInput(data.source);
+    setCurrentInput(source);
     setSaved(true);
   };
 
@@ -175,9 +176,10 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
             )
           }
         >
-          {renderMode === 'markdown' ? (
+          {renderMode === 'markdown' && (
             <FinalMarkdownEditor name="source" imageUploadURL={imageUploadURL} height="70vh" />
-          ) : (
+          )}
+          {renderMode === 'html' && (
             <FinalTextEditor
               name="source"
               loading={loading}

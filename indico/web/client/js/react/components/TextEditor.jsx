@@ -7,9 +7,8 @@
 
 import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from 'ckeditor';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
@@ -31,6 +30,11 @@ export default function TextEditor({
   setValidationError,
   ...rest
 }) {
+  if (typeof value === 'string') {
+    value = {initialValue: value, getData: () => value};
+  }
+
+  const [ready, setReady] = useState(false);
   const config = useMemo(() => getConfig(_config), [_config]);
   const onReady = editor => {
     editor.editing.view.change(writer => {
@@ -49,6 +53,7 @@ export default function TextEditor({
     if (_onReady) {
       _onReady(editor);
     }
+    setReady(true);
   };
 
   return (
@@ -58,14 +63,22 @@ export default function TextEditor({
       </Dimmer>
       <CKEditor
         editor={ClassicEditor}
-        data={value}
+        data={value.initialValue}
         onReady={onReady}
         config={config}
         onFocus={onFocus}
         onBlur={onBlur}
-        onChange={_.debounce((evt, editor) => {
-          onChange(editor.getData());
-        }, 250)}
+        onChange={(evt, editor) => {
+          // Prevent onChange firing when changing the initial data
+          // https://github.com/ckeditor/ckeditor5-react/issues/270
+          if (!ready) {
+            return;
+          }
+          // Return a lazy object with a getter for the editor data.
+          // Calling getData() explicitly on every change is too time consuming for
+          // long texts and lags the editor as you type.
+          onChange({...value, getData: () => editor.getData()});
+        }}
         {...rest}
       />
     </Dimmer.Dimmable>
@@ -79,7 +92,10 @@ TextEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({initialValue: PropTypes.string, getData: PropTypes.func}),
+  ]).isRequired,
   config: PropTypes.object,
   loading: PropTypes.bool,
   setValidationError: PropTypes.func,
