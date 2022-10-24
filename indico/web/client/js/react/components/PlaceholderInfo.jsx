@@ -6,8 +6,8 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
-import {Form} from 'semantic-ui-react';
+import React from 'react';
+import {Accordion} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -63,7 +63,7 @@ ParametrizedPlaceholderInfo.propTypes = placeholderShape;
 
 function PlaceholderInfoBox({placeholders}) {
   return (
-    <ul>
+    <ul styleName="placeholderInfo">
       {placeholders
         .filter(p => p.description)
         .map(placeholder => (
@@ -83,33 +83,29 @@ PlaceholderInfoBox.propTypes = {
 };
 
 export default function PlaceholderInfo({placeholders}) {
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const simplePlaceholders = placeholders.filter(p => !p.advanced);
   const advancedPlaceholders = placeholders.filter(p => p.advanced);
 
-  return (
-    <div styleName="placeholderInfo">
-      <Form.Field>
-        <Translate as="label">Available placeholders</Translate>
-        <PlaceholderInfoBox placeholders={simplePlaceholders} />
-      </Form.Field>
-      {advancedPlaceholders.length > 0 && (
-        <Form.Field>
-          <Translate as="label" styleName="advancedHeader">
-            Advanced placeholders
-          </Translate>
-          <span styleName="advancedToggle">
-            {'('}
-            <a onClick={() => setShowAdvanced(!showAdvanced)}>
-              {showAdvanced ? Translate.string('hide') : Translate.string('show')}
-            </a>
-            {')'}
-          </span>
-          {showAdvanced && <PlaceholderInfoBox placeholders={advancedPlaceholders} />}
-        </Form.Field>
-      )}
-    </div>
-  );
+  const panels = [
+    {
+      key: 'simple',
+      title: Translate.string('Available placeholders'),
+      content: {
+        content: <PlaceholderInfoBox placeholders={simplePlaceholders} />,
+      },
+    },
+  ];
+  if (advancedPlaceholders.length > 0) {
+    panels.push({
+      key: 'advanced',
+      title: Translate.string('Advanced placeholders'),
+      content: {
+        content: <PlaceholderInfoBox placeholders={advancedPlaceholders} />,
+      },
+    });
+  }
+
+  return <Accordion defaultActiveIndex={[0]} panels={panels} exclusive={false} styled fluid />;
 }
 
 PlaceholderInfo.propTypes = {

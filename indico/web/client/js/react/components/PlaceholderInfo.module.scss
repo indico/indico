@@ -8,16 +8,9 @@
 @import 'base/palette';
 
 .placeholderInfo {
-  padding: 0.2em 0.5em;
-  margin-top: -0.5em;
-  border: 1px solid $pastel-gray;
-  border-radius: 4px;
-
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
+  margin: 0;
+  padding: 0;
+  list-style: none;
 
   code {
     font-style: normal;
@@ -27,14 +20,5 @@
   .required {
     font-style: italic;
     margin-left: 0.2em;
-  }
-
-  .advancedHeader {
-    display: inline-block !important;
-    margin-right: 0.2em !important;
-  }
-
-  .advancedToggle {
-    font-size: 0.9em;
   }
 }
