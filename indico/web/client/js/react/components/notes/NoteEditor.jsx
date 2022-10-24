@@ -33,6 +33,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   const [converting, setConverting] = useState(false);
   const [saved, setSaved] = useState(false);
   const [renderMode, setRenderMode] = useState(undefined);
+  const [closeAndReload, setCloseAndReload] = useState(false);
 
   const combineNotes = (resp, mode) => {
     if (mode === 'markdown') {
@@ -139,12 +140,18 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
     getNote();
   }, [getNote]);
 
+  useEffect(() => {
+    if (closeAndReload) {
+      closeModal(true);
+    }
+  }, [closeAndReload, closeModal]);
+
   return (
     <>
-      <Dimmer active={loading} page>
+      <Dimmer active={loading || closeAndReload} page>
         <Loader active />
       </Dimmer>
-      {!loading && currentInput !== undefined && (
+      {!loading && !closeAndReload && currentInput !== undefined && (
         <FinalModalForm
           id="edit-minutes"
           header={Translate.string('Edit Minutes')}
@@ -152,7 +159,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
           style={{minWidth: '65vw'}}
           size="large"
           initialValues={{source: currentInput}}
-          onClose={() => closeModal(saved)}
+          onClose={() => (saved ? setCloseAndReload(true) : closeModal(false))}
           onSubmit={handleSubmit}
           disabledUntilChange={!allowWithoutChange}
           unloadPrompt
