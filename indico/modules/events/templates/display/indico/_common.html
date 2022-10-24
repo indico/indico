@@ -1,4 +1,4 @@
-{% from 'events/management/_affiliation.html' import render_affiliation %}
+{% from 'events/_affiliation.html' import render_affiliation %}
 
 {% macro _render_location_tip(item) -%}
     {% set show_url = item.room and item.room.map_url %}

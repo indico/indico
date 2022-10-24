@@ -1,4 +1,4 @@
-{% from 'events/management/_affiliation.html' import render_affiliation %}
+{% from 'events/_affiliation.html' import render_affiliation %}
 
 {% macro render_person_row(person_data, event_has_registration_forms, person_schema, has_predefined_affiliations) %}
     {% set person = person_data.person %}
