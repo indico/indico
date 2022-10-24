@@ -124,17 +124,22 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
       await indicoAxios.post(emailAttributesURL({event_id: eventId}), snakifyKeys(data), {
         params: snakifyKeys(recipientData),
       });
-      onClose(); // TODO display success message
+      setTimeout(() => onClose(), 5000);
     } catch (err) {
       return handleSubmitError(err);
     }
   };
 
-  const extraActions = (
+  const extraActions = ({submitSucceeded}) => (
     <Form.Field>
       <FormSpy subscription={{values: true}}>
         {({values}) => (
-          <Button type="button" active={!!preview} onClick={() => togglePreview(values)}>
+          <Button
+            type="button"
+            active={!!preview}
+            onClick={() => togglePreview(values)}
+            disabled={submitSucceeded}
+          >
             {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
           </Button>
         )}
@@ -162,19 +167,20 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
     </>
   );
 
-  const form = fprops => (
+  const successMessage = (
+    <Message positive>
+      <Translate as={Message.Header}>Your email has been sent.</Translate>
+      <PluralTranslate count={count} as="p">
+        <Singular>One email has been sent.</Singular>
+        <Plural>
+          <Param name="count" value={count} /> emails have been sent.
+        </Plural>
+      </PluralTranslate>
+    </Message>
+  );
+
+  const form = (
     <>
-      {fprops.submitSucceeded && (
-        <Message positive>
-          <Translate as={Message.Header}>Your email has been sent.</Translate>
-          <PluralTranslate count={count} as="p">
-            <Singular>One email has been sent.</Singular>
-            <Plural>
-              <Param name="count" value={count} /> emails have been sent.
-            </Plural>
-          </PluralTranslate>
-        </Message>
-      )}
       {preview && (
         <Message info>
           <Translate as={Message.Header}>
@@ -241,9 +247,10 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
           submitLabel={Translate.string('Send')}
           extraActions={extraActions}
           disabledUntilChange={false}
+          disabledAfterSubmit
           unloadPrompt
         >
-          {form}
+          {({submitSucceeded}) => (submitSucceeded ? successMessage : form)}
         </FinalModalForm>
       )}
     </>

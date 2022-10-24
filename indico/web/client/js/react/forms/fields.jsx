@@ -589,6 +589,7 @@ export function FinalSubmitButton({
   form,
   disabledUntilChange,
   disabledIfInvalid,
+  disabledAfterSubmit,
   activeSubmitButton,
   color,
   onClick,
@@ -598,19 +599,28 @@ export function FinalSubmitButton({
   style,
   children,
 }) {
-  const {validating, hasValidationErrors, pristine, submitting, submitError} = useFormState({
+  const {
+    validating,
+    hasValidationErrors,
+    pristine,
+    submitting,
+    submitError,
+    submitSucceeded,
+  } = useFormState({
     subscription: {
       validating: true,
       hasValidationErrors: true,
       pristine: true,
       submitting: true,
       submitError: true,
+      submitSucceeded: true,
     },
   });
   const disabled =
     validating ||
     (disabledIfInvalid && hasValidationErrors) ||
     (disabledUntilChange && pristine) ||
+    (disabledAfterSubmit && submitSucceeded) ||
     submitting;
   return (
     <Form.Field disabled={disabled} style={style}>
@@ -645,6 +655,7 @@ FinalSubmitButton.propTypes = {
   form: PropTypes.string,
   disabledUntilChange: PropTypes.bool,
   disabledIfInvalid: PropTypes.bool,
+  disabledAfterSubmit: PropTypes.bool,
   activeSubmitButton: PropTypes.bool,
   color: PropTypes.string,
   onClick: PropTypes.func,
@@ -660,6 +671,7 @@ FinalSubmitButton.defaultProps = {
   form: null,
   disabledUntilChange: true,
   disabledIfInvalid: true,
+  disabledAfterSubmit: false,
   activeSubmitButton: true,
   color: null,
   onClick: null,
