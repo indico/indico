@@ -71,17 +71,17 @@
                             </a>
                         {% elif regform.is_purged %}
                             <button class="i-button highlight disabled"
-                               title="{% trans %}Registration is disabled due to an expired retention period{% endtrans %}">
+                                    title="{% trans %}Registration is disabled due to an expired retention period{% endtrans %}">
                                 {{ button_text }}
                             </button>
                         {% elif not regform.is_open %}
                             <button class="i-button highlight disabled"
-                               title="{% trans %}Registration is closed{% endtrans %}">
+                                    title="{% trans %}Registration is closed{% endtrans %}">
                                 {{ button_text }}
                             </button>
                         {% elif regform.limit_reached %}
                             <button class="i-button highlight disabled"
-                               title="{% trans %}The maximum number of registrations has been reached{% endtrans %}">
+                                    title="{% trans %}The maximum number of registrations has been reached{% endtrans %}">
                                 {{ button_text }}
                             </button>
                         {% else %}

@@ -11,11 +11,11 @@
         {% endif -%}
     {% endset -%}
         <button class="i-button icon-time"
-           data-href="{{ url_for('.schedule_cfp', event) }}"
-           data-title="{{ title }}"
-           data-update="#paper-page"
-           data-replace-update
-           data-ajax-dialog>
+                data-href="{{ url_for('.schedule_cfp', event) }}"
+                data-title="{{ title }}"
+                data-update="#paper-page"
+                data-replace-update
+                data-ajax-dialog>
             {% if cfp.start_dt %}
                 {% trans %}Reschedule{% endtrans %}
             {% else %}

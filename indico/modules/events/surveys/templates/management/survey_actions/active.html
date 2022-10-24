@@ -22,15 +22,16 @@
 {% block buttons %}
     <div class="group">
         <button class="i-button icon-time js-survey-schedule-dialog"
-           data-href="{{ url_for('.schedule_survey', survey) }}"
-           data-title="{% trans %}Schedule survey{% endtrans %}">
+                data-href="{{ url_for('.schedule_survey', survey) }}"
+                data-title="{% trans %}Schedule survey{% endtrans %}">
             {% trans %}Reschedule{% endtrans %}
         </button>
     </div>
     {% block now_button %}
         <div class="group">
-            <button data-href="{{ url_for('.close_survey', survey) }}" data-method="POST"
-               class="i-button highlight">
+            <button data-href="{{ url_for('.close_survey', survey) }}" 
+                    data-method="POST"
+                    class="i-button highlight">
                 {% trans %}Close now{% endtrans %}
             </button>
         </div>

@@ -205,7 +205,9 @@
                                          management=false) %}
     <div class="toolbars space-after">
         <div class="toolbar">
-            <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
+            <button class="i-button icon-checkbox-checked arrow js-dropdown"
+                    data-toggle="dropdown">
+            </button>
             <ul class="i-dropdown">
                 <li>
                     <a href="#" data-select-all="#assignment-list input:checkbox">{% trans %}All{% endtrans %}</a>
@@ -222,7 +224,8 @@
                     data-ajax-dialog>
                 {%- trans %}Customize list{% endtrans -%}
             </button>
-            <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked" data-toggle="dropdown">
+            <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked"
+                    data-toggle="dropdown">
                 {%- trans %}Assign{% endtrans -%}
             </button>
             <ul class="i-dropdown hide-if-locked">
@@ -266,7 +269,8 @@
                     </li>
                 {% endif %}
             </ul>
-            <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked" data-toggle="dropdown">
+            <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked"
+                    data-toggle="dropdown">
                 {%- trans %}Unassign{% endtrans -%}
             </button>
             <ul class="i-dropdown hide-if-locked">
@@ -311,7 +315,7 @@
                 {% endif %}
             </ul>
             <button class="i-button arrow js-dropdown icon-hammer js-requires-selected-row disabled hide-if-locked"
-               data-toggle="dropdown">
+                    data-toggle="dropdown">
                 {%- trans %}Judge{% endtrans -%}
             </button>
             <ul class="i-dropdown hide-if-locked">
@@ -361,12 +365,12 @@
                      {%- trans %}Author list{% endtrans -%}
             </button>
             <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
-               data-href="{{ url_for('.download_papers', event) }}">
+                    data-href="{{ url_for('.download_papers', event) }}">
                 {%- trans %}Download papers{% endtrans -%}
             </button>
             {% if management %}
                 <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
-                   data-href="{{ url_for('.export_json', event) }}">
+                        data-href="{{ url_for('.export_json', event) }}">
                     {%- trans %}Export as JSON{% endtrans -%}
                 </button>
             {% endif %}

@@ -10,10 +10,11 @@
                 {% if item.can_manage_attachments(session.user) -%}
                     <div class="toolbar">
                         <button class="icon-edit i-button"
-                           data-locator="{{ item.locator|tojson|forceescape }}"
-                           data-attachment-editor
-                           data-reload-on-change
-                           title="{% trans %}Edit materials{% endtrans %}"></button>
+                                data-locator="{{ item.locator|tojson|forceescape }}"
+                                data-attachment-editor
+                                data-reload-on-change
+                                title="{% trans %}Edit materials{% endtrans %}">
+                        </button>
                     </div>
                 {%- endif %}
             </div>

@@ -23,8 +23,10 @@
         <div class="toolbars space-after">
             <div class="toolbar">
                 <div class="group">
-                    <button class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true"
-                       data-toggle="dropdown"></button>
+                    <button class="icon-checkbox-checked i-button arrow left icon-only"
+                            aria-hidden="true"
+                            data-toggle="dropdown">
+                    </button>
                     <ul class="i-dropdown">
                         <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
                         <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
@@ -41,7 +43,8 @@
                     </button>
                 </div>
                 <div class="group">
-                    <button class="i-button arrow icon-plus hide-if-locked" data-toggle="dropdown">
+                    <button class="i-button arrow icon-plus hide-if-locked"
+                            data-toggle="dropdown">
                         {% trans %}New{% endtrans %}
                     </button>
                     <ul class="i-dropdown">
@@ -76,7 +79,7 @@
                 </div>
                 <div class="group hide-if-locked">
                     <button class="i-button arrow icon-remove js-requires-selected-row disabled"
-                       data-toggle="dropdown">
+                            data-toggle="dropdown">
                         {%- trans %}Remove{% endtrans -%}
                     </button>
                     <ul class="i-dropdown">
@@ -106,7 +109,7 @@
                 </div>
                 <div class="group hide-if-locked">
                     <button class="i-button arrow icon-hammer js-requires-selected-row disabled"
-                       data-toggle="dropdown">
+                            data-toggle="dropdown">
                         {%- trans %}Judge{% endtrans -%}
                     </button>
                     <ul class="i-dropdown">
@@ -173,13 +176,14 @@
                 {% if can_download_attachments %}
                     <div class="group">
                         <button class="i-button icon-attachment js-requires-selected-row js-submit-list-form disabled"
-                           data-href="{{ url_for('.download_attachments', event) }}">
+                                data-href="{{ url_for('.download_attachments', event) }}">
                             {%- trans %}Download attachments{%- endtrans %}
                         </button>
                     </div>
                 {% endif %}
                 <div class="group">
-                    <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    <button class="i-button arrow button js-requires-selected-row disabled"
+                            data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
                     </button>
                     <ul class="i-dropdown">
@@ -209,14 +213,17 @@
                 </div>
                 {{ template_hook('abstract-list-options', event=event) }}
                 <div class="group">
-                    <button class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></button>
+                    <button class="i-button button change-columns-width"
+                            title="{% trans %}Adapt columns width{% endtrans %}">
+                    </button>
                 </div>
             </div>
             <div class="toolbar">
                 <div class="group">
                     <button class="i-button icon-link js-static-url"
-                       data-href="{{ url_for('.generate_static_url', event) }}"
-                       title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></button>
+                            data-href="{{ url_for('.generate_static_url', event) }}"
+                            title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}">
+                    </button>
                 </div>
                 <div class="group">
                     <div id="filter-statistics">

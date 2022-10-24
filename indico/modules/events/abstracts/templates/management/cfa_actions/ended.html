@@ -23,9 +23,9 @@
     {{ super() }}
     <div class="group">
         <button class="i-button"
-           data-href="{{ url_for('.open_abstracts_call', event) }}"
-           data-method="POST"
-           data-confirm="{% trans %}The call for abstracts is already finished. Do you want to open it again?{% endtrans %}">
+                data-href="{{ url_for('.open_abstracts_call', event) }}"
+                data-method="POST"
+                data-confirm="{% trans %}The call for abstracts is already finished. Do you want to open it again?{% endtrans %}">
             {%- trans %}Reopen now{% endtrans -%}
         </button>
     </div>

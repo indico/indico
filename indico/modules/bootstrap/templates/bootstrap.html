@@ -15,7 +15,8 @@
         <div class="header-subtitle">{% trans %}Indico needs just a little bit more data from you...{% endtrans %}</div>
         {% if languages and session.lang in languages %}
             <div id="language-selector" class="toolbar language-selector">
-                <button class="i-button transparent-button borderless icon-earth arrow js-dropdown" data-toggle="dropdown">
+                <button class="i-button transparent-button borderless icon-earth arrow js-dropdown"
+                        data-toggle="dropdown">
                     {{ languages[session.lang][0] }}
                 </button>
                 <ul class="i-dropdown">

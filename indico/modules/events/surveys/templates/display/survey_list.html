@@ -29,12 +29,12 @@
                     <td class="survey-actions">
                         {% if was_survey_submitted(survey) %}
                             <button class="i-button highlight disabled"
-                               title="{% trans %}Survey already filled out{% endtrans %}">
+                                    title="{% trans %}Survey already filled out{% endtrans %}">
                                 {%- trans %}Fill out{% endtrans -%}
                             </button>
                         {% elif not survey.is_active %}
                             <button class="i-button highlight disabled"
-                               title="{% trans %}Survey is closed{% endtrans %}">
+                                    title="{% trans %}Survey is closed{% endtrans %}">
                                 {%- trans %}Fill out{% endtrans -%}
                             </button>
                         {% elif is_submission_in_progress(survey) %}

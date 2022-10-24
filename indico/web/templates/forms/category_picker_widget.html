@@ -13,8 +13,9 @@
                 {% endtrans %}
             {% endcall %}
         </div>
-        <button class="i-button" id="categorynav-button-{{ field.id }}"
-           data-title='{% trans %}Choose category{% endtrans %}'>
+        <button class="i-button" 
+                id="categorynav-button-{{ field.id }}"
+                data-title='{% trans %}Choose category{% endtrans %}'>
             {%- trans %}Choose category{% endtrans -%}
         </button>
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() | tojson | forceescape }}">

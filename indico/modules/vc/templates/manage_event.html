@@ -40,15 +40,15 @@
                                         <div class="group">
                                             {% if vc_room.status.name != 'deleted' %}
                                                 <button class="i-button icon-loop js-vcroom-refresh hide-if-locked"
-                                                   title="{% trans %}Check videoconference status{% endtrans %}"
-                                                   data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}">
+                                                        title="{% trans %}Check videoconference status{% endtrans %}"
+                                                        data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}">
                                                 </button>
                                                 <button class="i-button icon-edit js-vcroom-edit hide-if-locked"
-                                                   data-href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"
-                                                   title="{% trans %}Edit{% endtrans %}"
-                                                   data-title="{% trans %}Edit room{% endtrans %}"
-                                                   data-ajax-dialog
-                                                   data-reload-after>
+                                                        data-href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"
+                                                        title="{% trans %}Edit{% endtrans %}"
+                                                        data-title="{% trans %}Edit room{% endtrans %}"
+                                                        data-ajax-dialog
+                                                        data-reload-after>
                                                 </button>
                                             {% endif %}
                                             <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}"
@@ -81,20 +81,20 @@
             <div class="add-room-options right hide-if-locked">
                 {% if plugins|length == 1 %}
                     <button class="i-button js-create-room"
-                       data-vc-system="{{ plugins[0].service_name }}"
-                       data-href="{{ url_for('.manage_vc_rooms_create', event, service=plugins[0].service_name) }}"
-                       data-title="{% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}"
-                       data-ajax-dialog
-                       data-reload-after>
+                            data-vc-system="{{ plugins[0].service_name }}"
+                            data-href="{{ url_for('.manage_vc_rooms_create', event, service=plugins[0].service_name) }}"
+                            data-title="{% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}"
+                            data-ajax-dialog
+                            data-reload-after>
                         <img src="{{ plugins[0].icon_url }}" alt="">
                         {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}
                     </button>
                 {% elif plugins|length > 1 %}
                     <button class="i-button icon-plus js-create-room"
-                       data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create', attach=False) }}"
-                       data-title="{% trans %}Create videoconference{% endtrans %}"
-                       data-ajax-dialog
-                       data-reload-after>
+                            data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create', attach=False) }}"
+                            data-title="{% trans %}Create videoconference{% endtrans %}"
+                            data-ajax-dialog
+                            data-reload-after>
                         {%- trans %}Create new room{% endtrans -%}
                     </button>
                 {% endif %}

@@ -67,15 +67,15 @@
                     </a>
                     {% if registration.can_be_withdrawn %}
                         <button class="i-button icon-exit"
-                           data-href="{{ url_for('.withdraw_registration', registration.locator.registrant) }}"
-                           data-method="POST"
-                           data-title="{% trans %}Withdraw{% endtrans %}"
-                           data-confirm="{% trans %}Are you sure that you want to withdraw your registration? This action cannot be undone.{% endtrans %}">
+                                data-href="{{ url_for('.withdraw_registration', registration.locator.registrant) }}"
+                                data-method="POST"
+                                data-title="{% trans %}Withdraw{% endtrans %}"
+                                data-confirm="{% trans %}Are you sure that you want to withdraw your registration? This action cannot be undone.{% endtrans %}">
                             {% trans %}Withdraw{% endtrans %}
                         </button>
                     {% else %}
                         <button class="i-button icon-exit disabled"
-                           title="{% trans %}The registration can no longer be withdrawn. Please contact an organizer.{% endtrans %}">
+                                title="{% trans %}The registration can no longer be withdrawn. Please contact an organizer.{% endtrans %}">
                             {% trans %}Withdraw{% endtrans %}
                         </button>
                     {% endif %}

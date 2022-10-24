@@ -27,11 +27,11 @@
             <div class="toolbar">
                 <div class="group">
                     <button class="i-button icon-settings"
-                       data-href="{{ url_for('.edit_program', event) }}"
-                       data-title="{% trans %}Configure program{% endtrans %}"
-                       data-qtip-position="right"
-                       data-reload-after
-                       data-ajax-dialog>
+                            data-href="{{ url_for('.edit_program', event) }}"
+                            data-title="{% trans %}Configure program{% endtrans %}"
+                            data-qtip-position="right"
+                            data-reload-after
+                            data-ajax-dialog>
                         {% trans %}Configure{% endtrans %}
                     </button>
                 </div>
@@ -42,17 +42,17 @@
     <div class="flexrow f-a-center">
         <h3 class="f-self-stretch">{% trans %}List of tracks and track groups{% endtrans %}</h3>
         <button class="i-button highlight icon-plus hide-if-locked"
-           data-href="{{ url_for('.create_track_group', event) }}"
-           data-title="{% trans %}Add new track group{% endtrans %}"
-           data-update="#track-list-container"
-           data-ajax-dialog>
+                data-href="{{ url_for('.create_track_group', event) }}"
+                data-title="{% trans %}Add new track group{% endtrans %}"
+                data-update="#track-list-container"
+                data-ajax-dialog>
             {%- trans %}Add track group{% endtrans -%}
         </button>
         <button class="i-button highlight icon-plus hide-if-locked"
-           data-href="{{ url_for('.create_track', event) }}"
-           data-title="{% trans %}Add new track{% endtrans %}"
-           data-update="#track-list-container"
-           data-ajax-dialog>
+                data-href="{{ url_for('.create_track', event) }}"
+                data-title="{% trans %}Add new track{% endtrans %}"
+                data-update="#track-list-container"
+                data-ajax-dialog>
             {%- trans %}Add track{% endtrans -%}
         </button>
     </div>

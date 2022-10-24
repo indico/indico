@@ -20,7 +20,10 @@
     <input type="submit" class="i-button highlight big" value="{% trans %}Send{% endtrans %}">
     <input id="preview-email" class="i-button big" type="button" value="{%- trans %}Preview email{% endtrans -%}"
            data-href="{{ url_for('.email_registrants_preview', regform) }}">
-    <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+    <button class="i-button big"
+            data-button-back>
+        {% trans %}Cancel{% endtrans %}
+    </button>
 {% endcall %}
 
 {% if form.attach_ticket is not none and registrations_without_ticket_count %}

@@ -46,10 +46,10 @@
                         {%- endif -%}
                     {%- endset %}
                     <button class="i-button {% if registration.participant_hidden %}icon-eye{% else %}icon-eye-blocked{% endif %}"
-                       data-update="#registration-details"
-                       data-method="POST"
-                       data-href="{{ url_for('.hide_registration', registration) }}"
-                       title="{{ tooltip_text }}">
+                            data-update="#registration-details"
+                            data-method="POST"
+                            data-href="{{ url_for('.hide_registration', registration) }}"
+                            title="{{ tooltip_text }}">
                         {%- if registration.participant_hidden -%}
                             {% trans %}Show participant{% endtrans %}
                         {%- else -%}

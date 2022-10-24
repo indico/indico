@@ -18,10 +18,10 @@
 {% block buttons %}
     {{ super() }}
     <button class="i-button highlight"
-       data-href="{{ url_for('.close_cfp', event) }}"
-       data-method="POST"
-       data-update="#paper-page"
-       data-replace-update>
+            data-href="{{ url_for('.close_cfp', event) }}"
+            data-method="POST"
+            data-update="#paper-page"
+            data-replace-update>
         {%- trans %}Close now{% endtrans -%}
     </button>
 {% endblock %}

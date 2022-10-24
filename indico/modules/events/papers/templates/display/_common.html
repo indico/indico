@@ -29,18 +29,18 @@
                     {% if contributions|length == 1 %}
                         {% set contrib = contributions|first %}
                         <button class="i-button highlight"
-                           data-title="{% trans %}Submit new paper{% endtrans %}"
-                           data-href="{{ url_for('papers.submit_revision', contrib) }}"
-                           data-redirect-after="{{ url_for('papers.paper_timeline', contrib) }}"
-                           data-confirm-close-unsaved
-                           data-ajax-dialog>
+                                data-title="{% trans %}Submit new paper{% endtrans %}"
+                                data-href="{{ url_for('papers.submit_revision', contrib) }}"
+                                data-redirect-after="{{ url_for('papers.paper_timeline', contrib) }}"
+                                data-confirm-close-unsaved
+                                data-ajax-dialog>
                             {%- trans %}Submit paper{% endtrans -%}
                         </button>
                     {% else %}
                         <button class="i-button highlight"
-                           data-title="{% trans %}Select contribution{% endtrans %}"
-                           data-href="{{ url_for('papers.select_contribution', event) }}"
-                           data-ajax-dialog>
+                                data-title="{% trans %}Select contribution{% endtrans %}"
+                                data-href="{{ url_for('papers.select_contribution', event) }}"
+                                data-ajax-dialog>
                             {%- trans %}Submit paper{% endtrans -%}
                         </button>
                     {% endif %}

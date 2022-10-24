@@ -13,10 +13,11 @@
                 {%- endtrans %}
             </div>
             <div class="toolbar">
-                <button id="enable-editing" class="i-button highlight {{ 'disabled' if event.is_locked }}"
-                   data-href="{{ url_for('event_features.switch', event, feature='editing') }}"
-                   data-method="PUT"
-                   data-reload-after>
+                <button id="enable-editing" 
+                        class="i-button highlight {{ 'disabled' if event.is_locked }}"
+                        data-href="{{ url_for('event_features.switch', event, feature='editing') }}"
+                        data-method="PUT"
+                        data-reload-after>
                     {% trans %}Enable module{% endtrans %}
                 </button>
             </div>

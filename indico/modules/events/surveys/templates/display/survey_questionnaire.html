@@ -36,11 +36,11 @@
     {% call form_footer(form) %}
         {% if partial_completion and session.user %}
             <button class="i-button big js-save-answers"
-               data-href="{{ url_for('.display_save_answers', survey.locator.token) }}"
-               data-method="POST"
-               data-params-selector="#survey-questionnaire input[name^=question_]:checked,
-                                     #survey-questionnaire [name^=question_]:not(:radio):not(:checkbox)"
-               data-ajax>
+                    data-href="{{ url_for('.display_save_answers', survey.locator.token) }}"
+                    data-method="POST"
+                    data-params-selector="#survey-questionnaire input[name^=question_]:checked,
+                                            #survey-questionnaire [name^=question_]:not(:radio):not(:checkbox)"
+                    data-ajax>
                 {%- trans %}Save answers{% endtrans -%}
             </button>
         {% endif %}

@@ -25,8 +25,10 @@
         <div class="list abstracts">
             <div class="toolbars space-after">
                 <div class="toolbar">
-                    <button class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true"
-                       data-toggle="dropdown"></button>
+                    <button class="icon-checkbox-checked i-button arrow left icon-only"
+                            aria-hidden="true"
+                            data-toggle="dropdown">
+                    </button>
                     <ul class="i-dropdown">
                         <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
                         <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
@@ -41,11 +43,12 @@
                     </button>
                     {% if can_download_attachments %}
                         <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
-                           data-href="{{ url_for('.display_download_attachments', track) }}">
+                                data-href="{{ url_for('.display_download_attachments', track) }}">
                             {%- trans %}Download attachments{%- endtrans %}
                         </button>
                     {% endif %}
-                    <button class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                    <button class="i-button arrow button js-requires-selected-row disabled"
+                            data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
                     </button>
                     <ul class="i-dropdown">

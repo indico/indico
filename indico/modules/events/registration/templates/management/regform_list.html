@@ -50,9 +50,9 @@
                 <div class="toolbar">
                     <div class="group">
                         <button class="i-button icon-settings"
-                           data-title="{% trans %}Manage registration managers{% endtrans %}"
-                           data-href="{{ url_for('.manage_registration_managers', event) }}"
-                           data-ajax-dialog>
+                                data-title="{% trans %}Manage registration managers{% endtrans %}"
+                                data-href="{{ url_for('.manage_registration_managers', event) }}"
+                                data-ajax-dialog>
                             {%- trans %}Configure{% endtrans -%}
                         </button>
                     </div>
@@ -125,12 +125,13 @@
                         {% block delete_regform_button scoped %}
                             <div class="group hide-if-locked">
                                 <button class="i-button icon-remove danger text-color"
-                                   title="{% trans %}Delete this registration form{% endtrans %}"
-                                   data-qtip-style="danger"
-                                   data-href="{{ url_for('.delete_regform', regform) }}"
-                                   data-method="POST"
-                                   data-title="{% trans %}Delete registration form?{% endtrans %}"
-                                   data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}"></button>
+                                        title="{% trans %}Delete this registration form{% endtrans %}"
+                                        data-qtip-style="danger"
+                                        data-href="{{ url_for('.delete_regform', regform) }}"
+                                        data-method="POST"
+                                        data-title="{% trans %}Delete registration form?{% endtrans %}"
+                                        data-confirm="{% trans title=regform.title %}Do you really want to delete the registration form &quot;{{ title }}&quot;?{% endtrans %}">
+                                </button>
                             </div>
                         {% endblock %}
                     </div>

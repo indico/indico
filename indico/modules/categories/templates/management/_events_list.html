@@ -85,7 +85,9 @@
     <div class="toolbars space-after">
         <div class="toolbar">
             <div class="group">
-                <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
+                <button class="i-button icon-checkbox-checked arrow js-dropdown"
+                        data-toggle="dropdown">
+                </button>
                 <ul class="i-dropdown">
                     <li>
                         <a href="#" data-select-all="#event-management input:checkbox[name=event_id]">
@@ -113,21 +115,23 @@
                 </div>
                 <div class="group">
                     <button class="i-button icon-split js-enabled-if-checked"
-                       title="{% trans %}Split selected events into new categories{% endtrans %}"
-                       data-method="POST"
-                       data-href="{{ url_for('.split_category', category) }}"
-                       data-title="{% trans %}Split category{% endtrans %}"
-                       data-params-selector="#event-management input[type=checkbox]:checked"
-                       data-ajax-dialog></button>
+                            title="{% trans %}Split selected events into new categories{% endtrans %}"
+                            data-method="POST"
+                            data-href="{{ url_for('.split_category', category) }}"
+                            data-title="{% trans %}Split category{% endtrans %}"
+                            data-params-selector="#event-management input[type=checkbox]:checked"
+                            data-ajax-dialog>
+                    </button>
                 </div>
                 <div class="group">
                     <span id="js-move-events-to-subcategory-container"></span>
                     <button class="i-button icon-remove js-enabled-if-checked"
-                       title="{% trans %}Delete selected events{% endtrans %}"
-                       data-href="{{ url_for('.delete_events', category) }}"
-                       data-method="POST"
-                       data-params-selector="#event-management input[type=checkbox]:checked"
-                       data-ajax-dialog></button>
+                            title="{% trans %}Delete selected events{% endtrans %}"
+                            data-href="{{ url_for('.delete_events', category) }}"
+                            data-method="POST"
+                            data-params-selector="#event-management input[type=checkbox]:checked"
+                            data-ajax-dialog>
+                    </button>
                 </div>
             </div>
         {% endif %}

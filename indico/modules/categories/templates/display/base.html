@@ -49,8 +49,9 @@
                     {% endblock %}
                     {% block cat_view_dropdown %}
                         <button class="i-button icon-eye arrow js-dropdown"
-                           title="{% trans %}View{% endtrans %}"
-                           data-toggle="dropdown"></button>
+                                title="{% trans %}View{% endtrans %}"
+                                data-toggle="dropdown">
+                        </button>
                         <ul class="i-dropdown">
                             {% if category.is_flat_view_enabled and category.children %}
                                 <li>

@@ -144,8 +144,10 @@
     {% if management %}
         <div class="i-box-footer text-right js-attachment-actions hide-if-locked">
             <button class="i-button icon-folder-plus js-dialog-action"
-               data-href="{{ url_for('attachments.create_folder', linked_object) }}"
-               data-title="{% trans %}Create a new folder{% endtrans %}">{% trans %}New folder{% endtrans -%}</button>
+                    data-href="{{ url_for('attachments.create_folder', linked_object) }}"
+                    data-title="{% trans %}Create a new folder{% endtrans %}">
+                {% trans %}New folder{% endtrans -%}
+            </button>
         </div>
     {% endif %}
 {%- endmacro %}
@@ -176,13 +178,13 @@
                 <div class="toolbar">
                     <div class="group">
                         <button class="i-button icon-file js-dialog-action"
-                           data-href="{{ url_for('attachments.upload', linked_object) }}"
-                           data-title="{%- trans %}Upload files{% endtrans -%}">
+                                data-href="{{ url_for('attachments.upload', linked_object) }}"
+                                data-title="{%- trans %}Upload files{% endtrans -%}">
                             {%- trans %}Upload files{% endtrans -%}
                         </button>
                         <button class="i-button icon-link js-dialog-action"
-                           data-href="{{ url_for('attachments.add_link', linked_object) }}"
-                           data-title="{%- trans %}Add link{% endtrans -%}">
+                                data-href="{{ url_for('attachments.add_link', linked_object) }}"
+                                data-title="{%- trans %}Add link{% endtrans -%}">
                             {%- trans %}Add link{% endtrans -%}
                         </button>
                         {{ template_hook('attachment-sources', linked_object=linked_object) }}

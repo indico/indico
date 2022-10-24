@@ -66,7 +66,9 @@
     <div class="list-section">
         <div class="toolbars space-after">
             <div class="toolbar">
-                <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
+                <button class="i-button icon-checkbox-checked arrow js-dropdown"
+                        data-toggle="dropdown">
+                </button>
                 <ul class="i-dropdown">
                     <li>
                         <a href="#" data-select-all="#contribution-list input:checkbox">{% trans %}All{% endtrans %}</a>
@@ -102,13 +104,13 @@
                     {%- trans %}Author list{% endtrans -%}
                 </button>
                 <button class="i-button icon-attachment js-enable-if-checked js-submit-form disabled"
-                   data-href="{{ url_for('.material_package', event) }}">
+                        data-href="{{ url_for('.material_package', event) }}">
                     {%- trans %}Material package{% endtrans -%}
                 </button>
                 <div class="group">
                     <button class="i-button js-enable-if-checked arrow disabled"
-                       title="{% trans %}Export data{% endtrans %}"
-                       data-toggle="dropdown">
+                            title="{% trans %}Export data{% endtrans %}"
+                            data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
                     </button>
                     <ul class="i-dropdown">
@@ -149,10 +151,10 @@
                         </li>
                     </ul>
                     <button class="i-button"
-                       title="{% trans %}Import contributions from CSV file{% endtrans %}"
-                       data-href="{{ url_for('.contributions_import', event) }}"
-                       data-title="{% trans %}Import contributions from CSV File{% endtrans %}"
-                       data-ajax-dialog>
+                            title="{% trans %}Import contributions from CSV file{% endtrans %}"
+                            data-href="{{ url_for('.contributions_import', event) }}"
+                            data-title="{% trans %}Import contributions from CSV File{% endtrans %}"
+                            data-ajax-dialog>
                         {%- trans %}Import{% endtrans -%}
                     </button>
                 </div>

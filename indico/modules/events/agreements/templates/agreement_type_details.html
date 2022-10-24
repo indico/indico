@@ -86,7 +86,7 @@
                         </div>
                         <div class="toolbar">
                             <button class="i-button highlight icon-mail js-ajax-dialog"
-                               data-href="{{ url_for('.event_agreements_details_send_all', event, definition=definition.name) }}">
+                                    data-href="{{ url_for('.event_agreements_details_send_all', event, definition=definition.name) }}">
                                 {% trans %}Send all{% endtrans %}
                             </button>
                         </div>
@@ -109,7 +109,7 @@
                         </div>
                         <div class="toolbar">
                             <button class="i-button icon-alarm js-ajax-dialog"
-                               data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
+                                    data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
                                 {% trans %}Remind all{% endtrans %}
                             </button>
                         </div>
@@ -121,7 +121,9 @@
         <div class="agreement-list i-box{% if not (not_sent or pending) %} titled{% endif %}">
             {% if not_sent %}
                 <div class="toolbar hide-if-locked">
-                    <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
+                    <button class="i-button icon-checkbox-checked arrow js-dropdown"
+                            data-toggle="dropdown">
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="#" id="select-new">{% trans %}All{% endtrans %}</a>
@@ -130,8 +132,9 @@
                             <a href="#" id="select-new-none">{% trans %}None{% endtrans %}</a>
                         </li>
                     </ul>
-                    <button id="send-new" class="i-button icon-mail disabled js-ajax-dialog-send"
-                       data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
+                    <button id="send-new"
+                            class="i-button icon-mail disabled js-ajax-dialog-send"
+                            data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
                         {%- trans %}Send new{% endtrans -%}
                     </button>
                 </div>
@@ -182,7 +185,9 @@
 
             {% if pending %}
                 <div class="toolbar hide-if-locked">
-                    <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
+                    <button class="i-button icon-checkbox-checked arrow js-dropdown"
+                            data-toggle="dropdown">
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="#" id="select-pending">{% trans %}All{% endtrans %}</a>
@@ -191,8 +196,9 @@
                             <a href="#" id="select-pending-none">{% trans %}None{% endtrans %}</a>
                         </li>
                     </ul>
-                    <button id="send-pending" class="i-button icon-alarm disabled js-ajax-dialog-remind"
-                       data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
+                    <button id="send-pending"
+                            class="i-button icon-alarm disabled js-ajax-dialog-remind"
+                            data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
                         {%- trans %}Remind pending{% endtrans -%}
                     </button>
                 </div>

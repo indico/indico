@@ -13,10 +13,10 @@
     {%- endset -%}
     <div class="group">
         <button class="i-button icon-time js-abstracts-schedule-dialog"
-           data-href="{{ url_for('.schedule_abstracts_call', event) }}"
-           data-title="{{ title }}"
-           data-ajax-dialog
-           data-reload-after>
+                data-href="{{ url_for('.schedule_abstracts_call', event) }}"
+                data-title="{{ title }}"
+                data-ajax-dialog
+                data-reload-after>
             {{- _('Reschedule') if cfa.start_dt else _('Schedule') -}}
         </button>
     </div>

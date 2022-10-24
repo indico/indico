@@ -90,10 +90,11 @@
                     {% if is_submitter %}
                         <div>
                             <button class="i-button text-color subtle icon-edit hide-if-locked"
-                               title="{% trans %}Manage materials{% endtrans %}"
-                               data-locator="{{ event.locator|tojson|forceescape }}"
-                               data-reload-on-change
-                               data-attachment-editor></button>
+                                    title="{% trans %}Manage materials{% endtrans %}"
+                                    data-locator="{{ event.locator|tojson|forceescape }}"
+                                    data-reload-on-change
+                                    data-attachment-editor>
+                            </button>
                         </div>
                     {% endif %}
                 </div>

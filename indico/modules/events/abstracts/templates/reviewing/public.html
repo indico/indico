@@ -28,13 +28,13 @@
                             {% endif %}
                         {% endset %}
                         <button class="i-button text-color color-on-hover danger hide-if-locked"
-                           title="{% trans %}Withdraw abstract{% endtrans %}"
-                           data-title="{% trans %}Withdraw Abstract{% endtrans %}"
-                           data-confirm="{{ message }}"
-                           data-href="{{ url_for('.withdraw_abstract', abstract) }}"
-                           data-method="POST"
-                           data-update="#reviewing-page"
-                           data-replace-update>
+                                title="{% trans %}Withdraw abstract{% endtrans %}"
+                                data-title="{% trans %}Withdraw Abstract{% endtrans %}"
+                                data-confirm="{{ message }}"
+                                data-href="{{ url_for('.withdraw_abstract', abstract) }}"
+                                data-method="POST"
+                                data-update="#reviewing-page"
+                                data-replace-update>
                             {% trans %}Withdraw{% endtrans %}
                         </button>
                     {% elif abstract.state.name == 'accepted' %}
@@ -44,18 +44,19 @@
                                 Please contact the event organizers if you want to withdraw the abstract anyway.
                             {%- endtrans %}
                         {% endset %}
-                        <button class="i-button disabled" title="{{ message }}">
+                        <button class="i-button disabled"
+                                title="{{ message }}">
                             {% trans %}Withdraw{% endtrans %}
                         </button>
                     {% elif abstract.state.name == 'withdrawn' and can_manage %}
                         <button class="i-button accept icon-lamp hide-if-locked"
-                           title="{% trans %}This abstract has been withdrawn but can be restored.{% endtrans %}"
-                           data-title="{% trans %}Restore Abstract{% endtrans %}"
-                           data-confirm="{% trans %}Do you really want to restore this abstract?{% endtrans %}"
-                           data-href="{{ url_for('.reset_abstract_state', abstract) }}"
-                           data-method="POST"
-                           data-update="#reviewing-page"
-                           data-replace-update>
+                                title="{% trans %}This abstract has been withdrawn but can be restored.{% endtrans %}"
+                                data-title="{% trans %}Restore Abstract{% endtrans %}"
+                                data-confirm="{% trans %}Do you really want to restore this abstract?{% endtrans %}"
+                                data-href="{{ url_for('.reset_abstract_state', abstract) }}"
+                                data-method="POST"
+                                data-update="#reviewing-page"
+                                data-replace-update>
                             {% trans %}Restore{% endtrans %}
                         </button>
                     {% endif %}
@@ -65,32 +66,40 @@
                 <div class="group">
                     {% if abstract.can_edit(session.user) %}
                         <button class="i-button icon-edit hide-if-locked"
-                           title="{% trans %}Edit abstract{% endtrans %}"
-                           data-href="{{ url_for('.edit_abstract', abstract) }}"
-                           data-title="{% trans %}Edit abstract{% endtrans %}"
-                           data-ajax-dialog
-                           data-reload-after></button>
+                                title="{% trans %}Edit abstract{% endtrans %}"
+                                data-href="{{ url_for('.edit_abstract', abstract) }}"
+                                data-title="{% trans %}Edit abstract{% endtrans %}"
+                                data-ajax-dialog
+                                data-reload-after>
+                        </button>
                     {% elif abstract.public_state.name == 'withdrawn' %}
                         <button class="i-button icon-edit disabled"
-                           title="{% trans %}The abstract cannot be edited because it was withdrawn{% endtrans %}"></button>
+                                title="{% trans %}The abstract cannot be edited because it was withdrawn{% endtrans %}">
+                        </button>
                     {% elif abstract.public_state.name == 'under_review' %}
                         <button class="i-button icon-edit disabled"
-                           title="{% trans %}The abstract cannot be edited because it is already under review{% endtrans %}"></button>
+                                title="{% trans %}The abstract cannot be edited because it is already under review{% endtrans %}">
+                        </button>
                     {% elif abstract.public_state.name != 'awaiting' %}
                         <button class="i-button icon-edit disabled"
-                           title="{% trans %}The abstract cannot be edited because it has already been processed{% endtrans %}"></button>
+                                title="{% trans %}The abstract cannot be edited because it has already been processed{% endtrans %}">
+                        </button>
                     {% elif abstract.modification_ended %}
                         <button class="i-button icon-edit disabled"
-                           title="{% trans %}The abstract cannot be edited because the modification deadline has passed{% endtrans %}"></button>
+                                title="{% trans %}The abstract cannot be edited because the modification deadline has passed{% endtrans %}">
+                        </button>
                     {% else %}
                         <button class="i-button icon-edit disabled"
-                           title="{% trans %}You are not authorized to edit this abstract{% endtrans %}"></button>
+                                title="{% trans %}You are not authorized to edit this abstract{% endtrans %}">
+                        </button>
                     {% endif %}
                 </div>
             {% endif %}
             {% if indico_config.LATEX_ENABLED and abstract.can_see_reviews(session.user) %}
                 <div class="group">
-                    <button class="i-button arrow icon-file-pdf js-dropdown" data-toggle="dropdown"></button>
+                    <button class="i-button arrow icon-file-pdf js-dropdown"
+                            data-toggle="dropdown">
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="{{ url_for('.display_abstract_pdf_export', abstract) }}">PDF</a>
@@ -207,7 +216,7 @@
                            data-replace-update
                            data-title="{% trans %}Reset judgment{% endtrans %}"
                            data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}">
-                            <i class="red link icon undo"></i>   
+                            <i class="red link icon undo"></i>
                         </a>
                     </div>
                 {% endif %}
