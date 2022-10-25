@@ -29,15 +29,12 @@ const useIdSelector = selector =>
     .filter(e => e.offsetWidth > 0 || e.offsetHeight > 0)
     .map(e => +e.value);
 
-// TODO: use existing button
-// TODO: disable if none selected
 export function EmailButton({
   eventId,
   roleId,
   personSelector,
   userSelector,
   triggerSelector,
-  trigger,
   extraParams,
 }) {
   const [open, setOpen] = useState(false);
@@ -56,7 +53,7 @@ export function EmailButton({
 
   return (
     <>
-      {!triggerSelector && !trigger && (
+      {!triggerSelector && (
         <Translate as={Button} onClick={() => setOpen(true)}>
           Send email
         </Translate>
@@ -81,7 +78,6 @@ EmailButton.propTypes = {
   personSelector: PropTypes.string,
   userSelector: PropTypes.string,
   triggerSelector: PropTypes.string,
-  trigger: PropTypes.node,
   extraParams: PropTypes.object,
 };
 
@@ -90,7 +86,6 @@ EmailButton.defaultProps = {
   personSelector: undefined,
   userSelector: undefined,
   triggerSelector: undefined,
-  trigger: undefined,
   extraParams: undefined,
 };
 
@@ -130,16 +125,11 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
     }
   };
 
-  const extraActions = ({submitSucceeded}) => (
-    <Form.Field>
+  const extraActions = (
+    <Form.Field styleName="preview-button">
       <FormSpy subscription={{values: true}}>
         {({values}) => (
-          <Button
-            type="button"
-            active={!!preview}
-            onClick={() => togglePreview(values)}
-            disabled={submitSucceeded}
-          >
+          <Button type="button" active={!!preview} onClick={() => togglePreview(values)}>
             {!preview ? <Translate>Preview</Translate> : <Translate>Edit</Translate>}
           </Button>
         )}
@@ -149,6 +139,15 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
 
   const previewRender = preview && (
     <>
+      <Message info>
+        <Translate as={Message.Header}>
+          This preview is only shown for a single recipient.
+        </Translate>
+        <Translate>
+          When sending the emails, each recipient will receive an email customized with their
+          personal data.
+        </Translate>
+      </Message>
       <Form.Field required>
         <Translate as="label">Subject</Translate>
         {preview.subject}
@@ -171,7 +170,9 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
     <Message positive>
       <Translate as={Message.Header}>Your email has been sent.</Translate>
       <PluralTranslate count={count} as="p">
-        <Singular>One email has been sent.</Singular>
+        <Singular>
+          <Param name="count" value={count} /> email has been sent.
+        </Singular>
         <Plural>
           <Param name="count" value={count} /> emails have been sent.
         </Plural>
@@ -181,28 +182,18 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
 
   const form = (
     <>
-      {preview && (
-        <Message info>
-          <Translate as={Message.Header}>
-            This preview is only shown for a single recipient.
-          </Translate>
-          <Translate>
-            When sending the emails, each recipient will receive an email customized with their
-            personal data.
-          </Translate>
-        </Message>
-      )}
-      <Form.Field>
-        <FinalDropdown
-          name="fromAddress"
-          label={Translate.string('From')}
-          scrolling
-          selection
-          options={senders.map(([value, text]) => ({value, text}))}
-          required
-        />
-      </Form.Field>
+      {previewRender}
       <Form.Field style={{display: preview ? 'none' : 'block'}}>
+        <Form.Field>
+          <FinalDropdown
+            name="fromAddress"
+            label={Translate.string('From')}
+            scrolling
+            selection
+            options={senders.map(([value, text]) => ({value, text}))}
+            required
+          />
+        </Form.Field>
         <Form.Field required>
           <Translate as="label">Subject</Translate>
           <FinalInput name="subject" required />
@@ -212,17 +203,16 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
           <FinalTextEditor name="body" required />
         </Form.Field>
         {placeholders.length > 0 && <PlaceholderInfo placeholders={placeholders} />}
-      </Form.Field>
-      {previewRender}
-      <Form.Field>
-        <Translate as="label">Recipients</Translate>
-        <TextArea rows={3} value={recipients.join(', ')} readOnly />
-      </Form.Field>
-      <Form.Field>
-        <FinalCheckbox name="copyForSender" label={Translate.string('Send copy to me')} toggle />
-        <Translate as="p" className="field-description">
-          Send copy of each email to my mailbox
-        </Translate>
+        <Form.Field>
+          <Translate as="label">Recipients</Translate>
+          <TextArea rows={3} value={recipients.join(', ')} readOnly />
+        </Form.Field>
+        <Form.Field>
+          <FinalCheckbox name="copyForSender" label={Translate.string('Send copy to me')} toggle />
+          <Translate as="p" className="field-description">
+            Send copy of each email to my mailbox
+          </Translate>
+        </Form.Field>
       </Form.Field>
     </>
   );
@@ -245,7 +235,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
           onClose={onClose}
           onSubmit={onSubmit}
           submitLabel={Translate.string('Send')}
-          extraActions={extraActions}
+          extraActions={({submitSucceeded}) => !submitSucceeded && extraActions}
           disabledUntilChange={false}
           disabledAfterSubmit
           unloadPrompt

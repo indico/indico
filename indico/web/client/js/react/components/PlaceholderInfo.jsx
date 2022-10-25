@@ -63,7 +63,7 @@ ParametrizedPlaceholderInfo.propTypes = placeholderShape;
 
 function PlaceholderInfoBox({placeholders}) {
   return (
-    <ul styleName="placeholderInfo">
+    <ul styleName="placeholder-info">
       {placeholders
         .filter(p => p.description)
         .map(placeholder => (
