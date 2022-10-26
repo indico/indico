@@ -1,14 +1,18 @@
 {% extends 'emails/base_i18n.txt' %}
 
 {% block subject -%}
-    {% trans sur=survey.title, evt=survey.event.title %}Survey "{{ sur }}" started on the event "{{ evt }}"{% endtrans %}
+    {% trans survey_title=survey.title, event_title=survey.event.title -%}
+        Survey "{{ survey_title }}" started on the event "{{ event_title }}"
+    {%- endtrans %}
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
     {%- filter dedent -%}
-        {% trans sur=survey.title, evt=survey.event.title %}The survey "{{ sur }}" on the event "{{ evt }}" is now open.{% endtrans %}
+        {% trans survey_title=survey.title, event_title=survey.event.title -%}
+            The survey "{{ survey_title }}" on the event "{{ event_title }}" is now open.
+        {%- endtrans %}
 
         {% trans %}You may answer the survey by clicking the link below:{% endtrans %}
         {{ url_for('surveys.display_survey_form', survey, _external=true) }}

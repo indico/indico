@@ -2,7 +2,9 @@
 {% set survey = submission.survey %}
 
 {% block subject -%}
-    {% trans sur=survey.title, evt=survey.event.title %}New survey submission for "{{ sur }}" on the event "{{ evt }}"{% endtrans %}
+    {% trans survey_title=survey.title, event_title=survey.event.title -%}
+        New survey submission for "{{ survey_title }}" on the event "{{ event_title }}"
+    {%- endtrans %}
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
@@ -10,12 +12,12 @@
 {% block body -%}
     {%- filter dedent -%}
         {%- if submission.is_anonymous -%}
-            {%- trans sur=survey.title, evt=survey.event.title -%}
-                A new submission has been made for the survey "{{ sur }}" on the event "{{ evt }}".
+            {%- trans survey_title=survey.title, event_title=survey.event.title -%}
+                A new submission has been made for the survey "{{ survey_title }}" on the event "{{ event_title }}".
             {%- endtrans -%}
         {%- else -%}
-            {%- trans sur=survey.title, evt=survey.event.title, name=submission.user.full_name -%}
-                A new submission has been made for the survey "{{ sur }}" on the event "{{ evt }}"
+            {%- trans survey_title=survey.title, event_title=survey.event.title, name=submission.user.full_name -%}
+                A new submission has been made for the survey "{{ survey_title }}" on the event "{{ event_title }}"
                 by {{ name }}.
             {%- endtrans -%}
         {%- endif %}
