@@ -32,7 +32,7 @@
 {% block body -%}
     {%- filter dedent -%}
         {% block request_message %}{% endblock %}
-        {{ url_for('requests.event_requests_details', req, _external=True) }}
+        {{ url_for('requests.event_requests_details', req, _external=true) }}
 
         {% filter underline %}{% trans %}Requested by{% endtrans %}{% endfilter %}
         {{ user_details(req.created_by_user) }}

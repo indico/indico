@@ -12,7 +12,7 @@
 
         {% trans %}Event:{% endtrans %} {{ event.title }}
         {% trans %}Requested by:{% endtrans %} {{ req.created_by_user.full_name }}
-        {% trans %}Details:{% endtrans %} {{ url_for('requests.event_requests_details', req, _external=True) }}
+        {% trans %}Details:{% endtrans %} {{ url_for('requests.event_requests_details', req, _external=true) }}
         {%- if self.request_details() %}
             {# empty line #}
             {% block request_details %}{% endblock -%}

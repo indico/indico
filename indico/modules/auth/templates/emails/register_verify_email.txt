@@ -10,7 +10,7 @@
 
 {% block body -%}
 {% filter dedent -%}
-    {%- filter wordwrap(width=81, break_long_words=False) -%}
+    {%- filter wordwrap(width=81, break_long_words=false) -%}
         {%- trans -%}
             You started the Indico profile creation process. To continue, you need to verify
             that {{ email }} is indeed your email address.

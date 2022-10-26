@@ -9,7 +9,7 @@
 {%- endblock %}
 
 {% block body -%}
-{% filter wordwrap(width=72, break_long_words=False) %}
+{% filter wordwrap(width=72, break_long_words=false) %}
     {%- trans mail=email -%}
         You recently added the e-mail address {{ mail }} to your Indico account.
         Please click the following link to confirm this action.

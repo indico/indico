@@ -60,13 +60,13 @@
                     (Note that there are {{ excluded }} excluded days. For further info, check your reservation.)
                 {% endtrans %}
             {%- endif %}
-            {% filter wordwrap(width=72, break_long_words=False) %}
+            {% filter wordwrap(width=72, break_long_words=false) %}
                 {% trans %}
                     If you end up not needing this room, please cancel the booking from the
                     booking details so that the room can be booked by somebody else.
                 {% endtrans %}
             {%- endfilter %}
-            {% filter wordwrap(width=72, break_long_words=False) %}
+            {% filter wordwrap(width=72, break_long_words=false) %}
                 {% trans %}
                     Please be aware that in special (rare) cases the person responsible
                     for this room may reject your booking. Should that happen you will
@@ -78,7 +78,7 @@
         {%- if prebooking %}
 
             {% trans %}Note:{% endtrans %}
-            {% filter wordwrap(width=60, break_long_words=False) -%}
+            {% filter wordwrap(width=60, break_long_words=false) -%}
                 {% trans %}
                     Your pre-booking is NOT YET ACCEPTED by a room manager.
                     Please be aware that pre-bookings are subject to acceptance
