@@ -28,8 +28,7 @@ def notify_request_response(blocked_room):
     blocking request for a room.
     """
     user = blocked_room.blocking.created_by_user
-    verb = blocked_room.State(blocked_room.state).title.upper()
     with user.force_user_locale():
         tpl = get_template_module('rb/emails/blockings/state_email_to_user.txt',
-                                  blocking=blocked_room.blocking, blocked_room=blocked_room, verb=verb)
+                                  blocking=blocked_room.blocking, blocked_room=blocked_room)
         return make_email(user.email, template=tpl)

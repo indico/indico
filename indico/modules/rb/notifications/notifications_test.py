@@ -47,7 +47,7 @@ def test_blocking_confirmation_email_plaintext(snapshot, dummy_room, dummy_user,
 def test_blocking_state_email_plaintext(snapshot, create_blocking, dummy_room, suffix, state):
     blocking = create_blocking(id=2)
     _assert_snapshot(snapshot, 'state_email_to_user.txt', 'blockings', suffix,
-                     blocking=blocking, verb=state.title.upper(),
+                     blocking=blocking,
                      blocked_room={'room': dummy_room, 'state': state,
                                    'State': BlockedRoomState})
 
