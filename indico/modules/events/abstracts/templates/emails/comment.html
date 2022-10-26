@@ -1,21 +1,25 @@
 {% extends 'events/abstracts/emails/base.html' %}
 
-{% block subject_message %}New abstract comment{% endblock %}
+{% block subject_message %}{% trans %}New abstract comment{% endtrans %}{% endblock %}
 
-{% block header_subtitle %}New abstract comment{% endblock %}
+{% block header_subtitle %}{% trans %}New abstract comment{% endtrans %}{% endblock %}
 
-{% block header_subtitle_ref %}ref #{{ abstract.friendly_id }}{% endblock %}
+{% block header_subtitle_ref %}{% trans id=abstract.friendly_id %}ref #{{ id }}{% endtrans %}{% endblock %}
 
 {% block content_header %}
-    <p>Dear {{ recipient.first_name }},</p>
-    <p>{{ submitter.full_name }} commented on the abstract <strong>{{ abstract.title }}</strong>:</p>
+    <p>{% trans name=recipient.first_name %}Dear {{ name }},{% endtrans %}</p>
+    <p>
+        {%- trans name=submitter.full_name, title=abstract.title, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            {{ name }} commented on the abstract {{ strong }}{{ title }}{{ endstrong }}:
+        {%- endtrans -%}
+    </p>
     <blockquote style="border-left: 5px solid #dfdfdf; padding-left: 10px; font-style: italic; color: #999;">
         {{ comment }}
     </blockquote>
 {% endblock %}
 
 {% block content_body %}
-    <p>You can view this comment on the abstract page:</p>
+    <p>{% trans %}You can view this comment on the abstract page:{% endtrans %}</p>
     <p>
         <a href="{{ url_for('abstracts.display_abstract', abstract, management=false, _external=true) }}">
             {{- url_for('abstracts.display_abstract', abstract, management=false, _external=true) -}}

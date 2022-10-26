@@ -36,7 +36,7 @@
     {% set height = stats.countries|length * 24 + 28 %}
     {% set badges = [(_("Registrations"),  stats.registrations|length),
                      (_("Days left<br>to register"), stats.days_left),
-                     (_("Countries"), stats.num_countries)]%}
+                     (_("Countries"), stats.num_countries)] %}
     {% set taken, total, progress = stats.availability %}
 
     {% call stats_box(title=stats.title, subtitle=stats.subtitle,

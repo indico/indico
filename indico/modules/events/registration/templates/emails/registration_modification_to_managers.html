@@ -1,11 +1,17 @@
 {% extends 'events/registration/emails/registration_creation_to_managers.html' %}
 
 {% block subject_message -%}
-    Modified {%- if registration.state.name == 'pending' %} pending{% endif %} registration
+    {% if registration.state.name == 'pending' -%}
+        {% trans title=event.title %}Modified pending registration for {{ title }}{% endtrans %}
+    {%- else -%}
+        {% trans title=event.title %}Modified registration for {{ title }}{% endtrans %}
+    {%- endif %}
 {%- endblock %}
 
 {% block registration_header_text -%}
-    There was a modification for the registration {{ render_registration_info() }}.
+    {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+        There was a modification for the registration for the event {{ strong }}{{ title }}{{ endstrong }} under {{ strong }}{{ name }}{{ endstrong }}.
+    {% endtrans %}
     {{ render_text_pending() }}
     {{ render_text_manage() }}
 {%- endblock %}

@@ -3,7 +3,7 @@
 {%- endmacro %}
 
 {% macro get_body(footer) %}
-    {%- block header %}Dear {% block header_recipient %}{% endblock %},
+    {%- block header %}{% block header_recipient %}{% endblock %},
 
 {% endblock -%}
 {% block body -%}{%- endblock %}

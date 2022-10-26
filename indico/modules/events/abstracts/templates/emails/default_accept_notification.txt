@@ -1,24 +1,30 @@
 {% extends 'events/abstracts/emails/default_notification.txt' %}
 
 {% block subject -%}
-    Abstract Acceptance notification (#{abstract_id})
+    {% trans %}Abstract Acceptance notification (#{abstract_id}){% endtrans %}
 {%- endblock %}
 
 {% block body -%}
-    We're pleased to announce that your abstract "{abstract_title}" with ID #{abstract_id} has been accepted in track "{abstract_track}" ({contribution_type}).
+    {% trans -%}
+        We're pleased to announce that your abstract "{abstract_title}" with ID #{abstract_id} has been accepted in track "{abstract_track}" ({contribution_type}).
+    {%- endtrans %}
 
-    See below a summary of your submitted abstract:
-    Conference: {event_title}
-    Submitted by: {submitter_name}
-    Title: {abstract_title}
-    Primary Authors: {primary_authors}
-    Co-authors: {co_authors}
-    Track classification: {abstract_track}
-    Presentation type: {contribution_type}
+    {% trans linebreak='\n' -%}
+        See below a summary of your submitted abstract:{{ linebreak }}
+        Conference: {event_title}{{ linebreak }}
+        Submitted by: {submitter_name}{{ linebreak }}
+        Title: {abstract_title}{{ linebreak }}
+        Primary Authors: {primary_authors}{{ linebreak }}
+        Co-authors: {co_authors}{{ linebreak }}
+        Track classification: {abstract_track}{{ linebreak }}
+        Presentation type: {contribution_type}
+    {%- endtrans %}
 
-    For a more detailed summary please visit the page of your abstract:
+    {% trans -%}For a more detailed summary please visit the page of your abstract:{%- endtrans %}
     {abstract_url}
 
-    Kind regards,
-    The organizers of {event_title}
+    {% trans linebreak='\n' -%}
+        Kind regards,{{ linebreak }}
+        The organizers of {event_title}
+    {%- endtrans %}
 {%- endblock %}

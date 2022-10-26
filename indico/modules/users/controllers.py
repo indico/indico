@@ -50,7 +50,7 @@ from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_fo
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserFavorites, WPUserPersonalData, WPUserProfilePic,
                                         WPUsersAdmin)
 from indico.util.date_time import now_utc
-from indico.util.i18n import _
+from indico.util.i18n import _, force_locale
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
 from indico.util.signals import values_from_signal
@@ -465,8 +465,10 @@ class RHUserEmails(RHUserBase):
         data = {'email': email, 'user_id': self.user.id}
         token = make_unique_token(lambda t: not token_storage.get(t))
         token_storage.set(token, data, timeout=86400)
-        send_email(make_email(email, template=get_template_module('users/emails/verify_email.txt',
-                                                                  user=self.user, email=email, token=token)))
+        with self.user.force_user_locale():
+            email_to_send = make_email(email, template=get_template_module('users/emails/verify_email.txt',
+                                       user=self.user, email=email, token=token))
+            send_email(email_to_send)
 
     def _process(self):
         form = UserEmailsForm()
@@ -744,8 +746,10 @@ class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
     def _process(self):
         user, identity = register_user(self.request.email, self.request.extra_emails, self.request.user_data,
                                        self.request.identity_data, self.request.settings)
-        tpl = get_template_module('users/emails/registration_request_accepted.txt', user=user)
-        send_email(make_email(self.request.email, template=tpl))
+        with user.force_user_locale():
+            tpl = get_template_module('users/emails/registration_request_accepted.txt', user=user)
+            email = make_email(self.request.email, template=tpl)
+        send_email(email)
         flash(_('The request has been approved.'), 'success')
         return jsonify_data()
 
@@ -755,8 +759,10 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 
     def _process(self):
         db.session.delete(self.request)
-        tpl = get_template_module('users/emails/registration_request_rejected.txt', req=self.request)
-        send_email(make_email(self.request.email, template=tpl))
+        with force_locale(None):
+            tpl = get_template_module('users/emails/registration_request_rejected.txt', req=self.request)
+            email = make_email(self.request.email, template=tpl)
+        send_email(email)
         flash(_('The request has been rejected.'), 'success')
         return jsonify_data()
 

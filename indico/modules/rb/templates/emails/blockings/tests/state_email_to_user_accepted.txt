@@ -1,15 +1,13 @@
 Dear Guinea,
 
-Your room blocking request has been forgotten by a room manager.
+Your room blocking request has been ACCEPTED by a room manager.
 
 Room: 1/2-3
-Action: forgotten
+Action: ACCEPTED
 
 You can view the details of your blocking here:
 http://localhost/rooms/blocking/2
 
-
 --
-Best regards,
 Indico :: Room Booking
 http://localhost/rooms/

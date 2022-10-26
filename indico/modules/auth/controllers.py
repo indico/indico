@@ -29,7 +29,7 @@ from indico.modules.auth.views import WPAuth, WPAuthUser, WPSignup
 from indico.modules.users import User, user_management_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.models.affiliations import Affiliation
-from indico.util.i18n import _
+from indico.util.i18n import _, force_locale
 from indico.util.marshmallow import LowercaseString, ModelField, not_empty
 from indico.util.passwords import validate_secure_password
 from indico.util.signing import secure_serializer
@@ -137,8 +137,9 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
     url_args = url_args or {}
     token = secure_serializer.dumps(data or email, salt=salt)
     url = url_for(endpoint, token=token, _external=True, **url_args)
-    template_module = get_template_module(template, email=email, url=url, **template_args)
-    send_email(make_email(email, template=template_module))
+    with force_locale(None) if 'user' not in template_args else template_args['user'].force_user_locale():
+        template_module = get_template_module(template, email=email, url=url, **template_args)
+        send_email(make_email(email, template=template_module))
     flash(_('We have sent you a verification email. Please check your mailbox within the next hour and open '
             'the link in that email.'))
     return redirect(url_for(endpoint, **url_args))

@@ -1,7 +1,7 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
-{% block subject -%}New submitter upload{%- endblock %}
+{% block subject -%}{% trans %}New submitter upload{% endtrans %}{%- endblock %}
 
 {% block body_text -%}
-{{ submitter_name }} has uploaded a new revision to an editable you are editor of.
+{% trans name=submitter_name %}{{ name }} has uploaded a new revision to an editable you are editor of.{% endtrans %}
 {% endblock %}

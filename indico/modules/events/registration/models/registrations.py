@@ -450,6 +450,22 @@ class Registration(db.Model):
         return url_for('event_registration.registration_avatar', self)
 
     @property
+    def external_registration_details_url(self):
+        return url_for(
+            'event_registration.registration_details',
+            registration=self.registration,
+            _external=True,
+        )
+
+    @property
+    def display_regform_url(self):
+        return url_for(
+            'event_registration.display_regform',
+            self.registration.locator.registrant,
+            _external=True,
+        )
+
+    @property
     def is_ticket_blocked(self):
         """Check whether the ticket is blocked by a plugin."""
         return any(values_from_signal(signals.event.is_ticket_blocked.send(self), single_value=True))

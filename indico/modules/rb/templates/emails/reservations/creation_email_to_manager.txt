@@ -1,7 +1,26 @@
 {% extends 'rb/emails/reservations/base_email_to_manager.txt' %}
+{%- set prebooking = not reservation.is_accepted -%}
+{% block subject_prefix %}{% endblock %}
+{% block subject -%}
+    {% if prebooking -%}
+        {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
+            [{{ room }}] New Pre-Booking on ({{ start }})
+        {%- endtrans %}
+    {%- else -%}
+        {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
+            [{{ room }}] New booking on ({{ start }})
+        {%- endtrans %}
+    {%- endif %}
+{%- endblock %}
 
-{% block body -%}
-There is a new {% block prebooking_prefix %}{% endblock %}booking for your room.
+{% block email_body -%}
+    {%- filter dedent -%}
+        {% if prebooking -%}
+            {% trans %}There is a new pre-booking for your room.{% endtrans %}
+        {%- else -%}
+            {% trans %}There is a new booking for your room.{% endtrans %}
+        {%- endif %}
 
-{% include 'rb/emails/reservations/reservation_info.txt' %}
+        {% include 'rb/emails/reservations/reservation_info.txt' %}
+    {%- endfilter -%}
 {%- endblock %}

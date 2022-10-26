@@ -1,6 +1,5 @@
 Dear Guinea,
 
-
 After the reviewing process your paper "Dummy Contribution (#1)", submitted for "dummy#0" has been accepted.
 
 Please see the comments from the reviewing team below:
@@ -9,8 +8,6 @@ This is a
 comment!
 
 You may proceed to your paper page:
-
-
 http://localhost/event/0/papers/0/
 
 --

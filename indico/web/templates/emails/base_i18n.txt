@@ -1,6 +1,6 @@
 {% extends 'emails/base.txt' %}
 
-{%- block header %}{{ pgettext('greeting', 'Dear') }} {% block header_recipient %}{% endblock %},
+{%- block header %}{% block header_recipient %}{% endblock %}
 
 {% endblock -%}
 

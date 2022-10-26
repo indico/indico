@@ -1,11 +1,17 @@
 {% extends 'rb/emails/reservations/base_email_to_manager.txt' %}
+{% block subject_prefix %}{% endblock %}
+{% block subject -%}{% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
+    [{{ room }}] Booking confirmed ({{ start }})
+{%- endtrans %}{%- endblock %}
 
-{% block body -%}
-A booking in your room '{{ reservation.room.full_name }}' has been CONFIRMED by a room manager.
+{% block email_body -%}
+    {%- filter dedent -%}
+        {% trans room=reservation.room.full_name %}A booking in your room '{{ room }}' has been CONFIRMED by a room manager.{% endtrans %}
 
-{%- if reason %}
+        {%- if reason %}
 
-The following message was provided by the room manager:
-{{ reason }}
-{%- endif -%}
+            {% trans %}The following message was provided by the room manager:{% endtrans %}
+            {{ reason }}
+        {%- endif -%}
+    {%- endfilter -%}
 {%- endblock %}

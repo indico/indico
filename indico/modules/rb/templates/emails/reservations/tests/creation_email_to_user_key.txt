@@ -1,0 +1,27 @@
+Dear Guinea,
+
+The conference room 1/2-3
+has been booked for Guinea Pig
+on Friday, 11/11/2022 from 13:37 to 14:37.
+Reason: Testing
+
+If you end up not needing this room, please cancel the
+booking from the booking details so that the room can be booked by
+somebody else.
+
+Please be aware that in special (rare) cases the person
+responsible for this room may reject your booking. Should that happen
+you will be instantly notified by e-mail.
+
+How to find a key:
+In a pocket dimension reachable via interpretative dance.
+
+Booking details:
+http://localhost/rooms/booking/1337
+
+Remember you can always check your bookings here:
+http://localhost/rooms/my-bookings
+
+--
+Indico :: Room Booking
+http://localhost/rooms/

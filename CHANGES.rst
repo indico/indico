@@ -7,6 +7,11 @@ Version 3.2.1
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- Make email templates translatable (:issue:`5263`, :pr:`5488`, thanks :user:`Leats`)
+
 Improvements
 ^^^^^^^^^^^^
 

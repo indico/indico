@@ -1,9 +1,9 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
-{% block header_recipient -%}{{ recipient_name }}{%- endblock %}
+{% block header_recipient -%}{% trans name=recipient_name %}Dear {{ name }},{% endtrans %}{%- endblock %}
 
 {% block body -%}
 {% block body_text %}{% endblock %}
-You can view details on the following URL:
+{% trans %}You can view details on the following URL:{% endtrans %}
 {{ timeline_url }}
 {%- endblock %}

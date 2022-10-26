@@ -45,7 +45,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, force_locale
 from indico.util.string import format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
@@ -1068,6 +1068,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                     EventPerson.event_links.any()
                 ))
                 .has_rows())
+
+    @contextmanager
+    def force_event_locale(self):
+        # TODO: once we have an event locale, force that one
+        with force_locale(None):
+            yield
 
 
 Event.register_location_events()

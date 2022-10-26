@@ -2,16 +2,17 @@ Dear Guinea,
 
 The conference room 1/2-3
 has been booked for Guinea Pig
-daily booking from Friday 11/11/2022 to Monday 21/11/2022 between 13:37 and 14:37.
+daily booking from Friday, 11/11/2022 to Monday, 21/11/2022 between 13:37 and 14:37.
 Reason: Testing
-    (Note that there are 1 excluded days. For further info, check your reservation)
+(Note that there are 1 excluded days. For further info, check your reservation.)
 
-If you end up not needing this room, please cancel the booking from the
-booking details so that the room can be booked by somebody else.
+If you end up not needing this room, please cancel the
+booking from the booking details so that the room can be booked by
+somebody else.
 
-Please be aware that in special (rare) cases the person responsible
-for this room may reject your booking. Should that happen you will
-be instantly notified by e-mail.
+Please be aware that in special (rare) cases the person
+responsible for this room may reject your booking. Should that happen
+you will be instantly notified by e-mail.
 
 Booking details:
 http://localhost/rooms/booking/1337
@@ -19,8 +20,6 @@ http://localhost/rooms/booking/1337
 Remember you can always check your bookings here:
 http://localhost/rooms/my-bookings
 
-
 --
-Best regards,
 Indico :: Room Booking
 http://localhost/rooms/

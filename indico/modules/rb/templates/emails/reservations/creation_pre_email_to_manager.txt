@@ -1,3 +1,0 @@
-{% extends 'rb/emails/reservations/creation_email_to_manager.txt' %}
-
-{% block prebooking_prefix %}pre-{% endblock %}

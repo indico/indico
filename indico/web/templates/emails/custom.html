@@ -1,4 +1,4 @@
-{% extends 'emails/base.html' %}
+{% extends 'emails/base_i18n.html' %}
 
 {% block subject %}{{ subject | safe }}{% endblock %}
 {% block body -%}{{ body | sanitize_html }}{%- endblock %}

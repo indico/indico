@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import itertools
+from contextlib import contextmanager
 from enum import Enum
 from operator import attrgetter
 from uuid import uuid4
@@ -31,7 +32,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table, favorite_user_table
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, force_locale
 from indico.util.locators import locator_property
 from indico.util.string import format_full_name, format_repr, validate_email
 from indico.web.flask.util import url_for
@@ -782,6 +783,13 @@ class User(PersonMixin, db.Model):
                      .where(user_alias.merged_into_id == cte_query.c.merged_from_id))
         cte = cte_query.union_all(rec_query)
         return User.query.join(cte, User.id == cte.c.merged_from_id).all()
+
+    @contextmanager
+    def force_user_locale(self):
+        """Temporarily override the locale to the locale of the user."""
+        locale = self.settings.get('lang')
+        with force_locale(locale):
+            yield
 
 
 @listens_for(User._primary_email, 'set')

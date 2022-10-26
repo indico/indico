@@ -4,21 +4,21 @@ http://localhost/event/0/manage/requests/meeting/?comment=Meow&created_by_user=%
 
 Requested by
 ------------
-Name:     Arthas Menethil
-Email:    arthas@frozenthrone.wow
-Phone:    1337
+Name: Arthas Menethil
+Email: arthas@frozenthrone.wow
+Phone: 1337
 
 Event created by
 ----------------
-Name:     Guinea Pig
-Email:    1337@example.test
+Name: Guinea Pig
+Email: 1337@example.test
 
 Event details
 -------------
-Name:     dummy#0
-Dates:    11 Nov 2022, 13:37 - 13 Nov 2022, 13:37
+Name: dummy#0
+Dates: 11 Nov 2022, 13:37 - 13 Nov 2022, 13:37
 Location: 
-Details:  http://localhost/event/0/
+Details: http://localhost/event/0/
 
 
 --

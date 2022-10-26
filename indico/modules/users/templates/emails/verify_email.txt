@@ -5,14 +5,16 @@
 {%- endblock %}
 
 {% block header_recipient -%}
-    {{ user.first_name }}
+    {% trans name=user.first_name %}Dear {{ name }},{% endtrans %}
 {%- endblock %}
 
 {% block body -%}
-{%- trans notrimmed -%}
-You recently added the e-mail address {{ email }} to your Indico account.
-Please click the following link to confirm this action.
-{%- endtrans %}
+{% filter wordwrap(width=72, break_long_words=false) %}
+    {%- trans mail=email -%}
+        You recently added the e-mail address {{ mail }} to your Indico account.
+        Please click the following link to confirm this action.
+    {%- endtrans %}
+{% endfilter %}
 
 {{ url_for('.user_emails_verify', token=token, _external=true) }}
 {%- endblock %}

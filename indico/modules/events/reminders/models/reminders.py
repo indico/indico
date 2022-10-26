@@ -223,7 +223,8 @@ class EventReminder(db.Model):
         if not recipients:
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
-        email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
+        with self.event.force_event_locale():
+            email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
         attachments = []
         if self.attach_ical:
             event_ical = event_to_ical(self.event, skip_access_check=True, method='REQUEST',
@@ -231,7 +232,8 @@ class EventReminder(db.Model):
             attachments.append(MIMECalendar('event.ics', event_ical))
 
         for recipient in recipients:
-            email = self._make_email(recipient, email_tpl, attachments)
+            with self.event.force_event_locale():
+                email = self._make_email(recipient, email_tpl, attachments)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
     def __repr__(self):

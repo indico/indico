@@ -1,0 +1,11 @@
+{% extends 'emails/base.html' %}
+
+{% block header_content %}
+    {% block header_recipient %}{% endblock %}
+{% endblock %}
+
+{% block footer_content %}
+    <hr>
+    <a href="{% block footer_url %}{{ url_for_index(_external=true) }}{% endblock %}">Indico</a>
+    :: {% block footer_title %}{% trans %}Email Notifier{% endtrans %}{% endblock %}<br>
+{% endblock %}

@@ -14,7 +14,8 @@ from flask import render_template
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoomState
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrenceState
-from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping
+from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping, ReservationState
+from indico.web.flask.templating import get_template_module
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -22,10 +23,10 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 def _assert_snapshot(snapshot, template_name, type,  suffix='', /, **context):
     __tracebackhide__ = True
-    template = render_template(f'rb/emails/{type}/{template_name}', **context)
+    template = get_template_module(f'rb/emails/{type}/{template_name}', **context)
     snapshot.snapshot_dir = Path(__file__).parent.parent / f'templates/emails/{type}/tests'
     snapshot_name, snapshot_ext = os.path.splitext(template_name)
-    snapshot.assert_match(template, snapshot_name + suffix + snapshot_ext)
+    snapshot.assert_match(template.get_body(), snapshot_name + suffix + snapshot_ext)
 
 
 @pytest.mark.parametrize(('suffix', 'rooms'), (
@@ -46,7 +47,7 @@ def test_blocking_confirmation_email_plaintext(snapshot, dummy_room, dummy_user,
 def test_blocking_state_email_plaintext(snapshot, create_blocking, dummy_room, suffix, state):
     blocking = create_blocking(id=2)
     _assert_snapshot(snapshot, 'state_email_to_user.txt', 'blockings', suffix,
-                     blocking=blocking, verb='forgotten',
+                     blocking=blocking,
                      blocked_room={'room': dummy_room, 'state': state,
                                    'State': BlockedRoomState})
 
@@ -85,18 +86,24 @@ def test_reservation_confirmation_emails_plaintext(snapshot, snapshot_name, crea
     ('creation_email_to_user.txt', '_repeat', None, RepeatFrequency.DAY),
     ('creation_email_to_user.txt', '_repeat_excluded_1', 1, RepeatFrequency.DAY),
     ('creation_email_to_user.txt', '_repeat_excluded_2', 2, RepeatFrequency.DAY),
-    ('creation_pre_email_to_manager.txt', '', None, RepeatFrequency.NEVER),
-    ('creation_pre_email_to_user.txt', '', None, RepeatFrequency.NEVER),
-    ('creation_pre_email_to_user.txt', '_repeat', None, RepeatFrequency.DAY),
+    ('creation_email_to_manager.txt', '', None, RepeatFrequency.NEVER),
+    ('creation_email_to_user.txt', '_pre', None, RepeatFrequency.NEVER),
+    ('creation_email_to_user.txt', '_repeat_pre', None, RepeatFrequency.DAY),
+    ('creation_email_to_user.txt', '_key', None, RepeatFrequency.NEVER),
+    ('creation_email_to_user.txt', '_pre_key', None, RepeatFrequency.NEVER),
 ))
 def test_reservation_creation_emails_plaintext(
     snapshot, snapshot_name, create_reservation, suffix, excluded_days, repeat
 ):
     res = create_reservation(id=1337, start_dt=datetime(2022, 11, 11, 13, 37), end_dt=datetime(2022, 11, 21, 14, 37),
                              repeat_frequency=repeat)
+    if 'pre' in suffix:
+        res.state = ReservationState.pending
     if excluded_days:
         for occ in res.occurrences[1:(excluded_days+1)]:
             occ.state = ReservationOccurrenceState.cancelled
+    if 'key' in suffix:
+        res.room.key_location = 'In a pocket dimension reachable via interpretative dance.'
     _assert_snapshot(snapshot, snapshot_name, 'reservations', suffix, reservation=res,
                      RepeatMapping=RepeatMapping, RepeatFrequency=RepeatFrequency)
 
@@ -134,4 +141,6 @@ def test_reservation_rejection_emails_plaintext(snapshot, snapshot_name, create_
 def test_reservation_emails_plaintext(snapshot, snapshot_name, create_reservation):
     res = create_reservation(id=0, start_dt=datetime(2022, 11, 11, 13, 37), end_dt=datetime(2022, 11, 11, 14, 37))
     res.room.key_location = 'In a pocket dimension reachable via interpretative dance.'
-    _assert_snapshot(snapshot, snapshot_name, 'reservations', reservation=res)
+    template = render_template(f'rb/emails/reservations/{snapshot_name}', reservation=res)
+    snapshot.snapshot_dir = Path(__file__).parent.parent / 'templates/emails/reservations/tests'
+    snapshot.assert_match(template, snapshot_name)

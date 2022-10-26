@@ -1,4 +1,4 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
 {% block subject -%}
     {{ subject }}
@@ -11,10 +11,9 @@
 {%- endblock %}
 
 {% block footer_title -%}
-    Call for Abstracts
+    {% trans %}Call for Abstracts{% endtrans %}
 {%- endblock %}
 
 {% block footer_url -%}
     {{ event.external_url }}
 {%- endblock %}
-

@@ -1,0 +1,22 @@
+Dear Guinea,
+
+The conference room 1/2-3
+has been pre-booked for Guinea Pig
+daily booking from Friday, 11/11/2022 to Monday, 21/11/2022 between 13:37 and 14:37.
+Reason: Testing
+
+Note:
+Your pre-booking is NOT YET ACCEPTED by a room manager.
+Please be aware that pre-bookings are subject to acceptance
+or rejection. Expect an e-mail with acceptance/rejection
+information.
+
+Booking details:
+http://localhost/rooms/booking/1337
+
+Remember you can always check your bookings here:
+http://localhost/rooms/my-bookings
+
+--
+Indico :: Room Booking
+http://localhost/rooms/

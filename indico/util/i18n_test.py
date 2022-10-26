@@ -203,3 +203,22 @@ def test_pgettext_plurals():
 
     assert pgettext('Dummy context', 'Convener') == 'Lider (Context)'
     assert pgettext('Dummy context', 'User') == 'User'
+
+
+@pytest.mark.usefixtures('mock_translations')
+def test_force_user_locale(dummy_user):
+    session.lang = 'en_AU'
+    dt = datetime(2022, 8, 29, 13, 37)
+
+    assert format_datetime(dt, timezone='UTC') == '29 Aug 2022, 1:37 pm'
+    assert _('I need a drink.') == "I be needin' a bottle of rhum!"
+
+    dummy_user.settings.set('lang', 'fr_CH')
+    with dummy_user.force_user_locale():
+        assert format_datetime(dt, timezone='UTC') == '29 août 2022, 13:37'
+        assert _('I need a drink.') == 'Booze, svp.'
+
+    assert format_datetime(dt, timezone='UTC') == '29 Aug 2022, 1:37 pm'
+    assert _('I need a drink.') == "I be needin' a bottle of rhum!"
+
+    assert session.lang == 'en_AU'

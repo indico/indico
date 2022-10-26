@@ -1,66 +1,73 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
 {% block subject -%}
-    New {{ event.type }} in Indico
+    {% if event.type == 'conference' -%}
+        {% trans %}New conference in Indico{% endtrans %}
+    {%- elif event.type == 'meeting' -%}
+        {% trans %}New meeting in Indico{% endtrans %}
+    {%- else -%}
+        {% trans %}New lecture in Indico{% endtrans %}
+    {%- endif %}
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
     {%- filter dedent -%}
-        {% filter underline %}Title{% endfilter %}
+        {% filter underline %}{% trans %}Title{% endtrans %}{% endfilter %}
         {{ event.title }}
 
-        {% filter underline %}Category{% endfilter %}
+        {% filter underline %}{% trans %}Category{% endtrans %}{% endfilter %}
         {{ event.category.chain_titles|join(' » ') }}
 
-        {% filter underline %}Creator{% endfilter %}
+        {% filter underline %}{% trans %}Creator{% endtrans %}{% endfilter %}
         {{ event.creator.full_name }}
 
         {%- if event.person_links %}
-
-            {{ ('Speakers' if event.type == 'lecture' else 'Chairpersons' ) | underline }}
+            {% filter underline -%}
+                {% if event.type == 'lecture' %}{% trans %}Speakers{% endtrans %}{% else %}{% trans %}Chairpersons{% endtrans %}{% endif %}
+            {%- endfilter %}
             {{ event.person_links|sort(attribute='full_name')|join('; ', attribute='full_name') }}
         {%- endif -%}
 
         {%- if event.venue_name and event.room_name %}
 
-            {% filter underline %}Location{% endfilter %}
+            {% filter underline %}{% trans %}Location{% endtrans %}{% endfilter %}
             {{ event.room_name }} ({{ event.venue_name }})
         {%- elif event.venue_name %}
 
-            {% filter underline %}Venue{% endfilter %}
+            {% filter underline %}{% trans %}Venue{% endtrans %}{% endfilter %}
             {{ event.venue_name }}
         {%- elif event.room_name %}
 
-            {% filter underline %}Room{% endfilter %}
+            {% filter underline %}{% trans %}Room{% endtrans %}{% endfilter %}
             {{ event.room_name }}
         {%- endif -%}
 
         {%- if event.description %}
 
-            {% filter underline %}Description{% endfilter %}
+            {% filter underline %}{% trans %}Description{% endtrans %}{% endfilter %}
             {{ event.description | striptags }}
         {%- endif %}
 
         {% if not occurrences -%}
-            {% filter underline %}Date{% endfilter %}
+            {% filter underline %}{% trans %}Date{% endtrans %}{% endfilter %}
             {{ event.start_dt|format_date(timezone=event.timezone) }}
             {%- if event.start_dt_local.date() != event.end_dt_local.date() %}
                 {#- #} - {{ event.end_dt|format_date(timezone=event.timezone) }}
             {%- endif %}
 
-            {% filter underline %}Time{% endfilter %}
+            {% filter underline %}{% trans %}Time{% endtrans %}{% endfilter %}
             {{ event.start_dt|format_time(timezone=event.timezone) }} - {{ event.end_dt|format_time(timezone=event.timezone) }}
             {#- #} ({{ event.timezone }})
 
-            {% filter underline %}URL{% endfilter %}
+            {% filter underline %}{% trans %}URL{% endtrans %}{% endfilter %}
             {{ event.external_url }}
         {%- else -%}
-            {% filter underline %}Timezone{% endfilter %}
+            {% filter underline %}{% trans %}Timezone{% endtrans %}{% endfilter %}
             {{ event.timezone }}
 
-            {% filter underline %}Occurrences{% endfilter -%}
+            {% filter underline %}{% trans %}Occurrences{% endtrans %}{% endfilter -%}
             {% for evt in occurrences|sort(attribute='start_dt') %}
                 {{ evt.start_dt|format_date(timezone=evt.timezone) }}, {# -#}
                 {{ evt.start_dt|format_time(timezone=evt.timezone) }} - {# -#}
@@ -72,7 +79,7 @@
 {%- endblock %}
 
 {% block footer_title -%}
-    Event notifications
+    {% trans %}Event notifications{% endtrans %}
 {%- endblock %}
 
 {% block footer_url %}{% endblock %}

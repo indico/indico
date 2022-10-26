@@ -1,20 +1,33 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ owner.first_name }}{% endblock %}
 
-{% block email_body -%}
-{{ blocking.created_by_user.full_name }} has created a blocking for {{ "some rooms" if blocked_rooms | length > 1 else "a room" }} you manage.
+{% block subject -%}{% trans %}Confirm room blockings{% endtrans %}{%- endblock %}
+
+{% block header_recipient -%}
+    {% trans name=owner.first_name -%}Dear {{ name }},{%- endtrans %}
+{%- endblock %}
+
+{% block body -%}
+{% if blocked_rooms | length > 1 -%}
+    {% trans name=blocking.created_by_user.full_name -%}
+        {{ name }} has created a blocking for some rooms you manage.
+    {%- endtrans %}
+{%- else -%}
+    {% trans name=blocking.created_by_user.full_name -%}
+        {{ name }} has created a blocking for a room you manage.
+    {%- endtrans %}
+{%- endif %}
 
 {% if blocked_rooms | length == 1 -%}
-Room: {{ blocked_rooms[0].room.full_name }}
+    {%- trans %}Room:{% endtrans %} {{ blocked_rooms[0].room.full_name }}
 {%- else -%}
-Rooms:
+    {%- trans -%}Rooms:{%- endtrans %}
     {% for blocked_room in blocked_rooms -%}
     {{ blocked_room.room.full_name }}
     {% endfor %}
 {%- endif %}
-Reason: {{ blocking.reason }}
-Dates: {{ blocking.start_date | format_date(locale='en_GB') }} - {{ blocking.end_date | format_date(locale='en_GB') }}
+{% trans %}Reason:{% endtrans %} {{ blocking.reason }}
+{% trans %}Dates:{% endtrans %} {{ blocking.start_date | format_date(locale='en_GB') }} - {{ blocking.end_date | format_date(locale='en_GB') }}
 
-You can approve or reject this blocking request here:
+{% trans %}You can approve or reject this blocking request here:{% endtrans %}
 {{ blocking.external_details_url }}
 {%- endblock %}

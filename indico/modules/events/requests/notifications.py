@@ -35,8 +35,9 @@ def notify_request_managers(req, template, **context):
     """
     context['event'] = req.event
     context['req'] = req
-    tpl_request_managers = _get_template_module(template, **context)
-    return _make_email(req, tpl_request_managers, to_request_managers=True)
+    with req.event.force_event_locale():
+        tpl_request_managers = _get_template_module(template, **context)
+        return _make_email(req, tpl_request_managers, to_request_managers=True)
 
 
 def notify_event_managers(req, template, **context):
@@ -48,8 +49,9 @@ def notify_event_managers(req, template, **context):
     """
     context['event'] = req.event
     context['req'] = req
-    tpl_event_managers = _get_template_module(template, **context)
-    return _make_email(req, tpl_event_managers, to_request_managers=False)
+    with req.event.force_event_locale():
+        tpl_event_managers = _get_template_module(template, **context)
+        return _make_email(req, tpl_event_managers, to_request_managers=False)
 
 
 @email_sender

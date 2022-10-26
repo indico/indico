@@ -1,12 +1,14 @@
 {% extends 'events/abstracts/emails/default_notification.txt' %}
 
 {% block subject -%}
-    Abstract Merge notification (#{abstract_id})
+    {% trans %}Abstract Merge notification (#{abstract_id}){% endtrans %}
 {%- endblock %}
 
 {% block body -%}
-    Your abstract "{abstract_title}" with ID #{abstract_id} has been merged into "{target_abstract_title}".
+    {% trans -%}Your abstract "{abstract_title}" with ID #{abstract_id} has been merged into "{target_abstract_title}".{%- endtrans %}
 
-    Kind regards,
-    The organizers of {event_title}
+    {% trans linebreak='\n' -%}
+        Kind regards,{{ linebreak }}
+        The organizers of {event_title}
+    {%- endtrans %}
 {%- endblock %}

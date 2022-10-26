@@ -1,18 +1,18 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
-{% block subject -%}Your Indico profile has been created{%- endblock %}
+{% block subject -%}{% trans %}Your Indico profile has been created{% endtrans %}{%- endblock %}
 
 {% block header_recipient -%}
-    {{ user.first_name }}
+    {% trans name=user.first_name %}Dear {{ name }},{% endtrans %}
 {%- endblock %}
 
 {% block body -%}
     {% filter dedent -%}
-        Your request to create an Indico profile has been approved.
-        You may now log in to your new account:
+        {% trans %}Your request to create an Indico profile has been approved.{%- endtrans %}
+        {% trans %}You may now log in to your new account:{%- endtrans %}
         {{ url_for('auth.login', _external=true) }}
 
-        After logging in your can finish setting up your profile:
+        {% trans %}After logging in your can finish setting up your profile:{% endtrans %}
         {{ url_for('users.user_profile', _external=true) }}
     {%- endfilter %}
 {%- endblock %}

@@ -1,23 +1,23 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base_i18n.txt' %}
 
 {% macro user_details(user) -%}
-    Name:     {{ user.full_name }}
-    Email:    {{ user.email }}
+    {% trans %}Name:{% endtrans %} {{ user.full_name }}
+    {% trans %}Email:{% endtrans %} {{ user.email }}
     {%- if user.phone %}
-    Phone:    {{ user.phone }}
+    {% trans %}Phone:{% endtrans %} {{ user.phone }}
     {%- endif -%}
 {%- endmacro %}
 
 
 {% macro event_details(event) -%}
-    Name:     {{ event.title }}
+    {% trans %}Name:{% endtrans %} {{ event.title }}
     {% if event.start_dt.date() == event.end_dt.date() -%}
-    Date:     {{ event.start_dt | format_date(timezone=event.tzinfo) }}, {{ event.start_dt | format_time(timezone=event.tzinfo) }}
+    {% trans %}Date:{% endtrans %} {{ event.start_dt | format_date(timezone=event.tzinfo) }}, {{ event.start_dt | format_time(timezone=event.tzinfo) }}
     {%- else -%}
-    Dates:    {{ event.start_dt | format_date(timezone=event.tzinfo) }}, {{ event.start_dt | format_time(timezone=event.tzinfo) }} - {{ event.end_dt | format_date(timezone=event.tzinfo) }}, {{ event.end_dt | format_time(timezone=event.tzinfo) }}
+    {% trans %}Dates:{% endtrans %} {{ event.start_dt | format_date(timezone=event.tzinfo) }}, {{ event.start_dt | format_time(timezone=event.tzinfo) }} - {{ event.end_dt | format_date(timezone=event.tzinfo) }}, {{ event.end_dt | format_time(timezone=event.tzinfo) }}
     {%- endif %}
-    Location: {% if event.venue_name %}{{ event.venue_name }}: {% endif %}{{ event.room_name }}
-    Details:  {{ event.external_url }}
+    {% trans %}Location:{% endtrans %} {% if event.venue_name %}{{ event.venue_name }}: {% endif %}{{ event.room_name }}
+    {% trans %}Details:{% endtrans %} {{ event.external_url }}
 {%- endmacro %}
 
 
@@ -32,26 +32,26 @@
 {% block body -%}
     {%- filter dedent -%}
         {% block request_message %}{% endblock %}
-        {{ url_for('requests.event_requests_details', req, _external=True) }}
+        {{ url_for('requests.event_requests_details', req, _external=true) }}
 
-        {% filter underline %}Requested by{% endfilter %}
+        {% filter underline %}{% trans %}Requested by{% endtrans %}{% endfilter %}
         {{ user_details(req.created_by_user) }}
         {%- if req.created_by_user != event.creator %}
 
-            {% filter underline %}Event created by{% endfilter %}
+            {% filter underline %}{% trans %}Event created by{% endtrans %}{% endfilter %}
             {{ user_details(event.creator) }}
         {%- endif %}
 
-        {% filter underline %}Event details{% endfilter %}
+        {% filter underline %}{% trans %}Event details{% endtrans %}{% endfilter %}
         {{ event_details(event) }}
 
         {%- if self.request_details() %}
 
-            {% filter underline %}Request details{% endfilter %}
+            {% filter underline %}{% trans %}Request details{% endtrans %}{% endfilter %}
             {% block request_details %}{% endblock -%}
         {% endif %}
     {%- endfilter %}
 {% endblock %}
 
 
-{% block footer_title %}Service Requests{% endblock %}
+{% block footer_title %}{% trans %}Service Requests{% endtrans %}{% endblock %}

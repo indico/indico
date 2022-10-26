@@ -10,7 +10,7 @@
                         {{ contribution.timetable_entry.start_dt | format_datetime(format='medium', timezone=timezone) }}
                         - {{ contribution.timetable_entry.end_dt | format_time(timezone=timezone) }}
                     {%- else -%}
-                        Not scheduled yet
+                        {% trans %}Not scheduled yet{% endtrans %}
                     {%- endif -%}
                     )
                 {% endif %}

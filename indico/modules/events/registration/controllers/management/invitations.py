@@ -48,9 +48,10 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
     """Invite someone to register."""
 
     def _process(self):
-        tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event)
+        with self.event.force_event_locale():
+            tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event)
+            defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
         form_cls = InvitationFormExisting if request.args.get('existing') == '1' else InvitationFormNew
-        defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
         form = form_cls(obj=defaults, regform=self.regform)
         skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
         if form.validate_on_submit():
@@ -77,8 +78,9 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
         return f'{sent_msg} {skipped_msg}'
 
     def _process(self):
-        tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event)
-        defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
+        with self.event.force_event_locale():
+            tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event)
+            defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
         form = ImportInvitationsForm(obj=defaults, regform=self.regform)
         skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
         skip_existing = form.skip_existing.data

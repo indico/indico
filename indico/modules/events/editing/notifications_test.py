@@ -45,7 +45,7 @@ def test_rejection_email_plaintext(snapshot):
                      timeline_url='http://localhost/timeline-url')
 
 
-def test_judgement_email_plaintext(snapshot):
+def test_judgment_email_plaintext(snapshot):
     _assert_snapshot(snapshot, 'editor_judgment_notification.txt',
                      recipient_name='John Doe',
                      editor_name='Jane Doe',
