@@ -1,4 +1,4 @@
-The survey "test" on the event "dummy#0" is now open.
+The survey "test" in the event "dummy#0" is now open.
 
 You may answer the survey by clicking the link below:
 http://localhost/event/0/surveys/4

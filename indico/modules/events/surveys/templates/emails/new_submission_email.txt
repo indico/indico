@@ -3,7 +3,7 @@
 
 {% block subject -%}
     {% trans survey_title=survey.title, event_title=survey.event.title -%}
-        New survey submission for "{{ survey_title }}" on the event "{{ event_title }}"
+        New survey submission for "{{ survey_title }}" in the event "{{ event_title }}"
     {%- endtrans %}
 {%- endblock %}
 
@@ -13,11 +13,11 @@
     {%- filter dedent -%}
         {%- if submission.is_anonymous -%}
             {%- trans survey_title=survey.title, event_title=survey.event.title -%}
-                A new submission has been made for the survey "{{ survey_title }}" on the event "{{ event_title }}".
+                A new submission has been made for the survey "{{ survey_title }}" in the event "{{ event_title }}".
             {%- endtrans -%}
         {%- else -%}
             {%- trans survey_title=survey.title, event_title=survey.event.title, name=submission.user.full_name -%}
-                A new submission has been made for the survey "{{ survey_title }}" on the event "{{ event_title }}"
+                A new submission has been made for the survey "{{ survey_title }}" in the event "{{ event_title }}"
                 by {{ name }}.
             {%- endtrans -%}
         {%- endif %}

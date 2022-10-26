@@ -2,7 +2,7 @@
 
 {% block subject -%}
     {% trans survey_title=survey.title, event_title=survey.event.title -%}
-        Survey "{{ survey_title }}" started on the event "{{ event_title }}"
+        Survey "{{ survey_title }}" started in the event "{{ event_title }}"
     {%- endtrans %}
 {%- endblock %}
 
@@ -11,7 +11,7 @@
 {% block body -%}
     {%- filter dedent -%}
         {% trans survey_title=survey.title, event_title=survey.event.title -%}
-            The survey "{{ survey_title }}" on the event "{{ event_title }}" is now open.
+            The survey "{{ survey_title }}" in the event "{{ event_title }}" is now open.
         {%- endtrans %}
 
         {% trans %}You may answer the survey by clicking the link below:{% endtrans %}

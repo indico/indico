@@ -1,4 +1,4 @@
-A new submission has been made for the survey "test" on the event "dummy#0" by Guinea Pig.
+A new submission has been made for the survey "test" in the event "dummy#0" by Guinea Pig.
 
 You can access the new submission here:
 http://localhost/event/0/manage/surveys/3/submission/1
