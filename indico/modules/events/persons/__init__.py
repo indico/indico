@@ -43,4 +43,5 @@ def _get_placeholders(sender, person, event, register_link=False, **kwargs):
 
 persons_settings = EventSettingsProxy('persons', {
     'disallow_custom_persons': False,  # Disallow manually entering persons on person lists
+    'default_search_external': False,  # Enable "Users with no Indico account" by d efault
 })

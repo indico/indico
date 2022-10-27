@@ -20,6 +20,8 @@ Improvements
 - Display & enforce judging deadline (:pr:`5506`)
 - Add a setting to disable entering persons in person link fields manually (:pr:`5499`)
 - Allow taking minutes in markdown (:issue:`3386`, :pr:`5500`, thanks :user:`Leats`)
+- Add setting to preselect "Include users with no Indico account" when adding
+  authors/speakers (:pr:`5553`)
 
 Bugfixes
 ^^^^^^^^

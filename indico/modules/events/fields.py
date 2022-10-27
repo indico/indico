@@ -100,6 +100,10 @@ class PersonLinkListFieldBase(PrincipalListField):
         return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
 
     @property
+    def default_search_external(self):
+        return persons_settings.get(self.event, 'default_search_external')
+
+    @property
     def can_enter_manually(self):
         if self.event is None:
             return True

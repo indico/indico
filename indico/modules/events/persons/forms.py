@@ -9,6 +9,7 @@ from flask import request
 from wtforms.fields import BooleanField, HiddenField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired
 
+from indico.core.auth import multipass
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
@@ -44,3 +45,11 @@ class ManagePersonListsForm(IndicoForm):
     disallow_custom_persons = BooleanField(_('Disallow manually entering persons'), widget=SwitchWidget(),
                                            description=_('Prohibit submitters from adding new speakers/authors '
                                                          'manually and only allow searching for existing users.'))
+    default_search_external = BooleanField(_('Include users with no Indico account by default'), widget=SwitchWidget(),
+                                           description=_('If enabled, searching people for speakers/authors will '
+                                                         'include those with no Indico account by default.'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not any(auth.supports_search for auth in multipass.identity_providers.values()):
+            del self.default_search_external

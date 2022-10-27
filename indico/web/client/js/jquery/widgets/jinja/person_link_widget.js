@@ -20,6 +20,7 @@ import {camelizeKeys} from 'indico/utils/case';
       sessionUser,
       hasPredefinedAffiliations,
       canEnterManually,
+      defaultSearchExternal,
       ...rest
     } = options;
     const field = document.getElementById(fieldId);
@@ -50,6 +51,7 @@ import {camelizeKeys} from 'indico/utils/case';
         sessionUser={user}
         hasPredefinedAffiliations={hasPredefinedAffiliations}
         canEnterManually={canEnterManually}
+        defaultSearchExternal={defaultSearchExternal}
         {...rest}
       />,
       document.getElementById(`person-link-field-${fieldId}`)

@@ -50,6 +50,7 @@ from indico.util.placeholders import replace_placeholders
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form
 
 
@@ -473,10 +474,9 @@ class RHManagePersonLists(RHManageEventBase):
     """Dialog to configure person list settings."""
 
     def _process(self):
-        form = ManagePersonListsForm(disallow_custom_persons=persons_settings.get(self.event,
-                                                                                  'disallow_custom_persons'))
+        form = ManagePersonListsForm(obj=FormDefaults(**persons_settings.get_all(self.event)))
         if form.validate_on_submit():
-            persons_settings.set(self.event, 'disallow_custom_persons', form.disallow_custom_persons.data)
+            persons_settings.set_multi(self.event, form.data)
             flash(_('Person lists settings changed successfully'), 'success')
             return jsonify_data()
         return jsonify_form(form)

@@ -233,6 +233,7 @@ function PersonLinkField({
   setAutoSort,
   hasPredefinedAffiliations,
   canEnterManually,
+  defaultSearchExternal,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState(false);
@@ -344,6 +345,7 @@ function PersonLinkField({
             )}
             withExternalUsers
             withEventPersons={eventId !== null}
+            initialFormValues={{external: defaultSearchExternal}}
             eventId={eventId}
             disabled={!sessionUser}
           />
@@ -378,6 +380,7 @@ PersonLinkField.propTypes = {
   setAutoSort: PropTypes.func,
   hasPredefinedAffiliations: PropTypes.bool,
   canEnterManually: PropTypes.bool,
+  defaultSearchExternal: PropTypes.bool,
 };
 
 PersonLinkField.defaultProps = {
@@ -389,6 +392,7 @@ PersonLinkField.defaultProps = {
   setAutoSort: null,
   hasPredefinedAffiliations: false,
   canEnterManually: true,
+  defaultSearchExternal: false,
 };
 
 export function WTFPersonLinkField({
@@ -400,6 +404,7 @@ export function WTFPersonLinkField({
   emptyMessage,
   hasPredefinedAffiliations,
   canEnterManually,
+  defaultSearchExternal,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -453,6 +458,7 @@ export function WTFPersonLinkField({
       setAutoSort={setAutoSort}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
       canEnterManually={canEnterManually}
+      defaultSearchExternal={defaultSearchExternal}
     />
   );
 }
@@ -466,6 +472,7 @@ WTFPersonLinkField.propTypes = {
   emptyMessage: PropTypes.string,
   hasPredefinedAffiliations: PropTypes.bool,
   canEnterManually: PropTypes.bool,
+  defaultSearchExternal: PropTypes.bool,
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -476,4 +483,5 @@ WTFPersonLinkField.defaultProps = {
   emptyMessage: null,
   hasPredefinedAffiliations: false,
   canEnterManually: true,
+  defaultSearchExternal: false,
 };

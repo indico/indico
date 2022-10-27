@@ -29,6 +29,7 @@
             emptyMessage: {{ field.empty_message | default(none) | tojson }},
             hasPredefinedAffiliations: {{ field.has_predefined_affiliations | tojson }},
             canEnterManually: {{ field.can_enter_manually | tojson }},
+            defaultSearchExternal: {{ field.default_search_external | tojson }},
             sessionUser: Indico.User
         });
     </script>
