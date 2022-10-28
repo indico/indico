@@ -39,9 +39,7 @@
         <div class="toolbars space-after">
             <div class="toolbar">
                 <div class="group">
-                    <button class="icon-checkbox-checked i-button arrow js-dropdown"
-                            data-toggle="dropdown">
-                    </button>
+                    <button class="icon-checkbox-checked i-button arrow js-dropdown" data-toggle="dropdown"></button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="#" data-select-all="#sessions-wrapper input.select-row">
@@ -56,7 +54,7 @@
                     </ul>
                 </div>
                 <div class="group hide-if-locked">
-                    <button id="add-new-session" 
+                    <button id="add-new-session"
                             class="i-button highlight icon-plus"
                             data-href="{{ url_for('.create_session', event) }}"
                             data-title="{% trans %}Add new session{% endtrans %}"

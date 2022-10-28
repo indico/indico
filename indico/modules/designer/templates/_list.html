@@ -168,8 +168,7 @@
                                                     {{ 'disabled' if not event.registration_forms }}"
                                     title="{{ print_title if event.registration_forms
                                                 else _('There are no registration forms in this event') }}"
-                                    data-toggle="dropdown">
-                            </button>
+                                    data-toggle="dropdown"></button>
                             <ul class="i-dropdown">
                                 {% for regform in event.registration_forms %}
                                     <li>

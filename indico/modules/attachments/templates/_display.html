@@ -10,9 +10,7 @@
                     {{ template_hook('event-display-after-attachment', attachment=attachment, top_level=true, has_label=true) }}
                 {%- endfor -%}
             {% else %}
-                <button class="i-button arrow"
-                        data-toggle="dropdown">
-                </button>
+                <button class="i-button arrow" data-toggle="dropdown"></button>
                 <ul class="i-dropdown">
                     {%- for attachment in folder.attachments -%}
                         {% set previewable = (attachment.file and attachment.file.is_previewable and not g.static_site) or false %}

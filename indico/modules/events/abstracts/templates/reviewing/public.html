@@ -97,9 +97,7 @@
             {% endif %}
             {% if indico_config.LATEX_ENABLED and abstract.can_see_reviews(session.user) %}
                 <div class="group">
-                    <button class="i-button arrow icon-file-pdf js-dropdown"
-                            data-toggle="dropdown">
-                    </button>
+                    <button class="i-button arrow icon-file-pdf js-dropdown" data-toggle="dropdown"></button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="{{ url_for('.display_abstract_pdf_export', abstract) }}">PDF</a>
