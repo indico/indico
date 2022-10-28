@@ -95,6 +95,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       } else {
         // in all other cases we want to use html
         combineNotes(resp, 'html');
+        setRenderMode('html');
       }
       setLoading(false);
     } else {
