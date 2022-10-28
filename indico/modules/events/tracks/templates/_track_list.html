@@ -13,8 +13,7 @@
                                 data-href="{{ url_for('tracks.edit_track', track) }}"
                                 data-title='{% trans title=track.title %}Edit track "{{ title }}"{% endtrans %}'
                                 data-update="#track-list-container"
-                                data-ajax-dialog>
-                        </button>
+                                data-ajax-dialog></button>
                     </div>
                     <div class="group">
                         {% if track.can_delete(session.user) %}
@@ -24,12 +23,10 @@
                                     data-confirm="{% trans %}Are you sure you want to delete this track?{% endtrans %}"
                                     data-title='{% trans title=track.title %}Delete track "{{ title }}"{% endtrans %}'
                                     data-method="DELETE"
-                                    data-update="#track-list-container">
-                            </button>
+                                    data-update="#track-list-container"></button>
                         {% else %}
                             <button class="i-button danger text-color icon-remove disabled"
-                                    title="{% trans %}This track cannot be deleted because it contains accepted abstracts{% endtrans %}">
-                            </button>
+                                    title="{% trans %}This track cannot be deleted because it contains accepted abstracts{% endtrans %}"></button>
                         {% endif %}
                     </div>
                 </div>
@@ -74,8 +71,7 @@
                                 data-href="{{ url_for('tracks.edit_track_group', group) }}"
                                 data-title='{% trans title=group.title %}Edit track group "{{ title }}"{% endtrans %}'
                                 data-update="#track-list-container"
-                                data-ajax-dialog>
-                        </button>
+                                data-ajax-dialog></button>
                     </div>
                     <div class="group">
                         <button class="i-button danger text-color icon-remove js-delete-item"
@@ -84,8 +80,7 @@
                                 data-confirm="{% trans %}Are you sure you want to delete this track group?{% endtrans %}"
                                 data-title='{% trans title=group.title %}Delete track "{{ title }}"{% endtrans %}'
                                 data-method="DELETE"
-                                data-update="#track-list-container">
-                        </button>
+                                data-update="#track-list-container"></button>
                     </div>
                 </div>
             </div>
@@ -95,7 +90,7 @@
                 {{ group.description }}
             </div>
         {% endif %}
-            <div  class="embedded-track-list">
+            <div class="embedded-track-list">
                 <ul class="i-box-group vert track-list"">
                     <div class="no-tracks-message">
                         <em>{% trans %}No tracks have been added yet.{% endtrans %}</em>

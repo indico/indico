@@ -41,21 +41,19 @@
                                             {% if vc_room.status.name != 'deleted' %}
                                                 <button class="i-button icon-loop js-vcroom-refresh hide-if-locked"
                                                         title="{% trans %}Check videoconference status{% endtrans %}"
-                                                        data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}">
-                                                </button>
+                                                        data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></button>
                                                 <button class="i-button icon-edit js-vcroom-edit hide-if-locked"
                                                         data-href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"
                                                         title="{% trans %}Edit{% endtrans %}"
                                                         data-title="{% trans %}Edit room{% endtrans %}"
                                                         data-ajax-dialog
-                                                        data-reload-after>
-                                                </button>
+                                                        data-reload-after></button>
                                             {% endif %}
-                                            <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}"
-                                               data-num-events="{{ vc_room.events | count }}"
-                                               data-extra-msg="{{ vc_room.plugin.get_extra_delete_msg(vc_room, event_vc_room) if vc_room.plugin else '' }}"
-                                               class="i-button icon-remove js-vcroom-remove hide-if-locked"
-                                               title="{% trans %}Detach{% endtrans %}"></a>
+                                            <button data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}"
+                                                    data-num-events="{{ vc_room.events | count }}"
+                                                    data-extra-msg="{{ vc_room.plugin.get_extra_delete_msg(vc_room, event_vc_room) if vc_room.plugin else '' }}"
+                                                    class="i-button icon-remove js-vcroom-remove hide-if-locked"
+                                                    title="{% trans %}Detach{% endtrans %}"></button>
                                             {% if vc_room.status.name != 'deleted' and vc_room.plugin %}
                                                 {{ vc_room.plugin.render_buttons(vc_room, event_vc_room) | safe }}
                                             {% endif %}

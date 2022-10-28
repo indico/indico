@@ -69,15 +69,15 @@
                             {{ render_attachment_info(sess) }}
                             <td class="i-table">
                                 <div class="group right entry-action-buttons vertical-aligner">
-                                    <button class="i-button color-button
-                                                    {{ 'palette-picker-trigger' if not event.is_locked else 'disabled' }}"
-                                            style="{{ sess.colors.css }}"
-                                            data-method="PATCH"
-                                            data-href="{{ url_for('.session_rest', sess) }}"
-                                            data-colors="{{ default_colors | tojson | forceescape }}"
-                                            data-color="{{ sess.colors | tojson | forceescape }}"
-                                            title="{% if not event.is_locked %}{% trans %}Change color{% endtrans %}{% endif %}">
-                                    </button>
+                                    <a href=""
+                                       class="i-button color-button
+                                              {{ 'palette-picker-trigger' if not event.is_locked else 'disabled' }}"
+                                       style="{{ sess.colors.css }}"
+                                       data-method="PATCH"
+                                       data-href="{{ url_for('.session_rest', sess) }}"
+                                       data-colors="{{ default_colors | tojson | forceescape }}"
+                                       data-color="{{ sess.colors | tojson | forceescape }}"
+                                       title="{% if not event.is_locked %}{% trans %}Change color{% endtrans %}{% endif %}"></a>
                                     <a href="#" class="i-link highlight icon-edit edit-session hide-if-locked"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"

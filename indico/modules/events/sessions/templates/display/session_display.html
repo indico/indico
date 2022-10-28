@@ -48,15 +48,13 @@
                         data-title="{% trans %}Edit session{% endtrans %}"
                         data-href="{{ url_for('.modify_session', sess) }}"
                         data-ajax-dialog
-                        data-reload-after>
-                </button>
-                <button class="i-button icon-shield" 
+                        data-reload-after></button>
+                <button class="i-button icon-shield"
                         title="{% trans %}Manage protection{% endtrans %}"
                         data-title="{% trans title=sess.title %}Manage protection{% endtrans %}"
                         data-href="{{ url_for('.session_protection', sess) }}"
                         data-ajax-dialog
-                        data-reload-after>
-                </button>
+                        data-reload-after></button>
                 <a href="{{ url_for('timetable.manage_session', sess) }}"
                    class="i-button icon-time"
                    title="{% trans %}Manage timetable{% endtrans %}"></a>
@@ -130,13 +128,13 @@
     <section>
         <div class="item-subitems toolbar">
             {% if sess.contributions %}
-                <button class="i-button icon-list js-switch-view" 
+                <button class="i-button icon-list js-switch-view"
                         data-show="session-contrib-list">
                     {%- trans %}Contribution list{% endtrans -%}
                 </button>
             {% endif %}
             {% if not sess.is_poster %}
-                <button class="i-button icon-time highlight js-switch-view" 
+                <button class="i-button icon-time highlight js-switch-view"
                         data-show="session-timetable">
                     {%- trans %}Timetable{% endtrans -%}
                 </button>
