@@ -101,6 +101,8 @@ class PersonLinkListFieldBase(PrincipalListField):
 
     @property
     def default_search_external(self):
+        if not self.event:
+            return False
         return persons_settings.get(self.event, 'default_search_external')
 
     @property
