@@ -125,8 +125,7 @@
                     title="{% trans %}Edit contribution{% endtrans %}"
                     data-href="{{ url_for('contributions.manage_update_contrib', contribution, standalone=true) }}"
                     data-ajax-dialog
-                    data-reload-after>
-            </button>
+                    data-reload-after></button>
         {%- endif %}
         {{ template_hook('url-shortener', target=url_for('contributions.display_contribution', contribution),
                          classes='i-button icon-link') }}

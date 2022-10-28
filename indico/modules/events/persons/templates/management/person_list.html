@@ -10,9 +10,8 @@
 
 {% block title_actions %}
     {%- if event.type == 'conference' -%}
-        <button class="i-button borderless icon-settings arrow js-dropdown"
-                data-toggle="dropdown">
-            {% trans %}Settings{% endtrans %}
+        <button class="i-button borderless icon-settings arrow js-dropdown" data-toggle="dropdown">
+            {%- trans %}Settings{% endtrans -%}
         </button>
         <ul class="i-dropdown">
             <li>
@@ -23,7 +22,8 @@
                    data-href="{{ url_for('.manage_person_lists', event) }}"
                    data-qtip-position="right"
                    data-ajax-dialog>
-                    {% trans %}Person lists{% endtrans %}</a>
+                    {% trans %}Person lists{% endtrans %}
+                </a>
             </li>
         </ul>
     {%- endif -%}
