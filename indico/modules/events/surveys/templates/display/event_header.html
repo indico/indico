@@ -14,10 +14,10 @@
                         <div class="event-service-toolbar toolbar right">
                             <div class="group">
                                 {% if was_survey_submitted(survey) %}
-                                    <a class="i-button i-button-small event-service-right-button highlight disabled"
-                                       title="{% trans %}You already submitted this survey.{% endtrans %}">
+                                    <button class="i-button i-button-small event-service-right-button highlight disabled"
+                                            title="{% trans %}You already submitted this survey.{% endtrans %}">
                                         <strong>{% trans %}Fill out{% endtrans %}</strong>
-                                    </a>
+                                    </button>
                                 {% else %}
                                     <a href="{{ url_for('surveys.display_survey_form', survey) }}"
                                        class="i-button i-button-small event-service-right-button highlight">

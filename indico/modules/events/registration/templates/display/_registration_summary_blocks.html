@@ -45,17 +45,17 @@
                             {% trans %}This will hide this participant from the list of participants regardless of other settings{% endtrans %}
                         {%- endif -%}
                     {%- endset %}
-                    <a class="i-button {% if registration.participant_hidden %}icon-eye{% else %}icon-eye-blocked{% endif %}"
-                       data-update="#registration-details"
-                       data-method="POST"
-                       data-href="{{ url_for('.hide_registration', registration) }}"
-                       title="{{ tooltip_text }}">
+                    <button class="i-button {% if registration.participant_hidden %}icon-eye{% else %}icon-eye-blocked{% endif %}"
+                            data-update="#registration-details"
+                            data-method="POST"
+                            data-href="{{ url_for('.hide_registration', registration) }}"
+                            title="{{ tooltip_text }}">
                         {%- if registration.participant_hidden -%}
                             {% trans %}Show participant{% endtrans %}
                         {%- else -%}
                             {% trans %}Hide participant{% endtrans %}
                         {%- endif -%}
-                    </a>
+                    </button>
                 </div>
             {% else %}
                 <div id="registration-summary-consent-to-publish"

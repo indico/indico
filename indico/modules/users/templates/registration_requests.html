@@ -25,16 +25,16 @@
                     <td>{{ req.user_data.affiliation }}</td>
                     <td>{{ req.comment }}</td>
                     <td>
-                        <a href="#" class="i-button danger right js-process-request"
-                           data-href="{{ url_for('.reject_registration_request', req) }}"
-                           data-method="POST">
-                           {% trans %}Reject{% endtrans %}
-                        </a>
-                        <a href="#" class="i-button accept right js-process-request"
-                           data-href="{{ url_for('.accept_registration_request', req) }}"
-                           data-method="POST">
+                        <button class="i-button danger right js-process-request"
+                                data-href="{{ url_for('.reject_registration_request', req) }}"
+                                data-method="POST">
+                            {% trans %}Reject{% endtrans %}
+                        </button>
+                        <button class="i-button accept right js-process-request"
+                                data-href="{{ url_for('.accept_registration_request', req) }}"
+                                data-method="POST">
                             {% trans %}Accept{% endtrans %}
-                        </a>
+                        </button>
                     </td>
                 </tr>
             {%- endfor %}

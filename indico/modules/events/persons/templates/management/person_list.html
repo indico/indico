@@ -10,8 +10,9 @@
 
 {% block title_actions %}
     {%- if event.type == 'conference' -%}
-        <a class="i-button borderless icon-settings arrow js-dropdown"
-           data-toggle="dropdown">{% trans %}Settings{% endtrans %}</a>
+        <button class="i-button borderless icon-settings arrow js-dropdown" data-toggle="dropdown">
+            {%- trans %}Settings{% endtrans -%}
+        </button>
         <ul class="i-dropdown">
             <li>
                 <a href="#"
@@ -21,7 +22,8 @@
                    data-href="{{ url_for('.manage_person_lists', event) }}"
                    data-qtip-position="right"
                    data-ajax-dialog>
-                    {% trans %}Person lists{% endtrans %}</a>
+                    {% trans %}Person lists{% endtrans %}
+                </a>
             </li>
         </ul>
     {%- endif -%}
@@ -36,7 +38,7 @@
         <div class="toolbars space-after">
             <div class="toolbar hide-if-locked">
                 <div class="group">
-                    <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
+                    <button class="icon-checkbox-checked i-button arrow js-dropdown" data-toggle="dropdown"></button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="#" data-select-all="#event-participants-list input.select-row:visible:not(:disabled)">
@@ -51,20 +53,20 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <a href="#" class="i-button icon-mail highlight disabled js-requires-selected-row"
-                       data-href="{{ url_for('persons.email_event_persons', event) }}"
-                       data-title="{% trans %}Send email{% endtrans %}"
-                       data-method="POST"
-                       data-params-selector="#event-participants-list input.id-field:checkbox:checked:visible"
-                       data-ajax-dialog
-                       data-reload-after>
+                    <button class="i-button icon-mail highlight disabled js-requires-selected-row"
+                            data-href="{{ url_for('persons.email_event_persons', event) }}"
+                            data-title="{% trans %}Send email{% endtrans %}"
+                            data-method="POST"
+                            data-params-selector="#event-participants-list input.id-field:checkbox:checked:visible"
+                            data-ajax-dialog
+                            data-reload-after>
                         {%- trans %}Send emails{% endtrans -%}
-                    </a>
+                    </button>
                 </div>
                 {% if event.type != 'lecture' %}
                     <div class="group i-selection">
                         <span class="i-button label">{% trans %}Privileges{% endtrans %}</span>
-                        <a href="#" class="i-button icon-collapse arrow js-dropdown" data-toggle="dropdown"></a>
+                        <button class="i-button icon-collapse arrow js-dropdown" data-toggle="dropdown"></button>
                         <ul class="i-dropdown">
                             <li>
                                 <a href="#"
@@ -85,7 +87,7 @@
                                     {% trans %}Modification rights{% endtrans %}</a>
                             </li>
                         </ul>
-                        <a href="#" class="i-button icon-expand arrow js-dropdown" data-toggle="dropdown"></a>
+                        <button class="i-button icon-expand arrow js-dropdown" data-toggle="dropdown"></button>
                         <ul class="i-dropdown">
                             <li>
                                 <a href="#"

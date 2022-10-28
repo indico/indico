@@ -17,11 +17,11 @@
 
 {% block buttons %}
     {{ super() }}
-    <a href="#" class="i-button highlight"
-       data-href="{{ url_for('.open_cfp', event) }}"
-       data-method="POST"
-       data-update="#paper-page"
-       data-replace-update>
+    <button class="i-button highlight"
+            data-href="{{ url_for('.open_cfp', event) }}"
+            data-method="POST"
+            data-update="#paper-page"
+            data-replace-update>
         {%- trans %}Start now{% endtrans -%}
-    </a>
+    </button>
 {% endblock %}

@@ -183,12 +183,12 @@
                                 </a>
                             </td>
                             <td class="i-table">
-                                <a class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
-                                   style="{{ contrib.session.colors.css if contrib.session }}"
-                                   data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
-                                   data-method="PATCH"
-                                   data-contrib-id="{{ contrib.id }}"
-                                   data-selected-item-id="{{ contrib.session.id or None | tojson }}">
+                                <button class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
+                                        style="{{ contrib.session.colors.css if contrib.session }}"
+                                        data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                        data-method="PATCH"
+                                        data-contrib-id="{{ contrib.id }}"
+                                        data-selected-item-id="{{ contrib.session.id or None | tojson }}">
                                     <span class="label">
                                         {% if contrib.session %}
                                             {% trans title=contrib.session.title -%}
@@ -199,13 +199,13 @@
                                         {% endif %}
                                     </span>
                                     {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                </a>
+                                </button>
                             </td>
                             <td class="i-table">
-                                <a class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
-                                   data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
-                                   data-method="PATCH"
-                                   data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
+                                <button class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
+                                        data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                        data-method="PATCH"
+                                        data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
                                     <span class="label">
                                         {% if contrib.track %}
                                             {% if contrib.track.track_group %}
@@ -217,7 +217,7 @@
                                         {% endif %}
                                     </span>
                                     {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                </a>
+                                </button>
                             </td>
                             {{ render_attachment_info(contrib) }}
                             <td class="i-table actions-column hide-if-locked">

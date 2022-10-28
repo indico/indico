@@ -39,7 +39,7 @@
         <div class="toolbars space-after">
             <div class="toolbar">
                 <div class="group">
-                    <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
+                    <button class="icon-checkbox-checked i-button arrow js-dropdown" data-toggle="dropdown"></button>
                     <ul class="i-dropdown">
                         <li>
                             <a href="#" data-select-all="#sessions-wrapper input.select-row">
@@ -54,13 +54,14 @@
                     </ul>
                 </div>
                 <div class="group hide-if-locked">
-                    <a id="add-new-session" class="i-button highlight icon-plus"
-                       data-href="{{ url_for('.create_session', event) }}"
-                       data-title="{% trans %}Add new session{% endtrans %}"
-                       data-update="#sessions-wrapper"
-                       data-ajax-dialog>
+                    <button id="add-new-session"
+                            class="i-button highlight icon-plus"
+                            data-href="{{ url_for('.create_session', event) }}"
+                            data-title="{% trans %}Add new session{% endtrans %}"
+                            data-update="#sessions-wrapper"
+                            data-ajax-dialog>
                         {% trans %}Add new session{% endtrans %}
-                    </a>
+                    </button>
                 </div>
                 <div class="group hide-if-locked">
                     <a id="remove-selected-sessions"
@@ -75,20 +76,20 @@
                     </a>
                 </div>
                 <div class="group">
-                    <a class="i-button icon-users js-requires-selected-row disabled"
-                       data-title="{% trans %}Author list{% endtrans %}"
-                       data-href="{{ url_for('.person_list', event) }}"
-                       data-params-selector="#sessions input[name=session_id]:checkbox:checked"
-                       data-method="POST"
-                       data-ajax-dialog>
+                    <button class="i-button icon-users js-requires-selected-row disabled"
+                            data-title="{% trans %}Author list{% endtrans %}"
+                            data-href="{{ url_for('.person_list', event) }}"
+                            data-params-selector="#sessions input[name=session_id]:checkbox:checked"
+                            data-method="POST"
+                            data-ajax-dialog>
                         {%- trans %}Author list{% endtrans -%}
-                    </a>
+                    </button>
                 </div>
                 <div class="group">
-                    <a class="i-button arrow js-requires-selected-row disabled js-dropdown"
-                       data-toggle="dropdown">
+                    <button class="i-button arrow js-requires-selected-row disabled js-dropdown"
+                            data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
-                    </a>
+                    </button>
                     <ul class="i-dropdown">
                         <li>
                             <a data-href="{{ url_for('.export_pdf', event) }}"

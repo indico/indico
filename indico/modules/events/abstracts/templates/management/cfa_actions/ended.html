@@ -22,11 +22,11 @@
 {% block buttons %}
     {{ super() }}
     <div class="group">
-        <a href="#" class="i-button"
-           data-href="{{ url_for('.open_abstracts_call', event) }}"
-           data-method="POST"
-           data-confirm="{% trans %}The call for abstracts is already finished. Do you want to open it again?{% endtrans %}">
+        <button class="i-button"
+                data-href="{{ url_for('.open_abstracts_call', event) }}"
+                data-method="POST"
+                data-confirm="{% trans %}The call for abstracts is already finished. Do you want to open it again?{% endtrans %}">
             {%- trans %}Reopen now{% endtrans -%}
-        </a>
+        </button>
     </div>
 {% endblock %}

@@ -43,17 +43,18 @@
     <div class="toolbar">
         {% if sess.can_manage(session.user) -%}
             <div class="group">
-                <a href="#" class="i-button icon-edit"
-                   title="{% trans %}Edit session{% endtrans %}"
-                   data-title="{% trans %}Edit session{% endtrans %}"
-                   data-href="{{ url_for('.modify_session', sess) }}"
-                   data-ajax-dialog
-                   data-reload-after></a>
-                <a href="#" class="i-button icon-shield" title="{% trans %}Manage protection{% endtrans %}"
-                   data-title="{% trans title=sess.title %}Manage protection{% endtrans %}"
-                   data-href="{{ url_for('.session_protection', sess) }}"
-                   data-ajax-dialog
-                   data-reload-after></a>
+                <button class="i-button icon-edit"
+                        title="{% trans %}Edit session{% endtrans %}"
+                        data-title="{% trans %}Edit session{% endtrans %}"
+                        data-href="{{ url_for('.modify_session', sess) }}"
+                        data-ajax-dialog
+                        data-reload-after></button>
+                <button class="i-button icon-shield"
+                        title="{% trans %}Manage protection{% endtrans %}"
+                        data-title="{% trans title=sess.title %}Manage protection{% endtrans %}"
+                        data-href="{{ url_for('.session_protection', sess) }}"
+                        data-ajax-dialog
+                        data-reload-after></button>
                 <a href="{{ url_for('timetable.manage_session', sess) }}"
                    class="i-button icon-time"
                    title="{% trans %}Manage timetable{% endtrans %}"></a>
@@ -127,14 +128,16 @@
     <section>
         <div class="item-subitems toolbar">
             {% if sess.contributions %}
-                <a href="#" class="i-button icon-list js-switch-view" data-show="session-contrib-list">
+                <button class="i-button icon-list js-switch-view"
+                        data-show="session-contrib-list">
                     {%- trans %}Contribution list{% endtrans -%}
-                </a>
+                </button>
             {% endif %}
             {% if not sess.is_poster %}
-                <a href="#" class="i-button icon-time highlight js-switch-view" data-show="session-timetable">
+                <button class="i-button icon-time highlight js-switch-view"
+                        data-show="session-timetable">
                     {%- trans %}Timetable{% endtrans -%}
-                </a>
+                </button>
             {% endif %}
         </div>
     </section>

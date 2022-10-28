@@ -12,12 +12,12 @@
         {%- endif -%}
     {%- endset -%}
     <div class="group">
-        <a href="#" class="i-button icon-time js-abstracts-schedule-dialog"
-           data-href="{{ url_for('.schedule_abstracts_call', event) }}"
-           data-title="{{ title }}"
-           data-ajax-dialog
-           data-reload-after>
+        <button class="i-button icon-time js-abstracts-schedule-dialog"
+                data-href="{{ url_for('.schedule_abstracts_call', event) }}"
+                data-title="{{ title }}"
+                data-ajax-dialog
+                data-reload-after>
             {{- _('Reschedule') if cfa.start_dt else _('Schedule') -}}
-        </a>
+        </button>
     </div>
 {% endblock %}

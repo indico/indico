@@ -205,7 +205,7 @@
                                          management=false) %}
     <div class="toolbars space-after">
         <div class="toolbar">
-            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+            <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
             <ul class="i-dropdown">
                 <li>
                     <a href="#" data-select-all="#assignment-list input:checkbox">{% trans %}All{% endtrans %}</a>
@@ -222,9 +222,10 @@
                     data-ajax-dialog>
                 {%- trans %}Customize list{% endtrans -%}
             </button>
-            <a class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked" data-toggle="dropdown">
+            <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked"
+                    data-toggle="dropdown">
                 {%- trans %}Assign{% endtrans -%}
-            </a>
+            </button>
             <ul class="i-dropdown hide-if-locked">
                 {% if management %}
                     <li>
@@ -266,9 +267,10 @@
                     </li>
                 {% endif %}
             </ul>
-            <a class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked" data-toggle="dropdown">
+            <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked"
+                    data-toggle="dropdown">
                 {%- trans %}Unassign{% endtrans -%}
-            </a>
+            </button>
             <ul class="i-dropdown hide-if-locked">
                 {% if management %}
                     <li>
@@ -310,10 +312,10 @@
                     </li>
                 {% endif %}
             </ul>
-            <a class="i-button arrow js-dropdown icon-hammer js-requires-selected-row disabled hide-if-locked"
-               data-toggle="dropdown">
+            <button class="i-button arrow js-dropdown icon-hammer js-requires-selected-row disabled hide-if-locked"
+                    data-toggle="dropdown">
                 {%- trans %}Judge{% endtrans -%}
-            </a>
+            </button>
             <ul class="i-dropdown hide-if-locked">
                 <li>
                     <a class="js-requires-selected-row js-dialog-action"
@@ -360,15 +362,15 @@
                     data-ajax-dialog>
                      {%- trans %}Author list{% endtrans -%}
             </button>
-            <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
-               data-href="{{ url_for('.download_papers', event) }}">
+            <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+                    data-href="{{ url_for('.download_papers', event) }}">
                 {%- trans %}Download papers{% endtrans -%}
-            </a>
+            </button>
             {% if management %}
-                <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
-                   data-href="{{ url_for('.export_json', event) }}">
+                <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+                        data-href="{{ url_for('.export_json', event) }}">
                     {%- trans %}Export as JSON{% endtrans -%}
-                </a>
+                </button>
             {% endif %}
         </div>
         <div class="toolbar">

@@ -24,13 +24,13 @@
                     {%- endtrans %}
                 </div>
                 <div class="toolbar">
-                    <a href="#" class="i-button icon-mail right highlight js-requires-selected-row send-mails-btn"
-                       data-href="{{ url_for('surveys.send_links', survey) }}"
-                       data-title="{% trans %}Send survey links{% endtrans %}"
-                       data-method="POST"
-                       data-ajax-dialog>
+                    <button class="i-button icon-mail right highlight js-requires-selected-row send-mails-btn"
+                            data-href="{{ url_for('surveys.send_links', survey) }}"
+                            data-title="{% trans %}Send survey links{% endtrans %}"
+                            data-method="POST"
+                            data-ajax-dialog>
                         {%- trans %}Send links{% endtrans -%}
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -59,13 +59,13 @@
                     {% trans %}Edit settings for this survey.{% endtrans %}
                 </div>
                 <div class="toolbar">
-                    <a href="#" class="i-button icon-edit"
-                       data-href="{{ url_for('.edit_survey', survey) }}"
-                       data-title="{% trans %}Edit survey{% endtrans %}"
-                       data-ajax-dialog
-                       data-reload-after>
+                    <button class="i-button icon-edit"
+                            data-href="{{ url_for('.edit_survey', survey) }}"
+                            data-title="{% trans %}Edit survey{% endtrans %}"
+                            data-ajax-dialog
+                            data-reload-after>
                         {% trans %}Edit{% endtrans %}
-                    </a>
+                    </button>
                 </div>
             </div>
         {% endif %}
@@ -95,7 +95,7 @@
     {% if submitted_surveys %}
         <div class="toolbars space-after">
             <div class="toolbar">
-                <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                <button class="i-button icon-checkbox-checked arrow js-dropdown"  data-toggle="dropdown"></button>
                 <ul class="i-dropdown">
                     <li><a href="#" id="select-all">
                         {% trans %}All{% endtrans %}
@@ -109,9 +109,10 @@
                 <a href="{{ url_for('.survey_results', survey) }}" class="i-button icon-chart">
                     {% trans %}Results{% endtrans %}
                 </a>
-                <a class="i-button arrow js-dropdown" data-toggle="dropdown">
+                <button class="i-button arrow js-dropdown"
+                        data-toggle="dropdown">
                     {%- trans %}Export{% endtrans -%}
-                </a>
+                </button>
                 <ul class="i-dropdown">
                     <li>
                         <a href="#" data-href="{{ url_for('.export_submissions_csv', survey) }}"

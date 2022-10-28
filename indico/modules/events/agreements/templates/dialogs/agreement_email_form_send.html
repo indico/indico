@@ -14,6 +14,9 @@
     {{ form_rows(form) }}
     {% call form_footer(form) %}
         <input type="submit" class="i-button highlight big" value="{% trans %}Send{% endtrans %}">
-        <a class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+        <button class="i-button big"
+                data-button-back>
+            {% trans %}Cancel{% endtrans %}
+        </button>
     {% endcall %}
 {% endblock %}

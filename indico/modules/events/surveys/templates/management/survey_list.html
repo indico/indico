@@ -43,13 +43,13 @@
                         </a>
                     </div>
                     <div class="group hide-if-locked">
-                        <a href="#" class="i-button icon-remove danger text-color"
-                           title="{% trans %}Delete this survey{% endtrans %}"
-                           data-qtip-style="danger"
-                           data-href="{{ url_for('.delete_survey', survey) }}"
-                           data-method="POST"
-                           data-title="{% trans %}Delete survey?{% endtrans %}"
-                           data-confirm="{% trans title=survey.title %}Do you really want to delete the survey &quot;{{ title }}&quot;?{% endtrans %}"></a>
+                        <button class="i-button icon-remove danger text-color"
+                                title="{% trans %}Delete this survey{% endtrans %}"
+                                data-qtip-style="danger"
+                                data-href="{{ url_for('.delete_survey', survey) }}"
+                                data-method="POST"
+                                data-title="{% trans %}Delete survey?{% endtrans %}"
+                                data-confirm="{% trans title=survey.title %}Do you really want to delete the survey &quot;{{ title }}&quot;?{% endtrans %}"></button>
                     </div>
                 </div>
             </div>
@@ -60,12 +60,12 @@
         {%- endcall %}
     {% endfor %}
     <div class="toolbar f-j-end hide-if-locked">
-        <a href="#" class="i-button"
-           data-href="{{ url_for('.create', event) }}"
-           data-title="{% trans %}Create survey{% endtrans %}"
-           data-ajax-dialog
-           data-reload-after>
+        <button class="i-button"
+                data-href="{{ url_for('.create', event) }}"
+                data-title="{% trans %}Create survey{% endtrans %}"
+                data-ajax-dialog
+                data-reload-after>
             {% trans %}Create survey{% endtrans %}
-        </a>
+        </button>
     </div>
 {% endblock %}

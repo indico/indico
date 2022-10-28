@@ -6,6 +6,9 @@
     {{ form_row(form.body, widget_attrs={'rows': 15}) }}
     {% call form_footer(form) %}
         <input type="submit" class="i-button highlight big" value="{% trans %}Save{% endtrans %}">
-        <a class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+        <button class="i-button big"
+                data-button-back>
+            {% trans %}Cancel{% endtrans %}
+        </button>
     {% endcall %}
 {% endblock %}

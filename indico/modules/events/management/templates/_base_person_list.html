@@ -2,7 +2,8 @@
     <div class="flashed-messages"></div>
     <div>
         <div class="toolbar space-after">
-            <a class="icon-checkbox-checked i-button arrow js-dropdown hide-if-locked" href="#" data-toggle="dropdown"></a>
+            <button class="icon-checkbox-checked i-button arrow js-dropdown hide-if-locked"
+                    data-toggle="dropdown"></button>
             <ul class="i-dropdown hide-if-locked">
                 <li>
                     <a href="#" data-select-all="#person-list-table input.select-row:visible">
@@ -36,16 +37,16 @@
         </table>
     </div>
     <div class="form-group-mail hide-if-locked">
-        <a href="#" class="i-button icon-mail right highlight disabled js-requires-selected-row"
-           {% block send_email_href %}
-               data-href="{{ url_for('persons.email_event_persons', event) }}"
-           {% endblock %}
-           data-title="{% trans %}Send email{% endtrans %}"
-           data-method="POST"
-           data-params-selector="#person-list-table input[name=person_id]:checkbox:checked:visible, #person-list-table input[name=user_id]:checkbox:checked:visible"
-           data-ajax-dialog>
+        <button class="i-button icon-mail right highlight disabled js-requires-selected-row"
+                {% block send_email_href %}
+                    data-href="{{ url_for('persons.email_event_persons', event) }}"
+                {% endblock %}
+                data-title="{% trans %}Send email{% endtrans %}"
+                data-method="POST"
+                data-params-selector="#person-list-table input[name=person_id]:checkbox:checked:visible, #person-list-table input[name=user_id]:checkbox:checked:visible"
+                data-ajax-dialog>
             {%- trans %}Send emails{% endtrans -%}
-        </a>
+        </button>
     </div>
 </div>
 <script>

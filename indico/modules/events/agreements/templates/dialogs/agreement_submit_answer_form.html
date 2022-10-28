@@ -15,7 +15,10 @@
 
     {% call form_footer(form) %}
         <input type="submit" class="i-button big highlight" value="{% trans %}Submit{% endtrans %}" disabled>
-        <a href="#" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+        <button class="i-button big"
+                data-button-back>
+            {% trans %}Cancel{% endtrans %}
+        </button>
     {% endcall %}
 
     <script>

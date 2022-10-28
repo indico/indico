@@ -49,21 +49,21 @@
                     </td>
                     <td class="regform-done-footer-button">
                         {% if not registration.is_paid %}
-                            <a class="i-button big"
-                               data-update="#registration-details"
-                               data-method="POST"
-                               data-params="{{ dict(pay=1) | tojson | forceescape }}"
-                               data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                            <button class="i-button big"
+                                    data-update="#registration-details"
+                                    data-method="POST"
+                                    data-params="{{ dict(pay=1) | tojson | forceescape }}"
+                                    data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                                 {% trans %}Mark as paid{% endtrans %}
-                            </a>
+                            </button>
                         {% else %}
-                            <a class="i-button big"
-                               data-update="#registration-details"
-                               data-method="POST"
-                               data-params="{{ dict(pay=0) | tojson | forceescape }}"
-                               data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                            <button class="i-button big"
+                                    data-update="#registration-details"
+                                    data-method="POST"
+                                    data-params="{{ dict(pay=0) | tojson | forceescape }}"
+                                    data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                                 {% trans %}Mark as unpaid{% endtrans %}
-                            </a>
+                            </button>
                         {% endif %}
                     </td>
                 </tr>
@@ -98,23 +98,23 @@
     <div class="toolbar">
         {% block registration_pending_action_buttons scoped %}
             <div class="group">
-                <a class="i-button accept"
-                   data-update="#registration-details"
-                   data-method="POST"
-                   data-href="{{ url_for('.approve_registration', registration) }}"
-                   data-confirm="{% trans %}Are you sure you want to approve this registration? This will trigger a notification email.{% endtrans %}"
-                   data-title="{% trans %}Approve registration{% endtrans %}">
+                <button class="i-button accept"
+                        data-update="#registration-details"
+                        data-method="POST"
+                        data-href="{{ url_for('.approve_registration', registration) }}"
+                        data-confirm="{% trans %}Are you sure you want to approve this registration? This will trigger a notification email.{% endtrans %}"
+                        data-title="{% trans %}Approve registration{% endtrans %}">
                     {%- trans %}Approve{% endtrans -%}
-                </a>
+                </button>
             </div>
             <div class="group">
-                <a class="i-button danger"
-                   data-update="#registration-details"
-                   data-href="{{ url_for('.reject_registration', registration) }}"
-                   data-title="{% trans %}Reject registration{% endtrans %}"
-                   data-ajax-dialog>
+                <button class="i-button danger"
+                        data-update="#registration-details"
+                        data-href="{{ url_for('.reject_registration', registration) }}"
+                        data-title="{% trans %}Reject registration{% endtrans %}"
+                        data-ajax-dialog>
                     {%- trans %}Reject{% endtrans -%}
-                </a>
+                </button>
             </div>
         {% endblock %}
     </div>
@@ -140,13 +140,13 @@
                 </span>
             </div>
             <div class="group">
-                <a class="i-button"
-                   data-update="#registration-details"
-                   data-method="POST"
-                   data-params="{{ dict(pay=1) | tojson | forceescape }}"
-                   data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                <button class="i-button"
+                        data-update="#registration-details"
+                        data-method="POST"
+                        data-params="{{ dict(pay=1) | tojson | forceescape }}"
+                        data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                     {% trans %}Mark as paid{% endtrans %}
-                </a>
+                </button>
             </div>
             {% if registration.registration_form.moderation_enabled %}
                 {{ _render_reset_registration_button(registration, _('Reset approval')) }}
@@ -219,15 +219,15 @@
         {%- endif -%}
     {%- endset %}
     {% block reset_registration_button scoped %}
-        <a class="i-button warning {{ 'disabled' if conflict }}"
-           data-update="#registration-details"
-           data-method="POST"
-           data-href="{{ url_for('.reset_registration', registration) }}"
-           data-confirm="{% trans %}Are you sure you want to reset this registration status?{% endtrans %} {{ confirm_notification }}"
-           data-title="{{ action_text }}"
-            {% if conflict %}title="{% trans %}There is another valid registration for this user so it cannot be restored.{% endtrans %}"{% endif %}>
+        <button class="i-button warning {{ 'disabled' if conflict }}"
+                data-update="#registration-details"
+                data-method="POST"
+                data-href="{{ url_for('.reset_registration', registration) }}"
+                data-confirm="{% trans %}Are you sure you want to reset this registration status?{% endtrans %} {{ confirm_notification }}"
+                data-title="{{ action_text }}"
+                {% if conflict %}title="{% trans %}There is another valid registration for this user so it cannot be restored.{% endtrans %}"{% endif %}>
             {{ action_text }}
-        </a>
+        </button>
     {% endblock %}
 {% endmacro %}
 
@@ -272,12 +272,12 @@
                 {% endif %}
             </div>
             <div class="toolbar hide-if-locked">
-                <a class="i-button"
-                   data-update="#registration-details"
-                   data-method="PUT"
-                   data-href="{{ url_for('.registration_check_in', registration) }}">
+                <button class="i-button"
+                        data-update="#registration-details"
+                        data-method="PUT"
+                        data-href="{{ url_for('.registration_check_in', registration) }}">
                     {% trans %}Check-in{% endtrans %}
-                </a>
+                </button>
             </div>
         {% endif %}
     </div>
@@ -297,14 +297,14 @@
             </div>
             <div class="toolbar">
                 <div class="group">
-                    <a class="i-button"
-                       data-href="{{ url_for('.manage_withdraw_registration', registration) }}"
-                       data-update="#registration-details"
-                       data-method="POST"
-                       data-title="{% trans %}Withdraw{% endtrans %}"
-                       data-confirm="{% trans %}Are you sure that you want to withdraw this registration? This will trigger a notification email.{% endtrans %}">
+                    <button class="i-button"
+                            data-href="{{ url_for('.manage_withdraw_registration', registration) }}"
+                            data-update="#registration-details"
+                            data-method="POST"
+                            data-title="{% trans %}Withdraw{% endtrans %}"
+                            data-confirm="{% trans %}Are you sure that you want to withdraw this registration? This will trigger a notification email.{% endtrans %}">
                         {% trans %}Withdraw{% endtrans %}
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>

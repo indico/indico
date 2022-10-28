@@ -20,10 +20,10 @@
 {% block buttons %}
     {{ super() }}
     <div class="group">
-        <a href="#" class="i-button highlight"
-           data-href="{{ url_for('.open_abstracts_call', event) }}"
-           data-method="POST">
+        <button class="i-button highlight"
+                data-href="{{ url_for('.open_abstracts_call', event) }}"
+                data-method="POST">
             {%- trans %}Start now{% endtrans -%}
-        </a>
+        </button>
     </div>
 {% endblock %}

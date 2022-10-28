@@ -93,9 +93,9 @@ export default function EditableTypeDashboard() {
               }
               description={Translate.string('Toggle whether users can submit new editables')}
             >
-              <a className="i-button highlight" onClick={toggleSubmission}>
+              <button className="i-button highlight" onClick={toggleSubmission} type="button">
                 {submissionEnabled ? Translate.string('Close now') : Translate.string('Start now')}
-              </a>
+              </button>
             </Section>
             <Section
               icon="edit"
@@ -106,9 +106,9 @@ export default function EditableTypeDashboard() {
               }
               description={Translate.string('Toggle whether editors can review submissions')}
             >
-              <a className="i-button highlight" onClick={toggleEditing}>
+              <button className="i-button highlight" onClick={toggleEditing} type="button">
                 {editingEnabled ? Translate.string('Close now') : Translate.string('Start now')}
-              </a>
+              </button>
             </Section>
           </div>
           <div className="action-box">
@@ -148,12 +148,16 @@ export default function EditableTypeDashboard() {
                 onClick={!anonymousTeamSaving ? toggleAnonymousTeam : null}
                 label={Translate.string('Keep editing team members anonymous')}
               />
-              <a className="i-button icon-mail" onClick={contactEditingTeam}>
+              <button className="i-button icon-mail" onClick={contactEditingTeam} type="button">
                 <Translate>Contact</Translate>
-              </a>
-              <a className="i-button icon-users" onClick={() => setEditorManagerVisible(true)}>
+              </button>
+              <button
+                className="i-button icon-users"
+                onClick={() => setEditorManagerVisible(true)}
+                type="button"
+              >
                 <Translate>Manage team</Translate>
-              </a>
+              </button>
               {editorManagerVisible && (
                 <TeamManager editableType={type} onClose={() => setEditorManagerVisible(false)} />
               )}
