@@ -41,6 +41,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.logs import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
@@ -474,9 +475,17 @@ class RHManagePersonLists(RHManageEventBase):
     """Dialog to configure person list settings."""
 
     def _process(self):
-        form = ManagePersonListsForm(obj=FormDefaults(**persons_settings.get_all(self.event)))
+        current_settings = persons_settings.get_all(self.event)
+        form = ManagePersonListsForm(obj=FormDefaults(**current_settings))
         if form.validate_on_submit():
             persons_settings.set_multi(self.event, form.data)
+            new_settings = persons_settings.get_all(self.event)
             flash(_('Person lists settings changed successfully'), 'success')
+            changes = {k: (v, current_settings[k]) for k, v in new_settings.items() if v != current_settings[k]}
+            if changes:
+                log_fields = {'disallow_custom_persons': 'Disallow custom persons',
+                              'default_search_external': 'Include users with no Indico account by default'}
+                self.event.log(EventLogRealm.management, LogKind.change, 'Persons', 'Settings updated', session.user,
+                               data={'Changes': make_diff_log(changes, log_fields)})
             return jsonify_data()
         return jsonify_form(form)
