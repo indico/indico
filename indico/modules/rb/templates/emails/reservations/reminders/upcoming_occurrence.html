@@ -34,12 +34,12 @@
     {% trans %}Reason:{% endtrans %} <strong>{{ reservation.booking_reason }}</strong><br>
     <br>
     {%- if reservation.repeat_frequency.name == 'NEVER' -%}
-        {% trans link='<a href="{{ reservation.external_details_url }}">'|safe endlink='</a>'|safe %}
+        {% trans link='<a href="{{ reservation.external_details_url }}">'|safe, endlink='</a>'|safe %}
             If you do not need to use the room, please
             {{ link }}cancel the reservation in Indico{{ endlink }}.
         {%- endtrans -%}
     {%- else -%}
-        {% trans link='<a href="{{ occurrence.external_cancellation_url }}">'|safe endlink='</a>'|safe %}
+        {% trans link='<a href="{{ occurrence.external_cancellation_url }}">'|safe, endlink='</a>'|safe %}
             If you do not need to use the room, please
             {{ link }}cancel the occurrence in Indico{{ endlink }}.
         {%- endtrans -%}
