@@ -583,7 +583,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         data.update({
             '_fossil': self.fossils_mapping['event'].get(self._detail_level),
             'categoryId': event.category_id,
-            'category': event.category.title,
+            'category': event.category.title if event.category else None,
             'note': build_note_api_data(event.note),
             'roomFullname': event.room_name,
             'url': event.external_url,
@@ -598,21 +598,23 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'organizer': event.organizer_info,
         })
 
-        event_category_path = event.category.chain
-        visibility = {'id': '', 'name': 'Everywhere'}
-        if event.visibility is None:
-            pass  # keep default
-        elif event.visibility == 0:
-            visibility['name'] = 'Nowhere'
-        elif event.visibility:
-            try:
-                path_segment = event_category_path[-event.visibility]
-            except IndexError:
-                pass
-            else:
-                visibility['id'] = path_segment['id']
-                visibility['name'] = path_segment['title']
-        data['visibility'] = visibility
+        if event.is_unlisted:
+            data['visibility'] = {'id': '', 'name': 'Nowhere (unlisted)'}
+        else:
+            visibility = {'id': '', 'name': 'Everywhere'}
+            if event.visibility is None:
+                pass  # keep default
+            elif event.visibility == 0:
+                visibility['name'] = 'Nowhere'
+            elif event.visibility:
+                try:
+                    path_segment = event.category.chain[-event.visibility]
+                except IndexError:
+                    pass
+                else:
+                    visibility['id'] = path_segment['id']
+                    visibility['name'] = path_segment['title']
+            data['visibility'] = visibility
 
         if can_manage:
             data['allowed'] = self._serialize_access_list(event)
