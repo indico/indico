@@ -4,18 +4,19 @@
 {% set address = event.address %}
 {% set location = event.venue_name %}
 {% set room = event.room_name %}
+{% set label = ' {%s}'|format(event.label.title) if event.label else '' %}
 
 
 {% block subject -%}
-    [{% trans %}Event reminder{% endtrans %}] {{ event.title }} ({{ event.start_dt | format_datetime('short', timezone=event.tzinfo) }} {{ event.timezone }})
+    [{% trans %}Event reminder{% endtrans %}] {{ event.title }}{{ label }} ({{ event.start_dt | format_datetime('short', timezone=event.tzinfo) }} {{ event.timezone }})
 {%- endblock %}
 {% block header %}{% endblock %}
 {% block footer_url %}{{ url }}{% endblock %}
 
 
 {% block body -%}
-{% trans title=event.title, start=event.start_dt|format_datetime(timezone=event.tzinfo), tz=event.timezone -%}
-    Please note that the event "{{ title }}" will start on {{ start }} ({{ tz }}).
+{%- trans title=event.title, start=event.start_dt|format_datetime(timezone=event.tzinfo), tz=event.timezone -%}
+    Please note that the event "{{ title }}"{{ label }} will start on {{ start }} ({{ tz }}).
 {%- endtrans %}
 
 {%- if location or room %}

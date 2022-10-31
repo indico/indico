@@ -11,6 +11,7 @@ import pytest
 
 from indico.modules.events import Event
 from indico.modules.events.models.events import EventType
+from indico.modules.events.models.labels import EventLabel
 from indico.util.date_time import now_utc
 
 
@@ -33,6 +34,19 @@ def create_event(dummy_user, dummy_category, db):
         return event
 
     return _create_event
+
+
+@pytest.fixture
+def create_label(db):
+    """Return a callable which lets you create dummy labels."""
+
+    def _create_label(title, color='red'):
+        label = EventLabel(title=title, color=color)
+        db.session.add(label)
+        db.session.flush()
+        return label
+
+    return _create_label
 
 
 @pytest.fixture

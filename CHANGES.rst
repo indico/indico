@@ -22,6 +22,8 @@ Improvements
 - Allow taking minutes in markdown (:issue:`3386`, :pr:`5500`, thanks :user:`Leats`)
 - Add setting to preselect "Include users with no Indico account" when adding
   authors/speakers (:pr:`5553`)
+- Include event label in email reminders (:issue:`5554`, :pr:`5556`,
+  thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^
