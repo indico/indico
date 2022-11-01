@@ -17,14 +17,24 @@ from indico.web.flask.templating import get_template_module
 pytest_plugins = 'indico.modules.events.timetable.testing.fixtures'
 
 
-@pytest.mark.parametrize(('with_label', 'snapshot_filename'), (
-    (False, 'event_reminder.txt'),
-    (True, 'event_reminder_label.txt')
+@pytest.mark.parametrize(('with_label', 'venue', 'room', 'address', 'snapshot_filename'), (
+    (True, '', '', '', 'event_reminder_label.txt'),
+    (False, '', '', '', 'event_reminder.txt'),
+    (False, 'Home', '', '', 'event_reminder_v.txt'),
+    (False, '', 'Bed', '', 'event_reminder_r.txt'),
+    (False, '', '', 'Some\nWhere', 'event_reminder_a.txt'),
+    (False, 'Home', 'Bed', '', 'event_reminder_vr.txt'),
+    (False, '', 'Bed', 'Some\nWhere', 'event_reminder_ra.txt'),
+    (False, 'Home', '', 'Some\nWhere', 'event_reminder_va.txt'),
+    (False, 'Home', 'Bed', 'Some\nWhere', 'event_reminder_vra.txt'),
 ))
 def test_event_reminder_email_plaintext(snapshot, create_contribution, create_entry, create_event, create_label,
-                                        with_label, snapshot_filename):
+                                        with_label, venue, room, address, snapshot_filename):
     event = create_event(start_dt=datetime(2022, 11, 11, 13, 37),
                          end_dt=datetime(2022, 11, 11, 23, 37), title='Baking with Cats')
+    event.venue_name = venue
+    event.room_name = room
+    event.address = address
     c1 = create_contribution(event, 'Kneading Dough', timedelta(minutes=23))
     c2 = create_contribution(event, 'Pure Bread Cats', timedelta(minutes=40))
     create_entry(c1, datetime(2022, 11, 11, 13, 37))

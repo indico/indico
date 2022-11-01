@@ -20,9 +20,10 @@
 {%- endtrans %}
 
 {%- if location or room %}
-    {% trans loc=render_location() %}It will take place at {{ loc }}{% endtrans %}
+{% trans loc=render_location() %}It will take place at {{ loc }}{% endtrans %}
 {%- elif address %}
-    {% trans %}It will take place at the following address:{% endtrans %}
+{% trans %}It will take place at the following address:{% endtrans %}
+
     {{ address | trim | indent }}
 {%- endif %}
 
@@ -81,8 +82,8 @@
 {%- endmacro -%}
 
 {%- macro render_address() -%}
-    {%- if address -%}
-    {% trans %}Address:{% endtrans %}
+    {%- if address %}
+{% trans %}Address:{% endtrans %}
 
     {{ address | trim | indent }}
     {%- endif -%}

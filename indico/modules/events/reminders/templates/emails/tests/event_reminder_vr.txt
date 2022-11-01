@@ -1,0 +1,22 @@
+Please note that the event "Baking with Cats" will start on 11 Nov 2022, 13:37 (UTC).
+It will take place at Home (Bed).
+
+You can access the full event here:
+http://localhost/
+
+
+Note
+----
+Meow.
+Nyah!
+
+
+Agenda for Baking with Cats
+---------------------------
+
+- [13:37 - 14:00] Kneading Dough
+- [15:50 - 16:30] Pure Bread Cats
+
+--
+Indico :: Email Notifier
+http://localhost/
