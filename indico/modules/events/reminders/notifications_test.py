@@ -8,6 +8,7 @@
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from indico.testing.util import assert_email_snapshot
 from indico.web.flask.templating import get_template_module
 
 
@@ -26,4 +27,4 @@ def test_event_reminder_email_plaintext(snapshot, create_contribution, create_en
                                    event=event, url='http://localhost/', with_description=True,
                                    note='Meow.\nNyah!', with_agenda=True, agenda=agenda)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
-    snapshot.assert_match(template.get_body(), 'event_reminder.txt')
+    assert_email_snapshot(snapshot, template, 'event_reminder.txt')
