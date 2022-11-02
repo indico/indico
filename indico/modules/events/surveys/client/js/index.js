@@ -67,7 +67,7 @@ import 'chartist/dist/chartist.css';
   }
 
   function setupSurveyScheduleWindows() {
-    $('a.js-survey-schedule-dialog').on('click', function(evt) {
+    $('.js-survey-schedule-dialog').on('click', function(evt) {
       evt.preventDefault();
       ajaxDialog({
         url: build_url($(this).data('href')),

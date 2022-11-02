@@ -31,7 +31,7 @@ import setupRegformSubmission from './form_submission';
   });
 
   function setupRegistrationFormScheduleDialogs() {
-    $('a.js-regform-schedule-dialog').on('click', function(e) {
+    $('.js-regform-schedule-dialog').on('click', function(e) {
       e.preventDefault();
       ajaxDialog({
         url: $(this).data('href'),
