@@ -59,8 +59,8 @@
             {%- endif %}
             {% if sess.can_manage(session.user, 'coordinate') -%}
                 <a href="{{ url_for('timetable.manage_session', sess) }}"
-                    class="i-button icon-time"
-                    title="{% trans %}Manage timetable{% endtrans %}"></a>
+                   class="i-button icon-time"
+                   title="{% trans %}Manage timetable{% endtrans %}"></a>
             {%- endif %}
         </div>
         <div class="group">
