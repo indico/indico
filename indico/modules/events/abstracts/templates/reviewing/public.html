@@ -1,5 +1,6 @@
 {% from 'events/abstracts/reviewing/_common.html' import render_tracks, render_track %}
 {% from 'events/reviews/_common.html' import render_edited_hint, render_user_avatar, render_summary_state %}
+{% from 'events/_affiliation.html' import render_affiliation %}
 
 
 {% macro render_abstract_info(abstract) %}
@@ -316,7 +317,7 @@
                             {{ user.full_name }}
                             {% if user.affiliation %}
                                 <span class="affiliation">
-                                    <span class="text">({{ user.affiliation }})</span>
+                                    <span class="text">({{ render_affiliation(user) }})</span>
                                 </span>
                             {% endif %}
                         </span>
@@ -341,7 +342,7 @@
                             {{ user.full_name }}
                             {% if user.affiliation %}
                                 <span class="affiliation">
-                                    <span class="text">({{ user.affiliation }})</span>
+                                    <span class="text">({{ render_affiliation(user) }})</span>
                                 </span>
                             {% endif %}
                         </span>
@@ -366,7 +367,7 @@
                             {{ user.full_name }}
                             {% if user.affiliation %}
                                 <span class="affiliation">
-                                    <span class="text">({{ user.affiliation }})</span>
+                                    <span class="text">({{ render_affiliation(user) }})</span>
                                 </span>
                             {% endif %}
                         </span>

@@ -3,6 +3,7 @@
 {% from 'events/contributions/display/_contribution_list.html' import render_contribution_list %}
 {% from 'events/display/common/_conferences.html' import render_attachments %}
 {% from 'events/display/indico/_common.html' import render_location, render_users %}
+{% from 'events/_affiliation.html' import render_affiliation %}
 {% from 'message_box.html' import message_box %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
@@ -98,7 +99,11 @@
                                     {% else %}
                                         {{ convener.full_name }}
                                     {% endif %}
-                                    ({{ convener.affiliation }})
+                                    {% if convener.affiliation %}
+                                        <span class="affiliation">
+                                            <span class="text">({{ render_affiliation(convener) }})</span>
+                                        </span>
+                                    {% endif %}
                                 </li>
                             {%- else -%}
                                 <li>{% trans %}There are no conveners in this block{% endtrans %}</li>

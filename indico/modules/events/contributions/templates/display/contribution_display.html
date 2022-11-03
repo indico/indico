@@ -4,6 +4,7 @@
 {% from 'events/display/indico/_common.html' import render_location, render_users, render_speakers %}
 {% from 'events/papers/_contributions.html' import render_paper_section, render_editables_section, render_proceedings_section %}
 {% from 'events/timetable/display/indico/_common.html' import render_references %}
+{% from 'events/_affiliation.html' import render_affiliation %}
 {% from 'message_box.html' import message_box %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
@@ -40,7 +41,7 @@
                 {% endif %}
                 {% if user_data.affiliation -%}
                     <span class="affiliation">
-                        <span class="text">({{ user_data.affiliation }})</span>
+                        <span class="text">({{ render_affiliation(user_data) }})</span>
                     </span>
                 {%- endif %}
             </span>

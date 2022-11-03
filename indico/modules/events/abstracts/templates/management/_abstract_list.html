@@ -1,7 +1,7 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
-{% from 'events/management/_affiliation.html' import render_affiliation %}
 {% from 'events/management/_lists.html' import render_num_reviews_tooltip %}
+{% from 'events/_affiliation.html' import render_affiliation %}
 
 {% macro _get_track_full_title(track, searchable=false) -%}
     {% if track.code -%}
