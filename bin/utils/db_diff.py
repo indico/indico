@@ -112,7 +112,7 @@ def main(dbname, verbose, reverse):
     _checked_call(verbose, ['createdb', '-T', 'indico_template', temp_dbname])
     try:
         env_override = {'INDICO_CONF_OVERRIDE': repr({'SQLALCHEMY_DATABASE_URI': _build_conn_string(temp_dbname)})}
-        _checked_call(verbose, ['indico', 'db', 'prepare'], env=env_override)
+        _checked_call(verbose, ['indico', 'db', 'prepare', '--force'], env=env_override)
 
         # create SQLAlchemy engines/connections for base and target db
         base_eng = create_engine(_build_conn_string(temp_dbname))

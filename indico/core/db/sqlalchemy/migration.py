@@ -81,11 +81,11 @@ def _require_encoding(encoding):
 def prepare_db(empty=False, root_path=None, verbose=True, force=False):
     """Initialize an empty database (create tables, set alembic rev to HEAD)."""
     if not _require_pg_version(13, force=force):
-        return
+        return False
     if not _require_encoding('UTF8'):
-        return
+        return False
     if not _require_extensions('unaccent', 'pg_trgm'):
-        return
+        return False
     root_path = root_path or current_app.root_path
     tables = get_all_tables(db)
     if 'alembic_version' not in tables['public']:
@@ -116,5 +116,6 @@ def prepare_db(empty=False, root_path=None, verbose=True, force=False):
             for schema, schema_tables in sorted(tables.items()):
                 for t in schema_tables:
                     print(cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t))
-        return
+        return False
     create_all_tables(db, verbose=verbose, add_initial_data=(not empty))
+    return True

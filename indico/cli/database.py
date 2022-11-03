@@ -45,7 +45,8 @@ def cli(ctx, plugin=None, all_plugins=False):
 @click.option('--force', is_flag=True, help='Force using an older Postgres version')
 def prepare(force=False):
     """Initialize a new database (creates tables, sets alembic rev to HEAD)."""
-    return prepare_db(force=force)
+    if not prepare_db(force=force):
+        sys.exit(1)
 
 
 def _stamp(plugin=None, revision=None):
