@@ -40,6 +40,8 @@ The `management` kwarg is set to `True` if the registration was updated from the
 
 registration_deleted = _signals.signal('registration-deleted', '''
 Called when a registration is removed. The `sender` is the `Registration` object.
+The `permanent` kwarg indicates whether the registration is being permanently deleted from the database,
+e.g. due to it exceeding its retention period.
 ''')
 
 registration_form_wtform_created = _signals.signal('registration_form_wtform_created', '''

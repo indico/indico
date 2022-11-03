@@ -259,7 +259,7 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
     def _process(self):
         for registration in self.registrations:
             registration.is_deleted = True
-            signals.event.registration_deleted.send(registration)
+            signals.event.registration_deleted.send(registration, permanent=False)
             logger.info('Registration %s deleted by %s', registration, session.user)
             registration.log(EventLogRealm.management, LogKind.negative, 'Registration',
                              f'Registration deleted: {registration.full_name}',

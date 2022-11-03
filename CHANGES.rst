@@ -50,6 +50,8 @@ Internal Changes
   reply-to addresses for these emails (:pr:`5501`)
 - Deleting a session no longer leaves orphaned session blocks (:pr:`5533`,
   thanks :user:`omegak`)
+- Indicate in the ``registration_deleted`` signal whether it's a permanent deletion
+  from the database or just a soft-deletion (:pr:`5559`)
 
 
 Version 3.2

@@ -9,6 +9,7 @@ from collections import defaultdict
 
 from celery.schedules import crontab
 
+from indico.core import signals
 from indico.core.celery import celery
 from indico.core.db import db
 from indico.modules.events import Event
@@ -79,6 +80,7 @@ def delete_registrations():
 
     for reg in registrations:
         logger.info('Purging registration: %r', reg)
+        signals.event.registration_deleted.send(reg, permanent=True)
         for data in reg.data:
             if data.field_data.field.field_impl.is_file_field:
                 _delete_file(data)
