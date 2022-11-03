@@ -42,8 +42,8 @@
 
 {% block page_actions -%}
     <div class="toolbar">
-        {% if sess.can_manage(session.user) -%}
-            <div class="group">
+        <div class="group">
+            {% if sess.can_manage(session.user) -%}
                 <button class="i-button icon-edit"
                         title="{% trans %}Edit session{% endtrans %}"
                         data-title="{% trans %}Edit session{% endtrans %}"
@@ -56,11 +56,13 @@
                         data-href="{{ url_for('.session_protection', sess) }}"
                         data-ajax-dialog
                         data-reload-after></button>
+            {%- endif %}
+            {% if sess.can_manage(session.user, 'coordinate') -%}
                 <a href="{{ url_for('timetable.manage_session', sess) }}"
-                   class="i-button icon-time"
-                   title="{% trans %}Manage timetable{% endtrans %}"></a>
-            </div>
-        {%- endif %}
+                    class="i-button icon-time"
+                    title="{% trans %}Manage timetable{% endtrans %}"></a>
+            {%- endif %}
+        </div>
         <div class="group">
             <a href="{{ url_for('sessions.export_session_timetable', sess) }}" class="i-button icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"></a>
             {% if sess.start_dt -%}
