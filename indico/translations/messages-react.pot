@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-10-22 17:18+0200\n"
+"POT-Creation-Date: 2022-11-22 16:03+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -833,7 +833,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:118
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:271
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:112
-#: indico/web/client/js/react/components/notes/NoteEditor.jsx:158
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:159
 msgid "Save"
 msgstr ""
 
@@ -844,7 +844,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:111
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:177
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:181
 msgid "List"
 msgstr ""
 
@@ -1171,15 +1171,15 @@ msgstr ""
 msgid "Contact"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:155
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:159
 msgid "Manage team"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:163
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:167
 msgid "Editor assignment"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:171
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:175
 msgid "Allow editors to self-assign editables"
 msgstr ""
 
@@ -3354,7 +3354,7 @@ msgid "Room Booking"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:55
-#: indico/web/client/js/react/components/PersonLinkField.jsx:342
+#: indico/web/client/js/react/components/PersonLinkField.jsx:343
 #: indico/web/client/js/react/components/principals/Search.jsx:126
 msgid "Search"
 msgstr ""
@@ -4773,19 +4773,19 @@ msgid "Delete person"
 msgstr ""
 
 #: indico/web/client/js/react/components/PersonLinkField.jsx:197
-#: indico/web/client/js/react/components/PersonLinkField.jsx:315
+#: indico/web/client/js/react/components/PersonLinkField.jsx:316
 msgid "There are no persons"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:307
+#: indico/web/client/js/react/components/PersonLinkField.jsx:308
 msgid "Others"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:332
+#: indico/web/client/js/react/components/PersonLinkField.jsx:333
 msgid "Add myself"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:353
+#: indico/web/client/js/react/components/PersonLinkField.jsx:355
 msgid "Enter manually"
 msgstr ""
 
@@ -4918,15 +4918,15 @@ msgstr ""
 msgid "Are you sure you want to delete these minutes?"
 msgstr ""
 
-#: indico/web/client/js/react/components/notes/NoteEditor.jsx:157
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:158
 msgid "Edit Minutes"
 msgstr ""
 
-#: indico/web/client/js/react/components/notes/NoteEditor.jsx:175
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:176
 msgid "You cannot switch back to Markdown after switching to HTML."
 msgstr ""
 
-#: indico/web/client/js/react/components/notes/NoteEditor.jsx:179
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:180
 msgid "Use rich-text (HTML) editor"
 msgstr ""
 
