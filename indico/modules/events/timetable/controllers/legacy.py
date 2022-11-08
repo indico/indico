@@ -176,6 +176,9 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
         RHManageTimetableEntryBase._process_args(self)
         self.edit_session = request.args.get('edit_session') == '1'
 
+    def render_form(self, form):
+        return jsonify_form(form, fields=getattr(form, '_display_fields', None))
+
     def _process(self):
         form = None
         parent_session_block = self.entry.parent.object if self.entry.parent else None
@@ -238,7 +241,7 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
                     return jsonify_data(update=serialize_entry_update(self.entry, session_=self.session),
                                         notifications=notifications, flash=False)
         self.commit = False
-        return jsonify_form(form, fields=getattr(form, '_display_fields', None))
+        return self.render_form(form)
 
 
 class RHLegacyTimetableEditEntryTime(RHManageTimetableEntryBase):
