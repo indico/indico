@@ -91,13 +91,16 @@ class RHCreateSession(RHManageSessionsBase):
 class RHModifySession(RHManageSessionBase):
     """Modify a session."""
 
+    def render_form(self, form):
+        return jsonify_form(form)
+
     def _process(self):
         form = SessionForm(obj=self.session, event=self.event)
         if form.validate_on_submit():
             with track_location_changes():
                 update_session(self.session, form.data)
             return jsonify_data(html=_render_session_list(self.event))
-        return jsonify_form(form)
+        return self.render_form(form)
 
 
 class RHDeleteSessions(RHManageSessionsActionsBase):
