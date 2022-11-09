@@ -1,6 +1,6 @@
 alembic
 authlib
-babel
+babel<2.11  # big update, not right before a release
 bcrypt
 bleach[css]
 blinker
@@ -19,12 +19,12 @@ flask-marshmallow
 flask-migrate
 flask-multipass
 flask-pluginengine
-flask-sqlalchemy
+flask-sqlalchemy<3  # separate PR: https://github.com/indico/indico/pull/5522
 flask-webpackext
 flask-wtf
 flask
 html2text
-icalendar
+icalendar<5  # major update, not right before a release
 indico-fonts
 ipython
 itsdangerous

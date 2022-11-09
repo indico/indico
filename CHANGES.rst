@@ -7,6 +7,19 @@ Version 3.2.1
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Update `cryptography <https://pypi.org/project/cryptography/>`_ library due to
+  vulnerabilities in OpenSSL (CVE-2022-3602, CVE-2022-3786)
+
+.. note::
+
+    We do not think that Indico is affected by those vulnerabilities as it does
+    not use the *cryptography* library itself, and the dependency that uses it
+    is only used during SSO (OAuth) logins and most likely in a way that is not
+    vulnerable. It is nonetheless recommended to update as soon as possible.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
