@@ -24,6 +24,8 @@ Improvements
   authors/speakers (:pr:`5553`)
 - Include event label in email reminders (:issue:`5554`, :pr:`5556`,
   thanks :user:`omegak`)
+- Include emails of submitters, speakers and authors in abstract/contribution
+  Excel/CSV exports (:pr:`5565`)
 
 Bugfixes
 ^^^^^^^^

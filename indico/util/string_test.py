@@ -11,9 +11,10 @@ from itertools import count
 
 import pytest
 
-from indico.util.string import (camelize, camelize_keys, crc32, format_repr, html_to_plaintext, make_unique_token,
-                                normalize_phone_number, render_markdown, sanitize_email, sanitize_for_platypus,
-                                sanitize_html, seems_html, slugify, snakify, snakify_keys, strip_tags, text_to_repr)
+from indico.util.string import (camelize, camelize_keys, crc32, format_email_with_name, format_repr, html_to_plaintext,
+                                make_unique_token, normalize_phone_number, render_markdown, sanitize_email,
+                                sanitize_for_platypus, sanitize_html, seems_html, slugify, snakify, snakify_keys,
+                                strip_tags, text_to_repr)
 
 
 def test_seems_html():
@@ -251,3 +252,13 @@ def test_sanitize_for_platypus_relative_urls():
 ))
 def test_sanitize_html_escaped_quotes(input, output):
     assert sanitize_html(input) == output
+
+
+@pytest.mark.parametrize(('name', 'address', 'expected'), (
+    ('GuineaPig', 'test@example.com', 'GuineaPig <test@example.com>'),
+    ('Guinea Pig', 'test@example.com', 'Guinea Pig <test@example.com>'),
+    ('Guinea,Pig', 'test@example.com', '"Guinea,Pig" <test@example.com>'),
+    ('John "Guinea Pig" Doe', 'test@example.com', '"John \\"Guinea Pig\\" Doe" <test@example.com>'),
+))
+def test_format_email_with_name(name, address, expected):
+    assert format_email_with_name(name, address) == expected

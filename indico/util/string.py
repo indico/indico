@@ -14,6 +14,7 @@ import os
 import re
 import string
 import unicodedata
+from email.utils import escapesre, specialsre
 from enum import Enum
 from itertools import chain
 from operator import attrgetter
@@ -569,3 +570,17 @@ def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mod
 def get_format_placeholders(format_str):
     """Get the format placeholders from a string."""
     return [name for text, name, spec, conv in string.Formatter().parse(format_str) if name is not None]
+
+
+def format_email_with_name(name, address):
+    """Format an email address and name.
+
+    This is very similar to email.utils.formataddr but doesn't encode to
+    UTF-8 since it's meant to be used e.g. in CSV files and similar places
+    (ie not when actually sending emails from indico).
+    """
+    quotes = ''
+    if specialsre.search(name):
+        quotes = '"'
+    name = escapesre.sub(r'\\\g<0>', name)
+    return f'{quotes}{name}{quotes} <{address}>'

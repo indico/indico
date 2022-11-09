@@ -29,6 +29,7 @@ from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import force_locale
 from indico.util.spreadsheets import unique_col
+from indico.util.string import format_email_with_name
 from indico.web.flask.templating import get_template_module
 
 
@@ -48,6 +49,10 @@ def build_default_email_template(event, tpl_type):
     return tpl
 
 
+def _names_with_emails(person_links):
+    return [format_email_with_name(x.full_name, x.email) for x in person_links if x.email]
+
+
 def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_items):
     """Generate a spreadsheet data from a given abstract list.
 
@@ -61,9 +66,12 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         'state': ('State', lambda x: x.state.title),
         'submitter': ('Submitter', lambda x: x.submitter.full_name),
         'submitter_affiliation': ('Submitter (affiliation)', lambda x: x.submitter.full_name_affiliation),
+        'submitter_email': ('Submitter (email)',
+                            lambda x: format_email_with_name(x.submitter.full_name, x.submitter.email)),
         'authors': ('Primary authors', lambda x: [a.full_name for a in x.primary_authors]),
         'authors_affiliation': ('Primary authors (affiliation)',
                                 lambda x: [a.full_name_affiliation for a in x.primary_authors]),
+        'authors_email': ('Primary authors (email)', lambda x: _names_with_emails(x.primary_authors)),
         'accepted_track': ('Accepted track', lambda x: x.accepted_track.short_title if x.accepted_track else None),
         'submitted_for_tracks': ('Submitted for tracks',
                                  lambda x: [t.short_title for t in x.submitted_for_tracks]),
@@ -78,8 +86,8 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         'description': ('Content', lambda x: x.description),
     }
     field_deps = {
-        'submitter': ['submitter_affiliation'],
-        'authors': ['authors_affiliation']
+        'submitter': ['submitter_affiliation', 'submitter_email'],
+        'authors': ['authors_affiliation', 'authors_email']
     }
     for name, deps in field_deps.items():
         if name in static_item_ids:
