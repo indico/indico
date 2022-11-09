@@ -132,7 +132,7 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
 
 class BaseEntryForm(EntryFormMixin, IndicoForm):
     shift_later = BooleanField(_('Shift'), widget=SwitchWidget(),
-                               description=_('Shift up or down all entries that start after this'))
+                               description=_('Shift all entries after this one up or down'))
 
     def __init__(self, *args, **kwargs):
         self.entry = kwargs.pop('entry')
