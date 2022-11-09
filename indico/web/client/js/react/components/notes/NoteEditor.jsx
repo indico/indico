@@ -106,7 +106,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   }, [apiURL, getNoteURL]);
 
   const handleSubmit = async ({source}) => {
-    const currentValue = renderMode === 'markdown' ? source : source.getData();
+    const currentValue = source.getData ? source.getData() : source;
     try {
       if (!currentValue) {
         await indicoAxios.delete(apiURL);
