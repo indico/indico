@@ -123,7 +123,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
    * This function resolves SASS files using a [~][module:]path syntax
    */
   function sassResolver(url) {
-    const match = url.match(/^(~?)(?:(\w+):)?([\w/-_]+)/);
+    const match = url.match(/^(~?)(?:(\w+):)?([\w/_-]+)/);
     if (match) {
       const skipOverride = match[1] === '~';
       const mod = match[2];
