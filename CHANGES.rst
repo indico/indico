@@ -5,7 +5,7 @@ Changelog
 Version 3.2.1
 -------------
 
-*Unreleased*
+*Released on November 10, 2022*
 
 Security fixes
 ^^^^^^^^^^^^^^
