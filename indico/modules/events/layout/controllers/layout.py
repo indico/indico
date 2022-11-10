@@ -94,7 +94,7 @@ class RHLayoutEdit(RHLayoutBase):
         if changes:
             form_cls = ConferenceLayoutForm if self.event.type_ == EventType.conference else LectureMeetingLayoutForm
             form = form_cls(event=self.event)
-            self.event.log(EventLogRealm.participants, LogKind.change, 'Layout', summary='Layout was updated',
+            self.event.log(EventLogRealm.management, LogKind.change, 'Layout', summary='Layout was updated',
                            user=session.user, data={'Changes': make_diff_log(changes, form.log_fields_metadata)})
         return ret
 
