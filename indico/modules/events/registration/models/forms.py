@@ -508,6 +508,10 @@ class RegistrationForm(db.Model):
                     field.personal_data_type == personal_data_type):
                 return field.id
 
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the regform."""
+        return self.event.log(*args, meta={'registration_form_id': self.id}, **kwargs)
+
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():

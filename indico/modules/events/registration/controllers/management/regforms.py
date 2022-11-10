@@ -167,9 +167,9 @@ class RHManageParticipants(RHManageRegFormsBase):
                 db.session.add(regform)
                 db.session.flush()
                 signals.event.registration_form_created.send(regform)
-                self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
-                               f'Registration form "{regform.title}" has been created', session.user,
-                               data=_get_regform_creation_log_data(regform))
+                regform.log(EventLogRealm.management, LogKind.positive, 'Registration',
+                            f'Registration form "{regform.title}" has been created', session.user,
+                            data=_get_regform_creation_log_data(regform))
             return redirect(url_for('event_registration.manage_regform', regform))
 
         if not regform or not registration_enabled:
@@ -201,9 +201,9 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             db.session.flush()
             signals.event.registration_form_created.send(regform)
             flash(_('Registration form has been successfully created'), 'success')
-            self.event.log(EventLogRealm.management, LogKind.positive, 'Registration',
-                           f'Registration form "{regform.title}" has been created', session.user,
-                           data=_get_regform_creation_log_data(regform))
+            regform.log(EventLogRealm.management, LogKind.positive, 'Registration',
+                        f'Registration form "{regform.title}" has been created', session.user,
+                        data=_get_regform_creation_log_data(regform))
             return redirect(url_for('.manage_regform', regform))
         return WPManageRegistration.render_template('management/regform_create.html', self.event,
                                                     form=form, regform=None)
@@ -246,6 +246,8 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
         signals.event.registration_form_deleted.send(self.regform)
         flash(_('Registration form deleted'), 'success')
         logger.info('Registration form %s deleted by %s', self.regform, session.user)
+        self.regform.log(EventLogRealm.management, LogKind.negative, 'Registration',
+                         f'Registration form "{self.regform.title}" was deleted', session.user)
         return redirect(url_for('.manage_regform_list', self.event))
 
 
@@ -266,7 +268,7 @@ class RHRegistrationFormOpen(RHManageRegFormBase):
                 log_text = f'Registration form "{self.regform.title}" was opened'
             else:
                 log_text = f'Registration form "{self.regform.title}" was reopened'
-            self.event.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
+            self.regform.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 
 
@@ -278,7 +280,7 @@ class RHRegistrationFormClose(RHManageRegFormBase):
         flash(_('Registrations for {} are now closed').format(self.regform.title), 'success')
         logger.info('Registrations for %s closed by %s', self.regform, session.user)
         log_text = f'Registration form "{self.regform.title}" was closed'
-        self.event.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
+        self.regform.log(EventLogRealm.event, LogKind.change, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', self.regform))
 
 
@@ -293,6 +295,14 @@ class RHRegistrationFormSchedule(RHManageRegFormBase):
             self.regform.modification_end_dt = form.modification_end_dt.data
             flash(_('Registrations for {} have been scheduled').format(self.regform.title), 'success')
             logger.info('Registrations for %s scheduled by %s', self.regform, session.user)
+            log_data = {
+                'Start': self.regform.start_dt.isoformat() if self.regform.start_dt else None,
+                'End': self.regform.end_dt.isoformat() if self.regform.end_dt else None,
+                'Modification End': (self.regform.modification_end_dt.isoformat()
+                                     if self.regform.modification_end_dt else None),
+            }
+            self.regform.log(EventLogRealm.management, LogKind.change, 'Registration',
+                             f'Registration form "{self.regform.title}" scheduled', session.user, data=log_data)
             return jsonify_data(flash=False)
         return jsonify_form(form, submit=_('Schedule'))
 
