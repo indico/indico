@@ -101,20 +101,16 @@
                     </div>
                 {% endif %}
                 <div class="group">
-                    <div
-                        id="invitation-email-all"
-                        data-event-id="{{ event.id }}"
-                        data-person-selector="#event-participants-list tr[data-no-account] input[name=person_id][type=checkbox]"
-                        data-no-account="1">
-                    </div>
+                    <div id="invitation-email-all"
+                         data-event-id="{{ event.id }}"
+                         data-person-selector="#event-participants-list tr[data-no-account] input[name=person_id][type=checkbox]"
+                         data-no-account></div>
                     {% if has_uninvited %}
-                        <div
-                            id="invitation-email-not-invited"
-                            data-event-id="{{ event.id }}"
-                            data-person-selector="#event-participants-list tr[data-no-account] input[name=person_id][type=checkbox]"
-                            data-no-account="1"
-                            data-not-invited-only="1">
-                        </div>
+                        <div id="invitation-email-not-invited"
+                             data-event-id="{{ event.id }}"
+                             data-person-selector="#event-participants-list tr[data-no-account] input[name=person_id][type=checkbox]"
+                             data-no-account
+                             data-not-invited-only></div>
                     {% endif %}
                     <a href="#"
                        class="i-button arrow highlight js-dropdown {{ 'disabled' if not has_no_account }}"

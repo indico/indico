@@ -5,11 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.events.persons.controllers import (RHAPIEmailEventPersons, RHDeleteUnusedEventPerson,
-                                                       RHEmailEventPersonsPreview, RHEventPersonSearch,
-                                                       RHGrantModificationRights, RHGrantSubmissionRights,
-                                                       RHManagePersonLists, RHPersonsList, RHRevokeSubmissionRights,
-                                                       RHUpdateEventPerson)
+from indico.modules.events.persons.controllers import (RHAPIEmailEventPersonsMetadata, RHAPIEmailEventPersonsSend,
+                                                       RHDeleteUnusedEventPerson, RHEmailEventPersonsPreview,
+                                                       RHEventPersonSearch, RHGrantModificationRights,
+                                                       RHGrantSubmissionRights, RHManagePersonLists, RHPersonsList,
+                                                       RHRevokeSubmissionRights, RHUpdateEventPerson)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -17,7 +17,9 @@ _bp = IndicoBlueprint('persons', __name__, template_folder='templates', virtual_
                       url_prefix='/event/<int:event_id>/manage')
 
 _bp.add_url_rule('/persons/', 'person_list', RHPersonsList)
-_bp.add_url_rule('/persons/email', 'email_event_persons', RHAPIEmailEventPersons, methods=('GET', 'POST'))
+_bp.add_url_rule('/api/persons/email', 'api_email_event_persons_send', RHAPIEmailEventPersonsSend, methods=('POST',))
+_bp.add_url_rule('/api/persons/email-metadata', 'api_email_event_persons_metadata', RHAPIEmailEventPersonsMetadata,
+                 methods=('POST',))
 _bp.add_url_rule('/persons/email-preview', 'email_event_persons_preview', RHEmailEventPersonsPreview, methods=('POST',))
 _bp.add_url_rule('/persons/grant-submission', 'grant_submission_rights', RHGrantSubmissionRights, methods=('POST',))
 _bp.add_url_rule('/persons/grant-modification', 'grant_modification_rights', RHGrantModificationRights,

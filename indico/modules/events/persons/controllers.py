@@ -263,8 +263,8 @@ class RHEmailEventPersonsPreview(RHManageEventBase):
     """Preview an email with EventPersons associated placeholders."""
 
     @use_kwargs({
-        'body': fields.String(load_default=''),
-        'subject': fields.String(load_default=''),
+        'body': fields.String(required=True),
+        'subject': fields.String(required=True),
     })
     def _process(self, body, subject):
         person = self.event.persons[0]
@@ -272,65 +272,23 @@ class RHEmailEventPersonsPreview(RHManageEventBase):
         email_subject = replace_placeholders('event-persons-email', subject, event=self.event, person=person)
         tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
                                   email_body=email_body)
-        return {
-            'subject': tpl.get_subject(),
-            'body': tpl.get_body()
-        }
+        return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
 
 
-class RHAPIEmailEventPersons(RHManageEventBase):
+class RHEmailEventPersonsBase(RHManageEventBase):
     """Send emails to selected EventPersons."""
 
-    def _process_args(self):
-        RHManageEventBase._process_args(self)
-        self.no_account = request.args.get('no_account') == '1'
-        self.recipients = set(self._find_event_persons(request.args.getlist('person_id'),
-                                                       request.args.get('not_invited_only') == '1'))
-        self.recipients |= set(self._find_users(request.args.getlist('user_id')))
-        self.recipients |= set(self._find_role_members(request.args.getlist('role_id')))
-
-    def _process_GET(self):
-        with self.event.force_event_locale():
-            if self.no_account:
-                tpl = get_template_module('events/persons/emails/invitation.html', event=self.event)
-            else:
-                tpl = get_template_module('events/persons/emails/generic.html', event=self.event)
-            subject = tpl.get_subject()
-            body = tpl.get_html_body()
-        placeholders = get_sorted_placeholders('event-persons-email', event=None, person=None,
-                                               register_link=self.no_account)
-        return {
-            'senders': list(self.event.get_allowed_sender_emails().items()),
-            'recipients': sorted(x.email for x in self.recipients),
-            'body': body,
-            'subject': subject,
-            'placeholders': [p.serialize(event=None, person=None) for p in placeholders],
-        }
-
     @use_kwargs({
-        'from_address': fields.String(required=True, validate=not_empty),
-        'body': fields.String(required=True, validate=not_empty),
-        'subject': fields.String(required=True, validate=not_empty),
-        'copy_for_sender': fields.Bool(load_default=False)
+        'person_id': fields.List(fields.Integer(), load_default=[]),
+        'user_id': fields.List(fields.Integer(), load_default=[]),
+        'role_id': fields.List(fields.Integer(), load_default=[]),
+        'not_invited_only': fields.Bool(load_default=None)
     })
-    def _process_POST(self, from_address, body, subject, copy_for_sender):
-        self._send_emails(from_address, body, subject, self.recipients, copy_for_sender)
-        return '', 204
-
-    def _send_emails(self, from_address, body, subject, recipients, copy_for_sender=False):
-        for recipient in recipients:
-            if self.no_account and isinstance(recipient, EventPerson):
-                recipient.invited_dt = now_utc()
-            email_body = replace_placeholders('event-persons-email', body, person=recipient,
-                                              event=self.event, register_link=self.no_account)
-            email_subject = replace_placeholders('event-persons-email', subject, person=recipient,
-                                                 event=self.event, register_link=self.no_account)
-            tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-            bcc = [session.user.email] if copy_for_sender else []
-            with self.event.force_event_locale():
-                email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=from_address, template=tpl,
-                                   html=True)
-            send_email(email, self.event, 'Event Persons')
+    def _process_args(self, person_id, user_id, role_id, not_invited_only):
+        RHManageEventBase._process_args(self)
+        self.recipients = set(self._find_event_persons(person_id, not_invited_only))
+        self.recipients |= set(self._find_users(user_id))
+        self.recipients |= set(self._find_role_members(role_id))
 
     def _find_event_persons(self, person_ids, not_invited_only):
         if not person_ids:
@@ -353,6 +311,52 @@ class RHAPIEmailEventPersons(RHManageEventBase):
                  .filter(EventRole.id.in_(role_ids))
                  .options(joinedload('members')))
         return itertools.chain.from_iterable(role.members for role in query)
+
+
+class RHAPIEmailEventPersonsMetadata(RHEmailEventPersonsBase):
+    @use_kwargs({'no_account': fields.Bool(load_default=False)})
+    def _process(self, no_account):
+        with self.event.force_event_locale():
+            if no_account:
+                tpl = get_template_module('events/persons/emails/invitation.html', event=self.event)
+            else:
+                tpl = get_template_module('events/persons/emails/generic.html', event=self.event)
+            body = tpl.get_html_body()
+            subject = tpl.get_subject()
+        placeholders = get_sorted_placeholders('event-persons-email', event=None, person=None,
+                                               register_link=no_account)
+        return jsonify({
+            'senders': list(self.event.get_allowed_sender_emails().items()),
+            'recipients': sorted(x.email for x in self.recipients),
+            'body': body,
+            'subject': subject,
+            'placeholders': [p.serialize(event=None, person=None) for p in placeholders],
+        })
+
+
+class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
+    @use_kwargs({
+        'from_address': fields.String(required=True, validate=not_empty),
+        'body': fields.String(required=True, validate=not_empty),
+        'subject': fields.String(required=True, validate=not_empty),
+        'copy_for_sender': fields.Bool(load_default=False),
+        'no_account': fields.Bool(load_default=False)
+    })
+    def _process(self, from_address, body, subject, copy_for_sender, no_account):
+        for recipient in self.recipients:
+            if no_account and isinstance(recipient, EventPerson):
+                recipient.invited_dt = now_utc()
+            email_body = replace_placeholders('event-persons-email', body, person=recipient,
+                                              event=self.event, register_link=no_account)
+            email_subject = replace_placeholders('event-persons-email', subject, person=recipient,
+                                                 event=self.event, register_link=no_account)
+            tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
+            bcc = [session.user.email] if copy_for_sender else []
+            with self.event.force_event_locale():
+                email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=from_address,
+                                   template=tpl, html=True)
+            send_email(email, self.event, 'Event Persons')
+        return '', 204
 
 
 class RHGrantSubmissionRights(RHManageEventBase):

@@ -5,7 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import emailAttributesURL from 'indico-url:persons.email_event_persons';
+import emailMetadataURL from 'indico-url:persons.api_email_event_persons_metadata';
+import emailSendURL from 'indico-url:persons.api_email_event_persons_send';
 import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
@@ -24,7 +25,7 @@ import {snakifyKeys} from 'indico/utils/case';
 
 import './Email.module.scss';
 
-const useIdSelector = selector =>
+const getIds = selector =>
   Array.from(document.querySelectorAll(selector))
     .filter(e => e.offsetWidth > 0 || e.offsetHeight > 0)
     .map(e => +e.value);
@@ -38,8 +39,8 @@ export function EmailButton({
   extraParams,
 }) {
   const [open, setOpen] = useState(false);
-  const personIds = useIdSelector(personSelector);
-  const userIds = useIdSelector(userSelector);
+  const personIds = getIds(personSelector);
+  const userIds = getIds(userSelector);
 
   useEffect(() => {
     if (!triggerSelector) {
@@ -63,7 +64,7 @@ export function EmailButton({
           eventId={eventId}
           personIds={personIds}
           userIds={userIds}
-          roleIds={[roleId]}
+          roleIds={roleId && [roleId]}
           onClose={() => setOpen(false)}
           extraParams={extraParams}
         />
@@ -93,8 +94,9 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
   const [preview, setPreview] = useState(null);
   const recipientData = {personId: personIds, roleId: roleIds, userId: userIds, ...extraParams};
   const {data, loading} = useIndicoAxios({
-    url: emailAttributesURL({event_id: eventId}),
-    params: snakifyKeys(recipientData),
+    url: emailMetadataURL({event_id: eventId}),
+    method: 'POST',
+    data: snakifyKeys(recipientData),
   });
   const {
     senders = [],
@@ -116,9 +118,10 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
 
   const onSubmit = async data => {
     try {
-      await indicoAxios.post(emailAttributesURL({event_id: eventId}), snakifyKeys(data), {
-        params: snakifyKeys(recipientData),
-      });
+      await indicoAxios.post(
+        emailSendURL({event_id: eventId}),
+        snakifyKeys({...data, ...recipientData})
+      );
       setTimeout(() => onClose(), 5000);
     } catch (err) {
       return handleSubmitError(err);
