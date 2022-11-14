@@ -451,19 +451,11 @@ class Registration(db.Model):
 
     @property
     def external_registration_details_url(self):
-        return url_for(
-            'event_registration.registration_details',
-            registration=self.registration,
-            _external=True,
-        )
+        return url_for('event_registration.registration_details', self, _external=True)
 
     @property
     def display_regform_url(self):
-        return url_for(
-            'event_registration.display_regform',
-            self.registration.locator.registrant,
-            _external=True,
-        )
+        return url_for('event_registration.display_regform', self.locator.registrant, _external=True)
 
     @property
     def is_ticket_blocked(self):

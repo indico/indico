@@ -46,7 +46,7 @@
 
 
 {% macro render_text_manage() %}
-    {% trans link='<a href="{{ registration.external_registration_details_url }}">'|safe, endlink='</a>'|safe -%}
+    {% trans link='<a href="%s">'|format(registration.external_registration_details_url)|safe, endlink='</a>'|safe -%}
         You can manage this registration {{ link }}here{{ endlink }}.
     {%- endtrans %}
 {% endmacro %}

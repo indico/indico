@@ -67,7 +67,7 @@
 
 {% macro render_text_unpaid() %}
     {% if registration.state.name == 'unpaid' %}
-        {% trans link='<a href="{{ registration.display_regform_url }}">'|safe, endlink='</a>'|safe -%}
+        {% trans link='<a href="%s">'|format(registration.display_regform_url)|safe, endlink='</a>'|safe -%}
             Please proceed to the checkout {{ link }}here{{ endlink }} in order to complete it.
         {%- endtrans %}
     {% endif %}
