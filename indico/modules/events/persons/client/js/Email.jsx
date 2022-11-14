@@ -117,11 +117,12 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
   };
 
   const onSubmit = async data => {
+    const requestData = {...data, ...recipientData};
+    if (requestData.body.getData) {
+      requestData.body = requestData.body.getData();
+    }
     try {
-      await indicoAxios.post(
-        emailSendURL({event_id: eventId}),
-        snakifyKeys({...data, ...recipientData})
-      );
+      await indicoAxios.post(emailSendURL({event_id: eventId}), snakifyKeys(requestData));
       setTimeout(() => onClose(), 5000);
     } catch (err) {
       return handleSubmitError(err);
