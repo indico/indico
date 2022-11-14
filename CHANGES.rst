@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix broken links in some notification emails (:pr:`5567`)
 
 
 Version 3.2.1
