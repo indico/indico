@@ -184,3 +184,23 @@ export const getConfig = ({
         }
       : undefined,
 });
+
+// Sanitize HTML pasted into ckeditor.
+// Removes all but the whitelisted CSS rules.
+export function sanitizeHtml(dirty) {
+  const matchAny = /^.*$/;
+
+  return _sanitizeHtml(dirty, {
+    allowedAttributes: {
+      ..._sanitizeHtml.defaults.allowedAttributes,
+      '*': ['style'],
+    },
+    allowedStyles: {
+      '*': {
+        'color': [matchAny],
+        'font-size': [matchAny],
+        'background-color': [matchAny],
+      },
+    },
+  });
+}

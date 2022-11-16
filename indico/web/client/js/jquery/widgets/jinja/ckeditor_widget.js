@@ -8,7 +8,7 @@
 import ClassicEditor from 'ckeditor';
 import _ from 'lodash';
 
-import {getConfig} from 'indico/ckeditor';
+import {getConfig, sanitizeHtml} from 'indico/ckeditor';
 
 (function(global) {
   global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
@@ -26,6 +26,23 @@ import {getConfig} from 'indico/ckeditor';
         field.dispatchEvent(new Event('change', {bubbles: true}));
       }, 250)
     );
+    // Sanitize pasted HTML
+    // https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/clipboard.html
+    editor.editing.view.document.on(
+      'clipboardInput',
+      (ev, data) => {
+        if (data.method !== 'paste' || data.content) {
+          return;
+        }
+        const dataTransfer = data.dataTransfer;
+        const contentData = dataTransfer.getData('text/html');
+        if (contentData) {
+          data.content = editor.data.htmlProcessor.toView(sanitizeHtml(contentData));
+        }
+      },
+      {priority: 'normal'}
+    );
+
     editor.editing.view.change(writer => {
       writer.setStyle(
         'width',
