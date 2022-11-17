@@ -185,8 +185,7 @@ export const getConfig = ({
       : undefined,
 });
 
-// Sanitize HTML pasted into ckeditor.
-// Removes all but the whitelisted CSS rules.
+// Sanitize HTML and remove all but the whitelisted CSS rules.
 export function sanitizeHtml(dirty) {
   const matchAny = /^.*$/;
 
@@ -203,4 +202,23 @@ export function sanitizeHtml(dirty) {
       },
     },
   });
+}
+
+// Sanitize HTML pasted into ckeditor.
+// Use it with the clipboardInput event and pass the editor instance:
+//
+//   editor.editing.view.document.on('clipboardInput', sanitizeHtmlOnPaste(editor))
+//
+// More info: https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/clipboard.html
+export function sanitizeHtmlOnPaste(editor) {
+  return (ev, data) => {
+    if (data.method !== 'paste' || data.content) {
+      return;
+    }
+    const dataTransfer = data.dataTransfer;
+    const contentData = dataTransfer.getData('text/html');
+    if (contentData) {
+      data.content = editor.data.htmlProcessor.toView(sanitizeHtml(contentData));
+    }
+  };
 }
