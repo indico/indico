@@ -12,7 +12,7 @@ import React, {useMemo, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
-import {getConfig} from 'indico/ckeditor';
+import {getConfig, sanitizeHtml} from 'indico/ckeditor';
 import {Translate} from 'indico/react/i18n';
 
 import {FinalField} from '../forms';
@@ -41,6 +41,22 @@ export default function TextEditor({
       writer.setStyle('width', width, editor.editing.view.document.getRoot());
       writer.setStyle('height', height, editor.editing.view.document.getRoot());
     });
+    // Sanitize pasted HTML
+    // https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/clipboard.html
+    editor.editing.view.document.on(
+      'clipboardInput',
+      (ev, data) => {
+        if (data.method !== 'paste' || data.content) {
+          return;
+        }
+        const dataTransfer = data.dataTransfer;
+        const contentData = dataTransfer.getData('text/html');
+        if (contentData) {
+          data.content = editor.data.htmlProcessor.toView(sanitizeHtml(contentData));
+        }
+      },
+      {priority: 'normal'}
+    );
     if (setValidationError) {
       editor.plugins._plugins.get('SourceEditing').on('change:isSourceEditingMode', evt => {
         if (evt.source.isSourceEditingMode) {
