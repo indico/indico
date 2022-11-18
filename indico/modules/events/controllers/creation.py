@@ -156,10 +156,13 @@ class RHCreateEvent(RHProtected):
             return jsonify_data(flash=False, redirect=url_for('event_management.settings', event))
         check_room_availability = rb_check_user_access(session.user) and config.ENABLE_ROOMBOOKING
         rb_excluded_categories = [c.id for c in rb_settings.get('excluded_categories')]
+        category = self._default_category
+        can_create_events = category.can_create_events(session.user) if category else True
         return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
                                 event_type=self.event_type.name, single_category=(not self.root_category.has_children),
                                 check_room_availability=check_room_availability,
                                 rb_excluded_categories=rb_excluded_categories,
+                                can_create_events=can_create_events,
                                 can_create_unlisted_events=can_create_unlisted_events(session.user))
 
 

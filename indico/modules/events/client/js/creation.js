@@ -33,7 +33,10 @@ import {camelizeKeys} from 'indico/utils/case';
     const messages = $($.parseHTML($('#event-creation-protection-messages').html()));
     const protectionMessage = $('<div>', {class: 'form-group', css: {marginTop: '5px'}});
     const listingMessage = $($.parseHTML($('#event-listing-message').html()));
+    const eventCreationMessage = $($.parseHTML($('#event-creation-message').html()));
 
+    const $form = options.categoryField.closest('form');
+    const $submitBtn = $form.find('input[type="submit"]').first();
     const $createBooking = $('#event-creation-create_booking');
     const $availableMessage = $('#room-available');
     const $availablePrebookMessage = $('#room-available-prebook');
@@ -55,7 +58,29 @@ import {camelizeKeys} from 'indico/utils/case';
     let multipleOccurrences = false;
 
     protectionMessage.appendTo(options.protectionModeFields.closest('.form-field'));
+    eventCreationMessage.appendTo(options.categoryField.closest('.form-field'));
     listingMessage.appendTo($listingField.closest('.form-field'));
+
+    $submitBtn.prop('disabled', true);
+    $form.on('change input', updateSubmitBtn);
+
+    function canCreateInSelectedCategory() {
+      return (
+        options.canCreateEvents ||
+        // unlisted events or no default category
+        !currentCategory ||
+        // categories other than the initial one cannot be selected unless the user can create events in them
+        currentCategory?.id !== options.initialCategory?.id
+      );
+    }
+
+    // like disabled-until-change but also disables submit when the user
+    // does not have the rights to create events in the selected category
+    function updateSubmitBtn() {
+      const untouched = $.param($form.serializeArray(), true) === $form.data('initialData');
+      const disabled = untouched || !canCreateInSelectedCategory();
+      $submitBtn.prop('disabled', disabled);
+    }
 
     function updateProtectionMessage() {
       if (!currentCategory) {
@@ -69,6 +94,11 @@ import {camelizeKeys} from 'indico/utils/case';
       const elem = messages.filter(`.${mode}-protection-message`);
       elem.find('.js-category-title').text(currentCategory && currentCategory.title);
       protectionMessage.html(elem);
+    }
+
+    // Display a warning if the user does not have the rights to create events in the selected category
+    function updateEventCreationMessage() {
+      eventCreationMessage.toggleClass('hidden', canCreateInSelectedCategory());
     }
 
     function updateWarningMessage() {
@@ -90,6 +120,8 @@ import {camelizeKeys} from 'indico/utils/case';
       }
       currentCategory = cat;
       updateProtectionMessage();
+      updateEventCreationMessage();
+      updateSubmitBtn();
     });
 
     $listingField.on('change', evt => {
