@@ -1,0 +1,49 @@
+{% macro render_contribution_section(contributions, title) %}
+    {% if contributions %}
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{{ title }}</h3>
+                </div>
+            </div>
+            {{ _render_contribution_list(contributions) }}
+        </section>
+    {%- endif %}
+{% endmacro %}
+
+{% macro _render_contribution_list(contributions) %}
+    <div class="i-box no-padding">
+        <div class="i-box-content">
+            <ul class="group-list no-content-before with-buttons">
+                {% for contrib in contributions | sort(attribute='title') %}
+                    {{ _render_contribution_row(contrib) }}
+                {%- endfor %}
+            </ul>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro _render_contribution_row(contrib) %}
+    <li class="flexrow f-j-space-between">
+        <span class="text">
+            <a class="js-mathjax" href="{{ url_for('.display_contribution', contrib) }}">
+                {{- contrib.title -}}
+            </a>
+            {% if contrib.code -%}
+                <span class="contrib-code">
+                    ({{ contrib.code }})
+                </span>
+            {%- endif %}
+        </span>
+        <div class="group">
+            {% if contrib.can_edit(session.user) -%}
+                <a href="#" class="icon-edit js-edit-contribution"
+                   title="{% trans %}Edit this contribution{% endtrans %}"
+                   data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
+                   data-href="{{ url_for('.manage_update_contrib', contrib, standalone=true) }}"
+                   data-ajax-dialog
+                   data-reload-after></a>
+            {%- endif %}
+        </div>
+    </li>
+{% endmacro %}

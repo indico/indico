@@ -99,13 +99,13 @@ class SubmitterPermission(ManagementPermission):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
+    from indico.modules.events.contributions.util import user_has_contributions
     from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_my_contributions(event):
         if not session.user:
             return False
-        return has_contributions_with_user_as_submitter(event, session.user)
+        return user_has_contributions(event, session.user)
 
     def _visible_list_of_contributions(event):
         published = contribution_settings.get(event, 'published')

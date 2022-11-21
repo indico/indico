@@ -244,6 +244,30 @@ def get_contributions_for_person(event, person, only_speakers=False):
             .all())
 
 
+def _query_contributions_for_user(event, user):
+    """Query for all contributions in an event associated with the given user.
+
+    The query looks for contributions where the user is a primary/secondary author, speaker or a submitter.
+    """
+    condition = db.or_(EventPerson.user == user,
+                       Contribution.acl_entries.any(db.and_(ContributionPrincipal.has_management_permission('submit'),
+                                                            ContributionPrincipal.user == user)))
+    return (Contribution.query.with_parent(event)
+            .outerjoin(ContributionPersonLink)  # outer join in case there is a contribution with
+            .outerjoin(EventPerson)             # no person links but the user has submission rights.
+            .filter(condition))
+
+
+def user_has_contributions(event, user):
+    """Return True if a user has any contributions in the given event."""
+    return _query_contributions_for_user(event, user).has_rows()
+
+
+def get_contributions_for_user(event, user):
+    """Get all contributions for a user in the given event."""
+    return _query_contributions_for_user(event, user).all()
+
+
 def serialize_contribution_for_ical(contrib):
     from indico.modules.events.persons.schemas import PersonLinkSchema
     return {
