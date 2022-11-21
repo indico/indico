@@ -154,7 +154,8 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 placeholder={Translate.string('Permanent')}
                 step="1"
                 min="1"
-                validate={v.optional(v.min(1))}
+                max="521"
+                validate={v.optional(v.range(1, 521))}
                 label={Translate.string('Retention period (weeks)')}
               />
               <FormSpy subscription={{values: true}}>

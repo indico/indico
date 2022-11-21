@@ -144,15 +144,23 @@ class RegistrationFormCreateForm(IndicoForm):
         if participant_visibility.value < public_visibility.value:
             raise ValidationError(_('Participant visibility cannot be more restrictive for other participants than '
                                     'for the public'))
-        if field.data[2] is not None and not field.data[2]:
-            raise ValidationError(_('The visibility duration cannot be zero.'))
+        if field.data[2] is not None:
+            visibility_duration = timedelta(weeks=field.data[2])
+            if visibility_duration <= timedelta():
+                raise ValidationError(_('The visibility duration cannot be zero.'))
+            elif visibility_duration > timedelta(days=3650):
+                raise ValidationError(_('The visibility duration cannot be longer than 10 years. Leave the field empty '
+                                        'for indefinite.'))
 
     def validate_retention_period(self, field):
         retention_period = field.data
         if retention_period is None:
             return
-        elif not retention_period:
-            raise ValidationError(_('The retention period cannot be zero.'))
+        elif retention_period <= timedelta():
+            raise ValidationError(_('The retention period cannot be zero or negative.'))
+        elif retention_period > timedelta(days=3650):
+            raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty for '
+                                    'indefinite.'))
         visibility_duration = (timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None
                                else None)
         if visibility_duration and visibility_duration > retention_period:
@@ -555,15 +563,23 @@ class RegistrationPrivacyForm(IndicoForm):
                                                                 ~Registration.created_by_manager).has_rows()
         ):
             raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
-        if field.data[2] is not None and not field.data[2]:
-            raise ValidationError(_('The visibility duration cannot be zero.'))
+        if field.data[2] is not None:
+            visibility_duration = timedelta(weeks=field.data[2])
+            if visibility_duration <= timedelta():
+                raise ValidationError(_('The visibility duration cannot be zero.'))
+            elif visibility_duration > timedelta(days=3650):
+                raise ValidationError(_('The visibility duration cannot be longer than 10 years. Leave the field empty '
+                                        'for indefinite.'))
 
     def validate_retention_period(self, field):
         retention_period = field.data
         if retention_period is None:
             return
-        elif not retention_period:
-            raise ValidationError(_('The retention period cannot be zero.'))
+        elif retention_period <= timedelta():
+            raise ValidationError(_('The retention period cannot be zero or negative.'))
+        elif retention_period > timedelta(days=3650):
+            raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty for '
+                                    'indefinite.'))
         visibility_duration = (timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None
                                else None)
         if visibility_duration and visibility_duration > retention_period:

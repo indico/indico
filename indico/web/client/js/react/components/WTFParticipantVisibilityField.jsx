@@ -90,7 +90,8 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
             type="number"
             placeholder={Translate.string('Permanent')}
             step="1"
-            min="0"
+            min="1"
+            max="521"
             value={visibilityDuration === null ? '' : visibilityDuration}
             onChange={(evt, {value}) => setVisibilityDuration(value === '' ? null : +value)}
             disabled={participantVisibility === 'hide_all'}
