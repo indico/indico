@@ -10,7 +10,7 @@ Version 3.2.2
 Improvements
 ^^^^^^^^^^^^
 
-- None so far :(
+- Display program codes in 'My contributions' (:pr:`5573`)
 
 Bugfixes
 ^^^^^^^^
