@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import timedelta
+
 from flask import jsonify, request, session
 from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates
 from werkzeug.exceptions import BadRequest
@@ -51,6 +53,8 @@ class GeneralFieldDataSchema(mm.Schema):
         if retention_period is not None:
             if retention_period.days < 7:
                 raise ValidationError('Retention period must be at least 1 week')
+            if retention_period > timedelta(days=3650):
+                raise ValidationError('Retention period cannot be longer than 10 years')
             if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.is_required:
                 raise ValidationError('Cannot add retention period to required field')
 

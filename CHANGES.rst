@@ -18,6 +18,7 @@ Bugfixes
 - Fix broken links in some notification emails (:pr:`5567`)
 - Fix always-disabled submit button when submitting an agreement response
   on someone's behalf (:pr:`5574`)
+- Disallow nonsensical retention periods and visibility durations (:pr:`5576`)
 
 
 Version 3.2.1
