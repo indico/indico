@@ -16,6 +16,8 @@ Bugfixes
 ^^^^^^^^
 
 - Fix broken links in some notification emails (:pr:`5567`)
+- Fix always-disabled submit button when submitting an agreement response
+  on someone's behalf (:pr:`5574`)
 
 
 Version 3.2.1

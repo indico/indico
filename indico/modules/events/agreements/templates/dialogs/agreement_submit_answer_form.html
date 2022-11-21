@@ -34,7 +34,7 @@
                     return false;
                 }
                 var valid = true;
-                form.find(':input:visible').each(function() {
+                form.find(':input:visible:not(:button)').each(function() {
                     var $this = $(this);
                     if ($this.is(':checkbox:not(:checked)') || !$this.val()) {
                         valid = false;
