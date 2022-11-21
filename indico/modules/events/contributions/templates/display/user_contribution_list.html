@@ -15,6 +15,11 @@
                                 <a class="js-mathjax" href="{{ url_for('.display_contribution', contrib) }}">
                                     {{- contrib.title -}}
                                 </a>
+                                {% if contrib.code -%}
+                                    <span class="contrib-code">
+                                        ({{ contrib.code }})
+                                    </span>
+                                {%- endif %}
                             </span>
                             <div class="group">
                                 {% if contrib.can_edit(session.user) -%}
