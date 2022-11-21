@@ -58,7 +58,7 @@ import {camelizeKeys} from 'indico/utils/case';
     let multipleOccurrences = false;
 
     protectionMessage.appendTo(options.protectionModeFields.closest('.form-field'));
-    eventCreationMessage.appendTo(options.categoryField.closest('.form-field'));
+    eventCreationMessage.insertAfter($('#category-warning-event-creation-category'));
     listingMessage.appendTo($listingField.closest('.form-field'));
 
     $submitBtn.prop('disabled', true);
