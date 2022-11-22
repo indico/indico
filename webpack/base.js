@@ -92,6 +92,9 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
   const globalBuildConfig = config.indico ? config.indico.build : config.build;
   const currentEnv = (env ? env.NODE_ENV : null) || 'development';
   const nodeModules = [
+    // Pass relative 'node_modules' first, so that nested node_modules are checked first.
+    // https://webpack.js.org/configuration/resolve/#resolvemodules
+    'node_modules',
     path.join(
       config.build.indicoSourcePath || path.resolve(config.build.rootPath, '..'),
       'node_modules'
