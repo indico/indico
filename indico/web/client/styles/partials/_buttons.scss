@@ -231,7 +231,6 @@ $i-button-spacing: 0.3rem;
 button.i-button,
 input.i-button[type='submit'] {
   line-height: 1em;
-  display: inline-block;
 
   &[class*='icon-'] {
     &::before {
