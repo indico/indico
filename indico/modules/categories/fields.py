@@ -25,7 +25,7 @@ class CategoryField(HiddenField):
     widget = JinjaWidget('forms/category_picker_widget.html')
 
     def __init__(self, *args, **kwargs):
-        self.navigator_category_id = 0
+        self.navigator_category_id = None
         self.require_event_creation_rights = kwargs.pop('require_event_creation_rights', False)
         super().__init__(*args, **kwargs)
 

@@ -2,7 +2,8 @@
 {% set category = {'id': form.category.data.id,
                    'is_protected': form.category.data.is_protected,
                    'title': form.category.data.title,
-                   'has_events': form.category.data.has_events} if form.category.data else none %}
+                   'has_events': form.category.data.has_events,
+                   'has_children': form.category.data.has_children } if form.category.data else none %}
 
 {{ form_header(form, action=url_for('events.create', event_type=event_type)) }}
 {% if can_create_unlisted_events %}

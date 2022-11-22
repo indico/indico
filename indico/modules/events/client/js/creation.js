@@ -101,13 +101,6 @@ import {camelizeKeys} from 'indico/utils/case';
       eventCreationMessage.toggleClass('hidden', canCreateInSelectedCategory());
     }
 
-    function updateWarningMessage() {
-      $(`#category-warning-event-creation-category`).toggleClass(
-        'hidden',
-        (currentCategory && currentCategory.has_events) || !currentCategory
-      );
-    }
-
     options.categoryField.on('indico:categorySelected', (evt, cat) => {
       if (!currentCategory) {
         options.protectionModeFields.filter('[value=inheriting]').prop('checked', true);
@@ -140,9 +133,8 @@ import {camelizeKeys} from 'indico/utils/case';
         options.categoryField.trigger('indico:categorySelected', []);
       }
 
-      // update listing and warning message boxes
+      // update listing
       listingMessage.toggleClass('hidden', JSON.parse($listingField.val()));
-      updateWarningMessage();
     });
 
     options.protectionModeFields.on('change', function() {
