@@ -367,6 +367,12 @@ class AccommodationItemSchema(LimitedPlacesBillableFieldDataSchema):
     is_no_accommodation = fields.Bool(load_default=False)
     caption = fields.String(required=True, validate=not_empty)
 
+    @pre_load
+    def _remove_garbage(self, data, **kwargs):
+        # legacy leftover
+        data.pop('placeholder', None)
+        return data
+
     @post_load
     def _stringify_uuid(self, data, **kwargs):
         if 'id' in data:
