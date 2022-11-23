@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {sanitizeHtml} from './utils/sanitize';
+
 export const getConfig = ({
   images = true,
   imageUploadURL = null,
@@ -184,25 +186,6 @@ export const getConfig = ({
         }
       : undefined,
 });
-
-// Sanitize HTML and remove all but the whitelisted CSS rules.
-export function sanitizeHtml(dirty) {
-  const matchAny = /^.*$/;
-
-  return _sanitizeHtml(dirty, {
-    allowedAttributes: {
-      ..._sanitizeHtml.defaults.allowedAttributes,
-      '*': ['style'],
-    },
-    allowedStyles: {
-      '*': {
-        'color': [matchAny],
-        'font-size': [matchAny],
-        'background-color': [matchAny],
-      },
-    },
-  });
-}
 
 // Sanitize HTML pasted into ckeditor.
 // Use it with the clipboardInput event and pass the editor instance:
