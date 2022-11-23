@@ -12,7 +12,7 @@ import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {FormSpy} from 'react-final-form';
-import {Form, Button, TextArea, Message, Dimmer, Loader} from 'semantic-ui-react';
+import {Form, Button, Message, Dimmer, Loader, Popup, Input, Icon} from 'semantic-ui-react';
 
 import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
 import TextEditor, {FinalTextEditor} from 'indico/react/components/TextEditor';
@@ -109,6 +109,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
 
   const togglePreview = async ({body, subject}) => {
     if (!preview) {
+      body = body.getData ? body.getData() : body;
       const {data} = await indicoAxios.post(emailPreviewURL({event_id: eventId}), {body, subject});
       setPreview(data);
       return;
@@ -118,9 +119,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
 
   const onSubmit = async data => {
     const requestData = {...data, ...recipientData};
-    if (requestData.body.getData) {
-      requestData.body = requestData.body.getData();
-    }
+    requestData.body = requestData.body.getData ? requestData.body.getData() : requestData.body;
     try {
       await indicoAxios.post(emailSendURL({event_id: eventId}), snakifyKeys(requestData));
       setTimeout(() => onClose(), 5000);
@@ -206,10 +205,36 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
           <Translate as="label">Email body</Translate>
           <FinalTextEditor name="body" required />
         </Form.Field>
-        {placeholders.length > 0 && <PlaceholderInfo placeholders={placeholders} />}
+        {placeholders.length > 0 && (
+          <Form.Field>
+            <PlaceholderInfo placeholders={placeholders} />
+          </Form.Field>
+        )}
         <Form.Field>
           <Translate as="label">Recipients</Translate>
-          <TextArea rows={3} value={recipients.join(', ')} readOnly />
+          <Input
+            value={recipients.join(', ')}
+            readOnly
+            icon={
+              navigator.clipboard && (
+                <Popup
+                  content={Translate.string('Copied!')}
+                  on="click"
+                  position="top center"
+                  inverted
+                  trigger={
+                    <Icon
+                      name="copy"
+                      color="black"
+                      title={Translate.string('Copy to clipboard')}
+                      onClick={() => navigator.clipboard.writeText(recipients.join(', '))}
+                      link
+                    />
+                  }
+                />
+              )
+            }
+          />
         </Form.Field>
         <Form.Field>
           <FinalCheckbox name="copyForSender" label={Translate.string('Send copy to me')} toggle />
@@ -229,7 +254,7 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
       {!loading && (
         <FinalModalForm
           id="send-email"
-          size="small"
+          size="standard"
           header={Translate.string('Send email')}
           initialValues={{
             fromAddress: senders[0][0],
