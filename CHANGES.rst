@@ -12,6 +12,8 @@ Improvements
 
 - Display program codes in 'My contributions' (:pr:`5573`)
 - Warn when a user cannot create an event in the current category (:pr:`5572`)
+- Display all contributions in 'My contributions' and not just those with
+  submitter privileges (:pr:`5575`)
 
 Bugfixes
 ^^^^^^^^
