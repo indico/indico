@@ -6,12 +6,19 @@
     <div>
         <div id="category-title-{{ field.id }}" class="text-holder-box flexrow f-a-center" data-tooltip-anchor></div>
         <div id="category-warning-{{ field.id }}" class="hidden">
-            {% call message_box('warning') %}
-                {% trans %}
-                    The selected category does not contain any events, only subcategories.
-                    Please make sure that you really want to create an event there.
-                {% endtrans %}
-            {% endcall %}
+            <div class="action-box mid-form for-form warning">
+                <div class="section">
+                    <div class="icon icon-warning"></div>
+                    <div class="text">
+                        <div>
+                            {% trans %}
+                                The selected category does not contain any events, only subcategories.
+                                Please make sure that you really want to create an event there.
+                            {% endtrans %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <button type="button"
                 class="i-button"

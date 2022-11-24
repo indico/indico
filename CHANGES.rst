@@ -11,6 +11,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Display program codes in 'My contributions' (:pr:`5573`)
+- Warn when a user cannot create an event in the current category (:pr:`5572`)
 
 Bugfixes
 ^^^^^^^^

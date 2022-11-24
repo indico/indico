@@ -37,21 +37,23 @@
       $field.val(JSON.stringify(hiddenData));
     }
 
-    $.ajax({
-      url: build_url(Indico.Urls.Categories.info, {category_id: navigatorCategory}),
-      dataType: 'json',
-      error: handleAjaxError,
-      success(data) {
-        navigatorCategory = data;
-        const {category} = navigatorCategory;
-        $categoryWarning.toggleClass(
-          'hidden',
-          !category.has_children ||
-            category.has_events ||
-            // match the emptying of category field when root category has no events (done in RHCreateEvent)
-            (!category.has_events && category.id === 0)
-        );
-      },
+    // null when we are in the root category and the root only has subcategories
+    // See RHCreateEvent._default_category
+    if (navigatorCategory !== null) {
+      $.ajax({
+        url: build_url(Indico.Urls.Categories.info, {category_id: navigatorCategory}),
+        dataType: 'json',
+        error: handleAjaxError,
+        success(data) {
+          navigatorCategory = data;
+          const {category} = navigatorCategory;
+          updateWarningVisibility(category);
+        },
+      });
+    }
+
+    $field.on('indico:categorySelected', (evt, category) => {
+      updateWarningVisibility(category);
     });
 
     $dialogTrigger.on('click', function(evt) {
@@ -63,7 +65,7 @@
         onAction(category) {
           const event = $.Event('indico:categorySelected');
           const dfd = $.Deferred();
-          $categoryWarning.toggleClass('hidden', !category.has_children || category.has_events);
+          updateWarningVisibility(category);
           $categoryTitle.text(category.title);
           hiddenData = {id: category.id, title: category.title};
           navigatorCategory = category.id;
@@ -77,5 +79,14 @@
         },
       });
     });
+
+    function updateWarningVisibility(category) {
+      $categoryWarning.toggleClass(
+        'hidden',
+        !category || // unlisted event or no category selected
+          !category.has_children ||
+          category.has_events
+      );
+    }
   };
 })(window);

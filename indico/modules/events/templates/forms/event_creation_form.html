@@ -2,7 +2,8 @@
 {% set category = {'id': form.category.data.id,
                    'is_protected': form.category.data.is_protected,
                    'title': form.category.data.title,
-                   'has_events': form.category.data.has_events} if form.category.data else none %}
+                   'has_events': form.category.data.has_events,
+                   'has_children': form.category.data.has_children} if form.category.data else none %}
 
 {{ form_header(form, action=url_for('events.create', event_type=event_type)) }}
 {% if can_create_unlisted_events %}
@@ -16,8 +17,7 @@
     {% endcall %}
 {% endif %}
 {% call form_footer(form) %}
-    <input class="i-button big highlight" type="submit" value="{% trans %}Create event{% endtrans %}"
-           data-disabled-until-change>
+    <input class="i-button big highlight" type="submit" value="{% trans %}Create event{% endtrans %}">
     <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
 {% endcall %}
 
@@ -110,11 +110,25 @@ purely client-side and are worded for event creation instead of being generic.
     </div>
 </script>
 
+<script type="text/html" id="event-creation-message">
+    <div class="action-box mid-form for-form danger hidden">
+        <div class="section">
+            <div class="icon icon-warning"></div>
+            <div class="text">
+                <div>
+                    {% trans %}You are not allowed to create events in this category.{% endtrans %}
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script>
     setupEventCreationDialog({
         categoryField: $('#{{ form.category.id }}'),
         protectionModeFields: $('input[name="{{ form.protection_mode.name }}"][id^="{{ form.protection_mode.id }}"]'),
         initialCategory: {{ category | tojson }},
+        canCreateEvents: {{ can_create_events | tojson }},
         checkAvailability: {{ check_room_availability | tojson }},
         rbExcludedCategories: {{ rb_excluded_categories | tojson }},
         serverDefaultTimezone: {{ indico_config.DEFAULT_TIMEZONE | tojson }}
