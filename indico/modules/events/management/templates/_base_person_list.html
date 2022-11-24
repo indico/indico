@@ -37,18 +37,18 @@
         </table>
     </div>
     <div class="form-group-mail hide-if-locked">
-        <button class="i-button icon-mail right highlight disabled js-requires-selected-row"
-                {% block send_email_href %}
-                    data-href="{{ url_for('persons.email_event_persons', event) }}"
-                {% endblock %}
-                data-title="{% trans %}Send email{% endtrans %}"
-                data-method="POST"
-                data-params-selector="#person-list-table input[name=person_id]:checkbox:checked:visible, #person-list-table input[name=user_id]:checkbox:checked:visible"
-                data-ajax-dialog>
+        <div id="persons-email"
+             data-event-id="{{ event.id }}"
+             data-user-selector="#person-list-table input[name=user_id][type=checkbox]:checked"
+             data-person-selector="#person-list-table input[name=person_id][type=checkbox]:checked">
+        </div>
+        <button id="persons-email-trigger"
+                class="i-button icon-mail right highlight disabled js-requires-selected-row">
             {%- trans %}Send emails{% endtrans -%}
         </button>
     </div>
 </div>
 <script>
     setupEventPersonsList();
+    setupEmailButton('#persons-email', '#persons-email-trigger');
 </script>

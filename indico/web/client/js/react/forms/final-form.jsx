@@ -89,6 +89,7 @@ export function FinalModalForm({
   children,
   extraActions,
   disabledUntilChange,
+  disabledAfterSubmit,
   unloadPrompt,
   unloadPromptRouter,
   alignTop,
@@ -111,7 +112,7 @@ export function FinalModalForm({
   return (
     <FinalForm
       onSubmit={onSubmit}
-      subscription={{submitting: true, dirty: true}}
+      subscription={{submitting: true, dirty: true, submitSucceeded: true}}
       initialValues={initialValues}
       initialValuesEqual={initialValuesEqual}
       decorators={decorators}
@@ -119,7 +120,11 @@ export function FinalModalForm({
     >
       {fprops => (
         <Modal
-          onClose={unloadPrompt ? confirmingOnClose(fprops.dirty) : onClose}
+          onClose={
+            unloadPrompt && !(disabledAfterSubmit && fprops.submitSucceeded)
+              ? confirmingOnClose(fprops.dirty)
+              : onClose
+          }
           size={size === 'standard' ? undefined : size}
           closeIcon={!fprops.submitting}
           closeOnEscape={!fprops.submitting}
@@ -145,10 +150,15 @@ export function FinalModalForm({
               form={`final-modal-form-${id}`}
               label={submitLabel || Translate.string('Submit')}
               disabledUntilChange={disabledUntilChange}
+              disabledAfterSubmit={disabledAfterSubmit}
             />
             <Form.Field disabled={fprops.submitting}>
               <Button onClick={onClose} disabled={fprops.submitting}>
-                {fprops.dirty ? <Translate>Cancel</Translate> : <Translate>Close</Translate>}
+                {fprops.dirty && !(fprops.submitSucceeded && disabledAfterSubmit) ? (
+                  <Translate>Cancel</Translate>
+                ) : (
+                  <Translate>Close</Translate>
+                )}
               </Button>
             </Form.Field>
           </Modal.Actions>
@@ -190,6 +200,8 @@ FinalModalForm.propTypes = {
   header: PropTypes.node.isRequired,
   /** Whether the submit button should remain disabled as long as the form is in pristine state. */
   disabledUntilChange: PropTypes.bool,
+  /** Whether to disable the submit button after the form is successfully submitted once. */
+  disabledAfterSubmit: PropTypes.bool,
   /**
    * Whether to ask the user to confirm when unloading the page or closing the dialog using
    * anything but the explicit cancel button.
@@ -229,6 +241,7 @@ FinalModalForm.defaultProps = {
   validate: undefined,
   size: 'tiny', // default to something reasonably small - let people explicitly go larger!
   disabledUntilChange: true,
+  disabledAfterSubmit: false,
   unloadPrompt: false,
   unloadPromptRouter: false,
   alignTop: false,

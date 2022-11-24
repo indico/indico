@@ -53,13 +53,13 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <button class="i-button icon-mail highlight disabled js-requires-selected-row"
-                            data-href="{{ url_for('persons.email_event_persons', event) }}"
-                            data-title="{% trans %}Send email{% endtrans %}"
-                            data-method="POST"
-                            data-params-selector="#event-participants-list input.id-field:checkbox:checked:visible"
-                            data-ajax-dialog
-                            data-reload-after>
+                    <div id="persons-email"
+                         data-event-id="{{ event.id }}"
+                         data-user-selector="#event-participants-list input[name=user_id][type=checkbox]:checked"
+                         data-person-selector="#event-participants-list input[name=person_id][type=checkbox]:checked">
+                    </div>
+                    <button id="persons-email-trigger"
+                            class="i-button icon-mail right highlight disabled js-requires-selected-row">
                         {%- trans %}Send emails{% endtrans -%}
                     </button>
                 </div>
@@ -102,6 +102,17 @@
                     </div>
                 {% endif %}
                 <div class="group">
+                    <div id="invitation-email-all"
+                         data-event-id="{{ event.id }}"
+                         data-person-selector="#event-participants-list tr[data-no-account] input[name=person_id][type=checkbox]"
+                         data-no-account></div>
+                    {% if has_uninvited %}
+                        <div id="invitation-email-not-invited"
+                             data-event-id="{{ event.id }}"
+                             data-person-selector="#event-participants-list tr[data-no-account] input[name=person_id][type=checkbox]"
+                             data-no-account
+                             data-not-invited-only></div>
+                    {% endif %}
                     <a href="#"
                        class="i-button arrow highlight js-dropdown {{ 'disabled' if not has_no_account }}"
                        data-toggle="dropdown">
@@ -111,12 +122,7 @@
                         <li>
                             <a href="#"
                                title="{% trans %}Send an email to all users with no Indico account{% endtrans %}"
-                               data-href="{{ url_for('persons.email_event_persons', event, no_account=true) }}"
-                               data-params-selector="#event-participants-list [data-no-account] input.id-field:checkbox"
-                               data-title="{% trans %}Send email{% endtrans %}"
-                               data-method="POST"
-                               data-ajax-dialog
-                               data-reload-after>
+                               id="invitation-email-all-trigger">
                                 {% trans %}To all users with no account{% endtrans %}
                             </a>
                         </li>
@@ -125,13 +131,7 @@
                                 <a href="#"
                                    title="{% trans %}Send an email to all users with no Indico account who have not
                                          received an invitation email yet{% endtrans %}"
-                                   data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
-                                                          not_invited_only=true) }}"
-                                   data-params-selector="#event-participants-list [data-no-account] input.id-field:checkbox"
-                                   data-title="{% trans %}Send email{% endtrans %}"
-                                   data-method="POST"
-                                   data-ajax-dialog
-                                   data-reload-after>
+                                   id="invitation-email-not-invited-trigger">
                                     {% trans %}To users not invited yet{% endtrans %}
                                 </a>
                             </li>
@@ -283,5 +283,10 @@
             hasNoRegistrationFilter: true,
             hasNoBuiltinRolesFilter: true,
         });
+        setupEmailButton('#persons-email', '#persons-email-trigger');
+        setupEmailButton('#invitation-email-all', '#invitation-email-all-trigger');
+        {% if has_uninvited %}
+            setupEmailButton('#invitation-email-not-invited', '#invitation-email-all-trigger');
+        {% endif %}
     </script>
 {% endblock %}

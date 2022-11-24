@@ -5,7 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-export const getConfig = ({images = true, imageUploadURL = null, fullScreen = true} = {}) => ({
+export const getConfig = ({
+  images = true,
+  imageUploadURL = null,
+  fullScreen = true,
+  showToolbar = true,
+} = {}) => ({
   removePlugins: images && imageUploadURL ? [] : ['ImageInsert', 'ImageUpload'],
   fontFamily: {
     options: [
@@ -14,7 +19,7 @@ export const getConfig = ({images = true, imageUploadURL = null, fullScreen = tr
       'Monospace/"Liberation Mono", monospace',
     ],
   },
-  toolbar: {
+  toolbar: showToolbar && {
     shouldNotGroupWhenFull: false,
     items: [
       'heading',

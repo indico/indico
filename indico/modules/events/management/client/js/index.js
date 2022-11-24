@@ -17,6 +17,7 @@ import 'indico/modules/events/util/static_filters';
 
 import './badges';
 
+import {EmailButton} from 'indico/modules/events/persons/Email';
 import {$T} from 'indico/utils/i18n';
 import {natSortCompare} from 'indico/utils/sort';
 
@@ -24,6 +25,29 @@ import {SingleEventMove, EventPublish} from './EventMove';
 import {SeriesManagement} from './SeriesManagement';
 
 (function(global) {
+  global.setupEmailButton = function setupEmailButton(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, roleId, personSelector, userSelector} = element.dataset;
+    const extraParams = {};
+    if (element.dataset.noAccount !== undefined) {
+      extraParams.noAccount = true;
+    }
+    if (element.dataset.notInvitedOnly !== undefined) {
+      extraParams.notInvitedOnly = true;
+    }
+    ReactDOM.render(
+      <EmailButton
+        eventId={+eventId}
+        roleId={roleId && +roleId}
+        personSelector={personSelector}
+        userSelector={userSelector}
+        triggerSelector={trigger}
+        {...extraParams}
+      />,
+      element
+    );
+  };
+
   global.setupEventManagementActionMenu = function setupEventManagementActionMenu() {
     const moveContainer = document.querySelector('#event-action-move-container');
     if (moveContainer) {

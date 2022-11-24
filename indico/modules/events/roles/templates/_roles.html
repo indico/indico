@@ -40,13 +40,19 @@
             <div class="thin toolbar right entry-action-buttons">
                 <div class="group">
                     {% if email_button %}
-                        <button class="icon-mail i-button text-color borderless"
-                                data-href="{{ url_for('persons.email_event_persons', role.event) }}"
-                                data-title
-                                title="{% trans %}Send email{% endtrans %}"
-                                data-method="POST"
-                                data-params="{{ dict(role_id=role.id) | tojson | forceescape }}"
-                                data-ajax-dialog></button>
+                        <button id="role-{{ role.id }}-email-trigger"
+                                class="icon-mail i-button text-color borderless {% if not role.members %}disabled{% endif %}"
+                                title="{% trans %}Send email{% endtrans %}"></button>
+                        {% if role.members %}
+                            <div
+                                id="role-{{ role.id }}-email"
+                                data-event-id="{{ role.event.id }}"
+                                data-role-id="{{ role.id }}">
+                            </div>
+                            <script>
+                                setupEmailButton('#role-{{ role.id }}-email', '#role-{{ role.id }}-email-trigger');
+                            </script>
+                        {% endif %}
                     {% endif %}
                     <button class="icon-edit i-button text-color borderless"
                             data-href="{{ url_for('.edit_role', role) }}"
