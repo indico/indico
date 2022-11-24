@@ -219,7 +219,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
                 : [e.contributionTitle, e.contributionCode]
             }
             onChangeFilters={onChangeFilters}
-            onChangeList={result => setFilteredSet(new Set(result.map(e => e.id)))}
+            onChangeList={setFilteredSet}
           />
         </div>
         <Dimmer.Dimmable styleName="filtered-editables" dimmed={loading}>
