@@ -20,6 +20,11 @@ Bugfixes
   on someone's behalf (:pr:`5574`)
 - Disallow nonsensical retention periods and visibility durations (:pr:`5576`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Refactor email-sending dialog using React (:pr:`5547`)
+
 
 Version 3.2.1
 -------------
