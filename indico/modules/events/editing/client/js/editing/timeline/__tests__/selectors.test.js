@@ -104,10 +104,9 @@ describe('timeline selectors', () => {
     expect(result[1].id).toBe(2);
     expect(result[1].items).toStrictEqual([
       expect.objectContaining({
-        header:
-          revisionStates[InitialRevisionState.needs_submitter_confirmation][
-            FinalRevisionState.needs_submitter_changes
-          ],
+        header: revisionStates[InitialRevisionState.needs_submitter_confirmation][
+          FinalRevisionState.needs_submitter_changes
+        ](result[1], {isLatestRevision: false}),
       }),
     ]);
     expect(result[2].id).toBe(3);
