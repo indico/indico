@@ -283,10 +283,10 @@
             hasNoRegistrationFilter: true,
             hasNoBuiltinRolesFilter: true,
         });
-        setupEmailButton('#persons-email');
-        setupEmailButton('#invitation-email-all');
+        setupEmailButton('#persons-email', '#persons-email-trigger');
+        setupEmailButton('#invitation-email-all', '#invitation-email-all-trigger');
         {% if has_uninvited %}
-            setupEmailButton('#invitation-email-not-invited');
+            setupEmailButton('#invitation-email-not-invited', '#invitation-email-all-trigger');
         {% endif %}
     </script>
 {% endblock %}

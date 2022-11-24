@@ -25,7 +25,7 @@ import {SingleEventMove, EventPublish} from './EventMove';
 import {SeriesManagement} from './SeriesManagement';
 
 (function(global) {
-  global.setupEmailButton = function setupEmailButton(field, trigger = null) {
+  global.setupEmailButton = function setupEmailButton(field, trigger) {
     const element = document.querySelector(field);
     const {eventId, roleId, personSelector, userSelector} = element.dataset;
     const extraParams = {};
@@ -41,7 +41,7 @@ import {SeriesManagement} from './SeriesManagement';
         roleId={roleId && +roleId}
         personSelector={personSelector}
         userSelector={userSelector}
-        triggerSelector={trigger || `${field}-trigger`}
+        triggerSelector={trigger}
         {...extraParams}
       />,
       element

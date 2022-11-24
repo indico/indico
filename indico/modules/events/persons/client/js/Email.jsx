@@ -123,7 +123,6 @@ export function EmailForm({
     body: defaultBody,
     placeholders = [],
   } = data || {};
-  const count = Object.values(recipientData).reduce((acc, v) => acc + v.length, 0);
 
   const togglePreview = async ({body, subject}) => {
     if (!preview) {
@@ -197,12 +196,12 @@ export function EmailForm({
   const successMessage = (
     <Message positive>
       <Translate as={Message.Header}>Your email has been sent.</Translate>
-      <PluralTranslate count={count} as="p">
+      <PluralTranslate count={recipients.length} as="p">
         <Singular>
-          <Param name="count" value={count} /> email has been sent.
+          <Param name="count" value={recipients.length} /> email has been sent.
         </Singular>
         <Plural>
-          <Param name="count" value={count} /> emails have been sent.
+          <Param name="count" value={recipients.length} /> emails have been sent.
         </Plural>
       </PluralTranslate>
     </Message>
