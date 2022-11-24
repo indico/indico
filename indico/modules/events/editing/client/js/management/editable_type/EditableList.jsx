@@ -33,6 +33,7 @@ import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import Palette from 'indico/utils/palette';
+import {natSortCompare} from 'indico/utils/sort';
 
 import StateIndicator from '../../editing/timeline/StateIndicator';
 import {userPropTypes} from '../../editing/timeline/util';
@@ -201,25 +202,33 @@ function EditableListDisplay({
     ['editor', Translate.string('Editor'), 400],
   ];
 
-  const sortEditor = contribution =>
+  const programCodeKey = contribution => contribution.code;
+  const titleKey = contribution => contribution.title.toLowerCase();
+  const revisionKey = contribution => contribution.editable && contribution.editable.revisionCount;
+  const statusKey = contribution =>
+    contribution.editable && contribution.editable.state.toLowerCase();
+  const editorKey = contribution =>
     contribution.editable &&
     contribution.editable.editor &&
     contribution.editable.editor.fullName.toLowerCase();
-  const sortStatus = contribution =>
-    contribution.editable && contribution.editable.state.toLowerCase();
-  const sortTitle = contribution => contribution.title.toLowerCase();
+
+  const sortKeys = {
+    code: programCodeKey,
+    title: titleKey,
+    revision: revisionKey,
+    status: statusKey,
+    editor: editorKey,
+  };
 
   const sortFuncs = {
-    title: sortTitle,
-    revision: contribution => contribution.editable && contribution.editable.revisionCount,
-    status: sortStatus,
-    editor: sortEditor,
+    code: (arr, key) => [...arr].sort((a, b) => natSortCompare(key(a), key(b))),
   };
 
   // eslint-disable-next-line no-shadow
   const _sortList = (sortBy, sortDirection, filteredResults) => {
-    const fn = sortFuncs[sortBy] || (x => x);
-    const newList = _.sortBy(contribList, fn);
+    const sortKey = sortKeys[sortBy] || (x => x[sortBy]);
+    const sortFn = sortFuncs[sortBy] || ((arr, key) => _.sortBy(arr, key));
+    const newList = sortFn(contribList, sortKey);
     if (sortDirection === SortDirection.DESC) {
       newList.reverse();
     }

@@ -20,6 +20,7 @@ Bugfixes
 - Fix always-disabled submit button when submitting an agreement response
   on someone's behalf (:pr:`5574`)
 - Disallow nonsensical retention periods and visibility durations (:pr:`5576`)
+- Fix sorting by program code in editable list (:pr:`5582`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
