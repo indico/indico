@@ -36,7 +36,8 @@ export function EmailButton({
   personSelector,
   userSelector,
   triggerSelector,
-  extraParams,
+  noAccount,
+  notInvitedOnly,
 }) {
   const [open, setOpen] = useState(false);
   const personIds = getIds(personSelector);
@@ -65,8 +66,9 @@ export function EmailButton({
           personIds={personIds}
           userIds={userIds}
           roleIds={roleId && [roleId]}
+          noAccount={noAccount}
+          notInvitedOnly={notInvitedOnly}
           onClose={() => setOpen(false)}
-          extraParams={extraParams}
         />
       )}
     </>
@@ -79,7 +81,8 @@ EmailButton.propTypes = {
   personSelector: PropTypes.string,
   userSelector: PropTypes.string,
   triggerSelector: PropTypes.string,
-  extraParams: PropTypes.object,
+  noAccount: PropTypes.bool,
+  notInvitedOnly: PropTypes.bool,
 };
 
 EmailButton.defaultProps = {
@@ -87,12 +90,27 @@ EmailButton.defaultProps = {
   personSelector: undefined,
   userSelector: undefined,
   triggerSelector: undefined,
-  extraParams: undefined,
+  noAccount: false,
+  notInvitedOnly: false,
 };
 
-export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraParams}) {
+export function EmailForm({
+  eventId,
+  personIds,
+  roleIds,
+  userIds,
+  onClose,
+  noAccount,
+  notInvitedOnly,
+}) {
   const [preview, setPreview] = useState(null);
-  const recipientData = {personId: personIds, roleId: roleIds, userId: userIds, ...extraParams};
+  const recipientData = {
+    personId: personIds,
+    roleId: roleIds,
+    userId: userIds,
+    noAccount,
+    notInvitedOnly,
+  };
   const {data, loading} = useIndicoAxios({
     url: emailMetadataURL({event_id: eventId}),
     method: 'POST',
@@ -110,7 +128,14 @@ export function EmailForm({eventId, personIds, roleIds, userIds, onClose, extraP
   const togglePreview = async ({body, subject}) => {
     if (!preview) {
       body = body.getData ? body.getData() : body;
-      const {data} = await indicoAxios.post(emailPreviewURL({event_id: eventId}), {body, subject});
+      const {data} = await indicoAxios.post(
+        emailPreviewURL({event_id: eventId}),
+        snakifyKeys({
+          body,
+          subject,
+          noAccount,
+        })
+      );
       setPreview(data);
       return;
     }
@@ -282,12 +307,14 @@ EmailForm.propTypes = {
   userIds: PropTypes.arrayOf(PropTypes.number),
   roleIds: PropTypes.arrayOf(PropTypes.number),
   onClose: PropTypes.func.isRequired,
-  extraParams: PropTypes.object,
+  noAccount: PropTypes.bool,
+  notInvitedOnly: PropTypes.bool,
 };
 
 EmailForm.defaultProps = {
   personIds: [],
   userIds: [],
   roleIds: [],
-  extraParams: {},
+  noAccount: false,
+  notInvitedOnly: false,
 };

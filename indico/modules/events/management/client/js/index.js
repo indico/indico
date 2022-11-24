@@ -27,7 +27,14 @@ import {SeriesManagement} from './SeriesManagement';
 (function(global) {
   global.setupEmailButton = function setupEmailButton(field, trigger = null) {
     const element = document.querySelector(field);
-    const {eventId, roleId, personSelector, userSelector, ...extraParams} = element.dataset;
+    const {eventId, roleId, personSelector, userSelector} = element.dataset;
+    const extraParams = {};
+    if (element.dataset.noAccount !== undefined) {
+      extraParams.noAccount = true;
+    }
+    if (element.dataset.notInvitedOnly !== undefined) {
+      extraParams.notInvitedOnly = true;
+    }
     ReactDOM.render(
       <EmailButton
         eventId={+eventId}
@@ -35,7 +42,7 @@ import {SeriesManagement} from './SeriesManagement';
         personSelector={personSelector}
         userSelector={userSelector}
         triggerSelector={trigger || `${field}-trigger`}
-        extraParams={extraParams}
+        {...extraParams}
       />,
       element
     );
