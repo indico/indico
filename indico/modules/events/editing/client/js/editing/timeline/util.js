@@ -16,10 +16,11 @@ import {filePropTypes} from './FileManager/util';
 // with a label referring to its previous state transition
 export function processRevisions(revisions) {
   let revisionState;
-  return revisions.map(revision => {
+  return revisions.map((revision, i) => {
     const items = [...revision.comments];
     const header = revisionState;
-    revisionState = getRevisionTransition(revision);
+    const isLatestRevision = i === revisions.length - 1;
+    revisionState = getRevisionTransition(revision, {isLatestRevision});
     // Generate the comment header
     if (revisionState) {
       const author = revision.editor || revision.submitter;
@@ -56,9 +57,11 @@ export const revisionStates = {
         ? Translate.string('Editor has accepted after making some changes')
         : Translate.string('Submitter has accepted proposed changes');
     },
-    [FinalRevisionState.needs_submitter_changes]: Translate.string(
-      'Submitter rejected proposed changes'
-    ),
+    [FinalRevisionState.needs_submitter_changes]: (_, {isLatestRevision}) => {
+      return isLatestRevision
+        ? Translate.string('Submitter rejected proposed changes')
+        : Translate.string('Submitter rejected proposed changes and uploaded a new revision');
+    },
   },
   any: {
     [FinalRevisionState.replaced]: Translate.string('Revision has been replaced'),
@@ -74,10 +77,10 @@ export const revisionStates = {
   },
 };
 
-export function getRevisionTransition(revision) {
+export function getRevisionTransition(revision, revisionMetadata) {
   const headerStates = revisionStates[revision.initialState.name] || revisionStates['any'];
   const header = headerStates[revision.finalState.name];
-  return typeof header === 'function' ? header(revision) : header;
+  return typeof header === 'function' ? header(revision, revisionMetadata) : header;
 }
 
 export const userPropTypes = {
