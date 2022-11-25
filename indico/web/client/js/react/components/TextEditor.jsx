@@ -12,7 +12,7 @@ import React, {useMemo, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
-import {getConfig} from 'indico/ckeditor';
+import {getConfig, sanitizeHtmlOnPaste} from 'indico/ckeditor';
 import {Translate} from 'indico/react/i18n';
 
 import {FinalField} from '../forms';
@@ -40,6 +40,10 @@ export default function TextEditor({
     editor.editing.view.change(writer => {
       writer.setStyle('width', width, editor.editing.view.document.getRoot());
       writer.setStyle('height', height, editor.editing.view.document.getRoot());
+    });
+    // Sanitize pasted HTML
+    editor.editing.view.document.on('clipboardInput', sanitizeHtmlOnPaste(editor), {
+      priority: 'normal',
     });
     if (setValidationError) {
       editor.plugins._plugins.get('SourceEditing').on('change:isSourceEditingMode', evt => {

@@ -14,6 +14,8 @@ Improvements
 - Warn when a user cannot create an event in the current category (:pr:`5572`)
 - Display all contributions in 'My contributions' and not just those with
   submitter privileges (:pr:`5575`)
+- Apply stronger sanitization on rich-text content pasted into CKEditor
+  (:issue:`5560`, :pr:`5571`)
 
 Bugfixes
 ^^^^^^^^

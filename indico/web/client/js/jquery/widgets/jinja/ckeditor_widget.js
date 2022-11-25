@@ -8,7 +8,7 @@
 import ClassicEditor from 'ckeditor';
 import _ from 'lodash';
 
-import {getConfig} from 'indico/ckeditor';
+import {getConfig, sanitizeHtmlOnPaste} from 'indico/ckeditor';
 
 (function(global) {
   global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
@@ -26,6 +26,10 @@ import {getConfig} from 'indico/ckeditor';
         field.dispatchEvent(new Event('change', {bubbles: true}));
       }, 250)
     );
+    // Sanitize pasted HTML
+    editor.editing.view.document.on('clipboardInput', sanitizeHtmlOnPaste(editor), {
+      priority: 'normal',
+    });
     editor.editing.view.change(writer => {
       writer.setStyle(
         'width',

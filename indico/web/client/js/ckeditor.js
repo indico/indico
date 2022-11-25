@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {sanitizeHtml} from './utils/sanitize';
+
 export const getConfig = ({
   images = true,
   imageUploadURL = null,
@@ -184,3 +186,22 @@ export const getConfig = ({
         }
       : undefined,
 });
+
+// Sanitize HTML pasted into ckeditor.
+// Use it with the clipboardInput event and pass the editor instance:
+//
+//   editor.editing.view.document.on('clipboardInput', sanitizeHtmlOnPaste(editor))
+//
+// More info: https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/clipboard.html
+export function sanitizeHtmlOnPaste(editor) {
+  return (ev, data) => {
+    if (data.method !== 'paste' || data.content) {
+      return;
+    }
+    const dataTransfer = data.dataTransfer;
+    const contentData = dataTransfer.getData('text/html');
+    if (contentData) {
+      data.content = editor.data.htmlProcessor.toView(sanitizeHtml(contentData));
+    }
+  };
+}
