@@ -115,14 +115,15 @@ class CKEditorWidget(JinjaWidget):
     """Render a CKEditor WYSIWYG editor.
 
     :param images: Whether to allow images.
+    :param html_embed: Whether to enable raw HTML embedding.
     :param height: The height of the editor.
 
     If the form has a ``ckeditor_upload_url`` attribute and images are enabled,
     the editor will allow pasting/selecting images and upload them using that URL.
     """
 
-    def __init__(self, *, images=False, height=475):
-        super().__init__('forms/ckeditor_widget.html', images=images, height=height)
+    def __init__(self, *, images=False, html_embed=False, height=475):
+        super().__init__('forms/ckeditor_widget.html', images=images, html_embed=html_embed, height=height)
 
 
 class SwitchWidget(JinjaWidget):
