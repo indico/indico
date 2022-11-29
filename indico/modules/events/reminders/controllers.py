@@ -128,6 +128,7 @@ class RHPreviewReminder(RHRemindersBase):
     def _process(self):
         include_summary = request.form.get('include_summary') == '1'
         include_description = request.form.get('include_description') == '1'
-        tpl = make_reminder_email(self.event, include_summary, include_description, request.form.get('message'))
-        html = render_template('events/reminders/preview.html', subject=tpl.get_subject(), body=tpl.get_body())
+        with self.event.force_event_locale():
+            tpl = make_reminder_email(self.event, include_summary, include_description, request.form.get('message'))
+            html = render_template('events/reminders/preview.html', subject=tpl.get_subject(), body=tpl.get_body())
         return jsonify(html=html)
