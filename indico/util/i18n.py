@@ -203,13 +203,22 @@ def _remove_locale_script(locale):
     return f'{parts[0]}_{parts[-1]}'
 
 
-def force_locale(locale):
+def force_locale(locale, *, default=True):
     """Temporarily override the locale.
 
     Use this as a context manager in a ``with`` block.
     `locale` can be set to ``None`` to avoid translation and thus
     use the hardcoded string which is en_US.
+
+    :param locale: The locale to force
+    :param default: Whether to use the server default instead of en_US
+                    if no locale is specified. Should be disabled only
+                    for cases where an english string is always preferred,
+                    e.g. when generating log messages that include stuff
+                    like enum titles or dates
     """
+    if default and not locale:
+        locale = config.DEFAULT_LOCALE
     return _force_locale(locale or 'en_US')
 
 

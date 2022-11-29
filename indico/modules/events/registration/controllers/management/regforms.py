@@ -127,7 +127,7 @@ class RHManageRegistrationFormDisplay(RHManageRegFormBase):
 
 
 def _get_regform_creation_log_data(regform):
-    with force_locale(None):
+    with force_locale(None, default=False):
         return {
             'Visibility to participants': orig_string(regform.publish_registrations_participants.title),
             'Visibility to everyone': orig_string(regform.publish_registrations_public.title),

@@ -74,7 +74,7 @@ def make_diff_log(changes, fields):
             change = [x.isoformat() for x in change]
         elif not_none_change and all(isinstance(x, timedelta) for x in not_none_change):
             type_ = 'timedelta'
-            with force_locale(None):
+            with force_locale(None, default=False):
                 change = [format_human_timedelta(x) if x is not None else default for x in change]
         else:
             type_ = 'text'

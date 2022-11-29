@@ -26,6 +26,8 @@ Bugfixes
 - Disallow nonsensical retention periods and visibility durations (:pr:`5576`)
 - Fix sorting by program code in editable list (:pr:`5582`)
 - Do not strip custom CSS classes from HTML in CKEditor (:issue:`5584`, :pr:`5585`)
+- Use the instance's default locale instead of "no locale" (US-English) in places
+  where no better information is known for email recipients (:pr:`5586`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
