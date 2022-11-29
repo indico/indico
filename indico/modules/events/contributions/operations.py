@@ -21,6 +21,7 @@ from indico.modules.events.timetable.operations import (delete_timetable_entry, 
                                                         update_timetable_entry)
 from indico.modules.events.util import set_custom_fields
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
+from indico.util.signals import make_interceptable
 
 
 def _ensure_consistency(contrib):
@@ -51,6 +52,7 @@ def _ensure_consistency(contrib):
     return False
 
 
+@make_interceptable
 def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None, extend_parent=False):
     user = session.user if session else None
     start_dt = contrib_data.pop('start_dt', None)
