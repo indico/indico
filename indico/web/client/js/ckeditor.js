@@ -12,6 +12,7 @@ export const getConfig = ({
   imageUploadURL = null,
   fullScreen = true,
   showToolbar = true,
+  htmlEmbed = false,
 } = {}) => ({
   removePlugins: images && imageUploadURL ? [] : ['ImageInsert', 'ImageUpload'],
   fontFamily: {
@@ -58,6 +59,7 @@ export const getConfig = ({
       fullScreen && 'fullscreen',
       fullScreen && '|',
       'sourceEditing',
+      htmlEmbed && 'htmlEmbed',
     ].filter(Boolean),
   },
   plugins: [
@@ -78,6 +80,7 @@ export const getConfig = ({
     'GeneralHtmlSupport',
     'Heading',
     'HorizontalLine',
+    htmlEmbed && 'HtmlEmbed',
     images && 'Image',
     images && 'ImageBlockEditing',
     images && 'ImageCaption',

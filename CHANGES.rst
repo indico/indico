@@ -16,6 +16,8 @@ Improvements
   submitter privileges (:pr:`5575`)
 - Apply stronger sanitization on rich-text content pasted into CKEditor
   (:issue:`5560`, :pr:`5571`)
+- Allow raw HTML snippets when editing custom conference pages and event
+  descriptions (:issue:`5584`, :pr:`5587`)
 
 Bugfixes
 ^^^^^^^^

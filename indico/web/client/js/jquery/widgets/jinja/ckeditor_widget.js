@@ -12,10 +12,18 @@ import {getConfig, sanitizeHtmlOnPaste} from 'indico/ckeditor';
 
 (function(global) {
   global.setupCKEditorWidget = async function setupCKEditorWidget(options) {
-    const {fieldId, images = true, imageUploadURL = null, width, height = 475, ...rest} = options;
+    const {
+      fieldId,
+      images = true,
+      imageUploadURL = null,
+      htmlEmbed = false,
+      width,
+      height = 475,
+      ...rest
+    } = options;
     const field = document.getElementById(fieldId);
     const editor = await ClassicEditor.create(field, {
-      ...getConfig({images, imageUploadURL}),
+      ...getConfig({images, imageUploadURL, htmlEmbed}),
       ...rest,
     });
     editor.setData(field.value);
