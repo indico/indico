@@ -231,17 +231,38 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
       return handleAxiosError(error);
     }
 
-    const {data} = response;
+    const data = camelizeKeys(response.data);
     const {status, conflict} = data;
     setUser(data.user);
-    setEventPerson(data.event_person);
+    setEventPerson(data.eventPerson);
 
-    if (conflict === 'person-already-exists' || conflict === 'user-and-person-already-exists') {
-      form.change('personId', data.event_person.id);
+    // A user can have multiple emails associated with their account.
+    // Check already added persons if there is any with the same userId
+    if (data.user) {
+      const existingPerson = otherPersons.find(p => data.user.id === p.userId);
+      if (existingPerson) {
+        msg = (
+          <Translate>
+            This email is associated with{' '}
+            <Param name="name" wrapper={<strong />} value={existingPerson.name} /> who is already in
+            the list.
+          </Translate>
+        );
+        setMessage({
+          status: 'error',
+          message: msg,
+        });
+        return msg;
+      }
     }
 
+    if (conflict === 'person-already-exists' || conflict === 'user-and-person-already-exists') {
+      form.change('personId', data.eventPerson.id);
+    }
+
+    // Load the user's avatar
     if (conflict === 'user-already-exists' || conflict === 'user-and-person-already-exists') {
-      form.change('avatarURL', data.user.avatar_url);
+      form.change('avatarURL', data.user.avatarURL);
     }
 
     if (
@@ -249,8 +270,8 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
       conflict === 'person-already-exists' ||
       conflict === 'user-and-person-already-exists'
     ) {
-      const obj = data.event_person || data.user;
-      const name = obj.full_name || obj.name;
+      const obj = data.eventPerson || data.user;
+      const name = obj.fullName || obj.name;
       if (isUpdate) {
         msg = (
           <Translate>
@@ -267,7 +288,7 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
         );
       }
     } else if (conflict === 'email-invalid') {
-      if (data.email_error === 'undeliverable') {
+      if (data.emailError === 'undeliverable') {
         msg = Translate.string('The domain used in the email address does not exist.');
       } else {
         msg = Translate.string('This email address is invalid.');
@@ -278,20 +299,23 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
 
     setMessage({status, message: msg});
     if (status === 'error') {
-      setMessage({status, message: msg});
       return msg;
     }
   }, 250);
 
   const onClick = async () => {
+    if (user) {
+      form.change('userId', user.id);
+    }
     const obj = eventPerson || user;
     form.change('address', obj.address);
-    form.change('firstName', obj.first_name);
-    form.change('lastName', obj.last_name);
+    form.change('name', obj.fullName || obj.name);
+    form.change('firstName', obj.firstName);
+    form.change('lastName', obj.lastName);
     form.change('title', obj.title);
     form.change('phone', obj.phone);
-    form.change('affiliationData', {id: obj.affiliation_id, text: obj.affiliation});
-    form.change('affiliationMeta', obj.affiliation_meta);
+    form.change('affiliationData', {id: obj.affiliationId, text: obj.affiliation});
+    form.change('affiliationMeta', obj.affiliationMeta);
   };
 
   const emailBtns = (
@@ -308,6 +332,8 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
       </Button>
     </div>
   );
+
+  const showEmailBtns = message.status !== 'error' && (!!user || !!eventPerson);
 
   return (
     <FinalInput
@@ -326,7 +352,7 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
           positive={message.status === 'ok'}
         >
           <div>{message.message}</div>
-          {(!!user || !!eventPerson) && emailBtns}
+          {showEmailBtns && emailBtns}
         </Message>
       )}
     </FinalInput>
