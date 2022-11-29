@@ -22,6 +22,7 @@ import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailPa
 import {$T} from 'indico/utils/i18n';
 import {natSortCompare} from 'indico/utils/sort';
 
+import {EmailAuthorsButton} from './EmailAuthors';
 import {SingleEventMove, EventPublish} from './EventMove';
 import {SeriesManagement} from './SeriesManagement';
 
@@ -61,6 +62,20 @@ import {SeriesManagement} from './SeriesManagement';
         metadataURL={metadataUrl}
         previewURL={previewUrl}
         sendURL={sendUrl}
+      />,
+      element
+    );
+  };
+
+  global.setupEmailAuthorsButton = function setupEmailAuthorsButton(context, field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, paramsSelector} = element.dataset;
+    ReactDOM.render(
+      <EmailAuthorsButton
+        eventId={+eventId}
+        context={context}
+        paramsSelector={paramsSelector}
+        triggerSelector={trigger}
       />,
       element
     );

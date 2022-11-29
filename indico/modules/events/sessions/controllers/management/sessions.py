@@ -178,7 +178,6 @@ class RHSessionREST(RHManageSessionBase):
 class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActionsBase):
     """List of persons in the session's contributions."""
 
-    template = 'events/sessions/management/session_person_list.html'
     ALLOW_LOCKED = True
 
     @property

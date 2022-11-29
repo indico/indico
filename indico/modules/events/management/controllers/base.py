@@ -7,7 +7,7 @@
 
 from collections import defaultdict
 
-from flask import session
+from flask import jsonify, session
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
@@ -17,7 +17,6 @@ from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import check_event_locked
 from indico.util.i18n import _
-from indico.web.util import jsonify_template
 
 
 class ManageEventMixin:
@@ -67,10 +66,14 @@ class RHContributionPersonListMixin:
         contribution_persons_dict = defaultdict(lambda: {'speaker': False, 'primary_author': False,
                                                          'secondary_author': False, 'not_registered': True})
         for contrib_person in contribution_persons:
-            person_roles = contribution_persons_dict[contrib_person.person]
-            person_roles['speaker'] |= contrib_person.is_speaker
-            person_roles['primary_author'] |= contrib_person.author_type == AuthorType.primary
-            person_roles['secondary_author'] |= contrib_person.author_type == AuthorType.secondary
-            person_roles['not_registered'] = contrib_person.person not in registered_persons
+            person_dict = contribution_persons_dict[contrib_person.person.id]
+            person_dict['id'] = contrib_person.person.id
+            person_dict['full_name'] = contrib_person.person.full_name
+            person_dict['email'] = contrib_person.person.email
+            person_dict['affiliation'] = contrib_person.person.affiliation
+            person_dict['speaker'] |= contrib_person.is_speaker
+            person_dict['primary_author'] |= contrib_person.author_type == AuthorType.primary
+            person_dict['secondary_author'] |= contrib_person.author_type == AuthorType.secondary
+            person_dict['registered'] = contrib_person.person in registered_persons
 
-        return jsonify_template(self.template, event_persons=contribution_persons_dict, event=self.event)
+        return jsonify(event_persons=[p for _, p in sorted(contribution_persons_dict.items())])

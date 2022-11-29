@@ -29,11 +29,12 @@ from indico.modules.events.cloning import get_attrs_to_clone
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
                                                                  EmailRolesSendMixin)
+from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import get_field_values
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
 from indico.web.args import use_kwargs
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 
 
 class RHAbstractListBase(RHManageAbstractsBase):
@@ -226,18 +227,23 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
         abstract_persons = (AbstractPersonLink.query
                             .filter(AbstractPersonLink.abstract.has(self._membership_filter))
                             .all())
+        registered_persons = get_registered_event_persons(self.event)
         abstract_persons_dict = defaultdict(lambda: {'speaker': False, 'submitter': False, 'primary_author': False,
                                                      'secondary_author': False})
         for abstract_person in abstract_persons:
-            dict_key = abstract_person.person.user if abstract_person.person.user else abstract_person.person
-            person_roles = abstract_persons_dict[dict_key]
-            person_roles['speaker'] |= abstract_person.is_speaker
-            person_roles['primary_author'] |= abstract_person.author_type == AuthorType.primary
-            person_roles['secondary_author'] |= abstract_person.author_type == AuthorType.secondary
+            person = abstract_person.person.user if abstract_person.person.user else abstract_person.person
+            person_dict = abstract_persons_dict[person.id]
+            person_dict['id'] = person.id
+            person_dict['full_name'] = person.full_name
+            person_dict['email'] = person.email
+            person_dict['affiliation'] = person.affiliation
+            person_dict['speaker'] |= abstract_person.is_speaker
+            person_dict['primary_author'] |= abstract_person.author_type == AuthorType.primary
+            person_dict['secondary_author'] |= abstract_person.author_type == AuthorType.secondary
+            person_dict['registered'] = abstract_person.person in registered_persons
         for submitter in submitters:
-            abstract_persons_dict[submitter]['submitter'] |= True
-        return jsonify_template('events/abstracts/management/abstract_person_list.html',
-                                event_persons=abstract_persons_dict, event=self.event)
+            abstract_persons_dict[submitter.id]['submitter'] |= True
+        return jsonify(event_persons=[p for _, p in sorted(abstract_persons_dict.items())])
 
 
 class RHManageAbstractsExportActionsBase(RHManageAbstractsActionsBase):

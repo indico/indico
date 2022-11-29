@@ -354,13 +354,13 @@
                     </a>
                 </li>
             </ul>
-            <button class="i-button icon-users js-enable-if-checked disabled"
-                    data-title="{% trans %}Author list{% endtrans %}"
-                    data-href="{{ url_for('contributions.person_list', event) }}"
-                    data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                    data-method="POST"
-                    data-ajax-dialog>
-                     {%- trans %}Author list{% endtrans -%}
+            <div id="email-authors"
+                 data-event-id="{{ event.id }}"
+                 data-params-selector="#assignment-list input[name=contribution_id]:checked">
+            </div>
+            <button id="email-authors-trigger"
+                    class="i-button icon-users js-enable-if-checked disabled">
+                {%- trans %}Email authors{% endtrans -%}
             </button>
             <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
                     data-href="{{ url_for('.download_papers', event) }}">
@@ -394,5 +394,6 @@
             $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
         setupPaperAssignmentList();
+        setupEmailAuthorsButton('contribution', '#email-authors', '#email-authors-trigger');
     </script>
 {% endmacro %}

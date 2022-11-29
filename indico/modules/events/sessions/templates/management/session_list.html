@@ -76,13 +76,13 @@
                     </a>
                 </div>
                 <div class="group">
-                    <button class="i-button icon-users js-requires-selected-row disabled"
-                            data-title="{% trans %}Author list{% endtrans %}"
-                            data-href="{{ url_for('.person_list', event) }}"
-                            data-params-selector="#sessions input[name=session_id]:checkbox:checked"
-                            data-method="POST"
-                            data-ajax-dialog>
-                        {%- trans %}Author list{% endtrans -%}
+                    <div id="email-authors"
+                         data-event-id="{{ event.id }}"
+                         data-params-selector="#sessions input[name=session_id]:checkbox:checked">
+                    </div>
+                    <button id="email-authors-trigger"
+                            class="i-button icon-users js-requires-selected-row disabled">
+                        {%- trans %}Email authors{% endtrans -%}
                     </button>
                 </div>
                 <div class="group">
@@ -140,5 +140,6 @@
         {% if selected_entry %}
             $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
+        setupEmailAuthorsButton('session', '#email-authors', '#email-authors-trigger');
     </script>
 {% endblock %}

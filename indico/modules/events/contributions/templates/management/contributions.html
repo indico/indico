@@ -95,12 +95,12 @@
                 </button>
                 <div class="group">
                     <div class="i-button-wrapper">
-                        <button class="i-button icon-users js-enable-if-checked disabled"
-                                data-title="{% trans %}Author list{% endtrans %}"
-                                data-href="{{ url_for('contributions.person_list', event) }}"
-                                data-params-selector="#contribution-list input[name=contribution_id]:checked"
-                                data-method="POST"
-                                data-ajax-dialog>
+                        <div id="email-authors-container"
+                             data-event-id="{{ event.id }}"
+                             data-params-selector="#contribution-list input[name=contribution_id]:checked">
+                        </div>
+                        <button id="email-authors-trigger"
+                                class="i-button icon-users js-enable-if-checked disabled">
                             {%- trans %}Author list{% endtrans -%}
                         </button>
                     </div>
@@ -209,6 +209,7 @@
             $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
 
+        setupEmailAuthorsButton('contribution', '#email-authors-container', '#email-authors-trigger');
         setupEmailContribAbstractRoles('#email-contrib-roles-container');
         setupContributionConfig();
         setupContributionList({
