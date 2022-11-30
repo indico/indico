@@ -361,11 +361,7 @@ function PersonLinkField({
               onClose={onClose}
               onSubmit={onSubmit}
               person={persons[selected]}
-              otherPersons={
-                selected !== null
-                  ? persons.filter(p => p.email !== persons[selected].email)
-                  : persons
-              }
+              otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
               validateEmailUrl={validateEmailUrl}
             />
