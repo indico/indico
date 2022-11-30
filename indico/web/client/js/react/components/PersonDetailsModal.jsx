@@ -5,11 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import validateEmailURL from 'indico-url:events.check_email';
 import searchAffiliationURL from 'indico-url:users.api_affiliations';
 
 import PropTypes from 'prop-types';
-import React, {useState, useMemo} from 'react';
+import React, {useState} from 'react';
 import {useForm, useFormState} from 'react-final-form';
 import {Form, Message, Header, Button, Icon} from 'semantic-ui-react';
 
@@ -102,12 +101,10 @@ export default function PersonDetailsModal({
   onSubmit,
   onClose,
   person,
-  eventId,
   otherPersons,
   hideEmailField,
+  validateEmailUrl,
 }) {
-  const shouldValidateEmail = eventId !== null;
-  const emailValidateUrl = useMemo(() => validateEmailURL({event_id: eventId}), [eventId]);
   return (
     <FinalModalForm
       id="person-link-details"
@@ -152,12 +149,7 @@ export default function PersonDetailsModal({
       {!hideEmailField && (
         <Form.Field>
           <Translate as="label">Email</Translate>
-          <EmailField
-            shouldValidate={shouldValidateEmail}
-            validateUrl={emailValidateUrl}
-            person={person}
-            otherPersons={otherPersons}
-          />
+          <EmailField validateUrl={validateEmailUrl} person={person} otherPersons={otherPersons} />
         </Form.Field>
       )}
       <Form.Group widths="equal">
@@ -178,20 +170,20 @@ PersonDetailsModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   person: PropTypes.object,
-  eventId: PropTypes.number,
   otherPersons: PropTypes.array,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
   hideEmailField: PropTypes.bool,
+  validateEmailUrl: PropTypes.string,
 };
 
 PersonDetailsModal.defaultProps = {
   person: undefined,
-  eventId: null,
   otherPersons: [],
   hideEmailField: false,
+  validateEmailUrl: null,
 };
 
-function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
+function EmailField({validateUrl, person, otherPersons}) {
   let response, msg;
   const [message, setMessage] = useState({status: '', message: ''});
   const form = useForm();
@@ -339,7 +331,7 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
     <FinalInput
       type="email"
       name="email"
-      validate={shouldValidate ? validateEmail : undefined}
+      validate={validateUrl ? validateEmail : undefined}
       // hide the normal error tooltip if we have an error from our async validation
       hideValidationError={message.status === 'error' ? 'message' : false}
       loaderWhileValidating
@@ -360,12 +352,12 @@ function EmailField({shouldValidate, validateUrl, person, otherPersons}) {
 }
 
 EmailField.propTypes = {
-  validateUrl: PropTypes.string.isRequired,
-  shouldValidate: PropTypes.bool.isRequired,
+  validateUrl: PropTypes.string,
   person: PropTypes.object,
   otherPersons: PropTypes.array.isRequired,
 };
 
 EmailField.defaultProps = {
   person: null,
+  validateUrl: null,
 };

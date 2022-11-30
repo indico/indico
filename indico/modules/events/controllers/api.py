@@ -6,13 +6,14 @@
 # LICENSE file for more details.
 
 from flask import jsonify, session
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events import Event
-from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.persons.util import check_person_link_email
+from indico.modules.events.util import get_object_from_args
 from indico.util.marshmallow import LowercaseString, ModelField
 from indico.web.args import use_kwargs
-from indico.web.rh import RH
+from indico.web.rh import RH, RHProtected
 
 
 class RHSingleEventAPI(RH):
@@ -29,11 +30,32 @@ class RHSingleEventAPI(RH):
         return EventDetailsForSeriesManagementSchema().jsonify(event)
 
 
-class RHEventCheckEmail(RHEventBase):
-    """Check a person's email when editing a person link."""
+class RHEventCheckEmail(RHProtected):
+    """Check a person's email when editing a person link.
+
+    Access to this endpoint is restricted to those users who can manage the person link's
+    parent object i.e. event, session block, abstract & {sub}contribution.
+    """
+
+    def _process_args(self):
+        self.object_type, self.event, self.object = get_object_from_args()
+        if self.object is None:
+            raise NotFound
+
+    def _check_access(self):
+        if self.object_type == 'event' and not self.object.can_manage(session.user):
+            raise Forbidden
+        if self.object_type == 'block' and not self.object.session.can_manage(session.user):
+            raise Forbidden
+        if self.object_type == 'abstract' and not self.object.can_manage(session.user):
+            raise Forbidden
+        if self.object_type == 'contribution' and not self.object.can_edit(session.user):
+            raise Forbidden
+        if self.object_type == 'subcontribution' and not self.object.can_edit(session.user):
+            raise Forbidden
 
     @use_kwargs({
         'email': LowercaseString(required=True),
     }, location='query')
-    def _process(self, email):
+    def _process_GET(self, email):
         return jsonify(check_person_link_email(self.event, email))

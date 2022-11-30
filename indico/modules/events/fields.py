@@ -27,6 +27,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.widgets import JinjaWidget
@@ -110,6 +111,10 @@ class PersonLinkListFieldBase(PrincipalListField):
         if self.event is None:
             return True
         return self.event.can_manage(session.user) or not persons_settings.get(self.event, 'disallow_custom_persons')
+
+    @property
+    def validate_email_url(self):
+        return url_for('events.check_email', self.object) if self.object else None
 
     @no_autoflush
     def _get_person_link(self, data):
