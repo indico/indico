@@ -64,15 +64,19 @@ def check_person_link_email(event, email):
     email = email.lower().strip()
     person = event.persons.filter_by(email=email).first()
     user = get_user_by_email(email)
+    # Do not return personal data
+    excluded_fields = ['address', 'phone']
+    user_schema = UserSchema(exclude=excluded_fields)
+    event_person_schema = EventPersonSchema(exclude=excluded_fields)
 
     if user and person:
         return dict(status='warning', conflict='user-and-person-already-exists',
-                    event_person=EventPersonSchema().dump(person),
-                    user=UserSchema().dump(user))
+                    event_person=event_person_schema.dump(person),
+                    user=user_schema.dump(user))
     if person:
-        return dict(status='warning', conflict='person-already-exists', event_person=EventPersonSchema().dump(person))
+        return dict(status='warning', conflict='person-already-exists', event_person=event_person_schema.dump(person))
     elif user:
-        return dict(status='warning', conflict='user-already-exists', user=UserSchema().dump(user))
+        return dict(status='warning', conflict='user-already-exists', user=user_schema.dump(user))
     if email_err := validate_email_verbose(email):
         return dict(status='error', conflict='email-invalid', email_error=email_err)
     else:
