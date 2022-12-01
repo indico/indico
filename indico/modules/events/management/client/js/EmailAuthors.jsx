@@ -77,6 +77,7 @@ EmailAuthorsButton.propTypes = {
 
 export function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
   const [selectedPersons, setSelectedPersons] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const formData = new FormData();
   sourceIds.forEach(v => formData.append(`${context}_id`, v));
   const {data, loading} = useIndicoAxios(
@@ -100,6 +101,11 @@ export function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
         ]
       : undefined;
 
+  const onChangeSelection = ({person, user}) => {
+    person && setSelectedPersons(person);
+    user && setSelectedUsers(user);
+  };
+
   return (
     <Modal open onClose={() => onClose()} size="large">
       <Modal.Header content={Translate.string('Email authors')} />
@@ -112,7 +118,8 @@ export function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
           <PersonList
             persons={data.eventPersons}
             selectedPersons={selectedPersons}
-            onSelect={newSelected => setSelectedPersons(newSelected)}
+            selectedUsers={selectedUsers}
+            onChangeSelection={onChangeSelection}
             isSelectable={person => !!person.email}
             extraRoles={extraRoles}
           />
@@ -121,9 +128,9 @@ export function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
         )}
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={() => onClose()}>
-          <Translate>Close</Translate>
-        </Button>
+        <Translate as={Button} onClick={() => onClose()}>
+          Close
+        </Translate>
       </Modal.Actions>
     </Modal>
   );

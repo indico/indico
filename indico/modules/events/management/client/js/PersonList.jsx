@@ -48,7 +48,14 @@ const makeAuthorType = ({primaryAuthor, secondaryAuthor}) => {
 };
 
 // TODO: implement filters
-export default function PersonList({persons, selectedPersons, onSelect, isSelectable, extraRoles}) {
+export default function PersonList({
+  persons,
+  selectedPersons,
+  selectedUsers,
+  onChangeSelection,
+  isSelectable,
+  extraRoles,
+}) {
   const [state, dispatch] = useReducer(personListReducer, {
     column: null,
     sortedPersons: persons.map(person => ({
@@ -59,7 +66,9 @@ export default function PersonList({persons, selectedPersons, onSelect, isSelect
     direction: null,
   });
   const {column, sortedPersons, direction} = state;
-  const numSelectablePersons = sortedPersons.filter(p => p.selectable).length;
+  const numSelectablePersons = sortedPersons.filter(p => p.selectable && p.idType === 'person')
+    .length;
+  const numSelectableUsers = sortedPersons.filter(p => p.selectable && p.idType === 'user').length;
   const roles = [
     ...extraRoles,
     {
@@ -72,18 +81,22 @@ export default function PersonList({persons, selectedPersons, onSelect, isSelect
 
   const toggleSelectAll = dataChecked => {
     if (dataChecked) {
-      onSelect(sortedPersons.filter(p => p.selectable).map(p => p.id));
+      onChangeSelection({
+        person: sortedPersons.filter(p => p.selectable && p.idType === 'person').map(p => p.id),
+        user: sortedPersons.filter(p => p.selectable && p.idType === 'user').map(p => p.id),
+      });
     } else {
-      onSelect([]);
+      onChangeSelection({person: [], user: []});
     }
   };
 
-  const toggleSelectRow = newId => {
-    if (selectedPersons.includes(newId)) {
-      onSelect(selectedPersons.filter(id => id !== newId));
-    } else {
-      onSelect([...selectedPersons, newId]);
+  const toggleSelectRow = ({id, idType, selectable}) => {
+    if (!selectable) {
+      return;
     }
+    const selected = idType === 'person' ? selectedPersons : selectedUsers;
+    const newIds = selected.includes(id) ? selected.filter(sId => sId !== id) : [...selected, id];
+    onChangeSelection({[idType]: newIds});
   };
 
   return (
@@ -93,13 +106,15 @@ export default function PersonList({persons, selectedPersons, onSelect, isSelect
           <Table.HeaderCell disabled colSpan="2">
             <Checkbox
               indeterminate={
-                selectedPersons.length > 0 && selectedPersons.length < numSelectablePersons
+                (selectedPersons.length > 0 && selectedPersons.length < numSelectablePersons) ||
+                (selectedUsers.length > 0 && selectedUsers.length < numSelectableUsers)
               }
               checked={
-                selectedPersons.length > 0 && selectedPersons.length === numSelectablePersons
+                (selectedPersons.length > 0 && selectedPersons.length === numSelectablePersons) ||
+                (selectedUsers.length > 0 && selectedUsers.length === numSelectableUsers)
               }
               onChange={(e, data) => toggleSelectAll(data.checked)}
-              disabled={!numSelectablePersons}
+              disabled={!numSelectablePersons && !numSelectableUsers}
             />
           </Table.HeaderCell>
           <Translate
@@ -140,12 +155,14 @@ export default function PersonList({persons, selectedPersons, onSelect, isSelect
           <Table.Row
             key={person.id}
             style={person.selectable ? {} : {opacity: '50%'}}
-            onClick={person.selectable ? () => toggleSelectRow(person.id) : undefined}
+            onClick={() => toggleSelectRow(person)}
           >
             <Table.Cell collapsing>
               <Checkbox
                 disabled={!person.selectable}
-                checked={selectedPersons.includes(person.id)}
+                checked={(person.idType === 'person' ? selectedPersons : selectedUsers).includes(
+                  person.id
+                )}
               />
             </Table.Cell>
             <Table.Cell collapsing>
@@ -191,6 +208,7 @@ PersonList.propTypes = {
   persons: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
+      idType: PropTypes.oneOf(['person', 'user']),
       fullName: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
       affiliation: PropTypes.string.isRequired,
@@ -201,7 +219,8 @@ PersonList.propTypes = {
     })
   ).isRequired,
   selectedPersons: PropTypes.arrayOf(PropTypes.number).isRequired,
-  onSelect: PropTypes.func.isRequired,
+  selectedUsers: PropTypes.arrayOf(PropTypes.number).isRequired,
+  onChangeSelection: PropTypes.func.isRequired,
   isSelectable: PropTypes.func,
   extraRoles: PropTypes.arrayOf(
     PropTypes.shape({

@@ -234,6 +234,7 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
             person = abstract_person.person.user if abstract_person.person.user else abstract_person.person
             person_dict = abstract_persons_dict[person.id]
             person_dict['id'] = person.id
+            person_dict['id_type'] = 'person' if abstract_person.person.user else 'user'
             person_dict['full_name'] = person.full_name
             person_dict['email'] = person.email
             person_dict['affiliation'] = person.affiliation
