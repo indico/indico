@@ -1,9 +1,0 @@
-{% extends 'events/management/_event_person_list.html' %}
-
-<!-- TODO delete this file -->
-
-{% block selection_toolbar %}
-    <input type="checkbox" id="filter-submitters" data-filter="submitter" checked>
-    <label for="filter-submitters" class="i-button">{% trans %}Submitters{% endtrans %}</label>
-    {{ super() }}
-{% endblock %}

@@ -231,13 +231,13 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
         abstract_persons_dict = defaultdict(lambda: {'speaker': False, 'submitter': False, 'primary_author': False,
                                                      'secondary_author': False})
         for abstract_person in abstract_persons:
-            person = abstract_person.person.user if abstract_person.person.user else abstract_person.person
-            person_dict = abstract_persons_dict[person.id]
-            person_dict['id'] = person.id
-            person_dict['id_type'] = 'person' if abstract_person.person.user else 'user'
-            person_dict['full_name'] = person.full_name
-            person_dict['email'] = person.email
-            person_dict['affiliation'] = person.affiliation
+            user_or_person = abstract_person.person.user if abstract_person.person.user else abstract_person.person
+            person_dict = abstract_persons_dict[user_or_person.id]
+            person_dict['id'] = user_or_person.id
+            person_dict['type'] = 'person' if abstract_person.person.user else 'user'
+            person_dict['full_name'] = user_or_person.full_name
+            person_dict['email'] = user_or_person.email
+            person_dict['affiliation'] = user_or_person.affiliation
             person_dict['speaker'] |= abstract_person.is_speaker
             person_dict['primary_author'] |= abstract_person.author_type == AuthorType.primary
             person_dict['secondary_author'] |= abstract_person.author_type == AuthorType.secondary

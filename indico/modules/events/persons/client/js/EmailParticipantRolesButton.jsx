@@ -17,15 +17,18 @@ import {getIds} from './util';
 export function EmailParticipantRolesButton({
   eventId,
   roleId,
+  personIds,
+  userIds,
   personSelector,
   userSelector,
   triggerSelector,
   noAccount,
   notInvitedOnly,
+  ...rest
 }) {
   const [open, setOpen] = useState(false);
-  const personIds = getIds(personSelector);
-  const userIds = getIds(userSelector);
+  personIds = personSelector ? getIds(personSelector) : personIds;
+  userIds = userSelector ? getIds(userSelector) : userIds;
 
   useEffect(() => {
     if (!triggerSelector) {
@@ -40,9 +43,13 @@ export function EmailParticipantRolesButton({
   return (
     <>
       {!triggerSelector && (
-        <Translate as={Button} onClick={() => setOpen(true)}>
-          Send email
-        </Translate>
+        <Button
+          onClick={() => setOpen(true)}
+          disabled={!(personIds.length || userIds.length || roleId)}
+          {...rest}
+        >
+          <Translate>Send emails</Translate>
+        </Button>
       )}
       {open && (
         <EmailParticipantRoles
@@ -62,6 +69,8 @@ export function EmailParticipantRolesButton({
 EmailParticipantRolesButton.propTypes = {
   eventId: PropTypes.number.isRequired,
   roleId: PropTypes.number,
+  personIds: PropTypes.arrayOf(PropTypes.number),
+  userIds: PropTypes.arrayOf(PropTypes.number),
   personSelector: PropTypes.string,
   userSelector: PropTypes.string,
   triggerSelector: PropTypes.string,
@@ -71,6 +80,8 @@ EmailParticipantRolesButton.propTypes = {
 
 EmailParticipantRolesButton.defaultProps = {
   roleId: undefined,
+  personIds: [],
+  userIds: [],
   personSelector: undefined,
   userSelector: undefined,
   triggerSelector: undefined,

@@ -142,6 +142,7 @@ export function EmailDialog({
       disabledUntilChange={false}
       disabledAfterSubmit
       unloadPrompt
+      scrolling
     >
       {({submitSucceeded}) =>
         submitSucceeded ? (

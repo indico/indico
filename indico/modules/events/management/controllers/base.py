@@ -68,7 +68,7 @@ class RHContributionPersonListMixin:
         for contrib_person in contribution_persons:
             person_dict = contribution_persons_dict[contrib_person.person.id]
             person_dict['id'] = contrib_person.person.id
-            person_dict['id_type'] = 'person' if contrib_person.person.user else 'user'
+            person_dict['type'] = 'person' if contrib_person.person.user else 'user'
             person_dict['full_name'] = contrib_person.person.full_name
             person_dict['email'] = contrib_person.person.email
             person_dict['affiliation'] = contrib_person.person.affiliation
@@ -77,4 +77,4 @@ class RHContributionPersonListMixin:
             person_dict['secondary_author'] |= contrib_person.author_type == AuthorType.secondary
             person_dict['registered'] = contrib_person.person in registered_persons
 
-        return jsonify(event_persons=[p for _, p in sorted(contribution_persons_dict.items())])
+        return jsonify(event_persons=[p for __, p in sorted(contribution_persons_dict.items())])

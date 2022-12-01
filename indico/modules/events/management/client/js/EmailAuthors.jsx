@@ -10,11 +10,14 @@ import contribsPersonListURL from 'indico-url:contributions.person_list';
 import sessionsPersonListURL from 'indico-url:sessions.person_list';
 
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Button, Dimmer, Loader, Message, Modal} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+
+import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailParticipantRolesButton';
+import {getIds} from 'indico/modules/events/persons/util';
 
 import PersonList from './PersonList';
 
@@ -35,12 +38,29 @@ const CONTEXTS = {
   },
 };
 
-// TODO: turn into util?
-// TODO: now do we need to check offsetwidth/height?
-const getIds = selector =>
-  Array.from(document.querySelectorAll(selector))
-    .filter(e => e.offsetWidth > 0 || e.offsetHeight > 0)
-    .map(e => +e.value);
+const FILTER_OPTIONS = {
+  submitter: {
+    text: Translate.string('Submitters'),
+    isMatch: person => person.submitter,
+    contexts: ['abstract'],
+  },
+  speaker: {
+    text: Translate.string('Speakers'),
+    isMatch: person => person.speaker,
+  },
+  primaryAuthor: {
+    text: Translate.string('Primary authors'),
+    isMatch: person => person.primaryAuthor,
+  },
+  secondaryAuthor: {
+    text: Translate.string('Co-authors'),
+    isMatch: person => person.secondaryAuthor,
+  },
+  notRegistered: {
+    text: Translate.string('Not registered'),
+    isMatch: person => !person.registered,
+  },
+};
 
 export function EmailAuthorsButton({eventId, context, paramsSelector, triggerSelector}) {
   const [open, setOpen] = useState(false);
@@ -75,9 +95,11 @@ EmailAuthorsButton.propTypes = {
   triggerSelector: PropTypes.string.isRequired,
 };
 
-export function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
+function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
   const [selectedPersons, setSelectedPersons] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [successMessage, setSuccessMessage] = useState(undefined);
+  const [activeFilters, setActiveFilters] = useState([]);
   const formData = new FormData();
   sourceIds.forEach(v => formData.append(`${context}_id`, v));
   const {data, loading} = useIndicoAxios(
@@ -89,6 +111,7 @@ export function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
     },
     {camelize: true}
   );
+  const eventPersons = useMemo(() => new Map(data?.eventPersons.map(p => [p.id, p])), [data]);
   const extraRoles =
     context === 'abstract'
       ? [
@@ -106,21 +129,52 @@ export function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
     user && setSelectedUsers(user);
   };
 
+  const isVisible = person =>
+    !activeFilters.length || activeFilters.every(filter => FILTER_OPTIONS[filter].isMatch(person));
+
+  const toggleFilter = name => {
+    setActiveFilters(
+      activeFilters.includes(name)
+        ? activeFilters.filter(f => f !== name)
+        : [...activeFilters, name]
+    );
+  };
+
+  const filterButtons = Object.entries(FILTER_OPTIONS)
+    .filter(([, filter]) => !filter.contexts || filter.contexts.includes(context))
+    .map(([name, filter]) => ({
+      key: name,
+      content: filter.text,
+      onClick: () => toggleFilter(name),
+      primary: activeFilters.includes(name),
+    }));
+
   return (
     <Modal open onClose={() => onClose()} size="large">
-      <Modal.Header content={Translate.string('Email authors')} />
+      <Modal.Header content={Translate.string('Authors list')} />
       <Modal.Content>
+        {successMessage}
+        <div>
+          <Translate
+            as="div"
+            style={{display: 'inline-block', fontWeight: 'bold', padding: '0.5em'}}
+          >
+            Filter by
+          </Translate>
+          <Button.Group buttons={filterButtons} compact />
+        </div>
         {loading || !data ? (
           <Dimmer active>
             <Loader />
           </Dimmer>
-        ) : data.eventPersons.length ? (
+        ) : eventPersons.size ? (
           <PersonList
             persons={data.eventPersons}
             selectedPersons={selectedPersons}
             selectedUsers={selectedUsers}
             onChangeSelection={onChangeSelection}
             isSelectable={person => !!person.email}
+            isVisible={isVisible}
             extraRoles={extraRoles}
           />
         ) : (
@@ -128,6 +182,13 @@ export function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
         )}
       </Modal.Content>
       <Modal.Actions>
+        <EmailParticipantRolesButton
+          eventId={eventId}
+          personIds={selectedPersons.filter(id => isVisible(eventPersons.get(id)))}
+          userIds={selectedUsers.filter(id => isVisible(eventPersons.get(id)))}
+          // onSuccess={msg => setSuccessMessage(msg)}
+          primary
+        />
         <Translate as={Button} onClick={() => onClose()}>
           Close
         </Translate>
