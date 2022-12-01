@@ -27,6 +27,7 @@ import {camelizeKeys} from 'indico/utils/case';
     const persons = JSON.parse(field.value);
     const user = sessionUser &&
       sessionUser.id !== undefined && {
+        title: sessionUser.title,
         name: sessionUser.fullName,
         userId: sessionUser.id,
         userIdentifier: `User:${sessionUser.id}`,
