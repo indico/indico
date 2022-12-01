@@ -193,6 +193,7 @@ function EmailField({validateUrl, person, otherPersons}) {
 
   const validateEmail = useDebouncedAsyncValidate(async email => {
     form.change('personId', person?.personId);
+    form.change('avatarURL', null);
     email = email.trim();
 
     if (email === '' || email === person?.email) {
