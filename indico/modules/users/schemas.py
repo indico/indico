@@ -34,10 +34,11 @@ class UserSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'affiliation_id',
-                  'address', 'affiliation_meta', 'full_name', 'phone', 'avatar_url')
+                  'address', 'title', 'affiliation_meta', 'full_name', 'phone', 'avatar_url')
 
     affiliation_id = fields.Integer(load_default=None, dump_only=True)
     affiliation_meta = fields.Nested(AffiliationSchema, attribute='affiliation_link', dump_only=True)
+    title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
 
 
 class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
