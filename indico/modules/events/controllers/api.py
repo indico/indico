@@ -43,19 +43,15 @@ class RHEventCheckEmail(RHProtected):
             raise NotFound
 
     def _check_access(self):
-        if self.object_type == 'event' and not self.object.can_manage(session.user):
-            raise Forbidden
-        if self.object_type == 'block' and not self.object.session.can_manage(session.user):
-            raise Forbidden
-        if self.object_type == 'abstract' and not self.object.can_manage(session.user):
-            raise Forbidden
-        if self.object_type == 'contribution' and not self.object.can_edit(session.user):
-            raise Forbidden
-        if self.object_type == 'subcontribution' and not self.object.can_edit(session.user):
+        obj = self.object.session if self.object_type == 'session_block' else self.object
+        # Depending on the settings, contribution submitters may be able to edit
+        # speakers/authors without having management rights
+        method = obj.can_edit if self.object_type in ('contribution', 'subcontribution') else obj.can_manage
+        if not method(session.user):
             raise Forbidden
 
     @use_kwargs({
         'email': LowercaseString(required=True),
     }, location='query')
-    def _process_GET(self, email):
+    def _process(self, email):
         return jsonify(check_person_link_email(self.event, email))

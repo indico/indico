@@ -63,16 +63,16 @@ _bp.add_url_rule('/event/<int:event_id>/api/info-for-series', 'single_event_api'
 
 # Email checker for PersonLinkField
 # Depending on where the person link is used, the person link field generates the correct url.
-# Eeach object has its own url so that we can do proper access checks.
-event_object_url_prefixes = {
+# Each object has its own url so that we can do proper access checks.
+_event_object_url_prefixes = {
     'event': '',
-    'block': '/blocks/<int:block_id>',
+    'session_block': '/sessions/<int:session_id>/blocks/<int:session_block_id>',
     'abstract': '/abstracts/<int:abstract_id>',
     'contribution': '/contributions/<int:contrib_id>',
     'subcontribution': '/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>',
 }
-for object_type, prefix in event_object_url_prefixes.items():
-    _bp.add_url_rule('/event/<int:event_id>/check-email' + prefix, 'check_email',
+for object_type, prefix in _event_object_url_prefixes.items():
+    _bp.add_url_rule(f'/event/<int:event_id>{prefix}/check-person-email', 'check_email',
                      RHEventCheckEmail, defaults={'object_type': object_type})
 
 

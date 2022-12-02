@@ -65,9 +65,8 @@ def check_person_link_email(event, email):
     person = event.persons.filter_by(email=email).first()
     user = get_user_by_email(email)
     # Do not return personal data
-    excluded_fields = ['address', 'phone']
-    user_schema = UserSchema(exclude=excluded_fields)
-    event_person_schema = EventPersonSchema(exclude=excluded_fields)
+    user_schema = UserSchema(exclude=['phone'])
+    event_person_schema = EventPersonSchema(exclude=['address', 'phone'])
 
     if user and person:
         return dict(status='warning', conflict='user-and-person-already-exists',
