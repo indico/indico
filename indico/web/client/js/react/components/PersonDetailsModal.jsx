@@ -129,7 +129,14 @@ export default function PersonDetailsModal({
       <Form.Group widths="equal">
         <Form.Field>
           <Translate as="label">Title</Translate>
-          <FinalDropdown name="title" fluid search selection options={titles} />
+          <FinalDropdown
+            name="title"
+            fluid
+            search
+            selection
+            options={titles}
+            placeholder={Translate.string('None')}
+          />
         </Form.Field>
         <Form.Field>
           <Translate as="label">Affiliation</Translate>
