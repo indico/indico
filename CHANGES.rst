@@ -18,6 +18,8 @@ Improvements
   (:issue:`5560`, :pr:`5571`)
 - Allow raw HTML snippets when editing custom conference pages and event
   descriptions (:issue:`5584`, :pr:`5587`)
+- Warn more clearly that link attachments are just a link and do not copy
+  the file (:issue:`5551`, :pr:`5593`)
 
 Bugfixes
 ^^^^^^^^

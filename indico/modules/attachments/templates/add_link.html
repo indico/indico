@@ -1,8 +1,15 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row %}
+{% from 'message_box.html' import message_box %}
 
 {%- block content %}
+    {% call message_box('warning', fixed_width=true) %}
+        {% trans %}
+            Please be aware that only the URL will be stored and no copy of the referenced file
+            or website will be made. In case of a file, it is recommended to upload it to Indico instead.
+        {% endtrans %}
+    {% endcall %}
     {{ form_header(form, id='attachment-link-form')}}
-    {{ form_row(form.link_url, widget_attrs={'placeholder': 'Example: http://www.example.com/YourPDFFile.pdf'}) }}
+    {{ form_row(form.link_url, widget_attrs={'placeholder': 'Example: https://www.google.com'}) }}
     {{ form_rows(form, fields=('title', 'description', 'folder', 'protected')) }}
     {{ form_rows(form, fields=('acl',)) }}
     {{ protection_message | safe }}
