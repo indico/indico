@@ -5,14 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
-
-.preview-button {
-  margin-right: auto;
-}
-
-.field-description {
-  color: $dark-gray;
-  font-size: 11px;
-  padding: 5px 2px 10px 2px;
-}
+export const getIds = selector =>
+  Array.from(document.querySelectorAll(selector))
+    .filter(e => e.offsetWidth > 0 || e.offsetHeight > 0)
+    .map(e => +e.value);

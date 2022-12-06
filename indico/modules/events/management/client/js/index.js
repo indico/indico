@@ -17,7 +17,7 @@ import 'indico/modules/events/util/static_filters';
 
 import './badges';
 
-import {EmailButton} from 'indico/modules/events/persons/Email';
+import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailParticipantRolesButton';
 import {$T} from 'indico/utils/i18n';
 import {natSortCompare} from 'indico/utils/sort';
 
@@ -36,7 +36,7 @@ import {SeriesManagement} from './SeriesManagement';
       extraParams.notInvitedOnly = true;
     }
     ReactDOM.render(
-      <EmailButton
+      <EmailParticipantRolesButton
         eventId={+eventId}
         roleId={roleId && +roleId}
         personSelector={personSelector}

@@ -359,7 +359,7 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
                 email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=from_address,
                                    template=tpl, html=True)
             send_email(email, self.event, 'Event Persons')
-        return '', 204
+        return jsonify(count=len(self.recipients))
 
 
 class RHGrantSubmissionRights(RHManageEventBase):
