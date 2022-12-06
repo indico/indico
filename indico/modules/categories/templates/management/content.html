@@ -116,8 +116,10 @@
         <p>
             {% trans %}This category is empty. A category can either hold categories or events.{% endtrans %}
         </p>
-        {{ create_category_button(category) }}
-        {{ create_event_button(category, text=_("Create event")) }}
+        <div class="toolbar">
+            {{ create_category_button(category) }}
+            {{ create_event_button(category, text=_("Create event")) }}
+        </div>
     {% else %}
         {% if subcategories %}
             {{ subcategories_table(subcategories, events.total|bool) }}
