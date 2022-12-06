@@ -32,6 +32,8 @@ Bugfixes
 - Do not strip custom CSS classes from HTML in CKEditor (:issue:`5584`, :pr:`5585`)
 - Use the instance's default locale instead of "no locale" (US-English) in places
   where no better information is known for email recipients (:pr:`5586`)
+- Make markdown display more consistent between editor preview and server-side
+  rendering (:issue:`5592`, :pr:`5595`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

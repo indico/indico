@@ -163,6 +163,7 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
     if md is None:
         extensions = set(kwargs.pop('extensions', ()))
         extensions.add('fenced_code')
+        extensions.add('mdx_truly_sane_lists')
         result = bleach.clean(markdown.markdown(text, extensions=tuple(extensions), **kwargs), tags=BLEACH_ALLOWED_TAGS,
                               attributes=BLEACH_ALLOWED_ATTRIBUTES)
     else:

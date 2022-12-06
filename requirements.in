@@ -38,6 +38,7 @@ marshmallow-enum
 marshmallow-oneofschema
 marshmallow-sqlalchemy
 marshmallow
+mdx-truly-sane-lists
 packaging
 pillow
 prompt-toolkit

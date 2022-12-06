@@ -179,7 +179,9 @@ lxml[html5]==4.9.1
 mako==1.2.3
     # via alembic
 markdown==3.4.1
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   mdx-truly-sane-lists
 markupsafe==2.1.1
     # via
     #   -r requirements.in
@@ -208,6 +210,8 @@ marshmallow-sqlalchemy==0.28.1
     # via -r requirements.in
 matplotlib-inline==0.1.6
     # via ipython
+mdx-truly-sane-lists==1.3
+    # via -r requirements.in
 mypy-extensions==0.4.3
     # via typing-inspect
 node-semver==0.8.1
