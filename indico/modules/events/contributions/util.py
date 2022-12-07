@@ -177,7 +177,7 @@ def generate_spreadsheet_from_contributions(contributions):
     return headers, rows
 
 
-def make_contribution_form(event):
+def make_contribution_form(event, *, management=True):
     """Extend the contribution WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
@@ -189,11 +189,11 @@ def make_contribution_form(event):
 
     form_class = type('_ContributionForm', (ContributionForm,), {})
     for custom_field in event.contribution_fields:
-        field_impl = custom_field.mgmt_field
+        field_impl = custom_field.mgmt_field if management else custom_field.field
         if field_impl is None:
             # field definition is not available anymore
             continue
-        if not custom_field.is_active:
+        if not custom_field.is_active or (not management and not custom_field.is_user_editable):
             continue
         name = f'custom_{custom_field.id}'
         setattr(form_class, name, field_impl.create_wtf_field())

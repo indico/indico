@@ -15,6 +15,7 @@ from wtforms_sqlalchemy.fields import QuerySelectField
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.abstracts.settings import BOASortField
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.fields import (ContributionPersonLinkListField,
                                                         SubContributionPersonLinkListField)
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
@@ -29,7 +30,7 @@ from indico.web.forms.fields import (HiddenFieldList, IndicoDateTimeField, Indic
                                      IndicoProtectionField, IndicoTagListField)
 from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.fields.principals import PermissionsField
-from indico.web.forms.validators import DateTimeRange, MaxDuration
+from indico.web.forms.validators import DateTimeRange, HiddenUnless, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -73,8 +74,13 @@ class ContributionForm(IndicoForm):
         if not to_schedule and (self.contrib is None or not self.contrib.is_scheduled):
             del self.start_dt
         if submitter_edit:
+            allow_custom = contribution_settings.get(self.event, 'submitters_can_edit_custom')
             for field in list(self):
-                if field.name != self.meta.csrf_field_name and field.name not in self._submitter_editable_fields:
+                if (
+                    field.name != self.meta.csrf_field_name and
+                    field.name not in self._submitter_editable_fields and
+                    (not allow_custom or not field.name.startswith('custom_'))
+                ):
                     delattr(self, field.name)
 
     def _get_earliest_start_dt(self):
@@ -195,9 +201,13 @@ class ContributionDefaultDurationForm(IndicoForm):
 
 
 class AllowSubmitterEditsForm(IndicoForm):
-    allow = BooleanField(_('Edit'), widget=SwitchWidget(),
-                         description=_('Allows submitters to edit basic information of '
-                                       'their contribution (title, description, speakers and authors)'))
+    submitters_can_edit = BooleanField(_('Edit (basic)'), widget=SwitchWidget(),
+                                       description=_('Allows submitters to edit basic information of their '
+                                                     'contribution (title, description, speakers and authors)'))
+    submitters_can_edit_custom = BooleanField(_('Edit (custom)'), [HiddenUnless('submitters_can_edit')],
+                                              widget=SwitchWidget(),
+                                              description=_('Allows submitters to edit user-editable custom fields '
+                                                            'of their contributions as well'))
 
 
 class ContributionTypeForm(IndicoForm):

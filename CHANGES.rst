@@ -22,6 +22,8 @@ Improvements
   the file (:issue:`5551`, :pr:`5593`)
 - Add option to email people with specific roles about their contributions
   or abstracts (:pr:`5598`)
+- Add setting to allow submitters to edit custom fields in their contributions
+  (:pr:`5599`)
 
 Bugfixes
 ^^^^^^^^

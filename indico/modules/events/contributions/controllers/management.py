@@ -54,6 +54,7 @@ from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import check_event_locked, get_field_values, track_location_changes, track_time_changes
 from indico.modules.logs import EventLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -209,7 +210,7 @@ class RHEditContribution(RHManageContributionBase):
 
     def _process(self):
         can_manage = self.contrib.can_manage(session.user)
-        contrib_form_class = make_contribution_form(self.event)
+        contrib_form_class = make_contribution_form(self.event, management=can_manage)
         custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.contrib.field_values}
         parent_session_block = (self.contrib.timetable_entry.parent.session_block
                                 if (self.contrib.timetable_entry and self.contrib.timetable_entry.parent) else None)
@@ -585,10 +586,19 @@ class RHManageSubmitterEdits(RHManageContributionsBase):
     """Dialog to configure submitter edit permissions."""
 
     def _process(self):
-        form = AllowSubmitterEditsForm(allow=contribution_settings.get(self.event, 'submitters_can_edit'))
+        current_settings = contribution_settings.get_all(self.event)
+        form = AllowSubmitterEditsForm(obj=FormDefaults(**current_settings))
         if form.validate_on_submit():
-            contribution_settings.set(self.event, 'submitters_can_edit', form.allow.data)
+            contribution_settings.set_multi(self.event, form.data)
+            new_settings = contribution_settings.get_all(self.event)
             flash(_('Submitter edit settings changed successfully'), 'success')
+            changes = {k: (v, new_settings[k]) for k, v in current_settings.items() if v != new_settings[k]}
+            if changes:
+                log_fields = {'submitters_can_edit': 'Edit basic fields',
+                              'submitters_can_edit_custom': 'Edit custom fields'}
+                self.event.log(EventLogRealm.management, LogKind.change, 'Contributions',
+                               'Submitter privileges updated', session.user,
+                               data={'Changes': make_diff_log(changes, log_fields)})
             return jsonify_data()
         return jsonify_form(form)
 
