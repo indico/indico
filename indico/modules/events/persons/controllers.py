@@ -13,6 +13,7 @@ from marshmallow import fields
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload
 from webargs import validate
+from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -346,6 +347,8 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
         'copy_for_sender': fields.Bool(load_default=False),
     })
     def _process(self, from_address, body, subject, copy_for_sender):
+        if from_address not in self.event.get_allowed_sender_emails():
+            abort(422, messages={'from_address': ['Invalid sender address']})
         for recipient in self.recipients:
             if self.no_account and isinstance(recipient, EventPerson):
                 recipient.invited_dt = now_utc()
