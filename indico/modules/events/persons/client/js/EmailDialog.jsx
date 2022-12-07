@@ -84,40 +84,32 @@ export function EmailDialog({
     <>
       {preview && renderPreview()}
       <Form.Field style={{display: preview ? 'none' : 'block'}}>
-        <Form.Field>
-          <FinalDropdown
-            name="from_address"
-            label={Translate.string('From')}
-            scrolling
-            selection
-            options={senders.map(([value, text]) => ({value, text}))}
-            required
-          />
-        </Form.Field>
-        <Form.Field required>
-          <Translate as="label">Subject</Translate>
-          <FinalInput name="subject" required />
-        </Form.Field>
-        <Form.Field required>
-          <Translate as="label">Email body</Translate>
-          <FinalTextEditor name="body" required config={{images: false}} />
-        </Form.Field>
+        <FinalDropdown
+          name="from_address"
+          label={Translate.string('From')}
+          scrolling
+          selection
+          options={senders.map(([value, text]) => ({value, text}))}
+          required
+        />
+        <FinalInput name="subject" label={Translate.string('Subject')} required />
+        <FinalTextEditor
+          name="body"
+          label={Translate.string('Email body')}
+          required
+          config={{images: false}}
+        />
         {placeholders.length > 0 && (
           <Form.Field>
             <PlaceholderInfo placeholders={placeholders} />
           </Form.Field>
         )}
         {recipientsField}
-        <Form.Field>
-          <FinalCheckbox
-            name="copy_for_sender"
-            label={Translate.string('Send copy to me')}
-            toggle
-          />
-          <Translate as="p" className="field-description">
-            Send copy of each email to my mailbox
-          </Translate>
-        </Form.Field>
+        <FinalCheckbox
+          name="copy_for_sender"
+          label={Translate.string('Send copy of each email to my mailbox')}
+          toggle
+        />
       </Form.Field>
     </>
   );

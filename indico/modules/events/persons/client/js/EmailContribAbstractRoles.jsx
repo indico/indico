@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Form, Dimmer, Loader} from 'semantic-ui-react';
+import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {FinalDropdown, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -63,16 +63,14 @@ export function EmailContribAbstractRoles({context, metadataURL, previewURL, sen
       initialFormValues={{subject: defaultSubject, body: defaultBody, recipient_roles: []}}
       sentEmailsCount={sentCount}
       recipientsField={
-        <Form.Field>
-          <FinalDropdown
-            name="recipient_roles"
-            label={Translate.string('Send emails to these roles')}
-            multiple
-            selection
-            options={recipientRoles.map(({name, title}) => ({value: name, text: title, key: name}))}
-            required
-          />
-        </Form.Field>
+        <FinalDropdown
+          name="recipient_roles"
+          label={Translate.string('Send emails to these roles')}
+          multiple
+          selection
+          options={recipientRoles.map(({name, title}) => ({value: name, text: title, key: name}))}
+          required
+        />
       }
     />
   );
