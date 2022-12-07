@@ -192,7 +192,7 @@ $i-button-spacing: 0.3rem;
     }
   }
 
-  .i-button:not(.hidden) {
+  & > .i-button:not(.hidden) {
     &:first-child {
       border-bottom-left-radius: $default-border-radius;
       border-top-left-radius: $default-border-radius;
@@ -215,6 +215,19 @@ $i-button-spacing: 0.3rem;
         border-bottom-left-radius: 0;
         border-top-left-radius: 0;
       }
+    }
+  }
+
+  .i-button-wrapper:not(.hidden) {
+    &:first-child .i-button {
+      border-bottom-left-radius: $default-border-radius;
+      border-top-left-radius: $default-border-radius;
+    }
+
+    &:last-child .i-button {
+      border-bottom-right-radius: $default-border-radius;
+      border-top-right-radius: $default-border-radius;
+      border-right-width: 1px;
     }
   }
 }

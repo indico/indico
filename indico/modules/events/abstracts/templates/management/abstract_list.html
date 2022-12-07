@@ -162,15 +162,18 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <button class="i-button icon-users js-requires-selected-row disabled"
-                            data-title="{% trans %}Author list{% endtrans %}"
-                            data-href="{{ url_for('.person_list', event) }}"
-                            data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                            data-method="POST"
-                            data-ajax-dialog>
-                        {%- trans %}Author list{% endtrans -%}
-                    </button>
+                    <div class="i-button-wrapper">
+                        <button class="i-button icon-users js-requires-selected-row disabled"
+                                data-title="{% trans %}Author list{% endtrans %}"
+                                data-href="{{ url_for('.person_list', event) }}"
+                                data-params-selector="#abstract-list input[name=abstract_id]:checked"
+                                data-method="POST"
+                                data-ajax-dialog>
+                            {%- trans %}Author list{% endtrans -%}
+                        </button>
+                    </div>
                     <div id="email-abstract-roles-container"
+                         class="i-button-wrapper"
                          data-object-context="abstracts"
                          data-id-selector="#abstract-list input[name=abstract_id]:checked"
                          data-metadata-url="{{ url_for('.api_email_abstract_roles_metadata', event) }}"

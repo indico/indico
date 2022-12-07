@@ -93,20 +93,25 @@
                         data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'>
                     {%- trans %}Remove{% endtrans -%}
                 </button>
-                <button class="i-button icon-users js-enable-if-checked disabled"
-                        data-title="{% trans %}Author list{% endtrans %}"
-                        data-href="{{ url_for('contributions.person_list', event) }}"
-                        data-params-selector="#contribution-list input[name=contribution_id]:checked"
-                        data-method="POST"
-                        data-ajax-dialog>
-                    {%- trans %}Author list{% endtrans -%}
-                </button>
-                <div id="email-contrib-roles-container"
-                     data-object-context="contributions"
-                     data-id-selector="#contribution-list input[name=contribution_id]:checked"
-                     data-metadata-url="{{ url_for('.api_email_contrib_roles_metadata', event) }}"
-                     data-preview-url="{{ url_for('.api_email_contrib_roles_preview', event) }}"
-                     data-send-url="{{ url_for('.api_email_contrib_roles_send', event) }}">
+                <div class="group">
+                    <div class="i-button-wrapper">
+                        <button class="i-button icon-users js-enable-if-checked disabled"
+                                data-title="{% trans %}Author list{% endtrans %}"
+                                data-href="{{ url_for('contributions.person_list', event) }}"
+                                data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                                data-method="POST"
+                                data-ajax-dialog>
+                            {%- trans %}Author list{% endtrans -%}
+                        </button>
+                    </div>
+                    <div id="email-contrib-roles-container"
+                         class="i-button-wrapper"
+                         data-object-context="contributions"
+                         data-id-selector="#contribution-list input[name=contribution_id]:checked"
+                         data-metadata-url="{{ url_for('.api_email_contrib_roles_metadata', event) }}"
+                         data-preview-url="{{ url_for('.api_email_contrib_roles_preview', event) }}"
+                         data-send-url="{{ url_for('.api_email_contrib_roles_send', event) }}">
+                    </div>
                 </div>
                 <button class="i-button icon-attachment js-enable-if-checked js-submit-form disabled"
                         data-href="{{ url_for('.material_package', event) }}">
