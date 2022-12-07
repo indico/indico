@@ -3,6 +3,25 @@
 
 {% block title %}{% trans %}Materials{% endtrans %}{% endblock %}
 
+{% block title_actions %}
+    {% if linked_object_type == 'event' and not request.is_xhr and event.can_manage(session.user) %}
+        <a id="attachments-settings-dropdown"
+           class="i-button borderless icon-settings arrow js-dropdown"
+           data-toggle="dropdown">{% trans %}Settings{% endtrans %}</a>
+        <ul class="i-dropdown">
+            <li>
+                <a href="#"
+                   title="{% trans %}Upload permissions{% endtrans %}"
+                   data-ajax-dialog
+                   data-title="{% trans %}Set upload permissions{% endtrans %}"
+                   data-href="{{ url_for('.set_upload_permissions', event) }}"
+                   data-qtip-position="right">
+                    {% trans %}Upload permissions{% endtrans %}</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     {{ attachments_page(linked_object, linked_object_type, attachments) }}
 {% endblock %}

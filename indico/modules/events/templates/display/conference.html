@@ -80,14 +80,14 @@
                 </div>
             {% endif %}
 
-            {% set is_submitter = event.can_manage(session.user, 'submit') %}
-            {% if is_submitter or event.attached_items %}
+            {% set can_attach = event.can_manage_attachments(session.user) %}
+            {% if can_attach or event.attached_items %}
                 <div class="infoline material material-list">
                     <span title="{% trans %}Materials{% endtrans %}" class="icon icon-attachment" aria-hidden="true"></span>
                     <div class="text attachments-box">
                         {{ render_attachments(event.attached_items, management=false) }}
                     </div>
-                    {% if is_submitter %}
+                    {% if can_attach %}
                         <div>
                             <button class="i-button text-color subtle icon-edit hide-if-locked"
                                     title="{% trans %}Manage materials{% endtrans %}"

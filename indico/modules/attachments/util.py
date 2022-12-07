@@ -61,10 +61,14 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
 
 def can_manage_attachments(obj, user, allow_admin=True):
     """Check if a user can manage attachments for the object."""
+    from indico.modules.attachments.settings import attachments_settings
     if not user:
         return False
     if obj.can_manage(user, allow_admin=allow_admin):
         return True
+    event = getattr(obj, 'event', None)
+    if event and attachments_settings.get(event, 'managers_only'):
+        return False
     if isinstance(obj, db.m.Event) and obj.can_manage(user, 'submit', allow_admin=allow_admin):
         return True
     if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit', allow_admin=allow_admin):

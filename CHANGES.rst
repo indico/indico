@@ -18,6 +18,8 @@ Improvements
   to avoid collisions and inconsistencies (:pr:`5478`)
 - Add option to use review track as accepted track when bulk-accepting abstracts
   (:pr:`5608`)
+- Add setting to only allow managers to upload attachments to events and
+  contributions (:pr:`5597`)
 
 Bugfixes
 ^^^^^^^^

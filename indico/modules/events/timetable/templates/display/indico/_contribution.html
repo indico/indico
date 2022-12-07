@@ -33,7 +33,7 @@
                 <div class="timetable-item-actions">
                     {{ render_manage_button(contrib, 'CONTRIBUTION', show_notes=show_notes,
                                             show_button=(not event.is_locked and
-                                                         contrib.can_manage_attachments(session.user))) }}
+                                                         contrib.can_manage(session.user, 'submit'))) }}
                     {{ template_hook('vc-actions', event=event, item=contrib) }}
                 </div>
             </div>

@@ -27,7 +27,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.controllers.base import RHAuthenticatedEventBase
+from indico.modules.events.controllers.base import EditEventSettingsMixin, RHAuthenticatedEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
@@ -42,7 +42,6 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.logs import LogKind
-from indico.modules.logs.util import make_diff_log
 from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
@@ -52,8 +51,6 @@ from indico.util.placeholders import get_sorted_placeholders, replace_placeholde
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
-from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_form
 
 
 BUILTIN_ROLES = {'chairperson': {'name': _('Chairperson'), 'code': 'CHR', 'color': 'f7b076',
@@ -511,21 +508,13 @@ class RHEventPersonSearch(RHAuthenticatedEventBase):
         )
 
 
-class RHManagePersonLists(RHManageEventBase):
+class RHManagePersonLists(EditEventSettingsMixin, RHManageEventBase):
     """Dialog to configure person list settings."""
 
-    def _process(self):
-        current_settings = persons_settings.get_all(self.event)
-        form = ManagePersonListsForm(obj=FormDefaults(**current_settings))
-        if form.validate_on_submit():
-            persons_settings.set_multi(self.event, form.data)
-            new_settings = persons_settings.get_all(self.event)
-            flash(_('Person lists settings changed successfully'), 'success')
-            changes = {k: (v, new_settings[k]) for k, v in current_settings.items() if v != new_settings[k]}
-            if changes:
-                log_fields = {'disallow_custom_persons': 'Disallow custom persons',
-                              'default_search_external': 'Include users with no Indico account by default'}
-                self.event.log(EventLogRealm.management, LogKind.change, 'Persons', 'Settings updated', session.user,
-                               data={'Changes': make_diff_log(changes, log_fields)})
-            return jsonify_data()
-        return jsonify_form(form)
+    settings_proxy = persons_settings
+    form_cls = ManagePersonListsForm
+    success_message = _('Person lists settings changed successfully')
+    log_module = 'Persons'
+    log_message = 'Settings updated'
+    log_fields = {'disallow_custom_persons': 'Disallow custom persons',
+                  'default_search_external': 'Include users with no Indico account by default'}

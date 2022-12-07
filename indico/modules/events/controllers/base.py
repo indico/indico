@@ -11,9 +11,13 @@ from werkzeug.exceptions import Forbidden, NotFound
 from indico.modules.events import Event
 from indico.modules.events.registration.util import get_event_regforms_registrations
 from indico.modules.events.views import WPAccessKey
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH
+from indico.web.util import jsonify_data, jsonify_form
 
 
 class RHEventBase(RH):
@@ -94,6 +98,29 @@ class RHDisplayEventBase(RHProtectedEventBase):
             if request.is_xhr:
                 raise
             return self._show_registration_form()
+
+
+class EditEventSettingsMixin:
+    settings_proxy = None
+    form_cls = None
+    success_message = None
+    log_module = None
+    log_message = None
+    log_fields = None
+
+    def _process(self):
+        current_settings = self.settings_proxy.get_all(self.event)
+        form = self.form_cls(obj=FormDefaults(**current_settings))
+        if form.validate_on_submit():
+            self.settings_proxy.set_multi(self.event, form.data)
+            new_settings = self.settings_proxy.get_all(self.event)
+            flash(self.success_message, 'success')
+            changes = {k: (v, new_settings[k]) for k, v in current_settings.items() if v != new_settings[k]}
+            if changes:
+                self.event.log(EventLogRealm.management, LogKind.change, self.log_module, self.log_message,
+                               session.user, data={'Changes': make_diff_log(changes, self.log_fields)})
+            return jsonify_data()
+        return jsonify_form(form)
 
 
 class AccessKeyRequired(Forbidden):

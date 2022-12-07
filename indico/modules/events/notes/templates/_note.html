@@ -72,7 +72,9 @@
             <span class="manage-notes-container hide-if-locked"
                   data-icon
                   data-api-url="{{ url_for('event_notes.api', note) }}"
-                  data-image-upload-url="{{ url_for('attachments.upload_ckeditor', note) }}"></span>
+                  {% if note.event.can_manage_attachments(session.user) %}
+                      data-image-upload-url="{{ url_for('attachments.upload_ckeditor', note) }}"
+                  {% endif %}></span>
         {% endif %}
     </div>
 {% endmacro %}

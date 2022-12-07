@@ -158,3 +158,9 @@ class AttachmentPackageForm(IndicoForm):
                                                DataRequired()],
                                               description=_('Include materials from sessions/contributions scheduled '
                                                             'on the selected dates'))
+
+
+class SetUploadPermissionsForm(IndicoForm):
+    managers_only = BooleanField(_('Managers only'), widget=SwitchWidget(),
+                                 description=_('Only allow managers to upload materials to the event, '
+                                               'contributions and sessions.'))

@@ -29,7 +29,8 @@ from indico.modules.attachments.controllers.management.event import (RHAddEventA
                                                                      RHCreateEventFolder, RHDeleteEventAttachment,
                                                                      RHDeleteEventFolder, RHEditEventAttachment,
                                                                      RHEditEventFolder, RHManageEventAttachments,
-                                                                     RHPackageEventAttachmentsManagement)
+                                                                     RHPackageEventAttachmentsManagement,
+                                                                     RHSetUploadPermissions)
 from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
 from indico.util.caching import memoize
 from indico.web.flask.util import make_compat_redirect_func, make_view_func
@@ -116,6 +117,9 @@ _bp.add_url_rule('/event/<int:event_id>/manage/attachments/package', 'package_ma
 _bp.add_url_rule('/event/<int:event_id>/attachments/package/status/<task_id>', 'package_status',
                  RHPackageEventAttachmentsStatus)
 
+# Event-level settings
+_bp.add_url_rule('/event/<int:event_id>/manage/attachments/upload-permissions', 'set_upload_permissions',
+                 RHSetUploadPermissions, methods=('GET', 'POST'))
 
 # Legacy redirects for the old URLs
 _compat_bp = IndicoBlueprint('compat_attachments', __name__, url_prefix='/event/<int:event_id>')

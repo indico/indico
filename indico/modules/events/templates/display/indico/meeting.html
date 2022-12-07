@@ -26,7 +26,7 @@
                     </h1>
                 </div>
                 <div class="event-actions">
-                    {% set show_button = not event.is_locked and event.can_manage_attachments(session.user) %}
+                    {% set show_button = not event.is_locked and event.can_manage(session.user, 'submit') %}
                     <div class="event-manage-button">
                         {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
                     </div>
