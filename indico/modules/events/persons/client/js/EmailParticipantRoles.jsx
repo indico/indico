@@ -17,7 +17,6 @@ import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {snakifyKeys} from 'indico/utils/case';
 
 import {EmailDialog} from './EmailDialog';
 
@@ -32,16 +31,16 @@ export function EmailParticipantRoles({
 }) {
   const [sentCount, setSentCount] = useState(0);
   const recipientData = {
-    personId: personIds,
-    roleId: roleIds,
-    userId: userIds,
-    noAccount,
-    notInvitedOnly,
+    person_id: personIds,
+    role_id: roleIds,
+    user_id: userIds,
+    no_account: noAccount,
+    not_invited_only: notInvitedOnly,
   };
   const {data, loading} = useIndicoAxios({
     url: emailMetadataURL({event_id: eventId}),
     method: 'POST',
-    data: snakifyKeys(recipientData),
+    data: recipientData,
   });
   const {
     senders = [],
@@ -56,7 +55,7 @@ export function EmailParticipantRoles({
     requestData.body = requestData.body.getData ? requestData.body.getData() : requestData.body;
     let resp;
     try {
-      resp = await indicoAxios.post(emailSendURL({event_id: eventId}), snakifyKeys(requestData));
+      resp = await indicoAxios.post(emailSendURL({event_id: eventId}), requestData);
     } catch (err) {
       return handleSubmitError(err);
     }

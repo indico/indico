@@ -16,7 +16,6 @@ import {FinalCheckbox, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {snakifyKeys} from 'indico/utils/case';
 
 export function EmailDialog({
   onClose,
@@ -37,10 +36,7 @@ export function EmailDialog({
       return;
     }
     body = body.getData ? body.getData() : body;
-    const {data} = await indicoAxios.post(
-      previewURL,
-      snakifyKeys({body, subject, ...previewContext})
-    );
+    const {data} = await indicoAxios.post(previewURL, {body, subject, ...previewContext});
     setPreview(data);
   };
 
@@ -90,7 +86,7 @@ export function EmailDialog({
       <Form.Field style={{display: preview ? 'none' : 'block'}}>
         <Form.Field>
           <FinalDropdown
-            name="fromAddress"
+            name="from_address"
             label={Translate.string('From')}
             scrolling
             selection
@@ -113,7 +109,11 @@ export function EmailDialog({
         )}
         {recipientsField}
         <Form.Field>
-          <FinalCheckbox name="copyForSender" label={Translate.string('Send copy to me')} toggle />
+          <FinalCheckbox
+            name="copy_for_sender"
+            label={Translate.string('Send copy to me')}
+            toggle
+          />
           <Translate as="p" className="field-description">
             Send copy of each email to my mailbox
           </Translate>
@@ -128,10 +128,10 @@ export function EmailDialog({
       size="standard"
       header={Translate.string('Send email')}
       initialValues={{
-        fromAddress: senders[0][0],
+        from_address: senders[0][0],
         subject: '',
         body: '',
-        copyForSender: false,
+        copy_for_sender: false,
         ...initialFormValues,
       }}
       onClose={onClose}

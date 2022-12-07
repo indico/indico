@@ -13,7 +13,6 @@ import {FinalDropdown, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {snakifyKeys} from 'indico/utils/case';
 
 import {EmailDialog} from './EmailDialog';
 
@@ -31,7 +30,7 @@ export function EmailContribAbstractRoles({context, metadataURL, previewURL, sen
     requestData.body = requestData.body.getData ? requestData.body.getData() : requestData.body;
     let resp;
     try {
-      resp = await indicoAxios.post(sendURL, snakifyKeys(requestData));
+      resp = await indicoAxios.post(sendURL, requestData);
     } catch (err) {
       return handleSubmitError(err);
     }
