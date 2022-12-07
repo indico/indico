@@ -510,7 +510,7 @@ class RHManagePersonLists(RHManageEventBase):
             persons_settings.set_multi(self.event, form.data)
             new_settings = persons_settings.get_all(self.event)
             flash(_('Person lists settings changed successfully'), 'success')
-            changes = {k: (v, current_settings[k]) for k, v in new_settings.items() if v != current_settings[k]}
+            changes = {k: (v, new_settings[k]) for k, v in current_settings.items() if v != new_settings[k]}
             if changes:
                 log_fields = {'disallow_custom_persons': 'Disallow custom persons',
                               'default_search_external': 'Include users with no Indico account by default'}
