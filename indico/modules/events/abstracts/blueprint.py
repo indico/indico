@@ -95,6 +95,14 @@ _bp.add_url_rule('/manage/abstracts/abstracts.json', 'abstracts_json_export', ab
 _bp.add_url_rule('/manage/abstracts/create', 'manage_create_abstract', abstract_list.RHCreateAbstract,
                  methods=('GET', 'POST'))
 
+# Emailing (management)
+_bp.add_url_rule('/manage/abstracts/api/email-roles/metadata', 'api_email_abstract_roles_metadata',
+                 abstract_list.RHAbstractsAPIEmailAbstractRolesMetadata, methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/api/email-roles/preview', 'api_email_abstract_roles_preview',
+                 abstract_list.RHAbstractsAPIEmailAbstractRolesPreview, methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/api/email-roles/send', 'api_email_abstract_roles_send',
+                 abstract_list.RHAbstractsAPIEmailAbstractRolesSend, methods=('POST',))
+
 # Bulk abstract actions (management)
 _bp.add_url_rule('/manage/abstracts/delete', 'manage_delete_abstracts', abstract_list.RHDeleteAbstracts,
                  methods=('POST',))

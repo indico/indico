@@ -20,6 +20,8 @@ Improvements
   descriptions (:issue:`5584`, :pr:`5587`)
 - Warn more clearly that link attachments are just a link and do not copy
   the file (:issue:`5551`, :pr:`5593`)
+- Add option to email people with specific roles about their contributions
+  or abstracts (:pr:`5598`)
 
 Bugfixes
 ^^^^^^^^

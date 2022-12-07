@@ -38,6 +38,14 @@ _bp.add_url_rule('/manage/contributions/contributions.pdf', 'contributions_pdf_e
 _bp.add_url_rule('/manage/contributions/contributions.zip', 'contributions_tex_export',
                  management.RHContributionsExportTeX, methods=('POST',))
 
+# Emailing (management)
+_bp.add_url_rule('/manage/contributions/api/email-roles/metadata', 'api_email_contrib_roles_metadata',
+                 management.RHContributionsAPIEmailContribRolesMetadata, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/api/email-roles/preview', 'api_email_contrib_roles_preview',
+                 management.RHContributionsAPIEmailContribRolesPreview, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/api/email-roles/send', 'api_email_contrib_roles_send',
+                 management.RHContributionsAPIEmailContribRolesSend, methods=('POST',))
+
 # LaTeX-based exports
 _bp.add_url_rule('/manage/contributions/tex-export/<uuid>', 'contributions_tex_export_book',
                  management.RHContributionsExportTeXBook)

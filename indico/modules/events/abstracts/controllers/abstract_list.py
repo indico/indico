@@ -27,6 +27,8 @@ from indico.modules.events.abstracts.util import can_create_invited_abstracts, m
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.cloning import get_attrs_to_clone
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
+                                                                 EmailRolesSendMixin)
 from indico.modules.events.util import get_field_values
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
@@ -55,14 +57,16 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
             query = query.options(*self._abstract_query_options)
         return query
 
-    def _process_args(self):
+    @use_kwargs({
+        'abstract_ids': fields.List(fields.Int(), data_key='abstract_id', load_default=[])
+    })
+    def _process_args(self, abstract_ids):
         RHAbstractListBase._process_args(self)
         query = self._abstract_query
         if request.method == 'POST' or not self._allow_get_all:
             # if it's POST we filter by abstract ids; otherwise we assume
             # the user wants everything (e.g. API-like usage via personal token)
-            ids = request.form.getlist('abstract_id', type=int)
-            query = query.filter(Abstract.id.in_(ids))
+            query = query.filter(Abstract.id.in_(abstract_ids))
         self.abstracts = query.all()
 
 
@@ -270,3 +274,33 @@ class RHAbstractsExportJSON(RHManageAbstractsExportActionsBase):
         response = jsonify(version=1, abstracts=abstracts, questions=questions)
         response.headers['Content-Disposition'] = 'attachment; filename="abstracts.json"'
         return response
+
+
+class RHAbstractsAPIEmailAbstractRolesMetadata(EmailRolesMetadataMixin, RHManageAbstractsBase):
+    object_context = 'abstracts'
+
+
+class RHAbstractsAPIEmailAbstractRolesPreview(EmailRolesPreviewMixin, RHManageAbstractsBase):
+    object_context = 'abstracts'
+
+    def get_placeholder_kwargs(self):
+        abstract = self.event.abstracts[0]
+        return {'person': abstract.submitter, 'abstract': abstract}
+
+
+class RHAbstractsAPIEmailAbstractRolesSend(EmailRolesSendMixin, RHManageAbstractsActionsBase):
+    object_context = 'abstracts'
+    log_module = 'Abstracts'
+
+    def get_recipients(self, roles):
+        for abstract in self.abstracts:
+            log_metadata = {'abstract_id': abstract.id}
+            seen = set()
+            if 'submitter' in roles:
+                yield abstract.submitter.email, {'abstract': abstract, 'person': abstract.submitter}, log_metadata
+                seen = {abstract.submitter.email, abstract.submitter}
+            for person_link in abstract.person_links:
+                if person_link.email in seen or person_link.person.user in seen or not person_link.email:
+                    continue
+                if self.get_roles_from_person_link(person_link) & roles:
+                    yield person_link.email, {'abstract': abstract, 'person': person_link}, log_metadata

@@ -17,6 +17,7 @@ import 'indico/modules/events/util/static_filters';
 
 import './badges';
 
+import {EmailContribAbstractRolesButton} from 'indico/modules/events/persons/EmailContribAbstractRolesButton';
 import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailParticipantRolesButton';
 import {$T} from 'indico/utils/i18n';
 import {natSortCompare} from 'indico/utils/sort';
@@ -43,6 +44,23 @@ import {SeriesManagement} from './SeriesManagement';
         userSelector={userSelector}
         triggerSelector={trigger}
         {...extraParams}
+      />,
+      element
+    );
+  };
+
+  global.setupEmailContribAbstractRoles = function setupEmailContribAbstractRoles(
+    containerSelector
+  ) {
+    const element = document.querySelector(containerSelector);
+    const {objectContext, idSelector, metadataUrl, previewUrl, sendUrl} = element.dataset;
+    ReactDOM.render(
+      <EmailContribAbstractRolesButton
+        objectContext={objectContext}
+        idSelector={idSelector}
+        metadataURL={metadataUrl}
+        previewURL={previewUrl}
+        sendURL={sendUrl}
       />,
       element
     );

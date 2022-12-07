@@ -170,6 +170,13 @@
                             data-ajax-dialog>
                         {%- trans %}Author list{% endtrans -%}
                     </button>
+                    <div id="email-abstract-roles-container"
+                         data-object-context="abstracts"
+                         data-id-selector="#abstract-list input[name=abstract_id]:checked"
+                         data-metadata-url="{{ url_for('.api_email_abstract_roles_metadata', event) }}"
+                         data-preview-url="{{ url_for('.api_email_abstract_roles_preview', event) }}"
+                         data-send-url="{{ url_for('.api_email_abstract_roles_send', event) }}">
+                    </div>
                 </div>
                 {% if can_download_attachments %}
                     <div class="group">
@@ -241,6 +248,7 @@
     </div>
 
     <script>
+        setupEmailContribAbstractRoles('#email-abstract-roles-container');
         setupAbstractList();
         setupAbstractJudgment({
             trackSessionMap: {{ track_session_map|tojson }}

@@ -9,6 +9,7 @@ import uuid
 from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request, session
+from marshmallow import fields
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -43,6 +44,8 @@ from indico.modules.events.contributions.util import (contribution_type_row, gen
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
+from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
+                                                                 EmailRolesSendMixin)
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
@@ -55,6 +58,7 @@ from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -118,9 +122,12 @@ class RHManageSubContributionBase(RHManageContributionBase):
 class RHManageContributionsActionsBase(RHManageContributionsBase):
     """Base class for classes performing actions on event contributions."""
 
-    def _process_args(self):
+    @use_kwargs({
+        'contribution_ids': fields.List(fields.Int(), data_key='contribution_id', load_default=[])
+    })
+    def _process_args(self, contribution_ids):
         RHManageContributionsBase._process_args(self)
-        self.contrib_ids = [int(x) for x in request.form.getlist('contribution_id')]
+        self.contrib_ids = contribution_ids
         self.contribs = Contribution.query.with_parent(self.event).filter(Contribution.id.in_(self.contrib_ids)).all()
 
 
@@ -820,3 +827,28 @@ class RHCloneContribution(RHManageContributionBase):
     def _process(self):
         ContributionCloner.clone_single_contribution(self.contrib)
         return jsonify_data(**self.list_generator.render_list())
+
+
+class RHContributionsAPIEmailContribRolesMetadata(EmailRolesMetadataMixin, RHManageContributionsBase):
+    object_context = 'contributions'
+
+
+class RHContributionsAPIEmailContribRolesPreview(EmailRolesPreviewMixin, RHManageContributionsBase):
+    object_context = 'contributions'
+
+    def get_placeholder_kwargs(self):
+        contribution = Contribution.query.with_parent(self.event).first()
+        # none of the contributions are guaranteed to have a person so we use the event creator...
+        return {'person': self.event.creator, 'contribution': contribution}
+
+
+class RHContributionsAPIEmailContribRolesSend(EmailRolesSendMixin, RHManageContributionsActionsBase):
+    object_context = 'contributions'
+    log_module = 'Contributions'
+
+    def get_recipients(self, roles):
+        for contrib in self.contribs:
+            log_metadata = {'contribution_id': contrib.id}
+            for person_link in contrib.person_links:
+                if person_link.email and self.get_roles_from_person_link(person_link) & roles:
+                    yield person_link.email, {'contribution': contrib, 'person': person_link}, log_metadata

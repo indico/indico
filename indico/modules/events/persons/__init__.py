@@ -26,19 +26,31 @@ def _sidemenu_items(sender, event, **kwargs):
 
 
 @signals.core.get_placeholders.connect_via('event-persons-email')
-def _get_placeholders(sender, person, event, register_link=False, **kwargs):
-    from indico.modules.events.persons.placeholders import (ContributionsPlaceholder, EmailPlaceholder,
-                                                            EventLinkPlaceholder, EventTitlePlaceholder,
-                                                            FirstNamePlaceholder, LastNamePlaceholder,
-                                                            RegisterLinkPlaceholder)
+def _get_placeholders(sender, person, event, contribution=None, abstract=None, register_link=False, object_context=None,
+                      **kwargs):
+    from indico.modules.events.persons.placeholders import (AbstractIDPlaceholder, AbstractTitlePlaceholder,
+                                                            ContributionCodePlaceholder, ContributionIDPlaceholder,
+                                                            ContributionsPlaceholder, ContributionTitlePlaceholder,
+                                                            EmailPlaceholder, EventLinkPlaceholder,
+                                                            EventTitlePlaceholder, FirstNamePlaceholder,
+                                                            LastNamePlaceholder, RegisterLinkPlaceholder)
+
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
     yield EmailPlaceholder
     yield EventTitlePlaceholder
     yield EventLinkPlaceholder
-    yield ContributionsPlaceholder
     if register_link:
         yield RegisterLinkPlaceholder
+    if object_context == 'abstracts':
+        yield AbstractIDPlaceholder
+        yield AbstractTitlePlaceholder
+    elif object_context == 'contributions':
+        yield ContributionIDPlaceholder
+        yield ContributionTitlePlaceholder
+        yield ContributionCodePlaceholder
+    else:
+        yield ContributionsPlaceholder
 
 
 persons_settings = EventSettingsProxy('persons', {

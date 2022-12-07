@@ -101,6 +101,13 @@
                         data-ajax-dialog>
                     {%- trans %}Author list{% endtrans -%}
                 </button>
+                <div id="email-contrib-roles-container"
+                     data-object-context="contributions"
+                     data-id-selector="#contribution-list input[name=contribution_id]:checked"
+                     data-metadata-url="{{ url_for('.api_email_contrib_roles_metadata', event) }}"
+                     data-preview-url="{{ url_for('.api_email_contrib_roles_preview', event) }}"
+                     data-send-url="{{ url_for('.api_email_contrib_roles_send', event) }}">
+                </div>
                 <button class="i-button icon-attachment js-enable-if-checked js-submit-form disabled"
                         data-href="{{ url_for('.material_package', event) }}">
                     {%- trans %}Material package{% endtrans -%}
@@ -197,6 +204,7 @@
             $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
 
+        setupEmailContribAbstractRoles('#email-contrib-roles-container');
         setupContributionConfig();
         setupContributionList({
             createSessionURL: {{ url_for('sessions.create_session', event) | tojson }},

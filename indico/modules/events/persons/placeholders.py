@@ -98,3 +98,48 @@ class RegisterLinkPlaceholder(Placeholder):
     def render(cls, person, event, **kwargs):
         url = url_for_register(event.url, email=person.email)
         return Markup('<a href="{url}">{url}</a>').format(url=url)
+
+
+class ContributionIDPlaceholder(Placeholder):
+    name = 'contribution_id'
+    description = _('The ID of the contribution')
+
+    @classmethod
+    def render(cls, contribution, **kwargs):
+        return str(contribution.friendly_id)
+
+
+class ContributionTitlePlaceholder(Placeholder):
+    name = 'contribution_title'
+    description = _('The title of the contribution')
+
+    @classmethod
+    def render(cls, contribution, **kwargs):
+        return str(contribution.title)
+
+
+class ContributionCodePlaceholder(Placeholder):
+    name = 'contribution_code'
+    description = _('The program code of the contribution')
+
+    @classmethod
+    def render(cls, contribution, **kwargs):
+        return str(contribution.code)
+
+
+class AbstractIDPlaceholder(Placeholder):
+    name = 'abstract_id'
+    description = _('The ID of the abstract')
+
+    @classmethod
+    def render(cls, abstract, **kwargs):
+        return str(abstract.friendly_id)
+
+
+class AbstractTitlePlaceholder(Placeholder):
+    name = 'abstract_title'
+    description = _('The title of the abstract')
+
+    @classmethod
+    def render(cls, abstract, **kwargs):
+        return str(abstract.title)
