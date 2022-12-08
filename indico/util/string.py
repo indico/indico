@@ -398,7 +398,9 @@ def camelize(name):
     if name.startswith('_'):
         underscore = '_'
         parts = parts[1:]
-    return underscore + parts[0] + ''.join(x.title() for x in parts[1:])
+    camelized = underscore + parts[0] + ''.join(x.title() for x in parts[1:])
+    # Always convert 'Url' into 'URL', same as camelizeKeys() in utils/case.js
+    return camelized.replace('Url', 'URL')
 
 
 def _convert_keys(value, convert_func):
