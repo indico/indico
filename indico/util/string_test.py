@@ -141,6 +141,19 @@ def test_camelize_keys():
     assert d2 == {'fooBar': 'foo', 'barFoo': 123, 'mooBar': {'helloWorld': 'test'},
                   'nested': [{'isDict': True}, 'foo', ({'aB': 'c'},)]}
 
+    # Keys starting with an underscore should not change
+    d = camelize_keys({'_deleted': True})
+    assert d == {'_deleted': True}
+
+    # 'url' is always camelized as 'URL' instead of 'Url'
+    d = {'avatar_url': 'avatar/1', 'upload_url_materials': '/upload/materials',
+         'url_download': '/download', 'saveURL': '/save'}
+    orig = d.copy()
+    d2 = camelize_keys(d)
+    assert d == orig  # original dict not modified
+    assert d2 == {'avatarURL': 'avatar/1', 'uploadURLMaterials': '/upload/materials',
+                  'urlDownload': '/download', 'saveURL': '/save'}
+
 
 def test_snakify_keys():
     d = {'sn_case': 2, 'shouldBeSnakeCase': 3, 'snake': 4, 'snake-case': 5, 'inner': {'innerDict': 2}}
