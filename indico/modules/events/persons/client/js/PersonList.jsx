@@ -228,7 +228,7 @@ PersonList.propTypes = {
   persons: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      type: PropTypes.oneOf(['person', 'user']),
+      type: PropTypes.oneOf(['person', 'user']).isRequired,
       fullName: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
       affiliation: PropTypes.string.isRequired,

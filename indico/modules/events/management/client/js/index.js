@@ -17,12 +17,12 @@ import 'indico/modules/events/util/static_filters';
 
 import './badges';
 
+import {AuthorsListButton} from 'indico/modules/events/persons/AuthorsListButton';
 import {EmailContribAbstractRolesButton} from 'indico/modules/events/persons/EmailContribAbstractRolesButton';
 import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailParticipantRolesButton';
 import {$T} from 'indico/utils/i18n';
 import {natSortCompare} from 'indico/utils/sort';
 
-import {EmailAuthorsButton} from './EmailAuthors';
 import {SingleEventMove, EventPublish} from './EventMove';
 import {SeriesManagement} from './SeriesManagement';
 
@@ -67,15 +67,14 @@ import {SeriesManagement} from './SeriesManagement';
     );
   };
 
-  global.setupEmailAuthorsButton = function setupEmailAuthorsButton(context, field, trigger) {
-    const element = document.querySelector(field);
-    const {eventId, paramsSelector} = element.dataset;
+  global.setupAuthorsListButton = function setupAuthorsListButton(containerSelector) {
+    const element = document.querySelector(containerSelector);
+    const {eventId, objectContext, paramsSelector} = element.dataset;
     ReactDOM.render(
-      <EmailAuthorsButton
+      <AuthorsListButton
         eventId={+eventId}
-        context={context}
+        objectContext={objectContext}
         paramsSelector={paramsSelector}
-        triggerSelector={trigger}
       />,
       element
     );

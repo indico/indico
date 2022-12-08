@@ -10,27 +10,27 @@ import contribsPersonListURL from 'indico-url:contributions.person_list';
 import sessionsPersonListURL from 'indico-url:sessions.person_list';
 
 import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Button, Dimmer, Loader, Message, Modal} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
-import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailParticipantRolesButton';
-import {getIds} from 'indico/modules/events/persons/util';
-
+import {EmailParticipantRolesButton} from './EmailParticipantRolesButton';
 import PersonList from './PersonList';
 
 // In abstracts there is always a submitter so we don't need an emptyListMessage
-const CONTEXTS = {
-  abstract: {personListURL: abstractsPersonListURL},
-  contribution: {
+export const CONTEXTS = {
+  abstracts: {idType: 'abstract_id', personListURL: abstractsPersonListURL},
+  contributions: {
+    idType: 'contribution_id',
     personListURL: contribsPersonListURL,
     emptyListMessage: Translate.string(
       'There are no persons associated with the selected contributions'
     ),
   },
-  session: {
+  sessions: {
+    idType: 'session_id',
     personListURL: sessionsPersonListURL,
     emptyListMessage: Translate.string(
       'There are no persons associated with contributions in the selected sessions'
@@ -42,7 +42,7 @@ const FILTER_OPTIONS = {
   submitter: {
     text: Translate.string('Submitters'),
     isMatch: person => person.submitter,
-    contexts: ['abstract'],
+    contexts: ['abstracts'],
   },
   speaker: {
     text: Translate.string('Speakers'),
@@ -62,49 +62,17 @@ const FILTER_OPTIONS = {
   },
 };
 
-export function EmailAuthorsButton({eventId, context, paramsSelector, triggerSelector}) {
-  const [open, setOpen] = useState(false);
-  const sourceIds = getIds(paramsSelector);
-
-  useEffect(() => {
-    if (!triggerSelector) {
-      return;
-    }
-    const handler = () => setOpen(true);
-    const element = document.querySelector(triggerSelector);
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
-
-  return (
-    open && (
-      <EmailAuthorsModal
-        eventId={eventId}
-        sourceIds={sourceIds}
-        context={context}
-        onClose={() => setOpen(false)}
-      />
-    )
-  );
-}
-
-EmailAuthorsButton.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  context: PropTypes.oneOf(Object.keys(CONTEXTS)).isRequired,
-  paramsSelector: PropTypes.string.isRequired,
-  triggerSelector: PropTypes.string.isRequired,
-};
-
-function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
+export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
   const [selectedPersons, setSelectedPersons] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  // TODO show success message:
   const [successMessage, setSuccessMessage] = useState(undefined);
   const [activeFilters, setActiveFilters] = useState([]);
   const formData = new FormData();
-  sourceIds.forEach(v => formData.append(`${context}_id`, v));
+  sourceIds.forEach(v => formData.append(CONTEXTS[objectContext].idType, v));
   const {data, loading} = useIndicoAxios(
     {
-      url: CONTEXTS[context].personListURL({event_id: eventId}),
+      url: CONTEXTS[objectContext].personListURL({event_id: eventId}),
       method: 'POST',
       data: formData,
       headers: {'content-type': 'multipart/form-data'},
@@ -113,7 +81,7 @@ function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
   );
   const eventPersons = useMemo(() => new Map(data?.eventPersons.map(p => [p.id, p])), [data]);
   const extraRoles =
-    context === 'abstract'
+    objectContext === 'abstracts'
       ? [
           {
             icon: 'user-check icon',
@@ -141,7 +109,7 @@ function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
   };
 
   const filterButtons = Object.entries(FILTER_OPTIONS)
-    .filter(([, filter]) => !filter.contexts || filter.contexts.includes(context))
+    .filter(([, filter]) => !filter.contexts || filter.contexts.includes(objectContext))
     .map(([name, filter]) => ({
       key: name,
       content: filter.text,
@@ -178,7 +146,7 @@ function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
             extraRoles={extraRoles}
           />
         ) : (
-          <Message error>{CONTEXTS[context].emptyListMessage}</Message>
+          <Message error>{CONTEXTS[objectContext].emptyListMessage}</Message>
         )}
       </Modal.Content>
       <Modal.Actions>
@@ -197,9 +165,9 @@ function EmailAuthorsModal({eventId, sourceIds, context, onClose}) {
   );
 }
 
-EmailAuthorsModal.propTypes = {
+AuthorsList.propTypes = {
   eventId: PropTypes.number.isRequired,
   sourceIds: PropTypes.arrayOf(PropTypes.number).isRequired,
-  context: PropTypes.oneOf(Object.keys(CONTEXTS)).isRequired,
+  objectContext: PropTypes.oneOf(Object.keys(CONTEXTS)).isRequired,
   onClose: PropTypes.func.isRequired,
 };

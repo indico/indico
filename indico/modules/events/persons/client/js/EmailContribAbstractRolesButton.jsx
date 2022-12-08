@@ -29,7 +29,6 @@ export function EmailContribAbstractRolesButton({
       <button
         type="button"
         className="i-button icon-mail js-requires-selected-row disabled"
-        id="email-roles-trigger"
         onClick={() => setOpen(true)}
       >
         <Translate>Email</Translate>

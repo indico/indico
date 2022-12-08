@@ -162,15 +162,11 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <div class="i-button-wrapper">
-                        <div id="email-authors-container"
-                             data-event-id="{{ event.id }}"
-                             data-params-selector="#abstract-list input[name=abstract_id]:checked">
-                        </div>
-                        <button id="email-authors-trigger"
-                                class="i-button icon-users js-requires-selected-row disabled">
-                            {%- trans %}Author list{% endtrans -%}
-                        </button>
+                    <div id="email-authors-container"
+                         class="i-button-wrapper"
+                         data-event-id="{{ event.id }}"
+                         data-object-context="abstracts"
+                         data-params-selector="#abstract-list input[name=abstract_id]:checked">
                     </div>
                     <div id="email-abstract-roles-container"
                          class="i-button-wrapper"
@@ -251,7 +247,7 @@
     </div>
 
     <script>
-        setupEmailAuthorsButton('abstract', '#email-authors-container', '#email-authors-trigger');
+        setupAuthorsListButton('#email-authors-container');
         setupEmailContribAbstractRoles('#email-abstract-roles-container');
         setupAbstractList();
         setupAbstractJudgment({

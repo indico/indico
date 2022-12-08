@@ -94,15 +94,11 @@
                     {%- trans %}Remove{% endtrans -%}
                 </button>
                 <div class="group">
-                    <div class="i-button-wrapper">
-                        <div id="email-authors-container"
-                             data-event-id="{{ event.id }}"
-                             data-params-selector="#contribution-list input[name=contribution_id]:checked">
-                        </div>
-                        <button id="email-authors-trigger"
-                                class="i-button icon-users js-enable-if-checked disabled">
-                            {%- trans %}Author list{% endtrans -%}
-                        </button>
+                    <div id="email-authors-container"
+                         class="i-button-wrapper"
+                         data-event-id="{{ event.id }}"
+                         data-object-context="contributions"
+                         data-params-selector="#contribution-list input[name=contribution_id]:checked">
                     </div>
                     <div id="email-contrib-roles-container"
                          class="i-button-wrapper"
@@ -209,7 +205,7 @@
             $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
 
-        setupEmailAuthorsButton('contribution', '#email-authors-container', '#email-authors-trigger');
+        setupAuthorsListButton('#email-authors-container');
         setupEmailContribAbstractRoles('#email-contrib-roles-container');
         setupContributionConfig();
         setupContributionList({

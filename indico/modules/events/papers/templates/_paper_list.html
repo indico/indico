@@ -354,14 +354,13 @@
                     </a>
                 </li>
             </ul>
-            <div id="email-authors"
+            {# TODO fix i-button-wrapper not being imported on this template #}
+            <div id="authors-list-container"
+                 class="i-button-wrapper"
                  data-event-id="{{ event.id }}"
+                 data-object-context="contributions"
                  data-params-selector="#assignment-list input[name=contribution_id]:checked">
             </div>
-            <button id="email-authors-trigger"
-                    class="i-button icon-users js-enable-if-checked disabled">
-                {%- trans %}Authors list{% endtrans -%}
-            </button>
             <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
                     data-href="{{ url_for('.download_papers', event) }}">
                 {%- trans %}Download papers{% endtrans -%}
@@ -394,6 +393,6 @@
             $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
         setupPaperAssignmentList();
-        setupEmailAuthorsButton('contribution', '#email-authors', '#email-authors-trigger');
+        setupAuthorsListButton('#authors-list-container');
     </script>
 {% endmacro %}
