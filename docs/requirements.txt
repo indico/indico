@@ -8,10 +8,10 @@ alabaster==0.7.12
     # via sphinx
 babel==2.10.3
     # via
-    #   -r docs/requirements.in
+    #   -r requirements.in
     #   flask-babel
     #   sphinx
-certifi==2022.6.15
+certifi==2022.12.7
     # via requests
 charset-normalizer==2.1.0
     # via requests
@@ -19,24 +19,20 @@ click==8.1.3
     # via flask
 docutils==0.16
     # via
-    #   -r docs/requirements.in
+    #   -r requirements.in
     #   plantweb
     #   sphinx
     #   sphinx-rtd-theme
 flask==2.1.3
     # via
-    #   -r docs/requirements.in
+    #   -r requirements.in
     #   flask-babel
 flask-babel==2.0.0
-    # via -r docs/requirements.in
+    # via -r requirements.in
 idna==3.3
     # via requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==4.12.0
-    # via
-    #   flask
-    #   sphinx
 itsdangerous==2.1.2
     # via flask
 jinja2==3.1.2
@@ -49,7 +45,7 @@ markupsafe==2.1.1
 packaging==21.3
     # via sphinx
 plantweb==1.2.1
-    # via -r docs/requirements.in
+    # via -r requirements.in
 pygments==2.12.0
     # via sphinx
 pyparsing==3.0.9
@@ -68,13 +64,13 @@ snowballstemmer==2.2.0
     # via sphinx
 sphinx==5.0.2
     # via
-    #   -r docs/requirements.in
+    #   -r requirements.in
     #   sphinx-issues
     #   sphinx-rtd-theme
 sphinx-issues==3.0.1
-    # via -r docs/requirements.in
+    # via -r requirements.in
 sphinx-rtd-theme==1.0.0
-    # via -r docs/requirements.in
+    # via -r requirements.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -91,5 +87,3 @@ urllib3==1.26.10
     # via requests
 werkzeug==2.1.2
     # via flask
-zipp==3.8.1
-    # via importlib-metadata
