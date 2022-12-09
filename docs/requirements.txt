@@ -11,7 +11,7 @@ babel==2.10.3
     #   -r docs/requirements.in
     #   flask-babel
     #   sphinx
-certifi==2022.6.15
+certifi==2022.12.7
     # via requests
 charset-normalizer==2.1.0
     # via requests
