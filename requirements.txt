@@ -46,7 +46,7 @@ celery[redis]==5.2.7
     # via
     #   -r requirements.in
     #   sentry-sdk
-certifi==2022.9.24
+certifi==2022.12.7
     # via
     #   -r requirements.in
     #   requests
