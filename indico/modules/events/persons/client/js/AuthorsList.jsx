@@ -98,7 +98,7 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
   };
 
   const isVisible = person =>
-    !activeFilters.length || activeFilters.every(filter => FILTER_OPTIONS[filter].isMatch(person));
+    !activeFilters.length || activeFilters.some(filter => FILTER_OPTIONS[filter].isMatch(person));
 
   const toggleFilter = name => {
     setActiveFilters(
