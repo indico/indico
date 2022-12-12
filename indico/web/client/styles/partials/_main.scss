@@ -281,3 +281,20 @@ div.impersonation-header {
     }
   }
 }
+
+// Xmas theme - falling snow background
+.page-header > .flexrow.f-j-space-between.f-a-start {
+  background: url('static:images/snow.png');
+  background-repeat: repeat;
+  animation: falling-snow 100s infinite linear;
+}
+
+@keyframes falling-snow {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 1000px 6500px;
+  }
+}
