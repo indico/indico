@@ -16,6 +16,7 @@ import {Button, Dimmer, Loader, Message, Modal} from 'semantic-ui-react';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
+import {EmailSentMessage} from './EmailDialog';
 import {EmailParticipantRolesButton} from './EmailParticipantRolesButton';
 import PersonList from './PersonList';
 
@@ -65,8 +66,7 @@ const FILTER_OPTIONS = {
 export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
   const [selectedPersons, setSelectedPersons] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  // TODO show success message:
-  const [successMessage, setSuccessMessage] = useState(undefined);
+  const [sentEmailCount, setSentEmailCount] = useState(undefined);
   const [activeFilters, setActiveFilters] = useState([]);
   const formData = new FormData();
   sourceIds.forEach(v => formData.append(CONTEXTS[objectContext].idType, v));
@@ -121,7 +121,7 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
     <Modal open onClose={() => onClose()} size="large">
       <Modal.Header content={Translate.string('Authors list')} />
       <Modal.Content>
-        {successMessage}
+        {sentEmailCount && <EmailSentMessage count={sentEmailCount} />}
         <div>
           <Translate
             as="div"
@@ -154,7 +154,8 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
           eventId={eventId}
           personIds={selectedPersons.filter(id => isVisible(eventPersons.get(id)))}
           userIds={selectedUsers.filter(id => isVisible(eventPersons.get(id)))}
-          // onSuccess={msg => setSuccessMessage(msg)}
+          onSubmitSucceded={count => setSentEmailCount(count)}
+          successTimeout={0}
           primary
         />
         <Translate as={Button} onClick={() => onClose()}>

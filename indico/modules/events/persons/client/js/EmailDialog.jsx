@@ -19,6 +19,24 @@ import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
+export function EmailSentMessage({count}) {
+  return (
+    <Message positive>
+      <Translate as={Message.Header}>Your email has been sent.</Translate>
+      <PluralTranslate count={count} as="p">
+        <Singular>
+          <Param name="count" value={count} /> email has been sent.
+        </Singular>
+        <Plural>
+          <Param name="count" value={count} /> emails have been sent.
+        </Plural>
+      </PluralTranslate>
+    </Message>
+  );
+}
+
+EmailSentMessage.propTypes = {count: PropTypes.number.isRequired};
+
 export function EmailDialog({
   onClose,
   onSubmit,
@@ -145,21 +163,7 @@ export function EmailDialog({
       scrolling
     >
       {({submitSucceeded}) =>
-        submitSucceeded ? (
-          <Message positive>
-            <Translate as={Message.Header}>Your email has been sent.</Translate>
-            <PluralTranslate count={sentEmailsCount} as="p">
-              <Singular>
-                <Param name="count" value={sentEmailsCount} /> email has been sent.
-              </Singular>
-              <Plural>
-                <Param name="count" value={sentEmailsCount} /> emails have been sent.
-              </Plural>
-            </PluralTranslate>
-          </Message>
-        ) : (
-          form
-        )
+        submitSucceeded ? <EmailSentMessage count={sentEmailsCount} /> : form
       }
     </FinalModalForm>
   );

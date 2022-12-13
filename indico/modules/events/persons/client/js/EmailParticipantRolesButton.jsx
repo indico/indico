@@ -24,6 +24,8 @@ export function EmailParticipantRolesButton({
   triggerSelector,
   noAccount,
   notInvitedOnly,
+  onSubmitSucceded,
+  successTimeout,
   ...rest
 }) {
   const [open, setOpen] = useState(false);
@@ -60,6 +62,8 @@ export function EmailParticipantRolesButton({
           noAccount={noAccount}
           notInvitedOnly={notInvitedOnly}
           onClose={() => setOpen(false)}
+          onSubmitSucceded={onSubmitSucceded}
+          successTimeout={successTimeout}
         />
       )}
     </>
@@ -76,6 +80,8 @@ EmailParticipantRolesButton.propTypes = {
   triggerSelector: PropTypes.string,
   noAccount: PropTypes.bool,
   notInvitedOnly: PropTypes.bool,
+  onSubmitSucceded: PropTypes.func,
+  successTimeout: PropTypes.number,
 };
 
 EmailParticipantRolesButton.defaultProps = {
@@ -87,4 +93,6 @@ EmailParticipantRolesButton.defaultProps = {
   triggerSelector: undefined,
   noAccount: false,
   notInvitedOnly: false,
+  onSubmitSucceded: undefined,
+  successTimeout: undefined,
 };
