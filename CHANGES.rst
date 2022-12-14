@@ -16,6 +16,7 @@ Bugfixes
 ^^^^^^^^
 
 - Correctly show contribution authors in participant roles list (:pr:`5603`)
+- Disable Sentry trace propagation to outgoing HTTP requests (:pr:`5604`)
 
 
 Version 3.2.2

@@ -35,6 +35,7 @@ def init_sentry(app):
         release=indico.__version__,
         send_default_pii=True,
         attach_stacktrace=True,
+        propagate_traces=False,
         in_app_include=({'indico'} | plugin_packages),
         integrations=[
             PureEvalIntegration(),
