@@ -145,7 +145,7 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
       <Modal.Actions>
         <EmailParticipantRolesButton
           eventId={eventId}
-          personIdentifiers={selectedPersons.filter(id => isVisible(eventPersons.get(id)))}
+          persons={selectedPersons.filter(id => isVisible(eventPersons.get(id)))}
           onSubmitSucceded={count => setSentEmailCount(count)}
           successTimeout={0}
           primary

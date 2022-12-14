@@ -22,10 +22,8 @@ import {EmailDialog} from './EmailDialog';
 
 export function EmailParticipantRoles({
   eventId,
-  personIds,
   roleIds,
-  userIds,
-  personIdentifiers,
+  persons,
   onClose,
   onSubmitSucceded,
   noAccount,
@@ -34,13 +32,12 @@ export function EmailParticipantRoles({
 }) {
   const [sentCount, setSentCount] = useState(0);
   const recipientData = {
-    person_id: personIds,
     role_id: roleIds,
-    user_id: userIds,
-    persons: personIdentifiers,
+    persons,
     no_account: noAccount,
     not_invited_only: notInvitedOnly,
   };
+  console.log(recipientData);
   const {data, loading} = useIndicoAxios({
     url: emailMetadataURL({event_id: eventId}),
     method: 'POST',
@@ -122,10 +119,8 @@ export function EmailParticipantRoles({
 
 EmailParticipantRoles.propTypes = {
   eventId: PropTypes.number.isRequired,
-  personIds: PropTypes.arrayOf(PropTypes.number),
-  userIds: PropTypes.arrayOf(PropTypes.number),
   roleIds: PropTypes.arrayOf(PropTypes.number),
-  personIdentifiers: PropTypes.arrayOf(PropTypes.string),
+  persons: PropTypes.arrayOf(PropTypes.string),
   onClose: PropTypes.func.isRequired,
   onSubmitSucceded: PropTypes.func,
   noAccount: PropTypes.bool,
@@ -134,10 +129,8 @@ EmailParticipantRoles.propTypes = {
 };
 
 EmailParticipantRoles.defaultProps = {
-  personIds: [],
-  userIds: [],
   roleIds: [],
-  personIdentifiers: [],
+  persons: [],
   onSubmitSucceded: undefined,
   noAccount: false,
   notInvitedOnly: false,

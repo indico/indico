@@ -17,9 +17,8 @@ import {getIds} from './util';
 export function EmailParticipantRolesButton({
   eventId,
   roleId,
-  personIdentifiers,
+  persons,
   personSelector,
-  userSelector,
   triggerSelector,
   noAccount,
   notInvitedOnly,
@@ -28,8 +27,7 @@ export function EmailParticipantRolesButton({
   ...rest
 }) {
   const [open, setOpen] = useState(false);
-  const personIds = getIds(personSelector);
-  const userIds = getIds(userSelector);
+  persons = personSelector ? getIds(personSelector, false) : persons;
 
   useEffect(() => {
     if (!triggerSelector) {
@@ -44,21 +42,15 @@ export function EmailParticipantRolesButton({
   return (
     <>
       {!triggerSelector && (
-        <Button
-          onClick={() => setOpen(true)}
-          disabled={!(personIds.length || userIds.length || roleId || personIdentifiers.length)}
-          {...rest}
-        >
+        <Button onClick={() => setOpen(true)} disabled={!(roleId || persons.length)} {...rest}>
           <Translate>Send emails</Translate>
         </Button>
       )}
       {open && (
         <EmailParticipantRoles
           eventId={eventId}
-          personIds={personIds}
-          userIds={userIds}
           roleIds={roleId && [roleId]}
-          personIdentifiers={personIdentifiers}
+          persons={persons}
           noAccount={noAccount}
           notInvitedOnly={notInvitedOnly}
           onClose={() => setOpen(false)}
@@ -73,9 +65,8 @@ export function EmailParticipantRolesButton({
 EmailParticipantRolesButton.propTypes = {
   eventId: PropTypes.number.isRequired,
   roleId: PropTypes.number,
-  personIdentifiers: PropTypes.arrayOf(PropTypes.string),
+  persons: PropTypes.arrayOf(PropTypes.string),
   personSelector: PropTypes.string,
-  userSelector: PropTypes.string,
   triggerSelector: PropTypes.string,
   noAccount: PropTypes.bool,
   notInvitedOnly: PropTypes.bool,
@@ -85,9 +76,8 @@ EmailParticipantRolesButton.propTypes = {
 
 EmailParticipantRolesButton.defaultProps = {
   roleId: undefined,
-  personIdentifiers: [],
+  persons: [],
   personSelector: undefined,
-  userSelector: undefined,
   triggerSelector: undefined,
   noAccount: false,
   notInvitedOnly: false,

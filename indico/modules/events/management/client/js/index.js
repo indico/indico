@@ -29,7 +29,7 @@ import {SeriesManagement} from './SeriesManagement';
 (function(global) {
   global.setupEmailButton = function setupEmailButton(field, trigger) {
     const element = document.querySelector(field);
-    const {eventId, roleId, personSelector, userSelector} = element.dataset;
+    const {eventId, roleId, personSelector} = element.dataset;
     const extraParams = {};
     if (element.dataset.noAccount !== undefined) {
       extraParams.noAccount = true;
@@ -42,7 +42,6 @@ import {SeriesManagement} from './SeriesManagement';
         eventId={+eventId}
         roleId={roleId && +roleId}
         personSelector={personSelector}
-        userSelector={userSelector}
         triggerSelector={trigger}
         {...extraParams}
       />,
