@@ -31,7 +31,7 @@ function personListReducer(state, action) {
       }
       return {
         column: null,
-        sortedPersons: _.sortBy(state.sortedPersons, ['id']),
+        sortedPersons: _.sortBy(state.sortedPersons, ['identifier']),
         direction: null,
       };
     default:
@@ -50,7 +50,6 @@ const makeAuthorType = ({primaryAuthor, secondaryAuthor}) => {
 export default function PersonList({
   persons,
   selectedPersons,
-  selectedUsers,
   onChangeSelection,
   isSelectable,
   isVisible,
@@ -58,26 +57,21 @@ export default function PersonList({
 }) {
   const [state, dispatch] = useReducer(personListReducer, {
     column: null,
-    sortedPersons: persons.map(person => ({
-      ...person,
-      authorType: makeAuthorType(person),
-      selectable: isSelectable(person),
-    })),
+    sortedPersons: _.sortBy(
+      persons.map(person => ({
+        ...person,
+        authorType: makeAuthorType(person),
+        selectable: isSelectable(person),
+      })),
+      ['identifier']
+    ),
     direction: null,
   });
   const {column, sortedPersons, direction} = state;
   const visibleSortedPersons = sortedPersons.filter(person => isVisible(person));
-  const selectablePersons = visibleSortedPersons.filter(
-    person => person.selectable && person.type === 'person'
-  );
-  const selectableUsers = sortedPersons.filter(
-    person => person.selectable && person.type === 'user'
-  );
+  const selectablePersons = visibleSortedPersons.filter(person => person.selectable);
   const visibleSelectedPersons = selectedPersons.filter(id =>
-    isVisible(persons.filter(p => p.id === id)[0])
-  ).length;
-  const visibleSelectedUsers = selectedUsers.filter(id =>
-    isVisible(persons.filter(p => p.id === id)[0])
+    isVisible(persons.filter(p => p.identifier === id)[0])
   ).length;
 
   const roles = [
@@ -92,22 +86,21 @@ export default function PersonList({
 
   const toggleSelectAll = dataChecked => {
     if (dataChecked) {
-      onChangeSelection({
-        person: selectablePersons.map(person => person.id),
-        user: selectableUsers.map(person => person.id),
-      });
+      onChangeSelection(selectablePersons.map(person => person.identifier));
     } else {
-      onChangeSelection({person: [], user: []});
+      onChangeSelection([]);
     }
   };
 
-  const toggleSelectRow = ({id, type, selectable}) => {
+  const toggleSelectRow = ({identifier, selectable}) => {
     if (!selectable) {
       return;
     }
-    const selected = type === 'person' ? selectedPersons : selectedUsers;
-    const newIds = selected.includes(id) ? selected.filter(sId => sId !== id) : [...selected, id];
-    onChangeSelection({[type]: newIds});
+    if (selectedPersons.includes(identifier)) {
+      onChangeSelection(selectedPersons.filter(sId => sId !== identifier));
+    } else {
+      onChangeSelection([...selectedPersons, identifier]);
+    }
   };
 
   return (
@@ -117,16 +110,13 @@ export default function PersonList({
           <Table.HeaderCell disabled colSpan="2">
             <Checkbox
               indeterminate={
-                (visibleSelectedPersons > 0 && visibleSelectedPersons < selectablePersons.length) ||
-                (visibleSelectedUsers > 0 && visibleSelectedUsers < selectableUsers.length)
+                visibleSelectedPersons > 0 && visibleSelectedPersons < selectablePersons.length
               }
               checked={
-                (visibleSelectedPersons > 0 &&
-                  visibleSelectedPersons === selectablePersons.length) ||
-                (visibleSelectedUsers > 0 && visibleSelectedUsers === selectableUsers.length)
+                visibleSelectedPersons > 0 && visibleSelectedPersons === selectablePersons.length
               }
               onChange={(e, data) => toggleSelectAll(data.checked)}
-              disabled={!selectablePersons.length && !selectableUsers.length}
+              disabled={!selectablePersons.length}
             />
           </Table.HeaderCell>
           <Translate
@@ -165,16 +155,14 @@ export default function PersonList({
       <Table.Body>
         {visibleSortedPersons.map(person => (
           <Table.Row
-            key={person.id}
+            key={person.identifier}
             style={person.selectable ? {} : {opacity: '50%'}}
             onClick={() => toggleSelectRow(person)}
           >
             <Table.Cell collapsing>
               <Checkbox
                 disabled={!person.selectable}
-                checked={(person.type === 'person' ? selectedPersons : selectedUsers).includes(
-                  person.id
-                )}
+                checked={selectedPersons.includes(person.identifier)}
               />
             </Table.Cell>
             <Table.Cell collapsing>
@@ -227,8 +215,7 @@ export default function PersonList({
 PersonList.propTypes = {
   persons: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      type: PropTypes.oneOf(['person', 'user']).isRequired,
+      identifier: PropTypes.string.isRequired,
       fullName: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
       affiliation: PropTypes.string.isRequired,
@@ -238,8 +225,7 @@ PersonList.propTypes = {
       registered: PropTypes.bool.isRequired,
     })
   ).isRequired,
-  selectedPersons: PropTypes.arrayOf(PropTypes.number).isRequired,
-  selectedUsers: PropTypes.arrayOf(PropTypes.number).isRequired,
+  selectedPersons: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChangeSelection: PropTypes.func.isRequired,
   isSelectable: PropTypes.func,
   isVisible: PropTypes.func,

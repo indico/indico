@@ -17,8 +17,7 @@ import {getIds} from './util';
 export function EmailParticipantRolesButton({
   eventId,
   roleId,
-  personIds,
-  userIds,
+  personIdentifiers,
   personSelector,
   userSelector,
   triggerSelector,
@@ -29,8 +28,8 @@ export function EmailParticipantRolesButton({
   ...rest
 }) {
   const [open, setOpen] = useState(false);
-  personIds = personSelector ? getIds(personSelector) : personIds;
-  userIds = userSelector ? getIds(userSelector) : userIds;
+  const personIds = getIds(personSelector);
+  const userIds = getIds(userSelector);
 
   useEffect(() => {
     if (!triggerSelector) {
@@ -47,7 +46,7 @@ export function EmailParticipantRolesButton({
       {!triggerSelector && (
         <Button
           onClick={() => setOpen(true)}
-          disabled={!(personIds.length || userIds.length || roleId)}
+          disabled={!(personIds.length || userIds.length || roleId || personIdentifiers.length)}
           {...rest}
         >
           <Translate>Send emails</Translate>
@@ -59,6 +58,7 @@ export function EmailParticipantRolesButton({
           personIds={personIds}
           userIds={userIds}
           roleIds={roleId && [roleId]}
+          personIdentifiers={personIdentifiers}
           noAccount={noAccount}
           notInvitedOnly={notInvitedOnly}
           onClose={() => setOpen(false)}
@@ -73,8 +73,7 @@ export function EmailParticipantRolesButton({
 EmailParticipantRolesButton.propTypes = {
   eventId: PropTypes.number.isRequired,
   roleId: PropTypes.number,
-  personIds: PropTypes.arrayOf(PropTypes.number),
-  userIds: PropTypes.arrayOf(PropTypes.number),
+  personIdentifiers: PropTypes.arrayOf(PropTypes.string),
   personSelector: PropTypes.string,
   userSelector: PropTypes.string,
   triggerSelector: PropTypes.string,
@@ -86,8 +85,7 @@ EmailParticipantRolesButton.propTypes = {
 
 EmailParticipantRolesButton.defaultProps = {
   roleId: undefined,
-  personIds: [],
-  userIds: [],
+  personIdentifiers: [],
   personSelector: undefined,
   userSelector: undefined,
   triggerSelector: undefined,

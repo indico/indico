@@ -65,7 +65,6 @@ const FILTER_OPTIONS = {
 
 export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
   const [selectedPersons, setSelectedPersons] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [sentEmailCount, setSentEmailCount] = useState(undefined);
   const [activeFilters, setActiveFilters] = useState([]);
   const formData = new FormData();
@@ -91,11 +90,6 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
           },
         ]
       : undefined;
-
-  const onChangeSelection = ({person, user}) => {
-    person && setSelectedPersons(person);
-    user && setSelectedUsers(user);
-  };
 
   const isVisible = person =>
     !activeFilters.length || activeFilters.some(filter => FILTER_OPTIONS[filter].isMatch(person));
@@ -139,8 +133,7 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
           <PersonList
             persons={data.eventPersons}
             selectedPersons={selectedPersons}
-            selectedUsers={selectedUsers}
-            onChangeSelection={onChangeSelection}
+            onChangeSelection={persons => setSelectedPersons(persons)}
             isSelectable={person => !!person.email}
             isVisible={isVisible}
             extraRoles={extraRoles}
@@ -152,8 +145,7 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
       <Modal.Actions>
         <EmailParticipantRolesButton
           eventId={eventId}
-          personIds={selectedPersons.filter(id => isVisible(eventPersons.get(id)))}
-          userIds={selectedUsers.filter(id => isVisible(eventPersons.get(id)))}
+          personIdentifiers={selectedPersons.filter(id => isVisible(eventPersons.get(id)))}
           onSubmitSucceded={count => setSentEmailCount(count)}
           successTimeout={0}
           primary

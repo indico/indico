@@ -26,11 +26,13 @@ def iter_acl(acl):
 
 
 def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
-                              allow_category_roles=False, allow_registration_forms=False, allow_emails=False,
-                              allow_networks=False, event_id=None, category_id=None, soft_fail=False):
+                              allow_event_persons=False, allow_category_roles=False, allow_registration_forms=False,
+                              allow_emails=False, allow_networks=False, event_id=None, category_id=None,
+                              soft_fail=False):
     from indico.modules.categories.models.categories import Category
     from indico.modules.categories.models.roles import CategoryRole
     from indico.modules.events.models.events import Event
+    from indico.modules.events.models.persons import EventPerson
     from indico.modules.events.models.roles import EventRole
     from indico.modules.events.registration.models.forms import RegistrationForm
     from indico.modules.groups import GroupProxy
@@ -43,6 +45,8 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         raise ValueError('Cannot use category roles without a category/event context')
     if allow_event_roles and event_id is None:
         raise ValueError('Cannot use event roles without an event context')
+    if allow_event_persons and event_id is None:
+        raise ValueError('Cannot use event persons without an event context')
     if allow_registration_forms and event_id is None:
         raise ValueError('Cannot use registration forms without an event context')
 
@@ -113,6 +117,17 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         if event_role is None or event_role.event_id != event_id:
             raise ValueError(f'Invalid event role: {event_role_id}')
         return event_role
+    elif type_ == 'EventPerson':
+        if not allow_event_persons:
+            raise ValueError('Event persons are not allowed')
+        try:
+            event_person_id = int(data)
+        except ValueError:
+            raise ValueError('Invalid data')
+        event_person = EventPerson.get(event_person_id)
+        if event_person is None or event_person.event_id != event_id:
+            raise ValueError(f'Invalid event person: {event_person_id}')
+        return event_person
     elif type_ == 'CategoryRole':
         if not allow_category_roles:
             raise ValueError('Category roles are not allowed')

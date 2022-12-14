@@ -46,9 +46,9 @@ from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import LowercaseString, not_empty, validate_with_message
+from indico.util.marshmallow import LowercaseString, PrincipalList, not_empty, validate_with_message
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
-from indico.web.args import use_args, use_kwargs
+from indico.web.args import use_args, use_kwargs, use_rh_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 
@@ -287,18 +287,20 @@ class RHEmailEventPersonsPreview(RHManageEventBase):
 class RHEmailEventPersonsBase(RHManageEventBase):
     """Send emails to selected EventPersons."""
 
-    @use_kwargs({
+    @use_rh_kwargs({
         'person_id': fields.List(fields.Integer(), load_default=[]),
         'user_id': fields.List(fields.Integer(), load_default=[]),
         'role_id': fields.List(fields.Integer(), load_default=[]),
+        'persons': PrincipalList(allow_event_persons=True),
         'not_invited_only': fields.Bool(load_default=None),
         'no_account': fields.Bool(load_default=False),
-    })
-    def _process_args(self, person_id, user_id, role_id, not_invited_only, no_account):
+    }, rh_context=('event',))
+    def _process_args(self, person_id, user_id, role_id, persons, not_invited_only, no_account):
         RHManageEventBase._process_args(self)
         self.recipients = set(self._find_event_persons(person_id, not_invited_only))
         self.recipients |= set(self._find_users(user_id))
         self.recipients |= set(self._find_role_members(role_id))
+        self.recipients |= set(persons)
         self.no_account = no_account
 
     def _find_event_persons(self, person_ids, not_invited_only):
