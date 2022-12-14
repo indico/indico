@@ -176,6 +176,14 @@ class RHPersonsBase(RHManageEventBase):
                 data['roles']['speaker'] = BUILTIN_ROLES['speaker'].copy()
                 data['roles']['speaker']['elements'] = contributions | subcontributions
 
+            author_contributions = {person_link.contribution.id: self.generate_contributions_data(person_link)
+                                    for person_link in event_person.contribution_links
+                                    if person_link.is_author and not person_link.contribution.is_deleted}
+
+            if author_contributions:
+                data['roles']['author'] = BUILTIN_ROLES['author'].copy()
+                data['roles']['author']['elements'] = author_contributions
+
             event_user_roles_data = {}
             for role in event_user_roles[event_person.user]:
                 event_user_roles_data[f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}

@@ -165,16 +165,14 @@
                                 <i class="icon-stop colored-square" style="color: #{{ builtin_roles.convener.color }};"></i>
                                 <label for="filter-conveners">{% trans %}Conveners{% endtrans %}</label>
                             </li>
-                            {% if event.has_feature('abstracts') %}
-                                <li class="enabled">
-                                    <input type="checkbox" id="filter-abstract-author" data-filter="author">
-                                    <i class="icon-checkmark"></i>
-                                    <i class="icon-stop colored-square" style="color: #{{ builtin_roles.author.color }};"></i>
-                                    <label for="filter-abstract-author">
-                                        {%- trans %}Abstract authors{% endtrans -%}
-                                    </label>
-                                </li>
-                            {% endif %}
+                            <li class="enabled">
+                                <input type="checkbox" id="filter-author" data-filter="author">
+                                <i class="icon-checkmark"></i>
+                                <i class="icon-stop colored-square" style="color: #{{ builtin_roles.author.color }};"></i>
+                                <label for="filter-author">
+                                    {%- trans %}Authors{% endtrans -%}
+                                </label>
+                            </li>
                         {% else %}
                             <li class="enabled">
                                 <input type="checkbox" id="filter-lecture-speakers" data-filter="lecture_speaker">

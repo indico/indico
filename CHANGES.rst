@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Correctly show contribution authors in participant roles list (:pr:`5603`)
 
 
 Version 3.2.2
