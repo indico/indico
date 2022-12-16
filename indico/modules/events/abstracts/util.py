@@ -72,6 +72,10 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         'authors_affiliation': ('Primary authors (affiliation)',
                                 lambda x: [a.full_name_affiliation for a in x.primary_authors]),
         'authors_email': ('Primary authors (email)', lambda x: _names_with_emails(x.primary_authors)),
+        'coauthors': ('Co-Authors', lambda x: [a.full_name for a in x.secondary_authors]),
+        'coauthors_affiliation': ('Co-Authors (affiliation)',
+                                  lambda x: [a.full_name_affiliation for a in x.secondary_authors]),
+        'coauthors_email': ('Co-Authors (email)', lambda x: _names_with_emails(x.secondary_authors)),
         'accepted_track': ('Accepted track', lambda x: x.accepted_track.short_title if x.accepted_track else None),
         'submitted_for_tracks': ('Submitted for tracks',
                                  lambda x: [t.short_title for t in x.submitted_for_tracks]),
@@ -87,7 +91,8 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     }
     field_deps = {
         'submitter': ['submitter_affiliation', 'submitter_email'],
-        'authors': ['authors_affiliation', 'authors_email']
+        'authors': ['authors_affiliation', 'authors_email'],
+        'coauthors': ['coauthors_affiliation', 'coauthors_email'],
     }
     for name, deps in field_deps.items():
         if name in static_item_ids:

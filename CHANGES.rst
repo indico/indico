@@ -10,7 +10,7 @@ Version 3.2.3
 Improvements
 ^^^^^^^^^^^^
 
-- None so far :(
+- Include co-authors in abstract list columns and spreadsheet exports (:pr:`5605`)
 
 Bugfixes
 ^^^^^^^^
