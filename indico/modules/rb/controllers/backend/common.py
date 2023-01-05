@@ -27,5 +27,6 @@ search_room_args = {
     'sw_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
     'sw_lng': fields.Float(validate=lambda x: -180 <= x <= 180),
     'ne_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
-    'ne_lng': fields.Float(validate=lambda x: -180 <= x <= 180)
+    'ne_lng': fields.Float(validate=lambda x: -180 <= x <= 180),
+    'location_id': fields.Int(),
 }

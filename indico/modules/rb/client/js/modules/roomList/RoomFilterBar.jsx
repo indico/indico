@@ -23,6 +23,7 @@ import {selectors as userSelectors} from '../../common/user';
 import BuildingForm from './filters/BuildingForm';
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
+import LocationForm from './filters/LocationForm';
 import ShowOnlyForm from './filters/ShowOnlyForm';
 
 import './RoomFilterBar.module.scss';
@@ -49,6 +50,19 @@ const renderEquipment = ({equipment, features}) => {
       <Label circular horizontal className="white" size="tiny" styleName="filter-bar-button-label">
         {count}
       </Label>
+    </>
+  );
+};
+
+const renderLocation = ({locationName}) => {
+  if (!locationName) {
+    return null;
+  }
+
+  return (
+    <>
+      <Icon name="map pin" />
+      {locationName}
     </>
   );
 };
@@ -87,6 +101,7 @@ export class RoomFilterBarBase extends React.Component {
     hasOwnedRooms: PropTypes.bool.isRequired,
     filters: PropTypes.shape({
       building: PropTypes.string,
+      locationId: PropTypes.number,
       capacity: PropTypes.number,
       equipment: PropTypes.array,
       onlyFavorites: PropTypes.bool,
@@ -100,6 +115,7 @@ export class RoomFilterBarBase extends React.Component {
     }).isRequired,
     hideOptions: PropTypes.objectOf(PropTypes.bool),
     disabled: PropTypes.bool,
+    locations: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -127,10 +143,13 @@ export class RoomFilterBarBase extends React.Component {
         equipment,
         features,
         building,
+        locationId,
         ...extraFilters
       },
       actions: {setFilterParameter, setFilters},
+      locations,
     } = this.props;
+    const showLocationFilter = locations.size > 1;
     const hideShowOnlyForm =
       hideOptions.favorites && !hasOwnedRooms && !onlyMine && !showOnlyAuthorizedFilter;
     const responsiveTitle = (title, orElse) => (
@@ -158,11 +177,29 @@ export class RoomFilterBarBase extends React.Component {
         disabled={disabled}
       />
     );
+    const selectedLocationName = locations.get(locationId);
 
     return (
       <Button.Group size="small">
         <Button icon="filter" as="div" disabled />
         <FilterBarController>
+          {!hideOptions.location && showLocationFilter && (
+            <FilterDropdownFactory
+              name="locationId"
+              title={responsiveTitle(Translate.string('Location'), <Icon name="map pin" />)}
+              form={({locationId: selectedLocation}, setParentField) => (
+                <LocationForm
+                  setParentField={setParentField}
+                  locations={locations}
+                  location={selectedLocation}
+                />
+              )}
+              setGlobalState={data => setFilterParameter('locationId', data.locationId)}
+              initialValues={{locationId, locationName: selectedLocationName}}
+              renderValue={renderLocation}
+              disabled={disabled}
+            />
+          )}
           {!hideOptions.building && (
             <FilterDropdownFactory
               name="building"
@@ -243,6 +280,7 @@ export default (namespace, searchRoomsSelectors) =>
       equipmentTypes: roomsSelectors.getUsedEquipmentTypeNamesWithoutFeatures(state),
       features: roomsSelectors.getFeatures(state),
       buildings: roomsSelectors.getBuildings(state),
+      locations: roomsSelectors.getLocations(state),
       hasOwnedRooms: userSelectors.hasOwnedRooms(state),
     }),
     dispatch => ({

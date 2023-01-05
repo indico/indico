@@ -144,12 +144,19 @@ export default class RoomBasicDetails extends React.PureComponent {
             <Header.Subheader>{division}</Header.Subheader>
           </Header>
           <ul styleName="room-basic-details">
-            <li>{location}</li>
+            <li className="has-icon">
+              {location && (
+                <>
+                  <AnnotatedIcon name="map pin" text={Translate.string('Location')} />
+                  {location}
+                </>
+              )}
+            </li>
             <li className="has-icon">
               {site && (
                 <>
                   <AnnotatedIcon name="street view" text={Translate.string('Site')} />
-                  {room.site}
+                  {site}
                 </>
               )}
             </li>
@@ -161,7 +168,7 @@ export default class RoomBasicDetails extends React.PureComponent {
               {telephone && (
                 <>
                   <AnnotatedIcon name="phone" text={Translate.string('Phone number')} />
-                  {room.telephone}
+                  {telephone}
                 </>
               )}
             </li>

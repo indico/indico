@@ -137,3 +137,8 @@ export const getBuildings = createSelector(
     return Array.from(buildings).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
   }
 );
+
+export const getLocations = createSelector(
+  getAllRooms,
+  allRooms => new Map(Object.values(allRooms).map(room => [room.locationId, room.locationName]))
+);

@@ -23,6 +23,8 @@ Improvements
 - Support Markdown when writing global announcement and apply standard HTML
   sanitization to the message (:pr:`5640`)
 - Add BCC field on contribution email dialogs (:pr:`5637`)
+- Allow filtering by location in room booking (:issue:`4291`, :pr:`5622`,
+  thanks :user:`mindouro`)
 
 Bugfixes
 ^^^^^^^^
