@@ -296,12 +296,10 @@ class PrincipalList(fields.Field):
     """Marshmallow field for a list of principals."""
 
     def __init__(self, allow_groups=False, allow_external_users=False, allow_event_roles=False,
-                 allow_event_persons=False, allow_category_roles=False, allow_registration_forms=False,
-                 allow_emails=False, **kwargs):
+                 allow_category_roles=False, allow_registration_forms=False, allow_emails=False, **kwargs):
         self.allow_groups = allow_groups
         self.allow_external_users = allow_external_users
         self.allow_event_roles = allow_event_roles
-        self.allow_event_persons = allow_event_persons
         self.allow_category_roles = allow_category_roles
         self.allow_registration_forms = allow_registration_forms
         self.allow_emails = allow_emails
@@ -312,14 +310,13 @@ class PrincipalList(fields.Field):
 
     def _deserialize(self, value, attr, data, **kwargs):
         event_id = None
-        if self.allow_event_roles or self.allow_event_persons or self.allow_category_roles:
+        if self.allow_event_roles or self.allow_category_roles:
             event_id = self.context['event'].id
         try:
             return {principal_from_identifier(identifier,
                                               allow_groups=self.allow_groups,
                                               allow_external_users=self.allow_external_users,
                                               allow_event_roles=self.allow_event_roles,
-                                              allow_event_persons=self.allow_event_persons,
                                               allow_category_roles=self.allow_category_roles,
                                               allow_registration_forms=self.allow_registration_forms,
                                               allow_emails=self.allow_emails,
