@@ -206,7 +206,11 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
     log_data = {'Judgment': orig_string(judgment.title)}
     if judgment == AbstractAction.accept:
         abstract.state = AbstractState.accepted
-        abstract.accepted_track = abstract_data.get('accepted_track')
+        if abstract_data.get('use_review_track'):
+            tracks = abstract.reviewed_for_tracks
+            abstract.accepted_track = list(tracks)[0] if len(tracks) == 1 else None
+        else:
+            abstract.accepted_track = abstract_data.get('accepted_track')
         if abstract_data.get('override_contrib_type') or abstract_data.get('accepted_contrib_type'):
             abstract.accepted_contrib_type = abstract_data.get('accepted_contrib_type')
         else:

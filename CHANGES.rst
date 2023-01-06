@@ -16,6 +16,8 @@ Improvements
 - Make it possible to load more events in series management (:pr:`5629`)
 - Check manually entered email addresses of speakers/authors/chairpersons
   to avoid collisions and inconsistencies (:pr:`5478`)
+- Add option to use review track as accepted track when bulk-accepting abstracts
+  (:pr:`5608`)
 
 Bugfixes
 ^^^^^^^^
