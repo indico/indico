@@ -30,6 +30,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.entries import TimetableEntry
@@ -269,6 +270,7 @@ class SerializerBase:
             'id': str(event.id),
             'title': event.title,
             'description': event.description,
+            'registrations': Registration.query.with_parent(event).count(),
             'startDate': self._serialize_date(event.start_dt),
             'timezone': event.timezone,
             'endDate': self._serialize_date(event.end_dt),

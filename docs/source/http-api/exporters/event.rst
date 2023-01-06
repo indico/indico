@@ -43,6 +43,7 @@ Result for https://indico.server/export/event/137346.json?occ=yes&pretty=yes::
                     "time": "08:00:00"
                 },
                 "_type": "Conference",
+                "registrations":1,
                 "endDate": {
                     "date": "2011-06-24",
                     "tz": "Europe/Zurich",
@@ -114,6 +115,7 @@ Output for https://indico.server/export/event/137346.json?detail=contributions&p
                     "time": "08:00:00"
                 },
                 "_type": "Conference",
+                "registrations":1,
                 "endDate": {
                     "date": "2011-06-24",
                     "tz": "Europe/Zurich",
@@ -258,6 +260,7 @@ For example, https://indico.server/export/event/137346.json?detail=sessions&pret
                     "time": "08:00:00"
                 },
                 "_type": "Conference",
+                "registrations":1,
                 "endDate": {
                     "date": "2011-06-24",
                     "tz": "Europe/Zurich",
