@@ -5,26 +5,33 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import uploadURL from 'indico-url:event_editing.api_upload';
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
-import {Form} from 'semantic-ui-react';
+import {Checkbox, Form} from 'semantic-ui-react';
 
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {EditingReviewAction} from '../../../models';
 import {reviewEditable} from '../actions';
-import {getLastRevision, getNonSystemTags} from '../selectors';
+import {FinalFileManager} from '../FileManager';
+import {getFileTypes, getLastRevision, getNonSystemTags, getStaticData} from '../selectors';
 
 import FinalTagInput from './TagInput';
 
 export default function RequestChangesForm({setLoading, onSuccess}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
+  const staticData = useSelector(getStaticData);
+  const {eventId, contributionId, editableType} = staticData;
+  const fileTypes = useSelector(getFileTypes);
   const tagOptions = useSelector(getNonSystemTags);
+  const [uploadChanges, setUploadChanges] = useState(false);
 
   const requestChanges = async formData => {
     setLoading(true);
@@ -65,6 +72,26 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
             hideValidationError
             autoFocus
           />
+          <Form.Field>
+            <Checkbox
+              toggle
+              label={Translate.string('Make changes to the submission')}
+              checked={uploadChanges}
+              onChange={(__, {checked}) => setUploadChanges(checked)}
+            />
+          </Form.Field>
+          {uploadChanges && (
+            <FinalFileManager
+              name="files"
+              fileTypes={fileTypes}
+              files={lastRevision.files}
+              uploadURL={uploadURL({
+                event_id: eventId,
+                contrib_id: contributionId,
+                type: editableType,
+              })}
+            />
+          )}
           <FinalTagInput name="tags" options={tagOptions} />
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
             <FinalSubmitButton label={Translate.string('Submit')} />
