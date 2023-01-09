@@ -79,18 +79,23 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
         if form.validate_on_submit():
             judgment_data, abstract_data = form.split_data
             submitted_abstracts = {abstract for abstract in self.abstracts if abstract.state == AbstractState.submitted}
-            for abstract in submitted_abstracts:
-                judge_abstract(abstract, abstract_data, judge=session.user, **judgment_data)
-            num_judged_abstracts = len(submitted_abstracts)
-            num_prejudged_abstracts = len(self.abstracts) - num_judged_abstracts
+            num_skipped_abstracts = sum(not judge_abstract(abstract, abstract_data, judge=session.user, **judgment_data)
+                                        for abstract in submitted_abstracts)
+            num_judged_abstracts = len(submitted_abstracts) - num_skipped_abstracts
+            num_prejudged_abstracts = len(self.abstracts) - len(submitted_abstracts)
             if num_judged_abstracts:
-                flash(ngettext('One abstract has been judged.',
+                flash(ngettext('{num} abstract has been judged.',
                                '{num} abstracts have been judged.',
                                num_judged_abstracts).format(num=num_judged_abstracts), 'success')
             if num_prejudged_abstracts:
-                flash(ngettext('One abstract has been skipped since it is already judged.',
+                flash(ngettext('{num} abstract has been skipped since it is already judged.',
                                '{num} abstracts have been skipped since they are already judged.',
                                num_prejudged_abstracts).format(num=num_prejudged_abstracts), 'warning')
+            if num_skipped_abstracts:
+                flash(ngettext('{num} abstract has been skipped since it was under review for more than one track.',
+                               '{num} abstracts have been skipped since they were under review for more than one '
+                               'track.',
+                               num_skipped_abstracts).format(num=num_skipped_abstracts), 'warning')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form=form, fields=form._order, submit=_('Judge'), disabled_until_change=False)
 
