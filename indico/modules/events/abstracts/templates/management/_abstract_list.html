@@ -150,6 +150,18 @@
                                                 <span class="text-superfluous">({{ render_affiliation(abstract.submitter) }})</span>
                                             {% endif %}
                                         </td>
+                                    {% elif item.id == 'speakers' %}
+                                        <td class="i-table person-row-cell"
+                                            data-searchable="{{ abstract.speakers | join(', ', attribute='display_full_name') | lower }}">
+                                            {% for speaker in abstract.speakers | sort(attribute='display_order_key_lastname') -%}
+                                                <div class="person-row icon-user">
+                                                    {{- speaker.display_full_name }}
+                                                    {% if speaker.affiliation %}
+                                                        <span class="text-superfluous">({{ render_affiliation(speaker) }})</span>
+                                                    {% endif %}
+                                                </div>
+                                            {%- endfor %}
+                                        </td>
                                     {% elif item.id == 'authors' %}
                                         <td class="i-table person-row-cell"
                                             data-searchable="{{ abstract.primary_authors | join(', ', attribute='display_full_name') | lower }}">

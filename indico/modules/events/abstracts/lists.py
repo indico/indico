@@ -41,6 +41,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         self.static_items = {
             'state': {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}},
             'submitter': {'title': _('Submitter')},
+            'speakers': {'title': _('Speakers')},
             'authors': {'title': _('Primary authors')},
             'coauthors': {'title': _('Co-authors')},
             'accepted_track': {'title': _('Accepted track'), 'filter_choices': track_empty | track_choices},

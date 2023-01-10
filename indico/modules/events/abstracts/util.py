@@ -68,6 +68,10 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         'submitter_affiliation': ('Submitter (affiliation)', lambda x: x.submitter.full_name_affiliation),
         'submitter_email': ('Submitter (email)',
                             lambda x: format_email_with_name(x.submitter.full_name, x.submitter.email)),
+        'speakers': ('Speakers', lambda x: [a.full_name for a in x.speakers]),
+        'speakers_affiliation': ('Speakers (affiliation)',
+                                 lambda x: [a.full_name_affiliation for a in x.speakers]),
+        'speakers_email': ('Speakers (email)', lambda x: _names_with_emails(x.speakers)),
         'authors': ('Primary authors', lambda x: [a.full_name for a in x.primary_authors]),
         'authors_affiliation': ('Primary authors (affiliation)',
                                 lambda x: [a.full_name_affiliation for a in x.primary_authors]),
@@ -91,6 +95,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     }
     field_deps = {
         'submitter': ['submitter_affiliation', 'submitter_email'],
+        'speakers': ['speakers_affiliation', 'speakers_email'],
         'authors': ['authors_affiliation', 'authors_email'],
         'coauthors': ['coauthors_affiliation', 'coauthors_email'],
     }
