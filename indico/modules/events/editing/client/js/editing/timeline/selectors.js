@@ -10,6 +10,8 @@ import {createSelector} from 'reselect';
 
 import {FinalRevisionState, InitialRevisionState} from '../../models';
 
+import {isRequestChangesWithFiles} from './util';
+
 export const getDetails = state => (state.timeline ? state.timeline.details : null);
 export const getNewDetails = state => (state.timeline ? state.timeline.newDetails : null);
 export const isInitialEditableDetailsLoading = state =>
@@ -109,6 +111,11 @@ export const getLastRevertableRevisionId = createSelector(
         latestRevision.initialState.name !== InitialRevisionState.needs_submitter_confirmation
       ) {
         return null;
+      }
+    } else if (latestRevision.finalState.name === FinalRevisionState.needs_submitter_changes) {
+      const previousRevision = details.revisions[details.revisions.length - 2];
+      if (isRequestChangesWithFiles(latestRevision, previousRevision)) {
+        return previousRevision.id;
       }
     }
     return lastFinalRev.id;

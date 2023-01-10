@@ -27,6 +27,7 @@ from indico.modules.events.editing.notifications import (notify_comment, notify_
 from indico.modules.events.editing.schemas import (EditableDumpSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction)
 from indico.modules.logs import EventLogRealm, LogKind
+from indico.util.caching import memoize
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, orig_string
@@ -210,8 +211,25 @@ def create_submitter_revision(prev_revision, user, files):
     return new_revision
 
 
+@memoize
+def _is_request_changes_with_files(revision):
+    if not revision or len(revision.editable.revisions) < 2:
+        return False
+    previous_revision = revision.editable.revisions[-2]
+    return (revision != previous_revision and
+            revision.reviewed_dt and
+            revision.editor and
+            previous_revision.final_state == FinalRevisionState.needs_submitter_changes and
+            revision.final_state == FinalRevisionState.needs_submitter_changes and
+            revision.reviewed_dt == previous_revision.reviewed_dt and
+            revision.editor == previous_revision.editor)
+
+
 def _ensure_latest_revision_with_final_state(revision):
-    expected = next((r for r in revision.editable.revisions[::-1] if r.final_state != FinalRevisionState.none), None)
+    final_revisions = (r for r in revision.editable.revisions[::-1] if r.final_state != FinalRevisionState.none)
+    expected = next(final_revisions, None)
+    if _is_request_changes_with_files(expected):
+        expected = next(final_revisions, None)
     if revision != expected:
         raise InvalidEditableState
 
@@ -220,8 +238,7 @@ def _ensure_latest_revision_with_final_state(revision):
 def undo_review(revision):
     _ensure_latest_revision_with_final_state(revision)
     latest_revision = revision.editable.revisions[-1]
-    previous_revision = revision.editable.revisions[-2] if len(revision.editable.revisions) >= 2 else None
-    if revision != latest_revision:
+    if revision != latest_revision and not _is_request_changes_with_files(latest_revision):
         if revision.editable.revisions[-2:] != [revision, latest_revision]:
             raise InvalidEditableState
         _ensure_state(revision, final=FinalRevisionState.needs_submitter_confirmation)
@@ -229,14 +246,10 @@ def undo_review(revision):
                       initial=InitialRevisionState.needs_submitter_confirmation,
                       final=FinalRevisionState.none)
         db.session.delete(latest_revision)
-    if (((revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
-          revision.final_state == FinalRevisionState.accepted) or
-         (previous_revision and
-          revision.final_state == FinalRevisionState.needs_submitter_changes and
-          revision.reviewed_dt == previous_revision.reviewed_dt and
-          revision.editor == previous_revision.editor)) and
-            revision.editor is not None):
-        revision = previous_revision
+    if ((revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
+         revision.final_state == FinalRevisionState.accepted and revision.editor is not None)
+            or _is_request_changes_with_files(latest_revision)):
+        revision = revision.editable.revisions[-2]
         revision.editable.published_revision = None
         db.session.delete(latest_revision)
     elif revision.final_state == FinalRevisionState.accepted:
