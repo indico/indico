@@ -265,12 +265,13 @@ class SerializerBase:
     }
 
     def _build_event_api_data_base(self, event):
+        is_participant = event.is_user_registered(self.user)
         return {
             '_type': 'Conference',
             'id': str(event.id),
             'title': event.title,
             'description': event.description,
-            'registrations': Registration.query.with_parent(event).count(),
+            'registrations': Registration.query.with_parent(event).filter(Registration.is_publishable(is_participant)).count(),
             'startDate': self._serialize_date(event.start_dt),
             'timezone': event.timezone,
             'endDate': self._serialize_date(event.end_dt),
