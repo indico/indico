@@ -50,9 +50,12 @@
             {{ privacy_info.privacy_policy|sanitize_html }}
         </section>
     {% elif privacy_info.privacy_policy_urls|length == 1 %}
-        <a href="{{ privacy_info.privacy_policy_urls[0].url }}" target="_blank" rel="noopener noreferrer">
-            {% trans %}Privacy notice{% endtrans %}
-        </a>
+        <h4>
+            <span class="icon icon-link"></span>
+            <a href="{{ privacy_info.privacy_policy_urls[0].url }}" target="_blank" rel="noopener noreferrer">
+                {% trans %}Event privacy notice{% endtrans %}
+            </a>
+        </h4>
     {% elif privacy_info.privacy_policy_urls %}
         <section>
             <div class="header">
