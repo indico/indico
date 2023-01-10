@@ -135,6 +135,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
         elif action == EditingReviewAction.request_update:
             initial_state = revision.initial_state
             final_state = FinalRevisionState.needs_submitter_changes
+            editable_editor = editor
         new_revision = EditingRevision(submitter=editor,
                                        editor=editable_editor,
                                        initial_state=initial_state,
@@ -219,6 +220,7 @@ def _ensure_latest_revision_with_final_state(revision):
 def undo_review(revision):
     _ensure_latest_revision_with_final_state(revision)
     latest_revision = revision.editable.revisions[-1]
+    previous_revision = revision.editable.revisions[-2] if len(revision.editable.revisions) >= 2 else None
     if revision != latest_revision:
         if revision.editable.revisions[-2:] != [revision, latest_revision]:
             raise InvalidEditableState
@@ -227,9 +229,14 @@ def undo_review(revision):
                       initial=InitialRevisionState.needs_submitter_confirmation,
                       final=FinalRevisionState.none)
         db.session.delete(latest_revision)
-    if (revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
-            revision.final_state == FinalRevisionState.accepted and revision.editor is not None):
-        revision = revision.editable.revisions[-2]
+    if (((revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
+          revision.final_state == FinalRevisionState.accepted) or
+         (previous_revision and
+          revision.final_state == FinalRevisionState.needs_submitter_changes and
+          revision.reviewed_dt == previous_revision.reviewed_dt and
+          revision.editor == previous_revision.editor)) and
+            revision.editor is not None):
+        revision = previous_revision
         revision.editable.published_revision = None
         db.session.delete(latest_revision)
     elif revision.final_state == FinalRevisionState.accepted:
