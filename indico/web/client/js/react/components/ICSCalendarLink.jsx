@@ -8,8 +8,8 @@
 import signURL from 'indico-url:core.sign_url';
 
 import PropTypes from 'prop-types';
-import React, {useReducer} from 'react';
-import {Button, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
+import React, {useReducer, useState} from 'react';
+import {Button, Icon, Input, Label, Grid, Popup, Header, Checkbox} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -83,8 +83,16 @@ ICSExportOptions.defaultProps = {
   options: [],
 };
 
-export default function ICSCalendarLink({endpoint, params, renderButton, popupPosition, options}) {
+export default function ICSCalendarLink({
+  endpoint,
+  params,
+  renderButton,
+  popupPosition,
+  options,
+  eventInSeries, // only relevant for events, true if the event belongs to an event series
+}) {
   const [popupState, dispatch] = useReducer(popupReducer, initialState);
+  const [exportEventSeries, setExportEventSeries] = useState(false);
 
   const copyButton = (
     <Button
@@ -119,15 +127,23 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
     dispatch({type: 'CLOSE'});
   };
 
-  const handleSetOption = async (key, extraParams) => {
+  const _handleSetOption = async (key, extraParams) => {
+    if (popupState.source) {
+      popupState.source.cancel();
+    }
+    const source = indicoAxios.CancelToken.source();
+    dispatch({type: 'OPEN', key, source});
+    const url = await fetchURL(extraParams, source);
+    dispatch({type: 'LOADED', url});
+  };
+
+  const handleSetOption = (key, extraParams) => {
     if (!popupState.open || popupState.key !== key) {
-      if (popupState.source) {
-        popupState.source.cancel();
-      }
-      const source = indicoAxios.CancelToken.source();
-      dispatch({type: 'OPEN', key, source});
-      const url = await fetchURL(extraParams, source);
-      dispatch({type: 'LOADED', url});
+      extraParams = {
+        ...extraParams,
+        ...(exportEventSeries && {export_event_series: exportEventSeries}),
+      };
+      _handleSetOption(key, extraParams);
     }
   };
 
@@ -165,6 +181,28 @@ export default function ICSCalendarLink({endpoint, params, renderButton, popupPo
         />
       </Header>
       <Popup.Content styleName="content">
+        {eventInSeries && (
+          <>
+            <strong styleName="export-option">
+              <Translate>Export options</Translate>
+            </strong>
+            <div
+              styleName="export-event-series"
+              onClick={() => {
+                const option = options.find(opt => opt.key === popupState.key);
+                const extraParams = option?.extraParams || {};
+                setExportEventSeries(!exportEventSeries);
+                _handleSetOption(popupState.key, {
+                  ...extraParams,
+                  ...(!exportEventSeries && {export_event_series: !exportEventSeries}),
+                });
+              }}
+            >
+              <Translate>Export all events in this event series</Translate>
+              <Checkbox toggle checked={exportEventSeries} />
+            </div>
+          </>
+        )}
         <strong styleName="export-option">Synchronize with your calendar</strong>
         <p>
           <Translate>
@@ -218,6 +256,7 @@ ICSCalendarLink.propTypes = {
   renderButton: PropTypes.func,
   popupPosition: PropTypes.string,
   options: ICSExportOptions.propTypes.options,
+  eventInSeries: PropTypes.bool,
 };
 
 ICSCalendarLink.defaultProps = {
@@ -225,4 +264,5 @@ ICSCalendarLink.defaultProps = {
   renderButton: null,
   popupPosition: 'left center',
   options: ICSExportOptions.defaultProps.options,
+  eventInSeries: false,
 };
