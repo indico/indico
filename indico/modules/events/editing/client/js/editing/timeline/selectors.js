@@ -26,6 +26,10 @@ export const getLastTimelineBlock = createSelector(
   getTimelineBlocks,
   blocks => blocks && blocks[blocks.length - 1]
 );
+export const getSecondLastTimelineBlock = createSelector(
+  getTimelineBlocks,
+  blocks => blocks && blocks[blocks.length - 2]
+);
 export const getLastRevision = createSelector(
   getDetails,
   details => details && details.revisions[details.revisions.length - 1]

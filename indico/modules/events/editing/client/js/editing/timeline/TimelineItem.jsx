@@ -21,27 +21,33 @@ import ReviewForm from './ReviewForm';
 import RevisionLog from './RevisionLog';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
-import {blockPropTypes} from './util';
+import {blockPropTypes, isRequestChangesWithFiles} from './util';
 
 import './TimelineItem.module.scss';
 
 export default function TimelineItem({block, index}) {
   const {submitter, createdDt} = block;
   const lastBlock = useSelector(selectors.getLastTimelineBlock);
+  const secondLastBlock = useSelector(selectors.getSecondLastTimelineBlock);
   const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
   const {canComment, state: editableState} = useSelector(selectors.getDetails);
   const {fileTypes} = useSelector(selectors.getStaticData);
   const isLastBlock = lastBlock.id === block.id;
-  const [visible, setVisible] = useState(isLastBlock);
+  const isVisibleByDefault =
+    isLastBlock ||
+    (secondLastBlock &&
+      secondLastBlock.id === block.id &&
+      (isRequestChangesWithFiles(lastBlock, secondLastBlock) || needsSubmitterConfirmation));
+  const [visible, setVisible] = useState(isVisibleByDefault);
 
   useEffect(() => {
     // when undoing a judgment deletes the last revision this revision may become the
     // latest one, and thus needs to be unhidden if it had been collapsed before.
-    if (isLastBlock && !visible) {
+    if (isVisibleByDefault && !visible) {
       setVisible(true);
     }
-  }, [isLastBlock, visible]);
+  }, [isVisibleByDefault, visible]);
 
   return (
     <>
