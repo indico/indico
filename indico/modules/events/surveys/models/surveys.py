@@ -297,9 +297,13 @@ class Survey(db.Model):
     def send_start_notification(self):
         if not self.notifications_enabled or self.start_notification_sent or not self.event.has_feature('surveys'):
             return
+        if not (recipients := self.start_notification_recipients):
+            # no recipients -> just mark as sent and not log an empty email...
+            self.start_notification_sent = True
+            return
         with self.event.force_event_locale():
             template_module = get_template_module('events/surveys/emails/start_notification_email.txt', survey=self)
-            email = make_email(bcc_list=self.start_notification_recipients, template=template_module)
+            email = make_email(bcc_list=recipients, template=template_module)
         send_email(email, event=self.event, module='Surveys')
         logger.info('Sending start notification for survey %s', self)
         self.start_notification_sent = True
