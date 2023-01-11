@@ -15,7 +15,7 @@
         {%- endtrans %}
 
         {% trans %}You may answer the survey by clicking the link below:{% endtrans %}
-        {{ url_for('surveys.display_survey_form', survey, _external=true) }}
+        {{ url_for('surveys.display_survey_form', survey.locator.token, _external=true) }}
     {%- endfilter -%}
 {%- endblock %}
 
