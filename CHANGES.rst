@@ -34,6 +34,7 @@ Improvements
   (:issue:`5579`, :pr:`5654`)
 - Hide the top box with the latest files of an editable until it has been accepted
   and published (:issue:`5660`, :pr:`5665`)
+- Allow uploading files when requesting changes on the editing timeline (:pr:`5612`)
 
 Bugfixes
 ^^^^^^^^

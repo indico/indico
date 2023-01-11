@@ -202,7 +202,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
         if action in (EditingReviewAction.update, EditingReviewAction.update_accept,
                       EditingReviewAction.request_update):
             argmap['files'] = EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
-                                                required=action != EditingReviewAction.request_update)
+                                                required=(action != EditingReviewAction.request_update))
         args = parser.parse(argmap, unknown=EXCLUDE)
         service_url = editing_settings.get(self.event, 'service_url')
 
