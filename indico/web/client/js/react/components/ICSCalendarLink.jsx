@@ -203,7 +203,9 @@ export default function ICSCalendarLink({
             </div>
           </>
         )}
-        <strong styleName="export-option">Synchronize with your calendar</strong>
+        <strong styleName="export-option">
+          <Translate>Synchronize with your calendar</Translate>
+        </strong>
         <p>
           <Translate>
             You may copy-paste the following URL into your scheduling application. Contents will be
@@ -228,7 +230,9 @@ export default function ICSCalendarLink({
             </Grid.Row>
           </Grid>
         )}
-        <strong styleName="export-option">Download</strong>
+        <strong styleName="export-option">
+          <Translate>Download</Translate>
+        </strong>
         <div styleName="download-option">
           <span>
             <Translate>
