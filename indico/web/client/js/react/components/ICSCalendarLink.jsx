@@ -139,10 +139,9 @@ export default function ICSCalendarLink({
 
   const handleSetOption = (key, extraParams) => {
     if (!popupState.open || popupState.key !== key) {
-      extraParams = {
-        ...extraParams,
-        ...(exportEventSeries && {export_event_series: exportEventSeries}),
-      };
+      if (exportEventSeries) {
+        extraParams = {...extraParams, export_event_series: true};
+      }
       _handleSetOption(key, extraParams);
     }
   };
@@ -190,12 +189,12 @@ export default function ICSCalendarLink({
               styleName="export-event-series"
               onClick={() => {
                 const option = options.find(opt => opt.key === popupState.key);
-                const extraParams = option?.extraParams || {};
+                let extraParams = option?.extraParams || {};
+                if (!exportEventSeries) {
+                  extraParams = {...extraParams, export_event_series: true};
+                }
                 setExportEventSeries(!exportEventSeries);
-                _handleSetOption(popupState.key, {
-                  ...extraParams,
-                  ...(!exportEventSeries && {export_event_series: !exportEventSeries}),
-                });
+                _handleSetOption(popupState.key, extraParams);
               }}
             >
               <Translate>Export all events in this event series</Translate>
