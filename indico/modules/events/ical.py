@@ -213,13 +213,13 @@ def events_to_ical(
         if not skip_access_check and not event.can_access(user):
             continue
 
-        if scope == CalendarScope.contribution:
+        if scope == CalendarScope.contribution and event.contributions_count > 0:
             components = [
                 generate_contribution_component(contrib, organizer=organizer)
                 for contrib in event.contributions
                 if contrib.start_dt and contrib.can_access(user)
             ]
-        elif scope == CalendarScope.session:
+        elif scope == CalendarScope.session and event.session_block_count > 0:
             components = [
                 generate_session_block_component(block, organizer=organizer)
                 for session in event.sessions
