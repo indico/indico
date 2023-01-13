@@ -28,12 +28,12 @@ class RHExportEventICAL(RHDisplayEventBase):
     @use_kwargs({
         'scope': EnumField(CalendarScope, load_default=None),
         'detail': fields.String(load_default=None),
-        'export_event_series': fields.Boolean(load_default=False)
+        'series': fields.Boolean(load_default=False)  # Export the full event series
     }, location='query')
-    def _process(self, scope, detail, export_event_series):
+    def _process(self, scope, detail, series):
         if not scope and detail == 'contributions':
             scope = CalendarScope.contribution
-        if not export_event_series:
+        if not series:
             event_ical = event_to_ical(self.event, session.user, scope)
             return send_file('event.ics', BytesIO(event_ical), 'text/calendar')
         else:

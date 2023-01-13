@@ -140,7 +140,7 @@ export default function ICSCalendarLink({
   const handleSetOption = (key, extraParams) => {
     if (!popupState.open || popupState.key !== key) {
       if (exportEventSeries) {
-        extraParams = {...extraParams, export_event_series: true};
+        extraParams = {...extraParams, series: true};
       }
       _handleSetOption(key, extraParams);
     }
@@ -191,7 +191,7 @@ export default function ICSCalendarLink({
                 const option = options.find(opt => opt.key === popupState.key);
                 let extraParams = option?.extraParams || {};
                 if (!exportEventSeries) {
-                  extraParams = {...extraParams, export_event_series: true};
+                  extraParams = {...extraParams, series: true};
                 }
                 setExportEventSeries(!exportEventSeries);
                 _handleSetOption(popupState.key, extraParams);
