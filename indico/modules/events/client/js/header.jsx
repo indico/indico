@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const {eventId, eventContribCount, eventSessionBlockCount} = calendarContainer.dataset;
+  const eventInSeries = calendarContainer.dataset.eventInSeries !== undefined;
   const options = [
     {
       key: 'event',
@@ -63,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
       dropdownPosition="top left"
       popupPosition="bottom right"
       options={options}
+      eventInSeries={eventInSeries}
     />,
     calendarContainer
   );

@@ -12,7 +12,7 @@ from marshmallow_enum import EnumField
 from webargs import fields
 
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
-from indico.modules.events.ical import CalendarScope, event_to_ical
+from indico.modules.events.ical import CalendarScope, event_to_ical, events_to_ical
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
@@ -27,13 +27,18 @@ from indico.web.rh import allow_signed_url
 class RHExportEventICAL(RHDisplayEventBase):
     @use_kwargs({
         'scope': EnumField(CalendarScope, load_default=None),
-        'detail': fields.String(load_default=None)
+        'detail': fields.String(load_default=None),
+        'series': fields.Boolean(load_default=False)  # Export the full event series
     }, location='query')
-    def _process(self, scope, detail):
+    def _process(self, scope, detail, series):
         if not scope and detail == 'contributions':
             scope = CalendarScope.contribution
-        event_ical = event_to_ical(self.event, session.user, scope)
-        return send_file('event.ics', BytesIO(event_ical), 'text/calendar')
+        if not series:
+            event_ical = event_to_ical(self.event, session.user, scope)
+            return send_file('event.ics', BytesIO(event_ical), 'text/calendar')
+        else:
+            events_ical = events_to_ical(self.event.series.events, session.user, scope)
+            return send_file('event-series.ics', BytesIO(events_ical), 'text/calendar')
 
 
 class RHDisplayEvent(RHDisplayEventBase):

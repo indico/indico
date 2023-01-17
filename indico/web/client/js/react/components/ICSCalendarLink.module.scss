@@ -26,6 +26,12 @@
   cursor: initial;
 }
 
+.export-event-series {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
 .export-option {
   display: block;
   text-align: center;
