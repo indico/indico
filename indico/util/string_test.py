@@ -197,15 +197,15 @@ def test_sanitize_email(input, output):
 
 
 @pytest.mark.parametrize(('input', 'output'), (
+    ('Simple text', 'Simple text'),
     ('<span>Simple text</span>', 'Simple text'),
-    ('<p>Simple text</p>', 'Simple text\n'),
-    ('Simple text', 'Simple text\n'),  # lxml parses this as <p>...</p> which creates the extra newline
+    ('<p>Simple text</p>', 'Simple text'),
     ('<h1>Some html</h1>', 'Some html'),
-    ('foo &amp; bar <a href="test">xxx</a> 1<2 <test>', 'foo & bar xxx 1<2 \n'),
+    ('foo &amp; bar <a href="test">xxx</a> 1<2 <test>', 'foo & bar xxx 1<2'),
     ('<strong>m\xf6p</strong> test', 'm\xf6p test'),
-    ('<p>hello</p> <p>world</p>', 'hello\n world\n'),
-    ('Text <br> with <br> linebreaks', 'Text \n with \n linebreaks\n'),
-    ('<p>Combining paragraphs with <br> linebreaks </p>', 'Combining paragraphs with \n linebreaks \n'),
+    ('<p>hello</p> <p>world</p>', 'hello\n world'),
+    ('Text <br> with <br> linebreaks', 'Text \n with \n linebreaks'),
+    ('<p>Combining paragraphs with <br> linebreaks </p>', 'Combining paragraphs with \n linebreaks'),
 ))
 def test_html_to_plaintext(input, output):
     assert html_to_plaintext(input) == output

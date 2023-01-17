@@ -506,7 +506,7 @@ def html_to_plaintext(string):
     doc = etree.HTML(string)
     for elem in doc.xpath('//p | //br'):
         elem.tail = '\n' + elem.tail if elem.tail else '\n'
-    return doc.xpath('string()')
+    return doc.xpath('string()').strip()
 
 
 class RichMarkup(Markup):
