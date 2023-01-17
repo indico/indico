@@ -19,7 +19,6 @@ export const indicoAxios = axios.create({
 });
 
 indicoAxios.isCancel = axios.isCancel;
-indicoAxios.CancelToken = axios.CancelToken;
 
 indicoAxios.interceptors.request.use(config => {
   if (isURLSameOrigin(config.url)) {
