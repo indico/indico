@@ -383,6 +383,15 @@ def get_request_user():
         # we don't want that code to fail because of an invalid token in the URL
         return None, None
 
+    # XXX this is an awful workaround for API requests than call something (e.g.
+    # `display_full_name`) which accesses `session.user` and thus calls this,
+    # which will then fail because the API token usually doesn't have one of the
+    # `everything` scopes... this should be removed whenever we get rid of the legacy
+    # API since any new code would simply be using normal RHs with an oauth scope,
+    # and thus not end up doing this weird mix.
+    if g.get('current_api_user'):
+        return None, None
+
     current_exc = sys.exc_info()[1]
     rh = type(g.rh) if 'rh' in g else None
     oauth_scope_hint = getattr(rh, '_OAUTH_SCOPE', None)
