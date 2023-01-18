@@ -21,7 +21,7 @@ const initialState = {
   key: null,
   open: false,
   url: null,
-  source: null,
+  controller: null,
   copied: false,
 };
 
@@ -30,9 +30,9 @@ function popupReducer(state, action) {
     case 'CLOSE':
       return initialState;
     case 'OPEN':
-      return {...initialState, open: true, key: action.key, source: action.source};
+      return {...initialState, open: true, key: action.key, controller: action.controller};
     case 'LOADED':
-      return {...state, url: action.url, source: null};
+      return {...state, url: action.url, controller: null};
     case 'COPIED':
       return {...state, copied: true};
     default:
@@ -105,36 +105,39 @@ export default function ICSCalendarLink({
     />
   );
 
-  const fetchURL = async (extraParams, source) => {
+  const fetchURL = async (extraParams, controller) => {
     try {
       const {
         data: {url: signedURL},
       } = await indicoAxios.post(
         signURL(),
         snakifyKeys({endpoint, params: {...params, ...extraParams}}),
-        {cancelToken: source.token}
+        {signal: controller.signal}
       );
       return signedURL;
     } catch (error) {
       handleAxiosError(error);
+      return null;
     }
   };
 
   const handleClose = () => {
-    if (popupState.source) {
-      popupState.source.cancel();
+    if (popupState.controller) {
+      popupState.controller.abort();
     }
     dispatch({type: 'CLOSE'});
   };
 
   const _handleSetOption = async (key, extraParams) => {
-    if (popupState.source) {
-      popupState.source.cancel();
+    if (popupState.controller) {
+      popupState.controller.abort();
     }
-    const source = indicoAxios.CancelToken.source();
-    dispatch({type: 'OPEN', key, source});
-    const url = await fetchURL(extraParams, source);
-    dispatch({type: 'LOADED', url});
+    const controller = new AbortController();
+    dispatch({type: 'OPEN', key, controller});
+    const url = await fetchURL(extraParams, controller);
+    if (url !== null) {
+      dispatch({type: 'LOADED', url});
+    }
   };
 
   const handleSetOption = (key, extraParams) => {

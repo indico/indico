@@ -34,7 +34,7 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
   const [shouldLoad, setShouldLoad] = useState(!lazy);
 
   const apiCall = useCallback(
-    async (method, id = null, source = null) => {
+    async (method, id = null, signal = null) => {
       let response;
       const args = {};
       if (id !== null) {
@@ -47,7 +47,7 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
         response = await indicoAxios.request({
           method,
           url: favoriteUsersURL(args),
-          cancelToken: source ? source.token : null,
+          signal,
         });
       } catch (error) {
         handleAxiosError(error);
@@ -58,18 +58,14 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
     [userId]
   );
 
-  const fetchDetails = async (ids, source = null) => {
+  const fetchDetails = async (ids, signal = null) => {
     const values = ids.map(id => `User:${id}`);
     let response;
     try {
-      response = await indicoAxios.post(
-        principalsURL(),
-        {values},
-        {cancelToken: source ? source.token : null}
-      );
+      response = await indicoAxios.post(principalsURL(), {values}, {signal});
     } catch (error) {
       handleAxiosError(error);
-      return;
+      return null;
     }
     return _.fromPairs(Object.values(camelizeKeys(response.data)).map(x => [x.userId, x]));
   };
@@ -96,20 +92,22 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
       return;
     }
 
-    const source = indicoAxios.CancelToken.source();
+    const controller = new AbortController();
 
     (async () => {
-      const ids = await apiCall('GET', null, source);
+      const ids = await apiCall('GET', null, controller.signal);
       if (ids === null || !ids.length) {
         setLoading(false);
         return;
       }
-      const data = await fetchDetails(ids, source);
-      setFavorites(data);
+      const data = await fetchDetails(ids, controller.signal);
+      if (data !== null) {
+        setFavorites(data);
+      }
       setLoading(false);
     })();
     return () => {
-      source.cancel();
+      controller.abort();
     };
   }, [apiCall, shouldLoad]);
 

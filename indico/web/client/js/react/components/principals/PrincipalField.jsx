@@ -57,14 +57,14 @@ const PrincipalField = props => {
       // nothing to do
       return;
     }
-    const source = indicoAxios.CancelToken.source();
+    const controller = new AbortController();
     (async () => {
       let response;
       try {
         response = await indicoAxios.post(
           principalsURL(),
           {values: [value]},
-          {cancelToken: source.token}
+          {signal: controller.signal}
         );
       } catch (error) {
         handleAxiosError(error);
@@ -74,7 +74,7 @@ const PrincipalField = props => {
     })();
 
     return () => {
-      source.cancel();
+      controller.abort();
     };
   }, [details, value]);
 
