@@ -11,6 +11,8 @@ from flask import session
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.oauth.protector import IndicoAuthlibHTTPError, IndicoResourceProtector
+from indico.modules.events.contributions.models.persons import ContributionPersonLink
+from indico.modules.events.models.persons import EventPerson
 from indico.web.flask.util import make_view_func
 from indico.web.rh import RH, allow_signed_url, oauth_scope
 from indico.web.util import (_check_request_user, _lookup_request_user, _request_likely_seen_by_user, get_oauth_user,
@@ -566,3 +568,23 @@ def test_get_request_user_nested_exceptions(mocker, app, test_client):
 
     # none of the requests should have ended up in the RH
     assert not process_called
+
+
+def test_get_request_user_legacy_api(test_client, dummy_user, dummy_event, dummy_contribution, dummy_personal_token):
+    # bug from https://talk.getindico.io/t/403-forbidden-or-400-bad-requests-using-api-tokens/2922
+    api_path = f'/export/event/{dummy_event.id}.json?detail=contributions'
+    person = EventPerson.create_from_user(dummy_user, dummy_event)
+    dummy_contribution.person_links.append(ContributionPersonLink(person=person))
+
+    # unauthenticated
+    resp = test_client.get(api_path)
+    assert resp.status_code == 200
+    assert resp.json['count'] == 1
+
+    # personal access token
+    assert 'read:everything' not in dummy_personal_token.scopes
+    assert 'full:everything' not in dummy_personal_token.scopes
+    personal_oauth_headers = {'Authorization': f'Bearer {dummy_personal_token._plaintext_token}'}
+    resp = test_client.get(api_path, headers=personal_oauth_headers)
+    assert resp.status_code == 200
+    assert resp.json['count'] == 1
