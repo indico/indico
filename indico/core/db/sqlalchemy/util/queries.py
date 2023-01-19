@@ -137,7 +137,7 @@ def get_related_object(obj, relationship, criteria):
     return cls.query.with_parent(obj, relationship).filter_by(**criteria).first()
 
 
-def get_n_matching(query, n, predicate, *, prefetch_factor=5, preload_bulk=None):
+def get_n_matching(query, n, predicate, *, prefetch_factor=5, preload_bulk=None, offset=0):
     """Get N objects from a query that satisfy a condition.
 
     This queries for ``n * 5`` objects initially and then loads
@@ -151,8 +151,9 @@ def get_n_matching(query, n, predicate, *, prefetch_factor=5, preload_bulk=None)
     :param preload_bulk: Function that's called with the full set of objects
                          to allow for bulk-preloading of data needed in the
                          predicate function
+    :param offset: The initial query offset
     """
-    _offset = 0
+    _offset = offset
 
     def _get():
         nonlocal _offset

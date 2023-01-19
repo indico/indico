@@ -23,7 +23,7 @@ import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
-import './SeriesManagement.module.scss';
+import styles from './SeriesManagement.module.scss';
 
 const debounce = makeAsyncDebounce(250);
 const debounceSingle = makeAsyncDebounce(250);
@@ -276,6 +276,7 @@ function SeriesEvents({
 }) {
   const [searchQuery, setSearchQuery] = useState(undefined);
   const [results, setResults] = useState([]);
+  const [hasMore, setHasMore] = useState(false);
   const [isSearching, setSearching] = useState(false);
   const [denialReason, setDenialReason] = useState(null);
 
@@ -311,20 +312,28 @@ function SeriesEvents({
     setResults([]);
   };
 
-  const searchEvents = async q => {
+  const searchEvents = async (q, searchOffset = 0, addToResults = false) => {
     let resp;
     try {
-      resp = await debounce(() => indicoAxios.get(eventSearch({category_id: categoryId, q})));
+      resp = await debounce(() =>
+        indicoAxios.get(eventSearch({category_id: categoryId, q, offset: searchOffset}))
+      );
     } catch (error) {
       handleAxiosError(error);
       return;
     }
-    setResults(resp.data);
+    if (addToResults) {
+      setResults([...results, ...resp.data.events]);
+    } else {
+      setResults(resp.data.events);
+    }
+    setHasMore(resp.data.has_more);
     setDenialReason(null);
     setSearching(false);
   };
 
   const handleSearch = async (__, {searchQuery: query}) => {
+    setHasMore(false);
     setSearchQuery(query);
     query = query.trim();
     setDenialReason(null);
@@ -349,7 +358,7 @@ function SeriesEvents({
 
   const currentEventIdsSet = new Set(currentEvents.map(e => e.id));
 
-  const eventOptions = results.map(evt => ({
+  let eventOptions = results.map(evt => ({
     key: evt.id,
     value: evt.id,
     text: evt.title,
@@ -402,6 +411,42 @@ function SeriesEvents({
     ),
   }));
 
+  const loadMore = () => {
+    setSearching(true);
+    searchEvents(searchQuery.trim(), results.length, true);
+  };
+
+  if (eventOptions.length > 0 && hasMore) {
+    eventOptions = [
+      ...eventOptions,
+      {
+        key: '_',
+        value: '_',
+        className: styles['load-more'],
+        content: (
+          <div
+            onClick={e => {
+              // The dropdown item with the 'Load more' button should not be selectable.
+              // This prevents triggering onChange on the dropdown when the item is clicked.
+              e.stopPropagation();
+            }}
+          >
+            <Button
+              primary
+              compact
+              size="small"
+              type="button"
+              loading={isSearching}
+              onClick={loadMore}
+            >
+              <Translate>Load more</Translate>
+            </Button>
+          </div>
+        ),
+      },
+    ];
+  }
+
   return (
     <>
       <Dropdown
@@ -409,6 +454,7 @@ function SeriesEvents({
         selection
         search={x => x}
         icon="search"
+        closeOnChange={false}
         selectOnBlur={false}
         selectOnNavigation={false}
         placeholder={Translate.string(
@@ -420,6 +466,9 @@ function SeriesEvents({
         onSearchChange={handleSearch}
         searchQuery={searchQuery}
         onChange={(__, {value}) => {
+          if (value === '_') {
+            return;
+          }
           const event = results.find(e => e.id === value);
           const newEvents = [...currentEvents, event].sort(
             (a, b) => moment(a.start_dt) - moment(b.start_dt)

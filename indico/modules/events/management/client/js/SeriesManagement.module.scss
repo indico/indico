@@ -67,3 +67,18 @@
 .positive-note {
   color: $dark-green;
 }
+
+:global(.ui.dropdown .menu) > :global(.item).load-more {
+  padding: 0 !important;
+  margin: 0;
+  cursor: default;
+
+  &:hover {
+    background: unset;
+  }
+}
+
+.load-more > div {
+  text-align: center;
+  padding: 11px 16px; // Same as <Dropdown.Item>
+}
