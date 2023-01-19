@@ -495,7 +495,18 @@ def sanitize_html(string):
 
 
 def html_to_plaintext(string):
-    return html.html5parser.fromstring(string).xpath('string()')
+    """Convert HTML to plaintext.
+
+    :param string: The HTML source string
+
+    <p> and <br> elements are converted into newline characters.
+    Any literal '\n' characters in the HTML source are removed.
+    """
+    string = string.replace('\n', '')
+    doc = etree.HTML(string)
+    for elem in doc.xpath('//p | //br'):
+        elem.tail = '\n' + elem.tail if elem.tail else '\n'
+    return doc.xpath('string()').strip()
 
 
 class RichMarkup(Markup):

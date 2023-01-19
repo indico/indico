@@ -22,6 +22,7 @@ Bugfixes
 - Disable Sentry trace propagation to outgoing HTTP requests (:pr:`5604`)
 - Include token in notification emails for private surveys (:pr:`5618`)
 - Fix some API calls not working with personal access tokens (:pr:`5627`)
+- Correctly handle paragraphs and linebreaks in plaintext conversion (:pr:`5623`)
 
 
 Version 3.2.2
