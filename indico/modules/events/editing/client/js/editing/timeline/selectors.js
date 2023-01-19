@@ -22,17 +22,19 @@ export const isTimelineOutdated = createSelector(
   (details, newDetails) => newDetails !== null && !_.isEqual(details, newDetails)
 );
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
-export const getLastTimelineBlock = createSelector(
-  getTimelineBlocks,
-  blocks => blocks && blocks[blocks.length - 1]
-);
-export const getSecondLastTimelineBlock = createSelector(
-  getTimelineBlocks,
-  blocks => blocks && blocks[blocks.length - 2]
+export const getValidTimelineBlocks = state =>
+  state.timeline.timelineBlocks.filter(
+    ({finalState}) => finalState.name !== FinalRevisionState.undone
+  );
+export const getValidRevisions = createSelector(
+  getDetails,
+  details =>
+    details &&
+    details.revisions.filter(({finalState}) => finalState.name !== FinalRevisionState.undone)
 );
 export const getLastRevision = createSelector(
-  getDetails,
-  details => details && details.revisions[details.revisions.length - 1]
+  getValidRevisions,
+  revisions => revisions && revisions[revisions.length - 1]
 );
 export const canReviewLastRevision = createSelector(
   getLastRevision,
@@ -86,21 +88,21 @@ export const getPublishableFileTypes = createSelector(
 
 export const hasPublishableFiles = createSelector(
   getPublishableFileTypes,
-  getLastTimelineBlock,
-  (publishableFileTypes, block) => {
-    const usedFileTypes = new Set(block.files.map(f => f.fileType));
+  getValidTimelineBlocks,
+  (publishableFileTypes, blocks) => {
+    const usedFileTypes = new Set(blocks[blocks.length - 1].files.map(f => f.fileType));
     return publishableFileTypes.some(ft => usedFileTypes.has(ft.id));
   }
 );
 
 export const getLastRevertableRevisionId = createSelector(
-  getDetails,
-  details => {
-    if (!details || !details.revisions.length) {
+  getValidRevisions,
+  revisions => {
+    if (!revisions || !revisions.length) {
       return null;
     }
-    const latestRevision = details.revisions[details.revisions.length - 1];
-    const lastFinalRev = details.revisions
+    const latestRevision = revisions[revisions.length - 1];
+    const lastFinalRev = revisions
       .slice()
       .reverse()
       .find(r => r.finalState.name !== FinalRevisionState.none);
@@ -117,7 +119,7 @@ export const getLastRevertableRevisionId = createSelector(
         return null;
       }
     } else if (latestRevision.finalState.name === FinalRevisionState.needs_submitter_changes) {
-      const previousRevision = details.revisions[details.revisions.length - 2];
+      const previousRevision = revisions[revisions.length - 2];
       if (isRequestChangesWithFiles(latestRevision, previousRevision)) {
         return previousRevision.id;
       }

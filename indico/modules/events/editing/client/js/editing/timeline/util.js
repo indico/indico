@@ -108,6 +108,7 @@ const statePropTypes = {
 
 // Type that represents a revision comment block
 // (a simplified-ish version of the revision blocks below)
+// TODO: add undone prop
 export const blockItemPropTypes = {
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   revisionId: PropTypes.number.isRequired,

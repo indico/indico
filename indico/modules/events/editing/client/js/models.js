@@ -14,6 +14,7 @@ export const FinalRevisionState = {
   needs_submitter_changes: 'needs_submitter_changes',
   accepted: 'accepted',
   rejected: 'rejected',
+  undone: 'undone',
 };
 
 export const InitialRevisionState = {

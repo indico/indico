@@ -12,6 +12,7 @@ from sqlalchemy.sql import select
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.caching import memoize_request
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -108,6 +109,12 @@ class Editable(db.Model):
     @property
     def event(self):
         return self.contribution.event
+
+    @property
+    @memoize_request
+    def valid_revisions(self):
+        from .revisions import FinalRevisionState
+        return [r for r in self.revisions if r.final_state != FinalRevisionState.undone]
 
     def _has_general_editor_permissions(self, user):
         """Whether the user has general editor permissions on the Editable.
@@ -271,7 +278,8 @@ def _mappers_configured():
         FinalRevisionState.rejected: EditableState.rejected,
     }, value=EditingRevision.final_state), PyIntEnum(EditableState))
     query = (select([cases])
-             .where(EditingRevision.editable_id == Editable.id)
+             .where(db.and_(EditingRevision.editable_id == Editable.id,
+                            EditingRevision.final_state != FinalRevisionState.undone))
              .order_by(EditingRevision.created_dt.desc())
              .limit(1)
              .correlate_except(EditingRevision)
@@ -280,7 +288,8 @@ def _mappers_configured():
 
     # Editable.revision_count -- the number of revisions the editable has
     query = (select([db.func.count(EditingRevision.id)])
-             .where(EditingRevision.editable_id == Editable.id)
+             .where(db.and_(EditingRevision.editable_id == Editable.id,
+                            EditingRevision.final_state != FinalRevisionState.undone))
              .correlate_except(EditingRevision)
              .scalar_subquery())
     Editable.revision_count = column_property(query)

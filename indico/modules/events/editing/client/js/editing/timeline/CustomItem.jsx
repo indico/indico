@@ -20,6 +20,7 @@ import {blockItemPropTypes} from './util';
 
 export default function CustomItem({item: {header, user, reviewedDt, html, revisionId}, state}) {
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
+  // TODO: display differently if item is undone
 
   return (
     <div className="i-timeline-item">

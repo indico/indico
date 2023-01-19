@@ -7,6 +7,17 @@
 
 @import 'base/palette';
 
+.undone-item {
+  :global(.i-box-header) {
+    background-image: repeating-linear-gradient(-45deg, $pastel-gray 0 2px, $light-gray 3px 15px);
+  }
+
+  .undone-indicator {
+    color: $light-black;
+    font-weight: bold;
+  }
+}
+
 .state-indicator {
   margin-left: 5px;
 }

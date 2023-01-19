@@ -79,26 +79,33 @@ def test_can_undo_review(db, dummy_contribution, dummy_user, is1, fs1, ok1, is2,
     db.session.expire(editable)  # so a deleted revision shows up in the relationship
     if ok1:
         assert rev1.final_state == FinalRevisionState.none
-        assert len(editable.revisions) == 1
+        if is2 is None:
+            assert len(editable.revisions) == 1
+        else:
+            assert rev2.final_state == FinalRevisionState.undone
+            assert len(editable.revisions) == 2
     elif ok2:
         assert rev2.final_state == FinalRevisionState.none
         assert len(editable.revisions) == 2
 
 
 def test_can_undo_review_request_changes(db, dummy_contribution, dummy_user):
-    from indico.modules.events.editing.operations import undo_review
+    from indico.modules.events.editing.operations import InvalidEditableState, undo_review
     editable = Editable(contribution=dummy_contribution, type=EditableType.paper)
     reviewed_dt = now_utc()
     rev1 = EditingRevision(editable=editable, submitter=dummy_user, editor=dummy_user,
                            initial_state=InitialRevisionState.ready_for_review,
                            final_state=FinalRevisionState.needs_submitter_changes, reviewed_dt=reviewed_dt)
-    EditingRevision(editable=editable, submitter=dummy_user, editor=dummy_user,
-                    initial_state=InitialRevisionState.ready_for_review,
-                    final_state=FinalRevisionState.needs_submitter_changes, reviewed_dt=reviewed_dt)
+    rev2 = EditingRevision(editable=editable, submitter=dummy_user, editor=dummy_user,
+                           initial_state=InitialRevisionState.ready_for_review,
+                           final_state=FinalRevisionState.needs_submitter_changes, reviewed_dt=reviewed_dt)
     db.session.flush()
 
     undo_review(rev1)
+    with pytest.raises(InvalidEditableState):
+        undo_review(rev2)
 
     db.session.expire(editable)  # so a deleted revision shows up in the relationship
     assert rev1.final_state == FinalRevisionState.none
-    assert len(editable.revisions) == 1
+    assert rev2.final_state == FinalRevisionState.undone
+    assert len(editable.revisions) == 2
