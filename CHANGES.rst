@@ -13,6 +13,7 @@ Improvements
 - Include co-authors in abstract list columns and spreadsheet exports (:pr:`5605`)
 - Include speakers in abstract list columns and spreadsheet exports (:pr:`5615`)
 - Add an option to export all events in a series to ical at once (:issue:`5617`, :pr:`5620`)
+- Make it possible to load more events in series management (:pr:`5629`)
 
 Bugfixes
 ^^^^^^^^

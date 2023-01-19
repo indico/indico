@@ -18,6 +18,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
 from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
+from webargs import fields, validate
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -197,9 +198,10 @@ class RHCategoryManagedEventSearch(RHCategoryBase):
             raise Forbidden
         RHCategoryBase._check_access(self)
 
-    @use_kwargs({'q': LowercaseString(required=True, validate=not_empty)}, location='query')
-    def _process(self, q):
-        from indico.modules.events.series.schemas import EventDetailsForSeriesManagementSchema
+    @use_kwargs({'q': LowercaseString(required=True, validate=not_empty),
+                 'offset': fields.Integer(load_default=0, validate=validate.Range(0))}, location='query')
+    def _process(self, q, offset):
+        from indico.modules.events.series.schemas import SeriesManagementSearchResultsSchema
         query = (
             Event.query.with_parent(self.category)
             .filter(Event.title_matches(q), ~Event.is_deleted)
@@ -214,8 +216,11 @@ class RHCategoryManagedEventSearch(RHCategoryBase):
             Event.start_dt,
             db.func.lower(Event.title),
         )
-        events = get_n_matching(query, 10, lambda event: event.can_manage(session.user))
-        return EventDetailsForSeriesManagementSchema(many=True).jsonify(events)
+        events_per_page = 10
+        # Try to load one extra event. This tells us if there are more events to load later
+        events = get_n_matching(query, events_per_page + 1, lambda event: event.can_manage(session.user), offset=offset)
+        return SeriesManagementSearchResultsSchema().jsonify({'events': events[:events_per_page],
+                                                              'has_more': len(events) > events_per_page})
 
 
 class RHSubcatInfo(RHDisplayCategoryBase):

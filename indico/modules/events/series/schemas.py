@@ -65,3 +65,8 @@ class EventDetailsForSeriesManagementSchema(mm.SQLAlchemyAutoSchema):
     category_chain = fields.List(fields.String(), attribute='category.chain_titles')
     can_manage = fields.Function(lambda event: event.can_manage(session.user))
     can_access = fields.Function(lambda event: event.can_access(session.user))
+
+
+class SeriesManagementSearchResultsSchema(mm.Schema):
+    events = fields.List(fields.Nested(EventDetailsForSeriesManagementSchema))
+    has_more = fields.Bool()
