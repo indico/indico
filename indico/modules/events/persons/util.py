@@ -77,6 +77,7 @@ def check_person_link_email(event, email):
     elif user:
         return dict(status='warning', conflict='user-already-exists', user=user_schema.dump(user))
     if email_err := validate_email_verbose(email):
-        return dict(status='error', conflict='email-invalid', email_error=email_err)
+        return dict(status=('error' if email_err != 'undeliverable' else 'warning'), conflict='email-invalid',
+                    email_error=email_err)
     else:
         return dict(status='ok')
