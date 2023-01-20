@@ -85,7 +85,10 @@ def get_object_from_args(args=None):
     elif object_type == 'session':
         obj = Session.query.with_parent(event).filter_by(id=args['session_id']).first()
     elif object_type == 'session_block':
-        obj = SessionBlock.query.filter_by(id=args['session_block_id'], session_id=args['session_id']).first()
+        obj = (SessionBlock.query
+               .filter(SessionBlock.id == args['session_block_id'],
+                       SessionBlock.session.has(event=event, id=args['session_id'], is_deleted=False))
+               .first())
     elif object_type == 'contribution':
         obj = Contribution.query.with_parent(event).filter_by(id=args['contrib_id']).first()
     elif object_type == 'subcontribution':
