@@ -26,6 +26,8 @@ Improvements
 - Allow filtering by location in room booking (:issue:`4291`, :pr:`5622`,
   thanks :user:`mindouro`)
 - Add button to adapt column widths in paper & contribution lists (:pr:`5642`)
+- Add event language settings to set default and additional languages (:issue:`5606`,
+  :pr:`5607`, thanks :user:`vasantvohra`)
 
 Bugfixes
 ^^^^^^^^

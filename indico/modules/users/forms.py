@@ -28,6 +28,13 @@ from indico.web.forms.widgets import SwitchWidget
 
 class UserPreferencesForm(IndicoForm):
     lang = SelectField(_('Language'))
+
+    force_language = BooleanField(
+        _('Use my language'),
+        widget=SwitchWidget(),
+        description=_("Always use my preferred language instead of an event's supported language."
+                      ' This may result in a mix of two languages in some areas of an event.'))
+
     timezone = SelectField(_('Timezone'))
 
     force_timezone = BooleanField(

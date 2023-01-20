@@ -216,6 +216,51 @@
 {% endmacro %}
 
 
+{% macro render_section_languages(event, with_container=true) %}
+    {% call render_section(event, 'languages', 'icon-bubble-quote', '.edit_languages', _('Edit supported languages'),
+                           with_container=with_container) %}
+        <dl class="i-data-list">
+            <dt>{% trans %}Default language{% endtrans %}</dt>
+            <dd>{{ with_default(event.default_language) }}</dd>
+
+            <dt>{% trans %}Additional languages{% endtrans %}</dt>
+            <dd>{{ with_default(event.supported_languages|join(', ')) }}</dd>
+        </dl>
+        <script>
+            let $previousInputElement;
+
+            function hideDefaultLocale() {
+                const defaultLocaleValue = $('#default_locale').val();
+                let $label;
+                const $inputElement = $(`input[value='${defaultLocaleValue}']`);
+                if ($previousInputElement && $previousInputElement !== $inputElement) {
+                    $label = $(`label[for='${$previousInputElement.attr('id')}']`);
+                    $label.show();
+                    $previousInputElement.show();
+                }
+                if ($inputElement.length) {
+                    $label = $(`label[for='${$inputElement.attr('id')}']`);
+                    $label.hide();
+                    $inputElement.hide();
+                    $inputElement.prop('checked', false);
+                    $previousInputElement = $inputElement;
+                }
+            }
+
+            const $settingsBox = $('#event-settings-languages');
+            $settingsBox.on('ajaxForm:show', function () {
+                hideDefaultLocale();
+            });
+            $settingsBox.on('change', function (evt) {
+                if (evt.target.id === 'default_locale') {
+                    hideDefaultLocale();
+                }
+            });
+        </script>
+    {% endcall %}
+{% endmacro %}
+
+
 {% macro render_event_settings(event, has_reference_types, has_event_labels, section=none, with_container=true) %}
     {% if section is none or section == 'data' %}
         {{ render_section_data(event, with_container=with_container) }}
@@ -234,5 +279,8 @@
     {% endif %}
     {% if section is none or section == 'classification' %}
         {{ render_section_classification(event, has_reference_types, has_event_labels, with_container=with_container) }}
+    {% endif %}
+    {% if section is none or section == 'languages' %}
+        {{ render_section_languages(event, with_container=with_container) }}
     {% endif %}
 {% endmacro %}

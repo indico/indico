@@ -9,6 +9,7 @@ from datetime import date, datetime, time, timedelta
 
 import pytest
 import pytz
+from flask_babel import get_locale
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events import Event
@@ -123,3 +124,29 @@ def test_iter_days_dst(dummy_event, tz, start_time, end_time, start_date, end_da
     all_days = list(dummy_event.iter_days())
     assert all_days[0] == days[0]
     assert all_days[-1] == days[-1]
+
+
+@pytest.mark.parametrize(('supported_locales', 'default_locale', 'user_lang', 'force_language', 'locale'), (
+    # Test with user who has force_language setting enabled
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', 'fr_FR', True, 'fr_FR'),
+    # Test with user who has force_language setting disabled and supported language
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', 'en_US', False, 'en_US'),
+    # Test with user who has force_language setting disabled and unsupported language
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', 'fr_FR', False, 'de_DE'),
+))
+def test_force_event_locale(db, dummy_event, dummy_user, supported_locales, default_locale, user_lang,
+                            force_language, locale):
+    # Setup Event
+    dummy_event.supported_locales = supported_locales
+    dummy_event.default_locale = default_locale
+
+    # Setup User
+    dummy_user.settings.set('lang', user_lang)
+    dummy_user.settings.set('force_language', force_language)
+
+    with dummy_event.force_event_locale(dummy_user):
+        assert str(get_locale()) == locale
+
+    # Test without a user
+    with dummy_event.force_event_locale():
+        assert str(get_locale()) == default_locale

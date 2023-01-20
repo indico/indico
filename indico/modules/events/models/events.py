@@ -37,7 +37,8 @@ from indico.modules.categories.models.event_move_request import EventMoveRequest
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkMixin
 from indico.modules.events.notifications import notify_event_creation
-from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
+from indico.modules.events.settings import (EventSettingProperty, event_contact_settings, event_core_settings,
+                                            event_language_settings)
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.logs import EventLogEntry
 from indico.modules.logs.models.entries import CategoryLogRealm
@@ -45,7 +46,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _, force_locale
+from indico.util.i18n import _, force_locale, get_all_locales
 from indico.util.iterables import materialize_iterable
 from indico.util.string import format_repr, text_to_repr
 from indico.web.flask.util import url_for
@@ -446,6 +447,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     contact_emails = _EventSettingProperty(event_contact_settings, 'emails')
     contact_phones = _EventSettingProperty(event_contact_settings, 'phones')
     public_regform_access = _EventSettingProperty(event_core_settings, 'public_regform_access')
+    supported_locales = _EventSettingProperty(event_language_settings, 'supported_locales')
+    default_locale = _EventSettingProperty(event_language_settings, 'default_locale')
 
     @classmethod
     def category_chain_overlaps(cls, category_ids):
@@ -1084,10 +1087,28 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                 ))
                 .has_rows())
 
+    @property
+    def supported_languages(self):
+        locales = get_all_locales()
+        supported_locales = [locales.get(code, ('', '', False)) for code in self.supported_locales
+                             if code != self.default_locale]
+        return [f'{name} ({territory})' if territory else name for name, territory, __ in supported_locales]
+
+    @property
+    def default_language(self):
+        locales = get_all_locales()
+        name, territory, ambiguous = locales.get(self.default_locale, ('', '', False))
+        return f'{name} ({territory})' if territory else name
+
     @contextmanager
-    def force_event_locale(self):
-        # TODO: once we have an event locale, force that one
-        with force_locale(None):
+    def force_event_locale(self, user=None):
+        locale = self.default_locale
+        if user:
+            locale = user.settings.get('lang')
+            if not user.settings.get('force_language') and locale not in self.supported_locales:
+                locale = self.default_locale
+
+        with force_locale(locale):
             yield
 
 

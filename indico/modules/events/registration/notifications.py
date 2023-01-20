@@ -49,7 +49,7 @@ def _notify_registration(registration, template_name, to_managers=False, attach_
         registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     )
     from_address = registration.registration_form.notification_sender_address if not to_managers else None
-    with registration.event.force_event_locale():
+    with registration.event.force_event_locale(registration.user if not to_managers else None):
         tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
                                   attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price)
         mail = make_email(to_list=to_list, template=tpl, html=True, from_address=from_address, attachments=attachments)
