@@ -22,6 +22,8 @@ from indico.util.date_time import now_utc
 
 
 def _delete_file(reg_data):
+    if reg_data.storage_file_id is None:
+        return
     logger.debug('Deleting file: %s', reg_data.filename)
     try:
         reg_data.delete()
