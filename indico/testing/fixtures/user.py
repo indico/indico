@@ -45,10 +45,10 @@ def dummy_user(create_user):
 @pytest.fixture
 def create_group(db):
     """Return a callable which lets you create dummy groups."""
-    def _create_group(id_):
+    def _create_group(id_, group_name=None):
         group = LocalGroup()
         group.id = id_
-        group.name = f'dummy-{id_}'
+        group.name = group_name or f'dummy-{id_}'
         db.session.add(group)
         db.session.flush()
         return group.proxy
