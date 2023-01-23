@@ -234,6 +234,7 @@ function PersonLinkField({
   hasPredefinedAffiliations,
   canEnterManually,
   defaultSearchExternal,
+  validateEmailUrl,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState(false);
@@ -360,7 +361,9 @@ function PersonLinkField({
               onClose={onClose}
               onSubmit={onSubmit}
               person={persons[selected]}
+              otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
+              validateEmailUrl={validateEmailUrl}
             />
           )}
         </Button.Group>
@@ -381,6 +384,7 @@ PersonLinkField.propTypes = {
   hasPredefinedAffiliations: PropTypes.bool,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
+  validateEmailUrl: PropTypes.string,
 };
 
 PersonLinkField.defaultProps = {
@@ -393,6 +397,7 @@ PersonLinkField.defaultProps = {
   hasPredefinedAffiliations: false,
   canEnterManually: true,
   defaultSearchExternal: false,
+  validateEmailUrl: null,
 };
 
 export function WTFPersonLinkField({
@@ -405,6 +410,7 @@ export function WTFPersonLinkField({
   hasPredefinedAffiliations,
   canEnterManually,
   defaultSearchExternal,
+  validateEmailUrl,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -459,6 +465,7 @@ export function WTFPersonLinkField({
       hasPredefinedAffiliations={hasPredefinedAffiliations}
       canEnterManually={canEnterManually}
       defaultSearchExternal={defaultSearchExternal}
+      validateEmailUrl={validateEmailUrl}
     />
   );
 }
@@ -473,6 +480,7 @@ WTFPersonLinkField.propTypes = {
   hasPredefinedAffiliations: PropTypes.bool,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
+  validateEmailUrl: PropTypes.string,
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -484,4 +492,5 @@ WTFPersonLinkField.defaultProps = {
   hasPredefinedAffiliations: false,
   canEnterManually: true,
   defaultSearchExternal: false,
+  validateEmailUrl: null,
 };

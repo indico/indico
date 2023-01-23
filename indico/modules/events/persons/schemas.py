@@ -13,7 +13,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.schemas import AffiliationSchema
-from indico.util.marshmallow import ModelField
+from indico.util.marshmallow import ModelField, NoneValueEnumField
 
 
 class PersonLinkSchema(mm.Schema):
@@ -66,12 +66,12 @@ class PersonLinkSchema(mm.Schema):
 class EventPersonSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventPerson
-        public_fields = ('id', 'identifier', '_title', 'email', 'affiliation', 'affiliation_link', 'affiliation_id',
+        public_fields = ('id', 'identifier', 'title', 'email', 'affiliation', 'affiliation_link', 'affiliation_id',
                          'affiliation_meta', 'name', 'first_name', 'last_name', 'user_identifier')
         fields = public_fields + ('phone', 'address')
 
     type = fields.Constant('EventPerson')
-    _title = EnumField(UserTitle, data_key='title')
+    title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
     name = fields.String(attribute='full_name')
     user_identifier = fields.String(attribute='user.identifier')
     last_name = fields.String(required=True)
@@ -89,22 +89,10 @@ class EventPersonSchema(mm.SQLAlchemyAutoSchema):
             data['affiliation_id'] = affiliation_link.id
         return data
 
-    @pre_load
-    def load_title(self, data, **kwargs):
-        if 'title' in data and not data.get('title'):
-            data['title'] = UserTitle.none.name
-        return data
-
     @post_load
     def ensure_affiliation_text(self, data, **kwargs):
         if affiliation_link := data.get('affiliation_link'):
             data['affiliation'] = affiliation_link.name
-        return data
-
-    @post_dump
-    def handle_no_title(self, data, **kwargs):
-        if data['title'] == UserTitle.none.name:
-            data['title'] = None
         return data
 
 

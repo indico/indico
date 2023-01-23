@@ -8,7 +8,7 @@
 from indico.modules.events.controllers.admin import (RHCreateEventLabel, RHCreateReferenceType, RHDeleteEventLabel,
                                                      RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
                                                      RHEventLabels, RHReferenceTypes, RHUnlistedEvents)
-from indico.modules.events.controllers.api import RHSingleEventAPI
+from indico.modules.events.controllers.api import RHEventCheckEmail, RHSingleEventAPI
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import RHDisplayPrivacyPolicy, RHEventAccessKey, RHExportEventICAL
 from indico.modules.events.controllers.entry import event_or_shorturl
@@ -60,6 +60,21 @@ _bp.add_url_rule('/event/<int:event_id>/other-view', 'display_other', redirect_v
 # Misc
 _bp.add_url_rule('/event/<int:event_id>/key-access', 'key_access', RHEventAccessKey, methods=('POST',))
 _bp.add_url_rule('/event/<int:event_id>/api/info-for-series', 'single_event_api', RHSingleEventAPI)
+
+# Email checker for PersonLinkField
+# Depending on where the person link is used, the person link field generates the correct url.
+# Each object has its own url so that we can do proper access checks.
+_event_object_url_prefixes = {
+    'event': '',
+    'session_block': '/sessions/<int:session_id>/blocks/<int:session_block_id>',
+    'abstract': '/abstracts/<int:abstract_id>',
+    'contribution': '/contributions/<int:contrib_id>',
+    'subcontribution': '/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>',
+}
+for object_type, prefix in _event_object_url_prefixes.items():
+    _bp.add_url_rule(f'/event/<int:event_id>{prefix}/check-person-email', 'check_email',
+                     RHEventCheckEmail, defaults={'object_type': object_type})
+
 
 # Privacy policy
 _bp.add_url_rule('/event/<int:event_id>/privacy', 'display_privacy', RHDisplayPrivacyPolicy)

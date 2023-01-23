@@ -14,6 +14,8 @@ Improvements
 - Include speakers in abstract list columns and spreadsheet exports (:pr:`5615`)
 - Add an option to export all events in a series to ical at once (:issue:`5617`, :pr:`5620`)
 - Make it possible to load more events in series management (:pr:`5629`)
+- Check manually entered email addresses of speakers/authors/chairpersons
+  to avoid collisions and inconsistencies (:pr:`5478`)
 
 Bugfixes
 ^^^^^^^^

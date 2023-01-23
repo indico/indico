@@ -9,15 +9,19 @@ import searchAffiliationURL from 'indico-url:users.api_affiliations';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Form, Message, Header} from 'semantic-ui-react';
+import {useForm, useFormState} from 'react-final-form';
+import {Form, Message, Header, Button, Icon} from 'semantic-ui-react';
 
 import {FinalComboDropdown, FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
+import {useDebouncedAsyncValidate} from 'indico/react/hooks';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
-import {Translate} from '../i18n';
+import {Param, Translate} from '../i18n';
+
+import './PersonDetailsModal.module.scss';
 
 const debounce = makeAsyncDebounce(250);
 
@@ -30,7 +34,9 @@ const titles = [
   {text: Translate.string('Mx'), value: 'mx'},
 ];
 
-const FinalAffiliationField = ({hasPredefinedAffiliations, currentAffiliation}) => {
+const FinalAffiliationField = ({hasPredefinedAffiliations}) => {
+  const formState = useFormState();
+  const currentAffiliation = formState.values.affiliationMeta;
   const [_affiliationResults, setAffiliationResults] = useState([]);
   const affiliationResults =
     currentAffiliation && !_affiliationResults.find(x => x.id === currentAffiliation.id)
@@ -88,11 +94,6 @@ const FinalAffiliationField = ({hasPredefinedAffiliations, currentAffiliation}) 
 
 FinalAffiliationField.propTypes = {
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
-  currentAffiliation: PropTypes.object,
-};
-
-FinalAffiliationField.defaultProps = {
-  currentAffiliation: null,
 };
 
 export default function PersonDetailsModal({
@@ -100,7 +101,9 @@ export default function PersonDetailsModal({
   onSubmit,
   onClose,
   person,
+  otherPersons,
   hideEmailField,
+  validateEmailUrl,
 }) {
   return (
     <FinalModalForm
@@ -113,7 +116,7 @@ export default function PersonDetailsModal({
       initialValues={
         person
           ? {...person, affiliationData: {id: person.affiliationId, text: person.affiliation}}
-          : {affiliationData: {id: null, text: ''}}
+          : {affiliationData: {id: null, text: ''}, email: ''}
       }
     >
       {/* eslint-disable-next-line eqeqeq */}
@@ -126,14 +129,18 @@ export default function PersonDetailsModal({
       <Form.Group widths="equal">
         <Form.Field>
           <Translate as="label">Title</Translate>
-          <FinalDropdown name="title" fluid search selection options={titles} />
+          <FinalDropdown
+            name="title"
+            fluid
+            search
+            selection
+            options={titles}
+            placeholder={Translate.string('None')}
+          />
         </Form.Field>
         <Form.Field>
           <Translate as="label">Affiliation</Translate>
-          <FinalAffiliationField
-            currentAffiliation={person?.affiliationMeta}
-            hasPredefinedAffiliations={hasPredefinedAffiliations}
-          />
+          <FinalAffiliationField hasPredefinedAffiliations={hasPredefinedAffiliations} />
         </Form.Field>
       </Form.Group>
       <Form.Group widths="equal">
@@ -149,7 +156,7 @@ export default function PersonDetailsModal({
       {!hideEmailField && (
         <Form.Field>
           <Translate as="label">Email</Translate>
-          <FinalInput name="email" />
+          <EmailField validateUrl={validateEmailUrl} person={person} otherPersons={otherPersons} />
         </Form.Field>
       )}
       <Form.Group widths="equal">
@@ -170,11 +177,195 @@ PersonDetailsModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   person: PropTypes.object,
+  otherPersons: PropTypes.array,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
   hideEmailField: PropTypes.bool,
+  validateEmailUrl: PropTypes.string,
 };
 
 PersonDetailsModal.defaultProps = {
   person: undefined,
+  otherPersons: [],
   hideEmailField: false,
+  validateEmailUrl: null,
+};
+
+function EmailField({validateUrl, person, otherPersons}) {
+  let response, msg;
+  const [message, setMessage] = useState({status: '', message: ''});
+  const form = useForm();
+  const [user, setUser] = useState(null);
+  const [eventPerson, setEventPerson] = useState(null);
+  const isUpdate = !!person;
+
+  const validateEmail = useDebouncedAsyncValidate(async email => {
+    form.change('personId', person?.personId);
+    form.change('avatarURL', null);
+    email = email.trim();
+
+    if (email === '' || email === person?.email) {
+      setMessage({status: '', message: ''});
+      return;
+    }
+
+    // Prevent adding the same person twice
+    if (otherPersons.some(p => p.email === email)) {
+      msg = Translate.string('There is already a person with this email in the list.');
+      setMessage({
+        status: 'error',
+        message: msg,
+      });
+      return msg;
+    }
+
+    setMessage({
+      status: '',
+      message: Translate.string('Checking email address...'),
+    });
+
+    try {
+      response = await indicoAxios.get(validateUrl, {
+        params: {email},
+      });
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+
+    const data = camelizeKeys(response.data);
+    const {status, conflict} = data;
+    setUser(data.user);
+    setEventPerson(data.eventPerson);
+
+    // A user can have multiple emails associated with their account.
+    // Check already added persons if there is any with the same userId
+    if (data.user) {
+      const existingPerson = otherPersons.find(p => data.user.id === p.userId);
+      if (existingPerson) {
+        msg = (
+          <Translate>
+            This email is associated with{' '}
+            <Param name="name" wrapper={<strong />} value={existingPerson.name} /> who is already in
+            the list.
+          </Translate>
+        );
+        setMessage({
+          status: 'error',
+          message: msg,
+        });
+        return msg;
+      }
+    }
+
+    if (conflict === 'person-already-exists' || conflict === 'user-and-person-already-exists') {
+      form.change('personId', data.eventPerson.id);
+    }
+
+    // Load the user's avatar
+    if (conflict === 'user-already-exists' || conflict === 'user-and-person-already-exists') {
+      form.change('avatarURL', data.user.avatarURL);
+    }
+
+    if (
+      conflict === 'user-already-exists' ||
+      conflict === 'person-already-exists' ||
+      conflict === 'user-and-person-already-exists'
+    ) {
+      const obj = data.eventPerson || data.user;
+      const name = obj.fullName || obj.name;
+      if (isUpdate) {
+        msg = (
+          <Translate>
+            This email is already used by <Param name="name" wrapper={<strong />} value={name} />.
+            You can update the form with their information.
+          </Translate>
+        );
+      } else {
+        msg = (
+          <Translate>
+            This email is already used by <Param name="name" wrapper={<strong />} value={name} />.
+            You can add the person directly or update the form with their information.
+          </Translate>
+        );
+      }
+    } else if (conflict === 'email-invalid') {
+      if (data.emailError === 'undeliverable') {
+        msg = Translate.string('The domain used in the email address does not exist.');
+      } else {
+        msg = Translate.string('This email address is invalid.');
+      }
+    } else if (status === 'ok') {
+      msg = Translate.string('This email is currently not linked to this event.');
+    }
+
+    setMessage({status, message: msg});
+    if (status === 'error') {
+      return msg;
+    }
+  }, 250);
+
+  const onClick = async () => {
+    if (user) {
+      form.change('userId', user.id);
+    }
+    const obj = eventPerson || user;
+    form.change('address', obj.address);
+    form.change('name', obj.fullName || obj.name);
+    form.change('firstName', obj.firstName);
+    form.change('lastName', obj.lastName);
+    form.change('title', obj.title);
+    form.change('phone', obj.phone);
+    form.change('affiliationData', {id: obj.affiliationId, text: obj.affiliation});
+    form.change('affiliationMeta', obj.affiliationMeta);
+  };
+
+  const emailBtns = (
+    <div styleName="email-buttons">
+      {!isUpdate && (
+        <Button icon type="submit" primary size="tiny" labelPosition="right" onClick={onClick}>
+          <Icon name="add" />
+          <Translate>Add</Translate>
+        </Button>
+      )}
+      <Button icon type="button" size="tiny" labelPosition="right" onClick={onClick}>
+        <Icon name="sync" />
+        <Translate>Update</Translate>
+      </Button>
+    </div>
+  );
+
+  const showEmailBtns = message.status !== 'error' && (!!user || !!eventPerson);
+
+  return (
+    <FinalInput
+      type="email"
+      name="email"
+      validate={validateUrl ? validateEmail : undefined}
+      // hide the normal error tooltip if we have an error from our async validation
+      hideValidationError={message.status === 'error' ? 'message' : false}
+      loaderWhileValidating
+    >
+      {!!message.message && (
+        <Message
+          visible
+          error={message.status === 'error'}
+          warning={message.status === 'warning'}
+          positive={message.status === 'ok'}
+        >
+          <div>{message.message}</div>
+          {showEmailBtns && emailBtns}
+        </Message>
+      )}
+    </FinalInput>
+  );
+}
+
+EmailField.propTypes = {
+  validateUrl: PropTypes.string,
+  person: PropTypes.object,
+  otherPersons: PropTypes.array.isRequired,
+};
+
+EmailField.defaultProps = {
+  person: null,
+  validateUrl: null,
 };

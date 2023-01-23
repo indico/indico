@@ -39,6 +39,7 @@ from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
@@ -69,7 +70,7 @@ def get_object_from_args(args=None):
                  ``request.view_args`` is used.
     :return: An ``(object_type, event, object)`` tuple.  The event is
              always the :class:`Event` associated with the object.
-             The object may be an `Event`, `Session`, `Contribution`
+             The object may be an `Event`, `Session`, `SessionBlock`, `Contribution`
              or `SubContribution`.  If the object does not exist,
              ``(object_type, None, None)`` is returned.
     """
@@ -83,6 +84,11 @@ def get_object_from_args(args=None):
         obj = event
     elif object_type == 'session':
         obj = Session.query.with_parent(event).filter_by(id=args['session_id']).first()
+    elif object_type == 'session_block':
+        obj = (SessionBlock.query
+               .filter(SessionBlock.id == args['session_block_id'],
+                       SessionBlock.session.has(event=event, id=args['session_id'], is_deleted=False))
+               .first())
     elif object_type == 'contribution':
         obj = Contribution.query.with_parent(event).filter_by(id=args['contrib_id']).first()
     elif object_type == 'subcontribution':
