@@ -497,7 +497,7 @@ class EventLanguagesForm(IndicoForm):
         locales = [(code, f'{name} ({territory})' if territory else name)
                    for code, (name, territory, __) in get_all_locales().items()]
         locales.sort(key=itemgetter(1))
-        self.default_locale.choices = [('', _('Select a default language'))] + locales
+        self.default_locale.choices = [('', _('No default language'))] + locales
         self.supported_locales.choices = locales
 
     def post_validate(self):
