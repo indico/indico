@@ -341,12 +341,15 @@ class AbstractReviewForm(IndicoForm):
 
 
 class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
-    _order = ('judgment', 'accepted_track', 'override_contrib_type', 'accepted_contrib_type', 'session', 'duplicate_of',
-              'merged_into', 'merge_persons', 'judgment_comment', 'send_notifications')
+    _order = ('judgment', 'use_review_track', 'accepted_track', 'override_contrib_type', 'accepted_contrib_type',
+              'session', 'duplicate_of', 'merged_into', 'merge_persons', 'judgment_comment', 'send_notifications')
 
     judgment = HiddenEnumField(enum=AbstractAction, skip={AbstractAction.change_tracks})
     abstract_id = HiddenFieldList()
     submitted = HiddenField()
+    use_review_track = BooleanField(_('Use review track'),
+                                    [HiddenUnless('judgment', AbstractAction.accept)], widget=SwitchWidget(),
+                                    description=_('Accept the abstracts in the track for which they were under review'))
     override_contrib_type = BooleanField(_('Override contribution type'),
                                          [HiddenUnless('judgment', AbstractAction.accept)], widget=SwitchWidget(),
                                          description=_('Override the contribution type for all selected abstracts'))
@@ -356,6 +359,8 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
         super().__init__(*args, **kwargs)
         if self.accepted_track:
             self.accepted_track.description = _('The abstracts will be accepted in this track')
+        else:
+            del self.use_review_track
         if self.accepted_contrib_type:
             self.accepted_contrib_type.description = _('The abstracts will be converted into a contribution of this '
                                                        'type')
@@ -386,16 +391,17 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
         return super().is_submitted() and 'submitted' in request.form
 
     @classmethod
-    def _add_contrib_type_hidden_unless(cls):
-        # In the bulk form we need to hide/disable the contrib type selector unless we want to
-        # override the type specified in the abstract.  However, multiple HiddenUnless validators
-        # are not supported in the client-side JS so we only add it to this form - it removes
-        # inactive fields on the server side so it still works (the JavaScript picks up the last
-        # HiddenUnless validator)
+    def _add_hidden_unless(cls):
+        # In the bulk form we need to hide/disable the accepted track selector and the contrib type
+        # selector unless we want to override the track or the type specified in the abstract.
+        # However, multiple HiddenUnless validators are not supported in the client-side JS so we
+        # only add it to this form - it removes inactive fields on the server side so it still works
+        # (the JavaScript picks up the last HiddenUnless validator)
+        inject_validators(BulkAbstractJudgmentForm, 'accepted_track', [HiddenUnless('use_review_track', value=False)])
         inject_validators(BulkAbstractJudgmentForm, 'accepted_contrib_type', [HiddenUnless('override_contrib_type')])
 
 
-BulkAbstractJudgmentForm._add_contrib_type_hidden_unless()
+BulkAbstractJudgmentForm._add_hidden_unless()
 
 
 class AbstractReviewingRolesForm(IndicoForm):

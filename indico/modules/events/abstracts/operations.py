@@ -200,13 +200,18 @@ def delete_abstract(abstract, delete_contrib=False):
 
 def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
                    send_notifications=False):
+    if abstract_data.get('use_review_track') and len(abstract.reviewed_for_tracks) > 1:
+        return False
     abstract.judge = judge
     abstract.judgment_dt = now_utc()
     abstract.judgment_comment = abstract_data['judgment_comment']
     log_data = {'Judgment': orig_string(judgment.title)}
     if judgment == AbstractAction.accept:
         abstract.state = AbstractState.accepted
-        abstract.accepted_track = abstract_data.get('accepted_track')
+        if abstract_data.get('use_review_track') and abstract.reviewed_for_tracks:
+            abstract.accepted_track = next(iter(abstract.reviewed_for_tracks))
+        else:
+            abstract.accepted_track = abstract_data.get('accepted_track')
         if abstract_data.get('override_contrib_type') or abstract_data.get('accepted_contrib_type'):
             abstract.accepted_contrib_type = abstract_data.get('accepted_contrib_type')
         else:
@@ -236,6 +241,7 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
     logger.info('Abstract %s judged by %s', abstract, judge)
     abstract.log(EventLogRealm.reviewing, LogKind.change, 'Abstracts',
                  f'Abstract {abstract.verbose_title} judged', judge, data=log_data)
+    return True
 
 
 def _merge_person_links(target_abstract, source_abstract):
