@@ -42,10 +42,12 @@ def render_header(category=None, protected_object=None, local_tz=None, force_loc
                            top_menu_items=top_menu_items,
                            protected_object=protected_object,
                            local_tz=local_tz,
-                           force_local_tz=force_local_tz)
+                           force_local_tz=force_local_tz,
+                           force_locale=None)
 
 
-def render_session_bar(protected_object=None, local_tz=None, force_local_tz=False):
+def render_session_bar(protected_object=None, local_tz=None, force_local_tz=False, force_locale=None,
+                       force_locale_alts=None):
     protection_disclaimers = {
         'network': legal_settings.get('network_protected_disclaimer'),
         'restricted': legal_settings.get('restricted_disclaimer')
@@ -77,7 +79,9 @@ def render_session_bar(protected_object=None, local_tz=None, force_local_tz=Fals
     rv = tpl.render_session_bar(protected_object=protected_object,
                                 protection_disclaimers=protection_disclaimers,
                                 timezone_data=timezone_data,
-                                languages=get_all_locales())
+                                languages=get_all_locales(),
+                                force_locale=force_locale,
+                                force_locale_alts=force_locale_alts)
     return Markup(rv)
 
 

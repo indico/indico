@@ -1100,14 +1100,23 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         name, territory, ambiguous = locales.get(self.default_locale, ('', '', False))
         return f'{name} ({territory})' if territory else name
 
-    @contextmanager
-    def force_event_locale(self, user=None):
-        locale = self.default_locale
+    def get_forced_event_locale(self, user=None, *, allow_session=False):
+        if not (locale := self.default_locale):
+            return None
         if user:
             locale = user.settings.get('lang')
-            if not user.settings.get('force_language') and locale not in self.supported_locales:
-                locale = self.default_locale
+        elif allow_session:
+            locale = session.lang
+        if (not user or not user.settings.get('force_language')) and locale not in self.supported_locales:
+            locale = self.default_locale
+        return locale
 
+    @contextmanager
+    def force_event_locale(self, user=None, *, allow_session=False):
+        locale = self.get_forced_event_locale(user, allow_session=allow_session)
+        if not locale:
+            yield
+            return
         with force_locale(locale):
             yield
 

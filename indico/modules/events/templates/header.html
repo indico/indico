@@ -246,7 +246,8 @@
             {% endif %}
         </div>
 
-        {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone) }}
+        {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone, force_locale=force_locale,
+                              force_locale_alts=force_locale_alts) }}
     </div>
 
     {# This div is used for inserting content under the header such as the filtering options for meetings #}

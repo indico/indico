@@ -98,7 +98,7 @@ class RHDisplayEventBase(RHProtectedEventBase):
     def _process_args(self):
         RHProtectedEventBase._process_args(self)
         if self.event.default_locale:
-            self.event_rh_contexts.enter_context(self.event.force_event_locale(session.user))
+            self.event_rh_contexts.enter_context(self.event.force_event_locale(session.user, allow_session=True))
 
     def _do_process(self):
         with self.event_rh_contexts:

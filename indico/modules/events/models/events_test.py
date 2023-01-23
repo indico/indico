@@ -134,19 +134,18 @@ def test_iter_days_dst(dummy_event, tz, start_time, end_time, start_date, end_da
     # Test with user who has force_language setting disabled and unsupported language
     (['en_US', 'en_GB', 'de_DE'], 'de_DE', 'fr_FR', False, 'de_DE'),
 ))
-def test_force_event_locale(db, dummy_event, dummy_user, supported_locales, default_locale, user_lang,
+def test_force_event_locale(dummy_event, dummy_user, supported_locales, default_locale, user_lang,
                             force_language, locale):
-    # Setup Event
     dummy_event.supported_locales = supported_locales
     dummy_event.default_locale = default_locale
-
-    # Setup User
     dummy_user.settings.set('lang', user_lang)
     dummy_user.settings.set('force_language', force_language)
 
+    assert dummy_event.get_forced_event_locale(dummy_user) == locale
     with dummy_event.force_event_locale(dummy_user):
         assert str(get_locale()) == locale
 
     # Test without a user
+    assert dummy_event.get_forced_event_locale() == default_locale
     with dummy_event.force_event_locale():
         assert str(get_locale()) == default_locale

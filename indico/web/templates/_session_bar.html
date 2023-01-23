@@ -112,7 +112,7 @@
 {% endmacro %}
 
 
-{% macro _render_user_settings(languages) %}
+{% macro _render_user_settings(languages, force_locale, force_locale_alts) %}
     <div id="user-settings-widget" style="display: none;" class="settingsWidget">
         <div style="line-height: 17px;">
             <span class="settingsWidgetHeader">{{ session.user.full_name }}</span><br>
@@ -130,7 +130,7 @@
             </a>
         </div>
         <div class="settingsWidgetSection">
-            {{ _render_language_selector(languages, lightweight=true) }}
+            {{ _render_language_selector(languages, force_locale, force_locale_alts, lightweight=true) }}
         </div>
         {% if session.user.is_admin %}
             <div class="settingsWidgetSection">
@@ -160,46 +160,60 @@
 {% endmacro %}
 
 
-{% macro _render_language_selector(languages, lightweight=false) %}
-    {% set name, territory, ambiguous = languages.get(session.lang, ('English', '', false)) %}
+{% macro _render_language_selector(languages, force_locale, force_locale_alts, lightweight=false) %}
+    {% set force_locale = force_locale
+                          if force_locale and (not session.user or not session.user.settings.get('force_language'))
+                          else none %}
+    {% set can_choose = not force_locale or force_locale_alts|length > 1 %}
+    {% set name, territory, ambiguous = languages.get(force_locale or session.lang, ('English', '', false)) %}
     {% set language -%}
         {{- name -}}
         {%- if ambiguous and territory %} ({{ territory }}){% endif -%}
     {%- endset %}
     {% if lightweight %}
-        <a id="language-selector-link" class="arrow js-dropdown" data-toggle="dropdown" href="">
+        <a id="language-selector-link"
+           href=""
+           class="{{ 'arrow' if can_choose }} js-dropdown" {% if can_choose %}data-toggle="dropdown"{% endif %}>
             {%- trans %}My language ({{ language }}){% endtrans %}
         </a>
     {% else %}
-        <button id="language-selector-link" class="arrow icon-earth i-button js-dropdown" data-toggle="dropdown">
+        <button id="language-selector-link" class="icon-earth i-button {{ 'arrow js-dropdown' if can_choose }}"
+                {% if can_choose %}data-toggle="dropdown"{% else %}disabled{% endif %}>
             {{- language -}}
         </button>
     {% endif %}
-    <ul class="i-dropdown">
-        {% for name, (title, territory, __) in languages|dictsort(by='value') %}
-            <li>
-                {% if name == session.lang %}
-                    <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">
-                        {{- title -}}
-                        {%- if territory %} ({{ territory }}){% endif -%}
-                    </a>
-                {% else %}
-                    <a data-href="{{ url_for('core.change_lang') }}"
-                       data-method="POST"
-                       data-params='{{ {'lang': name}|tojson|forceescape }}'
-                       data-reload-after
-                       data-ajax>
-                        {{- title -}}
-                        {%- if territory %} ({{ territory }}){% endif -%}
-                    </a>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
+    {% if can_choose %}
+        <ul class="i-dropdown">
+            {% for name, (title, territory, __) in languages|dictsort(by='value') %}
+                <li>
+                    {% if force_locale and name not in force_locale_alts %}
+                        <a class="disabled" title="{% trans %}This language is not available here.{% endtrans %}">
+                            {{- title -}}
+                            {%- if territory %} ({{ territory }}){% endif -%}
+                        </a>
+                    {% elif name == session.lang %}
+                        <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">
+                            {{- title -}}
+                            {%- if territory %} ({{ territory }}){% endif -%}
+                        </a>
+                    {% else %}
+                        <a data-href="{{ url_for('core.change_lang') }}"
+                           data-method="POST"
+                           data-params='{{ {'lang': name}|tojson|forceescape }}'
+                           data-reload-after
+                           data-ajax>
+                            {{- title -}}
+                            {%- if territory %} ({{ territory }}){% endif -%}
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endmacro %}
 
 
-{% macro render_session_bar(protected_object, protection_disclaimers, timezone_data, languages) %}
+{% macro render_session_bar(protected_object, protection_disclaimers, timezone_data, languages, force_locale, force_locale_alts) %}
     {% set is_protected = protected_object and protected_object.is_protected %}
 
     <div id="session-bar" class="session-bar flexrow f-j-end {{ 'ui-follow-scroll' if is_protected }}">
@@ -218,9 +232,9 @@
                 {{ _render_timezone_selector(timezone_data) }}
 
                 {% if session.user %}
-                    {{ _render_user_settings(languages) }}
+                    {{ _render_user_settings(languages, force_locale, force_locale_alts) }}
                 {% else %}
-                    {{ _render_language_selector(languages) }}
+                    {{ _render_language_selector(languages, force_locale, force_locale_alts) }}
                     {% set next_url = request.values.get('next') %}
                     {% if not next_url and request.endpoint != config.MULTIPASS_LOGIN_ENDPOINT %}
                         {% set after_login_url = request.relative_url %}
