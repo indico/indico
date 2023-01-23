@@ -15,6 +15,7 @@ from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.categories.util import format_visibility
 from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
+from indico.util.signals import make_interceptable
 
 
 def create_category(parent, data):
@@ -49,6 +50,7 @@ def move_category(category, target_category):
     logger.info('Category %s moved to %s by %s', category, target_category, session.user)
 
 
+@make_interceptable
 def update_category(category, data, skip=()):
     assert set(data) <= {
         'title', 'description', 'timezone', 'suggestions_disabled', 'is_flat_view_enabled',
@@ -62,6 +64,7 @@ def update_category(category, data, skip=()):
     _log_category_update(category, changes)
 
 
+@make_interceptable
 def update_category_protection(category, data):
     assert set(data) <= {'protection_mode', 'own_no_access_contact', 'event_creation_mode', 'visibility'}
     changes = category.populate_from_dict(data)
@@ -78,6 +81,7 @@ def update_category_protection(category, data):
                      data={'Changes': make_diff_log(changes, log_fields)})
 
 
+@make_interceptable
 def _log_category_update(category, changes):
     log_fields = {
         'title': {'title': 'Title', 'type': 'string'},
