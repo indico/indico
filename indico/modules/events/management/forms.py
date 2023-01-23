@@ -486,7 +486,7 @@ class EventLanguagesForm(IndicoForm):
                                                                       'This setting should be used only for events '
                                                                       'where it is important that there is no mix of '
                                                                       'languages e.g. due to custom menu titles.'))
-    supported_locales = IndicoSelectMultipleCheckboxField(_('Additional languages'), [HiddenUnless('default_locale')],
+    supported_locales = IndicoSelectMultipleCheckboxField(_('Additional languages'),
                                                           description=_('Languages from this list will be used if the '
                                                                         "user selected one of them, even if it's not "
                                                                         "the event's default language."))
@@ -503,3 +503,5 @@ class EventLanguagesForm(IndicoForm):
     def post_validate(self):
         if self.default_locale.data and self.default_locale.data not in self.supported_locales.data:
             self.supported_locales.data.append(self.default_locale.data)
+        if not self.default_locale.data:
+            self.supported_locales.data = []

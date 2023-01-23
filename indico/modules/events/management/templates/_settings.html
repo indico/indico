@@ -227,35 +227,27 @@
             <dd>{{ with_default(event.supported_languages|join(', ')) }}</dd>
         </dl>
         <script>
-            let $previousInputElement;
+            (() => {
+                function disableDefaultLocale() {
+                    const defaultLocaleValue = $('#default_locale').val();
+                    if (!defaultLocaleValue) {
+                        // Disable all when no default locale is used
+                        $(`input[name=supported_locales]`).prop('disabled', true);
+                        return;
+                    }
+                    const $inputElement = $(`input[name=supported_locales][value='${defaultLocaleValue}']`);
+                    $inputElement.prop('disabled', true);
+                    $('input[name=supported_locales]').not($inputElement).prop('disabled', false);
+                }
 
-            function hideDefaultLocale() {
-                const defaultLocaleValue = $('#default_locale').val();
-                let $label;
-                const $inputElement = $(`input[value='${defaultLocaleValue}']`);
-                if ($previousInputElement && $previousInputElement !== $inputElement) {
-                    $label = $(`label[for='${$previousInputElement.attr('id')}']`);
-                    $label.show();
-                    $previousInputElement.show();
-                }
-                if ($inputElement.length) {
-                    $label = $(`label[for='${$inputElement.attr('id')}']`);
-                    $label.hide();
-                    $inputElement.hide();
-                    $inputElement.prop('checked', false);
-                    $previousInputElement = $inputElement;
-                }
-            }
-
-            const $settingsBox = $('#event-settings-languages');
-            $settingsBox.on('ajaxForm:show', function () {
-                hideDefaultLocale();
-            });
-            $settingsBox.on('change', function (evt) {
-                if (evt.target.id === 'default_locale') {
-                    hideDefaultLocale();
-                }
-            });
+                $('#event-settings-languages')
+                    .on('ajaxForm:show', () => {
+                        disableDefaultLocale();
+                    })
+                    .on('change', '#default_locale', evt => {
+                        disableDefaultLocale();
+                    });
+            })();
         </script>
     {% endcall %}
 {% endmacro %}
