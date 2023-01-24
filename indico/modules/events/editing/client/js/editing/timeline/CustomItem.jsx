@@ -11,19 +11,28 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
+import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
+
+import {FinalRevisionState} from '../../models';
 
 import ResetReview from './ResetReview';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
 import {blockItemPropTypes} from './util';
 
-export default function CustomItem({item: {header, user, reviewedDt, html, revisionId}, state}) {
+import '../../../styles/timeline.module.scss';
+
+export default function CustomItem({
+  item: {header, user, reviewedDt, html, revisionId, undoneJudgement},
+  state,
+}) {
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
-  // TODO: display differently if item is undone
+  const isUndone = undoneJudgement && undoneJudgement.name !== FinalRevisionState.none;
+  state = isUndone ? undoneJudgement.name : state;
 
   return (
-    <div className="i-timeline-item">
+    <div className="i-timeline-item" styleName={isUndone ? 'undone-item' : undefined}>
       <UserAvatar user={user} />
       <div className="flexrow i-timeline-item-content">
         <div className="i-timeline-item-box">
@@ -31,14 +40,21 @@ export default function CustomItem({item: {header, user, reviewedDt, html, revis
             className={`i-box-header flexrow ${!html ? 'header-only' : ''}`}
             style={{alignItems: 'center'}}
           >
-            <div className="f-self-stretch">
+            <div className="f-self-stretch" styleName="item-header">
               {header}{' '}
               <time dateTime={serializeDate(reviewedDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
                 {serializeDate(reviewedDt, 'LL')}
-              </time>
+              </time>{' '}
+              {isUndone && (
+                <Translate as="span" styleName="undone-indicator">
+                  Retracted
+                </Translate>
+              )}
             </div>
-            {revisionId === lastRevertableRevisionId && <ResetReview revisionId={revisionId} />}
-            {state && <StateIndicator state={state} circular />}
+            {!isUndone && revisionId === lastRevertableRevisionId && (
+              <ResetReview revisionId={revisionId} />
+            )}
+            {state && <StateIndicator state={state} circular basic={isUndone} />}
           </div>
           {html && (
             <div className="i-box-content js-form-container">

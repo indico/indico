@@ -35,10 +35,15 @@ const labelColors = {
   ready_for_review: Palette.blue,
 };
 
-export default function StateIndicator({label, circular, tooltip, state, monochrome}) {
+export default function StateIndicator({label, circular, basic, tooltip, state, monochrome}) {
   const labelColor = labelColors[state] || Palette.black;
   const trigger = (
-    <Label size="tiny" color={monochrome ? 'grey' : colors[state]} circular={circular} />
+    <Label
+      size="tiny"
+      color={monochrome ? 'grey' : colors[state]}
+      circular={circular}
+      basic={basic}
+    />
   );
 
   return (
@@ -62,6 +67,7 @@ export default function StateIndicator({label, circular, tooltip, state, monochr
 StateIndicator.propTypes = {
   label: PropTypes.bool,
   circular: PropTypes.bool,
+  basic: PropTypes.bool,
   tooltip: PropTypes.string,
   state: PropTypes.string.isRequired,
   monochrome: PropTypes.bool,
@@ -70,6 +76,7 @@ StateIndicator.propTypes = {
 StateIndicator.defaultProps = {
   label: false,
   circular: false,
+  basic: false,
   tooltip: null,
   monochrome: false,
 };

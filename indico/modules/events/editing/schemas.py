@@ -132,11 +132,12 @@ class EditingRevisionSignedFileSchema(EditingRevisionFileSchema):
 class EditingRevisionCommentSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevisionComment
-        fields = ('id', 'user', 'created_dt', 'modified_dt', 'internal', 'system', 'text', 'html', 'can_modify',
-                  'modify_comment_url', 'revision_id')
+        fields = ('id', 'user', 'created_dt', 'modified_dt', 'internal', 'system', 'undone_judgement', 'text', 'html',
+                  'can_modify', 'modify_comment_url', 'revision_id')
 
     revision_id = fields.Int(attribute='revision.id')
     user = fields.Nested(EditingUserSchema)
+    undone_judgement = fields.Nested(RevisionStateSchema)
     html = fields.Function(lambda comment: escape(comment.text))
     can_modify = fields.Function(lambda comment, ctx: comment.can_modify(ctx.get('user')))
     modify_comment_url = fields.Function(lambda comment: url_for('event_editing.api_edit_comment', comment))

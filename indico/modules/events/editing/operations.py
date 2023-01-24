@@ -266,8 +266,12 @@ def undo_review(revision):
     elif revision.final_state == FinalRevisionState.accepted:
         revision.editable.published_revision = None
     db.session.flush()
+    # Keep comment history:
+    comment = EditingRevisionComment(user=revision.editor or revision.submitter, created_dt=revision.reviewed_dt,
+                                     undone_judgement=revision.final_state, text=revision.comment)
+    revision.comments.append(comment)
     revision.final_state = FinalRevisionState.none
-    #revision.comment = ''  # TODO keep comments
+    revision.comment = ''
     revision.reviewed_dt = None
     db.session.flush()
     logger.info('Revision %r review undone', revision)

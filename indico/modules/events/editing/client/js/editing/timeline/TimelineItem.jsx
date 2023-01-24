@@ -26,6 +26,7 @@ import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
 import {blockPropTypes, isRequestChangesWithFiles} from './util';
 
+import '../../../styles/timeline.module.scss';
 import './TimelineItem.module.scss';
 
 export default function TimelineItem({block, index}) {
@@ -68,7 +69,7 @@ export default function TimelineItem({block, index}) {
             id={`block-info-${block.id}`}
           >
             <div className="i-box-header flexrow">
-              <div className="f-self-stretch" styleName="header">
+              <div className="f-self-stretch" styleName="item-header">
                 <span styleName="item-index">#{index + 1}</span>{' '}
                 <span>
                   {block.header ? (

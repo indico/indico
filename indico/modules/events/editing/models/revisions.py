@@ -32,7 +32,7 @@ class InitialRevisionState(RichIntEnum):
 class FinalRevisionState(RichIntEnum):
     __titles__ = [None, _('Replaced'), _('Needs Confirmation'), _('Needs Changes'), _('Accepted'), _('Rejected'),
                   _('Undone')]
-    __css_classes__ = [None, 'highlight', 'warning', 'warning', 'success', 'error', 'disabled']
+    __css_classes__ = [None, 'highlight', 'warning', 'warning', 'success', 'error', None]
     #: A revision that is awaiting some action
     none = 0
     #: A revision that has been replaced by its next revision
