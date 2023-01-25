@@ -5,11 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {FormSpy} from 'react-final-form';
 import {Form, Button, Message} from 'semantic-ui-react';
 
+import {FinalEmailList} from 'indico/react/components';
 import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
 import TextEditor, {FinalTextEditor} from 'indico/react/components/TextEditor';
 import {FinalCheckbox, FinalDropdown, FinalInput} from 'indico/react/forms';
@@ -105,9 +107,14 @@ export function EmailDialog({
           </Form.Field>
         )}
         {recipientsField}
+        <FinalEmailList
+          name="bcc_addresses"
+          label={Translate.string('BCC addresses')}
+          description={Translate.string('Send a copy of each email to every address in this list')}
+        />
         <FinalCheckbox
           name="copy_for_sender"
-          label={Translate.string('Send copy of each email to my mailbox')}
+          label={Translate.string('Send a copy of each email to my mailbox')}
           toggle
         />
       </Form.Field>
@@ -123,9 +130,11 @@ export function EmailDialog({
         from_address: senders[0][0],
         subject: '',
         body: '',
+        bcc_addresses: [],
         copy_for_sender: false,
         ...initialFormValues,
       }}
+      initialValuesEqual={_.isEqual}
       onClose={onClose}
       onSubmit={onSubmit}
       submitLabel={Translate.string('Send')}

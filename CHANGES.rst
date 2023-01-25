@@ -22,6 +22,7 @@ Improvements
   contributions (:pr:`5597`)
 - Support Markdown when writing global announcement and apply standard HTML
   sanitization to the message (:pr:`5640`)
+- Add BCC field on contribution email dialogs (:pr:`5637`)
 
 Bugfixes
 ^^^^^^^^

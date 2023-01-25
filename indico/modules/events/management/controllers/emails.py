@@ -12,7 +12,7 @@ from webargs.flaskparser import abort
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.util.i18n import _
-from indico.util.marshmallow import not_empty
+from indico.util.marshmallow import LowercaseString, not_empty
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -93,6 +93,7 @@ class EmailRolesSendMixin:
         'from_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=not_empty),
         'subject': fields.String(required=True, validate=not_empty),
+        'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
         'recipient_roles': fields.List(
             fields.String(validate=validate.OneOf(['speaker', 'author', 'coauthor', 'submitter'])),
@@ -100,7 +101,7 @@ class EmailRolesSendMixin:
             validate=not_empty
         )
     })
-    def _process(self, from_address, body, subject, copy_for_sender, recipient_roles):
+    def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender, recipient_roles):
         recipient_roles = frozenset(recipient_roles)
         if from_address not in self.event.get_allowed_sender_emails():
             abort(422, messages={'from_address': ['Invalid sender address']})
@@ -110,7 +111,8 @@ class EmailRolesSendMixin:
                                               object_context=self.object_context, **kwargs)
             email_subject = replace_placeholders('event-persons-email', subject, event=self.event,
                                                  object_context=self.object_context, **kwargs)
-            bcc = [session.user.email] if copy_for_sender else []
+            bcc = {session.user.email} if copy_for_sender else set()
+            bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
                 email = make_email(to_list=email, bcc_list=bcc, from_address=from_address, template=tpl, html=True)
