@@ -24,6 +24,7 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
                                                      get_initial_form_values, get_user_data, make_registration_schema)
@@ -409,7 +410,8 @@ class RHRegistrationWithdraw(RHRegistrationFormRegistrationBase):
     def _process(self):
         self.registration.update_state(withdrawn=True)
         flash(_('Your registration has been withdrawn.'), 'success')
-        return redirect(url_for('.display_regform', self.registration.locator.registrant))
+        notify_registration_state_update(self.registration)
+        return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
 
 
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):

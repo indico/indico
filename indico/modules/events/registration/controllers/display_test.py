@@ -7,10 +7,13 @@
 
 import pytest
 from flask import request, session
+from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.registration.controllers.display import RHRegistrationForm
+from indico.modules.events.registration.controllers.display import RHRegistrationForm, RHRegistrationWithdraw
+from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.testing.util import extract_emails
 from indico.util.date_time import now_utc
 
 
@@ -43,3 +46,50 @@ def test_RHRegistrationForm_can_register(db, dummy_regform, dummy_reg, dummy_use
     assert rh._can_register()  # withdrawn/rejected do not count against limit
     dummy_reg.state = RegistrationState.complete
     assert not rh._can_register()  # exceeding limit
+
+
+@pytest.mark.usefixtures('request_context')
+def test_withdraw_registration_rh(smtp, dummy_regform, dummy_reg, dummy_user):
+    # Register the user and enable manager notifications
+    dummy_regform.start_dt = now_utc(False)
+    dummy_regform.manager_notifications_enabled = True
+    dummy_regform.manager_notification_recipients = ['mgr@example.test']
+    session.set_session_user(dummy_user)
+
+    # Set up request
+    request.view_args = {
+        'reg_form_id': dummy_regform.id,
+        'event_id': dummy_regform.event_id,
+    }
+    rh = RHRegistrationWithdraw()
+    rh._process_args()
+
+    # Throw forbidden if no modification allowed
+    dummy_regform.modification_mode = ModificationMode.not_allowed
+    assert not dummy_reg.can_be_withdrawn
+    with pytest.raises(Forbidden):
+        rh._check_access()
+    dummy_regform.modification_mode = ModificationMode.allowed_always
+
+    # Check if an email is sent, one to the user, one to the manager
+    assert not smtp.outbox
+    rh._process()
+    extract_emails(
+        smtp,
+        required=True,
+        count=1,
+        subject='[Indico] Registration withdrawn for {}'.format(
+            dummy_regform.event.title
+        ),
+        to=dummy_user.email,
+    )
+    extract_emails(
+        smtp,
+        required=True,
+        count=1,
+        subject='[Indico] Registration withdrawn for {}: {} {}'.format(
+            dummy_regform.event.title, dummy_user.first_name, dummy_user.last_name
+        ),
+        to='mgr@example.test',
+    )
+    assert not smtp.outbox

@@ -29,6 +29,8 @@ Bugfixes
 - Include token in notification emails for private surveys (:pr:`5618`)
 - Fix some API calls not working with personal access tokens (:pr:`5627`)
 - Correctly handle paragraphs and linebreaks in plaintext conversion (:pr:`5623`)
+- Send manager notifications and email participant if they withdraw from an event
+  (:issue:`5633`, :pr:`5638`, thanks :user:`kewisch`)
 
 
 Version 3.2.2
