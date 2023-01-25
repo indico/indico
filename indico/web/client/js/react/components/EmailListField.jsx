@@ -22,8 +22,9 @@ const isValid = value => /^\S+@\S+\.\S+$/.test(value);
 const EmailListField = props => {
   const {value, disabled, onChange, onFocus, onBlur} = props;
   const [options, setOptions] = useState(value.filter(isValid).map(x => ({text: x, value: x})));
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleChange = (e, {value: newValue}) => {
+  const setValue = newValue => {
     newValue = _.uniq(newValue.filter(isValid));
     setOptions(newValue.map(x => ({text: x, value: x})));
     onChange(newValue);
@@ -31,10 +32,35 @@ const EmailListField = props => {
     onBlur();
   };
 
+  const handleChange = (e, {value: newValue}) => {
+    if (newValue.length && newValue[newValue.length - 1] === searchQuery) {
+      setSearchQuery('');
+    }
+    setValue(newValue);
+  };
+
+  const handleSearchChange = (e, {searchQuery: newSearchQuery}) => {
+    if (/[,;]/.test(newSearchQuery)) {
+      const addresses = newSearchQuery.replace(/\s/g, '').split(/[,;]+/);
+      setValue([...value, ...addresses.filter(isValid)]);
+      setSearchQuery(addresses.filter(a => a && !isValid(a)).join(', '));
+    } else {
+      setSearchQuery(newSearchQuery);
+    }
+  };
+
+  const handleBlur = () => {
+    if (isValid(searchQuery)) {
+      setValue([...value, searchQuery]);
+      setSearchQuery('');
+    }
+  };
+
   return (
     <Dropdown
       options={options}
       value={value}
+      searchQuery={searchQuery}
       disabled={disabled}
       searchInput={{onFocus, onBlur, type: 'email'}}
       search
@@ -42,11 +68,13 @@ const EmailListField = props => {
       multiple
       allowAdditions
       fluid
-      closeOnChange
-      noResultsMessage={Translate.string('Please enter an email address')}
+      open={isValid(searchQuery)}
       placeholder={Translate.string('Please enter an email address')}
       additionLabel={Translate.string('Add email') + ' '} // eslint-disable-line prefer-template
       onChange={handleChange}
+      onSearchChange={handleSearchChange}
+      onBlur={handleBlur}
+      selectedLabel={null}
       icon=""
     />
   );
