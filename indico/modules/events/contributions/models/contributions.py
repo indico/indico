@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import g
+from flask import g, session
 from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
@@ -32,6 +32,7 @@ from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
+from indico.util.iterables import materialize_iterable
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify
 
@@ -546,6 +547,21 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
         from indico.modules.events.contributions import contribution_settings
         submitters_can_edit = contribution_settings.get(self.event, 'submitters_can_edit')
         return self.can_manage(user, permission=('submit' if submitters_can_edit else None))
+
+    @materialize_iterable()
+    def get_manage_button_options(self, *, note_may_exist=False):
+        if self.event.is_locked:
+            return
+        if self.can_edit_note(session.user) and (note_may_exist or not self.has_note):
+            yield 'notes_edit'
+        if self.can_edit(session.user):
+            yield 'contribution_edit'
+        if self.can_manage(session.user):
+            yield 'contribution_protection_edit'
+        if self.can_manage_attachments(session.user):
+            yield 'attachments_edit'
+        if self.can_manage(session.user):
+            yield 'contribution_subcontributions_edit'
 
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection."""

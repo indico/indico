@@ -20,9 +20,7 @@
                     </span>
                 {% endif %}
                 <div class="timetable-item-actions">
-                    {{ render_manage_button(subcontrib, 'SUBCONTRIBUTION', show_notes=show_notes,
-                                            show_button=(not event.is_locked and
-                                                         subcontrib.can_manage(session.user, 'submit'))) }}
+                    {{ render_manage_button(subcontrib, 'SUBCONTRIBUTION', show_notes=show_notes) }}
                 </div>
             </div>
 

@@ -31,9 +31,7 @@
                     {{ render_location(contrib, parent=parent) }}
                 {%- endif %}
                 <div class="timetable-item-actions">
-                    {{ render_manage_button(contrib, 'CONTRIBUTION', show_notes=show_notes,
-                                            show_button=(not event.is_locked and
-                                                         contrib.can_manage(session.user, 'submit'))) }}
+                    {{ render_manage_button(contrib, 'CONTRIBUTION', show_notes=show_notes) }}
                     {{ template_hook('vc-actions', event=event, item=contrib) }}
                 </div>
             </div>

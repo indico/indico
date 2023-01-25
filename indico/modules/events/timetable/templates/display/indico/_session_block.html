@@ -30,9 +30,7 @@
                     {{ render_location(block, parent=event) }}
                 {%- endif %}
                 <div class="timetable-item-actions">
-                    {{ render_manage_button(block, 'SESSION_BLOCK', show_notes=show_notes,
-                                            show_button=(not event.is_locked and block.can_manage(session.user)),
-                                            anchor=block.slug) }}
+                    {{ render_manage_button(block, 'SESSION_BLOCK', show_notes=show_notes, anchor=block.slug) }}
                     {{ template_hook('vc-actions', event=event, item=block) }}
                 </div>
             </div>

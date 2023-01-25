@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import session
 from sqlalchemy import DDL
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -15,6 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.locations import LocationMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.util.iterables import materialize_iterable
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify
 
@@ -125,6 +127,20 @@ class SessionBlock(LocationMixin, db.Model):
 
     def can_edit_note(self, user):
         return self.session.can_edit_note(user)
+
+    @materialize_iterable()
+    def get_manage_button_options(self, *, note_may_exist=False):
+        if self.event.is_locked:
+            return
+        if self.can_edit_note(session.user) and (note_may_exist or not self.session.has_note):
+            yield 'notes_edit'
+        if self.can_manage_attachments(session.user):
+            yield 'attachments_edit'  # XXX for session, not block!
+        if self.can_manage(session.user):
+            yield 'session_block_edit'
+        if self.session.can_manage(session.user, 'coordinate'):
+            yield 'session_timetable_edit'
+            yield 'session_protection_edit'
 
     @hybrid_property
     def start_dt(self):

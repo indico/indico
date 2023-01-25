@@ -46,6 +46,7 @@ from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _, force_locale
+from indico.util.iterables import materialize_iterable
 from indico.util.string import format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
@@ -723,6 +724,20 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def can_display(self, user):
         """Check whether the user can display the event in the category."""
         return self.visibility != 0 or self.can_manage(user)
+
+    @materialize_iterable()
+    def get_manage_button_options(self, *, note_may_exist=False):
+        if self.is_locked:
+            return
+        if self.can_manage(session.user):
+            yield 'event_edit'
+            yield 'event_clone'
+        if self.type_ != EventType.lecture and self.can_edit_note(session.user):
+            yield 'notes_edit'
+            if self.scheduled_notes:
+                yield 'notes_compile'
+        if self.can_manage_attachments(session.user):
+            yield 'attachments_edit'
 
     def get_relative_event_ids(self):
         """Get the first, last, previous and next event IDs.

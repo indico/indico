@@ -1,189 +1,131 @@
 {% from 'events/notes/_note.html' import render_toggle_button %}
 
 {% macro _render_note_editor(item) -%}
-    <li>
-        {% if item.has_note %}
-            {% set title = _('Edit minutes') %}
-        {% else %}
-            {% set title = _('Add minutes') %}
-        {% endif %}
+    {% if item.has_note %}
+        {% set title = _('Edit minutes') %}
+    {% else %}
+        {% set title = _('Add minutes') %}
+    {% endif %}
+    <div class="manage-notes-container"
+         data-api-url="{{ url_for('event_notes.api', item) }}"
+         {% if item.can_manage_attachments(session.user) %}
+             data-image-upload-url="{{ url_for('attachments.upload_ckeditor', item) }}"
+         {% endif %}
+         data-title="{{ title }}"></div>
+{%- endmacro %}
+
+{%- macro _render_dropdown_option(opt, item, item_type) -%}
+    {%- if opt == 'event_edit' -%}
+        <a href="{{ url_for('event_management.settings', item) }}">
+            {%- trans -%}Edit Event{%- endtrans -%}
+        </a>
+    {%- elif opt == 'event_clone' -%}
+        <a data-href="{{ url_for('event_management.clone', item) }}"
+           data-title="{% trans %}Clone Event{%- endtrans -%}"
+           data-ajax-dialog
+           href="">
+            {%- trans -%}Clone Event{%- endtrans -%}
+        </a>
+    {%- elif opt == 'notes_edit' -%}
+        {% set note_item = item.session if item_type == 'SESSION_BLOCK' else item %}
+        {{ _render_note_editor(note_item) }}
+    {%- elif opt == 'notes_compile' -%}
         <div class="manage-notes-container"
+             data-get-note-url="{{ url_for('event_notes.compile', item) }}"
              data-api-url="{{ url_for('event_notes.api', item) }}"
              {% if item.can_manage_attachments(session.user) %}
                  data-image-upload-url="{{ url_for('attachments.upload_ckeditor', item) }}"
              {% endif %}
-             data-title="{{ title }}"></div>
-    </li>
-{%- endmacro %}
+             data-title="{% trans %}Compile minutes{% endtrans %}"></div>
+    {%- elif opt == 'attachments_edit' -%}
+        {% set attachment_item = item.session if item_type == 'SESSION_BLOCK' else item %}
+        <a href="" class="js-material-editor"
+                   data-attachment-editor
+                   data-reload-on-change
+                   data-title="{% trans title=attachment_item.title %}Manage materials for '{{ title }}'{% endtrans %}"
+                   data-locator="{{ attachment_item.locator | tojson | forceescape }}">
+            {%- trans %}Material editor{% endtrans -%}
+        </a>
+    {%- elif opt == 'session_block_edit' -%}
+        <a href="#"
+           data-href="{{ url_for('sessions.manage_session_block', item) }}"
+           data-title="{% trans title=item.full_title %}Edit session block '{{ title }}'{% endtrans %}"
+           data-params="{{ item.locator | tojson | forceescape }}"
+           data-dialog-classes="session-block-form"
+           data-ajax-dialog
+           data-reload-after>
+            {%- trans -%}Edit session block{%- endtrans -%}
+        </a>
+    {%- elif opt == 'session_timetable_edit' -%}
+        <a href="{{ url_for('timetable.manage_session', item.session,
+                            _anchor=item.start_dt.astimezone(item.session.event.tzinfo).strftime('%Y%m%d')) }}"
+           title="{% trans %}Edit the timetable for this session{% endtrans %}">
+            {%- trans -%}Edit session timetable{%- endtrans -%}
+        </a>
+    {%- elif opt == 'session_protection_edit' -%}
+        <a href="#"
+           data-href="{{ url_for('sessions.session_protection', item.session) }}"
+           data-title="{% trans %}Edit session protection{% endtrans %}"
+           data-subtitle="{{ item.session.title }}"
+           data-ajax-dialog>
+            {%- trans -%}Edit session protection{%- endtrans -%}
+        </a>
+    {%- elif opt == 'contribution_edit' -%}
+        <a href="" class="contribution-edit"
+                   data-href="{{ url_for('contributions.manage_update_contrib', item, standalone=true) }}"
+                   data-title="{% trans title=item.title %}Edit contribution '{{ title }}'{% endtrans %}">
+            {%- trans -%}Edit contribution{%- endtrans -%}
+        </a>
+    {%- elif opt == 'contribution_subcontributions_edit' -%}
+        <a href=""
+           class="subcontributions-edit"
+           data-href="{{ url_for('contributions.manage_subcontributions', item) }}"
+           data-title="{% trans title=item.title %}Manage subcontributions{% endtrans %}"
+           data-subtitle="{{ item.title }}">
+            {%- trans -%}Manage subcontributions{%- endtrans -%}
+        </a>
+    {%- elif opt == 'contribution_protection_edit' -%}
+        <a href=""
+           data-href="{{ url_for('contributions.manage_contrib_protection', item) }}"
+           data-title="{% trans %}Manage contribution protection{% endtrans %}"
+           data-subtitle="{{ item.title }}"
+           data-ajax-dialog>
+            {%- trans -%}Edit protection{%- endtrans -%}
+        </a>
+    {%- elif opt == 'subcontribution_edit' -%}
+        <a href=""
+           class="subcontribution-edit"
+           data-title="{% trans %}Edit subcontribution{% endtrans %}"
+           data-subtitle="{{ item.title }}"
+           data-href="{{ url_for('contributions.manage_edit_subcontrib', item, standalone=true) }}">
+            {%- trans -%}Edit subcontribution{%- endtrans -%}
+        </a>
+    {%- else -%}
+        ERROR: unknown option "{{ opt }}"
+    {%- endif -%}
+{%- endmacro -%}
 
-{% macro _render_dropdown(item, item_type, show_note_operations=false) -%}
-    <ul class="i-dropdown">
-        {% if item_type == 'EVENT' %}
-            {% if item.can_manage(session.user) %}
-                <li>
-                    <a href="{{ url_for('event_management.settings', item) }}">
-                        {% trans %}Edit Event{% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    <a data-href="{{ url_for('event_management.clone', item) }}"
-                       data-title="{% trans %}Clone Event{% endtrans %}"
-                       data-ajax-dialog
-                       href="">
-                        {% trans %}Clone Event{% endtrans %}
-                    </a>
-                </li>
-            {% endif %}
-            {% if item.can_edit_note(session.user) %}
-                {% if item.type != 'lecture' %}
-                    {{ _render_note_editor(item) }}
-                    {% if item.scheduled_notes %}
-                        <li>
-                            <div class="manage-notes-container"
-                                 data-get-note-url="{{ url_for('event_notes.compile', item) }}"
-                                 data-api-url="{{ url_for('event_notes.api', item) }}"
-                                 {% if item.can_manage_attachments(session.user) %}
-                                     data-image-upload-url="{{ url_for('attachments.upload_ckeditor', item) }}"
-                                 {% endif %}
-                                 data-title="{% trans %}Compile minutes{% endtrans %}"></div>
-                        </li>
-                    {% endif %}
-                {% endif %}
-            {% endif %}
-        {% elif item_type == 'SESSION_BLOCK' %}
-            {% set session_ = item.session %}
-            {% if item.can_edit_note(session.user) %}
-                {% if not session_.has_note or show_note_operations %}
-                    {{ _render_note_editor(session_) }}
-                {% endif %}
-                <li>
-                    <a href="" class="js-material-editor"
-                               data-attachment-editor
-                               data-reload-on-change
-                               data-title="{% trans title=session_.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                               data-locator="{{ session_.locator | tojson | forceescape }}">
-                        {%- trans %}Material Editor{% endtrans -%}
-                    </a>
-                </li>
-            {% endif %}
-            {% if item.can_manage(session.user) %}
-                <li>
-                    <a href="#"
-                       data-href="{{ url_for('sessions.manage_session_block', item) }}"
-                       data-title="{% trans title=item.full_title %}Edit session block '{{ title }}'{% endtrans %}"
-                       data-params="{{ item.locator | tojson | forceescape }}"
-                       data-dialog-classes="session-block-form"
-                       data-ajax-dialog
-                       data-reload-after>
-                        {% trans %}Edit session block{% endtrans %}
-                    </a>
-                </li>
-            {% endif %}
-            {% if session_.can_manage(session.user, 'coordinate') %}
-                <li>
-                    <a href="{{ url_for('timetable.manage_session', session_,
-                                        _anchor=item.start_dt.astimezone(session_.event.tzinfo).strftime('%Y%m%d')) }}"
-                       title="{% trans %}Edit the timetable for this session{% endtrans %}">
-                        {% trans %}Edit session timetable{% endtrans %}
-                    </a>
-                </li>
-            {% endif %}
-            {% if session_.can_manage(session.user) %}
-                <li>
-                    <a href="#"
-                       data-href="{{ url_for('sessions.session_protection', session_) }}"
-                       data-title="{% trans %}Edit session protection{% endtrans %}"
-                       data-subtitle="{{ session_.title }}"
-                       data-ajax-dialog>
-                        {% trans %}Edit session protection{% endtrans %}
-                    </a>
-                </li>
-            {% endif %}
-        {% elif item_type == 'CONTRIBUTION' %}
-            {% if item.can_manage(session.user, 'submit') %}
-                {% if not item.has_note or show_note_operations %}
-                    {{ _render_note_editor(item) }}
-                {% endif %}
-            {% endif %}
-            {% if item.can_edit(session.user) %}
-                <li>
-                    <a href="" class="contribution-edit"
-                               data-href="{{ url_for('contributions.manage_update_contrib', item, standalone=true) }}"
-                               data-title="{% trans title=item.title %}Edit contribution '{{ title }}'{% endtrans %}">
-                        {% trans %}Edit contribution{% endtrans %}
-                    </a>
-                </li>
-            {% endif %}
-            {% if item.can_manage(session.user) %}
-                <li>
-                    <a href=""
-                       data-href="{{ url_for('contributions.manage_contrib_protection', item) }}"
-                       data-title="{% trans %}Manage contribution protection{% endtrans %}"
-                       data-subtitle="{{ item.title }}"
-                       data-ajax-dialog>
-                        {% trans %}Edit protection{% endtrans %}
-                    </a>
-                </li>
-            {% endif %}
-        {% elif item_type == 'SUBCONTRIBUTION' %}
-            {% if item.can_edit_note(session.user) %}
-                {% if not item.has_note or show_note_operations %}
-                    {{ _render_note_editor(item) }}
-                {% endif %}
-            {% endif %}
-            {% if item.can_edit(session.user) %}
-                <li>
-                    <a href=""
-                       class="subcontribution-edit"
-                       data-title="{% trans %}Edit subcontribution{% endtrans %}"
-                       data-subtitle="{{ item.title }}"
-                       data-href="{{ url_for('contributions.manage_edit_subcontrib', item, standalone=true) }}">
-                        {% trans %}Edit subcontribution{% endtrans %}
-                    </a>
-                </li>
-            {% endif %}
-        {% endif %}
-        {% if item_type != 'SESSION_BLOCK' and item.can_manage_attachments(session.user) %}
-            <li>
-                <a href="" class="js-material-editor"
-                           data-attachment-editor
-                           data-reload-on-change
-                           data-title="{% trans title=item.title %}Manage materials for '{{ title }}'{% endtrans %}"
-                           data-locator="{{ item.locator | tojson | forceescape }}">
-                    {%- trans %}Material editor{% endtrans -%}
-                </a>
-            </li>
-        {% endif %}
-        {% if item_type == 'CONTRIBUTION' and item.can_manage(session.user) %}
-            <li>
-                <a href=""
-                   class="subcontributions-edit"
-                   data-href="{{ url_for('contributions.manage_subcontributions', item) }}"
-                   data-title="{% trans title=item.title %}Manage subcontributions{% endtrans %}"
-                   data-subtitle="{{ item.title }}">
-                    {% trans %}Manage subcontributions{% endtrans %}
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-{%- endmacro %}
-
-{% macro render_manage_button(item, item_type, show_notes=true,
-                              toggle_notes=true, show_note_operations=false,
-                              show_button=true, anchor=none) -%}
+{% macro render_manage_button(item, item_type, show_notes=true, toggle_notes=true, show_note_operations=false, anchor=none) -%}
     <div class="toolbar right thin">
         {% if toggle_notes and item.has_note %}
             {% set req = request.args.get('note') %}
             {% set note_id = item.note.id|string %}
             {{ render_toggle_button(item.note, note_is_hidden=(req != note_id and not show_notes), anchor=anchor) }}
         {% endif %}
-        {% if show_button %}
+        {% set dropdown_options = item.get_manage_button_options(note_may_exist=show_note_operations) %}
+        {% if dropdown_options %}
             <div class="group manage-button">
                 <button class="tiny compact ui icon button js-dropdown" data-toggle="dropdown" title="{% trans %}Manage{% endtrans %}">
                     <i class="edit icon"></i>
                     <i class="caret down icon"></i>
                 </button>
-                {{ _render_dropdown(item, item_type, show_note_operations=show_note_operations) }}
+                <ul class="i-dropdown">
+                    {% for opt in dropdown_options %}
+                        <li>
+                            {{ _render_dropdown_option(opt, item, item_type) }}
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
         {% endif %}
         </div>

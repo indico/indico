@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import session
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -14,6 +15,7 @@ from indico.core.db.sqlalchemy.notes import AttachedNotesMixin
 from indico.core.db.sqlalchemy.searchable import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
+from indico.util.iterables import materialize_iterable
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify
 
@@ -185,6 +187,17 @@ class SubContribution(SearchableTitleMixin, SearchableDescriptionMixin, Attached
 
     def can_edit(self, user):
         return self.contribution.can_edit(user)
+
+    @materialize_iterable()
+    def get_manage_button_options(self, *, note_may_exist=False):
+        if self.event.is_locked:
+            return
+        if self.can_edit_note(session.user) and (note_may_exist or not self.has_note):
+            yield 'notes_edit'
+        if self.can_edit(session.user):
+            yield 'subcontribution_edit'
+        if self.can_manage_attachments(session.user):
+            yield 'attachments_edit'
 
     def is_user_associated(self, user):
         if user is None:
