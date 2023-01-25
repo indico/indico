@@ -47,6 +47,7 @@ const EmailListField = props => {
       placeholder={Translate.string('Please enter an email address')}
       additionLabel={Translate.string('Add email') + ' '} // eslint-disable-line prefer-template
       onChange={handleChange}
+      icon=""
     />
   );
 };

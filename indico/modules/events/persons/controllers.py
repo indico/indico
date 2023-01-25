@@ -46,7 +46,7 @@ from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import not_empty, validate_with_message
+from indico.util.marshmallow import LowercaseString, not_empty, validate_with_message
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -349,9 +349,10 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
         'from_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=not_empty),
         'subject': fields.String(required=True, validate=not_empty),
+        'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
     })
-    def _process(self, from_address, body, subject, copy_for_sender):
+    def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender):
         if from_address not in self.event.get_allowed_sender_emails():
             abort(422, messages={'from_address': ['Invalid sender address']})
         for recipient in self.recipients:
@@ -362,7 +363,8 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
             email_subject = replace_placeholders('event-persons-email', subject, person=recipient,
                                                  event=self.event, register_link=self.no_account)
             tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-            bcc = [session.user.email] if copy_for_sender else []
+            bcc = {session.user.email} if copy_for_sender else set()
+            bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=from_address,
                                    template=tpl, html=True)
