@@ -9,7 +9,7 @@
     {%- elif registration.state.name == 'rejected' -%}
         {% trans title=event.title %}Registration rejected for {{ title }}{% endtrans %}
     {%- elif registration.state.name == 'withdrawn' -%}
-        {% trans title=event.title %}Registration withdrawns for {{ title }}{% endtrans %}
+        {% trans title=event.title %}Registration withdrawn for {{ title }}{% endtrans %}
     {%- else -%}
         {% trans title=event.title %}Registration unpaid for {{ title }}{% endtrans %}
     {%- endif %}
