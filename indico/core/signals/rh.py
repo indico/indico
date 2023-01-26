@@ -18,8 +18,18 @@ The return value of `_process_args` (usually ``None``) is available in
 *result*.
 ''')
 
+before_check_access = _signals.signal('before-check-access', '''
+Executed right before `_check_access` of an `RH` instance is called.
+The *sender* is the RH class, the current instance is passed in *rh*.
+If the signal returns ``True`` or ``False``, the original `_check_access` method
+will not be executed.  If multiple subscribers to the signal return
+contradictory results, ``False`` wins and access is denied.
+In case access is denied, a generic error message will be displayed.
+For custom errors, raise `Forbidden` yourself while handling the signal.
+''')
+
 check_access = _signals.signal('check-access', '''
-Executed right after `_check_access` of an `RH` instance has been called
+Executed right after the access check of an `RH` instance has been performed
 unless the access check raised an exception.  The *sender* is the RH class,
 the current instance is passed in *rh*.
 ''')

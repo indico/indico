@@ -30,6 +30,11 @@ Bugfixes
 - Fix some API calls not working with personal access tokens (:pr:`5627`)
 - Correctly handle paragraphs and linebreaks in plaintext conversion (:pr:`5623`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``rh.before-check-access`` signal (:pr:`5639`, thanks :user:`omegak`)
+
 
 Version 3.2.2
 -------------
