@@ -35,6 +35,11 @@ Bugfixes
 - Send manager notifications and email participant if they withdraw from an event
   (:issue:`5633`, :pr:`5638`, thanks :user:`kewisch`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add ``rh.before-check-access`` signal (:pr:`5639`, thanks :user:`omegak`)
+
 
 Version 3.2.2
 -------------

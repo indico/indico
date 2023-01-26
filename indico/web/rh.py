@@ -233,7 +233,11 @@ class RH:
         if rv is not None:
             return rv
 
-        self._check_access()
+        signal_rv = values_from_signal(signals.rh.before_check_access.send(type(self), rh=self))
+        if not all(signal_rv):
+            raise Forbidden('Unauthorized access.')
+        if not signal_rv:
+            self._check_access()
         signals.rh.check_access.send(type(self), rh=self)
 
         signal_rv = values_from_signal(signals.rh.before_process.send(type(self), rh=self),
