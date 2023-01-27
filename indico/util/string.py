@@ -137,7 +137,7 @@ def strip_tags(text):
     return do_striptags(text)
 
 
-def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
+def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **kwargs):
     """Mako markdown to HTML filter.
 
     :param text: Markdown source to convert to HTML
@@ -145,6 +145,7 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
                               to replace math-mode segments.
     :param md: An alternative markdown processor (can be used
                to generate e.g. a different format)
+    :param extra_html: Whether to allow a bigger set of HTML tags
     :param kwargs: Extra arguments to pass on to the markdown
                    processor
     """
@@ -163,8 +164,11 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
     if md is None:
         extensions = set(kwargs.pop('extensions', ()))
         extensions.add('fenced_code')
-        result = bleach.clean(markdown.markdown(text, extensions=tuple(extensions), **kwargs), tags=BLEACH_ALLOWED_TAGS,
-                              attributes=BLEACH_ALLOWED_ATTRIBUTES)
+        result = markdown.markdown(text, extensions=tuple(extensions), **kwargs)
+        if extra_html:
+            result = sanitize_html(result)
+        else:
+            result = bleach.clean(result, tags=BLEACH_ALLOWED_TAGS, attributes=BLEACH_ALLOWED_ATTRIBUTES)
     else:
         result = md(text, **kwargs)
 

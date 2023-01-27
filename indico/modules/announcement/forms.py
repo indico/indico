@@ -16,4 +16,5 @@ from indico.web.forms.widgets import SwitchWidget
 
 class AnnouncementForm(IndicoForm):
     enabled = BooleanField(_('Enabled'), widget=SwitchWidget())
-    message = TextAreaField(_('Message'), [UsedIf(lambda form, _: form.enabled.data), DataRequired()])
+    message = TextAreaField(_('Message'), [UsedIf(lambda form, _: form.enabled.data), DataRequired()],
+                            description=_('You may use Markdown and basic HTML elements for formatting.'))

@@ -20,6 +20,8 @@ Improvements
   (:pr:`5608`)
 - Add setting to only allow managers to upload attachments to events and
   contributions (:pr:`5597`)
+- Support Markdown when writing global announcement and apply standard HTML
+  sanitization to the message (:pr:`5640`)
 
 Bugfixes
 ^^^^^^^^

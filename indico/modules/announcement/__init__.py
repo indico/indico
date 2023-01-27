@@ -10,6 +10,7 @@ from flask import session
 from indico.core import signals
 from indico.core.settings import SettingsProxy
 from indico.util.i18n import _
+from indico.util.string import render_markdown
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -25,9 +26,8 @@ announcement_settings = SettingsProxy('announcement', {
 def _inject_announcement_header(**kwargs):
     if not announcement_settings.get('enabled'):
         return
-    message = announcement_settings.get('message')
-    if message:
-        return ('warning', message)
+    if message := announcement_settings.get('message'):
+        return ('warning', render_markdown(message, extra_html=True))
 
 
 @signals.menu.items.connect_via('admin-sidemenu')
