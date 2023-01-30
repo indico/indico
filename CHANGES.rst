@@ -34,6 +34,8 @@ Bugfixes
 - Correctly handle paragraphs and linebreaks in plaintext conversion (:pr:`5623`)
 - Send manager notifications and email participant if they withdraw from an event
   (:issue:`5633`, :pr:`5638`, thanks :user:`kewisch`)
+- Do not break registrations with purged accommodation fields (:issue:`5641`,
+  :pr:`5643`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
