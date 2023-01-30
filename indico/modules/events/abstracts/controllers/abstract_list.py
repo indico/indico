@@ -29,6 +29,7 @@ from indico.modules.events.cloning import get_attrs_to_clone
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
                                                                  EmailRolesSendMixin)
+from indico.modules.events.persons.util import get_event_person_for_user
 from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import get_field_values
 from indico.modules.users.models.users import User
@@ -223,6 +224,14 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
         return Abstract.id.in_(abstract_ids)
 
     def _process(self):
+        def _get_or_create_person_dict(person):
+            person_dict = abstract_persons_dict[person.identifier]
+            person_dict['identifier'] = person.identifier
+            person_dict['full_name'] = person.full_name
+            person_dict['email'] = person.email
+            person_dict['affiliation'] = person.affiliation
+            return person_dict
+
         submitters = {abstract.submitter for abstract in self.abstracts}
         abstract_persons = (AbstractPersonLink.query
                             .filter(AbstractPersonLink.abstract.has(self._membership_filter))
@@ -232,17 +241,15 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
                                                      'secondary_author': False})
         for abstract_person in abstract_persons:
             user_or_person = abstract_person.person.user if abstract_person.person.user else abstract_person.person
-            person_dict = abstract_persons_dict[user_or_person.id]
-            person_dict['identifier'] = user_or_person.identifier
-            person_dict['full_name'] = user_or_person.full_name
-            person_dict['email'] = user_or_person.email
-            person_dict['affiliation'] = user_or_person.affiliation
+            person_dict = _get_or_create_person_dict(user_or_person)
             person_dict['speaker'] |= abstract_person.is_speaker
             person_dict['primary_author'] |= abstract_person.author_type == AuthorType.primary
             person_dict['secondary_author'] |= abstract_person.author_type == AuthorType.secondary
             person_dict['registered'] = abstract_person.person in registered_persons
         for submitter in submitters:
-            abstract_persons_dict[submitter.id]['submitter'] |= True
+            person_dict = _get_or_create_person_dict(submitter)
+            person_dict['submitter'] = True
+            person_dict['registered'] = get_event_person_for_user(self.event, submitter) in registered_persons
         return jsonify(event_persons=[p for _, p in sorted(abstract_persons_dict.items())])
 
 
