@@ -31,362 +31,369 @@
     {%- else %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <table class="i-table tablesorter">
-                <thead>
-                    <tr class="i-table">
-                        <th class="i-table thin-column" data-sorter="false"></th>
-                        <th class="i-table id-column">
-                            {%- trans %}ID{% endtrans -%}
-                        </th>
-                        <th class="i-table title-column">
-                            {%- trans %}Title{% endtrans -%}
-                        </th>
-                        {% for item in static_columns %}
-                            <th class="i-table">{{ item.caption }}</th>
-                        {% endfor %}
-                        <th class="i-table {{ 'revision-column' if not management }}">
-                            {%- trans %}Revision{% endtrans -%}
-                        </th>
-                        {% if management %}
-                            <th class="i-table judge-column" data-sorter="false">
-                                {%- trans %}Judges{% endtrans -%}
+            <div class="js-list-table-wrapper">
+                <table class="i-table tablesorter">
+                    <thead>
+                        <tr class="i-table">
+                            <th class="i-table thin-column" data-sorter="false"></th>
+                            <th class="i-table id-column">
+                                {%- trans %}ID{% endtrans -%}
                             </th>
-                        {% endif %}
-                        {% if event.cfp.content_reviewing_enabled %}
-                            <th class="i-table content-reviewers-column" data-sorter="false">
-                                {%- trans %}Content reviewers{% endtrans -%}
+                            <th class="i-table title-column">
+                                {%- trans %}Title{% endtrans -%}
                             </th>
-                        {% endif %}
-                        {% if event.cfp.layout_reviewing_enabled %}
-                            <th class="i-table layout-reviewers-column" data-sorter="false">
-                                {%- trans %}Layout reviewers{% endtrans -%}
-                            </th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for contrib in contribs %}
-                        {% if contrib.paper %}
-                            {% set last_revision_state = contrib.paper.last_revision.state.title %}
-                        {% else %}
-                            {% set last_revision_state %}
-                                {%- trans %}Paper not yet submitted{% endtrans -%}
-                            {% endset %}
-                        {% endif %}
-                        <tr id="contrib-{{ contrib.id }}" class="i-table contribution-row"
-                            data-friendly-id="{{ contrib.friendly_id }}"
-                            data-title="{{ contrib.title }}">
-                            <td class="i-table id-column">
-                                <span class="vertical-aligner">
-                                    <input type="checkbox" class="select-row"
-                                           name="contribution_id"
-                                           value="{{ contrib.id }}">
-                                </span>
-                            </td>
-                            <td class="i-table id-column">
-                                <span class="vertical-aligner">{{ contrib.friendly_id }}</span>
-                            </td>
-                            <td class="i-table title-column"
-                                data-searchable="{{ contrib.title | lower }}"
-                                data-text="{{ contrib.title | lower }}">
-                                <span class="vertical-aligner">
-                                    {% if contrib.paper %}
-                                        <a href="{{ url_for('.paper_timeline', contrib) }}">
-                                            {{- contrib.title -}}
-                                        </a>
-                                    {% else %}
-                                        {{- contrib.title -}}
-                                    {% endif %}
-                                </span>
-                            </td>
                             {% for item in static_columns %}
-                                {% if item.id == 'state' %}
-                                    {% set sort_text = '' %}
-                                    {% if contrib.paper %}
-                                        {% set acceptances = contrib.paper.last_revision.reviews|selectattr('proposed_action.name', 'equalto', 'accept')|list|length %}
-                                        {% set sort_text = '{}-{}-{}'.format('1' if contrib.paper.is_in_final_state else '0', contrib.paper.last_revision.state.name, acceptances) %}
-                                    {% endif %}
-                                    <td class="i-table"
-                                        data-searchable="{{ last_revision_state|lower }}"
-                                        data-text="{{ sort_text }}">
+                                <th class="i-table">{{ item.caption }}</th>
+                            {% endfor %}
+                            <th class="i-table {{ 'revision-column' if not management }}">
+                                {%- trans %}Revision{% endtrans -%}
+                            </th>
+                            {% if management %}
+                                <th class="i-table judge-column" data-sorter="false">
+                                    {%- trans %}Judges{% endtrans -%}
+                                </th>
+                            {% endif %}
+                            {% if event.cfp.content_reviewing_enabled %}
+                                <th class="i-table content-reviewers-column" data-sorter="false">
+                                    {%- trans %}Content reviewers{% endtrans -%}
+                                </th>
+                            {% endif %}
+                            {% if event.cfp.layout_reviewing_enabled %}
+                                <th class="i-table layout-reviewers-column" data-sorter="false">
+                                    {%- trans %}Layout reviewers{% endtrans -%}
+                                </th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contrib in contribs %}
+                            {% if contrib.paper %}
+                                {% set last_revision_state = contrib.paper.last_revision.state.title %}
+                            {% else %}
+                                {% set last_revision_state %}
+                                    {%- trans %}Paper not yet submitted{% endtrans -%}
+                                {% endset %}
+                            {% endif %}
+                            <tr id="contrib-{{ contrib.id }}" class="i-table contribution-row"
+                                data-friendly-id="{{ contrib.friendly_id }}"
+                                data-title="{{ contrib.title }}">
+                                <td class="i-table thin-column">
+                                    <span class="vertical-aligner">
+                                        <input type="checkbox" class="select-row"
+                                               name="contribution_id"
+                                               value="{{ contrib.id }}">
+                                    </span>
+                                </td>
+                                <td class="i-table id-column">
+                                    <span class="vertical-aligner">{{ contrib.friendly_id }}</span>
+                                </td>
+                                <td class="i-table title-column"
+                                    data-searchable="{{ contrib.title | lower }}"
+                                    data-text="{{ contrib.title | lower }}">
+                                    <span class="vertical-aligner">
                                         {% if contrib.paper %}
-                                            <span class="vertical-aligner">
-                                                {{ _render_paper_state(contrib.paper) }}
-                                            </span>
+                                            <a href="{{ url_for('.paper_timeline', contrib) }}">
+                                                {{- contrib.title -}}
+                                            </a>
                                         {% else %}
-                                            <span class="i-tag outline semantic-text state-badge">
-                                                {% trans %}Not submitted{% endtrans %}
-                                            </span>
+                                            {{- contrib.title -}}
                                         {% endif %}
-                                    </td>
-                                {% elif item.id == 'track' %}
-                                    <td class="i-table track-column"
-                                        data-searchable="{{ contrib.track.title|lower if contrib.track }}">
+                                    </span>
+                                </td>
+                                {% for item in static_columns %}
+                                    {% if item.id == 'state' %}
+                                        {% set sort_text = '' %}
+                                        {% if contrib.paper %}
+                                            {% set acceptances = contrib.paper.last_revision.reviews|selectattr('proposed_action.name', 'equalto', 'accept')|list|length %}
+                                            {% set sort_text = '{}-{}-{}'.format('1' if contrib.paper.is_in_final_state else '0', contrib.paper.last_revision.state.name, acceptances) %}
+                                        {% endif %}
+                                        <td class="i-table"
+                                            data-searchable="{{ last_revision_state|lower }}"
+                                            data-text="{{ sort_text }}">
+                                            {% if contrib.paper %}
+                                                <span class="vertical-aligner">
+                                                    {{ _render_paper_state(contrib.paper) }}
+                                                </span>
+                                            {% else %}
+                                                <span class="i-tag outline semantic-text state-badge">
+                                                    {% trans %}Not submitted{% endtrans %}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    {% elif item.id == 'track' %}
+                                        <td class="i-table track-column"
+                                            data-searchable="{{ contrib.track.title|lower if contrib.track }}">
+                                            <span class="vertical-aligner">
+                                                {%- if contrib.track -%}
+                                                    {{ contrib.track.title_with_group }}
+                                                {%- else -%}
+                                                    {% trans %}No track{% endtrans %}
+                                                {%- endif -%}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'session' %}
+                                        <td class="i-table"
+                                            data-searchable="{{ contrib.session.title|lower if contrib.session }}">
+                                            <span class="vertical-aligner">
+                                                {%- if contrib.session -%}
+                                                    {% trans title=contrib.session.title -%}
+                                                        {{ title }}
+                                                    {%- endtrans %}
+                                                {%- else -%}
+                                                    {% trans %}No session{% endtrans %}
+                                                {%- endif -%}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'type' %}
+                                        <td class="i-table"
+                                            data-searchable="{{ contrib.type.name|lower if contrib.type }}">
+                                            <span class="vertical-aligner">
+                                                {%- if contrib.type -%}
+                                                    {{ contrib.type.name }}
+                                                {%- else -%}
+                                                    {% trans %}n/a{% endtrans %}
+                                                {%- endif -%}
+                                            </span>
+                                        </td>
+                                    {% endif %}
+                                {% endfor %}
+                                <td class="i-table revision-column">
+                                    <span class="vertical-aligner">
+                                        {%- if contrib.paper.revision_count -%}
+                                            {{ contrib.paper.revision_count }}
+                                        {%- endif -%}
+                                    </span>
+                                </td>
+                                {% if management %}
+                                    <td class="i-table person-row-cell"
+                                        data-searchable="{{ contrib.paper_judges|join(', ', attribute='name')|lower }}">
                                         <span class="vertical-aligner">
-                                            {%- if contrib.track -%}
-                                                {{ contrib.track.title_with_group }}
-                                            {%- else -%}
-                                                {% trans %}No track{% endtrans %}
-                                            {%- endif -%}
-                                        </span>
-                                    </td>
-                                {% elif item.id == 'session' %}
-                                    <td class="i-table"
-                                        data-searchable="{{ contrib.session.title|lower if contrib.session }}">
-                                        <span class="vertical-aligner">
-                                            {%- if contrib.session -%}
-                                                {% trans title=contrib.session.title -%}
-                                                    {{ title }}
-                                                {%- endtrans %}
-                                            {%- else -%}
-                                                {% trans %}No session{% endtrans %}
-                                            {%- endif -%}
-                                        </span>
-                                    </td>
-                                {% elif item.id == 'type' %}
-                                    <td class="i-table"
-                                        data-searchable="{{ contrib.type.name|lower if contrib.type }}">
-                                        <span class="vertical-aligner">
-                                            {%- if contrib.type -%}
-                                                {{ contrib.type.name }}
-                                            {%- else -%}
-                                                {% trans %}n/a{% endtrans %}
-                                            {%- endif -%}
+                                            {% for judge in contrib.paper_judges|sort(attribute='display_full_name') -%}
+                                                <div class="person-row icon-user">{{ judge.display_full_name }}</div>
+                                            {%- endfor %}
                                         </span>
                                     </td>
                                 {% endif %}
-                            {% endfor %}
-                            <td class="i-table revision-column">
-                                <span class="vertical-aligner">
-                                    {%- if contrib.paper.revision_count -%}
-                                        {{ contrib.paper.revision_count }}
-                                    {%- endif -%}
-                                </span>
-                            </td>
-                            {% if management %}
-                                <td class="i-table person-row-cell"
-                                    data-searchable="{{ contrib.paper_judges|join(', ', attribute='name')|lower }}">
-                                    <span class="vertical-aligner">
-                                        {% for judge in contrib.paper_judges|sort(attribute='display_full_name') -%}
-                                            <div class="person-row icon-user">{{ judge.display_full_name }}</div>
-                                        {%- endfor %}
-                                    </span>
-                                </td>
-                            {% endif %}
-                            {% if event.cfp.content_reviewing_enabled %}
-                                <td class="i-table person-row-cell"
-                                    data-searchable="{{ contrib.paper_content_reviewers|join(', ', attribute='name')|lower }}">
-                                    <span class="vertical-aligner">
-                                        {% for reviewer in contrib.paper_content_reviewers|sort(attribute='display_full_name') -%}
-                                            <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
-                                        {%- endfor %}
-                                    </span>
-                                </td>
-                            {% endif %}
-                            {% if event.cfp.layout_reviewing_enabled %}
-                                <td class="i-table person-row-cell"
-                                    data-searchable="{{ contrib.paper_layout_reviewers|join(', ', attribute='name')|lower }}">
-                                    <span class="vertical-aligner">
-                                        {% for reviewer in contrib.paper_layout_reviewers|sort(attribute='display_full_name') -%}
-                                            <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
-                                        {%- endfor %}
-                                    </span>
-                                </td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                {% if event.cfp.content_reviewing_enabled %}
+                                    <td class="i-table person-row-cell"
+                                        data-searchable="{{ contrib.paper_content_reviewers|join(', ', attribute='name')|lower }}">
+                                        <span class="vertical-aligner">
+                                            {% for reviewer in contrib.paper_content_reviewers|sort(attribute='display_full_name') -%}
+                                                <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
+                                            {%- endfor %}
+                                        </span>
+                                    </td>
+                                {% endif %}
+                                {% if event.cfp.layout_reviewing_enabled %}
+                                    <td class="i-table person-row-cell"
+                                        data-searchable="{{ contrib.paper_layout_reviewers|join(', ', attribute='name')|lower }}">
+                                        <span class="vertical-aligner">
+                                            {% for reviewer in contrib.paper_layout_reviewers|sort(attribute='display_full_name') -%}
+                                                <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
+                                            {%- endfor %}
+                                        </span>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </form>
     {%- endif %}
 {% endmacro %}
 
 {% macro render_paper_assignment_content(event, total_entries, contribs, static_columns, selected_entry=none,
                                          management=false) %}
-    <div class="toolbars space-after">
-        <div class="toolbar">
-            <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
-            <ul class="i-dropdown">
-                <li>
-                    <a href="#" data-select-all="#assignment-list input:checkbox">{% trans %}All{% endtrans %}</a>
-                </li>
-                <li>
-                    <a href="#" data-select-none="#assignment-list input:checkbox">{% trans %}None{% endtrans %}</a>
-                </li>
-            </ul>
-            <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
-                    data-href="{{ url_for('.customize_paper_list', event) }}"
-                    data-title="{% trans %}Customize list{% endtrans %}"
-                    data-dialog-classes="list-filter-dialog"
-                    data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                    data-ajax-dialog>
-                {%- trans %}Customize list{% endtrans -%}
-            </button>
-            <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked"
-                    data-toggle="dropdown">
-                {%- trans %}Assign{% endtrans -%}
-            </button>
-            <ul class="i-dropdown hide-if-locked">
-                {% if management %}
+    <div class="list">
+        <div class="toolbars space-after">
+            <div class="toolbar">
+                <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
+                <ul class="i-dropdown">
                     <li>
-                        <a class="js-requires-selected-row disabled"
-                           data-title="{% trans %}Assign judges to selected contributions{% endtrans %}"
-                           data-href="{{ url_for('.assign_papers', event, role='judge') }}"
-                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                           data-method="POST"
-                           data-ajax-dialog>
-                            {%- trans %}Judges{% endtrans %}
-                        </a>
+                        <a href="#" data-select-all="#assignment-list input:checkbox">{% trans %}All{% endtrans %}</a>
                     </li>
-                {% endif %}
-                {% if event.cfp.content_reviewing_enabled %}
                     <li>
-                        <a class="js-requires-selected-row disabled"
-                           data-title="{% trans %}Assign content reviewers to selected contributions{% endtrans %}"
-                           data-href="{{ url_for('.assign_papers', event, role='content_reviewer') }}"
-                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                           data-method="POST"
-                           data-ajax-dialog>
-                            {%- trans %}Content reviewers{% endtrans %}
-                        </a>
+                        <a href="#" data-select-none="#assignment-list input:checkbox">{% trans %}None{% endtrans %}</a>
                     </li>
-                {% endif %}
-                {% if event.cfp.layout_reviewing_enabled %}
-                    <li>
-                        <a class="js-requires-selected-row disabled"
-                           data-title="{% trans %}Assign layout reviewers to selected contributions{% endtrans %}"
-                           data-href="{{ url_for('.assign_papers', event, role='layout_reviewer') }}"
-                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                           data-method="POST"
-                           data-ajax-dialog>
-                            {%- trans %}Layout reviewers{% endtrans %}
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-            <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked"
-                    data-toggle="dropdown">
-                {%- trans %}Unassign{% endtrans -%}
-            </button>
-            <ul class="i-dropdown hide-if-locked">
-                {% if management %}
-                    <li>
-                        <a class="js-requires-selected-row disabled"
-                           data-title="{% trans %}Unassign judges from selected contributions{% endtrans %}"
-                           data-href="{{ url_for('.unassign_papers', event, role='judge') }}"
-                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                           data-method="POST"
-                           data-ajax-dialog>
-                            {%- trans %}Judges{% endtrans %}
-                        </a>
-                    </li>
-                {% endif %}
-                {% if event.cfp.content_reviewing_enabled %}
-                    <li>
-                        <a class="js-requires-selected-row disabled"
-                           data-title="{% trans %}Unassign content reviewers from selected contributions{% endtrans %}"
-                           data-href="{{ url_for('.unassign_papers', event, role='content_reviewer') }}"
-                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                           data-method="POST"
-                           data-ajax-dialog>
-                            {%- trans %}Content reviewers{% endtrans %}
-                        </a>
-                    </li>
-                {% endif %}
-                {% if event.cfp.layout_reviewing_enabled %}
-                    <li>
-                        <a class="js-requires-selected-row disabled"
-                           data-title="{% trans %}Unassign layout reviewers from selected contributions{% endtrans %}"
-                           data-href="{{ url_for('.unassign_papers', event, role='layout_reviewer') }}"
-                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                           data-method="POST"
-                           data-ajax-dialog>
-                            {%- trans %}Layout reviewers{% endtrans %}
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-            <button class="i-button arrow js-dropdown icon-hammer js-requires-selected-row disabled hide-if-locked"
-                    data-toggle="dropdown">
-                {%- trans %}Judge{% endtrans -%}
-            </button>
-            <ul class="i-dropdown hide-if-locked">
-                <li>
-                    <a class="js-requires-selected-row js-dialog-action"
-                       data-href="{{ url_for('.judge_papers', event) }}"
-                       data-title="{% trans %}Accept selected papers{% endtrans %}"
-                       data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                       data-params='{"judgment": "accept"}'
-                       data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                       data-method="POST"
-                       data-ajax-dialog>
-                        {%- trans %}Accepted{% endtrans -%}
-                    </a>
-                </li>
-                <li>
-                    <a class="js-requires-selected-row js-dialog-action"
-                       data-href="{{ url_for('.judge_papers', event) }}"
-                       data-title="{% trans %}Reject selected papers{% endtrans %}"
-                       data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                       data-params='{"judgment": "reject"}'
-                       data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                       data-method="POST"
-                       data-ajax-dialog>
-                        {%- trans %}Rejected{% endtrans -%}
-                    </a>
-                </li>
-                <li>
-                    <a class="js-requires-selected-row js-dialog-action"
-                       data-href="{{ url_for('.judge_papers', event) }}"
-                       data-title="{% trans %}Mark to be corrected selected papers{% endtrans %}"
-                       data-params-selector="#assignment-list input[name=contribution_id]:checked"
-                       data-params='{"judgment": "to_be_corrected"}'
-                       data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
-                       data-method="POST"
-                       data-ajax-dialog>
-                        {%- trans %}To be corrected{% endtrans -%}
-                    </a>
-                </li>
-            </ul>
-            <div id="authors-list-container"
-                 class="group"
-                 data-event-id="{{ event.id }}"
-                 data-object-context="contributions"
-                 data-params-selector="#assignment-list input[name=contribution_id]:checked">
-            </div>
-            <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
-                    data-href="{{ url_for('.download_papers', event) }}">
-                {%- trans %}Download papers{% endtrans -%}
-            </button>
-            {% if management %}
-                <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
-                        data-href="{{ url_for('.export_json', event) }}">
-                    {%- trans %}Export as JSON{% endtrans -%}
+                </ul>
+                <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
+                        data-href="{{ url_for('.customize_paper_list', event) }}"
+                        data-title="{% trans %}Customize list{% endtrans %}"
+                        data-dialog-classes="list-filter-dialog"
+                        data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                        data-ajax-dialog>
+                    {%- trans %}Customize list{% endtrans -%}
                 </button>
-            {% endif %}
-        </div>
-        <div class="toolbar">
-            <div class="group">
-                <div id="filter-statistics">
-                    {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
+                <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked"
+                        data-toggle="dropdown">
+                    {%- trans %}Assign{% endtrans -%}
+                </button>
+                <ul class="i-dropdown hide-if-locked">
+                    {% if management %}
+                        <li>
+                            <a class="js-requires-selected-row disabled"
+                               data-title="{% trans %}Assign judges to selected contributions{% endtrans %}"
+                               data-href="{{ url_for('.assign_papers', event, role='judge') }}"
+                               data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                               data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Judges{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if event.cfp.content_reviewing_enabled %}
+                        <li>
+                            <a class="js-requires-selected-row disabled"
+                               data-title="{% trans %}Assign content reviewers to selected contributions{% endtrans %}"
+                               data-href="{{ url_for('.assign_papers', event, role='content_reviewer') }}"
+                               data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                               data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Content reviewers{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if event.cfp.layout_reviewing_enabled %}
+                        <li>
+                            <a class="js-requires-selected-row disabled"
+                               data-title="{% trans %}Assign layout reviewers to selected contributions{% endtrans %}"
+                               data-href="{{ url_for('.assign_papers', event, role='layout_reviewer') }}"
+                               data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                               data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Layout reviewers{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <button class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked"
+                        data-toggle="dropdown">
+                    {%- trans %}Unassign{% endtrans -%}
+                </button>
+                <ul class="i-dropdown hide-if-locked">
+                    {% if management %}
+                        <li>
+                            <a class="js-requires-selected-row disabled"
+                               data-title="{% trans %}Unassign judges from selected contributions{% endtrans %}"
+                               data-href="{{ url_for('.unassign_papers', event, role='judge') }}"
+                               data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                               data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Judges{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if event.cfp.content_reviewing_enabled %}
+                        <li>
+                            <a class="js-requires-selected-row disabled"
+                               data-title="{% trans %}Unassign content reviewers from selected contributions{% endtrans %}"
+                               data-href="{{ url_for('.unassign_papers', event, role='content_reviewer') }}"
+                               data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                               data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Content reviewers{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if event.cfp.layout_reviewing_enabled %}
+                        <li>
+                            <a class="js-requires-selected-row disabled"
+                               data-title="{% trans %}Unassign layout reviewers from selected contributions{% endtrans %}"
+                               data-href="{{ url_for('.unassign_papers', event, role='layout_reviewer') }}"
+                               data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                               data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                               data-method="POST"
+                               data-ajax-dialog>
+                                {%- trans %}Layout reviewers{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <button class="i-button arrow js-dropdown icon-hammer js-requires-selected-row disabled hide-if-locked"
+                        data-toggle="dropdown">
+                    {%- trans %}Judge{% endtrans -%}
+                </button>
+                <ul class="i-dropdown hide-if-locked">
+                    <li>
+                        <a class="js-requires-selected-row js-dialog-action"
+                           data-href="{{ url_for('.judge_papers', event) }}"
+                           data-title="{% trans %}Accept selected papers{% endtrans %}"
+                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-params='{"judgment": "accept"}'
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                           data-method="POST"
+                           data-ajax-dialog>
+                            {%- trans %}Accepted{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a class="js-requires-selected-row js-dialog-action"
+                           data-href="{{ url_for('.judge_papers', event) }}"
+                           data-title="{% trans %}Reject selected papers{% endtrans %}"
+                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-params='{"judgment": "reject"}'
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                           data-method="POST"
+                           data-ajax-dialog>
+                            {%- trans %}Rejected{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a class="js-requires-selected-row js-dialog-action"
+                           data-href="{{ url_for('.judge_papers', event) }}"
+                           data-title="{% trans %}Mark to be corrected selected papers{% endtrans %}"
+                           data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-params='{"judgment": "to_be_corrected"}'
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                           data-method="POST"
+                           data-ajax-dialog>
+                            {%- trans %}To be corrected{% endtrans -%}
+                        </a>
+                    </li>
+                </ul>
+                <div id="authors-list-container"
+                     class="group"
+                     data-event-id="{{ event.id }}"
+                     data-object-context="contributions"
+                     data-params-selector="#assignment-list input[name=contribution_id]:checked">
+                </div>
+                <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+                        data-href="{{ url_for('.download_papers', event) }}">
+                    {%- trans %}Download papers{% endtrans -%}
+                </button>
+                {% if management %}
+                    <button class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+                            data-href="{{ url_for('.export_json', event) }}">
+                        {%- trans %}Export as JSON{% endtrans -%}
+                    </button>
+                {% endif %}
+                <div class="group">
+                    <button class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></button>
                 </div>
             </div>
-            <div class="group">
-                <span class="i-button label icon-search"></span>
-                <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+            <div class="toolbar">
+                <div class="group">
+                    <div id="filter-statistics">
+                        {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
+                    </div>
+                </div>
+                <div class="group">
+                    <span class="i-button label icon-search"></span>
+                    <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+                </div>
             </div>
         </div>
+        <div class="list-content" id="assignment-list">
+            {{ render_paper_assignment_list(event, total_entries, contribs, static_columns, management=management) }}
+        </div>
+        <div id="filter-placeholder"></div>
     </div>
-    <div class="list" id="assignment-list">
-        {{ render_paper_assignment_list(event, total_entries, contribs, static_columns, management=management) }}
-    </div>
-    <div id="filter-placeholder"></div>
     <script>
         {% if selected_entry %}
             $('#search-input').val('#{{ selected_entry }}').trigger('change');

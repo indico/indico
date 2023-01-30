@@ -91,6 +91,12 @@
     table {
       width: auto;
       table-layout: auto;
+
+      td.title-column {
+        // Allow contribution, abstract & paper titles to wrap when 'Adapt columns width' is active.
+        // This prevents horizontal scroll on the table when the title is too long.
+        white-space: initial;
+      }
     }
   }
 

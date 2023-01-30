@@ -8,252 +8,253 @@
         {% set has_types = contribs|selectattr('type')|any %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <table class="i-table tablesorter" data-session-items="{{ sessions | tojson | forceescape }}"
-                   data-track-items="{{ tracks | tojson | forceescape }}">
-                <thead>
-                    <tr class="i-table">
-                        <th class="i-table thin-column" data-sorter="false"></th>
-                        <th class="i-table id-column">
-                            {% trans %}ID{% endtrans %}
-                        </th>
-                        <th class="i-table protection-column" data-sorter="false"></th>
-                        <th class="i-table title-column">
-                            {% trans %}Title{% endtrans %}
-                        </th>
-                        <th class="i-table time-column" data-sorter="text">
-                            {% trans %}Time{% endtrans %}
-                        </th>
-                        <th class="i-table duration-column">
-                            {% trans %}Duration{% endtrans %}
-                        </th>
-                        <th class="i-table" data-sorter="false">
-                            {% trans %}Presenters{% endtrans %}
-                        </th>
-                        {% if has_codes %}
-                            <th class="i-table code-column">
-                                {% trans %}Code{% endtrans %}
+            <div class="js-list-table-wrapper">
+                <table class="i-table tablesorter" data-session-items="{{ sessions | tojson | forceescape }}"
+                       data-track-items="{{ tracks | tojson | forceescape }}">
+                    <thead>
+                        <tr class="i-table">
+                            <th class="i-table thin-column" data-sorter="false"></th>
+                            <th class="i-table id-column">
+                                {% trans %}ID{% endtrans %}
                             </th>
-                        {% endif %}
-                        {% if has_types %}
-                            <th class="i-table type-column">
-                                {% trans %}Type{% endtrans %}
+                            <th class="i-table protection-column" data-sorter="false"></th>
+                            <th class="i-table title-column">
+                                {% trans %}Title{% endtrans %}
                             </th>
-                        {% endif %}
-                        <th class="i-table">
-                            {% trans %}Subcontributions{% endtrans %}
-                        </th>
-                        <th class="i-table">
-                            {% trans %}Session{% endtrans %}
-                        </th>
-                        <th class="i-table">
-                            {% trans %}Track{% endtrans %}
-                        </th>
-                        <th class="i-table material-column">
-                            {% trans %}Material{% endtrans %}
-                        </th>
-                        <th class="actions-column hide-if-locked" data-sorter="false">
-                            {# Actions #}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for contrib in contribs %}
-                        <tr id="contrib-{{ contrib.id }}" class="i-table contribution-row"
-                            data-friendly-id="{{ contrib.friendly_id }}"
-                            data-title="{{ contrib.title }}">
-                            <td class="i-table id-column">
-                                <span class="vertical-aligner">
-                                    <input type="checkbox" class="select-row" name="contribution_id"
-                                           value="{{ contrib.id }}">
-                                </span>
-                            </td>
-                            <td class="i-table id-column">
-                                <span class="vertical-aligner">{{ contrib.friendly_id }}</span>
-                            </td>
-                            <td class="i-table">
-                                <span class="vertical-aligner">
-                                    <i class="{% if contrib.is_self_protected %}icon-protection-self
-                                              {% elif contrib.is_public %}icon-protection-public{% endif %}"></i>
-                                </span>
-                            </td>
-                            <td class="i-table title-column" data-searchable="{{ contrib.title | lower }}"
-                                data-text="{{ contrib.title | lower }}">
-                                <span class="vertical-aligner">
-                                    {% if event.type == 'conference' %}
-                                        <a href="{{ url_for('.display_contribution', contrib) }}">{{ contrib.title }}</a>
-                                    {% else %}
-                                        {{ contrib.title }}
-                                    {% endif %}
-                                </span>
-                            </td>
-                            <td class="i-table start-date" data-text="{{ contrib.start_dt.isoformat()
-                                                                         if contrib.is_scheduled else ''}}">
-                                <span class="vertical-aligner">
-                                    {% if contrib.is_scheduled %}
-                                        {% if not contrib.session_block %}
-                                            <a href="#" class="icon-calendar js-contrib-start-date hide-if-locked"
-                                               data-href="{{ url_for('.manage_start_date', contrib) }}">
-                                            </a>
-                                        {% else %}
-                                            <i class="icon-calendar text-superfluous hide-if-locked"
-                                               title="{% trans %}This contribution is scheduled within a session block and time can't be modified.{% endtrans %}"></i>
-                                        {% endif %}
-                                        <span class="label">
-                                            {{ contrib.start_dt|format_datetime('short', timezone=event.timezone) }}
-                                        </span>
-                                    {%- else -%}
-                                        <em>
-                                            {% trans %}Not scheduled{% endtrans %}
-                                        </em>
-                                    {%- endif %}
-                                </span>
-                            </td>
-                            <td class="i-table duration-column">
-                                <span class="vertical-aligner">
-                                    {% if not contrib.session_block %}
-                                        <a href="#" class="icon-time js-contrib-duration hide-if-locked"
-                                           data-href="{{ url_for('.manage_duration', contrib) }}">
-                                        </a>
-                                    {% else %}
-                                        <i class="icon-time text-superfluous hide-if-locked"
-                                           title="{% trans %}This contribution is scheduled within a session block and duration can't be modified.{% endtrans %}"></i>
-                                    {% endif %}
-                                    <span class="label">
-                                        {{ contrib.duration|format_human_timedelta(narrow=true) if contrib.duration else 'n/a' }}
-                                    </span>
-                                </span>
-                            </td>
-                            <td class="i-table person-row-cell" data-searchable="{{ contrib.speakers|map(attribute='name')|join(', ')|lower }}">
-                                <span class="vertical-aligner">
-                                    {% for speaker in contrib.speakers | sort(attribute='display_order_key') -%}
-                                        {% set speaker_is_registered = speaker.person in registered_persons %}
-                                        <div class="person-row">
-                                            {% set tooltip %}
-                                                {% if speaker_is_registered %}
-                                                    {%- trans %}This speaker registered for the event{% endtrans -%}
-                                                {% else %}
-                                                    {%- trans %}This speaker did not register yet{% endtrans -%}
-                                                {% endif %}
-                                            {% endset %}
-                                            <i class="icon-user js-show-registrations {{ 'exists' if speaker_is_registered }}"
-                                               title="{{ tooltip }}"
-                                               data-qtip-position="bottom"></i>
-                                            {{ speaker.display_full_name }}
-                                            {% if speaker.affiliation %}
-                                                <span class="text-superfluous">({{ render_affiliation(speaker) }})</span>
-                                            {% endif %}
-                                        </div>
-                                    {%- endfor %}
-                                </span>
-                            </td>
+                            <th class="i-table time-column" data-sorter="text">
+                                {% trans %}Time{% endtrans %}
+                            </th>
+                            <th class="i-table duration-column">
+                                {% trans %}Duration{% endtrans %}
+                            </th>
+                            <th class="i-table" data-sorter="false">
+                                {% trans %}Presenters{% endtrans %}
+                            </th>
                             {% if has_codes %}
-                                <td class="i-table code-column" data-text="{{ contrib.code }}" data-searchable="{{ contrib.code|lower }}">
-                                    <span class="vertical-aligner">
-                                        {% if contrib.code -%}
-                                            {{ contrib.code }}
-                                        {%- else %}
-                                            {% trans %}n/a{% endtrans %}
-                                        {%- endif %}
-                                    </span>
-                                </td>
+                                <th class="i-table code-column">
+                                    {% trans %}Code{% endtrans %}
+                                </th>
                             {% endif %}
                             {% if has_types %}
-                                <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
+                                <th class="i-table type-column">
+                                    {% trans %}Type{% endtrans %}
+                                </th>
+                            {% endif %}
+                            <th class="i-table">
+                                {% trans %}Subcontributions{% endtrans %}
+                            </th>
+                            <th class="i-table">
+                                {% trans %}Session{% endtrans %}
+                            </th>
+                            <th class="i-table">
+                                {% trans %}Track{% endtrans %}
+                            </th>
+                            <th class="i-table material-column">
+                                {% trans %}Material{% endtrans %}
+                            </th>
+                            <th class="actions-column hide-if-locked" data-sorter="false">
+                                {# Actions #}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contrib in contribs %}
+                            <tr id="contrib-{{ contrib.id }}" class="i-table contribution-row"
+                                data-friendly-id="{{ contrib.friendly_id }}"
+                                data-title="{{ contrib.title }}">
+                                <td class="i-table thin-column">
                                     <span class="vertical-aligner">
-                                        {% if contrib.type -%}
-                                            {{ contrib.type.name }}
-                                        {%- else %}
-                                            {% trans %}n/a{% endtrans %}
+                                        <input type="checkbox" class="select-row" name="contribution_id"
+                                               value="{{ contrib.id }}">
+                                    </span>
+                                </td>
+                                <td class="i-table id-column">
+                                    <span class="vertical-aligner">{{ contrib.friendly_id }}</span>
+                                </td>
+                                <td class="i-table">
+                                    <span class="vertical-aligner">
+                                        <i class="{% if contrib.is_self_protected %}icon-protection-self
+                                                {% elif contrib.is_public %}icon-protection-public{% endif %}"></i>
+                                    </span>
+                                </td>
+                                <td class="i-table title-column" data-searchable="{{ contrib.title | lower }}"
+                                    data-text="{{ contrib.title | lower }}">
+                                    <span class="vertical-aligner">
+                                        {% if event.type == 'conference' %}
+                                            <a href="{{ url_for('.display_contribution', contrib) }}">{{ contrib.title }}</a>
+                                        {% else %}
+                                            {{ contrib.title }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td class="i-table start-date" data-text="{{ contrib.start_dt.isoformat()
+                                                                          if contrib.is_scheduled else ''}}">
+                                    <span class="vertical-aligner">
+                                        {% if contrib.is_scheduled %}
+                                            {% if not contrib.session_block %}
+                                                <a href="#" class="icon-calendar js-contrib-start-date hide-if-locked"
+                                                   data-href="{{ url_for('.manage_start_date', contrib) }}">
+                                                </a>
+                                            {% else %}
+                                                <i class="icon-calendar text-superfluous hide-if-locked"
+                                                   title="{% trans %}This contribution is scheduled within a session block and time can't be modified.{% endtrans %}"></i>
+                                            {% endif %}
+                                            <span class="label">
+                                                {{ contrib.start_dt|format_datetime('short', timezone=event.timezone) }}
+                                            </span>
+                                        {%- else -%}
+                                            <em>
+                                                {% trans %}Not scheduled{% endtrans %}
+                                            </em>
                                         {%- endif %}
                                     </span>
                                 </td>
-                            {% endif %}
-                            <td class="i-table" data-text="{{ contrib.subcontribution_count }}">
-                                <a href="#" class="i-label subcontribution-count"
-                                   title="{% trans %}Manage subcontributions{% endtrans %}"
-                                   data-href="{{ url_for('.manage_subcontributions', contrib) }}"
-                                   data-title="{% trans id=contrib.friendly_id %}Subcontributions of contribution #{{ id }}{% endtrans %}"
-                                   data-ajax-dialog>
-                                    <span class="label">
-                                        {%- trans %}Subcontributions{% endtrans -%}
-                                    </span>
-                                    <span class="badge">
-                                        {{- contrib.subcontribution_count -}}
-                                    </span>
-                                </a>
-                            </td>
-                            <td class="i-table">
-                                <button class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
-                                        style="{{ contrib.session.colors.css if contrib.session }}"
-                                        data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
-                                        data-method="PATCH"
-                                        data-contrib-id="{{ contrib.id }}"
-                                        data-selected-item-id="{{ contrib.session.id or None | tojson }}">
-                                    <span class="label">
-                                        {% if contrib.session %}
-                                            {% trans title=contrib.session.title -%}
-                                                {{ title }}
-                                            {%- endtrans %}
+                                <td class="i-table duration-column">
+                                    <span class="vertical-aligner">
+                                        {% if not contrib.session_block %}
+                                            <a href="#" class="icon-time js-contrib-duration hide-if-locked"
+                                               data-href="{{ url_for('.manage_duration', contrib) }}">
+                                            </a>
                                         {% else %}
-                                            {%- trans %}No session{% endtrans -%}
+                                            <i class="icon-time text-superfluous hide-if-locked"
+                                               title="{% trans %}This contribution is scheduled within a session block and duration can't be modified.{% endtrans %}"></i>
                                         {% endif %}
+                                        <span class="label">
+                                            {{ contrib.duration|format_human_timedelta(narrow=true) if contrib.duration else 'n/a' }}
+                                        </span>
                                     </span>
-                                    {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                </button>
-                            </td>
-                            <td class="i-table">
-                                <button class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
-                                        data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
-                                        data-method="PATCH"
-                                        data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
-                                    <span class="label">
-                                        {% if contrib.track %}
-                                            {% if contrib.track.track_group %}
-                                                {{ contrib.track.track_group.title | truncate(9, true, '…') }}:
+                                </td>
+                                <td class="i-table person-row-cell" data-searchable="{{ contrib.speakers|map(attribute='name')|join(', ')|lower }}">
+                                    <span class="vertical-aligner">
+                                        {% for speaker in contrib.speakers | sort(attribute='display_order_key') -%}
+                                            {% set speaker_is_registered = speaker.person in registered_persons %}
+                                            <div class="person-row">
+                                                {% set tooltip %}
+                                                    {% if speaker_is_registered %}
+                                                        {%- trans %}This speaker registered for the event{% endtrans -%}
+                                                    {% else %}
+                                                        {%- trans %}This speaker did not register yet{% endtrans -%}
+                                                    {% endif %}
+                                                {% endset %}
+                                                <i class="icon-user js-show-registrations {{ 'exists' if speaker_is_registered }}"
+                                                   title="{{ tooltip }}" data-qtip-position="bottom"></i>
+                                                {{ speaker.display_full_name }}
+                                                {% if speaker.affiliation %}
+                                                    <span class="text-superfluous">({{ render_affiliation(speaker) }})</span>
+                                                {% endif %}
+                                            </div>
+                                        {%- endfor %}
+                                    </span>
+                                </td>
+                                {% if has_codes %}
+                                    <td class="i-table code-column" data-text="{{ contrib.code }}" data-searchable="{{ contrib.code|lower }}">
+                                        <span class="vertical-aligner">
+                                            {% if contrib.code -%}
+                                                {{ contrib.code }}
+                                            {%- else %}
+                                                {% trans %}n/a{% endtrans %}
+                                            {%- endif %}
+                                        </span>
+                                    </td>
+                                {% endif %}
+                                {% if has_types %}
+                                    <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
+                                        <span class="vertical-aligner">
+                                            {% if contrib.type -%}
+                                                {{ contrib.type.name }}
+                                            {%- else %}
+                                                {% trans %}n/a{% endtrans %}
+                                            {%- endif %}
+                                        </span>
+                                    </td>
+                                {% endif %}
+                                <td class="i-table" data-text="{{ contrib.subcontribution_count }}">
+                                    <a href="#" class="i-label subcontribution-count"
+                                       title="{% trans %}Manage subcontributions{% endtrans %}"
+                                       data-href="{{ url_for('.manage_subcontributions', contrib) }}"
+                                       data-title="{% trans id=contrib.friendly_id %}Subcontributions of contribution #{{ id }}{% endtrans %}"
+                                       data-ajax-dialog>
+                                        <span class="label">
+                                            {%- trans %}Subcontributions{% endtrans -%}
+                                        </span>
+                                        <span class="badge">
+                                            {{- contrib.subcontribution_count -}}
+                                        </span>
+                                    </a>
+                                </td>
+                                <td class="i-table">
+                                    <button class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
+                                            style="{{ contrib.session.colors.css if contrib.session }}"
+                                            data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                            data-method="PATCH"
+                                            data-contrib-id="{{ contrib.id }}"
+                                            data-selected-item-id="{{ contrib.session.id or None | tojson }}">
+                                        <span class="label">
+                                            {% if contrib.session %}
+                                                {% trans title=contrib.session.title -%}
+                                                    {{ title }}
+                                                {%- endtrans %}
+                                            {% else %}
+                                                {%- trans %}No session{% endtrans -%}
                                             {% endif %}
-                                            {{ contrib.track.title }}
-                                        {% else %}
-                                            {% trans %}No track{% endtrans %}
-                                        {% endif %}
-                                    </span>
-                                    {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                </button>
-                            </td>
-                            {{ render_attachment_info(contrib) }}
-                            <td class="i-table actions-column hide-if-locked">
-                                <div class="group right entry-action-buttons vertical-aligner">
-                                    <a href="#" class="icon-edit i-link highlight js-dialog-action"
-                                       data-href="{{ url_for('.manage_update_contrib', contrib, flash=true) }}"
-                                       data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
-                                       title="{% trans %}Edit contribution{% endtrans %}"
-                                       data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
-                                       data-ajax-dialog></a>
-                                    <a href="#" class="icon-copy i-link highlight"
-                                       title="{% trans %}Clone contribution{% endtrans %}"
-                                       data-title="{% trans title=contrib.title %}Clone contribution '{{ title }}' {% endtrans %}"
-                                       data-href="{{ url_for('.clone_contribution', contrib) }}"
-                                       data-method="POST"
-                                       data-update="#contribution-list"
-                                       data-confirm="{% trans %}Are you sure you want to clone this contribution?{% endtrans %}"></a>
-                                    <a href="#" class="icon-shield i-link highlight"
-                                       title="{% trans %}Manage contribution protection{% endtrans %}"
-                                       data-href="{{ url_for('.manage_contrib_protection', contrib) }}"
-                                       data-title="{% trans %}Manage contribution protection{% endtrans %}"
-                                       data-update="#contribution-list"
-                                       data-ajax-dialog></a>
-                                    <a href="#" class="icon-remove i-link danger js-delete"
-                                       data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
-                                       title="{% trans %}Delete contribution{% endtrans %}"
-                                       data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
-                                       data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
-                                       data-method="DELETE"
-                                       data-href="{{ url_for('.manage_contrib_rest', contrib) }}"></a>
-                               </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                        </span>
+                                        {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
+                                    </button>
+                                </td>
+                                <td class="i-table">
+                                    <button class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
+                                            data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                            data-method="PATCH"
+                                            data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
+                                        <span class="label">
+                                            {% if contrib.track %}
+                                                {% if contrib.track.track_group %}
+                                                    {{ contrib.track.track_group.title | truncate(9, true, '…') }}:
+                                                {% endif %}
+                                                {{ contrib.track.title }}
+                                            {% else %}
+                                                {% trans %}No track{% endtrans %}
+                                            {% endif %}
+                                        </span>
+                                        {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
+                                    </button>
+                                </td>
+                                {{ render_attachment_info(contrib) }}
+                                <td class="i-table actions-column hide-if-locked">
+                                    <div class="group right entry-action-buttons vertical-aligner">
+                                        <a href="#" class="icon-edit i-link highlight js-dialog-action"
+                                           data-href="{{ url_for('.manage_update_contrib', contrib, flash=true) }}"
+                                           data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
+                                           title="{% trans %}Edit contribution{% endtrans %}"
+                                           data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
+                                           data-ajax-dialog></a>
+                                        <a href="#" class="icon-copy i-link highlight"
+                                           title="{% trans %}Clone contribution{% endtrans %}"
+                                           data-title="{% trans title=contrib.title %}Clone contribution '{{ title }}' {% endtrans %}"
+                                           data-href="{{ url_for('.clone_contribution', contrib) }}"
+                                           data-method="POST"
+                                           data-update="#contribution-list"
+                                           data-confirm="{% trans %}Are you sure you want to clone this contribution?{% endtrans %}"></a>
+                                        <a href="#" class="icon-shield i-link highlight"
+                                           title="{% trans %}Manage contribution protection{% endtrans %}"
+                                           data-href="{{ url_for('.manage_contrib_protection', contrib) }}"
+                                           data-title="{% trans %}Manage contribution protection{% endtrans %}"
+                                           data-update="#contribution-list"
+                                           data-ajax-dialog></a>
+                                        <a href="#" class="icon-remove i-link danger js-delete"
+                                           data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
+                                           title="{% trans %}Delete contribution{% endtrans %}"
+                                           data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
+                                           data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
+                                           data-method="DELETE"
+                                           data-href="{{ url_for('.manage_contrib_rest', contrib) }}"></a>
+                                </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </form>
     {%- else %}
         {%- call message_box('info') %}

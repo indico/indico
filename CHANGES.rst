@@ -25,6 +25,7 @@ Improvements
 - Add BCC field on contribution email dialogs (:pr:`5637`)
 - Allow filtering by location in room booking (:issue:`4291`, :pr:`5622`,
   thanks :user:`mindouro`)
+- Add button to adapt column widths in paper & contribution lists (:pr:`5642`)
 
 Bugfixes
 ^^^^^^^^

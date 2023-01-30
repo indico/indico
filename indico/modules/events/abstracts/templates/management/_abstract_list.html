@@ -121,14 +121,14 @@
                                 title="{{ accepted_other_msg | forceescape }}"
                                 data-friendly-id="{{ abstract.friendly_id }}"
                                 data-title="{{ abstract.title }}">
-                                <td class="i-table id-column">
+                                <td class="i-table thin-column">
                                     <input type="checkbox" class="select-row" name="abstract_id"
                                            value="{{ abstract.id }}">
                                 </td>
                                 <td class="i-table id-column">
                                     {{- abstract.friendly_id -}}
                                 </td>
-                                <td class="i-table" data-searchable="{{ abstract.title | lower }}">
+                                <td class="i-table title-column" data-searchable="{{ abstract.title | lower }}">
                                     <a class="js-mathjax" href="{{ url_for('.display_abstract', abstract) }}">
                                         {{- abstract.title -}}
                                     </a>
