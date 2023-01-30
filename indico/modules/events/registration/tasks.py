@@ -19,6 +19,7 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.util import close_registration
 from indico.util.date_time import now_utc
+from indico.util.string import snakify_keys
 
 
 def _delete_file(reg_data):
@@ -62,7 +63,7 @@ def delete_field_data():
             # expect structured data e.g. Accommodation & {Single,Multi}Choice.
             # This makes the React code relatively simple and we can always distinguish
             # purged fields since they have the 'is_purged' flag set to True
-            data.data = data.field_data.field.field_impl.default_value
+            data.data = snakify_keys(data.field_data.field.field_impl.default_value)
             if data.field_data.field.field_impl.is_file_field:
                 _delete_file(data)
             data.field_data.field.is_purged = True
