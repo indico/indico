@@ -37,7 +37,6 @@ export function EmailParticipantRoles({
     no_account: noAccount,
     not_invited_only: notInvitedOnly,
   };
-  console.log(recipientData);
   const {data, loading} = useIndicoAxios({
     url: emailMetadataURL({event_id: eventId}),
     method: 'POST',
