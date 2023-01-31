@@ -12,13 +12,17 @@ import {Checkbox, Icon, Popup, Table} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
+const getDefaultSort = persons => _.sortBy(persons, 'identifier');
+
 function personListReducer(state, action) {
   switch (action.type) {
     case 'CHANGE_SORT':
       if (state.column !== action.column) {
         return {
           column: action.column,
-          sortedPersons: _.sortBy(state.sortedPersons, [action.column, 'id']),
+          sortedPersons: getDefaultSort(state.sortedPersons).sort((a, b) =>
+            a[action.column].localeCompare(b[action.column])
+          ),
           direction: 'ascending',
         };
       }
@@ -31,7 +35,7 @@ function personListReducer(state, action) {
       }
       return {
         column: null,
-        sortedPersons: _.sortBy(state.sortedPersons, ['identifier']),
+        sortedPersons: getDefaultSort(state.sortedPersons),
         direction: null,
       };
     default:
@@ -57,14 +61,11 @@ export default function PersonList({
 }) {
   const [state, dispatch] = useReducer(personListReducer, {
     column: null,
-    sortedPersons: _.sortBy(
-      persons.map(person => ({
-        ...person,
-        authorType: makeAuthorType(person),
-        selectable: isSelectable(person),
-      })),
-      ['identifier']
-    ),
+    sortedPersons: getDefaultSort(persons).map(person => ({
+      ...person,
+      authorType: makeAuthorType(person),
+      selectable: isSelectable(person),
+    })),
     direction: null,
   });
   const {column, sortedPersons, direction} = state;
