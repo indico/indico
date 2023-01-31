@@ -93,7 +93,7 @@ class EmailRolesSendMixin:
         'from_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=not_empty),
         'subject': fields.String(required=True, validate=not_empty),
-        'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
+        'bcc_addresses': fields.List(LowercaseString(validate=validate.Email()), load_default=[]),
         'copy_for_sender': fields.Bool(load_default=False),
         'recipient_roles': fields.List(
             fields.String(validate=validate.OneOf(['speaker', 'author', 'coauthor', 'submitter'])),
