@@ -274,7 +274,7 @@ class RHEmailEventPersonsPreview(RHManageEventBase):
         'no_account': fields.Bool(load_default=False),
     })
     def _process(self, body, subject, no_account):
-        person = self.event.persons[0]
+        person = self.event.persons.first() or session.user
         email_body = replace_placeholders('event-persons-email', body, event=self.event, person=person,
                                           register_link=no_account)
         email_subject = replace_placeholders('event-persons-email', subject, event=self.event, person=person,
