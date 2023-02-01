@@ -22,7 +22,11 @@ export function AuthorsListButton({eventId, objectContext, paramsSelector}) {
       <button
         type="button"
         className="i-button icon-users js-requires-selected-row disabled"
-        onClick={() => setOpen(true)}
+        onClick={evt => {
+          if (!evt.target.classList.contains('disabled')) {
+            setOpen(true);
+          }
+        }}
       >
         <Translate>Authors list</Translate>
       </button>
