@@ -11,10 +11,10 @@ import ReactDOM from 'react-dom';
 
 import {FavoritesProvider} from 'indico/react/hooks';
 
-import {UserSearch} from './Search';
+import {UserSearch, GroupSearch} from './Search';
 
 /**
- * Open a user/group/etc. search prompt imperatively.
+ * Open a user search prompt imperatively.
  *
  * This mounts the UserSearch component in a temporary location
  * and returns a promise that will be resolved once something is
@@ -51,6 +51,44 @@ export function showUserSearch(searchProps = {}) {
           />
         )}
       </FavoritesProvider>,
+      container
+    );
+  });
+}
+
+/**
+ * Open a group search prompt imperatively.
+ *
+ * This mounts the GroupSearch component in a temporary location
+ * and returns a promise that will be resolved once something is
+ * selected or the dialog is closed (in that case it will be resolved
+ * with an empty list of principals)
+ */
+export function showGroupSearch(searchProps = {}) {
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+
+  const cleanup = () =>
+    _.defer(() => {
+      ReactDOM.unmountComponentAtNode(container);
+      document.body.removeChild(container);
+    });
+
+  return new Promise(resolve => {
+    ReactDOM.render(
+      <GroupSearch
+        existing={[]}
+        onAddItems={groups => {
+          resolve(searchProps.single ? groups?.identifier : groups.map(g => g.identifier));
+          cleanup();
+        }}
+        onClose={() => {
+          resolve(searchProps.single ? null : []);
+          cleanup();
+        }}
+        defaultOpen
+        {...searchProps}
+      />,
       container
     );
   });
