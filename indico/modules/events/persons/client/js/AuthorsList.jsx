@@ -146,7 +146,7 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
         <EmailParticipantRolesButton
           eventId={eventId}
           persons={selectedPersons.filter(id => isVisible(eventPersons.get(id)))}
-          onSubmitSucceded={count => setSentEmailCount(count)}
+          onSubmitSucceeded={count => setSentEmailCount(count)}
           successTimeout={0}
           primary
         />
