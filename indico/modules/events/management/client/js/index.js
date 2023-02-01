@@ -17,6 +17,7 @@ import 'indico/modules/events/util/static_filters';
 
 import './badges';
 
+import {AuthorsListButton} from 'indico/modules/events/persons/AuthorsListButton';
 import {EmailContribAbstractRolesButton} from 'indico/modules/events/persons/EmailContribAbstractRolesButton';
 import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailParticipantRolesButton';
 import {$T} from 'indico/utils/i18n';
@@ -28,7 +29,7 @@ import {SeriesManagement} from './SeriesManagement';
 (function(global) {
   global.setupEmailButton = function setupEmailButton(field, trigger) {
     const element = document.querySelector(field);
-    const {eventId, roleId, personSelector, userSelector} = element.dataset;
+    const {eventId, roleId, personSelector} = element.dataset;
     const extraParams = {};
     if (element.dataset.noAccount !== undefined) {
       extraParams.noAccount = true;
@@ -41,7 +42,6 @@ import {SeriesManagement} from './SeriesManagement';
         eventId={+eventId}
         roleId={roleId && +roleId}
         personSelector={personSelector}
-        userSelector={userSelector}
         triggerSelector={trigger}
         {...extraParams}
       />,
@@ -61,6 +61,19 @@ import {SeriesManagement} from './SeriesManagement';
         metadataURL={metadataUrl}
         previewURL={previewUrl}
         sendURL={sendUrl}
+      />,
+      element
+    );
+  };
+
+  global.setupAuthorsListButton = function setupAuthorsListButton(containerSelector) {
+    const element = document.querySelector(containerSelector);
+    const {eventId, objectContext, paramsSelector} = element.dataset;
+    ReactDOM.render(
+      <AuthorsListButton
+        eventId={+eventId}
+        objectContext={objectContext}
+        paramsSelector={paramsSelector}
       />,
       element
     );

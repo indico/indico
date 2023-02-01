@@ -42,12 +42,12 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.logs import LogKind
-from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import LowercaseString, not_empty, validate_with_message
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
+from indico.util.user import principal_from_identifier
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
@@ -288,32 +288,21 @@ class RHEmailEventPersonsBase(RHManageEventBase):
     """Send emails to selected EventPersons."""
 
     @use_kwargs({
-        'person_id': fields.List(fields.Integer(), load_default=[]),
-        'user_id': fields.List(fields.Integer(), load_default=[]),
         'role_id': fields.List(fields.Integer(), load_default=[]),
+        'persons': fields.List(fields.String(), load_default=[]),
         'not_invited_only': fields.Bool(load_default=None),
         'no_account': fields.Bool(load_default=False),
     })
-    def _process_args(self, person_id, user_id, role_id, not_invited_only, no_account):
+    def _process_args(self, role_id, persons, not_invited_only, no_account):
         RHManageEventBase._process_args(self)
-        self.recipients = set(self._find_event_persons(person_id, not_invited_only))
-        self.recipients |= set(self._find_users(user_id))
+        principals = [principal_from_identifier(identifier, allow_event_persons=True, event_id=self.event.id)
+                      for identifier in persons]
+        if not_invited_only:
+            self.recipients = {p for p in principals if p.invited_dt is None}
+        else:
+            self.recipients = set(principals)
         self.recipients |= set(self._find_role_members(role_id))
         self.no_account = no_account
-
-    def _find_event_persons(self, person_ids, not_invited_only):
-        if not person_ids:
-            return []
-        query = self.event.persons
-        query = query.filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
-        if not_invited_only:
-            query = query.filter(EventPerson.invited_dt.is_(None))
-        return query.all()
-
-    def _find_users(self, user_ids):
-        if not user_ids:
-            return []
-        return User.query.filter(User.id.in_(user_ids), User.email != '').all()
 
     def _find_role_members(self, role_ids):
         if not role_ids:

@@ -3,8 +3,8 @@
 {% macro render_person_row(person_data, event_has_registration_forms, person_schema, has_predefined_affiliations) %}
     {% set person = person_data.person %}
     <td class="i-table thin-column hide-if-locked">
-        <input type="checkbox" value="{{ person.id }}" class="select-row id-field"
-               name="{{ person_data.id_field_name }}"
+        <input type="checkbox" value="{{ person.identifier }}" class="select-row id-field"
+               name="person_identifier"
                {{ 'disabled' if not person.email }}>
     </td>
     {% if event_has_registration_forms %}

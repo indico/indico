@@ -85,6 +85,7 @@ export function FinalModalForm({
   initialValues,
   initialValuesEqual,
   size,
+  scrolling,
   header,
   children,
   extraActions,
@@ -134,7 +135,7 @@ export function FinalModalForm({
           open
         >
           <Modal.Header>{header}</Modal.Header>
-          <Modal.Content>
+          <Modal.Content scrolling={scrolling}>
             {unloadPrompt && <FinalUnloadPrompt router={unloadPromptRouter} />}
             <Form
               id={`final-modal-form-${id}`}
@@ -196,6 +197,8 @@ FinalModalForm.propTypes = {
   validate: PropTypes.func,
   /** The size of the modal. */
   size: PropTypes.oneOf(['mini', 'tiny', 'small', 'standard', 'large', 'fullscreen']),
+  /** Whether the modal's content is scolling. */
+  scrolling: PropTypes.bool,
   /** The header of the modal (typically a title). */
   header: PropTypes.node.isRequired,
   /** Whether the submit button should remain disabled as long as the form is in pristine state. */
@@ -240,6 +243,7 @@ FinalModalForm.defaultProps = {
   decorators: undefined,
   validate: undefined,
   size: 'tiny', // default to something reasonably small - let people explicitly go larger!
+  scrolling: false,
   disabledUntilChange: true,
   disabledAfterSubmit: false,
   unloadPrompt: false,

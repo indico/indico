@@ -22,18 +22,18 @@ import {EmailDialog} from './EmailDialog';
 
 export function EmailParticipantRoles({
   eventId,
-  personIds,
   roleIds,
-  userIds,
+  persons,
   onClose,
+  onSubmitSucceeded,
   noAccount,
   notInvitedOnly,
+  successTimeout,
 }) {
   const [sentCount, setSentCount] = useState(0);
   const recipientData = {
-    person_id: personIds,
     role_id: roleIds,
-    user_id: userIds,
+    persons,
     no_account: noAccount,
     not_invited_only: notInvitedOnly,
   };
@@ -60,7 +60,8 @@ export function EmailParticipantRoles({
       return handleSubmitError(err);
     }
     setSentCount(resp.data.count);
-    setTimeout(() => onClose(), 5000);
+    onSubmitSucceeded(resp.data.count);
+    setTimeout(() => onClose(), successTimeout);
   };
 
   if (loading) {
@@ -75,6 +76,7 @@ export function EmailParticipantRoles({
     <EmailDialog
       onSubmit={handleSubmit}
       onClose={onClose}
+      onSubmitSucceeded={onSubmitSucceeded}
       senders={senders}
       recipients={recipients}
       previewURL={emailPreviewURL({event_id: eventId})}
@@ -116,18 +118,20 @@ export function EmailParticipantRoles({
 
 EmailParticipantRoles.propTypes = {
   eventId: PropTypes.number.isRequired,
-  personIds: PropTypes.arrayOf(PropTypes.number),
-  userIds: PropTypes.arrayOf(PropTypes.number),
   roleIds: PropTypes.arrayOf(PropTypes.number),
+  persons: PropTypes.arrayOf(PropTypes.string),
   onClose: PropTypes.func.isRequired,
+  onSubmitSucceeded: PropTypes.func,
   noAccount: PropTypes.bool,
   notInvitedOnly: PropTypes.bool,
+  successTimeout: PropTypes.number,
 };
 
 EmailParticipantRoles.defaultProps = {
-  personIds: [],
-  userIds: [],
   roleIds: [],
+  persons: [],
+  onSubmitSucceeded: undefined,
   noAccount: false,
   notInvitedOnly: false,
+  successTimeout: 5000,
 };

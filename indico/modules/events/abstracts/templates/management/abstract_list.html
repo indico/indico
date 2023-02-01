@@ -162,15 +162,11 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <div class="i-button-wrapper">
-                        <button class="i-button icon-users js-requires-selected-row disabled"
-                                data-title="{% trans %}Author list{% endtrans %}"
-                                data-href="{{ url_for('.person_list', event) }}"
-                                data-params-selector="#abstract-list input[name=abstract_id]:checked"
-                                data-method="POST"
-                                data-ajax-dialog>
-                            {%- trans %}Author list{% endtrans -%}
-                        </button>
+                    <div id="email-authors-container"
+                         class="i-button-wrapper"
+                         data-event-id="{{ event.id }}"
+                         data-object-context="abstracts"
+                         data-params-selector="#abstract-list input[name=abstract_id]:checked">
                     </div>
                     <div id="email-abstract-roles-container"
                          class="i-button-wrapper"
@@ -251,6 +247,7 @@
     </div>
 
     <script>
+        setupAuthorsListButton('#email-authors-container');
         setupEmailContribAbstractRoles('#email-abstract-roles-container');
         setupAbstractList();
         setupAbstractJudgment({

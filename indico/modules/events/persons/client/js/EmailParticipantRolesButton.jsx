@@ -17,15 +17,17 @@ import {getIds} from './util';
 export function EmailParticipantRolesButton({
   eventId,
   roleId,
+  persons,
   personSelector,
-  userSelector,
   triggerSelector,
   noAccount,
   notInvitedOnly,
+  onSubmitSucceeded,
+  successTimeout,
+  ...rest
 }) {
   const [open, setOpen] = useState(false);
-  const personIds = getIds(personSelector);
-  const userIds = getIds(userSelector);
+  persons = personSelector ? getIds(personSelector, false) : persons;
 
   useEffect(() => {
     if (!triggerSelector) {
@@ -40,19 +42,20 @@ export function EmailParticipantRolesButton({
   return (
     <>
       {!triggerSelector && (
-        <Translate as={Button} onClick={() => setOpen(true)}>
-          Send email
-        </Translate>
+        <Button onClick={() => setOpen(true)} disabled={!(roleId || persons.length)} {...rest}>
+          <Translate>Send emails</Translate>
+        </Button>
       )}
       {open && (
         <EmailParticipantRoles
           eventId={eventId}
-          personIds={personIds}
-          userIds={userIds}
           roleIds={roleId && [roleId]}
+          persons={persons}
           noAccount={noAccount}
           notInvitedOnly={notInvitedOnly}
           onClose={() => setOpen(false)}
+          onSubmitSucceeded={onSubmitSucceeded}
+          successTimeout={successTimeout}
         />
       )}
     </>
@@ -62,18 +65,22 @@ export function EmailParticipantRolesButton({
 EmailParticipantRolesButton.propTypes = {
   eventId: PropTypes.number.isRequired,
   roleId: PropTypes.number,
+  persons: PropTypes.arrayOf(PropTypes.string),
   personSelector: PropTypes.string,
-  userSelector: PropTypes.string,
   triggerSelector: PropTypes.string,
   noAccount: PropTypes.bool,
   notInvitedOnly: PropTypes.bool,
+  onSubmitSucceeded: PropTypes.func,
+  successTimeout: PropTypes.number,
 };
 
 EmailParticipantRolesButton.defaultProps = {
   roleId: undefined,
+  persons: [],
   personSelector: undefined,
-  userSelector: undefined,
   triggerSelector: undefined,
   noAccount: false,
   notInvitedOnly: false,
+  onSubmitSucceeded: undefined,
+  successTimeout: undefined,
 };

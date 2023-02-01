@@ -313,7 +313,6 @@ class RHContributionREST(RHManageContributionBase):
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
     """List of persons in the contribution."""
 
-    template = 'events/contributions/management/contribution_person_list.html'
     ALLOW_LOCKED = True
 
     @property
