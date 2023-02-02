@@ -36,6 +36,7 @@ function PersonalDataForm({
   currentAffiliation,
   titles,
   syncedValues,
+  lockedFields,
   hasPredefinedAffiliations,
 }) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
@@ -87,12 +88,14 @@ function PersonalDataForm({
                 label={Translate.string('First name')}
                 required
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
               />
               <SyncedFinalInput
                 name="last_name"
                 label={Translate.string('Last name')}
                 required
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
               />
             </Form.Group>
             {hasPredefinedAffiliations ? (
@@ -101,28 +104,33 @@ function PersonalDataForm({
                 syncName="affiliation"
                 currentAffiliation={currentAffiliation}
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
               />
             ) : (
               <SyncedFinalInput
                 name="affiliation"
                 label={Translate.string('Affiliation')}
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
               />
             )}
             <SyncedFinalTextArea
               name="address"
               label={Translate.string('Address')}
               syncedValues={syncedValues}
+              lockedFields={lockedFields}
             />
             <SyncedFinalInput
               name="phone"
               label={Translate.string('Phone number')}
               syncedValues={syncedValues}
+              lockedFields={lockedFields}
             />
             <SyncedFinalInput
               name="email"
               label={Translate.string('Email address')}
               syncedValues={syncedValues}
+              lockedFields={lockedFields}
               readOnly
             >
               <Translate>
@@ -152,6 +160,7 @@ PersonalDataForm.propTypes = {
     })
   ).isRequired,
   syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
+  lockedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
 };
 
@@ -166,6 +175,7 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
   currentAffiliation,
   titles,
   syncedValues,
+  lockedFields,
   hasPredefinedAffiliations
 ) {
   document.addEventListener('DOMContentLoaded', () => {
@@ -176,6 +186,7 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
         currentAffiliation={currentAffiliation}
         titles={titles}
         syncedValues={syncedValues}
+        lockedFields={lockedFields}
         hasPredefinedAffiliations={hasPredefinedAffiliations}
       />,
       document.querySelector('#personal-details-form-container')

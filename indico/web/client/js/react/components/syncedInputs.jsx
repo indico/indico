@@ -26,6 +26,7 @@ function SyncedFinalField({
   syncName,
   as: FieldComponent,
   syncedValues,
+  lockedFields,
   readOnly,
   required,
   processSyncedValue,
@@ -41,25 +42,28 @@ function SyncedFinalField({
   }
 
   const syncable = syncedValues[syncName] !== undefined && (!required || syncedValues[syncName]);
+  const synced = syncedFields.includes(syncName);
+  const locked = lockedFields.includes(syncName);
 
   return (
     <FieldComponent
       {...rest}
       name={name}
       styleName={syncable ? 'syncable' : ''}
-      readOnly={readOnly || (syncable && syncedFields.includes(syncName))}
+      readOnly={readOnly || (syncable && synced)}
       required={required}
       action={
         syncable
           ? {
               type: 'button',
-              active: syncedFields.includes(syncName),
+              active: synced && !locked,
+              disabled: synced && locked,
               icon: 'sync',
               toggle: true,
               className: 'ui-qtip',
               title: Translate.string('Toggle synchronization of this field'),
               onClick: () => {
-                if (syncedFields.includes(syncName)) {
+                if (synced) {
                   setSyncedFields(syncedFields.filter(x => x !== syncName));
                   form.change(name, form.getFieldState(name).initial);
                 } else {
@@ -79,6 +83,7 @@ SyncedFinalField.propTypes = {
   syncName: PropTypes.string,
   as: PropTypes.elementType.isRequired,
   syncedValues: PropTypes.object.isRequired,
+  lockedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
   readOnly: PropTypes.bool,
   required: PropTypes.bool,
   processSyncedValue: PropTypes.func,
@@ -109,6 +114,7 @@ export function SyncedFinalAffiliationDropdown({
   required,
   syncName,
   syncedValues,
+  lockedFields,
   currentAffiliation,
 }) {
   const [_affiliationResults, setAffiliationResults] = useState([]);
@@ -167,6 +173,7 @@ export function SyncedFinalAffiliationDropdown({
       )}
       label={Translate.string('Affiliation')}
       syncedValues={syncedValues}
+      lockedFields={lockedFields}
     />
   );
 }
@@ -176,6 +183,7 @@ SyncedFinalAffiliationDropdown.propTypes = {
   required: PropTypes.bool,
   syncName: PropTypes.string,
   syncedValues: PropTypes.object.isRequired,
+  lockedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
   currentAffiliation: PropTypes.object,
 };
 

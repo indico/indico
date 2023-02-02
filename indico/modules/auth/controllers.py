@@ -549,6 +549,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
             'affiliationMeta': affiliation_meta,
             'hasPendingUser': bool(pending_data),
             'mandatoryFields': mandatory_fields,
+            'lockedFields': list(multipass.locked_fields),
         }
 
     def create_schema(self):
@@ -584,6 +585,9 @@ class MultipassRegistrationHandler(RegistrationHandler):
                     raise ValidationError(_('This field cannot be empty.'), 'first_name')
                 if 'last_name' not in data['synced_fields'] and not data['last_name']:
                     raise ValidationError(_('This field cannot be empty.'), 'last_name')
+                for field in data['synced_fields']:
+                    if field not in multipass.locked_fields:
+                        raise ValidationError('Locked fields must be synced.', field)
 
         return MultipassSignupSchema
 
