@@ -10,7 +10,7 @@ import contribsPersonListURL from 'indico-url:contributions.person_list';
 import sessionsPersonListURL from 'indico-url:sessions.person_list';
 
 import PropTypes from 'prop-types';
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {Button, Dimmer, Loader, Message, Modal} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -78,9 +78,6 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
     },
     {camelize: true}
   );
-  const eventPersons = useMemo(() => new Map(data?.eventPersons.map(p => [p.identifier, p])), [
-    data,
-  ]);
   const extraRoles =
     objectContext === 'abstracts'
       ? [
@@ -131,9 +128,9 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
           <Dimmer active>
             <Loader />
           </Dimmer>
-        ) : eventPersons.size ? (
+        ) : Object.keys(data.eventPersons).length ? (
           <PersonList
-            persons={data.eventPersons}
+            persons={Object.values(data.eventPersons)}
             selectedPersons={selectedPersons}
             onChangeSelection={persons => setSelectedPersons(persons)}
             isSelectable={person => !!person.email}
@@ -147,7 +144,7 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
       <Modal.Actions>
         <EmailParticipantRolesButton
           eventId={eventId}
-          persons={selectedPersons.filter(id => isVisible(eventPersons.get(id)))}
+          persons={selectedPersons.filter(id => isVisible(data.eventPersons[id]))}
           onSubmitSucceeded={count => setSentEmailCount(count)}
           successTimeout={0}
           primary

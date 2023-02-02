@@ -66,7 +66,7 @@ class RHContributionPersonListMixin:
         contribution_persons_dict = defaultdict(lambda: {'speaker': False, 'primary_author': False,
                                                          'secondary_author': False, 'not_registered': True})
         for contrib_person in contribution_persons:
-            person_dict = contribution_persons_dict[contrib_person.person.id]
+            person_dict = contribution_persons_dict[contrib_person.person.identifier]
             person_dict['identifier'] = contrib_person.person.identifier
             person_dict['full_name'] = contrib_person.person.full_name
             person_dict['email'] = contrib_person.person.email
@@ -76,4 +76,4 @@ class RHContributionPersonListMixin:
             person_dict['secondary_author'] |= contrib_person.author_type == AuthorType.secondary
             person_dict['registered'] = contrib_person.person in registered_persons
 
-        return jsonify(event_persons=[p for __, p in sorted(contribution_persons_dict.items())])
+        return jsonify(event_persons=contribution_persons_dict)
