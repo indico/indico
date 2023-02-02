@@ -14,7 +14,8 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
-                                                    EventDatesForm, EventLocationForm, EventPersonsForm)
+                                                    EventDatesForm, EventLanguagesForm, EventLocationForm,
+                                                    EventPersonsForm)
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
 from indico.modules.events.models.labels import EventLabel
@@ -136,6 +137,11 @@ class RHEditEventContactInfo(RHEditEventDataBase):
 class RHEditEventClassification(RHEditEventDataBase):
     form_class = EventClassificationForm
     section_name = 'classification'
+
+
+class RHEditEventLanguages(RHEditEventDataBase):
+    form_class = EventLanguagesForm
+    section_name = 'languages'
 
 
 class RHEditEventDates(RHEditEventDataBase):

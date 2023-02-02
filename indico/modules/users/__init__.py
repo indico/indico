@@ -27,6 +27,7 @@ logger = Logger.get('users')
 
 user_settings = UserSettingsProxy('users', {
     'lang': None,
+    'force_language': False,
     'timezone': None,
     'force_timezone': False,  # always use the user's timezone instead of an event's timezone
     'show_future_events': False,

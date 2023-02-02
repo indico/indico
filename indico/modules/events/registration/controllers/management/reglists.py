@@ -216,7 +216,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                                               registration=registration)
             email_subject = replace_placeholders('registration-email', form.subject.data, regform=self.regform,
                                                  registration=registration)
-            with self.regform.event.force_event_locale():
+            with self.regform.event.force_event_locale(registration.user):
                 template = get_template_module('events/registration/emails/custom_email.html',
                                                email_subject=email_subject, email_body=email_body)
                 bcc = [session.user.email] if form.copy_for_sender.data else []

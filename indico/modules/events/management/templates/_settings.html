@@ -216,6 +216,43 @@
 {% endmacro %}
 
 
+{% macro render_section_languages(event, with_container=true) %}
+    {% call render_section(event, 'languages', 'icon-bubble-quote', '.edit_languages', _('Edit supported languages'),
+                           with_container=with_container) %}
+        <dl class="i-data-list">
+            <dt>{% trans %}Default language{% endtrans %}</dt>
+            <dd>{{ with_default(event.default_language) }}</dd>
+
+            <dt>{% trans %}Additional languages{% endtrans %}</dt>
+            <dd>{{ with_default(event.supported_languages|join(', ')) }}</dd>
+        </dl>
+        <script>
+            (() => {
+                function disableDefaultLocale() {
+                    const defaultLocaleValue = $('#default_locale').val();
+                    if (!defaultLocaleValue) {
+                        // Disable all when no default locale is used
+                        $(`input[name=supported_locales]`).prop('disabled', true);
+                        return;
+                    }
+                    const $inputElement = $(`input[name=supported_locales][value='${defaultLocaleValue}']`);
+                    $inputElement.prop('disabled', true);
+                    $('input[name=supported_locales]').not($inputElement).prop('disabled', false);
+                }
+
+                $('#event-settings-languages')
+                    .on('ajaxForm:show', () => {
+                        disableDefaultLocale();
+                    })
+                    .on('change', '#default_locale', evt => {
+                        disableDefaultLocale();
+                    });
+            })();
+        </script>
+    {% endcall %}
+{% endmacro %}
+
+
 {% macro render_event_settings(event, has_reference_types, has_event_labels, section=none, with_container=true) %}
     {% if section is none or section == 'data' %}
         {{ render_section_data(event, with_container=with_container) }}
@@ -234,5 +271,8 @@
     {% endif %}
     {% if section is none or section == 'classification' %}
         {{ render_section_classification(event, has_reference_types, has_event_labels, with_container=with_container) }}
+    {% endif %}
+    {% if section is none or section == 'languages' %}
+        {{ render_section_languages(event, with_container=with_container) }}
     {% endif %}
 {% endmacro %}

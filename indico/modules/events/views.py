@@ -7,7 +7,7 @@
 
 import posixpath
 
-from flask import current_app, render_template, request
+from flask import current_app, render_template, request, session
 from sqlalchemy.orm import load_only
 from werkzeug.utils import cached_property
 
@@ -52,8 +52,11 @@ def render_event_header(event, conference_layout=False, theme=None, theme_overri
     show_nav_bar = event.type_ != EventType.conference or layout_settings.get(event, 'show_nav_bar')
     themes = {tid: {'name': data['title'], 'user_visible': data.get('user_visible')}
               for tid, data in theme_settings.get_themes_for(event.type_.name).items()}
-    return render_template('events/header.html',
-                           event=event, print_url=print_url, show_nav_bar=show_nav_bar, themes=themes, theme=theme)
+    forced_event_locale = event.get_forced_event_locale(session.user, allow_session=True)
+    forced_event_locale_alts = event.supported_locales if forced_event_locale else None
+    return render_template('events/header.html', event=event, print_url=print_url, show_nav_bar=show_nav_bar,
+                           themes=themes, theme=theme, force_locale=forced_event_locale,
+                           force_locale_alts=forced_event_locale_alts)
 
 
 def render_event_footer(event, dark=False):

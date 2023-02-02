@@ -15,7 +15,8 @@
         {% endblock %}
 
         <div class="flexcol">
-            {{ render_session_bar(protected_object=protected_object, local_tz=local_tz, force_local_tz=force_local_tz) }}
+            {{ render_session_bar(protected_object=protected_object, local_tz=local_tz, force_local_tz=force_local_tz,
+                                  force_locale=force_locale, force_locale_alts=force_locale_alts) }}
             {{ template_hook('page-header', category=category) }}
         </div>
     </div>

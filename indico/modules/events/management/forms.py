@@ -35,7 +35,7 @@ from indico.modules.events.sessions import COORDINATOR_PRIV_DESCS, COORDINATOR_P
 from indico.modules.events.timetable.util import get_top_level_entries
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import format_datetime, format_human_timedelta, now_utc, relativedelta
-from indico.util.i18n import _
+from indico.util.i18n import _, get_all_locales
 from indico.util.string import validate_email
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
@@ -477,3 +477,31 @@ class ImportContentsForm(ImportSourceEventForm):
 
         self.selected_items.disabled_choices = disabled_choices
         self.selected_items.disabled_choices_reasons = reasons
+
+
+class EventLanguagesForm(IndicoForm):
+    default_locale = SelectField(_('Default language'), description=_('If set, Indico will use this language '
+                                                                      "instead of the user's language when displaying "
+                                                                      'the event or sending emails related to it. '
+                                                                      'This setting should be used only for events '
+                                                                      'where it is important that there is no mix of '
+                                                                      'languages e.g. due to custom menu titles.'))
+    supported_locales = IndicoSelectMultipleCheckboxField(_('Additional languages'),
+                                                          description=_('Languages from this list will be used if the '
+                                                                        "user selected one of them, even if it's not "
+                                                                        "the event's default language."))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        locales = [(code, f'{name} ({territory})' if territory else name)
+                   for code, (name, territory, __) in get_all_locales().items()]
+        locales.sort(key=itemgetter(1))
+        self.default_locale.choices = [('', _('No default language'))] + locales
+        self.supported_locales.choices = locales
+
+    def post_validate(self):
+        if self.default_locale.data and self.default_locale.data not in self.supported_locales.data:
+            self.supported_locales.data.append(self.default_locale.data)
+        if not self.default_locale.data:
+            self.supported_locales.data = []

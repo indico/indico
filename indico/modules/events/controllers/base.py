@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from contextlib import ExitStack
+
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -55,6 +57,10 @@ class RHAuthenticatedEventBase(RHProtectedEventBase):
 
 
 class RHDisplayEventBase(RHProtectedEventBase):
+    def __init__(self):
+        RHProtectedEventBase.__init__(self)
+        self.event_rh_contexts = ExitStack()
+
     def _forbidden_if_not_admin(self):
         if not request.is_xhr and session.user and session.user.is_admin:
             flash(_('This page is currently not visible by non-admin users (menu entry disabled)!'), 'warning')
@@ -89,15 +95,21 @@ class RHDisplayEventBase(RHProtectedEventBase):
             return redirect(url_for('event_registration.display_regform', displayed_regforms[0]))
         return redirect(url_for('event_registration.display_regform_list', self.event))
 
+    def _process_args(self):
+        RHProtectedEventBase._process_args(self)
+        if self.event.default_locale:
+            self.event_rh_contexts.enter_context(self.event.force_event_locale(session.user, allow_session=True))
+
     def _do_process(self):
-        try:
-            return RHEventBase._do_process(self)
-        except AccessKeyRequired:
-            return self._show_access_key_form()
-        except RegistrationRequired:
-            if request.is_xhr:
-                raise
-            return self._show_registration_form()
+        with self.event_rh_contexts:
+            try:
+                return RHEventBase._do_process(self)
+            except AccessKeyRequired:
+                return self._show_access_key_form()
+            except RegistrationRequired:
+                if request.is_xhr:
+                    raise
+                return self._show_registration_form()
 
 
 class EditEventSettingsMixin:

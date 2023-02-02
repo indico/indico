@@ -7,8 +7,8 @@
     <meta name="csrf-token" id="csrf-token" content="{{ session.csrf_token }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ indico_config.IMAGES_BASE_URL }}/indico.ico">
 
-    <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
-    <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=session.lang) }}"></script>
+    <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=current_locale) }}"></script>
+    <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=current_locale) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
     {{ webpack['exports.js'] }}

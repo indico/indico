@@ -24,7 +24,7 @@ def make_email_template(template, agreement, email_body=None):
 
 @email_sender
 def notify_agreement_new(agreement, email_body=None, cc_addresses=None, from_address=None):
-    with agreement.event.force_event_locale():
+    with agreement.event.force_event_locale(agreement.user):
         template = make_email_template('events/agreements/emails/agreement_new.html', agreement, email_body)
         return make_email(agreement.person_email, cc_list=cc_addresses, from_address=from_address,
                           template=template, html=True)
@@ -32,7 +32,7 @@ def notify_agreement_new(agreement, email_body=None, cc_addresses=None, from_add
 
 @email_sender
 def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None, from_address=None):
-    with agreement.event.force_event_locale():
+    with agreement.event.force_event_locale(agreement.user):
         template = make_email_template('events/agreements/emails/agreement_reminder.html', agreement, email_body)
         return make_email(agreement.person_email, cc_list=cc_addresses, from_address=from_address,
                           template=template, html=True)
@@ -40,7 +40,7 @@ def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None, fro
 
 @email_sender
 def notify_new_signature_to_manager(agreement):
-    with agreement.event.force_event_locale():
+    with agreement.event.force_event_locale(agreement.user):
         template = get_template_module('events/agreements/emails/new_signature_email_to_manager.txt',
                                        agreement=agreement)
         return make_email(agreement.event.all_manager_emails, template=template)

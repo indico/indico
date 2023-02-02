@@ -26,6 +26,9 @@ _bp.add_url_rule('/settings/contact-info', 'edit_contact_info', settings.RHEditE
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/settings/classification', 'edit_classification', settings.RHEditEventClassification,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/settings/languages', 'edit_languages', settings.RHEditEventLanguages,
+                 methods=('GET', 'POST'))
+
 # Actions
 _bp.add_url_rule('/delete', 'delete', actions.RHDeleteEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/change-type', 'change_type', actions.RHChangeEventType, methods=('POST',))

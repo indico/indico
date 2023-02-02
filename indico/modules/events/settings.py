@@ -253,6 +253,11 @@ event_contact_settings = EventSettingsProxy('contact', {
     'phones': []
 })
 
+event_language_settings = EventSettingsProxy('language', {
+    'supported_locales': [],
+    'default_locale': '',
+})
+
 unlisted_events_settings = SettingsProxy('unlisted_events', {
     'enabled': False,
     'restricted': False,
