@@ -21,7 +21,7 @@ import {UserSearch, GroupSearch} from './Search';
  * selected or the dialog is closed (in that case it will be resolved
  * with an empty list of principals)
  */
-export function showUserSearch(searchProps = {}) {
+export function showUserSearch(searchProps = {}, existing = []) {
   const container = document.createElement('div');
   document.body.appendChild(container);
 
@@ -37,7 +37,7 @@ export function showUserSearch(searchProps = {}) {
         {([favorites]) => (
           <UserSearch
             favorites={favorites}
-            existing={[]}
+            existing={existing}
             onAddItems={users => {
               resolve(searchProps.single ? users?.identifier : users.map(u => u.identifier));
               cleanup();
@@ -64,7 +64,7 @@ export function showUserSearch(searchProps = {}) {
  * selected or the dialog is closed (in that case it will be resolved
  * with an empty list of principals)
  */
-export function showGroupSearch(searchProps = {}) {
+export function showGroupSearch(searchProps = {}, existing = []) {
   const container = document.createElement('div');
   document.body.appendChild(container);
 
@@ -77,7 +77,7 @@ export function showGroupSearch(searchProps = {}) {
   return new Promise(resolve => {
     ReactDOM.render(
       <GroupSearch
-        existing={[]}
+        existing={existing}
         onAddItems={groups => {
           resolve(searchProps.single ? groups?.identifier : groups.map(g => g.identifier));
           cleanup();
