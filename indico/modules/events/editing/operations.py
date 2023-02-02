@@ -269,6 +269,11 @@ def undo_review(revision):
     # Keep comment history:
     comment = EditingRevisionComment(user=revision.editor or revision.submitter, created_dt=revision.reviewed_dt,
                                      undone_judgement=revision.final_state, text=revision.comment)
+    num_revisions = len(revision.editable.valid_revisions)
+    revision.tags = {tag for tag in revision.tags if tag.system}
+    if num_revisions >= 3 or (num_revisions >= 2 and revision == latest_revision):
+        previous_revision = revision.editable.valid_revisions[-2 if revision == latest_revision else -3]
+        revision.tags |= {tag for tag in previous_revision.tags if not tag.system}
     revision.comments.append(comment)
     revision.final_state = FinalRevisionState.none
     revision.comment = ''
