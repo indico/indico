@@ -32,6 +32,7 @@ export const ajax = {
     serializer: ({onlyMine}) => onlyMine,
   },
   building: ({building}) => building,
+  location_id: ({locationId}) => locationId,
   text: ({text}) => text,
   division: ({division}) => division,
   start_dt: {

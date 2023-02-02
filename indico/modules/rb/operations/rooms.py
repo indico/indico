@@ -144,6 +144,8 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
         query = query.filter(Room.capacity >= filters['capacity'])
     if 'building' in filters:
         criteria['building'] = filters['building']
+    if 'location_id' in filters:
+        criteria['location_id'] = filters['location_id']
     if 'division' in filters:
         criteria['division'] = filters['division']
     query = query.filter_by(**criteria)

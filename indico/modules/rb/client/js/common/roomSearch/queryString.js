@@ -98,6 +98,10 @@ export const rules = {
   building: {
     stateField: 'filters.building',
   },
+  location_id: {
+    sanitizer: v.toInt(),
+    stateField: 'filters.locationId',
+  },
   text: {
     stateField: 'filters.text',
   },

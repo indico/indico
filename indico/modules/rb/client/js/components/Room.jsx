@@ -175,9 +175,7 @@ class Room extends React.Component {
           </Card.Description>
         </Card.Content>
         <Card.Content styleName="room-content" extra>
-          <>
-            <Icon name="user" /> {room.capacity || Translate.string('Not specified')}
-          </>
+          <Icon name="user" /> {room.capacity || Translate.string('Not specified')}
           <span styleName="room-details">
             {room.features.map(feature => (
               <RoomFeatureEntry key={feature.name} feature={feature} color="green" />
