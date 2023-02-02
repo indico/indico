@@ -480,7 +480,7 @@ class ImportContentsForm(ImportSourceEventForm):
 
 
 class EventLanguagesForm(IndicoForm):
-    default_locale = SelectField(_('Default language'), description=_('If set, the Indico will use this language '
+    default_locale = SelectField(_('Default language'), description=_('If set, Indico will use this language '
                                                                       "instead of the user's language when displaying "
                                                                       'the event or sending emails related to it. '
                                                                       'This setting should be used only for events '
