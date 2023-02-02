@@ -449,6 +449,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     public_regform_access = _EventSettingProperty(event_core_settings, 'public_regform_access')
     supported_locales = _EventSettingProperty(event_language_settings, 'supported_locales')
     default_locale = _EventSettingProperty(event_language_settings, 'default_locale')
+    enforce_locale = _EventSettingProperty(event_language_settings, 'enforce_locale')
 
     @classmethod
     def category_chain_overlaps(cls, category_ids):
@@ -1101,7 +1102,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return f'{name} ({territory})' if territory else name
 
     def get_forced_event_locale(self, user=None, *, allow_session=False):
-        if not (locale := self.default_locale):
+        if not self.enforce_locale or not (locale := self.default_locale):
             return None
         if user:
             locale = user.settings.get('lang')

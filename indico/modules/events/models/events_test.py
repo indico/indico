@@ -9,13 +9,13 @@ from datetime import date, datetime, time, timedelta
 
 import pytest
 import pytz
-from flask_babel import get_locale
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions import Session
+from indico.util.i18n import get_current_locale
 
 
 def test_deleted_relationships(db, dummy_event):
@@ -126,26 +126,33 @@ def test_iter_days_dst(dummy_event, tz, start_time, end_time, start_date, end_da
     assert all_days[-1] == days[-1]
 
 
-@pytest.mark.parametrize(('supported_locales', 'default_locale', 'user_lang', 'force_language', 'locale'), (
+@pytest.mark.parametrize(('supported_locales', 'default_locale', 'enforce', 'user_lang', 'force_language', 'locale'), (
     # Test with user who has force_language setting enabled
-    (['en_US', 'en_GB', 'de_DE'], 'de_DE', 'fr_FR', True, 'fr_FR'),
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', True, 'fr_FR', True, 'fr_FR'),
     # Test with user who has force_language setting disabled and supported language
-    (['en_US', 'en_GB', 'de_DE'], 'de_DE', 'en_US', False, 'en_US'),
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', True, 'en_US', False, 'en_US'),
     # Test with user who has force_language setting disabled and unsupported language
-    (['en_US', 'en_GB', 'de_DE'], 'de_DE', 'fr_FR', False, 'de_DE'),
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', True, 'fr_FR', False, 'de_DE'),
+    # Test with enforcing disabled
+    # Test with user who has force_language setting enabled
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', False, 'fr_FR', True, None),
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', False, 'en_US', False, None),
+    (['en_US', 'en_GB', 'de_DE'], 'de_DE', False, 'fr_FR', False, None),
+
 ))
-def test_force_event_locale(dummy_event, dummy_user, supported_locales, default_locale, user_lang,
+def test_force_event_locale(dummy_event, dummy_user, supported_locales, default_locale, enforce, user_lang,
                             force_language, locale):
     dummy_event.supported_locales = supported_locales
     dummy_event.default_locale = default_locale
+    dummy_event.enforce_locale = enforce
     dummy_user.settings.set('lang', user_lang)
     dummy_user.settings.set('force_language', force_language)
 
     assert dummy_event.get_forced_event_locale(dummy_user) == locale
     with dummy_event.force_event_locale(dummy_user):
-        assert str(get_locale()) == locale
+        assert str(get_current_locale()) == ('en_GB' if not enforce else locale)
 
     # Test without a user
-    assert dummy_event.get_forced_event_locale() == default_locale
+    assert dummy_event.get_forced_event_locale() == (default_locale if enforce else None)
     with dummy_event.force_event_locale():
-        assert str(get_locale()) == default_locale
+        assert str(get_current_locale()) == (default_locale if enforce else 'en_GB')

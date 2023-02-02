@@ -223,6 +223,9 @@
             <dt>{% trans %}Default language{% endtrans %}</dt>
             <dd>{{ with_default(event.default_language) }}</dd>
 
+            <dt>{% trans %}Enforce language{% endtrans %}</dt>
+            <dd>{{ _('Yes') if event.enforce_locale else _('No') }}</dd>
+
             <dt>{% trans %}Additional languages{% endtrans %}</dt>
             <dd>{{ with_default(event.supported_languages|join(', ')) }}</dd>
         </dl>
@@ -230,7 +233,8 @@
             (() => {
                 function disableDefaultLocale() {
                     const defaultLocaleValue = $('#default_locale').val();
-                    if (!defaultLocaleValue) {
+                    const enforceLocale = $('#enforce_locale').prop('checked');
+                    if (!defaultLocaleValue || !enforceLocale) {
                         // Disable all when no default locale is used
                         $(`input[name=supported_locales]`).prop('disabled', true);
                         return;
@@ -244,7 +248,7 @@
                     .on('ajaxForm:show', () => {
                         disableDefaultLocale();
                     })
-                    .on('change', '#default_locale', evt => {
+                    .on('change', '#default_locale, #enforce_locale', evt => {
                         disableDefaultLocale();
                     });
             })();

@@ -480,12 +480,14 @@ class ImportContentsForm(ImportSourceEventForm):
 
 
 class EventLanguagesForm(IndicoForm):
-    default_locale = SelectField(_('Default language'), description=_('If set, Indico will use this language '
-                                                                      "instead of the user's language when displaying "
-                                                                      'the event or sending emails related to it. '
-                                                                      'This setting should be used only for events '
-                                                                      'where it is important that there is no mix of '
-                                                                      'languages e.g. due to custom menu titles.'))
+    default_locale = SelectField(_('Default language'), description=_('This is the primary language of the event. It '
+                                                                      'will be included in the metadata of the event.'))
+    enforce_locale = BooleanField(_('Enforce language'), widget=SwitchWidget(),
+                                  description=_('If set, Indico will use the default language instead of the '
+                                                "user's language when displaying the event or sending emails related "
+                                                'to it. This setting should be enabled only for events where it is '
+                                                'important that there is no mix of languages e.g. due to custom menu '
+                                                'titles.'))
     supported_locales = IndicoSelectMultipleCheckboxField(_('Additional languages'),
                                                           description=_('Languages from this list will be used if the '
                                                                         "user selected one of them, even if it's not "

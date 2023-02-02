@@ -145,7 +145,7 @@ def update_event(event, update_timetable=False, **data):
                                 'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
                                 'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
                                 'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message',
-                                'own_map_url', 'supported_locales', 'default_locale'}
+                                'own_map_url', 'supported_locales', 'enforce_locale', 'default_locale'}
     old_person_links = event.sorted_person_links[:]
     changes = {}
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
@@ -260,7 +260,8 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
         'label_message': 'Label message',
         'own_map_url': {'title': 'Map URL', 'type': 'string'},
         'supported_locales': 'Supported languages',
-        'default_locale': 'Default language'
+        'default_locale': 'Default language',
+        'enforce_locale': 'Enforce language',
     }
     _split_location_changes(changes)
     if not visible_person_link_changes:
