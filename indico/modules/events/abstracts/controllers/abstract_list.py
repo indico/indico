@@ -250,7 +250,7 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
             person_dict = _get_or_create_person_dict(submitter)
             person_dict['submitter'] = True
             person_dict['registered'] = get_event_person_for_user(self.event, submitter) in registered_persons
-        return jsonify(event_persons=[p for _, p in sorted(abstract_persons_dict.items())])
+        return jsonify(event_persons=abstract_persons_dict)
 
 
 class RHManageAbstractsExportActionsBase(RHManageAbstractsActionsBase):
