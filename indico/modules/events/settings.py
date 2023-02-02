@@ -256,6 +256,7 @@ event_contact_settings = EventSettingsProxy('contact', {
 event_language_settings = EventSettingsProxy('language', {
     'supported_locales': [],
     'default_locale': '',
+    'enforce_locale': False,
 })
 
 unlisted_events_settings = SettingsProxy('unlisted_events', {
