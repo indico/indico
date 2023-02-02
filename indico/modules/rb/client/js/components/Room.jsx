@@ -16,7 +16,6 @@ import {TooltipIfTruncated, ResponsivePopup} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {Markdown, Slot} from 'indico/react/util';
 
-import {selectors as roomsSelectors} from '../common/rooms';
 import {actions as userActions, selectors as userSelectors} from '../common/user';
 
 import DimmableImage from './DimmableImage';
@@ -34,7 +33,6 @@ class Room extends React.Component {
     isCheckingUserRoomPermissions: PropTypes.bool.isRequired,
     addFavoriteRoom: PropTypes.func.isRequired,
     delFavoriteRoom: PropTypes.func.isRequired,
-    allLocations: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -151,11 +149,9 @@ class Room extends React.Component {
       addFavoriteRoom,
       delFavoriteRoom,
       isCheckingUserRoomPermissions,
-      allLocations,
       ...restProps
     } = this.props;
     const {content, actions} = Slot.split(children);
-    const showLocation = allLocations.size > 1;
 
     return (
       <Card styleName="room-card" {...restProps}>
@@ -180,11 +176,6 @@ class Room extends React.Component {
         </Card.Content>
         <Card.Content styleName="room-content" extra>
           <Icon name="user" /> {room.capacity || Translate.string('Not specified')}
-          {showLocation && (
-            <div>
-              <Icon name="map pin" /> {room.locationName || Translate.string('Not specified')}
-            </div>
-          )}
           <span styleName="room-details">
             {room.features.map(feature => (
               <RoomFeatureEntry key={feature.name} feature={feature} color="green" />
@@ -203,7 +194,6 @@ export default connect(
     return (state, props) => ({
       isFavorite: isFavoriteRoom(state, props),
       isCheckingUserRoomPermissions: userSelectors.isCheckingUserRoomPermissions(state),
-      allLocations: roomsSelectors.getLocations(state),
     });
   },
   dispatch =>
