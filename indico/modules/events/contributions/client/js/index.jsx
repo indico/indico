@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
       placeholder: '#filter-placeholder',
     };
 
-    $('.list-section [data-toggle=dropdown]')
+    $('.list [data-toggle=dropdown]')
       .closest('.toolbar')
       .dropdown();
     setupTableSorter('#contribution-list .tablesorter');
