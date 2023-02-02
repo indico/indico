@@ -78,7 +78,9 @@ export function AuthorsList({eventId, sourceIds, objectContext, onClose}) {
     },
     {camelize: true}
   );
-  const eventPersons = useMemo(() => new Map(data?.eventPersons.map(p => [p.id, p])), [data]);
+  const eventPersons = useMemo(() => new Map(data?.eventPersons.map(p => [p.identifier, p])), [
+    data,
+  ]);
   const extraRoles =
     objectContext === 'abstracts'
       ? [

@@ -72,7 +72,7 @@ export default function PersonList({
   const visibleSortedPersons = sortedPersons.filter(person => isVisible(person));
   const selectablePersons = visibleSortedPersons.filter(person => person.selectable);
   const visibleSelectedPersons = selectedPersons.filter(id =>
-    isVisible(persons.filter(p => p.identifier === id)[0])
+    isVisible(persons.find(person => person.identifier === id))
   ).length;
 
   const roles = [
