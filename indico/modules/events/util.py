@@ -38,6 +38,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.roles import EventRole
+from indico.modules.events.models.settings import EventSetting
 from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -49,6 +50,7 @@ from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
+from indico.util.iterables import materialize_iterable
 from indico.util.string import strip_tags
 from indico.util.user import principal_from_identifier
 from indico.web.flask.util import send_file, url_for
@@ -572,6 +574,8 @@ def serialize_event_for_json_ld(event, full=False):
             'address': event.address or 'No address set'
         }
     }
+    if full and event.default_locale:
+        data['inLanguage'] = event.default_locale.replace('_', '-')
     if full and event.description:
         data['description'] = strip_tags(event.description)
     if full and event.person_links:
@@ -579,6 +583,22 @@ def serialize_event_for_json_ld(event, full=False):
     if full and event.has_logo:
         data['image'] = event.external_logo_url
     return data
+
+
+@materialize_iterable()
+def serialize_events_for_json_ld(events, *, full=False):
+    # We have to query the default locale separately because there's no way to
+    # lazy-load them using the SettingsProxy, and when generating e.g. a category
+    # listing we really don't want to spam an extra query for each event.
+    query = (EventSetting.query
+             .filter_by(module='language', name='default_locale')
+             .filter(EventSetting.event_id.in_(e.id for e in events)))
+    default_locales = {x.event: x.value for x in query}
+    for event in events:
+        data = serialize_event_for_json_ld(event, full=full)
+        if locale := default_locales.get(event):
+            data['inLanguage'] = locale.replace('_', '-')
+        yield data
 
 
 def serialize_person_for_json_ld(person):
