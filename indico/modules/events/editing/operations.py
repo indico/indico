@@ -125,18 +125,21 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
     new_revision = None
     if action == EditingReviewAction.accept:
         _ensure_publishable_files(revision)
-    elif files and action in (EditingReviewAction.update, EditingReviewAction.update_accept,
-                              EditingReviewAction.request_update):
-        initial_state = InitialRevisionState.needs_submitter_confirmation
-        final_state = FinalRevisionState.none
-        editable_editor = None
-        if action == EditingReviewAction.update_accept:
+    elif files:
+        if action == EditingReviewAction.update:
+            initial_state = InitialRevisionState.needs_submitter_confirmation
+            final_state = FinalRevisionState.none
+            editable_editor = None
+        elif action == EditingReviewAction.update_accept:
+            initial_state = InitialRevisionState.needs_submitter_confirmation
             final_state = FinalRevisionState.accepted
             editable_editor = editor
         elif action == EditingReviewAction.request_update:
             initial_state = revision.initial_state
             final_state = FinalRevisionState.needs_submitter_changes
             editable_editor = editor
+        else:
+            raise InvalidEditableState
         new_revision = EditingRevision(submitter=editor,
                                        editor=editable_editor,
                                        initial_state=initial_state,
