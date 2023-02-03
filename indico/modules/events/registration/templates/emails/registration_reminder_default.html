@@ -1,0 +1,19 @@
+{% macro get_subject() -%}
+    {% trans %}Reminder to register{% endtrans %}
+{%- endmacro %}
+
+{% macro get_html_body() -%}
+    {% trans %}Dear {first_name},{% endtrans %}<br>
+    <br>
+    {% trans %}This is a reminder to register for the following event:{% endtrans %}<br>
+    <strong>{{ event.title }}</strong><br><br>
+
+    {% trans %}You can register (or decline the invitation) by using this link:{% endtrans %}<br>
+    {invitation_link}
+
+    {% if session %}
+        <br><br>
+        {% trans %}Best regards{% endtrans %}<br>
+        {{ session.user.full_name }}
+    {% endif %}
+{%- endmacro %}
