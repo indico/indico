@@ -28,6 +28,10 @@ from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
 
 
+def _has_pending_invitations(invitations):
+    return any(invitation.state == InvitationState.pending for invitation in invitations)
+
+
 def _query_pending_invitations(regform):
     return (RegistrationInvitation.query.with_parent(regform)
             .filter(RegistrationInvitation.state == InvitationState.pending)
@@ -44,9 +48,17 @@ def _query_invitation_list(regform):
             .all())
 
 
-def _render_invitation_list(regform):
+def _render_invitation_list(invitations):
     tpl = get_template_module('events/registration/management/_invitation_list.html')
-    return tpl.render_invitation_list(_query_invitation_list(regform))
+    return tpl.render_invitation_list(invitations)
+
+
+def _get_invitation_data(regform):
+    invitations = _query_invitation_list(regform)
+    return {
+        'invitation_list': _render_invitation_list(invitations),
+        'has_pending_invitations': _has_pending_invitations(invitations)
+    }
 
 
 class RHRegistrationFormInvitations(RHManageRegFormBase):
@@ -54,10 +66,9 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 
     def _process(self):
         invitations = _query_invitation_list(self.regform)
-        has_pending_invitations = any(invitation.state == InvitationState.pending for invitation in invitations)
         return WPManageRegistration.render_template('management/regform_invitations.html', self.event,
                                                     regform=self.regform, invitations=invitations,
-                                                    has_pending_invitations=has_pending_invitations)
+                                                    has_pending_invitations=_has_pending_invitations(invitations))
 
 
 class RHRegistrationFormInvite(RHManageRegFormBase):
@@ -78,7 +89,7 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
             flash(ngettext('The invitation has been sent.',
                            '{n} invitations have been sent.',
                            num).format(n=num), 'success')
-            return jsonify_data(invitation_list=_render_invitation_list(self.regform))
+            return jsonify_data(**_get_invitation_data(self.regform))
         return jsonify_template('events/registration/management/regform_invite.html', regform=self.regform, form=form)
 
 
@@ -176,7 +187,7 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
                                                                skip_existing=skip_existing)
             sent = len(invitations)
             flash(self._format_flash_message(sent, skipped), 'success' if sent > 0 else 'warning')
-            return jsonify_data(invitation_list=_render_invitation_list(self.regform))
+            return jsonify_data(**_get_invitation_data(self.regform))
         return jsonify_template('events/registration/management/import_invitations.html', form=form,
                                 regform=self.regform)
 
@@ -200,7 +211,7 @@ class RHRegistrationFormDeleteInvitation(RHRegistrationFormInvitationBase):
 
     def _process(self):
         db.session.delete(self.invitation)
-        return jsonify_data(invitation_list=_render_invitation_list(self.regform))
+        return jsonify_data(**_get_invitation_data(self.regform))
 
 
 class RHRegistrationFormManagerDeclineInvitation(RHRegistrationFormInvitationBase):
@@ -210,4 +221,4 @@ class RHRegistrationFormManagerDeclineInvitation(RHRegistrationFormInvitationBas
         if self.invitation.state == InvitationState.pending:
             self.invitation.state = InvitationState.declined
             db.session.flush()
-        return jsonify_data(invitation_list=_render_invitation_list(self.regform))
+        return jsonify_data(**_get_invitation_data(self.regform))

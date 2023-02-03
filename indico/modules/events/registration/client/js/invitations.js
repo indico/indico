@@ -8,8 +8,17 @@
 /* eslint-disable import/unambiguous */
 /* global handleAjaxError:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import EmailPendingInvitationsButton from './components/EmailPendingInvitationsButton';
+
 (function(global) {
-  global.setupInvitationPage = function setupInvitationPage() {
+  global.setupInvitationPage = function setupInvitationPage({
+    eventId,
+    regformId,
+    hasPendingInvitations,
+  }) {
     $('#invitation-list').on('indico:confirmed', '.js-invitation-action', function(evt) {
       evt.preventDefault();
 
@@ -21,6 +30,11 @@
         error: handleAjaxError,
         success(data) {
           $('#invitation-list').html(data.invitation_list);
+          renderEmailInvitationsBtn({
+            eventId,
+            regformId,
+            hasPendingInvitations: data.has_pending_invitations,
+          });
         },
       });
     });
@@ -29,8 +43,27 @@
       onClose(data) {
         if (data) {
           $('#invitation-list').html(data.invitation_list);
+          renderEmailInvitationsBtn({
+            eventId,
+            regformId,
+            hasPendingInvitations: data.has_pending_invitations,
+          });
         }
       },
     });
+
+    renderEmailInvitationsBtn({eventId, regformId, hasPendingInvitations});
   };
+
+  function renderEmailInvitationsBtn({eventId, regformId, hasPendingInvitations}) {
+    const container = document.getElementById('email-pending-invitations-container');
+    ReactDOM.render(
+      <EmailPendingInvitationsButton
+        eventId={eventId}
+        regformId={regformId}
+        hasPendingInvitations={hasPendingInvitations}
+      />,
+      container
+    );
+  }
 })(window);
