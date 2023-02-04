@@ -15,14 +15,20 @@ from indico.web.flask.wrappers import IndicoFlask
 
 
 @pytest.fixture(scope='session')
-def app(request, redis_proc):
+def app(request):
     """Create the flask app."""
+
+    redis_cache_url = os.environ.get('INDICO_TEST_REDIS_CACHE_URL')
+    if not redis_cache_url:
+        redis_proc = request.getfixturevalue('redis_proc')
+        redis_cache_url = f'redis://{redis_proc.host}:{redis_proc.port}/0'
+
     config_override = {
         'BASE_URL': 'http://localhost',
         'SMTP_SERVER': ('localhost', 0),  # invalid port - just in case so we NEVER send emails!
         'TEMP_DIR': request.config.indico_temp_dir.strpath,
         'CACHE_DIR': request.config.indico_temp_dir.strpath,
-        'REDIS_CACHE_URL': f'redis://{redis_proc.host}:{redis_proc.port}/0',
+        'REDIS_CACHE_URL': redis_cache_url,
         'STORAGE_BACKENDS': {'default': 'mem:'},
         'PLUGINS': request.config.indico_plugins,
         'ENABLE_ROOMBOOKING': True,
