@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import pycountry
 from marshmallow import fields, post_dump, post_load, validate
 from marshmallow.fields import List, String
 
@@ -15,6 +14,7 @@ from indico.modules.events import Event
 from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle, syncable_fields
+from indico.util.countries import get_country
 from indico.util.marshmallow import ModelField, NoneValueEnumField
 
 
@@ -25,8 +25,7 @@ class AffiliationSchema(mm.SQLAlchemyAutoSchema):
 
     @post_dump
     def add_country_name(self, data, **kwargs):
-        country = pycountry.countries.get(alpha_2=data['country_code'])
-        data['country_name'] = country.name if country else ''
+        data['country_name'] = get_country(data['country_code']) or ''
         return data
 
 
