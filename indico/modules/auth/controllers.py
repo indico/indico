@@ -534,9 +534,11 @@ class MultipassRegistrationHandler(RegistrationHandler):
                     synced_values['affiliation_id'] = -1
             initial_values.update((k, v) for k, v in pending_data.items()
                                   if k not in synced_fields and k not in initial_values)
+            locked_fields = [x for x in multipass.locked_fields if x not in required_empty_fields]
         else:
             synced_values = {}
             initial_values.update(pending_data)
+            locked_fields = []
 
         return {
             'cancelURL': url_for_logout(),
@@ -549,7 +551,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
             'affiliationMeta': affiliation_meta,
             'hasPendingUser': bool(pending_data),
             'mandatoryFields': mandatory_fields,
-            'lockedFields': list(multipass.locked_fields),
+            'lockedFields': locked_fields,
         }
 
     def create_schema(self):
@@ -585,14 +587,17 @@ class MultipassRegistrationHandler(RegistrationHandler):
                     raise ValidationError(_('This field cannot be empty.'), 'first_name')
                 if 'last_name' not in data['synced_fields'] and not data['last_name']:
                     raise ValidationError(_('This field cannot be empty.'), 'last_name')
-                for field in data['synced_fields']:
-                    if field not in multipass.locked_fields:
-                        raise ValidationError('Locked fields must be synced.', field)
 
         return MultipassSignupSchema
 
     def parse_request(self):
+        def _must_force_sync(field):
+            if field not in ('first_name', 'last_name'):
+                return True
+            return self.identity_info['data'].get(field)
         data = super().parse_request()
+        data['synced_fields'] += [f for f in multipass.locked_fields
+                                  if f not in data['synced_fields'] and _must_force_sync(f)]
         for field in data['synced_fields']:
             data[field] = self.identity_info['data'][field] or ''
         if (

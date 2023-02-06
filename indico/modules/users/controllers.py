@@ -222,7 +222,7 @@ class RHPersonalDataUpdate(RHUserBase):
         logger.info('Profile of user %r updated by %r: %r', self.user, session.user, changes)
         synced_fields = set(changes.pop('synced_fields', self.user.synced_fields))
         if not session.user.is_admin:
-            synced_fields |= multipass.locked_fields
+            synced_fields |= multipass.locked_fields & self.user.synced_fields
         syncable_fields = {k for k, v in self.user.synced_values.items()
                            if v or k not in ('first_name', 'last_name')}
         # we set this first so these fields are skipped below and only

@@ -37,6 +37,9 @@ Improvements
 - Allow uploading files when requesting changes on the editing timeline (:pr:`5612`)
 - Add a :data:`locked_fields` setting to ``indico.conf`` to prevent non-admin
   users of turning off their profile's personal data synchronization (:pr:`5648`)
+- Add ``locked_fields`` to the identity provider settings in ``indico.conf`` to
+  prevent non-admin users of turning off their profile's personal data
+  synchronization (:pr:`5648`)
 
 Bugfixes
 ^^^^^^^^
