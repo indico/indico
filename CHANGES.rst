@@ -28,6 +28,8 @@ Improvements
 - Add button to adapt column widths in paper & contribution lists (:pr:`5642`)
 - Add event language settings to set default and additional languages (:issue:`5606`,
   :pr:`5607`, thanks :user:`vasantvohra`)
+- Fail nicely when trying to import an event from another Indico instance (:issue:`5619`,
+  :pr:`5653`)
 
 Bugfixes
 ^^^^^^^^

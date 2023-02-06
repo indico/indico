@@ -629,12 +629,15 @@ def check_permissions(event, field, allow_networks=False):
 
 
 def get_event_from_url(url):
+    """Get an event from an Indico event URL."""
     data = url_parse(url)
     if not all([data.scheme, data.netloc, data.path]):
         raise ValueError(_('Invalid event URL'))
     event_path = re.match(r'/event/(\d+)(/|$)', data.path)
     if not event_path:
         raise ValueError(_('Invalid event URL'))
+    if not url.startswith(config.BASE_URL):
+        raise ValueError(_('Events from other Indico instances cannot be imported'))
     event_id = event_path.group(1)
     event = Event.get(event_id, is_deleted=False)
     if not event:
