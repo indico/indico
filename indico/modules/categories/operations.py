@@ -51,22 +51,16 @@ def move_category(category, target_category):
 
 
 @make_interceptable
-def update_category(category, data, skip=()):
-    assert set(data) <= {
-        'title', 'description', 'timezone', 'suggestions_disabled', 'is_flat_view_enabled',
-        'event_message_mode', 'event_message', 'notify_managers', 'event_creation_notification_emails',
-        *skip
-    }
+def update_category(category, data, *, skip=(), _extra_log_fields=None):
     changes = category.populate_from_dict(data, skip=skip)
     db.session.flush()
     signals.category.updated.send(category)
     logger.info('Category %s updated with %r by %s', category, data, session.user)
-    _log_category_update(category, changes)
+    _log_category_update(category, changes, _extra_log_fields)
 
 
 @make_interceptable
-def update_category_protection(category, data):
-    assert set(data) <= {'protection_mode', 'own_no_access_contact', 'event_creation_mode', 'visibility'}
+def update_category_protection(category, data, *, _extra_log_fields=None):
     changes = category.populate_from_dict(data)
     db.session.flush()
     signals.category.updated.send(category, changes=changes)
@@ -76,13 +70,13 @@ def update_category_protection(category, data):
                       'own_no_access_contact': 'No access contact',
                       'visibility': {'title': 'Visibility', 'type': 'string',
                                      'convert': lambda changes: [format_visibility(category, x) for x in changes]},
-                      'event_creation_mode': 'Event creation mode'}
+                      'event_creation_mode': 'Event creation mode',
+                      **(_extra_log_fields or {})}
         category.log(CategoryLogRealm.category, LogKind.change, 'Category', 'Protection updated', session.user,
                      data={'Changes': make_diff_log(changes, log_fields)})
 
 
-@make_interceptable
-def _log_category_update(category, changes):
+def _log_category_update(category, changes, extra_log_fields):
     log_fields = {
         'title': {'title': 'Title', 'type': 'string'},
         'description': 'Description',
@@ -92,7 +86,8 @@ def _log_category_update(category, changes):
         'event_message_mode': 'Event header message type',
         'event_message': 'Event header message',
         'notify_managers': 'Notify managers about event creation',
-        'event_creation_notification_emails': 'Event creation notification emails'
+        'event_creation_notification_emails': 'Event creation notification emails',
+        **(extra_log_fields or {})
     }
     if changes:
         what = 'Settings'
