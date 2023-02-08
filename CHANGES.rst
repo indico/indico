@@ -30,9 +30,10 @@ Improvements
   :pr:`5607`, thanks :user:`vasantvohra`)
 - Fail nicely when trying to import an event from another Indico instance (:issue:`5619`,
   :pr:`5653`)
-- Add option to send reminders to invited registrants who have not yet responsed
+- Add option to send reminders to invited registrants who have not yet responded
   (:issue:`5579`, :pr:`5654`)
-- Hide the top box with the latest files/paper until it has been accepted (:issue:`5660`)
+- Hide the top box with the latest files of an editable until it has been accepted
+  and published (:issue:`5660`, :pr:`5665`)
 
 Bugfixes
 ^^^^^^^^
