@@ -596,6 +596,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'material': material_data,
             'keywords': event.keywords,
             'organizer': event.organizer_info,
+            'language': event.default_locale or None,
         })
 
         if event.is_unlisted:
