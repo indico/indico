@@ -51,6 +51,8 @@ Bugfixes
   mode enabled (:pr:`5663`)
 - Fix roles resetting to the default ones when editing person data in an abstract
   or contribution (:pr:`5664`)
+- Correctly show paragraphs in CKEditor fields (:issue:`5624`, :pr:`5656`, thanks
+  :user:`kewisch`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
