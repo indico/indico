@@ -12,15 +12,6 @@ from indico.util.placeholders import Placeholder
 from indico.web.flask.util import url_for
 
 
-class EventTitlePlaceholder(Placeholder):
-    name = 'event_title'
-    description = _('The title of the event')
-
-    @classmethod
-    def render(cls, event, survey, **kwargs):
-        return event.title
-
-
 class SurveyTitlePlaceholder(Placeholder):
     name = 'survey_title'
     description = _('The title of the survey')

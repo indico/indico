@@ -11,11 +11,10 @@ import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Form, Dimmer, Loader, Popup, Input, Icon} from 'semantic-ui-react';
+import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {EmailDialog} from './EmailDialog';
@@ -84,34 +83,6 @@ export function EmailParticipantRoles({
       placeholders={placeholders}
       initialFormValues={{subject: defaultSubject, body: defaultBody}}
       sentEmailsCount={sentCount}
-      recipientsField={
-        <Form.Field>
-          <Translate as="label">Recipients</Translate>
-          <Input
-            value={recipients.join(', ')}
-            readOnly
-            icon={
-              navigator.clipboard && (
-                <Popup
-                  content={Translate.string('Copied!')}
-                  on="click"
-                  position="top center"
-                  inverted
-                  trigger={
-                    <Icon
-                      name="copy"
-                      color="black"
-                      title={Translate.string('Copy to clipboard')}
-                      onClick={() => navigator.clipboard.writeText(recipients.join(', '))}
-                      link
-                    />
-                  }
-                />
-              )
-            }
-          />
-        </Form.Field>
-      }
     />
   );
 }

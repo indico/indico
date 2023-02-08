@@ -49,6 +49,16 @@
                     </button>
                 </div>
             </div>
+            <div class="section">
+                <div class="icon icon-mail"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Remind pending invitees{% endtrans %}
+                    </div>
+                    {% trans %}Send email reminders to users who have not yet registered.{% endtrans %}
+                </div>
+                <div class="toolbar" id="email-pending-invitations-container"></div>
+            </div>
         </div>
     {% endif %}
 
@@ -57,6 +67,10 @@
     </div>
 
     <script>
-        setupInvitationPage();
+        setupInvitationPage({
+            eventId: {{ event.id | tojson }},
+            regformId: {{ regform.id | tojson }},
+            hasPendingInvitations: {{ has_pending_invitations | tojson }}
+        });
     </script>
 {% endblock %}

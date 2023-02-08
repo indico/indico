@@ -30,6 +30,8 @@ Improvements
   :pr:`5607`, thanks :user:`vasantvohra`)
 - Fail nicely when trying to import an event from another Indico instance (:issue:`5619`,
   :pr:`5653`)
+- Add option to send reminders to invited registrants who have not yet responsed
+  (:issue:`5579`, :pr:`5654`)
 
 Bugfixes
 ^^^^^^^^

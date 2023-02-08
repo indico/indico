@@ -17,7 +17,7 @@ class FirstNamePlaceholder(Placeholder):
     description = _('First name of the person')
 
     @classmethod
-    def render(cls, invitation):
+    def render(cls, invitation, **kwargs):
         return invitation.first_name
 
 
@@ -26,8 +26,17 @@ class LastNamePlaceholder(Placeholder):
     description = _('Last name of the person')
 
     @classmethod
-    def render(cls, invitation):
+    def render(cls, invitation, **kwargs):
         return invitation.last_name
+
+
+class EmailPlaceholder(Placeholder):
+    name = 'email'
+    description = _('Email of the person')
+
+    @classmethod
+    def render(cls, invitation, **kwargs):
+        return invitation.email
 
 
 class InvitationLinkPlaceholder(Placeholder):
@@ -36,6 +45,6 @@ class InvitationLinkPlaceholder(Placeholder):
     required = True
 
     @classmethod
-    def render(cls, invitation):
+    def render(cls, invitation, **kwargs):
         url = url_for('.display_regform', invitation.locator.uuid, _external=True)
         return Markup('<a href="{0}">{0}</a>'.format(url))

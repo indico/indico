@@ -195,6 +195,19 @@ def _get_registration_placeholders(sender, regform, registration, **kwargs):
     yield FieldPlaceholder
 
 
+@signals.core.get_placeholders.connect_via('registration-invitation-reminder-email')
+def _get_placeholders(sender, invitation=None, event=None, **kwargs):
+    from indico.modules.events import placeholders as event_placeholders
+    from indico.modules.events.registration.placeholders import invitations as invitation_placeholders
+
+    yield invitation_placeholders.InvitationLinkPlaceholder
+    yield invitation_placeholders.FirstNamePlaceholder
+    yield invitation_placeholders.LastNamePlaceholder
+    yield invitation_placeholders.EmailPlaceholder
+    yield event_placeholders.EventTitlePlaceholder
+    yield event_placeholders.EventLinkPlaceholder
+
+
 @signals.event.get_feature_definitions.connect
 def _get_feature_definitions(sender, **kwargs):
     return RegistrationFeature

@@ -28,29 +28,25 @@ def _sidemenu_items(sender, event, **kwargs):
 @signals.core.get_placeholders.connect_via('event-persons-email')
 def _get_placeholders(sender, person, event, contribution=None, abstract=None, register_link=False, object_context=None,
                       **kwargs):
-    from indico.modules.events.persons.placeholders import (AbstractIDPlaceholder, AbstractTitlePlaceholder,
-                                                            ContributionCodePlaceholder, ContributionIDPlaceholder,
-                                                            ContributionsPlaceholder, ContributionTitlePlaceholder,
-                                                            EmailPlaceholder, EventLinkPlaceholder,
-                                                            EventTitlePlaceholder, FirstNamePlaceholder,
-                                                            LastNamePlaceholder, RegisterLinkPlaceholder)
+    from indico.modules.events import placeholders as event_placeholders
+    from indico.modules.events.persons import placeholders as person_placeholders
 
-    yield FirstNamePlaceholder
-    yield LastNamePlaceholder
-    yield EmailPlaceholder
-    yield EventTitlePlaceholder
-    yield EventLinkPlaceholder
+    yield person_placeholders.FirstNamePlaceholder
+    yield person_placeholders.LastNamePlaceholder
+    yield person_placeholders.EmailPlaceholder
+    yield event_placeholders.EventTitlePlaceholder
+    yield event_placeholders.EventLinkPlaceholder
     if register_link:
-        yield RegisterLinkPlaceholder
+        yield person_placeholders.RegisterLinkPlaceholder
     if object_context == 'abstracts':
-        yield AbstractIDPlaceholder
-        yield AbstractTitlePlaceholder
+        yield person_placeholders.AbstractIDPlaceholder
+        yield person_placeholders.AbstractTitlePlaceholder
     elif object_context == 'contributions':
-        yield ContributionIDPlaceholder
-        yield ContributionTitlePlaceholder
-        yield ContributionCodePlaceholder
+        yield person_placeholders.ContributionIDPlaceholder
+        yield person_placeholders.ContributionTitlePlaceholder
+        yield person_placeholders.ContributionCodePlaceholder
     else:
-        yield ContributionsPlaceholder
+        yield person_placeholders.ContributionsPlaceholder
 
 
 persons_settings = EventSettingsProxy('persons', {

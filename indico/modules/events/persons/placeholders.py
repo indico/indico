@@ -47,25 +47,6 @@ class EmailPlaceholder(Placeholder):
         return person.email
 
 
-class EventTitlePlaceholder(Placeholder):
-    name = 'event_title'
-    description = _('The title of the event')
-
-    @classmethod
-    def render(cls, person, event, **kwargs):
-        return event.title
-
-
-class EventLinkPlaceholder(Placeholder):
-    name = 'event_link'
-    description = _('Link to the event')
-
-    @classmethod
-    def render(cls, person, event, **kwargs):
-        return Markup('<a href="{url}" title="{title}">{url}</a>').format(url=event.short_external_url,
-                                                                          title=event.title)
-
-
 class ContributionsPlaceholder(ParametrizedPlaceholder):
     name = 'contributions'
     param_required = False
