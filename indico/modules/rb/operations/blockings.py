@@ -45,13 +45,16 @@ def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
     return query.all()
 
 
-def filter_blocked_rooms(blocked_rooms, overridable_only=False, nonoverridable_only=False, explicit=False):
+def filter_blocked_rooms(blocked_rooms, overridable_only=False, nonoverridable_only=False, explicit=False,
+                         allow_admin=False):
     if overridable_only:
         blocked_rooms = [room for room in blocked_rooms
-                         if room.blocking.can_override(session.user, room=room.room, explicit_only=explicit)]
+                         if room.blocking.can_override(session.user, room=room.room, explicit_only=explicit,
+                                                       allow_admin=allow_admin)]
     if nonoverridable_only:
         blocked_rooms = [room for room in blocked_rooms
-                         if not room.blocking.can_override(session.user, room=room.room, explicit_only=explicit)]
+                         if not room.blocking.can_override(session.user, room=room.room, explicit_only=explicit,
+                                                           allow_admin=allow_admin)]
     return blocked_rooms
 
 

@@ -77,12 +77,14 @@ export default function Timeline() {
         submitter={timelineBlocks[0].submitter}
         eventId={eventId}
       >
-        <FileDisplay
-          fileTypes={fileTypes}
-          files={lastRevision.files}
-          downloadURL={lastRevision.downloadFilesURL}
-          tags={lastRevision.tags}
-        />
+        {details.hasPublishedRevision && (
+          <FileDisplay
+            fileTypes={fileTypes}
+            files={lastRevision.files}
+            downloadURL={lastRevision.downloadFilesURL}
+            tags={lastRevision.tags}
+          />
+        )}
       </TimelineHeader>
       <TimelineContent blocks={timelineBlocks} itemComponent={TimelineItem} />
       {canPerformSubmitterActions && needsSubmitterChanges && <SubmitRevision />}

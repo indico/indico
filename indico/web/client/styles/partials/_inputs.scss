@@ -147,29 +147,6 @@ ul {
   }
 }
 
-div[contenteditable],
-span[contenteditable] {
-  p {
-    margin: 0;
-  }
-
-  &:hover {
-    outline: 1px dashed $default-border-color;
-  }
-
-  &:focus,
-  &.focus {
-    background: white;
-    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-    outline: 1px solid $blue;
-  }
-
-  &.empty {
-    color: $gray;
-    font-style: italic;
-  }
-}
-
 .i-selection {
   input[type='checkbox'],
   input[type='radio'] {

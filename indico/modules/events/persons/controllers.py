@@ -351,10 +351,10 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
                                               event=self.event, register_link=self.no_account)
             email_subject = replace_placeholders('event-persons-email', subject, person=recipient,
                                                  event=self.event, register_link=self.no_account)
-            tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
             bcc = {session.user.email} if copy_for_sender else set()
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
+                tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
                 email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=from_address,
                                    template=tpl, html=True)
             send_email(email, self.event, 'Event Persons')

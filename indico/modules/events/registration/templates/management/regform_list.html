@@ -72,22 +72,24 @@
                     </div>
                 </div>
             </div>
-        {% endblock %}
-        <div class="section">
-            <div class="icon icon-tag"></div>
-            <div class="text">
-                <div class="label">{% trans %}Registration tags{% endtrans %}</div>
-                {% trans %}Create tags to mark and filter registrations{% endtrans %}
-            </div>
-            <div class="toolbar">
-                <div class="group">
-                    <a href="{{ url_for('.manage_registration_tags', event) }}" class="i-button icon-settings">
-                        {%- trans %}Configure{% endtrans -%}
-                    </a>
+            {% block tags_section %}
+                <div class="section">
+                    <div class="icon icon-tag"></div>
+                    <div class="text">
+                        <div class="label">{% trans %}Registration tags{% endtrans %}</div>
+                        {% trans %}Create tags to mark and filter registrations{% endtrans %}
+                    </div>
+                    <div class="toolbar">
+                        <div class="group">
+                            <a href="{{ url_for('.manage_registration_tags', event) }}" class="i-button icon-settings">
+                                {%- trans %}Configure{% endtrans -%}
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            {% endblock %}
         </div>
-    </div>
+    {% endblock %}
     {{ template_hook('extra-registration-settings', event=event) }}
     <div class="regform-list">
         <h3>{% trans %}List of registration forms{% endtrans %}</h3>

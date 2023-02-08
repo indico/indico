@@ -9,7 +9,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {FormSpy} from 'react-final-form';
-import {Form, Button, Message} from 'semantic-ui-react';
+import {Form, Button, Message, Input, Popup, Icon} from 'semantic-ui-react';
 
 import {FinalEmailList} from 'indico/react/components';
 import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
@@ -18,6 +18,41 @@ import {FinalCheckbox, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+
+function RecipientsField({recipients}) {
+  return (
+    <Form.Field>
+      <Translate as="label">Recipients</Translate>
+      <Input
+        value={recipients.join(', ')}
+        readOnly
+        icon={
+          navigator.clipboard && (
+            <Popup
+              content={Translate.string('Copied!')}
+              on="click"
+              position="top center"
+              inverted
+              trigger={
+                <Icon
+                  name="copy"
+                  color="black"
+                  title={Translate.string('Copy to clipboard')}
+                  onClick={() => navigator.clipboard.writeText(recipients.join(', '))}
+                  link
+                />
+              }
+            />
+          )
+        }
+      />
+    </Form.Field>
+  );
+}
+
+RecipientsField.propTypes = {
+  recipients: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
 
 export function EmailSentMessage({count}) {
   return (
@@ -45,6 +80,7 @@ export function EmailDialog({
   previewURL,
   previewContext,
   placeholders,
+  recipients,
   recipientsField,
   initialFormValues,
 }) {
@@ -124,7 +160,7 @@ export function EmailDialog({
             <PlaceholderInfo placeholders={placeholders} />
           </Form.Field>
         )}
-        {recipientsField}
+        {recipientsField || <RecipientsField recipients={recipients} />}
         <FinalEmailList
           name="bcc_addresses"
           label={Translate.string('BCC addresses')}
@@ -177,7 +213,10 @@ EmailDialog.propTypes = {
   previewURL: PropTypes.string.isRequired,
   previewContext: PropTypes.object,
   placeholders: PropTypes.array.isRequired,
-  recipientsField: PropTypes.node.isRequired,
+  /** Array of email addresses passed to <RecipientsField /> */
+  recipients: PropTypes.arrayOf(PropTypes.string),
+  /** React node to render instead of the default <RecipientsField /> component. */
+  recipientsField: PropTypes.node,
   initialFormValues: PropTypes.object,
 };
 
@@ -185,4 +224,6 @@ EmailDialog.defaultProps = {
   previewContext: {},
   initialFormValues: {},
   sentEmailsCount: 0,
+  recipients: [],
+  recipientsField: null,
 };

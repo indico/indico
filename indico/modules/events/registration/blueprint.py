@@ -119,6 +119,15 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invita
                  'manager_decline_invitation', invitations.RHRegistrationFormManagerDeclineInvitation,
                  methods=('POST',))
 
+# Invitation reminders API
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/reminders/send', 'api_invitations_reminders_send',
+                 invitations.RHRegistrationFormRemindersSend, methods=('POST',))
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/reminders/metadata',
+                 'api_invitations_reminders_metadata', invitations.RHRegistrationFormRemindersMetadata)
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/reminders/preview',
+                 'api_invitations_reminders_preview', invitations.RHRegistrationFormRemindersPreview,
+                 methods=('POST',))
+
 # E-ticket management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets', 'tickets', tickets.RHRegistrationFormTickets,
                  methods=('GET', 'POST'))

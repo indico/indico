@@ -256,6 +256,7 @@ def _log_event_update(event, changes, extra_log_fields, visible_person_link_chan
         'own_map_url': {'title': 'Map URL', 'type': 'string'},
         'supported_locales': 'Supported languages',
         'default_locale': 'Default language',
+        'enforce_locale': 'Enforce language',
         **(extra_log_fields or {})
     }
     _split_location_changes(changes)

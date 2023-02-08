@@ -46,7 +46,7 @@ class RHEventCheckEmail(RHProtected):
         obj = self.object.session if self.object_type == 'session_block' else self.object
         # Depending on the settings, contribution submitters may be able to edit
         # speakers/authors without having management rights
-        method = obj.can_edit if self.object_type in ('contribution', 'subcontribution') else obj.can_manage
+        method = obj.can_edit if self.object_type in ('contribution', 'subcontribution', 'abstract') else obj.can_manage
         if not method(session.user):
             raise Forbidden
 

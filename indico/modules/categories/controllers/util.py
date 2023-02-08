@@ -16,7 +16,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.categories.models.event_move_request import MoveRequestState
 from indico.modules.events.models.events import Event
-from indico.modules.events.util import serialize_event_for_json_ld
+from indico.modules.events.util import serialize_events_for_json_ld
 from indico.util.date_time import format_date, format_skeleton
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
@@ -162,7 +162,7 @@ def get_category_view_params(category, now, is_flat=False):
         'show_past_events': show_past_events,
         'past_threshold': past_threshold.strftime(threshold_format),
         'has_hidden_events': has_hidden_events,
-        'json_ld': list(map(serialize_event_for_json_ld, json_ld_events)),
+        'json_ld': serialize_events_for_json_ld(json_ld_events),
         'atom_feed_url': url_for('.export_atom', category),
         'atom_feed_title': _('Events of "{}"').format(category.title),
         'pending_event_moves': pending_event_moves,

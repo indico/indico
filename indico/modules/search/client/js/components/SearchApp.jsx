@@ -16,6 +16,7 @@ import {Checkbox, Dropdown, Grid, Label, Loader, Menu, Message} from 'semantic-u
 import {useIndicoAxios, useQueryParams} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
+import {getPluginObjects} from 'indico/utils/plugins';
 
 import ResultList from './ResultList';
 import Attachment from './results/Attachment';
@@ -253,6 +254,11 @@ export default function SearchApp({category, eventId, isAdmin}) {
     'event_note',
     scope
   );
+  const searchTypesFromPlugins = getPluginObjects('search_result_types').map(
+    ([title, type, resultComponent]) =>
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      [title, useSearch(searchURL(), query, type, scope), resultComponent]
+  );
   const searchMap = eventSearch
     ? [
         [Translate.string('Contributions'), contributionResults, setContributionPage, Contribution],
@@ -264,6 +270,12 @@ export default function SearchApp({category, eventId, isAdmin}) {
         [Translate.string('Materials'), fileResults, setFilePage, Attachment],
         [Translate.string('Notes'), noteResults, setNotePage, EventNote],
         [Translate.string('Categories'), categoryResults, setCategoryPage, Category],
+        ...searchTypesFromPlugins.map(([title, [hookResults, setHookPage], resultComponent]) => [
+          title,
+          hookResults,
+          setHookPage,
+          resultComponent,
+        ]),
       ];
   // Defaults to the first tab loading or with results
   const menuItem =
