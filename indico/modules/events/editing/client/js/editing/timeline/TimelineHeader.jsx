@@ -146,7 +146,7 @@ export default function TimelineHeader({children, contribution, state, submitter
             )}
           </Message>
         )}
-        <div className="review-item-content">{children}</div>
+        {children && <div className="review-item-content">{children}</div>}
       </div>
     </>
   );

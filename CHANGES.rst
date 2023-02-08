@@ -32,6 +32,7 @@ Improvements
   :pr:`5653`)
 - Add option to send reminders to invited registrants who have not yet responsed
   (:issue:`5579`, :pr:`5654`)
+- Hide the top box with the latest files/paper until it has been accepted (:issue:`5660`)
 
 Bugfixes
 ^^^^^^^^

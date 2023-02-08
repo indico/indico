@@ -205,7 +205,7 @@ class EditableSchema(mm.SQLAlchemyAutoSchema):
         model = Editable
         fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'review_conditions_valid',
                   'can_perform_editor_actions', 'can_perform_submitter_actions', 'can_create_internal_comments',
-                  'can_unassign', 'can_assign_self', 'editing_enabled', 'state')
+                  'can_unassign', 'can_assign_self', 'editing_enabled', 'state', 'has_published_revision')
 
     contribution = fields.Nested(BasicContributionSchema)
     editor = fields.Nested(EditingUserSchema)
@@ -224,6 +224,7 @@ class EditableSchema(mm.SQLAlchemyAutoSchema):
     review_conditions_valid = fields.Boolean()
     editing_enabled = fields.Boolean()
     state = fields.Nested(EditableStateSchema)
+    has_published_revision = fields.Function(lambda editable: editable.published_revision is not None)
 
     @post_dump(pass_original=True)
     def anonymize_editor(self, data, orig, **kwargs):
