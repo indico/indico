@@ -45,6 +45,8 @@ Bugfixes
   :pr:`5643`)
 - Do not show blocked rooms as available on the very last day of the blocking
   (:pr:`5663`)
+- Do not show blocked rooms as available for admins unles they have admin override
+  mode enabled (:pr:`5663`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
