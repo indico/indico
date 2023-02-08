@@ -94,7 +94,7 @@ class RHSearchRooms(RHRoomBookingBase):
     def _adjust_blockings(self, rooms, filters, availability):
         if availability is None:
             return rooms
-        blocked_rooms = get_blockings_with_rooms(filters['start_dt'], filters['end_dt'])
+        blocked_rooms = get_blockings_with_rooms(filters['start_dt'].date(), filters['end_dt'].date())
         nonoverridable_blocked_rooms = filter_blocked_rooms(blocked_rooms, nonoverridable_only=True)
         if availability:
             # Remove nonoverridable blockings from available rooms

@@ -43,6 +43,8 @@ Bugfixes
   (:issue:`5633`, :pr:`5638`, thanks :user:`kewisch`)
 - Do not break registrations with purged accommodation fields (:issue:`5641`,
   :pr:`5643`)
+- Do not show blocked rooms as available on the very last day of the blocking
+  (:pr:`5663`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
