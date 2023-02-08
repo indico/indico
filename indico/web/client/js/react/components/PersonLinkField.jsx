@@ -271,7 +271,6 @@ function PersonLinkField({
       delete value.affiliationData;
     }
     if (selected !== null) {
-      value.roles = roles.filter(x => x.default).map(x => x.name);
       onChange(persons.map((v, idx) => (idx === selected ? value : v)));
     } else {
       onAdd([value]);

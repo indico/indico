@@ -47,6 +47,8 @@ Bugfixes
   (:pr:`5663`)
 - Do not show blocked rooms as available for admins unles they have admin override
   mode enabled (:pr:`5663`)
+- Fix roles resetting to the default ones when editing person data in an abstract
+  or contribution (:pr:`5664`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
