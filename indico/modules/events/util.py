@@ -29,6 +29,7 @@ from indico.core.errors import NoReportError, UserValueError
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events import Event
+from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -97,6 +98,8 @@ def get_object_from_args(args=None):
                        ~SubContribution.is_deleted,
                        SubContribution.contribution.has(event=event, id=args['contrib_id'], is_deleted=False))
                .first())
+    elif object_type == 'abstract':
+        obj = Abstract.query.with_parent(event).filter_by(id=args['abstract_id']).first()
     else:
         raise ValueError(f'Unexpected object type: {object_type}')
     if obj is not None:
