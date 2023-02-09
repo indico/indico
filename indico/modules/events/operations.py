@@ -140,12 +140,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 
 @make_interceptable
 @no_autoflush
-def update_event(event, update_timetable=False, **data):
-    assert set(data.keys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
-                                'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
-                                'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
-                                'contact_phones', 'start_dt_override', 'end_dt_override', 'label', 'label_message',
-                                'own_map_url', 'supported_locales', 'enforce_locale', 'default_locale'}
+def update_event(event, *, update_timetable=False, _extra_log_fields=None, **data):
     old_person_links = event.sorted_person_links[:]
     changes = {}
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
@@ -165,7 +160,7 @@ def update_event(event, update_timetable=False, **data):
     db.session.flush()
     signals.event.updated.send(event, changes=changes)
     logger.info('Event %r updated with %r by %r', event, data, session.user)
-    _log_event_update(event, changes, visible_person_link_changes=visible_person_link_changes)
+    _log_event_update(event, changes, _extra_log_fields, visible_person_link_changes=visible_person_link_changes)
 
 
 def clone_event(event, n_occurrence, start_dt, cloners, category=None, refresh_users=False):
@@ -230,7 +225,7 @@ def clone_into_event(source_event, target_event, cloners):
     return target_event
 
 
-def _log_event_update(event, changes, visible_person_link_changes=False):
+def _log_event_update(event, changes, extra_log_fields, visible_person_link_changes=False):
     log_fields = {
         'title': {'title': 'Title', 'type': 'string'},
         'description': 'Description',
@@ -262,6 +257,7 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
         'supported_locales': 'Supported languages',
         'default_locale': 'Default language',
         'enforce_locale': 'Enforce language',
+        **(extra_log_fields or {})
     }
     _split_location_changes(changes)
     if not visible_person_link_changes:
@@ -320,9 +316,8 @@ def _format_person(data):
     return f'{data.full_name} <{data.email}>' if data.email else data.full_name
 
 
-def update_event_protection(event, data):
-    assert set(data.keys()) <= {'protection_mode', 'own_no_access_contact', 'access_key',
-                                'visibility', 'public_regform_access'}
+@make_interceptable
+def update_event_protection(event, data, *, _extra_log_fields=None):
     changes = event.populate_from_dict(data)
     db.session.flush()
     signals.event.updated.send(event, changes=changes)
@@ -333,7 +328,8 @@ def update_event_protection(event, data):
                       'access_key': {'title': 'Access key', 'type': 'string'},
                       'visibility': {'title': 'Visibility', 'type': 'string',
                                      'convert': lambda changes: [format_visibility(event, x) for x in changes]},
-                      'public_regform_access': 'Public registration form access'}
+                      'public_regform_access': 'Public registration form access',
+                      **(_extra_log_fields or {})}
         event.log(EventLogRealm.management, LogKind.change, 'Event', 'Protection updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
 
