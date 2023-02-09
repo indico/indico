@@ -148,7 +148,8 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                        tags=revision.tags)
         if action in (EditingReviewAction.update_accept, EditingReviewAction.request_update):
             new_revision.reviewed_dt = revision.reviewed_dt
-        _ensure_publishable_files(new_revision)
+        if action != EditingReviewAction.request_update:
+            _ensure_publishable_files(new_revision)
         revision.editable.revisions.append(new_revision)
     db.session.flush()
     notify_editor_judgment(revision, editor)
