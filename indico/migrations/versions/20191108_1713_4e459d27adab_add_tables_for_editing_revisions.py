@@ -5,12 +5,12 @@ Revises: 39a25a873063
 Create Date: 2019-11-08 17:13:48.096553
 """
 
+from enum import Enum
 import sqlalchemy as sa
 from alembic import op
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.events.editing.models.editable import EditableType
-from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
 
 
 # revision identifiers, used by Alembic.
@@ -18,6 +18,21 @@ revision = '4e459d27adab'
 down_revision = '39a25a873063'
 branch_labels = None
 depends_on = None
+
+
+class _InitialRevisionState(int, Enum):
+    new = 1
+    ready_for_review = 2
+    needs_submitter_confirmation = 3
+
+
+class _FinalRevisionState(int, Enum):
+    none = 0
+    replaced = 1
+    needs_submitter_confirmation = 2
+    needs_submitter_changes = 3
+    accepted = 4
+    rejected = 5
 
 
 def upgrade():
@@ -42,8 +57,8 @@ def upgrade():
         sa.Column('submitter_id', sa.Integer(), nullable=False, index=True),
         sa.Column('editor_id', sa.Integer(), nullable=True, index=True),
         sa.Column('created_dt', UTCDateTime, nullable=False),
-        sa.Column('initial_state', PyIntEnum(InitialRevisionState), nullable=False),
-        sa.Column('final_state', PyIntEnum(FinalRevisionState), nullable=False),
+        sa.Column('initial_state', PyIntEnum(_InitialRevisionState), nullable=False),
+        sa.Column('final_state', PyIntEnum(_FinalRevisionState), nullable=False),
         sa.Column('comment', sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(['editable_id'], ['event_editing.editables.id']),
         sa.ForeignKeyConstraint(['editor_id'], ['users.users.id']),

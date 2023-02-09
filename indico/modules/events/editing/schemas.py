@@ -21,7 +21,7 @@ from indico.modules.events.editing.models.editable import Editable, EditableStat
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
+from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.util import get_all_user_roles
 from indico.modules.users import User
@@ -44,7 +44,7 @@ def _get_anonymous_user():
     }
 
 
-class RevisionStateSchema(mm.Schema):
+class RevisionTypeSchema(mm.Schema):
     title = fields.String()
     name = fields.String()
     css_class = fields.String()
@@ -137,7 +137,6 @@ class EditingRevisionCommentSchema(mm.SQLAlchemyAutoSchema):
 
     revision_id = fields.Int(attribute='revision.id')
     user = fields.Nested(EditingUserSchema)
-    undone_judgment = fields.Nested(RevisionStateSchema)
     html = fields.Function(lambda comment: escape(comment.text))
     can_modify = fields.Function(lambda comment, ctx: comment.can_modify(ctx.get('user')))
     modify_comment_url = fields.Function(lambda comment: url_for('event_editing.api_edit_comment', comment))
@@ -153,18 +152,16 @@ class EditingRevisionCommentSchema(mm.SQLAlchemyAutoSchema):
 class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevision
-        fields = ('id', 'created_dt', 'reviewed_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html',
-                  'comments', 'initial_state', 'final_state', 'tags', 'create_comment_url', 'download_files_url',
-                  'review_url', 'confirm_url', 'custom_actions', 'custom_action_url')
+        fields = ('id', 'created_dt', 'revises_id', 'user', 'files', 'comment', 'comment_html',
+                  'comments', 'type', 'is_valid', 'is_undone', 'is_editor', 'tags', 'create_comment_url',
+                  'download_files_url', 'review_url', 'confirm_url', 'custom_actions', 'custom_action_url')
 
     comment_html = fields.Function(lambda rev: escape(rev.comment))
-    submitter = fields.Nested(EditingUserSchema)
-    editor = fields.Nested(EditingUserSchema)
+    user = fields.Nested(EditingUserSchema)
     files = fields.List(fields.Nested(EditingRevisionFileSchema))
     tags = fields.List(fields.Nested(EditingTagSchema))
     comments = fields.Method('_get_comments')
-    initial_state = fields.Nested(RevisionStateSchema)
-    final_state = fields.Nested(RevisionStateSchema)
+    type = fields.Nested(RevisionTypeSchema)
     create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_revision_comment',
                                                                   revision))
     download_files_url = fields.Function(lambda revision: url_for('event_editing.revision_files_export', revision))
@@ -174,7 +171,7 @@ class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     custom_actions = fields.Function(lambda revision, ctx: ctx.get('custom_actions', {}).get(revision, []))
 
     def _get_confirm_url(self, revision):
-        if revision.initial_state == InitialRevisionState.needs_submitter_confirmation and not revision.final_state:
+        if revision.type == RevisionType.needs_submitter_confirmation and not revision.reviewed:
             return url_for('event_editing.api_confirm_changes', revision)
 
     def _get_comments(self, revision):
@@ -191,10 +188,8 @@ class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     def anonymize_users(self, data, orig, **kwargs):
         can_see_editor_names_fn = self.context.get('can_see_editor_names')
         if can_see_editor_names_fn:
-            if data['editor'] and not can_see_editor_names_fn(self.context['user'], orig.editor):
-                data['editor'] = _get_anonymous_user()
-            if data['submitter'] and not can_see_editor_names_fn(self.context['user'], orig.submitter):
-                data['submitter'] = _get_anonymous_user()
+            if data['user'] and not can_see_editor_names_fn(self.context['user'], orig.user):
+                data['user'] = _get_anonymous_user()
         return data
 
 

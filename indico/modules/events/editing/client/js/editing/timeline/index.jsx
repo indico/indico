@@ -74,7 +74,7 @@ export default function Timeline() {
       <TimelineHeader
         contribution={details.contribution}
         state={details.state}
-        submitter={timelineBlocks[0].submitter}
+        submitter={timelineBlocks[0].user}
         eventId={eventId}
       >
         {details.hasPublishedRevision && (

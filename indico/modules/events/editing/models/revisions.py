@@ -5,8 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import re
 from collections import defaultdict
+
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -18,62 +19,35 @@ from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
-class InitialRevisionState(RichIntEnum):
-    __titles__ = [None, _('New'), _('Ready for Review'), _('Needs Confirmation')]
-    __css_classes__ = [None, 'highlight', 'ready', 'warning']
-    #: A revision that has been submitted by the user but isn't exposed to editors yet
+class RevisionType(RichIntEnum):
+    __titles__ = [None, _('New'), _('Ready for Review'), _('Needs Confirmation'), _('Accepted'), _('Needs Changes'),
+                  _('Accepted'), _('Rejected'), _('Undone'), _('Reset')]
+    __css_classes__ = [None, 'highlight', 'ready', 'warning', 'success', 'warning', 'success', 'error', None, None]
+    #: A submitter revision that hasn't been exposed to editors yet
     new = 1
-    #: A revision that can be reviewed by editors
+    #: A submitter revision that can be reviewed by editors
     ready_for_review = 2
-    #: A revision with changes the submitter needs to approve or reject
+    #: An editor revision with changes the submitter needs to approve or reject
     needs_submitter_confirmation = 3
-
-
-class FinalRevisionState(RichIntEnum):
-    __titles__ = [None, _('Replaced'), _('Needs Confirmation'), _('Needs Changes'), _('Accepted'), _('Rejected'),
-                  _('Undone')]
-    __css_classes__ = [None, 'highlight', 'warning', 'warning', 'success', 'error', None]
-    #: A revision that is awaiting some action
-    none = 0
-    #: A revision that has been replaced by its next revision
-    replaced = 1
-    #: A revision that requires the submitter to confirm the next revision
-    needs_submitter_confirmation = 2
+    #: A submitter revision that accepts the changes made by the editor
+    changes_acceptance = 4
     #: A revision that requires the submitter to submit a new revision
-    needs_submitter_changes = 3
-    #: A revision that has been accepted (no followup revision)
-    accepted = 4
-    #: A revision that has been rejected (no followup revision)
-    rejected = 5
-    #: A revision that has been undone
-    undone = 6
-
-
-def _make_state_check():
-    return re.sub(r'\s+', ' ', '''
-        (initial_state={i_new} AND final_state IN ({f_none}, {f_replaced})) OR
-        (initial_state={i_ready_for_review}) OR
-        (initial_state={i_needs_confirmation} AND
-         (final_state IN ({f_none}, {f_needs_changes}, {f_accepted}, {f_undone})))
-    '''.format(i_new=InitialRevisionState.new,
-               i_ready_for_review=InitialRevisionState.ready_for_review,
-               i_needs_confirmation=InitialRevisionState.needs_submitter_confirmation,
-               f_none=FinalRevisionState.none,
-               f_replaced=FinalRevisionState.replaced,
-               f_needs_changes=FinalRevisionState.needs_submitter_changes,
-               f_accepted=FinalRevisionState.accepted,
-               f_undone=FinalRevisionState.undone)).strip()
-
-
-def _make_reviewed_dt_check():
-    return f'((final_state = {FinalRevisionState.none}) OR (reviewed_dt IS NOT NULL))'
+    needs_submitter_changes = 5
+    #: An editor revision that accepts the editable
+    acceptance = 6
+    #: An editor revision that rejects the editable
+    rejection = 7
+    #: An editor revision that undoes the previous revision
+    undo = 8
+    #: An editor revision that resets the state of the editable to "ready for review"
+    reset = 9
 
 
 class EditingRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
-    __table_args__ = (db.CheckConstraint(_make_state_check(), name='valid_state_combination'),
-                      db.CheckConstraint(_make_reviewed_dt_check(), name='reviewed_dt_set_when_final_state'),
+    __table_args__ = (db.CheckConstraint(f'type IN ({RevisionType.new}, {RevisionType.ready_for_review}) OR revises_id IS NOT NULL', name='revises_set_unless_new'),
                       {'schema': 'event_editing'})
+    # TODO revisions can only be revised by one not undone revision
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
@@ -87,13 +61,13 @@ class EditingRevision(RenderModeMixin, db.Model):
         index=True,
         nullable=False
     )
-    submitter_id = db.Column(
+    user_id = db.Column(
         db.ForeignKey('users.users.id'),
         index=True,
         nullable=False
     )
-    editor_id = db.Column(
-        db.ForeignKey('users.users.id'),
+    revises_id = db.Column(
+        db.ForeignKey('event_editing.revisions.id'),
         index=True,
         nullable=True
     )
@@ -102,19 +76,10 @@ class EditingRevision(RenderModeMixin, db.Model):
         nullable=False,
         default=now_utc
     )
-    reviewed_dt = db.Column(
-        UTCDateTime,
-        nullable=True
-    )
-    initial_state = db.Column(
-        PyIntEnum(InitialRevisionState),
+    type = db.Column(
+        PyIntEnum(RevisionType),
         nullable=False,
-        default=InitialRevisionState.new
-    )
-    final_state = db.Column(
-        PyIntEnum(FinalRevisionState),
-        nullable=False,
-        default=FinalRevisionState.none
+        default=RevisionType.new
     )
     _comment = db.Column(
         'comment',
@@ -129,27 +94,33 @@ class EditingRevision(RenderModeMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'revisions',
+            primaryjoin=('(EditingRevision.editable_id == Editable.id) & '
+                         '~EditingRevision.type.in_(({}, {}))').format(RevisionType.undo, RevisionType.reset),
             lazy=True,
             order_by=created_dt,
             cascade='all, delete-orphan'
         )
     )
-    submitter = db.relationship(
+    user = db.relationship(
         'User',
         lazy=True,
-        foreign_keys=submitter_id,
+        foreign_keys=user_id,
         backref=db.backref(
             'editing_revisions',
             lazy='dynamic'
         )
     )
-    editor = db.relationship(
-        'User',
+    revises = db.relationship(
+        'EditingRevision',
         lazy=True,
-        foreign_keys=editor_id,
+        remote_side=id,
+        foreign_keys=revises_id,
         backref=db.backref(
-            'editor_for_revisions',
-            lazy='dynamic'
+            'revised_by',
+            uselist=False,
+            #primaryjoin='(EditingRevision.revises_id == EditingRevision.id) & ~EditingRevision.is_undone',
+            #primaryjoin=(db.remote(revises_id) == id) & ~db.remote(is_undone),
+            lazy=True
         )
     )
     tags = db.relationship(
@@ -164,7 +135,7 @@ class EditingRevision(RenderModeMixin, db.Model):
         )
     )
 
-    #: A comment provided by whoever assigned the final state of the revision.
+    #: A comment provided by whoever made the revision.
     comment = RenderModeMixin.create_hybrid_property('_comment')
 
     # relationship backrefs:
@@ -172,7 +143,7 @@ class EditingRevision(RenderModeMixin, db.Model):
     # - files (EditingRevisionFile.revision)
 
     def __repr__(self):
-        return format_repr(self, 'id', 'editable_id', 'initial_state', final_state=FinalRevisionState.none)
+        return format_repr(self, 'id', 'editable_id', 'type')
 
     @property
     def has_publishable_files(self):
@@ -193,3 +164,45 @@ class EditingRevision(RenderModeMixin, db.Model):
             if file.file_type.publishable:
                 files[file.file_type].append(file)
         return dict(files)
+
+    @hybrid_property
+    def is_replaced(self):
+        return self.revised_by is not None and self.revised_by.type == RevisionType.ready_for_review
+
+    @is_replaced.expression
+    def is_replaced(cls):
+        return cls.revised_by.has(type=RevisionType.ready_for_review)
+
+    @hybrid_property
+    def is_undone(self):
+        return self.revised_by is not None and self.revised_by.type == RevisionType.undo
+
+    @is_undone.expression
+    def is_undone(cls):
+        return cls.revised_by.has(type=RevisionType.undo)
+
+    @hybrid_property
+    def is_valid(self):
+        #TODO make reset revisions invalid?
+        return self.type != RevisionType.undo and not self.is_undone
+
+    @is_valid.expression
+    def is_valid(cls):
+        return (cls.type != RevisionType.undo) & ~cls.is_undone
+
+    @property
+    def reviewed(self):
+        return (self.is_valid and
+                self.revised_by is not None and
+                self.revised_by.is_valid and
+                self.revised_by.type not in (RevisionType.new, RevisionType.ready_for_review))
+
+    @property
+    def is_editor(self):
+        if self.type in (RevisionType.needs_submitter_confirmation, RevisionType.acceptance, RevisionType.rejection,
+                         RevisionType.undo, RevisionType.reset):
+            return True
+        if (self.type == RevisionType.needs_submitter_changes and
+                self.revises.type != RevisionType.needs_submitter_confirmation):
+            return True
+        return False

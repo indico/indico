@@ -7,20 +7,14 @@
 
 import {Translate} from 'indico/react/i18n';
 
-export const FinalRevisionState = {
-  none: 'none',
-  replaced: 'replaced',
-  needs_submitter_confirmation: 'needs_submitter_confirmation',
-  needs_submitter_changes: 'needs_submitter_changes',
-  accepted: 'accepted',
-  rejected: 'rejected',
-  undone: 'undone',
-};
-
-export const InitialRevisionState = {
+export const RevisionType = {
+  new: 'new',
   ready_for_review: 'ready_for_review',
   needs_submitter_confirmation: 'needs_submitter_confirmation',
-  new: 'new',
+  changes_acceptance: 'changes_acceptance',
+  needs_submitter_changes: 'needs_submitter_changes',
+  acceptance: 'acceptance',
+  rejection: 'rejection',
 };
 
 export const EditingReviewAction = {

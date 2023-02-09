@@ -16,7 +16,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.editable import EditableType
-from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
+from indico.modules.events.editing.models.revisions import RevisionType
 from indico.modules.events.editing.operations import create_revision_comment, publish_editable_revision
 from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingReviewAction,
                                                    EditingRevisionSignedSchema, ServiceActionResultSchema,
@@ -154,7 +154,7 @@ def service_handle_new_editable(editable, user):
         resp = ServiceCreateEditableResultSchema().load(resp.json()) if resp.text else {}
 
         if resp.get('ready_for_review'):
-            editable.revisions[0].initial_state = InitialRevisionState.ready_for_review
+            editable.revisions[0].type = RevisionType.ready_for_review
             db.session.flush()
     except (requests.RequestException, ValidationError) as exc:
         _log_service_error(exc, 'Calling listener for new editable failed')
@@ -252,7 +252,7 @@ def service_handle_custom_action(editable, revision, user, action):
         # if the revision got deleted, we're done
         return resp
 
-    if revision.final_state == FinalRevisionState.accepted:
+    if revision.type == RevisionType.acceptance:
         publish = resp.get('publish')
         if publish:
             publish_editable_revision(revision)

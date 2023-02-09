@@ -8,56 +8,20 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-import {FinalRevisionState, InitialRevisionState} from 'indico/modules/events/editing/models';
+import {RevisionType} from 'indico/modules/events/editing/models';
 import {Translate} from 'indico/react/i18n';
 
 import {filePropTypes} from './FileManager/util';
 
-export const isRequestChangesWithFiles = (revision, previousRevision) =>
-  previousRevision &&
-  revision.reviewedDt &&
-  revision.editor &&
-  previousRevision.editor &&
-  previousRevision.finalState.name === FinalRevisionState.needs_submitter_changes &&
-  revision.finalState.name === FinalRevisionState.needs_submitter_changes &&
-  revision.reviewedDt === previousRevision.reviewedDt &&
-  revision.editor.identifier === previousRevision.editor.identifier;
-
 // This method defines each revision as a block
 // with a label referring to its previous state transition
 export function processRevisions(revisions) {
-  let revisionState;
+  console.log(revisions);
   return revisions.map((revision, i) => {
-    const items = revision.comments.map(c =>
-      c.undoneJudgment.name === FinalRevisionState.none
-        ? c
-        : {
-            ...c,
-            header: getRevisionTransition(
-              {...revision, finalState: c.undoneJudgment},
-              {isLatestRevision: true}
-            ),
-            createdDt: c.createdDt,
-            custom: true,
-          }
-    );
-    const header = revisionState;
-    const isLatestRevision = i === revisions.length - 1;
-    const previousRevision = getPreviousValidRevision(revisions, i);
-    const nextRevision = getNextValidRevision(revisions, i);
-    revisionState = getRevisionTransition(revision, {isLatestRevision});
-    // Generate the comment header
-    if (
-      revisionState &&
-      !isRequestChangesWithFiles(revision, previousRevision) &&
-      !isEditorRevision(revision, nextRevision)
-    ) {
-      const author = revision.editor || revision.submitter;
-      items.push(commentFromState(revision, revisionState, author));
-    }
+    const previousRevision = getPreviousRevisionWithFiles(revisions, i);
     // Set the state on the files that were added/modified in this revision
     let files = revision.files;
-    if (previousRevision && previousRevision.files && files) {
+    if (previousRevision && files?.length) {
       const previousFilesUUIDs = new Set(previousRevision.files.map(f => f.uuid));
       const previousFilenames = new Set(previousRevision.files.map(f => f.filename));
       files = files.map(f => {
@@ -72,89 +36,70 @@ export function processRevisions(revisions) {
     }
     return {
       ...revision,
-      // use the previous state transition as current block header, unless the revision has been undone
-      header: revision.finalState.name !== FinalRevisionState.undone && (header || revision.header),
-      revisionCommentHtml: isEditorRevision(previousRevision, revision)
-        ? previousRevision.commentHtml
-        : '',
-      items: _.sortBy(items, 'createdDt'),
+      header: getRevisionHeader(revisions, revision) || revision.header,
+      items: _.sortBy(revision.comments, 'createdDt'),
       files,
     };
   });
 }
 
-export function isEditorRevision(previousRevision, revision) {
-  return (
-    revision &&
-    revision.finalState.name !== FinalRevisionState.undone &&
-    previousRevision &&
-    (revision.initialState.name === InitialRevisionState.needs_submitter_confirmation ||
-      isRequestChangesWithFiles(revision, previousRevision)) &&
-    previousRevision.editor &&
-    previousRevision.editor.identifier === revision.submitter.identifier
-  );
-}
-
-export function getPreviousValidRevision(revisions, index) {
+export function getPreviousRevisionWithFiles(revisions, index) {
   return revisions
     .slice(0, index)
     .reverse()
-    .find(revision => revision.finalState.name !== FinalRevisionState.undone);
+    .find(revision => revision.isValid && revision.files?.length);
 }
 
 export function getNextValidRevision(revisions, index) {
-  return revisions
-    .slice(index + 1)
-    .find(revision => revision.finalState.name !== FinalRevisionState.undone);
+  return revisions.slice(index + 1).find(revision => revision.isValid);
 }
 
-export function commentFromState(revision, state, user) {
-  const {finalState, id, reviewedDt, submitter} = revision;
-  return {
-    id: `custom-item-${id}-${reviewedDt}-${finalState.name}`,
-    revisionId: id,
-    header: state,
-    createdDt: reviewedDt,
-    user: user || submitter,
-    custom: true,
-    html: revision.commentHtml,
-  };
+function getRevisionHeader(revisions, revision) {
+  const revisedRevisionType = revisions.find(r => r.id === revision.revisesId)?.type.name;
+  switch (revision.type.name) {
+    case RevisionType.ready_for_review:
+      if ([RevisionType.new, RevisionType.ready_for_review].includes(revisedRevisionType)) {
+        return Translate.string('Revision has been replaced');
+      }
+      return null;
+    case RevisionType.needs_submitter_confirmation:
+      return Translate.string('{editorName} (editor) has made some changes to the paper', {
+        editorName: revision.user.fullName,
+      });
+    case RevisionType.changes_acceptance:
+      return Translate.string('Submitter has accepted proposed changes');
+    case RevisionType.needs_submitter_changes:
+      if (revisedRevisionType === RevisionType.needs_submitter_confirmation) {
+        return Translate.string('Submitter rejected proposed changes');
+      }
+      return Translate.string('Submitter has been asked to make some changes');
+    case RevisionType.acceptance:
+      if (revisedRevisionType === RevisionType.needs_submitter_confirmation) {
+        return Translate.string('{editorName} (editor) has accepted after making some changes', {
+          editorName: revision.user.fullName,
+        });
+      }
+      return Translate.string('{editorName} (editor) has accepted this revision', {
+        editorName: revision.user.fullName,
+      });
+    case RevisionType.rejection:
+      return Translate.string('{editorName} (editor) has rejected this revision', {
+        editorName: revision.user.fullName,
+      });
+    default:
+      return null;
+  }
 }
 
-// The top-down order defines a description for each state transition in a revision
-// [initialState, finalState] -> value | method -> value
-export const revisionStates = {
-  [InitialRevisionState.needs_submitter_confirmation]: {
-    [FinalRevisionState.accepted]: revision => {
-      return revision.editor !== null
-        ? Translate.string('Editor has accepted after making some changes')
-        : Translate.string('Submitter has accepted proposed changes');
-    },
-    [FinalRevisionState.needs_submitter_changes]: (__, {isLatestRevision}) => {
-      return isLatestRevision
-        ? Translate.string('Submitter rejected proposed changes')
-        : Translate.string('Submitter rejected proposed changes and uploaded a new revision');
-    },
-  },
-  any: {
-    [FinalRevisionState.replaced]: Translate.string('Revision has been replaced'),
-    [FinalRevisionState.accepted]: Translate.string('Revision has been accepted'),
-    [FinalRevisionState.rejected]: Translate.string('Revision has been rejected'),
-    [FinalRevisionState.needs_submitter_changes]: Translate.string(
-      'Submitter has been asked to make some changes'
-    ),
-    [FinalRevisionState.needs_submitter_confirmation]: revision =>
-      Translate.string('{editorName} (editor) has made some changes to the paper', {
-        editorName: revision.editor?.fullName || '',
-      }),
-  },
+export const typeStateMap = {
+  [RevisionType.new]: 'new',
+  [RevisionType.ready_for_review]: 'ready_for_review',
+  [RevisionType.needs_submitter_confirmation]: 'needs_submitter_confirmation',
+  [RevisionType.changes_acceptance]: 'accepted',
+  [RevisionType.needs_submitter_changes]: 'needs_submitter_changes',
+  [RevisionType.acceptance]: 'accepted',
+  [RevisionType.rejection]: 'rejected',
 };
-
-export function getRevisionTransition(revision, revisionMetadata) {
-  const headerStates = revisionStates[revision.initialState.name] || revisionStates['any'];
-  const header = headerStates[revision.finalState.name];
-  return typeof header === 'function' ? header(revision, revisionMetadata) : header;
-}
 
 export const userPropTypes = {
   identifier: PropTypes.string.isRequired,
@@ -163,7 +108,7 @@ export const userPropTypes = {
   id: PropTypes.number.isRequired,
 };
 
-const statePropTypes = {
+const typePropTypes = {
   cssClass: PropTypes.string,
   name: PropTypes.string.isRequired,
   title: PropTypes.string,
@@ -184,19 +129,19 @@ export const blockItemPropTypes = {
   html: PropTypes.string,
   internal: PropTypes.bool,
   system: PropTypes.bool,
-  custom: PropTypes.bool,
-  undoneJudgment: PropTypes.shape(statePropTypes),
+  isUndone: PropTypes.bool,
+  isEditor: PropTypes.bool,
   modifyCommentURL: PropTypes.string,
 };
 
 // Type that represents a revision block (with files)
 export const blockPropTypes = {
   id: PropTypes.number.isRequired,
-  submitter: PropTypes.shape(userPropTypes).isRequired,
-  editor: PropTypes.shape(userPropTypes),
+  user: PropTypes.shape(userPropTypes).isRequired,
   createdDt: PropTypes.string.isRequired,
-  initialState: PropTypes.shape(statePropTypes).isRequired,
-  finalState: PropTypes.shape(statePropTypes).isRequired,
+  type: PropTypes.shape(typePropTypes).isRequired,
+  isUndone: PropTypes.bool,
+  isEditor: PropTypes.bool,
   comment: PropTypes.string.isRequired,
   commentHtml: PropTypes.string.isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,

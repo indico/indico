@@ -8,23 +8,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {FinalRevisionState} from '../../models';
-
 import CommentItem from './CommentItem';
-import CustomItem from './CustomItem';
 import {blockItemPropTypes} from './util';
 
-export default function RevisionLog({items, state, children, separator}) {
+export default function RevisionLog({items, children, separator}) {
   return (
     <div className="i-timeline">
       <div className="i-timeline with-line">
         <div className="i-timeline-connect-up" />
-        {items.map(item => {
-          if (item.custom) {
-            return <CustomItem key={item.id} item={item} state={state} />;
-          }
-          return <CommentItem key={item.id} {...item} />;
-        })}
+        {items.map(item => (
+          <CommentItem key={item.id} {...item} />
+        ))}
         {children}
       </div>
       {separator && (
@@ -41,7 +35,6 @@ export default function RevisionLog({items, state, children, separator}) {
 
 RevisionLog.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape(blockItemPropTypes)).isRequired,
-  state: PropTypes.oneOf(Object.values(FinalRevisionState)),
   children: PropTypes.node,
   separator: PropTypes.bool,
 };
@@ -49,5 +42,4 @@ RevisionLog.propTypes = {
 RevisionLog.defaultProps = {
   children: null,
   separator: false,
-  state: null,
 };

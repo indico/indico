@@ -112,12 +112,21 @@ class Editable(db.Model):
 
     @property
     def valid_revisions(self):
-        from .revisions import FinalRevisionState
-        return [r for r in self.revisions if r.final_state != FinalRevisionState.undone]
+        return [r for r in self.revisions if r.is_valid]
 
     @property
     def latest_revision(self):
         return self.valid_revisions[-1] if self.valid_revisions else None
+
+    @property
+    def latest_revision_with_files(self):
+        from .revisions import EditingRevision
+        from .revision_files import EditingRevisionFile
+        return (EditingRevision.query
+                .filter_by(editable=self, is_valid=True)
+                .join(EditingRevisionFile)
+                .order_by(EditingRevision.created_dt.desc())
+                .first())
 
     def _has_general_editor_permissions(self, user):
         """Whether the user has general editor permissions on the Editable.
@@ -238,9 +247,9 @@ class Editable(db.Model):
         from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
         query = EditingReviewCondition.query.with_parent(self.event).filter_by(type=self.type)
         review_conditions = [{ft.id for ft in cond.file_types} for cond in query]
-        file_types = {file.file_type_id for file in self.latest_revision.files}
         if not review_conditions:
             return True
+        file_types = {file.file_type_id for file in self.latest_revision_with_files.files}
         return any(file_types >= cond for cond in review_conditions)
 
     @property
@@ -263,26 +272,21 @@ class Editable(db.Model):
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
-    from .revisions import EditingRevision, FinalRevisionState, InitialRevisionState
+    from .revisions import EditingRevision, RevisionType
 
     # Editable.state -- the state of the editable itself
     cases = db.cast(db.case({
-        FinalRevisionState.none: db.case({
-            InitialRevisionState.new: EditableState.new,
-            InitialRevisionState.ready_for_review: EditableState.ready_for_review,
-            InitialRevisionState.needs_submitter_confirmation: EditableState.needs_submitter_confirmation
-        }, value=EditingRevision.initial_state),
-        # the states resulting in None are always followed by another revision, so we don't ever
-        # expect the latest revision of an editable to have such a state
-        FinalRevisionState.replaced: None,
-        FinalRevisionState.needs_submitter_confirmation: None,
-        FinalRevisionState.needs_submitter_changes: EditableState.needs_submitter_changes,
-        FinalRevisionState.accepted: EditableState.accepted,
-        FinalRevisionState.rejected: EditableState.rejected,
-    }, value=EditingRevision.final_state), PyIntEnum(EditableState))
+        RevisionType.new: EditableState.new,
+        RevisionType.ready_for_review: EditableState.ready_for_review,
+        RevisionType.needs_submitter_confirmation: EditableState.needs_submitter_confirmation,
+        RevisionType.changes_acceptance: EditableState.accepted,
+        RevisionType.needs_submitter_changes: EditableState.needs_submitter_changes,
+        RevisionType.acceptance: EditableState.accepted,
+        RevisionType.rejection: EditableState.rejected,
+        RevisionType.reset: EditableState.ready_for_review,
+    }, value=EditingRevision.type), PyIntEnum(EditableState))
     query = (select([cases])
-             .where(db.and_(EditingRevision.editable_id == Editable.id,
-                            EditingRevision.final_state != FinalRevisionState.undone))
+             .where((EditingRevision.editable_id == Editable.id) & EditingRevision.is_valid)
              .order_by(EditingRevision.created_dt.desc())
              .limit(1)
              .correlate_except(EditingRevision)
@@ -290,9 +294,9 @@ def _mappers_configured():
     Editable.state = column_property(query)
 
     # Editable.revision_count -- the number of revisions the editable has
+    #TODO count only revisions with files
     query = (select([db.func.count(EditingRevision.id)])
-             .where(db.and_(EditingRevision.editable_id == Editable.id,
-                            EditingRevision.final_state != FinalRevisionState.undone))
+             .where((EditingRevision.editable_id == Editable.id) & EditingRevision.is_valid)
              .correlate_except(EditingRevision)
              .scalar_subquery())
     Editable.revision_count = column_property(query)

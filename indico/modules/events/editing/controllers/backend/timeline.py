@@ -23,7 +23,7 @@ from indico.modules.events.editing.controllers.base import RHContributionEditabl
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
+from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
 from indico.modules.events.editing.operations import (assign_editor, create_new_editable, create_revision_comment,
                                                       create_submitter_revision, delete_revision_comment,
                                                       ensure_latest_revision, replace_revision, reset_editable,
@@ -179,9 +179,9 @@ class RHCreateEditable(RHContributionEditableBase):
             'files': EditingFilesField(self.event, self.contrib, self.editable_type, required=True)
         })
         service_url = editing_settings.get(self.event, 'service_url')
-        initial_state = InitialRevisionState.new if service_url else InitialRevisionState.ready_for_review
+        revision_type = RevisionType.new if service_url else RevisionType.ready_for_review
 
-        editable = create_new_editable(self.contrib, self.editable_type, session.user, args['files'], initial_state)
+        editable = create_new_editable(self.contrib, self.editable_type, session.user, args['files'], revision_type)
         if service_url:
             try:
                 service_handle_new_editable(editable, session.user)
@@ -235,9 +235,9 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
 
     @use_kwargs({
         'comment': fields.String(load_default=''),
-        'state': EnumField(InitialRevisionState)
+        'revision_type': EnumField(RevisionType)
     })
-    def _process(self, comment, state):
+    def _process(self, comment, revision_type):
         args = parser.parse({
             'tags': EditingTagsField(self.event, allow_system_tags=self.is_service_call, load_default=lambda: set()),
             'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
@@ -245,7 +245,7 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
         }, unknown=EXCLUDE)
 
         user = User.get_system_user() if self.is_service_call else session.user
-        replace_revision(self.revision, user, comment, args['files'], args['tags'], state)
+        replace_revision(self.revision, user, comment, args['files'], args['tags'], revision_type)
         return '', 204
 
 
