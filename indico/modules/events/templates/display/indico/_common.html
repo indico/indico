@@ -58,11 +58,11 @@
         </span>
     {%- endif %}
     <span>{{ user_data.display_full_name }}</span>
-    {% if user_data.affiliation %}
+    {%- if user_data.affiliation %}
         <span class="affiliation">
-            <span class="text">({{ render_affiliation(user_data) }})</span>
+            <span class="text">({{ render_affiliation(user_data) }})</span>{#--#}
         </span>
-    {% endif %}
+    {%- endif %}
 {%- endmacro %}
 
 {% macro render_users(user_list, span_class='', title=true, separator=', ') -%}
