@@ -49,7 +49,7 @@ export default function ResetReview({revisionId}) {
   return (
     <>
       <Popup
-        content="Undo review"
+        content={Translate.string('Undo review')}
         trigger={
           <Icon
             styleName="reset-button"

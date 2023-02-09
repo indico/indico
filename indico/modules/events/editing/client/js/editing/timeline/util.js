@@ -12,6 +12,16 @@ import {Translate} from 'indico/react/i18n';
 
 import {filePropTypes} from './FileManager/util';
 
+export const isRequestChangesWithFiles = (revision, previousRevision) =>
+  previousRevision &&
+  revision.reviewedDt &&
+  revision.editor &&
+  previousRevision.editor &&
+  previousRevision.finalState.name === FinalRevisionState.needs_submitter_changes &&
+  revision.finalState.name === FinalRevisionState.needs_submitter_changes &&
+  revision.reviewedDt === previousRevision.reviewedDt &&
+  revision.editor.identifier === previousRevision.editor.identifier;
+
 // This method defines each revision as a block
 // with a label referring to its previous state transition
 export function processRevisions(revisions) {
@@ -22,7 +32,7 @@ export function processRevisions(revisions) {
     const isLatestRevision = i === revisions.length - 1;
     revisionState = getRevisionTransition(revision, {isLatestRevision});
     // Generate the comment header
-    if (revisionState) {
+    if (revisionState && !isRequestChangesWithFiles(revision, revisions[i - 1])) {
       const author = revision.editor || revision.submitter;
       items.push(commentFromState(revision, revisionState, author));
     }

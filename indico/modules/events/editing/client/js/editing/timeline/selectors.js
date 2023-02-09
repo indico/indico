@@ -10,6 +10,8 @@ import {createSelector} from 'reselect';
 
 import {FinalRevisionState, InitialRevisionState} from '../../models';
 
+import {isRequestChangesWithFiles} from './util';
+
 export const getDetails = state => (state.timeline ? state.timeline.details : null);
 export const getNewDetails = state => (state.timeline ? state.timeline.newDetails : null);
 export const isInitialEditableDetailsLoading = state =>
@@ -23,6 +25,10 @@ export const getTimelineBlocks = state => state.timeline.timelineBlocks;
 export const getLastTimelineBlock = createSelector(
   getTimelineBlocks,
   blocks => blocks && blocks[blocks.length - 1]
+);
+export const getSecondLastTimelineBlock = createSelector(
+  getTimelineBlocks,
+  blocks => blocks && blocks[blocks.length - 2]
 );
 export const getLastRevision = createSelector(
   getDetails,
@@ -109,6 +115,11 @@ export const getLastRevertableRevisionId = createSelector(
         latestRevision.initialState.name !== InitialRevisionState.needs_submitter_confirmation
       ) {
         return null;
+      }
+    } else if (latestRevision.finalState.name === FinalRevisionState.needs_submitter_changes) {
+      const previousRevision = details.revisions[details.revisions.length - 2];
+      if (isRequestChangesWithFiles(latestRevision, previousRevision)) {
+        return previousRevision.id;
       }
     }
     return lastFinalRev.id;
