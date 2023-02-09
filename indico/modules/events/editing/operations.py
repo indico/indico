@@ -220,7 +220,7 @@ def _is_request_changes_with_files(revision):
     if not revision or len(revision.editable.revisions) < 2:
         return False
     previous_revision = revision.editable.revisions[-2]
-    # when request-changes-with-files revision is made, the previous revision's final_state
+    # when a request-changes-with-files revision is made, the previous revision's final_state
     # is set to needs_submitter_changes, and a new one is created with the same reviewed_dt,
     # editor, and final_state. if any of these are different, then the two revisions are
     # actually separate request-changes, and not a request-changes-with-files
