@@ -27,7 +27,7 @@ from indico.modules.events.editing.notifications import (notify_comment, notify_
 from indico.modules.events.editing.schemas import (EditableDumpSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction)
 from indico.modules.logs import EventLogRealm, LogKind
-from indico.util.caching import memoize
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, orig_string
@@ -215,7 +215,7 @@ def create_submitter_revision(prev_revision, user, files):
     return new_revision
 
 
-@memoize
+@memoize_request
 def _is_request_changes_with_files(revision):
     if not revision or len(revision.editable.revisions) < 2:
         return False
