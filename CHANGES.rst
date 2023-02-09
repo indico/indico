@@ -61,6 +61,8 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Add ``rh.before-check-access`` signal (:pr:`5639`, thanks :user:`omegak`)
+- Add ``indico celery --watchman ...`` to run Celery with the Watchman reloader
+  (:pr:`5667`)
 
 
 Version 3.2.2

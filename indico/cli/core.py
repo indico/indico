@@ -84,10 +84,17 @@ def maint():
 
 
 @cli.command(context_settings={'ignore_unknown_options': True, 'allow_extra_args': True}, add_help_option=False)
+@click.option('--watchman', is_flag=True, help='Run celery inside watchman auto-reloader')
 @click.pass_context
-def celery(ctx):
+def celery(ctx, watchman=False):
     """Manage the Celery task daemon."""
     from indico.core.celery.cli import celery_cmd
+
+    if watchman:
+        from .devserver import run_watchman
+        run_watchman()
+        return
+
     celery_cmd(ctx.args)
 
 
