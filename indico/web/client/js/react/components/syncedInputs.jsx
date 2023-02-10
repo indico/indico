@@ -57,7 +57,7 @@ function SyncedFinalField({
         syncable
           ? {
               type: 'button',
-              active: synced && !locked,
+              active: synced,
               disabled: synced && locked,
               icon: 'sync',
               toggle: true,
