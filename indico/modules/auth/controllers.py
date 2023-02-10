@@ -534,7 +534,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
                     synced_values['affiliation_id'] = -1
             initial_values.update((k, v) for k, v in pending_data.items()
                                   if k not in synced_fields and k not in initial_values)
-            locked_fields = [x for x in multipass.locked_fields if x not in required_empty_fields]
+            locked_fields = list(multipass.locked_fields - required_empty_fields)
         else:
             synced_values = {}
             initial_values.update(pending_data)
