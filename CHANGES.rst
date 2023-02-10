@@ -88,6 +88,8 @@ Internal Changes
 - Add ``indico celery --watchman ...`` to run Celery with the Watchman reloader
   (:pr:`5667`)
 - Allow overriding the cache TTL for remote group membership checks (:pr:`5672`)
+- Allow a custom editing workflow service to mark new editables as ready-for-review
+  without creating a new replacement revision (:pr:`5668`)
 
 
 Version 3.2.2

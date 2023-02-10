@@ -146,6 +146,6 @@ export const canJudgeLastRevision = createSelector(
   canPerformEditorActions,
   (lastRevision, allowed) =>
     lastRevision.finalState.name === FinalRevisionState.none &&
-    lastRevision.initialState.name !== InitialRevisionState.needs_submitter_confirmation &&
+    lastRevision.initialState.name === InitialRevisionState.ready_for_review &&
     allowed
 );
