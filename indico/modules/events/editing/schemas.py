@@ -458,6 +458,10 @@ class ServiceUserSchema(mm.SQLAlchemyAutoSchema):
         return sorted(roles, key=lambda r: (r['source'], r['code']))
 
 
+class ServiceCreateEditableResultSchema(mm.Schema):
+    ready_for_review = fields.Boolean(load_default=False)
+
+
 class ServiceReviewEditableSchema(mm.Schema):
     publish = fields.Boolean(load_default=True)
     comment = fields.String()

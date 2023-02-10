@@ -15,11 +15,12 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.editable import EditableType
-from indico.modules.events.editing.models.revisions import FinalRevisionState
+from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.operations import create_revision_comment, publish_editable_revision
 from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingReviewAction,
                                                    EditingRevisionSignedSchema, ServiceActionResultSchema,
-                                                   ServiceActionSchema, ServiceReviewEditableSchema, ServiceUserSchema)
+                                                   ServiceActionSchema, ServiceCreateEditableResultSchema,
+                                                   ServiceReviewEditableSchema, ServiceUserSchema)
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.users import User
 from indico.util.caching import memoize_redis
@@ -149,7 +150,12 @@ def service_handle_new_editable(editable, user):
         )
         resp = requests.put(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
-    except requests.RequestException as exc:
+        resp = ServiceCreateEditableResultSchema().load(resp.json()) if resp.text else {}
+
+        if resp.get('ready_for_review'):
+            editable.revisions[0].initial_state = InitialRevisionState.ready_for_review
+            db.session.flush()
+    except (requests.RequestException, ValidationError) as exc:
         _log_service_error(exc, 'Calling listener for new editable failed')
         raise ServiceRequestFailed(exc)
 
