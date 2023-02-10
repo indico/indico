@@ -95,8 +95,9 @@ The following keys are available in the provider data:
   account during sync.
 - ``locked_fields`` -- A set of fields which are always synchronized
   with the identity provider. Its value must be a subset of the user
-  attributes listed in ``synced_fields``. The fields listed here can
-  still be desynchronized by an administrator.
+  attributes listed in ``synced_fields``, and it it not possible to lock
+  the ``email`` field. The fields listed here can still be desynchronized
+  by an administrator.
 - ``locked_field_message`` -- A message displayed next to the fields
   listed in ``locked_fields``. The purpose is to guide the user on
   how they should proceed in order to change the locked field's data.
