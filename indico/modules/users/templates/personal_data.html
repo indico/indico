@@ -48,6 +48,7 @@
             {{ titles | tojson }},
             {{ user.synced_values | tojson }},
             {{ locked_fields | tojson }},
+            {{ locked_field_message | tojson }},
             {{ has_predefined_affiliations | tojson }}
         );
     </script>

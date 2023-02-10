@@ -210,6 +210,7 @@ class RHPersonalData(RHUserBase):
         has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
                                                   titles=titles, user_values=user_values, locked_fields=locked_fields,
+                                                  locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
                                                   has_predefined_affiliations=has_predefined_affiliations)
 

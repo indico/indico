@@ -552,6 +552,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
             'hasPendingUser': bool(pending_data),
             'mandatoryFields': mandatory_fields,
             'lockedFields': locked_fields,
+            'lockedFieldMessage': multipass.locked_field_message,
         }
 
     def create_schema(self):

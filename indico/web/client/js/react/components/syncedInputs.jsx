@@ -10,7 +10,7 @@ import searchAffiliationURL from 'indico-url:users.api_affiliations';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useField, useForm} from 'react-final-form';
-import {Header} from 'semantic-ui-react';
+import {Form, Header, Popup} from 'semantic-ui-react';
 
 import {FinalComboDropdown, FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -27,6 +27,7 @@ function SyncedFinalField({
   as: FieldComponent,
   syncedValues,
   lockedFields,
+  lockedFieldMessage,
   readOnly,
   required,
   processSyncedValue,
@@ -45,7 +46,7 @@ function SyncedFinalField({
   const synced = syncedFields.includes(syncName);
   const locked = lockedFields.includes(syncName);
 
-  return (
+  const field = (
     <FieldComponent
       {...rest}
       name={name}
@@ -76,6 +77,18 @@ function SyncedFinalField({
       }
     />
   );
+  if (synced && locked && lockedFieldMessage) {
+    return (
+      <Popup
+        on="hover"
+        position="bottom left"
+        content={lockedFieldMessage}
+        trigger={<Form.Field>{field}</Form.Field>}
+      />
+    );
+  } else {
+    return field;
+  }
 }
 
 SyncedFinalField.propTypes = {
@@ -84,6 +97,7 @@ SyncedFinalField.propTypes = {
   as: PropTypes.elementType.isRequired,
   syncedValues: PropTypes.object.isRequired,
   lockedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+  lockedFieldMessage: PropTypes.string.isRequired,
   readOnly: PropTypes.bool,
   required: PropTypes.bool,
   processSyncedValue: PropTypes.func,
@@ -115,6 +129,7 @@ export function SyncedFinalAffiliationDropdown({
   syncName,
   syncedValues,
   lockedFields,
+  lockedFieldMessage,
   currentAffiliation,
 }) {
   const [_affiliationResults, setAffiliationResults] = useState([]);
@@ -174,6 +189,7 @@ export function SyncedFinalAffiliationDropdown({
       label={Translate.string('Affiliation')}
       syncedValues={syncedValues}
       lockedFields={lockedFields}
+      lockedFieldMessage={lockedFieldMessage}
     />
   );
 }
@@ -184,6 +200,7 @@ SyncedFinalAffiliationDropdown.propTypes = {
   syncName: PropTypes.string,
   syncedValues: PropTypes.object.isRequired,
   lockedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+  lockedFieldMessage: PropTypes.string.isRequired,
   currentAffiliation: PropTypes.object,
 };
 

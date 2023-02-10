@@ -37,6 +37,7 @@ function PersonalDataForm({
   titles,
   syncedValues,
   lockedFields,
+  lockedFieldMessage,
   hasPredefinedAffiliations,
 }) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
@@ -89,6 +90,7 @@ function PersonalDataForm({
                 required
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
               <SyncedFinalInput
                 name="last_name"
@@ -96,6 +98,7 @@ function PersonalDataForm({
                 required
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
             </Form.Group>
             {hasPredefinedAffiliations ? (
@@ -105,6 +108,7 @@ function PersonalDataForm({
                 currentAffiliation={currentAffiliation}
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
             ) : (
               <SyncedFinalInput
@@ -112,6 +116,7 @@ function PersonalDataForm({
                 label={Translate.string('Affiliation')}
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
             )}
             <SyncedFinalTextArea
@@ -119,18 +124,21 @@ function PersonalDataForm({
               label={Translate.string('Address')}
               syncedValues={syncedValues}
               lockedFields={lockedFields}
+              lockedFieldMessage={lockedFieldMessage}
             />
             <SyncedFinalInput
               name="phone"
               label={Translate.string('Phone number')}
               syncedValues={syncedValues}
               lockedFields={lockedFields}
+              lockedFieldMessage={lockedFieldMessage}
             />
             <SyncedFinalInput
               name="email"
               label={Translate.string('Email address')}
               syncedValues={syncedValues}
               lockedFields={lockedFields}
+              lockedFieldMessage={lockedFieldMessage}
               readOnly
             >
               <Translate>
@@ -161,6 +169,7 @@ PersonalDataForm.propTypes = {
   ).isRequired,
   syncedValues: PropTypes.objectOf(PropTypes.string).isRequired,
   lockedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+  lockedFieldMessage: PropTypes.string.isRequired,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
 };
 
@@ -176,6 +185,7 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
   titles,
   syncedValues,
   lockedFields,
+  lockedFieldMessage,
   hasPredefinedAffiliations
 ) {
   document.addEventListener('DOMContentLoaded', () => {
@@ -187,6 +197,7 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
         titles={titles}
         syncedValues={syncedValues}
         lockedFields={lockedFields}
+        lockedFieldMessage={lockedFieldMessage}
         hasPredefinedAffiliations={hasPredefinedAffiliations}
       />,
       document.querySelector('#personal-details-form-container')

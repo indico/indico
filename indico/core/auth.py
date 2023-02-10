@@ -68,6 +68,13 @@ class IndicoMultipass(Multipass):
             return set()
         return set(provider.settings.get('locked_fields', ())) & self.synced_fields
 
+    @property
+    def locked_field_message(self):
+        provider = self.sync_provider
+        if provider is None:
+            return ''
+        return provider.settings.get('locked_field_message', '')
+
     def init_app(self, app):
         super().init_app(app)
         with app.app_context():
