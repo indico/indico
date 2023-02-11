@@ -151,7 +151,7 @@ importlib-metadata==5.0.0
     #   markdown
 indico-fonts==1.1
     # via -r requirements.in
-ipython==8.6.0
+ipython==8.10.0
     # via -r requirements.in
 itsdangerous==2.1.2
     # via
