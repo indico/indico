@@ -36,6 +36,7 @@ class CallForPapers:
                                                               'enforce_content_reviewer_deadline')
     layout_reviewer_deadline_enforced = EventSettingProperty(paper_reviewing_settings,
                                                              'enforce_layout_reviewer_deadline')
+    hide_peer_reviewed_papers = EventSettingProperty(paper_reviewing_settings, 'hide_peer_reviewed_papers')
 
     @property
     def has_started(self):

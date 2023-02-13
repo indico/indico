@@ -54,6 +54,7 @@ paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
     'announcement': '',
     'scale_lower': -3,
     'scale_upper': 3,
+    'hide_peer_reviewed_papers': False,
 
     # Notifications
     'notify_on_added_to_event': set(),
