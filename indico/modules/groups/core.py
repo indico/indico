@@ -21,6 +21,7 @@ from indico.util.caching import memoize_request
 
 
 group_membership_cache = make_scoped_cache('group-membership')
+DEFAULT_GROUP_CACHE_TTL = 1800
 
 
 class GroupProxy:
@@ -202,6 +203,18 @@ class _MultipassGroupProxy(GroupProxy):
         except KeyError:
             return self.provider.title()
 
+    def get_membership_cache_ttl(self, value):
+        try:
+            ttl = multipass.identity_providers[self.provider].settings['group_cache_ttl']
+            if ttl is None or isinstance(ttl, int):
+                return ttl
+            else:
+                # allow separate caches for positive/negative results
+                return ttl[0] if value else ttl[1]
+        except KeyError:
+            # provider not found or setting not found
+            return DEFAULT_GROUP_CACHE_TTL
+
     def has_member(self, user):
         if not user:
             return False
@@ -214,7 +227,8 @@ class _MultipassGroupProxy(GroupProxy):
             rv = False
         else:
             rv = any(x[1] in self.group for x in user.iter_identifiers(check_providers=True, providers={self.provider}))
-        group_membership_cache.set(key, rv, timeout=1800)
+        if ttl := self.get_membership_cache_ttl(rv):
+            group_membership_cache.set(key, rv, timeout=ttl)
         return rv
 
     @memoize_request

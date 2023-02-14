@@ -74,6 +74,15 @@ The following keys are available in the provider data:
   verification email is sent to prove that the user has access to the
   email address, which is less user-friendly but extremely important
   to prevent malicious takeovers of Indico accounts.
+- ``group_cache_ttl`` -- Set this to the number in seconds for which
+  group membership check results should be cached, or 0 to disable the
+  cache. You may also set it to a list where the first element is the
+  cache duration for positive checks and the second element the duration
+  for negative checks. Note that you usually do NOT need to set this at
+  all, the default of 1800 seconds is reasonable in most cases, and unless
+  you use a custom multipass backend that has its own cache or is very
+  fast when checking membership on the fly it is best to not touch this at
+  all.
 - ``moderated`` -- Set this to ``True`` if you want to require manual
   approval of the registration by an Indico admin.  This results in
   the same workflow as :data:`LOCAL_MODERATION` in case of local

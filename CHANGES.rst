@@ -63,6 +63,7 @@ Internal Changes
 - Add ``rh.before-check-access`` signal (:pr:`5639`, thanks :user:`omegak`)
 - Add ``indico celery --watchman ...`` to run Celery with the Watchman reloader
   (:pr:`5667`)
+- Allow overriding the cache TTL for remote group membership checks (:pr:`5672`)
 
 
 Version 3.2.2
