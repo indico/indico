@@ -73,7 +73,7 @@ export default function Comment({
                 <span
                   className="review-comment-edited"
                   title={Translate.string('On {modificationDate}', {
-                    modificationDate: serializeDate(modifiedDt, 'LL'),
+                    modificationDate: serializeDate(modifiedDt, 'LLL'),
                   })}
                 >
                   {' '}
