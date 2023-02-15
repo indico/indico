@@ -273,13 +273,7 @@
             </div>
         </section>
     {%- endif %}
-
-    {% set paper_hidden = contribution.event.cfp.hide_peer_reviewed_papers %}
-    {% set permitted_hidden_paper_viewers = contribution.paper.can_judge(session.user) or contribution.paper.can_review(session.user) or contribution.paper.can_manage(session.user) or contribution.can_submit_proceedings(session.user) %}
-
-    {% if contribution.event.has_feature('papers') and not paper_hidden %}
-        {{ render_paper_section(contribution) }}
-    {% elif paper_hidden and permitted_hidden_paper_viewers %}
+    {% if contribution.event.has_feature('papers') %}
         {{ render_paper_section(contribution) }}
     {% endif %}
     {% if contribution.event.has_feature('editing') %}

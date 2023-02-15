@@ -11,6 +11,11 @@
             {% else %}
                 <div class="paper-files-list flexrow f-a-baseline">
                     <div class="paper-files-list-label f-self-no-shrink">
+                        {% if paper.event.cfp.hide_accepted %}
+                            <span title="{% trans %}Accepted papers are currently hidden from participants{% endtrans %}"
+                                class="category-action left icon-eye-blocked active" style="padding-right:0.2rem;">
+                            </span>
+                        {% endif %}
                         {%- trans %}Paper files:{% endtrans -%}
                     </div>
                     {{ _render_paper_files(paper.last_revision.files, full_width=true) }}
