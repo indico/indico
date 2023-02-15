@@ -25,29 +25,26 @@ import ReviewForm from './ReviewForm';
 import RevisionLog from './RevisionLog';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
-import {blockPropTypes, getPreviousValidRevision, isEditorRevision} from './util';
+import {blockPropTypes} from './util';
 
 import '../../../styles/timeline.module.scss';
 import './TimelineItem.module.scss';
 
 export default function TimelineItem({block, index}) {
   const {submitter, createdDt} = block;
-  const timelineBlocks = useSelector(selectors.getTimelineBlocks);
-  const validTimelineBlocks = useSelector(selectors.getValidTimelineBlocks);
+  const lastTimelineBlock = useSelector(selectors.getLastTimelineBlock);
+  const lastValidTimelineBlock = useSelector(selectors.getLastValidTimelineBlock);
+  const lastFinalState = useSelector(selectors.getLastFinalState);
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
   const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
+  const canUndoLastValidBlock = useSelector(selectors.canUndoLastValidBlock);
   const {canComment, state: editableState} = useSelector(selectors.getDetails);
   const {fileTypes} = useSelector(selectors.getStaticData);
-  const isLastBlock = timelineBlocks[timelineBlocks.length - 1].id === block.id;
-  const isLastValidBlock = validTimelineBlocks[validTimelineBlocks.length - 1].id === block.id;
-  const previousValidBlock = getPreviousValidRevision(timelineBlocks, index);
+  const isLastBlock = lastTimelineBlock.id === block.id;
+  const isLastValidBlock = lastValidTimelineBlock.id === block.id;
   const [visible, setVisible] = useState(isLastValidBlock);
   const isUndone = block.finalState.name === FinalRevisionState.undone;
-  const isUndoable =
-    !isUndone &&
-    isEditorRevision(previousValidBlock, block) &&
-    previousValidBlock.id === lastRevertableRevisionId;
 
   useEffect(() => {
     // when undoing a judgment deletes the last revision this revision may become the
@@ -88,21 +85,25 @@ export default function TimelineItem({block, index}) {
                   </Translate>
                 )}
               </div>
-              {!isLastValidBlock && (
-                <a
-                  className="i-link"
-                  styleName="item-visibility-toggle"
-                  onClick={() => setVisible(!visible)}
-                >
-                  {visible ? <Translate>Hide</Translate> : <Translate>Show details</Translate>}
-                </a>
-              )}
-              {isUndoable && <ResetReview revisionId={lastRevertableRevisionId} />}
-              {(!isLastValidBlock || isUndoable) && block.finalState && (
-                <StateIndicator
-                  state={isUndoable ? previousValidBlock.finalState.name : block.finalState.name}
-                  circular
-                />
+              {isLastValidBlock ? (
+                !isUndone &&
+                canUndoLastValidBlock && (
+                  <>
+                    <ResetReview revisionId={lastRevertableRevisionId} />
+                    <StateIndicator state={lastFinalState} circular />
+                  </>
+                )
+              ) : (
+                <>
+                  <a
+                    className="i-link"
+                    styleName="item-visibility-toggle"
+                    onClick={() => setVisible(!visible)}
+                  >
+                    {visible ? <Translate>Hide</Translate> : <Translate>Show details</Translate>}
+                  </a>
+                  {block.finalState && <StateIndicator state={block.finalState.name} circular />}
+                </>
               )}
             </div>
             {visible && (
