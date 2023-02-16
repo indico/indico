@@ -61,7 +61,7 @@ flake8==5.0.4
     #   flake8-quotes
 flake8-quotes==3.3.1
     # via -r requirements.dev.in
-flask==2.2.2
+flask==2.2.3
     # via
     #   -c requirements.txt
     #   flask-url-map-serializer
@@ -250,7 +250,7 @@ urllib3==1.26.12
     # via
     #   -c requirements.txt
     #   requests
-werkzeug==2.2.2
+werkzeug==2.2.3
     # via
     #   -c requirements.txt
     #   flask

@@ -7,6 +7,12 @@ Version 3.2.3
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Update `werkzeug <https://pypi.org/project/werkzeug/>`_ library due to a potential
+  Denial of Service vulnerability (CVE-2023-25577)
+
 Improvements
 ^^^^^^^^^^^^
 
