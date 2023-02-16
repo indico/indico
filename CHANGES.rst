@@ -10,6 +10,8 @@ Version 3.2.3
 Security fixes
 ^^^^^^^^^^^^^^
 
+- Update `cryptography <https://pypi.org/project/cryptography/>`_ library due to
+  vulnerabilities in OpenSSL (CVE-2023-0286)
 - Update `werkzeug <https://pypi.org/project/werkzeug/>`_ library due to a potential
   Denial of Service vulnerability (CVE-2023-25577)
 
