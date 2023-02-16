@@ -10,10 +10,18 @@ Version 3.2.3
 Security fixes
 ^^^^^^^^^^^^^^
 
+- Sanitize HTML in global announcement messages
 - Update `cryptography <https://pypi.org/project/cryptography/>`_ library due to
   vulnerabilities in OpenSSL (CVE-2023-0286)
 - Update `werkzeug <https://pypi.org/project/werkzeug/>`_ library due to a potential
   Denial of Service vulnerability (CVE-2023-25577)
+
+.. note::
+
+    The risk of malicious HTML (e.g. scripts) in the global announcement is minimal
+    as only Indico administrators can set such an announcement anyway. However, in the
+    unlikely case that an administrator becomes malicious or is compromised, they would
+    have been be able to perform XSS against their Indico instance.
 
 Improvements
 ^^^^^^^^^^^^
