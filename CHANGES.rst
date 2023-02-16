@@ -54,6 +54,7 @@ Improvements
 - Add ``locked_fields`` to the identity provider settings in ``indico.conf`` to
   prevent non-admin users from turning off their profile's personal data
   synchronization (:pr:`5648`)
+- Add an option to sync event persons with users (:pr:`5677`)
 
 Bugfixes
 ^^^^^^^^
