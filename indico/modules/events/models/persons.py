@@ -284,6 +284,19 @@ class EventPerson(PersonMixin, db.Model):
                 db.session.delete(event_person)
         db.session.flush()
 
+    def get_unsynced_data(self):
+        """Return data no longer in sync with the user."""
+        if not self.user:
+            return {}
+        fields = ('first_name', 'last_name', '_title', 'email', 'affiliation', 'affiliation_link', 'address', 'phone')
+        changes = {}
+        for field in fields:
+            person_data = getattr(self, field)
+            user_data = getattr(self.user, field)
+            if person_data != user_data:
+                changes[field] = (person_data, user_data)
+        return changes
+
     def sync_user(self, *, notify=True):
         """Update all person data based on the current user data.
 
@@ -291,7 +304,7 @@ class EventPerson(PersonMixin, db.Model):
         """
         if not self.user:
             return
-        fields = ('first_name', 'last_name', 'email', 'affiliation', 'address', 'phone')
+        fields = ('first_name', 'last_name', '_title', 'email', 'affiliation', 'affiliation_link', 'address', 'phone')
         has_changes = False
         for field in fields:
             new = getattr(self.user, field)

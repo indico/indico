@@ -9,7 +9,7 @@ from indico.modules.events.persons.controllers import (RHAPIEmailEventPersonsMet
                                                        RHDeleteUnusedEventPerson, RHEmailEventPersonsPreview,
                                                        RHEventPersonSearch, RHGrantModificationRights,
                                                        RHGrantSubmissionRights, RHManagePersonLists, RHPersonsList,
-                                                       RHRevokeSubmissionRights, RHUpdateEventPerson)
+                                                       RHRevokeSubmissionRights, RHSyncEventPerson, RHUpdateEventPerson)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -32,6 +32,7 @@ _bp.add_url_rule('/persons/revoke-submission', 'revoke_submission_rights', RHRev
 
 # EventPerson operations
 _bp.add_url_rule('/persons/<int:person_id>', 'update_person', RHUpdateEventPerson, methods=('PATCH',))
+_bp.add_url_rule('/persons/<int:person_id>', 'sync_with_user', RHSyncEventPerson, methods=('POST',))
 _bp.add_url_rule('/persons/<int:person_id>', 'delete_unused_person', RHDeleteUnusedEventPerson, methods=('DELETE',))
 _bp.add_url_rule('/api/persons/search', 'event_person_search', RHEventPersonSearch)
 
