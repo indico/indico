@@ -23,7 +23,7 @@ docutils==0.16
     #   plantweb
     #   sphinx
     #   sphinx-rtd-theme
-flask==2.1.3
+flask==2.2.3
     # via
     #   -r docs/requirements.in
     #   flask-babel
@@ -45,7 +45,9 @@ jinja2==3.1.2
     #   flask-babel
     #   sphinx
 markupsafe==2.1.1
-    # via jinja2
+    # via
+    #   jinja2
+    #   werkzeug
 packaging==21.3
     # via sphinx
 plantweb==1.2.1
@@ -89,7 +91,7 @@ sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 urllib3==1.26.10
     # via requests
-werkzeug==2.1.2
+werkzeug==2.2.3
     # via flask
 zipp==3.8.1
     # via importlib-metadata
