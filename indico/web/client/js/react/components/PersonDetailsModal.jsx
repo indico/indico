@@ -10,9 +10,15 @@ import searchAffiliationURL from 'indico-url:users.api_affiliations';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useForm, useFormState} from 'react-final-form';
-import {Form, Message, Header, Button, Icon} from 'semantic-ui-react';
+import {Form, Message, Header, Button, Icon, Popup} from 'semantic-ui-react';
 
-import {FinalComboDropdown, FinalDropdown, FinalInput, FinalTextArea} from 'indico/react/forms';
+import {
+  FinalCheckbox,
+  FinalComboDropdown,
+  FinalDropdown,
+  FinalInput,
+  FinalTextArea,
+} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useDebouncedAsyncValidate} from 'indico/react/hooks';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -104,6 +110,8 @@ export default function PersonDetailsModal({
   otherPersons,
   hideEmailField,
   validateEmailUrl,
+  isUpdate,
+  syncPersonMessage,
 }) {
   return (
     <FinalModalForm
@@ -115,15 +123,19 @@ export default function PersonDetailsModal({
       submitLabel={Translate.string('Save')}
       initialValues={
         person
-          ? {...person, affiliationData: {id: person.affiliationId, text: person.affiliation}}
-          : {affiliationData: {id: null, text: ''}, email: ''}
+          ? {
+              ...person,
+              affiliationData: {id: person.affiliationId, text: person.affiliation},
+              syncEventPerson: true,
+            }
+          : {affiliationData: {id: null, text: ''}, email: '', syncEventPerson: true}
       }
     >
       {/* eslint-disable-next-line eqeqeq */}
       {person && person.userId != null && (
         <Translate as={Message}>
-          You are updating details that were originally linked to a user. Please note that its
-          identity will remain the same.
+          You are updating details that were originally linked to a user. Please note that the
+          user's data will not change. Any changes you make here will only be visible in the event.
         </Translate>
       )}
       <Form.Group widths="equal">
@@ -169,6 +181,11 @@ export default function PersonDetailsModal({
           <FinalInput name="phone" />
         </Form.Field>
       </Form.Group>
+      {isUpdate && (
+        <Form.Group widths="equal">
+          <SyncPersonField syncPersonMessage={syncPersonMessage} />
+        </Form.Group>
+      )}
     </FinalModalForm>
   );
 }
@@ -181,6 +198,8 @@ PersonDetailsModal.propTypes = {
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
   hideEmailField: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
+  isUpdate: PropTypes.bool.isRequired,
+  syncPersonMessage: PropTypes.string.isRequired,
 };
 
 PersonDetailsModal.defaultProps = {
@@ -188,6 +207,22 @@ PersonDetailsModal.defaultProps = {
   otherPersons: [],
   hideEmailField: false,
   validateEmailUrl: null,
+};
+
+function SyncPersonField({syncPersonMessage}) {
+  return (
+    <Form.Field styleName="sync-person-field">
+      <FinalCheckbox
+        name="syncEventPerson"
+        label={Translate.string('Update all ocurrences of the person in this event')}
+      />
+      <Popup content={syncPersonMessage} trigger={<Icon name="question" circular size="small" />} />
+    </Form.Field>
+  );
+}
+
+SyncPersonField.propTypes = {
+  syncPersonMessage: PropTypes.string.isRequired,
 };
 
 function EmailField({validateUrl, person, otherPersons}) {

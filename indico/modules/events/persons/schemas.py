@@ -35,6 +35,7 @@ class PersonLinkSchema(mm.Schema):
     display_order = fields.Int(load_default=0, dump_default=0)
     avatar_url = fields.Function(lambda o: o.person.user.avatar_url if o.person.user else None, dump_only=True)
     roles = fields.List(fields.String(), load_only=True)
+    sync_event_person = fields.Bool(load_default=False, load_only=True)
 
     @pre_load
     def load_nones(self, data, **kwargs):

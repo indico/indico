@@ -235,6 +235,8 @@ function PersonLinkField({
   canEnterManually,
   defaultSearchExternal,
   validateEmailUrl,
+  isUpdate,
+  syncPersonMessage,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState(false);
@@ -363,6 +365,8 @@ function PersonLinkField({
               otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
               validateEmailUrl={validateEmailUrl}
+              isUpdate={isUpdate}
+              syncPersonMessage={syncPersonMessage}
             />
           )}
         </Button.Group>
@@ -384,6 +388,8 @@ PersonLinkField.propTypes = {
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
+  isUpdate: PropTypes.bool.isRequired,
+  syncPersonMessage: PropTypes.string.isRequired,
 };
 
 PersonLinkField.defaultProps = {
@@ -410,6 +416,8 @@ export function WTFPersonLinkField({
   canEnterManually,
   defaultSearchExternal,
   validateEmailUrl,
+  isUpdate,
+  syncPersonMessage,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -433,6 +441,7 @@ export function WTFPersonLinkField({
         'identifier',
         'type',
         'personId',
+        'syncEventPerson', // Whether the personal data (name, title, ..) should be propagated to the parent event person
       ])
     );
     inputField.value = JSON.stringify(
@@ -465,6 +474,8 @@ export function WTFPersonLinkField({
       canEnterManually={canEnterManually}
       defaultSearchExternal={defaultSearchExternal}
       validateEmailUrl={validateEmailUrl}
+      isUpdate={isUpdate}
+      syncPersonMessage={syncPersonMessage}
     />
   );
 }
@@ -480,6 +491,8 @@ WTFPersonLinkField.propTypes = {
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
+  isUpdate: PropTypes.bool.isRequired,
+  syncPersonMessage: PropTypes.string.isRequired,
 };
 
 WTFPersonLinkField.defaultProps = {

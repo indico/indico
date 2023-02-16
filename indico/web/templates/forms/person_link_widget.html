@@ -32,6 +32,8 @@
             defaultSearchExternal: {{ field.default_search_external | tojson }},
             sessionUser: Indico.User,
             validateEmailUrl: {{ field.validate_email_url | tojson }},
+            isUpdate: {{ (true if field.event else false) | tojson }},
+            syncPersonMessage: {{ field.sync_person_message | tojson }},
         });
     </script>
 {% endblock %}

@@ -116,6 +116,12 @@ class PersonLinkListFieldBase(PrincipalListField):
     def validate_email_url(self):
         return url_for('events.check_email', self.object) if self.object else None
 
+    def _sync_event_person(self, person_link):
+        keys = ('first_name', 'last_name', 'affiliation', 'affiliation_link',
+                'address', 'phone', '_title')
+        for key in keys:
+            setattr(person_link.person, key, getattr(person_link, key))
+
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
@@ -148,6 +154,8 @@ class PersonLinkListFieldBase(PrincipalListField):
             person_link = self.person_link_cls(person=person)
         if not self.can_enter_manually:
             person_link.populate_from_dict(data, keys=('display_order',))
+            if data['sync_event_person']:
+                self._sync_event_person(person_link)
             return person_link
         person_link.populate_from_dict(data, keys=('first_name', 'last_name', 'affiliation', 'affiliation_link',
                                                    'address', 'phone', '_title', 'display_order'))
@@ -160,6 +168,9 @@ class PersonLinkListFieldBase(PrincipalListField):
                     signals.event.person_updated.send(person_link.person)
             else:
                 raise UserValueError(_('There is already a person with the email {email}').format(email=email))
+
+        if data['sync_event_person']:
+            self._sync_event_person(person_link)
         return person_link
 
     def _serialize_person_link(self, principal):
@@ -203,6 +214,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         super().__init__(*args, **kwargs)
         if not event_type and self.object:
             event_type = self.object.event.type_
+        self.event_type = event_type
         if event_type == EventType.lecture:
             self.empty_message = _('There are no speakers')
 
@@ -216,6 +228,25 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         if (self.get_form().is_submitted() and self.data[principal]) or (principal.event and principal.is_submitter):
             data['roles'].append('submitter')
         return data
+
+    @property
+    def sync_person_message(self):
+        """The tooltip shown when editing a person in the <PersonDetailsModal />."""
+        if not self.event:
+            return ''
+
+        if self.linked_object_attr == 'contrib':
+            return _("If you disable this option, the person's data will be updated only in this contribution.")
+        elif self.linked_object_attr == 'subcontrib':
+            return _("If you disable this option, the person's data will be updated only in this subcontribution.")
+        elif self.linked_object_attr == 'abstract':
+            return _("If you disable this option, the person's data will be updated only in this abstract.")
+        elif self.linked_object_attr == 'session_block':
+            return _("If you disable this option, the person's data will be updated only in this session block.")
+        elif self.linked_object_attr == 'event' and self.event_type == EventType.lecture:
+            return _("If you disable this option, only the speaker's data will be updated.")
+        else:
+            return _("If you disable this option, only the chairperson's data will be updated.")
 
     def pre_validate(self, form):
         super().pre_validate(form)
