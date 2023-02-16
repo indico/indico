@@ -32,7 +32,7 @@ _bp.add_url_rule('/persons/revoke-submission', 'revoke_submission_rights', RHRev
 
 # EventPerson operations
 _bp.add_url_rule('/persons/<int:person_id>', 'update_person', RHUpdateEventPerson, methods=('PATCH',))
-_bp.add_url_rule('/persons/<int:person_id>', 'sync_with_user', RHSyncEventPerson, methods=('POST',))
+_bp.add_url_rule('/persons/<int:person_id>/sync', 'sync_with_user', RHSyncEventPerson, methods=('POST',))
 _bp.add_url_rule('/persons/<int:person_id>', 'delete_unused_person', RHDeleteUnusedEventPerson, methods=('DELETE',))
 _bp.add_url_rule('/api/persons/search', 'event_person_search', RHEventPersonSearch)
 
