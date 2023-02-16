@@ -55,6 +55,7 @@ Improvements
   prevent non-admin users from turning off their profile's personal data
   synchronization (:pr:`5648`)
 - Add an option to sync event persons with users (:pr:`5677`)
+- Disallow repeated filenames in editing revisions (:pr:`5681`)
 
 Bugfixes
 ^^^^^^^^

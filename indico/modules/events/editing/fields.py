@@ -67,6 +67,10 @@ class EditingFilesField(Dict):
                 raise ValidationError('Files found in multiple types: {}'
                                       .format(', '.join(str(f.uuid) for f in duplicates)))
 
+            # ensure no duplicate filenames
+            if len({f.filename for f in files}) != len(files):
+                raise ValidationError(f'Duplicate filenames found in file type "{file_type.name}"')
+
             seen |= set(files)
 
 

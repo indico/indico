@@ -42,11 +42,6 @@ export function Dropzone({
   files,
 }) {
   const dispatch = useContext(FileManagerContext);
-  // we only want to modify the existing file if we do not allow multiple files and
-  // there is exactly one file that is not in the 'added' state (which would imply
-  // a freshly uploaded file which can be simply replaced)
-  const fileToReplace =
-    !allowMultipleFiles && files.length && files[0].state !== 'added' ? files[0] : null;
   const fileToDelete = getFileToDelete(files, allowMultipleFiles);
   // as far as the user is concerned, they upload a "new" file when there are no files or
   // multiple files are supported for the file type
@@ -57,13 +52,22 @@ export function Dropzone({
       if (!allowMultipleFiles) {
         acceptedFiles = acceptedFiles.splice(0, 1);
       }
+      // we only want to modify the existing file if (1) we do not allow multiple files and
+      // there is exactly one file that is not in the 'added' state (which would imply
+      // a freshly uploaded file which can be simply replaced) or (2) we allow multiple files
+      // and a new one is uploaded with the same filename as an existing one.
+      acceptedFiles = acceptedFiles.map(file => ({
+        file,
+        replaceFileId: files.find(
+          ({state, filename}) =>
+            state !== 'added' && (!allowMultipleFiles || filename === file.name)
+        )?.uuid,
+      }));
       const rv = await uploadFiles({
-        action: fileToReplace ? actions.markModified : actions.markUploaded,
         fileTypeId: id,
         acceptedFiles,
         uploadFunc: uploadFile.bind(null, uploadURL),
         dispatch,
-        replaceFileId: fileToReplace ? fileToReplace.uuid : null,
       });
       // only delete if there is a file to delete and the upload of a new file didn't fail
       if (fileToDelete && rv[0] !== null) {
@@ -71,7 +75,7 @@ export function Dropzone({
         deleteFile(fileToDelete.uuid);
       }
     },
-    [fileToReplace, fileToDelete, allowMultipleFiles, id, uploadURL, dispatch]
+    [allowMultipleFiles, files, id, uploadURL, dispatch, fileToDelete]
   );
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({
@@ -134,10 +138,9 @@ function FileType({
   const fileToDelete = getFileToDelete(files, fileType.allowMultipleFiles);
   const onChangeDropdown = async (__, {value: fileIdx}) => {
     const rv = await uploadFiles({
-      action: actions.markUploaded,
       fileTypeId: fileType.id,
       // Use a fake file handle to seamlessly refer to an existing uploadable
-      acceptedFiles: [new File([], uploadableFiles[fileIdx].filename)],
+      acceptedFiles: [{file: new File([], uploadableFiles[fileIdx].filename)}],
       uploadFunc: uploadExistingFile.bind(null, uploadExistingURL, uploadableFiles[fileIdx]),
       dispatch,
       fileId: uploadableFiles[fileIdx].id,
