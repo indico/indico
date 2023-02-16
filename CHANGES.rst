@@ -12,9 +12,9 @@ Security fixes
 
 - Sanitize HTML in global announcement messages
 - Update `cryptography <https://pypi.org/project/cryptography/>`_ library due to
-  vulnerabilities in OpenSSL (CVE-2023-0286)
+  vulnerabilities in OpenSSL (:cve:`CVE-2023-0286`)
 - Update `werkzeug <https://pypi.org/project/werkzeug/>`_ library due to a potential
-  Denial of Service vulnerability (CVE-2023-25577)
+  Denial of Service vulnerability (:cve:`CVE-2023-25577`)
 
 .. note::
 
@@ -135,7 +135,7 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Update `cryptography <https://pypi.org/project/cryptography/>`_ library due to
-  vulnerabilities in OpenSSL (CVE-2022-3602, CVE-2022-3786)
+  vulnerabilities in OpenSSL (:cve:`CVE-2022-3602`, :cve:`CVE-2022-3786`)
 
 .. note::
 
