@@ -534,9 +534,11 @@ class MultipassRegistrationHandler(RegistrationHandler):
                     synced_values['affiliation_id'] = -1
             initial_values.update((k, v) for k, v in pending_data.items()
                                   if k not in synced_fields and k not in initial_values)
+            locked_fields = list(multipass.locked_fields - required_empty_fields)
         else:
             synced_values = {}
             initial_values.update(pending_data)
+            locked_fields = []
 
         return {
             'cancelURL': url_for_logout(),
@@ -549,6 +551,8 @@ class MultipassRegistrationHandler(RegistrationHandler):
             'affiliationMeta': affiliation_meta,
             'hasPendingUser': bool(pending_data),
             'mandatoryFields': mandatory_fields,
+            'lockedFields': locked_fields,
+            'lockedFieldMessage': multipass.locked_field_message,
         }
 
     def create_schema(self):
@@ -588,7 +592,13 @@ class MultipassRegistrationHandler(RegistrationHandler):
         return MultipassSignupSchema
 
     def parse_request(self):
+        def _must_force_sync(field):
+            if field not in ('first_name', 'last_name'):
+                return True
+            return self.identity_info['data'].get(field)
         data = super().parse_request()
+        data['synced_fields'] += [f for f in multipass.locked_fields
+                                  if f not in data['synced_fields'] and _must_force_sync(f)]
         for field in data['synced_fields']:
             data[field] = self.identity_info['data'][field] or ''
         if (

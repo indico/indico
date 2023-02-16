@@ -56,6 +56,25 @@ class IndicoMultipass(Multipass):
         synced_fields &= set(current_app.config['MULTIPASS_IDENTITY_INFO_KEYS'])
         return synced_fields
 
+    @property
+    def locked_fields(self):
+        """The keys that cannot be desynchronized.
+
+        This is a subset of the keys listed in ``synced_fields`` that cannot be
+        desynchronized by a non-admin user.
+        """
+        provider = self.sync_provider
+        if provider is None:
+            return set()
+        return (set(provider.settings.get('locked_fields', ())) & self.synced_fields) - {'email'}
+
+    @property
+    def locked_field_message(self):
+        provider = self.sync_provider
+        if provider is None:
+            return ''
+        return provider.settings.get('locked_field_message', '')
+
     def init_app(self, app):
         super().init_app(app)
         with app.app_context():

@@ -764,6 +764,7 @@ function ActionButton({action}) {
       icon
       toggle={action.toggle}
       active={action.active}
+      disabled={action.disabled}
       className={action.className}
       title={action.title}
       style={{
@@ -784,6 +785,7 @@ ActionButton.propTypes = {
   action: PropTypes.shape({
     type: PropTypes.oneOf(['button']).isRequired,
     active: PropTypes.bool,
+    disabled: PropTypes.bool,
     icon: PropTypes.string.isRequired,
     toggle: PropTypes.bool,
     className: PropTypes.string,

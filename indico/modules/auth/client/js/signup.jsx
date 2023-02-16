@@ -39,6 +39,8 @@ function Signup({
   affiliationMeta,
   hasPendingUser,
   mandatoryFields,
+  lockedFields,
+  lockedFieldMessage,
 }) {
   const handleSubmit = async (data, form) => {
     const values = getValuesForFields(data, form);
@@ -110,6 +112,8 @@ function Signup({
                   text: e,
                 }))}
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
                 required
               />
             ) : (
@@ -117,6 +121,8 @@ function Signup({
                 name="email"
                 label={Translate.string('Email address')}
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
                 readOnly
               />
             )}
@@ -126,12 +132,16 @@ function Signup({
                 label={Translate.string('First name')}
                 required
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
               <SyncedFinalInput
                 name="last_name"
                 label={Translate.string('Last name')}
                 required
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
             </Form.Group>
             {hasPredefinedAffiliations ? (
@@ -140,6 +150,8 @@ function Signup({
                 required={moderated && mandatoryFields.includes('affiliation')}
                 syncName="affiliation"
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
                 currentAffiliation={affiliationMeta}
               />
             ) : (
@@ -148,6 +160,8 @@ function Signup({
                 label={Translate.string('Affiliation')}
                 required={moderated && mandatoryFields.includes('affiliation')}
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
             )}
             {'address' in syncedValues && (
@@ -155,6 +169,8 @@ function Signup({
                 name="address"
                 label={Translate.string('Address')}
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
             )}
             {'phone' in syncedValues && (
@@ -162,6 +178,8 @@ function Signup({
                 name="phone"
                 label={Translate.string('Phone number')}
                 syncedValues={syncedValues}
+                lockedFields={lockedFields}
+                lockedFieldMessage={lockedFieldMessage}
               />
             )}
           </Fieldset>
@@ -238,11 +256,15 @@ Signup.propTypes = {
   affiliationMeta: PropTypes.object,
   hasPendingUser: PropTypes.bool,
   mandatoryFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+  lockedFields: PropTypes.arrayOf(PropTypes.string),
+  lockedFieldMessage: PropTypes.string,
 };
 
 Signup.defaultProps = {
   affiliationMeta: null,
   hasPendingUser: false,
+  lockedFields: [],
+  lockedFieldMessage: '',
 };
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -203,12 +203,14 @@ class RHPersonalData(RHUserBase):
     def _process(self):
         titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
         user_values = UserPersonalDataSchema().dump(self.user)
+        locked_fields = [] if session.user.is_admin else list(multipass.locked_fields)
         current_affiliation = None
         if self.user.affiliation_link:
             current_affiliation = AffiliationSchema().dump(self.user.affiliation_link)
         has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
-                                                  titles=titles, user_values=user_values,
+                                                  titles=titles, user_values=user_values, locked_fields=locked_fields,
+                                                  locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
                                                   has_predefined_affiliations=has_predefined_affiliations)
 
@@ -220,6 +222,8 @@ class RHPersonalDataUpdate(RHUserBase):
     def _process(self, changes):
         logger.info('Profile of user %r updated by %r: %r', self.user, session.user, changes)
         synced_fields = set(changes.pop('synced_fields', self.user.synced_fields))
+        if not session.user.is_admin:
+            synced_fields |= multipass.locked_fields & self.user.synced_fields
         syncable_fields = {k for k, v in self.user.synced_values.items()
                            if v or k not in ('first_name', 'last_name')}
         # we set this first so these fields are skipped below and only

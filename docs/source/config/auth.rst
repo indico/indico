@@ -87,7 +87,7 @@ The following keys are available in the provider data:
   approval of the registration by an Indico admin.  This results in
   the same workflow as :data:`LOCAL_MODERATION` in case of local
   accounts.
-- ``synced_fields`` -- This may be set in no more than once identity
+- ``synced_fields`` -- This may be set in no more than one identity
   provider and enables user data synchronization.  Its value should
   be a set of user attributes that can be synchronized during login.
   The following attributes can be synchronized:
@@ -102,6 +102,14 @@ The following keys are available in the provider data:
   has validated emails (ie ``trusted_email`` set to ``True``); otherwise
   users would get unvalidated (possibly even invalid) emails set on their
   account during sync.
+- ``locked_fields`` -- A set of fields which are always synchronized
+  with the identity provider. Its value must be a subset of the user
+  attributes listed in ``synced_fields``, and it it not possible to lock
+  the ``email`` field. The fields listed here can still be desynchronized
+  by an administrator.
+- ``locked_field_message`` -- A message displayed next to the fields
+  listed in ``locked_fields``. The purpose is to guide the user on
+  how they should proceed in order to change the locked field's data.
 - ``mapping`` -- A dictionary that maps between keys given by the
   identity provider and keys expected by Indico for user information.
   The key of each entry is the Indico-side attribute name; the value
