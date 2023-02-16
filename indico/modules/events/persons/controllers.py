@@ -419,11 +419,13 @@ class RHRevokeSubmissionRights(RHManageEventBase):
         return redirect(url_for('.person_list', self.event))
 
 
-class RHUpdateEventPerson(RHPersonsBase):
+class RHEventPersonActionBase(RHPersonsBase):
     def _process_args(self):
         RHPersonsBase._process_args(self)
         self.person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
 
+
+class RHUpdateEventPerson(RHEventPersonActionBase):
     @use_args(EventPersonUpdateSchema, partial=True)
     def _process(self, args):
         update_person(self.person, args)
@@ -433,17 +435,25 @@ class RHUpdateEventPerson(RHPersonsBase):
                                                   EventPersonSchema(), Affiliation.query.has_rows()))
 
 
-class RHDeleteUnusedEventPerson(RHPersonsBase):
-    def _process_args(self):
-        RHPersonsBase._process_args(self)
-        self.person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
-
+class RHDeleteUnusedEventPerson(RHEventPersonActionBase):
     def _process(self):
         if self.person.has_links:
             raise Forbidden(_('Only users with no ties to the event can be deleted.'))
         db.session.delete(self.person)
         logger.info('EventPerson deleted from event %r: %r', self.event, self.person)
         return jsonify_data()
+
+
+class RHSyncEventPerson(RHEventPersonActionBase):
+    def _process(self):
+        if not self.person.user:
+            raise Forbidden(_('Persons with no associated users cannot be synced.'))
+        self.person.sync_user(notify=False)
+        logger.info('EventPerson synced with user in event %r: %r', self.event, self.person)
+        person_data = self.get_persons()[self.person.email or self.person.id]
+        tpl = get_template_module('events/persons/management/_person_list_row.html')
+        return jsonify_data(html=tpl.render_person_row(person_data, bool(self.event.registration_forms),
+                                                       EventPersonSchema(), Affiliation.query.has_rows()))
 
 
 class RHEventPersonSearch(RHAuthenticatedEventBase):

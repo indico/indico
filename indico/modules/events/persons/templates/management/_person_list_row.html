@@ -98,6 +98,14 @@
             <a class="i-link icon-edit disabled"
                title="{%- trans %}This user does not play any public role{% endtrans -%}"></a>
         {% endif %}
+        {% if person_data.has_event_person and person_data.person.get_unsynced_data() %}
+            <a class="i-link icon-loop"
+               title="{%- trans %}Sync person with user{% endtrans -%}"
+               data-href="{{ url_for('persons.sync_with_user', person) }}"
+               data-title="{%- trans %}Sync person with user{% endtrans -%}"
+               data-method="POST"
+               data-update="#person-{{ person.id }}"></a>
+        {% endif %}
         {% if person_data.has_event_person and person_data.roles.no_builtin_roles %}
             <a class="i-link icon-remove"
                title="{%- trans %}Delete person{% endtrans -%}"
