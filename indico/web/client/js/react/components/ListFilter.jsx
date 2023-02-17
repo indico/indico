@@ -161,11 +161,12 @@ export default function ListFilter({
             >
               <Dropdown.Menu>
                 {_.sortBy(options.filter(o => !o.exclusive), 'text').map(
-                  ({value: option, text}) => (
+                  ({value: option, text, color}) => (
                     <Dropdown.Item
                       key={option}
                       value={option}
                       text={text}
+                      label={color ? {color, empty: true, circular: true} : undefined}
                       active={filters[key]?.includes(option)}
                       onClick={(e, {value}) => toggleFilter(key, value)}
                     />
@@ -176,11 +177,12 @@ export default function ListFilter({
                 )}
                 {options
                   .filter(o => o.exclusive)
-                  .map(({value: option, text}) => (
+                  .map(({value: option, text, color}) => (
                     <Dropdown.Item
                       key={option}
                       value={option}
                       text={text}
+                      label={color ? {color, empty: true, circular: true} : undefined}
                       active={filters[key]?.includes(option)}
                       onClick={(e, {value}) => toggleFilter(key, value)}
                     />
@@ -222,6 +224,7 @@ ListFilter.propTypes = {
           value: PropTypes.string.isRequired,
           text: PropTypes.string.isRequired,
           exclusive: PropTypes.bool,
+          color: PropTypes.string,
         })
       ).isRequired,
       isMatch: PropTypes.func,
