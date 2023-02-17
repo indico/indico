@@ -52,12 +52,10 @@ function FileEntry({uploadURL, fileType, file: {uuid, filename, state, claimed, 
     async acceptedFiles => {
       setActiveButton('replace');
       await uploadFiles({
-        action: actions.markModified,
         fileTypeId: fileType.id,
-        acceptedFiles,
+        acceptedFiles: acceptedFiles.map(file => ({file, replaceFileId: uuid})),
         uploadFunc: uploadFile.bind(null, uploadURL),
         dispatch,
-        replaceFileId: uuid,
         onError: () => setActiveButton(null),
       });
       // when we're done, the component will have been unmounted,

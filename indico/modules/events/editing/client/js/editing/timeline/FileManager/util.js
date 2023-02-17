@@ -52,18 +52,15 @@ export async function uploadExistingFile(url, file) {
 /**
  * Upload file using axios while triggering all needed actions to update progress.
  *
- * @param {Function} action - the action to be executed after upload is done
  * @param {String} fileTypeId - the id of the File Type
- * @param {Array} acceptedFiles - the "accepted files" array sent by react-dropzone
+ * @param {Array} acceptedFiles - an array of objects with the uploaded file and the id of the file to be replaced
  * @param {Function} uploadFunc - the function to be called on file upload
  * @param {Function} dispatch - the dispatch function for reducer actions
  * @param {Function} onError - the function to be called on file upload error
  * @param rest - optional arguments
- * @param {String?} rest.replaceFileId - the ID of the file to modify, if any
  * @param {Number?} rest.fileId - the id of the file, if any, used to cross-reference uploadables
  */
 export function uploadFiles({
-  action,
   fileTypeId,
   acceptedFiles,
   uploadFunc,
@@ -73,11 +70,11 @@ export function uploadFiles({
 }) {
   const tmpFileIds = acceptedFiles.map(() => _.uniqueId(_.now()));
 
-  dispatch(actions.startUploads(fileTypeId, acceptedFiles, tmpFileIds));
+  dispatch(actions.startUploads(fileTypeId, acceptedFiles.map(({file}) => file), tmpFileIds));
 
   return Promise.all(
-    _.zip(acceptedFiles, tmpFileIds).map(async ([acceptedFile, tmpFileId]) => {
-      const uploadedFile = await uploadFunc(acceptedFile, e =>
+    _.zip(acceptedFiles, tmpFileIds).map(async ([{file, replaceFileId}, tmpFileId]) => {
+      const uploadedFile = await uploadFunc(file, e =>
         dispatch(actions.progress(fileTypeId, tmpFileId, Math.floor((e.loaded / e.total) * 100)))
       );
 
@@ -89,8 +86,9 @@ export function uploadFiles({
         }
         return null;
       } else {
+        const action = replaceFileId ? actions.markModified : actions.markUploaded;
         dispatch(
-          action(fileTypeId, rest.replaceFileId, tmpFileId, {
+          action(fileTypeId, replaceFileId, tmpFileId, {
             filename: uploadedFile.filename,
             id: rest.fileId,
             uuid: uploadedFile.uuid,
