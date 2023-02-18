@@ -7,12 +7,17 @@
 
 import pytest
 from flask import request, session
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
-from indico.modules.events.registration.controllers.display import RHRegistrationForm, RHRegistrationWithdraw
+from indico.modules.events.registration.controllers.display import (RHRegistrationDisplayEdit, RHRegistrationForm,
+                                                                    RHRegistrationWithdraw)
+from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
+from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
+from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.registration.util import create_registration
 from indico.testing.util import extract_emails
 from indico.util.date_time import now_utc
 
@@ -93,3 +98,67 @@ def test_withdraw_registration_rh(smtp, dummy_regform, dummy_reg, dummy_user):
         to='mgr@example.test',
     )
     assert not smtp.outbox
+
+
+def test_display_edit_override_required_rh(
+    db, dummy_regform, dummy_user, app_context, smtp
+):
+    # Add a section and a required field
+    section = RegistrationFormSection(
+        registration_form=dummy_regform, title='dummy_section', is_manager_only=False
+    )
+
+    assert dummy_regform.active_registration_count == 0
+    boolean_field = RegistrationFormField(parent_id=section.id, registration_form=dummy_regform)
+    _fill_form_field_with_data(
+        boolean_field, {'input_type': 'bool', 'is_required': True, 'title': 'Yes/No'}
+    )
+
+    # Register the user
+    dummy_regform.modification_mode = ModificationMode.allowed_always
+    data = {
+        'email': dummy_user.email,
+        'first_name': dummy_user.first_name,
+        'last_name': dummy_user.last_name,
+    }
+    reg = create_registration(
+        dummy_regform, data, invitation=None, management=False, notify_user=False
+    )
+    assert dummy_regform.active_registration_count == 1
+
+    # We are not a manager, but are attempting to avoid setting the required field. We should get a 422
+    jsondata = {'first_name': 'hax0r', 'override_required': True}
+    url = f'/event/{dummy_regform.event_id}/registrations/{dummy_regform.id}/edit?token={reg.uuid}'
+    with app_context.test_request_context(url, json=jsondata):
+        rh = RHRegistrationDisplayEdit()
+        rh._process_args()
+        rh._check_access()
+
+        with pytest.raises(UnprocessableEntity) as excinfo:
+            rh._process_POST()
+
+        messages = excinfo.value.data['messages']
+        assert len(messages) == 2
+        assert messages['override_required'][0] == 'Unknown field.'
+        assert messages[boolean_field.html_field_name][0] == 'Missing data for required field.'
+
+    # Try again with the correct fields
+    assert not smtp.outbox
+    del jsondata['override_required']
+    jsondata[boolean_field.html_field_name] = True
+    with app_context.test_request_context(url, json=jsondata):
+        rh = RHRegistrationDisplayEdit()
+        rh._process_args()
+        rh._check_access()
+        rh._process_POST()
+
+        assert reg.first_name == 'hax0r'
+        assert reg.data_by_field[boolean_field.id].data is True
+
+        extract_emails(
+            smtp,
+            required=True,
+            count=1,
+            subject=f'[Indico] Registration modified for {dummy_regform.event.title}',
+            to=dummy_user.email,
+        )

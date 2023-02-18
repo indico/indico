@@ -97,6 +97,7 @@ export default function FormItem({
   }
 
   const required = meta.alwaysRequired || isRequired;
+  const managementRequired = meta.alwaysRequired || (!isManagement && isRequired);
   return (
     <div
       styleName={`form-item ${toClasses({
@@ -111,7 +112,7 @@ export default function FormItem({
         {InputComponent ? (
           meta.customFormItem ? (
             <InputComponent
-              isRequired={required}
+              isRequired={managementRequired}
               disabled={disabled}
               isPurged={showPurged}
               retentionPeriodIcon={retentionPeriodIcon}
@@ -122,7 +123,7 @@ export default function FormItem({
               <label style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}>{title}</label>
               {retentionPeriodIcon}
               <InputComponent
-                isRequired={required}
+                isRequired={managementRequired}
                 disabled={disabled}
                 isPurged={showPurged}
                 {...inputProps}

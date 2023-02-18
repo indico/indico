@@ -167,7 +167,7 @@ class RHRegistrationEdit(RegistrationEditMixin, RHManageRegistrationBase):
 
     @property
     def success_url(self):
-        return url_for('.registration_details', self.registration)
+        return url_for('event_registration.registration_details', self.registration)
 
 
 class RHRegistrationsActionBase(RHManageRegFormBase):
@@ -283,12 +283,13 @@ class RHRegistrationCreate(RHManageRegFormBase):
     def _process_POST(self):
         if self.regform.is_purged:
             raise Forbidden(_('Registration is disabled due to an expired retention period'))
-        schema = make_registration_schema(self.regform, management=True)()
+        override_required = request.json.get('override_required', False)
+        schema = make_registration_schema(self.regform, management=True, override_required=override_required)()
         form = parser.parse(schema)
         session['registration_notify_user_default'] = notify_user = form.pop('notify_user', False)
         create_registration(self.regform, form, management=True, notify_user=notify_user)
         flash(_('The registration was created.'), 'success')
-        return jsonify({'redirect': url_for('.manage_reglist', self.regform)})
+        return jsonify({'redirect': url_for('event_registration.manage_reglist', self.regform)})
 
     def _process_GET(self):
         user_data = self._get_user_data()
