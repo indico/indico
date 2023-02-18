@@ -403,7 +403,7 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
                 flash(_('We could not find a registration for you.  If have already registered, please use the '
                         'direct access link from the email you received after registering or log in to your Indico '
                         'account.'), 'warning')
-            return redirect(url_for('.display_regform', self.regform))
+            return redirect(url_for('event_registration.display_regform', self.regform))
 
     @property
     def success_url(self):

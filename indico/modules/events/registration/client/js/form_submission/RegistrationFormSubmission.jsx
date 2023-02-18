@@ -37,22 +37,34 @@ import {
 
 import '../../styles/regform.module.scss';
 
-function EmailNotification() {
+function ManagementOptions({isUpdateMode}) {
   return (
     <Message info style={{marginTop: 25}}>
       <Message.Header>
-        <Translate>Email notifications</Translate>
+        <Translate>Management Options</Translate>
       </Message.Header>
-      <div style={{marginTop: 10}}>
+      <div>
         <FinalCheckbox
+          style={{marginTop: 10}}
           label={Translate.string('Send an email notification to the user')}
           name="notify_user"
           toggle
         />
+        {!isUpdateMode && (
+          <FinalCheckbox
+            style={{marginTop: 10}}
+            label={Translate.string('Ignore field requirements for custom fields')}
+            name="override_required"
+            toggle
+          />
+        )}
       </div>
     </Message>
   );
 }
+ManagementOptions.propTypes = {
+  isUpdateMode: PropTypes.bool.isRequired,
+};
 
 function ConsentToPublish({publishToParticipants, publishToPublic}) {
   const isWarning = publishToParticipants === 'show_all' && publishToPublic === 'show_all';
@@ -133,7 +145,7 @@ export default function RegistrationFormSubmission() {
           ))}
           {renderPluginComponents('regformAfterSections')}
           <div>
-            {isManagement && <EmailNotification />}
+            {isManagement && <ManagementOptions isUpdateMode={isUpdateMode} />}
             {showConsentToPublish && (
               <ConsentToPublish
                 publishToParticipants={publishToParticipants}

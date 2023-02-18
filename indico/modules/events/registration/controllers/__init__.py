@@ -41,6 +41,10 @@ class RegistrationEditMixin:
 
     def _get_optional_fields(self):
         """Get fields for which we already have a value and thus are not required."""
+        if self.management:
+            # In management mode, all fields are optional
+            return True
+
         data_by_field = self.registration.data_by_field
         return [form_item.html_field_name for form_item in self.regform.active_fields
                 if data_by_field.get(form_item.id) is not None]
@@ -48,7 +52,9 @@ class RegistrationEditMixin:
     def _process_POST(self):
         optional_fields = self._get_optional_fields()
         schema = make_registration_schema(
-            self.regform, management=self.management, registration=self.registration
+            self.regform,
+            management=self.management,
+            registration=self.registration
         )(partial=optional_fields)
         form_data = parser.parse(schema)
 

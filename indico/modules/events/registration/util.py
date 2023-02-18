@@ -286,8 +286,22 @@ class RegistrationSchemaBase(IndicoSchema):
         unknown = RAISE
 
 
-def make_registration_schema(regform, management=False, registration=None, captcha_required=False):
-    """Dynamically create a Marshmallow schema based on the registration form fields."""
+def make_registration_schema(
+    regform,
+    *,
+    management=False,
+    override_required=False,
+    registration=None,
+    captcha_required=False,
+):
+    """Dynamically create a Marshmallow schema based on the registration form fields.
+
+    :param regform: The registration form
+    :param management: True if this registration is with manager privileges
+    :param override_required: True if the registration manager requested to override required fields
+    :param registration: The existing registration, if it exists
+    :param captcha_required: True if a captcha is present on the registration form
+    """
     class RegistrationSchema(RegistrationSchemaBase):
         @validates('email')
         def validate_email(self, email, **kwargs):
@@ -299,6 +313,7 @@ def make_registration_schema(regform, management=False, registration=None, captc
 
     if management:
         schema['notify_user'] = fields.Boolean()
+        schema['override_required'] = fields.Boolean()
     elif regform.needs_publish_consent:
         schema['consent_to_publish'] = EnumField(RegistrationVisibility)
 
@@ -309,7 +324,10 @@ def make_registration_schema(regform, management=False, registration=None, captc
         if not management and form_item.parent.is_manager_only:
             continue
 
-        if mm_field := form_item.field_impl.create_mm_field(registration=registration):
+        if mm_field := form_item.field_impl.create_mm_field(
+            registration=registration,
+            override_required=(management and override_required)
+        ):
             schema[form_item.html_field_name] = mm_field
 
     return RegistrationSchema.from_dict(schema, name='RegistrationSchema')

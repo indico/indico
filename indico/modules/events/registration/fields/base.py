@@ -86,7 +86,7 @@ class RegistrationFormFieldBase:
         schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
         return schema()
 
-    def create_mm_field(self, registration=None):
+    def create_mm_field(self, registration=None, override_required=False):
         """
         Create a marshmallow field.
         When modifying an existing registration, the `registration` parameter is
@@ -98,12 +98,27 @@ class RegistrationFormFieldBase:
         validators = self.get_validators(registration) or []
         if not isinstance(validators, list):
             validators = [validators]
-        if self.form_item.is_required and self.not_empty_if_required:
+
+        # Managers should be able to register without all required fields, but the personal data
+        # fields are mandatory either way.
+        from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
+        required_personal_field = (
+            isinstance(self.form_item, RegistrationFormPersonalDataField) and
+            self.form_item.personal_data_type.is_required
+        )
+        skip_required = override_required and not required_personal_field
+
+        if self.form_item.is_required and self.not_empty_if_required and not skip_required:
             validators.append(not_empty)
+
+        mm_field_kwargs = self.mm_field_kwargs
+        if skip_required:
+            mm_field_kwargs['allow_none'] = True
+
         return self.mm_field_class(*self.mm_field_args,
-                                   required=self.form_item.is_required,
+                                   required=(self.form_item.is_required and not skip_required),
                                    validate=validators,
-                                   **self.mm_field_kwargs)
+                                   **mm_field_kwargs)
 
     def has_data_changed(self, value, old_data):
         return value != old_data.data
@@ -215,5 +230,5 @@ class InvalidRegistrationFormField(RegistrationFormFieldBase):
 
     is_invalid_field = True
 
-    def create_mm_field(self, registration=None):
+    def create_mm_field(self, registration=None, override_required=False):
         return None
