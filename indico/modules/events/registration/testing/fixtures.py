@@ -42,3 +42,23 @@ def dummy_reg(db, dummy_event, dummy_regform, dummy_user):
     dummy_event.registrations.append(reg)
     db.session.flush()
     return reg
+
+
+@pytest.fixture
+def create_registration(dummy_event):
+    """Return a callable that lets you create a registration."""
+
+    def _create_registration(user, regform, **kwargs):
+        return Registration(
+            first_name='Guinea',
+            last_name='Pig',
+            checked_in=True,
+            state=RegistrationState.complete,
+            currency='USD',
+            email=user.email,
+            user=user,
+            registration_form=regform,
+            **kwargs
+        )
+
+    return _create_registration

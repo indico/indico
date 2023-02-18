@@ -67,6 +67,7 @@ class CategoryRole(db.Model):
     # - in_contribution_acls (ContributionPrincipal.category_role)
     # - in_event_acls (EventPrincipal.category_role)
     # - in_event_settings_acls (EventSettingPrincipal.category_role)
+    # - in_menuentry_acls (MenuEntryPrincipal.category_role)
     # - in_session_acls (SessionPrincipal.category_role)
     # - in_track_acls (TrackPrincipal.category_role)
 

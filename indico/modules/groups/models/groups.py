@@ -47,6 +47,7 @@ class LocalGroup(db.Model):
     # - in_contribution_acls (ContributionPrincipal.local_group)
     # - in_event_acls (EventPrincipal.local_group)
     # - in_event_settings_acls (EventSettingPrincipal.local_group)
+    # - in_menuentry_acls (MenuEntryPrincipal.local_group)
     # - in_room_acls (RoomPrincipal.local_group)
     # - in_session_acls (SessionPrincipal.local_group)
     # - in_settings_acls (SettingPrincipal.local_group)

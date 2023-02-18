@@ -103,7 +103,7 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
             defaults = FormDefaults(self.entry, skip_attrs={'title'},
                                     title=self.entry.title or self.entry.default_data.title,
                                     custom_title=self.entry.title is not None)
-        form = form_cls(entry=self.entry, obj=defaults, **form_kwargs)
+        form = form_cls(entry=self.entry, obj=defaults, event=self.event, **form_kwargs)
         if form.validate_on_submit():
             form.populate_obj(self.entry, skip={'html', 'custom_title'})
             if self.entry.is_page:
@@ -195,7 +195,7 @@ class RHMenuAddEntry(RHMenuBase):
         else:
             raise BadRequest
 
-        form = form_cls(obj=defaults, **form_kwargs)
+        form = form_cls(obj=defaults, event=self.event, **form_kwargs)
         if form.validate_on_submit():
             entry = MenuEntry(event=self.event, type=MenuEntryType[entry_type])
             form.populate_obj(entry, skip={'html'})

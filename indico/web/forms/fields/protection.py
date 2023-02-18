@@ -25,9 +25,10 @@ class IndicoProtectionField(IndicoEnumRadioField):
         self.acl_message_url = get_acl_message_url(kwargs['_form']) if get_acl_message_url else None
         self.can_inherit_protection = self.protected_object.protection_parent is not None
         self.is_unlisted_event = isinstance(self.protected_object, db.m.Event) and self.protected_object.is_unlisted
+        skip = set(self.protected_object.disallowed_protection_modes)
         if not self.can_inherit_protection and not self.is_unlisted_event:
-            kwargs['skip'] = {ProtectionMode.inheriting}
-        super().__init__(*args, enum=ProtectionMode, **kwargs)
+            skip.add(ProtectionMode.inheriting)
+        super().__init__(*args, enum=ProtectionMode, skip=skip, **kwargs)
 
     def render_protection_message(self):
         protected_object = self.get_form().protected_object
@@ -39,6 +40,8 @@ class IndicoProtectionField(IndicoEnumRadioField):
             parent_type = _('Event')
         elif isinstance(protected_object.protection_parent, db.m.Category):
             parent_type = _('Category')
+        elif isinstance(protected_object.protection_parent, db.m.MenuEntry):
+            parent_type = _('Menu Entry')
         else:
             parent_type = _('Session')
         rv = render_template('_protection_info.html', field=self, protected_object=protected_object,
