@@ -77,7 +77,7 @@ function SyncedFinalField({
       }
     />
   );
-  if (synced && locked && lockedFieldMessage) {
+  if (synced && syncable && locked && lockedFieldMessage) {
     return (
       <Popup
         on="hover"
