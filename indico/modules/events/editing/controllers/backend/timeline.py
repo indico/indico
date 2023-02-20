@@ -439,6 +439,8 @@ class RHEditableUnassign(RHContributionEditableBase):
 class RHEditableAssignMe(RHContributionEditableBase):
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
+        if self.editable.editor:
+            raise Forbidden(_('This contribution already has an assigned editor'))
         if not self.editable.can_assign_self(session.user):
             raise Forbidden(_('You do not have the permission to assign yourself'))
 

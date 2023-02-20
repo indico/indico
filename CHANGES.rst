@@ -58,6 +58,7 @@ Improvements
 - Disallow repeated filenames in editing revisions (:pr:`5681`)
 - Add setting to hide peer-reviewed papers from participants even after they have
   been accepted (:issue:`5666`, :pr:`5671`)
+- Prevent concurrent assignment of editors to editables (:pr:`5684`)
 
 Bugfixes
 ^^^^^^^^

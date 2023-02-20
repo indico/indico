@@ -15,6 +15,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.cache import make_scoped_cache
 from indico.core.db import db
+from indico.core.errors import UserValueError
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHEditableTypeEditorBase,
                                                             RHEditableTypeManagementBase)
@@ -80,17 +81,23 @@ class RHDownloadArchive(RHEditableTypeManagementBase):
         return fn(self.event, self.editable_type, editables)
 
 
-class RHAssignEditor(RHEditablesBase):
+class RHEditorAssignmentBase(RHEditablesBase):
     @use_kwargs({
-        'editor': Principal(required=True)
+        'editor_assignments': fields.Dict(keys=fields.Int, values=Principal, required=True)
     })
-    def _process_args(self, editor):
+    def _process_args(self, editor_assignments):
         RHEditablesBase._process_args(self)
-        if (not self.event.can_manage(editor, self.editable_type.editor_permission)
-                and not self.event.can_manage(editor, 'editing_manager')):
-            raise Forbidden(_('This user is not an editor of the {} type').format(self.editable_type.name))
+        if not all(e.editor == editor_assignments.get(e.id) for e in self.editables):
+            raise UserValueError(_('Editor assignments have changed, please reload the page'))
+        self.editor = None
 
-        self.editor = editor
+    def _check_access(self):
+        RHEditablesBase._check_access(self)
+        if (self.editor and not self.event.can_manage(self.editor, self.editable_type.editor_permission)
+                and not self.event.can_manage(self.editor, 'editing_manager')):
+            if self.editor == session.user:
+                raise Forbidden(_('You are not an editor of the {} type').format(self.editable_type.name))
+            raise Forbidden(_('This user is not an editor of the {} type').format(self.editable_type.name))
 
     def _process(self):
         editables = [e for e in self.editables if e.editor != self.editor]
@@ -99,21 +106,22 @@ class RHAssignEditor(RHEditablesBase):
         return EditableBasicSchema(many=True).jsonify(editables)
 
 
-class RHAssignMyselfAsEditor(RHEditablesBase):
-    def _check_access(self):
-        RHEditablesBase._check_access(self)
-        if (not self.event.can_manage(session.user, self.editable_type.editor_permission)
-                and not self.event.can_manage(session.user, 'editing_manager')):
-            raise Forbidden(_('You are not an editor of the {} type').format(self.editable_type.name))
-
-    def _process(self):
-        editables = [e for e in self.editables if e.editor != session.user]
-        for editable in editables:
-            assign_editor(editable, session.user)
-        return EditableBasicSchema(many=True).jsonify(editables)
+class RHAssignEditor(RHEditorAssignmentBase):
+    @use_kwargs({
+        'editor': Principal(required=True)
+    })
+    def _process_args(self, editor):
+        RHEditorAssignmentBase._process_args(self)
+        self.editor = editor
 
 
-class RHUnassignEditor(RHEditablesBase):
+class RHAssignMyselfAsEditor(RHEditorAssignmentBase):
+    def _process_args(self):
+        RHEditorAssignmentBase._process_args(self)
+        self.editor = session.user
+
+
+class RHUnassignEditor(RHEditorAssignmentBase):
     def _process(self):
         editables = [e for e in self.editables if e.editor]
         for editable in editables:

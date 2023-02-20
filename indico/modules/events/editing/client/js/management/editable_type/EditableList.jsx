@@ -111,6 +111,11 @@ function EditableListDisplay({
   const checkedContribsWithEditables = contribsWithEditables.filter(x =>
     checkedSet.has(x.editable.id)
   );
+  const editorAssignments = Object.fromEntries(
+    checkedContribsWithEditables
+      .filter(x => x.editable.editor)
+      .map(x => [x.editable.id, x.editable.editor.identifier])
+  );
   const [activeRequest, setActiveRequest] = useState(null);
 
   const editorOptions = useMemo(
@@ -398,7 +403,10 @@ function EditableListDisplay({
 
   const updateCheckedEditablesRequest = async (type, urlFunc, data = {}) => {
     setActiveRequest(type);
-    const rv = await checkedEditablesRequest(urlFunc, data);
+    const rv = await checkedEditablesRequest(urlFunc, {
+      ...data,
+      editor_assignments: editorAssignments,
+    });
     if (rv) {
       patchList(rv);
     }
