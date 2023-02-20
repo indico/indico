@@ -56,7 +56,7 @@ Improvements
   synchronization (:pr:`5648`)
 - Add an option to sync event persons with users (:pr:`5677`)
 - Disallow repeated filenames in editing revisions (:pr:`5681`)
-- Added a setting to hide peer-reviewed papers from participants even after they have
+- Add setting to hide peer-reviewed papers from participants even after they have
   been accepted (:issue:`5666`, :pr:`5671`)
 
 Bugfixes
