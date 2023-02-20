@@ -136,7 +136,7 @@ function EditableListDisplay({
         key: 'state',
         text: Translate.string('Status'),
         options: [
-          {value: 'not_submitted', text: Translate.string('Not submitted'), color: 'black'},
+          {value: 'not_submitted', text: Translate.string('Not submitted'), color: 'default'},
           {value: 'ready_for_review', text: Translate.string('Ready for review'), color: 'grey'},
           {value: 'accepted', text: Translate.string('Accepted'), exclusive: true, color: 'green'},
           {value: 'rejected', text: Translate.string('Rejected'), exclusive: true, color: 'black'},

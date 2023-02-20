@@ -63,6 +63,15 @@ export default function ListFilter({
     onChangeList(new Set(filtered.map(e => e.id)));
   };
 
+  const getLabelOpts = color => {
+    if (color === 'default') {
+      return {empty: true, circular: true};
+    } else if (color) {
+      return {color, empty: true, circular: true};
+    }
+    return null;
+  };
+
   const setSearchText = value => {
     if (onChangeSearchText) {
       onChangeSearchText(value);
@@ -166,7 +175,7 @@ export default function ListFilter({
                       key={option}
                       value={option}
                       text={text}
-                      label={color ? {color, empty: true, circular: true} : undefined}
+                      label={getLabelOpts(color)}
                       active={filters[key]?.includes(option)}
                       onClick={(e, {value}) => toggleFilter(key, value)}
                     />
@@ -182,7 +191,7 @@ export default function ListFilter({
                       key={option}
                       value={option}
                       text={text}
-                      label={color ? {color, empty: true, circular: true} : undefined}
+                      label={getLabelOpts(color)}
                       active={filters[key]?.includes(option)}
                       onClick={(e, {value}) => toggleFilter(key, value)}
                     />
