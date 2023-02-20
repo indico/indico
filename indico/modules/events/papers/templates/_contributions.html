@@ -3,11 +3,15 @@
 {% macro render_paper_section(contribution) %}
     {% set paper = contribution.paper %}
     {% set can_submit = contribution.can_submit_proceedings(session.user) %}
-    {% set show_paper = paper and paper.accepted_revision %}
+    {% set can_judge = paper.can_judge(session.user) %}
+    {% set can_review = paper.can_review(session.user) %}
+    {% set permitted_hidden_paper_viewers = can_submit or can_judge or can_review %}
+    {% set can_view_hidden_paper = contribution.event.cfp.hide_accepted and permitted_hidden_paper_viewers %}
+    {% set show_paper = paper and paper.accepted_revision and not contribution.event.cfp.hide_accepted %}
     {% set show_paper_status = paper and can_submit %}
     {% set show_paper_submission = contribution.event.cfp.is_open and can_submit %}
 
-    {% if show_paper or show_paper_status or show_paper_submission %}
+    {% if show_paper or show_paper_status or show_paper_submission or can_view_hidden_paper %}
         <section>
             <div class="header">
                 <div class="header-row">
@@ -17,13 +21,13 @@
             <div class="header">
                 <div class="header-row">
                     <h3 class="icon-file">{% trans %}Paper{% endtrans %}</h3>
-                    {% if show_paper and paper.state.name == 'accepted' %}
+                    {% if (show_paper or can_view_hidden_paper) and paper.state.name == 'accepted' %}
                         {{ render_paper_metadata(paper, contribution_page=true) }}
                     {% endif %}
                 </div>
             </div>
 
-            {% if show_paper %}
+            {% if show_paper or can_view_hidden_paper %}
                 {{ render_paper_content(paper, contribution_page=true) }}
             {% endif %}
 

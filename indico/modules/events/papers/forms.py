@@ -88,6 +88,9 @@ class PaperReviewingSettingsForm(IndicoForm):
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
     scale_lower = IntegerField(_('Scale (from)'), [InputRequired()])
     scale_upper = IntegerField(_('Scale (to)'), [InputRequired()])
+    hide_accepted = BooleanField(_('Keep papers hidden'), widget=SwitchWidget(),
+                                 description=_("Keep papers hidden from participants even after they've "
+                                               'been accepted.'))
     email_settings = PaperEmailSettingsField(_('Email notifications'))
 
     def __init__(self, *args, **kwargs):
