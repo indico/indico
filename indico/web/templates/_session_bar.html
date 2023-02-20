@@ -120,12 +120,12 @@
         </div>
         <div class="settingsSeparator"></div>
         <div class="settingsWidgetSection">
-            <a href="{{ url_for('users.user_dashboard', session.user) }}">
+            <a href="{{ url_for('users.user_dashboard', user_id=none) }}">
                 {%- trans %}My profile{% endtrans -%}
             </a>
         </div>
         <div class="settingsWidgetSection">
-            <a href="{{ url_for('users.user_preferences', session.user) }}">
+            <a href="{{ url_for('users.user_preferences', user_id=none) }}">
                 {%- trans %}My preferences{% endtrans -%}
             </a>
         </div>
