@@ -15,7 +15,6 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.cache import make_scoped_cache
 from indico.core.db import db
-from indico.core.errors import UserValueError
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHEditableTypeEditorBase,
                                                             RHEditableTypeManagementBase)
@@ -82,14 +81,7 @@ class RHDownloadArchive(RHEditableTypeManagementBase):
 
 
 class RHEditorAssignmentBase(RHEditablesBase):
-    @use_kwargs({
-        'editor_assignments': fields.Dict(keys=fields.Int, values=Principal, required=True)
-    })
-    def _process_args(self, editor_assignments):
-        RHEditablesBase._process_args(self)
-        if not all(e.editor == editor_assignments.get(e.id) for e in self.editables):
-            raise UserValueError(_('Editor assignments have changed, please reload the page'))
-        self.editor = None
+    editor = None
 
     def _check_access(self):
         RHEditablesBase._check_access(self)
@@ -99,11 +91,23 @@ class RHEditorAssignmentBase(RHEditablesBase):
                 raise Forbidden(_('You are not an editor of the {} type').format(self.editable_type.name))
             raise Forbidden(_('This user is not an editor of the {} type').format(self.editable_type.name))
 
-    def _process(self):
-        editables = [e for e in self.editables if e.editor != self.editor]
+    @use_kwargs({
+        'editor_assignments': fields.Dict(keys=fields.Int, values=Principal, required=True),
+        'force': fields.Bool(load_default=False)
+    })
+    def _process(self, editor_assignments, force):
+        editables = [e for e in self.editables if self._can_assign_editor(e)]
+        if not force and not all(e.editor == editor_assignments.get(e.id) for e in editables):
+            return jsonify(editor_conflict=True), 409
         for editable in editables:
-            assign_editor(editable, self.editor)
+            self._assign_editor(editable)
         return EditableBasicSchema(many=True).jsonify(editables)
+
+    def _can_assign_editor(self, editable):
+        return editable.editor != self.editor
+
+    def _assign_editor(self, editable):
+        assign_editor(editable, self.editor)
 
 
 class RHAssignEditor(RHEditorAssignmentBase):
@@ -122,11 +126,11 @@ class RHAssignMyselfAsEditor(RHEditorAssignmentBase):
 
 
 class RHUnassignEditor(RHEditorAssignmentBase):
-    def _process(self):
-        editables = [e for e in self.editables if e.editor]
-        for editable in editables:
-            unassign_editor(editable)
-        return EditableBasicSchema(many=True).jsonify(editables)
+    def _can_assign_editor(self, editable):
+        return bool(editable.editor)
+
+    def _assign_editor(self, editable):
+        unassign_editor(editable)
 
 
 class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):

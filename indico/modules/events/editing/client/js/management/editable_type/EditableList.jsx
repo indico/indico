@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import React, {useState, useMemo} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
-import {Button, Icon, Loader, Checkbox, Message, Dropdown} from 'semantic-ui-react';
+import {Button, Icon, Loader, Checkbox, Message, Dropdown, Confirm} from 'semantic-ui-react';
 
 import {
   TooltipIfTruncated,
@@ -117,6 +117,7 @@ function EditableListDisplay({
       .map(x => [x.editable.id, x.editable.editor.identifier])
   );
   const [activeRequest, setActiveRequest] = useState(null);
+  const [assignmentConflict, setAssignmentConflict] = useState(null);
 
   const editorOptions = useMemo(
     () =>
@@ -375,11 +376,15 @@ function EditableListDisplay({
           ...data,
         }
       );
-    } catch (error) {
-      handleAxiosError(error);
-      return null;
-    } finally {
       setActiveRequest(null);
+    } catch (error) {
+      if (error.response?.status === 409 && error.response.data.editor_conflict) {
+        setAssignmentConflict([urlFunc, {...data, force: true}]);
+        return null;
+      }
+      handleAxiosError(error);
+      setActiveRequest(null);
+      return null;
     }
 
     return camelizeKeys(response.data);
@@ -586,6 +591,23 @@ function EditableListDisplay({
           <Translate>There are no editables yet.</Translate>
         </Message>
       )}
+      <Confirm
+        open={!!assignmentConflict}
+        header={Translate.string('Assignment conflict')}
+        content={Translate.string(
+          'Some editor assignments for the current selection have been changed externally. Are you sure you want to proceed?'
+        )}
+        confirmButton={<Button content={Translate.string('Force assignments')} negative />}
+        cancelButton={Translate.string('Cancel')}
+        onCancel={() => {
+          setActiveRequest(null);
+          setAssignmentConflict(null);
+        }}
+        onConfirm={() => {
+          updateCheckedEditablesRequest(activeRequest, ...assignmentConflict);
+          setAssignmentConflict(null);
+        }}
+      />
     </>
   );
 }
