@@ -7,7 +7,7 @@
 
 import os
 from io import BytesIO
-from zipfile import ZipFile
+from zipfile import ZipFile, ZipInfo
 
 from flask import jsonify, request, session
 from marshmallow import EXCLUDE, fields
@@ -388,7 +388,11 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
                 folder_name = secure_filename(file_type.name, f'file-type-{file_type.id}')
 
                 with file.storage.get_local_path(file.storage_file_id) as filepath:
-                    zip_handler.write(filepath, os.path.join(folder_name, filename))
+                    info = ZipInfo.from_file(filepath)
+                    info.filename = os.path.join(folder_name, filename)
+                    info.date_time = self.revision.created_dt.astimezone(self.event.tzinfo).timetuple()[:6]
+                    with open(filepath, 'rb') as fd:
+                        zip_handler.writestr(info, fd.read())
         zip_filename = f'revision-{self.revision.id}.zip'
         if self.contrib.code:
             zip_filename = f'{self.contrib.code}-{zip_filename}'
