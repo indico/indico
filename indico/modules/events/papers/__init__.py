@@ -42,7 +42,8 @@ def _extend_editing_menu(sender, event, **kwargs):
         return None
     if (has_contributions_with_user_paper_submission_rights(event, session.user) or
             event.cfp.is_staff(session.user)):
-        return SideMenuItem('papers', _('Peer Reviewing'), url_for('papers.call_for_papers', event))
+        return SideMenuItem('papers', _('Peer Reviewing'), url_for('papers.call_for_papers', event),
+                            weight=20)
 
 
 @signals.event_management.management_url.connect

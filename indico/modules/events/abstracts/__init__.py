@@ -157,7 +157,8 @@ def _get_notification_placeholders(sender, **kwargs):
 @signals.menu.items.connect_via('event-editing-sidemenu')
 def _extend_editing_menu(sender, event, **kwargs):
     if event.has_feature('abstracts'):
-        yield SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.call_for_abstracts', event))
+        yield SideMenuItem('abstracts', _('Call for Abstracts'), url_for('abstracts.call_for_abstracts', event),
+                           weight=10)
 
 
 @signals.event.sidemenu.connect
