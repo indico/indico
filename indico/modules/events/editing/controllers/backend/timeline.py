@@ -13,9 +13,9 @@ from flask import jsonify, request, session
 from marshmallow import EXCLUDE, fields
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound, ServiceUnavailable
+from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServiceUnavailable
 
-from indico.core.errors import UserValueError
+from indico.core.errors import NoReportError, UserValueError
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase, TokenAccessMixin
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
@@ -440,7 +440,7 @@ class RHEditableAssignMe(RHContributionEditableBase):
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
         if self.editable.editor:
-            raise Forbidden(_('This contribution already has an assigned editor'))
+            raise NoReportError.wrap_exc(Conflict(_('This editable already has an editor assigned')))
         if not self.editable.can_assign_self(session.user):
             raise Forbidden(_('You do not have the permission to assign yourself'))
 
