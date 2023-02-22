@@ -1,14 +1,14 @@
 # Translations template for indico.
-# Copyright (C) 2022 ORGANIZATION
+# Copyright (C) 2023 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 3.2.1.dev0\n"
+"Project-Id-Version: indico 3.2.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-11-04 16:03+0100\n"
+"POT-Creation-Date: 2023-02-22 18:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,7 +69,7 @@ msgid_plural "{0} events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/management.js:57 indico/modules/events/management/client/js/index.js:327
+#: indico/modules/categories/client/js/management.js:57 indico/modules/events/management/client/js/index.js:382
 msgid "Undo"
 msgstr ""
 
@@ -291,7 +291,7 @@ msgstr ""
 msgid "There are no entries that match your search criteria."
 msgstr ""
 
-#: indico/modules/events/management/client/js/index.js:325
+#: indico/modules/events/management/client/js/index.js:380
 msgid "Undoing previous operation..."
 msgstr ""
 
@@ -383,7 +383,7 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/errors.js:31 indico/web/client/js/utils/axios.js:45
+#: indico/web/client/js/jquery/utils/errors.js:31 indico/web/client/js/utils/axios.js:44
 msgid "Something went wrong"
 msgstr ""
 
