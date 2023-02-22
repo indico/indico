@@ -42,7 +42,7 @@ def _notify_registration(registration, template_name, to_managers=False, attach_
             registration.state == RegistrationState.complete):
         attachments += get_ticket_attachments(registration)
     if not to_managers and registration.registration_form.attach_ical:
-        event_ical = event_to_ical(registration.event, method='REQUEST',
+        event_ical = event_to_ical(registration.event, method='REQUEST', skip_access_check=True,
                                    organizer=(core_settings.get('site_title'), config.NO_REPLY_EMAIL))
         attachments.append(MIMECalendar('event.ics', event_ical))
     to_list = (

@@ -81,6 +81,8 @@ Bugfixes
   or contribution (:pr:`5664`)
 - Correctly show paragraphs in CKEditor fields (:issue:`5624`, :pr:`5656`, thanks
   :user:`kewisch`)
+- Fix empty iCal file being attached when registering for a protected event
+  (:pr:`5688`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
