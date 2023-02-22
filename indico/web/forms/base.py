@@ -116,8 +116,8 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
             kwargs['meta'].setdefault('csrf', csrf_enabled)
         super().__init__(*args, **kwargs)
 
-    def validate(self):
-        valid = super().validate()
+    def validate(self, extra_validators=None):
+        valid = super().validate(extra_validators=extra_validators)
         if not valid:
             return False
         if not all(values_from_signal(signals.core.form_validated.send(self), single_value=True)):

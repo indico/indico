@@ -93,6 +93,7 @@ Internal Changes
 - Allow overriding the cache TTL for remote group membership checks (:pr:`5672`)
 - Allow a custom editing workflow service to mark new editables as ready-for-review
   without creating a new replacement revision (:pr:`5668`)
+- Update Python dependencies (:pr:`5689`)
 
 
 Version 3.2.2

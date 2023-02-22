@@ -56,7 +56,7 @@ requests
 sentry-sdk[flask,celery,sqlalchemy,pure_eval]
 simplejson
 speaklater
-sqlalchemy
+sqlalchemy<2  # major upgrade
 terminaltables
 translitcodec
 ua-parser

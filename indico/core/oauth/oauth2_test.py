@@ -12,6 +12,7 @@ from unittest.mock import MagicMock
 import pytest
 from authlib.common.security import generate_token
 from authlib.common.urls import url_encode
+from authlib.oauth2.base import OAuth2Error
 from authlib.oauth2.client import OAuth2Client
 from sqlalchemy.dialects.postgresql.array import ARRAY
 from werkzeug.urls import url_parse
@@ -145,7 +146,7 @@ def test_pkce_disabled(dummy_application, test_client, dummy_user, pkce_enabled)
         token = oauth_client.fetch_token(authorization_response=target_url, code_verifier=code_verifier)
         assert token.keys() == {'access_token', 'token_type', 'scope'}
     else:
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(OAuth2Error) as exc_info:
             oauth_client.fetch_token(authorization_response=target_url, code_verifier=code_verifier)
         assert 'invalid_client' in str(exc_info.value)
 

@@ -33,17 +33,17 @@ from sqlalchemy import ForeignKeyConstraint, inspect
 
 
 # basic list of tags, used for markdown content
-BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + [
+BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS | {
     'sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr', 'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4',
     'h5', 'h6', 'pre', 'dl', 'dd', 'dt', 'figure', 'blockquote'
-]
+}
 BLEACH_ALLOWED_ATTRIBUTES = {**bleach.ALLOWED_ATTRIBUTES, 'img': ['src', 'alt', 'style']}
 # extended list of tags, used for HTML content
-BLEACH_ALLOWED_TAGS_HTML = BLEACH_ALLOWED_TAGS + [
+BLEACH_ALLOWED_TAGS_HTML = BLEACH_ALLOWED_TAGS | {
     'address', 'area', 'bdo', 'big', 'caption', 'center', 'cite', 'col', 'colgroup', 'del', 'dfn', 'dir', 'div',
     'fieldset', 'font', 'ins', 'kbd', 'legend', 'map', 'menu', 'q', 's', 'samp', 'span', 'strike', 'tfoot', 'tt', 'u',
     'var'
-]
+}
 # yuck, this is ugly, but all these attributes were allowed in legacy...
 BLEACH_ALLOWED_ATTRIBUTES_HTML = BLEACH_ALLOWED_ATTRIBUTES | {'*': [
     'align', 'abbr', 'alt', 'border', 'bgcolor', 'class', 'cellpadding', 'cellspacing', 'color', 'char', 'charoff',
