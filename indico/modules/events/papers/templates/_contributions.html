@@ -3,8 +3,8 @@
 {% macro render_paper_section(contribution) %}
     {% set paper = contribution.paper %}
     {% set can_submit = contribution.can_submit_proceedings(session.user) %}
-    {% set can_judge = paper.can_judge(session.user) %}
-    {% set can_review = paper.can_review(session.user) %}
+    {% set can_judge = paper and paper.can_judge(session.user) %}
+    {% set can_review = paper and paper.can_review(session.user) %}
     {% set permitted_hidden_paper_viewers = can_submit or can_judge or can_review %}
     {% set can_view_hidden_paper = contribution.event.cfp.hide_accepted and permitted_hidden_paper_viewers %}
     {% set show_paper = paper and paper.accepted_revision and not contribution.event.cfp.hide_accepted %}
