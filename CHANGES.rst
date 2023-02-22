@@ -59,6 +59,7 @@ Improvements
 - Add setting to hide peer-reviewed papers from participants even after they have
   been accepted (:issue:`5666`, :pr:`5671`)
 - Prevent concurrent assignment of editors to editables (:pr:`5684`)
+- Add color labels to the filter dropdown (:issue:`5675`, :pr:`5680`)
 
 Bugfixes
 ^^^^^^^^

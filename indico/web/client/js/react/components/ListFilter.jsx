@@ -63,6 +63,15 @@ export default function ListFilter({
     onChangeList(new Set(filtered.map(e => e.id)));
   };
 
+  const getLabelOpts = color => {
+    if (color === 'default') {
+      return {empty: true, circular: true};
+    } else if (color) {
+      return {color, empty: true, circular: true};
+    }
+    return null;
+  };
+
   const setSearchText = value => {
     if (onChangeSearchText) {
       onChangeSearchText(value);
@@ -161,11 +170,12 @@ export default function ListFilter({
             >
               <Dropdown.Menu>
                 {_.sortBy(options.filter(o => !o.exclusive), 'text').map(
-                  ({value: option, text}) => (
+                  ({value: option, text, color}) => (
                     <Dropdown.Item
                       key={option}
                       value={option}
                       text={text}
+                      label={getLabelOpts(color)}
                       active={filters[key]?.includes(option)}
                       onClick={(e, {value}) => toggleFilter(key, value)}
                     />
@@ -176,11 +186,12 @@ export default function ListFilter({
                 )}
                 {options
                   .filter(o => o.exclusive)
-                  .map(({value: option, text}) => (
+                  .map(({value: option, text, color}) => (
                     <Dropdown.Item
                       key={option}
                       value={option}
                       text={text}
+                      label={getLabelOpts(color)}
                       active={filters[key]?.includes(option)}
                       onClick={(e, {value}) => toggleFilter(key, value)}
                     />
@@ -222,6 +233,7 @@ ListFilter.propTypes = {
           value: PropTypes.string.isRequired,
           text: PropTypes.string.isRequired,
           exclusive: PropTypes.bool,
+          color: PropTypes.string,
         })
       ).isRequired,
       isMatch: PropTypes.func,

@@ -136,19 +136,21 @@ function EditableListDisplay({
         key: 'state',
         text: Translate.string('Status'),
         options: [
-          {value: 'not_submitted', text: Translate.string('Not submitted')},
-          {value: 'ready_for_review', text: Translate.string('Ready for review')},
-          {value: 'accepted', text: Translate.string('Accepted'), exclusive: true},
-          {value: 'rejected', text: Translate.string('Rejected'), exclusive: true},
+          {value: 'not_submitted', text: Translate.string('Not submitted'), color: 'default'},
+          {value: 'ready_for_review', text: Translate.string('Ready for review'), color: 'grey'},
+          {value: 'accepted', text: Translate.string('Accepted'), exclusive: true, color: 'green'},
+          {value: 'rejected', text: Translate.string('Rejected'), exclusive: true, color: 'black'},
           {
             value: 'needs_submitter_changes',
             text: Translate.string('Needs submitter changes'),
             exclusive: true,
+            color: 'red',
           },
           {
             value: 'needs_submitter_confirmation',
             text: Translate.string('Needs submitter confirmation'),
             exclusive: true,
+            color: 'yellow',
           },
         ],
         isMatch: (contrib, selectedOptions) =>
