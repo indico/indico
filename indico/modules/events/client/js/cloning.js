@@ -52,9 +52,17 @@
         method: 'POST',
         success(data) {
           if (data.success) {
-            const $countNumber = $eventCount.find('.count');
+            const $countText = $eventCount.find('.count-text');
             const $lastDay = $eventCount.find('.last-day');
-            $countNumber.text(data.count);
+            $countText.text(
+              $T
+                .ngettext(
+                  '{0} new event will be created.',
+                  '{0} new events will be created.',
+                  data.count
+                )
+                .format(data.count)
+            );
             $cloneErrors.hide();
             $eventCount.show();
             $eventList.toggle(!!data.count);
