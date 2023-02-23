@@ -23,21 +23,21 @@ jobs:
           - { name: '3.10', python: '3.10', tox: py310 }
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         id: cache-npm
         with:
           path: node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('package*.json') }}
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
           node-version: 14.x
@@ -58,10 +58,10 @@ jobs:
 
       - name: Get pip cache dir
         id: pip-cache
-        run: echo "::set-output name=dir::$(pip cache dir)"
+        run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
 
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: pip|${{ runner.os }}|${{ matrix.python }}|${{ hashFiles('requirements*.txt') }}
@@ -79,7 +79,7 @@ jobs:
         run: tar cf /tmp/env.tar .venv node_modules
 
       - name: Upload environment
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: environment-${{ matrix.name }}
           retention-days: 1
@@ -91,20 +91,20 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       # BEGIN common steps - edit all occurrences if needed!
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
 
       - name: Download environment
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: environment-3.10
           path: /tmp
@@ -223,20 +223,20 @@ jobs:
 
     steps:
       # BEGIN common steps - edit all occurrences if needed!
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
 
       - name: Download environment
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: environment-${{ matrix.name }}
           path: /tmp
@@ -279,20 +279,20 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       # BEGIN common steps - edit all occurrences if needed!
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
 
       - name: Download environment
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: environment-3.10
           path: /tmp
