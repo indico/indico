@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import os
+import shutil
 from io import BytesIO
 from zipfile import ZipFile, ZipInfo
 
@@ -386,13 +387,11 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
                 filename = secure_filename(file.filename, f'file-{file.id}')
                 file_type = revision_file.file_type
                 folder_name = secure_filename(file_type.name, f'file-type-{file_type.id}')
-
-                with file.storage.get_local_path(file.storage_file_id) as filepath:
-                    info = ZipInfo.from_file(filepath)
-                    info.filename = os.path.join(folder_name, filename)
-                    info.date_time = self.revision.created_dt.astimezone(self.event.tzinfo).timetuple()[:6]
-                    with open(filepath, 'rb') as fd:
-                        zip_handler.writestr(info, fd.read())
+                info = ZipInfo(filename=os.path.join(folder_name, filename),
+                               date_time=self.revision.created_dt.astimezone(self.event.tzinfo).timetuple()[:6])
+                info.external_attr = 0o644 << 16
+                with file.storage.open(file.storage_file_id) as src, zip_handler.open(info, 'w') as dest:
+                    shutil.copyfileobj(src, dest, 1024*8)
         zip_filename = f'revision-{self.revision.id}.zip'
         if self.contrib.code:
             zip_filename = f'{self.contrib.code}-{zip_filename}'
