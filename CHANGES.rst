@@ -10,7 +10,7 @@ Version 3.2.4
 Improvements
 ^^^^^^^^^^^^
 
-- None so far :(
+- Use the revision's timestamp when downloading its files as a ZIP archive (:pr:`5686`)
 
 Bugfixes
 ^^^^^^^^
