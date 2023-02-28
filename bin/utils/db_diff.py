@@ -13,7 +13,7 @@ import sys
 import click
 from click._compat import should_strip_ansi
 from migra import Migration
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 
 def _indent(msg, level=4):
@@ -120,7 +120,7 @@ def main(dbname, verbose, reverse):
         base_conn = base_eng.connect()
         target_conn = target_eng.connect()
 
-        version = base_conn.execute("SELECT current_setting('server_version_num')::int").scalar()
+        version = base_conn.execute(text("SELECT current_setting('server_version_num')::int")).scalar()
         if version < 100000:
             click.echo(click.style('!! This utility requires at least Postgres 10', fg='red', bold=True), err=True)
             sys.exit(1)
