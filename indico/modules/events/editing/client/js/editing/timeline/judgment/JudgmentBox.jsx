@@ -35,13 +35,19 @@ export default function JudgmentBox({block, onClose, judgmentType: _judgmentType
         <div>
           <Dropdown
             value={judgmentType}
-            text={option.text}
+            trigger={
+              <Dropdown.Text className="text">
+                <div
+                  className={`ui empty circular ${option.color} label`}
+                  style={{marginRight: '0.5em', verticalAlign: '-10%'}}
+                />
+                {option.text}
+              </Dropdown.Text>
+            }
             direction="left"
             disabled={loading}
             button
             floating
-            styleName="judgment-type-button"
-            className={option.class}
           >
             <Dropdown.Menu>
               <JudgmentDropdownItems
@@ -73,6 +79,7 @@ JudgmentBox.propTypes = {
       value: PropTypes.string,
       text: PropTypes.string,
       class: PropTypes.string,
+      color: PropTypes.string,
     })
   ).isRequired,
   onClose: PropTypes.func,

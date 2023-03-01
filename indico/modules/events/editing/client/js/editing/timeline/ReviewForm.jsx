@@ -38,21 +38,25 @@ const judgmentOptions = [
   {
     value: EditingReviewAction.accept,
     text: Translate.string('Accept'),
+    color: 'green',
     class: 'accepted',
   },
   {
     value: EditingReviewAction.reject,
     text: Translate.string('Reject'),
+    color: 'black',
     class: 'rejected',
   },
   {
     value: EditingReviewAction.update,
     text: Translate.string('Make changes'),
+    color: 'yellow',
     class: 'needs-submitter-confirmation',
   },
   {
     value: EditingReviewAction.requestUpdate,
     text: Translate.string('Request changes'),
+    color: 'red',
     class: 'needs-submitter-changes',
   },
 ];
