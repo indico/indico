@@ -6,7 +6,7 @@
     {% set can_judge = paper and paper.can_judge(session.user) %}
     {% set can_review = paper and paper.can_review(session.user) %}
     {% set permitted_hidden_paper_viewers = can_submit or can_judge or can_review %}
-    {% set can_view_hidden_paper = contribution.event.cfp.hide_accepted and permitted_hidden_paper_viewers %}
+    {% set can_view_hidden_paper = paper and contribution.event.cfp.hide_accepted and permitted_hidden_paper_viewers %}
     {% set show_paper = paper and paper.accepted_revision and not contribution.event.cfp.hide_accepted %}
     {% set show_paper_status = paper and can_submit %}
     {% set show_paper_submission = contribution.event.cfp.is_open and can_submit %}
