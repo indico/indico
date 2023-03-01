@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix creating invited abstracts (:pr:`5696`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

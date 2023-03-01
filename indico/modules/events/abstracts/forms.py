@@ -637,13 +637,13 @@ class InvitedAbstractMixin:
         if get_user_by_email(field.data):
             raise ValidationError(_('There is already a user with this email address'))
 
-    def validate(self):
+    def validate(self, extra_validators=None):
         from indico.modules.events.abstracts.util import can_create_invited_abstracts
         if not can_create_invited_abstracts(self.event):
             raise ValidationError(_('You have to create an "Invited" abstract notification template in order to '
                                     'be able to create invited abstracts.'))
         else:
-            return super().validate()
+            return super().validate(extra_validators=extra_validators)
 
 
 class AbstractsScheduleForm(IndicoForm):
