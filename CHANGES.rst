@@ -11,7 +11,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Use the revision's timestamp when downloading its files as a ZIP archive (:pr:`5686`)
-- Replaced the colored status button with a dot on the judgment timeline (:issue:`5687`, :pr:`5697`)
+- Use more consistent colors on the editing judgment button (:issue:`5687`, :pr:`5697`)
 
 Bugfixes
 ^^^^^^^^
