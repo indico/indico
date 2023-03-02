@@ -19,7 +19,7 @@ import './JudgmentDropdownItems.module.scss';
 export default function JudgmentDropdownItems({options, judgmentType, setJudgmentType}) {
   const hasPublishables = useSelector(hasPublishableFiles);
 
-  return options.map(({value, text}) => (
+  return options.map(({value, text, color}) => (
     <Popup
       content={Translate.string(
         'You cannot accept an editable that does not contain any publishable files.'
@@ -27,6 +27,7 @@ export default function JudgmentDropdownItems({options, judgmentType, setJudgmen
       trigger={
         <Dropdown.Item
           text={text}
+          label={{color, empty: true, circular: true}}
           key={value}
           selected={value === judgmentType}
           styleName={!hasPublishables && value === 'accept' && 'disabled-item'}
@@ -50,7 +51,8 @@ JudgmentDropdownItems.propTypes = {
   options: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string,
-      text: PropTypes.string,
+      text: PropTypes.any,
+      color: PropTypes.string,
       class: PropTypes.string,
     })
   ).isRequired,
