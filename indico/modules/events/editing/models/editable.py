@@ -12,7 +12,6 @@ from sqlalchemy.sql import select
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.util.caching import memoize_request
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -111,7 +110,6 @@ class Editable(db.Model):
         return self.contribution.event
 
     @property
-    @memoize_request
     def valid_revisions(self):
         from .revisions import FinalRevisionState
         return [r for r in self.revisions if r.final_state != FinalRevisionState.undone]
