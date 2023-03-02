@@ -21,7 +21,7 @@ describe('timeline selectors', () => {
             user: {
               fullName: 'Indico Janitor',
             },
-            undoneJudgement: {
+            undoneJudgment: {
               name: FinalRevisionState.none,
             },
           },
@@ -130,7 +130,7 @@ describe('timeline selectors', () => {
             user: {
               fullName: 'Indico Janitor',
             },
-            undoneJudgement: {
+            undoneJudgment: {
               name: FinalRevisionState.none,
             },
           },
@@ -154,7 +154,7 @@ describe('timeline selectors', () => {
             user: {
               fullName: 'Indico Janitor',
             },
-            undoneJudgement: {
+            undoneJudgment: {
               name: FinalRevisionState.none,
             },
           },
@@ -164,7 +164,7 @@ describe('timeline selectors', () => {
             user: {
               fullName: 'Indico Janitor',
             },
-            undoneJudgement: {
+            undoneJudgment: {
               name: FinalRevisionState.none,
             },
           },

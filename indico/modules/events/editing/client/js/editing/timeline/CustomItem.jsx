@@ -24,12 +24,12 @@ import {blockItemPropTypes} from './util';
 import '../../../styles/timeline.module.scss';
 
 export default function CustomItem({
-  item: {header, user, reviewedDt, html, revisionId, undoneJudgement},
+  item: {header, user, reviewedDt, html, revisionId, undoneJudgment},
   state,
 }) {
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
-  const isUndone = undoneJudgement && undoneJudgement.name !== FinalRevisionState.none;
-  state = isUndone ? undoneJudgement.name : state;
+  const isUndone = undoneJudgment && undoneJudgment.name !== FinalRevisionState.none;
+  state = isUndone ? undoneJudgment.name : state;
 
   return (
     <div className="i-timeline-item" styleName={isUndone ? 'undone-item' : undefined}>

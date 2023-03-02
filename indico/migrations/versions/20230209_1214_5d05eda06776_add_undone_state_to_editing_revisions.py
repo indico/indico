@@ -39,9 +39,9 @@ def upgrade():
                                '(initial_state=1 AND final_state IN (0,1)) OR (initial_state=2) OR '
                                '(initial_state=3 AND (final_state IN (0,3,4,6)))', schema='event_editing')
     op.add_column('comments',
-                  sa.Column('undone_judgement', PyIntEnum(_FinalRevisionState), nullable=False, server_default='0'),
+                  sa.Column('undone_judgment', PyIntEnum(_FinalRevisionState), nullable=False, server_default='0'),
                   schema='event_editing')
-    op.alter_column('comments', 'undone_judgement', server_default=None, schema='event_editing')
+    op.alter_column('comments', 'undone_judgment', server_default=None, schema='event_editing')
 
 
 def downgrade():
@@ -52,4 +52,4 @@ def downgrade():
     op.create_check_constraint('valid_state_combination', 'revisions',
                                '(initial_state=1 AND final_state IN (0,1)) OR (initial_state=2) OR '
                                '(initial_state=3 AND (final_state IN (0,3,4)))', schema='event_editing')
-    op.drop_column('comments', 'undone_judgement', schema='event_editing')
+    op.drop_column('comments', 'undone_judgment', schema='event_editing')

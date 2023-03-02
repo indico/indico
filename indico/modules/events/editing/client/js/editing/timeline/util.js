@@ -28,12 +28,12 @@ export function processRevisions(revisions) {
   let revisionState;
   return revisions.map((revision, i) => {
     const items = revision.comments.map(c =>
-      c.undoneJudgement.name === FinalRevisionState.none
+      c.undoneJudgment.name === FinalRevisionState.none
         ? c
         : {
             ...c,
             header: getRevisionTransition(
-              {...revision, finalState: c.undoneJudgement},
+              {...revision, finalState: c.undoneJudgment},
               {isLatestRevision: true}
             ),
             reviewedDt: c.createdDt,
@@ -120,7 +120,6 @@ const statePropTypes = {
 
 // Type that represents a revision comment block
 // (a simplified-ish version of the revision blocks below)
-// TODO: add undone prop
 export const blockItemPropTypes = {
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   revisionId: PropTypes.number.isRequired,
@@ -135,7 +134,7 @@ export const blockItemPropTypes = {
   internal: PropTypes.bool,
   system: PropTypes.bool,
   custom: PropTypes.bool,
-  undoneJudgement: PropTypes.shape(statePropTypes),
+  undoneJudgment: PropTypes.shape(statePropTypes),
   modifyCommentURL: PropTypes.string,
 };
 

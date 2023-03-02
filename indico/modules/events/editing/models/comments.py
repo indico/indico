@@ -63,8 +63,8 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
         nullable=False,
         default=False
     )
-    #: Undone revision state if the comment comes from an undone judgement
-    undone_judgement = db.Column(
+    #: Undone revision state if the comment comes from an undone judgment
+    undone_judgment = db.Column(
         PyIntEnum(FinalRevisionState),
         nullable=False,
         default=FinalRevisionState.none
@@ -116,6 +116,6 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
             return False
         elif self.internal and not authorized_editor:
             return False
-        elif self.undone_judgement != FinalRevisionState.none:
+        elif self.undone_judgment != FinalRevisionState.none:
             return False
         return authorized_editor or authorized_submitter

@@ -259,8 +259,9 @@ def undo_review(revision):
     if ((revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
          revision.final_state == FinalRevisionState.accepted and revision.editor is not None)
             or _is_request_changes_with_files(latest_revision)):
-        revision = revision.editable.valid_revisions[-2]
         revision.editable.published_revision = None
+        db.session.flush()
+        revision = revision.editable.valid_revisions[-2]
         latest_revision.final_state = FinalRevisionState.undone
         latest_revision.reviewed_dt = now_utc()
     elif revision.final_state == FinalRevisionState.accepted:
@@ -268,7 +269,7 @@ def undo_review(revision):
     db.session.flush()
     # Keep comment history:
     comment = EditingRevisionComment(user=revision.editor or revision.submitter, created_dt=revision.reviewed_dt,
-                                     undone_judgement=revision.final_state, text=revision.comment)
+                                     undone_judgment=revision.final_state, text=revision.comment)
     num_revisions = len(revision.editable.valid_revisions)
     revision.tags = {tag for tag in revision.tags if tag.system}
     if num_revisions >= 3 or (num_revisions >= 2 and revision == latest_revision):
