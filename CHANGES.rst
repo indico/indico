@@ -12,6 +12,7 @@ Improvements
 
 - Use the revision's timestamp when downloading its files as a ZIP archive (:pr:`5686`)
 - Use more consistent colors on the editing judgment button (:issue:`5687`, :pr:`5697`)
+- Keep history when undoing judgments on editables (:pr:`5630`)
 
 Bugfixes
 ^^^^^^^^
