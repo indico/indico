@@ -30,8 +30,9 @@ class InitialRevisionState(RichIntEnum):
 
 
 class FinalRevisionState(RichIntEnum):
-    __titles__ = [None, _('Replaced'), _('Needs Confirmation'), _('Needs Changes'), _('Accepted'), _('Rejected')]
-    __css_classes__ = [None, 'highlight', 'warning', 'warning', 'success', 'error']
+    __titles__ = [None, _('Replaced'), _('Needs Confirmation'), _('Needs Changes'), _('Accepted'), _('Rejected'),
+                  _('Undone')]
+    __css_classes__ = [None, 'highlight', 'warning', 'warning', 'success', 'error', None]
     #: A revision that is awaiting some action
     none = 0
     #: A revision that has been replaced by its next revision
@@ -44,20 +45,24 @@ class FinalRevisionState(RichIntEnum):
     accepted = 4
     #: A revision that has been rejected (no followup revision)
     rejected = 5
+    #: A revision that has been undone
+    undone = 6
 
 
 def _make_state_check():
     return re.sub(r'\s+', ' ', '''
         (initial_state={i_new} AND final_state IN ({f_none}, {f_replaced})) OR
         (initial_state={i_ready_for_review}) OR
-        (initial_state={i_needs_confirmation} AND (final_state IN ({f_none}, {f_needs_changes}, {f_accepted})))
+        (initial_state={i_needs_confirmation} AND
+         (final_state IN ({f_none}, {f_needs_changes}, {f_accepted}, {f_undone})))
     '''.format(i_new=InitialRevisionState.new,
                i_ready_for_review=InitialRevisionState.ready_for_review,
                i_needs_confirmation=InitialRevisionState.needs_submitter_confirmation,
                f_none=FinalRevisionState.none,
                f_replaced=FinalRevisionState.replaced,
                f_needs_changes=FinalRevisionState.needs_submitter_changes,
-               f_accepted=FinalRevisionState.accepted)).strip()
+               f_accepted=FinalRevisionState.accepted,
+               f_undone=FinalRevisionState.undone)).strip()
 
 
 def _make_reviewed_dt_check():

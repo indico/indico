@@ -49,7 +49,7 @@ class InvalidEditableState(BadRequest):
 
 
 def ensure_latest_revision(revision):
-    if revision != revision.editable.revisions[-1]:
+    if revision != revision.editable.valid_revisions[-1]:
         raise InvalidEditableState
 
 
@@ -217,9 +217,9 @@ def create_submitter_revision(prev_revision, user, files):
 
 @memoize_request
 def _is_request_changes_with_files(revision):
-    if not revision or len(revision.editable.revisions) < 2:
+    if not revision or len(revision.editable.valid_revisions) < 2:
         return False
-    previous_revision = revision.editable.revisions[-2]
+    previous_revision = revision.editable.valid_revisions[-2]
     # when a request-changes-with-files revision is made, the previous revision's final_state
     # is set to needs_submitter_changes, and a new one is created with the same reviewed_dt,
     # editor, and final_state. if any of these are different, then the two revisions are
@@ -234,7 +234,8 @@ def _is_request_changes_with_files(revision):
 
 
 def _ensure_latest_revision_with_final_state(revision):
-    final_revisions = (r for r in revision.editable.revisions[::-1] if r.final_state != FinalRevisionState.none)
+    final_revisions = (r for r in revision.editable.revisions[::-1]
+                       if r.final_state not in (FinalRevisionState.none, FinalRevisionState.undone))
     expected = next(final_revisions, None)
     if _is_request_changes_with_files(expected):
         expected = next(final_revisions, None)
@@ -245,24 +246,36 @@ def _ensure_latest_revision_with_final_state(revision):
 @no_autoflush
 def undo_review(revision):
     _ensure_latest_revision_with_final_state(revision)
-    latest_revision = revision.editable.revisions[-1]
+    latest_revision = revision.editable.valid_revisions[-1]
     if revision != latest_revision and not _is_request_changes_with_files(latest_revision):
-        if revision.editable.revisions[-2:] != [revision, latest_revision]:
+        if revision.editable.valid_revisions[-2:] != [revision, latest_revision]:
             raise InvalidEditableState
         _ensure_state(revision, final=FinalRevisionState.needs_submitter_confirmation)
         _ensure_state(latest_revision,
                       initial=InitialRevisionState.needs_submitter_confirmation,
                       final=FinalRevisionState.none)
-        db.session.delete(latest_revision)
+        latest_revision.final_state = FinalRevisionState.undone
+        latest_revision.reviewed_dt = now_utc()
     if ((revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
          revision.final_state == FinalRevisionState.accepted and revision.editor is not None)
             or _is_request_changes_with_files(latest_revision)):
-        revision = revision.editable.revisions[-2]
         revision.editable.published_revision = None
-        db.session.delete(latest_revision)
+        db.session.flush()
+        revision = revision.editable.valid_revisions[-2]
+        latest_revision.final_state = FinalRevisionState.undone
+        latest_revision.reviewed_dt = now_utc()
     elif revision.final_state == FinalRevisionState.accepted:
         revision.editable.published_revision = None
     db.session.flush()
+    # Keep comment history:
+    comment = EditingRevisionComment(user=revision.editor or revision.submitter, created_dt=revision.reviewed_dt,
+                                     undone_judgment=revision.final_state, text=revision.comment)
+    num_revisions = len(revision.editable.valid_revisions)
+    revision.tags = {tag for tag in revision.tags if tag.system}
+    if num_revisions >= 3 or (num_revisions >= 2 and revision == latest_revision):
+        previous_revision = revision.editable.valid_revisions[-2 if revision == latest_revision else -3]
+        revision.tags |= {tag for tag in previous_revision.tags if not tag.system}
+    revision.comments.append(comment)
     revision.final_state = FinalRevisionState.none
     revision.comment = ''
     revision.reviewed_dt = None

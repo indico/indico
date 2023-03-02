@@ -27,7 +27,19 @@ export const isRequestChangesWithFiles = (revision, previousRevision) =>
 export function processRevisions(revisions) {
   let revisionState;
   return revisions.map((revision, i) => {
-    const items = [...revision.comments];
+    const items = revision.comments.map(c =>
+      c.undoneJudgment.name === FinalRevisionState.none
+        ? c
+        : {
+            ...c,
+            header: getRevisionTransition(
+              {...revision, finalState: c.undoneJudgment},
+              {isLatestRevision: true}
+            ),
+            reviewedDt: c.createdDt,
+            custom: true,
+          }
+    );
     const header = revisionState;
     const isLatestRevision = i === revisions.length - 1;
     revisionState = getRevisionTransition(revision, {isLatestRevision});
@@ -38,8 +50,8 @@ export function processRevisions(revisions) {
     }
     return {
       ...revision,
-      // use the previous state transition as current block header
-      header: header || revision.header,
+      // use the previous state transition as current block header, unless the revision has been undone
+      header: revision.finalState.name !== FinalRevisionState.undone && (header || revision.header),
       items,
     };
   });
@@ -122,6 +134,7 @@ export const blockItemPropTypes = {
   internal: PropTypes.bool,
   system: PropTypes.bool,
   custom: PropTypes.bool,
+  undoneJudgment: PropTypes.shape(statePropTypes),
   modifyCommentURL: PropTypes.string,
 };
 

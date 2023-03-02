@@ -1,0 +1,26 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'base/palette';
+
+.undone-item {
+  :global(.i-box-header) {
+    background-image: repeating-linear-gradient(-45deg, $pastel-gray 0 2px, $light-gray 3px 15px);
+  }
+
+  .undone-indicator {
+    color: $light-black;
+    font-weight: bold;
+  }
+}
+
+.item-header > :not(:first-child)::before {
+  content: '\00B7' !important;
+  padding-right: 0.3em;
+  color: $gray;
+  font-weight: normal;
+}
