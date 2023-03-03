@@ -298,7 +298,7 @@ export default function SearchApp({category, eventId, isAdmin}) {
           searchTerm={q || ''}
           placeholders={eventSearch ? [] : options?.placeholders || []}
         />
-        {renderPluginComponents('search-app-below-input', {user: Indico.User})}
+        {renderPluginComponents('search-app-below-input', {category, eventId, isAdmin})}
         {isAdmin && (
           <div styleName="admin-search-container">
             <Label content={Translate.string('ADMIN')} size="small" color="red" />
