@@ -16,7 +16,7 @@ import {Checkbox, Dropdown, Grid, Label, Loader, Menu, Message} from 'semantic-u
 import {useIndicoAxios, useQueryParams} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
-import {getPluginObjects} from 'indico/utils/plugins';
+import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
 import ResultList from './ResultList';
 import Attachment from './results/Attachment';
@@ -298,6 +298,7 @@ export default function SearchApp({category, eventId, isAdmin}) {
           searchTerm={q || ''}
           placeholders={eventSearch ? [] : options?.placeholders || []}
         />
+        {renderPluginComponents('search-app-below-input', {category, eventId, isAdmin})}
         {isAdmin && (
           <div styleName="admin-search-container">
             <Label content={Translate.string('ADMIN')} size="small" color="red" />
