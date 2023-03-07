@@ -76,16 +76,24 @@
                     </ul>
                 </div>
                 <div class="toolbar">
-                    <div id="filter-statistics">
-                        {{ render_displayed_entries_fragment(abstracts|length, total_abstracts) }}
+                    <div class="group">
+                        <div id="filter-statistics">
+                            {{ render_displayed_entries_fragment(abstracts|length, total_abstracts) }}
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div class="i-button label icon-search"></div>
+                        <input type="text" id="search-input" placeholder="{% trans %}Search by #id or string{% endtrans %}">
                     </div>
                 </div>
             </div>
-            <div id="abstract-list">
+            <div class="list-content" id="abstract-list">
                 {{ render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, track, reviewed_abstracts) }}
             </div>
+            <div id="filter-placeholder"></div>
             <script>
                 setupListGenerator();
+                setupAbstractList();
             </script>
         </div>
     {% endif %}
