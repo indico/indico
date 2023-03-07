@@ -8,7 +8,9 @@
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
+from indico.modules.attachments.settings import attachments_settings
 from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
+from indico.modules.events.contributions import contribution_settings, subcontribution_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.principals import EventPrincipal
@@ -138,6 +140,9 @@ class EventProtectionCloner(EventCloner):
         with db.session.no_autoflush:
             self._clone_protection(new_event)
             self._clone_session_coordinator_privs(new_event)
+            self._clone_contrib_settings(new_event)
+            self._clone_subcontrib_settings(new_event)
+            self._clone_attachment_settings(new_event)
             self._clone_acl(new_event, event_exists)
             self._clone_visibility(new_event)
         db.session.flush()
@@ -148,6 +153,8 @@ class EventProtectionCloner(EventCloner):
     def _clone_protection(self, new_event):
         new_event.protection_mode = self.old_event.protection_mode
         new_event.access_key = self.old_event.access_key
+        new_event.own_no_access_contact = self.old_event.own_no_access_contact
+        new_event.public_regform_access = self.old_event.public_regform_access
 
     def _clone_visibility(self, new_event):
         new_event.visibility = self.old_event.visibility if new_event.category == self.old_event.category else None
@@ -157,6 +164,25 @@ class EventProtectionCloner(EventCloner):
         session_settings.set_multi(new_event, {
             'coordinators_manage_contributions': session_settings_data['coordinators_manage_contributions'],
             'coordinators_manage_blocks': session_settings_data['coordinators_manage_blocks']
+        })
+
+    def _clone_contrib_settings(self, new_event):
+        contribution_settings_data = contribution_settings.get_all(self.old_event)
+        contribution_settings.set_multi(new_event, {
+            'submitters_can_edit': contribution_settings_data['submitters_can_edit'],
+            'submitters_can_edit_custom': contribution_settings_data['submitters_can_edit_custom']
+        })
+
+    def _clone_subcontrib_settings(self, new_event):
+        subcontribution_settings_data = subcontribution_settings.get_all(self.old_event)
+        subcontribution_settings.set_multi(new_event, {
+            'speakers_can_submit': subcontribution_settings_data['speakers_can_submit'],
+        })
+
+    def _clone_attachment_settings(self, new_event):
+        attachment_settings_data = attachments_settings.get_all(self.old_event)
+        attachments_settings.set_multi(new_event, {
+            'managers_only': attachment_settings_data['managers_only'],
         })
 
     def _clone_acl(self, new_event, event_exists):

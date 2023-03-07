@@ -20,6 +20,8 @@ Bugfixes
 - Fix creating invited abstracts (:pr:`5696`)
 - Fix error on contribution page when there is no paper but the peer reviewing module
   is enabled and configured to hide accepted papers
+- Clone all protection settings (in particular submitter privileges) when cloning events
+  (:pr:`5702`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
