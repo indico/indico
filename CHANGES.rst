@@ -23,6 +23,7 @@ Bugfixes
   is enabled and configured to hide accepted papers
 - Clone all protection settings (in particular submitter privileges) when cloning events
   (:pr:`5702`)
+- Fix searching in single-choice dropdown fields in registration forms (:pr:`5709`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

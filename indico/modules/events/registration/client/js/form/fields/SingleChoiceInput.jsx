@@ -80,7 +80,8 @@ function SingleChoiceDropdown({
       !c.isEnabled ||
       isPaidChoiceLocked(c) ||
       (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit && !existingValue[c.id]),
-    text: (
+    text: c.caption,
+    content: (
       <div styleName="dropdown-text">
         <div styleName="caption">
           <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
