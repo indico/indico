@@ -12,9 +12,25 @@ $semantic-color-map: (
   warning: $yellow,
   visited: $purple,
   strong: $black,
+  editing-rejected: $midnight-black,
+  editing-make-changes: $bright-yellow,
+  editing-request-changes: $dark-red,
 );
 
-$semantic-styles: (highlight, success, error, warning, visited, strong);
+// styles that are prefixed with 'editing-' are used exclusively
+// in the editing module and should not be [mis]used elsewhere.
+
+$semantic-styles: (
+  highlight,
+  success,
+  error,
+  warning,
+  visited,
+  strong,
+  editing-rejected,
+  editing-make-changes,
+  editing-request-changes
+);
 
 @mixin _semantic-background($color) {
   @include border-all($color);

@@ -34,7 +34,8 @@ class EditableType(RichIntEnum):
 class EditableState(RichIntEnum):
     __titles__ = [None, _('New'), _('Ready for Review'), _('Needs Confirmation'), _('Needs Changes'),
                   _('Accepted'), _('Rejected')]
-    __css_classes__ = [None, 'highlight', 'ready', 'warning', 'warning', 'success', 'error']
+    __css_classes__ = [None, 'highlight', 'ready', 'editing-make-changes', 'editing-request-changes',
+                       'success', 'editing-rejected']
 
     new = 1
     ready_for_review = 2
