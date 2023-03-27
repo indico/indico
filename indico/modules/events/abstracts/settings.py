@@ -39,6 +39,7 @@ class AllowEditingType(RichEnum):
 
 class SubmissionRightsType(RichEnum):
     speakers = 'speakers'
+    speakers_primary = 'speakers_primary'
     all = 'all'
 
 
@@ -89,7 +90,8 @@ AllowEditingType.__titles__ = {
 
 SubmissionRightsType.__titles__ = {
     SubmissionRightsType.speakers: _('Speakers'),
-    SubmissionRightsType.all: _('Speakers and authors')
+    SubmissionRightsType.speakers_primary: _('Speakers and authors'),
+    SubmissionRightsType.all: _('Speakers, authors and co-authors')
 }
 
 abstracts_settings = EventSettingsProxy('abstracts', {
