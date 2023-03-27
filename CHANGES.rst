@@ -16,6 +16,8 @@ Improvements
 - Add search field to the abstracts list for reviewers (:issue:`5698`, :pr:`5703`)
 - Align status box colors with judgment dropdown (:issue:`5699`, :pr:`5706`)
 - Use a gender-neutral chairperson icon (:pr:`5710`)
+- Add option to set the abstracts' primary authors as the default submitters for the
+  corresponding contributions (:pr:`5711`)
 
 Bugfixes
 ^^^^^^^^
