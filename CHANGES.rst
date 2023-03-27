@@ -15,6 +15,7 @@ Improvements
 - Keep history when undoing judgments on editables (:pr:`5630`)
 - Add search field to the abstracts list for reviewers (:issue:`5698`, :pr:`5703`)
 - Align status box colors with judgment dropdown (:issue:`5699`, :pr:`5706`)
+- Use a gender-neutral chairperson icon (:pr:`5710`)
 
 Bugfixes
 ^^^^^^^^
