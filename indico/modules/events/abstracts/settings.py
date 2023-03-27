@@ -121,6 +121,7 @@ abstracts_settings = EventSettingsProxy('abstracts', {
     'end_dt': DatetimeConverter,
     'modification_end_dt': DatetimeConverter,
     'allow_editing': EnumConverter(AllowEditingType),
+    'contribution_submitters': EnumConverter(SubmissionRightsType),
 })
 
 

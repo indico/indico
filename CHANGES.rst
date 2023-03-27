@@ -28,6 +28,8 @@ Bugfixes
 - Fix searching in single-choice dropdown fields in registration forms (:pr:`5709`)
 - Fix uploading files in registration forms where the user only has access through the
   registration's token (:pr:`5719`)
+- Fix being unable to set the "speakers and authors" as the default contribution
+  submitter type (:pr:`5711`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
