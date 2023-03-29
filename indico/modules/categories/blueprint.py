@@ -21,8 +21,9 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
 from indico.modules.categories.controllers.management import (RHAddCategoryRole, RHAddCategoryRoleMembers,
                                                               RHAPIEventMoveRequests, RHCategoryRoleMembersExportCSV,
                                                               RHCategoryRoleMembersImportCSV, RHCategoryRoles,
-                                                              RHCreateCategory, RHDeleteCategory, RHDeleteCategoryRole,
-                                                              RHDeleteEvents, RHDeleteSubcategories, RHEditCategoryRole,
+                                                              RHCategoryRolesAPI, RHCreateCategory, RHDeleteCategory,
+                                                              RHDeleteCategoryRole, RHDeleteEvents,
+                                                              RHDeleteSubcategories, RHEditCategoryRole,
                                                               RHManageCategoryContent, RHManageCategoryIcon,
                                                               RHManageCategoryLogo, RHManageCategoryModeration,
                                                               RHManageCategoryProtection, RHManageCategorySettings,
@@ -63,6 +64,7 @@ _bp.add_url_rule('/manage/roles/<int:role_id>/members/<int:user_id>', 'remove_ro
 _bp.add_url_rule('/manage/roles/<int:role_id>/members/import', 'add_members_import_csv',
                  RHCategoryRoleMembersImportCSV, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/roles/<int:role_id>/members.csv', 'members_export_csv', RHCategoryRoleMembersExportCSV)
+_bp.add_url_rule('/manage/roles/api/roles/', 'api_roles', RHCategoryRolesAPI)
 
 
 # Event management

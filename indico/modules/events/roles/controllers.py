@@ -21,7 +21,7 @@ from indico.modules.events.roles.views import WPEventRoles
 from indico.modules.logs import LogKind
 from indico.modules.users import User
 from indico.util.marshmallow import PrincipalList
-from indico.util.roles import ExportRoleMembersMixin, ImportRoleMembersMixin
+from indico.util.roles import ExportRoleMembersMixin, ImportRoleMembersMixin, RolesAPIMixin
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_role_colors
@@ -157,3 +157,11 @@ class RHEventRoleMembersImportCSV(ImportRoleMembersMixin, RHManageEventRole):
 
 class RHEventRoleMembersExportCSV(ExportRoleMembersMixin, RHManageEventRole):
     """Export event role members to a CSV."""
+
+
+class RHEventRolesAPI(RolesAPIMixin, RHManageEventBase):
+    """Export event role members to JSON."""
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.roles = EventRole.query.with_parent(self.event).options(joinedload('members'))

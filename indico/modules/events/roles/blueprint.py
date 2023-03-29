@@ -7,7 +7,8 @@
 
 from indico.modules.events.roles.controllers import (RHAddEventRole, RHAddEventRoleMembers, RHDeleteEventRole,
                                                      RHEditEventRole, RHEventRoleMembersExportCSV,
-                                                     RHEventRoleMembersImportCSV, RHEventRoles, RHRemoveEventRoleMember)
+                                                     RHEventRoleMembersImportCSV, RHEventRoles, RHEventRolesAPI,
+                                                     RHRemoveEventRoleMember)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -27,3 +28,6 @@ _bp.add_url_rule('/<int:role_id>/members/<int:user_id>', 'remove_role_member', R
 _bp.add_url_rule('/<int:role_id>/members/import', 'add_members_import_csv', RHEventRoleMembersImportCSV,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/<int:role_id>/members.csv', 'members_export_csv', RHEventRoleMembersExportCSV)
+
+# API
+_bp.add_url_rule('/api/roles/', 'api_roles', RHEventRolesAPI)
