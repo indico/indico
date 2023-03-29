@@ -58,7 +58,7 @@
 
             {% if event.person_links %}
                 <div class="infoline chairs clear">
-                    <span title="{% trans %}Chairpersons{% endtrans %}" class="icon icon-user-chairperson"
+                    <span title="{% trans %}Chairpersons{% endtrans %}" class="icon icon-user"
                           aria-hidden="true"></span>
                     <ul class="chair_list text">
                         {% for link in event.person_links|sort(attribute='display_order_key') %}

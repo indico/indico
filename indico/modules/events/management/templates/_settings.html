@@ -122,7 +122,7 @@
 
 {% macro render_section_persons(event, with_container=true) %}
     {% set edit_persons_title = _('Edit speakers') if event.type == 'lecture' else _('Edit chairpersons') %}
-    {% call render_section(event, 'persons', 'icon-user-chairperson', '.edit_persons', edit_persons_title,
+    {% call render_section(event, 'persons', 'icon-user', '.edit_persons', edit_persons_title,
                            with_container=with_container) %}
         <dl class="i-data-list">
             <dt>
