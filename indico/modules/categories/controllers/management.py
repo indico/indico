@@ -41,7 +41,7 @@ from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import ModelField, PrincipalList, not_empty
-from indico.util.roles import ExportRoleMembersMixin, ImportRoleMembersMixin
+from indico.util.roles import ExportRoleMembersMixin, ImportRoleMembersMixin, RolesAPIMixin
 from indico.util.string import crc32, natural_sort_key
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -612,3 +612,11 @@ class RHCategoryRoleMembersImportCSV(ImportRoleMembersMixin, RHManageCategoryRol
 
 class RHCategoryRoleMembersExportCSV(ExportRoleMembersMixin, RHManageCategoryRole):
     """Export category role members to a CSV."""
+
+
+class RHCategoryRolesAPI(RolesAPIMixin, RHManageCategoryBase):
+    """Export category role members to JSON."""
+
+    def _process_args(self):
+        RHManageCategoryBase._process_args(self)
+        self.roles = CategoryRole.query.with_parent(self.category).options(joinedload('members'))
