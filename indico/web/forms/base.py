@@ -33,7 +33,7 @@ class _DataWrapper:
         return f'<DataWrapper({self.data!r})>'
 
 
-class generated_data(property):
+class generated_data(property):  # noqa: N801
     """Property decorator for generated data in forms."""
 
     def __get__(self, obj, objtype=None):
@@ -45,7 +45,7 @@ class generated_data(property):
 
 
 class IndicoFormMeta(FormMeta):
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args, **kwargs):  # noqa: N805
         # If we are instantiating a form that was just extended, don't
         # send the signal again - it's pointless to extend the extended
         # form and doing so could actually result in infinite recursion

@@ -79,7 +79,7 @@ from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from urllib.parse import urljoin, urlparse
-from xml.etree import ElementTree as etree
+from xml.etree import ElementTree as etree  # noqa: N813
 
 import markdown
 import requests
@@ -308,7 +308,7 @@ def latex_render_image(src, alt, tmpdir, strict=False):
         ''' % (os.path.basename(tempfile.name), latex_escape(alt))), tempfile.name)
 
 
-def makeExtension(configs=None):
+def makeExtension(configs=None):  # noqa: N802
     return LaTeXExtension(configs=configs)
 
 
@@ -317,7 +317,7 @@ class LaTeXExtension(markdown.Extension):
         self.configs = configs
         self.reset()
 
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md, md_globals):  # noqa: N802
         self.md = md
 
         # remove escape pattern -- \\(.*) -- as this messes up any embedded
@@ -344,7 +344,7 @@ class LaTeXExtension(markdown.Extension):
 class NonEncodedAutoMailPattern(markdown.inlinepatterns.Pattern):
     """Reimplementation of AutoMailPattern to avoid URL-encoded links."""
 
-    def handleMatch(self, m):
+    def handleMatch(self, m):  # noqa: N802
         el = etree.Element('a')
         email = self.unescape(m.group(2))
         email.removeprefix('mailto:')

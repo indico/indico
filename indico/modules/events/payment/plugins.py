@@ -57,7 +57,7 @@ class PaymentPluginMixin:
 
     @classproperty
     @classmethod
-    def category(self):
+    def category(cls):
         from indico.core.plugins import PluginCategory
         return PluginCategory.payment
 

@@ -307,7 +307,7 @@ def _serializable_reservation(reservation_data, include_room=False):
 def _ical_serialize_repeatability(data):
     start_dt_utc = data['startDT'].astimezone(pytz.utc)
     end_dt_utc = data['endDT'].astimezone(pytz.utc)
-    WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
+    week_days = 'MO TU WE TH FR SA SU'.split()
     recur = ical.vRecur()
     recur['until'] = end_dt_utc
     if data['repeat_frequency'] == RepeatFrequency.DAY:
@@ -317,7 +317,7 @@ def _ical_serialize_repeatability(data):
         recur['interval'] = data['repeat_interval']
     elif data['repeat_frequency'] == RepeatFrequency.MONTH:
         recur['freq'] = 'monthly'
-        recur['byday'] = f'{start_dt_utc.day // 7}{WEEK_DAYS[start_dt_utc.weekday()]}'
+        recur['byday'] = f'{start_dt_utc.day // 7}{week_days[start_dt_utc.weekday()]}'
     return recur
 
 

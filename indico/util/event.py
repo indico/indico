@@ -5,31 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.core.db import db
-
-
-def uniqueId(obj):
-    if isinstance(obj, db.m.Contribution):
-        return f'{obj.event_id}.{obj.legacy_mapping.legacy_contribution_id if obj.legacy_mapping else obj.id}'
-    elif isinstance(obj, db.m.SubContribution):
-        return '{}.{}.{}'.format(
-            obj.event.id,
-            obj.legacy_mapping.legacy_contribution_id if obj.legacy_mapping else obj.contribution.id,
-            obj.legacy_mapping.legacy_subcontribution_id if obj.legacy_mapping else obj.id
-        )
-    elif isinstance(obj, db.m.Session):
-        return f'{obj.event_id}.s{obj.legacy_mapping.legacy_session_id if obj.legacy_mapping else obj.id}'
-    elif isinstance(obj, db.m.SessionBlock):
-        return '{}.s{}.{}'.format(obj.event.id,
-                                  obj.legacy_mapping.legacy_session_id if obj.legacy_mapping else obj.session.id,
-                                  obj.legacy_mapping.legacy_session_block_id if obj.legacy_mapping else obj.id)
-    elif isinstance(obj, db.m.EventNote):
-        return f'{uniqueId(obj.object)}.n{obj.id}'
-    else:
-        # XXX: anything besides Event?! probably not..
-        return obj.id
-
-
 def truncate_path(full_path, chars=30, skip_first=True):
     """Truncate the path of a category to the number of character.
 

@@ -105,7 +105,7 @@ class IndicoCelery(Celery):
         class IndicoTask(self.Task):
             abstract = True
 
-            def apply_async(s, args=None, kwargs=None, task_id=None, producer=None,
+            def apply_async(s, args=None, kwargs=None, task_id=None, producer=None,  # noqa: N805
                             link=None, link_error=None, shadow=None, **options):
                 if args is not None:
                     args = _CelerySAWrapper.wrap_args(args)
@@ -117,7 +117,7 @@ class IndicoCelery(Celery):
                 return super().apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
                                            link=link, link_error=link_error, shadow=shadow, **options)
 
-            def __call__(s, *args, **kwargs):
+            def __call__(s, *args, **kwargs):  # noqa: N805
                 stack = ExitStack()
                 stack.enter_context(self.flask_app.app_context())
                 if getattr(s, 'request_context', False):

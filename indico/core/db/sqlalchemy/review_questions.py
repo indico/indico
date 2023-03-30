@@ -81,7 +81,7 @@ class ReviewQuestionMixin:
         )
 
     @declared_attr
-    def is_required(self):
+    def is_required(cls):
         return db.Column(
             db.Boolean,
             nullable=False,

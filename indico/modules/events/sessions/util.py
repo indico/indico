@@ -54,7 +54,7 @@ class SessionListToPDF(PDFBase):
         self.sessions = sessions
         self.PAGE_WIDTH, self.PAGE_HEIGHT = landscape(A4)
 
-    def getBody(self, story=None):
+    def getBody(self, story=None):  # noqa: N802
         story = story or self._story
         header_style = ParagraphStyle(name='header_style', fontSize=12, alignment=TA_CENTER)
         story.append(Paragraph('<b>{}</b>'.format(_('List of sessions')), header_style))

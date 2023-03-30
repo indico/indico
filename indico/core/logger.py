@@ -43,7 +43,7 @@ class RequestInfoFormatter(logging.Formatter):
 
 
 class FormattedSubjectSMTPHandler(logging.handlers.SMTPHandler):
-    def getSubject(self, record):
+    def getSubject(self, record):  # noqa: N802
         return self.subject % record.__dict__
 
 

@@ -191,7 +191,7 @@ class WPBundleMixin:
 
     @classproperty
     @classmethod
-    def page_metadata(self):
+    def page_metadata(cls):
         site_name = core_settings.get('site_title')
         return {
             'og': {
@@ -377,6 +377,3 @@ class WPError(WPDecorated, WPJinjaMixin):
             'error_message': self._message,
             'error_description': self._description
         })
-
-    def getHTML(self):
-        return self.display()

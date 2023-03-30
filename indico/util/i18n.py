@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import ast
 import re
 from collections import Counter
 
@@ -26,7 +25,6 @@ from indico.util.caching import memoize_request
 
 
 LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')
-RE_TR_FUNCTION = re.compile(r'''_\("([^"]*)"\)|_\('([^']*)'\)''', re.DOTALL | re.MULTILINE)
 
 babel = Babel()
 _use_context = object()
@@ -307,17 +305,6 @@ def set_session_lang(lang):
 def parse_locale(locale):
     """Get a Locale object from a locale id."""
     return IndicoLocale.parse(locale)
-
-
-def extract_node(node, keywords, commentTags, options, parents=[None]):
-    if isinstance(node, ast.Str) and isinstance(parents[-1], (ast.Assign, ast.Call)):
-        matches = RE_TR_FUNCTION.findall(node.s)
-        for m in matches:
-            line = m[0] or m[1]
-            yield (node.lineno, '', line.split('\n'), ['old style recursive strings'])
-    else:
-        for cnode in ast.iter_child_nodes(node):
-            yield from extract_node(cnode, keywords, commentTags, options, parents=(parents + [node]))
 
 
 def po_to_json(po_file, locale=None, domain=None):

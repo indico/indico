@@ -19,7 +19,7 @@ from indico.util.date_time import now_utc
 from indico.web.http_api.metadata.serializer import Serializer
 
 
-class vRecur(ical.vRecur):
+class vRecur(ical.vRecur):  # noqa: N801
     """Fix vRecur so the frequency comes first."""
     def ical(self):
         # SequenceTypes

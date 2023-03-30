@@ -80,11 +80,11 @@ def _make_shell_context():
     add_to_context_smart = partial(_add_to_context_smart, context, info)
     # Common stdlib modules
     info.append(cformat('*** %{magenta!}stdlib%{reset} ***'))
-    DATETIME_ATTRS = ('date', 'time', 'datetime', 'timedelta')
-    ORM_ATTRS = ('joinedload', 'defaultload', 'contains_eager', 'lazyload', 'noload', 'subqueryload', 'undefer',
+    datetime_attrs = ('date', 'time', 'datetime', 'timedelta')
+    orm_attrs = ('joinedload', 'defaultload', 'contains_eager', 'lazyload', 'noload', 'subqueryload', 'undefer',
                  'undefer_group', 'load_only')
-    add_to_context_multi([getattr(datetime, attr) for attr in DATETIME_ATTRS] +
-                         [getattr(sqlalchemy.orm, attr) for attr in ORM_ATTRS] +
+    add_to_context_multi([getattr(datetime, attr) for attr in datetime_attrs] +
+                         [getattr(sqlalchemy.orm, attr) for attr in orm_attrs] +
                          [itertools, re, sys, os],
                          color='yellow')
     # Models

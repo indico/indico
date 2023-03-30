@@ -180,7 +180,7 @@ class TimetablePDFExportForm(IndicoForm):
     other = IndicoSelectMultipleCheckboxBooleanField(_('Miscellaneous'), choices=_OTHER_CHOICES)
     pagesize = SelectField(_('Page size'), choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'),
                                                     ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
-    firstPageNumber = IntegerField(_('Number for the first page'), [NumberRange(min=1)], default=1,
+    firstPageNumber = IntegerField(_('Number for the first page'), [NumberRange(min=1)], default=1,  # noqa: N815
                                    widget=NumberInput(step=1))
     submitted = HiddenField()
 

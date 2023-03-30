@@ -88,8 +88,8 @@ class ReservationOccurrence(db.Model):
         return self.start_dt.date()
 
     @date.expression
-    def date(self):
-        return cast(self.start_dt, Date)
+    def date(cls):
+        return cast(cls.start_dt, Date)
 
     @hybrid_property
     def is_valid(self):

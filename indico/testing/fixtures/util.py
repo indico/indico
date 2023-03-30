@@ -44,7 +44,7 @@ def freeze_time(monkeypatch):
     freezers = []
     orig_call = _FunctionGenerator.__call__
 
-    def FunctionGenerator_call(self, *args, **kwargs):
+    def FunctionGenerator_call(self, *args, **kwargs):  # noqa: N802
         if self._FunctionGenerator__names == ['now']:
             return cast(datetime.now().isoformat(), DateTime)
         return orig_call(self, *args, **kwargs)

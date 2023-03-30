@@ -383,9 +383,9 @@ class RegistrationForm(db.Model):
         return now_utc() <= end_dt if end_dt else True
 
     @is_modification_open.expression
-    def is_modification_open(self):
+    def is_modification_open(cls):
         now = now_utc()
-        return now <= db.func.coalesce(self.modification_end_dt, self.end_dt, now)
+        return now <= db.func.coalesce(cls.modification_end_dt, cls.end_dt, now)
 
     @hybrid_property
     def is_open(self):
