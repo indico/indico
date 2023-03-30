@@ -26,6 +26,8 @@ ignore =
     W504
     # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
     E731
+    # not all our exceptions are errors
+    N818
 
 per-file-ignores =
     # signals use wildcard imports to expose everything in `indico.core.signals`
@@ -34,7 +36,36 @@ per-file-ignores =
     # allow long lines in migrations (only do that for raw SQL please)
     indico/migrations/versions/*.py:E501
     indico/util/mdx_latex_test.py:E501
-    # allow nicely aligned parametrizations
-    indico/*_test.py:E241
+    # allow nicely aligned parametrizations & mixed case functions
+    indico/*_test.py:E241,N802
     # sphinx config has many commented-out variables with no space after `#`
     docs/source/conf.py:E265
+    # legacy code with camelCase
+    indico/web/http_api/*.py:N802,N803,N806
+    indico/modules/events/api.py:N802,N803,N806
+    indico/modules/events/agreements/api.py:N802
+    indico/modules/events/notes/api.py:N802
+    indico/modules/rb/api.py:N802
+    indico/modules/attachments/api/hooks.py:N802
+    indico/modules/users/api.py:N802
+    # the config class has some properties that are basically constants
+    indico/core/config.py:N802
+    # custom sqlalchemy constructs commonly use lowercase class names
+    indico/core/db/sqlalchemy/custom/*.py:N801
+    indico/util/decorators.py:N801
+    # vendored code - don't care about naming in there
+    indico/vendor/*.py:N
+
+classmethod_decorators =
+    classmethod
+    declared_attr
+    strict_classproperty
+    expression
+    comparator
+
+ignore_names =
+    _process_GET
+    _process_POST
+    _process_PATCH
+    _process_PUT
+    _process_DELETE
