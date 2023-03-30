@@ -55,6 +55,7 @@ flake8==6.0.0
     # via
     #   -r requirements.dev.in
     #   flake8-quotes
+    #   pep8-naming
 flake8-quotes==3.3.2
     # via -r requirements.dev.in
 flask==2.2.3
@@ -117,6 +118,8 @@ parso==0.8.3
     # via
     #   -c requirements.txt
     #   pyquotes
+pep8-naming==0.13.3
+    # via -r requirements.dev.in
 pip-tools==6.12.2
     # via -r requirements.dev.in
 plantweb==1.2.1

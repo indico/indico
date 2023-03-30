@@ -5,6 +5,7 @@ flask-url-map-serializer
 freezegun
 isort
 migra
+pep8-naming
 pip-tools
 plantweb
 pygments
