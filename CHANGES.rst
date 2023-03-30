@@ -19,6 +19,7 @@ Improvements
 - Add option to set the abstracts' primary authors as the default submitters for the
   corresponding contributions (:pr:`5711`)
 - Allow commenting on accepted/rejected editables (:issue:`5712`, :pr:`5722`)
+- Hide deleted sections and fields from registration summary (:pr:`5716`)
 
 Bugfixes
 ^^^^^^^^
