@@ -277,8 +277,8 @@ class Room(ProtectionManagersMixin, db.Model):
         return not self.reservations_need_confirmation
 
     @is_auto_confirm.expression
-    def is_auto_confirm(self):
-        return ~self.reservations_need_confirmation
+    def is_auto_confirm(cls):
+        return ~cls.reservations_need_confirmation
 
     @property
     def details_url(self):

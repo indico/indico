@@ -27,7 +27,7 @@ from indico.core.config import config
 from indico.util.i18n import IndicoLocale, _, get_current_locale, ngettext, parse_locale
 
 
-class relativedelta(_relativedelta):
+class relativedelta(_relativedelta):  # noqa: N801
     """Improved `relativedelta`."""
 
     def __abs__(self):

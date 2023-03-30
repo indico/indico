@@ -10,7 +10,7 @@ from collections import UserDict
 from werkzeug.utils import cached_property
 
 
-class locator_property:
+class locator_property:  # noqa: N801
     """Define a smart locator property.
 
     This behaves pretty much like a normal read-only property and the

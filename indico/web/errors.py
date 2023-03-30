@@ -31,7 +31,7 @@ def render_error(exc, title, message, code, standalone=False):
         return render_template('standalone_error.html', error_message=title, error_description=message), code
     else:
         try:
-            return WPError(title, message).getHTML(), code
+            return WPError(title, message).display(), code
         except OperationalError:
             # If the error was caused while connecting the database,
             # rendering the error page fails since e.g. the header/footer

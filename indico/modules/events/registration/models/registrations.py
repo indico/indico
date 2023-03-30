@@ -371,8 +371,8 @@ class Registration(db.Model):
         return self.state in (RegistrationState.rejected, RegistrationState.withdrawn)
 
     @is_cancelled.expression
-    def is_cancelled(self):
-        return self.state.in_((RegistrationState.rejected, RegistrationState.withdrawn))
+    def is_cancelled(cls):
+        return cls.state.in_((RegistrationState.rejected, RegistrationState.withdrawn))
 
     @hybrid_property
     def is_state_publishable(self):

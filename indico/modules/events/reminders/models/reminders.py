@@ -197,8 +197,8 @@ class EventReminder(db.Model):
         return self.event_start_delta is not None
 
     @is_relative.expression
-    def is_relative(self):
-        return self.event_start_delta.isnot(None)
+    def is_relative(cls):
+        return cls.event_start_delta.isnot(None)
 
     @property
     def is_overdue(self):

@@ -142,8 +142,8 @@ def test_acls(dummy_user, create_user):
 
 
 def test_delete_propagate(mocker):
-    Setting = mocker.patch('indico.core.settings.proxy.Setting')
-    SettingPrincipal = mocker.patch('indico.core.settings.proxy.SettingPrincipal')
+    Setting = mocker.patch('indico.core.settings.proxy.Setting')  # noqa: N806
+    SettingPrincipal = mocker.patch('indico.core.settings.proxy.SettingPrincipal')  # noqa: N806
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
     proxy.delete('reg', 'acl')
     Setting.delete.assert_called_once_with('foo', 'reg')
@@ -151,8 +151,8 @@ def test_delete_propagate(mocker):
 
 
 def test_set_multi_propagate(mocker):
-    Setting = mocker.patch('indico.core.settings.proxy.Setting')
-    SettingPrincipal = mocker.patch('indico.core.settings.proxy.SettingPrincipal')
+    Setting = mocker.patch('indico.core.settings.proxy.Setting')  # noqa: N806
+    SettingPrincipal = mocker.patch('indico.core.settings.proxy.SettingPrincipal')  # noqa: N806
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
     proxy.set_multi({
         'reg': 'bar',

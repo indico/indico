@@ -17,8 +17,8 @@ from indico.util.marshmallow import not_empty
 
 class AccompanyingPersonSchema(mm.Schema):
     id = fields.UUID()
-    firstName = fields.String(required=True, validate=not_empty)
-    lastName = fields.String(required=True, validate=not_empty)
+    firstName = fields.String(required=True, validate=not_empty)  # noqa: N815
+    lastName = fields.String(required=True, validate=not_empty)  # noqa: N815
 
     @pre_load
     def _generate_new_uuid(self, data, **kwargs):

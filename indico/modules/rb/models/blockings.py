@@ -79,8 +79,8 @@ class Blocking(db.Model):
         return self.start_date <= d <= self.end_date
 
     @is_active_at.expression
-    def is_active_at(self, d):
-        return (self.start_date <= d) & (d <= self.end_date)
+    def is_active_at(cls, d):
+        return (cls.start_date <= d) & (d <= cls.end_date)
 
     def can_edit(self, user, allow_admin=True):
         if not user:

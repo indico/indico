@@ -65,7 +65,7 @@ class PersonalDataType(int, IndicoEnum):
 
     @strict_classproperty
     @classmethod
-    def FIELD_DATA(cls):
+    def FIELD_DATA(cls):  # noqa: N802
         title_item = {'price': 0,
                       'places_limit': 0,
                       'is_enabled': True}

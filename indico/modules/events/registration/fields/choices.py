@@ -426,9 +426,9 @@ class AccommodationSetupSchema(mm.Schema):
 
 class AccommodationSchema(mm.Schema):
     choice = UUIDString()
-    isNoAccommodation = fields.Bool(load_default=False)
-    arrivalDate = fields.Date(allow_none=True)
-    departureDate = fields.Date(allow_none=True)
+    isNoAccommodation = fields.Bool(load_default=False)  # noqa: N815
+    arrivalDate = fields.Date(allow_none=True)  # noqa: N815
+    departureDate = fields.Date(allow_none=True)  # noqa: N815
 
     @validates_schema(skip_on_field_errors=True)
     def validate_everything(self, data, **kwargs):
