@@ -51,20 +51,6 @@ class IndicoRedisCache(RedisCache):
 
     serializer = NoneWrappingRedisSerializer()
 
-    def add(self, key, value, timeout=None):
-        # XXX: remove this once there's a release with this issue fixed:
-        # https://github.com/pallets-eco/cachelib/issues/156
-        timeout = self._normalize_timeout(timeout)
-        dump = self.serializer.dumps(value)
-        created = self._write_client.setnx(
-            name=self._get_prefix() + key, value=dump
-        )
-        if created and timeout != -1:
-            self._write_client.expire(
-                name=self._get_prefix() + key, time=timeout
-            )
-        return created
-
     def get(self, key, default=None):
         return CachedNone.unwrap(super().get(key), default)
 
