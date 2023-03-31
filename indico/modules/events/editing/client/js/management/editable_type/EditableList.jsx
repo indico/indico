@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import applyJudgmentURL from 'indico-url:event_editing.api_apply_judgment';
 import assignEditorURL from 'indico-url:event_editing.api_assign_editor';
 import assignSelfEditorURL from 'indico-url:event_editing.api_assign_myself';
 import editableListURL from 'indico-url:event_editing.api_editable_list';
@@ -129,6 +130,21 @@ function EditableListDisplay({
       })),
     [editors]
   );
+
+  const judgmentOptions = [
+    {
+      key: 'accept',
+      value: 'accept',
+      text: Translate.string('Accept'),
+      label: {color: 'green', empty: true, circular: true},
+    },
+    {
+      key: 'reject',
+      value: 'reject',
+      text: Translate.string('Reject'),
+      label: {color: 'black', empty: true, circular: true},
+    },
+  ];
 
   const filterOptions = useMemo(
     () => [
@@ -409,25 +425,32 @@ function EditableListDisplay({
 
   const updateCheckedEditablesRequest = async (type, urlFunc, data = {}) => {
     setActiveRequest(type);
-    const rv = await checkedEditablesRequest(urlFunc, {
-      ...data,
-      editor_assignments: editorAssignments,
-    });
+    const rv = await checkedEditablesRequest(urlFunc, data);
     if (rv) {
       patchList(rv);
     }
   };
 
+  const checkedEditablesAssignmentRequest = async (type, urlFunc, data = {}) =>
+    updateCheckedEditablesRequest(type, urlFunc, {
+      ...data,
+      editor_assignments: editorAssignments,
+    });
+
   const assignEditor = editor => {
-    updateCheckedEditablesRequest('assign', assignEditorURL, {editor});
+    checkedEditablesAssignmentRequest('assign', assignEditorURL, {editor});
   };
 
   const assignSelfEditor = () => {
-    updateCheckedEditablesRequest('assign-self', assignSelfEditorURL);
+    checkedEditablesAssignmentRequest('assign-self', assignSelfEditorURL);
   };
 
   const unassignEditor = async () => {
-    updateCheckedEditablesRequest('unassign', unassignEditorURL);
+    checkedEditablesAssignmentRequest('unassign', unassignEditorURL);
+  };
+
+  const applyJudgment = action => {
+    updateCheckedEditablesRequest('judgment', applyJudgmentURL, {action});
   };
 
   return (
@@ -485,6 +508,24 @@ function EditableListDisplay({
                   content={Translate.string('Unassign')}
                   onClick={unassignEditor}
                   loading={activeRequest === 'unassign'}
+                />
+              </Button.Group>{' '}
+              <Button.Group>
+                <Dropdown
+                  disabled={!hasCheckedContribs || !!activeRequest}
+                  options={judgmentOptions}
+                  scrolling
+                  icon={null}
+                  value={null}
+                  selectOnBlur={false}
+                  selectOnNavigation={false}
+                  onChange={(evt, {value}) => applyJudgment(value)}
+                  trigger={
+                    <Button icon loading={activeRequest === 'judgment'}>
+                      <Translate>Judge</Translate>
+                      <Icon name="caret down" />
+                    </Button>
+                  }
                 />
               </Button.Group>{' '}
               <Button.Group>

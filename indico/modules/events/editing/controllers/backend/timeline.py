@@ -130,7 +130,7 @@ class RHEditable(RHContributionEditableBase):
 
     def _process(self):
         custom_actions = self._get_custom_actions()
-        custom_actions_ctx = {self.editable.valid_revisions[-1]: custom_actions}
+        custom_actions_ctx = {self.editable.latest_revision: custom_actions}
         schema = EditableSchema(context={
             'user': session.user,
             'custom_actions': custom_actions_ctx,

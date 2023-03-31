@@ -115,6 +115,10 @@ class Editable(db.Model):
         from .revisions import FinalRevisionState
         return [r for r in self.revisions if r.final_state != FinalRevisionState.undone]
 
+    @property
+    def latest_revision(self):
+        return self.valid_revisions[-1] if self.valid_revisions else None
+
     def _has_general_editor_permissions(self, user):
         """Whether the user has general editor permissions on the Editable.
 

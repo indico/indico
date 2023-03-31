@@ -8,7 +8,7 @@
 import uuid
 
 from flask import jsonify, request, session
-from marshmallow import fields
+from marshmallow import fields, validate
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql import and_, func, over
 from werkzeug.exceptions import Forbidden
@@ -16,14 +16,18 @@ from werkzeug.exceptions import Forbidden
 from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.editing.controllers.backend.util import (confirm_and_publish_changes,
+                                                                    review_and_publish_editable)
 from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHEditableTypeEditorBase,
                                                             RHEditableTypeManagementBase)
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision
+from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.operations import (assign_editor, generate_editables_json, generate_editables_zip,
                                                       unassign_editor)
-from indico.modules.events.editing.schemas import EditableBasicSchema, EditingEditableListSchema, FilteredEditableSchema
+from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingConfirmationAction,
+                                                   EditingEditableListSchema, EditingReviewAction,
+                                                   FilteredEditableSchema)
 from indico.modules.files.models.files import File
 from indico.util.i18n import _
 from indico.util.marshmallow import Principal
@@ -131,6 +135,25 @@ class RHUnassignEditor(RHEditorAssignmentBase):
 
     def _assign_editor(self, editable):
         unassign_editor(editable)
+
+
+class RHApplyJudgment(RHEditablesBase):
+    @use_kwargs({
+        'action': fields.String(required=True, validate=validate.OneOf(['accept', 'reject']))
+    })
+    def _process(self, action):
+        for editable in self.editables:
+            revision = editable.latest_revision
+            if revision.final_state != FinalRevisionState.none:
+                continue
+            if revision.initial_state == InitialRevisionState.ready_for_review:
+                review_and_publish_editable(revision, EditingReviewAction[action], '')
+            elif revision.initial_state == InitialRevisionState.needs_submitter_confirmation and action == 'accept':
+                confirm_and_publish_changes(revision, EditingConfirmationAction.accept, '')
+                revision.editor = session.user
+                db.session.flush()
+            db.session.expire(editable)
+        return EditableBasicSchema(many=True).jsonify(self.editables)
 
 
 class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):
