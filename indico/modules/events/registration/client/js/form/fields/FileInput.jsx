@@ -20,9 +20,17 @@ import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
 export default function FileInput({htmlName, disabled, isRequired}) {
-  const {eventId, regformId, fileData} = useSelector(getStaticData);
+  const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const initialFileDetails = isUpdateMode ? fileData[htmlName] || null : null;
+
+  const urlParams = {
+    event_id: eventId,
+    reg_form_id: regformId,
+  };
+  if (registrationUuid) {
+    urlParams.token = registrationUuid;
+  }
 
   return (
     <div styleName="file-field">
@@ -30,7 +38,7 @@ export default function FileInput({htmlName, disabled, isRequired}) {
         name={htmlName}
         disabled={disabled}
         required={isRequired}
-        uploadURL={uploadFileURL({event_id: eventId, reg_form_id: regformId})}
+        uploadURL={uploadFileURL(urlParams)}
         initialFileDetails={initialFileDetails}
       />
     </div>

@@ -365,6 +365,17 @@ class RHUploadRegistrationFile(UploadFileMixin, RHRegistrationFormBase):
     Only this uuid is then sent when the regform is submitted.
     """
 
+    @use_kwargs({
+        'token': UUIDString(load_default=None),
+    }, location='query')
+    def _process_args(self, token):
+        RHRegistrationFormBase._process_args(self)
+        self.existing_registration = self.regform.get_registration(uuid=token) if token else None
+
+    def _check_access(self):
+        if not self.existing_registration:
+            RHRegistrationFormBase._check_access(self)
+
     def get_file_context(self):
         return 'event', self.event.id, 'regform', self.regform.id, 'registration'
 

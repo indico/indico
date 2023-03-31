@@ -26,6 +26,8 @@ Bugfixes
 - Clone all protection settings (in particular submitter privileges) when cloning events
   (:pr:`5702`)
 - Fix searching in single-choice dropdown fields in registration forms (:pr:`5709`)
+- Fix uploading files in registration forms where the user only has access through the
+  registration's token (:pr:`5719`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
