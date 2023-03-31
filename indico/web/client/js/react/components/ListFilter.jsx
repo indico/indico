@@ -117,7 +117,7 @@ export default function ListFilter({
   };
 
   return (
-    <div>
+    <div styleName="filters-container">
       <Dropdown
         text={Translate.string('Filter')}
         icon="filter"

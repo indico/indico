@@ -460,7 +460,7 @@ function EditableListDisplay({
         <ManagementPageBackButton url={editableTypeURL({event_id: eventId, type: editableType})} />
       )}
       <div styleName="editable-topbar">
-        <div>
+        <div styleName="editable-actions">
           {canAssignSelf && (
             <Button
               content={GetNextEditableTitles[editableType]}
@@ -509,25 +509,23 @@ function EditableListDisplay({
                   onClick={unassignEditor}
                   loading={activeRequest === 'unassign'}
                 />
-              </Button.Group>{' '}
-              <Button.Group>
-                <Dropdown
-                  disabled={!hasCheckedContribs || !!activeRequest}
-                  options={judgmentOptions}
-                  scrolling
-                  icon={null}
-                  value={null}
-                  selectOnBlur={false}
-                  selectOnNavigation={false}
-                  onChange={(evt, {value}) => applyJudgment(value)}
-                  trigger={
-                    <Button icon loading={activeRequest === 'judgment'}>
-                      <Translate>Judge</Translate>
-                      <Icon name="caret down" />
-                    </Button>
-                  }
-                />
-              </Button.Group>{' '}
+              </Button.Group>
+              <Dropdown
+                disabled={!hasCheckedContribs || !!activeRequest}
+                options={judgmentOptions}
+                scrolling
+                icon={null}
+                value={null}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+                onChange={(evt, {value}) => applyJudgment(value)}
+                trigger={
+                  <Button icon loading={activeRequest === 'judgment'}>
+                    <Translate>Judge</Translate>
+                    <Icon name="caret down" />
+                  </Button>
+                }
+              />
               <Button.Group>
                 <Button
                   disabled={!hasCheckedContribs || !!activeRequest}
