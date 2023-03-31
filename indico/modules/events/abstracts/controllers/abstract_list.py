@@ -183,8 +183,8 @@ class RHCreateAbstract(RHAbstractListBase):
                 data.pop('submitter')
 
             send_notifications = data.pop('send_notifications', is_invited)
-            abstract = create_abstract(self.event, *get_field_values(data), send_notifications=send_notifications,
-                                       submitter=submitter, is_invited=is_invited)
+            abstract, __ = create_abstract(self.event, *get_field_values(data), send_notifications=send_notifications,
+                                           submitter=submitter, is_invited=is_invited)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
             if tpl_components.get('hide_abstract'):

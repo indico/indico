@@ -110,11 +110,13 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
     signals.event.abstract_created.send(abstract)
 
     if send_notifications:
-        send_abstract_notifications(abstract)
+        notifications_sent = send_abstract_notifications(abstract)
+    else:
+        notifications_sent = False
     logger.info('Abstract %s created by %s', abstract, session.user)
     abstract.log(EventLogRealm.reviewing, LogKind.positive, 'Abstracts',
                  f'Abstract {abstract.verbose_title} created', session.user)
-    return abstract
+    return abstract, notifications_sent
 
 
 def update_abstract(abstract, abstract_data, custom_fields_data=None):

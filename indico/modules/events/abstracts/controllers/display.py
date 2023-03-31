@@ -65,10 +65,15 @@ class RHSubmitAbstract(RHAbstractsBase):
         abstract_form_class = make_abstract_form(self.event, session.user, management=self.management)
         form = abstract_form_class(event=self.event)
         if form.validate_on_submit():
-            abstract = create_abstract(self.event, *get_field_values(form.data), send_notifications=True)
-            flash(_("Your abstract '{}' has been successfully submitted. It is registered with the number "
-                    '#{}. You will be notified by email with the submission details.')
-                  .format(abstract.title, abstract.friendly_id), 'success')
+            abstract, notifications_sent = create_abstract(self.event, *get_field_values(form.data),
+                                                           send_notifications=True)
+            if notifications_sent:
+                flash(_("Your abstract '{}' has been successfully submitted. It is registered with the number "
+                        '#{}. You will be notified by email with the submission details.')
+                      .format(abstract.title, abstract.friendly_id), 'success')
+            else:
+                flash(_("Your abstract '{}' has been successfully submitted. It is registered with the number #{}.")
+                      .format(abstract.title, abstract.friendly_id), 'success')
             return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event))
         return jsonify_template('events/abstracts/display/submission.html', event=self.event, form=form)
 
