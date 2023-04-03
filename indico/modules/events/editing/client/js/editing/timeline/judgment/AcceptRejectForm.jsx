@@ -22,7 +22,7 @@ import FinalTagInput from './TagInput';
 
 import './JudgmentBox.module.scss';
 
-export default function AcceptRejectForm({action, setLoading}) {
+export default function AcceptRejectForm({action, setLoading, onSuccess}) {
   const lastRevision = useSelector(getLastRevision);
   const tagOptions = useSelector(getNonSystemTags);
   const dispatch = useDispatch();
@@ -44,6 +44,7 @@ export default function AcceptRejectForm({action, setLoading}) {
           setLoading(false);
           return rv.error;
         }
+        onSuccess();
       }}
       subscription={{}}
     >
@@ -77,4 +78,5 @@ export default function AcceptRejectForm({action, setLoading}) {
 AcceptRejectForm.propTypes = {
   action: PropTypes.oneOf(['accept', 'reject']).isRequired,
   setLoading: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
 };
