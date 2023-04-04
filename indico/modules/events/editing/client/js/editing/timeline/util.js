@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import {FinalRevisionState, InitialRevisionState} from 'indico/modules/events/editing/models';
@@ -42,9 +43,15 @@ export function processRevisions(revisions) {
     );
     const header = revisionState;
     const isLatestRevision = i === revisions.length - 1;
+    const previousRevision = getPreviousValidRevision(revisions, i);
+    const nextRevision = getNextValidRevision(revisions, i);
     revisionState = getRevisionTransition(revision, {isLatestRevision});
     // Generate the comment header
-    if (revisionState && !isRequestChangesWithFiles(revision, revisions[i - 1])) {
+    if (
+      revisionState &&
+      !isRequestChangesWithFiles(revision, previousRevision) &&
+      !isEditorRevision(revision, nextRevision)
+    ) {
       const author = revision.editor || revision.submitter;
       items.push(commentFromState(revision, revisionState, author));
     }
@@ -52,9 +59,37 @@ export function processRevisions(revisions) {
       ...revision,
       // use the previous state transition as current block header, unless the revision has been undone
       header: revision.finalState.name !== FinalRevisionState.undone && (header || revision.header),
-      items,
+      revisionCommentHtml: isEditorRevision(previousRevision, revision)
+        ? previousRevision.commentHtml
+        : '',
+      items: _.sortBy(items, 'createdDt'),
     };
   });
+}
+
+export function isEditorRevision(previousRevision, revision) {
+  return (
+    revision &&
+    revision.finalState.name !== FinalRevisionState.undone &&
+    previousRevision &&
+    (revision.initialState.name === InitialRevisionState.needs_submitter_confirmation ||
+      isRequestChangesWithFiles(revision, previousRevision)) &&
+    previousRevision.editor &&
+    previousRevision.editor.identifier === revision.submitter.identifier
+  );
+}
+
+export function getPreviousValidRevision(revisions, index) {
+  return revisions
+    .slice(0, index)
+    .reverse()
+    .find(revision => revision.finalState.name !== FinalRevisionState.undone);
+}
+
+export function getNextValidRevision(revisions, index) {
+  return revisions
+    .slice(index + 1)
+    .find(revision => revision.finalState.name !== FinalRevisionState.undone);
 }
 
 export function commentFromState(revision, state, user) {
@@ -79,7 +114,7 @@ export const revisionStates = {
         ? Translate.string('Editor has accepted after making some changes')
         : Translate.string('Submitter has accepted proposed changes');
     },
-    [FinalRevisionState.needs_submitter_changes]: (_, {isLatestRevision}) => {
+    [FinalRevisionState.needs_submitter_changes]: (__, {isLatestRevision}) => {
       return isLatestRevision
         ? Translate.string('Submitter rejected proposed changes')
         : Translate.string('Submitter rejected proposed changes and uploaded a new revision');

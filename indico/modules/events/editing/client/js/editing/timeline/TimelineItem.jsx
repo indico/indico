@@ -9,7 +9,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Icon, Message} from 'semantic-ui-react';
+import {Divider, Icon, Message} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
@@ -20,44 +20,39 @@ import {FinalRevisionState} from '../../models';
 import ChangesConfirmation from './ChangesConfirmation';
 import CustomActions from './CustomActions';
 import FileDisplay from './FileDisplay';
+import ResetReview from './ResetReview';
 import ReviewForm from './ReviewForm';
 import RevisionLog from './RevisionLog';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
-import {blockPropTypes, isRequestChangesWithFiles} from './util';
+import {blockPropTypes} from './util';
 
 import '../../../styles/timeline.module.scss';
 import './TimelineItem.module.scss';
 
 export default function TimelineItem({block, index}) {
   const {submitter, createdDt} = block;
-  const timelineBlocks = useSelector(selectors.getTimelineBlocks);
-  const validTimelineBlocks = useSelector(selectors.getValidTimelineBlocks);
+  const lastTimelineBlock = useSelector(selectors.getLastTimelineBlock);
+  const lastValidTimelineBlock = useSelector(selectors.getLastValidTimelineBlock);
+  const lastFinalState = useSelector(selectors.getLastFinalState);
+  const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
   const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
+  const canUndoLastValidBlock = useSelector(selectors.canUndoLastValidBlock);
   const {canComment, state: editableState} = useSelector(selectors.getDetails);
   const {fileTypes} = useSelector(selectors.getStaticData);
-  const isLastBlock = timelineBlocks[timelineBlocks.length - 1].id === block.id;
-  const isLastValidBlock = validTimelineBlocks[validTimelineBlocks.length - 1].id === block.id;
-  const isVisibleByDefault =
-    isLastValidBlock ||
-    (validTimelineBlocks.length >= 2 &&
-      validTimelineBlocks[validTimelineBlocks.length - 2].id === block.id &&
-      (isRequestChangesWithFiles(
-        validTimelineBlocks[validTimelineBlocks.length - 1],
-        validTimelineBlocks[validTimelineBlocks.length - 2]
-      ) ||
-        needsSubmitterConfirmation));
-  const [visible, setVisible] = useState(isVisibleByDefault);
+  const isLastBlock = lastTimelineBlock.id === block.id;
+  const isLastValidBlock = lastValidTimelineBlock.id === block.id;
+  const [visible, setVisible] = useState(isLastValidBlock);
   const isUndone = block.finalState.name === FinalRevisionState.undone;
 
   useEffect(() => {
     // when undoing a judgment deletes the last revision this revision may become the
     // latest one, and thus needs to be unhidden if it had been collapsed before.
-    if (isLastValidBlock && isVisibleByDefault && !visible) {
+    if (isLastValidBlock && !visible) {
       setVisible(true);
     }
-  }, [isLastValidBlock, isVisibleByDefault, visible]);
+  }, [isLastValidBlock, visible]);
 
   return (
     <>
@@ -90,16 +85,24 @@ export default function TimelineItem({block, index}) {
                   </Translate>
                 )}
               </div>
-              {!isLastValidBlock && (
+              {isLastValidBlock ? (
+                !isUndone &&
+                canUndoLastValidBlock && (
+                  <>
+                    <ResetReview revisionId={lastRevertableRevisionId} />
+                    <StateIndicator state={lastFinalState} circular />
+                  </>
+                )
+              ) : (
                 <>
-                  <a className="block-info-link i-link" onClick={() => setVisible(!visible)}>
+                  <a
+                    className="i-link"
+                    styleName="item-visibility-toggle"
+                    onClick={() => setVisible(!visible)}
+                  >
                     {visible ? <Translate>Hide</Translate> : <Translate>Show details</Translate>}
                   </a>
-                  {!visible && block.finalState && (
-                    <div styleName="state-indicator">
-                      <StateIndicator state={block.finalState.name} circular />
-                    </div>
-                  )}
+                  {block.finalState && <StateIndicator state={block.finalState.name} circular />}
                 </>
               )}
             </div>
@@ -110,6 +113,15 @@ export default function TimelineItem({block, index}) {
                     <Icon name="warning sign" />
                     <Translate>This revision has been retracted by the editor.</Translate>
                   </Message>
+                )}
+                {block.revisionCommentHtml && (
+                  <>
+                    <div
+                      className="markdown-text"
+                      dangerouslySetInnerHTML={{__html: block.revisionCommentHtml}}
+                    />
+                    <Divider />
+                  </>
                 )}
                 <FileDisplay
                   fileTypes={fileTypes}

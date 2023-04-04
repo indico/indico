@@ -43,7 +43,7 @@ export default function CustomItem({
             <div className="f-self-stretch" styleName="item-header">
               {header}{' '}
               <time dateTime={serializeDate(reviewedDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
-                {serializeDate(reviewedDt, 'LL')}
+                {serializeDate(reviewedDt, 'LLL')}
               </time>{' '}
               {isUndone && (
                 <Translate as="span" styleName="undone-indicator">

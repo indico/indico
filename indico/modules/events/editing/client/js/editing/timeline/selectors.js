@@ -10,7 +10,7 @@ import {createSelector} from 'reselect';
 
 import {FinalRevisionState, InitialRevisionState} from '../../models';
 
-import {isRequestChangesWithFiles} from './util';
+import {isEditorRevision, isRequestChangesWithFiles} from './util';
 
 export const getDetails = state => (state.timeline ? state.timeline.details : null);
 export const getNewDetails = state => (state.timeline ? state.timeline.newDetails : null);
@@ -22,10 +22,18 @@ export const isTimelineOutdated = createSelector(
   (details, newDetails) => newDetails !== null && !_.isEqual(details, newDetails)
 );
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
+export const getLastTimelineBlock = createSelector(
+  getTimelineBlocks,
+  blocks => blocks && blocks[blocks.length - 1]
+);
 export const getValidTimelineBlocks = state =>
   state.timeline.timelineBlocks.filter(
     ({finalState}) => finalState.name !== FinalRevisionState.undone
   );
+export const getLastValidTimelineBlock = createSelector(
+  getValidTimelineBlocks,
+  blocks => blocks && blocks[blocks.length - 1]
+);
 export const getValidRevisions = createSelector(
   getDetails,
   details =>
@@ -54,6 +62,18 @@ export const needsSubmitterConfirmation = createSelector(
     lastRevision.initialState.name === InitialRevisionState.needs_submitter_confirmation &&
     lastRevision.finalState.name === FinalRevisionState.none &&
     lastRevision.editor === null
+);
+export const getLastFinalState = createSelector(
+  getDetails,
+  details =>
+    details &&
+    details.revisions
+      .slice()
+      .reverse()
+      .find(
+        ({finalState}) =>
+          ![FinalRevisionState.none, FinalRevisionState.undone].includes(finalState.name)
+      )?.finalState?.name
 );
 export const getStaticData = state => state.staticData;
 
@@ -150,4 +170,13 @@ export const canJudgeLastRevision = createSelector(
     lastRevision.finalState.name === FinalRevisionState.none &&
     lastRevision.initialState.name === InitialRevisionState.ready_for_review &&
     allowed
+);
+
+export const canUndoLastValidBlock = createSelector(
+  getValidTimelineBlocks,
+  getLastRevertableRevisionId,
+  (blocks, lastRevertableRevisionId) =>
+    blocks.length >= 2 &&
+    isEditorRevision(blocks[blocks.length - 2], blocks[blocks.length - 1]) &&
+    blocks[blocks.length - 2].id === lastRevertableRevisionId
 );
