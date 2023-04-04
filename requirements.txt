@@ -283,7 +283,7 @@ pyyaml==6.0
     # via -r requirements.in
 qrcode==7.4.2
     # via -r requirements.in
-redis==4.5.1
+redis==4.5.4
     # via
     #   -r requirements.in
     #   celery
