@@ -1,6 +1,6 @@
 alembic
 authlib
-babel<2.11  # big update, not right before a release
+babel
 bcrypt
 bleach[css]
 blinker
@@ -12,10 +12,10 @@ colorclass
 distro
 email-validator<1.3.0  # 1.3 checks SPF which is wrong (JoshData/python-email-validator#90)
 feedgen
-flask-babel
+flask-babel<3  # v3 has an upper bound for pytz (python-babel/flask-babel#225)
 flask-caching
 flask-limiter
-flask-marshmallow
+flask-marshmallow<0.15  # update together w/ flask-sqlalchemy
 flask-migrate
 flask-multipass
 flask-pluginengine
@@ -24,7 +24,7 @@ flask-webpackext
 flask-wtf
 flask
 html2text
-icalendar<5  # major update, not right before a release
+icalendar
 indico-fonts
 ipython
 itsdangerous
@@ -38,6 +38,7 @@ marshmallow-enum
 marshmallow-oneofschema
 marshmallow-sqlalchemy
 marshmallow
+node-semver<0.9
 packaging
 pillow
 prompt-toolkit
