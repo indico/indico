@@ -8,6 +8,7 @@
 from flask import request, session
 from werkzeug.exceptions import Forbidden
 
+from indico.core.errors import NoReportError
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
 from indico.modules.events.papers.forms import PaperSubmissionForm
 from indico.modules.events.papers.models.files import PaperFile
@@ -18,6 +19,7 @@ from indico.modules.events.papers.util import (get_contributions_with_paper_subm
                                                get_user_submittable_contributions)
 from indico.modules.events.papers.views import (WPDisplayCallForPapers, WPDisplayCallForPapersReact,
                                                 WPDisplayReviewingArea)
+from indico.util.i18n import _
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -32,6 +34,12 @@ class RHSubmitPaper(RHPaperBase):
             return False
         # this RH is only used for initial submission
         return self.paper is None
+
+    def _check_access(self):
+        RHPaperBase._check_access(self)
+        if not self.event.cfp.is_open:
+            raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
+                                                     'Please contact the event organizer for further assistance.')))
 
     def _process(self):
         form = PaperSubmissionForm()
@@ -111,6 +119,12 @@ class RHCallForPapers(RHPapersBase):
 
 class RHSelectContribution(RHCallForPapers):
     """Select a contribution for which the user wants to submit a paper."""
+
+    def _check_access(self):
+        RHCallForPapers._check_access(self)
+        if not self.event.cfp.is_open:
+            raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
+                                                     'Please contact the event organizer for further assistance.')))
 
     def _process(self):
         return jsonify_template('events/papers/display/select_contribution.html', contributions=self.contribs)

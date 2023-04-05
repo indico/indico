@@ -34,6 +34,7 @@ Bugfixes
   registration's token (:pr:`5719`)
 - Fix being unable to set the "speakers and authors" as the default contribution
   submitter type (:pr:`5711`)
+- Check server-side if Call for Papers is open when submitting a paper (:pr:`5725`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -50,7 +50,7 @@ class NoReportError(IndicoError):
     """A generic error that cannot be reported by users.
 
     This behaves exactly like :exc:`IndicoError` except that users
-    cannot sent an error report.
+    cannot send an error report.
 
     Its `wrap_exc` method can be wrapped to raise any other HTTP error
     from werkzeug without allowing the user to report it::
