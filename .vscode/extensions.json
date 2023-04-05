@@ -11,7 +11,6 @@
     "redhat.vscode-yaml",
     "samuelcolvin.jinjahtml",
     // misc
-    "ms-vscode.references-view",
     "jakearl.search-editor-apply-changes",
   ],
   "unwantedRecommendations": [
