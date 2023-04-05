@@ -29,7 +29,7 @@ import {
   ListFilter,
 } from 'indico/react/components';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
@@ -119,6 +119,7 @@ function EditableListDisplay({
   );
   const [activeRequest, setActiveRequest] = useState(null);
   const [assignmentConflict, setAssignmentConflict] = useState(null);
+  const [skippedEditables, setSkippedEditables] = useState(0);
 
   const editorOptions = useMemo(
     () =>
@@ -215,6 +216,27 @@ function EditableListDisplay({
     [EditableType.paper]: Translate.string('List of papers'),
     [EditableType.slides]: Translate.string('List of slides'),
     [EditableType.poster]: Translate.string('List of posters'),
+  }[editableType];
+
+  const skippedEditablesWarning = {
+    [EditableType.paper]: PluralTranslate.string(
+      '{count} paper was skipped because it does not fulfill the reviewing conditions.',
+      '{count} papers were skipped because they do not fulfill the reviewing conditions.',
+      skippedEditables,
+      {count: skippedEditables}
+    ),
+    [EditableType.slides]: PluralTranslate.string(
+      '{count} slide was skipped because it does not fulfill the reviewing conditions.',
+      '{count} slides were skipped because they do not fulfill the reviewing conditions.',
+      skippedEditables,
+      {count: skippedEditables}
+    ),
+    [EditableType.poster]: PluralTranslate.string(
+      '{count} poster was skipped because it does not fulfill the reviewing conditions.',
+      '{count} posters were skipped because they do not fulfill the reviewing conditions.',
+      skippedEditables,
+      {count: skippedEditables}
+    ),
   }[editableType];
 
   const columnHeaders = [
@@ -451,6 +473,12 @@ function EditableListDisplay({
 
   const applyJudgment = action => {
     updateCheckedEditablesRequest('judgment', applyJudgmentURL, {action});
+    const isJudgeable = ({state}) =>
+      state === 'ready_for_review' ||
+      (state === 'needs_submitter_confirmation' && action === 'accept');
+    setSkippedEditables(
+      contribList.filter(({editable: e}) => e && checked.includes(e.id) && !isJudgeable(e)).length
+    );
   };
 
   return (
@@ -551,6 +579,12 @@ function EditableListDisplay({
           onChangeList={onChangeList}
         />
       </div>
+      {!!skippedEditables && (
+        <Message warning>
+          <Icon name="warning sign" />
+          {skippedEditablesWarning}
+        </Message>
+      )}
       {sortedList.length ? (
         <div styleName="editable-list">
           <WindowScroller>
