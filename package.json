@@ -11,8 +11,6 @@
     "@ckeditor/ckeditor5-react": "^5.0.0",
     "@dr.pogodin/babel-plugin-react-css-modules": "~6.1.1",
     "ajv": "^8.11.0",
-    "angular-ui-sortable": "git+https://indico@github.com/angular-ui/ui-sortable.git#6b79634f0921f3b5ac7b3989bd0f59376d7d765b",
-    "AngularJS": "git+https://indico@github.com/indico/angular.js.git#indico",
     "axios": "^0.27.2",
     "axios-hooks": "^3.1.1",
     "chartist": "^0.11.4",
