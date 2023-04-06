@@ -1,14 +1,19 @@
-{% macro render_cfp_infoline(event, cfp, contributions, show_icon=true) %}
+{% macro render_cfp_infoline(event, cfp, contributions) %}
     <div class="action-box highlight">
         <div class="section">
-            {% if show_icon %}
-                <span class="icon icon-file-content"></span>
-            {% endif %}
+            {% set is_authorized = cfp.is_authorized_submitter(session.user) %}
+            {% set can_submit = cfp.can_submit_proceedings(session.user) %}
             <div class="text">
-                {%- if cfp.is_open %}
-                    <div class="label">
+                <div class="label">
+                    {%- if cfp.is_open %}
                         {%- trans %}The call for papers is open{% endtrans -%}
-                    </div>
+                    {% elif is_authorized %}
+                        {%- trans %}You have been authorized to submit papers{% endtrans -%}
+                    {% else %}
+                        <div class="label">{% trans %}The call for papers is closed.{% endtrans %}</div>
+                    {% endif -%}
+                </div>
+                {%- if can_submit %}
                     <div>
                         {% if contributions|length == 1 %}
                             {% set contrib = contributions|first %}
@@ -20,11 +25,9 @@
                             {%- trans %}You can submit a paper{% endtrans -%}
                         {% endif %}
                     </div>
-                {% else %}
-                    <div class="label">{% trans %}The call for papers is closed.{% endtrans %}</div>
                 {% endif -%}
             </div>
-            {%- if cfp.is_open %}
+            {%- if can_submit %}
                 <div class="toolbar">
                     {% if contributions|length == 1 %}
                         {% set contrib = contributions|first %}

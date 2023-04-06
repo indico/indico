@@ -37,7 +37,7 @@ class RHSubmitPaper(RHPaperBase):
 
     def _check_access(self):
         RHPaperBase._check_access(self)
-        if not self.event.cfp.is_open:
+        if not self.event.cfp.can_submit_proceedings(session.user):
             raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
                                                      'Please contact the event organizer for further assistance.')))
 
@@ -122,7 +122,7 @@ class RHSelectContribution(RHCallForPapers):
 
     def _check_access(self):
         RHCallForPapers._check_access(self)
-        if not self.event.cfp.is_open:
+        if not self.event.cfp.can_submit_proceedings(session.user):
             raise NoReportError.wrap_exc(Forbidden(_('The Call for Papers is closed. '
                                                      'Please contact the event organizer for further assistance.')))
 
