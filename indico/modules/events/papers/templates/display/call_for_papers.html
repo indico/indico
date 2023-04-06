@@ -17,9 +17,9 @@
                 <div class="cfp-announcement">{{ cfp.announcement }}</div>
             </section>
         {% endif %}
-        {% if contributions or not cfp.is_open %}
+        {% if contributions or not cfp.can_submit_proceedings(session.user) %}
             <section class="cfp-infoline-section">
-                {{ render_cfp_infoline(event, cfp, contributions, show_icon=false) }}
+                {{ render_cfp_infoline(event, cfp, contributions) }}
             </section>
         {% endif %}
         {% if event.paper_templates %}

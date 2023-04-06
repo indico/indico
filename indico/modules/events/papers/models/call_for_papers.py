@@ -163,6 +163,19 @@ class CallForPapers:
             return (self.is_reviewer(user, PaperReviewingRole.content_reviewer) or
                     self.is_reviewer(user, PaperReviewingRole.layout_reviewer))
 
+    def is_authorized_submitter(self, user):
+        """Check if the user can submit papers even when the CfP is closed."""
+        return paper_reviewing_settings.acls.contains_user(self.event, 'authorized_submitters', user)
+
+    def can_submit_proceedings(self, user):
+        """Check if the user can theoretically submit papers.
+
+        This does not check if the user actually has any contributions for which they can
+        submit a paper. To check if a user can submit a paper for a specific contribution, use
+        :meth:`Contribution.can_submit_proceedings <.Contribution.can_submit_proceedings>` instead.
+        """
+        return self.is_open or self.is_authorized_submitter(user)
+
     def can_access_reviewing_area(self, user):
         return self.is_staff(user)
 

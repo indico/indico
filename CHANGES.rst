@@ -20,6 +20,7 @@ Improvements
   corresponding contributions (:pr:`5711`)
 - Allow commenting on accepted/rejected editables (:issue:`5712`, :pr:`5722`)
 - Hide deleted sections and fields from registration summary (:pr:`5716`)
+- Add support for authorized submitters in Call for Papers (:pr:`5728`)
 
 Bugfixes
 ^^^^^^^^

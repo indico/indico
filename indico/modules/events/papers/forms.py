@@ -91,6 +91,11 @@ class PaperReviewingSettingsForm(IndicoForm):
     hide_accepted = BooleanField(_('Keep papers hidden'), widget=SwitchWidget(),
                                  description=_("Keep papers hidden from participants even after they've "
                                                'been accepted.'))
+    authorized_submitters = PrincipalListField(_('Authorized submitters'), event=lambda form: form.event,
+                                               allow_external_users=True, allow_groups=True,
+                                               allow_event_roles=True, allow_category_roles=True,
+                                               description=_('These users may always submit papers, '
+                                                             'even outside the regular submission period.'))
     email_settings = PaperEmailSettingsField(_('Email notifications'))
 
     def __init__(self, *args, **kwargs):

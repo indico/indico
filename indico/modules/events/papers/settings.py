@@ -71,4 +71,6 @@ paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
     'notify_on_added_to_event': RoleConverter,
     'notify_on_assigned_contrib': RoleConverter,
     'notify_on_paper_submission': RoleConverter
+}, acls={
+    'authorized_submitters'
 })
