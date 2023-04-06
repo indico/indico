@@ -186,9 +186,10 @@ jobs:
       # https://github.com/actions/toolkit/issues/457
       - name: Get list of changed files
         if: github.event_name == 'pull_request' && (success() || failure())
-        uses: ThiefMaster/changed-files-action@json-output
+        uses: umani/changed-files@v4.0.1
         with:
           repo-token: ${{ github.token }}
+          result-encoding: json
           pattern: '^.+\.s?css$'
 
       - name: Run stylelint for changed files
