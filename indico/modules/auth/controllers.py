@@ -279,7 +279,7 @@ class RHRegister(RH):
             else:
                 retry_in = signup_rate_limiter.get_reset_delay()
                 delay = format_human_timedelta(retry_in, 'minutes')
-                flash(_('Too many verification email sent. Please wait {}').format(delay), 'warning')
+                flash(_('Too many verification emails sent. Please wait {}').format(delay), 'warning')
                 return redirect(url_for('.register', provider=self.provider_name))
         return WPSignup.render_template('register_verify.html', form=form,
                                         email_sent=session.pop('register_verification_email_sent', False))
