@@ -338,7 +338,6 @@ function EditableListDisplay({
     return (
       <TooltipIfTruncated>
         <div
-          index={rowIndex}
           styleName="rowcolumn-tooltip"
           role="gridcell"
           style={dataKey === 'title' ? {display: 'block'} : {}}

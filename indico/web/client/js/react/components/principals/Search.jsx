@@ -684,6 +684,7 @@ const InnerUserSearch = searchFactory({
 export const DefaultUserSearch = ({withExternalUsers, initialFormValues, ...props}) => {
   if (!withExternalUsers) {
     // ignore form defaults for a field that's hidden
+    // eslint-disable-next-line react/destructuring-assignment
     delete initialFormValues.external;
   }
   return (

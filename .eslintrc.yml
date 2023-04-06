@@ -66,12 +66,9 @@ rules:
     - error
     - capIsNewExceptionPattern: '\$\.(Event|Deferred|Color)$'
   prefer-template: warn
-  react/jsx-curly-brace-presence:
-    # remove this override once they fixed this rule (probably in the next update)
-    # check e.g. with indico/modules/rb/client/js/components/TimeInformation.jsx
-    # where it should NOT remove the `{', '}` since it's required for proper spacing
+  react/no-unknown-property:
     - error
-    - children: ignore
+    - ignore: [styleName]
   no-restricted-globals:
     - error
     - event

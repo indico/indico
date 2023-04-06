@@ -107,7 +107,7 @@ export default function TimelineHeader({children, contribution, state, submitter
                       <a onClick={unassignEditor}>
                         <Translate>unassign</Translate>
                       </a>
-                      {')'}
+                      )
                     </>
                   )}
                 </>
@@ -120,7 +120,7 @@ export default function TimelineHeader({children, contribution, state, submitter
                       <a onClick={assignMyself}>
                         <Translate>assign myself</Translate>
                       </a>
-                      {')'}
+                      )
                     </>
                   )}
                 </>

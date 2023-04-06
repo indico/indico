@@ -33,9 +33,7 @@ function SinglePlaceholderInfo({name, description, required}) {
       <code>{`{${name}}`}</code> - {description}
       {required && (
         <span styleName="required">
-          {'('}
-          <Translate>required</Translate>
-          {')'}
+          (<Translate>required</Translate>)
         </span>
       )}
     </li>
