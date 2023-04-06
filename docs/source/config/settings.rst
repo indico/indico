@@ -97,10 +97,10 @@ Authentication
     Rate limiting is applied by IP address and each verification email sent count against the
     rate limit.
 
-    The default allows a burst of 20 attempts, and then only 3 attempts every 2
+    The default allows a burst of 20 attempts, and then only 3 attempts every 10
     minutes for the next 24 hours.  Setting the rate limit to ``None`` disables it.
 
-    Default: ``'3 per 2 minutes; 20 per day'``
+    Default: ``'3 per 10 minutes; 20 per day'``
 
 .. data:: EXTERNAL_REGISTRATION_URL
 
