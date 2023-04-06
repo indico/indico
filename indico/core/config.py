@@ -51,7 +51,7 @@ DEFAULTS = {
     'EXTERNAL_REGISTRATION_URL': None,
     'HELP_URL': 'https://learn.getindico.io',
     'FAILED_LOGIN_RATE_LIMIT': '5 per 15 minutes; 10 per day',
-    'SIGNUP_RATE_LIMIT': '3 per 2 minutes; 20 per day',
+    'SIGNUP_RATE_LIMIT': '3 per 10 minutes; 20 per day',
     'IDENTITY_PROVIDERS': {},
     'LOCAL_IDENTITIES': True,
     'LOCAL_MODERATION': False,
