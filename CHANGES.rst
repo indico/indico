@@ -39,7 +39,7 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- None so far
+- Update Python & JavaScript dependencies (:pr:`5726`)
 
 
 Version 3.2.3
