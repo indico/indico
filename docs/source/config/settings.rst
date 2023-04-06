@@ -94,7 +94,7 @@ Authentication
     and then slowing down more strongly (in case someone tries to brute-force more
     than just a few passwords).
 
-    Rate limiting is applied by IP address and each verification email sent count against the
+    Rate limiting is applied by IP address and each verification email sent counts against the
     rate limit.
 
     The default allows a burst of 20 attempts, and then only 3 attempts every 10
