@@ -274,9 +274,7 @@ class RHRegister(RH):
     def _process_verify(self, handler):
         form = handler.create_verify_email_form()
         if form.validate_on_submit():
-            rate_limit_exceeded = not signup_rate_limiter.test()
-            if not rate_limit_exceeded:
-                signup_rate_limiter.hit()
+            if signup_rate_limiter.hit():                
                 return self._send_confirmation(form.email.data)
             else:
                 retry_in = signup_rate_limiter.get_reset_delay()
