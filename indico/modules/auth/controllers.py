@@ -13,7 +13,7 @@ from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
-from indico.core.auth import login_rate_limiter, multipass
+from indico.core.auth import login_rate_limiter, multipass, signup_rate_limiter
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.marshmallow import mm
@@ -29,6 +29,7 @@ from indico.modules.auth.views import WPAuth, WPAuthUser, WPSignup
 from indico.modules.users import User, user_management_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.models.affiliations import Affiliation
+from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _, force_locale
 from indico.util.marshmallow import LowercaseString, ModelField, not_empty
 from indico.util.passwords import validate_secure_password
@@ -273,7 +274,15 @@ class RHRegister(RH):
     def _process_verify(self, handler):
         form = handler.create_verify_email_form()
         if form.validate_on_submit():
-            return self._send_confirmation(form.email.data)
+            rate_limit_exceeded = not signup_rate_limiter.test()
+            if not rate_limit_exceeded:
+                signup_rate_limiter.hit()
+                return self._send_confirmation(form.email.data)
+            else:
+                retry_in = signup_rate_limiter.get_reset_delay()
+                delay = format_human_timedelta(retry_in, 'minutes')
+                flash(_('Too many verification email sent. Please wait {}').format(delay), 'warning')
+                return redirect(url_for('.register', provider=self.provider_name))
         return WPSignup.render_template('register_verify.html', form=form,
                                         email_sent=session.pop('register_verification_email_sent', False))
 

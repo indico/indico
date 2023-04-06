@@ -18,6 +18,7 @@ from indico.core.logger import Logger
 
 logger = Logger.get('auth')
 login_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('login', config.FAILED_LOGIN_RATE_LIMIT)))
+signup_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('signup', config.SIGNUP_RATE_LIMIT)))
 
 
 class IndicoMultipass(Multipass):
