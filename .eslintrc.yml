@@ -73,6 +73,14 @@ rules:
     - error
     - event
 
+overrides:
+  - files:
+      - indico/web/client/js/react/components/**/*
+      - indico/web/client/js/react/forms/final-form.jsx
+      - indico/modules/rb/**/*
+    rules:
+      import/no-cycle: off
+
 globals:
   Indico: false
   IndicoUI: false
