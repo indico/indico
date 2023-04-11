@@ -31,6 +31,9 @@ def run_cmd(info, **kwargs):
             return
         run_watchman()
         return
+    elif kwargs['reloader_type'] == 'watchfiles':
+        run_watchfiles()
+        return
     run_server(info, **kwargs)
 
 
@@ -41,6 +44,11 @@ def run_watchman():
     except pywatchman.WatchmanError as exc:
         from indico.util.console import cformat
         print(cformat('%{red!}watchman error: {}').format(exc))
+
+
+def run_watchfiles():
+    from .watchfiles import Watchfiles
+    Watchfiles().run()
 
 
 def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from, reloader_type):

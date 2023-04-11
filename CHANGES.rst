@@ -44,6 +44,7 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Update Python & JavaScript dependencies (:pr:`5726`)
+- Add support for the watchfiles live reloader (:pr:`5732`)
 
 
 Version 3.2.3
