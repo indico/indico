@@ -11,7 +11,6 @@ import path from 'path';
 
 import autoprefixer from 'autoprefixer';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import importOnce from 'node-sass-import-once';
 import postcssURL from 'postcss-url';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
@@ -29,18 +28,6 @@ function _resolveTheme(rootPath, indicoClientPath, filePath) {
   }
 
   return path.resolve(rootPath, filePath);
-}
-
-function _importOnce(...args) {
-  // Due to https://github.com/webpack-contrib/sass-loader/pull/958/files we need to
-  // use a different context for the importOnce plugin in order to keep the cache
-  // between calls to this function.
-  // Using a global one might work as well but like this it's scoped with the same
-  // lifetime which we had before the sass-loader update as `options` is cloned at
-  // the same time the object previously used in `this` was created (`context` in
-  // `getOptions`).
-  this.options._ctx = this.options._ctx || {options: this.options};
-  return importOnce.apply(this.options._ctx, args);
 }
 
 export function getThemeEntryPoints(config, prefix) {
@@ -213,8 +200,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
           sourceMap: true,
           sassOptions: {
             includePaths: [scssIncludePath],
-            outputStyle: 'compact',
-            importer: [sassResolver, _importOnce],
+            importer: [sassResolver],
           },
         },
       },

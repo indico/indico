@@ -184,15 +184,15 @@ div.session-bar {
     font-weight: normal;
 
     &.protection-public {
-      @extend .i-button.accept;
+      @extend .accept;
     }
 
     &.protection-restricted {
-      @extend .i-button.danger;
+      @extend .danger;
     }
 
     &.protection-network {
-      @extend .i-button.warning;
+      @extend .warning;
     }
   }
 

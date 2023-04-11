@@ -136,7 +136,6 @@ $i-box-padding: 10px;
   @extend %default-border-radius;
   @include border-all();
   @include single-box-shadow();
-  @include transition();
   @include transition(padding-bottom);
 
   box-sizing: border-box;

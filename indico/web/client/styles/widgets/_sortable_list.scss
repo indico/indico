@@ -86,7 +86,7 @@
 
     &.disabled li {
       &:hover:not(.ui-sortable-helper) {
-        @extend .i-label.striped;
+        @extend .i-label, .striped;
         background-color: lighten($i-label-color, 50%);
       }
 

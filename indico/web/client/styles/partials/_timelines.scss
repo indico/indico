@@ -60,8 +60,7 @@
   }
 
   .i-timeline-item-box {
-    @extend .i-box;
-    @extend .i-box.no-shadow;
+    @extend .i-box, .no-shadow;
     flex-grow: 1;
     position: relative;
     min-width: 0;

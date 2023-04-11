@@ -38,11 +38,7 @@
 }
 
 .categorynav .category-list {
-  @extend .i-box;
-  @extend .i-box.no-shadow;
-  @extend .i-box.just-group-list;
-  @extend .i-box.just-group-list.with-hover-effect;
-  @extend .flexcol;
+  @extend .i-box, .no-shadow, .just-group-list, .with-hover-effect, .flexcol;
 
   background: $light-gray;
   flex-grow: 1;
@@ -129,8 +125,7 @@
     }
 
     .action-button {
-      @extend .i-button;
-      @extend .i-button.highlight;
+      @extend .i-button, .highlight;
       visibility: hidden;
     }
   }

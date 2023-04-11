@@ -153,8 +153,7 @@ ul {
     display: none;
 
     &:checked + label {
-      @extend .i-button.highlight;
-      @extend .i-button.highlight.open;
+      @extend .i-button, .highlight, .open;
     }
 
     &:first-child + label {
@@ -174,7 +173,7 @@ ul {
 
     &:checked + label:hover,
     &:checked + label:active {
-      @extend .i-button.highlight.open;
+      @extend .i-button, .highlight, .open;
     }
   }
 }

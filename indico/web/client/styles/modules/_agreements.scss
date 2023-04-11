@@ -6,8 +6,7 @@
 // LICENSE file for more details.
 
 .agreement-form-sections {
-  @extend .i-box-group;
-  @extend .i-box-group.vert;
+  @extend .i-box-group, .vert;
   color: $black;
   margin-bottom: 1em;
 
