@@ -21,12 +21,11 @@ const isValid = value => /^\S+@\S+\.\S+$/.test(value);
  */
 const EmailListField = props => {
   const {value, disabled, onChange, onFocus, onBlur} = props;
-  const [options, setOptions] = useState(value.filter(isValid).map(x => ({text: x, value: x})));
   const [searchQuery, setSearchQuery] = useState('');
+  const options = value.filter(isValid).map(x => ({text: x, value: x}));
 
   const setValue = newValue => {
     newValue = _.uniq(newValue.filter(isValid));
-    setOptions(newValue.map(x => ({text: x, value: x})));
     onChange(newValue);
     onFocus();
     onBlur();

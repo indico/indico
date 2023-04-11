@@ -36,6 +36,8 @@ Bugfixes
 - Fix being unable to set the "speakers and authors" as the default contribution
   submitter type (:pr:`5711`)
 - Check server-side if Call for Papers is open when submitting a paper (:pr:`5725`)
+- Fix room notification email list showing up empty when editing it (:issue:`5729`,
+  :pr:`5731`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
