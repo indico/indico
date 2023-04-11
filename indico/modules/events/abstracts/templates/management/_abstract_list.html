@@ -241,6 +241,10 @@
                                         <td class="i-table" data-text="{{ abstract.modified_dt }}">
                                             {{ abstract.modified_dt | format_datetime('short', timezone=abstract.event.timezone) if abstract.modified_dt else '-' }}
                                         </td>
+                                    {% elif item.id == 'submission_comment' %}
+                                        <td class="i-table" data-searchable="{{ abstract.submission_comment | lower }}">
+                                            {{ abstract.submission_comment }}
+                                        </td>
                                     {% endif %}
                                 {% endfor %}
                                 {% set data = abstract.data_by_field %}

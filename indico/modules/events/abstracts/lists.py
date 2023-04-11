@@ -52,7 +52,8 @@ class AbstractListGeneratorBase(ListGeneratorBase):
             'score': {'title': _('Score')},
             'submitted_dt': {'title': _('Submission date')},
             'modified_dt': {'title': _('Modification date')},
-            'description': {'title': _('Content')}
+            'description': {'title': _('Content')},
+            'submission_comment': {'title': _('Submission comment')}
         }
         self.extra_filters = {}
         self.list_config = self._get_config()
