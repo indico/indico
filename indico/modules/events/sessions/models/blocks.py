@@ -27,6 +27,7 @@ class SessionBlock(LocationMixin, db.Model):
                          db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
                          {'schema': 'events'})
     location_backref_name = 'session_blocks'
+    allow_relationship_preloading = True
 
     @declared_attr
     def __table_args__(cls):

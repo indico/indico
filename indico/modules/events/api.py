@@ -28,8 +28,10 @@ from indico.modules.categories.models.legacy_mapping import LegacyCategoryMappin
 from indico.modules.categories.serialize import serialize_categories_ical
 from indico.modules.events import Event
 from indico.modules.events.contributions import contribution_settings
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.entries import TimetableEntry
@@ -453,10 +455,23 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         # acl_user_strategy.noload('_primary_email')
         creator_strategy = joinedload('creator')
         contributions_strategy = subqueryload('contributions')
+        contributions_strategy.joinedload('legacy_mapping')
         contributions_strategy.subqueryload('references')
+        contributions_strategy.selectinload('person_links')
+        contributions_strategy.selectinload('track').joinedload('track_group')
+        contributions_strategy.selectinload('type')
+        contributions_strategy.selectinload('note')
         if detail_level in {'subcontributions', 'sessions'}:
-            contributions_strategy.subqueryload('subcontributions').subqueryload('references')
+            subcontrib_strategy = contributions_strategy.subqueryload('subcontributions')
+            subcontrib_strategy.subqueryload('references')
+            subcontrib_strategy.subqueryload('legacy_mapping')
+            subcontrib_strategy.selectinload('person_links')
+            subcontrib_strategy.selectinload('note')
         sessions_strategy = subqueryload('sessions')
+        sessions_strategy.joinedload('legacy_mapping')
+        session_block_strategy = sessions_strategy.subqueryload('blocks')
+        session_block_strategy.selectinload('person_links')
+        session_block_strategy.selectinload('note')
         options = [acl_user_strategy, creator_strategy]
         if detail_level in {'contributions', 'subcontributions', 'sessions'}:
             options.append(contributions_strategy)
@@ -501,12 +516,21 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             idlist = list(map(int, idlist))
         except ValueError:
             raise HTTPAPIError('Event IDs must be numeric', 400)
-        query = (Event.query
-                 .filter(Event.id.in_(idlist),
+        event_filters = (Event.id.in_(idlist),
                          ~Event.is_deleted,
                          Event.happens_between(self._fromDT, self._toDT))
+        query = (Event.query
+                 .filter(*event_filters)
                  .options(*self._get_query_options(self._detail_level)))
         query = self._update_query(query)
+        Contribution.preload_relationships(
+            Contribution.query.join(Event).filter(*event_filters),
+            'timetable_entry'
+        )
+        SessionBlock.preload_relationships(
+            SessionBlock.query.join(Session).join(Event).filter(*event_filters),
+            'timetable_entry'
+        )
         return self.serialize_events(x for x in query if self._filter_event(x) and x.can_access(self.user))
 
     def _filter_event(self, event):
