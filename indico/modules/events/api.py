@@ -320,7 +320,8 @@ class SerializerBase:
             'description': '',  # Session blocks don't have a description
             'title': block.full_title,
             'url': url_for('sessions.display_session', block.session, _external=True),
-            'contributions': [self._serialize_contribution(c) for c in block.contributions],
+            'contributions': [self._serialize_contribution(c) for c in block.event.contributions
+                              if c.session_block == block],
             'note': build_note_api_data(block.note),
             'session': serialized_session,
             'room': block.get_room_name(full=False),
@@ -470,9 +471,9 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             subcontrib_strategy.selectinload('note')
         sessions_strategy = subqueryload('sessions')
         sessions_strategy.joinedload('legacy_mapping')
+        sessions_strategy.selectinload('note')
         session_block_strategy = sessions_strategy.subqueryload('blocks')
         session_block_strategy.selectinload('person_links')
-        session_block_strategy.selectinload('note')
         options = [acl_user_strategy, creator_strategy]
         if detail_level in {'contributions', 'subcontributions', 'sessions'}:
             options.append(contributions_strategy)
