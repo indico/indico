@@ -229,7 +229,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                                    attachments=attachments)
             signals.core.before_notification_send.send('registration-custom-email', email=email,
                                                        registration=registration, form=form)
-            send_email(email, self.event, 'Registration', log_metadata={'registration_id': registration.id})
+            send_email(email, self.event, 'Registration', session.user,
+                       log_metadata={'registration_id': registration.id})
 
     def _process(self):
         with self.regform.event.force_event_locale():
