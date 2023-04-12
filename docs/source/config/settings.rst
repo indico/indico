@@ -90,9 +90,7 @@ Authentication
     Applies a rate limit to sending verification email in signup attempts.
     When specifying multiple rate limits separated with a semicolon,
     they are checked in that specific order, which can allow for a short burst of
-    attempts (e.g. a legitimate user trying multiple passwords they commonly use)
-    and then slowing down more strongly (in case someone tries to brute-force more
-    than just a few passwords).
+    attempts.
 
     Rate limiting is applied by IP address and each verification email sent counts against the
     rate limit.
