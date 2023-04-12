@@ -7,6 +7,8 @@
 
 /* Animation utility constructs */
 
+@use './palette';
+
 @mixin indico-animation($name, $duration, $timing-function, $count) {
   animation-name: $name;
   -webkit-animation-name: $name;
@@ -67,7 +69,7 @@
 
 @keyframes highlight {
   0% {
-    background-color: $blue;
+    background-color: palette.$blue;
   }
 
   100% {

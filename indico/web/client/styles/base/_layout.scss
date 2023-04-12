@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import './utilities';
+@use './utilities';
 
 body {
   @extend .flexcol;
@@ -119,7 +119,7 @@ body > * {
         text-align: left;
 
         span {
-          @include ellipsis();
+          @include utilities.ellipsis();
         }
       }
     }
@@ -131,7 +131,7 @@ body > * {
   }
 
   .side-menu-label {
-    @include ellipsis();
+    @include utilities.ellipsis();
     margin-right: 0.5rem;
 
     & + .badge {

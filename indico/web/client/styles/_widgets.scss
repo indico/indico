@@ -5,6 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'widgets/occurrences';
-@import 'widgets/permissions';
-@import 'widgets/sortable_list';
+@forward 'widgets/occurrences';
+@forward 'widgets/permissions';
+@forward 'widgets/sortable_list';

@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use './palette';
+
 %font-family-body {
   font-family: 'Liberation Sans', sans-serif;
 }
@@ -80,7 +82,7 @@ td,
 dl,
 ol,
 blockquote {
-  color: $black;
+  color: palette.$black;
 }
 
 h1 {
@@ -131,7 +133,7 @@ pre {
   margin-top: 0;
   font-size: 2em;
   font-weight: normal;
-  color: $dark-orange;
+  color: palette.$dark-orange;
 }
 
 .group-title {
@@ -225,15 +227,15 @@ td.groupSubTitle {
 }
 
 .text-error {
-  color: $red;
+  color: palette.$red;
 }
 
 .text-not-important {
-  color: $light-black;
+  color: palette.$light-black;
 }
 
 .text-superfluous {
-  color: $gray;
+  color: palette.$gray;
 }
 
 .text-paper {
@@ -254,7 +256,7 @@ td.groupSubTitle {
 }
 
 a.small-link {
-  color: $light-black;
+  color: palette.$light-black;
   font-size: 11px;
 }
 
@@ -265,7 +267,7 @@ code {
 
 textarea.log {
   @extend .mono;
-  color: $dark-gray;
+  color: palette.$dark-gray;
   font-size: 0.7em;
 }
 

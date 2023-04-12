@@ -5,16 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use './palette';
+@use './borders';
+
 $semantic-color-map: (
-  highlight: $blue,
-  success: $green,
-  error: $red,
-  warning: $yellow,
-  visited: $purple,
-  strong: $black,
-  editing-rejected: $midnight-black,
-  editing-make-changes: $bright-yellow,
-  editing-request-changes: $dark-red,
+  highlight: palette.$blue,
+  success: palette.$green,
+  error: palette.$red,
+  warning: palette.$yellow,
+  visited: palette.$purple,
+  strong: palette.$black,
+  editing-rejected: palette.$midnight-black,
+  editing-make-changes: palette.$bright-yellow,
+  editing-request-changes: palette.$dark-red,
 );
 
 // styles that are prefixed with 'editing-' are used exclusively
@@ -33,12 +36,12 @@ $semantic-styles: (
 );
 
 @mixin _semantic-background($color) {
-  @include border-all($color);
+  @include borders.border-all($color);
   background: $color;
 }
 
 @mixin _semantic-outline($color) {
-  @include border-all($color);
+  @include borders.border-all($color);
   color: $color;
 }
 
@@ -59,7 +62,7 @@ $semantic-styles: (
 }
 
 %semantic-background {
-  @include _semantic-background($dark-gray);
+  @include _semantic-background(palette.$dark-gray);
   color: white;
 
   @each $style in $semantic-styles {
@@ -70,7 +73,7 @@ $semantic-styles: (
 }
 
 %semantic-outline {
-  @include _semantic-outline($dark-gray);
+  @include _semantic-outline(palette.$dark-gray);
 
   @each $style in $semantic-styles {
     &.#{$style} {
@@ -80,24 +83,24 @@ $semantic-styles: (
 }
 
 %semantic-link {
-  color: $gray;
+  color: palette.$gray;
 
   &:not(.disabled) {
     &:hover,
     &:active,
     &.active {
-      color: $black;
+      color: palette.$black;
       @include _semantic-colors();
     }
   }
 
   &.disabled {
-    color: $gray;
+    color: palette.$gray;
   }
 }
 
 .semantic-text {
-  color: $dark-gray;
+  color: palette.$dark-gray;
   @include _semantic-colors();
 }
 

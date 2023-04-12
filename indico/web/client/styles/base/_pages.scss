@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use './palette';
+@use './typography' as *;
+
 %indico-page {
   header {
     $separator-margin: 0.42rem;
@@ -23,7 +26,7 @@
     }
 
     h3 {
-      color: $light-black;
+      color: palette.$light-black;
       margin-top: $separator-margin;
     }
 
@@ -32,10 +35,10 @@
       top: 11px;
       left: -20px;
       font-size: 15px;
-      color: $pastel-gray;
+      color: palette.$pastel-gray;
 
       &:hover {
-        color: $dark-gray;
+        color: palette.$dark-gray;
       }
     }
 
@@ -44,7 +47,7 @@
       align-items: flex-start;
       padding-top: 0.4rem;
       min-height: 2rem;
-      border-bottom: 1px solid $separator-color;
+      border-bottom: 1px solid palette.$separator-color;
       margin-bottom: 1rem;
 
       > .text {
@@ -74,14 +77,14 @@
     .page-description {
       @extend %font-family-title-light;
       @extend .fixed-width;
-      color: $dark-gray;
+      color: palette.$dark-gray;
       font-size: 1.2em;
       margin-top: $separator-margin;
     }
 
     .page-info {
       @extend %font-family-title;
-      color: $dark-gray;
+      color: palette.$dark-gray;
       margin-top: $separator-margin;
     }
   }
@@ -99,8 +102,8 @@
   @extend .flexrow;
 
   $banner-color: #000;
-  $banner-title-color: $dark-orange;
-  $banner-subtitle-color: $dark-gray;
+  $banner-title-color: palette.$dark-orange;
+  $banner-subtitle-color: palette.$dark-gray;
   $banner-title-margin: 19px;
 
   color: $banner-color;
@@ -205,7 +208,7 @@
   @extend %indico-page;
 
   header h2 {
-    color: $dark-orange;
+    color: palette.$dark-orange;
     padding-right: 5px;
 
     .track-name {
@@ -219,7 +222,7 @@
   margin: 2em auto 0 auto;
 
   h1 {
-    color: $dark-blue;
+    color: palette.$dark-blue;
   }
 }
 

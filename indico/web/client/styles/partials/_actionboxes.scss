@@ -9,6 +9,11 @@
 // Base definitions
 // ============================================================================
 
+@use 'base/layout' as *;
+@use 'base/palette' as *;
+@use 'base/borders' as *;
+@use 'base/animation' as *;
+
 %action-box {
   box-sizing: border-box;
   @extend %default-border-radius;
