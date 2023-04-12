@@ -8,7 +8,7 @@
 from operator import attrgetter
 
 from flask import request
-from sqlalchemy.orm import subqueryload, undefer
+from sqlalchemy.orm import selectinload, subqueryload, undefer
 
 from indico.core.db import db
 from indico.modules.events.contributions import Contribution
@@ -65,7 +65,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
     def _build_query(self):
         return (Contribution.query.with_parent(self.event)
                 .order_by(Contribution.friendly_id)
-                .options(subqueryload('_paper_last_revision'),
+                .options(subqueryload('_paper_last_revision').options(selectinload('reviews')),
                          subqueryload('paper_judges'),
                          subqueryload('paper_content_reviewers'),
                          subqueryload('paper_layout_reviewers'),

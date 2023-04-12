@@ -39,6 +39,9 @@ Bugfixes
 - Check server-side if Call for Papers is open when submitting a paper (:pr:`5725`)
 - Fix room notification email list showing up empty when editing it (:issue:`5729`,
   :pr:`5731`)
+- Fix performance issues in paper assignment list (:pr:`5736`)
+- Fix performance issues in event export API with large events when including
+  contributions (:pr:`5736`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
