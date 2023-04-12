@@ -278,7 +278,7 @@ class SerializerBase:
             'location': event.venue_name,
             'address': event.address,
             'type': event.type_.legacy_name,
-            'references': list(map(self.serialize_reference, event.references))
+            'references': [self.serialize_reference(x) for x in event.references]
         }
 
     def _serialize_reservations(self, reservations):
@@ -320,7 +320,7 @@ class SerializerBase:
             'description': '',  # Session blocks don't have a description
             'title': block.full_title,
             'url': url_for('sessions.display_session', block.session, _external=True),
-            'contributions': list(map(self._serialize_contribution, block.contributions)),
+            'contributions': [self._serialize_contribution(c) for c in block.contributions],
             'note': build_note_api_data(block.note),
             'session': serialized_session,
             'room': block.get_room_name(full=False),
@@ -387,12 +387,13 @@ class SerializerBase:
             'keywords': contrib.keywords,
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
-            'references': list(map(self.serialize_reference, contrib.references)),
+            'references': [self.serialize_reference(x) for x in contrib.references],
             'board_number': contrib.board_number,
             'code': contrib.code,
         }
         if include_subcontribs:
-            data['subContributions'] = list(map(self._serialize_subcontribution, contrib.subcontributions))
+            data['subContributions'] = [self._serialize_subcontribution(sc)
+                                        for sc in contrib.subcontributions]
         if can_manage:
             data['allowed'] = self._serialize_access_list(contrib)
         return data
@@ -413,7 +414,7 @@ class SerializerBase:
             'folders': build_folders_api_data(subcontrib),
             'speakers': self._serialize_persons(subcontrib.speakers, person_type='SubContribParticipation',
                                                 can_manage=can_manage),
-            'references': list(map(self.serialize_reference, subcontrib.references)),
+            'references': [self.serialize_reference(x) for x in subcontrib.references],
             'code': subcontrib.code,
         }
         return data
@@ -482,7 +483,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
 
     def category(self, idlist, format):
         try:
-            idlist = list(map(int, idlist))
+            idlist = [int(x) for x in idlist]
         except ValueError:
             raise HTTPAPIError('Category IDs must be numeric', 400)
         if format == 'ics':
@@ -513,7 +514,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
 
     def event(self, idlist):
         try:
-            idlist = list(map(int, idlist))
+            idlist = [int(x) for x in idlist]
         except ValueError:
             raise HTTPAPIError('Event IDs must be numeric', 400)
         event_filters = (Event.id.in_(idlist),
@@ -569,7 +570,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         return query
 
     def serialize_events(self, events):
-        return list(map(self._build_event_api_data, events))
+        return [self._build_event_api_data(e) for e in events]
 
     def _serialize_category_path(self, category):
         visibility = {'id': None, 'name': 'Everywhere'}
