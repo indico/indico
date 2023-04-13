@@ -7,7 +7,7 @@
 
 /* Animation utility constructs */
 
-@use './palette';
+@use './palette' as *;
 @use './defaults' as *;
 
 @mixin indico-animation($name, $duration, $timing-function, $count) {
@@ -70,7 +70,7 @@
 
 @keyframes highlight {
   0% {
-    background-color: palette.$blue;
+    background-color: $blue;
   }
 
   100% {

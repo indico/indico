@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
 @use 'rb:styles/palette' as *;
 
 :global(.ui.list) > .upcoming-bookings-item:global(.item) {

@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
-@use 'base/theme' as *;
 
 .i-tag {
   @include semantic-background();
@@ -28,7 +27,7 @@
     }
 
     &.contrast {
-      background: white;
+      background: $white;
     }
   }
 }

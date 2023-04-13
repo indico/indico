@@ -11,9 +11,7 @@
 @use 'base/palette' as *;
 @use 'base/animation' as *;
 @use 'base/typography' as *;
-
 @use 'partials/boxes' as *;
-
 @use 'modules/contributions/display' as *;
 
 $editor-preview-bg-color: $light-gray;

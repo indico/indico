@@ -5,19 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use './palette';
-@use './borders';
+@use './palette' as *;
+@use './borders' as *;
 
 $semantic-color-map: (
-  highlight: palette.$blue,
-  success: palette.$green,
-  error: palette.$red,
-  warning: palette.$yellow,
-  visited: palette.$purple,
-  strong: palette.$black,
-  editing-rejected: palette.$midnight-black,
-  editing-make-changes: palette.$bright-yellow,
-  editing-request-changes: palette.$dark-red,
+  highlight: $blue,
+  success: $green,
+  error: $red,
+  warning: $yellow,
+  visited: $purple,
+  strong: $black,
+  editing-rejected: $midnight-black,
+  editing-make-changes: $bright-yellow,
+  editing-request-changes: $dark-red,
 );
 
 // styles that are prefixed with 'editing-' are used exclusively
@@ -36,12 +36,12 @@ $semantic-styles: (
 );
 
 @mixin _semantic-background($color) {
-  @include borders.border-all($color);
+  @include border-all($color);
   background: $color;
 }
 
 @mixin _semantic-outline($color) {
-  @include borders.border-all($color);
+  @include border-all($color);
   color: $color;
 }
 
@@ -62,7 +62,7 @@ $semantic-styles: (
 }
 
 @mixin semantic-background {
-  @include _semantic-background(palette.$dark-gray);
+  @include _semantic-background($dark-gray);
   color: white;
 
   @each $style in $semantic-styles {
@@ -73,7 +73,7 @@ $semantic-styles: (
 }
 
 @mixin semantic-outline {
-  @include _semantic-outline(palette.$dark-gray);
+  @include _semantic-outline($dark-gray);
 
   @each $style in $semantic-styles {
     &.#{$style} {
@@ -83,24 +83,24 @@ $semantic-styles: (
 }
 
 @mixin semantic-link {
-  color: palette.$gray;
+  color: $gray;
 
   &:not(.disabled) {
     &:hover,
     &:active,
     &.active {
-      color: palette.$black;
+      color: $black;
       @include _semantic-colors();
     }
   }
 
   &.disabled {
-    color: palette.$gray;
+    color: $gray;
   }
 }
 
 .semantic-text {
-  color: palette.$dark-gray;
+  color: $dark-gray;
   @include _semantic-colors();
 }
 

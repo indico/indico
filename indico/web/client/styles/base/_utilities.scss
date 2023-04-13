@@ -20,14 +20,7 @@
   @extend .#{$icon-class}-after;
 
   &::after {
-    // TODO: target selector not found
-    // @include adjacent-icon();
-    font-family: 'icomoon-ultimate';
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    -webkit-font-smoothing: antialiased;
+    @include adjacent-icon();
     margin-left: 0.2em;
   }
 }
@@ -36,13 +29,7 @@
   @extend .#{$icon-class};
 
   &::before {
-    font-family: 'icomoon-ultimate';
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    -webkit-font-smoothing: antialiased;
-    // @include adjacent-icon();
+    @include adjacent-icon();
   }
 }
 

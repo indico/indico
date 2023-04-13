@@ -9,14 +9,14 @@
 // Custom mixins default variables
 // -----------------------------------------------------------------------------
 
-@use './palette';
+@use './palette' as *;
 
 $default-border-radius: 2px;
 $default-transition-duration: 0.25s;
 $default-transition-function: ease-out;
 $default-transition-delay: null;
 
-$default-border-color: palette.$pastel-gray;
+$default-border-color: $pastel-gray;
 $default-border-style: solid;
 $default-border-width: 1px;
 
@@ -28,7 +28,7 @@ $default-box-shadow-h-offset: 1px;
 $default-box-shadow-v-offset: 1px;
 $default-box-shadow-blur: 1px;
 $default-box-shadow-spread: null;
-$default-box-shadow-color: lighten(palette.$gray, $color-variation);
+$default-box-shadow-color: lighten($gray, $color-variation);
 
 // -----------------------------------------------------------------------------
 // Custom mixins

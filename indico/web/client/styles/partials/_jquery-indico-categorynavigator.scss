@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
-
 @use 'partials/forms' as *;
 @use 'partials/boxes' as *;
 
@@ -131,6 +130,7 @@
 
     .action-button {
       @extend .i-button, .highlight;
+      padding: 4px 10px 4px;
       visibility: hidden;
     }
   }
