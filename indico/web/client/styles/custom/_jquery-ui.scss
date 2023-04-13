@@ -10,6 +10,7 @@
 @use 'base/animation' as *;
 @use 'base/utilities' as *;
 @use 'base/borders' as *;
+@use 'base/typography' as *;
 
 @use 'partials/boxes' as *;
 
@@ -18,7 +19,7 @@
 }
 
 .ui-corner-all {
-  @extend %default-border-radius;
+  @include default-border-radius;
 
   .ui-dialog-content {
     /* For some reason the dialogs don't get their bottom corners rounded without this. */
@@ -41,11 +42,11 @@
 }
 
 .ui-widget {
-  @extend %font-family-body;
+  @include font-family-body;
 
   textarea,
   button {
-    @extend %font-family-body;
+    @include font-family-body;
   }
 }
 

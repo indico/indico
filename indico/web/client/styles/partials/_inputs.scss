@@ -5,17 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/borders' as *;
-@use 'base/animation' as *;
-@use 'base/defaults' as *;
-@use 'base/utilities' as *;
+@use 'base' as *;
 
 @use 'partials/toolbars' as  *;
+@use 'partials/buttons' as *;
 
-%text-input-base {
+@mixin input-invalid {
+  @include border-all($red);
+}
+
+@mixin text-input-base {
   @include border-all();
-  @extend %default-border-radius;
+  @include default-border-radius;
   box-sizing: border-box;
   @include transition(border-color 0.12s);
   color: $black;
@@ -28,16 +29,12 @@
   }
 
   &.hasError {
-    @extend %input-invalid;
+    @include input-invalid;
   }
 
   &:-moz-ui-invalid {
     box-shadow: none;
   }
-}
-
-%input-invalid {
-  @include border-all($red);
 }
 
 :not(.ui) {
@@ -54,7 +51,7 @@
   > input[type='time'],
   > input[type='url'],
   > input[type='week'] {
-    @extend %text-input-base;
+    @include text-input-base;
   }
 
   // the react timepicker has an input with no type
@@ -108,12 +105,12 @@ input[type='time'] {
 }
 
 textarea {
-  @extend %text-input-base;
+  @include text-input-base;
   resize: vertical;
 }
 
 select {
-  @extend %text-input-base;
+  @include text-input-base;
   background: white;
 
   @mixin no-value {
@@ -168,7 +165,7 @@ ul {
     }
 
     &:disabled + label.i-button {
-      @extend %button-disabled;
+      @include button-disabled;
     }
   }
 
@@ -198,7 +195,7 @@ ul {
 $dropdown-transition-step: 0.05s;
 $dropdown-transition: $dropdown-transition-step ease-out;
 
-%dropdown-visible {
+@mixin dropdown-visible {
   visibility: visible;
   opacity: 1;
   @include transition(
@@ -209,7 +206,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   );
 }
 
-%dropdown-hidden {
+@mixin dropdown-hidden {
   visibility: hidden;
   opacity: 0;
   height: 0 !important;
@@ -350,7 +347,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 }
 
-%tilted-strips-bg {
+@mixin tilted-strips-bg {
   @include placeholder-color($color: $light-black);
   background: repeating-linear-gradient(
     -40deg,
@@ -364,7 +361,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 .i-has-action {
-  @extend %toolbar-group;
+  @include toolbar-group;
   @extend .flexrow;
   padding: 0;
 

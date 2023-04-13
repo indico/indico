@@ -48,7 +48,7 @@ $pending-cancellation-fadeout-colors: $pending-cancellation-color,
 $rejection-fadeout-colors: $rejection-color, lighten($rejection-color, 30%);
 $other-booking-fadeout-colors: $other-booking-color, lighten($other-booking-color, 30%);
 
-%rb-splash-background {
+@mixin rb-splash-background {
   background-image: url('static:images/globe.png');
   background-size: cover;
 }

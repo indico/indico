@@ -5,11 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/borders' as *;
-@use 'base/animation' as *;
-@use 'base/defaults' as *;
-@use 'base/utilities' as *;
+@use 'base' as *;
+
+@use 'partials/boxes' as *;
 
 .padded-box {
   box-sizing: border-box;
@@ -33,7 +31,7 @@
   }
 
   .padded-box-content {
-    @extend %default-border-radius;
+    @include default-border-radius;
     color: $black;
     display: table-cell;
     padding: 10px;
@@ -43,7 +41,7 @@
     word-break: break-word;
 
     hr {
-      @extend %box-hr;
+      @include box-hr;
       @include border-bottom($color: $pastel-gray, $width: 2px);
     }
   }

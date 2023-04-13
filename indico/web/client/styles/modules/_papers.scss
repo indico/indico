@@ -79,7 +79,7 @@
 }
 
 .paper-contribution-list {
-  @extend %font-family-modern-body;
+  @include font-family-modern-body;
 
   .contribution-row {
     @include border-left($width: 3px);
@@ -205,7 +205,7 @@
   }
 
   .spotlight-file-name {
-    @extend %font-family-title;
+    @include font-family-title;
     font-size: 1.2em;
     color: $light-black;
 

@@ -80,7 +80,7 @@ $display-preview-bg-color: white;
   overflow-y: auto;
 
   &.empty {
-    @extend %font-family-sans;
+    @include font-family-sans;
     background-color: lighten($background-color, 2%);
     color: $gray;
     min-height: 2em;
@@ -118,7 +118,7 @@ $display-preview-bg-color: white;
 
 .wmd-input,
 .wmd-input:focus {
-  @extend %font-family-monospace;
+  @include font-family-monospace;
   @include transition(height 0.25s ease-out);
   box-shadow: none;
   @include border-all($width: 0);

@@ -15,8 +15,8 @@
 @use './boxes' as *;
 
 .qtip-default.qbubble {
-  @extend %qtip-light;
-  @extend %default-border-radius;
+  @include qtip-light;
+  @include default-border-radius;
   @include single-box-shadow();
   @include border-all();
   color: $light-black;

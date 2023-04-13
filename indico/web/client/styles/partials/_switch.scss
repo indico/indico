@@ -5,11 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/borders' as *;
-@use 'base/animation' as *;
-@use 'base/defaults' as *;
-@use 'base/utilities' as *;
+@use 'base' as *;
 
 $switch-transition-step: 0.05s;
 $switch-label-transition: $switch-transition-step ease-out;
@@ -22,7 +18,7 @@ $switch-right-shadow: (0.05em + $switch-shadow-blur) 0 $switch-shadow-blur (-$sw
   $switch-shadow-color;
 $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
-%switch-elem {
+@mixin switch-elem {
   position: relative;
   z-index: 100;
 
@@ -37,7 +33,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
   font-weight: normal;
 }
 
-%switch-elem-visible {
+@mixin switch-elem-visible {
   visibility: visible;
   opacity: 1;
   @include transition(
@@ -46,7 +42,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
   );
 }
 
-%switch-elem-hidden {
+@mixin switch-elem-hidden {
   visibility: hidden;
   opacity: 0;
   @include transition(
@@ -62,7 +58,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
   width: 6em;
   height: 1.6em;
 
-  @extend %default-border-radius;
+  @include default-border-radius;
   background-color: lighten($dark-gray, $color-variation);
   box-shadow: $switch-shadow-border $dark-gray, $switch-inner-shadow;
   user-select: none;
@@ -76,15 +72,15 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     cursor: pointer;
 
     &::before {
-      @extend %switch-elem;
-      @extend %switch-elem-visible;
+      @include switch-elem;
+      @include switch-elem-visible;
       color: $light-black;
       content: attr(data-off);
     }
 
     &::after {
-      @extend %switch-elem;
-      @extend %switch-elem-hidden;
+      @include switch-elem;
+      @include switch-elem-hidden;
       color: $light-blue;
       content: attr(data-on);
     }
@@ -100,7 +96,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     display: inline-block;
     width: 50%;
     height: 100%;
-    @extend %default-border-radius;
+    @include default-border-radius;
 
     background: #eaeaea;
     box-shadow: $switch-shadow-border $gray, $switch-right-shadow;
@@ -123,11 +119,11 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     &:checked {
       & + .switch-label {
         &::before {
-          @extend %switch-elem-hidden;
+          @include switch-elem-hidden;
         }
 
         &::after {
-          @extend %switch-elem-visible;
+          @include switch-elem-visible;
         }
 
         & + .switch-handle {

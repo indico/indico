@@ -73,7 +73,7 @@ $display-preview-bg-color: white;
   overflow-y: auto;
 
   &.empty {
-    @extend %font-family-sans;
+    @include font-family-sans;
     background-color: lighten($background-color, 2%);
     color: $gray;
     min-height: 2em;

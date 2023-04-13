@@ -5,14 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/borders' as *;
-@use 'base/animation' as *;
-@use 'base/defaults' as *;
-@use 'base/utilities' as *;
-@use 'base/indicators' as *;
+@use 'base' as *;
 
-%time-information {
+@use 'partials/boxes' as *;
+
+@mixin time-information {
   time {
     color: $gray;
 
@@ -55,7 +52,7 @@
   margin-top: 1rem;
 
   .i-timeline-item-label {
-    @extend %default-border-radius;
+    @include default-border-radius;
     @include border-all($color: transparent);
     box-sizing: border-box;
     margin-right: 12px;
@@ -73,7 +70,7 @@
     min-width: 0;
 
     .i-box-header {
-      @extend %time-information;
+      @include time-information;
       // To match i-timeline-item-label height
       min-height: $min-height;
 
@@ -109,7 +106,7 @@
   }
 
   .i-timeline-item-metadata {
-    @extend %time-information;
+    @include time-information;
     display: flex;
     align-items: center;
     color: $light-black;
@@ -121,7 +118,7 @@
 }
 
 .i-timeline-item-label.action {
-  @extend %semantic-background;
+  @include semantic-background;
   display: flex;
   color: white;
   background: $dark-gray;

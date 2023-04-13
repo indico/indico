@@ -5,11 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/defaults' as *;
-@use 'base/animation' as *;
-@use 'base/utilities' as *;
-@use 'base/borders' as *;
+@use 'base' as *;
+
+@use 'partials/boxes' as *;
 
 .agreement-form-sections {
   @extend .i-box-group, .vert;

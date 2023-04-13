@@ -23,7 +23,7 @@
 
   & > span {
     /* from the role-code mixin */
-    @extend %default-border-radius;
+    @include default-border-radius;
     @include border-all();
     padding: 0.3em 0.1em;
     font-size: 0.9em;

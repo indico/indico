@@ -5,11 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/borders' as *;
-@use 'base/animation' as *;
-@use 'base/defaults' as *;
-@use 'base/utilities' as *;
+@use 'base' as *;
 
 @use './labels' as *;
 
@@ -121,11 +117,11 @@
   max-width: 1200px;
 }
 
-%enabled-action {
+@mixin enabled-action {
   @include icon-before('icon-eye');
 }
 
-%not-enabled-action {
+@mixin not-enabled-action {
   @include icon-before('icon-eye-blocked');
   color: $red !important;
 }
@@ -205,12 +201,12 @@
 
         > .visibility {
           &.enabled {
-            @extend %enabled-action;
+            @include enabled-action;
             display: none;
           }
 
           &:not(.enabled) {
-            @extend %not-enabled-action;
+            @include not-enabled-action;
           }
         }
       }
@@ -250,7 +246,7 @@
 }
 
 #filter-placeholder {
-  @extend %font-family-title;
+  @include font-family-title;
 
   display: none;
   font-size: 1.2em;

@@ -15,6 +15,179 @@ $toolbar-height: 2.2em;
 $toolbar-thin-height: 1.9em;
 $toolbar-spacing: 10px;
 
+@mixin toolbar-group {
+  @include toolbar-group-inputs;
+  @include toolbar-group-datepicker;
+  @include toolbar-group-slider;
+  @extend .flexrow;
+
+  & ~ .i-button,
+  & ~ .group {
+    margin-left: buttons.$i-button-spacing;
+  }
+
+  .i-button {
+    border-radius: 0;
+    border-right-width: 0;
+    margin: 0;
+
+    // i-button flavors don't change border color on hover
+    &:not(.label):not(.accept):not(.danger):not(.highlight):not(.warning):not(.disabled):not(:disabled) {
+      &:hover + .i-button {
+        border-left-color: $gray;
+      }
+    }
+
+    &.arrow:last-of-type {
+      border-bottom-right-radius: $default-border-radius;
+      border-top-right-radius: $default-border-radius;
+    }
+  }
+
+  & > .i-button:not(.hidden) {
+    &:first-child {
+      border-bottom-left-radius: $default-border-radius;
+      border-top-left-radius: $default-border-radius;
+    }
+
+    &:last-child {
+      border-bottom-right-radius: $default-border-radius;
+      border-top-right-radius: $default-border-radius;
+      border-right-width: 1px;
+    }
+
+    &.label {
+      &:not(:last-child) {
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+        border-right: none !important;
+      }
+
+      & ~ .i-button:not(.hidden):first-child {
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+      }
+    }
+  }
+
+  .i-button-wrapper:not(.hidden) {
+    &:first-child .i-button {
+      border-bottom-left-radius: $default-border-radius;
+      border-top-left-radius: $default-border-radius;
+    }
+
+    &:last-child .i-button {
+      border-bottom-right-radius: $default-border-radius;
+      border-top-right-radius: $default-border-radius;
+      border-right-width: 1px;
+    }
+  }
+}
+
+@mixin toolbar-group-inputs {
+  label.i-button {
+    &:not(.label) {
+      &:hover ~ .i-button {
+        border-left-color: $gray;
+      }
+
+      &:hover ~ .i-button ~ .i-button {
+        border-left-color: $default-border-color;
+      }
+    }
+  }
+
+  input[type='radio']:first-child,
+  input[type='text']:first-child,
+  input[type='password']:first-child {
+    + .i-button {
+      border-bottom-left-radius: $default-border-radius;
+      border-top-left-radius: $default-border-radius;
+    }
+  }
+
+  > .clearableinput {
+    float: left;
+  }
+
+  > input[type='text']:first-child,
+  > input[type='password']:first-child,
+  > .clearableinput:first-child input[type='text'] {
+    border-bottom-right-radius: $default-border-radius;
+    border-top-right-radius: $default-border-radius;
+  }
+
+  > input[type='text']:last-child,
+  > input[type='password']:last-child,
+  > .clearableinput:last-child input[type='text'] {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+  }
+
+  > input[type='text']:not(:last-child),
+  > input[type='password']:not(:last-child),
+  > .clearableinput:not(:last-child) {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+
+    & + .i-button {
+      border-left: none;
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+  }
+
+  #search-box {
+    margin: 0 2em;
+  }
+}
+
+@mixin toolbar-group-slider {
+  &.with-slider {
+    .slider {
+      padding-left: 1em !important;
+      padding-right: 1em !important;
+      width: 150px;
+
+      .ui-slider {
+        display: inline-block !important;
+        margin-top: 3px;
+        margin-left: -2px;
+        width: 100% !important;
+      }
+    }
+  }
+}
+
+@mixin toolbar-group-datepicker {
+  &.with-datepicker {
+    .datepicker {
+      position: relative;
+
+      &:last-child {
+        input[type='text'] {
+          border-bottom-right-radius: $default-border-radius;
+          border-top-right-radius: $default-border-radius;
+        }
+      }
+
+      .ui-datepicker-trigger {
+        float: right;
+        font-size: 1em;
+        position: absolute;
+        margin: 0;
+        right: 5px;
+        top: auto;
+      }
+
+      &.thin .ui-datepicker-trigger {
+        line-height: $toolbar-thin-height;
+      }
+    }
+  }
+}
+
+
 .sticky-scrolling .toolbar {
   margin: 0.5em 0 0.5em 0;
 }
@@ -120,7 +293,7 @@ $toolbar-spacing: 10px;
   }
 
   .group {
-    @extend %toolbar-group;
+    @include toolbar-group;
   }
 
   .search-box {
@@ -164,178 +337,6 @@ $toolbar-spacing: 10px;
 
       display: table-cell;
       float: none;
-    }
-  }
-}
-
-%toolbar-group {
-  @extend %toolbar-group-inputs;
-  @extend %toolbar-group-datepicker;
-  @extend %toolbar-group-slider;
-  @extend .flexrow;
-
-  & ~ .i-button,
-  & ~ .group {
-    margin-left: buttons.$i-button-spacing;
-  }
-
-  .i-button {
-    border-radius: 0;
-    border-right-width: 0;
-    margin: 0;
-
-    // i-button flavors don't change border color on hover
-    &:not(.label):not(.accept):not(.danger):not(.highlight):not(.warning):not(.disabled):not(:disabled) {
-      &:hover + .i-button {
-        border-left-color: $gray;
-      }
-    }
-
-    &.arrow:last-of-type {
-      border-bottom-right-radius: $default-border-radius;
-      border-top-right-radius: $default-border-radius;
-    }
-  }
-
-  & > .i-button:not(.hidden) {
-    &:first-child {
-      border-bottom-left-radius: $default-border-radius;
-      border-top-left-radius: $default-border-radius;
-    }
-
-    &:last-child {
-      border-bottom-right-radius: $default-border-radius;
-      border-top-right-radius: $default-border-radius;
-      border-right-width: 1px;
-    }
-
-    &.label {
-      &:not(:last-child) {
-        border-bottom-right-radius: 0;
-        border-top-right-radius: 0;
-        border-right: none !important;
-      }
-
-      & ~ .i-button:not(.hidden):first-child {
-        border-bottom-left-radius: 0;
-        border-top-left-radius: 0;
-      }
-    }
-  }
-
-  .i-button-wrapper:not(.hidden) {
-    &:first-child .i-button {
-      border-bottom-left-radius: $default-border-radius;
-      border-top-left-radius: $default-border-radius;
-    }
-
-    &:last-child .i-button {
-      border-bottom-right-radius: $default-border-radius;
-      border-top-right-radius: $default-border-radius;
-      border-right-width: 1px;
-    }
-  }
-}
-
-%toolbar-group-inputs {
-  label.i-button {
-    &:not(.label) {
-      &:hover ~ .i-button {
-        border-left-color: $gray;
-      }
-
-      &:hover ~ .i-button ~ .i-button {
-        border-left-color: $default-border-color;
-      }
-    }
-  }
-
-  input[type='radio']:first-child,
-  input[type='text']:first-child,
-  input[type='password']:first-child {
-    + .i-button {
-      border-bottom-left-radius: $default-border-radius;
-      border-top-left-radius: $default-border-radius;
-    }
-  }
-
-  > .clearableinput {
-    float: left;
-  }
-
-  > input[type='text']:first-child,
-  > input[type='password']:first-child,
-  > .clearableinput:first-child input[type='text'] {
-    border-bottom-right-radius: $default-border-radius;
-    border-top-right-radius: $default-border-radius;
-  }
-
-  > input[type='text']:last-child,
-  > input[type='password']:last-child,
-  > .clearableinput:last-child input[type='text'] {
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
-  }
-
-  > input[type='text']:not(:last-child),
-  > input[type='password']:not(:last-child),
-  > .clearableinput:not(:last-child) {
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
-
-    & + .i-button {
-      border-left: none;
-      border-bottom-left-radius: 0;
-      border-top-left-radius: 0;
-    }
-  }
-
-  #search-box {
-    margin: 0 2em;
-  }
-}
-
-%toolbar-group-slider {
-  &.with-slider {
-    .slider {
-      padding-left: 1em !important;
-      padding-right: 1em !important;
-      width: 150px;
-
-      .ui-slider {
-        display: inline-block !important;
-        margin-top: 3px;
-        margin-left: -2px;
-        width: 100% !important;
-      }
-    }
-  }
-}
-
-%toolbar-group-datepicker {
-  &.with-datepicker {
-    .datepicker {
-      position: relative;
-
-      &:last-child {
-        input[type='text'] {
-          border-bottom-right-radius: $default-border-radius;
-          border-top-right-radius: $default-border-radius;
-        }
-      }
-
-      .ui-datepicker-trigger {
-        float: right;
-        font-size: 1em;
-        position: absolute;
-        margin: 0;
-        right: 5px;
-        top: auto;
-      }
-
-      &.thin .ui-datepicker-trigger {
-        line-height: $toolbar-thin-height;
-      }
     }
   }
 }

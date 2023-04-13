@@ -28,7 +28,7 @@
   flex-direction: column;
 
   &::before {
-    @extend %rb-splash-background;
+    @include rb-splash-background;
     @include remaining-screen-height();
     content: ' ';
     position: absolute;

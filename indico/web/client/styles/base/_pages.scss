@@ -10,7 +10,7 @@
 @use './layout' as *;
 @use './flex' as *;
 
-%indico-page {
+@mixin indico-page {
   header {
     $separator-margin: 0.42rem;
     position: relative;
@@ -77,7 +77,7 @@
     }
 
     .page-description {
-      @extend %font-family-title-light;
+      @include font-family-title-light;
       @extend .fixed-width;
       color: palette.$dark-gray;
       font-size: 1.2em;
@@ -85,15 +85,15 @@
     }
 
     .page-info {
-      @extend %font-family-title;
+      @include font-family-title;
       color: palette.$dark-gray;
       margin-top: $separator-margin;
     }
   }
 }
 
-%indico-page-standalone {
-  @extend %indico-page;
+@mixin indico-page-standalone {
+  @include indico-page;
 
   header {
     margin-top: 1em;
@@ -153,13 +153,13 @@
 }
 
 .dialog-page {
-  @extend %indico-page;
+  @include indico-page;
 
   max-width: 800px;
 }
 
 .management-page {
-  @extend %indico-page;
+  @include indico-page;
 
   div.page-content {
     @extend .fixed-width;
@@ -173,7 +173,7 @@
 }
 
 .fixed-width-standalone-page {
-  @extend %indico-page-standalone;
+  @include indico-page-standalone;
 
   margin-left: auto;
   margin-right: auto;
@@ -207,7 +207,7 @@
 }
 
 .conference-page {
-  @extend %indico-page;
+  @include indico-page;
 
   header h2 {
     color: palette.$dark-orange;
@@ -229,7 +229,7 @@
 }
 
 .meeting-page {
-  @extend %indico-page;
+  @include indico-page;
   max-width: 800px;
   margin: 2em auto 0 auto;
 }
@@ -247,7 +247,7 @@
 }
 
 .search-page {
-  @extend %indico-page-standalone;
+  @include indico-page-standalone;
 
   .title .text {
     margin-left: 2%;

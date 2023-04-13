@@ -7,11 +7,7 @@
 
 /* Basic elements */
 
-@use 'base/palette' as *;
-@use 'base/borders' as *;
-@use 'base/animation' as *;
-@use 'base/defaults' as *;
-@use 'base/utilities' as *;
+@use 'base' as *;
 
 .right {
   float: right;

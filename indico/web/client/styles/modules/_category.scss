@@ -10,6 +10,10 @@
 @use 'base/animation' as *;
 @use 'base/utilities' as *;
 @use 'base/borders' as *;
+@use 'base/typography' as *;
+@use 'base/pages' as *;
+
+@use 'partials/buttons' as *;
 
 .confirmation-dialog .body ul.categ-list {
   padding-left: 13px;
@@ -86,7 +90,7 @@
 }
 
 .category-info {
-  @extend %font-family-modern-body;
+  @include font-family-modern-body;
 
   color: #888;
   font-size: 1.2em;
@@ -631,14 +635,14 @@ ul.category-resource-qtip {
 }
 
 .category-calendar-page {
-  @extend %indico-page;
+  @include indico-page;
 
   .category-calendar-view {
     font-family: 'Roboto', sans-serif;
 
     .fc-right {
       .fc-button {
-        @extend %button;
+        @include button;
         margin-left: 5px;
       }
 

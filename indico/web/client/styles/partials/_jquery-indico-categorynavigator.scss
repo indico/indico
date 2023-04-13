@@ -5,27 +5,26 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/defaults' as *;
-@use 'base/animation' as *;
-@use 'base/utilities' as *;
-@use 'base/borders' as *;
+@use 'base' as *;
 
-%categorynav-sizing {
+@use 'partials/forms' as *;
+@use 'partials/boxes' as *;
+
+@mixin categorynav-sizing {
   width: 800px;
   height: 600px;
 }
 
 .categorynav-dialog-content {
-  @extend %categorynav-sizing;
+  @include categorynav-sizing;
 }
 
 .categorynav {
-  @extend %categorynav-sizing;
+  @include categorynav-sizing;
   @extend .flexcol;
 
   :not(.ui) > input[type='search'] {
-    @extend %form-field-input;
+    @include form-field-input;
     width: 100%;
     flex-shrink: 0;
     padding-left: 10px;
@@ -107,7 +106,7 @@
     flex-grow: 1;
 
     .title {
-      @extend %font-family-title-light;
+      @include font-family-title-light;
       display: block;
     }
   }
@@ -299,6 +298,6 @@
   }
 
   .title strong {
-    @extend %font-family-title;
+    @include font-family-title;
   }
 }

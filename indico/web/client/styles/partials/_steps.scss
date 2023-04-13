@@ -5,11 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/borders' as *;
-@use 'base/animation' as *;
-@use 'base/defaults' as *;
-@use 'base/utilities' as *;
+@use 'base' as *;
 
 @keyframes step-fade-in-background {
   0% {
@@ -89,7 +85,7 @@ ul.steps {
   }
 
   .label {
-    @extend %font-family-title-light;
+    @include font-family-title-light;
     color: $light-black;
     font-size: 1.1em;
     text-align: center;

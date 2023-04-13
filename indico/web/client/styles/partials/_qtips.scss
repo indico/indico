@@ -5,13 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/borders' as *;
-@use 'base/animation' as *;
-@use 'base/defaults' as *;
-@use 'base/utilities' as *;
+@use 'base' as *;
+@use 'base/typography' as *;
 
-%qtip-light {
+@mixin qtip-light {
   background-color: white;
   color: $light-black;
 
@@ -21,7 +18,7 @@
 }
 
 .qtip-default {
-  @extend %default-border-radius;
+  @include default-border-radius;
   @include border-all($black);
   box-shadow: 1px 0 0 1px rgba(0, 0, 0, 0.2);
 
@@ -73,7 +70,7 @@
   }
 
   &.qtip-popup {
-    @extend %qtip-light;
+    @include qtip-light;
     border: solid 1px #e2e2e2;
     color: #454545;
   }
@@ -98,8 +95,8 @@
   }
 
   &.add-field-qtip {
-    @extend %qtip-light;
-    @extend %font-family-title;
+    @include qtip-light;
+    @include font-family-title;
     @include border-all();
     font-size: 0.8em;
 
@@ -124,7 +121,7 @@
   }
 
   &.informational {
-    @extend %qtip-light;
+    @include qtip-light;
     box-shadow: rgba($dark-gray, 0.2) 0 0 3px 3px, lighten($light-gray, 20%) 0 1px 0 0 inset;
     @include border-all(#add9ed);
     background-color: #edf3fd;

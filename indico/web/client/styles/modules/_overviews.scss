@@ -10,11 +10,11 @@
 $result-group-padding: 1rem;
 $result-group-header-padding: 0.55rem;
 
-%content-fit-cell {
+@mixin content-fit-cell {
   width: 1%;
 }
 
-%results-title {
+@mixin results-title {
   color: $light-black;
   font-size: 1.5em;
   font-weight: bold;
@@ -22,7 +22,7 @@ $result-group-header-padding: 0.55rem;
   padding-top: $result-group-padding;
 }
 
-%result-group {
+@mixin result-group {
   td {
     padding-bottom: $result-group-padding / 2;
     padding-top: $result-group-padding / 2;
@@ -50,14 +50,14 @@ $result-group-header-padding: 0.55rem;
     }
 
     tr.no-results-title td {
-      @extend %results-title;
+      @include results-title;
       color: $gray;
       font-style: italic;
     }
 
     tr.result-group-title {
       td {
-        @extend %results-title;
+        @include results-title;
         padding-bottom: $result-group-padding / 2;
       }
 
@@ -67,7 +67,7 @@ $result-group-header-padding: 0.55rem;
     }
 
     tr.result-group-header {
-      @extend %result-group;
+      @include result-group;
 
       td .title {
         border-bottom: 1px dotted $gray;
@@ -78,7 +78,7 @@ $result-group-header-padding: 0.55rem;
     }
 
     tr.result-group-entry {
-      @extend %result-group;
+      @include result-group;
 
       &:hover {
         background: $light-blue;
@@ -86,12 +86,12 @@ $result-group-header-padding: 0.55rem;
     }
 
     td.entry-time {
-      @extend %content-fit-cell;
+      @include content-fit-cell;
       font-weight: bold;
     }
 
     td.entry-type {
-      @extend %content-fit-cell;
+      @include content-fit-cell;
 
       img {
         max-height: 2em;
@@ -99,7 +99,7 @@ $result-group-header-padding: 0.55rem;
     }
 
     td.entry-location {
-      @extend %content-fit-cell;
+      @include content-fit-cell;
 
       .location {
         color: $dark-gray;

@@ -61,7 +61,7 @@ $semantic-styles: (
   }
 }
 
-%semantic-background {
+@mixin semantic-background {
   @include _semantic-background(palette.$dark-gray);
   color: white;
 
@@ -72,7 +72,7 @@ $semantic-styles: (
   }
 }
 
-%semantic-outline {
+@mixin semantic-outline {
   @include _semantic-outline(palette.$dark-gray);
 
   @each $style in $semantic-styles {
@@ -82,7 +82,7 @@ $semantic-styles: (
   }
 }
 
-%semantic-link {
+@mixin semantic-link {
   color: palette.$gray;
 
   &:not(.disabled) {
@@ -105,5 +105,5 @@ $semantic-styles: (
 }
 
 .semantic-background {
-  @extend %semantic-background;
+  @include semantic-background;
 }

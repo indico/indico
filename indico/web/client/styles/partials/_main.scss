@@ -5,13 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base' as  *;
-@use 'partials/icons' as  *;
+@use 'base' as *;
+@use 'partials/icons' as *;
+@use 'partials/buttons' as *;
 
 /* Styles for the main menu */
 
 .toolbar.global-menu {
-  @extend %font-family-title-light;
+  @include font-family-title-light;
 
   height: 3em;
   line-height: 3em;
@@ -71,7 +72,7 @@ div.page-header-dark {
 
 /* Announcements */
 div.announcement-bar {
-  @extend %font-family-title;
+  @include font-family-title;
 
   display: flex;
   align-items: center;
@@ -137,7 +138,7 @@ div.announcement-bar {
 /* Breadcrumbs */
 
 div.main-breadcrumb {
-  @extend %font-family-title;
+  @include font-family-title;
 
   background-color: darken($light-gray, 5%);
   border-bottom: 1px solid $gray;
@@ -167,7 +168,7 @@ div.main-breadcrumb {
 /* Styles for the session bar at the top right corner */
 
 div.session-bar {
-  @extend %font-family-title;
+  @include font-family-title;
 
   margin: 0.5em 0.5em 0 0;
 

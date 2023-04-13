@@ -22,7 +22,7 @@
   }
 }
 
-%editing-states-bg {
+@mixin editing-states-bg {
   @include editing-state('accepted', $pastel-green);
   @include editing-state('rejected', $pastel-red);
   @include editing-state('needs-submitter-confirmation', $yellow);

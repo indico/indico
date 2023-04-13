@@ -148,7 +148,7 @@ a {
   }
 }
 
-%banner-bar {
+@mixin banner-bar {
   height: 50px;
   display: flex;
   justify-content: space-between;
@@ -171,7 +171,7 @@ a {
 }
 
 .announcement-bar {
-  @extend %banner-bar;
+  @include banner-bar;
 
   &.highlight {
     background-color: $light-blue;
@@ -198,7 +198,7 @@ a {
 $text-yellow: lighten($yellow, 15%);
 
 .impersonation-bar {
-  @extend %banner-bar;
+  @include banner-bar;
   height: 50px;
   background-color: $dark-black;
   color: $text-yellow;

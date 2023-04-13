@@ -20,7 +20,7 @@
 // Base classes
 // ============================================================================
 
-%regform-section {
+@mixin regform-section {
   @extend .i-box;
   margin-top: 25px;
 }
@@ -30,7 +30,7 @@
 // ============================================================================
 
 .regform-section {
-  @extend %regform-section;
+  @include regform-section;
 
   .i-box-header {
     table {
@@ -59,7 +59,7 @@
 // ============================================================================
 
 .regform-done {
-  @extend %regform-section;
+  @include regform-section;
   margin-bottom: 15px;
 
   table.registration-info {
@@ -234,7 +234,7 @@
   text-align: center;
 
   .permalink {
-    @extend %font-family-monospace;
+    @include font-family-monospace;
     color: $light-black;
     font-size: 0.8em;
     margin-top: 0.5em;
@@ -251,13 +251,13 @@
 // Sortable-related
 // ============================================================================
 
-%regform-sortable-placeholder {
+@mixin regform-sortable-placeholder {
   background-color: $light-gray;
 }
 
 .regform-section-sortable-placeholder {
-  @extend %regform-sortable-placeholder;
-  @extend %regform-section;
+  @include regform-sortable-placeholder;
+  @include regform-section;
   @include border-all($gray, dashed);
   box-shadow: none;
 }

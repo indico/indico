@@ -21,7 +21,7 @@
 }
 
 .judgment-type-button:global(.ui.button) {
-  @extend %editing-states-bg;
+  @include editing-states-bg;
   color: white;
 
   &:global(.active),

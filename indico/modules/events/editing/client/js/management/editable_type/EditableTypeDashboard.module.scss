@@ -13,7 +13,7 @@
   margin-top: 0.4rem;
 
   &:global(.ui.toggle.checkbox) input ~ label {
-    @extend %font-family-body;
+    @include font-family-body;
     color: $dark-gray !important;
     padding-right: 1rem;
     font-size: 0.9em !important;
