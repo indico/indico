@@ -5,6 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
+@use 'base/animation' as *;
+@use 'base/utilities' as *;
+@use 'base/borders' as *;
+@use 'base/typography' as *;
+
+@use 'partials/boxes' as *;
+
 $editor-preview-bg-color: $light-gray;
 $display-preview-bg-color: white;
 
@@ -18,7 +27,7 @@ $display-preview-bg-color: white;
   h2,
   h3,
   h4 {
-    @extend %font-family-serif;
+    @include font-family-serif;
   }
 
   h1 {
@@ -61,7 +70,7 @@ $display-preview-bg-color: white;
   border-bottom-right-radius: $default-border-radius;
   border-bottom-left-radius: $default-border-radius;
   @include border-top($width: 0);
-  @extend %font-family-serif;
+  @include font-family-serif;
 
   background-color: $background-color;
   font-size: 1.1em;

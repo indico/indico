@@ -5,10 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+@use 'base/utilities' as *;
+@use 'base/defaults' as *;
+
+@use './buttons' as buttons;
+
 $toolbar-height: 2.2em;
 $toolbar-thin-height: 1.9em;
 $toolbar-spacing: 10px;
-$i-button-spacing: 0.3rem;
 
 .sticky-scrolling .toolbar {
   margin: 0.5em 0 0.5em 0;
@@ -171,7 +176,7 @@ $i-button-spacing: 0.3rem;
 
   & ~ .i-button,
   & ~ .group {
-    margin-left: $i-button-spacing;
+    margin-left: buttons.$i-button-spacing;
   }
 
   .i-button {

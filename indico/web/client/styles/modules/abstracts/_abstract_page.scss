@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base';
-@import 'partials/boxes';
+@use 'base' as  *;
+@use 'partials/boxes' as  *;
 
 .abstract-contribution-type {
   @include border-bottom($style: dashed);

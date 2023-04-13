@@ -7,7 +7,7 @@
 
 // stylelint-disable rule-empty-line-before
 
-@import 'base/palette';
+@use 'base/palette' as  *;
 
 @font-face {
   font-family: 'icomoon-ultimate';

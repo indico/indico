@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use './utilities';
+@use './flex' as *;
 
 body {
   @extend .flexcol;

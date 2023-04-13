@@ -7,6 +7,8 @@
 
 @use './palette';
 @use './typography' as *;
+@use './layout' as *;
+@use './flex' as *;
 
 %indico-page {
   header {

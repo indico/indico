@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
-@import 'rb:styles/responsive';
+@use 'base/palette' as  *;
+@use 'rb:styles/responsive' as  *;
 
 .banner.user-dashboard,
 .user-dashboard {

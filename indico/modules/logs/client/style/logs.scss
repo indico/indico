@@ -5,10 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/flex';
-@import 'base/palette';
-@import 'base/typography';
-@import 'base/utilities';
+@use 'base/flex' as  *;
+@use 'base/palette' as  *;
+@use 'base/typography' as  *;
+@use 'base/utilities' as  *;
 
 %line-style {
   line-height: 2em;

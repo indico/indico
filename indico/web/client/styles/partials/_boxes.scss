@@ -5,7 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'partials/toolbars';
+@use 'base/palette' as *;
+@use 'base/borders' as *;
+@use 'base/animation' as *;
+@use 'base/defaults' as *;
+@use 'base/utilities' as *;
+@use 'partials/toolbars' as  *;
 
 // ============================================================================
 // Base classes and mixins

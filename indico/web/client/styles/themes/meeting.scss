@@ -6,4 +6,4 @@
 // LICENSE file for more details.
 
 // stylelint-disable-next-line scss/at-import-partial-extension
-@import 'indico.scss';
+@use 'indico.scss' as  *;

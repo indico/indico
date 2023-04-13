@@ -8,6 +8,14 @@
 // XXX: Use _markdown.scss for anything new. This file is legacy and
 // should be removed together with the legacy abstract code!
 
+@use 'base/palette' as *;
+@use 'base/animation' as *;
+@use 'base/typography' as *;
+
+@use 'partials/boxes' as *;
+
+@use 'modules/contributions/display' as *;
+
 $editor-preview-bg-color: $light-gray;
 
 .wmd-input {

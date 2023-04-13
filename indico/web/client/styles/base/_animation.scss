@@ -8,6 +8,7 @@
 /* Animation utility constructs */
 
 @use './palette';
+@use './defaults' as *;
 
 @mixin indico-animation($name, $duration, $timing-function, $count) {
   animation-name: $name;

@@ -45,7 +45,7 @@ $semantic-styles: (
   color: $color;
 }
 
-@mixin _semantic-versions {
+@mixin semantic-versions {
   @each $style in $semantic-styles {
     &.#{$style} {
       @content;

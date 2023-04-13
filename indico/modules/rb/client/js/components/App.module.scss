@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'rb:styles/util';
-@import 'rb:styles/palette';
-@import 'rb:styles/responsive';
+@use 'rb:styles/util' as  *;
+@use 'rb:styles/palette' as  *;
+@use 'rb:styles/responsive' as  *;
 
 .rb-layout {
   // this will reset the stacking context,

@@ -5,6 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+@use 'base/borders' as *;
+@use 'base/animation' as *;
+@use 'base/defaults' as *;
+@use 'base/utilities' as *;
+@use 'base/theme' as *;
+
 .i-tag {
   @extend %semantic-background;
   @extend %default-border-radius;
@@ -16,7 +23,7 @@
     @extend %semantic-outline;
     background: transparent;
 
-    @include _semantic-versions() {
+    @include semantic-versions() {
       background: transparent;
     }
 

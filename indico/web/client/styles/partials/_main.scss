@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base';
-@import 'partials/icons';
+@use 'base' as  *;
+@use 'partials/icons' as  *;
 
 /* Styles for the main menu */
 

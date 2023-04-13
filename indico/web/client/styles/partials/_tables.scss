@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base';
-@import 'base/animation';
-@import 'partials/icons';
+@use 'base' as  *;
+@use 'base/animation' as  *;
+@use 'partials/icons' as  *;
 
 @mixin sortable-table-header() {
   &.tablesorter-header:not(.sorter-false) {

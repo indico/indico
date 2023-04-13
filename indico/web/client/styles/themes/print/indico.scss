@@ -17,7 +17,7 @@ $tt-additional-text-color: black;
 
 $gray: black;
 
-@import 'themes/indico';
+@use 'themes/indico' as indico;
 
 %black-and-white {
   background-color: white !important;
@@ -82,11 +82,11 @@ body {
 
 .meeting-timetable {
   @extend %no-shadow;
-  border: 1px solid $gray;
+  border: 1px solid indico.$gray;
 
   .start-time {
     @extend %no-shadow;
-    border: 1px solid $gray;
+    border: 1px solid indico.$gray;
 
     &::before {
       display: none !important;

@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+@use 'base/borders' as *;
+@use 'base/animation' as *;
+@use 'base/defaults' as *;
+@use 'base/utilities' as *;
+
 $switch-transition-step: 0.05s;
 $switch-label-transition: $switch-transition-step ease-out;
 $switch-handle-transition: 2 * $switch-transition-step ease-out;

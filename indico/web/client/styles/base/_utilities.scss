@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'partials/icons';
+@use 'partials/icons' as *;
 
 %adjacent-icon {
   font-family: 'icomoon-ultimate';
@@ -20,7 +20,14 @@
   @extend .#{$icon-class}-after;
 
   &::after {
-    @extend %adjacent-icon;
+    // TODO: target selector not found
+    // @extend %adjacent-icon;
+    font-family: 'icomoon-ultimate';
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
     margin-left: 0.2em;
   }
 }
@@ -29,7 +36,13 @@
   @extend .#{$icon-class};
 
   &::before {
-    @extend %adjacent-icon;
+    font-family: 'icomoon-ultimate';
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    // @extend %adjacent-icon;
   }
 }
 

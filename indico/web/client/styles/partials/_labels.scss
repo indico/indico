@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+@use 'base/borders' as *;
+@use 'base/animation' as *;
+@use 'base/defaults' as *;
+@use 'base/utilities' as *;
+
 $i-label-horizontal-padding: 10px;
 $i-label-vertical-padding: 4px;
 $i-label-color: $light-black;

@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
+@use 'base/animation' as *;
+@use 'base/utilities' as *;
+@use 'base/borders' as *;
+
 .confirmation-dialog .body ul.categ-list {
   padding-left: 13px;
   margin: 0;

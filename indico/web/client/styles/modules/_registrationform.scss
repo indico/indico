@@ -9,6 +9,13 @@
 // out if they are needed for some strange reason
 // stylelint-disable no-duplicate-selectors
 
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
+@use 'base/animation' as *;
+@use 'base/utilities' as *;
+@use 'base/borders' as *;
+@use 'base/typography' as *;
+
 // ============================================================================
 // Base classes
 // ============================================================================
@@ -213,7 +220,8 @@
 }
 
 .action-button {
-  @extend .i-button, .big, .highlight, .next;
+  // TODO: fix imports
+  // @extend .i-button, .big, .highlight, .next;
   font-weight: bold;
   margin-left: 2em;
   margin-right: 0;

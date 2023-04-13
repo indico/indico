@@ -5,7 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
+@use 'base/animation' as *;
+@use 'base/utilities' as *;
+@use 'base/borders' as *;
 
 $image-preview-width: 120;
 $image-preview-margin: 16;

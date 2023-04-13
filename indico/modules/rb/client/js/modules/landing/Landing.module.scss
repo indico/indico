@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'rb:styles/palette';
-@import 'rb:styles/util';
-@import 'rb:styles/responsive';
+@use 'base/palette' as *;
+@use 'rb:styles/palette' as  *;
+@use 'rb:styles/util' as  *;
+@use 'rb:styles/responsive' as  *;
 
 @keyframes fade-slide-down {
   0% {

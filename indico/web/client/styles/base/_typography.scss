@@ -35,7 +35,7 @@
   font-family: 'Liberation Mono', monospace;
 }
 
-%font-family-serif {
+@mixin font-family-serif {
   font-family: 'Liberation Serif', serif;
 }
 
@@ -239,7 +239,7 @@ td.groupSubTitle {
 }
 
 .text-paper {
-  @extend %font-family-serif;
+  @include font-family-serif;
   text-align: justify;
   text-indent: 2em;
 

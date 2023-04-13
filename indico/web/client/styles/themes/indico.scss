@@ -5,7 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base';
+@use 'base' as  *;
+@forward 'base';
 
 $indico-theme-color: #1a63a0;
 $header-bg-color: $indico-theme-color !default;

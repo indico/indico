@@ -5,6 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
+@use 'base/animation' as *;
+@use 'base/utilities' as *;
+@use 'base/borders' as *;
+@use 'base/layout' as *;
+@use 'base/typography' as *;
+
+@use 'partials/buttons' as *;
+@use 'partials/boxes' as *;
+
 #flashed-messages {
   &:empty {
     display: none;
@@ -74,7 +85,7 @@
     align-self: stretch;
 
     .i-button {
-      @include _i-button-states($black, transparent, transparent, $gray, white, false);
+      @include i-button-states($black, transparent, transparent, $gray, white, false);
       border-radius: 0;
       padding: 0 0.8em;
       font-size: 1.1em;

@@ -8,6 +8,10 @@
 // XXX: Use _markdown.scss for anything new. This file is legacy and
 // should be removed together with the legacy abstract code!
 
+@use 'base/palette' as *;
+@use 'base/animation' as *;
+@use 'base/typography' as *;
+
 $display-preview-bg-color: white;
 
 @mixin md-display-rules(
@@ -20,7 +24,7 @@ $display-preview-bg-color: white;
   h2,
   h3,
   h4 {
-    @extend %font-family-serif;
+    @include font-family-serif;
   }
 
   h1 {
@@ -59,7 +63,7 @@ $display-preview-bg-color: white;
 @mixin md-preview-wrapper-mixin($background-color, $max-height: 500px) {
   @include md-display-rules($background-color);
   @include transition(height 0.25s ease-out, background-color 1s ease-in, color 1s ease-in);
-  @extend %font-family-serif;
+  @include font-family-serif;
 
   background-color: $background-color;
   font-size: 1.1em;

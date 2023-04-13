@@ -5,6 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
+@use 'base/animation' as *;
+@use 'base/utilities' as *;
+@use 'base/borders' as *;
+@use 'base/layout' as *;
+
+@use 'partials/boxes' as *;
+
 @mixin base-list-properties() {
   overflow: auto;
   list-style-type: none;

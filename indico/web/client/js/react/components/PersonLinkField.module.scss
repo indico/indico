@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
+@use 'base/palette' as  *;
 
 .person-link-field {
   color: rgba(0, 0, 0, 0.87);
