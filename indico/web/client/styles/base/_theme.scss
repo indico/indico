@@ -105,5 +105,5 @@ $semantic-styles: (
 }
 
 .semantic-background {
-  @include semantic-background;
+  @include semantic-background();
 }

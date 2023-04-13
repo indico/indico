@@ -24,7 +24,7 @@ $display-preview-bg-color: white;
   h2,
   h3,
   h4 {
-    @include font-family-serif;
+    @include font-family-serif();
   }
 
   h1 {
@@ -63,7 +63,7 @@ $display-preview-bg-color: white;
 @mixin md-preview-wrapper-mixin($background-color, $max-height: 500px) {
   @include md-display-rules($background-color);
   @include transition(height 0.25s ease-out, background-color 1s ease-in, color 1s ease-in);
-  @include font-family-serif;
+  @include font-family-serif();
 
   background-color: $background-color;
   font-size: 1.1em;
@@ -73,7 +73,7 @@ $display-preview-bg-color: white;
   overflow-y: auto;
 
   &.empty {
-    @include font-family-sans;
+    @include font-family-sans();
     background-color: lighten($background-color, 2%);
     color: $gray;
     min-height: 2em;

@@ -64,12 +64,12 @@ body {
   background: #fff;
   padding: 0;
   margin: 0;
-  @include font-family-body;
-  @include font-size-body;
+  @include font-family-body();
+  @include font-size-body();
 }
 
 .ui {
-  @include font-family-sui;
+  @include font-family-sui();
 }
 
 h1,
@@ -86,7 +86,7 @@ blockquote {
 }
 
 h1 {
-  @include font-family-title;
+  @include font-family-title();
   font-size: 1.7em;
 }
 
@@ -97,7 +97,7 @@ h1.category-title {
 h2,
 h3,
 h4 {
-  @include font-family-title-light;
+  @include font-family-title-light();
 }
 
 h2 {
@@ -239,7 +239,7 @@ td.groupSubTitle {
 }
 
 .text-paper {
-  @include font-family-serif;
+  @include font-family-serif();
   text-align: justify;
   text-indent: 2em;
 
@@ -262,7 +262,7 @@ a.small-link {
 
 .mono,
 code {
-  @include font-family-monospace;
+  @include font-family-monospace();
 }
 
 textarea.log {

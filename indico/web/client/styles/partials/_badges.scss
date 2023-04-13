@@ -16,7 +16,7 @@
 }
 
 .i-badges-list {
-  @include badges-list;
+  @include badges-list();
   text-align: center;
   justify-content: space-around;
 
@@ -26,21 +26,21 @@
 }
 
 .i-badges-list.left {
-  @include badges-list;
+  @include badges-list();
   float: none; // disable default .left style
   text-align: left;
   justify-content: flex-start;
 }
 
 .i-badges-list.center {
-  @include badges-list;
+  @include badges-list();
   margin: -0.8em 0 0.8em 0; // disable default .center style
   text-align: center;
   justify-content: center;
 }
 
 .i-badges-list-hover {
-  @include badges-list;
+  @include badges-list();
 
   & > .i-badge {
     @include transition(background-color $default-transition-duration $default-transition-function);
@@ -77,7 +77,7 @@
 }
 
 .i-badge {
-  @include default-border-radius;
+  @include default-border-radius();
   position: relative;
   display: inline-block;
   min-width: 10em;
@@ -127,14 +127,14 @@
     padding: 0.4em 10% 0.8em;
 
     & > .i-badge-value {
-      @include i-badge-elem;
+      @include i-badge-elem();
 
       font-size: 3.6em;
       font-weight: bold;
     }
 
     & > .i-badge-img {
-      @include i-badge-elem;
+      @include i-badge-elem();
 
       width: 100%;
 
@@ -147,7 +147,7 @@
     }
 
     & > .i-badge-title {
-      @include i-badge-elem;
+      @include i-badge-elem();
 
       max-width: 100%;
       margin-top: 0.2em;
@@ -172,7 +172,7 @@
   }
 
   & > .i-badge-legend {
-    @include i-badge-elem;
+    @include i-badge-elem();
 
     display: block;
     position: absolute;

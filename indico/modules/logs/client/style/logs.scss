@@ -5,10 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/flex' as  *;
-@use 'base/palette' as  *;
-@use 'base/typography' as  *;
-@use 'base/utilities' as  *;
+@use 'base/flex' as *;
+@use 'base/palette' as *;
+@use 'base/typography' as *;
+@use 'base/utilities' as *;
 
 @mixin line-style {
   line-height: 2em;
@@ -99,7 +99,7 @@
   }
 
   > li {
-    @include line-style;
+    @include line-style();
     display: flex;
     align-items: center;
     width: 100%;

@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
-@use 'rb:styles/responsive' as  *;
+@use 'rb:styles/responsive' as *;
 
 :global(.ui.icon.message).message-icon :global(.icon) {
   font-size: 2em;

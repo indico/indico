@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 $header-bg-color: white;
 $header-icon-color: black;
 $header-text-color: black;
@@ -29,7 +31,7 @@ $gray: black;
 }
 
 body {
-  @include black-and-white;
+  @include black-and-white();
 }
 
 .manage-button,
@@ -47,13 +49,13 @@ body {
 .dayList .day,
 .dayList .day-title,
 .participant-list-wrapper {
-  @include black-and-white;
+  @include black-and-white();
 }
 
 .timetable-time {
   .start-time,
   .end-time {
-    @include black-and-white;
+    @include black-and-white();
   }
 }
 
@@ -62,7 +64,7 @@ body {
     background: transparent !important;
 
     .timetable-title {
-      @include black-and-white;
+      @include black-and-white();
     }
   }
 }
@@ -72,7 +74,7 @@ body {
 }
 
 .event-service-row {
-  @include no-shadow;
+  @include no-shadow();
   border: none !important;
 
   .event-service-toolbar {
@@ -81,12 +83,12 @@ body {
 }
 
 .meeting-timetable {
-  @include no-shadow;
-  border: 1px solid indico.$gray;
+  @include no-shadow();
+  border: 1px solid $gray;
 
   .start-time {
-    @include no-shadow;
-    border: 1px solid indico.$gray;
+    @include no-shadow();
+    border: 1px solid $gray;
 
     &::before {
       display: none !important;
@@ -95,7 +97,7 @@ body {
 }
 
 .event-sub-header {
-  @include no-shadow;
+  @include no-shadow();
   border: none;
 }
 

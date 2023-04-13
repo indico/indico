@@ -7,7 +7,7 @@
 
 @use 'base' as *;
 
-@use 'partials/toolbars' as  *;
+@use 'partials/toolbars' as *;
 @use 'partials/buttons' as *;
 
 @mixin input-invalid {
@@ -16,7 +16,7 @@
 
 @mixin text-input-base {
   @include border-all();
-  @include default-border-radius;
+  @include default-border-radius();
   box-sizing: border-box;
   @include transition(border-color 0.12s);
   color: $black;
@@ -29,7 +29,7 @@
   }
 
   &.hasError {
-    @include input-invalid;
+    @include input-invalid();
   }
 
   &:-moz-ui-invalid {
@@ -51,7 +51,7 @@
   > input[type='time'],
   > input[type='url'],
   > input[type='week'] {
-    @include text-input-base;
+    @include text-input-base();
   }
 
   // the react timepicker has an input with no type
@@ -105,12 +105,12 @@ input[type='time'] {
 }
 
 textarea {
-  @include text-input-base;
+  @include text-input-base();
   resize: vertical;
 }
 
 select {
-  @include text-input-base;
+  @include text-input-base();
   background: white;
 
   @mixin no-value {
@@ -165,7 +165,7 @@ ul {
     }
 
     &:disabled + label.i-button {
-      @include button-disabled;
+      @include button-disabled();
     }
   }
 
@@ -361,7 +361,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 .i-has-action {
-  @include toolbar-group;
+  @include toolbar-group();
   @extend .flexrow;
   padding: 0;
 

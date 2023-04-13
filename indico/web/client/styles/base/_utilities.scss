@@ -21,7 +21,7 @@
 
   &::after {
     // TODO: target selector not found
-    // @include adjacent-icon;
+    // @include adjacent-icon();
     font-family: 'icomoon-ultimate';
     font-style: normal;
     font-weight: normal;
@@ -42,7 +42,7 @@
     font-variant: normal;
     text-transform: none;
     -webkit-font-smoothing: antialiased;
-    // @include adjacent-icon;
+    // @include adjacent-icon();
   }
 }
 

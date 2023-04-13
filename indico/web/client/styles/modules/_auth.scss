@@ -175,7 +175,7 @@
 }
 
 .login-reason-box {
-  @include default-border-radius;
+  @include default-border-radius();
   background: $indico-blue;
   color: white;
   font-weight: bold;

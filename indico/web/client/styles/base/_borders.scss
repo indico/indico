@@ -86,7 +86,7 @@
   $style: defaults.$default-border-style,
   $width: defaults.$default-border-width
 ) {
-  @include inner-border-base;
+  @include inner-border-base();
 
   &::before {
     @include border-top($color, $style, $width);
@@ -101,7 +101,7 @@
   $style: defaults.$default-border-style,
   $width: defaults.$default-border-width
 ) {
-  @include inner-border-base;
+  @include inner-border-base();
 
   &::before {
     @include border-right($color, $style, $width);
@@ -116,7 +116,7 @@
   $style: defaults.$default-border-style,
   $width: defaults.$default-border-width
 ) {
-  @include inner-border-base;
+  @include inner-border-base();
 
   &::before {
     @include border-bottom($color, $style, $width);
@@ -131,7 +131,7 @@
   $style: defaults.$default-border-style,
   $width: defaults.$default-border-width
 ) {
-  @include inner-border-base;
+  @include inner-border-base();
 
   &::before {
     @include border-left($color, $style, $width);

@@ -16,15 +16,15 @@
 }
 
 .categorynav-dialog-content {
-  @include categorynav-sizing;
+  @include categorynav-sizing();
 }
 
 .categorynav {
-  @include categorynav-sizing;
+  @include categorynav-sizing();
   @extend .flexcol;
 
   :not(.ui) > input[type='search'] {
-    @include form-field-input;
+    @include form-field-input();
     width: 100%;
     flex-shrink: 0;
     padding-left: 10px;
@@ -106,7 +106,7 @@
     flex-grow: 1;
 
     .title {
-      @include font-family-title-light;
+      @include font-family-title-light();
       display: block;
     }
   }
@@ -298,6 +298,6 @@
   }
 
   .title strong {
-    @include font-family-title;
+    @include font-family-title();
   }
 }

@@ -85,7 +85,7 @@ ul.steps {
   }
 
   .label {
-    @include font-family-title-light;
+    @include font-family-title-light();
     color: $light-black;
     font-size: 1.1em;
     text-align: center;

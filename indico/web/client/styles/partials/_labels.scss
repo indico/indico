@@ -12,7 +12,7 @@ $i-label-vertical-padding: 4px;
 $i-label-color: $light-black;
 
 @mixin label {
-  @include default-border-radius;
+  @include default-border-radius();
   @include border-all($gray);
   user-select: none;
   box-sizing: border-box;
@@ -90,7 +90,7 @@ $i-label-color: $light-black;
 }
 
 .i-label {
-  @include label;
+  @include label();
   @include _i-label-borderless($light-black);
   @include _i-label-outlines($light-black);
   background: white;

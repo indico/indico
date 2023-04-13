@@ -48,7 +48,7 @@
 }
 
 dl.i-data-list {
-  @include font-family-form;
+  @include font-family-form();
   max-width: 800px;
   color: $light-black;
   margin-top: 1em;

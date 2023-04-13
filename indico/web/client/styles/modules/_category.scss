@@ -90,7 +90,7 @@
 }
 
 .category-info {
-  @include font-family-modern-body;
+  @include font-family-modern-body();
 
   color: #888;
   font-size: 1.2em;
@@ -635,14 +635,14 @@ ul.category-resource-qtip {
 }
 
 .category-calendar-page {
-  @include indico-page;
+  @include indico-page();
 
   .category-calendar-view {
     font-family: 'Roboto', sans-serif;
 
     .fc-right {
       .fc-button {
-        @include button;
+        @include button();
         margin-left: 5px;
       }
 

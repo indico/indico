@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'rb:styles/palette' as  *;
+@use 'rb:styles/palette' as *;
 // stylelint-disable-next-line scss/at-import-partial-extension
-@use './TimelineContent.module.scss' as  *;
+@use './TimelineContent.module.scss' as *;
 
 .timeline-day-divider {
   position: absolute;

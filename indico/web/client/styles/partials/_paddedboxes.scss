@@ -31,7 +31,7 @@
   }
 
   .padded-box-content {
-    @include default-border-radius;
+    @include default-border-radius();
     color: $black;
     display: table-cell;
     padding: 10px;
@@ -41,7 +41,7 @@
     word-break: break-word;
 
     hr {
-      @include box-hr;
+      @include box-hr();
       @include border-bottom($color: $pastel-gray, $width: 2px);
     }
   }

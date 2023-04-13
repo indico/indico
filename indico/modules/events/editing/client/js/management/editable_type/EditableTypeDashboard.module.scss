@@ -5,15 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as  *;
-@use 'base/typography' as  *;
+@use 'base/palette' as *;
+@use 'base/typography' as *;
 
 .toolbar-checkbox {
   align-self: center;
   margin-top: 0.4rem;
 
   &:global(.ui.toggle.checkbox) input ~ label {
-    @include font-family-body;
+    @include font-family-body();
     color: $dark-gray !important;
     padding-right: 1rem;
     font-size: 0.9em !important;

@@ -8,14 +8,14 @@
 @use 'base' as *;
 @use 'base/typography' as *;
 
-@use 'partials/toolbars' as  *;
+@use 'partials/toolbars' as *;
 
 // ============================================================================
 // Base classes and mixins
 // ============================================================================
 
 @mixin i-box-title {
-  @include font-family-title-light;
+  @include font-family-title-light();
   color: $dark-blue;
   display: inline-block;
   font-size: 1.5em;
@@ -23,7 +23,7 @@
 }
 
 @mixin i-box-description {
-  @include font-family-description;
+  @include font-family-description();
   color: $dark-gray;
   font-size: 14px;
 }
@@ -77,8 +77,8 @@
 }
 
 @mixin i-box-sortable-handle {
-  @include i-box-sortable-handle-background;
-  @include i-box-sortable-handle-grip;
+  @include i-box-sortable-handle-background();
+  @include i-box-sortable-handle-grip();
 }
 
 // ============================================================================
@@ -108,18 +108,18 @@ $i-box-padding: 10px;
 }
 
 @mixin i-box-padding {
-  @include i-box-horizontal-padding;
-  @include i-box-vertical-padding;
+  @include i-box-horizontal-padding();
+  @include i-box-vertical-padding();
 }
 
 @mixin i-box-cancel-margin {
-  @include i-box-cancel-horizontal-margin;
-  @include i-box-cancel-vertical-margin;
+  @include i-box-cancel-horizontal-margin();
+  @include i-box-cancel-vertical-margin();
 }
 
 // Use the titled-rule as the top border of the i-box. Combine with .titled on the i-box.
 @mixin i-box-titled-rule-header {
-  @include i-box-cancel-horizontal-margin;
+  @include i-box-cancel-horizontal-margin();
   margin-top: -18px; // Pure magic number to align the rule with the i-box border
 }
 
@@ -135,8 +135,8 @@ $i-box-padding: 10px;
 }
 
 .i-box {
-  @include i-box-padding;
-  @include default-border-radius;
+  @include i-box-padding();
+  @include default-border-radius();
   @include border-all();
   @include single-box-shadow();
   @include transition(padding-bottom);
@@ -146,15 +146,15 @@ $i-box-padding: 10px;
   color: $black;
 
   hr {
-    @include box-hr;
+    @include box-hr();
   }
 
   > .empty {
-    @include i-box-empty;
+    @include i-box-empty();
   }
 
   .ui-i-box-sortable-handle {
-    @include i-box-sortable-handle;
+    @include i-box-sortable-handle();
     @include transition(
       background-color $default-transition-duration $default-transition-function,
       height $default-transition-duration $default-transition-function
@@ -192,7 +192,7 @@ $i-box-padding: 10px;
 
   > .titled-rule:first-child,
   > *:first-child > .titled-rule:first-child {
-    @include i-box-titled-rule-header;
+    @include i-box-titled-rule-header();
   }
 
   // For i-box without headers where the first child is a .titled-rule
@@ -201,7 +201,7 @@ $i-box-padding: 10px;
   }
 
   .i-box-footer {
-    @include i-box-cancel-margin;
+    @include i-box-cancel-margin();
     background-color: $light-gray;
     box-shadow: inset 0 15px 20px -20px $gray;
     overflow: auto;
@@ -210,8 +210,8 @@ $i-box-padding: 10px;
   }
 
   .i-box-header {
-    @include i-box-cancel-margin;
-    @include i-box-padding;
+    @include i-box-cancel-margin();
+    @include i-box-padding();
     @include border-bottom();
     @include transition(margin-bottom);
     display: flex;
@@ -224,11 +224,11 @@ $i-box-padding: 10px;
     word-break: break-word;
 
     .i-box-title {
-      @include i-box-title;
+      @include i-box-title();
     }
 
     .i-box-description {
-      @include i-box-description;
+      @include i-box-description();
     }
 
     .i-box-buttons {
@@ -261,14 +261,14 @@ $i-box-padding: 10px;
   }
 
   .i-box-table-widget {
-    @include i-box-cancel-margin;
+    @include i-box-cancel-margin();
 
     > table.i-table-widget {
       border: none;
     }
 
     > *:not(table) {
-      @include i-box-padding;
+      @include i-box-padding();
     }
   }
 
@@ -437,14 +437,14 @@ $i-box-padding: 10px;
       margin: 0;
 
       > .ui-sortable-handle {
-        @include i-box-sortable-handle-background;
+        @include i-box-sortable-handle-background();
         display: flex;
         align-items: center;
         visibility: hidden;
         width: 1em;
 
         > .handle {
-          @include i-box-sortable-handle-grip;
+          @include i-box-sortable-handle-grip();
         }
       }
 

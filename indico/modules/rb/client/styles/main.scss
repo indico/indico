@@ -5,10 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as  *;
-@use 'rb:styles/sui_fixes' as  *;
-@use 'rb:styles/palette' as  *;
-@use 'rb:styles/responsive' as  *;
+@use 'base/palette' as *;
+@use 'rb:styles/sui_fixes' as *;
+@use 'rb:styles/palette' as *;
+@use 'rb:styles/responsive' as *;
 
 $indico-top-bar-height: 50px;
 
@@ -171,7 +171,7 @@ a {
 }
 
 .announcement-bar {
-  @include banner-bar;
+  @include banner-bar();
 
   &.highlight {
     background-color: $light-blue;
@@ -198,7 +198,7 @@ a {
 $text-yellow: lighten($yellow, 15%);
 
 .impersonation-bar {
-  @include banner-bar;
+  @include banner-bar();
   height: 50px;
   background-color: $dark-black;
   color: $text-yellow;

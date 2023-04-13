@@ -5,11 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base' as  *;
-@use 'partials/boxes' as  *;
+@use 'base' as *;
+@use 'partials/boxes' as *;
 
 .reviewing-page {
-  @include font-family-body;
+  @include font-family-body();
   position: relative;
 
   .i-form {
@@ -146,7 +146,7 @@
       }
 
       &.single-choice .value {
-        @include default-border-radius;
+        @include default-border-radius();
         background-color: $light-gray;
         padding: 0.1em;
       }
@@ -274,7 +274,7 @@
 
 .review-summary-box {
   .global-state-icon {
-    @include semantic-background;
+    @include semantic-background();
     align-self: flex-start;
     margin-right: 10px;
     border-radius: 50%;
@@ -283,7 +283,7 @@
   }
 
   .group-state-icon {
-    @include semantic-outline;
+    @include semantic-outline();
     border: none !important;
     margin-right: 10px;
     // Align with header icon by adding its width and border
@@ -313,8 +313,8 @@
   }
 
   .group-review-summary {
-    @include i-box-cancel-horizontal-margin;
-    @include i-box-horizontal-padding;
+    @include i-box-cancel-horizontal-margin();
+    @include i-box-horizontal-padding();
     @include border-top();
     padding: 0;
 

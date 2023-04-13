@@ -12,7 +12,7 @@ $i-button-spacing: 0.3rem;
 
 @mixin button {
   user-select: none;
-  @include default-border-radius;
+  @include default-border-radius();
   @include border-all();
   box-sizing: border-box;
   display: inline-block;
@@ -122,7 +122,7 @@ $i-button-spacing: 0.3rem;
 }
 
 @mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
-  @include button;
+  @include button();
   box-sizing: content-box;
 
   border: none;
@@ -140,7 +140,7 @@ $i-button-spacing: 0.3rem;
 }
 
 .i-button {
-  @include button;
+  @include button();
   @include transition(color);
   @include i-button-states(
     $i-button-background-color,
@@ -175,7 +175,7 @@ $i-button-spacing: 0.3rem;
 
   &:disabled,
   &.disabled {
-    @include button-disabled;
+    @include button-disabled();
   }
 
   &[class*='icon-'] {
@@ -247,7 +247,7 @@ input.i-button[type='submit'] {
 
 a.i-big-button {
   $size: 60px;
-  @include button;
+  @include button();
 
   background: #fff;
   width: $size;

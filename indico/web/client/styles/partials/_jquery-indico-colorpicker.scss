@@ -18,16 +18,16 @@
     display: inline-block;
 
     .color-preview {
-      @include form-field-input;
+      @include form-field-input();
       @include border-all();
-      @include default-border-radius;
+      @include default-border-radius();
       display: inline-block;
       width: 3em;
       float: left;
       margin-right: 0.5em;
 
       &.no-value {
-        @include tilted-strips-bg;
+        @include tilted-strips-bg();
       }
     }
 

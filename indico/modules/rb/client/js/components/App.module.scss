@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'rb:styles/util' as  *;
-@use 'rb:styles/palette' as  *;
-@use 'rb:styles/responsive' as  *;
+@use 'rb:styles/util' as *;
+@use 'rb:styles/palette' as *;
+@use 'rb:styles/responsive' as *;
 
 .rb-layout {
   // this will reset the stacking context,
@@ -59,7 +59,7 @@
 }
 
 .rb-menu-bar-side-left {
-  @include rb-menu-bar-side;
+  @include rb-menu-bar-side();
 
   * {
     margin-right: auto;
@@ -67,7 +67,7 @@
 }
 
 .rb-menu-bar-side-right {
-  @include rb-menu-bar-side;
+  @include rb-menu-bar-side();
 
   * {
     margin-left: auto;

@@ -27,7 +27,7 @@ $display-preview-bg-color: white;
   h2,
   h3,
   h4 {
-    @include font-family-serif;
+    @include font-family-serif();
   }
 
   h1 {
@@ -70,7 +70,7 @@ $display-preview-bg-color: white;
   border-bottom-right-radius: $default-border-radius;
   border-bottom-left-radius: $default-border-radius;
   @include border-top($width: 0);
-  @include font-family-serif;
+  @include font-family-serif();
 
   background-color: $background-color;
   font-size: 1.1em;
@@ -80,7 +80,7 @@ $display-preview-bg-color: white;
   overflow-y: auto;
 
   &.empty {
-    @include font-family-sans;
+    @include font-family-sans();
     background-color: lighten($background-color, 2%);
     color: $gray;
     min-height: 2em;
@@ -118,7 +118,7 @@ $display-preview-bg-color: white;
 
 .wmd-input,
 .wmd-input:focus {
-  @include font-family-monospace;
+  @include font-family-monospace();
   @include transition(height 0.25s ease-out);
   box-shadow: none;
   @include border-all($width: 0);

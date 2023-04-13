@@ -16,9 +16,9 @@ $toolbar-thin-height: 1.9em;
 $toolbar-spacing: 10px;
 
 @mixin toolbar-group {
-  @include toolbar-group-inputs;
-  @include toolbar-group-datepicker;
-  @include toolbar-group-slider;
+  @include toolbar-group-inputs();
+  @include toolbar-group-datepicker();
+  @include toolbar-group-slider();
   @extend .flexrow;
 
   & ~ .i-button,
@@ -187,7 +187,6 @@ $toolbar-spacing: 10px;
   }
 }
 
-
 .sticky-scrolling .toolbar {
   margin: 0.5em 0 0.5em 0;
 }
@@ -293,7 +292,7 @@ $toolbar-spacing: 10px;
   }
 
   .group {
-    @include toolbar-group;
+    @include toolbar-group();
   }
 
   .search-box {

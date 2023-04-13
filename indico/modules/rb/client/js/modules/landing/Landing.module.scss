@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
-@use 'rb:styles/palette' as  *;
-@use 'rb:styles/util' as  *;
-@use 'rb:styles/responsive' as  *;
+@use 'rb:styles/palette' as *;
+@use 'rb:styles/util' as *;
+@use 'rb:styles/responsive' as *;
 
 @keyframes fade-slide-down {
   0% {
@@ -28,7 +28,7 @@
   flex-direction: column;
 
   &::before {
-    @include rb-splash-background;
+    @include rb-splash-background();
     @include remaining-screen-height();
     content: ' ';
     position: absolute;

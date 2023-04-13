@@ -12,7 +12,7 @@
 @use 'base/borders' as *;
 
 @mixin user-action($color, $final-color: $color) {
-  @include user-action-button;
+  @include user-action-button();
   color: $color;
   opacity: 0.7;
 
@@ -62,7 +62,7 @@
 }
 
 .event-user {
-  @include default-border-radius;
+  @include default-border-radius();
   @include icon-before('icon-user');
 
   display: inline-block;
@@ -224,7 +224,7 @@
       }
 
       .event-person {
-        @include user-action-button;
+        @include user-action-button();
         @include icon-before('icon-ticket');
         color: $gray;
       }

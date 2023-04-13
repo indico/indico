@@ -11,9 +11,9 @@
 @use 'base/utilities' as *;
 @use 'base/borders' as *;
 
-@use 'contributions/display' as  *;
-@use 'contributions/editor' as  *;
-@use 'types_dialog' as  *;
+@use 'contributions/display' as *;
+@use 'contributions/editor' as *;
+@use 'types_dialog' as *;
 
 @mixin picker-root-element-label() {
   .label {

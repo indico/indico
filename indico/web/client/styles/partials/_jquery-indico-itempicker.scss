@@ -10,7 +10,7 @@
 @use './boxes' as *;
 
 .item-picker-qbubble {
-  @include default-border-radius;
+  @include default-border-radius();
   @include single-box-shadow();
   @include border-all();
 

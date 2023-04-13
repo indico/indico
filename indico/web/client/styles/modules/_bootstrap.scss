@@ -14,7 +14,7 @@
 @use 'base/typography' as *;
 
 .bootstrap-header {
-  @include font-family-form;
+  @include font-family-form();
 
   line-height: initial;
 
@@ -42,7 +42,7 @@
   }
 
   .header-title {
-    @include font-family-logo;
+    @include font-family-logo();
 
     font-size: 54px;
 
@@ -50,7 +50,7 @@
   }
 
   .header-subtitle {
-    @include font-family-logo;
+    @include font-family-logo();
 
     font-size: 26px;
 
@@ -111,7 +111,7 @@
 }
 
 .bootstrap-body {
-  @include font-family-form;
+  @include font-family-form();
 
   width: 100%;
   min-width: 800px;
@@ -195,7 +195,7 @@
         text-align: left;
 
         .step-title {
-          @include font-family-logo;
+          @include font-family-logo();
 
           font-size: 4em;
           font-weight: bold;
@@ -254,7 +254,7 @@
       }
 
       .i-button {
-        @include font-family-logo;
+        @include font-family-logo();
       }
     }
   }

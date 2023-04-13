@@ -5,16 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base' as  *;
-@use 'partials/icons' as  *;
-@use 'partials/boxes' as  *;
-@use 'partials/labels' as  *;
+@use 'base' as *;
+@use 'partials/icons' as *;
+@use 'partials/boxes' as *;
+@use 'partials/labels' as *;
 
 .sortable-list {
   margin-bottom: 10px;
 
   ul {
-    @include i-box-cancel-horizontal-margin;
+    @include i-box-cancel-horizontal-margin();
     padding: 0;
     margin-top: 0;
     margin-bottom: 0;
@@ -107,7 +107,7 @@
       flex-grow: 1;
 
       > .titled-rule {
-        @include i-box-titled-rule-header;
+        @include i-box-titled-rule-header();
       }
 
       &:first-child ul {
@@ -130,7 +130,7 @@
     }
 
     li.i-label {
-      @include default-border-radius;
+      @include default-border-radius();
 
       &:not(:last-child) {
         margin-bottom: 5px;

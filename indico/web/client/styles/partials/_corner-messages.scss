@@ -54,7 +54,7 @@
 }
 
 .corner-message {
-  @include font-family-title;
+  @include font-family-title();
   @include border-all($light-black);
   box-shadow: 0 3px 2px rgba(150, 150, 150, 0.2);
   @include transition(background-color 0.5s, color 0.5s, border-color 0.5s, width 0.5s);

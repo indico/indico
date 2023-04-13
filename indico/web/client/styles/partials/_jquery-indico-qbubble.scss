@@ -11,12 +11,12 @@
 @use 'base/utilities' as *;
 @use 'base/borders' as *;
 
-@use 'partials/qtips' as  *;
+@use 'partials/qtips' as *;
 @use './boxes' as *;
 
 .qtip-default.qbubble {
-  @include qtip-light;
-  @include default-border-radius;
+  @include qtip-light();
+  @include default-border-radius();
   @include single-box-shadow();
   @include border-all();
   color: $light-black;

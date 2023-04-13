@@ -50,14 +50,14 @@ $result-group-header-padding: 0.55rem;
     }
 
     tr.no-results-title td {
-      @include results-title;
+      @include results-title();
       color: $gray;
       font-style: italic;
     }
 
     tr.result-group-title {
       td {
-        @include results-title;
+        @include results-title();
         padding-bottom: $result-group-padding / 2;
       }
 
@@ -67,7 +67,7 @@ $result-group-header-padding: 0.55rem;
     }
 
     tr.result-group-header {
-      @include result-group;
+      @include result-group();
 
       td .title {
         border-bottom: 1px dotted $gray;
@@ -78,7 +78,7 @@ $result-group-header-padding: 0.55rem;
     }
 
     tr.result-group-entry {
-      @include result-group;
+      @include result-group();
 
       &:hover {
         background: $light-blue;
@@ -86,12 +86,12 @@ $result-group-header-padding: 0.55rem;
     }
 
     td.entry-time {
-      @include content-fit-cell;
+      @include content-fit-cell();
       font-weight: bold;
     }
 
     td.entry-type {
-      @include content-fit-cell;
+      @include content-fit-cell();
 
       img {
         max-height: 2em;
@@ -99,7 +99,7 @@ $result-group-header-padding: 0.55rem;
     }
 
     td.entry-location {
-      @include content-fit-cell;
+      @include content-fit-cell();
 
       .location {
         color: $dark-gray;

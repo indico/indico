@@ -12,7 +12,7 @@
 @use 'base/borders' as *;
 
 .i-taglist-field {
-  @include default-border-radius;
+  @include default-border-radius();
   @include border-all();
 
   height: auto;

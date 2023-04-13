@@ -69,7 +69,7 @@
 
 .timeTableLegend {
   @include border-all();
-  @include default-border-radius;
+  @include default-border-radius();
   background: $light-gray;
   font-size: 11px;
   overflow: hidden;
@@ -88,7 +88,7 @@
   }
 
   .legendItem {
-    @include default-border-radius;
+    @include default-border-radius();
     background: $pastel-gray;
     color: $black;
     float: left;
@@ -281,7 +281,7 @@
 
 .bottomTip {
   @include border-all();
-  @include default-border-radius;
+  @include default-border-radius();
   background: $light-gray;
   color: $light-black;
   display: none;
@@ -306,7 +306,7 @@
 }
 
 .entry-arrows {
-  @include timetable-entry-button;
+  @include timetable-entry-button();
   @include border-horz();
   @include border-bottom();
   border-bottom-left-radius: $default-border-radius;
@@ -333,7 +333,7 @@
 }
 
 .entry-attachments {
-  @include timetable-entry-button;
+  @include timetable-entry-button();
   border-bottom-left-radius: $default-border-radius;
   border-top-right-radius: $default-border-radius;
   @include border-left();

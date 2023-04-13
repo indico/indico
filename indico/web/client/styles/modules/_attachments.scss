@@ -18,7 +18,7 @@
 }
 
 @mixin attachment-icon {
-  @include attachment-line;
+  @include attachment-line();
 
   font-size: 0.8rem;
 
@@ -67,7 +67,7 @@
         }
 
         > .custom-protection::before {
-          @include attachment-icon;
+          @include attachment-icon();
 
           color: $pastel-red;
         }
@@ -98,7 +98,7 @@
       }
 
       > * {
-        @include attachment-line;
+        @include attachment-line();
       }
 
       i {
@@ -128,7 +128,7 @@
         &.actions,
         &.actions > *,
         &.date {
-          @include attachment-icon;
+          @include attachment-icon();
 
           color: $gray;
         }
@@ -379,7 +379,7 @@
     margin-top: 0.2em;
 
     &.is-protected {
-      @include protected-colors;
+      @include protected-colors();
     }
 
     &.has-label {
@@ -394,7 +394,7 @@
 
     &.is-protected {
       .i-button.label {
-        @include protected-colors;
+        @include protected-colors();
 
         border-bottom-color: $red !important;
       }

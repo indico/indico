@@ -201,12 +201,12 @@
 
         > .visibility {
           &.enabled {
-            @include enabled-action;
+            @include enabled-action();
             display: none;
           }
 
           &:not(.enabled) {
-            @include not-enabled-action;
+            @include not-enabled-action();
           }
         }
       }
@@ -246,7 +246,7 @@
 }
 
 #filter-placeholder {
-  @include font-family-title;
+  @include font-family-title();
 
   display: none;
   font-size: 1.2em;

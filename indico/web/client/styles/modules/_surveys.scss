@@ -14,7 +14,7 @@
 @use 'partials/boxes' as *;
 
 @mixin survey-results-text-box {
-  @include default-border-radius;
+  @include default-border-radius();
   background: $light-gray;
   color: $light-black;
   margin: 1em 0;
@@ -62,7 +62,7 @@
   }
 
   .i-box-content > ul {
-    @include i-box-cancel-margin;
+    @include i-box-cancel-margin();
 
     & > li.survey-item {
       background-color: white;
@@ -130,7 +130,7 @@
   }
 
   .text-answer {
-    @include survey-results-text-box;
+    @include survey-results-text-box();
     font-style: italic;
 
     &:last-of-type {
@@ -139,7 +139,7 @@
   }
 
   .chart-option-details {
-    @include survey-results-text-box;
+    @include survey-results-text-box();
 
     &:first-child {
       margin-top: 0;

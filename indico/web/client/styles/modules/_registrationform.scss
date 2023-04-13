@@ -30,7 +30,7 @@
 // ============================================================================
 
 .regform-section {
-  @include regform-section;
+  @include regform-section();
 
   .i-box-header {
     table {
@@ -59,7 +59,7 @@
 // ============================================================================
 
 .regform-done {
-  @include regform-section;
+  @include regform-section();
   margin-bottom: 15px;
 
   table.registration-info {
@@ -234,7 +234,7 @@
   text-align: center;
 
   .permalink {
-    @include font-family-monospace;
+    @include font-family-monospace();
     color: $light-black;
     font-size: 0.8em;
     margin-top: 0.5em;
@@ -256,8 +256,8 @@
 }
 
 .regform-section-sortable-placeholder {
-  @include regform-sortable-placeholder;
-  @include regform-section;
+  @include regform-sortable-placeholder();
+  @include regform-section();
   @include border-all($gray, dashed);
   box-shadow: none;
 }

@@ -9,14 +9,14 @@
 @use 'base/theme' as *;
 
 .i-tag {
-  @include semantic-background;
-  @include default-border-radius;
+  @include semantic-background();
+  @include default-border-radius();
   padding: 0.3em 0.6em;
   font-weight: bold;
   box-sizing: initial;
 
   &.outline {
-    @include semantic-outline;
+    @include semantic-outline();
     background: transparent;
 
     @include semantic-versions() {

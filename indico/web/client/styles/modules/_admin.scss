@@ -8,7 +8,7 @@
 @use 'base' as *;
 
 .code {
-  @include default-border-radius;
+  @include default-border-radius();
   border: 1px solid $gray;
   background: $light-gray;
   padding: 1em 1.5em;

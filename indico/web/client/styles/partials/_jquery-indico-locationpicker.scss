@@ -104,7 +104,7 @@
       z-index: 1;
 
       &.disabled {
-        @include tilted-strips-bg;
+        @include tilted-strips-bg();
         opacity: 1;
       }
 
@@ -208,7 +208,7 @@
       margin-top: 0.4em;
 
       &.disabled {
-        @include tilted-strips-bg;
+        @include tilted-strips-bg();
       }
 
       &:-ms-input-placeholder {
@@ -231,7 +231,7 @@
 }
 
 .keyword-highlighter {
-  @include default-border-radius;
+  @include default-border-radius();
   @include ellipsis();
 
   display: none !important;

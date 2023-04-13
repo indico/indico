@@ -95,14 +95,14 @@ i.info-helper {
   > input:checked + label {
     + .i-linking-dropdown,
     + span {
-      @include dropdown-visible;
+      @include dropdown-visible();
     }
   }
 
   > input:not(:checked) + label {
     + .i-linking-dropdown,
     + span {
-      @include dropdown-hidden;
+      @include dropdown-hidden();
     }
   }
 }

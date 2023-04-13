@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
-@use 'rb:styles/palette' as  *;
+@use 'rb:styles/palette' as *;
 
 .sidebar:global(.inverted.menu) {
   background-color: darken($primary-color, 10%);

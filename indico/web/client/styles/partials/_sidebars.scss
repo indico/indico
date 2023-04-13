@@ -30,7 +30,7 @@
   }
 
   .content {
-    @include default-border-radius;
+    @include default-border-radius();
     background-color: #ececec;
     padding: 2em;
   }
@@ -48,11 +48,11 @@
 }
 
 .side-menu {
-  @include font-family-title;
+  @include font-family-title();
   user-select: none;
   @include single-box-shadow();
   @include border-all();
-  @include default-border-radius;
+  @include default-border-radius();
   font-size: 1.1em;
 
   ul.menu-items > li.section {

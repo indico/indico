@@ -10,7 +10,7 @@
 @use './boxes' as *;
 
 .palette-picker-qtip {
-  @include default-border-radius;
+  @include default-border-radius();
   @include single-box-shadow();
   background: #fff;
   background-clip: padding-box;

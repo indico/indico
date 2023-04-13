@@ -19,7 +19,7 @@
 }
 
 .ui-corner-all {
-  @include default-border-radius;
+  @include default-border-radius();
 
   .ui-dialog-content {
     /* For some reason the dialogs don't get their bottom corners rounded without this. */
@@ -42,11 +42,11 @@
 }
 
 .ui-widget {
-  @include font-family-body;
+  @include font-family-body();
 
   textarea,
   button {
-    @include font-family-body;
+    @include font-family-body();
   }
 }
 

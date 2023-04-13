@@ -28,7 +28,7 @@ $i-form-button-line-height: 1.8;
 }
 
 .form-field-input {
-  @include form-field-input;
+  @include form-field-input();
 }
 
 @mixin form-field-button {
@@ -48,7 +48,7 @@ form {
 }
 
 .i-form {
-  @include font-family-form;
+  @include font-family-form();
   box-sizing: border-box;
   max-width: 800px;
   display: block;
@@ -165,7 +165,7 @@ form {
       textarea,
       .ui.dropdown,
       .i-table-widget {
-        @include input-invalid;
+        @include input-invalid();
       }
     }
   }
@@ -224,12 +224,12 @@ form {
   }
 
   textarea {
-    @include form-field-input;
+    @include form-field-input();
     height: auto;
   }
 
   select {
-    @include form-field-input;
+    @include form-field-input();
     padding-left: 0.7em;
 
     &[multiple] {
@@ -254,11 +254,11 @@ form {
   button,
   input[type='button'],
   input[type='submit'] {
-    @include form-field-button;
+    @include form-field-button();
   }
 
   a.i-button {
-    @include form-field-button;
+    @include form-field-button();
     line-height: $i-form-button-line-height;
   }
 
@@ -314,7 +314,7 @@ form {
 
 .i-form .form-group-footer {
   .i-button {
-    @include form-field-button;
+    @include form-field-button();
     line-height: 1 !important;
   }
 

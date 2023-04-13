@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as  *;
-@use 'base/defaults' as  *;
-@use 'base/borders' as  *;
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
+@use 'base/borders' as *;
 
 .item,
 :global(.ui.list) > .item,
@@ -23,7 +23,7 @@
 
   & > span {
     /* from the role-code mixin */
-    @include default-border-radius;
+    @include default-border-radius();
     @include border-all();
     padding: 0.3em 0.1em;
     font-size: 0.9em;
