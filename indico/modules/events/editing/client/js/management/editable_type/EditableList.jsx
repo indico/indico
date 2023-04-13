@@ -220,20 +220,20 @@ function EditableListDisplay({
 
   const skippedEditablesWarning = {
     [EditableType.paper]: PluralTranslate.string(
-      '{count} paper was skipped because it does not fulfill the reviewing conditions.',
-      '{count} papers were skipped because they do not fulfill the reviewing conditions.',
+      '{count} paper was skipped because of its current status.',
+      '{count} papers were skipped because of their current status.',
       skippedEditables,
       {count: skippedEditables}
     ),
     [EditableType.slides]: PluralTranslate.string(
-      '{count} slide was skipped because it does not fulfill the reviewing conditions.',
-      '{count} slides were skipped because they do not fulfill the reviewing conditions.',
+      '{count} slide was skipped because of its current status.',
+      '{count} slides were skipped because of their current status.',
       skippedEditables,
       {count: skippedEditables}
     ),
     [EditableType.poster]: PluralTranslate.string(
-      '{count} poster was skipped because it does not fulfill the reviewing conditions.',
-      '{count} posters were skipped because they do not fulfill the reviewing conditions.',
+      '{count} poster was skipped because of its current status.',
+      '{count} posters were skipped because of their current status.',
       skippedEditables,
       {count: skippedEditables}
     ),
@@ -241,7 +241,7 @@ function EditableListDisplay({
 
   const columnHeaders = [
     ['friendlyId', Translate.string('ID'), 60],
-    ...(codePresent ? [['code', Translate.string('Code'), 80]] : []),
+    ...(codePresent ? [['code', Translate.string('Code'), 110]] : []),
     ['title', Translate.string('Title'), 600],
     ['revision', Translate.string('Rev.'), 80],
     ['status', Translate.string('Status'), 200],
@@ -451,6 +451,7 @@ function EditableListDisplay({
     if (rv) {
       patchList(rv);
     }
+    return rv;
   };
 
   const checkedEditablesAssignmentRequest = async (type, urlFunc, data = {}) =>
@@ -471,14 +472,11 @@ function EditableListDisplay({
     checkedEditablesAssignmentRequest('unassign', unassignEditorURL);
   };
 
-  const applyJudgment = action => {
-    updateCheckedEditablesRequest('judgment', applyJudgmentURL, {action});
-    const isJudgeable = ({state}) =>
-      state === 'ready_for_review' ||
-      (state === 'needs_submitter_confirmation' && action === 'accept');
-    setSkippedEditables(
-      contribList.filter(({editable: e}) => e && checked.includes(e.id) && !isJudgeable(e)).length
-    );
+  const applyJudgment = async action => {
+    const rv = await updateCheckedEditablesRequest('judgment', applyJudgmentURL, {action});
+    if (rv) {
+      setSkippedEditables(checked.length - rv.length);
+    }
   };
 
   return (

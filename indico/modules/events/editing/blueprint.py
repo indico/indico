@@ -19,7 +19,7 @@ _bp.add_url_rule('/manage/editing/tags', 'manage_tags', frontend.RHEditingDashbo
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/', 'manage_editable_type',
                  frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/list', 'manage_editable_type_list',
-                 frontend.RHEditingDashboard)
+                 frontend.RHEditableListManagement)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/types', 'manage_file_types',
                  frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/review-conditions', 'manage_review_conditions',

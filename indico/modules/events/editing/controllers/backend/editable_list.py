@@ -142,6 +142,7 @@ class RHApplyJudgment(RHEditablesBase):
         'action': fields.String(required=True, validate=validate.OneOf(['accept', 'reject']))
     })
     def _process(self, action):
+        changed = []
         for editable in self.editables:
             revision = editable.latest_revision
             if revision.final_state != FinalRevisionState.none:
@@ -152,8 +153,11 @@ class RHApplyJudgment(RHEditablesBase):
                 confirm_and_publish_changes(revision, EditingConfirmationAction.accept, '')
                 revision.editor = session.user
                 db.session.flush()
+            else:
+                continue
             db.session.expire(editable)
-        return EditableBasicSchema(many=True).jsonify(self.editables)
+            changed.append(editable)
+        return EditableBasicSchema(many=True).jsonify(changed)
 
 
 class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):
