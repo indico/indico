@@ -72,7 +72,7 @@ class EventTimeTableHook(HTTPAPIHook):
     def _serialize_timetable(self, event, user):
         if not contribution_settings.get(event, 'published') and not event.can_manage(user):
             return {}
-        return TimetableSerializer(event, management=False, user=user).serialize_timetable()
+        return TimetableSerializer(event, management=False, user=user, api=True).serialize_timetable()
 
     def export_timetable(self, user):
         events = Event.query.filter(Event.id.in_(map(int, self._idList)), ~Event.is_deleted).all()

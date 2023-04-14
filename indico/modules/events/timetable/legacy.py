@@ -20,11 +20,12 @@ from indico.web.flask.util import url_for
 
 
 class TimetableSerializer:
-    def __init__(self, event, management=False, user=None):
+    def __init__(self, event, management=False, user=None, api=False):
         self.management = management
         self.user = user if user is not None or not has_request_context() else session.user
         self.event = event
         self.can_manage_event = self.event.can_manage(self.user)
+        self.api = api
 
     def serialize_timetable(self, days=None, hide_weekends=False, strip_empty_days=False):
         tzinfo = self.event.tzinfo if self.management else self.event.display_tzinfo
@@ -173,6 +174,12 @@ class TimetableSerializer:
                      'friendlyId': contribution.friendly_id,
                      'references': list(map(SerializerBase.serialize_reference, contribution.references)),
                      'board_number': contribution.board_number})
+        if self.api:
+            data['authors'] = list(map(self._get_person_data,
+                                       sorted((p for p in contribution.person_links if not p.is_speaker),
+                                              key=lambda x: (x.author_type != AuthorType.primary,
+                                                             x.author_type != AuthorType.secondary,
+                                                             x.display_order_key))))
         return data
 
     def serialize_break_entry(self, entry, management=False):
