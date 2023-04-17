@@ -18,7 +18,6 @@ import {Translate, Param} from 'indico/react/i18n';
 import {fullyOverlaps, serializeTime} from 'indico/utils/date';
 
 import {openModal} from '../../actions';
-import {mapRecurrenceTypeToInfo} from '../../util';
 
 import './TimelineItem.module.scss';
 
@@ -141,6 +140,14 @@ class TimelineItem extends React.Component {
 
   renderMessagePopup = (message, segmentStartDt, segmentEndDt, reservation) => {
     const {dayBased} = this.props;
+    const mapRecurrenceTypeToInfo = type =>
+      type.toLowerCase() === 'day'
+        ? Translate.string('daily')
+        : type.toLowerCase() === 'week'
+        ? Translate.string('weekly')
+        : type.toLowerCase() === 'month'
+        ? Translate.string('monthly')
+        : '';
     return dayBased && !message ? null : (
       <div styleName="popup-center">
         {!dayBased && (
@@ -156,9 +163,13 @@ class TimelineItem extends React.Component {
                 <Translate>Recurring Booking</Translate>
               </Message.Header>
               <Translate>
-                Recurs {mapRecurrenceTypeToInfo(reservation.repeatFrequency)} from{' '}
-                {moment(reservation.startDt).format('L LT')} to{' '}
-                {moment(reservation.endDt).format('L LT')}
+                Recurs{' '}
+                <Param
+                  name="recurrenceFrequency"
+                  value={mapRecurrenceTypeToInfo(reservation.repeatFrequency)}
+                />{' '}
+                from <Param name="startTime" value={moment(reservation.startDt).format('L LT')} />{' '}
+                <Param name="endTime" value={moment(reservation.endDt).format('L LT')} />
               </Translate>
             </Message.Content>
           </Message>

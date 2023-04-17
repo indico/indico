@@ -23,6 +23,8 @@ Improvements
 - Add support for authorized submitters in Call for Papers (:pr:`5728`)
 - Display abstract submission comment in the list of abstracts (:pr:`5733`)
 - Allow searching for contributions by author in the management area (:pr:`5742`)
+- Include start/end times of the whole room booking in the timeline tooltip (:issue:`5730`,
+  :pr:`5740`)
 
 Bugfixes
 ^^^^^^^^
