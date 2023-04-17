@@ -234,6 +234,18 @@ export function serializeRecurrenceInfo({type, number, interval}) {
   }
 }
 
+export function mapRecurrenceTypeToInfo(type) {
+  const recurrenceType = type.toLowerCase();
+
+  if (recurrenceType === 'day') {
+    return 'daily';
+  } else if (recurrenceType === 'week') {
+    return 'weekly';
+  } else if (recurrenceType === 'month') {
+    return 'monthly';
+  }
+}
+
 const _legendLabels = {
   candidates: {label: Translate.string('Available'), style: 'available'},
   bookings: {label: Translate.string('Booking'), style: 'booking'},

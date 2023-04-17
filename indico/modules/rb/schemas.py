@@ -139,7 +139,8 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
 
     class Meta:
         model = Reservation
-        fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted', 'start_dt', 'end_dt')
+        fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted', 'start_dt', 'end_dt',
+                  'is_repeating', 'repeat_frequency')
 
 
 class ReservationLinkedObjectDataSchema(mm.Schema):

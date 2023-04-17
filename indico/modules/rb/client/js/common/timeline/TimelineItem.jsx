@@ -11,13 +11,14 @@ import React from 'react';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {List, Popup} from 'semantic-ui-react';
+import {List, Popup, Message} from 'semantic-ui-react';
 
 import {ResponsivePopup} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
 import {fullyOverlaps, serializeTime} from 'indico/utils/date';
 
 import {openModal} from '../../actions';
+import {mapRecurrenceTypeToInfo} from '../../util';
 
 import './TimelineItem.module.scss';
 
@@ -138,7 +139,7 @@ class TimelineItem extends React.Component {
     return (segStartMins / ((endHour - startHour) * 60)) * 100;
   };
 
-  renderMessagePopup = (message, segmentStartDt, segmentEndDt) => {
+  renderMessagePopup = (message, segmentStartDt, segmentEndDt, reservation) => {
     const {dayBased} = this.props;
     return dayBased && !message ? null : (
       <div styleName="popup-center">
@@ -148,6 +149,20 @@ class TimelineItem extends React.Component {
           </div>
         )}
         <div>{message}</div>
+        {reservation && reservation.isRepeating && (
+          <Message info>
+            <Message.Content>
+              <Message.Header>
+                <Translate>Recurring Booking</Translate>
+              </Message.Header>
+              <Translate>
+                Recurs {mapRecurrenceTypeToInfo(reservation.repeatFrequency)} from{' '}
+                {moment(reservation.startDt).format('L LT')} to{' '}
+                {moment(reservation.endDt).format('L LT')}
+              </Translate>
+            </Message.Content>
+          </Message>
+        )}
       </div>
     );
   };
@@ -282,7 +297,12 @@ class TimelineItem extends React.Component {
           ? Translate.string('Click to book it')
           : Translate.string('Click to pre-book it');
       }
-      popupContent = this.renderMessagePopup(popupMessage, segmentStartDt, segmentEndDt);
+      popupContent = this.renderMessagePopup(
+        popupMessage,
+        segmentStartDt,
+        segmentEndDt,
+        reservation
+      );
     }
     const clickable =
       (onClickCandidate && bookable && type === 'candidate') ||
