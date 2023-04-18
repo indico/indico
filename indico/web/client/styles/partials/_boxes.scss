@@ -292,7 +292,7 @@ $i-box-padding: 10px;
 }
 
 .i-box.no-shadow {
-  @include single-box-shadow(none);
+  box-shadow: none;
 }
 
 .i-box.highlight {
@@ -308,7 +308,7 @@ $i-box-padding: 10px;
   padding-top: 0;
 
   .i-box-footer {
-    @include single-box-shadow(none);
+    box-shadow: none;
     margin-top: 0;
   }
 }
