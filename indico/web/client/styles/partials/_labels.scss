@@ -89,6 +89,21 @@ $i-label-color: $light-black;
   @include _i-label-outlines($flavor-color);
 }
 
+@mixin i-label-highlight($flavor-color, $border-color) {
+  @include i-label-flavor($flavor-color, $border-color);
+
+  &.striped {
+    color: white;
+    background: repeating-linear-gradient(
+      -40deg,
+      $flavor-color,
+      $flavor-color 10px,
+      lighten($flavor-color, 0.3 * $color-variation) 10px,
+      lighten($flavor-color, 0.3 * $color-variation) 20px
+    );
+  }
+}
+
 .i-label {
   @include label();
   @include _i-label-borderless($light-black);
@@ -125,18 +140,7 @@ $i-label-color: $light-black;
   }
 
   &.highlight {
-    @include i-label-flavor($blue, $dark-blue);
-
-    &.striped {
-      color: white;
-      background: repeating-linear-gradient(
-        -40deg,
-        $blue,
-        $blue 10px,
-        lighten($blue, 0.3 * $color-variation) 10px,
-        lighten($blue, 0.3 * $color-variation) 20px
-      );
-    }
+    @include i-label-highlight($blue, $dark-blue);
   }
 
   &.warning {

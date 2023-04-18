@@ -8,6 +8,8 @@
 @use 'base' as *;
 @use 'partials/toolbars' as *;
 @use 'partials/buttons' as *;
+@use 'partials/toolbars' as *;
+@use 'partials/labels' as labels;
 
 @mixin input-invalid {
   @include border-all($red);
@@ -155,7 +157,8 @@ ul {
     display: none;
 
     &:checked + label {
-      @extend .i-button, .highlight, .open;
+      @include labels.i-label-highlight($blue, $dark-blue);
+      @include i-button-flavor($blue, $dark-blue);
     }
 
     &:first-child + label {
@@ -175,7 +178,8 @@ ul {
 
     &:checked + label:hover,
     &:checked + label:active {
-      @extend .i-button, .highlight, .open;
+      @include labels.i-label-highlight($blue, $dark-blue);
+      @include i-button-flavor($blue, $dark-blue);
     }
   }
 }
