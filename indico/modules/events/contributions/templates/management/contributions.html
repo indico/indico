@@ -164,6 +164,7 @@
                         {%- trans %}Import{% endtrans -%}
                     </button>
                 </div>
+                {{ template_hook('contribution-list-options', event=event) }}
                 <button class="i-button js-enable-if-checked disabled"
                         data-title="{% trans %}Assign program codes{% endtrans %}"
                         data-href="{{ url_for('event_management.assign_program_codes_contributions', event) }}"
