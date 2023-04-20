@@ -22,6 +22,7 @@ Improvements
 - Hide deleted sections and fields from registration summary (:pr:`5716`)
 - Add support for authorized submitters in Call for Papers (:pr:`5728`)
 - Display abstract submission comment in the list of abstracts (:pr:`5733`)
+- Allow searching for contributions by author in the management area (:pr:`5742`)
 
 Bugfixes
 ^^^^^^^^
