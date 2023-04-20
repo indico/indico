@@ -124,7 +124,7 @@
                                         </span>
                                     </span>
                                 </td>
-                                <td class="i-table person-row-cell" data-searchable="{{ contrib.speakers|map(attribute='name')|join(', ')|lower }}">
+                                <td class="i-table person-row-cell" data-searchable="{{ contrib.person_links|map(attribute='name')|join(', ')|lower }}">
                                     <span class="vertical-aligner">
                                         {% for speaker in contrib.speakers | sort(attribute='display_order_key') -%}
                                             {% set speaker_is_registered = speaker.person in registered_persons %}
