@@ -14,7 +14,7 @@ import {bindActionCreators} from 'redux';
 import {List, Popup, Message} from 'semantic-ui-react';
 
 import {ResponsivePopup} from 'indico/react/components';
-import {Translate, Param} from 'indico/react/i18n';
+import {Translate, Param, PluralTranslate} from 'indico/react/i18n';
 import {fullyOverlaps, serializeTime} from 'indico/utils/date';
 
 import {openModal} from '../../actions';
@@ -140,14 +140,31 @@ class TimelineItem extends React.Component {
 
   renderMessagePopup = (message, segmentStartDt, segmentEndDt, reservation) => {
     const {dayBased} = this.props;
-    const mapRecurrenceTypeToInfo = type =>
-      type.toLowerCase() === 'day'
-        ? Translate.string('daily')
-        : type.toLowerCase() === 'week'
-        ? Translate.string('weekly')
-        : type.toLowerCase() === 'month'
-        ? Translate.string('monthly')
-        : '';
+
+    function mapRecurrenceTypeToInfo(repeatFrequency, repeatInterval) {
+      if (repeatFrequency === 'DAY') {
+        return PluralTranslate.string('Recurs daily', 'Recurs every {count} days', repeatInterval, {
+          count: repeatInterval,
+        });
+      } else if (repeatFrequency === 'WEEK') {
+        return PluralTranslate.string(
+          'Recurs weekly',
+          'Recurs every {count} weeks',
+          repeatInterval,
+          {count: repeatInterval}
+        );
+      } else if (repeatFrequency === 'MONTH') {
+        return PluralTranslate.string(
+          'Recurs monthly',
+          'Recurs every {count} months',
+          repeatInterval,
+          {count: repeatInterval}
+        );
+      } else {
+        return '';
+      }
+    }
+
     return dayBased && !message ? null : (
       <div styleName="popup-center">
         {!dayBased && (
@@ -163,13 +180,15 @@ class TimelineItem extends React.Component {
                 <Translate>Recurring Booking</Translate>
               </Message.Header>
               <Translate>
-                Recurs{' '}
                 <Param
                   name="recurrenceFrequency"
-                  value={mapRecurrenceTypeToInfo(reservation.repeatFrequency)}
+                  value={mapRecurrenceTypeToInfo(
+                    reservation.repeatFrequency,
+                    reservation.repeatInterval
+                  )}
                 />{' '}
                 from <Param name="startTime" value={moment(reservation.startDt).format('L LT')} />{' '}
-                <Param name="endTime" value={moment(reservation.endDt).format('L LT')} />
+                to <Param name="endTime" value={moment(reservation.endDt).format('L LT')} />
               </Translate>
             </Message.Content>
           </Message>
