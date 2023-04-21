@@ -28,11 +28,15 @@ def _disable_reloader(argv):
     for i, arg in enumerate(argv):
         if arg == '--reloader' and argv[i + 1] == 'watchman':
             argv[i + 1] = 'none'
-        elif arg.startswith('--reloader') and '=' in arg:
+            break
+        elif arg.startswith('--reloader='):
             argv[i] = '--reloader=none'
+            break
         elif arg == '--watchman':
             del argv[i]
             break
+    else:
+        argv += ['--reloader', 'none']
     return argv
 
 
