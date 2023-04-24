@@ -37,7 +37,7 @@ export function processRevisions(revisions) {
               {...revision, finalState: c.undoneJudgment},
               {isLatestRevision: true}
             ),
-            reviewedDt: c.createdDt,
+            createdDt: c.createdDt,
             custom: true,
           }
     );
@@ -98,7 +98,7 @@ export function commentFromState(revision, state, user) {
     id: `custom-item-${id}-${reviewedDt}-${finalState.name}`,
     revisionId: id,
     header: state,
-    reviewedDt,
+    createdDt: reviewedDt,
     user: user || submitter,
     custom: true,
     html: revision.commentHtml,

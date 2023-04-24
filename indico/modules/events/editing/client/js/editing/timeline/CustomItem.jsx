@@ -24,7 +24,7 @@ import {blockItemPropTypes} from './util';
 import '../../../styles/timeline.module.scss';
 
 export default function CustomItem({
-  item: {header, user, reviewedDt, html, revisionId, undoneJudgment},
+  item: {header, user, createdDt, html, revisionId, undoneJudgment},
   state,
 }) {
   const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
@@ -42,8 +42,8 @@ export default function CustomItem({
           >
             <div className="f-self-stretch" styleName="item-header">
               {header}{' '}
-              <time dateTime={serializeDate(reviewedDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
-                {serializeDate(reviewedDt, 'LLL')}
+              <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
+                {serializeDate(createdDt, 'LLL')}
               </time>{' '}
               {isUndone && (
                 <Translate as="span" styleName="undone-indicator">
