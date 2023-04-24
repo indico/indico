@@ -292,7 +292,7 @@ class BookingDetails extends React.Component {
         rejections: rejections[day] || [],
         other: other[day] || [],
       },
-      label: moment(day).format('(ddd.) L'),
+      label: moment(day).format('ddd. L'),
       key: day,
       room,
     });

@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/palette';
+
 .booking-time-info {
   margin-top: 10px;
 }
@@ -13,4 +15,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.booking-times-weekday {
+  color: $booking-details-dates-weekday-color;
+  font-weight: bold;
 }

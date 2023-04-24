@@ -47,6 +47,7 @@ $pending-cancellation-fadeout-colors: $pending-cancellation-color,
   lighten($pending-cancellation-color, 30%);
 $rejection-fadeout-colors: $rejection-color, lighten($rejection-color, 30%);
 $other-booking-fadeout-colors: $other-booking-color, lighten($other-booking-color, 30%);
+$booking-details-dates-weekday-color: #8f8f8f;
 
 %rb-splash-background {
   background-image: url('static:images/globe.png');

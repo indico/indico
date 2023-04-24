@@ -25,6 +25,8 @@ Improvements
 - Allow searching for contributions by author in the management area (:pr:`5742`)
 - Include start/end dates of the whole booking in the timeline tooltip of recurring
   room bookings (:issue:`5730`, :pr:`5740`)
+- Add day of the week to room booking details modal and timeline (:issue:`5718`,
+  :pr:`5743`)
 
 Bugfixes
 ^^^^^^^^
