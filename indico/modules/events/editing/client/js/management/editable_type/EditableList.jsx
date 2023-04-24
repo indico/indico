@@ -8,6 +8,7 @@
 import applyJudgmentURL from 'indico-url:event_editing.api_apply_judgment';
 import assignEditorURL from 'indico-url:event_editing.api_assign_editor';
 import assignSelfEditorURL from 'indico-url:event_editing.api_assign_myself';
+import createCommentURL from 'indico-url:event_editing.api_create_comment';
 import editableListURL from 'indico-url:event_editing.api_editable_list';
 import editorsURL from 'indico-url:event_editing.api_editable_type_editors';
 import canAssignSelfURL from 'indico-url:event_editing.api_editor_self_assign_allowed';
@@ -40,6 +41,7 @@ import StateIndicator from '../../editing/timeline/StateIndicator';
 import {userPropTypes} from '../../editing/timeline/util';
 import {EditableType, GetNextEditableTitles} from '../../models';
 
+import CommentButton from './CommentButton';
 import NextEditable from './NextEditable';
 
 import './EditableList.module.scss';
@@ -472,6 +474,11 @@ function EditableListDisplay({
     checkedEditablesAssignmentRequest('unassign', unassignEditorURL);
   };
 
+  const createComment = data => {
+    setActiveRequest('comment');
+    checkedEditablesRequest(createCommentURL, data);
+  };
+
   const applyJudgment = async action => {
     const rv = await updateCheckedEditablesRequest('judgment', applyJudgmentURL, {action});
     if (rv) {
@@ -536,6 +543,11 @@ function EditableListDisplay({
                   loading={activeRequest === 'unassign'}
                 />
               </Button.Group>
+              <CommentButton
+                disabled={!hasCheckedContribs || !!activeRequest}
+                onSubmit={createComment}
+                loading={activeRequest === 'comment'}
+              />
               <Dropdown
                 disabled={!hasCheckedContribs || !!activeRequest}
                 options={judgmentOptions}

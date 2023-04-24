@@ -37,6 +37,7 @@ Improvements
 - Allow acceptance and rejection of editables in the editable list (:pr:`5721`)
 - Email verification attempts during signup now trigger rate limiting to prevent
   spamming large amounts of confirmation emails (:pr:`5727`)
+- Allow bulk-commenting editables in the editable list (:pr:`5747`)
 
 Bugfixes
 ^^^^^^^^

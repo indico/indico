@@ -23,14 +23,14 @@ from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHE
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
-from indico.modules.events.editing.operations import (assign_editor, generate_editables_json, generate_editables_zip,
-                                                      unassign_editor)
+from indico.modules.events.editing.operations import (assign_editor, create_revision_comment, generate_editables_json,
+                                                      generate_editables_zip, unassign_editor)
 from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingConfirmationAction,
                                                    EditingEditableListSchema, EditingReviewAction,
                                                    FilteredEditableSchema)
 from indico.modules.files.models.files import File
 from indico.util.i18n import _
-from indico.util.marshmallow import Principal
+from indico.util.marshmallow import Principal, not_empty
 from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 
@@ -135,6 +135,17 @@ class RHUnassignEditor(RHEditorAssignmentBase):
 
     def _assign_editor(self, editable):
         unassign_editor(editable)
+
+
+class RHCreateComment(RHEditablesBase):
+    @use_kwargs({
+        'text': fields.String(required=True, validate=not_empty),
+        'internal': fields.Bool(load_default=False)
+    })
+    def _process(self, text, internal):
+        for editable in self.editables:
+            create_revision_comment(editable.latest_revision, session.user, text, internal)
+        return '', 201
 
 
 class RHApplyJudgment(RHEditablesBase):

@@ -165,7 +165,8 @@ class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     comments = fields.Method('_get_comments')
     initial_state = fields.Nested(RevisionStateSchema)
     final_state = fields.Nested(RevisionStateSchema)
-    create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_comment', revision))
+    create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_revision_comment',
+                                                                  revision))
     download_files_url = fields.Function(lambda revision: url_for('event_editing.revision_files_export', revision))
     review_url = fields.Function(lambda revision: url_for('event_editing.api_review_editable', revision))
     confirm_url = fields.Method('_get_confirm_url')

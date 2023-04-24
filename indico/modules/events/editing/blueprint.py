@@ -83,6 +83,8 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/
                  editable_list.RHAssignMyselfAsEditor, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/unassign', 'api_unassign_editor',
                  editable_list.RHUnassignEditor, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/comment', 'api_create_comment',
+                 editable_list.RHCreateComment, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/judge', 'api_apply_judgment',
                  editable_list.RHApplyJudgment, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/self-assign-allowed',
@@ -115,7 +117,7 @@ _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/new', 'api_create_subm
                  timeline.RHCreateSubmitterRevision, methods=('POST',),)
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/review', 'api_undo_review',
                  timeline.RHUndoReview, methods=('DELETE',))
-_bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/', 'api_create_comment',
+_bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/', 'api_create_revision_comment',
                  timeline.RHCreateRevisionComment, methods=('POST',),)
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/<int:comment_id>',
                  'api_edit_comment', timeline.RHEditRevisionComment, methods=('PATCH', 'DELETE'),)
