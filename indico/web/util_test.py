@@ -14,7 +14,7 @@ from indico.core.oauth.protector import IndicoAuthlibHTTPError, IndicoResourcePr
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.persons import EventPerson
 from indico.web.flask.util import make_view_func
-from indico.web.rh import RH, allow_signed_url, oauth_scope
+from indico.web.rh import RH, allow_signed_url, custom_auth, oauth_scope
 from indico.web.util import (_check_request_user, _lookup_request_user, _request_likely_seen_by_user, get_oauth_user,
                              get_request_user, is_legacy_signed_url_valid, signed_url_for_user, verify_signed_user_url)
 
@@ -392,14 +392,20 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, du
     class RHTestScope(RHTest):
         pass
 
+    @custom_auth
+    class RHTestCustom(RHTest):
+        pass
+
     app.add_url_rule('/test/default', 'test_default', make_view_func(RHTest), methods=('GET', 'POST'))
     app.add_url_rule('/test/signed', 'test_signed', make_view_func(RHTestSigned))
     app.add_url_rule('/test/scope', 'test_scope', make_view_func(RHTestScope), methods=('GET', 'POST'))
+    app.add_url_rule('/test/custom', 'test_custom', make_view_func(RHTestCustom))
 
     # no auth
     assert test_client.get('/test/default').data == b'none'
     assert test_client.get('/test/signed').data == b'none'
     assert test_client.get('/test/scope').data == b'none'
+    assert test_client.get('/test/custom').data == b'none'
 
     # signature auth
     resp = test_client.get(signed_url_for_user(dummy_user, 'test_default'))
@@ -413,6 +419,10 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, du
     resp = test_client.get(signed_url_for_user(dummy_user, 'test_scope'))
     assert resp.status_code == 400
     assert b'Signature auth is not allowed for this URL' in resp.data
+
+    resp = test_client.get(signed_url_for_user(dummy_user, 'test_custom'))
+    assert resp.status_code == 200
+    assert resp.data == b'none'
 
     # personal oauth-like token - token with read:user scope
     personal_oauth_headers = {'Authorization': f'Bearer {dummy_personal_token._plaintext_token}'}
@@ -435,6 +445,10 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, du
     resp = test_client.post('/test/scope', headers=personal_oauth_headers)
     assert resp.status_code == 200
     assert resp.data == b'1337|oauth'
+
+    resp = test_client.get('/test/custom', headers=personal_oauth_headers)
+    assert resp.status_code == 200
+    assert resp.data == b'none'
 
     # oauth - token with read:user scope
     oauth_headers = {'Authorization': f'Bearer {dummy_token._plaintext_token}'}
@@ -485,6 +499,11 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, du
     assert resp.status_code == 200
     assert resp.data == b'1337|oauth'
 
+    # custom auth should ignore all those headers
+    resp = test_client.get('/test/custom', headers=oauth_headers)
+    assert resp.status_code == 200
+    assert resp.data == b'none'
+
     # full:everything should allow posting to any endpoint
     dummy_token._scopes.append('full:everything')
     dummy_token.app_user_link.scopes.append('full:everything')
@@ -512,6 +531,7 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, du
     assert test_client.get('/test/default').data == b'123|session'
     assert test_client.get('/test/signed').data == b'123|session'
     assert test_client.get('/test/scope').data == b'123|session'
+    assert test_client.get('/test/custom').data == b'none'
 
     # personal token + session is not allowed
     resp = test_client.get('/test/default', headers=personal_oauth_headers)
@@ -532,6 +552,11 @@ def test_get_request_user_complete(dummy_user, app, test_client, dummy_token, du
     resp = test_client.get(signed_url_for_user(dummy_user, 'test_signed'))
     assert resp.status_code == 200
     assert resp.data == b'1337|signed_url'
+
+    # bearer tokens are completely ignored
+    resp = test_client.get('/test/custom', headers={'Authorization': 'Bearer foobar'})
+    assert resp.status_code == 200
+    assert resp.data == b'none'
 
 
 def test_get_request_user_nested_exceptions(mocker, app, test_client):

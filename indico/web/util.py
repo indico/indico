@@ -394,6 +394,10 @@ def get_request_user():
 
     current_exc = sys.exc_info()[1]
     rh = type(g.rh) if 'rh' in g else None
+
+    if getattr(rh, '_DISABLE_CORE_AUTH', False):
+        return None, None
+
     oauth_scope_hint = getattr(rh, '_OAUTH_SCOPE', None)
     allow_signed_url = getattr(rh, '_ALLOW_SIGNED_URL', False)
 

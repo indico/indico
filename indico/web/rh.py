@@ -374,6 +374,21 @@ def oauth_scope(scope):
     return decorator
 
 
+def custom_auth(rh):
+    """Use custom (bearer token) auth for this RH.
+
+    This is useful when creating endpoints that will handle Bearer tokens
+    on their own and should never try to verify a token against Indico's
+    own OAuth or personal tokens.
+
+    It completely disables any of the core auth features, so neither bearer
+    tokens nor session cookies nor signed URLs will be handled; this means
+    the "current user" is always going to be None.
+    """
+    rh._DISABLE_CORE_AUTH = True
+    return rh
+
+
 def allow_signed_url(rh):
     """Allow accessing this RH using persistent signed URLs.
 
