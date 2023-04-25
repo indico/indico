@@ -165,6 +165,8 @@ class TimelineItem extends React.Component {
       }
     }
 
+    const fmt = dayBased ? 'L' : 'L LT';
+
     return dayBased && !message ? null : (
       <div styleName="popup-center">
         {!dayBased && (
@@ -187,8 +189,8 @@ class TimelineItem extends React.Component {
                     reservation.repeatInterval
                   )}
                 />{' '}
-                from <Param name="startTime" value={moment(reservation.startDt).format('L LT')} />{' '}
-                to <Param name="endTime" value={moment(reservation.endDt).format('L LT')} />
+                from <Param name="startTime" value={moment(reservation.startDt).format(fmt)} /> to{' '}
+                <Param name="endTime" value={moment(reservation.endDt).format(fmt)} />
               </Translate>
             </Message.Content>
           </Message>
