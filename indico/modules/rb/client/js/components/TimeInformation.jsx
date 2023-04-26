@@ -59,7 +59,7 @@ function TimeInformation({
                 <Param
                   name="endDateDay"
                   wrapper={<span styleName="booking-times-weekday" />}
-                  value={mEndDate.format('ddd.')}
+                  value={mEndDate.format('ddd')}
                 />{' '}
                 <Param name="endDate" wrapper={<strong />} value={mEndDate.format('L')} />
               </Translate>
