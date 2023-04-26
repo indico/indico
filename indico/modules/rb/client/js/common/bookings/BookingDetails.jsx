@@ -292,7 +292,11 @@ class BookingDetails extends React.Component {
         rejections: rejections[day] || [],
         other: other[day] || [],
       },
-      label: moment(day).format('ddd L'),
+      label: (
+        <>
+          <span styleName="weekday">{moment(day).format('ddd')}</span> {moment(day).format('L')}
+        </>
+      ),
       key: day,
       room,
     });
