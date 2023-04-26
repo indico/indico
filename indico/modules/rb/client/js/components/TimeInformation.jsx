@@ -52,7 +52,7 @@ function TimeInformation({
                 <Param
                   name="startDateDay"
                   wrapper={<span styleName="booking-times-weekday" />}
-                  value={mStartDate.format('ddd.')}
+                  value={mStartDate.format('ddd')}
                 />{' '}
                 <Param name="startDate" wrapper={<strong />} value={mStartDate.format('L')} />
                 {' — '}
