@@ -65,7 +65,7 @@ function TimeInformation({
               </Translate>
             ) : (
               <strong>
-                <span styleName="booking-times-weekday">{mStartDate.format('ddd.')}</span>{' '}
+                <span styleName="booking-times-weekday">{mStartDate.format('ddd')}</span>{' '}
                 {mStartDate.format('L')}
               </strong>
             )}
