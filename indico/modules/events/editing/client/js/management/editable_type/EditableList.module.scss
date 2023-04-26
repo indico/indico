@@ -21,6 +21,7 @@ $border: 1px solid $pastel-gray;
 
     :global(.ui.button) {
       margin-right: 0;
+      min-height: 37px;
     }
   }
 }
