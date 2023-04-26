@@ -49,11 +49,25 @@ function TimeInformation({
             <Icon name="calendar outline" />
             {mEndDate && !mStartDate.isSame(mEndDate, 'day') ? (
               <Translate>
-                <Param name="startDate" wrapper={<strong />} value={mStartDate.format('L')} /> to{' '}
+                <Param
+                  name="startDateDay"
+                  wrapper={<span styleName="booking-times-weekday" />}
+                  value={mStartDate.format('ddd')}
+                />{' '}
+                <Param name="startDate" wrapper={<strong />} value={mStartDate.format('L')} />
+                {' — '}
+                <Param
+                  name="endDateDay"
+                  wrapper={<span styleName="booking-times-weekday" />}
+                  value={mEndDate.format('ddd')}
+                />{' '}
                 <Param name="endDate" wrapper={<strong />} value={mEndDate.format('L')} />
               </Translate>
             ) : (
-              <strong>{mStartDate.format('L')}</strong>
+              <strong>
+                <span styleName="booking-times-weekday">{mStartDate.format('ddd')}</span>{' '}
+                {mStartDate.format('L')}
+              </strong>
             )}
           </div>
         </Segment>
