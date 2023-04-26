@@ -445,5 +445,5 @@ def _compose_filepath(editable, revision_file):
 
 
 def _ensure_publishable_files(revision):
-    if not any(f.file_type.publishable for f in revision.files):
+    if not revision.has_publishable_files:
         raise InvalidEditableState

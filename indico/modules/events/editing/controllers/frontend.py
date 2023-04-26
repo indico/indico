@@ -22,8 +22,6 @@ class RHEditingDashboard(RHEditingManagementBase):
 
 
 class RHEditableListManagement(RHEditingManagementBase):
-    EVENT_FEATURE = None
-
     def _process(self):
         return WPEditing.render_template('management/editable_list.html', self.event)
 

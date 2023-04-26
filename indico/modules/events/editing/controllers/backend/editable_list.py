@@ -147,6 +147,8 @@ class RHApplyJudgment(RHEditablesBase):
             revision = editable.latest_revision
             if revision.final_state != FinalRevisionState.none:
                 continue
+            elif action == 'accept' and not revision.has_publishable_files:
+                continue
             if revision.initial_state == InitialRevisionState.ready_for_review:
                 review_and_publish_editable(revision, EditingReviewAction[action], '')
             elif revision.initial_state == InitialRevisionState.needs_submitter_confirmation and action == 'accept':
