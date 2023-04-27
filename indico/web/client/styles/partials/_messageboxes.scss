@@ -42,6 +42,13 @@ $default-spacing: 10px;
     }
   }
 
+  &.large-icon {
+    .icon {
+      font-size: 2.7em;
+      margin-bottom: $default-spacing;
+    }
+  }
+
   .icon {
     flex-shrink: 0;
     font-size: 1.5em;
@@ -61,13 +68,6 @@ $default-spacing: 10px;
     flex: 1 100%;
     margin: $default-spacing -#{$default-spacing} -#{$default-spacing} -#{$default-spacing};
     padding: $default-spacing;
-  }
-}
-
-%message-box.large-icon {
-  .icon {
-    font-size: 2.7em;
-    margin-bottom: $default-spacing;
   }
 }
 
