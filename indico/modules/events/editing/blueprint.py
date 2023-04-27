@@ -19,7 +19,7 @@ _bp.add_url_rule('/manage/editing/tags', 'manage_tags', frontend.RHEditingDashbo
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/', 'manage_editable_type',
                  frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/list', 'manage_editable_type_list',
-                 frontend.RHEditingDashboard)
+                 frontend.RHEditableListManagement)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/types', 'manage_file_types',
                  frontend.RHEditingDashboard)
 _bp.add_url_rule('/manage/editing/<any(paper,slides,poster):type>/review-conditions', 'manage_review_conditions',
@@ -83,6 +83,8 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/assign/
                  editable_list.RHAssignMyselfAsEditor, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/unassign', 'api_unassign_editor',
                  editable_list.RHUnassignEditor, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/judge', 'api_apply_judgment',
+                 editable_list.RHApplyJudgment, methods=('POST',))
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editables/self-assign-allowed',
                  'api_editor_self_assign_allowed', common.RHEditableCheckSelfAssign)
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editors', 'api_editable_type_editors',

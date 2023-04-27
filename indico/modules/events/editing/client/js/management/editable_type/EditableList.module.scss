@@ -11,8 +11,18 @@ $border: 1px solid $pastel-gray;
 
 .editable-topbar {
   display: flex;
-  width: 1000px;
   justify-content: space-between;
+  min-width: 1000px;
+
+  .editable-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+
+    :global(.ui.button) {
+      margin-right: 0;
+    }
+  }
 }
 
 .editable-list {

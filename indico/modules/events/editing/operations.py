@@ -49,7 +49,7 @@ class InvalidEditableState(BadRequest):
 
 
 def ensure_latest_revision(revision):
-    if revision != revision.editable.valid_revisions[-1]:
+    if revision != revision.editable.latest_revision:
         raise InvalidEditableState
 
 
@@ -246,7 +246,7 @@ def _ensure_latest_revision_with_final_state(revision):
 @no_autoflush
 def undo_review(revision):
     _ensure_latest_revision_with_final_state(revision)
-    latest_revision = revision.editable.valid_revisions[-1]
+    latest_revision = revision.editable.latest_revision
     if revision != latest_revision and not _is_request_changes_with_files(latest_revision):
         if revision.editable.valid_revisions[-2:] != [revision, latest_revision]:
             raise InvalidEditableState
@@ -445,5 +445,5 @@ def _compose_filepath(editable, revision_file):
 
 
 def _ensure_publishable_files(revision):
-    if not any(f.file_type.publishable for f in revision.files):
+    if not revision.has_publishable_files:
         raise InvalidEditableState

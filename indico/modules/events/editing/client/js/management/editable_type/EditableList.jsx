@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import applyJudgmentURL from 'indico-url:event_editing.api_apply_judgment';
 import assignEditorURL from 'indico-url:event_editing.api_assign_editor';
 import assignSelfEditorURL from 'indico-url:event_editing.api_assign_myself';
 import editableListURL from 'indico-url:event_editing.api_editable_list';
@@ -28,7 +29,7 @@ import {
   ListFilter,
 } from 'indico/react/components';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
@@ -118,6 +119,7 @@ function EditableListDisplay({
   );
   const [activeRequest, setActiveRequest] = useState(null);
   const [assignmentConflict, setAssignmentConflict] = useState(null);
+  const [skippedEditables, setSkippedEditables] = useState(0);
 
   const editorOptions = useMemo(
     () =>
@@ -129,6 +131,21 @@ function EditableListDisplay({
       })),
     [editors]
   );
+
+  const judgmentOptions = [
+    {
+      key: 'accept',
+      value: 'accept',
+      text: Translate.string('Accept'),
+      label: {color: 'green', empty: true, circular: true},
+    },
+    {
+      key: 'reject',
+      value: 'reject',
+      text: Translate.string('Reject'),
+      label: {color: 'black', empty: true, circular: true},
+    },
+  ];
 
   const filterOptions = useMemo(
     () => [
@@ -201,9 +218,30 @@ function EditableListDisplay({
     [EditableType.poster]: Translate.string('List of posters'),
   }[editableType];
 
+  const skippedEditablesWarning = {
+    [EditableType.paper]: PluralTranslate.string(
+      '{count} paper was skipped because of its current status.',
+      '{count} papers were skipped because of their current status.',
+      skippedEditables,
+      {count: skippedEditables}
+    ),
+    [EditableType.slides]: PluralTranslate.string(
+      '{count} slide was skipped because of its current status.',
+      '{count} slides were skipped because of their current status.',
+      skippedEditables,
+      {count: skippedEditables}
+    ),
+    [EditableType.poster]: PluralTranslate.string(
+      '{count} poster was skipped because of its current status.',
+      '{count} posters were skipped because of their current status.',
+      skippedEditables,
+      {count: skippedEditables}
+    ),
+  }[editableType];
+
   const columnHeaders = [
     ['friendlyId', Translate.string('ID'), 60],
-    ...(codePresent ? [['code', Translate.string('Code'), 80]] : []),
+    ...(codePresent ? [['code', Translate.string('Code'), 110]] : []),
     ['title', Translate.string('Title'), 600],
     ['revision', Translate.string('Rev.'), 80],
     ['status', Translate.string('Status'), 200],
@@ -409,25 +447,36 @@ function EditableListDisplay({
 
   const updateCheckedEditablesRequest = async (type, urlFunc, data = {}) => {
     setActiveRequest(type);
-    const rv = await checkedEditablesRequest(urlFunc, {
-      ...data,
-      editor_assignments: editorAssignments,
-    });
+    const rv = await checkedEditablesRequest(urlFunc, data);
     if (rv) {
       patchList(rv);
     }
+    return rv;
   };
 
+  const checkedEditablesAssignmentRequest = async (type, urlFunc, data = {}) =>
+    updateCheckedEditablesRequest(type, urlFunc, {
+      ...data,
+      editor_assignments: editorAssignments,
+    });
+
   const assignEditor = editor => {
-    updateCheckedEditablesRequest('assign', assignEditorURL, {editor});
+    checkedEditablesAssignmentRequest('assign', assignEditorURL, {editor});
   };
 
   const assignSelfEditor = () => {
-    updateCheckedEditablesRequest('assign-self', assignSelfEditorURL);
+    checkedEditablesAssignmentRequest('assign-self', assignSelfEditorURL);
   };
 
   const unassignEditor = async () => {
-    updateCheckedEditablesRequest('unassign', unassignEditorURL);
+    checkedEditablesAssignmentRequest('unassign', unassignEditorURL);
+  };
+
+  const applyJudgment = async action => {
+    const rv = await updateCheckedEditablesRequest('judgment', applyJudgmentURL, {action});
+    if (rv) {
+      setSkippedEditables(checked.length - rv.length);
+    }
   };
 
   return (
@@ -437,7 +486,7 @@ function EditableListDisplay({
         <ManagementPageBackButton url={editableTypeURL({event_id: eventId, type: editableType})} />
       )}
       <div styleName="editable-topbar">
-        <div>
+        <div styleName="editable-actions">
           {canAssignSelf && (
             <Button
               content={GetNextEditableTitles[editableType]}
@@ -486,7 +535,23 @@ function EditableListDisplay({
                   onClick={unassignEditor}
                   loading={activeRequest === 'unassign'}
                 />
-              </Button.Group>{' '}
+              </Button.Group>
+              <Dropdown
+                disabled={!hasCheckedContribs || !!activeRequest}
+                options={judgmentOptions}
+                scrolling
+                icon={null}
+                value={null}
+                selectOnBlur={false}
+                selectOnNavigation={false}
+                onChange={(evt, {value}) => applyJudgment(value)}
+                trigger={
+                  <Button icon loading={activeRequest === 'judgment'}>
+                    <Translate>Judge</Translate>
+                    <Icon name="caret down" />
+                  </Button>
+                }
+              />
               <Button.Group>
                 <Button
                   disabled={!hasCheckedContribs || !!activeRequest}
@@ -512,6 +577,12 @@ function EditableListDisplay({
           onChangeList={onChangeList}
         />
       </div>
+      {!!skippedEditables && (
+        <Message warning>
+          <Icon name="warning sign" />
+          {skippedEditablesWarning}
+        </Message>
+      )}
       {sortedList.length ? (
         <div styleName="editable-list">
           <WindowScroller>

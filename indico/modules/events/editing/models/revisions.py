@@ -174,6 +174,10 @@ class EditingRevision(RenderModeMixin, db.Model):
     def __repr__(self):
         return format_repr(self, 'id', 'editable_id', 'initial_state', final_state=FinalRevisionState.none)
 
+    @property
+    def has_publishable_files(self):
+        return any(file.file_type.publishable for file in self.files)
+
     @locator_property
     def locator(self):
         return dict(self.editable.locator, revision_id=self.id)

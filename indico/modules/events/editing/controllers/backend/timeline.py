@@ -17,17 +17,17 @@ from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServiceUnavailable
 
 from indico.core.errors import NoReportError, UserValueError
+from indico.modules.events.editing.controllers.backend.util import (confirm_and_publish_changes,
+                                                                    review_and_publish_editable)
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase, TokenAccessMixin
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
-from indico.modules.events.editing.operations import (assign_editor, confirm_editable_changes, create_new_editable,
-                                                      create_revision_comment, create_submitter_revision,
-                                                      delete_revision_comment, ensure_latest_revision,
-                                                      publish_editable_revision, replace_revision,
-                                                      review_editable_revision, unassign_editor, undo_review,
-                                                      update_revision_comment)
+from indico.modules.events.editing.operations import (assign_editor, create_new_editable, create_revision_comment,
+                                                      create_submitter_revision, delete_revision_comment,
+                                                      ensure_latest_revision, replace_revision, unassign_editor,
+                                                      undo_review, update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
 from indico.modules.events.editing.service import (ServiceRequestFailed, service_get_custom_actions,
@@ -130,7 +130,7 @@ class RHEditable(RHContributionEditableBase):
 
     def _process(self):
         custom_actions = self._get_custom_actions()
-        custom_actions_ctx = {self.editable.valid_revisions[-1]: custom_actions}
+        custom_actions_ctx = {self.editable.latest_revision: custom_actions}
         schema = EditableSchema(context={
             'user': session.user,
             'custom_actions': custom_actions_ctx,
@@ -205,21 +205,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
             argmap['files'] = EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                                 required=(action != EditingReviewAction.request_update))
         args = parser.parse(argmap, unknown=EXCLUDE)
-        service_url = editing_settings.get(self.event, 'service_url')
-
-        new_revision = review_editable_revision(self.revision, session.user, action, comment, args['tags'],
-                                                args.get('files'))
-
-        publish = True
-        if service_url:
-            try:
-                resp = service_handle_review_editable(self.editable, session.user, action, self.revision, new_revision)
-                publish = resp.get('publish', True)
-            except ServiceRequestFailed:
-                raise ServiceUnavailable(_('Failed processing review, please try again later.'))
-
-        if publish and action in (EditingReviewAction.accept, EditingReviewAction.update_accept):
-            publish_editable_revision(new_revision or self.revision)
+        review_and_publish_editable(self.revision, action, comment, args['tags'], args.get('files'))
         return '', 204
 
 
@@ -234,19 +220,7 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
         'comment': fields.String(load_default='')
     })
     def _process(self, action, comment):
-        confirm_editable_changes(self.revision, session.user, action, comment)
-
-        service_url = editing_settings.get(self.event, 'service_url')
-        publish = True
-        if service_url:
-            try:
-                resp = service_handle_review_editable(self.editable, session.user, action, self.revision)
-                publish = resp.get('publish', True)
-            except ServiceRequestFailed:
-                raise ServiceUnavailable(_('Failed processing review, please try again later.'))
-
-        if publish and action == EditingConfirmationAction.accept:
-            publish_editable_revision(self.revision)
+        confirm_and_publish_changes(self.revision, action, comment)
         return '', 204
 
 

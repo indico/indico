@@ -21,6 +21,11 @@ class RHEditingDashboard(RHEditingManagementBase):
         return WPEditing.render_template(f'management/{template}', self.event)
 
 
+class RHEditableListManagement(RHEditingManagementBase):
+    def _process(self):
+        return WPEditing.render_template('management/editable_list.html', self.event)
+
+
 class RHEditableTimeline(RHContributionEditableBase):
     def _process_args(self):
         RHContributionEditableBase._process_args(self)
