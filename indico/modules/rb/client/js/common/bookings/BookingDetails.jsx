@@ -311,6 +311,7 @@ class BookingDetails extends React.Component {
         fixedHeight={rows.length > 1 ? '70vh' : null}
         booking={booking}
         rowActions={{occurrence: true}}
+        hideRecurrence
       />
     );
   };
