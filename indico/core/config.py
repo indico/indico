@@ -75,7 +75,7 @@ DEFAULTS = {
     'SENTRY_LOGGING_LEVEL': 'WARNING',
     'SESSION_LIFETIME': 86400 * 31,
     'SIGNUP_CAPTCHA': True,
-    'SIGNUP_RATE_LIMIT': '3 per hour; 10 per day',
+    'SIGNUP_RATE_LIMIT': '2 per hour; 5 per day',
     'SMTP_ALLOWED_SENDERS': set(),
     'SMTP_CERTFILE': None,
     'SMTP_KEYFILE': None,
