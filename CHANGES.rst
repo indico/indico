@@ -35,6 +35,8 @@ Improvements
 - Add day of the week to room booking details modal and timeline (:issue:`5718`,
   :pr:`5743`)
 - Allow acceptance and rejection of editables in the editable list (:pr:`5721`)
+- Email verification attempts during signup now trigger rate limiting to prevent
+  spamming large amounts of confirmation emails (:pr:`5727`)
 
 Bugfixes
 ^^^^^^^^

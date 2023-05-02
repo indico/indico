@@ -85,6 +85,20 @@ Authentication
 
     Default: ``'5 per 15 minutes; 10 per day'``
 
+.. data:: SIGNUP_RATE_LIMIT
+
+    Applies a rate limit to sending verification emails in signup attempts.
+    When specifying multiple rate limits separated with a semicolon, they are checked
+    in that specific order, which can allow for a short burst of attempts.
+
+    Rate limiting is applied by IP address and each verification email sent counts
+    against the rate limit.
+
+    The default allows a burst of 5 attempts, and then only 2 attempts every hour for
+    the next 24 hours.  Setting the rate limit to ``None`` disables it.
+
+    Default: ``'2 per hour; 5 per day'``
+
 .. data:: EXTERNAL_REGISTRATION_URL
 
     The URL to an external page where people can register an account that
