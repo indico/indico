@@ -7,6 +7,13 @@ Version 3.2.4
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Set ``Vary: Cookie`` header when session data is present and used. This ensures
+  that data linked to a (logged-in) session cannot leak between requests even in case
+  of a poorly-configured caching proxy in front of Indico (:pr:`5753`)
+
 Improvements
 ^^^^^^^^^^^^
 

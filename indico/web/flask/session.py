@@ -196,7 +196,13 @@ class IndicoSessionInterface(SessionInterface):
             # empty session, delete it from storage and cookie
             self.storage.delete(session.sid)
             response.delete_cookie(app.session_cookie_name, domain=domain)
+            response.vary.add('Cookie')
             return
+
+        if session.accessed and session:
+            # if a non-empty session is accessed, the response almost certainly depends on
+            # session contents so we need to add a `Vary: Cookie`` header
+            response.vary.add('Cookie')
 
         if not refresh_sid and not session.modified and not self.should_refresh_session(app, session):
             # If the session has not been modified we only store if it needs to be refreshed
@@ -219,3 +225,4 @@ class IndicoSessionInterface(SessionInterface):
         self.storage.set(session.sid, self.serializer.dumps(dict(session)), storage_ttl)
         response.set_cookie(app.session_cookie_name, session.sid, expires=cookie_lifetime, httponly=True,
                             secure=secure)
+        response.vary.add('Cookie')
