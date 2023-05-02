@@ -6,9 +6,9 @@
 # LICENSE file for more details.
 
 import typing as t
+from urllib.parse import urlsplit
 
 import icalendar
-from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -25,7 +25,7 @@ def generate_session_component(
     organizer: t.Optional[t.Tuple[str, str]] = None
 ):
     """Generate an Event iCalendar component from an Indico Session."""
-    uid = f'indico-session-{session.id}@{url_parse(config.BASE_URL).host}'
+    uid = f'indico-session-{session.id}@{urlsplit(config.BASE_URL).hostname}'
     url = url_for('sessions.display_session', session, _external=True)
     component = generate_basic_component(session, uid, url, organizer=organizer)
 
@@ -41,7 +41,7 @@ def generate_session_block_component(
     organizer: t.Optional[t.Tuple[str, str]] = None
 ):
     """Generate an Event iCalendar component for a session block in an Indico Session."""
-    uid = f'indico-session-block-{block.id}@{url_parse(config.BASE_URL).host}'
+    uid = f'indico-session-block-{block.id}@{urlsplit(config.BASE_URL).hostname}'
     url = url_for('sessions.display_session', block.session, _external=True)
     component = generate_basic_component(
         block, uid, url, title=block.full_title, description=block.session.description, organizer=organizer
@@ -69,7 +69,7 @@ def session_to_ical(
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
-    related_event_uid = f'indico-event-{session.event.id}@{url_parse(config.BASE_URL).host}'
+    related_event_uid = f'indico-event-{session.event.id}@{urlsplit(config.BASE_URL).hostname}'
 
     if not detailed and session.blocks:
         component = generate_session_component(session, related_event_uid, organizer=organizer)

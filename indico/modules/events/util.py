@@ -15,13 +15,13 @@ from contextlib import contextmanager
 from copy import deepcopy
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
+from urllib.parse import urlsplit
 from zipfile import ZipFile
 
 from flask import current_app, flash, g, redirect, request, session
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
 from werkzeug.exceptions import BadRequest, Forbidden
-from werkzeug.urls import url_parse
 
 from indico.core import signals
 from indico.core.config import config
@@ -653,7 +653,7 @@ def check_permissions(event, field, allow_networks=False):
 
 def get_event_from_url(url):
     """Get an event from an Indico event URL."""
-    data = url_parse(url)
+    data = urlsplit(url)
     if not all([data.scheme, data.netloc, data.path]):
         raise ValueError(_('Invalid event URL'))
     event_path = re.match(r'/event/(\d+)(/|$)', data.path)

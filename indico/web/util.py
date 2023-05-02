@@ -8,14 +8,15 @@
 import hashlib
 import sys
 from datetime import datetime
+from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 import sentry_sdk
 from authlib.oauth2 import OAuth2Error
 from flask import flash, g, has_request_context, jsonify, render_template, request, session
 from itsdangerous import Signer
 from markupsafe import Markup
+from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import BadRequest, Forbidden, ImATeapot
-from werkzeug.urls import url_decode, url_encode, url_parse, url_unparse
 
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
@@ -194,18 +195,18 @@ def is_legacy_signed_url_valid(user, url):
     :func:`signed_url_for_user` and :func:`verify_signed_user_url` utils
     which encode the user id within the signature.
     """
-    parsed = url_parse(url)
-    params = url_decode(parsed.query)
+    parsed = urlsplit(url)
+    params = MultiDict(parse_qs(parsed.query))
     try:
         signature = params.pop('token')
     except KeyError:
         return False
 
-    url = url_unparse((
+    url = urlunsplit((
         '',
         '',
         parsed.path,
-        url_encode(params, sort=False),
+        urlencode(list(params.lists()), doseq=True),
         parsed.fragment
     ))
     signer = Signer(user.signing_secret, salt='url-signing')
@@ -255,8 +256,8 @@ def verify_signed_user_url(url, method):
     :raise Forbidden: if a token is present but invalid
     """
     from indico.modules.users import User
-    parsed = url_parse(url)
-    params = url_decode(parsed.query)
+    parsed = urlsplit(url)
+    params = MultiDict(parse_qs(parsed.query))
     try:
         user_id, signature = params.pop('user_token').split('_', 1)
         user_id = int(user_id)
@@ -265,11 +266,11 @@ def verify_signed_user_url(url, method):
     except ValueError:
         raise BadRequest(_('The persistent link you used is invalid.'))
 
-    url = url_unparse((
+    url = urlunsplit((
         '',
         '',
         parsed.path,
-        url_encode(params, sort=False),
+        urlencode(list(params.lists()), doseq=True),
         parsed.fragment
     ))
 

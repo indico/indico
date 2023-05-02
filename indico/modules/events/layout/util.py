@@ -8,10 +8,10 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import chain, count
+from urllib.parse import urlsplit
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only
-from werkzeug.urls import url_parse
 
 import indico
 from indico.core import signals
@@ -347,7 +347,7 @@ def _build_css_url(theme):
         plugin = theme.split(':', 1)[0]
         return url_for_plugin(f'{plugin}.static', filename=path)
     else:
-        css_base = url_parse(config.CONFERENCE_CSS_TEMPLATES_BASE_URL).path
+        css_base = urlsplit(config.CONFERENCE_CSS_TEMPLATES_BASE_URL).path
         return f'{css_base}/{theme}'
 
 

@@ -6,9 +6,9 @@
 # LICENSE file for more details.
 
 import os
+from urllib.parse import urlsplit
 
 from flask import current_app, json, render_template, session
-from werkzeug.urls import url_parse
 
 from indico.core.auth import multipass
 from indico.core.config import config
@@ -99,7 +99,7 @@ def generate_global_file():
         'ExperimentalEditingService': config.EXPERIMENTAL_EDITING_SERVICE,
         'Urls': {
             'Base': config.BASE_URL,
-            'BasePath': url_parse(config.BASE_URL).path.rstrip('/'),
+            'BasePath': urlsplit(config.BASE_URL).path.rstrip('/'),
             'ExportAPIBase': url_for('api.httpapi', prefix='export'),
             'APIBase': url_for('api.httpapi', prefix='api'),
 

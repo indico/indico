@@ -5,10 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from urllib.parse import urlsplit
+
 import requests
 from marshmallow import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
-from werkzeug.urls import url_parse
 
 import indico
 from indico.core.config import config
@@ -83,7 +84,7 @@ def _log_service_error(exc, msg):
 
 
 def make_event_identifier(event):
-    data = url_parse(config.BASE_URL)
+    data = urlsplit(config.BASE_URL)
     parts = data.netloc.split('.')
     if data.path:
         parts += data.path.split('/')

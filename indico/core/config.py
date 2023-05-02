@@ -12,13 +12,13 @@ import re
 import socket
 import warnings
 from datetime import timedelta
+from urllib.parse import urlsplit
 
 import pytz
 from celery.schedules import crontab
 from flask import current_app, g
 from flask.helpers import get_root_path
 from werkzeug.datastructures import ImmutableDict
-from werkzeug.urls import url_parse
 
 from indico.util.caching import make_hashable
 from indico.util.fs import resolve_link
@@ -258,7 +258,7 @@ class IndicoConfig:
 
     @property
     def IMAGES_BASE_URL(self):
-        return 'static/images' if g.get('static_site') else url_parse(f'{self.BASE_URL}/images').path
+        return 'static/images' if g.get('static_site') else urlsplit(f'{self.BASE_URL}/images').path
 
     @property
     def LATEX_ENABLED(self):

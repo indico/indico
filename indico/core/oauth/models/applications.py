@@ -5,12 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from urllib.parse import urlsplit
 from uuid import uuid4
 
 from authlib.oauth2.rfc6749 import ClientMixin, list_to_scope, scope_to_list
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.ext.declarative import declared_attr
-from werkzeug.urls import url_parse
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -162,8 +162,8 @@ class OAuthApplication(ClientMixin, db.Model):
         that path.
         """
         # TODO: maybe use a stricter implementation that does not use substrings?
-        uri_data = url_parse(redirect_uri)
-        for valid_uri_data in map(url_parse, self.redirect_uris):
+        uri_data = urlsplit(redirect_uri)
+        for valid_uri_data in map(urlsplit, self.redirect_uris):
             if (uri_data.scheme == valid_uri_data.scheme and uri_data.netloc == valid_uri_data.netloc and
                     uri_data.path.startswith(valid_uri_data.path)):
                 return True

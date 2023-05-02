@@ -6,10 +6,10 @@
 # LICENSE file for more details.
 
 import json
+from urllib.parse import urljoin
 
 import requests
 from requests.exceptions import HTTPError, RequestException, Timeout
-from werkzeug.urls import url_join
 
 from indico.core.config import config
 from indico.modules.cephalopod import cephalopod_settings, logger
@@ -21,7 +21,7 @@ TIMEOUT = 10
 
 
 def _get_url():
-    return url_join(config.COMMUNITY_HUB_URL, 'api/instance/')
+    return urljoin(config.COMMUNITY_HUB_URL, 'api/instance/')
 
 
 def register_instance(contact, email):
@@ -62,7 +62,7 @@ def register_instance(contact, email):
 
 def unregister_instance():
     payload = {'enabled': False}
-    url = url_join(_get_url(), cephalopod_settings.get('uuid'))
+    url = urljoin(_get_url(), cephalopod_settings.get('uuid'))
     response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
                               verify=(not config.DEBUG))
     try:
@@ -95,7 +95,7 @@ def sync_instance(contact, email):
                'contact': contact,
                'email': email,
                'organization': core_settings.get('site_organization')}
-    url = url_join(_get_url(), cephalopod_settings.get('uuid'))
+    url = urljoin(_get_url(), cephalopod_settings.get('uuid'))
     response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
                               verify=(not config.DEBUG))
     try:

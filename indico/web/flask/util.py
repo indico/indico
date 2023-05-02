@@ -9,6 +9,7 @@ import inspect
 import os
 import re
 from importlib import import_module
+from urllib.parse import urlsplit
 
 from flask import Blueprint, current_app, g, redirect, request
 from flask import send_file as _send_file
@@ -16,7 +17,6 @@ from flask import url_for as _url_for
 from flask.helpers import get_root_path
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
-from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.util.caching import memoize
@@ -286,8 +286,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
 def endpoint_for_url(url, base_url=None):
     if base_url is None:
         base_url = config.BASE_URL
-    base_url_data = url_parse(base_url)
-    url_data = url_parse(url)
+    base_url_data = urlsplit(base_url)
+    url_data = urlsplit(url)
     netloc = url_data.netloc or base_url_data.netloc
     # absolute url not matching our hostname
     if url_data.netloc and url_data.netloc != base_url_data.netloc:

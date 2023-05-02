@@ -7,6 +7,7 @@
 
 import logging
 import re
+from urllib.parse import urlsplit
 
 import requests
 import sentry_sdk
@@ -16,7 +17,6 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 from sentry_sdk.integrations.pure_eval import PureEvalIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
-from werkzeug.urls import url_parse
 
 import indico
 from indico.core.config import config
@@ -61,7 +61,7 @@ def submit_user_feedback(error_data, email, comment):
 
     # get rid of credentials or query string in case they are present in the DSN
     dsn = re.sub(r':[^@/]+(?=@)', '', config.SENTRY_DSN)
-    url = url_parse(dsn)
+    url = urlsplit(dsn)
     dsn = str(url.replace(query=''))
     verify = url.decode_query().get('ca_certs', True)
     url = str(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=''))

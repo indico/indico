@@ -8,6 +8,7 @@
 import os
 import traceback
 from threading import Lock, Thread
+from urllib.parse import urlsplit
 
 import click
 from werkzeug.debug import DebuggedApplication
@@ -15,7 +16,6 @@ from werkzeug.exceptions import NotFound
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.serving import WSGIRequestHandler, run_simple
-from werkzeug.urls import url_parse
 
 
 try:
@@ -129,7 +129,7 @@ def _make_wsgi_app(info, url, evalex_whitelist, proxy):
         _reset_state()
         return info.load_app()
 
-    url_data = url_parse(url)
+    url_data = urlsplit(url)
     app = DispatchingApp(_load_app)
     app = DebuggedIndico(app, evalex_whitelist)
     app = _make_indico_dispatcher(app, url_data.path)

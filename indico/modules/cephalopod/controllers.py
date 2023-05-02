@@ -6,10 +6,10 @@
 # LICENSE file for more details.
 
 import platform
+from urllib.parse import urljoin
 
 from flask import flash, jsonify, redirect, request
 from requests.exceptions import HTTPError, RequestException, Timeout
-from werkzeug.urls import url_join
 
 import indico
 from indico.core.config import config
@@ -37,7 +37,7 @@ class RHCephalopod(RHCephalopodBase):
         form = CephalopodForm(obj=FormDefaults(**cephalopod_settings.get_all()))
         if form.validate_on_submit():
             return self._process_form(form)
-        hub_url = url_join(config.COMMUNITY_HUB_URL, 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        hub_url = urljoin(config.COMMUNITY_HUB_URL, 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
         cephalopod_settings.set('show_migration_message', False)
         return WPCephalopod.render_template('cephalopod.html', 'cephalopod',
                                             affiliation=core_settings.get('site_organization'),

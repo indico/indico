@@ -7,6 +7,7 @@
 
 import os
 import uuid
+from urllib.parse import urlsplit
 
 from babel.numbers import format_currency, get_currency_name
 from flask import has_app_context, render_template, request
@@ -21,7 +22,6 @@ from sqlalchemy.pool import QueuePool
 from werkzeug.exceptions import BadRequest
 from werkzeug.local import LocalProxy
 from werkzeug.middleware.proxy_fix import ProxyFix
-from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
 import indico
@@ -81,7 +81,7 @@ def configure_app(app):
     configure_multipass(app, config)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = config.PLUGINS
-    base = url_parse(config.BASE_URL)
+    base = urlsplit(config.BASE_URL)
     app.config['PREFERRED_URL_SCHEME'] = base.scheme
     app.config['SERVER_NAME'] = base.netloc
     if base.path:

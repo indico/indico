@@ -16,7 +16,6 @@ from flask import current_app, g, request
 from flask_webpackext import current_webpack
 from flask_webpackext.manifest import JinjaManifestEntry
 from pywebpack import Manifest
-from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.modules.events.layout.models.images import ImageFile
@@ -32,9 +31,10 @@ _custom_url_pattern = r'(?:{})?/static/custom/(.+)$'
 
 def rewrite_static_url(path):
     """Remove __vxxx prefix from static URLs."""
-    plugin_pattern = _plugin_url_pattern.format(url_parse(config.BASE_URL).path)
-    static_pattern = _static_url_pattern.format(url_parse(config.BASE_URL).path)
-    custom_pattern = _custom_url_pattern.format(url_parse(config.BASE_URL).path)
+    base_path = urlsplit(config.BASE_URL).path
+    plugin_pattern = _plugin_url_pattern.format(base_path)
+    static_pattern = _static_url_pattern.format(base_path)
+    custom_pattern = _custom_url_pattern.format(base_path)
     if re.match(plugin_pattern, path):
         return re.sub(plugin_pattern, r'static/plugins/\1/\2.\3', path)
     elif re.match(static_pattern, path):
@@ -109,7 +109,7 @@ def rewrite_css_urls(event, css):
             else:
                 return f"url('../../../{rewritten_url}')"
 
-    indico_path = url_parse(config.BASE_URL).path
+    indico_path = urlsplit(config.BASE_URL).path
     new_css = re.sub(_css_url_pattern.format(indico_path), _replace_url, css, flags=re.MULTILINE)
     return new_css, used_urls, used_images
 
@@ -123,7 +123,7 @@ def url_to_static_filename(endpoint, url):
     elif endpoint == 'event_images.logo_display':
         return 'logo.png'
 
-    indico_path = url_parse(config.BASE_URL).path
+    indico_path = urlsplit(config.BASE_URL).path
     if re.match(_static_url_pattern.format(indico_path), url):
         url = rewrite_static_url(url)
     else:

@@ -5,8 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from urllib.parse import urlsplit
+
 import icalendar
-from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.modules.events.ical import generate_basic_component
@@ -20,7 +21,7 @@ def generate_contribution_component(contribution, related_to_uid=None, organizer
     :param related_to_uid: Indico uid used in RELATED-TO field
     :return: an icalendar Event
     """
-    uid = f'indico-contribution-{contribution.id}@{url_parse(config.BASE_URL).host}'
+    uid = f'indico-contribution-{contribution.id}@{urlsplit(config.BASE_URL).hostname}'
     url = url_for('contributions.display_contribution', contribution, _external=True)
     component = generate_basic_component(contribution, uid, url, organizer=organizer)
 
@@ -39,7 +40,7 @@ def contribution_to_ical(contribution):
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
-    related_event_uid = f'indico-event-{contribution.event.id}@{url_parse(config.BASE_URL).host}'
+    related_event_uid = f'indico-event-{contribution.event.id}@{urlsplit(config.BASE_URL).hostname}'
     component = generate_contribution_component(contribution, related_event_uid)
     calendar.add_component(component)
 

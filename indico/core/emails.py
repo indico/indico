@@ -12,11 +12,11 @@ from datetime import date
 from email.headerregistry import parser
 from email.utils import make_msgid
 from fnmatch import fnmatch
+from urllib.parse import urlsplit
 
 import click
 from celery.exceptions import MaxRetriesExceededError, Retry
 from sqlalchemy.orm.attributes import flag_modified
-from werkzeug.urls import url_parse
 
 from indico.core.celery import celery
 from indico.core.config import config
@@ -103,7 +103,7 @@ def do_send_email(email, log_entry=None, _from_task=False):
         _rewrite_sender(msg)
         if email['html']:
             msg.content_subtype = 'html'
-        msg.extra_headers['message-id'] = make_msgid(domain=url_parse(config.BASE_URL).host)
+        msg.extra_headers['message-id'] = make_msgid(domain=urlsplit(config.BASE_URL).hostname)
         msg.send()
     if not _from_task:
         logger.info('Sent email "%s"', truncate(email['subject'], 100))

@@ -14,6 +14,7 @@ import sys
 from operator import attrgetter
 from pathlib import Path
 from smtplib import SMTP
+from urllib.parse import urlsplit
 
 import click
 from click import wrap_text
@@ -30,7 +31,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.pool import NullPool
 from terminaltables import AsciiTable
-from werkzeug.urls import url_parse
 
 import indico
 from indico.core.db.sqlalchemy.util.models import import_all_models
@@ -421,8 +421,8 @@ class SetupWizard:
 
     def _prompt_indico_url(self, dev=False):
         def _check_url(url):
-            data = url_parse(url)
-            if not data.scheme or not data.host:
+            data = urlsplit(url)
+            if not data.scheme or not data.hostname:
                 _warn('Invalid URL: scheme/host missing')
                 return False
             elif data.fragment or data.query or data.auth:

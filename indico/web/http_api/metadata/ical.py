@@ -6,13 +6,13 @@
 # LICENSE file for more details.
 
 from datetime import datetime
+from urllib.parse import urlsplit
 
 import dateutil.parser
 import icalendar as ical
 from lxml import html
 from lxml.etree import ParserError
 from pytz import timezone, utc
-from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.util.date_time import now_utc
@@ -48,7 +48,7 @@ def _deserialize_date(date_dict):
 
 def serialize_event(cal, fossil, now, id_prefix='indico-event'):
     event = ical.Event()
-    event.add('uid', '{}-{}@{}'.format(id_prefix, fossil['id'], url_parse(config.BASE_URL).host))
+    event.add('uid', '{}-{}@{}'.format(id_prefix, fossil['id'], urlsplit(config.BASE_URL).hostname))
     event.add('dtstamp', now)
     event.add('dtstart', _deserialize_date(fossil['startDate']))
     event.add('dtend', _deserialize_date(fossil['endDate']))

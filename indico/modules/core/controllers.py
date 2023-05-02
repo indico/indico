@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from urllib.parse import urljoin, urlsplit
+
 import requests
 from flask import current_app, flash, jsonify, redirect, request, session
 from packaging.version import Version
@@ -14,7 +16,6 @@ from webargs import fields
 from webargs.flaskparser import abort
 from werkzeug.exceptions import NotFound, ServiceUnavailable
 from werkzeug.routing import BuildError
-from werkzeug.urls import url_join, url_parse
 
 import indico
 from indico.core.config import config
@@ -71,7 +72,7 @@ class RHReportErrorAPI(RH):
         template = get_template_module('core/emails/error_report.txt',
                                        comment=comment,
                                        error_data=self.error_data,
-                                       server_name=url_parse(config.BASE_URL).netloc)
+                                       server_name=urlsplit(config.BASE_URL).netloc)
         send_email(make_email(config.SUPPORT_EMAIL, from_address=(email or config.NO_REPLY_EMAIL), template=template))
 
     @use_kwargs({
@@ -90,8 +91,7 @@ class RHSettings(RHAdminBase):
         if not cephalopod_settings.get('joined'):
             return None, {'enabled': False}
 
-        url = url_join(config.COMMUNITY_HUB_URL,
-                       'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        url = urljoin(config.COMMUNITY_HUB_URL, 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
         data = {'enabled': cephalopod_settings.get('joined'),
                 'contact': cephalopod_settings.get('contact_name'),
                 'email': cephalopod_settings.get('contact_email'),

@@ -8,6 +8,7 @@
 import hashlib
 from base64 import b64encode
 from unittest.mock import MagicMock
+from urllib.parse import urlsplit
 
 import pytest
 from authlib.common.security import generate_token
@@ -15,7 +16,6 @@ from authlib.common.urls import url_encode
 from authlib.oauth2.base import OAuth2Error
 from authlib.oauth2.client import OAuth2Client
 from sqlalchemy.dialects.postgresql.array import ARRAY
-from werkzeug.urls import url_parse
 
 from indico.core.oauth.models.applications import OAuthApplicationUserLink
 from indico.core.oauth.models.tokens import OAuthToken
@@ -101,7 +101,7 @@ def test_oauth_flows(create_application, test_client, dummy_user, app, trusted, 
 
     assert authorized_resp.status_code == 302
     target_url = authorized_resp.headers['Location']
-    target_url_parts = url_parse(target_url)
+    target_url_parts = urlsplit(target_url)
 
     assert f'state={state}' in target_url_parts.query
     assert target_url == f'{oauth_app.default_redirect_uri}?{target_url_parts.query}'

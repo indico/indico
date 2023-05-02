@@ -10,11 +10,11 @@ from datetime import timedelta
 from email import message
 from email.mime.base import MIMEBase
 from email.policy import compat32
+from urllib.parse import urlsplit
 
 import icalendar
 from lxml import html
 from lxml.etree import ParserError
-from werkzeug.urls import url_parse
 
 from indico.core import signals
 from indico.core.config import config
@@ -123,7 +123,7 @@ def generate_event_component(
     skip_access_check: t.Optional[bool] = False,
 ):
     """Generate an event icalendar component from an Indico event."""
-    uid = f'indico-event-{event.id}@{url_parse(config.BASE_URL).host}'
+    uid = f'indico-event-{event.id}@{urlsplit(config.BASE_URL).hostname}'
     component = generate_basic_component(event, uid, organizer=organizer)
 
     # add contact information

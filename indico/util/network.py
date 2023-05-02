@@ -7,13 +7,12 @@
 
 import ipaddress
 import socket
-
-from werkzeug.urls import url_parse
+from urllib.parse import urlsplit
 
 
 def is_private_url(url):
     """Check if the provided URL points to a private IP address."""
-    hostname = url_parse(url).host.strip('[]')
+    hostname = urlsplit(url).hostname.strip('[]')
     if '.' not in hostname and ':' not in hostname:
         return True
 
