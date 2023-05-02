@@ -10,7 +10,20 @@ from pathlib import Path
 
 import pytest
 
+from indico.util.locators import locator_property
 from indico.web.flask.templating import get_template_module
+
+
+class MockRequest:
+    def __init__(self, data):
+        self.data = data
+
+    def __getattr__(self, key):
+        return self.data[key]
+
+    @locator_property
+    def locator(self):
+        return {'event_id': self.event_id, 'type': self.type}
 
 
 @pytest.mark.parametrize(('snapshot_name'), (
@@ -25,7 +38,7 @@ def test_accepted_emails_plaintext(snapshot, snapshot_name, dummy_event):
     dummy_event.start_dt = datetime(2022, 11, 11, 13, 37)
     dummy_event.end_dt = datetime(2022, 11, 13, 13, 37)
     template = get_template_module(f'events/requests/emails/{snapshot_name}',
-                                   req=request, event=dummy_event)
+                                   req=MockRequest(request), event=dummy_event)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     snapshot.assert_match(template.get_body(), snapshot_name)
 
@@ -42,7 +55,7 @@ def test_new_modified_emails_plaintext(snapshot, snapshot_name, dummy_event):
     dummy_event.start_dt = datetime(2022, 11, 11, 13, 37)
     dummy_event.end_dt = datetime(2022, 11, 13, 13, 37)
     template = get_template_module(f'events/requests/emails/{snapshot_name}',
-                                   req=request, event=dummy_event, new=False)
+                                   req=MockRequest(request), event=dummy_event, new=False)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     snapshot.assert_match(template.get_body(), snapshot_name)
 
@@ -59,7 +72,7 @@ def test_rejected_emails_plaintext(snapshot, snapshot_name, dummy_event):
     dummy_event.start_dt = datetime(2022, 11, 11, 13, 37)
     dummy_event.end_dt = datetime(2022, 11, 13, 13, 37)
     template = get_template_module(f'events/requests/emails/{snapshot_name}',
-                                   req=request, event=dummy_event)
+                                   req=MockRequest(request), event=dummy_event)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     snapshot.assert_match(template.get_body(), snapshot_name)
 
@@ -76,6 +89,6 @@ def test_withdrawn_emails_plaintext(snapshot, snapshot_name, dummy_event):
     dummy_event.start_dt = datetime(2022, 11, 11, 13, 37)
     dummy_event.end_dt = datetime(2022, 11, 13, 13, 37)
     template = get_template_module(f'events/requests/emails/{snapshot_name}',
-                                   req=request, event=dummy_event)
+                                   req=MockRequest(request), event=dummy_event)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     snapshot.assert_match(template.get_body(), snapshot_name)
