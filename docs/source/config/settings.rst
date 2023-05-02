@@ -87,18 +87,17 @@ Authentication
 
 .. data:: SIGNUP_RATE_LIMIT
 
-    Applies a rate limit to sending verification email in signup attempts.
-    When specifying multiple rate limits separated with a semicolon,
-    they are checked in that specific order, which can allow for a short burst of
-    attempts.
+    Applies a rate limit to sending verification emails in signup attempts.
+    When specifying multiple rate limits separated with a semicolon, they are checked
+    in that specific order, which can allow for a short burst of attempts.
 
-    Rate limiting is applied by IP address and each verification email sent counts against the
-    rate limit.
+    Rate limiting is applied by IP address and each verification email sent counts
+    against the rate limit.
 
-    The default allows a burst of 20 attempts, and then only 3 attempts every 10
-    minutes for the next 24 hours.  Setting the rate limit to ``None`` disables it.
+    The default allows a burst of 10 attempts, and then only 3 attempts every hour for
+    the next 24 hours.  Setting the rate limit to ``None`` disables it.
 
-    Default: ``'3 per 10 minutes; 20 per day'``
+    Default: ``'3 per hour; 10 per day'``
 
 .. data:: EXTERNAL_REGISTRATION_URL
 
