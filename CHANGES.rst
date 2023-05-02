@@ -59,7 +59,7 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Update Python & JavaScript dependencies (:pr:`5726`)
+- Update Python & JavaScript dependencies (:pr:`5726`, :pr:`5752`)
 - Add support for the watchfiles live reloader (:pr:`5732`)
 
 
