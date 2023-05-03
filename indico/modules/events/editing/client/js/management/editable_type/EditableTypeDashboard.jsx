@@ -121,6 +121,24 @@ export default function EditableTypeDashboard() {
                 {editingEnabled ? Translate.string('Close now') : Translate.string('Start now')}
               </button>
             </Section>
+            <Section
+              icon="bell"
+              label={Translate.string('Remind submitters')}
+              description={Translate.string(
+                'Send an email to authors who have not submitted any files of this editable type'
+              )}
+            >
+              <span className="i-label" title={Translate.string('Contributions without editables')}>
+                {numEditables}
+              </span>
+              <EmailContribAbstractRolesButton
+                objectContext="contributions"
+                metadataURL={emailMetadataURL({event_id: eventId, type})}
+                previewURL={emailPreviewURL({event_id: eventId, type})}
+                sendURL={emailSendURL({event_id: eventId, type})}
+                className={numEditables > 0 ? '' : 'disabled'}
+              />
+            </Section>
           </div>
           <div className="action-box">
             <Section
@@ -205,26 +223,6 @@ export default function EditableTypeDashboard() {
                   management
                 />
               )}
-            </Section>
-          </div>
-          <div className="action-box">
-            <Section
-              icon="bell"
-              label={Translate.string('Remind submitters')}
-              description={Translate.string(
-                'Send an email to authors who have not submitted any files of this editable type'
-              )}
-            >
-              <span className="i-label" title={Translate.string('Contributions without editables')}>
-                {numEditables}
-              </span>
-              <EmailContribAbstractRolesButton
-                objectContext="contributions"
-                metadataURL={emailMetadataURL({event_id: eventId, type})}
-                previewURL={emailPreviewURL({event_id: eventId, type})}
-                sendURL={emailSendURL({event_id: eventId, type})}
-                className={numEditables > 0 ? '' : 'disabled'}
-              />
             </Section>
           </div>
         </>
