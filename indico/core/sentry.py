@@ -7,7 +7,7 @@
 
 import logging
 import re
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 import requests
 import sentry_sdk
@@ -17,6 +17,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 from sentry_sdk.integrations.pure_eval import PureEvalIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
+from werkzeug.datastructures import MultiDict
 
 import indico
 from indico.core.config import config
@@ -62,9 +63,11 @@ def submit_user_feedback(error_data, email, comment):
     # get rid of credentials or query string in case they are present in the DSN
     dsn = re.sub(r':[^@/]+(?=@)', '', config.SENTRY_DSN)
     url = urlsplit(dsn)
-    dsn = str(url.replace(query=''))
-    verify = url.decode_query().get('ca_certs', True)
-    url = str(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=''))
+    dsn = str(url._replace(query=''))
+    query = MultiDict(parse_qs(url.query))
+    verify = query.get('ca_certs', True)
+    hostname = url.netloc.rpartition('@')[2]  # host w/o credentials
+    url = str(url._replace(path='/api/embed/error-page/', netloc=hostname, query=''))
     url = _resolve_redirects(url, verify)
     user_data = error_data['request_info']['user'] or {'name': 'Anonymous', 'email': config.NO_REPLY_EMAIL}
     try:
