@@ -99,6 +99,7 @@ class TimelineItem extends React.Component {
     actions: PropTypes.exact({
       openBookingDetails: PropTypes.func.isRequired,
     }).isRequired,
+    hideRecurringTooltip: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -107,6 +108,7 @@ class TimelineItem extends React.Component {
     children: [],
     setSelectable: null,
     dayBased: false,
+    hideRecurringTooltip: false,
   };
 
   calculateWidth = (startDt, endDt) => {
@@ -139,7 +141,7 @@ class TimelineItem extends React.Component {
   };
 
   renderMessagePopup = (message, segmentStartDt, segmentEndDt, reservation) => {
-    const {dayBased} = this.props;
+    const {dayBased, hideRecurringTooltip} = this.props;
 
     function mapRecurrenceTypeToInfo(repeatFrequency, repeatInterval) {
       if (repeatFrequency === 'DAY') {
@@ -175,7 +177,7 @@ class TimelineItem extends React.Component {
           </div>
         )}
         <div>{message}</div>
-        {reservation && reservation.isRepeating && (
+        {reservation && reservation.isRepeating && !hideRecurringTooltip && (
           <Message info>
             <Message.Content>
               <Message.Header>
@@ -408,6 +410,7 @@ class TimelineItem extends React.Component {
       onClickReservation,
       setSelectable,
       dayBased,
+      hideRecurringTooltip,
       ...restProps
     } = this.props;
     return (

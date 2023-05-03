@@ -44,6 +44,7 @@ export default class DailyTimelineContent extends React.Component {
     rowActions: PropTypes.objectOf(PropTypes.bool),
     booking: PropTypes.object,
     gutterAllowed: PropTypes.bool,
+    hideRecurrence: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -66,6 +67,7 @@ export default class DailyTimelineContent extends React.Component {
     },
     booking: null,
     gutterAllowed: false,
+    hideRecurrence: false,
   };
 
   state = {
@@ -82,10 +84,10 @@ export default class DailyTimelineContent extends React.Component {
   };
 
   getEditableItem = room => {
-    const {onAddSlot} = this.props;
+    const {onAddSlot, hideRecurrence} = this.props;
     const editable = onAddSlot && (room.canUserBook || room.canUserPrebook);
     const ItemClass = editable ? EditableTimelineItem : TimelineItem;
-    const itemProps = editable ? {onAddSlot} : {};
+    const itemProps = editable ? {onAddSlot} : {hideRecurringTooltip: hideRecurrence};
     return {ItemClass, itemProps};
   };
 
