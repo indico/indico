@@ -261,6 +261,16 @@ class RHContactEditingTeam(RHEditableTypeManagementBase):
                                 event_persons=editors, event=self.event)
 
 
+class RHEditablesNotSubmitted(RHEditableTypeManagementBase):
+    """Return the number of contributions without editables of this type."""
+
+    def _process(self):
+        query = Contribution.query.with_parent(self.event).filter(
+            ~Contribution.editables.any(Editable.type == self.editable_type)
+        )
+        return jsonify(no_contribs=query.count())
+
+
 class RHEmailNotSubmittedEditablesMetadata(EmailRolesMetadataMixin, RHEditableTypeManagementBase):
     object_context = 'contributions'
 

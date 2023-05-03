@@ -8,6 +8,7 @@
 /* global ajaxDialog:false */
 
 import anonymousTeamURL from 'indico-url:event_editing.api_anonymous_team';
+import contribsWithNoEditablesURL from 'indico-url:event_editing.api_contribs_with_no_editables';
 import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
 import emailMetadataURL from 'indico-url:event_editing.api_email_not_submitted_metadata';
 import emailPreviewURL from 'indico-url:event_editing.api_email_not_submitted_preview';
@@ -26,7 +27,7 @@ import {Checkbox, Loader} from 'semantic-ui-react';
 
 import {EmailContribAbstractRolesButton} from 'indico/modules/events/persons/EmailContribAbstractRolesButton';
 import {ManagementPageSubTitle, ManagementPageBackButton} from 'indico/react/components';
-import {useTogglableValue} from 'indico/react/hooks';
+import {useIndicoAxios, useTogglableValue} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
 
@@ -78,6 +79,12 @@ export default function EditableTypeDashboard() {
     poster: Translate.string('Assign an editor to posters'),
     slides: Translate.string('Assign an editor to slides'),
   }[type];
+
+  const {data} = useIndicoAxios({
+    url: contribsWithNoEditablesURL({event_id: eventId, type}),
+    method: 'POST',
+  });
+  const numEditables = (data && data.no_contribs) || 0;
 
   return (
     <>
@@ -208,11 +215,15 @@ export default function EditableTypeDashboard() {
                 'Send an email to authors who have not submitted any files of this editable type'
               )}
             >
+              <span className="i-label" title={Translate.string('Contributions without editables')}>
+                {numEditables}
+              </span>
               <EmailContribAbstractRolesButton
                 objectContext="contributions"
                 metadataURL={emailMetadataURL({event_id: eventId, type})}
                 previewURL={emailPreviewURL({event_id: eventId, type})}
                 sendURL={emailSendURL({event_id: eventId, type})}
+                className={numEditables > 0 ? '' : 'disabled'}
               />
             </Section>
           </div>
