@@ -9,6 +9,9 @@
 
 import anonymousTeamURL from 'indico-url:event_editing.api_anonymous_team';
 import enableEditingURL from 'indico-url:event_editing.api_editing_enabled';
+import emailMetadataURL from 'indico-url:event_editing.api_email_not_submitted_metadata';
+import emailPreviewURL from 'indico-url:event_editing.api_email_not_submitted_preview';
+import emailSendURL from 'indico-url:event_editing.api_email_not_submitted_send';
 import selfAssignURL from 'indico-url:event_editing.api_self_assign_enabled';
 import enableSubmissionURL from 'indico-url:event_editing.api_submission_enabled';
 import contactEditingTeamURL from 'indico-url:event_editing.contact_team';
@@ -21,6 +24,7 @@ import React, {useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Checkbox, Loader} from 'semantic-ui-react';
 
+import {EmailContribAbstractRolesButton} from 'indico/modules/events/persons/EmailContribAbstractRolesButton';
 import {ManagementPageSubTitle, ManagementPageBackButton} from 'indico/react/components';
 import {useTogglableValue} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -194,6 +198,22 @@ export default function EditableTypeDashboard() {
                   management
                 />
               )}
+            </Section>
+          </div>
+          <div className="action-box">
+            <Section
+              icon="bell"
+              label={Translate.string('Remind submitters')}
+              description={Translate.string(
+                'Send an email to authors who have not submitted any files of this editable type'
+              )}
+            >
+              <EmailContribAbstractRolesButton
+                objectContext="contributions"
+                metadataURL={emailMetadataURL({event_id: eventId, type})}
+                previewURL={emailPreviewURL({event_id: eventId, type})}
+                sendURL={emailSendURL({event_id: eventId, type})}
+              />
             </Section>
           </div>
         </>
