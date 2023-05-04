@@ -497,7 +497,7 @@ export function FinalCheckbox({name, label, value, ...rest}) {
 
 FinalCheckbox.propTypes = {
   name: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   value: PropTypes.string,
 };
 

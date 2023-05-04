@@ -265,6 +265,12 @@ class RegistrationForm(db.Model):
         default=False,
         nullable=False
     )
+    #: Whether users must accept the event's privacy policy when registering
+    require_privacy_policy_agreement = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
 
     #: The Event containing this registration form
     event = db.relationship(

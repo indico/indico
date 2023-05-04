@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import privacyNoticeURL from 'indico-url:events.display_privacy';
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -19,7 +21,7 @@ import {
   FinalCheckbox,
   getChangedValues,
 } from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
@@ -36,6 +38,34 @@ import {
 } from './selectors';
 
 import '../../styles/regform.module.scss';
+
+function PrivacyPolicy({url}) {
+  const label = (
+    <label>
+      <Translate>
+        I have read and agree to the{' '}
+        <Param name="url" wrapper={<a href={url} target="_blank" rel="noreferrer" />}>
+          Privacy policy
+        </Param>
+      </Translate>
+    </label>
+  );
+
+  return (
+    <Message info style={{marginTop: 25}}>
+      <Message.Header>
+        <Translate>Privacy policy</Translate>
+      </Message.Header>
+      <Form as="div" style={{marginTop: 10}}>
+        <FinalCheckbox required label={label} name="agreed_to_privacy_policy" toggle />
+      </Form>
+    </Message>
+  );
+}
+
+PrivacyPolicy.propTypes = {
+  url: PropTypes.string.isRequired,
+};
 
 function ManagementOptions({isUpdateMode}) {
   return (
@@ -101,11 +131,13 @@ ConsentToPublish.propTypes = {
 export default function RegistrationFormSubmission() {
   const sections = useSelector(getNestedSections);
   const {
+    eventId,
     submitUrl,
     registrationData,
     initialValues,
     captchaRequired,
     captchaSettings,
+    policyAgreementRequired,
   } = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isModerated = useSelector(getModeration);
@@ -153,6 +185,9 @@ export default function RegistrationFormSubmission() {
               />
             )}
             {captchaRequired && <Captcha settings={captchaSettings} />}
+            {!isManagement && !isUpdateMode && policyAgreementRequired && (
+              <PrivacyPolicy url={privacyNoticeURL({event_id: eventId})} />
+            )}
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}
