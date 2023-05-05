@@ -17,7 +17,7 @@ from indico.modules.rb.util import (format_weekdays, get_booking_params_for_even
 from indico.testing.util import bool_matrix
 
 
-pytest_plugins = ('indico.modules.rb.testing.fixtures', 'indico.modules.events.timetable.testing.fixtures')
+pytest_plugins = 'indico.modules.events.timetable.testing.fixtures'
 
 
 @pytest.mark.parametrize(('is_rb_admin', 'acl_empty', 'in_acl', 'expected'), bool_matrix('...', expect=any))

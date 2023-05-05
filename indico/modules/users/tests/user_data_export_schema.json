@@ -1,0 +1,239 @@
+{
+  "abstracts": [
+    {
+      "description": "",
+      "event_id": 0,
+      "event_url": "http://localhost/event/0/",
+      "files": [
+        {
+          "filename": "dummy_abstract_file.txt",
+          "id": 42,
+          "url": "http://localhost/event/-314/abstracts/1234/attachments/42/dummy_abstract_file.txt"
+        }
+      ],
+      "id": 42,
+      "state": "submitted",
+      "submission_comment": "",
+      "submitted_dt": "2022-05-22T12:00:00+00:00",
+      "title": "Broken Symmetry and the Mass of Gauge Vector Mesons",
+      "url": "http://localhost/event/-314/abstracts/1234/"
+    }
+  ],
+  "attachments": [
+    {
+      "description": "Dummy attachment",
+      "folder": 42,
+      "folder_id": 42,
+      "id": 42,
+      "link_url": null,
+      "modified_dt": "2022-05-22T12:00:00+00:00",
+      "title": "dummy_attachment",
+      "type": "file",
+      "url": "http://localhost/event/0/attachments/42/42/dummy_file.txt"
+    }
+  ],
+  "contributions": [
+    {
+      "address": "",
+      "description": "",
+      "duration": 20,
+      "end_dt": null,
+      "event_id": 0,
+      "event_url": "http://localhost/event/0/",
+      "id": 42,
+      "is_author": false,
+      "is_deleted": false,
+      "is_speaker": true,
+      "keywords": [],
+      "minutes": "<p><strong>Contrib Test</strong></p>",
+      "room_name": "",
+      "start_dt": null,
+      "title": "Dummy Contribution",
+      "url": "http://localhost/event/0/contributions/42/",
+      "venue_name": ""
+    }
+  ],
+  "miscellaneous": {
+    "created_events": [
+      {
+        "id": 0,
+        "title": "dummy#0",
+        "url": "http://localhost/event/0/"
+      }
+    ],
+    "identities": [],
+    "oauth_applications": [],
+    "personal_tokens": [],
+    "static_sites": [
+      {
+        "event_id": 0,
+        "event_url": "http://localhost/event/0/",
+        "id": 2,
+        "requested_dt": "2022-05-22T12:00:00+00:00",
+        "state": "pending",
+        "url": "http://localhost/event/0/manage/offline-copy/2.zip"
+      }
+    ]
+  },
+  "papers": [
+    {
+      "event_url": "http://localhost/event/0/",
+      "files": [
+        {
+          "filename": "dummy_file.txt",
+          "id": 42,
+          "url": "http://localhost/event/0/papers/42/files/42-dummy_file.txt"
+        }
+      ],
+      "submitted_dt": "2022-05-22T12:00:00+00:00",
+      "title": "Dummy Contribution",
+      "url": "http://localhost/event/0/papers/42/"
+    }
+  ],
+  "personal_data": {
+    "affiliation": {
+      "city": "",
+      "country_code": "",
+      "country_name": "",
+      "id": 2,
+      "meta": {},
+      "name": "CERN",
+      "postcode": "",
+      "street": ""
+    },
+    "avatar_url": "/user/1337/picture-default",
+    "email": "1337@example.test",
+    "favorite_categories": [
+      {
+        "id": 42,
+        "title": "dummy",
+        "url": "http://localhost/category/42/"
+      }
+    ],
+    "favorite_events": [
+      {
+        "id": 0,
+        "title": "dummy#0",
+        "url": "http://localhost/event/0/"
+      }
+    ],
+    "first_name": "Guinea",
+    "full_name": "Guinea Pig",
+    "last_name": "Pig",
+    "phone": "",
+    "picture_metadata": null,
+    "picture_source": "standard",
+    "secondary_emails": [],
+    "title": null
+  },
+  "registrations": [
+    {
+      "checked_in": false,
+      "checked_in_dt": null,
+      "consent_to_publish": "nobody",
+      "created_by_manager": false,
+      "currency": "USD",
+      "data": [
+        {
+          "data": "dummy_file.txt",
+          "description": "",
+          "file": {
+            "field_data_id": 73,
+            "filename": "dummy_file.txt",
+            "md5": "d659f3992a4861fbba98e728e8ab5d8e",
+            "registration_id": 43,
+            "url": "http://localhost/event/0/manage/registration/42/registrations/43/file/73-dummy_file.txt"
+          },
+          "title": "File field"
+        }
+      ],
+      "email": "1337@example.test",
+      "event_id": 0,
+      "event_title": "dummy#0",
+      "event_url": "http://localhost/event/0/",
+      "first_name": "Guinea",
+      "id": 43,
+      "is_deleted": false,
+      "last_name": "Pig",
+      "price": "0",
+      "rejection_reason": "",
+      "state": "complete",
+      "submitted_dt": "2022-05-22T12:00:00+00:00",
+      "tags": [],
+      "url": "http://localhost/event/0/manage/registration/42/registrations/43/"
+    }
+  ],
+  "room_booking": {
+    "favorite_rooms": [
+      {
+        "building": "1",
+        "floor": "2",
+        "id": 42,
+        "location_name": "Test",
+        "map_url": null,
+        "name": "1/2-3",
+        "number": "3",
+        "site": "",
+        "verbose_name": null
+      }
+    ],
+    "owned_rooms": [
+      {
+        "building": "1",
+        "floor": "2",
+        "id": 42,
+        "location_name": "Test",
+        "map_url": null,
+        "name": "1/2-3",
+        "number": "3",
+        "site": "",
+        "verbose_name": null
+      }
+    ],
+    "reservations": [
+      {
+        "booked_for_name": "Guinea Pig",
+        "booking_reason": "Testing",
+        "end_dt": "2022-05-22T17:30:00",
+        "id": 42,
+        "is_accepted": true,
+        "is_repeating": false,
+        "repeat_frequency": "NEVER",
+        "repeat_interval": 0,
+        "room_id": 42,
+        "start_dt": "2022-05-22T08:30:00"
+      }
+    ]
+  },
+  "settings": {
+    "add_ical_alerts": false,
+    "add_ical_alerts_mins": 5,
+    "force_language": false,
+    "force_timezone": false,
+    "lang": null,
+    "name_format": "first_last",
+    "show_future_events": false,
+    "show_past_events": false,
+    "suggest_categories": false,
+    "synced_fields": null,
+    "timezone": null,
+    "use_markdown_for_minutes": false,
+    "use_previewer_pdf": true
+  },
+  "subcontributions": [
+    {
+      "contribution_id": 42,
+      "description": "",
+      "duration": 10,
+      "event_url": "http://localhost/event/0/",
+      "id": 42,
+      "is_deleted": false,
+      "minutes": "<p><strong>SubContrib Test</strong></p>",
+      "room_name": "",
+      "title": "Dummy SubContribution",
+      "url": "http://localhost/event/0/contributions/42/subcontributions/42",
+      "venue_name": ""
+    }
+  ],
+  "survey_submissions": []
+}

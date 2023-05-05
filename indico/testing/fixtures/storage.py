@@ -14,6 +14,7 @@ from indico.core import signals
 from indico.core.storage.backend import Storage
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.files.models.files import File
 
 
 @signals.core.get_storage_backends.connect
@@ -44,7 +45,39 @@ class MemoryStorage(Storage):
 
 
 @pytest.fixture
-def dummy_attachment(dummy_user):
-    folder = AttachmentFolder(title='dummy_folder', description='a dummy folder')
-    file_ = AttachmentFile(user=dummy_user, filename='dummy_file.txt', content_type='text/plain')
-    return Attachment(folder=folder, user=dummy_user, title='dummy_attachment', type=AttachmentType.file, file=file_)
+def create_attachment(db):
+    """Return a callable which lets you create attachments."""
+    def _create_attachment(user, object, *, title, attachment_folder_id=None, attachment_file_id=None, **kwargs):
+        folder = AttachmentFolder(id=attachment_folder_id, object=object, title='dummy_folder',
+                                  description='a dummy folder')
+        file = AttachmentFile(user=user, filename='dummy_file.txt', content_type='text/plain', id=attachment_file_id)
+        attachment = Attachment(folder=folder, user=user, type=AttachmentType.file, file=file, title=title, **kwargs)
+        file.save(b'hello world')
+        db.session.flush()
+        return attachment
+    return _create_attachment
+
+
+@pytest.fixture
+def dummy_attachment(dummy_user, dummy_event, create_attachment):
+    """Create a dummy attachment."""
+    return create_attachment(dummy_user, dummy_event, title='dummy_attachment', description='Dummy attachment',
+                             id=42, attachment_folder_id=42, attachment_file_id=42)
+
+
+@pytest.fixture
+def create_file(db):
+    """Return a callable which lets you create (unclaimed) files."""
+    def _create_file(filename, content_type, context, data, **kwargs):
+        file = File(filename=filename, content_type=content_type, **kwargs)
+        file.save(context, data.encode('utf-8'))
+        db.session.add(file)
+        db.session.flush()
+        return file
+    return _create_file
+
+
+@pytest.fixture
+def dummy_file(create_file):
+    """Create a dummy (unclaimed) file."""
+    return create_file('dummy_file.txt', 'text/plain', 'dummy_context', 'A dummy file', id=42)

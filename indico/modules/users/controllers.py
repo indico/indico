@@ -40,15 +40,16 @@ from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm
                                         SearchForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.models.export import DataExportOptions, DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
-from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
-                                          UserPersonalDataSchema)
+from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, DataExportRequestSchema,
+                                          FavoriteEventSchema, UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
                                        merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
-from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserFavorites, WPUserPersonalData, WPUserProfilePic,
-                                        WPUsersAdmin)
+from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
+                                        WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
@@ -213,6 +214,27 @@ class RHPersonalData(RHUserBase):
                                                   locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
                                                   has_predefined_affiliations=has_predefined_affiliations)
+
+
+class RHUserDataExport(RHUserBase):
+    def _process(self):
+        if req := self.user.data_export_request:
+            data = DataExportRequestSchema().dump(req)
+        else:
+            data = {'state': DataExportRequestState.pending.name}
+        export_options = [(opt.name, str(opt.title)) for opt in DataExportOptions]
+        return WPUserDataExport.render_template('data_export.html', 'data_export', user=self.user,
+                                                export_request=data, export_options=export_options)
+
+
+class RHUserDataExportAPI(RHUserBase):
+    @use_kwargs({
+        'options': fields.List(fields.Enum(DataExportOptions)),
+    })
+    def _process_POST(self, options):
+        from indico.modules.users.tasks import export_user_data_task
+        export_user_data_task.delay(self.user, options)
+        return {'state': DataExportRequestState.running.name}
 
 
 class RHPersonalDataUpdate(RHUserBase):

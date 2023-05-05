@@ -113,7 +113,7 @@ class CheckboxField(RegistrationFormBillableField):
         return versioned_data.get('price', 0)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
-        return self.friendly_data_mapping[registration_data.data]
+        return str(self.friendly_data_mapping[registration_data.data])
 
     def get_places_used(self):
         places_used = 0
@@ -299,7 +299,7 @@ class BooleanField(RegistrationFormBillableField):
         return versioned_data.get('price', 0) if reg_data else 0
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
-        return self.friendly_data_mapping[registration_data.data]
+        return str(self.friendly_data_mapping[registration_data.data])
 
 
 class PhoneField(RegistrationFormFieldBase):

@@ -16,8 +16,6 @@ from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.tasks import roombooking_end_notifications, roombooking_occurrences
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
 settings = {
     'notification_before_days': 2,
     'notification_before_days_weekly': 5,

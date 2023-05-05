@@ -1,0 +1,35 @@
+{
+  "checked_in": false,
+  "checked_in_dt": null,
+  "consent_to_publish": "nobody",
+  "created_by_manager": false,
+  "currency": "USD",
+  "data": [
+    {
+      "data": "dummy_file.txt",
+      "description": "",
+      "file": {
+        "field_data_id": 73,
+        "filename": "dummy_file.txt",
+        "md5": "d659f3992a4861fbba98e728e8ab5d8e",
+        "registration_id": 43,
+        "url": "http://localhost/event/0/manage/registration/42/registrations/43/file/73-dummy_file.txt"
+      },
+      "title": "File field"
+    }
+  ],
+  "email": "1337@example.test",
+  "event_id": 0,
+  "event_title": "dummy#0",
+  "event_url": "http://localhost/event/0/",
+  "first_name": "Guinea",
+  "id": 43,
+  "is_deleted": false,
+  "last_name": "Pig",
+  "price": "0",
+  "rejection_reason": "",
+  "state": "complete",
+  "submitted_dt": "2022-05-22T12:00:00+00:00",
+  "tags": [],
+  "url": "http://localhost/event/0/manage/registration/42/registrations/43/"
+}

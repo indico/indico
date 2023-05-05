@@ -1,0 +1,11 @@
+{
+  "description": "Dummy attachment",
+  "folder": 42,
+  "folder_id": 42,
+  "id": 42,
+  "link_url": null,
+  "modified_dt": "2022-05-22T12:00:00+00:00",
+  "title": "dummy_attachment",
+  "type": "file",
+  "url": "http://localhost/event/0/attachments/42/42/dummy_file.txt"
+}

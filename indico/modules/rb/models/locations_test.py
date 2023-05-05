@@ -8,9 +8,6 @@
 from indico.modules.rb.models.rooms import Room
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
 def test_room_name_format(create_location, db, dummy_user):
     location = create_location('Foo')
     location.room_name_format = '{building}|{floor}|{number}'

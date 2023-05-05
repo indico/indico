@@ -53,3 +53,11 @@ def test_reg_req_rejected_email_plaintext(snapshot, dummy_user):
                                    req=req)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     snapshot.assert_match(template.get_body(), 'registration_request_rejected.txt')
+
+
+@pytest.mark.parametrize('test_file', ('data_export_success.txt', 'data_export_failure.txt'))
+def test_data_export_notification_emails_plaintext(snapshot, dummy_user, test_file):
+    template = get_template_module(f'users/emails/{test_file}',
+                                   user=dummy_user, link='attachment.zip')
+    snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
+    snapshot.assert_match(template.get_body(), test_file)

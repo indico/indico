@@ -1,0 +1,18 @@
+{
+  "description": "",
+  "event_id": 0,
+  "event_url": "http://localhost/event/0/",
+  "files": [
+    {
+      "filename": "dummy_abstract_file.txt",
+      "id": 42,
+      "url": "http://localhost/event/-314/abstracts/1234/attachments/42/dummy_abstract_file.txt"
+    }
+  ],
+  "id": 42,
+  "state": "submitted",
+  "submission_comment": "",
+  "submitted_dt": "2022-05-22T12:00:00+00:00",
+  "title": "Broken Symmetry and the Mass of Gauge Vector Mesons",
+  "url": "http://localhost/event/-314/abstracts/1234/"
+}

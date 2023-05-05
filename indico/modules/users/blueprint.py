@@ -13,12 +13,13 @@ from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdm
                                               RHProfilePictureDisplay, RHProfilePicturePage, RHProfilePicturePreview,
                                               RHRegistrationRequestList, RHRejectRegistrationRequest,
                                               RHSaveProfilePicture, RHSearchAffiliations, RHUserBlock, RHUserDashboard,
-                                              RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
-                                              RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesAPI,
-                                              RHUserFavoritesCategoryAPI, RHUserFavoritesEventAPI, RHUserPreferences,
-                                              RHUserPreferencesMarkdownAPI, RHUsersAdmin, RHUsersAdminCreate,
-                                              RHUsersAdminMerge, RHUsersAdminMergeCheck, RHUsersAdminSettings,
-                                              RHUserSearch, RHUserSearchInfo, RHUserSuggestionsRemove)
+                                              RHUserDataExport, RHUserDataExportAPI, RHUserEmails, RHUserEmailsDelete,
+                                              RHUserEmailsSetPrimary, RHUserEmailsVerify, RHUserFavorites,
+                                              RHUserFavoritesAPI, RHUserFavoritesCategoryAPI, RHUserFavoritesEventAPI,
+                                              RHUserPreferences, RHUserPreferencesMarkdownAPI, RHUsersAdmin,
+                                              RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
+                                              RHUsersAdminSettings, RHUserSearch, RHUserSearchInfo,
+                                              RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -73,6 +74,9 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))
     _bp.add_url_rule('/emails/make-primary', 'user_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
     _bp.add_url_rule('/blocked', 'user_block', RHUserBlock, methods=('PUT', 'DELETE'))
+    # Data export
+    _bp.add_url_rule('/data-export', 'user_data_export', RHUserDataExport)
+    _bp.add_url_rule('/api/data-export', 'api_user_data_export', RHUserDataExportAPI, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
 _bp.add_url_rule('/<int:user_id>/dashboard.ics', 'export_dashboard_ics_legacy', RHExportDashboardICSLegacy)

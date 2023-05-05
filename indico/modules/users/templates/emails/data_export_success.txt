@@ -1,0 +1,13 @@
+{% extends 'emails/base_i18n.txt' %}
+
+{% block subject %}{% trans %}Indico data ready for download{% endtrans %}{% endblock %}
+
+{% block header_recipient -%}
+    {% trans name=user.first_name %}Dear {{ name }},{% endtrans %}
+{%- endblock %}
+
+{% block body -%}
+{% trans %}Your Indico user data is ready for download.{% endtrans %}
+
+{% trans %}Download link:{% endtrans %} {{ link }}
+{%- endblock %}

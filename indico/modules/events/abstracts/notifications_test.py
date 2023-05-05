@@ -17,9 +17,6 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.util.date_time import now_utc
 
 
-pytest_plugins = 'indico.modules.events.abstracts.testing.fixtures'
-
-
 def assert_text_equal(v1, v2):
     """Compare two strings, ignoring white space and line breaks."""
     assert re.sub(r'\s', '', v1) == re.sub(r'\s', '', v2)

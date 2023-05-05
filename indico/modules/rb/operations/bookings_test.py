@@ -12,9 +12,6 @@ import pytest
 from indico.modules.rb.models.reservations import RepeatFrequency
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
 def test_bookings_are_split_on_time_changes(create_reservation):
     from indico.modules.rb.operations.bookings import should_split_booking
 

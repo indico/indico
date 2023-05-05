@@ -72,6 +72,7 @@ def _sidemenu_items(sender, user, **kwargs):
     yield SideMenuItem('emails', _('Emails'), url_for('users.user_emails'), 70, disabled=user.is_system)
     yield SideMenuItem('preferences', _('Preferences'), url_for('users.user_preferences'), 60, disabled=user.is_system)
     yield SideMenuItem('favorites', _('Favorites'), url_for('users.user_favorites'), 50, disabled=user.is_system)
+    yield SideMenuItem('data_export', _('Data export'), url_for('users.user_data_export'), 40, disabled=user.is_system)
 
 
 @signals.menu.items.connect_via('top-menu')

@@ -27,4 +27,4 @@ def create_category(db):
 @pytest.fixture
 def dummy_category(create_category):
     """Create a mocked dummy category."""
-    return create_category(title='dummy')
+    return create_category(title='dummy', id_=42)

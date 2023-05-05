@@ -1,0 +1,13 @@
+{
+  "event_url": "http://localhost/event/0/",
+  "files": [
+    {
+      "filename": "dummy_file.txt",
+      "id": 42,
+      "url": "http://localhost/event/0/papers/42/files/42-dummy_file.txt"
+    }
+  ],
+  "submitted_dt": "2022-05-22T12:00:00+00:00",
+  "title": "Dummy Contribution",
+  "url": "http://localhost/event/0/papers/42/"
+}
