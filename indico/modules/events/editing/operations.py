@@ -284,6 +284,23 @@ def undo_review(revision):
 
 
 @no_autoflush
+def reset_editable(revision):
+    _ensure_latest_revision_with_final_state(revision)
+    if revision.final_state != FinalRevisionState.accepted:
+        return
+    revision.editable.published_revision = None
+    revision.initial_state = InitialRevisionState.ready_for_review
+    revision.final_state = FinalRevisionState.none
+    comment = EditingRevisionComment(user=revision.editor or revision.submitter, created_dt=revision.reviewed_dt,
+                                     undone_judgment=FinalRevisionState.accepted, text=revision.comment)
+    revision.comments.append(comment)
+    revision.comment = ''
+    revision.reviewed_dt = None
+    db.session.flush()
+    logger.info('Revision %r review reset', revision)
+
+
+@no_autoflush
 def create_revision_comment(revision, user, text, internal=False):
     ensure_latest_revision(revision)
     comment = EditingRevisionComment(user=user, text=text, internal=internal)

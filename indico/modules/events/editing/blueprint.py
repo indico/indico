@@ -117,6 +117,8 @@ _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/new', 'api_create_subm
                  timeline.RHCreateSubmitterRevision, methods=('POST',),)
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/review', 'api_undo_review',
                  timeline.RHUndoReview, methods=('DELETE',))
+_bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/reset', 'api_reset_editable',
+                 timeline.RHResetEditable, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/', 'api_create_revision_comment',
                  timeline.RHCreateRevisionComment, methods=('POST',),)
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/<int:comment_id>',
