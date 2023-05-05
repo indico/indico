@@ -323,6 +323,7 @@ def extend_url_map(app):
 
 
 def add_handlers(app):
+    app.before_request(allow_many_formdata_args)
     app.before_request(canonicalize_url)
     app.before_request(reject_nuls)
     app.after_request(inject_current_url)
@@ -351,6 +352,11 @@ def add_plugin_blueprints(app):
         blueprint_names.add(blueprint.name)
         with plugin.plugin_context():
             app.register_blueprint(blueprint)
+
+
+def allow_many_formdata_args():
+    if request.mimetype == 'application/x-www-form-urlencoded':
+        request.max_form_parts = 50000
 
 
 def canonicalize_url():
