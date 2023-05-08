@@ -80,11 +80,8 @@ export default function EditableTypeDashboard() {
     slides: Translate.string('Assign an editor to slides'),
   }[type];
 
-  const {data} = useIndicoAxios({
-    url: contribsWithNoEditablesURL({event_id: eventId, type}),
-    method: 'POST',
-  });
-  const numEditables = (data && data.no_contribs) || 0;
+  const {data} = useIndicoAxios(contribsWithNoEditablesURL({event_id: eventId, type}));
+  const numEditables = data?.count || 0;
 
   return (
     <>

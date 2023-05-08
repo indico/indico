@@ -268,7 +268,7 @@ class RHEditablesNotSubmitted(RHEditableTypeManagementBase):
         query = Contribution.query.with_parent(self.event).filter(
             ~Contribution.editables.any(Editable.type == self.editable_type)
         )
-        return jsonify(no_contribs=query.count())
+        return jsonify(count=query.count())
 
 
 class RHEmailNotSubmittedEditablesMetadata(EmailRolesMetadataMixin, RHEditableTypeManagementBase):
