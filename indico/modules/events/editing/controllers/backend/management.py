@@ -9,8 +9,9 @@ from flask import jsonify, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import UserValueError
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.controllers.base import RHEditableTypeManagementBase, RHEditingManagementBase
-from indico.modules.events.editing.models.editable import EditableType
+from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
@@ -23,6 +24,8 @@ from indico.modules.events.editing.schemas import (EditableFileTypeArgs, Editabl
                                                    EditingReviewConditionArgs, EditingTagSchema, EditingUserSchema)
 from indico.modules.events.editing.settings import editable_type_settings, editing_settings
 from indico.modules.events.editing.util import get_editors
+from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
+                                                                 EmailRolesSendMixin)
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _, orig_string
 from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
@@ -256,3 +259,41 @@ class RHContactEditingTeam(RHEditableTypeManagementBase):
         editors = get_editors(self.event, self.editable_type)
         return jsonify_template('events/editing/management/editor_list.html',
                                 event_persons=editors, event=self.event)
+
+
+class RHEditablesNotSubmitted(RHEditableTypeManagementBase):
+    """Return the number of contributions without editables of this type."""
+
+    def _process(self):
+        query = Contribution.query.with_parent(self.event).filter(
+            ~Contribution.editables.any(Editable.type == self.editable_type)
+        )
+        return jsonify(count=query.count())
+
+
+class RHEmailNotSubmittedEditablesMetadata(EmailRolesMetadataMixin, RHEditableTypeManagementBase):
+    object_context = 'contributions'
+
+
+class RHEmailNotSubmittedEditablesPreview(EmailRolesPreviewMixin, RHEditableTypeManagementBase):
+    object_context = 'contributions'
+
+    def get_placeholder_kwargs(self):
+        contribution = Contribution.query.with_parent(self.event).first()
+        # none of the contributions are guaranteed to have a person so we use the event creator...
+        return {'person': self.event.creator, 'contribution': contribution}
+
+
+class RHEmailNotSubmittedEditablesSend(EmailRolesSendMixin, RHEditableTypeManagementBase):
+    object_context = 'contributions'
+    log_module = 'Editing'
+
+    def get_recipients(self, roles):
+        contribs = Contribution.query.with_parent(self.event).filter(
+            ~Contribution.editables.any(Editable.type == self.editable_type)
+        ).all()
+        for contrib in contribs:
+            log_metadata = {'contribution_id': contrib.id}
+            for person_link in contrib.person_links:
+                if person_link.email and self.get_roles_from_person_link(person_link) & roles:
+                    yield person_link.email, {'contribution': contrib, 'person': person_link}, log_metadata

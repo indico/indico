@@ -19,16 +19,17 @@ export function EmailContribAbstractRolesButton({
   metadataURL,
   previewURL,
   sendURL,
+  className,
 }) {
   const [open, setOpen] = useState(false);
-  const ids = getIds(idSelector);
+  const ids = idSelector && getIds(idSelector);
   const idType = {abstracts: 'abstract_id', contributions: 'contribution_id'}[objectContext];
 
   return (
     <>
       <button
         type="button"
-        className="i-button icon-mail js-requires-selected-row disabled"
+        className={`i-button icon-mail ${className}`}
         onClick={evt => {
           if (!evt.target.classList.contains('disabled')) {
             setOpen(true);
@@ -52,8 +53,14 @@ export function EmailContribAbstractRolesButton({
 
 EmailContribAbstractRolesButton.propTypes = {
   objectContext: PropTypes.oneOf(['abstracts', 'contributions']).isRequired,
-  idSelector: PropTypes.string.isRequired,
+  idSelector: PropTypes.string,
   metadataURL: PropTypes.string.isRequired,
   previewURL: PropTypes.string.isRequired,
   sendURL: PropTypes.string.isRequired,
+  className: PropTypes.string,
+};
+
+EmailContribAbstractRolesButton.defaultProps = {
+  idSelector: null,
+  className: '',
 };

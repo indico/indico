@@ -61,6 +61,7 @@ import {SeriesManagement} from './SeriesManagement';
         metadataURL={metadataUrl}
         previewURL={previewUrl}
         sendURL={sendUrl}
+        className="js-requires-selected-row disabled"
       />,
       element
     );

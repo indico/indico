@@ -93,6 +93,16 @@ _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/editors', 'api_ed
                  management.RHEditableTypeEditors)
 _bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/list-with-filetypes',
                  'api_filter_editables_by_filetypes', editable_list.RHFilterEditablesByFileTypes, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/not-submitted', 'api_contribs_with_no_editables',
+                 management.RHEditablesNotSubmitted)
+
+# Emailing (management)
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/email-not-submitted/metadata',
+                 'api_email_not_submitted_metadata', management.RHEmailNotSubmittedEditablesMetadata, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/email-not-submitted/preview',
+                 'api_email_not_submitted_preview', management.RHEmailNotSubmittedEditablesPreview, methods=('POST',))
+_bp.add_url_rule('/editing/api/<any(paper,slides,poster):type>/email-not-submitted/send',
+                 'api_email_not_submitted_send', management.RHEmailNotSubmittedEditablesSend, methods=('POST',))
 
 # Editable-level APIs
 contrib_api_prefix = '/api' + contrib_prefix

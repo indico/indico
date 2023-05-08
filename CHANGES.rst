@@ -38,6 +38,8 @@ Improvements
 - Email verification attempts during signup now trigger rate limiting to prevent
   spamming large amounts of confirmation emails (:pr:`5727`)
 - Allow bulk-commenting editables in the editable list (:pr:`5747`)
+- Allow emailing contribution persons that have not yet made any submissions to a
+  given editable type (:pr:`5755`)
 
 Bugfixes
 ^^^^^^^^
