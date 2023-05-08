@@ -112,16 +112,17 @@ class InternalSearch(IndicoSearchProvider):
                            .filter(EventNote.id.in_(o.id for o in objs)))
         else:
             raise Exception(f'Unhandled object type: {obj_type}')
-        category_ids = set(itertools.chain.from_iterable(id for id, in chain_query))
-        query = (
-            Category.query
-            .filter(Category.id.in_(category_ids))
-            .options(load_only('id', 'parent_id', 'protection_mode'))
-        )
-        Category.preload_relationships(query, 'acl_entries',
-                                       strategy=lambda rel: _apply_acl_entry_strategy(subqueryload(rel),
-                                                                                      CategoryPrincipal))
-        preloaded_categories |= set(query)
+        if chain_query:
+            category_ids = set(itertools.chain.from_iterable(id for id, in chain_query))
+            query = (
+                Category.query
+                .filter(Category.id.in_(category_ids))
+                .options(load_only('id', 'parent_id', 'protection_mode'))
+            )
+            Category.preload_relationships(query, 'acl_entries',
+                                           strategy=lambda rel: _apply_acl_entry_strategy(subqueryload(rel),
+                                                                                          CategoryPrincipal))
+            preloaded_categories |= set(query)
 
     def _can_access(self, user, obj, allow_effective_protection_mode=True, admin_override_enabled=False):
         if isinstance(obj, (Category, Event, Session, Contribution)):
