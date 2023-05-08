@@ -42,3 +42,16 @@ def test_multi_test_client_no_g_leak(app, test_client):
     assert resp.text == 'notset'
     resp = test_client.get('test-tc-multi')
     assert resp.text == 'notset'
+
+
+def test_many_form_parts(app, test_client, monkeypatch):
+    monkeypatch.setattr('indico.web.flask.wrappers.IndicoRequest.max_form_parts', 1)
+
+    @app.route('/test-many-form-parts', methods=('POST',))
+    def test_many_form_parts_endpoint():
+        # make sure normal form posts are not subject to multipart limits
+        assert request.form.getlist('foo') == ['1', '2']
+        return str(len(request.form.getlist('foo')))
+
+    resp = test_client.post('test-many-form-parts', data={'foo': ['1', '2']})
+    assert resp.text == '2'

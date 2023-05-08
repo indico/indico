@@ -92,7 +92,7 @@ sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 urllib3==1.26.15
     # via requests
-werkzeug==2.3.3
+werkzeug==2.3.4
     # via flask
 zipp==3.15.0
     # via importlib-metadata
