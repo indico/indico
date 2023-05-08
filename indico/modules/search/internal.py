@@ -198,7 +198,8 @@ class InternalSearch(IndicoSearchProvider):
     def search_events(self, q, user, page, category_id, admin_override_enabled):
         filters = [
             Event.title_matches(q),
-            ~Event.is_deleted
+            ~Event.is_deleted,
+            ~Event.is_unlisted
         ]
 
         if category_id is not None:
@@ -238,7 +239,8 @@ class InternalSearch(IndicoSearchProvider):
         contrib_filters = [
             Contribution.title_matches(q) | Contribution.description_matches(q),
             ~Contribution.is_deleted,
-            ~Event.is_deleted
+            ~Event.is_deleted,
+            ~Event.is_unlisted
         ]
 
         if category_id is not None:
@@ -364,11 +366,11 @@ class InternalSearch(IndicoSearchProvider):
             AttachmentFolder.link_type != LinkType.category,
             db.or_(
                 AttachmentFolder.link_type != LinkType.event,
-                ~Event.is_deleted,
+                (~Event.is_deleted & ~Event.is_unlisted),
             ),
             db.or_(
                 AttachmentFolder.link_type != LinkType.contribution,
-                ~Contribution.is_deleted & ~contrib_event.is_deleted
+                ~Contribution.is_deleted & ~contrib_event.is_deleted & ~contrib_event.is_unlisted
             ),
             db.or_(
                 AttachmentFolder.link_type != LinkType.subcontribution,
@@ -376,11 +378,12 @@ class InternalSearch(IndicoSearchProvider):
                     ~SubContribution.is_deleted,
                     ~subcontrib_contrib.is_deleted,
                     ~subcontrib_event.is_deleted,
+                    ~subcontrib_event.is_unlisted,
                 )
             ),
             db.or_(
                 AttachmentFolder.link_type != LinkType.session,
-                ~Session.is_deleted & ~session_event.is_deleted
+                ~Session.is_deleted & ~session_event.is_deleted & ~session_event.is_unlisted
             )
         ]
 
@@ -483,23 +486,24 @@ class InternalSearch(IndicoSearchProvider):
             ~EventNote.is_deleted,
             db.or_(
                 EventNote.link_type != LinkType.event,
-                ~Event.is_deleted
+                (~Event.is_deleted & ~Event.is_unlisted)
             ),
             db.or_(
                 EventNote.link_type != LinkType.contribution,
-                ~Contribution.is_deleted & ~contrib_event.is_deleted
+                ~Contribution.is_deleted & ~contrib_event.is_deleted & ~contrib_event.is_unlisted
             ),
             db.or_(
                 EventNote.link_type != LinkType.subcontribution,
                 db.and_(
                     ~SubContribution.is_deleted,
                     ~subcontrib_contrib.is_deleted,
-                    ~subcontrib_event.is_deleted
+                    ~subcontrib_event.is_deleted,
+                    ~subcontrib_event.is_unlisted,
                 )
             ),
             db.or_(
                 EventNote.link_type != LinkType.session,
-                ~Session.is_deleted & ~session_event.is_deleted
+                ~Session.is_deleted & ~session_event.is_deleted & ~session_event.is_unlisted
             )
         ]
 

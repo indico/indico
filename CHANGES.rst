@@ -58,6 +58,8 @@ Bugfixes
 - Fix performance issues in paper assignment list (:pr:`5736`)
 - Fix performance issues in event export API with large events when including
   contributions (:pr:`5736`)
+- Fix error when a search query matches content from unlisted events (:issue:`5759`,
+  :pr:`5761`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
