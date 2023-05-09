@@ -18,7 +18,7 @@ import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState, useMemo} from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
 import {Button, Icon, Loader, Checkbox, Message, Dropdown, Confirm} from 'semantic-ui-react';
@@ -485,6 +485,14 @@ function EditableListDisplay({
       setSkippedEditables(checked.length - rv.length);
     }
   };
+
+  // make the page full-width
+  useEffect(() => {
+    document.body.classList.add('full-width-content-wrapper');
+    return () => {
+      document.body.classList.remove('full-width-content-wrapper');
+    };
+  }, []);
 
   return (
     <>
