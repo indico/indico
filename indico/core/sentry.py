@@ -7,7 +7,7 @@
 
 import logging
 import re
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, urlsplit, urlunsplit
 
 import requests
 import sentry_sdk
@@ -63,11 +63,11 @@ def submit_user_feedback(error_data, email, comment):
     # get rid of credentials or query string in case they are present in the DSN
     dsn = re.sub(r':[^@/]+(?=@)', '', config.SENTRY_DSN)
     url = urlsplit(dsn)
-    dsn = str(url._replace(query=''))
+    dsn = urlunsplit(url._replace(query=''))
     query = MultiDict(parse_qs(url.query))
     verify = query.get('ca_certs', True)
     hostname = url.netloc.rpartition('@')[2]  # host w/o credentials
-    url = str(url._replace(path='/api/embed/error-page/', netloc=hostname, query=''))
+    url = urlunsplit(url._replace(path='/api/embed/error-page/', netloc=hostname, query=''))
     url = _resolve_redirects(url, verify)
     user_data = error_data['request_info']['user'] or {'name': 'Anonymous', 'email': config.NO_REPLY_EMAIL}
     try:
