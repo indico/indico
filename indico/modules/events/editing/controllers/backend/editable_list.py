@@ -20,7 +20,7 @@ from indico.modules.events.editing.controllers.backend.util import (confirm_and_
                                                                     review_and_publish_editable)
 from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHEditableTypeEditorBase,
                                                             RHEditableTypeManagementBase)
-from indico.modules.events.editing.models.editable import Editable
+from indico.modules.events.editing.models.editable import Editable, EditableState
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.operations import (assign_editor, create_revision_comment, generate_editables_json,
@@ -199,6 +199,7 @@ class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):
                             )
                         ),
                         Editable.type == self.editable_type,
+                        Editable.state == EditableState.ready_for_review,
                     )
                 )
             )
