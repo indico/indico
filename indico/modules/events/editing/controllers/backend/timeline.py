@@ -26,8 +26,8 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 from indico.modules.events.editing.operations import (assign_editor, create_new_editable, create_revision_comment,
                                                       create_submitter_revision, delete_revision_comment,
-                                                      ensure_latest_revision, replace_revision, unassign_editor,
-                                                      undo_review, update_revision_comment)
+                                                      ensure_latest_revision, replace_revision, reset_editable,
+                                                      unassign_editor, undo_review, update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
 from indico.modules.events.editing.service import (ServiceRequestFailed, service_get_custom_actions,
@@ -283,6 +283,19 @@ class RHUndoReview(RHContributionEditableRevisionBase):
 
     def _process(self):
         undo_review(self.revision)
+        return '', 204
+
+
+class RHResetEditable(RHContributionEditableRevisionBase):
+    """Undo the last review/confirmation on an Editable."""
+
+    SERVICE_ALLOWED = True
+
+    def _check_revision_access(self):
+        return self.editable.can_perform_editor_actions(session.user)
+
+    def _process(self):
+        reset_editable(self.revision)
         return '', 204
 
 
