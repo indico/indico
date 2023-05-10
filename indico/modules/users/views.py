@@ -24,6 +24,7 @@ class WPUser(WPJinjaMixin, WPDecorated):
     """
 
     template_prefix = 'users/'
+    ALLOW_JSON = False
 
     def __init__(self, rh, active_menu_item, **kwargs):
         kwargs['active_menu_item'] = active_menu_item
