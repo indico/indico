@@ -228,7 +228,13 @@ def test_html_to_plaintext(input, output):
     ('<https://getindico.io>', '<p><a href="https://getindico.io">https://getindico.io</a></p>')
 ))
 def test_markdown(input, output):
-    assert render_markdown(input,  extensions=('tables',)) == output
+    assert render_markdown(input, extensions=('tables',)) == output
+
+
+def test_markdown_sanitize_css():
+    input = '<img src="foo.png" style="wtf: isthis; text-align: center;"> **test**'
+    output = '<p><img src="foo.png" style="text-align: center;"> <strong>test</strong></p>'
+    assert render_markdown(input) == output
 
 
 def test_sanitize_html_imagemaps():

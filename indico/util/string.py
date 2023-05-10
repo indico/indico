@@ -168,7 +168,9 @@ def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **k
         if extra_html:
             result = sanitize_html(result)
         else:
-            result = bleach.clean(result, tags=BLEACH_ALLOWED_TAGS, attributes=BLEACH_ALLOWED_ATTRIBUTES)
+            css_sanitizer = IndicoCSSSanitizer(allowed_css_properties=BLEACH_ALLOWED_STYLES_HTML)
+            result = bleach.clean(result, tags=BLEACH_ALLOWED_TAGS, attributes=BLEACH_ALLOWED_ATTRIBUTES,
+                                  css_sanitizer=css_sanitizer)
     else:
         result = md(text, **kwargs)
 
