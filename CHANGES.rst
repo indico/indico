@@ -40,6 +40,7 @@ Improvements
 - Allow bulk-commenting editables in the editable list (:pr:`5747`)
 - Allow emailing contribution persons that have not yet made any submissions to a
   given editable type (:pr:`5755`)
+- Show only "ready to review" editables on the "get next editable" list (:pr:`5765`)
 
 Bugfixes
 ^^^^^^^^
