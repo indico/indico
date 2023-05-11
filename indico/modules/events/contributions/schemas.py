@@ -9,12 +9,14 @@ import hashlib
 from operator import attrgetter
 
 from marshmallow import fields, post_dump
+from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import column2field
 
 from indico.core.marshmallow import mm
 from indico.modules.events.abstracts.util import filter_field_values
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.models.fields import ContributionFieldValue
+from indico.modules.events.contributions.models.fields import (ContributionField, ContributionFieldValue,
+                                                               ContributionFieldVisibility)
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.schemas import BasicSessionSchema, SessionBlockSchema
@@ -33,6 +35,15 @@ class ContributionTypeSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ContributionType
         fields = ('id', 'name', 'description')
+
+
+class ContributionFieldSchema(mm.Schema):
+    visibility = EnumField(ContributionFieldVisibility)
+
+    class Meta:
+        model = ContributionField
+        fields = ('id', 'position', 'title', 'description', 'is_required', 'is_active', 'is_user_editable',
+                  'visibility', 'field_type', 'field_data')
 
 
 class ContributionFieldValueSchema(mm.Schema):

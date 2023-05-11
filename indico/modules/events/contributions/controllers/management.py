@@ -11,6 +11,7 @@ from operator import attrgetter
 from flask import flash, jsonify, redirect, request, session
 from marshmallow import fields
 from sqlalchemy.orm import undefer
+from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.cache import make_scoped_cache
@@ -37,7 +38,9 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.contributions.operations import (create_contribution, create_subcontribution,
                                                             delete_contribution, delete_subcontribution,
-                                                            update_contribution, update_subcontribution)
+                                                            log_contribution_update, update_contribution,
+                                                            update_subcontribution)
+from indico.modules.events.contributions.schemas import ContributionFieldSchema
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       get_boa_export_formats, import_contributions_from_csv,
                                                       make_contribution_form)
@@ -53,7 +56,8 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import check_event_locked, get_field_values, track_location_changes, track_time_changes
+from indico.modules.events.util import (check_event_locked, get_field_values, set_custom_fields, track_location_changes,
+                                        track_time_changes)
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
@@ -64,6 +68,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import serialize_principal
+from indico.web.rh import json_errors
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -672,10 +677,18 @@ class RHManageContributionFields(RHManageContributionsBase):
     """Dialog to manage the custom contribution fields of an event."""
 
     def _process(self):
-        custom_fields = self.event.contribution_fields.order_by(ContributionField.position)
+        custom_fields = self.event.contribution_fields.order_by(ContributionField.position).all()
         custom_field_types = sorted(list(get_contrib_field_types().values()), key=attrgetter('friendly_name'))
         return jsonify_template('events/contributions/management/fields_dialog.html', event=self.event,
                                 custom_fields=custom_fields, custom_field_types=custom_field_types)
+
+
+class RHManageContributionFieldsAPI(RHManageContributionsBase):
+    """API endpoint to get the custom contribution fields."""
+
+    def _process(self):
+        custom_fields = self.event.contribution_fields.order_by(ContributionField.position).all()
+        return ContributionFieldSchema(many=True).jsonify(custom_fields)
 
 
 class RHSortContributionFields(RHManageContributionsBase):
@@ -803,6 +816,34 @@ class RHCreateContributionReferenceREST(RHCreateReferenceMixin, RHManageContribu
                                           contribution=self.contrib)
         db.session.flush()
         return self.jsonify_reference(reference)
+
+
+@json_errors
+class RHContributionFieldsREST(RHManageContributionBase):
+    """REST endpoint to manage custom field values for a Contribution."""
+
+    @use_kwargs({'friendly': fields.Bool(load_default=False)}, location='query')
+    def _process_GET(self, friendly):
+        return jsonify({f'custom_{fv.contribution_field.id}': (fv.friendly_data if friendly else fv.data)
+                        for fv in self.contrib.field_values})
+
+    def _process_PATCH(self):
+        # it'd be nicer to use marshmallow here but converting the custom field logic to support
+        # marshmallow would be a significant refactoring. let's do that only when moving all the
+        # places that use those fields to react so we can just replace wtforms with
+        # marshmallow there altogether!
+        form = make_contribution_form(self.event, only_custom_fields=True)()
+        formdata = request.json if request.is_json else request.form
+        # wtforms has no partial mode but we never want to overwrite fields not specified,
+        # so we remove any fields not in the request data
+        for field in list(form):
+            if field.name not in formdata:
+                delattr(form, field.name)
+        if not form.validate_on_submit():
+            abort(422, messages=form.errors)
+        changes = set_custom_fields(self.contrib, form.data)
+        log_contribution_update(self.contrib, changes)
+        return self._process_GET()
 
 
 class RHCreateSubContributionReferenceREST(RHCreateReferenceMixin, RHManageSubContributionBase):

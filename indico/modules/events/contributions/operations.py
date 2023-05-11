@@ -21,6 +21,7 @@ from indico.modules.events.timetable.operations import (delete_timetable_entry, 
                                                         update_timetable_entry)
 from indico.modules.events.util import set_custom_fields
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.signals import make_interceptable
 
 
@@ -200,3 +201,31 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
                 attachment.file.save(fd)
     db.session.flush()
     return contrib
+
+
+def log_contribution_update(contrib, changes):
+    # TODO when doing https://github.com/indico/indico/issues/5754 rewrite this based on `_log_event_update`
+    if not changes:
+        return
+    log_fields = {}
+    for field_name in changes:
+        if not field_name.startswith('custom_') or not any(changes):
+            continue
+        field_id = int(field_name.removeprefix('custom_'))
+        field = contrib.event.get_contribution_field(field_id)
+        field_impl = field.field
+        log_fields[field_name] = {
+            'title': field.title,
+            'type': field_impl.log_type,
+            'convert': lambda change, field_impl=field_impl: list(map(field_impl.get_friendly_value, change))
+        }
+    if changes:
+        extra = ''
+        if len(changes) == 1:
+            what = log_fields[list(changes.keys())[0]]
+            if isinstance(what, dict):
+                what = what['title']
+            extra = f' ({what})'
+        contrib.log(EventLogRealm.management, LogKind.change, 'Contributions',
+                    f'Contribution {contrib.verbose_title} has been updated{extra}', session.user,
+                    data={'Changes': make_diff_log(changes, log_fields)})

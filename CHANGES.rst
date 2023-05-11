@@ -71,6 +71,7 @@ Internal Changes
 - Add support for the watchfiles live reloader (:pr:`5732`)
 - Add an endpoint to allow resetting the state of an accepted editable to "ready to
   review" (:pr:`5758`)
+- Add RESTful endpoints for custom contribution fields (:pr:`5768`)
 
 
 Version 3.2.3

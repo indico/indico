@@ -76,6 +76,8 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/clone', 'clone_contribu
 # Contribution RESTful endpoints
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/references/', 'create_contrib_reference_rest',
                  management.RHCreateContributionReferenceREST, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/fields/', 'manage_contrib_fields_rest',
+                 management.RHContributionFieldsREST, methods=('GET', 'PATCH'))
 
 # Subcontributions
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/subcontributions/', 'manage_subcontributions',
@@ -119,6 +121,7 @@ _bp.add_url_rule('/manage/contributions/published', 'manage_publication',
                  management.RHManageContributionPublicationREST, methods=('GET', 'PUT', 'DELETE'))
 
 # Custom contribution fields
+_bp.add_url_rule('/manage/contributions/api/fields/', 'manage_fields_api', management.RHManageContributionFieldsAPI)
 _bp.add_url_rule('/manage/contributions/fields/', 'manage_fields', management.RHManageContributionFields)
 _bp.add_url_rule('/manage/contributions/fields/create/<field_type>', 'create_field',
                  management.RHCreateContributionField, methods=('GET', 'POST'))
