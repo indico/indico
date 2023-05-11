@@ -67,7 +67,7 @@ def _save_error(exc, title, message):
 
 
 def _need_json_response():
-    return request.is_xhr or request.is_json
+    return request.is_xhr or request.is_json or (hasattr(g, 'rh') and getattr(g.rh, '_JSON_ERRORS', False))
 
 
 def _is_error_reporting_opted_out(code):

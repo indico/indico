@@ -398,3 +398,13 @@ def allow_signed_url(rh):
     """
     rh._ALLOW_SIGNED_URL = True
     return rh
+
+
+def json_errors(rh):
+    """Specify that the RH should always jsonify errors.
+
+    This is meant for API endpoints and similar places where errors
+    should be returned as JSON and not as a formatted HTML error page.
+    """
+    rh._JSON_ERRORS = True
+    return rh
