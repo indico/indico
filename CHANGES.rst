@@ -41,6 +41,7 @@ Improvements
 - Allow emailing contribution persons that have not yet made any submissions to a
   given editable type (:pr:`5755`)
 - Show only "ready to review" editables on the "get next editable" list (:pr:`5765`)
+- Disallow uploading zero-byte files (:pr:`5767`)
 
 Bugfixes
 ^^^^^^^^
