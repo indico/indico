@@ -42,6 +42,9 @@ class UploadFileMixin:
         content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
         f = File(filename=file.filename, content_type=content_type)
         f.save(context, stream)
+        if not f.size:
+            f.delete()
+            raise UnprocessableEntity
         db.session.add(f)
         db.session.flush()
         logger.info('File %r uploaded (context: %r)', f, context)
