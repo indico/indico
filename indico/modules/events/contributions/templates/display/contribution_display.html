@@ -183,7 +183,7 @@
     {% endfor %}
 
     <table class="other-fields">
-        {% for field_value in field_values %}
+        {% for field_value in field_values|sort(attribute='contribution_field.position') %}
             {% set field = field_value.contribution_field %}
             {% if (field.field_type == 'single_choice' or not field.field_data.multiline) and field_value.data and field.is_active %}
                 {{ _render_field_value(field_value) }}
