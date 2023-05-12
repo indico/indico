@@ -112,6 +112,7 @@ export default function FormItem({
         {InputComponent ? (
           meta.customFormItem ? (
             <InputComponent
+              showAsRequired={required}
               isRequired={managementRequired}
               disabled={disabled}
               isPurged={showPurged}
