@@ -27,6 +27,7 @@ export default function CheckboxInput({
   disabled,
   title,
   isRequired,
+  showAsRequired,
   price,
   placesLimit,
   placesUsed,
@@ -37,7 +38,7 @@ export default function CheckboxInput({
 
   return (
     <FinalCheckbox
-      fieldProps={{className: styles.field}}
+      fieldProps={{className: `${styles.field} ${showAsRequired ? 'required' : ''}`}}
       name={htmlName}
       label={title}
       disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
@@ -68,6 +69,7 @@ CheckboxInput.propTypes = {
   disabled: PropTypes.bool,
   title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool.isRequired,
+  showAsRequired: PropTypes.bool.isRequired,
   price: PropTypes.number,
   placesLimit: PropTypes.number.isRequired,
   placesUsed: PropTypes.number.isRequired,
