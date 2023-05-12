@@ -218,7 +218,7 @@ export default function AccommodationInput({
       placesUsed={placesUsed}
       validate={value => {
         if (value.choice === null) {
-          return Translate.string('You must select an option');
+          return isRequired ? Translate.string('You must select an option') : undefined;
         } else if (!value.isNoAccommodation && (!value.arrivalDate || !value.departureDate)) {
           return Translate.string('You must select the arrival and departure date');
         }
