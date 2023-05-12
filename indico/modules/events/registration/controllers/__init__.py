@@ -54,7 +54,8 @@ class RegistrationEditMixin:
         schema = make_registration_schema(
             self.regform,
             management=self.management,
-            registration=self.registration
+            registration=self.registration,
+            override_required=self.management
         )(partial=optional_fields)
         form_data = parser.parse(schema)
 
