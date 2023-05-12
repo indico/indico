@@ -21,9 +21,11 @@
             </thead>
             <tbody></tbody>
         </table>
-        <button type="button" id="{{ field.id }}-add-button" class="js-add-row i-button icon-plus">
-            {%- trans %}Add{% endtrans -%}
-        </button>
+        {% block action_buttons %}
+            <button type="button" id="{{ field.id }}-add-button" class="js-add-row i-button icon-plus">
+                {%- trans %}Add{% endtrans -%}
+            </button>
+        {% endblock %}
     </div>
 {% endblock %}
 
