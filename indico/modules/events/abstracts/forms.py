@@ -163,6 +163,9 @@ class AbstractReviewingSettingsForm(IndicoForm):
                                                widget=SwitchWidget(),
                                                description=_('Enabling this allows track conveners to update the track '
                                                              'an abstract is part of.'))
+    force_track_selection = BooleanField(_('Force track selection on judgment'), widget=SwitchWidget(),
+                                         description=_('Enabling this makes the track selection mandatory when '
+                                                       'accepting an abstract.'))
     allow_comments = BooleanField(_('Allow comments'), widget=SwitchWidget(),
                                   description=_('Enabling this allows judges, conveners and reviewers to leave '
                                                 'comments on abstracts.'))
@@ -276,6 +279,8 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
             kwargs.setdefault('accepted_contrib_type', candidate_contrib_types[0])
         elif not abstract.reviews:
             kwargs.setdefault('accepted_contrib_type', abstract.submitted_contrib_type)
+        if self.event.cfa.force_track_selection:
+            inject_validators(self, 'accepted_track', [DataRequired()])
         super().__init__(*args, **kwargs)
         self.duplicate_of.excluded_abstract_ids = {abstract.id}
         self.merged_into.excluded_abstract_ids = {abstract.id}
