@@ -135,10 +135,11 @@ class CSSForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        url = f'{config.CONFERENCE_CSS_TEMPLATES_BASE_URL}/standard.css'
+        link = f"<a href='{url}' target='_blank'>"
         self.css_file.description = _('If you want to fully customize your conference page you can create your own '
                                       'stylesheet and upload it. An example stylesheet can be downloaded '
-                                      "<a href='{base_url}/standard.css' target='_blank'>here</a>."
-                                      .format(base_url=config.CONFERENCE_CSS_TEMPLATES_BASE_URL))
+                                      '{link}here{endlink}').format(link=link, endlink='</a>')
 
 
 class MenuBuiltinEntryForm(IndicoForm):
