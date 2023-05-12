@@ -53,6 +53,14 @@ class RegistrationFormFieldBase:
     def default_value(self):
         return ''
 
+    @property
+    def empty_value(self):
+        # THis value is used when a manager edits an existing registration, and
+        # it should be something that, especially in case of choice fields, does
+        # not preselect any of the available choices (such as "no accommodation"
+        # or whatever default value is set for a field).
+        return self.default_value
+
     def get_validators(self, existing_registration):
         """Return a list of marshmallow validators for this field.
 

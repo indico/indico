@@ -281,6 +281,10 @@ class BooleanField(RegistrationFormBillableField):
         data = self.form_item.data
         return {'yes': True, 'no': False}.get(data.get('default_value'))
 
+    @property
+    def empty_value(self):
+        return None
+
     def get_places_used(self):
         places_used = 0
         if self.form_item.data.get('places_limit'):

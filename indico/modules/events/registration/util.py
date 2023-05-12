@@ -215,6 +215,8 @@ def get_form_registration_data(regform, registration, *, management=False):
             continue
         elif item.id in data_by_field:
             registration_data[item.html_field_name] = camelize_keys(data_by_field[item.id].user_data)
+        elif management:
+            registration_data[item.html_field_name] = item.field_impl.empty_value
         else:
             registration_data[item.html_field_name] = item.field_impl.default_value
     if management:
@@ -417,8 +419,11 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
         if has_data and can_modify:
             value = data.get(form_item.html_field_name)
-        elif not has_data and form_item.id not in data_by_field:
-            # set default value for a field if it didn't have one before (including manager-only fields)
+        elif not has_data and form_item.id not in data_by_field and not management:
+            # set default value for a field if it didn't have one before (including manager-only fields).
+            # but we do so only if it's the user editing their registration - if a manager edits
+            # the registration, we keep those fields empty so it's clear they have never been
+            # filled in.
             value = field_impl.default_value
         else:
             # keep current value

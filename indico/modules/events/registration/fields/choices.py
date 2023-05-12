@@ -213,6 +213,10 @@ class SingleChoiceField(ChoiceBaseField):
         # only use the default item if it exists in the current version
         return {default_item: 1} if any(x['id'] == default_item for x in versioned_data['choices']) else {}
 
+    @property
+    def empty_value(self):
+        return {}
+
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         if not registration_data.data:
             return ''
@@ -459,6 +463,10 @@ class AccommodationField(RegistrationFormBillableItemsField):
             'arrivalDate': None,
             'departureDate': None,
         }
+
+    @property
+    def empty_value(self):
+        return {'choice': None}
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
