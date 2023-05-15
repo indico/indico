@@ -86,11 +86,11 @@ class RHRoomsSprite(RHRoomBookingBase):
 
 class RHStats(RHRoomBookingBase):
     def _process(self):
-        return self._get_stats(date.today())
+        return jsonify(self._get_stats_data(date.today()))
 
     @staticmethod
     @memoize_redis(3600)
-    def _get_stats(date):
+    def _get_stats_data(date):
         today_dt = datetime.combine(date, time())
         bookings_today = (ReservationOccurrence.query
                           .filter(ReservationOccurrence.is_valid,
@@ -98,7 +98,7 @@ class RHStats(RHRoomBookingBase):
                                                    'start_dt', today_dt,
                                                    'end_dt', today_dt + timedelta(days=1)))
                           .count())
-        return jsonify(
+        return dict(
             active_rooms=Room.query.filter_by(is_deleted=False).count(),
             buildings=Room.query.distinct(Room.building).filter_by(is_deleted=False).count(),
             pending_bookings=Reservation.query.filter(Reservation.is_pending, ~Reservation.is_archived).count(),
