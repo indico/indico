@@ -38,6 +38,7 @@ Afterwards, make sure the services you just installed are running:
 .. code-block:: shell
 
     systemctl start postgresql.service redis-server.service
+    pg_ctlcluster 13 main start
 
 
 2. Create a Database
