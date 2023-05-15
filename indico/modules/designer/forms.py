@@ -8,6 +8,7 @@
 from wtforms import BooleanField, StringField
 from wtforms.validators import DataRequired
 
+from indico.modules.categories.fields import CategoryField
 from indico.modules.designer.models.templates import TemplateType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -20,3 +21,7 @@ class AddTemplateForm(IndicoForm):
     type = IndicoEnumSelectField(_('Template'), enum=TemplateType, default=TemplateType.poster)
     is_clonable = BooleanField(_('Allow cloning'), widget=SwitchWidget(), default=True,
                                description=_('Allow cloning this template in subcategories and events'))
+
+
+class CloneTemplateForm(IndicoForm):
+    category = CategoryField(_('Category'), [DataRequired()], require_category_management_rights=True)

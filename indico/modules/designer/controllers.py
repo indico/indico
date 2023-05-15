@@ -11,6 +11,7 @@ from copy import deepcopy
 from io import BytesIO
 
 from flask import flash, jsonify, request, session
+from markupsafe import Markup
 from PIL import Image
 from webargs import fields
 from werkzeug.exceptions import Forbidden, NotFound
@@ -21,7 +22,7 @@ from indico.core.errors import UserValueError
 from indico.modules.categories import Category
 from indico.modules.categories.controllers.management import RHManageCategoryBase
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
-from indico.modules.designer.forms import AddTemplateForm
+from indico.modules.designer.forms import AddTemplateForm, CloneTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
@@ -37,6 +38,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -173,6 +175,8 @@ class TemplateListMixin(TargetFromURLMixin):
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
+    clonable_elsewhere = False
+
     def _check_access(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
@@ -180,9 +184,10 @@ class CloneTemplateMixin(TargetFromURLMixin):
     def _process_args(self):
         self.template = DesignerTemplate.get_or_404(request.view_args['template_id'])
 
-    def _process(self):
+    def clone_template(self, target=None):
         title = f'{self.template.title} (copy)'
-        new_template = DesignerTemplate(title=title, type=self.template.type, **self.target_dict)
+        target_dict = target if target else self.target_dict
+        new_template = DesignerTemplate(title=title, type=self.template.type, **target_dict)
 
         data = deepcopy(self.template.data)
         image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
@@ -206,8 +211,23 @@ class CloneTemplateMixin(TargetFromURLMixin):
 
         new_template.background_image = new_background
 
-        flash(_("Created copy of template '{}'").format(self.template.title), 'success')
+        message = _("Created copy of template '{}'").format(self.template.title)
+        if target_dict != self.target_dict:
+            link = f'<a href="{url_for("designer.template_list", target_dict["category"])}" target="_blank">'
+            message = _("Created copy of template '{}' {} here {}").format(self.template.title, link, '</a>')
+        flash(Markup(message), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
+
+    def _process(self):
+        category = (self.target if isinstance(self.target, Category) and
+                    self.target.can_manage(session.user) else None)
+        form = CloneTemplateForm(category=category)
+        if self.clonable_elsewhere:
+            if form.validate_on_submit():
+                return self.clone_template(target=form.data)
+            return jsonify_form(form, submit=_('Clone'), disabled_until_change=False)
+        if request.method == 'POST':
+            return self.clone_template()
 
 
 class AddTemplateMixin(TargetFromURLMixin):
@@ -253,6 +273,8 @@ class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
 
 
 class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
+    clonable_elsewhere = True
+
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
         CloneTemplateMixin._process_args(self)
