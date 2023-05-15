@@ -20,6 +20,11 @@ class CategoryField(HiddenField):
     :param require_event_creation_rights: Whether to allow selecting
                                           only categories where the
                                           user can create events.
+    :param require_category_management_rights: Whether to allow selecting
+                                               only categories where the
+                                               user has management rights.
+    :param show_warning_message: Whether to show warning message in the
+                                 category field in case a warning occurs.
     """
 
     widget = JinjaWidget('forms/category_picker_widget.html')
@@ -27,6 +32,8 @@ class CategoryField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.navigator_category_id = None
         self.require_event_creation_rights = kwargs.pop('require_event_creation_rights', False)
+        self.require_category_management_rights = kwargs.pop('require_category_management_rights', False)
+        self.show_warning_message = kwargs.pop('show_warning_message', True)
         super().__init__(*args, **kwargs)
 
     def process_data(self, value):

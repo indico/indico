@@ -37,6 +37,8 @@
             fieldId: {{ field.id | tojson }},
             navigatorCategoryId: {{ field.navigator_category_id | tojson }},
             requireEventCreationRights: {{ field.require_event_creation_rights | tojson }},
+            requireCategoryManagementRights: {{ field.require_category_management_rights | tojson }},
+            showWarningMessage: {{ field.show_warning_message | tojson }},
         });
     </script>
 {% endblock %}
