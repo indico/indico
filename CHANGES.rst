@@ -65,6 +65,8 @@ Bugfixes
   contributions (:pr:`5736`)
 - Fix error when a search query matches content from unlisted events (:issue:`5759`,
   :pr:`5761`)
+- Fix ToS and Privacy Policy links in room booking module not working when using an
+  external URL (:pr:`5774`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

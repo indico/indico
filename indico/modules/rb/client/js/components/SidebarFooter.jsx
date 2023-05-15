@@ -20,7 +20,14 @@ import {Responsive} from 'indico/react/util';
 
 import {selectors as configSelectors} from '../common/config';
 
-const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy, contactEmail) => {
+const buildMenuItems = (
+  helpURL,
+  hasTOS,
+  hasTOSHTML,
+  hasPrivacyPolicy,
+  hasPrivacyPolicyHTML,
+  contactEmail
+) => {
   const menuItems = [
     [
       'help',
@@ -50,7 +57,7 @@ const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy, contactEmail) => {
       'tos',
       {
         href: tosURL(),
-        modal: true,
+        modal: hasTOSHTML,
         target: '_blank',
         rel: 'noopener noreferrer',
         caption: Translate.string('Terms and Conditions'),
@@ -63,7 +70,7 @@ const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy, contactEmail) => {
       'privacy',
       {
         href: privacyPolicyURL(),
-        modal: true,
+        modal: hasPrivacyPolicyHTML,
         target: '_blank',
         rel: 'noopener noreferrer',
         caption: Translate.string('Privacy Policy'),
@@ -89,7 +96,14 @@ function SidebarFooter({
     e.preventDefault();
   }
 
-  const items = buildMenuItems(helpURL, hasTOS, hasPrivacyPolicy, contactEmail);
+  const items = buildMenuItems(
+    helpURL,
+    hasTOS,
+    !!tosHTML,
+    hasPrivacyPolicy,
+    !!privacyPolicyHTML,
+    contactEmail
+  );
 
   return (
     <>
@@ -105,7 +119,11 @@ function SidebarFooter({
                 inverted
                 position="bottom right"
                 trigger={
-                  <a href={href} onClick={modal && (e => openModal(e, id))} {...extraProps}>
+                  <a
+                    href={href}
+                    onClick={modal ? e => openModal(e, id) : undefined}
+                    {...extraProps}
+                  >
                     <Icon size="large" name={icon} />
                   </a>
                 }
