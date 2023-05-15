@@ -425,7 +425,7 @@ class SetupWizard:
             if not data.scheme or not data.hostname:
                 _warn('Invalid URL: scheme/host missing')
                 return False
-            elif data.fragment or data.query or data.auth:
+            elif data.fragment or data.query or '@' in data.netloc:
                 _warn('Invalid URL: must not contain fragment, query string or username/password')
                 return False
             elif not dev and data.scheme != 'https':
