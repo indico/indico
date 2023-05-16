@@ -165,7 +165,8 @@ class AbstractReviewingSettingsForm(IndicoForm):
                                                              'an abstract is part of.'))
     force_track_selection = BooleanField(_('Force track selection on judgment'), widget=SwitchWidget(),
                                          description=_('Enabling this makes the track selection mandatory when '
-                                                       'accepting an abstract.'))
+                                                       'accepting an abstract. This does not affect bulk judgment by '
+                                                       'managers.'))
     allow_comments = BooleanField(_('Allow comments'), widget=SwitchWidget(),
                                   description=_('Enabling this allows judges, conveners and reviewers to leave '
                                                 'comments on abstracts.'))
