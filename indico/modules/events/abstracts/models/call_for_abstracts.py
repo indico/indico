@@ -29,6 +29,7 @@ class CallForAbstracts:
                                                           'allow_contributors_in_comments')
     allow_convener_judgment = EventSettingProperty(abstracts_reviewing_settings, 'allow_convener_judgment')
     allow_convener_track_change = EventSettingProperty(abstracts_reviewing_settings, 'allow_convener_track_change')
+    force_track_selection = EventSettingProperty(abstracts_reviewing_settings, 'force_track_selection')
     allow_editing = EventSettingProperty(abstracts_settings, 'allow_editing')
     contribution_submitters = EventSettingProperty(abstracts_settings, 'contribution_submitters')
     submission_instructions = EventSettingProperty(abstracts_settings, 'submission_instructions')

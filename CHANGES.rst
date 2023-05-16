@@ -43,6 +43,7 @@ Improvements
 - Show only "ready to review" editables on the "get next editable" list (:pr:`5765`)
 - Disallow uploading empty files (:pr:`5767`)
 - Include non-speaker authors in the timetable export API (:issue:`5412`, :pr:`5738`)
+- Add setting to force track selection when accepting abstracts (:pr:`5771`)
 
 Bugfixes
 ^^^^^^^^
