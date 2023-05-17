@@ -44,6 +44,7 @@ Improvements
 - Disallow uploading empty files (:pr:`5767`)
 - Include non-speaker authors in the timetable export API (:issue:`5412`, :pr:`5738`)
 - Add setting to force track selection when accepting abstracts (:pr:`5771`)
+- Log detailed changes when editing contributions (:pr:`5777`)
 
 Bugfixes
 ^^^^^^^^

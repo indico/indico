@@ -74,7 +74,7 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
 
 
 @no_autoflush
-def update_contribution(contrib, contrib_data, custom_fields_data=None):
+def update_contribution(contrib: Contribution, contrib_data, custom_fields_data=None):
     """Update a contribution.
 
     :param contrib: The `Contribution` to update
@@ -93,7 +93,12 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
     start_dt = contrib_data.pop('start_dt', None)
     if start_dt is not None:
         update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
+    old_person_links = contrib.sorted_person_links[:]
     changes = contrib.populate_from_dict(contrib_data)
+    changes.pop('person_link_data', None)
+    visible_person_link_changes = contrib.sorted_person_links != old_person_links
+    if visible_person_link_changes or 'person_link_data' in contrib_data:
+        changes['person_links'] = (old_person_links, contrib.sorted_person_links)
     if custom_fields_data:
         changes.update(set_custom_fields(contrib, custom_fields_data))
     if 'session' in contrib_data:
@@ -108,8 +113,7 @@ def update_contribution(contrib, contrib_data, custom_fields_data=None):
     if changes:
         signals.event.contribution_updated.send(contrib, changes=changes)
         logger.info('Contribution %s updated by %s', contrib, session.user)
-        contrib.log(EventLogRealm.management, LogKind.change, 'Contributions',
-                    f'Contribution "{contrib.title}" has been updated', session.user)
+        log_contribution_update(contrib, changes, visible_person_link_changes=visible_person_link_changes)
     return rv
 
 
@@ -203,11 +207,61 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
     return contrib
 
 
-def log_contribution_update(contrib, changes):
-    # TODO when doing https://github.com/indico/indico/issues/5754 rewrite this based on `_log_event_update`
+def log_contribution_update(contrib, changes, *, visible_person_link_changes=False):
     if not changes:
         return
-    log_fields = {}
+
+    # TODO move this to more generic utils
+    from indico.modules.events.operations import _format_person, _format_ref, _split_location_changes
+
+    log_fields = {
+        'title': {'title': 'Title', 'type': 'string'},
+        'description': 'Description',
+        'address': 'Address',
+        'venue_room': {'title': 'Location', 'type': 'string'},
+        'keywords': 'Keywords',
+        'board_number': {'title': 'Board number', 'type': 'string'},
+        'code': {'title': 'Program code', 'type': 'string'},
+        'duration': 'Duration',
+        'protection_mode': 'Protection mode',
+        'references': {
+            'title': 'External IDs',
+            'convert': lambda changes: [list(map(_format_ref, refs)) for refs in changes]
+        },
+        'person_links': {
+            'title': 'Persons',
+            'convert': lambda changes: [list(map(_format_person, persons)) for persons in changes]
+        },
+        'track': {
+            'title': 'Track',
+            'type': 'string',
+            'convert': lambda changes: [x.full_title if x else None for x in changes]
+        },
+        'session': {
+            'title': 'Session',
+            'type': 'string',
+            'convert': lambda changes: [x.title if x else None for x in changes]
+        },
+        'session_block': {
+            'title': 'Session Block',
+            'type': 'string',
+            'convert': lambda changes: [x.full_title if x else None for x in changes]
+        },
+        'type': {
+            'title': 'Type',
+            'type': 'string',
+            'convert': lambda changes: [x.name if x else None for x in changes]
+        },
+    }
+    _split_location_changes(changes)
+    if not visible_person_link_changes:
+        # Don't log a person link change with no visible changes (changes
+        # on an existing link or reordering). It would look quite weird in
+        # the event log.
+        # TODO: maybe use a separate signal for such changes to log them
+        # anyway and allow other code to act on them?
+        changes.pop('person_links', None)
+
     for field_name in changes:
         if not field_name.startswith('custom_') or not any(changes):
             continue
