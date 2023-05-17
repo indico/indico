@@ -744,3 +744,39 @@ def should_show_draft_warning(event):
             not contribution_settings.get(event, 'published') and
             (TimetableEntry.query.with_parent(event).has_rows() or
              Contribution.query.with_parent(event).has_rows()))
+
+
+def format_log_ref(ref):
+    return f'{ref.reference_type.name}:{ref.value}'
+
+
+def _get_venue_room_name(data):
+    venue_name = data['venue'].name if data.get('venue') else data.get('venue_name', '')
+    room_name = data['room'].full_name if data.get('room') else data.get('room_name', '')
+    return venue_name, room_name
+
+
+def _format_location(data):
+    venue_name = data[0]
+    room_name = data[1]
+    if venue_name and room_name:
+        return f'{venue_name}: {room_name}'
+    elif venue_name or room_name:
+        return venue_name or room_name
+    else:
+        return None
+
+
+def split_log_location_changes(changes):
+    location_changes = changes.pop('location_data', None)
+    if location_changes is None:
+        return
+    if location_changes[0]['address'] != location_changes[1]['address']:
+        changes['address'] = (location_changes[0]['address'], location_changes[1]['address'])
+    venue_room_changes = (_get_venue_room_name(location_changes[0]), _get_venue_room_name(location_changes[1]))
+    if venue_room_changes[0] != venue_room_changes[1]:
+        changes['venue_room'] = list(map(_format_location, venue_room_changes))
+
+
+def format_log_person(data):
+    return f'{data.full_name} <{data.email}>' if data.email else data.full_name

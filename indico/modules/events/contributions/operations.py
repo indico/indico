@@ -19,7 +19,7 @@ from indico.modules.events.contributions.models.persons import AuthorType, Contr
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.timetable.operations import (delete_timetable_entry, schedule_contribution,
                                                         update_timetable_entry)
-from indico.modules.events.util import set_custom_fields
+from indico.modules.events.util import format_log_person, format_log_ref, set_custom_fields, split_log_location_changes
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.signals import make_interceptable
@@ -211,9 +211,6 @@ def log_contribution_update(contrib, changes, *, visible_person_link_changes=Fal
     if not changes:
         return
 
-    # TODO move this to more generic utils
-    from indico.modules.events.operations import _format_person, _format_ref, _split_location_changes
-
     log_fields = {
         'title': {'title': 'Title', 'type': 'string'},
         'description': 'Description',
@@ -226,11 +223,11 @@ def log_contribution_update(contrib, changes, *, visible_person_link_changes=Fal
         'protection_mode': 'Protection mode',
         'references': {
             'title': 'External IDs',
-            'convert': lambda changes: [list(map(_format_ref, refs)) for refs in changes]
+            'convert': lambda changes: [list(map(format_log_ref, refs)) for refs in changes]
         },
         'person_links': {
             'title': 'Persons',
-            'convert': lambda changes: [list(map(_format_person, persons)) for persons in changes]
+            'convert': lambda changes: [list(map(format_log_person, persons)) for persons in changes]
         },
         'track': {
             'title': 'Track',
@@ -253,7 +250,7 @@ def log_contribution_update(contrib, changes, *, visible_person_link_changes=Fal
             'convert': lambda changes: [x.name if x else None for x in changes]
         },
     }
-    _split_location_changes(changes)
+    split_log_location_changes(changes)
     if not visible_person_link_changes:
         # Don't log a person link change with no visible changes (changes
         # on an existing link or reordering). It would look quite weird in
