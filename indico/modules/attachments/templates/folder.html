@@ -3,7 +3,9 @@
 <div class="folder-main">
     <h1><a href="{{ event.url }}">{{ event.title }}</a></h1>
     <h2>{{ folder.title }}</h2>
-    {% for attachment in folder.attachments %}
-        {{ render_attachment(attachment) }}
-    {% endfor %}
+    <ul>
+        {% for attachment in folder.attachments %}
+            <li>{{ render_attachment(attachment) }}</li>
+        {% endfor %}
+    </ul>
 </div>
