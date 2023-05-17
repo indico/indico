@@ -152,7 +152,7 @@ def move_timetable_entry(entry, parent=None, day=None):
         new_start_dt = entry.start_dt.replace(day=day.day, month=day.month)
         updates['start_dt'] = new_start_dt
         updates['parent'] = None
-        contrib_update_data = {'session_id': None, 'session_block_id': None}
+        contrib_update_data = {'session_block': None, 'session': None}
     elif parent:
         new_start_dt = find_latest_entry_end_dt(parent.object) or parent.start_dt
         tz = entry.event.tzinfo

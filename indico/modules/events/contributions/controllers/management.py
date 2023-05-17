@@ -305,13 +305,13 @@ class RHContributionREST(RHManageContributionBase):
     def _get_contribution_track_updates(self, track_id):
         updates = {}
         if track_id is None:
-            updates['track_id'] = None
+            updates['track'] = None
         else:
             track = Track.query.with_parent(self.event).filter_by(id=track_id).first()
             if not track:
                 raise BadRequest('Invalid track id')
             if track_id != self.contrib.track_id:
-                updates['track_id'] = track_id
+                updates['track'] = track
         return updates
 
 
