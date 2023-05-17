@@ -26,7 +26,7 @@ flask
 html2text
 icalendar
 indico-fonts
-ipython!=8.13.1,!=8.12.1  # right cursor key broken (ipython/ipython#14051)
+ipython
 itsdangerous
 jinja2
 jsonschema

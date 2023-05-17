@@ -150,7 +150,7 @@ importlib-resources==5.12.0
     # via limits
 indico-fonts==1.1
     # via -r requirements.in
-ipython==8.12.0
+ipython==8.13.2
     # via -r requirements.in
 itsdangerous==2.1.2
     # via
