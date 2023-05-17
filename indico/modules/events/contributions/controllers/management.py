@@ -307,7 +307,7 @@ class RHContributionREST(RHManageContributionBase):
         if track_id is None:
             updates['track_id'] = None
         else:
-            track = Track.get(track_id)
+            track = Track.query.with_parent(self.event).filter_by(id=track_id).first()
             if not track:
                 raise BadRequest('Invalid track id')
             if track_id != self.contrib.track_id:
