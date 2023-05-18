@@ -1,15 +1,15 @@
 # 
 # Translators:
 # Adrian, 2021
-# batpurev batchuluun <batpurev@gmail.com>, 2022
-# Batbayar Bat-Erdene <yertonts@gmail.com>, 2022
-# Pedro Lourenço <pedroob221@gmail.com>, 2022
+# Batbayar Bat-Erdene <yertonts@gmail.com>, 2023
+# batpurev batchuluun <batpurev@gmail.com>, 2023
+# Pedro Lourenço <pedroob221@gmail.com>, 2023
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-08-22 18:00+0200\n"
-"Last-Translator: Pedro Lourenço <pedroob221@gmail.com>, 2022\n"
-"Language-Team: Mongolian (Mongolia) (https://www.transifex.com/indico/teams/6478/mn_MN/)\n"
+"POT-Creation-Date: 2023-05-23 22:02+0200\n"
+"Last-Translator: Pedro Lourenço <pedroob221@gmail.com>, 2023\n"
+"Language-Team: Mongolian (Mongolia) (https://app.transifex.com/indico/teams/6478/mn_MN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Language: mn_MN\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: indico/modules/auth/client/js/signup.jsx:81
+#: indico/modules/auth/client/js/signup.jsx:83
 msgid "Passwords must match"
 msgstr ""
 
-#: indico/modules/auth/client/js/signup.jsx:93
+#: indico/modules/auth/client/js/signup.jsx:95
 msgid ""
 "There is already some information in Indico that concerns you. We are going "
 "to link it automatically."
@@ -29,99 +29,102 @@ msgstr ""
 "Таны тухай зарим мэдээлэл Indico дотор аль хэдийнэ байна. Бид үүнтэй "
 "автоматаар холбох гэж байна."
 
-#: indico/modules/auth/client/js/signup.jsx:100
+#: indico/modules/auth/client/js/signup.jsx:102
 msgid "User information"
 msgstr "Хэрэглэгчийн мэдээлэл"
 
-#: indico/modules/auth/client/js/signup.jsx:106
-#: indico/modules/auth/client/js/signup.jsx:118
-#: indico/modules/users/client/js/PersonalDataForm.jsx:124
-#: indico/web/client/js/react/components/principals/Search.jsx:541
+#: indico/modules/auth/client/js/signup.jsx:108
+#: indico/modules/auth/client/js/signup.jsx:122
+#: indico/modules/users/client/js/PersonalDataForm.jsx:138
+#: indico/web/client/js/react/components/principals/Search.jsx:542
 #: indico/web/client/js/react/errors/component.jsx:78
 msgid "Email address"
 msgstr "Цахим шуудангийн хаяг"
 
-#: indico/modules/auth/client/js/signup.jsx:126
-#: indico/modules/users/client/js/PersonalDataForm.jsx:87
+#: indico/modules/auth/client/js/signup.jsx:132
+#: indico/modules/users/client/js/PersonalDataForm.jsx:89
 msgid "First name"
 msgstr "Нэр"
 
-#: indico/modules/auth/client/js/signup.jsx:132
-#: indico/modules/users/client/js/PersonalDataForm.jsx:93
+#: indico/modules/auth/client/js/signup.jsx:140
+#: indico/modules/users/client/js/PersonalDataForm.jsx:97
 msgid "Last name"
 msgstr "Овог"
 
-#: indico/modules/auth/client/js/signup.jsx:148
-#: indico/modules/users/client/js/PersonalDataForm.jsx:108
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:132
-#: indico/web/client/js/react/components/principals/Search.jsx:542
-#: indico/web/client/js/react/components/syncedInputs.jsx:168
+#: indico/modules/auth/client/js/signup.jsx:160
+#: indico/modules/events/persons/client/js/PersonList.jsx:137
+#: indico/modules/users/client/js/PersonalDataForm.jsx:116
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:142
+#: indico/web/client/js/react/components/principals/Search.jsx:543
+#: indico/web/client/js/react/components/syncedInputs.jsx:189
 msgid "Affiliation"
 msgstr "Харьяалал"
 
-#: indico/modules/auth/client/js/signup.jsx:156
-#: indico/modules/users/client/js/PersonalDataForm.jsx:114
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:157
+#: indico/modules/auth/client/js/signup.jsx:170
+#: indico/modules/users/client/js/PersonalDataForm.jsx:124
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:164
 msgid "Address"
 msgstr "Хаяг"
 
-#: indico/modules/auth/client/js/signup.jsx:163
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:163
-#: indico/modules/users/client/js/PersonalDataForm.jsx:119
+#: indico/modules/auth/client/js/signup.jsx:179
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:170
+#: indico/modules/users/client/js/PersonalDataForm.jsx:131
 msgid "Phone number"
 msgstr "Утасны дугаар"
 
-#: indico/modules/auth/client/js/signup.jsx:169
+#: indico/modules/auth/client/js/signup.jsx:187
 msgid "Login details"
 msgstr "Нэвтрэх дэлгэрэнгүй"
 
-#: indico/modules/auth/client/js/signup.jsx:170
+#: indico/modules/auth/client/js/signup.jsx:188
 msgid "Username"
 msgstr "Хэрэглэгчийн нэр"
 
-#: indico/modules/auth/client/js/signup.jsx:175
+#: indico/modules/auth/client/js/signup.jsx:193
 msgid "Password"
 msgstr "Нууц үг"
 
-#: indico/modules/auth/client/js/signup.jsx:182
+#: indico/modules/auth/client/js/signup.jsx:200
 msgid "Confirm password"
 msgstr "Нууц үгээ баталгаажуулна уу"
 
-#: indico/modules/auth/client/js/signup.jsx:190
+#: indico/modules/auth/client/js/signup.jsx:208
 msgid "Account moderation"
 msgstr "Бүртгэлээ хэвийн болгох"
 
-#: indico/modules/auth/client/js/signup.jsx:192
+#: indico/modules/auth/client/js/signup.jsx:210
 msgid ""
 "Each new account needs to be approved by an administrator. We will send you "
 "an email as soon as your request has been approved."
 msgstr ""
 
-#: indico/modules/auth/client/js/signup.jsx:201
+#: indico/modules/auth/client/js/signup.jsx:219
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
+#: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx:29
+#: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx:49
 #: indico/modules/events/management/client/js/EventMove.jsx:158
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:108
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:113
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:114
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:213
 msgid "Comment"
 msgstr "Сэтгэгдэл"
 
-#: indico/modules/auth/client/js/signup.jsx:202
+#: indico/modules/auth/client/js/signup.jsx:220
 msgid ""
 "You can provide additional information or a comment for the administrators "
 "who will review your registration."
 msgstr ""
 "Та бүртгэлээ хянах админуудад нэмэлт мэдээлэл эсвэл тайлбар өгөх боломжтой."
 
-#: indico/modules/auth/client/js/signup.jsx:213
+#: indico/modules/auth/client/js/signup.jsx:231
 msgid "Submit registration request"
 msgstr "Бүртгүүлэх хүсэлтийг оруулах"
 
-#: indico/modules/auth/client/js/signup.jsx:214
+#: indico/modules/auth/client/js/signup.jsx:232
 msgid "Create my Indico profile"
 msgstr "Миний Индикогийн профайлыг үүсгээрэй"
 
-#: indico/modules/auth/client/js/signup.jsx:220
+#: indico/modules/auth/client/js/signup.jsx:238
 #: indico/modules/events/abstracts/client/js/boa.jsx:146
 #: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:108
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:71
@@ -129,13 +132,14 @@ msgstr "Миний Индикогийн профайлыг үүсгээрэй"
 #: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:80
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:81
 #: indico/modules/events/editing/client/js/management/ManageService.jsx:253
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:693
 #: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:238
 #: indico/modules/events/management/client/js/EventMove.jsx:180
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
 #: indico/modules/events/papers/client/js/components/RevisionComment.jsx:123
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:89
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:512
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:90
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:517
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:170
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:360
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:131
@@ -144,13 +148,23 @@ msgstr "Миний Индикогийн профайлыг үүсгээрэй"
 #: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:312
 #: indico/web/client/js/react/components/RequestConfirm.jsx:92
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:107
-#: indico/web/client/js/react/components/principals/Search.jsx:481
-#: indico/web/client/js/react/forms/final-form.jsx:149
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:108
+#: indico/web/client/js/react/components/principals/Search.jsx:482
+#: indico/web/client/js/react/forms/final-form.jsx:159
 msgid "Cancel"
 msgstr "Цуцлах"
 
 #: indico/modules/categories/client/js/base.jsx:28
+#: indico/modules/events/client/js/header.jsx:61
+#: indico/modules/events/contributions/client/js/index.jsx:46
+#: indico/modules/events/sessions/client/js/session_display.jsx:36
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:84
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:57
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:159
+msgid "Export"
+msgstr "Экспортлох"
+
+#: indico/modules/categories/client/js/base.jsx:30
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:155
 msgid "Category"
 msgstr "Ангилал"
@@ -164,8 +178,8 @@ msgid "There are no event move requests."
 msgstr ""
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:153
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:471
-#: indico/web/client/js/react/components/principals/Search.jsx:556
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:473
+#: indico/web/client/js/react/components/principals/Search.jsx:557
 msgid "User"
 msgstr "Хэрэглэгч"
 
@@ -187,8 +201,8 @@ msgid "Approve"
 msgstr "Батлах"
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:187
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:100
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:116
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:104
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:120
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx:56
 #: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:101
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx:62
@@ -196,7 +210,7 @@ msgid "or"
 msgstr "эсвэл"
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:192
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:635
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:640
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:110
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:160
 msgid "Provide the rejection reason"
@@ -208,23 +222,24 @@ msgstr ""
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:199
 #: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:72
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:45
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:46
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:147
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:35
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:56
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:658
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:663
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:123
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:172
 msgid "Reject"
 msgstr "Татгалзах"
 
 #: indico/modules/categories/client/js/components/CategoryStatistics.jsx:66
-#: indico/modules/search/client/js/components/SearchApp.jsx:262
+#: indico/modules/search/client/js/components/SearchApp.jsx:268
 msgid "Events"
 msgstr "Үйл явдалууд"
 
 #: indico/modules/categories/client/js/components/CategoryStatistics.jsx:72
-#: indico/modules/search/client/js/components/SearchApp.jsx:258
-#: indico/modules/search/client/js/components/SearchApp.jsx:263
+#: indico/modules/search/client/js/components/SearchApp.jsx:264
+#: indico/modules/search/client/js/components/SearchApp.jsx:269
 msgid "Contributions"
 msgstr "Хувь нэмэрүүд"
 
@@ -335,7 +350,7 @@ msgid "You can upload a PDF file with the Book of Abstracts here."
 msgstr "Та энд буй Хураангуй номын хамтаар PDF файлыг байрлуулж болно."
 
 #: indico/modules/events/abstracts/client/js/boa.jsx:130
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:509
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:514
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:53
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:144
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:309
@@ -361,12 +376,13 @@ msgstr ""
 
 #: indico/modules/events/abstracts/client/js/boa.jsx:149
 #: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx:51
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:511
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:516
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:119
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:55
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:146
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:311
 #: indico/web/client/js/react/components/RequestConfirm.jsx:103
+#: indico/web/client/js/react/components/principals/items.jsx:175
 msgid "Delete"
 msgstr "Устгах"
 
@@ -378,15 +394,15 @@ msgstr ""
 msgid "Delete event from favorites"
 msgstr ""
 
-#: indico/modules/events/client/js/header.jsx:25
+#: indico/modules/events/client/js/header.jsx:26
 msgid "Basic"
 msgstr "Үндсэн"
 
-#: indico/modules/events/client/js/header.jsx:26
+#: indico/modules/events/client/js/header.jsx:27
 msgid "Just the event."
 msgstr "Зөвхөн үйл явдал."
 
-#: indico/modules/events/client/js/header.jsx:33
+#: indico/modules/events/client/js/header.jsx:34
 msgid ""
 "A detailed timetable containing individual session blocks and top-level "
 "contributions."
@@ -394,23 +410,17 @@ msgstr ""
 "Тухайн хурлын блок, дээд түвшний хувь нэмрийг агуулсан дэлгэрэнгүй цагийн "
 "хуваарь."
 
-#: indico/modules/events/client/js/header.jsx:36
+#: indico/modules/events/client/js/header.jsx:37
 msgid "Compact"
 msgstr "Нарийн төвөгтэй"
 
-#: indico/modules/events/client/js/header.jsx:43
+#: indico/modules/events/client/js/header.jsx:44
 msgid "Detailed"
 msgstr "Дэлгэрэнгүй"
 
-#: indico/modules/events/client/js/header.jsx:44
+#: indico/modules/events/client/js/header.jsx:45
 msgid "A detailed timetable containing all individual contributions."
 msgstr "Бүх хувь нэмрийг агуулсан дэлгэрэнгүй цагийн хуваарь."
-
-#: indico/modules/events/client/js/header.jsx:60
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:84
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:57
-msgid "Export"
-msgstr "Экспортлох"
 
 #: indico/modules/events/contributions/client/js/PublicationButton.jsx:35
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx:21
@@ -490,7 +500,7 @@ msgstr "Хэвлэгдсэн"
 msgid "Draft"
 msgstr "Ноорог"
 
-#: indico/modules/events/contributions/client/js/index.jsx:46
+#: indico/modules/events/contributions/client/js/index.jsx:48
 msgid "Contribution"
 msgstr "Хувь нэмэр"
 
@@ -507,13 +517,13 @@ msgid "Submit slides"
 msgstr "Слайд илгээх"
 
 #: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:106
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:70
-#: indico/web/client/js/react/forms/final-form.jsx:144
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:97
+#: indico/web/client/js/react/forms/final-form.jsx:152
 msgid "Submit"
 msgstr "Илгээх"
 
 #: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:121
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:108
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:112
 msgid "Submit files"
 msgstr "Файлууд илгээх"
 
@@ -558,21 +568,24 @@ msgstr "Хүсвэл та сэтгэгдэл үлдээж болно"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ChangesConfirmation.jsx:62
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:40
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:141
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:31
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:52
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:688
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:693
 msgid "Accept"
 msgstr "Зөвшөөрөх"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:54
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:55
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:63
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:56
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:70
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:138
+#: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx:55
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:92
 msgid "Leave a comment..."
 msgstr "Сэтгэгдэл үлдээх"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:62
+#: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx:61
 msgid "Restrict visibility of this comment to other editors"
 msgstr "Энэ сэтгэгдэлийг бусад Редакторуудад харуулахгүй"
 
@@ -627,6 +640,11 @@ msgstr "Үйлдлийг баталгаажуулах: {action}"
 msgid "OK"
 msgstr "ЗА"
 
+#: indico/modules/events/editing/client/js/editing/timeline/CustomItem.jsx:49
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:83
+msgid "Retracted"
+msgstr ""
+
 #: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:34
 msgid "No files uploaded"
 msgstr "Нэг ч файл хуулагдаагүй"
@@ -635,15 +653,15 @@ msgstr "Нэг ч файл хуулагдаагүй"
 msgid "Download ZIP"
 msgstr "ZIP файл татах"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx:94
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx:92
 msgid "Replace the existing file"
 msgstr "Одоо байгаа файлыг солих"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx:107
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx:105
 msgid "Delete the existing file"
 msgstr "Одоо байгаа файлыг устгах"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx:124
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/FileList.jsx:122
 msgid "Revert to the existing file"
 msgstr "Одоо байгаа файл руу буцах"
 
@@ -651,28 +669,28 @@ msgstr "Одоо байгаа файл руу буцах"
 msgid "An error occurred while uploading this file"
 msgstr "Энэ файлыг хуулах явцад алдаа гарлаа"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:157
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:160
 msgid "This file type is required"
 msgstr "Энэ төрлийн файл шаардлагатай"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:174
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:177
 msgid "This file does not conform to the filename template {template}"
 msgstr "Энэ файл нь {template} файлын нэрийн загвартай тохирохгүй байна"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:198
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:201
 msgid "Use an existing file"
 msgstr "Одоо байгаа файлыг ашиглах"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:245
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:248
 msgid "Filename pattern: {pattern}"
 msgstr "Файлын нэрийн загвар: {pattern}"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:345
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:348
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx:181
 msgid "Upload in progress"
 msgstr "Байршуулж байна"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:359
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:362
 msgid "No changes yet"
 msgstr "Одоогоор өөрчлөлт ороогүй байна"
 
@@ -688,6 +706,10 @@ msgid_plural "Required file types missing: {types}"
 msgstr[0] "Шаардлагатай файлын төрлүүд байхгүй байна: {types}"
 msgstr[1] "Шаардлагатай файлын төрлүүд байхгүй байна: {types}"
 
+#: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:52
+msgid "Undo review"
+msgstr ""
+
 #: indico/modules/events/editing/client/js/editing/timeline/ResetReview.jsx:65
 msgid "Reset review"
 msgstr "Хяналтыг дахин тохируулах"
@@ -700,20 +722,21 @@ msgstr ""
 msgid "Are you sure you want to reset the review?"
 msgstr "Хяналтыг дахин тохируулахдаа итгэлтэй байна уу?"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:50
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:52
 msgid "Make changes"
 msgstr "Өөрчлөлт хийх"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:55
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:58
 msgid "Request changes"
 msgstr "Өөрчлөх хүсэлт"
 
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:120
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:124
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:570
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:93
 msgid "Judge"
 msgstr "Шүүх"
 
-#: indico/modules/events/editing/client/js/editing/timeline/StateIndicator.jsx:55
+#: indico/modules/events/editing/client/js/editing/timeline/StateIndicator.jsx:60
 msgid "Unknown"
 msgstr ""
 
@@ -764,17 +787,21 @@ msgstr "Засах хугацаа хараахан эхлээгүй байна."
 msgid "Since you are a manager you can edit anyway."
 msgstr "Та менежер тул ямар ч тохиолдолд засах боломжтой."
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:62
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:73
 msgid "{submitterName} has submitted files"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:75
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:103
 msgid "Hide"
 msgstr "Нуух"
 
-#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:75
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:103
 msgid "Show details"
 msgstr "Дэлгэрэнгүйг харуулах"
+
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx:114
+msgid "This revision has been retracted by the editor."
+msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/index.jsx:63
 msgid "This revision has been updated"
@@ -785,11 +812,11 @@ msgid "{link}Click here to refresh{/link} and see the most recent version."
 msgstr ""
 "{link} Энд дарж сэргээнэ үү{/link}, хамгийн сүүлийн хувилбарыг нь үзнэ үү."
 
-#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:67
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/AcceptRejectForm.jsx:68
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:33
 #: indico/modules/events/management/client/js/EventMove.jsx:172
 #: indico/web/client/js/react/components/RequestConfirm.jsx:91
-#: indico/web/client/js/react/components/principals/Search.jsx:477
+#: indico/web/client/js/react/components/principals/Search.jsx:478
 msgid "Confirm"
 msgstr "Баталгаажуулах"
 
@@ -803,6 +830,10 @@ msgid ""
 msgstr ""
 "Та нийтэлж болох ямарваа файл агуулаагүй засварлагдах зүйлсийг та хүлээн "
 "зөвшөөрч болохгүй."
+
+#: indico/modules/events/editing/client/js/editing/timeline/judgment/RequestChangesForm.jsx:78
+msgid "Make changes to the submission"
+msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/TagInput.jsx:67
 msgid "Tag code or title..."
@@ -828,35 +859,39 @@ msgstr[1] ""
 msgid "There is no publishable file uploaded."
 msgstr "Нийтлэх боломжтой файл байршуулаагүй байна."
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:56
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:114
 msgid "Editor has accepted after making some changes"
 msgstr "Зарим өөрчлөлтийг хийсний дараа редактор хүлээн авсан"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:57
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:115
 msgid "Submitter has accepted proposed changes"
 msgstr "Илгээгч нь санал болгож буй өөрчлөлтийг хүлээн зөвшөөрөв"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:59
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:119
 msgid "Submitter rejected proposed changes"
 msgstr "Илгээгч санал болгосон өөрчлөлтөөс татгалзсан"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:64
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:120
+msgid "Submitter rejected proposed changes and uploaded a new revision"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:124
 msgid "Revision has been replaced"
 msgstr "Шинэчилсэн найруулгыг сольсон"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:65
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:125
 msgid "Revision has been accepted"
 msgstr "Шинэчилсэн найруулгыг зөвшөөрсөн"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:66
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:126
 msgid "Revision has been rejected"
 msgstr "Шинэчилсэн найруулгаас татгалзсан"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:67
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:127
 msgid "Submitter has been asked to make some changes"
 msgstr "Илгээгчээс зарим өөрчлөлтийг хийхийг хүссэн"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:71
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:131
 msgid "{editorName} (editor) has made some changes to the paper"
 msgstr "{editorName} (редактор) өгүүлэл дээр зарим өөрчлөлт оруулсан"
 
@@ -865,7 +900,8 @@ msgstr "{editorName} (редактор) өгүүлэл дээр зарим өө�
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:106
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:118
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:271
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:112
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:115
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:159
 msgid "Save"
 msgstr "Хадгалах"
 
@@ -878,7 +914,7 @@ msgstr ""
 "болох төрлийг идэвхжүүлэхийн тулд асаах товчийг дарна уу."
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:111
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:177
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:207
 msgid "List"
 msgstr "Жагсаалт"
 
@@ -905,8 +941,8 @@ msgid "Configure the tags that can be assigned to revisions"
 msgstr "Засварлахаар оноож болох шошгонуудыг тохируулах"
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:31
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:124
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:136
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:150
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:162
 msgid "Configure"
 msgstr "Тохируулах"
 
@@ -1018,204 +1054,268 @@ msgstr ""
 "GitHub{link} дээрх Нээлттэй Мэдээлэгч-ийг хэрэгжүүлэх {/link}мэдээлэл рүү "
 "хандана уу."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:130
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:189
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:156
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:249
 msgid "Status"
 msgstr "Төлөв"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:132
-#: indico/modules/events/editing/client/js/models.js:51
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:482
-msgid "Accepted"
-msgstr "Хүлээн зөвшөөрсөн"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:133
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:158
 #: indico/modules/events/editing/client/js/models.js:54
-msgid "Ready for review"
-msgstr "Шалгахад бэлэн байна"
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:134
-#: indico/modules/events/editing/client/js/models.js:53
 msgid "Not submitted"
 msgstr "Илгээгээгүй байна"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:142
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:190
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:159
+#: indico/modules/events/editing/client/js/models.js:55
+msgid "Ready for review"
+msgstr "Шалгахад бэлэн байна"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:160
+#: indico/modules/events/editing/client/js/models.js:52
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:487
+msgid "Accepted"
+msgstr "Хүлээн зөвшөөрсөн"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:161
+#: indico/modules/events/editing/client/js/models.js:51
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:469
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:287
+#: indico/modules/rb/client/js/util.jsx:251
+msgid "Rejected"
+msgstr "Татгалзсан"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:164
+#: indico/modules/events/editing/client/js/models.js:53
+msgid "Needs submitter changes"
+msgstr "Илгээгчийг өөрчлөх шаардлагатай"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:170
+#: indico/modules/events/editing/client/js/models.js:50
+msgid "Needs submitter confirmation"
+msgstr "Илгээгчийн баталгаажуулалт шаардлагатай"
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:181
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:250
 msgid "Editor"
 msgstr "Редактор"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:157
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:196
 #: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:99
 msgid "Program code"
 msgstr "Программын код"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:166
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:205
 #: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:108
 msgid "Keywords"
 msgstr "Түлхүүр үгс"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:179
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:218
 msgid "List of papers"
 msgstr "Өгүүллийн жагсаалт"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:180
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:219
 msgid "List of slides"
 msgstr "Слайдийн жагсаалт"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:181
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:220
 msgid "List of posters"
 msgstr "Постерийн жагсаалт"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:185
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:224
+msgid "{count} paper was skipped because of its current status."
+msgid_plural "{count} papers were skipped because of their current status."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:230
+msgid "{count} slide was skipped because of its current status."
+msgid_plural "{count} slides were skipped because of their current status."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:236
+msgid "{count} poster was skipped because of its current status."
+msgid_plural "{count} posters were skipped because of their current status."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:245
 msgid "ID"
 msgstr "ID"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:186
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:246
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:45
 msgid "Code"
 msgstr "Код"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:187
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:247
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:46
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:124
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:53
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:83
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:85
-#: indico/modules/users/client/js/PersonalDataForm.jsx:81
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:128
+#: indico/modules/users/client/js/PersonalDataForm.jsx:83
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:131
 #: indico/web/client/js/react/components/WTFLinkListField.jsx:101
 msgid "Title"
 msgstr "Гарчиг"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:188
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:248
 msgid "Rev."
 msgstr "Хув."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:263
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:331
 #: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:289
 msgid "n/a"
 msgstr "хамаарахгүй"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:435
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:533
 msgid "Assign"
 msgstr "Томилох"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:443
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:541
 #: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:241
 msgid "Assign to myself"
 msgstr "Өөрийгөө томилох"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:451
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:549
 msgid "Unassign"
 msgstr "Томилсоноо цуцлах"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:459
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:578
 msgid "Download all files"
 msgstr "Бүх файлыг татах"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:465
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:584
 msgid "Export as JSON"
 msgstr "JSON хэлбэрээр экспортлох"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:556
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:683
 msgid "There are no editables yet."
 msgstr "Энд засварлаж болох зүйлс байхгүй байна."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:68
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:688
+msgid "Assignment conflict"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:689
+msgid ""
+"Some editor assignments for the current selection have been changed "
+"externally. Are you sure you want to proceed?"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:692
+msgid "Force assignments"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:73
 msgid "Send emails to the editing team"
 msgstr "Засварлах баг руу цахим шуудан илгээх"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:73
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:78
 msgid "Assign an editor to papers"
 msgstr "Өгүүлэл дээр редактор томилох"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:74
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:79
 msgid "Assign an editor to posters"
 msgstr "Зурагт хуудсанд редактор оноох"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:75
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:80
 msgid "Assign an editor to slides"
 msgstr "Слайданд редактор оноох"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:91
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:99
 msgid "Submission is open"
 msgstr "Материал хүлээн авах нээлттэй"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:92
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:100
 msgid "Submission is not open"
 msgstr "Материал хүлээн авах хаалттай"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:94
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:102
 msgid "Toggle whether users can submit new editables"
 msgstr "Хэрэглэгчид шинэ засварлах зүйлсийг хүргүүлж болох эсэхийг товшоорой"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:97
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:110
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:105
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:118
 msgid "Close now"
 msgstr "Одоо хаах"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:97
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:110
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:105
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:118
 msgid "Start now"
 msgstr "Одоо эхлэх"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:104
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:112
 msgid "Editing is open"
 msgstr "Засварлах нээлттэй байна"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:105
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:113
 msgid "Editing is not open"
 msgstr "Засварлах хаалттай байна"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:107
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:115
 msgid "Toggle whether editors can review submissions"
 msgstr "Засварлагчид хүргүүлэлтийг хянаж болох эсэхийг товшоорой"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:117
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:123
+msgid "Remind submitters"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:124
+msgid ""
+"Send an email to authors who have not submitted any files of this editable "
+"type"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:128
+msgid "Contributions without editables"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:143
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/index.jsx:24
 msgid "File types"
 msgstr "Файлын төрлүүд"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:118
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:144
 msgid "Configure file types"
 msgstr "Файлын төрлүүд тохируулах"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:129
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:155
 msgid "Ready for review conditions"
 msgstr "Хянах нөхцөл байдалд бэлэн"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:130
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:156
 msgid "Configure conditions for reviewing"
 msgstr "Хянах нөхцлийг тохируулах"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:141
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:167
 msgid "Editing team"
 msgstr "Засварлах баг"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:142
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:168
 msgid "Configure editing team"
 msgstr "Засварлах багийг тохируулах"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:149
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:175
 msgid "Keep editing team members anonymous"
 msgstr "Багийн гишүүдийг нэр нь тодорхойгүйгээр үргэлжлүүлэн засварлах"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:152
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:178
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:20
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:43
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:127
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:50
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:145
 msgid "Contact"
 msgstr "Холбоо барих"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:155
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:185
 msgid "Manage team"
 msgstr "Баг удирдах"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:163
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:193
 msgid "Editor assignment"
 msgstr "Редактор томилох"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:171
+#: indico/modules/events/editing/client/js/management/editable_type/EditableTypeDashboard.jsx:201
 msgid "Allow editors to self-assign editables"
 msgstr "Засварлах зүйлсийг өөрөө оноох боломжийг редакторт олгох"
 
@@ -1305,6 +1405,7 @@ msgid "Take into account that this file type has files attached to it."
 msgstr "Энэхүү файлын төрөлд хавсаргасан файл байна гэдгийг анхаарна уу."
 
 #: indico/modules/events/editing/client/js/management/editable_type/file_types/FileTypeModal.jsx:51
+#: indico/modules/events/persons/client/js/PersonList.jsx:123
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:26
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:80
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:81
@@ -1401,7 +1502,16 @@ msgstr "Шинэ файлын нөхцлийг бий болгох"
 msgid "Review conditions"
 msgstr "Нөхцлийг хянах"
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:126
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:109
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:153
+msgid "Edit tag"
+msgstr "Шошгыг засах"
+
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:119
+msgid "Delete tag"
+msgstr "Шошгыг устгах"
+
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:128
 msgid ""
 "System tags are managed by the editing workflow service and cannot be "
 "modified."
@@ -1409,23 +1519,19 @@ msgstr ""
 "Системийн хаягуудыг засварлах ажлын урсгалын үйлчилгээгээр удирддаг тул "
 "өөрчлөх боломжгүй."
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:135
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:137
 msgid "There are no tags defined for this event"
 msgstr "Энэ арга хэмжээнд зориулагдсан шошго байхгүй байна"
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:145
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:147
 msgid "Add new tag"
 msgstr "Шинэ шошго нэмэх"
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:151
-msgid "Edit tag"
-msgstr "Шошгыг засах"
-
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:152
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:154
 msgid "Create a new tag"
 msgstr "Шинэ шошго үүсгэх"
 
-#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:171
+#: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:173
 msgid "Are you sure you want to delete the tag {tag}?"
 msgstr "Та {tag} тагийг устгахдаа итгэлтэй байна уу?"
 
@@ -1433,62 +1539,47 @@ msgstr "Та {tag} тагийг устгахдаа итгэлтэй байна �
 msgid "Color"
 msgstr "Өнгө"
 
-#: indico/modules/events/editing/client/js/models.js:40
+#: indico/modules/events/editing/client/js/models.js:41
 msgid "Paper"
 msgstr "Өгүүлэл"
 
-#: indico/modules/events/editing/client/js/models.js:41
+#: indico/modules/events/editing/client/js/models.js:42
 msgid "Slides"
 msgstr "Слайд"
 
-#: indico/modules/events/editing/client/js/models.js:42
+#: indico/modules/events/editing/client/js/models.js:43
 msgid "Poster"
 msgstr "Зурагт хуудас"
 
-#: indico/modules/events/editing/client/js/models.js:48
+#: indico/modules/events/editing/client/js/models.js:49
 msgid "Replaced"
 msgstr "Солигдсон"
 
-#: indico/modules/events/editing/client/js/models.js:49
-msgid "Needs submitter confirmation"
-msgstr "Илгээгчийн баталгаажуулалт шаардлагатай"
-
-#: indico/modules/events/editing/client/js/models.js:50
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:464
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:238
-#: indico/modules/rb/client/js/util.jsx:251
-msgid "Rejected"
-msgstr "Татгалзсан"
-
-#: indico/modules/events/editing/client/js/models.js:52
-msgid "Needs submitter changes"
-msgstr "Илгээгчийг өөрчлөх шаардлагатай"
-
-#: indico/modules/events/editing/client/js/models.js:55
+#: indico/modules/events/editing/client/js/models.js:56
 msgid "New"
 msgstr "Шинэ"
 
-#: indico/modules/events/editing/client/js/models.js:59
+#: indico/modules/events/editing/client/js/models.js:60
 msgid "Paper Editing"
 msgstr "Нийтлэл засварлах"
 
-#: indico/modules/events/editing/client/js/models.js:60
+#: indico/modules/events/editing/client/js/models.js:61
 msgid "Slides Editing"
 msgstr "Слайд засварлах"
 
-#: indico/modules/events/editing/client/js/models.js:61
+#: indico/modules/events/editing/client/js/models.js:62
 msgid "Poster Editing"
 msgstr "Зурагт хуудас засварлах"
 
-#: indico/modules/events/editing/client/js/models.js:65
+#: indico/modules/events/editing/client/js/models.js:66
 msgid "Get next paper"
 msgstr "Дараагийн өгүүллийг авах"
 
-#: indico/modules/events/editing/client/js/models.js:66
+#: indico/modules/events/editing/client/js/models.js:67
 msgid "Get next poster"
 msgstr "Дараагийн зурагт хуудсыг авах"
 
-#: indico/modules/events/editing/client/js/models.js:67
+#: indico/modules/events/editing/client/js/models.js:68
 msgid "Get next slides"
 msgstr "Дараагийн слайдыг авах"
 
@@ -1650,58 +1741,62 @@ msgid ""
 "deleted."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:299
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:300
 msgid "No event found with this ID."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:301
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:302
 msgid "You don't have rights to access this event."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:303
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:385
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:304
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:394
 msgid "This event is unlisted."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:372
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:465
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:381
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:514
 #: indico/modules/users/client/js/Favorites.jsx:208
 msgid "Unlisted"
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:379
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:388
 msgid "You do not have editing rights for this event."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:391
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:400
 msgid "This event is already part of a different series."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:397
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:406
 msgid "This event is already part of this series."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:414
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:442
+msgid "Load more"
+msgstr ""
+
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:460
 msgid "Search for an event title or paste an event URL or event ID (#123)"
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:433
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:482
 msgid "Searching..."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:437
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:486
 msgid "No results found."
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:438
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:487
 msgid "Enter search term"
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:452
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:501
 msgid "this event"
 msgstr ""
 
-#: indico/modules/events/management/client/js/SeriesManagement.jsx:484
+#: indico/modules/events/management/client/js/SeriesManagement.jsx:533
 msgid "Remove from event series"
 msgstr ""
 
@@ -1821,31 +1916,31 @@ msgstr "{judgeName} энэ өгүүллээс татгалзсан."
 msgid "{judgeName} asked for changes."
 msgstr "{judgeName} энэ өгүүллийг засварлахыг хүссэн."
 
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:66
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:93
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:67
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:94
 msgid "Reset judgment"
 msgstr "Шүүлтийг дахин тохируулах"
 
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:74
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:75
 msgid "Confirm the operation"
 msgstr "Үйлдлийг баталгаажуулна уу"
 
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:78
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:79
 msgid ""
 "Do you really want to reset the judgment? This operation is irreversible."
 msgstr ""
 "Та үнэхээр шийдвэрийг анхны байдалд нь оруулахыг хүсч байна уу? Энэ "
 "ажиллагаа нь эргэлт буцалтгүй юм."
 
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:105
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:106
 msgid "The paper was accepted."
 msgstr "Өгүүлэлийг зөвшөөрөн хүлээн авсан."
 
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:106
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:107
 msgid "The paper was rejected."
 msgstr "Өгүүлэлээс татгалзсан."
 
-#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:108
+#: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:109
 msgid "The paper requires changes."
 msgstr "Өгүүллийг өөрчлөх шаардлагатай"
 
@@ -1901,8 +1996,210 @@ msgstr "Хуучин хувилбарыг нуух"
 msgid "Show old revision"
 msgstr "Хуучин хувилбарыг харуулах"
 
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:29
+msgid "There are no persons associated with the selected contributions"
+msgstr "Сонгосон өгүүллүүдэд хамаарах хүн байхгүй байна"
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:36
+msgid ""
+"There are no persons associated with contributions in the selected sessions"
+msgstr "Сонгосон хурал дээрх хувь нэмэртэй холбогдох хүн байхгүй байна."
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:44
+msgid "Submitters"
+msgstr "Материал илгээгч нар"
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:49
+msgid "Speakers"
+msgstr "Илтгэгч нар"
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:53
+msgid "Primary authors"
+msgstr "Үндсэн зохиолч нар"
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:57
+msgid "Co-authors"
+msgstr "Хамтран зохиогч нар"
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:61
+msgid "Not registered"
+msgstr "Бүртгэлгүй"
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:87
+msgid "This person submitted an abstract"
+msgstr "Энэ хүн хураангуй илггэсэн"
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:88
+msgid "This person hasn't submitted any abstracts"
+msgstr "Энэ хүн хараахан хураангуй илгээгээгүй байна"
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:115
+#: indico/modules/events/persons/client/js/AuthorsListButton.jsx:31
+msgid "Authors list"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:119
+msgid "Filter by"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/AuthorsList.jsx:152
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:222
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:239
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:257
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:740
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:232
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:86
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:360
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:663
+#: indico/web/client/js/react/forms/final-form.jsx:161
+msgid "Close"
+msgstr "Хаах"
+
 #: indico/modules/events/persons/client/js/EditEventPerson.jsx:51
 msgid "Edit person information"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:42
+msgid "Speaker"
+msgstr "Илтгэгч"
+
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:43
+msgid "Author"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:44
+#: indico/modules/events/persons/client/js/PersonList.jsx:48
+msgid "Co-author"
+msgstr "Хамтран зохиогч нар"
+
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:45
+msgid "Submitter"
+msgstr "Хүргүүлэгч"
+
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:68
+msgid "Send emails to these roles"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/EmailContribAbstractRolesButton.jsx:39
+#: indico/modules/events/persons/client/js/PersonList.jsx:130
+#: indico/modules/events/registration/client/js/form/fields/registry.js:139
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:158
+msgid "Email"
+msgstr "Цахим шуудан"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:25
+msgid "Recipients"
+msgstr "Хүлээн авагчид"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:32
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:230
+msgid "Copied!"
+msgstr "Хуулагдсан!"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:40
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:100
+msgid "Copy to clipboard"
+msgstr "Түр санах ой руу хуулах"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:60
+msgid "Your email has been sent."
+msgstr "Цахим шуудан илгээгдсэн байна."
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:61
+msgid "{count} email has been sent."
+msgid_plural "{count} emails have been sent."
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:104
+msgid "Preview"
+msgstr "Урьдчилан харах"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:104
+msgid "Edit"
+msgstr "Засварлах"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:114
+msgid "This preview is only shown for a single recipient."
+msgstr ""
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:117
+msgid ""
+"When sending the emails, each recipient will receive an email customized "
+"with their personal data."
+msgstr ""
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:123
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:151
+msgid "Subject"
+msgstr "Гарчиг"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:127
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:154
+msgid "Email body"
+msgstr "Цахим шуудангйин их бие"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:145
+msgid "From"
+msgstr "Хаанаас"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:166
+msgid "BCC addresses"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:167
+msgid "Send a copy of each email to every address in this list"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:171
+msgid "Send a copy of each email to my mailbox"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:182
+msgid "Send email"
+msgstr "Цахим шуудан илгээх"
+
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:194
+msgid "Send"
+msgstr "Илгээх"
+
+#: indico/modules/events/persons/client/js/EmailParticipantRolesButton.jsx:46
+msgid "Send emails"
+msgstr "Цахим шуудангуудыг илгээх"
+
+#: indico/modules/events/persons/client/js/PersonList.jsx:48
+msgid "Primary"
+msgstr "Үндсэн"
+
+#: indico/modules/events/persons/client/js/PersonList.jsx:83
+msgid "This person is a speaker"
+msgstr "Энэ хүн бол илтгэгч"
+
+#: indico/modules/events/persons/client/js/PersonList.jsx:84
+msgid "This person is not a speaker"
+msgstr "Энэ хүн илтгэгч биш"
+
+#: indico/modules/events/persons/client/js/PersonList.jsx:144
+msgid "Author type"
+msgstr "Зохиогчийн төрөл"
+
+#: indico/modules/events/persons/client/js/PersonList.jsx:151
+msgid "Roles"
+msgstr "Ажил үүрэг"
+
+#: indico/modules/events/persons/client/js/PersonList.jsx:173
+msgid "This person is registered for the event"
+msgstr "Энэ хүн үйл явдалд бүртгүүлсэн байна"
+
+#: indico/modules/events/persons/client/js/PersonList.jsx:174
+msgid "This person is not yet registered"
+msgstr "Энэ хүн хараахан бүртгүүлээгүй байна"
+
+#: indico/modules/events/persons/client/js/PersonList.jsx:207
+msgid "No persons were found matching the selected criteria."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/components/ConsentToPublishDropdown.jsx:26
@@ -1931,9 +2228,14 @@ msgstr ""
 msgid "Display my participation to everyone who can see this event"
 msgstr ""
 
+#: indico/modules/events/registration/client/js/components/EmailPendingInvitationsButton.jsx:33
+msgid "Send reminders"
+msgstr "Сануулга илгээх"
+
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:60
 #: indico/modules/rb/client/js/modules/admin/EditableList.jsx:60
 #: indico/modules/rb/client/js/modules/admin/EditableList.jsx:147
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:326
 #: indico/web/client/js/react/components/WTFLinkListField.jsx:77
 msgid "Add"
 msgstr "Нэмэх"
@@ -1998,8 +2300,8 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:165
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:144
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:126
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:259
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:127
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:260
 msgid "Total: {total} {currency}"
 msgstr ""
 
@@ -2021,7 +2323,7 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:321
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:224
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:451
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:452
 msgid "Choices"
 msgstr ""
 
@@ -2030,7 +2332,7 @@ msgid "You need to have at least one enabled option."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:34
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:141
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:148
 msgid "First Name"
 msgstr "Нэр"
 
@@ -2075,24 +2377,25 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:107
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:39
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:368
-#: indico/web/client/js/react/components/syncedInputs.jsx:155
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:369
+#: indico/web/client/js/react/components/syncedInputs.jsx:176
 #: indico/web/client/js/react/forms/validators.js:58
 msgid "This field is required."
 msgstr "Энэ талбарыг заавал оруулах шаардлагатай."
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:157
-#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:88
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:90
 msgid "Places limit"
 msgstr "Хязгаар тавина"
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:158
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:169
-#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:89
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:91
 #: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:241
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:167
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:168
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:30
-#: indico/modules/users/client/js/PersonalDataForm.jsx:82
+#: indico/modules/users/client/js/PersonalDataForm.jsx:84
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:138
 msgid "None"
 msgstr "Хоосон"
 
@@ -2200,6 +2503,7 @@ msgid "Time format"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:50
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:223
 msgid "Checking email address..."
 msgstr "Цахим шуудангийн хаяг шалгаж байна..."
 
@@ -2232,10 +2536,12 @@ msgid "The registration will be disassociated from the current user ({name})."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:90
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:292
 msgid "The domain used in the email address does not exist."
 msgstr "Энэхүү цахим шуудангийн хаяг дээр ашигласан домэйн байхгүй байна."
 
 #: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:92
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:294
 msgid "This email address is invalid."
 msgstr "Энэхүү цахим шуудангийн хаяг хүчингүй."
 
@@ -2257,7 +2563,7 @@ msgid "The registration will be associated with the Indico account {name}."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:219
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:446
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:447
 msgid "Enable extra slots"
 msgstr ""
 
@@ -2274,33 +2580,33 @@ msgid "The minimum value cannot be greater than the maximum value."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/PlacesLeftLabel.jsx:21
-msgid "1 place left"
+msgid "{count} place left"
 msgid_plural "{count} places left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/registration/client/js/form/fields/PlacesLeftLabel.jsx:28
+#: indico/modules/events/registration/client/js/form/fields/PlacesLeftLabel.jsx:30
 msgid "No places left"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:112
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:113
 #: indico/web/client/js/react/components/WTFMultipleTagSelectField.jsx:51
 msgid "Choose an option"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:424
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:425
 msgid "Widget type"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:426
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:427
 msgid "Drop-down list"
 msgstr "Доош урсах жагсаалт"
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:427
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:428
 msgid "Radio buttons"
 msgstr "Радио товчлуур"
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:436
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:437
 msgid "Default option"
 msgstr ""
 
@@ -2367,11 +2673,6 @@ msgstr "Улс"
 #: indico/modules/events/registration/client/js/form/fields/registry.js:134
 msgid "File"
 msgstr "Файл"
-
-#: indico/modules/events/registration/client/js/form/fields/registry.js:139
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:151
-msgid "Email"
-msgstr "Цахим шуудан"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:144
 msgid "Single Choice"
@@ -2469,11 +2770,11 @@ msgstr ""
 msgid "Permanent"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:158
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:159
 msgid "Retention period (weeks)"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:166
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:167
 msgid ""
 "Please note that invoice information will be lost as well once a field's "
 "retention period expires."
@@ -2512,33 +2813,37 @@ msgid "Whether the section is only visible for managers."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:44
-msgid "Email notifications"
-msgstr "Цахим шуудангийн мэдэгдэл"
+msgid "Management Options"
+msgstr ""
 
-#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:48
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:49
 msgid "Send an email notification to the user"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:62
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:56
+msgid "Ignore field requirements for custom fields"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:74
 msgid "Participant list"
 msgstr "Оролцогчдын жагсаалт"
 
-#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:67
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:79
 msgid ""
 "Specify whether you consent to being included in the event's list of "
 "participants"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:149
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:161
 msgid "Modify"
 msgstr "Өөрчлөх"
 
-#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:151
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:163
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:164
 msgid "Apply"
 msgstr "Одоо хэрэгжүүлэх"
 
-#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:152
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:164
 msgid "Register"
 msgstr "Бүртгүүлэх"
 
@@ -2618,20 +2923,6 @@ msgstr "Ямар ч байсан хүлээж ав"
 msgid "There is no occurrence on this date ({date})."
 msgstr "Энэ өдөр ({date}) -д ямар ч тохиолдол гараагүй болно."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:222
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:239
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:257
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:735
-#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:232
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:86
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:360
-#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
-#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:663
-msgid "Close"
-msgstr "Хаах"
-
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:230
 msgid "Cancellation not possible"
 msgstr "Цуцлах боломжгүй"
@@ -2641,7 +2932,7 @@ msgid "The occurrence you chose ({date}) cannot be cancelled."
 msgstr "Таны сонгосон тохиолдлыг цуцлах боломжгүй ({date})."
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:247
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:713
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:718
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:190
 msgid "Confirm cancellation"
 msgstr "Цуцалсныг баталгаажуулна уу"
@@ -2658,87 +2949,87 @@ msgstr "Энэ тохиолдлыг цуцлах"
 msgid "Booking reason"
 msgstr "Захиалгын шалтгаан"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:371
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:376
 msgid "{date} - {info} by {user}"
 msgstr "{date} - {info} by {user}"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:384
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:389
 msgid "Booking history"
 msgstr "Захиалгын түүх"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:404
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:409
 msgid "The booking has been successfully split"
 msgstr "Захиалга амжилттай хуваагдлаа"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:406
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:411
 msgid "You can consult your new booking {link}here{/link}."
 msgstr "Та шинэ захиалгаа {link} эндээс {/link} үзэх боломжтой."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:420
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:425
 msgid "Operation failed"
 msgstr "Үйл ажиллагаа амжилтгүй боллоо"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:441
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:446
 msgid "Pending Confirmation"
 msgstr "Хүлээгдэж буй баталгаажуулалт"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:442
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:447
 msgid "This booking is subject to acceptance by the room owner"
 msgstr "Энэхүү захиалгыг өрөөний эзэн хүлээн авах ёстой"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:446
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:219
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:451
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:268
 #: indico/modules/rb/client/js/util.jsx:252
 msgid "Cancelled"
 msgstr "Цуцлагдсан"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:449
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:454
 msgid "The booking was cancelled."
 msgstr "Захиалга цуцлагдсан."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:453
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:471
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:458
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:476
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:143
 msgid "Reason: {rejectionReason}"
 msgstr "Шалтгаан: {rejectionReason}"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:467
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:472
 msgid "The booking was rejected."
 msgstr "Захиалгаас татгалзсан."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:483
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:488
 msgid "The booking was accepted"
 msgstr "Захиалгыг хүлээн авлаа"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:510
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:515
 msgid "Are you sure you want to delete this booking?"
 msgstr "Та энэ захиалгыг устгахдаа итгэлтэй байна уу?"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:611
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:616
 msgid "Reject booking"
 msgstr "Захиалгаас татгалзах"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:643
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:648
 msgid "I understand that this will reject all occurrences of the booking."
 msgstr ""
 "Энэ нь захиалгын бүх тохиолдлоос татгалзах болно гэдгийг би ойлгож байна."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:647
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:652
 msgid "Please confirm rejecting the booking."
 msgstr "Захиалгаас татгалзсанаа баталгаажуулна уу."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:674
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:679
 msgid "You can provide an optional message when accepting this booking"
 msgstr "Та энэ захиалгыг хүлээн авахдаа нэмэлт мессеж өгөх боломжтой"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:705
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:751
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:710
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:756
 msgid "Cancel booking"
 msgid_plural "Cancel all occurrences"
 msgstr[0] "Бүх тохиолдлыг цуцлах"
 msgstr[1] "Бүх тохиолдлыг цуцлах"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:717
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:722
 msgid "Are you sure you want to cancel this booking?"
 msgid_plural ""
 "Are you sure you want to cancel this booking? This will cancel {count} "
@@ -2750,27 +3041,27 @@ msgstr[1] ""
 "Та энэ захиалгыг цуцлахдаа итгэлтэй байна уу? Энэ нь бүх {count} тохиолдлыг "
 "цуцлах болно."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:728
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:733
 msgid "Single occurrences can be cancelled via the timeline view."
 msgstr "Нэг тохиолдлыг цагийн хуваарь харах замаар цуцлах боломжтой."
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:743
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:748
 msgid "View Timeline"
 msgstr "Он цагийн хэлхээг үзэх"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:784
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:789
 msgid "Accept booking"
 msgstr "Захиалгыг зөвшөөрөх"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:863
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:868
 msgid "Booking Details"
 msgstr "Захиалгын дэлгэрэнгүй"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:868
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:873
 msgid "Booking link copied"
 msgstr "Захиалгын линкийг хуулсан"
 
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:914
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:919
 #: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:128
 msgid "Occurrences"
 msgstr "Тохиолдолууд"
@@ -2789,7 +3080,7 @@ msgid "This booking has already started."
 msgstr "Энэ захиалга аль хэдийн эхэлсэн байна."
 
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:229
-#: indico/modules/users/client/js/PersonalDataForm.jsx:136
+#: indico/modules/users/client/js/PersonalDataForm.jsx:152
 #: indico/modules/users/client/js/ProfilePicture.jsx:207
 msgid "Save changes"
 msgstr "Өөрчлөлтүүдийг хадгалах"
@@ -2831,11 +3122,11 @@ msgstr "шинэчлэгдсэн цагийн мэдээллийг харгал�
 msgid "Original booking"
 msgstr "Анхны захиалга"
 
-#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:180
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:181
 msgid "New booking"
 msgstr "Шинэ захиалга"
 
-#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:182
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:183
 msgid "Booking after changes"
 msgstr "Өөрчлөлт хийсний дараа захиалга өгөх"
 
@@ -3093,7 +3384,7 @@ msgid "Where is the key?"
 msgstr "Түлхүүр хаана байна?"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:31
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:161
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:168
 msgid "Telephone"
 msgstr "Утас"
 
@@ -3102,7 +3393,7 @@ msgid "Information"
 msgstr "Мэдээлэл"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:41
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:171
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:178
 msgid "Capacity"
 msgstr "Чадавхи"
 
@@ -3116,17 +3407,20 @@ msgstr "Тайлбар"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:21
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:120
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:150
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:141
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:189
+#: indico/modules/rb/client/js/modules/roomList/filters/LocationForm.jsx:45
 msgid "Location"
 msgstr "Байршил"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:34
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:151
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:158
 msgid "Site"
 msgstr "Сайт"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:40
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:169
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:206
 #: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:55
 msgid "Building"
 msgstr "Барилга"
@@ -3315,7 +3609,7 @@ msgstr "Одоо байгаа зургийг устгах"
 msgid "No photo found."
 msgstr "Зураг олдсонгүй."
 
-#: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx:319
+#: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx:321
 msgid "Please turn your device horizontally to view this page."
 msgstr "Энэ хуудсыг үзэхийн тулд төхөөрөмжөө хэвтээ чиглэлд эргүүлнэ үү."
 
@@ -3368,50 +3662,76 @@ msgstr "Та энэ тохиолдлыг цуцлахдаа итгэлтэй б�
 msgid "Confirm rejection"
 msgstr "Татгалзсан гэдгээ баталгаажуулна уу"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:191
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:196
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:148
+msgid "Recurs daily"
+msgid_plural "Recurs every {count} days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:152
+msgid "Recurs weekly"
+msgid_plural "Recurs every {count} weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:159
+msgid "Recurs monthly"
+msgid_plural "Recurs every {count} months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:184
+msgid "Recurring Booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:186
+msgid "{recurrenceFrequency} from {startTime} to {endTime}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:240
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:245
 msgid "Space blocked: {reason}"
 msgstr "Зайг хаасан: {reason}"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:197
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:246
 msgid "(You are allowed to make a booking)"
 msgstr "(Та захиалга өгөх боломжтой)"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:203
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:252
 msgid "Not possible to book in this period"
 msgstr "Энэ хугацаанд захиалга хийх боломжгүй"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:209
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:258
 msgid "Not possible to book between:"
 msgstr "Дараахь хугацаанд захиалах боломжгүй байна."
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:222
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:241
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:271
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:290
 msgid "Reason: {reason}"
 msgstr "Шалтгаан: {reason}"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:230
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:279
 msgid "This occurrence will be cancelled"
 msgstr "Энэ тохиолдлыг цуцлах болно"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:249
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:298
 msgid "This occurrence is conflicting with an existing booking"
 msgstr "Энэ тохиолдол одоо байгаа захиалгатай зөрчилдөж байна"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:258
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:307
 msgid "Full overlap between two pre-bookings:"
 msgstr "Хоёр урьдчилсан захиалгын хоорондох бүрэн давхцал:"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:263
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:312
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:330
 msgid "{time} by {bookedForName} ({bookingReason})"
 msgstr "{bookedForName} ({bookingReason})-н {time}"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:282
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:331
 msgid "Click to book it"
 msgstr "Үүнийг захиалахын тулд товшино уу"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:283
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:332
 msgid "Click to pre-book it"
 msgstr "Урьдчилан захиалах бол дарна уу"
 
@@ -3444,7 +3764,7 @@ msgid "Room Booking"
 msgstr "Өрөөний захиалга"
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:55
-#: indico/web/client/js/react/components/PersonLinkField.jsx:328
+#: indico/web/client/js/react/components/PersonLinkField.jsx:343
 #: indico/web/client/js/react/components/principals/Search.jsx:126
 msgid "Search"
 msgstr "Хайх"
@@ -3478,32 +3798,34 @@ msgstr "Энэ зай олон нийтэд нээлттэй биш байна"
 #: indico/modules/users/client/js/Favorites.jsx:118
 #: indico/modules/users/client/js/Favorites.jsx:222
 #: indico/modules/users/client/js/Favorites.jsx:289
+#: indico/web/client/js/react/components/principals/items.jsx:156
 msgid "Remove from favorites"
 msgstr "Дуртай зүйлээс хасах"
 
 #: indico/modules/rb/client/js/components/Room.jsx:72
+#: indico/web/client/js/react/components/principals/items.jsx:165
 msgid "Add to favorites"
 msgstr "Дуртай зүйл дээр нэмэх"
 
-#: indico/modules/rb/client/js/components/Room.jsx:179
+#: indico/modules/rb/client/js/components/Room.jsx:178
 msgid "Not specified"
 msgstr "Тодорхойлоогүй байна"
 
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:157
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:164
 msgid "Room Owner"
 msgstr "Өрөөний эзэн"
 
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:172
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:179
 msgid "1 {label}seat{/label}"
 msgid_plural "{count} {label}seats{/label}"
 msgstr[0] "1 {label}суудал{/label}"
 msgstr[1] "{count} {label}суудлууд{/label}"
 
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:192
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:199
 msgid "Surface Area"
 msgstr "Гадаргуугийн талбай"
 
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:202
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:209
 msgid "Geographical Coordinates"
 msgstr "Газарзүйн солбицол"
 
@@ -3515,21 +3837,21 @@ msgstr "Өрөө"
 msgid "There are no rooms selected."
 msgstr "Сонгосон өрөө алга."
 
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:31
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:38
 msgid "Help"
 msgstr "Туслаач"
 
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:56
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:144
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:63
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:162
 msgid "Terms and Conditions"
 msgstr "Нөхцөл"
 
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:69
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:154
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:76
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:172
 msgid "Privacy Policy"
 msgstr "Нууцлалын бодлого"
 
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx:131
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:149
 msgid "If you need support, you can contact the following email address:"
 msgstr ""
 "Хэрэв танд тусламж хэрэгтэй бол та дараах цахим шуудангийн хаягаар холбоо "
@@ -3561,14 +3883,14 @@ msgid "Admin Override"
 msgstr "Админ Хүчингүй болгох эрх"
 
 #: indico/modules/rb/client/js/components/TimeInformation.jsx:51
-msgid "{startDate} to {endDate}"
-msgstr "{startDate} -с {endDate} хүртэл"
+msgid "{startDateDay} {startDate} — {endDateDay} {endDate}"
+msgstr ""
 
-#: indico/modules/rb/client/js/components/TimeInformation.jsx:70
+#: indico/modules/rb/client/js/components/TimeInformation.jsx:84
 msgid "{count} occurrences"
 msgstr "{count} тохиолдол"
 
-#: indico/modules/rb/client/js/components/TimeInformation.jsx:79
+#: indico/modules/rb/client/js/components/TimeInformation.jsx:93
 msgid "See on timeline"
 msgstr "Цагийн хуваарь дээрээс харна уу"
 
@@ -3811,6 +4133,7 @@ msgid "Create"
 msgstr "Үүсгэх"
 
 #: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:311
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:331
 msgid "Update"
 msgstr "Шинэчлэх"
 
@@ -4511,21 +4834,21 @@ msgstr "Захиалгын идэвхитэй хүсэлтүүд"
 msgid "Your bookings"
 msgstr "Таны захиалгууд"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:47
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:144
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:48
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:163
 msgid "Equipment"
 msgstr "Тоног төхөөрөмж"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:65
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:79
 msgid "Building {building}"
 msgstr "Барилга {building}"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:186
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:223
 #: indico/modules/rb/client/js/modules/roomList/filters/CapacityForm.jsx:34
 msgid "Min. Capacity"
 msgstr "Хамгийн бага. Багтаамж"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:206
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:243
 msgid "Show only..."
 msgstr "Зөвхөн харуулах ..."
 
@@ -4624,11 +4947,11 @@ msgstr "( Өмнөх хуудас"
 msgid "Next page ⟩"
 msgstr "Дараагийн хуудас )"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:108
+#: indico/modules/search/client/js/components/SearchApp.jsx:109
 msgid "Enter a term above to begin searching."
 msgstr "Хайж эхлэхийн тулд дээрх үгийг оруулна уу."
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:110
+#: indico/modules/search/client/js/components/SearchApp.jsx:111
 msgid ""
 "Enter a term above to begin searching inside the {categoryTitle} category. "
 "You can {link}search all of Indico instead{/link}."
@@ -4636,15 +4959,15 @@ msgstr ""
 "{categoryTitle} ангилал дотор хайж эхлэхийн тулд үг оруулна уу. Та оронд нь "
 "Indico-н бүх хэсэгт {/link} хайлтаа {link} холбож болно."
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:129
+#: indico/modules/search/client/js/components/SearchApp.jsx:130
 msgid "No Results"
 msgstr "Үр дүн байхгүй"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:132
+#: indico/modules/search/client/js/components/SearchApp.jsx:133
 msgid "Your search - {query} - did not match any results."
 msgstr "Таны хайлт - {query} - ямар ч үр дүн гаргасангүй."
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:136
+#: indico/modules/search/client/js/components/SearchApp.jsx:137
 msgid ""
 "Your search - {query} - did not match any results. You could try "
 "{link}searching all of Indico instead{/link}."
@@ -4652,31 +4975,31 @@ msgstr ""
 "Таны хайлт - {query} - ямар ч үр дүн гаргасангүй. Та оронд нь Indico-н бүх "
 "хэсэгт {link}хайлтаа{/link} холбож болно."
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:188
+#: indico/modules/search/client/js/components/SearchApp.jsx:189
 msgid "Sort by: {value}"
 msgstr "Ангилах: {value}"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:259
-#: indico/modules/search/client/js/components/SearchApp.jsx:264
+#: indico/modules/search/client/js/components/SearchApp.jsx:265
+#: indico/modules/search/client/js/components/SearchApp.jsx:270
 msgid "Materials"
 msgstr "Материалууд"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:265
+#: indico/modules/search/client/js/components/SearchApp.jsx:271
 #: indico/modules/search/client/js/components/results/EventNote.jsx:24
 msgid "Notes"
 msgstr "Тэмдэглэлүүд"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:266
+#: indico/modules/search/client/js/components/SearchApp.jsx:272
 #: indico/modules/users/client/js/dashboard.jsx:22
 msgid "Categories"
 msgstr "Ангилалууд"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:291
+#: indico/modules/search/client/js/components/SearchApp.jsx:304
 #: indico/modules/search/client/js/components/SearchBox.jsx:55
 msgid "ADMIN"
 msgstr "АДМИН"
 
-#: indico/modules/search/client/js/components/SearchApp.jsx:293
+#: indico/modules/search/client/js/components/SearchApp.jsx:306
 #: indico/modules/search/client/js/components/SearchBox.jsx:58
 msgid "Skip access checks"
 msgstr "Хандах шалгалтыг алгасах"
@@ -4726,7 +5049,7 @@ msgstr "Дуртай хэрэглэгчид"
 msgid "You have not marked any user as favorite."
 msgstr "Та ямар ч хэрэглэгчийг дуртай болгон тэмдэглээгүй байна."
 
-#: indico/modules/users/client/js/PersonalDataForm.jsx:128
+#: indico/modules/users/client/js/PersonalDataForm.jsx:144
 msgid "You can manage your email addresses {link}here{/link}."
 msgstr ""
 
@@ -4755,8 +5078,8 @@ msgstr "Бүх зүйл"
 msgid "Are you sure you want to leave this page without saving?"
 msgstr "Та энэ хуудсыг хадгалалгүйгээр орхихыг хүсч байна уу?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:477
-#: indico/web/client/js/react/components/principals/Search.jsx:721
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:479
+#: indico/web/client/js/react/components/principals/Search.jsx:723
 msgid "Group"
 msgstr "Бүлэг"
 
@@ -4794,16 +5117,31 @@ msgstr "Хариу"
 msgid "Text copied"
 msgstr "Текстийг хуулсан"
 
-#: indico/web/client/js/react/components/EmailListField.jsx:46
-#: indico/web/client/js/react/components/EmailListField.jsx:47
+#: indico/web/client/js/react/components/ConfirmButton.jsx:45
+msgid "Click again to confirm ({delay})"
+msgstr ""
+
+#: indico/web/client/js/react/components/EmailListField.jsx:71
 msgid "Please enter an email address"
 msgstr "Цахим шуудангийн хаяг оруулна уу"
 
-#: indico/web/client/js/react/components/EmailListField.jsx:48
+#: indico/web/client/js/react/components/EmailListField.jsx:72
 msgid "Add email"
 msgstr "Цахим шуудангийн хаяг нэмэх"
 
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:169
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:189
+msgid "Export options"
+msgstr ""
+
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:203
+msgid "Export all events in this event series"
+msgstr ""
+
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:209
+msgid "Synchronize with your calendar"
+msgstr ""
+
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:212
 msgid ""
 "You may copy-paste the following URL into your scheduling application. "
 "Contents will be automatically synchronized."
@@ -4811,119 +5149,168 @@ msgstr ""
 "Та дараах URL-г өөрийн цагийн хуваарийн программ руу хуулж нааж болно. "
 "Агуулга нь автоматаар тохирох болно."
 
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:175
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:218
 #: indico/web/client/js/react/components/WTFRemoteSearchDropdown.jsx:221
 msgid "Loading…"
 msgstr "Ачаалж байна ..."
 
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:187
-msgid "Copied!"
-msgstr "Хуулагдсан!"
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:236
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:246
+msgid "Download"
+msgstr "Татаж авах"
 
-#: indico/web/client/js/react/components/ICSCalendarLink.jsx:195
+#: indico/web/client/js/react/components/ICSCalendarLink.jsx:240
 msgid ""
 "Download an iCalendar file that you can use in calendaring applications."
 msgstr ""
 "Хуанлийн аппликэйнш дотор таны ашиглаж болох iCalendar-н файлыг татаж авах."
 
-#: indico/web/client/js/react/components/ListFilter.jsx:113
+#: indico/web/client/js/react/components/ListFilter.jsx:122
 msgid "Filter"
 msgstr "Шүүлтүүр"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:141
+#: indico/web/client/js/react/components/ListFilter.jsx:150
 msgid "Clear all filters"
 msgstr ""
 
-#: indico/web/client/js/react/components/ListFilter.jsx:146
+#: indico/web/client/js/react/components/ListFilter.jsx:155
 msgid "No filters were added yet"
 msgstr ""
 
-#: indico/web/client/js/react/components/ListFilter.jsx:194
+#: indico/web/client/js/react/components/ListFilter.jsx:205
 msgid "Enter #id or search string"
 msgstr "#id буюу хайх текст оруулна"
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:25
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:29
 msgid "Mr"
 msgstr "Ноён"
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:26
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:30
 msgid "Ms"
 msgstr "Хатагтай"
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:27
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:31
 msgid "Mrs"
 msgstr "Хатагтай"
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:28
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:32
 msgid "Dr"
 msgstr "Доктор"
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:29
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:33
 msgid "Prof"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:30
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:34
 msgid "Mx"
 msgstr "Mx"
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:76
-#: indico/web/client/js/react/components/syncedInputs.jsx:161
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:82
+#: indico/web/client/js/react/components/syncedInputs.jsx:182
 msgid "Use custom affiliation:"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:78
-#: indico/web/client/js/react/components/syncedInputs.jsx:163
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:84
+#: indico/web/client/js/react/components/syncedInputs.jsx:184
 msgid "Select an affiliation or add your own"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:79
-#: indico/web/client/js/react/components/syncedInputs.jsx:164
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:85
+#: indico/web/client/js/react/components/syncedInputs.jsx:185
 msgid "Search an affiliation or enter one manually"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:81
-#: indico/web/client/js/react/components/syncedInputs.jsx:166
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:87
+#: indico/web/client/js/react/components/syncedInputs.jsx:187
 msgid "You entered this option manually"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:111
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:114
 msgid "Edit Person"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:111
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:114
 msgid "Enter Person"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:121
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:124
 msgid ""
 "You are updating details that were originally linked to a user. Please note "
 "that its identity will remain the same."
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx:145
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:152
 msgid "Family Name"
 msgstr "Овог"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:188
-#: indico/web/client/js/react/components/PersonLinkField.jsx:301
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:213
+msgid "There is already a person with this email in the list."
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:245
+msgid "This email is associated with {name} who is already in the list."
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:277
+msgid ""
+"This email is already used by {name}. You can update the form with their "
+"information."
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:284
+msgid ""
+"This email is already used by {name}. You can add the person directly or "
+"update the form with their information."
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx:297
+msgid "This email is currently not linked to this event."
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:72
+msgid "Edit person"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:82
+msgid "Delete person"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonLinkField.jsx:197
+#: indico/web/client/js/react/components/PersonLinkField.jsx:316
 msgid "There are no persons"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:294
+#: indico/web/client/js/react/components/PersonLinkField.jsx:308
 msgid "Others"
 msgstr "Бусад"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:318
+#: indico/web/client/js/react/components/PersonLinkField.jsx:333
 msgid "Add myself"
 msgstr "Өөрийгөө нэмэх"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:338
+#: indico/web/client/js/react/components/PersonLinkField.jsx:355
 msgid "Enter manually"
 msgstr "Гар аргаар оруулах"
+
+#: indico/web/client/js/react/components/PlaceholderInfo.jsx:36
+msgid "required"
+msgstr ""
+
+#: indico/web/client/js/react/components/PlaceholderInfo.jsx:90
+msgid "Available placeholders"
+msgstr "Бэлэн байгаа зай авагчид"
+
+#: indico/web/client/js/react/components/PlaceholderInfo.jsx:99
+msgid "Advanced placeholders"
+msgstr "Ахисан шатны зай авагч"
 
 #: indico/web/client/js/react/components/ScrollButton.jsx:31
 msgid "Back to top"
 msgstr "Дээш буцах"
+
+#: indico/web/client/js/react/components/TextEditor.jsx:51
+msgid "Please exit source editing mode"
+msgstr ""
 
 #: indico/web/client/js/react/components/UserMenu.jsx:45
 msgid "Impersonate user"
@@ -4978,7 +5365,7 @@ msgstr ""
 msgid "Visibility duration (weeks)"
 msgstr ""
 
-#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:106
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:107
 msgid ""
 "Setting 'Visibility to everyone' to 'Show all participants' is discouraged "
 "as everyone who can access this event can see the participant list "
@@ -5035,6 +5422,30 @@ msgstr "Компьютерээсээ шинэ файл сонгоно уу"
 msgid "Upload failed"
 msgstr "Байршуулж чадсангүй"
 
+#: indico/web/client/js/react/components/notes/ManageNotes.jsx:38
+msgid "Edit minutes"
+msgstr "Хурлын тэмдэглэлийг засварлах"
+
+#: indico/web/client/js/react/components/notes/ManageNotes.jsx:47
+msgid "Delete minutes"
+msgstr "Тэмдэглэл устгах"
+
+#: indico/web/client/js/react/components/notes/ManageNotes.jsx:58
+msgid "Are you sure you want to delete these minutes?"
+msgstr ""
+
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:158
+msgid "Edit Minutes"
+msgstr ""
+
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:176
+msgid "You cannot switch back to Markdown after switching to HTML."
+msgstr ""
+
+#: indico/web/client/js/react/components/notes/NoteEditor.jsx:180
+msgid "Use rich-text (HTML) editor"
+msgstr ""
+
 #: indico/web/client/js/react/components/principals/ACLField.jsx:165
 #: indico/web/client/js/react/components/principals/PrincipalListField.jsx:112
 msgid "This list is currently empty"
@@ -5058,7 +5469,8 @@ msgstr "Бүртгүүлэгчид"
 msgid "Registrants in \"{form}\""
 msgstr "\"{form}\" -д бүртгүүлэгч"
 
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:94
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:37
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:95
 msgid "Add permission"
 msgstr "Зөвшөөрөл нэмэх"
 
@@ -5076,61 +5488,61 @@ msgid_plural "{total} favorites"
 msgstr[0] "{total} дуртай зүйл"
 msgstr[1] "{total} дуртай зүйл"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:538
+#: indico/web/client/js/react/components/principals/Search.jsx:539
 msgid "Family name"
 msgstr "Овог"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:540
+#: indico/web/client/js/react/components/principals/Search.jsx:541
 msgid "Given name"
 msgstr "Нэр"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:546
+#: indico/web/client/js/react/components/principals/Search.jsx:547
 msgid "Include users with no Indico account"
 msgstr "Индико дансгүй хэрэглэгчдийг оруулаарай"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:549
-#: indico/web/client/js/react/components/principals/Search.jsx:735
+#: indico/web/client/js/react/components/principals/Search.jsx:550
+#: indico/web/client/js/react/components/principals/Search.jsx:737
 msgid "Exact matches only"
 msgstr "Зөвхөн яг таарч байгааг нь"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:558
+#: indico/web/client/js/react/components/principals/Search.jsx:559
 msgid "Select user"
 msgstr "Хэрэглэгч сонгох"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:558
+#: indico/web/client/js/react/components/principals/Search.jsx:559
 msgid "Select users"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:666
+#: indico/web/client/js/react/components/principals/Search.jsx:667
 msgid ""
 "Your query matched too many users. Please try more specific search criteria."
 msgstr ""
 "Таны асуулга хэт олон хэрэглэгчтэй таарч байна. Илүү тодорхой хайлтын "
 "шалгуурыг туршиж үзээрэй."
 
-#: indico/web/client/js/react/components/principals/Search.jsx:669
+#: indico/web/client/js/react/components/principals/Search.jsx:670
 msgid "No users found"
 msgstr "Хэрэглэгч олдсонгүй"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:672
+#: indico/web/client/js/react/components/principals/Search.jsx:673
 msgid "{count} user found"
 msgid_plural "{count} users found"
 msgstr[0] "{count} хэрэглэгч олдлоо"
 msgstr[1] "{count} хэрэглэгч олдлоо"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:723
+#: indico/web/client/js/react/components/principals/Search.jsx:725
 msgid "Select group"
 msgstr "Бүлгийг сонгоно уу"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:723
+#: indico/web/client/js/react/components/principals/Search.jsx:725
 msgid "Add groups"
 msgstr "Бүлэг нэмэх"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:733
+#: indico/web/client/js/react/components/principals/Search.jsx:735
 msgid "Group name"
 msgstr "Бүлгийн нэр"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:758
+#: indico/web/client/js/react/components/principals/Search.jsx:760
 msgid ""
 "Your query matched too many groups. Please try more specific search "
 "criteria."
@@ -5138,21 +5550,21 @@ msgstr ""
 "Таны асуулга хэт олон бүлэгт тохирсон байна. Илүү тодорхой хайлтын шалгуурыг"
 " туршиж үзээрэй."
 
-#: indico/web/client/js/react/components/principals/Search.jsx:761
+#: indico/web/client/js/react/components/principals/Search.jsx:763
 msgid "No groups found"
 msgstr "Бүлэг олдсонгүй"
 
-#: indico/web/client/js/react/components/principals/Search.jsx:764
+#: indico/web/client/js/react/components/principals/Search.jsx:766
 msgid "{count} group found"
 msgid_plural "{count} groups found"
 msgstr[0] "{count} бүлэг олдсон"
 msgstr[1] "{count} бүлэг олдсон"
 
-#: indico/web/client/js/react/components/principals/items.jsx:226
+#: indico/web/client/js/react/components/principals/items.jsx:229
 msgid "Nobody"
 msgstr "Хэн ч биш"
 
-#: indico/web/client/js/react/components/principals/items.jsx:227
+#: indico/web/client/js/react/components/principals/items.jsx:230
 msgid "Select a user"
 msgstr "Хэрэглэгчээ сонгоно уу"
 
@@ -5194,7 +5606,7 @@ msgstr "Энэ бүлэг одоо байхгүй байна. Өөрийг нь 
 msgid "This form does not exist anymore. Please choose a different one."
 msgstr "Энэ маягт одоо байхгүй байна. Өөрийг нь сонгоно уу."
 
-#: indico/web/client/js/react/components/syncedInputs.jsx:60
+#: indico/web/client/js/react/components/syncedInputs.jsx:65
 msgid "Toggle synchronization of this field"
 msgstr ""
 
@@ -5244,7 +5656,7 @@ msgstr "Орхиод (дараагийн алдааг харуулах)"
 msgid "Dismiss"
 msgstr "Орхих"
 
-#: indico/web/client/js/react/forms/final-form.jsx:104
+#: indico/web/client/js/react/forms/final-form.jsx:107
 msgid "Are you sure you want to close this dialog without saving?"
 msgstr ""
 

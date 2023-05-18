@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2022 ORGANIZATION
+# Copyright (C) 2023 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -9,14 +9,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-18 18:00+0200\n"
+"POT-Creation-Date: 2023-05-18 22:02+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2019-2022\n"
-"Language-Team: Chinese (China) (GB2312) (http://www.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
+"Language-Team: Chinese (China) (GB2312) (http://app.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.12.1\n"
 "Language: zh_CN.GB2312\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
@@ -37,7 +37,7 @@ msgstr "拒绝访问"
 msgid "This file is protected. You will be redirected to the login page."
 msgstr "此文件受保护。你将被重定向到登录页面。"
 
-#: indico/modules/attachments/client/js/legacy.js:228
+#: indico/modules/attachments/client/js/legacy.js:233
 msgid "Manage material"
 msgstr "管理材料"
 
@@ -72,7 +72,7 @@ msgid_plural "{0} events"
 msgstr[0] "{0} 个事件"
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:327
+#: indico/modules/events/management/client/js/index.js:383
 msgid "Undo"
 msgstr "撤销"
 
@@ -290,9 +290,10 @@ msgstr "显示预览"
 msgid "Hide preview"
 msgstr "隐藏预览"
 
-#: indico/modules/events/client/js/display.js:175
-msgid "Edit minutes"
-msgstr "编辑纪要"
+#: indico/modules/events/client/js/cloning.js:59
+msgid "{0} new event will be created."
+msgid_plural "{0} new events will be created."
+msgstr[0] ""
 
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
@@ -306,7 +307,7 @@ msgstr "显示 {0} 个 共 {1} 个"
 msgid "There are no entries that match your search criteria."
 msgstr "没有符合查询条件的条目。"
 
-#: indico/modules/events/management/client/js/index.js:325
+#: indico/modules/events/management/client/js/index.js:381
 msgid "Undoing previous operation..."
 msgstr "撤销前面的操作..."
 
@@ -389,12 +390,12 @@ msgstr "关闭"
 msgid "You have unsaved changes that will be lost."
 msgstr "您尚未保存的更改将丢失。"
 
-#: indico/web/client/js/jquery/utils/declarative.js:251
+#: indico/web/client/js/jquery/utils/declarative.js:256
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "确认操作"
 
-#: indico/web/client/js/jquery/utils/declarative.js:361
+#: indico/web/client/js/jquery/utils/declarative.js:366
 msgid "Direct link to this item"
 msgstr "直接连接到此项"
 
@@ -407,7 +408,7 @@ msgid "Previous"
 msgstr "前一个"
 
 #: indico/web/client/js/jquery/utils/errors.js:31
-#: indico/web/client/js/utils/axios.js:45
+#: indico/web/client/js/utils/axios.js:44
 msgid "Something went wrong"
 msgstr "出了问题"
 
@@ -684,51 +685,53 @@ msgid "Registrants cannot have management permissions"
 msgstr "注册人不能具有管理权限"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:186
 msgid "Assign Permissions"
 msgstr "赋予权限   "
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:204
 msgid "Delete entry '{0}'"
 msgstr "删除第 '{0}' 条"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "您确定要从列表中删除你自己？"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:289
 msgid "All options have been added"
 msgstr "所有选项已添加"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:320
 msgid "This entry was already added"
 msgstr "此条目已被添加"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
 msgid "Anonymous"
 msgstr "匿名"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:364
 msgid "Additional users"
 msgstr "其他用户"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:368
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} 个用户由于其他角色具有隐式读取权限"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Category Managers"
 msgstr "类别管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Parent Category Managers"
 msgstr "父类别管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:388
 msgid "Event Managers"
 msgstr "事件管理员"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
 msgid "Registrants in \"{0}\""
 msgstr "\"{0}\" 中的注册人"
 

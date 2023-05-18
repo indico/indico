@@ -1,24 +1,24 @@
 # Translations template for indico.
-# Copyright (C) 2022 ORGANIZATION
+# Copyright (C) 2023 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
 # Adrian, 2021
-# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2019-2021
+# Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2019-2021,2023
 # Oleksandr Pylypovskyi <o.pylypovskyi@gmail.com>, 2018-2019
 # Sonya Sirets <prettyflysonia@gmail.com>, 2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-18 18:00+0200\n"
+"POT-Creation-Date: 2023-05-18 22:02+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
-"Last-Translator: Adrian, 2021\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/indico/indico/language/uk_UA/)\n"
+"Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2019-2021,2023\n"
+"Language-Team: Ukrainian (Ukraine) (http://app.transifex.com/indico/indico/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.12.1\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
@@ -39,7 +39,7 @@ msgstr "Доступ заборонено."
 msgid "This file is protected. You will be redirected to the login page."
 msgstr "Цей файл захищено. Вас буде направлено до сторінки входу."
 
-#: indico/modules/attachments/client/js/legacy.js:228
+#: indico/modules/attachments/client/js/legacy.js:233
 msgid "Manage material"
 msgstr "Керувати матеріалом"
 
@@ -80,7 +80,7 @@ msgstr[2] "{0} подій"
 msgstr[3] "{0} подій"
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:327
+#: indico/modules/events/management/client/js/index.js:383
 msgid "Undo"
 msgstr "Відкотити"
 
@@ -277,7 +277,7 @@ msgstr "Шаблон не може пустим. Додайте кілька е�
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
-msgstr ""
+msgstr "Елемент постійне зображення не може бути пустим. Завантажте зображення або видаліть його."
 
 #: indico/modules/designer/client/js/index.js:628
 msgid "Are you sure you want to change the dimensions of this template?"
@@ -290,7 +290,7 @@ msgstr "Вибрати файл"
 
 #: indico/modules/designer/client/js/index.js:780
 msgid "Fixed Image"
-msgstr ""
+msgstr "Постійне зображення"
 
 #: indico/modules/designer/client/js/index.js:838
 msgid "This back side template will be removed"
@@ -322,9 +322,13 @@ msgstr "Показати попередній варіант"
 msgid "Hide preview"
 msgstr "Сховати попередній варіант"
 
-#: indico/modules/events/client/js/display.js:175
-msgid "Edit minutes"
-msgstr "Редагувати протокол"
+#: indico/modules/events/client/js/cloning.js:59
+msgid "{0} new event will be created."
+msgid_plural "{0} new events will be created."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
@@ -338,7 +342,7 @@ msgstr "Показано {0} з {1}"
 msgid "There are no entries that match your search criteria."
 msgstr "Жодних елементів, які підходять під пошуковий запит, не знайдено."
 
-#: indico/modules/events/management/client/js/index.js:325
+#: indico/modules/events/management/client/js/index.js:381
 msgid "Undoing previous operation..."
 msgstr "Скасування попередньої операції..."
 
@@ -424,12 +428,12 @@ msgstr "Закрити"
 msgid "You have unsaved changes that will be lost."
 msgstr "Присутні незбережені зміни, які будуть втрачені."
 
-#: indico/web/client/js/jquery/utils/declarative.js:251
+#: indico/web/client/js/jquery/utils/declarative.js:256
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "Підтвердити операцію"
 
-#: indico/web/client/js/jquery/utils/declarative.js:361
+#: indico/web/client/js/jquery/utils/declarative.js:366
 msgid "Direct link to this item"
 msgstr "Пряме посилання на цей пункт"
 
@@ -442,7 +446,7 @@ msgid "Previous"
 msgstr "Попередній"
 
 #: indico/web/client/js/jquery/utils/errors.js:31
-#: indico/web/client/js/utils/axios.js:45
+#: indico/web/client/js/utils/axios.js:44
 msgid "Something went wrong"
 msgstr "Щось пішло не так"
 
@@ -565,11 +569,11 @@ msgstr "Оберіть категорію."
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:35
 msgid "Not possible for categories where you cannot propose events"
-msgstr ""
+msgstr "Неможливо для категорій, в яких ви не можете запропонувати захід."
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:39
 msgid "Not possible for categories where you cannot propose/create events"
-msgstr ""
+msgstr "Неможливо для категорій, в яких ви не можете запропонувати/створити захід."
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:43
 msgid "Not possible for categories where you cannot create events"
@@ -740,34 +744,36 @@ msgid "Registrants cannot have management permissions"
 msgstr "Реєстранти не можуть мати дозволів на керування"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:186
 msgid "Assign Permissions"
 msgstr "Надати дозволи"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:204
 msgid "Delete entry '{0}'"
 msgstr "Видалити елемент {0}"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Ви впевнені, що хочете видалитись зі списку?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:289
 msgid "All options have been added"
 msgstr "Всі опції було додано"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:320
 msgid "This entry was already added"
 msgstr "Цей елемент уже доданий"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
 msgid "Anonymous"
 msgstr "Анонімно"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:364
 msgid "Additional users"
 msgstr "Додаткові користувачі"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:368
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} користувач має неявний доступ до читання через інші ролі"
@@ -775,19 +781,19 @@ msgstr[1] "{0} користувачі мають неявний доступ д�
 msgstr[2] "{0} користувачів мають неявний доступ до читання через інші ролі"
 msgstr[3] "{0} користувачів мають неявний доступ до читання через інші ролі"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Category Managers"
 msgstr "Керівники категорії"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Parent Category Managers"
 msgstr "Керівники материнської категорії"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:388
 msgid "Event Managers"
 msgstr "Керівники заходу"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
 msgid "Registrants in \"{0}\""
 msgstr "Реєстранти в \"{0}\""
 

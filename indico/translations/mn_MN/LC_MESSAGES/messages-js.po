@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2022 ORGANIZATION
+# Copyright (C) 2023 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -10,14 +10,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-18 18:00+0200\n"
+"POT-Creation-Date: 2023-05-18 22:02+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>, 2021\n"
-"Language-Team: Mongolian (Mongolia) (http://www.transifex.com/indico/indico/language/mn_MN/)\n"
+"Language-Team: Mongolian (Mongolia) (http://app.transifex.com/indico/indico/language/mn_MN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.12.1\n"
 "Language: mn_MN\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -38,7 +38,7 @@ msgstr "Хандах эрхгүй"
 msgid "This file is protected. You will be redirected to the login page."
 msgstr "Энэ файл хамгаалагдсан. Таныг нэвтрэх хуудас руу шилжүүлэх болно."
 
-#: indico/modules/attachments/client/js/legacy.js:228
+#: indico/modules/attachments/client/js/legacy.js:233
 msgid "Manage material"
 msgstr "Материалыг удирдах"
 
@@ -75,7 +75,7 @@ msgstr[0] "{0} үйл явдал"
 msgstr[1] "{0} үйл явдлууд"
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:327
+#: indico/modules/events/management/client/js/index.js:383
 msgid "Undo"
 msgstr "Буцах"
 
@@ -301,9 +301,11 @@ msgstr "Урьдчилсан харагдацыг үзүүлэх"
 msgid "Hide preview"
 msgstr "Урьдчилсан харагдацыг нуух"
 
-#: indico/modules/events/client/js/display.js:175
-msgid "Edit minutes"
-msgstr "Хурлын тэмдэглэлийг засварлах"
+#: indico/modules/events/client/js/cloning.js:59
+msgid "{0} new event will be created."
+msgid_plural "{0} new events will be created."
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
@@ -317,7 +319,7 @@ msgstr "{1}-с {0}-г харуулах"
 msgid "There are no entries that match your search criteria."
 msgstr "Таны хайлтын шүүлтүүртэй тохирох мэдээлэл байхгүй байна."
 
-#: indico/modules/events/management/client/js/index.js:325
+#: indico/modules/events/management/client/js/index.js:381
 msgid "Undoing previous operation..."
 msgstr "Өмнөх үйл ажиллагааг цуцалж байна..."
 
@@ -401,12 +403,12 @@ msgstr "Хаах"
 msgid "You have unsaved changes that will be lost."
 msgstr "Танд алдагдах хадгалагдаагүй өөрчлөлтүүд байна."
 
-#: indico/web/client/js/jquery/utils/declarative.js:251
+#: indico/web/client/js/jquery/utils/declarative.js:256
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "Үйлдэлийг батлах"
 
-#: indico/web/client/js/jquery/utils/declarative.js:361
+#: indico/web/client/js/jquery/utils/declarative.js:366
 msgid "Direct link to this item"
 msgstr "Энэхүү зүйл рүү шууд холбох"
 
@@ -419,7 +421,7 @@ msgid "Previous"
 msgstr "Өмнөх"
 
 #: indico/web/client/js/jquery/utils/errors.js:31
-#: indico/web/client/js/utils/axios.js:45
+#: indico/web/client/js/utils/axios.js:44
 msgid "Something went wrong"
 msgstr "Нэг зүйл буруу ажиллалаа"
 
@@ -703,52 +705,54 @@ msgid "Registrants cannot have management permissions"
 msgstr "Бүртгүүлэгчдэд удирдлагын зөвшөөрөл шаардлагагүй"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:186
 msgid "Assign Permissions"
 msgstr "Зөвшөөрөл оноох"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:204
 msgid "Delete entry '{0}'"
 msgstr "'{0}' мэдээллийг устгах"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Та өөрийгөө жагсаалтаас хасахыг хүсэж байгаад итгэлтэй байна уу?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:289
 msgid "All options have been added"
 msgstr "Бүх сонголтыг нэмлээ. "
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:320
 msgid "This entry was already added"
 msgstr "Мэдээллийг аль хэдийнэ нэмсэн байна"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
 msgid "Anonymous"
 msgstr "Нэр нь тодорхойгүй"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:364
 msgid "Additional users"
 msgstr "Нэмэлт хэрэглэгчид"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:368
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} хэрэглэгч бусад үүргийн улмаас хандалтыг далдаар уншдаг"
 msgstr[1] "{0} хэрэглэгчид бусад үүргийн улмаас хандалтыг далдаар уншдаг"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Category Managers"
 msgstr "Ангиллын менежерүүд"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Parent Category Managers"
 msgstr "Эх ангиллын менежерүүд"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:388
 msgid "Event Managers"
 msgstr "Үйл явдлын менежерүүд"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
 msgid "Registrants in \"{0}\""
 msgstr "\"{0}\" дээрх бүртгүүлэгчид"
 

@@ -1,26 +1,26 @@
 # Translations template for indico.
-# Copyright (C) 2022 ORGANIZATION
+# Copyright (C) 2023 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
 # Arturo Diaz Rosemberg <arturo@diazrosemberg.net>, 2012
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Jesús Martín <jesusmartin@sallep.net>, 2017-2018,2021
-# Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
+# Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2022
 # rodrigotorrens <rodrigotorrens@gmail.com>, 2011
 # ssice <ssaavedra@gpul.org>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-18 18:00+0200\n"
+"POT-Creation-Date: 2023-05-18 22:02+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
-"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2017-2018,2021\n"
-"Language-Team: Spanish (Spain) (http://www.transifex.com/indico/indico/language/es_ES/)\n"
+"Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2022\n"
+"Language-Team: Spanish (Spain) (http://app.transifex.com/indico/indico/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.12.1\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -41,7 +41,7 @@ msgstr "Acceso denegado"
 msgid "This file is protected. You will be redirected to the login page."
 msgstr "Este archivo está protegido. Se le redirigirá a la página de inicio de sesión."
 
-#: indico/modules/attachments/client/js/legacy.js:228
+#: indico/modules/attachments/client/js/legacy.js:233
 msgid "Manage material"
 msgstr "Gestionar material"
 
@@ -80,7 +80,7 @@ msgstr[1] "{0} eventos"
 msgstr[2] "{0} eventos"
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:327
+#: indico/modules/events/management/client/js/index.js:383
 msgid "Undo"
 msgstr "Deshacer"
 
@@ -269,7 +269,7 @@ msgstr "La plantilla no puede estar vacía. Añada algunos elementos o una image
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
-msgstr ""
+msgstr "El elemento Imagen fija no puede estar vacío. Cargue una imagen dentro de ella o elimínela."
 
 #: indico/modules/designer/client/js/index.js:628
 msgid "Are you sure you want to change the dimensions of this template?"
@@ -282,7 +282,7 @@ msgstr "Seleccione un archivo"
 
 #: indico/modules/designer/client/js/index.js:780
 msgid "Fixed Image"
-msgstr ""
+msgstr "Imagen fija"
 
 #: indico/modules/designer/client/js/index.js:838
 msgid "This back side template will be removed"
@@ -314,9 +314,12 @@ msgstr "Mostrar vista previa"
 msgid "Hide preview"
 msgstr "Ocultar vista previa"
 
-#: indico/modules/events/client/js/display.js:175
-msgid "Edit minutes"
-msgstr "Editar las actas"
+#: indico/modules/events/client/js/cloning.js:59
+msgid "{0} new event will be created."
+msgid_plural "{0} new events will be created."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
@@ -330,7 +333,7 @@ msgstr "{0} de {1} mostrados"
 msgid "There are no entries that match your search criteria."
 msgstr "No hay entradas que coincidan con sus criterios de búsqueda."
 
-#: indico/modules/events/management/client/js/index.js:325
+#: indico/modules/events/management/client/js/index.js:381
 msgid "Undoing previous operation..."
 msgstr "Deshaciendo la operación anterior ..."
 
@@ -415,12 +418,12 @@ msgstr "Cerrar"
 msgid "You have unsaved changes that will be lost."
 msgstr "Tiene cambios sin guardar que se perderán."
 
-#: indico/web/client/js/jquery/utils/declarative.js:251
+#: indico/web/client/js/jquery/utils/declarative.js:256
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:704
 msgid "Confirm action"
 msgstr "Confirmar acción"
 
-#: indico/web/client/js/jquery/utils/declarative.js:361
+#: indico/web/client/js/jquery/utils/declarative.js:366
 msgid "Direct link to this item"
 msgstr "Enlace directo a este ítem"
 
@@ -433,7 +436,7 @@ msgid "Previous"
 msgstr "Anterior"
 
 #: indico/web/client/js/jquery/utils/errors.js:31
-#: indico/web/client/js/utils/axios.js:45
+#: indico/web/client/js/utils/axios.js:44
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
@@ -724,53 +727,55 @@ msgid "Registrants cannot have management permissions"
 msgstr "Los inscritos no pueden tener permisos de administración"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:186
 msgid "Assign Permissions"
 msgstr "Asignar permisos"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:202
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:204
 msgid "Delete entry '{0}'"
 msgstr "Eliminar la entrada \"{0}\""
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:203
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "¿Seguro que desea autoborrarse de la lista?"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:287
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:289
 msgid "All options have been added"
 msgstr "Se han añadido todas las opciones."
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:318
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:320
 msgid "This entry was already added"
 msgstr "Esta entrada ya fue añadida"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:352
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
 msgid "Anonymous"
 msgstr "Anónimo"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:362
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:364
 msgid "Additional users"
 msgstr "Usuarios adicionales"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:366
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:368
 msgid "{0} user has implicit read access due to other roles"
 msgid_plural "{0} users have implicit read access due to other roles"
 msgstr[0] "{0} usuario tiene acceso implícito de lectura debido a otras funciones"
 msgstr[1] "{0}  usuarios tienen acceso implícito de lectura debido a otros roles"
 msgstr[2] "{0}  usuarios tienen acceso implícito de lectura debido a otros roles"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:382
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
 msgid "Category Managers"
 msgstr "Administradores de la categoría"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
 msgid "Parent Category Managers"
 msgstr "Administradores de categorías principales"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:388
 msgid "Event Managers"
 msgstr "Administradores de eventos"
 
-#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:405
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
 msgid "Registrants in \"{0}\""
 msgstr "Inscritos en \"{0}\""
 
