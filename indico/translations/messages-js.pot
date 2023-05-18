@@ -6,16 +6,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 3.2.3.dev0\n"
+"Project-Id-Version: indico 3.2.4.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-02-22 18:58+0100\n"
+"POT-Creation-Date: 2023-05-18 22:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.12.1\n"
 
 #: indico/modules/attachments/client/js/legacy.js:152
 msgid "This file no longer exists. Please reload the page."
@@ -69,7 +69,7 @@ msgid_plural "{0} events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/management.js:57 indico/modules/events/management/client/js/index.js:382
+#: indico/modules/categories/client/js/management.js:57 indico/modules/events/management/client/js/index.js:383
 msgid "Undo"
 msgstr ""
 
@@ -279,6 +279,12 @@ msgstr ""
 msgid "Hide preview"
 msgstr ""
 
+#: indico/modules/events/client/js/cloning.js:59
+msgid "{0} new event will be created."
+msgid_plural "{0} new events will be created."
+msgstr[0] ""
+msgstr[1] ""
+
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
 msgstr ""
@@ -291,7 +297,7 @@ msgstr ""
 msgid "There are no entries that match your search criteria."
 msgstr ""
 
-#: indico/modules/events/management/client/js/index.js:380
+#: indico/modules/events/management/client/js/index.js:381
 msgid "Undoing previous operation..."
 msgstr ""
 
