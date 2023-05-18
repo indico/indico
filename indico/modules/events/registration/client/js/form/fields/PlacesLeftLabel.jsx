@@ -19,7 +19,9 @@ export function PlacesLeft({placesLimit, placesUsed, isEnabled}) {
     <Label color={color} style={{whiteSpace: 'nowrap'}}>
       {placesLeft > 0 ? (
         <PluralTranslate count={placesLeft}>
-          <Singular>1 place left</Singular>
+          <Singular>
+            <Param name="count" value={placesLeft} /> place left
+          </Singular>
           <Plural>
             <Param name="count" value={placesLeft} /> places left
           </Plural>
