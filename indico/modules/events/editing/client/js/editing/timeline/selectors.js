@@ -140,6 +140,11 @@ export const canPerformEditorActions = createSelector(
   details => details && details.canPerformEditorActions
 );
 
+export const canDeleteEditable = createSelector(
+  getDetails,
+  details => details && details.canDelete
+);
+
 export const editingEnabled = createSelector(
   getDetails,
   details => details && details.editingEnabled

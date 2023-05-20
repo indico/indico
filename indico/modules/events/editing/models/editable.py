@@ -47,7 +47,8 @@ class EditableState(RichIntEnum):
 
 class Editable(db.Model):
     __tablename__ = 'editables'
-    __table_args__ = (db.UniqueConstraint('contribution_id', 'type'),
+    __table_args__ = (db.Index(None, 'contribution_id', 'type', unique=True,
+                               postgresql_where=db.text('NOT is_deleted')),
                       {'schema': 'event_editing'})
 
     id = db.Column(
@@ -72,6 +73,11 @@ class Editable(db.Model):
         db.ForeignKey('event_editing.revisions.id'),
         index=True,
         nullable=True
+    )
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False,
     )
 
     contribution = db.relationship(
@@ -245,6 +251,10 @@ class Editable(db.Model):
                     and self.event.can_manage(user, permission=self.type.editor_permission)
                     and type_settings.get(self.event, 'editing_enabled')
                     and type_settings.get(self.event, 'self_assign_allowed')))
+
+    def can_delete(self, user):
+        """Whether the user can delete the editable."""
+        return self.event.can_manage(user)
 
     @property
     def review_conditions_valid(self):

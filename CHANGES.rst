@@ -24,6 +24,7 @@ Improvements
 - Add full ACLs for custom conference menu items, instead of just being able to
   restrict them to speakers or registrants (:pr:`5670`, thanks :user:`kewisch`)
 - Make editing timeline display much more straightforward (:pr:`5674`)
+- Allow event managers to delete editables from contributions (:pr:`5778`)
 
 Bugfixes
 ^^^^^^^^

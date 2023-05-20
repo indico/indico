@@ -84,12 +84,13 @@ def create_new_editable(contrib, type_, submitter, files, type=RevisionType.read
     return editable
 
 
-def delete_editable(editable):
+def delete_editable(editable, soft=True):
     db.session.expire(editable)
-    for revision in editable.revisions:
-        for ef in revision.files:
-            ef.file.claimed = False
-    db.session.delete(editable)
+    if not soft:
+        for revision in editable.revisions:
+            for ef in revision.files:
+                ef.file.claimed = False
+    editable.is_deleted = True
     db.session.flush()
 
 
