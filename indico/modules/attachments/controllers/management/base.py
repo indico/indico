@@ -22,6 +22,7 @@ from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import _, ngettext
+from indico.util.signals import make_interceptable
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -29,6 +30,7 @@ from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
 
 
+@make_interceptable
 def _render_attachment_list(linked_object):
     tpl = get_template_module('attachments/_attachments.html')
     return tpl.render_attachments(attachments=get_attached_items(linked_object), linked_object=linked_object)

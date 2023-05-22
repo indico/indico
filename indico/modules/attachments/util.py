@@ -8,6 +8,7 @@
 from flask import session
 
 from indico.core.db import db
+from indico.util.signals import make_interceptable
 
 
 def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False):
@@ -32,6 +33,7 @@ def get_attached_folders(linked_object, include_empty=True, include_hidden=True,
     return folders
 
 
+@make_interceptable
 def get_attached_items(linked_object, include_empty=True, include_hidden=True, preload_event=False):
     """
     Return a structured representation of all the attachments linked
