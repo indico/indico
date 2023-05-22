@@ -6,9 +6,11 @@
 // LICENSE file for more details.
 
 import deleteEditableURL from 'indico-url:event_editing.api_delete_editable';
+import editableTypeListURL from 'indico-url:event_editing.editable_type_list';
 
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
+import {useHistory} from 'react-router-dom';
 import {Icon, Popup} from 'semantic-ui-react';
 
 import {RequestConfirm} from 'indico/react/components';
@@ -24,6 +26,7 @@ export default function DeleteEditable() {
   const allowed = useSelector(selectors.canDeleteEditable);
   const [submitting, setSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const history = useHistory();
 
   const title = {
     [EditableType.paper]: Translate.string('Delete paper'),
@@ -46,10 +49,11 @@ export default function DeleteEditable() {
         })
       );
     } catch (error) {
-      setSubmitting(false);
       return handleAxiosError(error);
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
+    history.push(editableTypeListURL({event_id: eventId, type: editableType}));
   };
 
   return (
