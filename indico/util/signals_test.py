@@ -216,3 +216,41 @@ def test_interceptable_multi():
         signals.plugin.interceptable_function.connected_to(_handler2, interceptable_sender(foo)),
     ):
         assert foo(1) == 6
+
+
+def test_interceptable_posarg():
+    def _handler(sender, func, args, **kwargs):
+        pass
+
+    foo = make_interceptable(lambda a: a)
+    bar = make_interceptable(lambda *args: args[0])
+    with signals.plugin.interceptable_function.connected_to(_handler, interceptable_sender(foo)):
+        with pytest.raises(TypeError):
+            foo(1, 2)
+    with signals.plugin.interceptable_function.connected_to(_handler, interceptable_sender(bar)):
+        bar(1, 2)
+
+
+def test_interceptable_custom_kwarg():
+    def _handler(sender, func, args, **kwargs):
+        pass
+
+    def _handler2(sender, func, args, **kwargs):
+        args.arguments.pop('b')
+
+    foo = make_interceptable(lambda a: a)
+    bar = make_interceptable(lambda a, **kwargs: a)
+    with signals.plugin.interceptable_function.connected_to(_handler, interceptable_sender(foo)):
+        with pytest.raises(TypeError):
+            foo(1, b=2)
+    with signals.plugin.interceptable_function.connected_to(_handler, interceptable_sender(bar)):
+        bar(1, b=2)
+    with signals.plugin.interceptable_function.connected_to(_handler2, interceptable_sender(foo)):
+        foo(1, b=2)
+
+
+def test_interceptable_colliding_posarg_kwarg():
+    foo = make_interceptable(lambda *args: args[0])
+    with signals.plugin.interceptable_function.connected_to(lambda *a, **kw: 'x', interceptable_sender(foo)):
+        with pytest.raises(TypeError):
+            foo(args=1)

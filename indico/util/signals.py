@@ -84,10 +84,10 @@ _inspect_signature = functools.cache(inspect.signature)
 def make_interceptable(func, key=None, ctx=None):
     """Create a wrapper to make a function call interceptable.
 
-    The returned wrapper behaves like the original function, but it triggers a signal
-    which can modify its call arguments or even override the return value (in which
-    case the original function would not get called at all, unless the signal handler
-    decides to do so itself).
+    The returned wrapper behaves like the original function, but accepting any kwarg and
+    triggering a signal which can modify its call arguments or even override the return
+    value (in which case the original function would not get called at all, unless the
+    signal handler decides to do so itself).
 
     This function can also be used as a decorator; in that case neither a key nor context
     can be provided (but it would not make sense anyway).
@@ -109,7 +109,12 @@ def make_interceptable(func, key=None, ctx=None):
             # it usually passes even when there's no receiver connected anymore, but outside testing
             # we never disconnect signals anyway...
             return func(*args, **kwargs)
-        bound_args = sig.bind(*args, **kwargs)
+        call_sig = sig
+        if not any(p.kind == p.VAR_KEYWORD for p in sig.parameters.values()):
+            missing_kwargs = set(kwargs) - set(sig.parameters)
+            extra_parameters = [inspect.Parameter(mk, inspect.Parameter.KEYWORD_ONLY) for mk in missing_kwargs]
+            call_sig = sig.replace(parameters=[*sig.parameters.values(), *extra_parameters])
+        bound_args = call_sig.bind(*args, **kwargs)
         return_none = object()
         sig_rvs = values_from_signal(signals.plugin.interceptable_function.send(sender, func=func, args=bound_args,
                                                                                 ctx=ctx, RETURN_NONE=return_none),
