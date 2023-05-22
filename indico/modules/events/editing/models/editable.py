@@ -85,6 +85,7 @@ class Editable(db.Model):
         lazy=True,
         backref=db.backref(
             'editables',
+            primaryjoin='(Editable.contribution_id == Contribution.id) & ~Editable.is_deleted',
             lazy=True,
         )
     )

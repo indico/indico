@@ -497,7 +497,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
         if not self.event.has_feature('editing'):
             return []
 
-        submitted_for = {editable.type.name for editable in self.editables if not editable.is_deleted}
+        submitted_for = {editable.type.name for editable in self.editables}
         return [
             editable_type
             for editable_type in self.event.editable_types
@@ -513,8 +513,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
             return []
 
         enabled_editable_types = editing_settings.get(self.event, 'editable_types')
-        enabled_editables = [editable for editable in self.editables
-                             if not editable.is_deleted and editable.type.name in enabled_editable_types]
+        enabled_editables = [editable for editable in self.editables if editable.type.name in enabled_editable_types]
         order = list(EditableType)
         return sorted(enabled_editables, key=lambda editable: order.index(editable.type))
 
@@ -587,7 +586,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
 
     def get_editable(self, editable_type):
         """Get the editable of the given type."""
-        return next((e for e in self.editables if not e.is_deleted and e.type == editable_type), None)
+        return next((e for e in self.editables if e.type == editable_type), None)
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the contribution."""

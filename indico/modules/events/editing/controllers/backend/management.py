@@ -268,7 +268,7 @@ class RHEditablesNotSubmitted(RHEditableTypeManagementBase):
 
     def _process(self):
         query = Contribution.query.with_parent(self.event).filter(
-            ~Contribution.editables.any(Editable.type == self.editable_type, ~Editable.is_deleted)
+            ~Contribution.editables.any(Editable.type == self.editable_type)
         )
         return jsonify(count=query.count())
 
@@ -298,7 +298,7 @@ class RHEmailNotSubmittedEditablesSend(EmailRolesSendMixin, RHEditableTypeManage
 
     def get_recipients(self, roles):
         contribs = Contribution.query.with_parent(self.event).filter(
-            ~Contribution.editables.any(Editable.type == self.editable_type, ~Editable.is_deleted)
+            ~Contribution.editables.any(Editable.type == self.editable_type)
         ).all()
         for contrib in contribs:
             log_metadata = {'contribution_id': contrib.id}

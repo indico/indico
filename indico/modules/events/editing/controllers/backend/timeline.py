@@ -63,7 +63,7 @@ class RHEditingUploadContributionFile(RHEditingUploadFile):
         files = []
         if id and self.contrib.editables:
             files = [file.file for e in self.contrib.editables
-                     if not e.is_deleted and e.type == self.editable.type for file in e.revisions[-1].files]
+                     if e.type == self.editable.type for file in e.revisions[-1].files]
         if paper_id and self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
             files = last_rev.files
         if found := next((f for f in files if f.id == (id or paper_id)), None):

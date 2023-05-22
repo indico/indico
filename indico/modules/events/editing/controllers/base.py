@@ -120,7 +120,7 @@ class RHContributionEditableBase(TokenAccessMixin, RequireUserMixin, RHContribut
         self.editable_type = EditableType[request.view_args['type']]
         self.editable = (Editable.query
                          .with_parent(self.contrib)
-                         .filter_by(type=self.editable_type, is_deleted=False)
+                         .filter_by(type=self.editable_type)
                          .options(*self._editable_query_options)
                          .first())
         if self.editable is None and self.EDITABLE_REQUIRED:
