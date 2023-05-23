@@ -83,7 +83,7 @@
             {% if data.content_type == 'text/plain' %}
                 <pre class="mono">{{ data.body }}</pre>
             {% else %}
-                {{ data.body | safe }}
+                <div class="html">{{ data.body | safe }}</div>
             {% endif %}
         </td>
     </tr>

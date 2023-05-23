@@ -179,6 +179,13 @@ table.log-modal-details {
     width: 200px;
   }
 
+  td.email-body .html {
+    // For simple Markdown emails where we can simply wrap the text.
+    white-space: normal;
+    // For custom HTML where wrapping doesn't work, we at least show a scrollbar.
+    overflow-x: auto;
+  }
+
   .diff {
     ins {
       background: $light-green;
