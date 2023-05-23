@@ -215,10 +215,14 @@ def get_form_registration_data(regform, registration, *, management=False):
             continue
         elif item.id in data_by_field:
             registration_data[item.html_field_name] = camelize_keys(data_by_field[item.id].user_data)
-        elif management:
-            registration_data[item.html_field_name] = item.field_impl.empty_value
         else:
-            registration_data[item.html_field_name] = item.field_impl.default_value
+            # we never use default values when editing a registration where data does not exist yet.
+            # such a field has been added after the registration has been created, and it's rather
+            # confusing when you see the default value when editing your own registration, even though
+            # you never set that value. and it also breaks things because when you submit the form there
+            # is no value sent (since nothing changed and we send partial updates when editing), but the
+            # field is required and thus validation fails
+            registration_data[item.html_field_name] = item.field_impl.empty_value
     if management:
         registration_data['notify_user'] = session.get('registration_notify_user_default', True)
     return registration_data

@@ -71,6 +71,8 @@ Bugfixes
   :pr:`5761`)
 - Fix ToS and Privacy Policy links in room booking module not working when using an
   external URL (:pr:`5774`)
+- Do not apply default values to new registration form fields when editing an existing
+  registration (:pr:`5781`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
