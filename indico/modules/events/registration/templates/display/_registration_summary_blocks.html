@@ -99,7 +99,7 @@
         </ul>
     {% elif field.input_type == 'file' and friendly_data and from_management %}
         <a href="{{ url_for('.registration_file', data[field.id].locator.file) }}">{{ friendly_data }}</a>
-    {% elif friendly_data %}
+    {% elif friendly_data is not none %}
         {{- friendly_data -}}
     {% endif %}
 {% endmacro %}
