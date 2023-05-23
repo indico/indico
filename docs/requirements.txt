@@ -58,7 +58,7 @@ pygments==2.15.1
     # via sphinx
 pytz==2023.3
     # via flask-babel
-requests==2.29.0
+requests==2.31.0
     # via
     #   plantweb
     #   sphinx

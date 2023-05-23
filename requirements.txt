@@ -294,7 +294,7 @@ redis==4.5.4
     #   celery
 reportlab==3.6.13
     # via -r requirements.in
-requests==2.29.0
+requests==2.31.0
     # via -r requirements.in
 rich==13.3.5
     # via flask-limiter

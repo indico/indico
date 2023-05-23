@@ -177,7 +177,7 @@ redis==4.5.4
     # via
     #   -c requirements.txt
     #   pytest-redis
-requests==2.29.0
+requests==2.31.0
     # via
     #   -c requirements.txt
     #   plantweb
