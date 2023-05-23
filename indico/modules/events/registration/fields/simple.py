@@ -69,6 +69,7 @@ class NumberField(RegistrationFormBillableField):
     name = 'number'
     mm_field_class = fields.Integer
     setup_schema_base_cls = NumberFieldDataSchema
+    not_empty_if_required = False
 
     @property
     def mm_field_kwargs(self):

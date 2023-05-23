@@ -73,6 +73,8 @@ Bugfixes
   external URL (:pr:`5774`)
 - Do not apply default values to new registration form fields when editing an existing
   registration (:pr:`5781`)
+- Allow ``0`` for a required registration form numbe field (unless a higher minimum
+  value is set) (:pr:`5781`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
