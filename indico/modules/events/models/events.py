@@ -22,6 +22,7 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from sqlalchemy.sql import select
 
 from indico.core import signals
+from indico.core.config import config
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
@@ -833,8 +834,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             query.filter(SessionBlock.timetable_entry != None)  # noqa
         return query.first()
 
-    def get_allowed_sender_emails(self, include_current_user=True, include_creator=True, include_managers=True,
-                                  include_contact=True, include_chairs=True, extra=None):
+    def get_allowed_sender_emails(self, *, include_current_user=True, include_creator=True, include_managers=True,
+                                  include_contact=True, include_chairs=True, include_noreply=False, extra=None):
         """
         Return the emails of people who can be used as senders (or
         rather Reply-to contacts) in emails sent from within an event.
@@ -849,6 +850,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                 emails
         :param include_chairs: Whether to include the emails of event
                                chairpersons (or lecture speakers)
+        :param include_noreply: Whether to include the global noreply
+                                address
         :param extra: An email address that is always included, even
                       if it is not in any of the included lists.
         :return: A dictionary mapping emails to pretty names
@@ -872,11 +875,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         # Chairs
         if include_chairs:
             emails.update((pl.email, pl.full_name) for pl in self.person_links if pl.email)
+        # Noreply
+        if include_noreply:
+            emails.setdefault(config.NO_REPLY_EMAIL, None)
         # Extra email (e.g. the current value in an object from the DB)
         if extra:
-            emails.setdefault(extra, extra)
+            emails.setdefault(extra, None)
         # Sanitize and format emails
-        emails = {email.strip().lower(): f'{name} <{email}>'
+        emails = {email.strip().lower(): (f'{name} <{email}>' if name else email)
                   for email, name in emails.items()
                   if email and email.strip()}
         own_email = session.user.email if has_request_context() and session.user else None

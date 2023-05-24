@@ -47,6 +47,8 @@ Improvements
 - Log detailed changes when editing contributions (:pr:`5777`)
 - Allow managers to ignore required field restrictions in registration forms
   (:issue:`5644`, :pr:`5682`, thanks :user:`kewisch`)
+- Allow selecting the global noreply address as the sender for event reminders
+  (:pr:`5784`)
 
 Bugfixes
 ^^^^^^^^
