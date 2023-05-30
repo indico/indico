@@ -11,8 +11,6 @@ Hours: 13:37 - 14:37
 You can check the details of the booking here:
 http://localhost/rooms/booking/1337
 
-
 --
-Best regards,
 Indico :: Room Booking
 http://localhost/rooms/
