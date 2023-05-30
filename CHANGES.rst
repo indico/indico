@@ -71,6 +71,8 @@ Improvements
   (:issue:`5644`, :pr:`5682`, thanks :user:`kewisch`)
 - Allow selecting the global noreply address as the sender for event reminders
   (:pr:`5784`)
+- Allow admins to change the password of local accounts (:pr:`5789`, thanks
+  :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^
