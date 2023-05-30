@@ -15,6 +15,7 @@ from flask import render_template
 from indico.modules.rb.models.blocked_rooms import BlockedRoomState
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping, ReservationState
+from indico.testing.util import assert_email_snapshot
 from indico.web.flask.templating import get_template_module
 
 
@@ -26,7 +27,7 @@ def _assert_snapshot(snapshot, template_name, type,  suffix='', /, **context):
     template = get_template_module(f'rb/emails/{type}/{template_name}', **context)
     snapshot.snapshot_dir = Path(__file__).parent.parent / f'templates/emails/{type}/tests'
     snapshot_name, snapshot_ext = os.path.splitext(template_name)
-    snapshot.assert_match(template.get_body(), snapshot_name + suffix + snapshot_ext)
+    assert_email_snapshot(snapshot, template, snapshot_name + suffix + snapshot_ext)
 
 
 @pytest.mark.parametrize(('suffix', 'rooms'), (
