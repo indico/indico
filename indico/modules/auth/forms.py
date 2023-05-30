@@ -7,6 +7,7 @@
 
 from fnmatch import fnmatch
 
+from flask import session
 from wtforms.fields import EmailField, PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
@@ -71,6 +72,8 @@ class EditLocalIdentityForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.identity = kwargs.pop('identity', None)
         super().__init__(*args, **kwargs)
+        if session.user.is_admin and session.user != self.identity.user:
+            del self.password
 
     def validate_password(self, field):
         if field.data != self.identity.password:
