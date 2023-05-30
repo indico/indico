@@ -310,6 +310,10 @@ class RHUpdateBooking(RHBookingBase):
             'repeat_interval': args['repeat_interval'],
         }
 
+        # allow updating the internal notes only if the setting is enabled
+        if rb_settings.get('internal_notes_enabled'):
+            new_booking_data['internal_note'] = args['internal_note']
+
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):
             has_slot_changed = not has_same_slots(self.booking, new_booking_data)

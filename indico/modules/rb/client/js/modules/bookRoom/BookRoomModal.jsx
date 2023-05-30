@@ -629,6 +629,33 @@ class BookRoomModal extends React.Component {
                     fprops.form.mutators
                   )}
               </Form>
+
+              {room.canUserViewInternalNotes && (
+                <Form
+                  id="book-notes-form"
+                  onSubmit={fprops.handleSubmit}
+                  style={{paddingTop: '1em'}}
+                >
+                  <Segment inverted styleName="booking-notes-section">
+                    <h3 style={{marginBottom: '0.5em'}}>
+                      <Icon name="clipboard list" />
+                      <Translate>Notes</Translate>
+                    </h3>
+                    <p>
+                      <Translate>
+                        Internal notes about the booking that will only be shown to room booking
+                        managers
+                      </Translate>
+                    </p>
+                    <FinalTextArea
+                      name="internalNote"
+                      placeholder={Translate.string('(Optional)')}
+                      disabled={fprops.submitSucceeded}
+                    />
+                  </Segment>
+                </Form>
+              )}
+
               {preConflictsExist && !fprops.submitSucceeded && this.renderPreConflictMessage()}
               {conflictsExist &&
                 this.renderBookingConstraints(
@@ -719,7 +746,7 @@ export default connect(
         fetchRelatedEvents: actions.fetchRelatedEvents,
         resetRelatedEvents: actions.resetRelatedEvents,
         createBooking: (data, props) => {
-          const {reason, usage, user, linkType, linkId, linkBack} = data;
+          const {reason, internalNote, usage, user, linkType, linkId, linkBack} = data;
           const {
             bookingData: {recurrence, dates, timeSlot, isPrebooking},
             room,
@@ -728,6 +755,7 @@ export default connect(
           return actions.createBooking(
             {
               reason,
+              internalNote,
               usage,
               user,
               recurrence,

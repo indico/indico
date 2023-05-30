@@ -36,6 +36,7 @@ rb_settings = SettingsProxy('roombooking', {
     'end_notification_weekly': 3,
     'end_notification_monthly': 7,
     'end_notifications_enabled': True,
+    'internal_notes_enabled': False,
     'booking_limit': 365,
     'tileserver_url': None,
     'grace_period': None,

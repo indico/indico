@@ -219,6 +219,7 @@ Improvements
   (:pr:`5784`)
 - Allow admins to change the password of local accounts (:pr:`5789`, thanks
   :user:`omegak`)
+- Allow room managers to add internal notes to bookings (:issue:`5746`, :pr:`5791`)
 
 Bugfixes
 ^^^^^^^^

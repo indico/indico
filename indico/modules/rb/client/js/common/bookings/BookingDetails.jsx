@@ -281,6 +281,23 @@ class BookingDetails extends React.Component {
     </Message>
   );
 
+  renderNotes = internalNote => {
+    if (!internalNote) {
+      return null;
+    }
+    return (
+      <Message warning icon styleName="message-icon">
+        <Icon name="clipboard list" style={{marginRight: '0.4em'}} />
+        <Message.Content>
+          <Message.Header>
+            <Translate>Internal notes</Translate>
+          </Message.Header>
+          {internalNote}
+        </Message.Content>
+      </Message>
+    );
+  };
+
   _getRowSerializer = day => {
     const {
       booking: {room},
@@ -829,6 +846,7 @@ class BookingDetails extends React.Component {
         room,
         bookedForUser,
         bookingReason,
+        internalNote,
         editLogs,
         createdDt,
         createdByUser,
@@ -896,6 +914,7 @@ class BookingDetails extends React.Component {
                 <>
                   {bookedForUser && this.renderBookedFor(bookedForUser)}
                   {this.renderReason(bookingReason)}
+                  {room.canUserViewInternalNotes && this.renderNotes(internalNote)}
                   {isLinkedToObject && (
                     <LazyBookingObjectLink type={_.camelCase(link.type)} id={link.id} />
                   )}

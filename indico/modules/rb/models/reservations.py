@@ -203,6 +203,11 @@ class Reservation(db.Model):
         nullable=False,
         default=False
     )
+    internal_note = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
 
     edit_logs = db.relationship(
         'ReservationEditLog',
@@ -335,6 +340,7 @@ class Reservation(db.Model):
             if field in data:
                 setattr(reservation, field, data[field])
         reservation.room = room
+        reservation.internal_note = data.get('internal_note')
         reservation.booked_for_user = data.get('booked_for_user') or user
         reservation.booked_for_name = reservation.booked_for_user.full_name
         reservation.state = ReservationState.pending if prebook else ReservationState.accepted
@@ -568,7 +574,7 @@ class Reservation(db.Model):
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
-                           'booking_reason')
+                           'booking_reason', 'internal_note')
         # fields affecting occurrences
         occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'}
         # fields where date and time are compared separately
@@ -609,6 +615,9 @@ class Reservation(db.Model):
                 # If any occurrence-related field changed we need to recreate the occurrences
                 if field in occurrence_fields:
                     update_occurrences = True
+                # If the internal notes are being updated then we don't bother updating the edit log with this
+                if field == 'internal_note':
+                    continue
                 # Record change for history entry
                 if field in date_time_fields:
                     # The date/time fields create separate entries for the date and time parts
