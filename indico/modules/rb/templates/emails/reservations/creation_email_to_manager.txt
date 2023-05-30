@@ -4,11 +4,11 @@
 {% block subject -%}
     {% if prebooking -%}
         {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
-            [{{ room }}] New Pre-Booking on ({{ start }})
+            [{{ room }}] New Pre-Booking ({{ start }})
         {%- endtrans %}
     {%- else -%}
         {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
-            [{{ room }}] New booking on ({{ start }})
+            [{{ room }}] New booking ({{ start }})
         {%- endtrans %}
     {%- endif %}
 {%- endblock %}
