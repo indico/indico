@@ -301,7 +301,7 @@ def test_reject(smtp, create_reservation, dummy_user, silent):
         assert occurrence.reservation.edit_logs.count() == 1
         assert occurrence.reservation.edit_logs[0].user_name == dummy_user.full_name
         assert len(occurrence.reservation.edit_logs[0].info) == 2
-        extract_emails(smtp, count=2, regex=True, subject=r'Booking rejected on .+ \(SINGLE OCCURRENCE\)')
+        extract_emails(smtp, count=2, regex=True, subject=r'Booking rejected \(.+\) \(SINGLE OCCURRENCE\)')
     assert not smtp.outbox
 
 
