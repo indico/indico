@@ -13,6 +13,8 @@ from flask import has_request_context, request
 from flask_limiter import Limiter
 from limits import parse_many
 
+from indico.util.signals import make_interceptable
+
 
 class IndicoRedisStorage(limits.storage.RedisStorage):
     # This is needed so redis also works with unix sockets. For details, see:
@@ -79,6 +81,7 @@ def make_rate_limiter(scope, limits):
     return RateLimit(limiter, limiter._key_func, scope, limits)
 
 
+@make_interceptable
 def _limiter_key():
     return request.remote_addr if has_request_context() else 'dummy.ip'
 
