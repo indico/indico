@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix width of time column in PDF timetable when using 12-hour time format (:pr:`5788`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

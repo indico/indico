@@ -573,7 +573,9 @@ class TimeTablePlain(PDFWithTOC):
                             ts.add('BACKGROUND', (0, 1), (0, -1), self._getSessionColor(sess_block))
                         t = Table(l, colWidths=widths, style=ts)
                 else:  # it's not a poster
+                    formatted_times = set()
                     for s_entry in sorted(sess_block.timetable_entry.children, key=attrgetter('start_dt')):
+                        formatted_times.add(format_time(s_entry.start_dt, timezone=self._tz))
                         obj = s_entry.object
                         if s_entry.type == TimetableEntryType.CONTRIBUTION:
                             if self._ttPDFFormat.showContribAbstract():
@@ -600,7 +602,9 @@ class TimeTablePlain(PDFWithTOC):
                         if not self._ttPDFFormat.showContribId():
                             title = 'title'
                         row = self._fontifyRow(['time', title, 'presenter'], 11)
-                        widths = [1 * cm, None, 5 * cm]
+                        max_time_len = len(max(formatted_times, key=len)) if formatted_times else 0
+                        time_width = 1 if max_time_len <= 5 else 1.65
+                        widths = [time_width * cm, None, 5 * cm]
                         if self._useColors():
                             row.insert(0, '')
                             widths.insert(0, 0.2 * cm)
