@@ -122,7 +122,7 @@ def test_reservation_modification_emails_plaintext(snapshot, snapshot_name, crea
     'occurrence_rejection_email_to_manager.txt', 'occurrence_rejection_email_to_user.txt'
 ))
 def test_reservation_occurrence_emails_plaintext(snapshot, snapshot_name, create_reservation):
-    res = create_reservation(id=0, start_dt=datetime(2022, 11, 11, 13, 37), end_dt=datetime(2022, 11, 12, 14, 37))
+    res = create_reservation(id=0, start_dt=datetime(2022, 11, 10, 13, 37), end_dt=datetime(2022, 11, 12, 14, 37))
     occurrence = {'start_dt': datetime(2022, 11, 11, 13, 37), 'rejection_reason': 'A valid reason!'}
     _assert_snapshot(snapshot, snapshot_name, 'reservations', reservation=res, occurrence=occurrence)
 
