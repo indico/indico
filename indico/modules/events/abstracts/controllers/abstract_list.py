@@ -298,11 +298,11 @@ class RHAbstractsAPIEmailAbstractRolesMetadata(EmailRolesMetadataMixin, RHManage
     object_context = 'abstracts'
 
 
-class RHAbstractsAPIEmailAbstractRolesPreview(EmailRolesPreviewMixin, RHManageAbstractsBase):
+class RHAbstractsAPIEmailAbstractRolesPreview(EmailRolesPreviewMixin, RHManageAbstractsActionsBase):
     object_context = 'abstracts'
 
     def get_placeholder_kwargs(self):
-        abstract = self.event.abstracts[0]
+        abstract = self.abstracts[0]
         return {'person': abstract.submitter, 'abstract': abstract}
 
 

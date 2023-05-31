@@ -19,7 +19,8 @@ Security fixes
 Improvements
 ^^^^^^^^^^^^
 
-- None so far :(
+- Show actual recipient data in the email preview instead of the that of the event creator
+  (:pr:`5794`)
 
 Bugfixes
 ^^^^^^^^

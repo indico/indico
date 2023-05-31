@@ -10,6 +10,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.editing.controllers.base import RHEditableTypeManagementBase, RHEditingManagementBase
 from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
@@ -26,6 +27,7 @@ from indico.modules.events.editing.settings import editable_type_settings, editi
 from indico.modules.events.editing.util import get_editors
 from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
                                                                  EmailRolesSendMixin)
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _, orig_string
 from indico.web.args import use_kwargs, use_rh_args, use_rh_kwargs
@@ -279,9 +281,15 @@ class RHEmailNotSubmittedEditablesPreview(EmailRolesPreviewMixin, RHEditableType
     object_context = 'contributions'
 
     def get_placeholder_kwargs(self):
-        contribution = Contribution.query.with_parent(self.event).first()
-        # none of the contributions are guaranteed to have a person so we use the event creator...
-        return {'person': self.event.creator, 'contribution': contribution}
+        query = Contribution.query.with_parent(self.event).filter(
+            ~Contribution.editables.any(Editable.type == self.editable_type)
+        )
+        if contribution := query.join(ContributionPersonLink).join(EventPerson).filter(EventPerson.email != '').first():
+            person = next(p for p in contribution.person_links if p.email)
+        else:
+            contribution = query.first()
+            person = self.event.creator
+        return {'person': person, 'contribution': contribution}
 
 
 class RHEmailNotSubmittedEditablesSend(EmailRolesSendMixin, RHEditableTypeManagementBase):
