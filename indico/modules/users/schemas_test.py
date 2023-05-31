@@ -19,6 +19,7 @@ from indico.modules.events.notes.models.notes import EventNote
 from indico.modules.events.static.models.static import StaticSite
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest, DataExportRequestState
+from indico.modules.users.models.users import NameFormat
 
 
 pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
@@ -35,6 +36,7 @@ def freeze_time():
 @pytest.fixture
 def snapshot(snapshot):
     def assert_json_match(data, filename):
+        __tracebackhide__ = True
         snapshot.assert_match(json.dumps(data, indent=2, sort_keys=True), filename)
 
     snapshot.snapshot_dir = Path(__file__).parent / 'tests'
@@ -66,6 +68,23 @@ def test_data_export_request_schema(db, dummy_user):
         'selected_options': ['attachments'],
         'url': None
     }
+
+
+def setup_settings(settings):
+    settings.set_multi({
+        'name_format': NameFormat.first_last_upper,
+        'timezone': 'Europe/Paris',
+        'lang': 'en_US',
+        'use_previewer_pdf': False
+    })
+
+
+def test_settings_export_schema(snapshot, dummy_user):
+    from indico.modules.users.schemas import SettingsExportSchema
+
+    setup_settings(dummy_user.settings)
+    data = SettingsExportSchema().dump(dummy_user.settings.get_all())
+    snapshot.assert_json_match(data, 'settings_export_schema.json')
 
 
 def setup_personal_data(dummy_user, dummy_event, dummy_category):
@@ -138,7 +157,7 @@ def setup_room_booking(user, room):
     user.owned_rooms.append(room)
 
 
-@pytest.mark.usefixtures('dummy_reservation')
+@pytest.mark.usefixtures('freeze_time', 'dummy_reservation')
 def test_room_booking_export_schema(snapshot, db, dummy_user, dummy_room):
     from indico.modules.users.schemas import RoomBookingExportSchema
 
@@ -202,6 +221,7 @@ def test_user_data_export_schema(snapshot, db, dummy_user, dummy_category, dummy
                                  dummy_subcontribution, dummy_event_person, dummy_room):
     from indico.modules.users.schemas import UserDataExportSchema
 
+    setup_settings(dummy_user.settings)
     setup_personal_data(dummy_user, dummy_event, dummy_category)
     setup_contributions(db, dummy_user, dummy_contribution, dummy_event_person)
     setup_subcontributions(db, dummy_user, dummy_subcontribution, dummy_event_person)

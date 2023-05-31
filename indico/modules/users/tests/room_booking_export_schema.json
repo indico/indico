@@ -29,14 +29,14 @@
     {
       "booked_for_name": "Guinea Pig",
       "booking_reason": "Testing",
-      "end_dt": "2023-05-30T17:30:00",
+      "end_dt": "2022-05-22T17:30:00",
       "id": 42,
       "is_accepted": true,
       "is_repeating": false,
       "repeat_frequency": "NEVER",
       "repeat_interval": 0,
       "room_id": 42,
-      "start_dt": "2023-05-30T08:30:00"
+      "start_dt": "2022-05-22T08:30:00"
     }
   ]
 }

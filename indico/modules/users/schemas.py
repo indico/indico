@@ -353,7 +353,7 @@ class SettingsExportSchema(Schema):
                   'suggest_categories', 'synced_fields', 'timezone', 'use_markdown_for_minutes',
                   'use_previewer_pdf')
 
-    name_format = Enum(NameFormat)
+    name_format = Function(lambda settings: NameFormat(settings['name_format']).name)
 
 
 class UserDataExportSchema(mm.SQLAlchemyAutoSchema):

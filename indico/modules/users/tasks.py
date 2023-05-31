@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import os
 from datetime import timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -80,11 +79,12 @@ def export_user_data(user, options):
     temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
     try:
         generate_zip(user, options, temp_file)
-    except Exception as exc:
-        logger.warning('Could not create a zip file for export %r: %s', export_request, exc)
-        os.unlink(temp_file.name)
+    except Exception:
+        logger.exception('Could not create a zip file for export %r', export_request)
+        export_request.state = DataExportRequestState.failed
+        export_request.file = None
+        Path(temp_file.name).unlink(missing_ok=True)
         notify_data_export_failure(export_request)
-        return
 
     file = File(filename='data-export.zip', content_type='application/zip')
     try:
@@ -93,8 +93,8 @@ def export_user_data(user, options):
         export_request.file = file
         export_request.state = DataExportRequestState.success
         db.session.commit()
-    except Exception as exc:
-        logger.warning('Could not create a user data export %r: %s', export_request, exc)
+    except Exception:
+        logger.exception('Could not create a user data export %r', export_request)
         export_request.state = DataExportRequestState.failed
         export_request.file = None
         file.delete()
@@ -103,7 +103,7 @@ def export_user_data(user, options):
     else:
         notify_data_export_success(export_request)
     finally:
-        os.unlink(temp_file.name)
+        Path(temp_file.name).unlink(missing_ok=True)
 
 
 @celery.task(name='export_user_data')

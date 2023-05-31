@@ -141,7 +141,7 @@ function DataExport({userId, request, exportOptions}) {
                 <Message info>
                   <Message.Header>
                     <Translate>
-                      We are preparing your data. We will notify you via email, when the export is
+                      We are preparing your data. We will notify you via email when the export is
                       finished.
                     </Translate>
                   </Message.Header>
