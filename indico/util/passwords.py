@@ -132,7 +132,7 @@ def _get_pwned_hashes(prefix, timeout=1):
     return {x.split(':', 1)[0] for x in resp.text.splitlines() if not x.endswith(':0')}
 
 
-def check_password_pwned(password, fast=False):
+def check_password_pwned(password, *, fast=False):
     """Check if a password is in the pwned-passwords list.
 
     :param password: The plaintext password
@@ -192,5 +192,5 @@ def validate_secure_password(context, password, *, username='', fast=False):
     if len(username) >= 5 and len(password) <= 16 and username.lower() in password.lower():
         return _('Passwords may not contain your username.')
 
-    if check_password_pwned(password):
+    if check_password_pwned(password, fast=fast):
         return _('This password has been seen in previous data breaches.')
