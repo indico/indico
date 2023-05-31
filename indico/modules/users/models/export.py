@@ -114,5 +114,13 @@ class DataExportRequest(db.Model):
     def locator(self):
         return {'user_id': self.user_id, 'id': self.id}
 
+    def succeed(self, file):
+        self.file = file
+        self.state = DataExportRequestState.success
+
+    def fail(self):
+        self.file = None
+        self.state = DataExportRequestState.failed
+
     def __repr__(self):
         return f'<DataExportRequest({self.id}, {self.user_id}, {self.state}, {self.file})>'

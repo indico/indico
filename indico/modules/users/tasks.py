@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from contextlib import suppress
 from datetime import timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -78,32 +79,32 @@ def export_user_data(user, options):
 
     temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
     try:
-        generate_zip(user, options, temp_file)
+        _export_user_data(user, export_request, temp_file)
     except Exception:
-        logger.exception('Could not create a zip file for export %r', export_request)
-        export_request.state = DataExportRequestState.failed
-        export_request.file = None
-        Path(temp_file.name).unlink(missing_ok=True)
+        logger.exception('Could not create a user data export %r', export_request)
+        export_request.fail()
+        db.session.commit()
         notify_data_export_failure(export_request)
+    finally:
+        Path(temp_file.name).unlink(missing_ok=True)
+
+
+def _export_user_data(user, export_request, buffer):
+    generate_zip(user, export_request.selected_options, buffer, config.MAX_DATA_EXPORT_SIZE)
+    buffer.seek(0)
 
     file = File(filename='data-export.zip', content_type='application/zip')
     try:
-        file.save(('user', user.id), temp_file)
+        file.save(('user', user.id), buffer)
         file.claim()
-        export_request.file = file
-        export_request.state = DataExportRequestState.success
+        export_request.succeed(file)
         db.session.commit()
-    except Exception:
-        logger.exception('Could not create a user data export %r', export_request)
-        export_request.state = DataExportRequestState.failed
-        export_request.file = None
-        file.delete()
-        db.session.commit()
-        notify_data_export_failure(export_request)
+    except Exception as exc:
+        with suppress(Exception):
+            file.delete()
+        raise exc
     else:
         notify_data_export_success(export_request)
-    finally:
-        Path(temp_file.name).unlink(missing_ok=True)
 
 
 @celery.task(name='export_user_data')
@@ -125,52 +126,39 @@ def get_data(user, options):
     return UserDataExportSchema(only=fields).dump(user)
 
 
-def generate_zip(user, options, temp_file):
+def generate_zip(user, options, temp_file, max_size_mb):
     data = get_data(user, options)
-
-    with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_file:
+    with ZipFile(temp_file, 'w', allowZip64=True) as zip_file:
         zip_file.writestr('/data.yml', yaml.dump(data))
-
-        if DataExportOptions.registrations in options:
-            registration_data = get_registration_data(user)
-            write_registration_files(zip_file, registration_data)
-
-        if DataExportOptions.attachments in options:
-            attachments = get_attachments(user)
-            write_attachment_files(zip_file, attachments)
-
-        if DataExportOptions.abstracts_papers in options:
-            abstracts = get_abstracts(user)
-            papers = get_papers(user)
-            write_abstract_files(zip_file, abstracts)
-            write_paper_files(zip_file, papers)
+        size_mb = 0
+        for file in collect_files(user, options):
+            size_mb += file.size / 1024  # file size is in KB
+            if size_mb <= max_size_mb:
+                write_file(zip_file, file)
+            else:
+                logger.warning('User data export exceeds size limit, exporting only partial data: %r',
+                               user.data_export_request)
 
 
-def write_registration_files(zip_file, registration_data):
-    for data in registration_data:
-        write_file(zip_file, data)
+def collect_files(user, options):
+    if DataExportOptions.attachments in options:
+        for attachment in get_attachments(user):
+            yield attachment.file
+
+    if DataExportOptions.abstracts_papers in options:
+        for abstract in get_abstracts(user):
+            yield from abstract.files
+
+        for paper in get_papers(user):
+            yield from paper.files
+
+    if DataExportOptions.registrations in options:
+        yield from get_registration_data(user)
 
 
-def write_attachment_files(zip_file, attachments):
-    for attachment in attachments:
-        write_file(zip_file, attachment.file)
-
-
-def write_abstract_files(zip_file, abstracts):
-    for abstract in abstracts:
-        for file in abstract.files:
-            write_file(zip_file, file)
-
-
-def write_paper_files(zip_file, papers):
-    for paper in papers:
-        for file in paper.files:
-            write_file(zip_file, file)
-
-
-def write_file(zip_file, object):
-    path = build_storage_path(object)
-    with object.open() as f:
+def write_file(zip_file, file):
+    path = build_storage_path(file)
+    with file.open() as f:
         zip_file.writestr(path, f.read())
 
 

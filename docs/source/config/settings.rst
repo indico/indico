@@ -746,6 +746,15 @@ Storage
 
     Default: ``None``
 
+.. data:: MAX_DATA_EXPORT_SIZE
+
+    The maximum file size (in MB) for the user data export zip archive.
+    Note that this limit does not apply to the main ``data.yml`` file which is
+    always generated and typically does not exceed several megabytes. However,
+    any additional files such as attachments, papers, etc., that the user might
+    have and that do not fit within the limit are not included in the exported
+    archive. The default size is 10GB.
+
 
 System
 ------

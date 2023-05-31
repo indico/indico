@@ -6,12 +6,12 @@
 # LICENSE file for more details.
 
 from datetime import datetime
-from tempfile import NamedTemporaryFile
+from io import BytesIO
+from pathlib import Path
 from zipfile import ZipFile
 
 import pytest
 
-from indico.core.config import config
 from indico.modules.files.models.files import File
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest, DataExportRequestState
 from indico.modules.users.tasks import _get_old_requests, build_storage_path, export_user_data, generate_zip, get_data
@@ -20,6 +20,20 @@ from indico.util.date_time import now_utc
 
 pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
                   'indico.modules.users.testing.fixtures')
+
+
+@pytest.fixture
+def mock_io(mocker):
+    class MockBytesIO(BytesIO):
+        name = '/tmp/somefile'  # for temp_file.name
+
+        def __init__(self, *args, **kwargs):  # for NamedTemporaryFile constructor
+            super().__init__()
+
+    # We don't want to write to the disk
+    mocker.patch('indico.modules.users.tasks.NamedTemporaryFile', MockBytesIO)
+    # We don't want to delete anything from the disk either
+    mocker.patch.object(Path, 'unlink')
 
 
 def test_build_storage_path(dummy_reg_with_file_field, dummy_attachment, dummy_abstract_file, dummy_paper_file):
@@ -63,20 +77,22 @@ def test_get_data_convert_options_to_fields(mocker, dummy_user):
 
 def test_generate_zip_no_files(dummy_user):
     options = [DataExportOptions.personal_data]
-    temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
-    generate_zip(dummy_user, options, temp_file)
+    buffer = BytesIO()
+    generate_zip(dummy_user, options, buffer, max_size_mb=0)
+    buffer.seek(0)
 
-    zip = ZipFile(temp_file.name)
+    zip = ZipFile(buffer)
     assert zip.namelist() == ['/data.yml']
 
 
 @pytest.mark.usefixtures('dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file')
 def test_generate_zip_all_options(dummy_user):
     options = list(DataExportOptions)
-    temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
-    generate_zip(dummy_user, options, temp_file)
+    buffer = BytesIO()
+    generate_zip(dummy_user, options, buffer, max_size_mb=100)
+    buffer.seek(0)
 
-    zip = ZipFile(temp_file.name)
+    zip = ZipFile(buffer)
     assert zip.namelist() == [
         '/data.yml',
         'attachments/42_dummy_file.txt',
@@ -86,6 +102,32 @@ def test_generate_zip_all_options(dummy_user):
     ]
 
 
+@pytest.mark.usefixtures('dummy_attachment')
+def test_generate_zip_max_size_exceeds_1(dummy_user):
+    options = list(DataExportOptions)
+    buffer = BytesIO()
+    generate_zip(dummy_user, options, buffer, max_size_mb=0)
+    buffer.seek(0)
+
+    zip = ZipFile(buffer)
+    # max_size_mb is set 0, so only the data file should be exported
+    assert zip.namelist() == ['/data.yml']
+
+
+@pytest.mark.usefixtures('dummy_abstract_file')
+def test_generate_zip_max_size_exceeds_2(dummy_user, dummy_attachment):
+    options = list(DataExportOptions)
+    # Set max_size_mb to cover only the attachment, but no the abstract file
+    buffer = BytesIO()
+    generate_zip(dummy_user, options, buffer, max_size_mb=dummy_attachment.file.size / 1024)
+    buffer.seek(0)
+
+    zip = ZipFile(buffer)
+    # Only the attachment should be exported
+    assert zip.namelist() == ['/data.yml', 'attachments/42_dummy_file.txt',]
+
+
+@pytest.mark.usefixtures('mock_io')
 def test_export_user_data(mocker, dummy_user):
     success = mocker.patch('indico.modules.users.tasks.notify_data_export_success')
     failure = mocker.patch('indico.modules.users.tasks.notify_data_export_failure')
@@ -104,7 +146,7 @@ def test_export_user_data(mocker, dummy_user):
         assert zip.namelist() == ['/data.yml']
 
 
-@pytest.mark.usefixtures('dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file')
+@pytest.mark.usefixtures('mock_io', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file')
 def test_export_user_data_all_options(mocker, dummy_user):
     success = mocker.patch('indico.modules.users.tasks.notify_data_export_success')
     failure = mocker.patch('indico.modules.users.tasks.notify_data_export_failure')
@@ -129,6 +171,7 @@ def test_export_user_data_all_options(mocker, dummy_user):
         ]
 
 
+@pytest.mark.usefixtures('mock_io')
 def test_export_user_data_existing_request(mocker, db, dummy_user):
     mock = mocker.patch('indico.modules.users.tasks.generate_zip')
 
@@ -139,6 +182,7 @@ def test_export_user_data_existing_request(mocker, db, dummy_user):
     mock.assert_not_called()
 
 
+@pytest.mark.usefixtures('mock_io')
 def test_export_user_data_zip_error(mocker, dummy_user):
     success = mocker.patch('indico.modules.users.tasks.notify_data_export_success')
     failure = mocker.patch('indico.modules.users.tasks.notify_data_export_failure')
@@ -152,6 +196,7 @@ def test_export_user_data_zip_error(mocker, dummy_user):
     success.assert_not_called()
 
 
+@pytest.mark.usefixtures('mock_io')
 def test_export_user_data_file_claim_error(mocker, dummy_user):
     success = mocker.patch('indico.modules.users.tasks.notify_data_export_success')
     failure = mocker.patch('indico.modules.users.tasks.notify_data_export_failure')

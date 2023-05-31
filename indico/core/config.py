@@ -62,6 +62,7 @@ DEFAULTS = {
     'LOGIN_LOGO_URL': None,
     'LOGO_URL': None,
     'LOG_DIR': '/opt/indico/log',
+    'MAX_DATA_EXPORT_SIZE': 10 * 1024,  # 10GB
     'MAX_UPLOAD_FILES_TOTAL_SIZE': 0,
     'MAX_UPLOAD_FILE_SIZE': 0,
     'MEMCACHED_SERVERS': [],
