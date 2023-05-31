@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import redirect, request, session
+from flask import flash, redirect, request, session
 from flask_multipass import MultipassException
 from werkzeug.exceptions import Forbidden
 
@@ -139,4 +139,5 @@ def _handle_insecure_password_logins(app, **kwargs):
         if request.is_xhr or request.is_json:
             return
 
+        flash(_('You logged in with an insecure password. Please change it to continue using Indico.'), 'danger')
         return redirect(url_for('auth.accounts'))
