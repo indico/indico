@@ -49,17 +49,34 @@ export default function ListFilter({
   const filters = onChangeFilters ? externalFilters : internalFilters;
   const searchText = onChangeSearchText ? externalSearchText : internalSearchText;
 
+  const matchFilters = (value, e) =>
+    filterOptions.every(
+      ({key, isMatch}) => !value[key] || !isMatch || isMatch(e, value[key] || [])
+    );
+
+  const matchSearch = (value, e) => {
+    if (!value) {
+      return true;
+    }
+    if (searchableId) {
+      const match = value.match(/^#(\d+)$/);
+      if (match) {
+        return searchableId(e) === +match[1];
+      }
+    }
+    return (
+      !searchableFields ||
+      searchableFields(e).some(f => f.toLowerCase().includes(value.toLowerCase()))
+    );
+  };
+
   const setFilters = value => {
     if (onChangeFilters) {
       onChangeFilters(value);
       return;
     }
     setInternalFilters(value);
-    const filtered = list.filter(x =>
-      filterOptions.every(
-        ({key, isMatch}) => !value[key] || !isMatch || isMatch(x, value[key] || [])
-      )
-    );
+    const filtered = list.filter(e => matchFilters(value, e) && matchSearch(searchText, e));
     onChangeList(new Set(filtered.map(e => e.id)));
   };
 
@@ -79,18 +96,7 @@ export default function ListFilter({
     }
     setInternalSearchText(value);
     value = value.toLowerCase().trim();
-    let filtered = list;
-    if (value) {
-      filtered = list.filter(e => {
-        if (searchableId) {
-          const match = value.match(/^#(\d+)$/);
-          if (match) {
-            return searchableId(e) === +match[1];
-          }
-        }
-        return !searchableFields || searchableFields(e).some(f => f.toLowerCase().includes(value));
-      });
-    }
+    const filtered = list.filter(e => matchFilters(filters, e) && matchSearch(value, e));
     onChangeList(new Set(filtered.map(e => e.id)));
   };
 

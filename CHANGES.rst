@@ -23,6 +23,7 @@ Bugfixes
   many registrants while not logged in (:pr:`5799`)
 - Fix title of session conveners being always empty in HTTP API with XML serialization
   (:pr:`5813`)
+- Fix editable filters not working simultaneously with editable search (:pr:`5796`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
