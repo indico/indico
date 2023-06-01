@@ -74,7 +74,6 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))
     _bp.add_url_rule('/emails/make-primary', 'user_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
     _bp.add_url_rule('/blocked', 'user_block', RHUserBlock, methods=('PUT', 'DELETE'))
-    # Data export
     _bp.add_url_rule('/data-export', 'user_data_export', RHUserDataExport)
     _bp.add_url_rule('/api/data-export', 'api_user_data_export', RHUserDataExportAPI, methods=('GET', 'POST'))
 

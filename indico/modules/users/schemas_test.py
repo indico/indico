@@ -26,14 +26,14 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
                   'indico.modules.users.testing.fixtures')
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def freeze_time():
     dt = datetime(2022, 5, 22, 12, 0, 0)
     with freezegun.freeze_time(dt):
         yield
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def snapshot(snapshot):
     def assert_json_match(data, filename):
         __tracebackhide__ = True

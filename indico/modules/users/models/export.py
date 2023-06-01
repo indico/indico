@@ -12,11 +12,11 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import L_
 
 
 class DataExportRequestState(RichIntEnum):
-    __titles__ = [_('Pending'), _('Running'), _('Success'), _('Failed'), _('Expired')]
+    __titles__ = [L_('Pending'), L_('Running'), L_('Success'), L_('Failed'), L_('Expired')]
     pending = 0  # Default value when there is no request
     running = 1
     success = 2
@@ -25,9 +25,9 @@ class DataExportRequestState(RichIntEnum):
 
 
 class DataExportOptions(RichIntEnum):
-    __titles__ = [_('Personal data'), _('Settings'), _('Minutes & Contributions'), _('Registrations'),
-                  _('Room booking data'), _('Abstracts & Papers'), _('Survey submissions'),
-                  _('Attachments & Materials'), _('Miscellaneous')]
+    __titles__ = [L_('Personal data'), L_('Settings'), L_('Minutes & Contributions'), L_('Registrations'),
+                  L_('Room booking data'), L_('Abstracts & Papers'), L_('Survey submissions'),
+                  L_('Attachments & Materials'), L_('Miscellaneous')]
     personal_data = 0
     settings = 1
     contribs = 2
@@ -42,7 +42,7 @@ class DataExportOptions(RichIntEnum):
 class DataExportRequest(db.Model):
     __tablename__ = 'data_export_requests'
     __table_args__ = (db.UniqueConstraint('user_id'),
-                      # If the state is 'success', there must be a file
+                      # If the state is 'success', there must be a file attached
                       db.CheckConstraint(f'(state != {DataExportRequestState.success}) OR (file_id IS NOT NULL)',
                                          'success_has_file'),
                       {'schema': 'users'})

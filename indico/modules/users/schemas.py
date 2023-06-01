@@ -7,6 +7,7 @@
 
 from marshmallow import Schema, fields, post_dump, post_load, validate
 from marshmallow.fields import DateTime, Dict, Enum, Function, List, Method, Nested, String, TimeDelta
+from speaklater import _LazyString
 
 from indico.core.marshmallow import mm
 from indico.core.oauth.models.applications import OAuthApplication
@@ -185,7 +186,21 @@ class RegistrationFileExportSchema(Schema):
 class RegistrationDataExportSchema(Schema):
     title = Function(lambda data: data.field_data.field.title)
     description = Function(lambda data: data.field_data.field.description)
-    data = Function(lambda data: data.field_data.field.get_friendly_data(data, for_humans=True))
+    data = Method('_get_data')
+
+    def _get_data(self, data):
+        friendly_data = data.field_data.field.get_friendly_data(data, for_humans=True)
+        return self._strip_lazy_strings(friendly_data)
+
+    def _strip_lazy_strings(self, data):
+        if isinstance(data, _LazyString):
+            return str(data)
+        elif isinstance(data, dict):
+            return {k: self._strip_lazy_strings(v) for k, v in data.items()}
+        elif isinstance(data, (list, tuple)):
+            return [self._strip_lazy_strings(v) for v in data]
+        else:
+            return data
 
     @post_dump(pass_original=True)
     def _add_file(self, data, original, **kwargs):

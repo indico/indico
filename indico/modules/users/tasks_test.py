@@ -22,7 +22,7 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
                   'indico.modules.users.testing.fixtures')
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def mock_io(mocker):
     class MockBytesIO(BytesIO):
         name = '/tmp/somefile'  # for temp_file.name
