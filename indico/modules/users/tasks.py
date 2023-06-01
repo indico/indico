@@ -79,7 +79,7 @@ def export_user_data(user, options):
 
     temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
     try:
-        _export_user_data(user, export_request, temp_file)
+        _export_user_data(export_request, temp_file)
     except Exception:
         logger.exception('Could not create a user data export %r', export_request)
         export_request.fail()
@@ -89,13 +89,13 @@ def export_user_data(user, options):
         Path(temp_file.name).unlink(missing_ok=True)
 
 
-def _export_user_data(user, export_request, buffer):
-    generate_zip(user, export_request.selected_options, buffer, config.MAX_DATA_EXPORT_SIZE)
+def _export_user_data(export_request, buffer):
+    generate_zip(export_request, buffer, config.MAX_DATA_EXPORT_SIZE)
     buffer.seek(0)
 
     file = File(filename='data-export.zip', content_type='application/zip')
     try:
-        file.save(('user', user.id), buffer)
+        file.save(('user', export_request.user.id), buffer)
         file.claim()
         export_request.succeed(file)
         db.session.commit()
@@ -112,8 +112,11 @@ def export_user_data_task(user, options):
     export_user_data(user, options)
 
 
-def get_data(user, options):
+def get_data(export_request):
     from indico.modules.users.schemas import UserDataExportSchema
+
+    user = export_request.user
+    options = export_request.selected_options
 
     options_map = {
         DataExportOptions.contribs: ('contributions', 'subcontributions'),
@@ -126,21 +129,26 @@ def get_data(user, options):
     return UserDataExportSchema(only=fields).dump(user)
 
 
-def generate_zip(user, options, temp_file, max_size_mb):
-    data = get_data(user, options)
+def generate_zip(export_request, temp_file, max_size_mb):
+    data = get_data(export_request)
     with ZipFile(temp_file, 'w', allowZip64=True) as zip_file:
         zip_file.writestr('/data.yml', yaml.dump(data))
         size_mb = 0
-        for file in collect_files(user, options):
+        for file in collect_files(export_request):
             size_mb += file.size / 1024  # file size is in KB
             if size_mb <= max_size_mb:
                 write_file(zip_file, file)
             else:
+                export_request.max_size_exceeded = True
                 logger.warning('User data export exceeds size limit, exporting only partial data: %r',
-                               user.data_export_request)
+                               export_request)
+                break
 
 
-def collect_files(user, options):
+def collect_files(export_request):
+    user = export_request.user
+    options = export_request.selected_options
+
     if DataExportOptions.attachments in options:
         for attachment in get_attachments(user):
             yield attachment.file
@@ -197,7 +205,8 @@ def notify_data_export_success(export_request):
     """Send an email to the user when a data export is completed"""
     with export_request.user.force_user_locale():
         template = get_template_module('users/emails/data_export_success.txt',
-                                       user=export_request.user, link=export_request.url)
+                                       user=export_request.user, link=export_request.url,
+                                       max_size_exceeded=export_request.max_size_exceeded)
         return make_email({export_request.user.email}, template=template, html=False)
 
 

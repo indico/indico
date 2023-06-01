@@ -27,6 +27,7 @@ def upgrade():
         sa.Column('requested_dt', UTCDateTime, nullable=False),
         sa.Column('selected_options', ARRAY(sa.Enum(DataExportOptions)), nullable=False),
         sa.Column('state', PyIntEnum(DataExportRequestState), nullable=False, server_default='0'),
+        sa.Column('max_size_exceeded', sa.Boolean(), nullable=False, server_default='false'),
         sa.Column('user_id', sa.Integer(), nullable=False, index=True),
         sa.Column('file_id', sa.Integer(), nullable=True, index=True),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),

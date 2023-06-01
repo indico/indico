@@ -159,6 +159,14 @@ function DataExport({userId, request, exportOptions}) {
                       You can download it from the link below
                     </Translate>
                   </Message>
+                  {request.maxSizeExceeded && (
+                    <Message warning>
+                      <Translate as="p" context="user data export">
+                        Some files were not exported due to exceeding the maximum allowed size of
+                        the archive. Consider selecting less options
+                      </Translate>
+                    </Message>
+                  )}
                   <InfoTable request={request} exportOptions={exportOptions} />
                   <div style={{display: 'flex', justifyContent: 'space-between'}}>
                     <Button primary icon labelPosition="right" as="a" href={request.url}>
@@ -218,6 +226,7 @@ DataExport.propTypes = {
     state: PropTypes.string.isRequired,
     requestedDt: PropTypes.string,
     selectedOptions: PropTypes.array,
+    maxSizeExceeded: PropTypes.bool,
     url: PropTypes.string,
   }).isRequired,
   exportOptions: PropTypes.array.isRequired,

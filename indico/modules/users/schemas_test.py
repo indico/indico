@@ -26,14 +26,14 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
                   'indico.modules.users.testing.fixtures')
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def freeze_time():
     dt = datetime(2022, 5, 22, 12, 0, 0)
     with freezegun.freeze_time(dt):
         yield
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def snapshot(snapshot):
     def assert_json_match(data, filename):
         __tracebackhide__ = True
@@ -66,6 +66,7 @@ def test_data_export_request_schema(db, dummy_user):
         'state': 'running',
         'requested_dt': '2022-05-22T12:00:00+00:00',
         'selected_options': ['attachments'],
+        'max_size_exceeded': False,
         'url': None
     }
 

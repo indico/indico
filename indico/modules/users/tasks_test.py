@@ -22,7 +22,7 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
                   'indico.modules.users.testing.fixtures')
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def mock_io(mocker):
     class MockBytesIO(BytesIO):
         name = '/tmp/somefile'  # for temp_file.name
@@ -55,30 +55,30 @@ def test_build_storage_path(dummy_reg_with_file_field, dummy_attachment, dummy_a
 
 
 def test_get_data(dummy_user):
-    options = list(DataExportOptions)
-    data = get_data(dummy_user, options)
+    request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
+    data = get_data(request)
     assert isinstance(data, dict)
 
 
 def test_get_data_convert_options_to_fields(mocker, dummy_user):
     mock = mocker.patch('indico.modules.users.schemas.UserDataExportSchema')
 
-    options = [DataExportOptions.contribs]
-    get_data(dummy_user, options)
+    request = DataExportRequest(user=dummy_user, selected_options=[DataExportOptions.contribs])
+    get_data(request)
     mock.assert_called_with(only=['contributions', 'subcontributions'])
     mock.reset_mock()
 
-    options = list(DataExportOptions)
-    get_data(dummy_user, options)
+    request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
+    get_data(request)
     mock.assert_called_with(only=['personal_data', 'settings', 'contributions', 'subcontributions',
                                   'registrations', 'room_booking', 'abstracts', 'papers',
                                   'survey_submissions', 'attachments', 'miscellaneous'])
 
 
 def test_generate_zip_no_files(dummy_user):
-    options = [DataExportOptions.personal_data]
+    request = DataExportRequest(user=dummy_user, selected_options=[DataExportOptions.personal_data])
     buffer = BytesIO()
-    generate_zip(dummy_user, options, buffer, max_size_mb=0)
+    generate_zip(request, buffer, max_size_mb=0)
     buffer.seek(0)
 
     zip = ZipFile(buffer)
@@ -87,9 +87,9 @@ def test_generate_zip_no_files(dummy_user):
 
 @pytest.mark.usefixtures('dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file')
 def test_generate_zip_all_options(dummy_user):
-    options = list(DataExportOptions)
+    request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
     buffer = BytesIO()
-    generate_zip(dummy_user, options, buffer, max_size_mb=100)
+    generate_zip(request, buffer, max_size_mb=100)
     buffer.seek(0)
 
     zip = ZipFile(buffer)
@@ -104,26 +104,28 @@ def test_generate_zip_all_options(dummy_user):
 
 @pytest.mark.usefixtures('dummy_attachment')
 def test_generate_zip_max_size_exceeds_1(dummy_user):
-    options = list(DataExportOptions)
+    request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
     buffer = BytesIO()
-    generate_zip(dummy_user, options, buffer, max_size_mb=0)
+    generate_zip(request, buffer, max_size_mb=0)
     buffer.seek(0)
 
     zip = ZipFile(buffer)
     # max_size_mb is set 0, so only the data file should be exported
+    assert request.max_size_exceeded
     assert zip.namelist() == ['/data.yml']
 
 
 @pytest.mark.usefixtures('dummy_abstract_file')
 def test_generate_zip_max_size_exceeds_2(dummy_user, dummy_attachment):
-    options = list(DataExportOptions)
+    request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
     # Set max_size_mb to cover only the attachment, but no the abstract file
     buffer = BytesIO()
-    generate_zip(dummy_user, options, buffer, max_size_mb=dummy_attachment.file.size / 1024)
+    generate_zip(request, buffer, max_size_mb=dummy_attachment.file.size / 1024)
     buffer.seek(0)
 
     zip = ZipFile(buffer)
     # Only the attachment should be exported
+    assert request.max_size_exceeded
     assert zip.namelist() == ['/data.yml', 'attachments/42_dummy_file.txt',]
 
 

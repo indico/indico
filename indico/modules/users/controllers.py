@@ -229,7 +229,7 @@ class RHUserDataExport(RHUserBase):
 
 class RHUserDataExportAPI(RHUserBase):
     @use_kwargs({
-        'options': fields.List(fields.Enum(DataExportOptions)),
+        'options': fields.List(fields.Enum(DataExportOptions), validate=validate.Length(min=1)),
     })
     def _process_POST(self, options):
         from indico.modules.users.tasks import export_user_data_task

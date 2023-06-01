@@ -81,6 +81,12 @@ class DataExportRequest(db.Model):
         nullable=False,
         default=DataExportRequestState.pending
     )
+    # Whether the export archive exceeded config.MAX_DATA_EXPORT_SIZE
+    max_size_exceeded = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     user = db.relationship(
         'User',

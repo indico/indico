@@ -110,7 +110,7 @@ class FavoriteEventSchema(mm.SQLAlchemyAutoSchema):
 class DataExportRequestSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = DataExportRequest
-        fields = ('state', 'requested_dt', 'selected_options', 'url')
+        fields = ('state', 'requested_dt', 'selected_options', 'max_size_exceeded', 'url')
 
     selected_options = List(Enum(DataExportOptions))
 

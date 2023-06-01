@@ -1,0 +1,13 @@
+Dear Guinea,
+
+Your Indico user data is ready for download.
+
+    Please note that some files were not exported due to exceeding the maximum allowed size of the archive. Consider selecting less options.
+
+
+
+Download link: attachment.zip
+
+--
+Indico :: Email Notifier
+http://localhost/

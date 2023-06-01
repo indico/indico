@@ -55,9 +55,20 @@ def test_reg_req_rejected_email_plaintext(snapshot, dummy_user):
     snapshot.assert_match(template.get_body(), 'registration_request_rejected.txt')
 
 
-@pytest.mark.parametrize('test_file', ('data_export_success.txt', 'data_export_failure.txt'))
-def test_data_export_notification_emails_plaintext(snapshot, dummy_user, test_file):
-    template = get_template_module(f'users/emails/{test_file}',
+def test_data_export_notification_email_failure_plaintext(snapshot, dummy_user):
+    template = get_template_module('users/emails/data_export_failure.txt',
                                    user=dummy_user, link='attachment.zip')
+    snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
+    snapshot.assert_match(template.get_body(), 'data_export_failure.txt')
+
+
+@pytest.mark.parametrize(('test_file', 'max_size_exceeded'), (
+    ('data_export_success_exceeded.txt', True),
+    ('data_export_success.txt', False)
+))
+def test_data_export_notification_email_success_plaintext(snapshot, dummy_user, test_file, max_size_exceeded):
+    template = get_template_module('users/emails/data_export_success.txt',
+                                   user=dummy_user, link='attachment.zip',
+                                   max_size_exceeded=max_size_exceeded)
     snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     snapshot.assert_match(template.get_body(), test_file)
