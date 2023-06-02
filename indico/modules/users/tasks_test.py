@@ -36,22 +36,23 @@ def mock_io(mocker):
     mocker.patch.object(Path, 'unlink')
 
 
-def test_build_storage_path(dummy_reg_with_file_field, dummy_attachment, dummy_abstract_file, dummy_paper_file):
-    file = dummy_reg_with_file_field.data[0]
-    path = build_storage_path(file)
-    assert path == 'registrations/0_dummy0/43_73_dummy_file.txt'
+def test_build_storage_path(dummy_reg_with_file_field, dummy_attachment, dummy_abstract_file,
+                            dummy_paper_file, dummy_editing_revision_file):
+    path = build_storage_path(dummy_reg_with_file_field.data[0])
+    assert path == 'registrations/0_dummy0/43_73_registration_upload.txt'
 
-    file = dummy_attachment.file
-    path = build_storage_path(file)
+    path = build_storage_path(dummy_attachment.file)
     assert path == 'attachments/42_dummy_file.txt'
 
-    file = dummy_abstract_file
-    path = build_storage_path(file)
-    assert path == 'abstracts/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/42_dummy_abstract_file.txt'
+    path = build_storage_path(dummy_abstract_file)
+    assert path == ('abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
+                    '42_dummy_abstract_file.txt')
 
-    file = dummy_paper_file
-    path = build_storage_path(file)
-    assert path == 'papers/42_Dummy_Contribution/42_dummy_file.txt'
+    path = build_storage_path(dummy_paper_file)
+    assert path == 'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt'
+
+    path = build_storage_path(dummy_editing_revision_file)
+    assert path == 'editables/paper/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt'
 
 
 def test_get_data(dummy_user):
@@ -72,7 +73,7 @@ def test_get_data_convert_options_to_fields(mocker, dummy_user):
     get_data(request)
     mock.assert_called_with(only=['personal_data', 'settings', 'contributions', 'subcontributions',
                                   'registrations', 'room_booking', 'abstracts', 'papers',
-                                  'survey_submissions', 'attachments', 'miscellaneous'])
+                                  'survey_submissions', 'attachments', 'editables', 'miscellaneous'])
 
 
 def test_generate_zip_no_files(dummy_user):
@@ -85,7 +86,8 @@ def test_generate_zip_no_files(dummy_user):
     assert zip.namelist() == ['/data.yml']
 
 
-@pytest.mark.usefixtures('dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file')
+@pytest.mark.usefixtures('dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
+                         'dummy_editing_revision_file', 'dummy_reg_with_file_field')
 def test_generate_zip_all_options(dummy_user):
     request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
     buffer = BytesIO()
@@ -96,9 +98,11 @@ def test_generate_zip_all_options(dummy_user):
     assert zip.namelist() == [
         '/data.yml',
         'attachments/42_dummy_file.txt',
-        'abstracts/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/' +
-        '42_dummy_abstract_file.txt',
-        'papers/42_Dummy_Contribution/42_dummy_file.txt',
+        ('abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
+         '42_dummy_abstract_file.txt'),
+        'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
+        'editables/paper/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
+        'registrations/0_dummy0/43_73_registration_upload.txt'
     ]
 
 
@@ -148,7 +152,8 @@ def test_export_user_data(mocker, dummy_user):
         assert zip.namelist() == ['/data.yml']
 
 
-@pytest.mark.usefixtures('mock_io', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file')
+@pytest.mark.usefixtures('mock_io', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
+                         'dummy_editing_revision_file', 'dummy_reg_with_file_field')
 def test_export_user_data_all_options(mocker, dummy_user):
     success = mocker.patch('indico.modules.users.tasks.notify_data_export_success')
     failure = mocker.patch('indico.modules.users.tasks.notify_data_export_failure')
@@ -167,9 +172,11 @@ def test_export_user_data_all_options(mocker, dummy_user):
         assert zip.namelist() == [
             '/data.yml',
             'attachments/42_dummy_file.txt',
-            'abstracts/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/' +
-            '42_dummy_abstract_file.txt',
-            'papers/42_Dummy_Contribution/42_dummy_file.txt',
+            ('abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
+             '42_dummy_abstract_file.txt'),
+            'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
+            'editables/paper/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
+            'registrations/0_dummy0/43_73_registration_upload.txt'
         ]
 
 

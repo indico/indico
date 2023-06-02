@@ -27,7 +27,7 @@ class DataExportRequestState(RichIntEnum):
 class DataExportOptions(RichIntEnum):
     __titles__ = [L_('Personal data'), L_('Settings'), L_('Minutes & Contributions'), L_('Registrations'),
                   L_('Room booking data'), L_('Abstracts & Papers'), L_('Survey submissions'),
-                  L_('Attachments & Materials'), L_('Miscellaneous')]
+                  L_('Attachments & Materials'), L_('Editables'), L_('Miscellaneous')]
     personal_data = 0
     settings = 1
     contribs = 2
@@ -36,7 +36,8 @@ class DataExportOptions(RichIntEnum):
     abstracts_papers = 5
     survey_submissions = 6
     attachments = 7
-    misc = 8
+    editables = 8
+    misc = 9
 
 
 class DataExportRequest(db.Model):

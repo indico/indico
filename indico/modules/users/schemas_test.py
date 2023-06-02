@@ -193,6 +193,14 @@ def test_attachment_export_schema(snapshot, dummy_attachment):
     snapshot.assert_json_match(data, 'attachment_export_schema.json')
 
 
+@pytest.mark.usefixtures('freeze_time', 'dummy_editing_revision_file')
+def test_editable_export_schema(snapshot, dummy_paper):
+    from indico.modules.users.schemas import EditableExportSchema
+
+    data = EditableExportSchema().dump(dummy_paper)
+    snapshot.assert_json_match(data, 'editable_export_schema.json')
+
+
 def setup_misc_data(user, event):
     event.creator = user
     StaticSite(creator=user, event=event)
@@ -217,7 +225,8 @@ def test_empty_user_data_export_schema(snapshot, dummy_user):
 
 
 @pytest.mark.usefixtures('freeze_time', 'dummy_reservation', 'dummy_attachment',
-                         'dummy_abstract_file', 'dummy_paper_file', 'dummy_reg_with_file_field')
+                         'dummy_abstract_file', 'dummy_paper_file',
+                         'dummy_reg_with_file_field', 'dummy_editing_revision_file')
 def test_user_data_export_schema(snapshot, db, dummy_user, dummy_category, dummy_event, dummy_contribution,
                                  dummy_subcontribution, dummy_event_person, dummy_room):
     from indico.modules.users.schemas import UserDataExportSchema

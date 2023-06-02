@@ -30,7 +30,7 @@ def create_paper_revision(db):
 
 @pytest.fixture
 def dummy_paper_revision(dummy_user, dummy_paper, create_paper_revision):
-    """Crate a dummy paper revision."""
+    """Create a dummy paper revision."""
     return create_paper_revision(dummy_paper, submitter=dummy_user)
 
 
@@ -50,5 +50,5 @@ def create_paper_file(db):
 
 @pytest.fixture
 def dummy_paper_file(create_paper_file, dummy_paper_revision, dummy_file):
-    """Crate a dummy paper file."""
+    """Create a dummy paper file."""
     return create_paper_file(dummy_paper_revision, dummy_file, id=42)

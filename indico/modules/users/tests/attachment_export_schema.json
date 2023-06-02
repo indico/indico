@@ -1,5 +1,11 @@
 {
   "description": "Dummy attachment",
+  "file": {
+    "filename": "dummy_file.txt",
+    "id": 42,
+    "md5": "5eb63bbbe01eeed093cb22bb8f5acdc3",
+    "path": "attachments/42_dummy_file.txt"
+  },
   "folder": 42,
   "folder_id": 42,
   "id": 42,

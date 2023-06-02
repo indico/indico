@@ -14,7 +14,7 @@ from indico.modules.events.registration.models.registrations import Registration
 
 
 @pytest.fixture
-def dummy_reg_with_file_field(db, dummy_event, dummy_regform, dummy_user, dummy_file):
+def dummy_reg_with_file_field(db, dummy_event, dummy_regform, dummy_user, create_file):
     """Create a dummy registration which includes an uploaded file."""
     from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 
@@ -54,6 +54,7 @@ def dummy_reg_with_file_field(db, dummy_event, dummy_regform, dummy_user, dummy_
         currency=dummy_regform.currency,
     )
 
+    dummy_file = create_file('registration_upload.txt', 'text/plain', 'registration', 'A dummy file', id=23)
     fill_file_field(registration, file_field, dummy_file)
     dummy_event.registrations.append(registration)
     db.session.flush()

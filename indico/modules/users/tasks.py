@@ -9,6 +9,7 @@ from contextlib import suppress
 from datetime import timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from uuid import uuid4
 from zipfile import ZipFile
 
 import yaml
@@ -22,10 +23,11 @@ from indico.core.notifications import email_sender, make_email
 from indico.core.storage.backend import StorageError
 from indico.modules.attachments.models.attachments import AttachmentFile
 from indico.modules.events.abstracts.models.files import AbstractFile
+from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.files.models.files import File
 from indico.modules.users import logger
-from indico.modules.users.export import get_abstracts, get_attachments, get_papers, get_registration_data
+from indico.modules.users.export import get_abstracts, get_attachments, get_editables, get_papers, get_registration_data
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest, DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, User
 from indico.modules.users.util import get_gravatar_for_user, set_user_avatar
@@ -135,7 +137,7 @@ def generate_zip(export_request, temp_file, max_size_mb):
         zip_file.writestr('/data.yml', yaml.dump(data))
         size_mb = 0
         for file in collect_files(export_request):
-            size_mb += file.size / 1024  # file size is in KB
+            size_mb += get_size_mb(file)
             if size_mb <= max_size_mb:
                 write_file(zip_file, file)
             else:
@@ -143,6 +145,11 @@ def generate_zip(export_request, temp_file, max_size_mb):
                 logger.warning('User data export exceeds size limit, exporting only partial data: %r',
                                export_request)
                 break
+
+
+def get_size_mb(file):
+    file = getattr(file, 'file', file)
+    return file.size / 1024  # file size is in KB
 
 
 def collect_files(export_request):
@@ -160,37 +167,51 @@ def collect_files(export_request):
         for paper in get_papers(user):
             yield from paper.files
 
+    if DataExportOptions.editables in options:
+        for editable in get_editables(user):
+            for revision in editable.revisions:
+                yield from revision.files
+
     if DataExportOptions.registrations in options:
         yield from get_registration_data(user)
 
 
 def write_file(zip_file, file):
     path = build_storage_path(file)
+    file = getattr(file, 'file', file)
     with file.open() as f:
         zip_file.writestr(path, f.read())
 
 
-def build_storage_path(object):
-    if isinstance(object, RegistrationData):
-        event = object.registration.event
+def build_storage_path(file):
+    if isinstance(file, RegistrationData):
+        event = file.registration.event
         prefix = 'registrations'
-        folder = f'{event.id}_{event.title}'
-    elif isinstance(object, AttachmentFile):
+        path = f'{event.id}_{event.title}'
+    elif isinstance(file, AttachmentFile):
         prefix = 'attachments'
-        folder = ''
-    elif isinstance(object, AbstractFile):
+        path = ''
+    elif isinstance(file, AbstractFile):
+        event = file.abstract.event
         prefix = 'abstracts'
-        folder = f'{object.abstract.id}_{object.abstract.title}'
-    else:
+        path = f'{event.id}_{event.title}/{file.abstract.id}_{file.abstract.title}'
+    elif isinstance(file, PaperFile):
+        event = file._contribution.event
         prefix = 'papers'
-        folder = f'{object._contribution.id}_{object.paper.title}'
+        path = f'{event.id}_{event.title}/{file._contribution.id}_{file.paper.title}'
+    else:
+        editable = file.revision.editable
+        event = editable.contribution.event
+        prefix = f'editables/{editable.type.name}'
+        path = f'{event.id}_{event.title}/{editable.id}_{editable.contribution.title}'
 
-    folder = secure_filename(folder, '')
-    filename = build_filename(object)
-    return str(Path() / prefix / folder / filename)
+    path = secure_path(path)
+    filename = build_filename(file)
+    return str(Path() / prefix / path / filename)
 
 
 def build_filename(file):
+    file = getattr(file, 'file', file)
     if isinstance(file, RegistrationData):
         id = f'{file.registration_id}_{file.field_data_id}'
     else:
@@ -198,6 +219,11 @@ def build_filename(file):
 
     filename = secure_filename(Path(file.filename).stem, '')
     return f'{id}_{filename}.{file.extension}'
+
+
+def secure_path(path):
+    parts = (secure_filename(p, uuid4()) for p in Path(path).parts)
+    return Path(*parts)
 
 
 @email_sender

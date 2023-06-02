@@ -12,7 +12,7 @@ from speaklater import _LazyString
 from indico.core.marshmallow import mm
 from indico.core.oauth.models.applications import OAuthApplication
 from indico.core.oauth.models.personal_tokens import PersonalToken
-from indico.modules.attachments.models.attachments import Attachment, AttachmentType
+from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.auth.models.identities import Identity
 from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
@@ -20,6 +20,8 @@ from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractS
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.editing.models.editable import Editable, EditableState, EditableType
+from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.papers import PaperRevisionState
 from indico.modules.events.registration.models.registrations import Registration
@@ -28,11 +30,12 @@ from indico.modules.events.static.models.static import StaticSite
 from indico.modules.events.surveys.schemas import SurveySubmissionSchema
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users import User
-from indico.modules.users.export import (get_abstracts, get_attachments, get_contributions, get_papers,
+from indico.modules.users.export import (get_abstracts, get_attachments, get_contributions, get_editables, get_papers,
                                          get_subcontributions)
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest
 from indico.modules.users.models.users import NameFormat, UserTitle, syncable_fields
+from indico.modules.users.tasks import build_storage_path
 from indico.util.countries import get_country
 from indico.util.marshmallow import ModelField, NoneValueEnumField
 from indico.web.flask.util import url_for
@@ -178,9 +181,10 @@ class RegistrationTagExportSchema(mm.SQLAlchemyAutoSchema):
 
 class RegistrationFileExportSchema(Schema):
     class Meta:
-        fields = ('registration_id', 'field_data_id', 'filename', 'md5', 'url')
+        fields = ('registration_id', 'field_data_id', 'filename', 'md5', 'url', 'path')
 
     url = Function(lambda data: url_for('event_registration.registration_file', data.locator.file, _external=True))
+    path = Function(lambda file: build_storage_path(file))
 
 
 class RegistrationDataExportSchema(Schema):
@@ -276,9 +280,10 @@ class ContributionExportSchema(mm.SQLAlchemyAutoSchema):
 class AbstractFileExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = AbstractFile
-        fields = ('id', 'filename', 'url')
+        fields = ('id', 'filename', 'md5', 'url', 'path')
 
     url = Function(lambda f: url_for('abstracts.download_attachment', f, management=False, _external=True))
+    path = Function(lambda file: build_storage_path(file))
 
 
 class AbstractExportSchema(mm.SQLAlchemyAutoSchema):
@@ -297,9 +302,10 @@ class AbstractExportSchema(mm.SQLAlchemyAutoSchema):
 class PaperFileExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = PaperFile
-        fields = ('id', 'filename', 'url')
+        fields = ('id', 'filename', 'md5', 'url', 'path')
 
     url = Function(lambda f: url_for('papers.download_file', f.paper.contribution, f, _external=True))
+    path = Function(lambda file: build_storage_path(file))
 
 
 class PaperExportSchema(mm.SQLAlchemyAutoSchema):
@@ -351,6 +357,14 @@ class MiscDataExportSchema(Schema):
         return OAuthApplicationExportSchema(many=True).dump(oauth_apps)
 
 
+class AttachmentFileExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = AttachmentFile
+        fields = ('id', 'filename', 'md5', 'path')
+
+    path = Function(lambda file: build_storage_path(file))
+
+
 class AttachmentExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Attachment
@@ -359,6 +373,38 @@ class AttachmentExportSchema(mm.SQLAlchemyAutoSchema):
 
     url = String(attribute='absolute_download_url')
     type = Enum(AttachmentType)
+
+    @post_dump(pass_original=True)
+    def _add_file(self, data, original, **kwargs):
+        """Export the attached file if there is one."""
+        if original.file:
+            file_data = AttachmentFileExportSchema().dump(original.file)
+            return data | {'file': file_data}
+
+
+class EditableFileExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EditingRevisionFile
+        fields = ('uuid', 'filename', 'md5', 'signed_download_url', 'path')
+
+    path = Function(lambda file: build_storage_path(file))
+
+
+class EditableExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Editable
+        fields = ('id', 'type', 'contribution_id', 'contribution_title', 'state', 'files')
+
+    type = Enum(EditableType)
+    contribution_title = Function(lambda editable: editable.contribution.title)
+    state = Enum(EditableState, attribute='latest_revision.state')
+    files = Method('_get_files')
+
+    def _get_files(self, editable):
+        files = []
+        for rev in editable.revisions:
+            files += rev.files
+        return EditableFileExportSchema(many=True).dump(files)
 
 
 class SettingsExportSchema(Schema):
@@ -375,7 +421,7 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         fields = ('personal_data', 'settings', 'contributions', 'subcontributions', 'registrations', 'room_booking',
-                  'survey_submissions', 'abstracts', 'papers', 'miscellaneous', 'attachments')
+                  'survey_submissions', 'abstracts', 'papers', 'miscellaneous', 'editables', 'attachments')
 
     personal_data = Function(lambda user: PersonalDataExportSchema().dump(user))
     settings = Method('_get_settings')
@@ -387,6 +433,7 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     abstracts = Method('_get_abstracts')
     papers = Method('_get_papers')
     attachments = Method('_get_attachments')
+    editables = Method('_get_editables')
     miscellaneous = Function(lambda user: MiscDataExportSchema().dump(user))
 
     def _get_settings(self, user):
@@ -412,3 +459,7 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     def _get_attachments(self, user):
         attachments = get_attachments(user)
         return AttachmentExportSchema(many=True).dump(attachments)
+
+    def _get_editables(self, user):
+        editables = get_editables(user)
+        return EditableExportSchema(many=True).dump(editables)

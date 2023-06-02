@@ -14,6 +14,8 @@ from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.editing.models.editable import Editable
+from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.papers.models.revisions import PaperRevision
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 
@@ -67,3 +69,16 @@ def get_papers(user):
                                Contribution._paper_revisions.any(PaperRevision.submitter == user)))
                 .all())
     return [contrib.paper for contrib in contribs]
+
+
+def get_editables(user):
+    """Get all editables where the user is either linked to the
+    parent contribution or has submitted an editing revision.
+    """
+    return (Editable.query
+            .join(Contribution, Contribution.id == Editable.contribution_id)
+            .outerjoin(ContributionPersonLink, ContributionPersonLink.contribution_id == Contribution.id)
+            .outerjoin(EditingRevision, EditingRevision.editable_id == Editable.id)
+            .filter(db.or_(Contribution.person_links.any(ContributionPersonLink.person.has(user=user)),
+                           EditingRevision.submitter == user))
+            .all())

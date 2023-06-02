@@ -8,6 +8,8 @@
         {
           "filename": "dummy_abstract_file.txt",
           "id": 42,
+          "md5": "d659f3992a4861fbba98e728e8ab5d8e",
+          "path": "abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/42_dummy_abstract_file.txt",
           "url": "http://localhost/event/-314/abstracts/1234/attachments/42/dummy_abstract_file.txt"
         }
       ],
@@ -22,6 +24,12 @@
   "attachments": [
     {
       "description": "Dummy attachment",
+      "file": {
+        "filename": "dummy_file.txt",
+        "id": 42,
+        "md5": "5eb63bbbe01eeed093cb22bb8f5acdc3",
+        "path": "attachments/42_dummy_file.txt"
+      },
       "folder": 42,
       "folder_id": 42,
       "id": 42,
@@ -53,6 +61,19 @@
       "venue_name": ""
     }
   ],
+  "editables": [
+    {
+      "contribution_id": 42,
+      "contribution_title": "Dummy Contribution",
+      "files": [
+        {
+          "path": "editables/paper/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt"
+        }
+      ],
+      "id": 42,
+      "type": "paper"
+    }
+  ],
   "miscellaneous": {
     "created_events": [
       {
@@ -82,6 +103,8 @@
         {
           "filename": "dummy_file.txt",
           "id": 42,
+          "md5": "d659f3992a4861fbba98e728e8ab5d8e",
+          "path": "papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt",
           "url": "http://localhost/event/0/papers/42/files/42-dummy_file.txt"
         }
       ],
@@ -135,14 +158,15 @@
       "currency": "USD",
       "data": [
         {
-          "data": "dummy_file.txt",
+          "data": "registration_upload.txt",
           "description": "",
           "file": {
             "field_data_id": 73,
-            "filename": "dummy_file.txt",
+            "filename": "registration_upload.txt",
             "md5": "d659f3992a4861fbba98e728e8ab5d8e",
+            "path": "registrations/0_dummy0/43_73_registration_upload.txt",
             "registration_id": 43,
-            "url": "http://localhost/event/0/manage/registration/42/registrations/43/file/73-dummy_file.txt"
+            "url": "http://localhost/event/0/manage/registration/42/registrations/43/file/73-registration_upload.txt"
           },
           "title": "File field"
         }

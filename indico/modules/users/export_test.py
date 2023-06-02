@@ -9,9 +9,11 @@ import pytest
 
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
+from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.users.export import (get_abstracts, get_attachments, get_contributions, get_papers,
+from indico.modules.users.export import (get_abstracts, get_attachments, get_contributions, get_editables, get_papers,
                                          get_registration_data, get_subcontributions)
+from indico.util.date_time import now_utc
 
 
 pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
@@ -22,7 +24,7 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
 def test_get_registration_data(dummy_user):
     data = get_registration_data(dummy_user)
     assert len(data) == 1
-    assert data[0].filename == 'dummy_file.txt'
+    assert data[0].filename == 'registration_upload.txt'
 
 
 def test_get_get_attachments(db, dummy_user, create_user, dummy_event, create_attachment):
@@ -36,10 +38,10 @@ def test_get_get_attachments(db, dummy_user, create_user, dummy_event, create_at
     attachments = get_attachments(dummy_user)
     assert not attachments
 
-    create_attachment(dummy_user, dummy_event, title='Presentation')
+    attachment = create_attachment(dummy_user, dummy_event, title='Presentation')
     db.session.flush()
     attachments = get_attachments(dummy_user)
-    assert len(attachments) == 1
+    assert attachments == [attachment]
 
 
 def test_get_contributions(db, dummy_user, dummy_event, dummy_contribution):
@@ -51,8 +53,7 @@ def test_get_contributions(db, dummy_user, dummy_event, dummy_contribution):
     db.session.flush()
 
     contribs = get_contributions(dummy_user)
-    assert len(contribs) == 1
-    assert contribs[0] == dummy_contribution
+    assert contribs == [dummy_contribution]
 
 
 def test_get_subcontributions(db, dummy_user, dummy_event, dummy_subcontribution):
@@ -64,8 +65,7 @@ def test_get_subcontributions(db, dummy_user, dummy_event, dummy_subcontribution
     db.session.flush()
 
     subcontribs = get_subcontributions(dummy_user)
-    assert len(subcontribs) == 1
-    assert subcontribs[0] == dummy_subcontribution
+    assert subcontribs == [dummy_subcontribution]
 
 
 def test_get_abstracts_submitter(db, dummy_user, dummy_event, create_abstract):
@@ -75,8 +75,7 @@ def test_get_abstracts_submitter(db, dummy_user, dummy_event, create_abstract):
     abstract = create_abstract(dummy_event, 'Rewriting Indico in Rust', submitter=dummy_user)
     db.session.flush()
     abstracts = get_abstracts(dummy_user)
-    assert len(abstracts) == 1
-    assert abstracts[0] == abstract
+    assert abstracts == [abstract]
 
 
 def test_get_abstracts_person_link(db, dummy_user, dummy_event, create_abstract):
@@ -89,8 +88,7 @@ def test_get_abstracts_person_link(db, dummy_user, dummy_event, create_abstract)
     db.session.flush()
 
     abstracts = get_abstracts(dummy_user)
-    assert len(abstracts) == 1
-    assert abstracts[0] == abstract
+    assert abstracts == [abstract]
 
 
 @pytest.mark.usefixtures('dummy_reg_with_file_field')
@@ -125,3 +123,37 @@ def test_get_papers_from_paper_revision(db, dummy_user, dummy_paper, create_pape
     papers = get_papers(dummy_user)
     assert len(papers) == 1
     assert papers[0].contribution == dummy_paper.contribution
+
+
+def test_get_editables_from_contribution_link(db, dummy_event, dummy_user, create_user,
+                                              dummy_editable, create_editing_revision):
+    editables = get_editables(dummy_user)
+    assert not editables
+
+    submitter = create_user(42)
+    create_editing_revision(dummy_editable, submitter, reviewed_dt=now_utc(),
+                            initial_state=InitialRevisionState.ready_for_review,
+                            final_state=FinalRevisionState.accepted)
+    db.session.flush()
+    editables = get_editables(dummy_user)
+    assert not editables
+
+    person = EventPerson.create_from_user(dummy_user, dummy_event)
+    dummy_editable.contribution.person_links.append(ContributionPersonLink(person=person))
+    db.session.flush()
+
+    editables = get_editables(dummy_user)
+    assert editables == [dummy_editable]
+
+
+def test_get_editables_from_editing_revision(db, dummy_user, dummy_editable, create_editing_revision):
+    editables = get_editables(dummy_user)
+    assert not editables
+
+    create_editing_revision(dummy_editable, dummy_user, reviewed_dt=now_utc(),
+                            initial_state=InitialRevisionState.ready_for_review,
+                            final_state=FinalRevisionState.accepted)
+    db.session.flush()
+
+    editables = get_editables(dummy_user)
+    assert editables == [dummy_editable]

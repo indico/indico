@@ -126,7 +126,7 @@ function DataExport({userId, request, exportOptions}) {
             <Translate>Data export</Translate>
           </div>
         </div>
-        <div className="i-box-content">
+        <div className="i-box-content ui">
           <Translate as="p">
             Here, you can request to export all data concerning you that is currently stored in
             Indico.

@@ -6,14 +6,15 @@
   "currency": "USD",
   "data": [
     {
-      "data": "dummy_file.txt",
+      "data": "registration_upload.txt",
       "description": "",
       "file": {
         "field_data_id": 73,
-        "filename": "dummy_file.txt",
+        "filename": "registration_upload.txt",
         "md5": "d659f3992a4861fbba98e728e8ab5d8e",
+        "path": "registrations/0_dummy0/43_73_registration_upload.txt",
         "registration_id": 43,
-        "url": "http://localhost/event/0/manage/registration/42/registrations/43/file/73-dummy_file.txt"
+        "url": "http://localhost/event/0/manage/registration/42/registrations/43/file/73-registration_upload.txt"
       },
       "title": "File field"
     }
