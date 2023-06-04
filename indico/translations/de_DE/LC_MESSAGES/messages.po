@@ -24,7 +24,7 @@
 # Peter Trueb <ptr885@hotmail.com>, 2021
 # Reiko Kaps <kaps@luis.uni-hannover.de>, 2019-2020
 # Richard Chojetzki, 2022
-# bbbuserde, 2022
+# bbbuserde, 2022-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
@@ -3084,7 +3084,7 @@ msgstr "mehr..."
 #: indico/modules/categories/templates/display/sidebar.html:51
 #, python-format
 msgid "Posted %(date)s"
-msgstr "Veröffentlicht am %(date)s"
+msgstr "Veröffentlicht: %(date)s"
 
 #: indico/modules/categories/templates/display/sidebar.html:74
 #, python-format
@@ -13320,7 +13320,7 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/emails/invitation_default.html:1
 msgid "Invitation to register"
-msgstr ""
+msgstr "Einladung zur Registrierung"
 
 #: indico/modules/events/registration/templates/emails/invitation_default.html:6
 msgid "We'd like to invite you to register for the following event:"
@@ -13334,12 +13334,12 @@ msgstr ""
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:5
 #, python-format
 msgid "New pending registration for %(title)s"
-msgstr ""
+msgstr "Neue ausstehende Registrierung für %(title)s"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:7
 #, python-format
 msgid "New registration for %(title)s"
-msgstr ""
+msgstr "Neue Registrierung für %(title)s"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:12
 msgid "Dear organizer,"
@@ -13358,7 +13358,7 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:28
 msgid "Manage registration form"
-msgstr ""
+msgstr "Registrierungsformular verwalten"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:36
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:55
@@ -13367,7 +13367,7 @@ msgstr ""
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_manager.txt:11
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_user.txt:11
 msgid "Rejection reason:"
-msgstr ""
+msgstr "Grund der Ablehnung:"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:43
 msgid "Please note that it's waiting for manual approval by a manager."
@@ -13392,11 +13392,11 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:32
 msgid "To manage your registration follow this link:"
-msgstr ""
+msgstr "Um Ihre Anmeldung zu verwalten, folgen Sie diesem Link:"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:34
 msgid "Manage my registration"
-msgstr ""
+msgstr "Meine Anmeldung verwalten"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:62
 msgid "Please note that this event requires manual approval."
@@ -13454,19 +13454,19 @@ msgstr ""
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:6
 #, python-format
 msgid "Registration complete for %(title)s"
-msgstr ""
+msgstr "Anmeldung abgeschlossen für %(title)s"
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_managers.html:8
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:8
 #, python-format
 msgid "Registration pending for %(title)s"
-msgstr ""
+msgstr "Anmeldung anstehend für %(title)s"
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_managers.html:10
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:10
 #, python-format
 msgid "Registration rejected for %(title)s"
-msgstr ""
+msgstr "Abgelehnte Anmeldung für %(title)s"
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_managers.html:12
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:12
@@ -19352,7 +19352,7 @@ msgstr "'Morgen'"
 
 #: indico/util/date_time.py:292
 msgid "'Last' EEEE"
-msgstr "“Letzter” EEEE"
+msgstr "'Letzter' EEEE"
 
 #: indico/util/date_time.py:293
 msgid "EEEE"
@@ -19372,11 +19372,11 @@ msgstr "'Morgen' 'um' {time_fmt}"
 
 #: indico/util/date_time.py:312
 msgid "'Last' EEEE 'at' {time_fmt}"
-msgstr "“Letzte” EEEE “am” {time_fmt}"
+msgstr "'Letzter' EEEE 'um' {time_fmt}"
 
 #: indico/util/date_time.py:313
 msgid "EEEE 'at' {time_fmt}"
-msgstr "EEEE “am” {time_fmt}"
+msgstr "EEEE 'um' {time_fmt}"
 
 #: indico/util/date_time.py:314
 msgid "{date_fmt} 'at' {time_fmt}"
