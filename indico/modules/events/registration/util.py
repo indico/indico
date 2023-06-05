@@ -695,8 +695,9 @@ def get_event_regforms(event, user, with_registrations=False, only_in_acl=False)
     if only_in_acl:
         query = query.filter(RegistrationForm.in_event_acls.any(event=event))
     if with_registrations:
+        user_criterion = (Registration.user == user) if user else False
         query = query.outerjoin(Registration, db.and_(Registration.registration_form_id == RegistrationForm.id,
-                                                      Registration.user == user,
+                                                      user_criterion,
                                                       ~Registration.is_deleted))
     return query.all()
 

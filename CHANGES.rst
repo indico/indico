@@ -19,6 +19,8 @@ Bugfixes
 - Fix wrong date in email subject for room booking occurrence cancellations (:pr:`5790`)
 - Fix excessive queries being sent in meetings that have registration form with limited
   places and many registrants (:pr:`5799`)
+- Fix extremely slow query when retrieving list of registration forms in conferences with
+  many registrants while not logged in (:pr:`5799`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
