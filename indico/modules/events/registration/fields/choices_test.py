@@ -189,7 +189,7 @@ def test_multi_choice_field_validate_max_choices(multi_choice_field):
 
     multi_choice_field.data['max_choices'] = 1
     run_validators(validators, {_id(1): 1})
-    with pytest.raises(ValidationError, match='At most one option can be selected'):
+    with pytest.raises(ValidationError, match='At most 1 option can be selected'):
         run_validators(validators, {_id(1): 1, _id(2): 1})
 
     multi_choice_field.data['max_choices'] = 2

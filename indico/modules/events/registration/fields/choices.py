@@ -294,7 +294,7 @@ class MultiChoiceField(ChoiceBaseField):
             # If `max_choices` is set, ensure that it is
             # less than or equal to the total number of choices.
             if max_choices and len(new_data) > max_choices:
-                raise ValidationError(ngettext('At most one option can be selected',
+                raise ValidationError(ngettext('At most {max_choices} option can be selected',
                                                'At most {max_choices} options can be selected', max_choices)
                                       .format(max_choices=max_choices))
         return [_check_max_choices] + super().get_validators(existing_registration)
