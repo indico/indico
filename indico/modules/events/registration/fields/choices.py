@@ -22,7 +22,7 @@ from indico.modules.events.registration.fields.base import (LimitedPlacesBillabl
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import format_date
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import UUIDString, not_empty
 from indico.util.string import camelize_keys, snakify_keys
 
@@ -89,6 +89,19 @@ class ChoiceSetupSchema(mm.Schema):
                     if data.get('default_item') == orig_id:
                         data['default_item'] = c['id']
         return data
+
+
+class MultiChoiceSetupSchema(ChoiceSetupSchema):
+    max_choices = fields.Int(load_default=None, validate=validate.Range(min=0,
+                                                                        error='Maximum choices must be greater than 0'))
+
+    @validates_schema(skip_on_field_errors=True)
+    def _validate_max_choices(self, data, **kwargs):
+        max_choices = data['max_choices']
+        choices = data['choices']
+
+        if max_choices and max_choices > len(choices):
+            raise ValidationError('Value must not be greater than the total number of choices', 'max_choices')
 
 
 class SingleChoiceSetupSchema(ChoiceSetupSchema):
@@ -242,7 +255,7 @@ def _hashable_choice(choice):
 
 class MultiChoiceField(ChoiceBaseField):
     name = 'multi_choice'
-    setup_schema_base_cls = ChoiceSetupSchema
+    setup_schema_base_cls = MultiChoiceSetupSchema
 
     @property
     def default_value(self):
@@ -271,6 +284,19 @@ class MultiChoiceField(ChoiceBaseField):
         choices = [_format_item(uuid, number_of_slots) for uuid, number_of_slots in reg_data.items()]
 
         return ', '.join(choices) if for_humans or for_search else choices
+
+    def get_validators(self, existing_registration):
+        def _check_max_choices(new_data):
+            """If `max_choices` is set, ensure that it is less than or equal to the total number of choices."""
+            if not new_data:
+                return
+
+            max_choices = self.form_item.data['max_choices']
+            if max_choices and len(new_data.keys()) > max_choices:
+                raise ValidationError(ngettext('At most one option can be selected',
+                                               'At most {max_choices} options can be selected', max_choices)
+                                      .format(max_choices=max_choices))
+        return [_check_max_choices] + super().get_validators(existing_registration)
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False, new_data_version=None):
         # always store no-option as empty dict
