@@ -287,12 +287,13 @@ class MultiChoiceField(ChoiceBaseField):
 
     def get_validators(self, existing_registration):
         def _check_max_choices(new_data):
-            """If `max_choices` is set, ensure that it is less than or equal to the total number of choices."""
             if not new_data:
                 return
 
             max_choices = self.form_item.data['max_choices']
-            if max_choices and len(new_data.keys()) > max_choices:
+            # If `max_choices` is set, ensure that it is
+            # less than or equal to the total number of choices.
+            if max_choices and len(new_data) > max_choices:
                 raise ValidationError(ngettext('At most one option can be selected',
                                                'At most {max_choices} options can be selected', max_choices)
                                       .format(max_choices=max_choices))
