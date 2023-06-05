@@ -50,6 +50,7 @@ def test_RHRegistrationForm_can_register(db, dummy_regform, dummy_reg, dummy_use
     dummy_regform.registration_limit = 1
     assert rh._can_register()  # withdrawn/rejected do not count against limit
     dummy_reg.state = RegistrationState.complete
+    db.session.expire(dummy_regform)
     assert not rh._can_register()  # exceeding limit
 
 

@@ -17,6 +17,8 @@ Bugfixes
 
 - Fix width of time column in PDF timetable when using 12-hour time format (:pr:`5788`)
 - Fix wrong date in email subject for room booking occurrence cancellations (:pr:`5790`)
+- Fix excessive queries being sent in meetings that have registration form with limited
+  places and many registrants (:pr:`5799`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
