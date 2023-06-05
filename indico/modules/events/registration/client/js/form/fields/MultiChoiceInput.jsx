@@ -192,7 +192,7 @@ export default function MultiChoiceInput({
       validate={value => {
         if (maxChoices && _.keys(value).length > maxChoices) {
           return PluralTranslate.string(
-            'At most one option can be selected',
+            'At most {n} option can be selected',
             'At most {n} options can be selected',
             maxChoices,
             {n: maxChoices}
