@@ -55,6 +55,21 @@ export function processRevisions(revisions) {
       const author = revision.editor || revision.submitter;
       items.push(commentFromState(revision, revisionState, author));
     }
+    // Set the state on the files that were added/modified in this revision
+    let files = revision.files;
+    if (previousRevision && previousRevision.files && files) {
+      const previousFilesUUIDs = new Set(previousRevision.files.map(f => f.uuid));
+      const previousFilenames = new Set(previousRevision.files.map(f => f.filename));
+      files = files.map(f => {
+        if (!previousFilesUUIDs.has(f.uuid)) {
+          if (previousFilenames.has(f.filename)) {
+            return {...f, state: 'modified'};
+          }
+          return {...f, state: 'added'};
+        }
+        return f;
+      });
+    }
     return {
       ...revision,
       // use the previous state transition as current block header, unless the revision has been undone
@@ -63,6 +78,7 @@ export function processRevisions(revisions) {
         ? previousRevision.commentHtml
         : '',
       items: _.sortBy(items, 'createdDt'),
+      files,
     };
   });
 }

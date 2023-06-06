@@ -15,7 +15,7 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
-- None so far :(
+- Show which files were added or modified on each editing timeline revision (:pr:`5802`)
 
 Bugfixes
 ^^^^^^^^
