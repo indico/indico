@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Button, Icon, Label} from 'semantic-ui-react';
+import {Button, Icon, Label, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -16,12 +16,31 @@ import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/uti
 import './FileDisplay.module.scss';
 
 function FileListDisplay({files}) {
+  const stateIcon = {
+    modified: {
+      icon: 'dot circle',
+      color: 'yellow',
+      tooltip: Translate.string('This file was modified since the last revision.'),
+    },
+    added: {
+      icon: 'add circle',
+      color: 'green',
+      tooltip: Translate.string('This file was added since the last revision.'),
+    },
+  };
+
   return (
     <ul styleName="file-list-display">
-      {files.map(({filename, uuid, downloadURL}) => (
+      {files.map(({filename, uuid, downloadURL, state}) => (
         <li key={uuid} styleName="file-row">
           <TooltipIfTruncated>
             <span styleName="file-name">
+              {state && (
+                <Popup
+                  trigger={<Icon name={stateIcon[state].icon} color={stateIcon[state].color} />}
+                  content={stateIcon[state].tooltip}
+                />
+              )}
               <a href={downloadURL} target="_blank" rel="noopener noreferrer">
                 {filename}
               </a>

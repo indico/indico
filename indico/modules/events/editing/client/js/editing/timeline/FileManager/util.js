@@ -132,7 +132,5 @@ export function getFilesFromRevision(fileTypes, revision) {
 export function getFileToDelete(files, allowMultipleFiles = false) {
   // if we don't allow multiple files and have a file in the added or modified state,
   // that file can always be deleted from the server after the upload
-  return !allowMultipleFiles && files.length && ['added', 'modified'].includes(files[0].state)
-    ? files[0]
-    : null;
+  return !allowMultipleFiles && files.length && !files[0].claimed ? files[0] : null;
 }
