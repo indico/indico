@@ -15,7 +15,7 @@
         {{ render_impersonation() }}
         <div class="indico-top-bar">
             {% block logo %}
-                {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.png') -%}
+                {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.svg') -%}
                 <a class="indico-top-bar-logo" href="{{ url_for_index() }}">
                     <img src="{{ logo_url }}">
                 </a>
