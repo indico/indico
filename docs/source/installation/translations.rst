@@ -1,9 +1,11 @@
 Translations
 ************
 
-Indico comes with a number of languages by default. In release 2.3, those are:
-English (default), French, Portuguese, Spanish and Chinese (in the order of integration).
-Additional languages are being prepared on the Transifex platform.
+Indico comes with a number of languages by default. In release 3.2, those are:
+English (default), French, Portuguese, Spanish, Chinese, Ukrainian, Polish,
+Mongolian, Turkish and German (in the order of integration). Additional
+languages are being prepared on the
+`Transifex platform <https://www.transifex.com/indico/>`_.
 
 In order to use (partially) existing translations from Transifex or to contribute
 translations, you need to register with the
@@ -41,11 +43,17 @@ Follow the instructions on the `transifex site <https://docs.transifex.com/clien
 -------------------
 
 Go `to your transifex settings <https://www.transifex.com/user/settings/api/>`_ and generate an API token.
-Afterwards, you should run the command ``tx init --skipsetup``.
-It will request the token you just copied from the previous settings and save it locally so you can start
-using transifex locally.
-If you do not know how to run this command, please refer to the
-`transifex client guide <https://docs.transifex.com/client/init>`_.
+Next, create a ``~/.transifexrc`` configuration file::
+
+    [https://www.transifex.com]
+    rest_hostname = https://rest.api.transifex.com
+    token = API_TOKEN_HERE
+
+You can either save your API token in the configuration file as shown above or pass it
+as an environment variable every time you invoke a command using ``TX_TOKEN=myapitoken``.
+
+You can also consult the official
+`transifex client guide <https://developers.transifex.com/docs/using-the-client>`_.
 
 4. Install the translations
 ---------------------------
