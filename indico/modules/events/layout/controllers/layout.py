@@ -188,7 +188,11 @@ class RHLayoutLogoDelete(RHLayoutBase):
 class RHLayoutCSSUpload(RHLayoutBase):
     def _process(self):
         f = request.files['css_file']
-        self.event.stylesheet = f.read().decode().strip()
+        try:
+            self.event.stylesheet = f.read().decode().strip()
+        except UnicodeDecodeError:
+            flash(_('Uploaded CSS file contains invalid characters.'), 'error')
+            return jsonify_data(success=False, content=None)
         self.event.stylesheet_metadata = {
             'hash': crc32(self.event.stylesheet),
             'size': len(self.event.stylesheet),
