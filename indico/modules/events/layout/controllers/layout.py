@@ -191,7 +191,7 @@ class RHLayoutCSSUpload(RHLayoutBase):
         try:
             self.event.stylesheet = f.read().decode().strip()
         except UnicodeDecodeError:
-            flash(_('Uploaded CSS file contains invalid characters.'), 'error')
+            flash(_('CSS files must be ASCII or UTF-8 encoded.'), 'error')
             return jsonify_data(success=False, content=None)
         self.event.stylesheet_metadata = {
             'hash': crc32(self.event.stylesheet),
