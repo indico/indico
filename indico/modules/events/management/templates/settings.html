@@ -30,27 +30,29 @@
             </div>
         </div>
     {%- endif -%}
-    {%- if show_booking_warning -%}
-        <div class="action-box warning">
-            <div class="section">
-                <div class="icon icon-bookmark"></div>
-                <div class="text">
-                    <div class="label">{% trans %}Book the event location{% endtrans %}</div>
-                    {% trans %}
-                        There is no active booking linked to this event.
-                    {% endtrans %}
-                </div>
-                <div class="toolbar">
-                    <div class="group">
-                        <a class="i-button icon-settings"
-                           href="{{ url_for('rb.event_booking_list', event) }}">
-                            {% trans %}Book the room{% endtrans %}
-                        </a>
+    {% block booking_warning %}
+        {%- if show_booking_warning -%}
+            <div class="action-box warning">
+                <div class="section">
+                    <div class="icon icon-bookmark"></div>
+                    <div class="text">
+                        <div class="label">{% trans %}Book the event location{% endtrans %}</div>
+                        {% trans %}
+                            There is no active booking linked to this event.
+                        {% endtrans %}
+                    </div>
+                    <div class="toolbar">
+                        <div class="group">
+                            <a class="i-button icon-settings"
+                            href="{{ url_for('rb.event_booking_list', event) }}">
+                                {% trans %}Book the room{% endtrans %}
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {%- endif -%}
+        {%- endif -%}
+    {% endblock %}
     {%- if event.is_unlisted and event.can_manage(session.user) -%}
         <div class="action-box warning">
             <div class="section">
