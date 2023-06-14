@@ -25,7 +25,7 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- None so far
+- Some basic but useful docs for the Registration Form model classes
 
 
 Version 3.2.4
