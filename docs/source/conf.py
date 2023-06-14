@@ -44,6 +44,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.imgmath',
               'sphinx.ext.intersphinx',
               'sphinx_issues',
+              'sphinxcontrib.mermaid',
               'exec_directive',
               'indico_uml_directive']
 
@@ -239,3 +240,6 @@ skinparam class {
     ArrowColor slategray
 }
 skinparam classStereotypeFontSize 1'''
+
+mermaid_version = '10.2.3'
+mermaid_verbose = True

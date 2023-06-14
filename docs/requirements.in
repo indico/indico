@@ -6,3 +6,4 @@ plantweb
 sphinx
 sphinx-issues
 sphinx-rtd-theme
+sphinxcontrib-mermaid
