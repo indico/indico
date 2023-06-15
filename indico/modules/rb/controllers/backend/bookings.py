@@ -175,6 +175,10 @@ class RHCreateBooking(RHRoomBookingBase):
                    .format(self.room.name, booking_limit_days))
             raise ExpectedError(msg)
 
+        # Prevent the submission of notes if the setting is disabled
+        if not rb_settings.get('internal_notes_enabled'):
+            del args['internal_note']
+
         try:
             resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook,
                                                 ignore_admin=(not admin_override))
