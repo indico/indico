@@ -37,6 +37,7 @@ from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.util.date_time import iterdays
+from indico.util.i18n import orig_string
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
@@ -197,7 +198,7 @@ class SerializerBase:
             'name': convener.get_full_name(last_name_upper=False, abbrev_first_name=False),
             'last_name': convener.last_name,
             'first_name': convener.first_name,
-            'title': convener.title,
+            'title': orig_string(convener.title),
             '_type': 'SlotChair',
             'affiliation': convener.affiliation,
             '_fossil': 'conferenceParticipation',

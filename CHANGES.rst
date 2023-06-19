@@ -21,6 +21,8 @@ Bugfixes
   places and many registrants (:pr:`5799`)
 - Fix extremely slow query when retrieving list of registration forms in conferences with
   many registrants while not logged in (:pr:`5799`)
+- Fix title of session conveners being always empty in HTTP API with XML serialization
+  (:pr:`5813`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
