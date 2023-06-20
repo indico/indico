@@ -24,6 +24,7 @@ Bugfixes
 - Fix title of session conveners being always empty in HTTP API with XML serialization
   (:pr:`5813`)
 - Fix editable filters not working simultaneously with editable search (:pr:`5796`)
+- Fix missing icons in Abstract Markdown editor (:pr:`5815`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
