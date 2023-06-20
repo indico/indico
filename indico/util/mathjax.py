@@ -5,9 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import current_app, render_template
+from flask import current_app
 
 
 class MathjaxMixin:
     def _get_head_content(self):
-        return render_template('mathjax_config.html') + str(current_app.manifest['mathjax.js'])
+        return str(current_app.manifest['mathjax.js'])

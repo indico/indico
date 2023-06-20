@@ -5,49 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* eslint-disable camelcase, one-var, no-lonely-if */
+/* eslint-disable camelcase, one-var, no-lonely-if, import/unambiguous */
 /* global Markdown:false, MathJax:false, PageDownMathJax:false */
-
-// General MathJax configuration
-(function() {
-  MathJax.Ajax.config.root =
-    ($('html').data('static-site') ? 'static/' : Indico.Urls.Base) + '/dist/js/mathjax';
-})();
 
 (function() {
   var DELIMITERS = [['$', '$'], ['$$', '$$']];
 
   window.PageDownMathJax = function() {
-    var ready = false; // true after initial typeset is complete
-    var pending = false; // true when MathJax has been requested
     var $preview = null; // the preview container
-    var ready_listeners = []; // the inline math delimiter
 
     var blocks, start, end, last, braces; // used in searching for math
     var math; // stores math until markdone is done
-    var HUB = MathJax.Hub;
-
-    //
-    // Runs after initial typeset
-    //
-    HUB.Queue(function() {
-      ready = true;
-      HUB.processUpdateTime = 50; // reduce update time so that we can cancel easier
-      HUB.Config({
-        'HTML-CSS': {
-          EqnChunk: 10,
-          EqnChunkFactor: 1,
-        }, // reduce chunk for more frequent updates
-        'SVG': {
-          EqnChunk: 10,
-          EqnChunkFactor: 1,
-        },
-      });
-
-      ready_listeners.forEach(listener => {
-        listener();
-      });
-    });
 
     //
     // The pattern for math delimiters and special symbols
@@ -70,9 +38,6 @@
         .replace(/&/g, '&amp;') // use HTML entity for &
         .replace(/</g, '&lt;') // use HTML entity for <
         .replace(/>/g, '&gt;'); // use HTML entity for >
-      if (HUB.Browser.isMSIE) {
-        block = block.replace(/(%[^\n]*)\n/g, '$1<br/>\n');
-      }
       while (j > i) {
         blocks[j] = '';
         j--;
@@ -162,41 +127,27 @@
     }
 
     //
-    // This is run to restart MathJax after it has finished
-    // the previous run (that may have been canceled)
-    //
-    function restartMJ(cb) {
-      pending = false;
-      HUB.cancelTypeset = false; // won't need to do this in the future
-
-      if ($preview) {
-        typeset($preview.get(0));
-      }
-
-      if (cb) {
-        HUB.Queue(cb);
-      }
-    }
-
-    //
     // When the preview changes, cancel MathJax and restart,
     // if we haven't done that already.
     //
     function updateMJ(elem, cb) {
-      var mathjaxEnabled = $(elem).data('no-mathjax') === undefined;
-      if (!mathjaxEnabled) {
+      if (elem.dataset.noMathjax !== undefined) {
         cb();
-      } else if (!pending && ready) {
-        pending = true;
-        HUB.cancelTypeset = false;
-        HUB.Queue(restartMJ, cb);
+      } else {
+        typeset($preview.get(0)).then(cb);
       }
     }
 
-    function typeset(elem) {
-      if ($(elem).data('no-mathjax') === undefined) {
-        HUB.Queue(['Typeset', HUB, elem]);
+    async function typeset(elem) {
+      if (elem.dataset.noMathjax !== undefined) {
+        return;
       }
+
+      // https://docs.mathjax.org/en/latest/web/typeset.html#handling-asynchronous-typesetting
+      MathJax.startup.promise = MathJax.startup.promise
+        .then(() => MathJax.typesetPromise([elem]))
+        .catch(err => console.log(`[MathJax] Typeset failed: ${err.message}`));
+      return MathJax.startup.promise;
     }
 
     function createPreview(elem, editorObject) {
@@ -222,8 +173,7 @@
       }
 
       editorObject.hooks.chain('onPreviewRefresh', preview);
-      typeset($preview.get(0));
-      addListener(preview);
+      MathJax.startup.promise.then(preview);
     }
 
     function createEditor(elem) {
@@ -256,11 +206,7 @@
     }
 
     function mathJax(elem) {
-      typeset(elem);
-    }
-
-    function addListener(listener) {
-      ready_listeners.push(listener);
+      return typeset(elem);
     }
 
     return {
@@ -280,77 +226,11 @@
     return this;
   };
 
-  $.fn.pagedown = function(arg1, arg2) {
+  $.fn.pagedown = function() {
     function _pagedown(elem) {
-      var options = {},
-        pd_context = elem.data('pagedown'),
-        last_change = null,
-        $save_button = elem.siblings('.wmd-button-bar').find('.save-button');
-
-      function _set_saving() {
-        $save_button
-          .prop('disabled', true)
-          .addClass('saved')
-          .removeClass('saving waiting-save')
-          .text($T('Saving...'));
-        // the 'save' function will trigger a callback that sets
-        // the final state
-        options.save(elem.val(), function() {
-          $save_button
-            .text($T('Saved'))
-            .addClass('saved')
-            .removeClass('saving waiting-save');
-        });
-      }
-
-      function _save_cycle(my_time) {
-        return function() {
-          // if there's been a change meanwhile, don't do anything
-          if (last_change <= my_time) {
-            // otherwise, start saving
-            _set_saving();
-          }
-        };
-      }
-
-      if (pd_context) {
-        if (arg1 === 'auto-save' && $save_button.length) {
-          /*
-           * This is the 'auto-save' feature
-           * options:
-           *   - 'wait_time' - time to wait after a change, before saving
-           *   - save - function to be called on save (passed current data and callback)
-           *
-           * This feature also requires a '.save-button' button element to exist
-           * inside '.wmd-button-bar'
-           */
-
-          _.extend(options, arg2 || {});
-          elem.on('input', function() {
-            $save_button
-              .addClass('waiting-save')
-              .removeClass('saving saved')
-              .text($T('Save'))
-              .prop('disabled', false);
-
-            // let handlers (_save_cyle) know that they're out-of-date
-            // by updating last_change with the current time
-            last_change = new Date().getTime();
-            setTimeout(_save_cycle(last_change), options.wait_time || 2000);
-          });
-
-          $save_button.on('click', function() {
-            // let's kill handlers that may have been triggered
-            // by setting last_change to now
-            last_change = new Date().getTime();
-            _set_saving();
-          });
-        }
-      } else {
-        pd_context = PageDownMathJax();
-        elem.data('pagedown', pd_context);
-        pd_context.createEditor(elem.get(0));
-      }
+      const pd_context = PageDownMathJax();
+      elem.data('pagedown', pd_context);
+      pd_context.createEditor(elem.get(0));
     }
 
     $(this).each(function(i, elem) {
