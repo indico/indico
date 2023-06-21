@@ -43,6 +43,7 @@
   }
 
   .booking-status {
+    display: flex;
     flex: 4;
 
     @media (max-width: $tablet-width) {
