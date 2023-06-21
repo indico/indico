@@ -878,14 +878,11 @@ class RHContributionsAPIEmailContribRolesPreview(EmailRolesPreviewMixin, RHManag
     object_context = 'contributions'
 
     def get_placeholder_kwargs(self):
-        contribution = self.contribs[0]
-        person = self.event.creator
         for contrib in self.contribs:
-            for p in contribution.person_links:
+            for p in contrib.person_links:
                 if p.email:
-                    person = p
-                    contribution = contrib
-        return {'person': person, 'contribution': contribution}
+                    return {'person': p, 'contribution': contrib}
+        return {'person': self.event.creator, 'contribution': self.contribs[0]}
 
 
 class RHContributionsAPIEmailContribRolesSend(EmailRolesSendMixin, RHManageContributionsActionsBase):
