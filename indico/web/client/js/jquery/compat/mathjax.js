@@ -50,6 +50,7 @@ window.MathJax = {
       safeProtocols: {
         http: true,
         https: true,
+        mailto: true,
         file: false,
         javascript: false,
         data: false,
