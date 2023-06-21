@@ -489,7 +489,7 @@ class BookingDetails extends React.Component {
     }
 
     const label = (
-      <Label color={color}>
+      <Label color={color} style={{verticalAlign: '50%'}}>
         {icon}
         {status}
       </Label>
