@@ -149,7 +149,7 @@ class RHCategoryInfo(RHDisplayCategoryBase):
 
 class RHReachableCategoriesInfo(RH):
     def _get_reachable_categories(self, id_, excluded_ids):
-        cat = Category.query.filter_by(id=id_).options(joinedload('children').load_only('id')).one()
+        cat = Category.query.filter_by(id=id_).options(joinedload('children').load_only('id')).first_or_404()
         ids = ({c.id for c in cat.children} | {c.id for c in cat.parent_chain_query}) - excluded_ids
         if not ids:
             return []
@@ -158,8 +158,11 @@ class RHReachableCategoriesInfo(RH):
                 .options(*RHCategoryInfo._category_query_options)
                 .all())
 
-    def _process(self):
-        excluded_ids = set(request.json.get('exclude', set())) if request.json else set()
+    @use_kwargs({
+        'excluded_ids': fields.List(fields.Int(), data_key='exclude', load_default=None)
+    })
+    def _process(self, excluded_ids):
+        excluded_ids = set(excluded_ids) if excluded_ids is not None else set()
         categories = self._get_reachable_categories(request.view_args['category_id'], excluded_ids=excluded_ids)
         return jsonify_data(categories=[serialize_category_chain(c, include_children=True) for c in categories],
                             flash=False)
