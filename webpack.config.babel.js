@@ -136,6 +136,8 @@ export default env => {
     },
     plugins: [
       new CopyWebpackPlugin({
+        // mathjax requests some assets dynamically after it has been loaded,
+        // so we copy everything to the dist folder.
         patterns: [{from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform}],
       }),
       new webpack.ProvidePlugin({
