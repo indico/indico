@@ -874,13 +874,15 @@ class RHContributionsAPIEmailContribRolesMetadata(EmailRolesMetadataMixin, RHMan
     object_context = 'contributions'
 
 
-class RHContributionsAPIEmailContribRolesPreview(EmailRolesPreviewMixin, RHManageContributionsBase):
+class RHContributionsAPIEmailContribRolesPreview(EmailRolesPreviewMixin, RHManageContributionsActionsBase):
     object_context = 'contributions'
 
     def get_placeholder_kwargs(self):
-        contribution = Contribution.query.with_parent(self.event).first()
-        # none of the contributions are guaranteed to have a person so we use the event creator...
-        return {'person': self.event.creator, 'contribution': contribution}
+        for contrib in self.contribs:
+            for p in contrib.person_links:
+                if p.email:
+                    return {'person': p, 'contribution': contrib}
+        return {'person': self.event.creator, 'contribution': self.contribs[0]}
 
 
 class RHContributionsAPIEmailContribRolesSend(EmailRolesSendMixin, RHManageContributionsActionsBase):

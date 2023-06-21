@@ -79,7 +79,7 @@ export function EmailParticipantRoles({
       senders={senders}
       recipients={recipients}
       previewURL={emailPreviewURL({event_id: eventId})}
-      previewContext={{noAccount}}
+      previewContext={recipientData}
       placeholders={placeholders}
       initialFormValues={{subject: defaultSubject, body: defaultBody}}
       sentEmailsCount={sentCount}

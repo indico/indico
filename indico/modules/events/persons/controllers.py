@@ -265,25 +265,6 @@ class RHPersonsList(RHPersonsBase):
                                                has_predefined_affiliations=Affiliation.query.has_rows())
 
 
-class RHEmailEventPersonsPreview(RHManageEventBase):
-    """Preview an email with EventPersons associated placeholders."""
-
-    @use_kwargs({
-        'body': fields.String(required=True),
-        'subject': fields.String(required=True),
-        'no_account': fields.Bool(load_default=False),
-    })
-    def _process(self, body, subject, no_account):
-        person = self.event.persons.first() or session.user
-        email_body = replace_placeholders('event-persons-email', body, event=self.event, person=person,
-                                          register_link=no_account)
-        email_subject = replace_placeholders('event-persons-email', subject, event=self.event, person=person,
-                                             register_link=no_account)
-        tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
-                                  email_body=email_body)
-        return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
-
-
 class RHEmailEventPersonsBase(RHManageEventBase):
     """Send emails to selected EventPersons."""
 
@@ -311,6 +292,24 @@ class RHEmailEventPersonsBase(RHManageEventBase):
                  .filter(EventRole.id.in_(role_ids))
                  .options(joinedload('members')))
         return itertools.chain.from_iterable(role.members for role in query)
+
+
+class RHEmailEventPersonsPreview(RHEmailEventPersonsBase):
+    """Preview an email with EventPersons associated placeholders."""
+
+    @use_kwargs({
+        'body': fields.String(required=True),
+        'subject': fields.String(required=True),
+    })
+    def _process(self, body, subject):
+        person = next(iter(self.recipients)) if self.recipients else session.user
+        email_body = replace_placeholders('event-persons-email', body, event=self.event, person=person,
+                                          register_link=self.no_account)
+        email_subject = replace_placeholders('event-persons-email', subject, event=self.event, person=person,
+                                             register_link=self.no_account)
+        tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
+                                  email_body=email_body)
+        return jsonify(subject=tpl.get_subject(), body=tpl.get_body())
 
 
 class RHAPIEmailEventPersonsMetadata(RHEmailEventPersonsBase):

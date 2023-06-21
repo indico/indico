@@ -59,6 +59,7 @@ export function EmailContribAbstractRoles({context, metadataURL, previewURL, sen
       onClose={onClose}
       senders={senders}
       previewURL={previewURL}
+      previewContext={context}
       placeholders={placeholders}
       initialFormValues={{subject: defaultSubject, body: defaultBody, recipient_roles: []}}
       sentEmailsCount={sentCount}
