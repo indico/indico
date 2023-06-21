@@ -10,10 +10,11 @@ Version 3.2.5
 Security fixes
 ^^^^^^^^^^^^^^
 
-- Fix a possible XSS vulnerability in the LaTeX ``\href`` macro. Previously, it was
-  possible to embed arbitrary javascript using the ``javascript:`` protocol. The
-  underlying MathJax library was updated to version 3 which allows blacklisting
-  certain protocols. Currently, only ``http`` and ``https`` is allowed in ``\href`` macros.
+- Fix an XSS vulnerability in the LaTeX ``\href`` macro when rendering it client-side.
+  Previously, it was possible to embed arbitrary JavaScript there using the ``javascript:``
+  protocol. The underlying MathJax library has now been updated to version 3 which allows
+  blacklisting certain protocols, thus allowing only ``http`` and ``https`` links in ``\href``
+  macros :pr:`5818`
 
 Improvements
 ^^^^^^^^^^^^
