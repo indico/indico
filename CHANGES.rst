@@ -34,6 +34,7 @@ Bugfixes
   (:pr:`5813`)
 - Fix editable filters not working simultaneously with editable search (:pr:`5796`)
 - Fix missing icons in Abstract Markdown editor (:pr:`5815`)
+- Fix text overflow in event manage button (:pr:`5816`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
