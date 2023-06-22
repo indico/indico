@@ -21,6 +21,7 @@ Improvements
 
 - Show actual recipient data in the email preview instead of the that of the event creator
   (:pr:`5794`)
+- Add an option to set a maximum number of choices in a multi-choice field (:pr:`5800`)
 
 Bugfixes
 ^^^^^^^^

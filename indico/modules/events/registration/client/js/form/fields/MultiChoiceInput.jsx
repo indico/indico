@@ -12,8 +12,8 @@ import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Checkbox, Dropdown, Label} from 'semantic-ui-react';
 
-import {FinalCheckbox, FinalField} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
+import {Translate, PluralTranslate} from 'indico/react/i18n';
 
 import {getCurrency} from '../../form/selectors';
 import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
@@ -29,6 +29,8 @@ function MultiChoiceInputComponent({
   existingValue,
   value,
   onChange,
+  onFocus,
+  onBlur,
   disabled,
   choices,
   withExtraSlots,
@@ -38,7 +40,13 @@ function MultiChoiceInputComponent({
   const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
 
+  const markTouched = () => {
+    onFocus();
+    onBlur();
+  };
+
   const makeHandleChange = choice => () => {
+    markTouched();
     if (value[choice.id]) {
       onChange(_.omit(value, choice.id));
     } else {
@@ -46,6 +54,7 @@ function MultiChoiceInputComponent({
     }
   };
   const makeHandleSlotsChange = choice => (__, {value: newValue}) => {
+    markTouched();
     if (!+newValue) {
       onChange(_.omit(value, choice.id));
     } else {
@@ -54,8 +63,8 @@ function MultiChoiceInputComponent({
   };
 
   const formatPrice = choice => {
-    const v = value[choice.id] || 0;
-    return ((v === 0 ? 0 : choice.extraSlotsPay ? v : 1) * choice.price).toFixed(2);
+    const val = value[choice.id] || 0;
+    return ((val === 0 ? 0 : choice.extraSlotsPay ? val : 1) * choice.price).toFixed(2);
   };
 
   const isPaidChoice = choice => choice.price > 0 && paid;
@@ -160,6 +169,8 @@ function MultiChoiceInputComponent({
 MultiChoiceInputComponent.propTypes = {
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
@@ -173,6 +184,7 @@ export default function MultiChoiceInput({
   disabled,
   isRequired,
   choices,
+  maxChoices,
   withExtraSlots,
   placesUsed,
 }) {
@@ -188,6 +200,16 @@ export default function MultiChoiceInput({
       placesUsed={placesUsed}
       existingValue={existingValue}
       isEqual={_.isEqual}
+      validate={value => {
+        if (maxChoices && _.keys(value).length > maxChoices) {
+          return PluralTranslate.string(
+            'At most {n} option can be selected',
+            'At most {n} options can be selected',
+            maxChoices,
+            {n: maxChoices}
+          );
+        }
+      }}
     />
   );
 }
@@ -198,6 +220,7 @@ MultiChoiceInput.propTypes = {
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
+  maxChoices: PropTypes.number,
   withExtraSlots: PropTypes.bool,
   placesUsed: PropTypes.objectOf(PropTypes.number).isRequired,
 };
@@ -205,6 +228,7 @@ MultiChoiceInput.propTypes = {
 MultiChoiceInput.defaultProps = {
   disabled: false,
   isRequired: false,
+  maxChoices: null,
   withExtraSlots: false,
 };
 
@@ -216,6 +240,27 @@ export const multiChoiceSettingsInitialData = {
 export function MultiChoiceSettings() {
   return (
     <>
+      <Field name="choices" subscription={{value: true}}>
+        {({input: {value}}) => {
+          const min = value.length > 0 ? 1 : 0;
+          const max = value.length > 0 ? value.length : 0;
+          return (
+            <FinalInput
+              name="maxChoices"
+              type="number"
+              placeholder={Translate.string('Unlimited', 'Number of choices')}
+              step="1"
+              min={min}
+              max={max}
+              validate={v.optional(v.range(min, max))}
+              label={Translate.string('Maximum number of choices')}
+              description={Translate.string(
+                'Maximum number of choices that can be selected. Leave empty to unset.'
+              )}
+            />
+          );
+        }}
+      </Field>
       <FinalCheckbox name="withExtraSlots" label={Translate.string('Enable extra slots')} />
       <Field name="withExtraSlots" subscription={{value: true}}>
         {({input: {value: withExtraSlots}}) => (

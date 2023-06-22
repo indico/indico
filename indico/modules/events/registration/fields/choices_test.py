@@ -8,8 +8,9 @@
 from copy import deepcopy
 
 import pytest
+from marshmallow import ValidationError
 
-from indico.modules.events.registration.fields.choices import _hashable_choice
+from indico.modules.events.registration.fields.choices import MultiChoiceSetupSchema, _hashable_choice
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
 
@@ -28,6 +29,14 @@ def multi_choice_field():
             {'id': _id(2), 'places_limit': 0, 'price': 0},
             {'id': _id(3), 'places_limit': 0, 'price': 10}
         ]
+    }
+    field.data = {
+        'captions': {
+            _id(1): 'Option 1',
+            _id(2): 'Option 2',
+            _id(3): 'Option 3',
+        },
+        'max_choices': None
     }
     return field
 
@@ -167,3 +176,49 @@ def test_multi_choice_field_process_form_data_price_change_deselected(multi_choi
     form_data = {_id(2): 1, _id(3): 1}
     rv = multi_choice_field.field_impl.process_form_data(None, form_data, new_data)
     assert RegistrationData(**rv).price == 510
+
+
+def test_multi_choice_field_validate_max_choices(multi_choice_field):
+    def run_validators(validators, value):
+        for v in validators:
+            v(value)
+
+    validators = multi_choice_field.field_impl.get_validators(None)
+    run_validators(validators, {})
+    run_validators(validators, {_id(1): 1, _id(2): 1})
+
+    multi_choice_field.data['max_choices'] = 1
+    run_validators(validators, {_id(1): 1})
+    with pytest.raises(ValidationError, match='At most 1 option can be selected'):
+        run_validators(validators, {_id(1): 1, _id(2): 1})
+
+    multi_choice_field.data['max_choices'] = 2
+    run_validators(validators, {_id(1): 1, _id(2): 1})
+    with pytest.raises(ValidationError, match='At most 2 options can be selected'):
+        run_validators(validators, {_id(1): 1, _id(2): 1, _id(3): 1})
+
+
+@pytest.mark.parametrize(('max_choices', 'n_choices', 'error'), (
+    (-3, 2, 'Maximum choices must be greater than 0'),
+    (None, 2, None),
+    (1, 2, None),
+    (2, 2, None),
+    (4, 3, 'Value must not be greater than the total number of choices')
+))
+def test_multi_choice_setup_schema_max_choices_validation(max_choices, n_choices, error):
+    def _choice(n):
+        return {
+            'id': _id(n),
+            'caption': f'Option {n}',
+            'is_enabled': True,
+        }
+
+    schema = MultiChoiceSetupSchema()
+    choices = [_choice(n) for n in range(n_choices)]
+    data = {'max_choices': max_choices, 'choices': choices}
+
+    if error:
+        with pytest.raises(ValidationError, match=error):
+            schema.load(data)
+    else:
+        schema.load(data)
