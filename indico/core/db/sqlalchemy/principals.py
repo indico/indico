@@ -682,7 +682,12 @@ def clone_principals(cls, principals, event_role_map=None, regform_map=None):
         elif old_principal.type == PrincipalType.registration_form:
             if regform_map is None:
                 continue
-            registration_form = regform_map[old_principal.registration_form]
+            try:
+                registration_form = regform_map[old_principal.registration_form]
+            except KeyError:
+                # initially regforms were not removed from ACLs when deleting them, so we
+                # can end up with a registration form here that's not in the mapping
+                continue
         principal = cls()
         principal.populate_from_dict({attr: getattr(old_principal, attr) for attr in attrs})
         if event_role:
