@@ -136,7 +136,7 @@ def service_get_status(event):
 
 
 def service_handle_new_editable(editable, user):
-    revision = editable.revisions[-1]
+    revision = editable.latest_revision
     data = {
         'editable': EditableBasicSchema().dump(editable),
         'revision': EditingRevisionSignedSchema().dump(revision),

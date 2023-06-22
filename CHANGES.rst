@@ -37,6 +37,10 @@ Bugfixes
 - Fix editable filters not working simultaneously with editable search (:pr:`5796`)
 - Fix missing icons in Abstract Markdown editor (:pr:`5815`)
 - Fix text overflow in event manage button (:pr:`5816`)
+- Fix undone revisions being used instead of the latest valid one when downloading
+  revision files as a ZIP archive (:pr:`5820`)
+- Fix custom actions not showing on revisions if the latest revision has been undone
+  (:pr:`5820`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

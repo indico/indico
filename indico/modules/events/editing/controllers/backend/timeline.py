@@ -123,7 +123,7 @@ class RHEditable(RHContributionEditableBase):
             return []
 
         try:
-            return service_get_custom_actions(self.editable, self.editable.revisions[-1], session.user)
+            return service_get_custom_actions(self.editable, self.editable.latest_revision, session.user)
         except ServiceRequestFailed:
             # unlikely to fail, but if it does we don't break the whole timeline
             return []

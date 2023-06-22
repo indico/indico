@@ -238,7 +238,7 @@ class Editable(db.Model):
         from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
         query = EditingReviewCondition.query.with_parent(self.event).filter_by(type=self.type)
         review_conditions = [{ft.id for ft in cond.file_types} for cond in query]
-        file_types = {file.file_type_id for file in self.revisions[-1].files}
+        file_types = {file.file_type_id for file in self.latest_revision.files}
         if not review_conditions:
             return True
         return any(file_types >= cond for cond in review_conditions)

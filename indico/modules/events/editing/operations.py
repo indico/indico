@@ -425,7 +425,7 @@ def generate_editables_zip(event, editable_type, editables):
     buf = BytesIO()
     with ZipFile(buf, 'w', allowZip64=True) as zip_file:
         for editable in editables:
-            for revision_file in editable.revisions[-1].files:
+            for revision_file in editable.latest_revision.files:
                 file_obj = revision_file.file
                 with file_obj.get_local_path() as src_file:
                     zip_file.write(src_file, _compose_filepath(editable, revision_file))
