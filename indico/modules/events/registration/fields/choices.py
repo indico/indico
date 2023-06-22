@@ -290,7 +290,7 @@ class MultiChoiceField(ChoiceBaseField):
             if not new_data:
                 return
 
-            max_choices = self.form_item.data['max_choices']
+            max_choices = self.form_item.data.get('max_choices')
             # If `max_choices` is set, ensure that it is
             # less than or equal to the total number of choices.
             if max_choices and len(new_data) > max_choices:
