@@ -29,6 +29,8 @@ function MultiChoiceInputComponent({
   existingValue,
   value,
   onChange,
+  onFocus,
+  onBlur,
   disabled,
   choices,
   withExtraSlots,
@@ -38,7 +40,13 @@ function MultiChoiceInputComponent({
   const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
 
+  const markTouched = () => {
+    onFocus();
+    onBlur();
+  };
+
   const makeHandleChange = choice => () => {
+    markTouched();
     if (value[choice.id]) {
       onChange(_.omit(value, choice.id));
     } else {
@@ -46,6 +54,7 @@ function MultiChoiceInputComponent({
     }
   };
   const makeHandleSlotsChange = choice => (__, {value: newValue}) => {
+    markTouched();
     if (!+newValue) {
       onChange(_.omit(value, choice.id));
     } else {
@@ -160,6 +169,8 @@ function MultiChoiceInputComponent({
 MultiChoiceInputComponent.propTypes = {
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   choices: PropTypes.arrayOf(PropTypes.shape(choiceShape)).isRequired,
   withExtraSlots: PropTypes.bool.isRequired,
