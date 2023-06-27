@@ -17,7 +17,7 @@
     "ckeditor": "git+https://indico@github.com/indico/ckeditor.git#v1.10.0",
     "clipboard": "^2.0.11",
     "connected-react-router": "^6.9.2",
-    "core-js": "^2.6.12",
+    "core-js": "^3.31.0",
     "dropzone": "^5.9.3",
     "file-selector": "^0.6.0",
     "final-form": "^4.20.7",
