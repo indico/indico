@@ -317,7 +317,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                       rendering of the log message/data
         :param data: JSON-serializable data specific to the log type.
         :param meta: JSON-serializable data that won't be displayed.
-        :return: The newly created `EventLogEntry`
+        :return: The newly created `CategoryLogEntry`
 
         In most cases the ``simple`` log type is fine. For this type,
         any items from data will be shown in the detailed view of the
