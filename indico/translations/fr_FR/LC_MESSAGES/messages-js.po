@@ -4,19 +4,19 @@
 # 
 # Translators:
 # Adrian, 2018
-# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012,2020
+# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012,2020,2023
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Jean-René Rouet <rouet@in2p3.fr>, 2017
 # Thomas Baron <thomas.baron@cern.ch>, 2013-2015
 # Thomas Baron <thomas.baron@cern.ch>, 2011, 2012
-# Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2022
+# Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-05-18 22:02+0200\n"
+"POT-Creation-Date: 2023-06-15 13:26+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2022\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2023\n"
 "Language-Team: French (France) (http://app.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -270,7 +270,7 @@ msgstr "Le modèle ne peut pas être vide. Veuillez ajouter des éléments ou un
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
-msgstr "L'élément Image Fixe ne peut pas être vide. Téléchargez une image dedans ou supprimez le."
+msgstr "L'élément Image Fixe ne peut pas être vide. Télédéposez une image dedans ou supprimez le."
 
 #: indico/modules/designer/client/js/index.js:628
 msgid "Are you sure you want to change the dimensions of this template?"
@@ -318,9 +318,9 @@ msgstr "Cacher l'aperçu"
 #: indico/modules/events/client/js/cloning.js:59
 msgid "{0} new event will be created."
 msgid_plural "{0} new events will be created."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} nouvel événement sera créé."
+msgstr[1] "{0} nouveaux événements seront créés."
+msgstr[2] "{0} nouveaux événements seront créés."
 
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
