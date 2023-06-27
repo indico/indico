@@ -10,18 +10,18 @@
 # Damian Bucher <bucher@uni-muenster.de>, 2022
 # Ina Gante Gaspar <ina.gaspar@uni-muenster.de>, 2022
 # Jan Schumacher, 2022
-# Adrian, 2022
-# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2022
 # Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2023
 # bpedersen <iceelch@googlemail.com>, 2023
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2023
 # bbbuserde, 2023
 # markus heuchert <m.heuchert@uni-muenster.de>, 2023
+# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2023
+# Adrian, 2023
 # 
 msgid ""
 msgstr ""
 "POT-Creation-Date: 2023-05-23 22:02+0200\n"
-"Last-Translator: markus heuchert <m.heuchert@uni-muenster.de>, 2023\n"
+"Last-Translator: Adrian, 2023\n"
 "Language-Team: German (Germany) (https://app.transifex.com/indico/teams/6478/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -571,7 +571,7 @@ msgid ""
 " verify their changes. If you reject them, you can upload a new version "
 "afterwards."
 msgstr ""
-"Ein Ediot hat Änderung am Paper hochgeladen. Bitte laden Sie die "
+"Ein Editor hat Änderung am Paper hochgeladen. Bitte laden Sie die "
 "aktualisierten Dateien herunter und prüfen Sie die Änderungen. Wenn Sie sie "
 "ablehnen, können Sie eine neue Version danach hochladen."
 
@@ -2078,11 +2078,11 @@ msgstr "Diese Person hat keine Abstracts eingereicht"
 #: indico/modules/events/persons/client/js/AuthorsList.jsx:115
 #: indico/modules/events/persons/client/js/AuthorsListButton.jsx:31
 msgid "Authors list"
-msgstr ""
+msgstr "Autorenliste"
 
 #: indico/modules/events/persons/client/js/AuthorsList.jsx:119
 msgid "Filter by"
-msgstr ""
+msgstr "Filtern nach"
 
 #: indico/modules/events/persons/client/js/AuthorsList.jsx:152
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:222
