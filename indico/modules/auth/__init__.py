@@ -118,16 +118,14 @@ def _delete_requests(user, **kwargs):
 
 @signals.core.app_created.connect
 def _handle_insecure_password_logins(app, **kwargs):
+    from indico.modules.auth.util import should_skip_redirect_on_insecure_password
+
     @app.before_request
     def _redirect_if_insecure():
         if not request.endpoint:
             return
 
-        if (
-            request.blueprint == 'assets' or
-            request.endpoint.endswith('.static') or
-            request.endpoint in ('auth.logout', 'auth.accounts', 'core.contact', 'core.change_lang')
-        ):
+        if should_skip_redirect_on_insecure_password(request.endpoint):
             return
 
         if 'insecure_password_error' not in session:
