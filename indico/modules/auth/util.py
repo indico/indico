@@ -11,6 +11,7 @@ from werkzeug.datastructures import MultiDict
 from indico.core.config import config
 from indico.modules.auth import Identity
 from indico.modules.users.operations import create_user
+from indico.util.signals import make_interceptable
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
 
@@ -103,6 +104,15 @@ def redirect_to_login(next_url=None, reason=None):
     if reason:
         session['login_reason'] = reason
     return redirect(url_for_login(next_url))
+
+
+@make_interceptable
+def should_skip_redirect_on_insecure_password(endpoint):
+    return (
+        endpoint.startswith('assets.') or
+        endpoint.endswith('.static') or
+        endpoint in ('auth.logout', 'auth.accounts', 'core.contact', 'core.change_lang')
+    )
 
 
 def url_for_login(next_url=None):
