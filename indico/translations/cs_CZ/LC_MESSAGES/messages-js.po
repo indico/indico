@@ -1,0 +1,1389 @@
+# Translations template for indico.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the indico project.
+# 
+# Translators:
+# Jan Kubancak <jan.kubancak@fjfi.cvut.cz>, 2021
+# Jiri Franc, 2018
+# fri, 2017-2018,2022
+# Petr Vokac <vokac@fjfi.cvut.cz>, 2015
+# Tomáš Roun <tomas.roun8@gmail.com>, 2023
+# Vaclav Stepan <vaclav.stepan@gmail.com>, 2015,2021,2023
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-06-15 13:26+0200\n"
+"PO-Revision-Date: 2011-07-07 13:45+0000\n"
+"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2023\n"
+"Language-Team: Czech (Czech Republic) (http://app.transifex.com/indico/indico/language/cs_CZ/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
+"Language: cs_CZ\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: indico/modules/attachments/client/js/legacy.js:152
+msgid "This file no longer exists. Please reload the page."
+msgstr "Tento soubor již neexistuje. Prosím načtěte stránku znovu."
+
+#: indico/modules/attachments/client/js/legacy.js:158
+msgid "You are not authorized to access this file."
+msgstr "Pro přístup k tomuto souboru nemáte oprávnění."
+
+#: indico/modules/attachments/client/js/legacy.js:158
+#: indico/modules/attachments/client/js/legacy.js:161
+msgid "Access Denied"
+msgstr "Přístup odepřen"
+
+#: indico/modules/attachments/client/js/legacy.js:160
+msgid "This file is protected. You will be redirected to the login page."
+msgstr "Tento soubor je chráněn. Budete přesměrován na přihlašovací stránku."
+
+#: indico/modules/attachments/client/js/legacy.js:233
+msgid "Manage material"
+msgstr "Spravovat podklady"
+
+#: indico/modules/attachments/client/js/package.js:49
+msgid "Building package"
+msgstr "Vytvářím balíček"
+
+#: indico/modules/categories/client/js/calendar.js:24
+msgid "Today"
+msgstr "Dnes"
+
+#: indico/modules/categories/client/js/calendar.js:50
+msgid "Events happening on {0}"
+msgstr "Události probíhající {0}"
+
+#: indico/modules/categories/client/js/calendar.js:62
+msgid "{0} long-lasting event not shown"
+msgid_plural "{0} long-lasting events not shown"
+msgstr[0] "{0} dlouhotrvající událost nezobrazena"
+msgstr[1] "{0} dlouhotrvající události nezobrazeny"
+msgstr[2] "{0} dlouhotrvající události nezobrazeny"
+msgstr[3] "{0} dlouhotrvající události nezobrazeny"
+
+#: indico/modules/categories/client/js/calendar.js:72
+msgid "Long lasting events"
+msgstr "Dlouhotrvající události"
+
+#: indico/modules/categories/client/js/display.js:25
+msgid "empty"
+msgstr "prázdné"
+
+#: indico/modules/categories/client/js/display.js:26
+msgid "{0} event"
+msgid_plural "{0} events"
+msgstr[0] "{0} událost"
+msgstr[1] "{0} události"
+msgstr[2] "{0} událostí"
+msgstr[3] "{0} událostí"
+
+#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/events/management/client/js/index.js:383
+msgid "Undo"
+msgstr "Vrátit zpět"
+
+#: indico/modules/categories/client/js/management.js:59
+msgid "The category order has been restored."
+msgstr "Pořadí kategorií bylo obnoveno."
+
+#: indico/modules/categories/client/js/management.js:61
+msgid "The category list has been sorted."
+msgstr "Seznam kategorií byl seřazen"
+
+#: indico/modules/categories/client/js/management.js:184
+msgid "Delete category"
+msgstr "Smazat kategorii"
+
+#: indico/modules/categories/client/js/management.js:188
+msgid "This category cannot be deleted because it is not empty."
+msgstr "Kategorii nelze smazat, protože není prázdná."
+
+#: indico/modules/categories/client/js/management.js:196
+msgid ""
+"At least one selected category cannot be deleted because it is not empty."
+msgstr "Alespoň jednu z vybraných kategorií nelze smazat, protože není prázdná."
+
+#: indico/modules/categories/client/js/management.js:201
+msgid "Delete the selected category"
+msgid_plural "Delete {0} selected categories"
+msgstr[0] "Smazat vybranou kategorii"
+msgstr[1] "Smazat {0} vybraných kategorií"
+msgstr[2] "Smazat {0} vybraných kategorií"
+msgstr[3] "Smazat {0} vybraných kategorií"
+
+#: indico/modules/categories/client/js/management.js:209
+msgid "Select the categories to delete first."
+msgstr "Nejprve vyberte kategorie ke smazání."
+
+#: indico/modules/categories/client/js/management.js:218
+msgid "Delete categories"
+msgstr "Smazat kategorie"
+
+#: indico/modules/categories/client/js/management.js:238
+msgid "Move the selected category"
+msgid_plural "Move the {0} selected categories"
+msgstr[0] "Přesunout {0} vybranou kategorii"
+msgstr[1] "Přesunout {0} vybrané kategorie"
+msgstr[2] "Přesunout {0} vybraných kategorií"
+msgstr[3] "Přesunout {0} vybraných kategorií"
+
+#: indico/modules/categories/client/js/management.js:245
+msgid "Select the categories to move first."
+msgstr "Nejprve vyberte kategorie, které chcete přesunout."
+
+#: indico/modules/categories/client/js/management.js:274
+#: indico/modules/vc/client/js/index.js:54
+#: indico/web/client/js/jquery/utils/forms.js:405
+msgid "*"
+msgid_plural "All {0} events in this category are currently selected."
+msgstr[0] "Jediná ({0}) událost v této kategorii je zvolena. "
+msgstr[1] "Jsou zvoleny obě ({0}) události v této kategorii."
+msgstr[2] "Je zvoleno všech {0} událostí v této kategorii."
+msgstr[3] "Je zvoleno všech {0} událostí v této kategorii."
+
+#: indico/modules/categories/client/js/management.js:279
+msgid "Only {0} out of {1} events is currently selected."
+msgid_plural "Only {0} out of {1} events are currently selected."
+msgstr[0] "Pouze {0} z {1} událostí je nyní zvolena."
+msgstr[1] "Pouze {0} z {1} událostí jsou nyní zvoleny."
+msgstr[2] "Pouze {0} z {1} událostí jsou nyní zvoleny."
+msgstr[3] "Pouze {0} z {1} událostí jsou nyní zvoleny."
+
+#: indico/modules/categories/client/js/management.js:358
+msgid "Move here"
+msgstr "Přesunout sem"
+
+#: indico/modules/categories/client/js/management.js:359
+msgid "Move category"
+msgid_plural "Move categories"
+msgstr[0] "Přesunout kategorii"
+msgstr[1] "Přesunout kategorie"
+msgstr[2] "Přesunout kategorie"
+msgstr[3] "Přesunout kategorie"
+
+#: indico/modules/categories/client/js/management.js:361
+msgid "Select new category parent for the category"
+msgid_plural "Select new category parent for {0} selected categories"
+msgstr[0] "Zvolte do které kategorie zařadit vybranou kategorii"
+msgstr[1] "Zvolte do které kategorie zařadit {0} vybraných kategorií"
+msgstr[2] "Zvolte do které kategorie zařadit {0} vybraných kategorií"
+msgstr[3] "Zvolte, do které kategorie zařadit {0} vybraných kategorií"
+
+#: indico/modules/categories/client/js/management.js:377
+msgid "The category is already here"
+msgid_plural "The selected categories are already here"
+msgstr[0] "Kategorie již tu je"
+msgstr[1] "Zvolené kategorie již jsou tu"
+msgstr[2] "Zvolené kategorie již jsou tu"
+msgstr[3] "Zvolené kategorie již jsou tu"
+
+#: indico/modules/categories/client/js/management.js:385
+msgid "This is the category you are trying to move"
+msgid_plural "This is one of the categories you are trying to move"
+msgstr[0] "Tohle je kategorie, kterou se snažíte přesunout"
+msgstr[1] "Tohle je jedna z kategorií, kterou se snažíte přesunout"
+msgstr[2] "Tohle je jedna z kategorií, kterou se snažíte přesunout"
+msgstr[3] "Toto je jedna z kategorií, kterou se snažíte přesunout"
+
+#: indico/modules/cephalopod/client/js/index.js:40
+msgid "Unknown error while contacting the Community Hub"
+msgstr "Při připojování se ke komunitnímu uzlu se vyskytla neznámá chyba"
+
+#: indico/modules/cephalopod/client/js/index.js:42
+msgid "Internal error: Parse error on the reply of the Community Hub."
+msgstr "Vnitřní chyba: Chyba při zpracování odpovědi od komunitního uzlu."
+
+#: indico/modules/cephalopod/client/js/index.js:44
+msgid "Unable to contact the Community Hub."
+msgstr "Nelze se spojit s komunitním uzlem."
+
+#: indico/modules/cephalopod/client/js/index.js:46
+msgid "The connection to the Community Hub timed out."
+msgstr "Spojení s komunitním uzlem vypršelo."
+
+#: indico/modules/cephalopod/client/js/index.js:51
+msgid "Your server is not registered with the Community Hub."
+msgstr "Váš server není v komunitním uzlu registrován."
+
+#: indico/modules/cephalopod/client/js/index.js:86
+msgid "Disabled"
+msgstr "Zakázáno"
+
+#: indico/modules/cephalopod/client/js/index.js:87
+msgid "This server is not registered as part of the community."
+msgstr "Server není registrován jako část komunity."
+
+#: indico/modules/cephalopod/client/js/index.js:108
+msgid "Synchronized"
+msgstr "Synchronizováno"
+
+#: indico/modules/cephalopod/client/js/index.js:109
+msgid "This server is registered as part of the community and is up to date."
+msgstr "Tento server je zapsán jako součást komunity a je aktualizován."
+
+#: indico/modules/cephalopod/client/js/index.js:118
+msgid "Out of sync"
+msgstr "Nesynchronizováno"
+
+#: indico/modules/cephalopod/client/js/index.js:119
+msgid ""
+"Your Indico server is out of sync. Synchronize it with the button on the "
+"right."
+msgstr "Váš Indico server není synchronizován s komunitním uzlem. Synchronizujte ho pomocí tlačítka vpravo."
+
+#: indico/modules/cephalopod/client/js/index.js:129
+msgid "Error!"
+msgstr "Chyba!"
+
+#: indico/modules/cephalopod/client/js/index.js:147
+msgid ""
+"Your Indico server is not synchronized with the Community Hub! You can solve"
+" this <a href=\"{0}\">here</a>."
+msgstr "Váš Indico server není synchronizován s komunitním uzlem! Můžete to vyřešit <a href=\"{0}\">zde</a>."
+
+#: indico/modules/designer/client/js/index.js:31
+#: indico/modules/designer/client/js/index.js:847
+msgid ""
+"The back side of the templates that use this one as the back side will be "
+"removed."
+msgstr "Zadní strana šablon, které používají tuto stranu jako zadní stranu bude odstraněna."
+
+#: indico/modules/designer/client/js/index.js:34
+#: indico/modules/designer/client/js/index.js:850
+msgid "Disassociate back sides"
+msgstr "Odpojit zadní strany"
+
+#: indico/modules/designer/client/js/index.js:95
+msgid "Fixed text"
+msgstr "Pevný text"
+
+#: indico/modules/designer/client/js/index.js:587
+msgid "Please choose a name for the template"
+msgstr "Vyberte prosím název šablony"
+
+#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:593
+#: indico/modules/designer/client/js/index.js:602
+msgid "Warning"
+msgstr "Upozornění"
+
+#: indico/modules/designer/client/js/index.js:592
+msgid "The template cannot be empty. Add some elements or a background image."
+msgstr "Šablona nemůže být prázdná. Přidejte nějaké položky nebo obrázek na pozadí."
+
+#: indico/modules/designer/client/js/index.js:599
+msgid ""
+"The Fixed image element cannot be empty. Upload an image inside it or remove"
+" it."
+msgstr ""
+
+#: indico/modules/designer/client/js/index.js:628
+msgid "Are you sure you want to change the dimensions of this template?"
+msgstr "Opravdu chcete změnit rozměry této šablony?"
+
+#: indico/modules/designer/client/js/index.js:772
+#: indico/modules/designer/client/js/index.js:1124
+msgid "Choose a file"
+msgstr "Vybrat soubor"
+
+#: indico/modules/designer/client/js/index.js:780
+msgid "Fixed Image"
+msgstr ""
+
+#: indico/modules/designer/client/js/index.js:838
+msgid "This back side template will be removed"
+msgstr "Šablona zadní strany bude odstraněna"
+
+#: indico/modules/designer/client/js/index.js:840
+msgid "The back side of this template will be removed"
+msgstr "Zadní strana této šablony bude odstraněna"
+
+#: indico/modules/designer/client/js/index.js:841
+msgid "Disassociate back side"
+msgstr "Odpojit zadní stranu"
+
+#: indico/modules/designer/client/js/index.js:845
+msgid "The back side is empty."
+msgstr "Zadní strana je prázdná."
+
+#: indico/modules/designer/client/js/index.js:983
+#: indico/modules/designer/client/js/index.js:997
+msgid "Error"
+msgstr "Chyba"
+
+#: indico/modules/events/abstracts/client/js/index.js:75
+#: indico/modules/events/abstracts/client/js/index.js:88
+msgid "Show preview"
+msgstr "Zobrazit náhled"
+
+#: indico/modules/events/abstracts/client/js/index.js:79
+msgid "Hide preview"
+msgstr "Skrýt náhled"
+
+#: indico/modules/events/client/js/cloning.js:59
+msgid "{0} new event will be created."
+msgid_plural "{0} new events will be created."
+msgstr[0] "{0} nová událost bude vytvořena."
+msgstr[1] "{0} nových událostí bude vytvořeno."
+msgstr[2] "{0} nových událostí bude vytvořeno."
+msgstr[3] "{0} nových událostí bude vytvořeno."
+
+#: indico/modules/events/client/js/layout.js:165
+msgid "Menu Entry Settings"
+msgstr "Nastavení položek nabídky"
+
+#: indico/modules/events/client/js/util/static_filters.js:19
+msgid "{0} out of {1} displayed"
+msgstr "{0} z {1} zobrazeno"
+
+#: indico/modules/events/client/js/util/static_filters.js:61
+msgid "There are no entries that match your search criteria."
+msgstr "Neexistují žádné položky vyhovující zvoleným hlediskům."
+
+#: indico/modules/events/management/client/js/index.js:381
+msgid "Undoing previous operation..."
+msgstr "Poslední krok se vrací zpět…"
+
+#: indico/modules/events/registration/client/js/index.js:54
+#: indico/modules/events/registration/client/js/registration.js:42
+msgid "Terms and Conditions"
+msgstr "Podmínky použití"
+
+#: indico/modules/events/registration/client/js/reglists.js:35
+msgid "Email Preview"
+msgstr "Zaslat náhled e-mailem"
+
+#: indico/modules/events/registration/client/js/reglists.js:52
+msgid "Do you really want to delete the selected registration?"
+msgid_plural "Do you really want to delete the {0} selected registrations?"
+msgstr[0] "Opravdu chcete smazat vybranou registraci?"
+msgstr[1] "Opravdu chcete smazat {0} vybrané registrace?"
+msgstr[2] "Opravdu chcete smazat {0} vybraných registrací?"
+msgstr[3] "Opravdu chcete smazat {0} vybraných registrací?"
+
+#: indico/modules/events/sessions/client/js/index.js:118
+msgid "Filter types"
+msgstr "Filtrovat typy"
+
+#: indico/modules/events/sessions/client/js/index.js:123
+#: indico/modules/events/sessions/client/js/index.js:126
+msgid "Add new type"
+msgstr "Přidat nový typ"
+
+#: indico/modules/events/sessions/client/js/index.js:150
+msgid "No type"
+msgstr "Žádný typ"
+
+#: indico/modules/vc/client/js/index.js:83
+msgid ""
+"This room has been deleted and cannot be used. You can detach it from the "
+"event, however."
+msgstr "Tato místnost byla odstraněna a nemůže být použita. Můžete nicméně odstranit její přiřazení k události."
+
+#: indico/modules/vc/client/js/index.js:112
+msgid "Click to toggle collapse status"
+msgstr "Klepnout pro přepnutí stavu sbalení"
+
+#: indico/web/client/js/jquery/extensions/clipboard.js:49
+msgid "Copied to clipboard"
+msgstr "Zkopírováno do schránky"
+
+#: indico/web/client/js/jquery/extensions/clipboard.js:57
+msgid "Press {0} to copy"
+msgstr "Stiskněte {0} pro zkopírování"
+
+#: indico/web/client/js/jquery/extensions/global.js:256
+msgid "Create new lecture"
+msgstr "Vytvořit novou přednášku"
+
+#: indico/web/client/js/jquery/extensions/global.js:257
+msgid "Create new meeting"
+msgstr "Vytvořit novou schůzku"
+
+#: indico/web/client/js/jquery/extensions/global.js:258
+msgid "Create new conference"
+msgstr "Vytvořit novou konferenci"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:79
+msgid ""
+"You have unsaved changes. Do you really want to close the dialog without "
+"saving?"
+msgstr "Máte neuložené změny. Opravdu chcete tento dialog zavřít bez uložení?"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:149
+#: indico/web/client/js/jquery/utils/ajaxform.js:134
+#: indico/web/client/js/jquery/utils/ajaxform.js:283
+msgid "Unsaved changes"
+msgstr "Neuložené změny"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:181
+#: indico/web/client/js/jquery/utils/misc.js:87
+#: indico/web/client/js/legacy/libs/timetable/Management.js:247
+msgid "Close"
+msgstr "Zavřít"
+
+#: indico/web/client/js/jquery/utils/ajaxform.js:266
+msgid "You have unsaved changes that will be lost."
+msgstr "Máte neuložené změny, které budou ztraceny."
+
+#: indico/web/client/js/jquery/utils/declarative.js:256
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
+msgid "Confirm action"
+msgstr "Potvrdit činnost"
+
+#: indico/web/client/js/jquery/utils/declarative.js:366
+msgid "Direct link to this item"
+msgstr "Odkaz přímo na tuto položku"
+
+#: indico/web/client/js/jquery/utils/defaults.js:19
+msgid "Next"
+msgstr "Další"
+
+#: indico/web/client/js/jquery/utils/defaults.js:20
+msgid "Previous"
+msgstr "Předchozí"
+
+#: indico/web/client/js/jquery/utils/errors.js:31
+#: indico/web/client/js/utils/axios.js:44
+msgid "Something went wrong"
+msgstr "Něco se pokazilo"
+
+#: indico/web/client/js/jquery/utils/forms.js:19
+msgid "The passwords do not match."
+msgstr "Hesla nesouhlasí."
+
+#: indico/web/client/js/jquery/utils/forms.js:69
+msgid "Field must be at least {0} character long."
+msgid_plural "Field must be at least {0} characters long."
+msgstr[0] "Pole musí být alespoň {0} znak dlouhé."
+msgstr[1] "Pole musí být alespoň {0} znaky dlouhé."
+msgstr[2] "Pole musí být alespoň {0} znaků dlouhé."
+msgstr[3] "Pole musí být alespoň {0} znaků dlouhé."
+
+#: indico/web/client/js/jquery/utils/forms.js:77
+msgid "Field cannot be longer than {0} character."
+msgid_plural "Field cannot be longer than {0} characters."
+msgstr[0] "Pole nemůže být delší než {0} znak."
+msgstr[1] "Pole nemůže být delší než {0} znaky."
+msgstr[2] "Pole nemůže být delší než {0} znaků."
+msgstr[3] "Pole nemůže být delší než {0} znaků."
+
+#: indico/web/client/js/jquery/utils/forms.js:85
+msgid "Field must be between {0} and {1} characters long."
+msgstr "Délka pole musí být mezi {0} a {1} znaky."
+
+#: indico/web/client/js/jquery/utils/forms.js:91
+msgid "Field must contain at least {0} word."
+msgid_plural "Field must contain at least {0} words."
+msgstr[0] "Pole musí obsahovat nejméně {0} slovo."
+msgstr[1] "Pole musí obsahovat nejméně {0} slova."
+msgstr[2] "Pole musí obsahovat nejméně {0} slov."
+msgstr[3] "Pole musí obsahovat nejméně {0} slov."
+
+#: indico/web/client/js/jquery/utils/forms.js:99
+msgid "Field cannot contain more than {0} word."
+msgid_plural "Field cannot contain more than {0} words."
+msgstr[0] "Pole nemůže obsahovat víc jak {0} slovo."
+msgstr[1] "Pole nemůže obsahovat víc jak {0} slova."
+msgstr[2] "Pole nemůže obsahovat víc jak {0} slov."
+msgstr[3] "Pole nemůže obsahovat víc jak {0} slov."
+
+#: indico/web/client/js/jquery/utils/forms.js:107
+msgid "Field must contain between {0} and {1} words."
+msgstr "Pole musí obsahovat mezi {0} a {1} slovy."
+
+#: indico/web/client/js/jquery/utils/forms.js:125
+msgid "Save now"
+msgstr "Uložit nyní"
+
+#: indico/web/client/js/jquery/utils/forms.js:126
+#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
+msgid "Saving..."
+msgstr "Ukládá se..."
+
+#: indico/web/client/js/jquery/utils/forms.js:127
+msgid "Do not forget to save your changes!"
+msgstr "Nezapomeňte změny uložit!"
+
+#: indico/web/client/js/jquery/utils/forms.js:411
+msgid "Only {0} out of {1} rows is currently selected"
+msgid_plural "Only {0} out of {1} rows are currently selected."
+msgstr[0] "Je zvolena pouze {0} z {1} řádek."
+msgstr[1] "Jsou zvoleny pouze {0} z {1} řádek."
+msgstr[2] "Je zvoleno pouze {0} z {1} řádek."
+msgstr[3] "Je zvoleno pouze {0} z {1} řádků."
+
+#: indico/web/client/js/jquery/utils/forms.js:450
+msgid "Select only the current page."
+msgstr "Zvolte pouze tuto stránku."
+
+#: indico/web/client/js/jquery/utils/forms.js:464
+msgid "Click here to select them all."
+msgstr "Klepnutím zde zvolte vše."
+
+#: indico/web/client/js/jquery/utils/misc.js:16
+#: indico/web/client/js/jquery/utils/misc.js:30
+msgid "Please confirm"
+msgstr "Prosím potvrďte"
+
+#: indico/web/client/js/jquery/utils/misc.js:101
+msgid "Executing operation..."
+msgstr "Operace probíhá…"
+
+#: indico/web/client/js/jquery/utils/misc.js:103
+msgid "Operation done!"
+msgstr "Hotovo!"
+
+#: indico/web/client/js/jquery/utils/misc.js:168
+msgid "Operation failed!"
+msgstr "Operace selhala!"
+
+#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:300
+msgid "Saved"
+msgstr "Uloženo"
+
+#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
+msgid "Save"
+msgstr "Uložit"
+
+#: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:675
+msgid "Loading..."
+msgstr "Nahrává se..."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:20
+msgid "Select"
+msgstr "Vybrat"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:24
+msgid "This category doesn't contain any subcategory"
+msgstr "Kategorie neobsahuje žádné podkategorie"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:28
+msgid "Select a category"
+msgstr "Zvolte kategorii"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:35
+msgid "Not possible for categories where you cannot propose events"
+msgstr "Není možné pro kategorie, kde nemůžete navrhovat události"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:39
+msgid "Not possible for categories where you cannot propose/create events"
+msgstr "Není možné pro kategorie, kde nemůžete navrhovat/vytvářet události"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:43
+msgid "Not possible for categories where you cannot create events"
+msgstr "Není možné pro kategorie, kde nemůžete vytvářet události"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:49
+msgid "Not possible for categories descending from category \"{0}\""
+msgstr "Není možné pro kategorie pocházející z kategorie \"{0}\""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
+msgid "Not possible for this category"
+msgstr "Není možné pro tuto kategorii"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:142
+msgid "Search"
+msgstr "Hledat"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:199
+msgid "Go to: {0}"
+msgstr "Jít na: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:236
+msgid "This category is protected"
+msgstr "Tato kategorie je chráněna"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:284
+msgid "Go to parent: {0}"
+msgstr "Jít na rodiče: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:333
+msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
+msgstr "Můžete pouze <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> tuto."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+msgid ""
+"You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
+" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
+"class=\"js-search\">search</a>."
+msgstr "Můžete položku <a class=\"js-action\" data-category-id=\"{0}\">{1}</a>, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">jít o úroveň výš,</a>, nebo <a class=\"js-search\">hledat</a>."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:346
+msgid ""
+"You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
+"or <a class=\"js-search\">search</a>."
+msgstr "Můžete <a class=\"js-navigate-up\" data-parent-id=\"{2}\">jít o úroveň výš,</a> nebo <a class=\"js-search\">hledat</a>."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:361
+msgid "Your search doesn't match any category"
+msgstr "Vašemu hledání neodpovídá žádná kategorie"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:366
+msgid ""
+"You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
+"search\">clear</a> your search."
+msgstr "Můžete <a class=\"js-search\">změnit</a> nebo <a class=\"js-clear-search\">vyčistit</a> své hledání."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:440
+msgid "In favorite categories"
+msgstr "V oblíbených kategoriích"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:447
+msgid "Search result"
+msgstr "Výsledky hledání"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:468
+msgid "Displaying {0} out of {1} results."
+msgstr "Zobrazuje se {0} z {1} výsledků."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:469
+msgid "There are no results."
+msgstr "Žádné výsledky."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:478
+msgid "Clear search"
+msgstr "Vymazat vyhledávání"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:702
+msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
+msgstr "Vybrali jste kategorii <em>{0}</em>. Jste si jistí, že chcete pokračovat?"
+
+#: indico/web/client/js/jquery/widgets/itempicker.js:23
+msgid "Type to filter..."
+msgstr "Zadejte parametry filtru"
+
+#: indico/web/client/js/jquery/widgets/misc.js:58
+msgid "You can copy the URL below using CTRL + C (&#8984; + C on OSX):"
+msgstr "Adresu (URL) zkopírujte pomocí zkratky CTRL + C (&#8984; + C v OSX): "
+
+#: indico/web/client/js/jquery/widgets/multitextfield.js:254
+msgid "Type to add {0}"
+msgstr "Vložte {0} pro přidání"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
+#: indico/web/client/js/jquery/widgets/multitextfield.js:278
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1506
+msgid "Delete"
+msgstr "Smazat"
+
+#: indico/web/client/js/jquery/widgets/multitextfield.js:353
+msgid "Empty values are not allowed."
+msgstr "Prázdné hodnoty nejsou povoleny."
+
+#: indico/web/client/js/jquery/widgets/rulelistwidget.js:60
+msgid "Select an option"
+msgstr "Vyberte možnost"
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:68
+msgid "Using default location from: {0} ({1})"
+msgstr "Použití výchozího umístění z: {0} ({1}) "
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:70
+msgid "Using custom location"
+msgstr "Použijte vlastní umístění"
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:166
+msgid "Just use \"{0}\""
+msgstr "Prostě použijte \"{0}\""
+
+#: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:29
+msgid "<strong>1</strong> char left"
+msgid_plural "<strong>{0}</strong> chars left"
+msgstr[0] "zůstává 1 znak"
+msgstr[1] "zůstávají 1{0}1 znaky"
+msgstr[2] "zůstává 1{0}1 znaků"
+msgstr[3] "zbývá <strong>{0}</strong> znaků"
+
+#: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:39
+msgid "<strong>1</strong> word left"
+msgid_plural "<strong>{0}</strong> words left"
+msgstr[0] "zůstává <strong>1</strong> slovo"
+msgstr[1] "zůstávají <strong>{0}</strong> slova"
+msgstr[2] "zůstává <strong>{0}</strong> slov"
+msgstr[3] "zbývá <strong>{0}</strong> slov"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1438
+msgid "Edit"
+msgstr "Upravit"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:49
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:354
+#: indico/web/client/js/legacy/libs/timetable/Management.js:670
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:296
+msgid "Must be between {0} and {1}"
+msgstr "Musí být mezi {0} a {1}"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:298
+msgid "Must be above {0}"
+msgstr "Musí být větší než {0}"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:300
+msgid "Must be below {0}"
+msgstr "Musí být menší než {0}"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:319
+msgid "Please fill in the required fields."
+msgstr "Prosím vyplňte požadovaná pole."
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
+msgid "IP networks cannot have management permissions"
+msgstr "IP sítě nemohou mít oprávnění pro správu."
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:173
+msgid "Registrants cannot have management permissions"
+msgstr "Účastníci nemohou mít oprávnění pro správu."
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:186
+msgid "Assign Permissions"
+msgstr "Přiřadit oprávnění"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:204
+msgid "Delete entry '{0}'"
+msgstr "Smazat položku '{0}'"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
+msgid "Are you sure you want to remove yourself from the list?"
+msgstr "Opravdu chcete sám sebe odstranit ze seznamu?"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:289
+msgid "All options have been added"
+msgstr "Všechny možnosti byly přidány"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:320
+msgid "This entry was already added"
+msgstr "Tato položka už byla přidána"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
+msgid "Anonymous"
+msgstr "Anonymní"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:364
+msgid "Additional users"
+msgstr "Další uživatelé"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:368
+msgid "{0} user has implicit read access due to other roles"
+msgid_plural "{0} users have implicit read access due to other roles"
+msgstr[0] "implicitní přístup na čtení má vzhledem k jejich oprávněním {0} uživatel"
+msgstr[1] "implicitní přístup na čtení mají vzhledem k jejich oprávněním {0} uživatelé"
+msgstr[2] "implicitní přístup na čtení má vzhledem k jejich oprávněním {0} uživatelů"
+msgstr[3] "Bezvýhradně má přístup ke čtení vzhledem k jejich oprávněním {0} uživatelů"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
+msgid "Category Managers"
+msgstr "Správci kategorií"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
+msgid "Parent Category Managers"
+msgstr "Správci nadřízených kategorií"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:388
+msgid "Event Managers"
+msgstr "Správci událostí"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
+msgid "Registrants in \"{0}\""
+msgstr "Počet zaregistrovaných v \"{0}\""
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:245
+msgid "OK"
+msgstr "OK"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:465
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:473
+msgid "Previous tab"
+msgstr "Předchozí záložka"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:485
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:492
+msgid "Next tab"
+msgstr "Další záložka"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:267
+msgid "At least one must be selected"
+msgstr "Alespoň jedna volba musí být vybrána"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:271
+msgid "Please enable the checkbox"
+msgstr "Prosím zatrhněte zaškrtávací okénko"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:275
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:279
+msgid "Please choose an option"
+msgstr "Prosím zvolte možnost"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:286
+msgid "Field must be a number"
+msgstr "Hodnota pole musí být číselná"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:298
+msgid "Field must be a positive number"
+msgstr "Hodnota pole musí být kladné číslo"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:304
+msgid "Date format is not valid. It should be dd/mm/yyyy hh:mm"
+msgstr "Tvar data je neplatý. Mělo by to být dd/mm/yyyy hh:mm"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:310
+msgid "Invalid e-mail address"
+msgstr "Neplatná e-mailová adresa"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:316
+msgid "Invalid URL"
+msgstr "Neplatné URL"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:318
+msgid "Time format is not valid. It should be hh:mm"
+msgstr "Tvar času je neplatný. Mělo by to být hh:mm"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:324
+msgid "Field is mandatory"
+msgstr "Pole je povinné"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:225
+msgid "Add break"
+msgstr "Přidat přestávku"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:241
+msgid "Add session"
+msgstr "Přidat sekci"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:269
+msgid "Add session block"
+msgstr "Přidat blok sekce"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:45
+msgid "Session"
+msgstr "Sekce"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:46
+msgid "Room"
+msgstr "Místnost"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:133
+msgid "Updating the timetable..."
+msgstr "Obnovuje se rozvrh…"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:184
+#: indico/web/client/js/legacy/libs/timetable/Base.js:423
+msgid "Filter"
+msgstr "Filtr"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:202
+msgid "Printable version"
+msgstr "Verze pro tisk"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:223
+msgid "Go back"
+msgstr "Zpět"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:230
+#: indico/web/client/js/legacy/libs/timetable/Base.js:389
+msgid "Print"
+msgstr "Tisk"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:274
+msgid "Export to PDF"
+msgstr "Export do PDF"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:282
+msgid "Switching to full screen mode..."
+msgstr "Přepnout do režimu celé obrazovky…"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:319
+msgid "Exit Full Screen"
+msgstr "Opustit režim celé obrazovky"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:396
+msgid "PDF"
+msgstr "PDF"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:403
+msgid "Full screen"
+msgstr "Celá obrazovka"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:410
+msgid "Link"
+msgstr "Odkaz"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:415
+msgid "Detailed view"
+msgstr "Podrobný náhled"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:478
+msgid "All days"
+msgstr "Všechny dny"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:482
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1218
+msgctxt "momentjs date format for timetable tab headers"
+msgid "ddd DD/MM"
+msgstr "ddd DD/MM"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:684
+msgid "You are viewing the contents of the session block:"
+msgstr "Díváte se na obsah bloku sekce:"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:773
+msgid "Your changes triggered the automatic modification of some settings:"
+msgstr "Změny, které jste zadali, spustily automatickou změnu některých nastavení:"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:781
+#: indico/web/client/js/legacy/libs/timetable/Base.js:785
+msgid "The <strong>starting time</strong> of the session interval <strong>"
+msgstr "<strong>Čas zahájení</strong> <strong> sekce"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:783
+#: indico/web/client/js/legacy/libs/timetable/Base.js:787
+#: indico/web/client/js/legacy/libs/timetable/Base.js:796
+#: indico/web/client/js/legacy/libs/timetable/Base.js:800
+msgid "</strong> was moved from "
+msgstr "</strong>byl přesunut z  "
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:788
+msgid ""
+"The <strong>starting time</strong> of the <strong>Event</strong> was moved "
+"from "
+msgstr "<strong>Čas zahájení</strong><strong>události</strong> byl přesunut z"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:794
+#: indico/web/client/js/legacy/libs/timetable/Base.js:798
+msgid "The <strong>ending time</strong> of the session interval <strong>"
+msgstr "<strong>Čas ukončení</strong> <strong> sekce"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:801
+msgid ""
+"The <strong>ending time</strong> of the <strong>Event</strong> was moved "
+"from "
+msgstr "<strong>Čas ukončení</strong> <strong>události</strong> byl přesunut z"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:807
+msgid "The contents of the interval <strong>"
+msgstr "Obsah z programu <strong> "
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:809
+msgid "</strong> were moved from "
+msgstr "</strong> byl přesunut"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:819
+msgid " to "
+msgstr "do"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1012
+msgid "Session block"
+msgstr "Blok sekce"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1030
+msgid "Contribution"
+msgstr "Příspěvek"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1044
+msgid "Break"
+msgstr "Přestávka"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1066
+msgid "Add poster"
+msgstr "Přidat vývěsku"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
+msgid "Add new"
+msgstr "Přidat nový"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1075
+#: indico/web/client/js/legacy/libs/timetable/Management.js:664
+msgid "Reschedule"
+msgstr "Přeplánovat"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1085
+msgid "Fit to content"
+msgstr "Přizpůsobit obsahu"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1094
+msgid "Add new block"
+msgstr "Přidat nový blok"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1138
+msgid "Add one hour"
+msgstr "Přidat jednu hodinu"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1207
+msgid "Session legend"
+msgstr "Legenda sekce"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1243
+msgid "see more..."
+msgstr "zobrazit více ..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
+msgid "less..."
+msgstr "méně ..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1562
+msgid "Go to event timetable"
+msgstr "Přejít na rozvrh události"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1732
+msgid "Up to timetable"
+msgstr "Nahoru na rozvrh"
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:42
+msgid "move to resize"
+msgstr "pohybem změňte velikost"
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:420
+msgid ""
+"<span class=\"key light\">Shift</span> is currently pressed. Changes will be"
+" applied to blocks after."
+msgstr "Je stisknuta klávesa <span class=\"key light\">Shift</span>. Změny budou použity na následující blok. "
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
+msgid "Drop to move block inside session"
+msgstr "Pro přemístění bloku do vnitřku sekce uvolněte přesouvaný obsah"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:113
+msgid "Show materials"
+msgstr "Ukázat podklady"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:218
+msgid "et al."
+msgstr "a kol."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:318
+msgid "This poster session has "
+msgstr "Vývěsková sekce má "
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:320
+msgid " contribution(s)."
+msgstr "příspěvek/příspěvků."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:322
+msgid "Please click for more information."
+msgstr "Klepněte prosím pro více informací."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:625
+msgid "Move entry"
+msgstr "Přesunout položku"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:669
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:680
+msgid "This timetable entry does not exist anymore. Please refresh the page."
+msgstr "Tahle položka rozvrhu již neexistuje. Načtěte prosím stránku znovu."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:681
+msgid "Refresh"
+msgstr "Obnovit"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:784
+msgid "Move up"
+msgstr "Posunout nahoru"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
+msgid "Move down"
+msgstr "Posunout dolů"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1440
+msgid "Edit poster"
+msgstr "Upravit vývěsku"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1472
+msgid "Manage protection"
+msgstr "Spravovat přístup"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1474
+msgid "Manage poster protection"
+msgstr "Spravovat přístup k vývěsce"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1502
+msgid "Unschedule"
+msgstr "Vyjmout z rozvrhu"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
+msgid "Unschedule poster"
+msgstr "Vyjmout vývěsku z rozvrhu"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
+msgid "Are you sure you want to unschedule the poster?"
+msgstr "Opravdu chcete vývěsku vyjmout z časového rozvrhu?"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1507
+msgid "Delete poster"
+msgstr "Smazat vývěsku"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1508
+msgid "Are you sure you want to delete the poster?"
+msgstr "Opravdu chcete vývěsku smazat?"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:219
+msgid "Sessions"
+msgstr "Sekce"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:224
+msgid "No sessions in the timetable"
+msgstr "V časovém rozvrhu nejsou žádné sekce"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:228
+msgid "Rooms"
+msgstr "Místnosti"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:233
+msgid "No rooms found in the timetable"
+msgstr "V časovém rozvrhu nebyly nalezeny žádné místnosti"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:238
+msgid "Filter options"
+msgstr "Nastavení filtru"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:244
+msgid "Reset filter"
+msgstr "Zrušit filtr"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:15
+msgid "All"
+msgstr "Vše"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:16
+msgid "None"
+msgstr "Žádný"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:19
+msgid "ID"
+msgstr "ID"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:21
+msgid "Title"
+msgstr "Titul"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:24
+msgid "Sort by: "
+msgstr "Řadit dle: "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:29
+msgid "Select: "
+msgstr "Vybrat: "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:188
+msgid "Add Contribution"
+msgstr "Přidat příspěvek"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:238
+msgid "Add selected"
+msgstr "Přidat vybrané"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:273
+msgid "Create a new one"
+msgstr "Vytvořit nové"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:280
+msgid "You may choose to:"
+msgstr "Můžete:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:286
+msgid "Choose one (or more) unscheduled"
+msgstr "Vyberte jednu nebo více nezařazených "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:294
+msgid "To add an unscheduled contribution, please select at least one"
+msgstr "Pro přidání nezařazeného příspěvku prosím zvolte alespoň jeden"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:334
+msgid "Add contribution"
+msgstr "Přidat příspěvek"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:387
+msgid "Step 1: Choose type of rescheduling"
+msgstr "Krok 1: Zvolte, jak přeplánovat"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:397
+#: indico/web/client/js/legacy/libs/timetable/Management.js:434
+msgid "See an example"
+msgstr "Viz příklad"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:402
+msgid "Adjust starting time of all entries"
+msgstr "Upravte počáteční čas všech položek"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:406
+msgid "Move the entries of "
+msgstr "Přesunout položky "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:406
+#: indico/web/client/js/legacy/libs/timetable/Management.js:409
+msgid " by changing their"
+msgstr " změnou jejich "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:407
+msgid "Move the entries of the interval "
+msgstr "Přesunout položky intervalu "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:410
+msgid " starting times. "
+msgstr " počátečních časů. "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:412
+msgid "The first entry will start when the event starts ("
+msgstr "První položka začne se začátkem události ("
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:415
+msgid "The first entry will start when the interval starts ("
+msgstr "První položka začne, když začne časový úsek ("
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:418
+msgid ""
+"and the other entries will follow consecutively after it. The durations of "
+"the entries will not change. "
+msgstr "a další položky budou následovat postupně po ní. Délka položek nebude změněna."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:439
+msgid "Adjust duration of all entries"
+msgstr "Upravit délku všech položek"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:442
+msgid "Adjust the "
+msgstr "Přizpůsobit "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:443
+msgid " duration "
+msgstr " délku "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:444
+msgid "of the entries of "
+msgstr "položek "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:447
+msgid "the interval "
+msgstr "interval "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:448
+msgid ""
+" to fill the gaps between them, so that their starting time don't change. If"
+" a time gap is specified, the duration will be extended up to the value of "
+"this time gap before the starting time of the next entry. "
+msgstr " pro vyplnění mezer mezi nimi tak, že jejich počáteční časy nebudou změněny. Je-li uvedena délka mezery, bude trvání položky prodlouženo tak, aby mezera před další položkou právě zůstala zachována."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:531
+msgid "Step 2: Choose time gap between entries"
+msgstr "Krok 2: Zvolte časovou mezeru mezi položkami"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:568
+msgid "Step 3: Choose to fit sessions to their content"
+msgstr "Krok 3: Vyberte, zda změnit trvání sekcí dle jejich obsahu"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:617
+msgid "There will be no gaps between consecutive entries."
+msgstr "Mezi po sobě následujícími položkami nebudou žádné mezery."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:622
+msgid "Entries will be separated by gaps of "
+msgstr "Mezi položkami budou mezery zvíci "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:624
+msgid "1 hour "
+msgstr "1 hodina"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:626
+msgid " hours "
+msgstr " hodin/y"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:630
+msgid "and "
+msgstr "a"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:634
+msgid "1 minute."
+msgstr "1 minuta."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:636
+msgid " minutes."
+msgstr " minut."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:717
+msgid "Rescheduling..."
+msgstr "Přeplánovává se…"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:733
+msgid "Are you sure you want to reschedule entries ?"
+msgstr "Jste si jisti, že chcete položky přeplánovat?"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:740
+msgid "The entries that are part of a session will"
+msgstr "Položky, které jsou částmi sekce budou"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:745
+msgid " first"
+msgstr " první "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:747
+msgid " be fitted to their content."
+msgstr " budou přizpůsobeny jejich obsahu."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
+msgid "Then, all entries "
+msgstr "Potom, všechny položky "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
+msgid "All entries "
+msgstr "Všechny položky"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:754
+msgid " will have their "
+msgstr " budou mít jejich "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+msgid "starting times"
+msgstr "počáteční časy"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+msgid "duration"
+msgstr "délky"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:756
+msgid " changed."
+msgstr " upraveny."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:763
+msgid "Please review your choice"
+msgstr "Prosím, zvažte znovu svou volbu"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:779
+msgid "Please select the rescheduling type"
+msgstr "Prosím zvolte, jak přeplánovat"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:809
+msgid "Reschedule Entries"
+msgstr "Přeplánovat položky"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:845
+msgid ""
+"This will change the starting and ending times of the session block {0} so "
+"that it encompasses all entries defined in its timetable."
+msgstr "Tohle změní počáteční a koncové časy bloku sekce {0} tak, že pojme všechny položky v jeho rozvrhu."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:852
+msgid "Are you sure you want to proceed?"
+msgstr "Opravdu chcete pokračovat?"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:874
+msgid "Fitting..."
+msgstr "Přizpůsobuje se…"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:888
+msgid "Fit timetable to content"
+msgstr "Přizpůsobit časový rozvrh obsahu"
+
+#: indico/web/client/js/legacy/libs/timetable/Undo.js:13
+msgid "Undo last operation"
+msgstr "Vzít poslední krok zpět"

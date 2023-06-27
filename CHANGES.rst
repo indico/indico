@@ -7,6 +7,11 @@ Version 3.2.6
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Czech
+
 Improvements
 ^^^^^^^^^^^^
 
