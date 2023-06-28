@@ -302,8 +302,8 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
         lazy=True,
         viewonly=True,
         uselist=False,
-        primaryjoin=('(PaperRevision._contribution_id == Contribution.id) & (PaperRevision.state == {})'
-                     .format(PaperRevisionState.accepted)),
+        primaryjoin=lambda: db.and_(PaperRevision._contribution_id == Contribution.id,
+                                    PaperRevision.state == PaperRevisionState.accepted),
     )
     #: Paper files not submitted for reviewing
     pending_paper_files = db.relationship(
