@@ -139,6 +139,7 @@ export class Landing extends React.Component {
                 <BookingBootstrapForm onSearch={this.doSearch} defaults={defaults}>
                   <Form.Group inline>
                     <Form.Input
+                      style={{marginTop: '0.875em'}}
                       placeholder="e.g. IT Amphitheatre"
                       styleName="search-input"
                       onChange={(event, data) => this.updateText(data.value)}

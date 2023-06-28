@@ -59,6 +59,7 @@ class RHSearchRooms(RHRoomBookingBase):
         'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
     def _process(self, args):
+        print(f'args -> {args}')
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))
         only_unavailable = args.pop('unavailable')
         admin_override_enabled = args.pop('admin_override_enabled')

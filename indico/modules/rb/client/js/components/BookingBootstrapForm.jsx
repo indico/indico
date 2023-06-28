@@ -31,6 +31,7 @@ import {selectors as userSelectors} from '../common/user';
 import {sanitizeRecurrence} from '../util';
 
 import TimeRangePicker from './TimeRangePicker';
+import WeekdayRecurrencePicker from './WeekdayRecurrencePicker';
 
 import './BookingBootstrapForm.module.scss';
 
@@ -322,6 +323,7 @@ class BookingBootstrapForm extends React.Component {
             />
           </Form.Group>
         )}
+        {type === 'every' && <WeekdayRecurrencePicker onChange={this.handleRecurrenceChange} />}
         {children}
         <Button primary disabled={buttonDisabled || !isStartDtValid} onClick={this.onSearch}>
           {buttonCaption}
