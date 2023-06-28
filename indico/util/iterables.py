@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from functools import wraps
-from itertools import groupby, islice, zip_longest
+from itertools import groupby, islice
 
 
 def group_list(data, key=None, sort_by=None, sort_reverse=False):
@@ -29,26 +29,6 @@ def committing_iterator(iterable, n=100):
         if i % n == 0:
             db.session.commit()
     db.session.commit()
-
-
-def grouper(iterable, n, fillvalue=None, skip_missing=False):
-    """Collect data into fixed-length chunks or blocks.
-
-    :param iterable: an iterable object
-    :param n: number of items per chunk
-    :param fillvalue: value to pad the last chunk with if necessary
-    :param skip_missing: if the last chunk should be smaller instead
-                         of being padded with `fillvalue`
-    """
-    # Taken from https://docs.python.org/2/library/itertools.html#recipes
-    args = [iter(iterable)] * n
-    if not skip_missing:
-        return zip_longest(fillvalue=fillvalue, *args)
-    else:
-        # skips the missing items in the last tuple instead of padding it
-        fillvalue = object()
-        return (tuple(x for x in chunk if x is not fillvalue)
-                for chunk in zip_longest(fillvalue=fillvalue, *args))
 
 
 def materialize_iterable(type_=list):
