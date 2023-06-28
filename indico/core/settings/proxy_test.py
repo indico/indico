@@ -25,7 +25,7 @@ def test_proxy_strict_nodefaults():
 def test_proxy_strict_off():
     proxy = SettingsProxy('test', {}, False)
     assert proxy.get('foo') is None
-    proxy.get('foo', 'bar') == 'bar'
+    assert proxy.get('foo', 'bar') == 'bar'
     proxy.set('foo', 'foobar')
     assert proxy.get('foo') == 'foobar'
 
