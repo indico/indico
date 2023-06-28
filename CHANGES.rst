@@ -25,7 +25,7 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- None so far
+- Support Python 3.11
 
 
 Version 3.2.5
