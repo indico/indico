@@ -65,7 +65,7 @@ class Logger:
             default_path = os.path.join(app.root_path, 'logging.yaml.sample')
             warnings.warn('Logging config file not found; using defaults. '
                           'Copy {default_path} to {path} to get rid of this warning.'
-                          .format(path=path, default_path=default_path))
+                          .format(path=path, default_path=default_path), stacklevel=2)
             path = default_path
         with open(path) as f:
             data = yaml.safe_load(f)
