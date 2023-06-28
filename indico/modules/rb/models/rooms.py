@@ -378,7 +378,7 @@ class Room(ProtectionManagersMixin, db.Model):
 
     def generate_name(self):
         if self.location is None:
-            warnings.warn('Room has no location; using default name format')
+            warnings.warn('Room has no location; using default name format', stacklevel=2)
             return f'{self.building}/{self.floor}-{self.number}'
         return self.location.room_name_format.format(
             site=self.site,

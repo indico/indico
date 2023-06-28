@@ -177,7 +177,7 @@ def _sanitize_data(data, allow_internal=False):
     if allow_internal:
         allowed |= set(INTERNAL_DEFAULTS)
     for key in set(data) - allowed:
-        warnings.warn(f'Ignoring unknown config key {key}')
+        warnings.warn(f'Ignoring unknown config key {key}', stacklevel=2)
     return {k: v for k, v in data.items() if k in allowed}
 
 
