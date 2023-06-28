@@ -81,7 +81,7 @@ class VersionedResourceMixin:
             cascade='all, delete, delete-orphan',
             order_by=lambda: cls.stored_file_class.created_dt.desc(),
             backref=db.backref(
-                getattr(cls.stored_file_class, 'version_of'),
+                cls.stored_file_class.version_of,
                 lazy=False
             )
         )
