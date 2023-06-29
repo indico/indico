@@ -16,7 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import orig_string
 from indico.util.string import camelize_keys, format_repr
 
@@ -34,7 +34,7 @@ def _get_next_position(context):
     return (res[0] or 0) + 1
 
 
-class RegistrationFormItemType(int, IndicoEnum):
+class RegistrationFormItemType(IndicoIntEnum):
     section = 1
     field = 2
     text = 3
@@ -43,7 +43,7 @@ class RegistrationFormItemType(int, IndicoEnum):
 
 
 # We are not using a RichIntEnum since one of the instances is named "title".
-class PersonalDataType(int, IndicoEnum):
+class PersonalDataType(IndicoIntEnum):
     """
     Description of the personal data items that exist on every registration form.
     """

@@ -13,7 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
 from indico.util.decorators import strict_classproperty
-from indico.util.enum import IndicoEnum, RichIntEnum
+from indico.util.enum import IndicoIntEnum, RichIntEnum
 from indico.util.i18n import _
 from indico.util.string import format_repr
 
@@ -33,7 +33,7 @@ class CategoryLogRealm(RichIntEnum):
     events = 2
 
 
-class LogKind(int, IndicoEnum):
+class LogKind(IndicoIntEnum):
     other = 1
     positive = 2
     change = 3

@@ -13,11 +13,11 @@ from sqlalchemy.orm import joinedload, noload
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.permissions import get_available_permissions
 from indico.util.decorators import classproperty, strict_classproperty
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.string import format_repr
 
 
-class PrincipalType(int, IndicoEnum):
+class PrincipalType(IndicoIntEnum):
     user = 1
     local_group = 2
     multipass_group = 3

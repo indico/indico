@@ -9,7 +9,7 @@ import dataclasses
 
 from indico.core import signals
 from indico.util.decorators import classproperty
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.signals import values_from_signal
 
 
@@ -33,7 +33,7 @@ def get_search_provider(only_active=True):
         raise RuntimeError(f'Only one search provider can be defined (found: {providers_str})')
 
 
-class SearchTarget(int, IndicoEnum):
+class SearchTarget(IndicoIntEnum):
     category = 1
     event = 2
     contribution = 3

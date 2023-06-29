@@ -13,7 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.string import format_repr
 
 
@@ -37,14 +37,14 @@ class DoublePaymentTransaction(Exception):
     pass
 
 
-class TransactionAction(int, IndicoEnum):
+class TransactionAction(IndicoIntEnum):
     complete = 1
     cancel = 2
     pending = 3
     reject = 4
 
 
-class TransactionStatus(int, IndicoEnum):
+class TransactionStatus(IndicoIntEnum):
     #: payment attempt succeeded
     successful = 1
     #: payment cancelled manually

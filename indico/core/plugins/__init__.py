@@ -24,7 +24,7 @@ from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.events.static.util import RewrittenManifest
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoStrEnum
 from indico.util.i18n import NullDomain, _
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
@@ -33,7 +33,7 @@ from indico.web.menu import SideMenuItem
 from indico.web.views import WPJinjaMixin
 
 
-class PluginCategory(str, IndicoEnum):
+class PluginCategory(IndicoStrEnum):
     search = _('Search')
     synchronization = _('Synchronization')
     payment = _('Payment')

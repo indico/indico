@@ -31,7 +31,7 @@ from indico.modules.rb.notifications.reservations import (notify_cancellation, n
                                                           notify_modification, notify_rejection, notify_reset_approval)
 from indico.modules.rb.util import get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import _
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
@@ -41,7 +41,7 @@ class ConflictingOccurrences(Exception):
     pass
 
 
-class RepeatFrequency(int, IndicoEnum):
+class RepeatFrequency(IndicoIntEnum):
     NEVER = 0
     DAY = 1
     WEEK = 2
@@ -81,7 +81,7 @@ class RepeatMapping:
             return 'periodically'
 
 
-class ReservationState(int, IndicoEnum):
+class ReservationState(IndicoIntEnum):
     pending = 1
     accepted = 2
     cancelled = 3

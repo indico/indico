@@ -19,10 +19,10 @@ from indico.core.logger import Logger
 from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 
 
-class VCRoomLinkType(int, IndicoEnum):
+class VCRoomLinkType(IndicoIntEnum):
     event = 1
     contribution = 2
     block = 3
@@ -46,7 +46,7 @@ def _make_checks():
         yield db.CheckConstraint(condition, f'valid_{link_type.name}_link')
 
 
-class VCRoomStatus(int, IndicoEnum):
+class VCRoomStatus(IndicoIntEnum):
     created = 1
     deleted = 2
 

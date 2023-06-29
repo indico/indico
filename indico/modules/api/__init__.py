@@ -11,7 +11,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.settings import SettingsProxy
 from indico.modules.api.models.keys import APIKey
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -20,7 +20,7 @@ from indico.web.menu import SideMenuItem
 __all__ = ('settings',)
 
 
-class APIMode(int, IndicoEnum):
+class APIMode(IndicoIntEnum):
     KEY = 0  # public requests without API key, authenticated requests with api key
     ONLYKEY = 1  # all requests require an API key
     SIGNED = 2  # public requests without API key, authenticated requests with api key and signature

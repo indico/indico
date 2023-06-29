@@ -12,7 +12,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.modules.events.surveys.fields import get_field_types
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.string import text_to_repr
 
 
@@ -30,7 +30,7 @@ def _get_item_default_title(context):
     return '' if context.current_parameters['type'] == SurveyItemType.section else None
 
 
-class SurveyItemType(int, IndicoEnum):
+class SurveyItemType(IndicoIntEnum):
     question = 1
     section = 2
     text = 3

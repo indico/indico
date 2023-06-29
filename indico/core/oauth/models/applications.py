@@ -15,10 +15,10 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.oauth.logger import logger
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 
 
-class SystemAppType(int, IndicoEnum):
+class SystemAppType(IndicoIntEnum):
     none = 0
     checkin = 1
 

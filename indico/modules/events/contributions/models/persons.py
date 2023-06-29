@@ -7,12 +7,12 @@
 
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.modules.events.models.persons import PersonLinkBase
-from indico.util.enum import IndicoEnum
+from indico.util.enum import IndicoIntEnum
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
-class AuthorType(int, IndicoEnum):
+class AuthorType(IndicoIntEnum):
     none = 0
     primary = 1
     secondary = 2
