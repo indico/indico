@@ -28,6 +28,8 @@ ignore =
     E731
     # not all our exceptions are errors
     N818
+    # allow unused loop control variables
+    B007
 
 per-file-ignores =
     # signals use wildcard imports to expose everything in `indico.core.signals`
