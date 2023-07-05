@@ -6,139 +6,95 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React from 'react';
-import {Button, Icon, Message} from 'semantic-ui-react';
+import React, {useEffect, useState} from 'react';
+import {Button} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
+function WeekdayRecurrencePicker() {
+  const [selectedDays, setSelectedDays] = useState({});
+  let delayTimeout = null;
 
-function validate({selectedDays}) {
-  const errors = {};
-  if (Object.keys(selectedDays).length === 0) {
-    errors.weekdays = Translate.string('You must select at least one weekday');
-  }
-  return errors;
-}
-
-class WeekdayRecurrencePicker extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedDays: {},
-      errors: {},
-      messageState: {
-        visible: true,
-      },
+  useEffect(() => {
+    return () => {
+      if (delayTimeout) {
+        clearTimeout(delayTimeout);
+      }
     };
-    this.delayTimeout = null;
-  }
+  }, [delayTimeout]);
 
-  componentDidMount() {
-    this.preselectFirstWeekday();
-  }
-
-  componentWillUmount() {
-    if (this.delayTimeout) {
-      clearTimeout(this.delayTimeout);
-    }
-  }
-
-  preselectFirstWeekday = () => {
+  const preselectFirstWeekday = () => {
     const firstWeekday = moment()
       .weekday(0)
       .locale('en')
       .format('ddd')
       .toLowerCase();
 
-    this.setState(prevState => ({
-      selectedDays: {
-        ...prevState.selectedDays,
-        [firstWeekday]: true,
-      },
+    setSelectedDays(prevSelectedDays => ({
+      ...prevSelectedDays,
+      [firstWeekday]: true,
     }));
   };
 
-  handleDayClick = day => {
-    this.setState(
-      prevState => {
-        const selectedDays = {...prevState.selectedDays};
-        if (selectedDays[day]) {
-          delete selectedDays[day];
-        } else {
-          selectedDays[day] = true;
-        }
-        return {selectedDays};
-      },
-      () => {
-        clearTimeout(this.delayTimeout);
-        this.validateSelectedDays();
+  useEffect(() => {
+    preselectFirstWeekday();
+  }, []);
+
+  const handleDayClick = day => {
+    setSelectedDays(prevSelectedDays => {
+      const newSelectedDays = {...prevSelectedDays};
+      if (newSelectedDays[day]) {
+        delete newSelectedDays[day];
+      } else {
+        newSelectedDays[day] = true;
       }
-    );
+      return newSelectedDays;
+    });
+
+    clearTimeout(delayTimeout);
   };
 
-  validateSelectedDays = () => {
-    const {selectedDays, messageState} = this.state;
-    const errors = validate({selectedDays});
-    this.setState({errors});
-
+  const validateSelectedDays = () => {
     if (Object.keys(selectedDays).length === 0) {
-      clearTimeout(this.delayTimeout);
-      this.delayTimeout = setTimeout(() => {
-        this.preselectFirstWeekday();
+      clearTimeout(delayTimeout);
+      delayTimeout = setTimeout(() => {
+        preselectFirstWeekday();
       }, 250);
     } else {
-      clearTimeout(this.delayTimeout);
-      this.setState({errors: {}});
-      messageState.visible = true;
+      clearTimeout(delayTimeout);
     }
   };
 
-  handleMessageDismiss = () => {
-    const {messageState} = this.state;
-    messageState.visible = false;
-    clearTimeout(this.delayTimeout);
-    this.setState({errors: {}});
-  };
+  useEffect(() => {
+    validateSelectedDays();
+  });
 
-  render() {
-    const WEEKDAYS = moment.weekdays(true).map(weekday => {
-      return {
-        value: moment()
-          .day(weekday)
-          .locale('en')
-          .format('ddd')
-          .toLowerCase(),
-        text: moment()
-          .isoWeekday(weekday)
-          .format('ddd'),
-      };
-    });
+  const WEEKDAYS = moment.weekdays(true).map(weekday => ({
+    value: moment()
+      .day(weekday)
+      .locale('en')
+      .format('ddd')
+      .toLowerCase(),
+    text: moment()
+      .isoWeekday(weekday)
+      .format('ddd'),
+  }));
 
-    const {selectedDays, errors, messageState} = this.state;
-
-    return (
-      <div>
-        <Button.Group>
-          {WEEKDAYS.map(weekday => (
-            <Button
-              key={weekday.value}
-              value={weekday.value}
-              compact
-              className={selectedDays[weekday.value] ? 'primary' : ''}
-              onClick={() => this.handleDayClick(weekday.value)}
-            >
-              {weekday.text}
-            </Button>
-          ))}
-        </Button.Group>
-        {errors.weekdays && messageState.visible && (
-          <Message color="yellow" onDismiss={this.handleMessageDismiss}>
-            <Icon name="warning circle" />
-            {errors.weekdays}
-          </Message>
-        )}
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Button.Group>
+        {WEEKDAYS.map(weekday => (
+          <Button
+            key={weekday.value}
+            value={weekday.value}
+            compact
+            className={selectedDays[weekday.value] ? 'primary' : ''}
+            onClick={() => handleDayClick(weekday.value)}
+          >
+            {weekday.text}
+          </Button>
+        ))}
+      </Button.Group>
+    </div>
+  );
 }
 
 export default WeekdayRecurrencePicker;
