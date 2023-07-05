@@ -30,6 +30,7 @@
             hasPredefinedAffiliations: {{ field.has_predefined_affiliations | tojson }},
             canEnterManually: {{ field.can_enter_manually | tojson }},
             defaultSearchExternal: {{ field.default_search_external | tojson }},
+            nameFormat: {{ field.name_format.name | tojson }},
             sessionUser: Indico.User,
             validateEmailUrl: {{ field.validate_email_url | tojson }},
         });

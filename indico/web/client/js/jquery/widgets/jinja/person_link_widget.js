@@ -21,6 +21,7 @@ import {camelizeKeys} from 'indico/utils/case';
       hasPredefinedAffiliations,
       canEnterManually,
       defaultSearchExternal,
+      nameFormat,
       ...rest
     } = options;
     const field = document.getElementById(fieldId);
@@ -28,7 +29,6 @@ import {camelizeKeys} from 'indico/utils/case';
     const user = sessionUser &&
       sessionUser.id !== undefined && {
         title: sessionUser.title,
-        name: sessionUser.fullName,
         userId: sessionUser.id,
         userIdentifier: `User:${sessionUser.id}`,
         avatarURL: sessionUser.avatarURL,
@@ -53,6 +53,7 @@ import {camelizeKeys} from 'indico/utils/case';
         hasPredefinedAffiliations={hasPredefinedAffiliations}
         canEnterManually={canEnterManually}
         defaultSearchExternal={defaultSearchExternal}
+        nameFormat={nameFormat}
         {...rest}
       />,
       document.getElementById(`person-link-field-${fieldId}`)

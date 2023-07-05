@@ -17,7 +17,7 @@ from indico.core import signals
 from indico.core.cache import make_scoped_cache
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
-from indico.modules.events.layout import theme_settings
+from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
@@ -111,6 +111,14 @@ class PersonLinkListFieldBase(PrincipalListField):
         if self.event is None:
             return True
         return self.event.can_manage(session.user) or not persons_settings.get(self.event, 'disallow_custom_persons')
+
+    @property
+    def name_format(self):
+        from indico.modules.users.models.users import NameFormat
+        name_format = layout_settings.get(self.event, 'name_format') if self.event else None
+        if name_format is None and session.user:
+            name_format = session.user.settings.get('name_format')
+        return name_format if name_format is not None else NameFormat.first_last
 
     @property
     def validate_email_url(self):

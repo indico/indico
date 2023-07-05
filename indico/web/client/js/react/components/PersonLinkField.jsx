@@ -25,10 +25,8 @@ import {PrincipalItem} from './principals/items';
 
 import './PersonLinkField.module.scss';
 
-const nameFormat = ({firstName, lastName}) => (firstName ? `${firstName} ${lastName}` : lastName);
-
 const PersonListItem = ({
-  person: {avatarURL, firstName, lastName, affiliation, email},
+  person: {avatarURL, name, affiliation, email},
   roles,
   canEdit,
   canDelete,
@@ -40,7 +38,7 @@ const PersonListItem = ({
   <PrincipalItem as={List.Item} styleName="principal">
     <PrincipalItem.Icon type={PrincipalType.user} avatarURL={avatarURL} styleName="icon" />
     <PrincipalItem.Content
-      name={nameFormat({firstName, lastName})}
+      name={name}
       detail={(email ? `${email} ` : '') + (affiliation ? `(${affiliation})` : '')}
     />
     <div styleName="roles">
@@ -234,6 +232,7 @@ function PersonLinkField({
   hasPredefinedAffiliations,
   canEnterManually,
   defaultSearchExternal,
+  nameFormat,
   validateEmailUrl,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
@@ -254,13 +253,40 @@ function PersonLinkField({
     setModalOpen(true);
   };
 
+  const formatName = ({firstName, lastName}) => {
+    const upperLastName = [
+      'first_last_upper',
+      'f_last_upper',
+      'last_f_upper',
+      'last_first_upper',
+    ].includes(nameFormat);
+    const formattedLastName = upperLastName ? lastName.toUpperCase() : lastName;
+    if (!firstName) {
+      return formattedLastName;
+    }
+    const abbreviateFirstName = ['last_f', 'last_f_upper', 'f_last', 'f_last_upper'].includes(
+      nameFormat
+    );
+    const formattedFirstName = abbreviateFirstName ? `${firstName[0].toUpperCase()}.` : firstName;
+    const lastNameFirst = ['last_f', 'last_f_upper', 'last_first', 'last_first_upper'].includes(
+      nameFormat
+    );
+    return lastNameFirst
+      ? `${formattedLastName}, ${formattedFirstName}`
+      : `${formattedFirstName} ${formattedLastName}`;
+  };
+
   const onAdd = values => {
     const existing = persons.filter(p => !!p.email).map(p => p.email);
-    values.forEach(p => (p.roles = roles.filter(x => x.default).map(x => x.name)));
+    values.forEach(p => {
+      p.name = formatName(p);
+      p.roles = roles.filter(x => x.default).map(x => x.name);
+    });
     onChange([...persons, ...values.filter(v => !existing.includes(v.email))]);
   };
 
   const onSubmit = value => {
+    value.name = formatName(value);
     if (!hasPredefinedAffiliations) {
       // value.affiliation is already there and used
       delete value.affiliationData;
@@ -383,6 +409,7 @@ PersonLinkField.propTypes = {
   hasPredefinedAffiliations: PropTypes.bool,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
+  nameFormat: PropTypes.string,
   validateEmailUrl: PropTypes.string,
 };
 
@@ -396,6 +423,7 @@ PersonLinkField.defaultProps = {
   hasPredefinedAffiliations: false,
   canEnterManually: true,
   defaultSearchExternal: false,
+  nameFormat: '',
   validateEmailUrl: null,
 };
 
@@ -409,6 +437,7 @@ export function WTFPersonLinkField({
   hasPredefinedAffiliations,
   canEnterManually,
   defaultSearchExternal,
+  nameFormat,
   validateEmailUrl,
 }) {
   const [persons, setPersons] = useState(
@@ -449,11 +478,7 @@ export function WTFPersonLinkField({
 
   return (
     <PersonLinkField
-      value={
-        !autoSort
-          ? persons
-          : persons.slice().sort((a, b) => nameFormat(a).localeCompare(nameFormat(b)))
-      }
+      value={!autoSort ? persons : persons.slice().sort((a, b) => a.name.localeCompare(b.name))}
       eventId={eventId}
       onChange={onChange}
       roles={roles}
@@ -464,6 +489,7 @@ export function WTFPersonLinkField({
       hasPredefinedAffiliations={hasPredefinedAffiliations}
       canEnterManually={canEnterManually}
       defaultSearchExternal={defaultSearchExternal}
+      nameFormat={nameFormat}
       validateEmailUrl={validateEmailUrl}
     />
   );
@@ -477,6 +503,7 @@ WTFPersonLinkField.propTypes = {
   sessionUser: PropTypes.object,
   emptyMessage: PropTypes.string,
   hasPredefinedAffiliations: PropTypes.bool,
+  nameFormat: PropTypes.string,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
@@ -491,5 +518,6 @@ WTFPersonLinkField.defaultProps = {
   hasPredefinedAffiliations: false,
   canEnterManually: true,
   defaultSearchExternal: false,
+  nameFormat: '',
   validateEmailUrl: null,
 };

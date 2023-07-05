@@ -23,7 +23,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Use correct name formatting in person link fields (:pr:`5835`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
