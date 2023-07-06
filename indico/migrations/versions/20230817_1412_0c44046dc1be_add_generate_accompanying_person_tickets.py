@@ -1,8 +1,8 @@
 """Add generate accompanying person tickets
 
 Revision ID: 0c44046dc1be
-Revises: b45847c0e62f
-Create Date: 2022-08-30 14:28:32.880804
+Revises: cb46beecbb93
+Create Date: 2023-08-17 14:12:32.880804
 """
 
 import sqlalchemy as sa
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '0c44046dc1be'
-down_revision = 'b45847c0e62f'
+down_revision = 'cb46beecbb93'
 branch_labels = None
 depends_on = None
 
