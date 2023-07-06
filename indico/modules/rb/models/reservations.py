@@ -9,6 +9,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from sqlalchemy import Date, Time
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -124,6 +125,7 @@ class Reservation(db.Model):
                 db.Index('ix_reservations_start_dt_time', cast(cls.start_dt, Time)),
                 db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)),
                 db.CheckConstraint("rejection_reason != ''", 'rejection_reason_not_empty'),
+                # db.CheckConstraint('recurrence_weekdays', 'recurrence_weekdays_is_valid'),  # !!!
                 {'schema': 'roombooking'})
 
     id = db.Column(
@@ -155,6 +157,11 @@ class Reservation(db.Model):
         nullable=False,
         default=0
     )  # 1, 2, 3, etc.
+    recurrence_weekdays = db.Column(
+        ARRAY(db.String),
+        nullable=True,
+        default=[]
+    )  # mon, tue, wed, etc.
     booked_for_id = db.Column(
         db.Integer,
         db.ForeignKey('users.users.id'),
