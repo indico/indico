@@ -84,12 +84,9 @@ class PersonMixin:
             return get_default_values(type(self)).get('_title', UserTitle.none).title
         return self._title.title
 
-    def get_full_name(self, show_title=False, last_name_first=True, last_name_upper=True,
+    def get_full_name(self, *, show_title=False, last_name_first=True, last_name_upper=True,
                       abbrev_first_name=True, _show_empty_names=False):
         """Return the person's name in the specified notation.
-
-        Note: Do not use positional arguments when calling this method.
-        Always use keyword arguments!
 
         :param last_name_first: if "lastname, firstname" instead of
                                 "firstname lastname" should be used
@@ -650,8 +647,7 @@ class User(PersonMixin, db.Model):
                                              if x.provider != 'indico' and x.provider in multipass.identity_providers)
 
     def get_full_name(self, *args, **kwargs):
-        kwargs['_show_empty_names'] = True
-        return super().get_full_name(*args, **kwargs)
+        return super().get_full_name(*args, **kwargs, _show_empty_names=True)
 
     def make_email_primary(self, email):
         """Promote a secondary email address to the primary email address.

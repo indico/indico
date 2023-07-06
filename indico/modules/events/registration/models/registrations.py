@@ -559,14 +559,11 @@ class Registration(db.Model):
         return format_repr(self, 'id', 'registration_form_id', 'email', 'state',
                            user_id=None, is_deleted=False, _text=self.full_name)
 
-    def get_full_name(self, last_name_first=True, last_name_upper=False, abbrev_first_name=False):
-        """Return the user's in the specified notation.
+    def get_full_name(self, *, last_name_first=True, last_name_upper=False, abbrev_first_name=False):
+        """Return the user's name in the specified notation.
 
-        If not format options are specified, the name is returned in
+        If no format options are specified, the name is returned in
         the 'Lastname, Firstname' notation.
-
-        Note: Do not use positional arguments when calling this method.
-        Always use keyword arguments!
 
         :param last_name_first: if "lastname, firstname" instead of
                                 "firstname lastname" should be used
