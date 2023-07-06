@@ -26,9 +26,17 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.queries import escape_like
+from indico.core.settings.models.settings import SettingPrincipal
+from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
+from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.models.settings import EventSettingPrincipal
+from indico.modules.events.sessions.models.principals import SessionPrincipal
+from indico.modules.events.tracks.models.principals import TrackPrincipal
+from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
@@ -417,6 +425,38 @@ def merge_users(source, target, force=False):
     db.session.flush()
 
     logger.info('Successfully merged %s into %s', source, target)
+
+
+def anonymize_user(user):
+    user.first_name = '<anonymous>'
+    user.last_name = '<anonymous>'
+    user.title = UserTitle.none
+    user.affiliation = ''
+    user.affiliation_id = None
+    user.phone = ''
+    user.address = ''
+    user.picture = None
+    user.picture_metadata = None
+    user.picture_source = ProfilePictureSource.standard
+    user.favorite_users = set()
+    user.favorite_events = set()
+    user.favorite_categories = set()
+    user.identities = set()
+    # TODO: check what breaks when we delete all emails
+    UserEmail.query.filter(UserEmail.user == user).delete()
+
+    principals = [
+        EventPrincipal, CategoryPrincipal, AttachmentPrincipal, AttachmentFolderPrincipal,
+        BlockingPrincipal, TrackPrincipal, EventSettingPrincipal, SettingPrincipal, RoomPrincipal,
+        SessionPrincipal
+    ]
+
+    for principal in principals:
+        principal.query.filter(principal.user == user).delete()
+
+    user.is_deleted = True
+    # TODO: More things we can delete?
+    db.session.commit()
 
 
 def get_color_for_user_id(user_id: t.Union[int, str]):

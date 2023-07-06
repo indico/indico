@@ -7,6 +7,7 @@
 
 import click
 from flask_multipass import IdentityInfo
+from sqlalchemy.exc import IntegrityError
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
@@ -16,7 +17,7 @@ from indico.core.oauth.scopes import SCOPES
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.modules.users.operations import create_user
-from indico.modules.users.util import search_users
+from indico.modules.users.util import anonymize_user, search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
 from indico.util.date_time import utc_to_server
 
@@ -215,6 +216,52 @@ def unblock(user_id):
         user.is_blocked = False
         db.session.commit()
         click.secho('Successfully unblocked user', fg='green')
+
+
+@cli.command()
+@click.argument('user_id', type=int)
+def anonymize(user_id):
+    """Anonymize a given user.
+
+    This will remove all personal data about the given user including
+    their name, affiliation and emails. Note that any data tied to events
+    such registrations will not be deleted.
+    """
+    if (user := User.get(user_id)) is None:
+        click.secho('This user does not exist', fg='red')
+        return
+    _print_user_info(user)
+    if not click.confirm(click.style('Anonymize this user?', fg='yellow')):
+        return
+
+    anonymize_user(user)
+    click.secho('Successfully anonymized user', fg='green')
+
+
+@cli.command()
+@click.argument('user_id', type=int)
+def delete(user_id):
+    """Delete a given user.
+
+    This will completely remove the user and everything
+    they are connected to. Use at your own risk.
+    """
+    user = User.get(user_id)
+    if user is None:
+        click.secho('This user does not exist', fg='red')
+        return
+    _print_user_info(user)
+    if not click.confirm(click.style('Permanently delete this user?', fg='yellow')):
+        return
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        click.secho('Failed to delete user', fg='red')
+    else:
+        click.secho('Successfully deleted user', fg='green')
 
 
 @cli.group('token')

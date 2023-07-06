@@ -408,8 +408,8 @@ class ProtectionManagersMixin(ProtectionMixin):
             # Not even signals may override this since management code generally
             # expects session.user to be not None.
             return False
-        if user.is_system:
-            # A system user has no email and thus access checks (against groups) may fail
+        if user.is_system or user.is_deleted:
+            # The system user and deleted users have no email and thus access checks (against groups) may fail
             return False
 
         # Trigger signals for protection overrides

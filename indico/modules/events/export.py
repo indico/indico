@@ -262,7 +262,8 @@ class EventExporter:
         uuid = self.id_map[fullname].setdefault(value, self._get_uuid())
         if type_ == 'userref' and uuid not in self.users:
             user = User.get(value)
-            self.users[uuid] = None if user.is_system else {
+            # TODO: Come back to this one
+            self.users[uuid] = None if (user.is_system or user.is_deleted) else {
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'title': user._title,
