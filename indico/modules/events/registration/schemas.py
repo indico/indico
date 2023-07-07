@@ -7,10 +7,14 @@
 
 from marshmallow.decorators import post_dump
 from marshmallow.fields import String
+from webargs import fields
 
 from indico.core.marshmallow import mm
+from indico.modules.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
+from indico.modules.events.registration.util import get_flat_section_submission_data, get_form_registration_data
 from indico.util.string import natural_sort_key
 
 
@@ -32,4 +36,85 @@ class RegistrationTagSchema(mm.SQLAlchemyAutoSchema):
     def sort_list(self, data, many, **kwargs):
         if many:
             data = sorted(data, key=lambda tag: natural_sort_key(tag['title']))
+        return data
+
+
+# Schemas for the Check-in app API
+
+class CheckinEventSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Event
+        fields = ('event_id', 'title', 'description', 'start_dt', 'end_dt')
+
+    event_id = fields.Int(attribute='id')
+
+
+class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = RegistrationForm
+        fields = ('regform_id', 'title', 'introduction', 'start_dt', 'end_dt',
+                  'registration_count', 'checked_in_count')
+
+    regform_id = fields.Int(attribute='id')
+    registration_count = fields.Function(lambda regform: len(regform.registrations))
+    checked_in_count = fields.Function(lambda regform: len(regform.checked_in_registrations))
+
+
+class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Registration
+        fields = ('registration_id', 'full_name', 'email', 'state', 'checked_in', 'checked_in_dt',
+                  'checkin_secret', 'tags', 'registration_date', 'registration_data')
+
+    registration_id = fields.Int(attribute='id')
+    full_name = fields.Str(attribute='display_full_name')
+    state = fields.Enum(RegistrationState)
+    checkin_secret = fields.UUID(attribute='ticket_uuid')
+    tags = fields.Function(lambda reg: sorted(t.title for t in reg.tags))
+    registration_date = fields.DateTime(attribute='submitted_dt')
+    registration_data = fields.Method('_get_registration_data')
+
+    def _get_registration_data(self, registration):
+        regform = registration.registration_form
+        form_data = get_flat_section_submission_data(regform, registration=registration, management=True)
+        reg_data = get_form_registration_data(regform, registration, management=True)
+        data = {}
+
+        for section_id, section in form_data['sections'].items():
+            data[section_id] = {
+                'id': section_id,
+                'position': section['position'],
+                'title': section['title'],
+                'description': section['description'],
+                'fields': []
+            }
+
+        for field_id, field in form_data['items'].items():
+            section = data[field['sectionId']]
+            field_data = {
+                'id': field_id,
+                'position': field['position'],
+                'title': field['title'],
+                'description': field['description'],
+                'inputType': field['inputType'],
+                'data': reg_data[field['htmlName']],
+                'defaultValue': field['defaultValue'],
+            }
+            if 'price' in field:
+                field_data['price'] = field['price']
+            if 'choices' in field:
+                field_data['choices'] = field['choices']
+            section['fields'].append(field_data)
+
+        # Sort sections and fields based on 'position'
+        data = list(data.values())
+        data.sort(key=lambda s: s['position'])
+        for sections in data:
+            sections['fields'].sort(key=lambda f: f['position'])
+
+        # Remove the 'position' key
+        for section in data:
+            del section['position']
+            for field in section['fields']:
+                del field['position']
         return data

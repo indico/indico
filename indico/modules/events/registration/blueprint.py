@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask_cors import CORS
+
 from indico.modules.events.registration import api
 from indico.modules.events.registration.controllers import display
 from indico.modules.events.registration.controllers.compat import compat_registration
@@ -16,6 +18,8 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/registration', event_feature='registration')
+# Enable CORS for the the Check-in app API endpoints
+CORS(_bp, resources=r'/api/checkin/*')
 
 # Management
 _bp.add_url_rule('/manage/registration/', 'manage_regform_list', regforms.RHManageRegistrationForms)
@@ -201,15 +205,26 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar'
 
 
 # API
-_bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',
-                 api.RHAPIRegistrant, methods=('GET', 'PATCH'))
-_bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants',
-                 api.RHAPIRegistrants)
 _bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api.RHAPIRegistrationForms)
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registration_tags_assign',
                  tags.RHAPIRegistrationTagsAssign, methods=('POST',))
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_registration_change_consent',
                  privacy.RHAPIRegistrationChangeConsent, methods=('POST',))
+
+
+# Check-in app API
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>', 'api_checkin_event', api.RHAPIEvent)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/registration/<int:reg_form_id>', 'api_checkin_regform',
+                 api.RHAPIRegForm)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/registration/<int:reg_form_id>/registrations',
+                 'api_checkin_registrations', api.RHAPIRegistrations)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/registration/<int:reg_form_id>/<int:registration_id>',
+                 'api_checkin_registration', api.RHAPIRegistration, methods=('GET', 'PATCH'))
+
+# Deprecated Check-in app API
+_bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',
+                 api.RHAPIRegistrant, methods=('GET', 'PATCH'))
+_bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants', api.RHAPIRegistrants)
 
 # Participants
 _bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<int:event_id>',

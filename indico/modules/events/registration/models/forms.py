@@ -457,6 +457,13 @@ class RegistrationForm(db.Model):
                 .all())
 
     @property
+    def checked_in_registrations(self):
+        return (Registration.query.with_parent(self)
+                .filter(Registration.checked_in)
+                .options(subqueryload('data'))
+                .all())
+
+    @property
     def needs_publish_consent(self):
         return (self.publish_registrations_participants == PublishRegistrationsMode.show_with_consent or
                 self.publish_registrations_public == PublishRegistrationsMode.show_with_consent)

@@ -99,6 +99,7 @@ flask==2.3.2
     #   -r requirements.in
     #   flask-babel
     #   flask-caching
+    #   flask-cors
     #   flask-limiter
     #   flask-marshmallow
     #   flask-migrate
@@ -111,6 +112,8 @@ flask==2.3.2
 flask-babel==3.1.0
     # via -r requirements.in
 flask-caching==2.0.2
+    # via -r requirements.in
+flask-cors==4.0.0
     # via -r requirements.in
 flask-limiter==3.3.1
     # via -r requirements.in
