@@ -269,8 +269,8 @@ class RHEmailEventPersonsBase(RHManageEventBase):
     """Send emails to selected EventPersons."""
 
     @use_kwargs({
-        'role_id': fields.List(fields.Integer(), load_default=[]),
-        'persons': fields.List(fields.String(), load_default=[]),
+        'role_id': fields.List(fields.Integer(), load_default=lambda: []),
+        'persons': fields.List(fields.String(), load_default=lambda: []),
         'not_invited_only': fields.Bool(load_default=None),
         'no_account': fields.Bool(load_default=False),
     })

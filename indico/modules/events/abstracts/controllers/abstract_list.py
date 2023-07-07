@@ -60,7 +60,7 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
         return query
 
     @use_kwargs({
-        'abstract_ids': fields.List(fields.Int(), data_key='abstract_id', load_default=[])
+        'abstract_ids': fields.List(fields.Int(), data_key='abstract_id', load_default=lambda: [])
     })
     def _process_args(self, abstract_ids):
         RHAbstractListBase._process_args(self)

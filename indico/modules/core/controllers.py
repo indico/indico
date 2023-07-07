@@ -257,7 +257,8 @@ class RHPrincipals(PrincipalsMixin, RHProtected):
     """
 
     @use_kwargs({
-        'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_emails=True, load_default={})
+        'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_emails=True,
+                                load_default=lambda: {})
     })
     def _process_args(self, values):
         self.values = values
@@ -281,7 +282,7 @@ class RHSignURL(RH):
         'endpoint': fields.String(required=True,
                                   validate=validate_with_message(lambda ep: ep in current_app.view_functions,
                                                                  'Invalid endpoint')),
-        'params': fields.Dict(keys=fields.String(), load_default={},
+        'params': fields.Dict(keys=fields.String(), load_default=lambda: {},
                               validate=validate_with_message(lambda params: not any(x.startswith('_') for x in params),
                                                              'Params starting with an underscore are not allowed'))
     })

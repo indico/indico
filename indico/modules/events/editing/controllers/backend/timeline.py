@@ -199,7 +199,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
 
     @use_kwargs(ReviewEditableArgs)
     def _process(self, action, comment):
-        argmap = {'tags': EditingTagsField(self.event, load_default=set())}
+        argmap = {'tags': EditingTagsField(self.event, load_default=lambda: set())}
         if action in (EditingReviewAction.update, EditingReviewAction.update_accept,
                       EditingReviewAction.request_update):
             argmap['files'] = EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
@@ -239,7 +239,7 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
     })
     def _process(self, comment, state):
         args = parser.parse({
-            'tags': EditingTagsField(self.event, allow_system_tags=self.is_service_call, load_default=set()),
+            'tags': EditingTagsField(self.event, allow_system_tags=self.is_service_call, load_default=lambda: set()),
             'files': EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                        required=True)
         }, unknown=EXCLUDE)

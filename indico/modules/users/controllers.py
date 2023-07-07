@@ -157,7 +157,7 @@ class RHExportDashboardICS(RHProtected):
 
     @use_kwargs({
         'from_': HumanizedDate(data_key='from', load_default=lambda: now_utc(False) - relativedelta(weeks=1)),
-        'include': fields.List(fields.Str(), load_default={'linked', 'categories'}),
+        'include': fields.List(fields.Str(), load_default=lambda: {'linked', 'categories'}),
         'limit': fields.Integer(load_default=100, validate=lambda v: 0 < v <= 500)
     }, location='query')
     def _process(self, from_, include, limit):

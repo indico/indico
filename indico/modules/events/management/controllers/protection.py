@@ -135,7 +135,7 @@ class RHEventPrincipals(PrincipalsMixin, RHAuthenticatedEventBase):
     @use_rh_kwargs({
         'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                 allow_category_roles=True, allow_registration_forms=True, allow_emails=True,
-                                load_default={})
+                                load_default=lambda: {})
     }, rh_context=('event',))
     def _process(self, values):
         self.values = values

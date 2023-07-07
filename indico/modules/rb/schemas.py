@@ -444,7 +444,7 @@ class EquipmentTypeArgs(mm.Schema):
         rh_context = ('equipment_type',)
 
     name = fields.String(validate=validate.Length(min=2), required=True)
-    features = ModelList(RoomFeature, load_default=[])
+    features = ModelList(RoomFeature, load_default=lambda: [])
 
     @validates('name')
     def _check_name_unique(self, name, **kwargs):

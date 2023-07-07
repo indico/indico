@@ -112,8 +112,8 @@ class RHAPIRegistrationTagsAssign(RHRegistrationsActionBase):
     """Internal API to assign and remove registration tags."""
 
     @use_kwargs({
-        'add': fields.List(fields.Integer(), load_default=[]),
-        'remove': fields.List(fields.Integer(), load_default=[])
+        'add': fields.List(fields.Integer(), load_default=lambda: []),
+        'remove': fields.List(fields.Integer(), load_default=lambda: [])
     })
     def _process_POST(self, add, remove):
         _assign_registration_tags(self.event, self.registrations, add, remove)

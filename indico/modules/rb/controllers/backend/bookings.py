@@ -66,7 +66,7 @@ class RHTimeline(RHRoomBookingBase):
         'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
     @use_kwargs({
-        'room_ids': fields.List(fields.Int(), load_default=[]),
+        'room_ids': fields.List(fields.Int(), load_default=lambda: []),
     })
     def _process(self, room_ids, **kwargs):
         rooms = [self.room] if self.room else Room.query.filter(Room.id.in_(room_ids), ~Room.is_deleted).all()

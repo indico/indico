@@ -21,7 +21,7 @@ from indico.web.args import use_args, use_kwargs
 
 class RHCreateRoomBlocking(RHRoomBookingBase):
     @use_args({
-        'room_ids': fields.List(fields.Int(), load_default=[]),
+        'room_ids': fields.List(fields.Int(), load_default=lambda: []),
         'start_date': fields.Date(required=True),
         'end_date': fields.Date(required=True),
         'reason': fields.Str(required=True),

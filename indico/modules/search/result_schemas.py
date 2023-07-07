@@ -103,7 +103,7 @@ class EventResultSchema(ResultSchemaBase):
     #: The event location
     location: LocationResultSchema = fields.Nested(LocationResultSchema, required=True)
     #: The event content to highlight
-    highlight = fields.Nested(HighlightSchema, load_default={})
+    highlight = fields.Nested(HighlightSchema, load_default=lambda: {})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
 
@@ -133,7 +133,7 @@ class ContributionResultSchema(ResultSchemaBase):
     #: The contribution duration
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
     #: The contribution content to highlight
-    highlight = fields.Nested(HighlightSchema, load_default={})
+    highlight = fields.Nested(HighlightSchema, load_default=lambda: {})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
     event_path = fields.Method('_get_event_path', dump_only=True)
@@ -247,7 +247,7 @@ class EventNoteResultSchema(ResultSchemaBase):
     #: The note content
     content = fields.String(required=True)
     #: The note content to highlight
-    highlight: HighlightSchema = fields.Nested(HighlightSchema, load_default={})
+    highlight: HighlightSchema = fields.Nested(HighlightSchema, load_default=lambda: {})
     # extra fields that are not taken from the data returned by the search engine
     url = fields.Method('_get_url')
     event_path = fields.Method('_get_event_path', dump_only=True)
@@ -318,4 +318,4 @@ class ResultSchema(_ResultSchemaBase):
     pages = fields.Int(load_default=None)
     pagenav = fields.Nested(PageNavSchema, load_default=None)
     results = fields.List(fields.Nested(ResultItemSchema), required=True)
-    aggregations = fields.Dict(fields.String(), fields.Nested(AggregationSchema), load_default={})
+    aggregations = fields.Dict(fields.String(), fields.Nested(AggregationSchema), load_default=lambda: {})

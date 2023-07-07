@@ -404,7 +404,7 @@ class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
 
     @use_kwargs({
         'all_selected': fields.Bool(load_default=False),
-        'event_ids': fields.List(fields.Int(), data_key='event_id', load_default=[]),
+        'event_ids': fields.List(fields.Int(), data_key='event_id', load_default=lambda: []),
     })
     def _process_args(self, all_selected, event_ids):
         RHManageCategoryBase._process_args(self)

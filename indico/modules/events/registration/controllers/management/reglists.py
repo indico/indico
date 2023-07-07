@@ -176,7 +176,7 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
     registration_query_options = ()
 
     @use_kwargs({
-        'registration_ids': fields.List(fields.Integer(), data_key='registration_id', load_default=[]),
+        'registration_ids': fields.List(fields.Integer(), data_key='registration_id', load_default=lambda: []),
     })
     def _process_args(self, registration_ids):
         RHManageRegFormBase._process_args(self)

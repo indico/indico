@@ -129,7 +129,7 @@ class RHManageContributionsActionsBase(RHManageContributionsBase):
     """Base class for classes performing actions on event contributions."""
 
     @use_kwargs({
-        'contribution_ids': fields.List(fields.Int(), data_key='contribution_id', load_default=[])
+        'contribution_ids': fields.List(fields.Int(), data_key='contribution_id', load_default=lambda: [])
     })
     def _process_args(self, contribution_ids):
         RHManageContributionsBase._process_args(self)
