@@ -7,13 +7,14 @@
 
 from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload
+from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
-from indico.modules.events.controllers.base import RHProtectedEventBase
-from indico.modules.events.controllers.base import RHEventBase
+from indico.modules.events.controllers.base import RHEventBase, RHProtectedEventBase
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
+from indico.web.args import use_kwargs
 from indico.web.rh import cors_enabled, json_errors, oauth_scope
 
 
@@ -38,20 +39,13 @@ class RHAPIRegistrant(RHEventBase):
     def _process_GET(self):
         return jsonify(build_registration_api_data(self._registration))
 
-    def _process_PATCH(self):
-        if request.json is None:
-            raise BadRequest('Expected JSON payload')
-
-        invalid_fields = request.json.keys() - {'checked_in'}
-        if invalid_fields:
-            raise BadRequest('Invalid fields: {}'.format(', '.join(invalid_fields)))
-
-        if 'checked_in' in request.json:
-            if self._registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
-                raise BadRequest('This registration cannot be marked as checked-in')
-            self._registration.checked_in = bool(request.json['checked_in'])
-            signals.event.registration_checkin_updated.send(self._registration)
-
+    @cors_enabled
+    @use_kwargs({'checked_in': fields.Bool(required=True)})
+    def _process_PATCH(self, checked_in):
+        if self._registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
+            raise BadRequest('This registration cannot be marked as checked-in')
+        self._registration.checked_in = checked_in
+        signals.event.registration_checkin_updated.send(self._registration)
         return jsonify(build_registration_api_data(self._registration))
 
 
