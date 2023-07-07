@@ -149,7 +149,7 @@
     "sass-loader": "^13.0.0",
     "script-loader": "^0.7.2",
     "semver": "^7.3.7",
-    "stylelint": "^14.9.1",
+    "stylelint": "^15.10.1",
     "stylelint-config-prettier": "^9.0.3",
     "stylelint-config-recommended-scss": "^6.0.0",
     "stylelint-prettier": "^1.2.0",
