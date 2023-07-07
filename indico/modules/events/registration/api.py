@@ -14,9 +14,10 @@ from indico.modules.events.controllers.base import RHProtectedEventBase
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
-from indico.web.rh import RH, oauth_scope, cors_enabled
+from indico.web.rh import RH, cors_enabled, json_errors, oauth_scope
 
 
+@json_errors
 @oauth_scope('registrants')
 class RHAPIRegistrant(RH):
     """RESTful registrant API."""
@@ -54,6 +55,7 @@ class RHAPIRegistrant(RH):
         return jsonify(build_registration_api_data(self._registration))
 
 
+@json_errors
 @oauth_scope('registrants')
 class RHAPIRegistrants(RH):
     """RESTful registrants API."""
