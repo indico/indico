@@ -11,15 +11,15 @@ from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
 from indico.modules.events.controllers.base import RHProtectedEventBase
-from indico.modules.events.models.events import Event
+from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
-from indico.web.rh import RH, cors_enabled, json_errors, oauth_scope
+from indico.web.rh import cors_enabled, json_errors, oauth_scope
 
 
 @json_errors
 @oauth_scope('registrants')
-class RHAPIRegistrant(RH):
+class RHAPIRegistrant(RHEventBase):
     """RESTful registrant API."""
 
     def _check_access(self):
@@ -27,7 +27,7 @@ class RHAPIRegistrant(RH):
             raise Forbidden()
 
     def _process_args(self):
-        self.event = Event.query.filter_by(id=request.view_args['event_id'], is_deleted=False).first_or_404()
+        RHEventBase._process_args(self)
         self._registration = (self.event.registrations
                               .filter_by(id=request.view_args['registrant_id'],
                                          is_deleted=False)
@@ -57,15 +57,12 @@ class RHAPIRegistrant(RH):
 
 @json_errors
 @oauth_scope('registrants')
-class RHAPIRegistrants(RH):
+class RHAPIRegistrants(RHEventBase):
     """RESTful registrants API."""
 
     def _check_access(self):
         if not self.event.can_manage(session.user, permission='registration'):
             raise Forbidden()
-
-    def _process_args(self):
-        self.event = Event.query.filter_by(id=request.view_args['event_id'], is_deleted=False).first_or_404()
 
     @cors_enabled
     def _process_GET(self):
