@@ -15,12 +15,18 @@ from indico.modules.events.controllers.base import RHEventBase, RHProtectedEvent
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
 from indico.web.args import use_kwargs
-from indico.web.rh import cors_enabled, json_errors, oauth_scope
+from indico.web.rh import json_errors, oauth_scope
 
 
 @json_errors
 @oauth_scope('registrants')
-class RHAPIRegistrant(RHEventBase):
+class RHAPICheckinAppBase(RHEventBase):
+    """Base class for the Indico Check-in API."""
+
+    CORS_ENABLED = True
+
+
+class RHAPIRegistrant(RHAPICheckinAppBase):
     """RESTful registrant API."""
 
     def _check_access(self):
@@ -35,11 +41,9 @@ class RHAPIRegistrant(RHEventBase):
                               .options(joinedload('data').joinedload('field_data'))
                               .first_or_404())
 
-    @cors_enabled
     def _process_GET(self):
         return jsonify(build_registration_api_data(self._registration))
 
-    @cors_enabled
     @use_kwargs({'checked_in': fields.Bool(required=True)})
     def _process_PATCH(self, checked_in):
         if self._registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
@@ -49,16 +53,13 @@ class RHAPIRegistrant(RHEventBase):
         return jsonify(build_registration_api_data(self._registration))
 
 
-@json_errors
-@oauth_scope('registrants')
-class RHAPIRegistrants(RHEventBase):
+class RHAPIRegistrants(RHAPICheckinAppBase):
     """RESTful registrants API."""
 
     def _check_access(self):
         if not self.event.can_manage(session.user, permission='registration'):
             raise Forbidden()
 
-    @cors_enabled
     def _process_GET(self):
         return jsonify(registrants=build_registrations_api_data(self.event))
 

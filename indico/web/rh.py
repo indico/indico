@@ -42,6 +42,7 @@ class RH:
     CSRF_ENABLED = True  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
     DENY_FRAMES = False  # whether to send an X-Frame-Options:DENY header
+    CORS_ENABLED = False  # whether CORS is allowed
 
     #: A dict specifying how the url should be normalized.
     #: `args` is a dictionary mapping view args keys to callables
@@ -307,6 +308,8 @@ class RH:
         response = current_app.make_response(res)
         if self.DENY_FRAMES:
             response.headers['X-Frame-Options'] = 'DENY'
+        if self.CORS_ENABLED:
+            response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
 
@@ -408,14 +411,3 @@ def json_errors(rh):
     """
     rh._JSON_ERRORS = True
     return rh
-
-
-def cors_enabled(f):
-    """Enable CORS for this endpoint."""
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        response = f(*args, **kwargs)
-        response = current_app.make_response(response)
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
-    return wrapper
