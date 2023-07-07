@@ -14,7 +14,7 @@ from indico.modules.events.controllers.base import RHProtectedEventBase
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
-from indico.web.rh import RH, oauth_scope
+from indico.web.rh import RH, oauth_scope, cors_enabled
 
 
 @oauth_scope('registrants')
@@ -33,6 +33,7 @@ class RHAPIRegistrant(RH):
                               .options(joinedload('data').joinedload('field_data'))
                               .first_or_404())
 
+    @cors_enabled
     def _process_GET(self):
         return jsonify(build_registration_api_data(self._registration))
 
@@ -64,6 +65,7 @@ class RHAPIRegistrants(RH):
     def _process_args(self):
         self.event = Event.query.filter_by(id=request.view_args['event_id'], is_deleted=False).first_or_404()
 
+    @cors_enabled
     def _process_GET(self):
         return jsonify(registrants=build_registrations_api_data(self.event))
 

@@ -408,3 +408,14 @@ def json_errors(rh):
     """
     rh._JSON_ERRORS = True
     return rh
+
+
+def cors_enabled(f):
+    """Enable CORS for this endpoint."""
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        response = f(*args, **kwargs)
+        response = current_app.make_response(response)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+    return wrapper
