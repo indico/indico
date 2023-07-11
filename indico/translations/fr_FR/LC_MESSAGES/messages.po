@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-06-15 13:26+0200\n"
+"POT-Creation-Date: 2023-07-11 14:32+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2023\n"
 "Language-Team: French (France) (http://app.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -857,7 +857,7 @@ msgstr "API HTTP"
 #: indico/modules/api/controllers.py:31
 #: indico/modules/events/layout/controllers/layout.py:116
 #: indico/modules/events/layout/controllers/layout.py:136
-#: indico/modules/events/layout/controllers/layout.py:241
+#: indico/modules/events/layout/controllers/layout.py:245
 #: indico/modules/events/payment/controllers.py:34
 #: indico/modules/events/payment/controllers.py:77
 #: indico/modules/events/registration/controllers/management/privacy.py:75
@@ -1777,7 +1777,7 @@ msgstr "Votre profil Indico a été bloqué."
 msgid "Accounts"
 msgstr "Comptes"
 
-#: indico/modules/auth/__init__.py:137
+#: indico/modules/auth/__init__.py:135
 #: indico/modules/auth/templates/accounts.html:144
 msgid "You need to change your password"
 msgstr "Vous devez changer votre mot de passe"
@@ -2743,7 +2743,7 @@ msgstr "Vous n'êtes pas autorisé à accéder à cette catégorie."
 msgid "If you believe you should have access, please contact {}"
 msgstr "Si vous pensez que vous devriez avoir l'accès, veuillez contacter {}"
 
-#: indico/modules/categories/controllers/display.py:626
+#: indico/modules/categories/controllers/display.py:629
 msgid "There are no upcoming events for this category"
 msgstr "Aucun événement à venir dans cette catégorie"
 
@@ -3500,7 +3500,7 @@ msgstr "Réponse incorrecte"
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
-#: indico/modules/core/controllers.py:306
+#: indico/modules/core/controllers.py:307
 msgid "All your token-based links have been invalidated"
 msgstr "Tous vos liens basés sur des jetons ont été invalidés"
 
@@ -8494,15 +8494,15 @@ msgstr "Vous n'êtes pas éditeur du type {}"
 msgid "This user is not an editor of the {} type"
 msgstr "Cet utilisateur n'est pas éditeur pour le type {}"
 
-#: indico/modules/events/editing/controllers/backend/management.py:107
+#: indico/modules/events/editing/controllers/backend/management.py:109
 msgid "Cannot delete file type which already has files"
 msgstr "Impossible de supprimer un type de fichier qui a déjà des fichiers"
 
-#: indico/modules/events/editing/controllers/backend/management.py:110
+#: indico/modules/events/editing/controllers/backend/management.py:112
 msgid "Cannot delete file type which is used in a review condition"
 msgstr "Impossible de supprimer un type de fichier utilisé dans une condition de relecture"
 
-#: indico/modules/events/editing/controllers/backend/management.py:117
+#: indico/modules/events/editing/controllers/backend/management.py:119
 msgid "Cannot delete the only publishable file type"
 msgstr "Impossible de supprimer le seul type de fichier publiable"
 
@@ -8918,13 +8918,17 @@ msgid ""
 "necessary."
 msgstr "Le logo que vous avez télédéposé utilise un espace de couleur CMYK et a été converti en RGB. Veuillez vérifier que les couleurs sont correctes et la convertir manuellement si nécessaire."
 
-#: indico/modules/events/layout/controllers/layout.py:198
+#: indico/modules/events/layout/controllers/layout.py:194
+msgid "CSS files must be ASCII or UTF-8 encoded."
+msgstr "Les fichiers CSS doivent être encodés en ASCII ou UTF-8."
+
+#: indico/modules/events/layout/controllers/layout.py:202
 msgid ""
 "New CSS file saved. Do not forget to enable it (\"Use custom CSS\") after "
 "verifying that it is correct using the preview."
 msgstr "Nouveau fichier CSS sauvegardé. N'oubliez pas de l'activer (\"Utiliser un CSS personnalisé\") après avoir vérifié qu'il est correct en utilisant l'aperçu."
 
-#: indico/modules/events/layout/controllers/layout.py:209
+#: indico/modules/events/layout/controllers/layout.py:213
 msgid "CSS file deleted"
 msgstr "Le fichier CSS a été supprimé"
 
@@ -11621,14 +11625,14 @@ msgstr[0] "Président de séance"
 msgstr[1] "Présidents de séance"
 msgstr[2] "Présidents de séance"
 
-#: indico/modules/events/persons/controllers.py:380
+#: indico/modules/events/persons/controllers.py:379
 msgid "Submission rights have been granted to one speaker"
 msgid_plural "Submission rights have been granted to {} speakers"
 msgstr[0] "Les droits de dépôt ont été donnés à un orateur"
 msgstr[1] "Les droits de dépôt ont été donnés à {} orateurs"
 msgstr[2] "Les droits de dépôt ont été donnés à {} orateurs"
 
-#: indico/modules/events/persons/controllers.py:398
+#: indico/modules/events/persons/controllers.py:397
 msgid "Session modification rights have been granted to one session convener"
 msgid_plural ""
 "Session modification rights have been granted to {} session conveners"
@@ -11636,22 +11640,22 @@ msgstr[0] "Les droits de modification ont été donnés à un président de sess
 msgstr[1] "Les droits de modification ont été donnés à {} présidents de session"
 msgstr[2] "Les droits de modification ont été donnés à {} présidents de session"
 
-#: indico/modules/events/persons/controllers.py:417
+#: indico/modules/events/persons/controllers.py:416
 msgid "Submission rights have been revoked from one user"
 msgid_plural "Submission rights have been revoked from {} users"
 msgstr[0] "Les droits de dépôt ont été révoqué pour un utilisateur"
 msgstr[1] "Les droits de dépôt ont été révoqué pour {} utilisateurs"
 msgstr[2] "Les droits de dépôt ont été révoqué pour {} utilisateurs"
 
-#: indico/modules/events/persons/controllers.py:441
+#: indico/modules/events/persons/controllers.py:440
 msgid "Only users with no ties to the event can be deleted."
 msgstr "Seuls les utilisateurs sans lien avec l'événement peuvent être supprimés."
 
-#: indico/modules/events/persons/controllers.py:450
+#: indico/modules/events/persons/controllers.py:449
 msgid "Persons with no associated users cannot be synced."
 msgstr "Les personnes avec aucun utilisateur associé ne peuvent être synchronisés."
 
-#: indico/modules/events/persons/controllers.py:517
+#: indico/modules/events/persons/controllers.py:516
 msgid "Person lists settings changed successfully"
 msgstr "Les paramètres de liste de personnes ont été modifié"
 
@@ -12803,19 +12807,26 @@ msgstr "L'étiquette {} a été modifiée."
 msgid "There are no places left for this option."
 msgstr "Il n'y a plus de places pour cette option."
 
-#: indico/modules/events/registration/fields/choices.py:148
+#: indico/modules/events/registration/fields/choices.py:161
 msgid "No places left for the option: {0}"
 msgstr "Plus de place disponible pour l'option: {0}"
 
-#: indico/modules/events/registration/fields/choices.py:535
+#: indico/modules/events/registration/fields/choices.py:297
+msgid "At most {max_choices} option can be selected"
+msgid_plural "At most {max_choices} options can be selected"
+msgstr[0] "Au plus {max_choices} option peut être sélectionnée"
+msgstr[1] "Au plus {max_choices} options peuvent être sélectionnées"
+msgstr[2] "Au plus {max_choices} options peuvent être sélectionnées"
+
+#: indico/modules/events/registration/fields/choices.py:562
 msgid "Arrival/departure date is missing"
 msgstr "La date d'arrivée/de départ manque"
 
-#: indico/modules/events/registration/fields/choices.py:537
+#: indico/modules/events/registration/fields/choices.py:564
 msgid "Arrival date can't be set after the departure date."
 msgstr "La date d'arrivée ne peut pas être après la date de départ."
 
-#: indico/modules/events/registration/fields/choices.py:552
+#: indico/modules/events/registration/fields/choices.py:579
 msgid "Not enough rooms in '{0}'"
 msgstr "Pas assez de chambres dans '{0}'"
 
@@ -18755,42 +18766,42 @@ msgstr "MARTIN, J."
 msgid "J. DOE"
 msgstr "J. MARTIN"
 
-#: indico/modules/users/models/users.py:151
+#: indico/modules/users/models/users.py:148
 msgid "first name"
 msgstr "prénom"
 
-#: indico/modules/users/models/users.py:152
+#: indico/modules/users/models/users.py:149
 msgid "family name"
 msgstr "nom de famille"
 
-#: indico/modules/users/models/users.py:153
+#: indico/modules/users/models/users.py:150
 msgid "affiliation"
 msgstr "affiliation"
 
-#: indico/modules/users/models/users.py:154
+#: indico/modules/users/models/users.py:151
 msgid "address"
 msgstr "adresse"
 
-#: indico/modules/users/models/users.py:155
+#: indico/modules/users/models/users.py:152
 msgid "phone number"
 msgstr "numéro de téléphone"
 
-#: indico/modules/users/models/users.py:156
+#: indico/modules/users/models/users.py:153
 msgid "primary email address"
 msgstr "Adresse de courriel principale"
 
-#: indico/modules/users/models/users.py:726
+#: indico/modules/users/models/users.py:722
 msgid ""
 "Your {field_name} has been synchronized from '{old_value}' to '{new_value}'."
 msgstr "Votre {field_name} a été synchronisé(e) de '{old_value}' à '{new_value}'."
 
-#: indico/modules/users/models/users.py:737
+#: indico/modules/users/models/users.py:733
 msgid ""
 "Your email address could not be synchronized from '{old_value}' to "
 "'{new_value}' since the new email address is not valid."
 msgstr "Votre adresse de courriel n'a pas pu être synchronisée de '{old_value}' à '{new_value}' car la nouvelle adresse n'est pas valable."
 
-#: indico/modules/users/models/users.py:746
+#: indico/modules/users/models/users.py:742
 msgid ""
 "Your email address could not be synchronized from '{old_value}' to "
 "'{new_value}' due to a conflict with another Indico profile."

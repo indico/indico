@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-05-23 22:02+0200\n"
+"POT-Creation-Date: 2023-07-23 14:32+0200\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2023\n"
 "Language-Team: Chinese (China) (GB2312) (https://app.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -627,11 +627,19 @@ msgstr "OK"
 msgid "Retracted"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:34
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:23
+msgid "This file was modified since the last revision."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:28
+msgid "This file was added since the last revision."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:53
 msgid "No files uploaded"
 msgstr "没有上传文件"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:84
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:103
 msgid "Download ZIP"
 msgstr "下载 ZIP"
 
@@ -831,39 +839,39 @@ msgstr[0] "没有可发布的文件。 请上传至少以下一种类型的文�
 msgid "There is no publishable file uploaded."
 msgstr "没有已上传的可发布文件。"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:114
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:130
 msgid "Editor has accepted after making some changes"
 msgstr "进行一些更改后，编辑人已接收"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:115
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:131
 msgid "Submitter has accepted proposed changes"
 msgstr "提交人已接受提议的修改"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:119
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:135
 msgid "Submitter rejected proposed changes"
 msgstr "提交人拒绝了建议的更改"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:120
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:136
 msgid "Submitter rejected proposed changes and uploaded a new revision"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:124
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:140
 msgid "Revision has been replaced"
 msgstr "修订已替换"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:125
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:141
 msgid "Revision has been accepted"
 msgstr "修订已接受"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:126
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:142
 msgid "Revision has been rejected"
 msgstr "修改已拒绝"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:127
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:143
 msgid "Submitter has been asked to make some changes"
 msgstr "已要求提交人进行一些更改"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:131
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:147
 msgid "{editorName} (editor) has made some changes to the paper"
 msgstr "{editorName} (editor) 对论文进行了一些更改"
 
@@ -2019,7 +2027,7 @@ msgstr ""
 msgid "Submitter"
 msgstr "提交人"
 
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:68
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:69
 msgid "Send emails to these roles"
 msgstr ""
 
@@ -2237,7 +2245,7 @@ msgid "Departure"
 msgstr "离开"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:165
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:144
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:153
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:127
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:260
 msgid "Total: {total} {currency}"
@@ -2260,7 +2268,7 @@ msgid "The arrival period cannot end after the departure period."
 msgstr "到达时间不能晚于离开时间"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:321
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:224
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:269
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:452
 msgid "Choices"
 msgstr "选择"
@@ -2496,7 +2504,20 @@ msgstr ""
 msgid "The registration will be associated with the Indico account {name}."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:219
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:205
+msgid "At most {n} option can be selected"
+msgid_plural "At most {n} options can be selected"
+msgstr[0] ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:256
+msgid "Maximum number of choices"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:257
+msgid "Maximum number of choices that can be selected. Leave empty to unset."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:264
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:447
 msgid "Enable extra slots"
 msgstr ""
@@ -4992,19 +5013,19 @@ msgid ""
 "Download an iCalendar file that you can use in calendaring applications."
 msgstr "下载可在日历应用程序中使用的iCalendar文件。"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:122
+#: indico/web/client/js/react/components/ListFilter.jsx:128
 msgid "Filter"
 msgstr "过滤"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:150
+#: indico/web/client/js/react/components/ListFilter.jsx:156
 msgid "Clear all filters"
 msgstr ""
 
-#: indico/web/client/js/react/components/ListFilter.jsx:155
+#: indico/web/client/js/react/components/ListFilter.jsx:161
 msgid "No filters were added yet"
 msgstr ""
 
-#: indico/web/client/js/react/components/ListFilter.jsx:205
+#: indico/web/client/js/react/components/ListFilter.jsx:211
 msgid "Enter #id or search string"
 msgstr "输入 #id 或搜索字符串"
 
@@ -5542,6 +5563,11 @@ msgstr "灰色"
 #: indico/web/client/js/utils/palette.js:41
 msgid "Black"
 msgstr "黑色"
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:251
+msgctxt "Number of choices"
+msgid "Unlimited"
+msgstr ""
 
 #: indico/modules/rb/client/js/util.jsx:166
 msgctxt "single booking shortcut"

@@ -15,13 +15,13 @@
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2023
 # bbbuserde, 2023
 # markus heuchert <m.heuchert@uni-muenster.de>, 2023
-# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2023
 # Adrian, 2023
+# Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2023
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-05-23 22:02+0200\n"
-"Last-Translator: Adrian, 2023\n"
+"POT-Creation-Date: 2023-07-23 14:32+0200\n"
+"Last-Translator: Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2023\n"
 "Language-Team: German (Germany) (https://app.transifex.com/indico/teams/6478/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -658,11 +658,19 @@ msgstr "OK"
 msgid "Retracted"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:34
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:23
+msgid "This file was modified since the last revision."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:28
+msgid "This file was added since the last revision."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:53
 msgid "No files uploaded"
 msgstr "Keine Dateien hochgeladen"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:84
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:103
 msgid "Download ZIP"
 msgstr "ZIP Herunterladen"
 
@@ -873,39 +881,39 @@ msgstr[1] ""
 msgid "There is no publishable file uploaded."
 msgstr "Keine Datei zur Veröffentlichung hochgeladen."
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:114
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:130
 msgid "Editor has accepted after making some changes"
 msgstr "Vom Editor mit einigen Änderungen akzeptiert"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:115
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:131
 msgid "Submitter has accepted proposed changes"
 msgstr "Absender hat die vorgeschlagenen Änderungen angenommen."
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:119
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:135
 msgid "Submitter rejected proposed changes"
 msgstr "Absender hat die vorgeschlagenen Änderungen abgelehnt."
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:120
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:136
 msgid "Submitter rejected proposed changes and uploaded a new revision"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:124
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:140
 msgid "Revision has been replaced"
 msgstr "Berichtigung wurde erstzt"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:125
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:141
 msgid "Revision has been accepted"
 msgstr "Die Änderung wurde angenommen."
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:126
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:142
 msgid "Revision has been rejected"
 msgstr "Die Änderung wurde abgelehnt."
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:127
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:143
 msgid "Submitter has been asked to make some changes"
 msgstr "Absender wurde um Änderungen gebeten."
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:131
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:147
 msgid "{editorName} (editor) has made some changes to the paper"
 msgstr "{editorName} (Editor) hat einige Änderungen an dem Papier vorgenommen"
 
@@ -2121,7 +2129,7 @@ msgstr "Co-Autor"
 msgid "Submitter"
 msgstr "Einreichender"
 
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:68
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:69
 msgid "Send emails to these roles"
 msgstr ""
 
@@ -2353,7 +2361,7 @@ msgid "Departure"
 msgstr "Abreise"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:165
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:144
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:153
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:127
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:260
 msgid "Total: {total} {currency}"
@@ -2376,7 +2384,7 @@ msgid "The arrival period cannot end after the departure period."
 msgstr "Der Ankunftszeitraum kann nicht nach dem Abfahrtszeitraum enden."
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:321
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:224
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:269
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:452
 msgid "Choices"
 msgstr "Auswahlmöglichkeiten"
@@ -2620,7 +2628,21 @@ msgstr "Die Registrierung bleibt mit dem Indico Konto {name} verknüpft."
 msgid "The registration will be associated with the Indico account {name}."
 msgstr "Die Registrierung wird mit dem Indico Konto {name} verknüpft."
 
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:219
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:205
+msgid "At most {n} option can be selected"
+msgid_plural "At most {n} options can be selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:256
+msgid "Maximum number of choices"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:257
+msgid "Maximum number of choices that can be selected. Leave empty to unset."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:264
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:447
 msgid "Enable extra slots"
 msgstr "Zusätzliche Slots aktivieren"
@@ -2918,7 +2940,7 @@ msgstr "Sitzung"
 
 #: indico/modules/events/sessions/client/js/session_display.jsx:26
 msgid "Detailed timetable"
-msgstr "Detailierte Tagesordnung"
+msgstr "Detaillierte Tagesordnung"
 
 #: indico/modules/logs/client/js/components/EventLog.jsx:28
 msgid ""
@@ -5255,19 +5277,19 @@ msgstr ""
 "Laden Sie eine iCalendar-Datei herunter, die Sie in Kalenderprogrammen "
 "verwenden können."
 
-#: indico/web/client/js/react/components/ListFilter.jsx:122
+#: indico/web/client/js/react/components/ListFilter.jsx:128
 msgid "Filter"
 msgstr "Filter"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:150
+#: indico/web/client/js/react/components/ListFilter.jsx:156
 msgid "Clear all filters"
 msgstr "Alle Filter löschen"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:155
+#: indico/web/client/js/react/components/ListFilter.jsx:161
 msgid "No filters were added yet"
 msgstr "Es wurden noch keine Filter hinzugefügt"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:205
+#: indico/web/client/js/react/components/ListFilter.jsx:211
 msgid "Enter #id or search string"
 msgstr "Zeichenkette oder #id zum Suchen eingeben"
 
@@ -5830,6 +5852,11 @@ msgstr "Grau"
 #: indico/web/client/js/utils/palette.js:41
 msgid "Black"
 msgstr "Schwarz"
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:251
+msgctxt "Number of choices"
+msgid "Unlimited"
+msgstr ""
 
 #: indico/modules/rb/client/js/util.jsx:166
 msgctxt "single booking shortcut"

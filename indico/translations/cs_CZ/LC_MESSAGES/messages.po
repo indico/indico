@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-06-15 13:26+0200\n"
+"POT-Creation-Date: 2023-07-11 14:32+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2023\n"
 "Language-Team: Czech (Czech Republic) (http://app.transifex.com/indico/indico/language/cs_CZ/)\n"
@@ -864,7 +864,7 @@ msgstr "HTTP API"
 #: indico/modules/api/controllers.py:31
 #: indico/modules/events/layout/controllers/layout.py:116
 #: indico/modules/events/layout/controllers/layout.py:136
-#: indico/modules/events/layout/controllers/layout.py:241
+#: indico/modules/events/layout/controllers/layout.py:245
 #: indico/modules/events/payment/controllers.py:34
 #: indico/modules/events/payment/controllers.py:77
 #: indico/modules/events/registration/controllers/management/privacy.py:75
@@ -1788,7 +1788,7 @@ msgstr "Váš Indico profil byl zablokován."
 msgid "Accounts"
 msgstr "Účty"
 
-#: indico/modules/auth/__init__.py:137
+#: indico/modules/auth/__init__.py:135
 #: indico/modules/auth/templates/accounts.html:144
 msgid "You need to change your password"
 msgstr "Musíte změnit vaše heslo"
@@ -2756,7 +2756,7 @@ msgstr "Nemáte oprávnění přistupovat k této kategorii."
 msgid "If you believe you should have access, please contact {}"
 msgstr "Pokud si myslíte, že byste měli mít přístup, kontaktujte prosím {}"
 
-#: indico/modules/categories/controllers/display.py:626
+#: indico/modules/categories/controllers/display.py:629
 msgid "There are no upcoming events for this category"
 msgstr "Pro tuto kategorii nejsou žádné nadcházející události"
 
@@ -3522,7 +3522,7 @@ msgstr "Špatná odpověď"
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
-#: indico/modules/core/controllers.py:306
+#: indico/modules/core/controllers.py:307
 msgid "All your token-based links have been invalidated"
 msgstr "Všechny odkazy využívající tokeny byli zneplatněny. "
 
@@ -8541,15 +8541,15 @@ msgstr ""
 msgid "This user is not an editor of the {} type"
 msgstr ""
 
-#: indico/modules/events/editing/controllers/backend/management.py:107
+#: indico/modules/events/editing/controllers/backend/management.py:109
 msgid "Cannot delete file type which already has files"
 msgstr ""
 
-#: indico/modules/events/editing/controllers/backend/management.py:110
+#: indico/modules/events/editing/controllers/backend/management.py:112
 msgid "Cannot delete file type which is used in a review condition"
 msgstr ""
 
-#: indico/modules/events/editing/controllers/backend/management.py:117
+#: indico/modules/events/editing/controllers/backend/management.py:119
 msgid "Cannot delete the only publishable file type"
 msgstr ""
 
@@ -8968,13 +8968,17 @@ msgid ""
 "necessary."
 msgstr "Nahrané logo používá barevný model CMYK a bylo převedeno na RGB. Prosím zkontrolujte, zda jsou barvy správné, a v případě potřeby je ručně převeďte."
 
-#: indico/modules/events/layout/controllers/layout.py:198
+#: indico/modules/events/layout/controllers/layout.py:194
+msgid "CSS files must be ASCII or UTF-8 encoded."
+msgstr ""
+
+#: indico/modules/events/layout/controllers/layout.py:202
 msgid ""
 "New CSS file saved. Do not forget to enable it (\"Use custom CSS\") after "
 "verifying that it is correct using the preview."
 msgstr "Nový CSS soubor je uložen. Nezapomeňte ho zapnout (\"Použít vlastní CSS\"). Že vypadá správně si můžete ověřit pomocí náhledu."
 
-#: indico/modules/events/layout/controllers/layout.py:209
+#: indico/modules/events/layout/controllers/layout.py:213
 msgid "CSS file deleted"
 msgstr "CSS soubor smazán"
 
@@ -11678,7 +11682,7 @@ msgstr[1] "Předsedající"
 msgstr[2] "Předsedající"
 msgstr[3] "Předsedající"
 
-#: indico/modules/events/persons/controllers.py:380
+#: indico/modules/events/persons/controllers.py:379
 msgid "Submission rights have been granted to one speaker"
 msgid_plural "Submission rights have been granted to {} speakers"
 msgstr[0] "Práva nahrávat materiály byla přednášejícímu přidělena"
@@ -11686,7 +11690,7 @@ msgstr[1] "Práva nahrávat materiály byla přidělena {} přednášejícím"
 msgstr[2] "Práva nahrávat materiály byla přidělena {} přednášejícím"
 msgstr[3] "Práva nahrávat materiály byla přidělena {} přednášejícím"
 
-#: indico/modules/events/persons/controllers.py:398
+#: indico/modules/events/persons/controllers.py:397
 msgid "Session modification rights have been granted to one session convener"
 msgid_plural ""
 "Session modification rights have been granted to {} session conveners"
@@ -11695,7 +11699,7 @@ msgstr[1] "Práva na úpravu sekcí byla přidělena {} předsedajícím sekcí"
 msgstr[2] "Práva na úpravu sekcí byla přidělena {} předsedajícím sekcí"
 msgstr[3] "Práva na úpravu sekcí byla přidělena {} garantům sekcí"
 
-#: indico/modules/events/persons/controllers.py:417
+#: indico/modules/events/persons/controllers.py:416
 msgid "Submission rights have been revoked from one user"
 msgid_plural "Submission rights have been revoked from {} users"
 msgstr[0] ""
@@ -11703,15 +11707,15 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: indico/modules/events/persons/controllers.py:441
+#: indico/modules/events/persons/controllers.py:440
 msgid "Only users with no ties to the event can be deleted."
 msgstr ""
 
-#: indico/modules/events/persons/controllers.py:450
+#: indico/modules/events/persons/controllers.py:449
 msgid "Persons with no associated users cannot be synced."
 msgstr ""
 
-#: indico/modules/events/persons/controllers.py:517
+#: indico/modules/events/persons/controllers.py:516
 msgid "Person lists settings changed successfully"
 msgstr ""
 
@@ -12871,19 +12875,27 @@ msgstr "Značka {} byla upravena."
 msgid "There are no places left for this option."
 msgstr "Pro tuto volbu nejsou dostupná místa."
 
-#: indico/modules/events/registration/fields/choices.py:148
+#: indico/modules/events/registration/fields/choices.py:161
 msgid "No places left for the option: {0}"
 msgstr "Pro možnost {0} nezbývají žádná místa"
 
-#: indico/modules/events/registration/fields/choices.py:535
+#: indico/modules/events/registration/fields/choices.py:297
+msgid "At most {max_choices} option can be selected"
+msgid_plural "At most {max_choices} options can be selected"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/registration/fields/choices.py:562
 msgid "Arrival/departure date is missing"
 msgstr "Chybí datum příjezdu a odjezdu"
 
-#: indico/modules/events/registration/fields/choices.py:537
+#: indico/modules/events/registration/fields/choices.py:564
 msgid "Arrival date can't be set after the departure date."
 msgstr "Datum příjezdu nemůže být po datu odjezdu."
 
-#: indico/modules/events/registration/fields/choices.py:552
+#: indico/modules/events/registration/fields/choices.py:579
 msgid "Not enough rooms in '{0}'"
 msgstr "V '{0}' není dostatek pokojů"
 
@@ -14387,7 +14399,7 @@ msgstr "Statistiky pro \"%(title)s\""
 
 #: indico/modules/events/registration/templates/management/regform_stats.html:18
 msgid "Currency: {}"
-msgstr "Mána: {} "
+msgstr "Měna: {} "
 
 #: indico/modules/events/registration/templates/management/regform_stats.html:38
 msgid "Days left<br>to register"
@@ -18840,42 +18852,42 @@ msgstr "NOVÁKOVÁ, J."
 msgid "J. DOE"
 msgstr "J. NOVÁKOVÁ"
 
-#: indico/modules/users/models/users.py:151
+#: indico/modules/users/models/users.py:148
 msgid "first name"
 msgstr "křestní jméno"
 
-#: indico/modules/users/models/users.py:152
+#: indico/modules/users/models/users.py:149
 msgid "family name"
 msgstr "příjmení"
 
-#: indico/modules/users/models/users.py:153
+#: indico/modules/users/models/users.py:150
 msgid "affiliation"
 msgstr "afiliace"
 
-#: indico/modules/users/models/users.py:154
+#: indico/modules/users/models/users.py:151
 msgid "address"
 msgstr "adresa"
 
-#: indico/modules/users/models/users.py:155
+#: indico/modules/users/models/users.py:152
 msgid "phone number"
 msgstr "telefonní číslo"
 
-#: indico/modules/users/models/users.py:156
+#: indico/modules/users/models/users.py:153
 msgid "primary email address"
 msgstr "hlavní e-mailová adresa"
 
-#: indico/modules/users/models/users.py:726
+#: indico/modules/users/models/users.py:722
 msgid ""
 "Your {field_name} has been synchronized from '{old_value}' to '{new_value}'."
 msgstr ""
 
-#: indico/modules/users/models/users.py:737
+#: indico/modules/users/models/users.py:733
 msgid ""
 "Your email address could not be synchronized from '{old_value}' to "
 "'{new_value}' since the new email address is not valid."
 msgstr ""
 
-#: indico/modules/users/models/users.py:746
+#: indico/modules/users/models/users.py:742
 msgid ""
 "Your email address could not be synchronized from '{old_value}' to "
 "'{new_value}' due to a conflict with another Indico profile."

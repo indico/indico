@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-06-15 13:26+0200\n"
+"POT-Creation-Date: 2023-07-11 14:32+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2019-2021,2023\n"
 "Language-Team: Ukrainian (Ukraine) (http://app.transifex.com/indico/indico/language/uk_UA/)\n"
@@ -860,7 +860,7 @@ msgstr "HTTP API"
 #: indico/modules/api/controllers.py:31
 #: indico/modules/events/layout/controllers/layout.py:116
 #: indico/modules/events/layout/controllers/layout.py:136
-#: indico/modules/events/layout/controllers/layout.py:241
+#: indico/modules/events/layout/controllers/layout.py:245
 #: indico/modules/events/payment/controllers.py:34
 #: indico/modules/events/payment/controllers.py:77
 #: indico/modules/events/registration/controllers/management/privacy.py:75
@@ -1784,7 +1784,7 @@ msgstr "Ваш профіль Indico було заблоковано."
 msgid "Accounts"
 msgstr "Акаунти"
 
-#: indico/modules/auth/__init__.py:137
+#: indico/modules/auth/__init__.py:135
 #: indico/modules/auth/templates/accounts.html:144
 msgid "You need to change your password"
 msgstr "Ви повинні змінити ваш пароль"
@@ -2752,7 +2752,7 @@ msgstr "Ви не маєте доступу до цієї категорії"
 msgid "If you believe you should have access, please contact {}"
 msgstr "Якщо вам здається, що ви повинні мати доступ, будь ласка, зверніться до {}"
 
-#: indico/modules/categories/controllers/display.py:626
+#: indico/modules/categories/controllers/display.py:629
 msgid "There are no upcoming events for this category"
 msgstr "Найближчі заходи відсутні для цієї категорії"
 
@@ -3518,7 +3518,7 @@ msgstr ""
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
-#: indico/modules/core/controllers.py:306
+#: indico/modules/core/controllers.py:307
 msgid "All your token-based links have been invalidated"
 msgstr "Всі посилання з токенами було відмінено"
 
@@ -8537,15 +8537,15 @@ msgstr "Ви не є редактором типу {}"
 msgid "This user is not an editor of the {} type"
 msgstr "Цей користувач не є редактором типу {}"
 
-#: indico/modules/events/editing/controllers/backend/management.py:107
+#: indico/modules/events/editing/controllers/backend/management.py:109
 msgid "Cannot delete file type which already has files"
 msgstr "Неможливо видалити тип файлів що використовується"
 
-#: indico/modules/events/editing/controllers/backend/management.py:110
+#: indico/modules/events/editing/controllers/backend/management.py:112
 msgid "Cannot delete file type which is used in a review condition"
 msgstr "Неможливо видалити тип файлів що використовується в умовах рецензування"
 
-#: indico/modules/events/editing/controllers/backend/management.py:117
+#: indico/modules/events/editing/controllers/backend/management.py:119
 msgid "Cannot delete the only publishable file type"
 msgstr "Неможливо видалити єдиний тип файлів для публіукацій"
 
@@ -8964,13 +8964,17 @@ msgid ""
 "necessary."
 msgstr "Зображення, яке ви завантажили, використовує кольоровий простір CMYK, що був змінений на  RGB. Будь ласка, переконайтесь, що всі кольори відповідають дійсності та змініть їх вручну, якщо потрібно. "
 
-#: indico/modules/events/layout/controllers/layout.py:198
+#: indico/modules/events/layout/controllers/layout.py:194
+msgid "CSS files must be ASCII or UTF-8 encoded."
+msgstr ""
+
+#: indico/modules/events/layout/controllers/layout.py:202
 msgid ""
 "New CSS file saved. Do not forget to enable it (\"Use custom CSS\") after "
 "verifying that it is correct using the preview."
 msgstr "Збережено новий файл CSS. Не забувайте активувати його (\"Використовувати власний CSS\") після попередньої перевірки. "
 
-#: indico/modules/events/layout/controllers/layout.py:209
+#: indico/modules/events/layout/controllers/layout.py:213
 msgid "CSS file deleted"
 msgstr "Файл CSS видалено"
 
@@ -11674,7 +11678,7 @@ msgstr[1] "Головуючих "
 msgstr[2] "Головуючі"
 msgstr[3] "Головуючі"
 
-#: indico/modules/events/persons/controllers.py:380
+#: indico/modules/events/persons/controllers.py:379
 msgid "Submission rights have been granted to one speaker"
 msgid_plural "Submission rights have been granted to {} speakers"
 msgstr[0] "Доповідачу надано права подачі. "
@@ -11682,7 +11686,7 @@ msgstr[1] "{} доповідачам надано права подачі. "
 msgstr[2] "{} доповідачам надано права подачі. "
 msgstr[3] "{} доповідачам надано права подачі. "
 
-#: indico/modules/events/persons/controllers.py:398
+#: indico/modules/events/persons/controllers.py:397
 msgid "Session modification rights have been granted to one session convener"
 msgid_plural ""
 "Session modification rights have been granted to {} session conveners"
@@ -11691,7 +11695,7 @@ msgstr[1] "Права зміни засідання було надано {} к�
 msgstr[2] "Права зміни засідання було надано {} координаторам засідань. "
 msgstr[3] "Права зміни засідання було надано {} координаторам засідань. "
 
-#: indico/modules/events/persons/controllers.py:417
+#: indico/modules/events/persons/controllers.py:416
 msgid "Submission rights have been revoked from one user"
 msgid_plural "Submission rights have been revoked from {} users"
 msgstr[0] "Права подачі користувача було відкликано."
@@ -11699,15 +11703,15 @@ msgstr[1] "Права подачі {} користувачів було відк
 msgstr[2] "Права подачі {} користувачів було відкликано."
 msgstr[3] "Права подачі {}  користувачів було відкликано."
 
-#: indico/modules/events/persons/controllers.py:441
+#: indico/modules/events/persons/controllers.py:440
 msgid "Only users with no ties to the event can be deleted."
 msgstr ""
 
-#: indico/modules/events/persons/controllers.py:450
+#: indico/modules/events/persons/controllers.py:449
 msgid "Persons with no associated users cannot be synced."
 msgstr ""
 
-#: indico/modules/events/persons/controllers.py:517
+#: indico/modules/events/persons/controllers.py:516
 msgid "Person lists settings changed successfully"
 msgstr ""
 
@@ -12867,19 +12871,27 @@ msgstr ""
 msgid "There are no places left for this option."
 msgstr "Опцію не можна використати. "
 
-#: indico/modules/events/registration/fields/choices.py:148
+#: indico/modules/events/registration/fields/choices.py:161
 msgid "No places left for the option: {0}"
 msgstr "Опцію не можна використати: {0}"
 
-#: indico/modules/events/registration/fields/choices.py:535
+#: indico/modules/events/registration/fields/choices.py:297
+msgid "At most {max_choices} option can be selected"
+msgid_plural "At most {max_choices} options can be selected"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/registration/fields/choices.py:562
 msgid "Arrival/departure date is missing"
 msgstr "Бракує дати прибуття/від'їзду"
 
-#: indico/modules/events/registration/fields/choices.py:537
+#: indico/modules/events/registration/fields/choices.py:564
 msgid "Arrival date can't be set after the departure date."
 msgstr "Дата прибуття завжди повинна бути після дати від'їзду. "
 
-#: indico/modules/events/registration/fields/choices.py:552
+#: indico/modules/events/registration/fields/choices.py:579
 msgid "Not enough rooms in '{0}'"
 msgstr "Недостатньо номерів у \"{0}\""
 
@@ -18836,42 +18848,42 @@ msgstr "ПЕТРЕНКО, П."
 msgid "J. DOE"
 msgstr "П. Петренко"
 
-#: indico/modules/users/models/users.py:151
+#: indico/modules/users/models/users.py:148
 msgid "first name"
 msgstr "ім'я"
 
-#: indico/modules/users/models/users.py:152
+#: indico/modules/users/models/users.py:149
 msgid "family name"
 msgstr "прізвище"
 
-#: indico/modules/users/models/users.py:153
+#: indico/modules/users/models/users.py:150
 msgid "affiliation"
 msgstr "організація"
 
-#: indico/modules/users/models/users.py:154
+#: indico/modules/users/models/users.py:151
 msgid "address"
 msgstr "адреса"
 
-#: indico/modules/users/models/users.py:155
+#: indico/modules/users/models/users.py:152
 msgid "phone number"
 msgstr "номер телефону"
 
-#: indico/modules/users/models/users.py:156
+#: indico/modules/users/models/users.py:153
 msgid "primary email address"
 msgstr "Головна адреса електронної пошти"
 
-#: indico/modules/users/models/users.py:726
+#: indico/modules/users/models/users.py:722
 msgid ""
 "Your {field_name} has been synchronized from '{old_value}' to '{new_value}'."
 msgstr "{field_name} було синхронізовано з \"{old_value}\" до \"{new_value}\"."
 
-#: indico/modules/users/models/users.py:737
+#: indico/modules/users/models/users.py:733
 msgid ""
 "Your email address could not be synchronized from '{old_value}' to "
 "'{new_value}' since the new email address is not valid."
 msgstr ""
 
-#: indico/modules/users/models/users.py:746
+#: indico/modules/users/models/users.py:742
 msgid ""
 "Your email address could not be synchronized from '{old_value}' to "
 "'{new_value}' due to a conflict with another Indico profile."

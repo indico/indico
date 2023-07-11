@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-06-15 13:26+0200\n"
+"POT-Creation-Date: 2023-07-11 14:32+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2023\n"
 "Language-Team: French (France) (http://app.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -486,7 +486,6 @@ msgid "Save now"
 msgstr "Sauver maintenant"
 
 #: indico/web/client/js/jquery/utils/forms.js:126
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "Sauvegarde..."
 
@@ -525,15 +524,6 @@ msgstr "Opération effectuée!"
 #: indico/web/client/js/jquery/utils/misc.js:168
 msgid "Operation failed!"
 msgstr "L'opération a échoué!"
-
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:300
-msgid "Saved"
-msgstr "Sauvé"
-
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
-#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
-msgid "Save"
-msgstr "Sauver"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
@@ -691,6 +681,10 @@ msgid_plural "<strong>{0}</strong> words left"
 msgstr[0] "<strong>{0}</strong> mot restant"
 msgstr[1] "<strong>{0}</strong> mots restants"
 msgstr[2] "<strong>{0}</strong> mots restants"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
+msgid "Save"
+msgstr "Sauver"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
 #: indico/web/client/js/legacy/libs/timetable/Draw.js:1438

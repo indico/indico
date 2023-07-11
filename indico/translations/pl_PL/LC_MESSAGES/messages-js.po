@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-05-18 22:02+0200\n"
+"POT-Creation-Date: 2023-07-11 14:32+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Marcin Miłek, 2021-2022\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/indico/indico/language/pl_PL/)\n"
@@ -502,7 +502,6 @@ msgid "Save now"
 msgstr "Składuj"
 
 #: indico/web/client/js/jquery/utils/forms.js:126
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "Składuję..."
 
@@ -542,15 +541,6 @@ msgstr "Zadanie wykonane!"
 #: indico/web/client/js/jquery/utils/misc.js:168
 msgid "Operation failed!"
 msgstr "Zadanie nie powiodło się!"
-
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:300
-msgid "Saved"
-msgstr "Składowane"
-
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
-#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
-msgid "Save"
-msgstr "Zapisz"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
@@ -710,6 +700,10 @@ msgstr[0] "<strong>{0}</strong> słów pozostało"
 msgstr[1] "<strong>{0}</strong> słów pozostało"
 msgstr[2] "<strong>{0}</strong> słów pozostało"
 msgstr[3] "<strong>{0}</strong> słów pozostało"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
+msgid "Save"
+msgstr "Zapisz"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
 #: indico/web/client/js/legacy/libs/timetable/Draw.js:1438

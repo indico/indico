@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-05-18 22:02+0200\n"
+"POT-Creation-Date: 2023-07-11 14:32+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2019-2022\n"
 "Language-Team: Chinese (China) (GB2312) (http://app.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
@@ -449,7 +449,6 @@ msgid "Save now"
 msgstr "现在保存"
 
 #: indico/web/client/js/jquery/utils/forms.js:126
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
 msgid "Saving..."
 msgstr "保存..."
 
@@ -486,15 +485,6 @@ msgstr "操作完成！"
 #: indico/web/client/js/jquery/utils/misc.js:168
 msgid "Operation failed!"
 msgstr "操作失败！"
-
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:300
-msgid "Saved"
-msgstr "已保存"
-
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
-#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
-msgid "Save"
-msgstr "保存"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
@@ -648,6 +638,10 @@ msgstr[0] "<strong> {0} </strong> 剩余字符"
 msgid "<strong>1</strong> word left"
 msgid_plural "<strong>{0}</strong> words left"
 msgstr[0] "<strong> {0} </strong> 剩余单词"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
+msgid "Save"
+msgstr "保存"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
 #: indico/web/client/js/legacy/libs/timetable/Draw.js:1438

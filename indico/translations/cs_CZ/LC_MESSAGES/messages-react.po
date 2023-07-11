@@ -12,7 +12,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-06-23 13:27+0200\n"
+"POT-Creation-Date: 2023-07-23 14:32+0200\n"
 "Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2023\n"
 "Language-Team: Czech (Czech Republic) (https://app.transifex.com/indico/teams/6478/cs_CZ/)\n"
 "MIME-Version: 1.0\n"
@@ -650,11 +650,19 @@ msgstr "OK"
 msgid "Retracted"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:34
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:23
+msgid "This file was modified since the last revision."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:28
+msgid "This file was added since the last revision."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:53
 msgid "No files uploaded"
 msgstr "Nebyly nahrány žádné soubory"
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:84
+#: indico/modules/events/editing/client/js/editing/timeline/FileDisplay/index.jsx:103
 msgid "Download ZIP"
 msgstr "Stáhnout ZIP"
 
@@ -869,39 +877,39 @@ msgstr[3] ""
 msgid "There is no publishable file uploaded."
 msgstr "Není nahrán žádný zveřejnitelný soubor."
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:114
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:130
 msgid "Editor has accepted after making some changes"
 msgstr "Editor přijal po provedení změn"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:115
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:131
 msgid "Submitter has accepted proposed changes"
 msgstr "Autor přijal navrhované změny"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:119
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:135
 msgid "Submitter rejected proposed changes"
 msgstr "Autor odmítnul navrhované změny"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:120
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:136
 msgid "Submitter rejected proposed changes and uploaded a new revision"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:124
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:140
 msgid "Revision has been replaced"
 msgstr "Revize byla nahrazena"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:125
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:141
 msgid "Revision has been accepted"
 msgstr "Revize byla přijata"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:126
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:142
 msgid "Revision has been rejected"
 msgstr "Revize byla odmítnuta"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:127
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:143
 msgid "Submitter has been asked to make some changes"
 msgstr "Po autorovi se žádá provést změny"
 
-#: indico/modules/events/editing/client/js/editing/timeline/util.js:131
+#: indico/modules/events/editing/client/js/editing/timeline/util.js:147
 msgid "{editorName} (editor) has made some changes to the paper"
 msgstr "{editorName} (editor) udělal v příspěvku změny"
 
@@ -2098,7 +2106,7 @@ msgstr "spoluautor"
 msgid "Submitter"
 msgstr "Navrhovatelé"
 
-#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:68
+#: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx:69
 msgid "Send emails to these roles"
 msgstr ""
 
@@ -2331,7 +2339,7 @@ msgid "Departure"
 msgstr "Odjezd"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:165
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:144
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:153
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:127
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:260
 msgid "Total: {total} {currency}"
@@ -2354,7 +2362,7 @@ msgid "The arrival period cannot end after the departure period."
 msgstr "Doba příjezdu nemůže skončit po datu odjezdu."
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:321
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:224
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:269
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:452
 msgid "Choices"
 msgstr "Možnosti"
@@ -2597,7 +2605,23 @@ msgstr "Registrace zůstane přiřazena k Indico účtu {name}."
 msgid "The registration will be associated with the Indico account {name}."
 msgstr "Registrace bude přiřazena k Indico účtu {name}."
 
-#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:219
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:205
+msgid "At most {n} option can be selected"
+msgid_plural "At most {n} options can be selected"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:256
+msgid "Maximum number of choices"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:257
+msgid "Maximum number of choices that can be selected. Leave empty to unset."
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:264
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:447
 msgid "Enable extra slots"
 msgstr "Povolit místa navíc"
@@ -5257,19 +5281,19 @@ msgid ""
 "Download an iCalendar file that you can use in calendaring applications."
 msgstr "Stáhnout soubor ve formátu iCalendar"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:122
+#: indico/web/client/js/react/components/ListFilter.jsx:128
 msgid "Filter"
 msgstr "Filtr"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:150
+#: indico/web/client/js/react/components/ListFilter.jsx:156
 msgid "Clear all filters"
 msgstr "Bez filtrů"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:155
+#: indico/web/client/js/react/components/ListFilter.jsx:161
 msgid "No filters were added yet"
 msgstr "Zatím nebyly přidány žádné filtry"
 
-#: indico/web/client/js/react/components/ListFilter.jsx:205
+#: indico/web/client/js/react/components/ListFilter.jsx:211
 msgid "Enter #id or search string"
 msgstr "#id či co hledáte"
 
@@ -5828,6 +5852,11 @@ msgstr "Šedá"
 #: indico/web/client/js/utils/palette.js:41
 msgid "Black"
 msgstr "Černá"
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:251
+msgctxt "Number of choices"
+msgid "Unlimited"
+msgstr ""
 
 #: indico/modules/rb/client/js/util.jsx:166
 msgctxt "single booking shortcut"
