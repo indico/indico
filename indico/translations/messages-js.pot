@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 3.2.5.dev0\n"
+"Project-Id-Version: indico 3.2.6.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-06-15 13:26+0200\n"
+"POT-Creation-Date: 2023-07-11 14:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -433,7 +433,7 @@ msgstr ""
 msgid "Save now"
 msgstr ""
 
-#: indico/web/client/js/jquery/utils/forms.js:126 indico/web/client/js/jquery/utils/pagedown_mathjax.js:295
+#: indico/web/client/js/jquery/utils/forms.js:126
 msgid "Saving..."
 msgstr ""
 
@@ -469,15 +469,6 @@ msgstr ""
 
 #: indico/web/client/js/jquery/utils/misc.js:168
 msgid "Operation failed!"
-msgstr ""
-
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:300
-msgid "Saved"
-msgstr ""
-
-#: indico/web/client/js/jquery/utils/pagedown_mathjax.js:333
-#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
-msgid "Save"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20 indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
@@ -627,6 +618,10 @@ msgid "<strong>1</strong> word left"
 msgid_plural "<strong>{0}</strong> words left"
 msgstr[0] ""
 msgstr[1] ""
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
+msgid "Save"
+msgstr ""
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
 #: indico/web/client/js/legacy/libs/timetable/Draw.js:1438
