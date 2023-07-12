@@ -16,6 +16,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Show which files were added or modified on each editing timeline revision (:pr:`5802`)
+- Support rendering Japanese, Chinese & Korean letters in PDFs (:issue:`3120`, :pr:`5842`,
+  thanks :user:`adamjenkins`)
 
 Bugfixes
 ^^^^^^^^
