@@ -110,7 +110,7 @@ class Room extends React.Component {
           key="not-bookable"
           trigger={<Icon name="dont" color="red" />}
           content={Translate.string('This space is not bookable')}
-          position="bottom center"
+          position="top center"
           hideOnScroll
         />
       );
@@ -120,7 +120,7 @@ class Room extends React.Component {
           key="check-pending"
           trigger={<Loader active inline size="tiny" />}
           content={Translate.string('Checking permissions...')}
-          position="bottom center"
+          position="top center"
           hideOnScroll
         />
       );
@@ -130,7 +130,7 @@ class Room extends React.Component {
           key="not-authorized"
           trigger={<Icon name="lock" color="red" />}
           content={Translate.string('This space is not publicly available')}
-          position="bottom center"
+          position="top center"
           hideOnScroll
         />
       );
