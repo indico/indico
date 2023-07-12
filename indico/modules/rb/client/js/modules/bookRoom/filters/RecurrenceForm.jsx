@@ -75,7 +75,7 @@ export default class RecurrenceForm extends FilterFormComponent {
             onChange={this.onTypeChange}
           />
         </Form.Field>
-        <Form.Field>
+        <Form.Field style={{marginBottom: '0.5em'}}>
           <Radio
             value="daily"
             name="type"
@@ -84,7 +84,7 @@ export default class RecurrenceForm extends FilterFormComponent {
             onChange={this.onTypeChange}
           />
         </Form.Field>
-        <Form.Group inline styleName="recurrence-every">
+        <Form.Group inline styleName="recurrence-every" style={{marginBottom: '0em'}}>
           <Form.Field>
             <Radio
               value="every"
@@ -105,7 +105,7 @@ export default class RecurrenceForm extends FilterFormComponent {
               onChange={this.onNumberChange}
             />
           </Form.Field>
-          <Form.Field>
+          <Form.Field style={{paddingRight: '0em'}}>
             <Select
               value={interval}
               disabled={type !== 'every'}
