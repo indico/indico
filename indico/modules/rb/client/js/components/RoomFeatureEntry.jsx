@@ -13,10 +13,10 @@ export default function RoomFeatureEntry({feature, color, size}) {
   const {icon, title, equipment} = feature;
   const trigger = <Icon name={icon} color={color} size={size} />;
   if (equipment.length === 1 && equipment[0] === title) {
-    return <Popup trigger={trigger} content={title} />;
+    return <Popup trigger={trigger} content={title} position="top center" />;
   }
   return (
-    <Popup trigger={trigger}>
+    <Popup trigger={trigger} position="top center">
       {title} ({equipment.filter(eq => eq !== title).join(', ')})
     </Popup>
   );
