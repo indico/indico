@@ -70,7 +70,10 @@ class EventACLProxy(ACLProxyBase):
         :param name: Setting name
         :param user: A :class:`.User`
         """
-        return any(user in principal for principal in iter_acl(self.get(event, name)))
+        # we need to use the original `get` method in case this acl proxy is bound to an event,
+        # in which case calling `self.get()` with an explicitly provided event argument would fail
+        acl_entries = EventACLProxy.get(self, event, name)
+        return any(user in principal for principal in iter_acl(acl_entries))
 
     @event_or_id
     def add_principal(self, event, name, principal):

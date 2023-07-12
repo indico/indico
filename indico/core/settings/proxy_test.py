@@ -11,9 +11,10 @@ import pytest
 import pytz
 
 from indico.core.settings import PrefixSettingsProxy, SettingsProxy
-from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
+from indico.core.settings.converters import DatetimeConverter, EnumConverter, TimedeltaConverter
 from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.users import User
+from indico.util.enum import IndicoIntEnum
 
 
 def test_proxy_strict_nodefaults():
@@ -194,3 +195,27 @@ def test_prefix_settings(dummy_event, with_arg):
     proxy.set_multi({'foo_a': 11, 'bar_x': 33}, **kw)
     proxy.delete_all(**kw)
     assert proxy.get_all(no_defaults=True, **kw) == {}
+
+
+def test_bound_settings(dummy_event, dummy_user):
+    class TestEnum(IndicoIntEnum):
+        foo = 123
+        bar = 456
+
+    proxy = EventSettingsProxy(
+        'test',
+        {'a': 1, 'b': 2, 'e': TestEnum.foo},
+        acls={'acl'},
+        converters={'e': EnumConverter(TestEnum)}
+    )
+    proxy.set(dummy_event, 'a', 111)
+    proxy.set(dummy_event, 'e', TestEnum.bar)
+    proxy.acls.set(dummy_event, 'acl', {dummy_user})
+    bound = proxy.bind(dummy_event)
+    assert bound.converters == proxy.converters
+    assert bound.get('a') == 111
+    assert bound.get('b') == 2
+    assert bound.acls.contains_user('acl', dummy_user)
+    assert bound.acls.get('acl') == {dummy_user}
+    assert bound.get('e') == TestEnum.bar
+    assert isinstance(bound.get('e'), TestEnum)

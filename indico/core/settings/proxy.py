@@ -84,15 +84,22 @@ class SettingsProxyBase:
                      function call.
         """
         self_type = type(self)
-        bound = self_type(self.module, self.defaults, self.strict)
+        bound = self_type(self.module, self.defaults, self.strict, self.acl_names, self.converters)
         bound._bound_args = args
 
         for name in dir(self_type):
-            if name[0] == '_' or name == 'bind' or not callable(getattr(self_type, name)):
+            if name[0] == '_' or name in ('bind', 'acl_proxy_class') or not callable(getattr(self_type, name)):
                 continue
             func = getattr(bound, name)
             func = update_wrapper(partial(func, *args), func)
             setattr(bound, name, func)
+        if bound.acl_proxy_class is not None:
+            for name in dir(bound.acl_proxy_class):
+                if name[0] == '_' or name == 'merge_users' or not callable(getattr(bound.acl_proxy_class, name)):
+                    continue
+                func = getattr(bound.acls, name)
+                func = update_wrapper(partial(func, *args), func)
+                setattr(bound.acls, name, func)
         return bound
 
     def _check_name(self, name, acl=False):
