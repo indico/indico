@@ -27,6 +27,8 @@ import TimeForm from './filters/TimeForm';
 import timeRenderer from './filters/TimeRenderer';
 import * as bookRoomSelectors from './selectors';
 
+import './BookingFilterBar.module.scss';
+
 class BookingFilterBar extends React.Component {
   static propTypes = {
     dayBased: PropTypes.bool,
@@ -72,7 +74,7 @@ class BookingFilterBar extends React.Component {
     );
 
     return (
-      <Button.Group size="small">
+      <Button.Group size="small" styleName="recurrence-bar">
         <Button icon="calendar alternate outline" as="div" disabled />
         <FilterBarController>
           <Overridable id="BookingFilterBar.recurrence">
