@@ -27,6 +27,7 @@ import LocationForm from './filters/LocationForm';
 import ShowOnlyForm from './filters/ShowOnlyForm';
 
 import './RoomFilterBar.module.scss';
+import '../bookRoom/BookingFilterBar.module.scss';
 
 /* eslint-disable react/prop-types */
 const renderCapacity = ({capacity}) =>
@@ -180,7 +181,7 @@ export class RoomFilterBarBase extends React.Component {
     const selectedLocationName = locations.get(locationId);
 
     return (
-      <Button.Group size="small">
+      <Button.Group size="small" styleName="recurrence-bar">
         <Button icon="filter" as="div" disabled />
         <FilterBarController>
           {!hideOptions.location && showLocationFilter && (
