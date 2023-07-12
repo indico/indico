@@ -63,6 +63,8 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
         qr_data = {
             'event_id': self.event.id,
             'title': self.event.title,
+            'regform_id': self.regform.id,
+            'regform_title': self.regform.title,
             'date': self.event.start_dt.isoformat(),
             'version': 2,
             'server': {
