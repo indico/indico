@@ -45,7 +45,7 @@ prompt-toolkit
 psycopg2
 pycountry
 pygments
-pypdf2
+pypdf
 python-dateutil
 pytz
 pywebpack

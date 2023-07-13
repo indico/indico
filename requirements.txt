@@ -262,7 +262,7 @@ pynpm==0.1.2
     # via
     #   flask-webpackext
     #   pywebpack
-pypdf2==3.0.1
+pypdf==3.12.1
     # via -r requirements.in
 pypng==0.20220715.0
     # via qrcode
@@ -339,7 +339,7 @@ typing-extensions==4.5.0
     #   kombu
     #   limits
     #   marshmallow-dataclass
-    #   pypdf2
+    #   pypdf
     #   qrcode
     #   typing-inspect
 typing-inspect==0.8.0

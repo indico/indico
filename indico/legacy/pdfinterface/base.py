@@ -557,7 +557,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self.mergePDFs(self.filename, contentFile)
 
     def mergePDFs(self, pdf1, pdf2):
-        from PyPDF2 import PdfReader, PdfWriter
+        from pypdf import PdfReader, PdfWriter
         output = PdfWriter()
         background_pages = PdfReader(pdf1)
         foreground_pages = PdfReader(pdf2)
