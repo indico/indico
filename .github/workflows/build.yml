@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+
+jobs:
+  build:
+    name: Build package 📦
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        name: Set up Python 🐍
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements.dev.txt
+      - uses: actions/setup-node@v3
+        name: Setup Node
+        with:
+          node-version: 18.x
+      - name: Install build deps 🔧
+        run: |
+          sudo apt-get install libpq-dev
+          pip install --user -U pip setuptools wheel
+          pip install --user -e '.[dev]'
+      - name: Install npm deps ☕
+        run: npm ci
+      - name: Build wheel 🏗
+        run: ./bin/maintenance/build-wheel.py indico --add-version-suffix
+      - uses: actions/upload-artifact@v3
+        name: Upload build artifacts 📦
+        with:
+          name: indico-wheel
+          retention-days: 7
+          path: ./dist
