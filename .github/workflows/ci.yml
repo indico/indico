@@ -41,7 +41,7 @@ jobs:
         uses: actions/setup-node@v3
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
-          node-version: 14.x
+          node-version: 18.x
 
       - name: Install system dependencies
         run: sudo apt-get install libpq-dev
@@ -102,7 +102,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 18.x
 
       - name: Download environment
         uses: actions/download-artifact@v3
@@ -236,7 +236,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 18.x
 
       - name: Download environment
         uses: actions/download-artifact@v3
@@ -292,7 +292,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 18.x
 
       - name: Download environment
         uses: actions/download-artifact@v3
