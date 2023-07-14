@@ -89,7 +89,7 @@ jobs:
 
   lint:
     needs: setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       # BEGIN common steps - edit all occurrences if needed!
       - uses: actions/checkout@v3
@@ -205,7 +205,7 @@ jobs:
   test-python:
     name: test-python-${{ matrix.name }}
     needs: setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
@@ -279,7 +279,7 @@ jobs:
 
   test-js:
     needs: setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       # BEGIN common steps - edit all occurrences if needed!
       - uses: actions/checkout@v3
