@@ -203,7 +203,7 @@ def _patch_version(add_version_suffix, file_name, search, replace):
     if not add_version_suffix:
         yield
         return
-    rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
+    rev = subprocess.check_output(['git', 'rev-parse', '--short=10', 'HEAD'], text=True).strip()
     suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d%H%M'), rev)
     info('adding version suffix: ' + suffix, unimportant=True)
     with open(file_name, 'r+') as f:
