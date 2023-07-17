@@ -1,0 +1,100 @@
+name: PyPI release 🐍 📦
+
+on:
+  push:
+    tags: [v*]
+
+jobs:
+  build:
+    name: Build package 📦
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        name: Set up Python 🐍
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements.dev.txt
+      - name: Check version 🔍
+        run: python .github/utils/check_version.py "${GITHUB_REF#refs/tags/v}"
+      - name: Extract changelog 📜
+        run: python .github/utils/extract_changelog.py "${GITHUB_REF#refs/tags/v}" /tmp/changelog.md
+      - uses: actions/setup-node@v3
+        name: Setup Node
+        with:
+          node-version: 18.x
+      - name: Install build deps 🔧
+        run: |
+          sudo apt-get install libpq-dev
+          pip install --user -U pip setuptools wheel
+          pip install --user -e '.[dev]'
+      - name: Install npm deps ☕
+        run: npm ci
+      - name: Build wheel 🏗
+        run: ./bin/maintenance/build-wheel.py indico
+      - uses: actions/upload-artifact@v3
+        name: Upload build artifacts 📦
+        with:
+          name: indico-wheel
+          retention-days: 7
+          path: ./dist
+      - uses: actions/upload-artifact@v3
+        name: Store Markdown changelog 📜
+        with:
+          name: changelog
+          retention-days: 7
+          path: /tmp/changelog.md
+  create-github-release:
+    name: Create GitHub release 🐙
+    # Upload wheel to a GitHub release. It remains available as a build artifact for a while as well.
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v3
+        name: Download build artifacts 📦
+      - name: Create draft release 🐙
+        run: >-
+          gh release create
+          --draft
+          --repo ${{ github.repository }}
+          --title ${{ github.ref_name }}
+          --notes-file changelog/changelog.md
+          ${{ github.ref_name }}
+          indico-wheel/*
+        env:
+          GH_TOKEN: ${{ github.token }}
+  publish-pypi:
+    name: Publish 🚀
+    needs: build
+    # Wait for approval before attempting to upload to PyPI. This allows reviewing the
+    # files in the draft release.
+    environment: publish
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v3
+      # Try uploading to Test PyPI first, in case something fails.
+      - name: Publish to Test PyPI 🧪
+        uses: pypa/gh-action-pypi-publish@v1.8.7
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: indico-wheel/
+      - name: Publish to PyPI 🚀
+        uses: pypa/gh-action-pypi-publish@v1.8.7
+        with:
+          packages-dir: indico-wheel/
+      - name: Publish GitHub release 🐙
+        run: >-
+          gh release edit
+          --draft=false
+          --repo ${{ github.repository }}
+          ${{ github.ref_name }}
+        env:
+          GH_TOKEN: ${{ github.token }}
