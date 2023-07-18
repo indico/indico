@@ -73,9 +73,12 @@ class EventCreationFormBase(IndicoForm):
     listing = IndicoButtonsBooleanField(_('Listing'), default=True,
                                         true_caption=(_('List in a category'), 'eye'),
                                         false_caption=(_('Keep unlisted'), 'eye-blocked'))
-    category = CategoryField(_('Category'), [UsedIf(lambda form, _: (form.listing.data or
-                                                                     not can_create_unlisted_events(session.user))),
-                                             DataRequired()], require_event_creation_rights=True)
+    category = CategoryField(_('Category'),
+                             [UsedIf(lambda form, _: (form.listing.data or
+                                                      not can_create_unlisted_events(session.user))),
+                              DataRequired()],
+                             require_event_creation_rights=True,
+                             show_event_creation_warning=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)

@@ -16,6 +16,8 @@
         fieldId: null,
         navigatorCategoryId: null,
         requireEventCreationRights: false,
+        requireCategoryManagementRights: false,
+        showEventCreationWarning: false,
       },
       options
     );
@@ -30,6 +32,10 @@
 
     if (options.requireEventCreationRights) {
       actionOn.categoriesWithoutEventCreationRights = {disabled: true};
+    }
+
+    if (options.requireCategoryManagementRights) {
+      actionOn.categoriesWithoutCategoryManagementRights = {disabled: true};
     }
 
     if (hiddenData) {
@@ -81,12 +87,12 @@
     });
 
     function updateWarningVisibility(category) {
-      $categoryWarning.toggleClass(
-        'hidden',
+      const hidden =
+        !options.showEventCreationWarning ||
         !category || // unlisted event or no category selected
-          !category.has_children ||
-          category.has_events
-      );
+        !category.has_children ||
+        category.has_events;
+      $categoryWarning.toggleClass('hidden', hidden);
     }
   };
 })(window);

@@ -109,13 +109,16 @@
                         {% if not clonable %}
                             title="{% trans %}This template cannot be cloned{% endtrans %}">
                         {% else %}
-                            title="{% trans %}Clone this template{% endtrans %}"
                             data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
-                            data-method="POST"
+                            title="{% trans %}Clone this template{% endtrans %}"
                             data-update="#template-list"
-                            data-confirm="{% trans title=tpl.title -%}
-                                              Are you sure you want to clone template '{{ title }}'?
-                                          {%- endtrans %}">
+                            {% if event %}
+                                data-method="POST"
+                                data-confirm="{% trans title=tpl.title -%}Are you sure you want to clone template '{{ title }}'?{%- endtrans %}">
+                            {% else %}
+                                data-title="{% trans title=tpl.title %}Clone '{{ title }}' template into a category{% endtrans %}"
+                                data-ajax-dialog>
+                            {% endif %}
                         {% endif %}
                     </button>
                     {% if not inherited %}

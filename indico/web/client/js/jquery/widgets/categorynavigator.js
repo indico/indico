@@ -42,6 +42,10 @@ import Palette from '../../utils/palette';
           disabled: false,
           message: $T.gettext('Not possible for categories where you cannot create events'),
         },
+        categoriesWithoutCategoryManagementRights: {
+          disabled: false,
+          message: $T.gettext('Not possible for categories where you are not a manager'),
+        },
         categoriesDescendingFrom: {
           disabled: false,
           ids: [],
@@ -719,6 +723,10 @@ import Palette from '../../utils/palette';
         category,
         true
       );
+      const canActOnCategoriesWithoutCategoryManagementRights = self._canActOnCategoriesWithoutCategoryManagementRights(
+        category,
+        true
+      );
       const canActOnCategoriesWithoutEventProposalRights = self._canActOnCategoriesWithoutEventProposalRights(
         category,
         true
@@ -734,6 +742,8 @@ import Palette from '../../utils/palette';
         result = canActOnCategoriesDescendingFrom;
       } else if (!canActOnCategoriesWithoutEventCreationRights.allowed) {
         result = canActOnCategoriesWithoutEventCreationRights;
+      } else if (!canActOnCategoriesWithoutCategoryManagementRights.allowed) {
+        result = canActOnCategoriesWithoutCategoryManagementRights;
       } else if (!canActOnCategoriesWithoutEventProposalRights.allowed) {
         result = canActOnCategoriesWithoutEventProposalRights;
       } else if (!canActOnCategoriesWithoutEventProposalOrCreationRights.allowed) {
@@ -751,6 +761,18 @@ import Palette from '../../utils/palette';
       if (categoriesWithoutEventCreationRights.disabled && !category.can_create_events) {
         result.allowed = false;
         result.message = categoriesWithoutEventCreationRights.message;
+      }
+      return withMessage ? result : result.allowed;
+    },
+
+    _canActOnCategoriesWithoutCategoryManagementRights(category, withMessage) {
+      const self = this;
+      const result = {allowed: true, message: ''};
+      const categoriesWithoutCategoryManagementRights =
+        self.options.actionOn.categoriesWithoutCategoryManagementRights;
+      if (categoriesWithoutCategoryManagementRights.disabled && !category.can_manage) {
+        result.allowed = false;
+        result.message = categoriesWithoutCategoryManagementRights.message;
       }
       return withMessage ? result : result.allowed;
     },

@@ -19,6 +19,8 @@ Improvements
 - Support rendering Japanese, Chinese & Korean letters in PDFs (:issue:`3120`, :pr:`5842`,
   thanks :user:`adamjenkins`)
 - Add button to adapt columns widths on the reviewing area's abstracts list (:pr:`5837`)
+- Allow cloning category-level badge/poster templates into another category (:pr:`5775`,
+  thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^

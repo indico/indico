@@ -107,6 +107,7 @@ def serialize_category(category, with_favorite=False, with_path=False, parent_pa
         'can_access': category.can_access(session.user),
         'can_create_events': category.can_create_events(session.user),
         'can_propose_events': category.can_propose_events(session.user),
+        'can_manage': category.can_manage(session.user),
     }
     if with_path:
         if child_path:

@@ -54,7 +54,7 @@ for object_type in ('event', 'category'):
                      defaults={'object_type': object_type}, methods=('DELETE',))
     _bp.add_url_rule(prefix + '/<int:template_id>/clone', 'clone_template',
                      _dispatch(RHCloneEventTemplate, RHCloneCategoryTemplate),
-                     defaults={'object_type': object_type}, methods=('POST',))
+                     defaults={'object_type': object_type}, methods=('GET', 'POST'))
     _bp.add_url_rule(prefix + '/<int:template_id>/data', 'get_template_data',
                      RHGetTemplateData, defaults={'object_type': object_type})
     _bp.add_url_rule(prefix + '/<int:template_id>/images/<int:image_id>/<filename>', 'download_image',
