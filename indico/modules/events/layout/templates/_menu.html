@@ -37,7 +37,7 @@
                          title="{% trans %}Remove the menu entry{% endtrans %}"
                          data-confirm="
                             {%- if not entry.is_separator -%}
-                                {%- trans name='&quot;%s&quot;'|format(entry.localized_title) -%}
+                                {%- trans name='"%s"'|format(entry.localized_title) -%}
                                     Are you sure you want to remove {{ name }}?
                                 {%- endtrans -%}
                             {% else %}

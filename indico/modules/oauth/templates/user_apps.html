@@ -36,7 +36,7 @@
                             <button class="ui negative small button"
                                     data-href="{{ url_for('.user_app_revoke', auth.application) }}"
                                     data-method="POST"
-                                    data-confirm="{% trans app_name=auth.application.name %}{{ app_name }} will no longer have access to your Indico data.<br>
+                                    data-confirm="{% trans app_name=auth.application.name %}{{ app_name }} will no longer have access to your Indico data.
                                     Are you sure you want to revoke its access?{% endtrans %}">
                                 {%- trans %}Revoke{% endtrans -%}
                             </button>

@@ -19,12 +19,10 @@
                         {% set message %}
                             {% trans %}Do you really want to withdraw this abstract?{% endtrans %}
                             {% if abstract.contribution %}
-                                <br>
                                 {%- trans -%}
                                     Withdrawing this abstract will permanently delete its corresponding contribution.
                                 {%- endtrans -%}
                             {% elif not can_manage %}
-                                <br>
                                 {% trans %}This operation is irreversible.{% endtrans %}
                             {% endif %}
                         {% endset %}

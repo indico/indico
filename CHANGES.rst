@@ -7,6 +7,17 @@ Version 3.2.6
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix an XSS vulnerability in various confirmation prompts commonly used when deleting
+  things. Exploitation requires someone with at least submission privileges (such as a
+  speaker) and then rely on someone else to attempt to delete this content. However,
+  considering that event organizers may indeed delete suspicious-looking content when
+  encountering it, there is a non-negligible risk of such an attack to succeed. Because
+  of this it is strongly recommended to upgrade as soon as possible (:pr:`5862`,
+  :cve:`CVE-2023-37901`)
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 

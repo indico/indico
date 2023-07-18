@@ -12,7 +12,7 @@ import Palette from '../../utils/palette';
 (function(global) {
   global.confirmPrompt = function confirmPrompt(message, title) {
     var dfd = $.Deferred();
-    message = $('<div>', {width: 400, html: message});
+    message = $('<div>', {width: 400, text: message});
     new ConfirmPopup(title || $T('Please confirm'), message, function(confirmed) {
       if (confirmed) {
         dfd.resolve();

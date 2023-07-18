@@ -14,7 +14,7 @@
                                 <button class="ui negative small button"
                                         data-href="{{ url_for('.user_block') }}"
                                         data-method="PUT"
-                                        data-confirm="{% trans %}This user will no longer have access to Indico.<br>
+                                        data-confirm="{% trans %}This user will no longer have access to Indico.
                                         Are you sure you want to revoke their access?{% endtrans %}"
                                         data-reload-after
                                         {% if user == session.user %}disabled{% endif %}>
@@ -25,7 +25,7 @@
                             <button class="ui small button"
                                     data-href="{{ url_for('.user_block') }}"
                                     data-method="DELETE"
-                                    data-confirm="{% trans %}This user will regain access to Indico.<br>
+                                    data-confirm="{% trans %}This user will regain access to Indico.
                                     Are you sure you want to restore their access?{% endtrans %}"
                                     data-reload-after>
                                 {% trans %}Unblock User{% endtrans %}

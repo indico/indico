@@ -194,8 +194,10 @@
             {% set data_confirm %}
                 {% trans %}Are you sure you want to remove this submission?{% endtrans %}
                 {% if submission.is_anonymous %}
-                    <br><br>
-                    {% trans %}Note: Authenticated users will not be able to submit an anonymous survey again even if you delete their submission.{% endtrans %}
+                    {% trans %}
+                        Note: Authenticated users will not be able to submit an anonymous survey again
+                        even if you delete their submission.
+                    {% endtrans %}
                 {% endif %}
             {% endset %}
             <a href="#" class="icon-remove right js-delete-submission hide-if-locked"

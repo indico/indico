@@ -2,7 +2,9 @@
 
 {% macro delete_category_button(category, classes="i-button") %}
     {% set confirmation_message -%}
-        {% trans category=category.title %}Do you really want to delete the category "{{ category }}"?{% endtrans %}
+        {% trans category=category.title %}
+            Do you really want to delete the category &quot;{{ category }}&quot;?
+        {% endtrans %}
     {%- endset %}
     {% if category.is_empty %}
         {% set tooltip -%}
@@ -16,7 +18,7 @@
     {% endif %}
     <a class="{{ classes }} icon-remove js-delete-category"
        title="{{ tooltip|forceescape }}"
-       data-confirm="{{ confirmation_message|forceescape }}"
+       data-confirm="{{ confirmation_message }}"
        data-title="{% trans %}Delete category{% endtrans %}"
        data-href="{{ url_for('categories.delete', category) }}"
        data-method="POST"></a>
