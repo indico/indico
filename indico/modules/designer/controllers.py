@@ -219,10 +219,10 @@ class CloneTemplateMixin(TargetFromURLMixin):
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
 
     def _process(self):
-        category = (self.target if isinstance(self.target, Category) and
-                    self.target.can_manage(session.user) else None)
-        form = CloneTemplateForm(category=category)
         if self.clonable_elsewhere:
+            category = (self.target if isinstance(self.target, Category) and
+                        self.target.can_manage(session.user) else None)
+            form = CloneTemplateForm(category=category)
             if form.validate_on_submit():
                 return self.clone_template(target=form.data)
             return jsonify_form(form, submit=_('Clone'), disabled_until_change=False)
