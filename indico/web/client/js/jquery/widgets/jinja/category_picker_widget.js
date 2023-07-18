@@ -17,7 +17,7 @@
         navigatorCategoryId: null,
         requireEventCreationRights: false,
         requireCategoryManagementRights: false,
-        showWarningMessage:true,
+        showEventCreationWarning: false,
       },
       options
     );
@@ -87,14 +87,12 @@
     });
 
     function updateWarningVisibility(category) {
-      if (options.showWarningMessage) {
-        $categoryWarning.toggleClass(
-          'hidden',
-          !category || // unlisted event or no category selected
-            !category.has_children ||
-            category.has_events
-        );
-      }
-    };
-  }
+      const hidden =
+        !options.showEventCreationWarning ||
+        !category || // unlisted event or no category selected
+        !category.has_children ||
+        category.has_events;
+      $categoryWarning.toggleClass('hidden', hidden);
+    }
+  };
 })(window);

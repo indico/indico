@@ -364,7 +364,7 @@ class CloneContentsForm(CloneRepeatabilityForm):
 
 
 class CloneCategorySelectForm(CloneContentsForm):
-    category = CategoryField(_('Category'), require_event_creation_rights=True)
+    category = CategoryField(_('Category'), require_event_creation_rights=True, show_event_creation_warning=True)
 
     def validate_category(self, field):
         if not field.data:

@@ -24,5 +24,4 @@ class AddTemplateForm(IndicoForm):
 
 
 class CloneTemplateForm(IndicoForm):
-    category = CategoryField(_('Category'), [DataRequired()], require_category_management_rights=True,
-                             show_warning_message=False)
+    category = CategoryField(_('Category'), [DataRequired()], require_category_management_rights=True)
