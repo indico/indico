@@ -44,7 +44,7 @@ import Palette from '../../utils/palette';
         },
         categoriesWithoutCategoryManagementRights: {
           disabled: false,
-          message: $T.gettext('Not possible for categories where you do not have management rights'),
+          message: $T.gettext('Not possible for categories where you are not a manager'),
         },
         categoriesDescendingFrom: {
           disabled: false,
