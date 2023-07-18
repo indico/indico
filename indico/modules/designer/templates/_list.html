@@ -116,7 +116,7 @@
                                 data-method="POST"
                                 data-confirm="{% trans title=tpl.title -%}Are you sure you want to clone template '{{ title }}'?{%- endtrans %}">
                             {% else %}
-                                data-title="{% trans title = tpl.title %}Clone '{{ title }}' template into a Category{% endtrans %}"
+                                data-title="{% trans title=tpl.title %}Clone '{{ title }}' template into a category{% endtrans %}"
                                 data-ajax-dialog>
                             {% endif %}
                         {% endif %}
