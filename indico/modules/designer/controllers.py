@@ -213,8 +213,8 @@ class CloneTemplateMixin(TargetFromURLMixin):
 
         message = _("Created copy of template '{}'").format(self.template.title)
         if target_dict != self.target_dict:
-            link = f'<a href="{url_for("designer.template_list", target_dict["category"])}" target="_blank">'
-            message = _("Created copy of template '{}' {} here {}").format(self.template.title, link, '</a>')
+            message += ' (<a href="{}">{}</a>)'.format(url_for('designer.template_list', target_dict['category']),
+                                                       _('Go to category'))
         flash(Markup(message), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
 
