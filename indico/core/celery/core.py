@@ -53,6 +53,7 @@ class IndicoCelery(Celery):
             # default timeout is 1h, so retries >1h would result in task duplication
             # https://docs.celeryproject.org/en/master/getting-started/backends-and-brokers/redis.html#visibility-timeout
             self.conf['broker_transport_options'] = {'visibility_timeout': 86400*2}
+        self.conf['broker_connection_retry_on_startup'] = True
         self.conf['result_backend'] = config.CELERY_RESULT_BACKEND or config.CELERY_BROKER
         self.conf['beat_scheduler'] = IndicoPersistentScheduler
         self.conf['beat_schedule_filename'] = os.path.join(config.TEMP_DIR, 'celerybeat-schedule')
