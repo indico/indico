@@ -8,7 +8,7 @@
 from markupsafe import Markup
 
 from indico.util.i18n import _
-from indico.util.placeholders import Placeholder
+from indico.util.placeholders import ParametrizedPlaceholder, Placeholder
 
 
 class EventTitlePlaceholder(Placeholder):
@@ -20,11 +20,17 @@ class EventTitlePlaceholder(Placeholder):
         return event.title
 
 
-class EventLinkPlaceholder(Placeholder):
+class EventLinkPlaceholder(ParametrizedPlaceholder):
     name = 'event_link'
-    description = _('Link to the event')
+    param_friendly_name = 'link title'
 
     @classmethod
-    def render(cls, event, **kwargs):
-        return Markup('<a href="{url}" title="{title}">{url}</a>').format(url=event.short_external_url,
-                                                                          title=event.title)
+    def render(cls, param, event, **kwargs):
+        return Markup('<a href="{url}" title="{title}">{text}</a>').format(url=event.short_external_url,
+                                                                           title=event.title,
+                                                                           text=(param or event.short_external_url))
+
+    @classmethod
+    def iter_param_info(cls, person, event, **kwargs):
+        yield None, _('Link to the event')
+        yield 'custom-text', _('Custom link text instead of the full URL')
