@@ -481,6 +481,8 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         if detail_level == 'sessions':
             options.append(sessions_strategy)
         options.append(undefer('effective_protection_mode'))
+        options.append(selectinload('label'))
+        options.append(selectinload('references'))
         return options
 
     def category(self, idlist, format):
@@ -624,6 +626,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'keywords': event.keywords,
             'organizer': event.organizer_info,
             'language': event.default_locale or None,
+            'label': self._serialize_event_label(event),
         })
 
         if event.is_unlisted:
@@ -676,6 +679,16 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
         ):
             data.update(update)
         return data
+
+    def _serialize_event_label(self, event):
+        if not (label := event.label):
+            return None
+        return {
+            'title': label.title,
+            'color': label.color,
+            'is_event_not_happening': label.is_event_not_happening,
+            'message': event.label_message,
+        }
 
 
 class EventBaseHook(HTTPAPIHook):

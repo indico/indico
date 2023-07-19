@@ -209,6 +209,13 @@
                     {% call with_default() %}
                         {{ event.get_label_markup('mini') }}
                     {% endcall %}
+                    {% if event.is_not_happening %}
+                        <p>
+                            {% trans %}
+                                This label indicates that the event is not happening. Reminders are disabled.
+                            {% endtrans %}
+                        </p>
+                    {% endif %}
                 </dd>
             {% endif %}
         </dl>

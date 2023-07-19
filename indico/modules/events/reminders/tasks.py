@@ -10,6 +10,7 @@ from celery.schedules import crontab
 from indico.core.celery import celery
 from indico.core.db import db
 from indico.modules.events import Event
+from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.models.reminders import EventReminder
 from indico.util.date_time import now_utc
@@ -20,6 +21,7 @@ def send_event_reminders():
     reminders = (EventReminder.query
                  .filter(~EventReminder.is_sent,
                          ~Event.is_deleted,
+                         ~Event.label.has(EventLabel.is_event_not_happening),
                          EventReminder.scheduled_dt <= now_utc())
                  .join(EventReminder.event)
                  .all())

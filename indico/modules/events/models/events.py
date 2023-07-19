@@ -801,6 +801,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             return ''
         return Markup(render_template('events/label.html', label=label, message=self.label_message, size=size))
 
+    @property
+    def is_not_happening(self):
+        return self.label is not None and self.label.is_event_not_happening
+
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)

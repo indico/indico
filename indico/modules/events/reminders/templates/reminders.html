@@ -1,5 +1,7 @@
 {% extends 'events/management/base.html' %}
 
+{% from 'message_box.html' import message_box %}
+
 {% set pending_reminders = reminders|rejectattr('is_sent')|list %}
 {% set sent_reminders = reminders|selectattr('is_sent')|list %}
 {% set tzinfo = event.tzinfo %}
@@ -43,6 +45,14 @@
 {% endmacro %}
 
 {% block content %}
+    {% if event.is_not_happening %}
+        {% call message_box('info') %}
+            {% trans label=event.get_label_markup() %}
+                Since this event has the {{ label }} label, no reminders will be sent for it.
+            {% endtrans %}
+        {% endcall %}
+    {% endif %}
+
     <div class="i-box-group vert fixed-width reminders">
         <div class="i-box">
             <div class="i-box-header">

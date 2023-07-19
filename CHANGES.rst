@@ -23,6 +23,8 @@ Improvements
   thanks :user:`SegiNyn`)
 - Allow using a custom link text in the ``{event_link}`` email placeholder, using the
   ``{event_link:something-else-here}`` syntax (:issue:`5858`, :pr:`5860`)
+- Add option to add "event cancelled" semantics for event labels, which will disable
+  reminders for events having this label (:issue:`5285`, :pr:`5861`)
 
 Bugfixes
 ^^^^^^^^

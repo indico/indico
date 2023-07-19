@@ -56,6 +56,10 @@ class ReferenceTypeForm(IndicoForm):
 class EventLabelForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     color = SUIColorPickerField(_('Color'), [DataRequired()])
+    is_event_not_happening = BooleanField(_('Event does not happen'), widget=SwitchWidget(), default=False,
+                                          description=_('Enable this to indicate that an event with this label '
+                                                        'does not happen (e.g. cancelled or postponed). This will '
+                                                        'prevent event reminders from being sent.'))
 
     def __init__(self, *args, **kwargs):
         self.event_label = kwargs.pop('event_label', None)

@@ -32,6 +32,11 @@ class EventLabel(db.Model):
         db.String,
         nullable=False
     )
+    is_event_not_happening = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     # relationship backrefs:
     # - events (Event.label)
