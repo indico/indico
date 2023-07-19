@@ -40,15 +40,21 @@ class EventTitlePlaceholder(Placeholder):
         return registration.registration_form.event.title
 
 
-class EventLinkPlaceholder(Placeholder):
+class EventLinkPlaceholder(ParametrizedPlaceholder):
     name = 'event_link'
-    description = _('Link to the event')
+    param_friendly_name = 'link title'
 
     @classmethod
-    def render(cls, regform, registration):
-        regform = registration.registration_form
-        return Markup('<a href="{url}" title="{title}">{url}</a>').format(url=regform.event.short_external_url,
-                                                                          title=regform.event.title)
+    def render(cls, param, regform, registration):
+        event = registration.registration_form.event
+        return Markup('<a href="{url}" title="{title}">{text}</a>').format(url=event.short_external_url,
+                                                                           title=event.title,
+                                                                           text=(param or event.short_external_url))
+
+    @classmethod
+    def iter_param_info(cls, regform, registration, **kwargs):
+        yield None, _('Link to the event')
+        yield 'custom-text', _('Custom link text instead of the full URL')
 
 
 class IDPlaceholder(Placeholder):

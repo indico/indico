@@ -21,6 +21,8 @@ Improvements
 - Add button to adapt columns widths on the reviewing area's abstracts list (:pr:`5837`)
 - Allow cloning category-level badge/poster templates into another category (:pr:`5775`,
   thanks :user:`SegiNyn`)
+- Allow using a custom link text in the ``{event_link}`` email placeholder, using the
+  ``{event_link:something-else-here}`` syntax (:issue:`5858`, :pr:`5860`)
 
 Bugfixes
 ^^^^^^^^
