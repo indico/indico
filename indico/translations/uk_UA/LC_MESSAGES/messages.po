@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2023-07-20 15:21+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2019-2021,2023\n"
 "Language-Team: Ukrainian (Ukraine) (http://app.transifex.com/indico/indico/language/uk_UA/)\n"
@@ -734,8 +734,8 @@ msgid "Board:"
 msgstr "Комісія:"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:130
-#: indico/modules/events/abstracts/templates/reviewing/public.html:129
-#: indico/modules/events/abstracts/templates/reviewing/public.html:307
+#: indico/modules/events/abstracts/templates/reviewing/public.html:127
+#: indico/modules/events/abstracts/templates/reviewing/public.html:305
 msgid "Author:"
 msgid_plural "Authors:"
 msgstr[0] "Автор:"
@@ -744,8 +744,8 @@ msgstr[2] "Автори:"
 msgstr[3] "Автори:"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:143
-#: indico/modules/events/abstracts/templates/reviewing/public.html:142
-#: indico/modules/events/abstracts/templates/reviewing/public.html:332
+#: indico/modules/events/abstracts/templates/reviewing/public.html:140
+#: indico/modules/events/abstracts/templates/reviewing/public.html:330
 msgid "Co-author:"
 msgid_plural "Co-authors:"
 msgstr[0] "Співавтор:"
@@ -1544,9 +1544,9 @@ msgstr "Видалити"
 #: indico/modules/attachments/templates/_attachments.html:56
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the attachment permanently."
-msgstr "Ви впевнені, що хочете видалити &quot;%(name)s&quot;?<br> Вкладення буде видалене назавжди.  "
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"attachment permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:73
 msgid ""
@@ -1574,9 +1574,9 @@ msgstr "Редагувати директорію"
 #: indico/modules/attachments/templates/_attachments.html:96
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the folder and its contents permanently."
-msgstr "Ви впевнені, що хочете видалити &quot;%(name)s&quot;?<br> Папка з усіма файлами буде видалена назавжди. "
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"folder and its contents permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:126
 msgid "empty folder"
@@ -3282,11 +3282,11 @@ msgstr "Немає подій у цій категорії"
 
 #: indico/modules/categories/templates/management/base.html:5
 #, python-format
-msgid "Do you really want to delete the category \"%(category)s\"?"
-msgstr "Ви справді хочете видалити категорію “%(category)s”?"
+msgid "Do you really want to delete the category &quot;%(category)s&quot;?"
+msgstr ""
 
-#: indico/modules/categories/templates/management/base.html:9
-#: indico/modules/categories/templates/management/base.html:20
+#: indico/modules/categories/templates/management/base.html:11
+#: indico/modules/categories/templates/management/base.html:22
 #: indico/modules/categories/templates/management/delete_categories.html:3
 msgid "Delete category"
 msgid_plural "Delete categories"
@@ -3295,19 +3295,19 @@ msgstr[1] "Видалити категорії"
 msgstr[2] "Видалити категорії"
 msgstr[3] "Видалити категорії"
 
-#: indico/modules/categories/templates/management/base.html:14
+#: indico/modules/categories/templates/management/base.html:16
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Цю категорію не можна видалити, тому що вона не порожня. "
 
-#: indico/modules/categories/templates/management/base.html:27
+#: indico/modules/categories/templates/management/base.html:29
 msgid "Move to another category"
 msgstr "Перемістити до іншої категорії"
 
-#: indico/modules/categories/templates/management/base.html:61
+#: indico/modules/categories/templates/management/base.html:63
 msgid "See the display page of the category"
 msgstr "Показати сторінку огляду категорії"
 
-#: indico/modules/categories/templates/management/base.html:62
+#: indico/modules/categories/templates/management/base.html:64
 #: indico/modules/events/management/templates/base.html:27
 msgid "Switch to display view"
 msgstr "До огляду"
@@ -5071,8 +5071,8 @@ msgstr "Автори та доповідачі поточних тез буду�
 #: indico/modules/events/abstracts/forms.py:235
 #: indico/modules/events/abstracts/forms.py:296
 #: indico/modules/events/abstracts/forms.py:671
-#: indico/modules/events/abstracts/templates/reviewing/public.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:391
+#: indico/modules/events/abstracts/templates/reviewing/public.html:271
+#: indico/modules/events/abstracts/templates/reviewing/public.html:389
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75
 #: indico/modules/events/papers/forms.py:74
@@ -6244,7 +6244,7 @@ msgid "You have reviewed this abstract"
 msgstr "Ви рецензували ці тези"
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:459
+#: indico/modules/events/abstracts/templates/reviewing/public.html:457
 msgid "Go to contribution"
 msgstr "Перейти до доповіді"
 
@@ -6791,26 +6791,26 @@ msgstr "<strong>Шаблон:</strong> <span class=\"template\">%(name)s</span>"
 msgid "Do you really want to withdraw this abstract?"
 msgstr "Ви справді хочете видалити ці тези?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:23
+#: indico/modules/events/abstracts/templates/reviewing/public.html:22
 msgid ""
 "Withdrawing this abstract will permanently delete its corresponding "
 "contribution."
 msgstr "Видалення цих тез означатиме видалення відповідної доповіді."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:28
+#: indico/modules/events/abstracts/templates/reviewing/public.html:26
 msgid "This operation is irreversible."
 msgstr "Ця операція не зворотня. "
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:32
+#: indico/modules/events/abstracts/templates/reviewing/public.html:30
 msgid "Withdraw abstract"
 msgstr "Видалити тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:33
+#: indico/modules/events/abstracts/templates/reviewing/public.html:31
 msgid "Withdraw Abstract"
 msgstr "Видалити тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:39
-#: indico/modules/events/abstracts/templates/reviewing/public.html:50
+#: indico/modules/events/abstracts/templates/reviewing/public.html:37
+#: indico/modules/events/abstracts/templates/reviewing/public.html:48
 #: indico/modules/events/management/templates/settings.html:26
 #: indico/modules/events/registration/templates/display/registration_summary.html:72
 #: indico/modules/events/registration/templates/display/registration_summary.html:74
@@ -6820,84 +6820,84 @@ msgstr "Видалити тези"
 msgid "Withdraw"
 msgstr "Видалити"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:43
+#: indico/modules/events/abstracts/templates/reviewing/public.html:41
 msgid ""
 "You cannot withdraw this abstract as it has already been accepted. Please "
 "contact the event organizers if you want to withdraw the abstract anyway."
 msgstr "Ви не можете видалити ці тези, так як їх уже прийняли. Зв'яжіться з організаторами заходу, якщо все ще хочете видалити тези."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:54
+#: indico/modules/events/abstracts/templates/reviewing/public.html:52
 msgid "This abstract has been withdrawn but can be restored."
 msgstr "Тези видалено, але їх можна відновити. "
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:55
+#: indico/modules/events/abstracts/templates/reviewing/public.html:53
 msgid "Restore Abstract"
 msgstr "Відновити тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:56
+#: indico/modules/events/abstracts/templates/reviewing/public.html:54
 msgid "Do you really want to restore this abstract?"
 msgstr "Ви справді хочете видалити ці тези?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:61
+#: indico/modules/events/abstracts/templates/reviewing/public.html:59
 msgid "Restore"
 msgstr "Відновити"
 
+#: indico/modules/events/abstracts/templates/reviewing/public.html:68
 #: indico/modules/events/abstracts/templates/reviewing/public.html:70
-#: indico/modules/events/abstracts/templates/reviewing/public.html:72
 msgid "Edit abstract"
 msgstr "Редагувати тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:78
+#: indico/modules/events/abstracts/templates/reviewing/public.html:76
 msgid "The abstract cannot be edited because it was withdrawn"
 msgstr "Тези не можна редагувати, тому що їх було видалено"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:82
+#: indico/modules/events/abstracts/templates/reviewing/public.html:80
 msgid "The abstract cannot be edited because it is already under review"
 msgstr "Тези не можна редагувати, тому що вони рецензуються"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:86
+#: indico/modules/events/abstracts/templates/reviewing/public.html:84
 msgid "The abstract cannot be edited because it has already been processed"
 msgstr "Тези не можна редагувати, тому що їх уже було оброблено"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:90
+#: indico/modules/events/abstracts/templates/reviewing/public.html:88
 msgid ""
 "The abstract cannot be edited because the modification deadline has passed"
 msgstr "Тези не можна редагувати, тому що останній день змін уже минув"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:94
+#: indico/modules/events/abstracts/templates/reviewing/public.html:92
 msgid "You are not authorized to edit this abstract"
 msgstr "У Вас немає дозволу редагувати ці тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:108
+#: indico/modules/events/abstracts/templates/reviewing/public.html:106
 msgid "PDF with reviews"
 msgstr "PDF-файл з рецензіями"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:117
+#: indico/modules/events/abstracts/templates/reviewing/public.html:115
 msgid "Download abstract submission in PDF"
 msgstr "Завантажити підтвердження тез у PDF"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:168
+#: indico/modules/events/abstracts/templates/reviewing/public.html:166
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit an abstract"
 msgstr "<strong>%(name)s</strong> було запрошено подати тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:172
-#: indico/modules/events/abstracts/templates/reviewing/public.html:413
+#: indico/modules/events/abstracts/templates/reviewing/public.html:170
+#: indico/modules/events/abstracts/templates/reviewing/public.html:411
 #, python-format
 msgid "<strong>%(name)s</strong> submitted this abstract"
 msgstr "<strong>%(name)s</strong> надіслав ці тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:211
-#: indico/modules/events/abstracts/templates/reviewing/public.html:216
+#: indico/modules/events/abstracts/templates/reviewing/public.html:209
+#: indico/modules/events/abstracts/templates/reviewing/public.html:214
 msgid "Reset judgment"
 msgstr "Скинути висновок"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:217
+#: indico/modules/events/abstracts/templates/reviewing/public.html:215
 msgid ""
 "Do you really want to reset the judgment? This operation is irreversible."
 msgstr "Ви справді хочете скинути висновок? Ця операція не зворотня."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:233
+#: indico/modules/events/abstracts/templates/reviewing/public.html:231
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6905,7 +6905,7 @@ msgid ""
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "Тези було прийнято як <span class=\"abstract-contribution-type\">%(type)s</span> у напрямку %(track)s, а %(link_start)sдоповідь%(link_end)s була додана до заходу."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:240
+#: indico/modules/events/abstracts/templates/reviewing/public.html:238
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6913,42 +6913,42 @@ msgid ""
 "created in the event."
 msgstr "Тези було прийнято як <span class=\"abstract-contribution-type\">%(type)s</span>, а %(link_start)sдоповідь%(link_end)s було додано до заходу."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:246
+#: indico/modules/events/abstracts/templates/reviewing/public.html:244
 #, python-format
 msgid ""
 "The abstract was accepted for track %(track)s and a "
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "Тези було прийнято у напрямку %(track)s, а %(link_start)sдоповідь%(link_end)s була додана до заходу."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:252
+#: indico/modules/events/abstracts/templates/reviewing/public.html:250
 #, python-format
 msgid ""
 "The abstract was accepted and a %(link_start)scontribution%(link_end)s was "
 "created in the event."
 msgstr "Тези було затверджено, а %(link_start)sдоповідь%(link_end)s була додана до заходу."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:257
+#: indico/modules/events/abstracts/templates/reviewing/public.html:255
 msgid "The abstract was rejected."
 msgstr "Тези було відхилено."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:261
+#: indico/modules/events/abstracts/templates/reviewing/public.html:259
 #, python-format
 msgid "The abstract was merged into %(link_start)s%(other)s%(link_end)s."
 msgstr "Тези було об'єднано із %(link_start)s%(other)s%(link_end)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:267
+#: indico/modules/events/abstracts/templates/reviewing/public.html:265
 #, python-format
 msgid ""
 "The abstract was marked as a duplicate of "
 "%(link_start)s%(other)s%(link_end)s"
 msgstr "Тези було позначено як копію %(link_start)s%(other)s%(link_end)s"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:287
+#: indico/modules/events/abstracts/templates/reviewing/public.html:285
 msgid "As contribution type:"
 msgstr "Тип доповіді:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:295
-#: indico/modules/events/abstracts/templates/reviewing/public.html:420
+#: indico/modules/events/abstracts/templates/reviewing/public.html:293
+#: indico/modules/events/abstracts/templates/reviewing/public.html:418
 msgid "For track:"
 msgid_plural "For tracks:"
 msgstr[0] "Для напрямку:"
@@ -6956,7 +6956,7 @@ msgstr[1] "Для напрямків:"
 msgstr[2] "Для напрямків:"
 msgstr[3] "Для напрямків:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:357
+#: indico/modules/events/abstracts/templates/reviewing/public.html:355
 msgid "Speaker:"
 msgid_plural "Speakers:"
 msgstr[0] "Доповідач:"
@@ -6964,18 +6964,18 @@ msgstr[1] "Доповідачі:"
 msgstr[2] "Доповідачі:"
 msgstr[3] "Доповідачі:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:381
+#: indico/modules/events/abstracts/templates/reviewing/public.html:379
 msgid "More information"
 msgstr "Більше"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:409
+#: indico/modules/events/abstracts/templates/reviewing/public.html:407
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this <span class=\"abstract-"
 "contribution-type\">%(type)s</span>"
 msgstr "<strong>%(name)s</strong> подав це як <span class=\"abstract-contribution-type\">%(type)s</span>"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:431
+#: indico/modules/events/abstracts/templates/reviewing/public.html:429
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
@@ -6983,94 +6983,94 @@ msgid ""
 "type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> надіслав ці тези для напрямку “%(track)s” як <span class=\"abstract-contribution-type\">%(type)s</span>."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:439
+#: indico/modules/events/abstracts/templates/reviewing/public.html:437
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted as <span class=\"abstract-contribution-type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> затвердив ці тези як <span class=\"abstract-contribution-type\">%(type)s</span>."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:445
+#: indico/modules/events/abstracts/templates/reviewing/public.html:443
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s."
 msgstr "<strong>%(name)s</strong> надіслав ці тези для напрямку “%(track)s”."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:451
+#: indico/modules/events/abstracts/templates/reviewing/public.html:449
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted."
 msgstr "<strong>%(name)s</strong> затвердив ці тези. "
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:465
+#: indico/modules/events/abstracts/templates/reviewing/public.html:463
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was merged into "
 "another."
 msgstr "<strong>%(name)s</strong> затвердив ці тези та приєднав їх до інших. "
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:471
-#: indico/modules/events/abstracts/templates/reviewing/public.html:482
+#: indico/modules/events/abstracts/templates/reviewing/public.html:469
+#: indico/modules/events/abstracts/templates/reviewing/public.html:480
 #, python-format
 msgid "<a href=\"%(url)s\">Go to abstract</a>"
 msgstr "<a href=\"%(url)s\">До тез</a>"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:477
+#: indico/modules/events/abstracts/templates/reviewing/public.html:475
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was marked as "
 "duplicate of another."
 msgstr "<strong>%(name)s</strong>затвердив ці тези та помітив як копію інших. "
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:488
+#: indico/modules/events/abstracts/templates/reviewing/public.html:486
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit this abstract"
 msgstr "<strong>%(name)s</strong> було запрошено подати ці тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:524
+#: indico/modules/events/abstracts/templates/reviewing/public.html:522
 msgid "No answer"
 msgstr "Без відповіді"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:533
+#: indico/modules/events/abstracts/templates/reviewing/public.html:531
 #, python-format
 msgid "<strong>%(name)s</strong> withdrew this abstract"
 msgstr "<strong>%(name)s</strong>видалив ці тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:538
+#: indico/modules/events/abstracts/templates/reviewing/public.html:536
 #, python-format
 msgid "<strong>%(name)s</strong> accepted this abstract"
 msgstr "<strong>%(name)s</strong> затвердив ці тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:542
+#: indico/modules/events/abstracts/templates/reviewing/public.html:540
 #, python-format
 msgid "<strong>%(name)s</strong> rejected this abstract"
 msgstr "<strong>%(name)s</strong> відхилив ці тези"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:546
+#: indico/modules/events/abstracts/templates/reviewing/public.html:544
 #, python-format
 msgid "<strong>%(name)s</strong> merged this abstract into another"
 msgstr "<strong>%(name)s</strong>приєднав ці тези до інших"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:550
+#: indico/modules/events/abstracts/templates/reviewing/public.html:548
 #, python-format
 msgid "<strong>%(name)s</strong> marked this abstract as duplicate of another"
 msgstr "<strong>%(name)s</strong> позначив(ли) ці тези як копію інших"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:556
+#: indico/modules/events/abstracts/templates/reviewing/public.html:554
 msgid "This abstract was accepted"
 msgstr "Тези було затверджено"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:558
+#: indico/modules/events/abstracts/templates/reviewing/public.html:556
 msgid "This abstract was rejected"
 msgstr "Тези було відхилено"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:560
+#: indico/modules/events/abstracts/templates/reviewing/public.html:558
 msgid "This abstract was merged"
 msgstr "Тези було об'єднано"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:562
+#: indico/modules/events/abstracts/templates/reviewing/public.html:560
 msgid "This abstract was marked as duplicate"
 msgstr "Тези було позначено як копію"
 
@@ -9788,10 +9788,9 @@ msgstr "Налаштування захисту оновлено"
 #: indico/modules/events/management/templates/_action_menu.html:2
 #, python-format
 msgid ""
-"Changing the event type to <strong>%(type)s</strong> will change the look of"
-" the event page and may disable some features not available for the new "
-"event type."
-msgstr "Зміна типу заходу на <strong>%(type)s</strong> змінить вигляд його сторінки та може деактивувати деякі опції, що не доступні для нового типу заходу."
+"Changing the event type to %(type)s will change the look of the event page "
+"and may disable some features not available for the new event type."
+msgstr ""
 
 #: indico/modules/events/management/templates/_action_menu.html:11
 msgid "Change type"
@@ -15353,10 +15352,10 @@ msgstr "Створити офлайнову копію"
 
 #: indico/modules/events/static/templates/static_sites.html:14
 msgid ""
-"Are you sure you want to build an offline copy of this event?<br>Beware that"
-" it is a heavy operation, especially for large events, and it might take "
-"some time to finish."
-msgstr "Ви впевнені, що хочете створити оффлайнову копію цієї події? <br>Увага, цей процес тривалий, особливо для масштабних подій, тому він може зайняти деякий час. "
+"Are you sure you want to build an offline copy of this event? Beware that it"
+" is a heavy operation, especially for large events, and it might take some "
+"time to finish."
+msgstr ""
 
 #: indico/modules/events/static/templates/static_sites.html:15
 msgid "Build offline copy"
@@ -15924,13 +15923,13 @@ msgstr "Анонімно"
 msgid "Are you sure you want to remove this submission?"
 msgstr "Ви впевнені, що хочете видалити цю подачу? "
 
-#: indico/modules/events/surveys/templates/management/survey.html:198
+#: indico/modules/events/surveys/templates/management/survey.html:197
 msgid ""
 "Note: Authenticated users will not be able to submit an anonymous survey "
 "again even if you delete their submission."
 msgstr "Примітка: Авторизовані користувачі не зможуть повторно пройти анонімне опитування, навіть якщо ви видалите їх. "
 
-#: indico/modules/events/surveys/templates/management/survey.html:205
+#: indico/modules/events/surveys/templates/management/survey.html:207
 msgid "Remove submission"
 msgstr ""
 
@@ -17870,9 +17869,9 @@ msgstr "Востаннє використано:"
 #: indico/modules/oauth/templates/user_apps.html:39
 #, python-format
 msgid ""
-"%(app_name)s will no longer have access to your Indico data.<br> Are you "
-"sure you want to revoke its access?"
-msgstr "%(app_name)s  більше не матиме доступу до ваших даних  Indico. <br> Ви впевнені, що хочете заборонити доступ?"
+"%(app_name)s will no longer have access to your Indico data. Are you sure "
+"you want to revoke its access?"
+msgstr ""
 
 #: indico/modules/oauth/templates/user_apps.html:41
 msgid "Revoke"
@@ -17937,7 +17936,7 @@ msgid ""
 "access the Indico API. You cannot undo this action."
 msgstr "Будь-які програми або сценарії, що використовують цей токен, більше не матимуть доступу до API Indico. Ви не можете скасувати цю дію. "
 
-#: indico/modules/oauth/templates/user_tokens.html:114
+#: indico/modules/oauth/templates/user_tokens.html:112
 msgid ""
 "Warning: You will not be able to create a new API token since only Indico "
 "admins can create API tokens."
@@ -19043,9 +19042,9 @@ msgstr "Встановити як основне"
 
 #: indico/modules/users/templates/personal_data.html:17
 msgid ""
-"This user will no longer have access to Indico.<br> Are you sure you want to"
-" revoke their access?"
-msgstr "Цей користувач більше не матиме доступу до Indico. <br> Ви впевнені, що хочете заборонити доступ?"
+"This user will no longer have access to Indico. Are you sure you want to "
+"revoke their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:21
 msgid "Block User"
@@ -19053,9 +19052,9 @@ msgstr "Залокувати користувача"
 
 #: indico/modules/users/templates/personal_data.html:28
 msgid ""
-"This user will regain access to Indico.<br> Are you sure you want to restore"
-" their access?"
-msgstr "Цей користувач поновить доступ до Indico.  <br> Ви впевнені що хочете відновити його доступ?"
+"This user will regain access to Indico. Are you sure you want to restore "
+"their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:31
 msgid "Unblock User"

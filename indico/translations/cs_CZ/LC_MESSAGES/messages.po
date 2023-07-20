@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2023-07-20 15:21+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2023\n"
 "Language-Team: Czech (Czech Republic) (http://app.transifex.com/indico/indico/language/cs_CZ/)\n"
@@ -738,8 +738,8 @@ msgid "Board:"
 msgstr "Nástěnka:"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:130
-#: indico/modules/events/abstracts/templates/reviewing/public.html:129
-#: indico/modules/events/abstracts/templates/reviewing/public.html:307
+#: indico/modules/events/abstracts/templates/reviewing/public.html:127
+#: indico/modules/events/abstracts/templates/reviewing/public.html:305
 msgid "Author:"
 msgid_plural "Authors:"
 msgstr[0] "Autor:"
@@ -748,8 +748,8 @@ msgstr[2] "Autoři:"
 msgstr[3] "Autoři:"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:143
-#: indico/modules/events/abstracts/templates/reviewing/public.html:142
-#: indico/modules/events/abstracts/templates/reviewing/public.html:332
+#: indico/modules/events/abstracts/templates/reviewing/public.html:140
+#: indico/modules/events/abstracts/templates/reviewing/public.html:330
 msgid "Co-author:"
 msgid_plural "Co-authors:"
 msgstr[0] "Spoluautor:"
@@ -1548,9 +1548,9 @@ msgstr "Odstranit"
 #: indico/modules/attachments/templates/_attachments.html:56
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the attachment permanently."
-msgstr "Určitě chcete odstranit &quot;%(name)s&quot;? Tímto krokem dojde k ztracení přílohy."
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"attachment permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:73
 msgid ""
@@ -1578,9 +1578,9 @@ msgstr "Upravit složku"
 #: indico/modules/attachments/templates/_attachments.html:96
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the folder and its contents permanently."
-msgstr "Určitě chcete odstranit  &quot;%(name)s&quot;? Tato akce trvale smaže adresář a jeho obsah. "
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"folder and its contents permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:126
 msgid "empty folder"
@@ -3286,11 +3286,11 @@ msgstr "V této kategorii nejsou žádné události"
 
 #: indico/modules/categories/templates/management/base.html:5
 #, python-format
-msgid "Do you really want to delete the category \"%(category)s\"?"
-msgstr "Opravdu chcete smazat kategorii \"%(category)s\"?"
+msgid "Do you really want to delete the category &quot;%(category)s&quot;?"
+msgstr ""
 
-#: indico/modules/categories/templates/management/base.html:9
-#: indico/modules/categories/templates/management/base.html:20
+#: indico/modules/categories/templates/management/base.html:11
+#: indico/modules/categories/templates/management/base.html:22
 #: indico/modules/categories/templates/management/delete_categories.html:3
 msgid "Delete category"
 msgid_plural "Delete categories"
@@ -3299,19 +3299,19 @@ msgstr[1] "Smazat kategorie"
 msgstr[2] "Smazat kategorie"
 msgstr[3] "Smazat kategorie"
 
-#: indico/modules/categories/templates/management/base.html:14
+#: indico/modules/categories/templates/management/base.html:16
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Tuhle kategorii nelze smazat, protože není prázdná."
 
-#: indico/modules/categories/templates/management/base.html:27
+#: indico/modules/categories/templates/management/base.html:29
 msgid "Move to another category"
 msgstr "Přesunout do jiné kategorie"
 
-#: indico/modules/categories/templates/management/base.html:61
+#: indico/modules/categories/templates/management/base.html:63
 msgid "See the display page of the category"
 msgstr "Přejít na uživatelské zobrazení stránky pro kategorii"
 
-#: indico/modules/categories/templates/management/base.html:62
+#: indico/modules/categories/templates/management/base.html:64
 #: indico/modules/events/management/templates/base.html:27
 msgid "Switch to display view"
 msgstr "Uživatelské zobrazení"
@@ -5075,8 +5075,8 @@ msgstr "Autoři a přednášející aktuálního abstraktu budou přidáni do zv
 #: indico/modules/events/abstracts/forms.py:235
 #: indico/modules/events/abstracts/forms.py:296
 #: indico/modules/events/abstracts/forms.py:671
-#: indico/modules/events/abstracts/templates/reviewing/public.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:391
+#: indico/modules/events/abstracts/templates/reviewing/public.html:271
+#: indico/modules/events/abstracts/templates/reviewing/public.html:389
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75
 #: indico/modules/events/papers/forms.py:74
@@ -6248,7 +6248,7 @@ msgid "You have reviewed this abstract"
 msgstr "Posoudili jste abstrakt"
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:459
+#: indico/modules/events/abstracts/templates/reviewing/public.html:457
 msgid "Go to contribution"
 msgstr "Přejít na příspěvek"
 
@@ -6795,26 +6795,26 @@ msgstr "<strong>Šablona:</strong> <span class=\"template\">%(name)s</span>"
 msgid "Do you really want to withdraw this abstract?"
 msgstr "Opravdu chcete přihlášku tohoto abstraktu stáhnout?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:23
+#: indico/modules/events/abstracts/templates/reviewing/public.html:22
 msgid ""
 "Withdrawing this abstract will permanently delete its corresponding "
 "contribution."
 msgstr "Odstraněním abstraktu na věky odstraníte i odpovídající příspěvek."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:28
+#: indico/modules/events/abstracts/templates/reviewing/public.html:26
 msgid "This operation is irreversible."
 msgstr "Tato operace je nevratná."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:32
+#: indico/modules/events/abstracts/templates/reviewing/public.html:30
 msgid "Withdraw abstract"
 msgstr "Sáhnout abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:33
+#: indico/modules/events/abstracts/templates/reviewing/public.html:31
 msgid "Withdraw Abstract"
 msgstr "Stáhnout abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:39
-#: indico/modules/events/abstracts/templates/reviewing/public.html:50
+#: indico/modules/events/abstracts/templates/reviewing/public.html:37
+#: indico/modules/events/abstracts/templates/reviewing/public.html:48
 #: indico/modules/events/management/templates/settings.html:26
 #: indico/modules/events/registration/templates/display/registration_summary.html:72
 #: indico/modules/events/registration/templates/display/registration_summary.html:74
@@ -6824,84 +6824,84 @@ msgstr "Stáhnout abstrakt"
 msgid "Withdraw"
 msgstr "Stáhnout"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:43
+#: indico/modules/events/abstracts/templates/reviewing/public.html:41
 msgid ""
 "You cannot withdraw this abstract as it has already been accepted. Please "
 "contact the event organizers if you want to withdraw the abstract anyway."
 msgstr "Nemůžete odvolat přihlášku abstraktu, který už byl přijatý. Prosím, domluvte se přímo s organizátory události, chcete-li tenhle abstrakt stáhnout i tak."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:54
+#: indico/modules/events/abstracts/templates/reviewing/public.html:52
 msgid "This abstract has been withdrawn but can be restored."
 msgstr "Tenhle abstrakt byl stažen, ale může být obnoven."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:55
+#: indico/modules/events/abstracts/templates/reviewing/public.html:53
 msgid "Restore Abstract"
 msgstr "Obnovit abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:56
+#: indico/modules/events/abstracts/templates/reviewing/public.html:54
 msgid "Do you really want to restore this abstract?"
 msgstr "Opravdu chcete obnovit tento abstrakt?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:61
+#: indico/modules/events/abstracts/templates/reviewing/public.html:59
 msgid "Restore"
 msgstr "Obnovit"
 
+#: indico/modules/events/abstracts/templates/reviewing/public.html:68
 #: indico/modules/events/abstracts/templates/reviewing/public.html:70
-#: indico/modules/events/abstracts/templates/reviewing/public.html:72
 msgid "Edit abstract"
 msgstr "Upravit abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:78
+#: indico/modules/events/abstracts/templates/reviewing/public.html:76
 msgid "The abstract cannot be edited because it was withdrawn"
 msgstr "Abstrakt nelze upravit, protože byl stažen."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:82
+#: indico/modules/events/abstracts/templates/reviewing/public.html:80
 msgid "The abstract cannot be edited because it is already under review"
 msgstr "Abstrakt nelze upravit, protože už je v recenzním řízení."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:86
+#: indico/modules/events/abstracts/templates/reviewing/public.html:84
 msgid "The abstract cannot be edited because it has already been processed"
 msgstr "Abstrakt nelze upravit, protože už byl zpracován."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:90
+#: indico/modules/events/abstracts/templates/reviewing/public.html:88
 msgid ""
 "The abstract cannot be edited because the modification deadline has passed"
 msgstr "Abstrakt nelze upravovat, protože už je po uzávěrce pro úpravy."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:94
+#: indico/modules/events/abstracts/templates/reviewing/public.html:92
 msgid "You are not authorized to edit this abstract"
 msgstr "Nemáte oprávnění upravovat tento abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:108
+#: indico/modules/events/abstracts/templates/reviewing/public.html:106
 msgid "PDF with reviews"
 msgstr "PDF s recenzemi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:117
+#: indico/modules/events/abstracts/templates/reviewing/public.html:115
 msgid "Download abstract submission in PDF"
 msgstr "Stáhnout příspěvek abstraktu v PDF"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:168
+#: indico/modules/events/abstracts/templates/reviewing/public.html:166
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit an abstract"
 msgstr "<strong>%(name)s</strong> byl vyzván odeslat abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:172
-#: indico/modules/events/abstracts/templates/reviewing/public.html:413
+#: indico/modules/events/abstracts/templates/reviewing/public.html:170
+#: indico/modules/events/abstracts/templates/reviewing/public.html:411
 #, python-format
 msgid "<strong>%(name)s</strong> submitted this abstract"
 msgstr "<strong>%(name)s</strong> odeslal tento abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:211
-#: indico/modules/events/abstracts/templates/reviewing/public.html:216
+#: indico/modules/events/abstracts/templates/reviewing/public.html:209
+#: indico/modules/events/abstracts/templates/reviewing/public.html:214
 msgid "Reset judgment"
 msgstr "Smazat rozhodnutí o (ne)přijetí"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:217
+#: indico/modules/events/abstracts/templates/reviewing/public.html:215
 msgid ""
 "Do you really want to reset the judgment? This operation is irreversible."
 msgstr "Opravdu chcete rozhodnutí vrátit zpět? Tahle akce je nevratná."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:233
+#: indico/modules/events/abstracts/templates/reviewing/public.html:231
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6909,7 +6909,7 @@ msgid ""
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "Abstrakt byl přijat jako <span class=\"abstract-contribution-type\">%(type)s</span> do tematického okruhu %(track)s a v události byl vytvořen  %(link_start)spříspěvek%(link_end)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:240
+#: indico/modules/events/abstracts/templates/reviewing/public.html:238
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6917,42 +6917,42 @@ msgid ""
 "created in the event."
 msgstr "Abstrakt byl přijat jako <span class=\"abstract-contribution-type\">%(type)s</span> a v události byl vytvořen  %(link_start)spříspěvek%(link_end)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:246
+#: indico/modules/events/abstracts/templates/reviewing/public.html:244
 #, python-format
 msgid ""
 "The abstract was accepted for track %(track)s and a "
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "Abstrakt byl přijat, zařazen do tematického okruhu %(track)sa v události byl vytvořen  %(link_start)spříspěvek%(link_end)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:252
+#: indico/modules/events/abstracts/templates/reviewing/public.html:250
 #, python-format
 msgid ""
 "The abstract was accepted and a %(link_start)scontribution%(link_end)s was "
 "created in the event."
 msgstr "Abstrakt byl přijat a v události byl vytvořen  %(link_start)spříspěvek%(link_end)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:257
+#: indico/modules/events/abstracts/templates/reviewing/public.html:255
 msgid "The abstract was rejected."
 msgstr "Abstrakt byl odmítnut."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:261
+#: indico/modules/events/abstracts/templates/reviewing/public.html:259
 #, python-format
 msgid "The abstract was merged into %(link_start)s%(other)s%(link_end)s."
 msgstr "Abstrakt byl sloučen do %(link_start)s%(other)s%(link_end)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:267
+#: indico/modules/events/abstracts/templates/reviewing/public.html:265
 #, python-format
 msgid ""
 "The abstract was marked as a duplicate of "
 "%(link_start)s%(other)s%(link_end)s"
 msgstr "Abstrakt byl označen jako dupikát %(link_start)s%(other)s%(link_end)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:287
+#: indico/modules/events/abstracts/templates/reviewing/public.html:285
 msgid "As contribution type:"
 msgstr "Jako příspěvek typu:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:295
-#: indico/modules/events/abstracts/templates/reviewing/public.html:420
+#: indico/modules/events/abstracts/templates/reviewing/public.html:293
+#: indico/modules/events/abstracts/templates/reviewing/public.html:418
 msgid "For track:"
 msgid_plural "For tracks:"
 msgstr[0] "Pro tématický okruh:"
@@ -6960,7 +6960,7 @@ msgstr[1] "Pro tématické okruhy:"
 msgstr[2] "Pro tématické okruhy:"
 msgstr[3] "Pro tematické okruhy:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:357
+#: indico/modules/events/abstracts/templates/reviewing/public.html:355
 msgid "Speaker:"
 msgid_plural "Speakers:"
 msgstr[0] "Přednášející:"
@@ -6968,18 +6968,18 @@ msgstr[1] "Přednášející:"
 msgstr[2] "Přednášející:"
 msgstr[3] "Přednášející:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:381
+#: indico/modules/events/abstracts/templates/reviewing/public.html:379
 msgid "More information"
 msgstr "Více informací"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:409
+#: indico/modules/events/abstracts/templates/reviewing/public.html:407
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this <span class=\"abstract-"
 "contribution-type\">%(type)s</span>"
 msgstr "Příspěvek přihlásil/a <strong>%(name)s</strong>, typ příspěvku:  <span class=\"abstract-contribution-type\">%(type)s</span>."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:431
+#: indico/modules/events/abstracts/templates/reviewing/public.html:429
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
@@ -6987,94 +6987,94 @@ msgid ""
 "type\">%(type)s</span>."
 msgstr "Abstrakt uživatele <strong>%(name)s</strong> byl odeslán a přijat jako příspěvek v tematickém okruhu  %(track)s jako <span class=\"abstract-contribution-type\">%(type)s</span>."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:439
+#: indico/modules/events/abstracts/templates/reviewing/public.html:437
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted as <span class=\"abstract-contribution-type\">%(type)s</span>."
 msgstr "Abstrakt uživatele <strong>%(name)s</strong> byl odeslán a přijat jako <span class=\"abstract-contribution-type\">%(type)s</span>."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:445
+#: indico/modules/events/abstracts/templates/reviewing/public.html:443
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s."
 msgstr "Abstrakt uživatele <strong>%(name)s</strong> byl odeslán a přijat jako příspěvek tematickém okruhu %(track)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:451
+#: indico/modules/events/abstracts/templates/reviewing/public.html:449
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted."
 msgstr "<strong>%(name)s</strong> odeslal tento abstrakt a abstrakt byl přijat."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:465
+#: indico/modules/events/abstracts/templates/reviewing/public.html:463
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was merged into "
 "another."
 msgstr "<strong>%(name)s</strong> odeslal tento abstrakt, ale byl sloučen do jiného."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:471
-#: indico/modules/events/abstracts/templates/reviewing/public.html:482
+#: indico/modules/events/abstracts/templates/reviewing/public.html:469
+#: indico/modules/events/abstracts/templates/reviewing/public.html:480
 #, python-format
 msgid "<a href=\"%(url)s\">Go to abstract</a>"
 msgstr "<a href=\"%(url)s\">Přejít na abstrakt</a>"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:477
+#: indico/modules/events/abstracts/templates/reviewing/public.html:475
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was marked as "
 "duplicate of another."
 msgstr "<strong>%(name)s</strong> odeslal tento abstrakt, ale byl označen za duplikát jiného. "
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:488
+#: indico/modules/events/abstracts/templates/reviewing/public.html:486
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit this abstract"
 msgstr "<strong>%(name)s</strong> byl vyzván odeslat tento abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:524
+#: indico/modules/events/abstracts/templates/reviewing/public.html:522
 msgid "No answer"
 msgstr "Žádná odpověď"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:533
+#: indico/modules/events/abstracts/templates/reviewing/public.html:531
 #, python-format
 msgid "<strong>%(name)s</strong> withdrew this abstract"
 msgstr "<strong>%(name)s</strong> tento abstrakt stáhl"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:538
+#: indico/modules/events/abstracts/templates/reviewing/public.html:536
 #, python-format
 msgid "<strong>%(name)s</strong> accepted this abstract"
 msgstr "<strong>%(name)s</strong> přijmul tento abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:542
+#: indico/modules/events/abstracts/templates/reviewing/public.html:540
 #, python-format
 msgid "<strong>%(name)s</strong> rejected this abstract"
 msgstr "<strong>%(name)s</strong> odmítl tento abstrakt"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:546
+#: indico/modules/events/abstracts/templates/reviewing/public.html:544
 #, python-format
 msgid "<strong>%(name)s</strong> merged this abstract into another"
 msgstr "<strong>%(name)s</strong> sloučil tento abstrakt do jiného"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:550
+#: indico/modules/events/abstracts/templates/reviewing/public.html:548
 #, python-format
 msgid "<strong>%(name)s</strong> marked this abstract as duplicate of another"
 msgstr "<strong>%(name)s</strong> označil tento abstrakt jako duplikát jiného"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:556
+#: indico/modules/events/abstracts/templates/reviewing/public.html:554
 msgid "This abstract was accepted"
 msgstr "Tento abstrakt byl přijat"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:558
+#: indico/modules/events/abstracts/templates/reviewing/public.html:556
 msgid "This abstract was rejected"
 msgstr "Tento abstrakt byl odmítnut"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:560
+#: indico/modules/events/abstracts/templates/reviewing/public.html:558
 msgid "This abstract was merged"
 msgstr "Tento abstrakt byl sloučen"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:562
+#: indico/modules/events/abstracts/templates/reviewing/public.html:560
 msgid "This abstract was marked as duplicate"
 msgstr "Tento abstrakt byl označen jako duplikát"
 
@@ -9792,10 +9792,9 @@ msgstr "Nastavení přístupu bylo aktualizováno"
 #: indico/modules/events/management/templates/_action_menu.html:2
 #, python-format
 msgid ""
-"Changing the event type to <strong>%(type)s</strong> will change the look of"
-" the event page and may disable some features not available for the new "
-"event type."
-msgstr "Změna typu události na <strong>%(type)s</strong> změní vzhled stránky události a může vypnout části nedostupné pro nový typ události."
+"Changing the event type to %(type)s will change the look of the event page "
+"and may disable some features not available for the new event type."
+msgstr ""
 
 #: indico/modules/events/management/templates/_action_menu.html:11
 msgid "Change type"
@@ -15357,10 +15356,10 @@ msgstr "Vytvořit offline kopii"
 
 #: indico/modules/events/static/templates/static_sites.html:14
 msgid ""
-"Are you sure you want to build an offline copy of this event?<br>Beware that"
-" it is a heavy operation, especially for large events, and it might take "
-"some time to finish."
-msgstr "Opravdu chcete vytvořit offline kopii této události? <br>Zejména pro velké události je to náročná operace, která zabere nějaký čas."
+"Are you sure you want to build an offline copy of this event? Beware that it"
+" is a heavy operation, especially for large events, and it might take some "
+"time to finish."
+msgstr ""
 
 #: indico/modules/events/static/templates/static_sites.html:15
 msgid "Build offline copy"
@@ -15928,13 +15927,13 @@ msgstr "Anonymní"
 msgid "Are you sure you want to remove this submission?"
 msgstr "Opravdu chcete odebrat tento příspěvek?"
 
-#: indico/modules/events/surveys/templates/management/survey.html:198
+#: indico/modules/events/surveys/templates/management/survey.html:197
 msgid ""
 "Note: Authenticated users will not be able to submit an anonymous survey "
 "again even if you delete their submission."
 msgstr ""
 
-#: indico/modules/events/surveys/templates/management/survey.html:205
+#: indico/modules/events/surveys/templates/management/survey.html:207
 msgid "Remove submission"
 msgstr "Smazat příspěvek"
 
@@ -17874,8 +17873,8 @@ msgstr "Naposledy použito:"
 #: indico/modules/oauth/templates/user_apps.html:39
 #, python-format
 msgid ""
-"%(app_name)s will no longer have access to your Indico data.<br> Are you "
-"sure you want to revoke its access?"
+"%(app_name)s will no longer have access to your Indico data. Are you sure "
+"you want to revoke its access?"
 msgstr ""
 
 #: indico/modules/oauth/templates/user_apps.html:41
@@ -17941,7 +17940,7 @@ msgid ""
 "access the Indico API. You cannot undo this action."
 msgstr ""
 
-#: indico/modules/oauth/templates/user_tokens.html:114
+#: indico/modules/oauth/templates/user_tokens.html:112
 msgid ""
 "Warning: You will not be able to create a new API token since only Indico "
 "admins can create API tokens."
@@ -19047,9 +19046,9 @@ msgstr "Nastavit jako hlavní"
 
 #: indico/modules/users/templates/personal_data.html:17
 msgid ""
-"This user will no longer have access to Indico.<br> Are you sure you want to"
-" revoke their access?"
-msgstr "Uživatel ztratí přístup do Indica. <br>Opravdu mu chcete odebrat přístup?"
+"This user will no longer have access to Indico. Are you sure you want to "
+"revoke their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:21
 msgid "Block User"
@@ -19057,9 +19056,9 @@ msgstr "Zablokovat uživatele"
 
 #: indico/modules/users/templates/personal_data.html:28
 msgid ""
-"This user will regain access to Indico.<br> Are you sure you want to restore"
-" their access?"
-msgstr "Uživatel znovu získá přístup do Indica. <br>Opravdu to chcete?"
+"This user will regain access to Indico. Are you sure you want to restore "
+"their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:31
 msgid "Unblock User"

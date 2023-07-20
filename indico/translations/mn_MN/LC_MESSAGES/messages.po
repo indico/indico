@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2023-07-20 15:21+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>, 2021\n"
 "Language-Team: Mongolian (Mongolia) (http://app.transifex.com/indico/indico/language/mn_MN/)\n"
@@ -726,16 +726,16 @@ msgid "Board:"
 msgstr ""
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:130
-#: indico/modules/events/abstracts/templates/reviewing/public.html:129
-#: indico/modules/events/abstracts/templates/reviewing/public.html:307
+#: indico/modules/events/abstracts/templates/reviewing/public.html:127
+#: indico/modules/events/abstracts/templates/reviewing/public.html:305
 msgid "Author:"
 msgid_plural "Authors:"
 msgstr[0] "Зохиолч нар"
 msgstr[1] "Зохиогч нар"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:143
-#: indico/modules/events/abstracts/templates/reviewing/public.html:142
-#: indico/modules/events/abstracts/templates/reviewing/public.html:332
+#: indico/modules/events/abstracts/templates/reviewing/public.html:140
+#: indico/modules/events/abstracts/templates/reviewing/public.html:330
 msgid "Co-author:"
 msgid_plural "Co-authors:"
 msgstr[0] "Хамтран зохиолч нар"
@@ -1520,9 +1520,9 @@ msgstr "Устгах"
 #: indico/modules/attachments/templates/_attachments.html:56
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the attachment permanently."
-msgstr "Та &quot;%(name)sба квотыг устгахыг хүсэж байгаадаа итгэлтэй байна уу?<br>Энэ нь хавсралтыг үүрд устгах болно."
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"attachment permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:73
 msgid ""
@@ -1550,9 +1550,9 @@ msgstr ""
 #: indico/modules/attachments/templates/_attachments.html:96
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the folder and its contents permanently."
-msgstr "Та &quot;%(name)sба квотыг устгахыг хүсэж байгаадаа итгэлтэй байна уу?<br>Энэ нь хавтас болон түүний агуулгыг үүрд устгах болно."
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"folder and its contents permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:126
 msgid "empty folder"
@@ -3238,30 +3238,30 @@ msgstr "Энэ ангилалд үйл явдлууд байхгүй байна.
 
 #: indico/modules/categories/templates/management/base.html:5
 #, python-format
-msgid "Do you really want to delete the category \"%(category)s\"?"
-msgstr "Та ангилал \"%(category)s\"-г устгахыг үнэхээр хүсэж байна уу?"
+msgid "Do you really want to delete the category &quot;%(category)s&quot;?"
+msgstr ""
 
-#: indico/modules/categories/templates/management/base.html:9
-#: indico/modules/categories/templates/management/base.html:20
+#: indico/modules/categories/templates/management/base.html:11
+#: indico/modules/categories/templates/management/base.html:22
 #: indico/modules/categories/templates/management/delete_categories.html:3
 msgid "Delete category"
 msgid_plural "Delete categories"
 msgstr[0] "Ангилалуудыг устгах"
 msgstr[1] "Ангилалуудыг устгах"
 
-#: indico/modules/categories/templates/management/base.html:14
+#: indico/modules/categories/templates/management/base.html:16
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Энэ ангилал нь хоосон биш учир устгах боломжгүй."
 
-#: indico/modules/categories/templates/management/base.html:27
+#: indico/modules/categories/templates/management/base.html:29
 msgid "Move to another category"
 msgstr "Өөр ангилалд шилжих"
 
-#: indico/modules/categories/templates/management/base.html:61
+#: indico/modules/categories/templates/management/base.html:63
 msgid "See the display page of the category"
 msgstr "Ангилал харуулах хуудсыг үзэх"
 
-#: indico/modules/categories/templates/management/base.html:62
+#: indico/modules/categories/templates/management/base.html:64
 #: indico/modules/events/management/templates/base.html:27
 msgid "Switch to display view"
 msgstr "Дэлгэцний харагдац руу шилжих"
@@ -5015,8 +5015,8 @@ msgstr "Одоогийн хураангуйн зохиогчид болон ил
 #: indico/modules/events/abstracts/forms.py:235
 #: indico/modules/events/abstracts/forms.py:296
 #: indico/modules/events/abstracts/forms.py:671
-#: indico/modules/events/abstracts/templates/reviewing/public.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:391
+#: indico/modules/events/abstracts/templates/reviewing/public.html:271
+#: indico/modules/events/abstracts/templates/reviewing/public.html:389
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75
 #: indico/modules/events/papers/forms.py:74
@@ -6170,7 +6170,7 @@ msgid "You have reviewed this abstract"
 msgstr "Та энэ хураангуйг хянасан байна"
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:459
+#: indico/modules/events/abstracts/templates/reviewing/public.html:457
 msgid "Go to contribution"
 msgstr "Өгүүлэл рүү очих"
 
@@ -6715,26 +6715,26 @@ msgstr "<strong>Загвар:</strong><span class=\"template\">%(name)s</span>"
 msgid "Do you really want to withdraw this abstract?"
 msgstr "Та энэ хураангуйг буцаан татахыг үнэхээр хүсэж байна уу?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:23
+#: indico/modules/events/abstracts/templates/reviewing/public.html:22
 msgid ""
 "Withdrawing this abstract will permanently delete its corresponding "
 "contribution."
 msgstr "Энэ хураангуйг буцаан татснаар үүнд хамаарах өгүүлэл бүрэн мөсөн устгагдана"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:28
+#: indico/modules/events/abstracts/templates/reviewing/public.html:26
 msgid "This operation is irreversible."
 msgstr "Энэ үйлдлийг буцаах боломжгүй."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:32
+#: indico/modules/events/abstracts/templates/reviewing/public.html:30
 msgid "Withdraw abstract"
 msgstr "Хураангуйг буцаан татах"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:33
+#: indico/modules/events/abstracts/templates/reviewing/public.html:31
 msgid "Withdraw Abstract"
 msgstr "Хураангуйг буцаан татах"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:39
-#: indico/modules/events/abstracts/templates/reviewing/public.html:50
+#: indico/modules/events/abstracts/templates/reviewing/public.html:37
+#: indico/modules/events/abstracts/templates/reviewing/public.html:48
 #: indico/modules/events/management/templates/settings.html:26
 #: indico/modules/events/registration/templates/display/registration_summary.html:72
 #: indico/modules/events/registration/templates/display/registration_summary.html:74
@@ -6744,84 +6744,84 @@ msgstr "Хураангуйг буцаан татах"
 msgid "Withdraw"
 msgstr "Буцаан татах"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:43
+#: indico/modules/events/abstracts/templates/reviewing/public.html:41
 msgid ""
 "You cannot withdraw this abstract as it has already been accepted. Please "
 "contact the event organizers if you want to withdraw the abstract anyway."
 msgstr "Энэ хураангуйг аль хэдийн хүлээн зөвшөөрсөн тул үүнийг та буцаан татах боломжгүй. Ямар ч байсан энэ хураангуйг буцаан татахыг хүсэж байгаа бол үйл явдал зохион байгуулагч нартай холбогдоно уу."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:54
+#: indico/modules/events/abstracts/templates/reviewing/public.html:52
 msgid "This abstract has been withdrawn but can be restored."
 msgstr "Энэ хураангуйг буцаан татсан боловч сэргээж болно."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:55
+#: indico/modules/events/abstracts/templates/reviewing/public.html:53
 msgid "Restore Abstract"
 msgstr "Хураангуйг Сэргээх"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:56
+#: indico/modules/events/abstracts/templates/reviewing/public.html:54
 msgid "Do you really want to restore this abstract?"
 msgstr "Та үнэхээр энэ хураангуйг сэргээхийг хүсэж байна уу?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:61
+#: indico/modules/events/abstracts/templates/reviewing/public.html:59
 msgid "Restore"
 msgstr "Сэргээх"
 
+#: indico/modules/events/abstracts/templates/reviewing/public.html:68
 #: indico/modules/events/abstracts/templates/reviewing/public.html:70
-#: indico/modules/events/abstracts/templates/reviewing/public.html:72
 msgid "Edit abstract"
 msgstr "Хураангуйг Засварлах"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:78
+#: indico/modules/events/abstracts/templates/reviewing/public.html:76
 msgid "The abstract cannot be edited because it was withdrawn"
 msgstr "Хураангуйг буцаан татсан байсан учир засварлах боломжгүй"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:82
+#: indico/modules/events/abstracts/templates/reviewing/public.html:80
 msgid "The abstract cannot be edited because it is already under review"
 msgstr "Хураангуйг аль хэдийн хянаж эхлэсэн учир засварлах боломжгүй"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:86
+#: indico/modules/events/abstracts/templates/reviewing/public.html:84
 msgid "The abstract cannot be edited because it has already been processed"
 msgstr "Хураангуйг аль хэдийн боловсруулж эхлэсэн учир засварлах боломжгүй"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:90
+#: indico/modules/events/abstracts/templates/reviewing/public.html:88
 msgid ""
 "The abstract cannot be edited because the modification deadline has passed"
 msgstr "Хураангуйн нэмэлт өөрчлөлт оруулах эцсийн хугацаа өнгөрсөн тул засварлах боломжгүй"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:94
+#: indico/modules/events/abstracts/templates/reviewing/public.html:92
 msgid "You are not authorized to edit this abstract"
 msgstr "Та энэ хураангуйг засварлах эрхгүй байна"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:108
+#: indico/modules/events/abstracts/templates/reviewing/public.html:106
 msgid "PDF with reviews"
 msgstr "Хянасан PDF"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:117
+#: indico/modules/events/abstracts/templates/reviewing/public.html:115
 msgid "Download abstract submission in PDF"
 msgstr "Илгээсэн хураангуйг PDF-ээр татах"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:168
+#: indico/modules/events/abstracts/templates/reviewing/public.html:166
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit an abstract"
 msgstr "Тоймыг хүргүүлэхээр <strong>%(name)s</strong>-г урив"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:172
-#: indico/modules/events/abstracts/templates/reviewing/public.html:413
+#: indico/modules/events/abstracts/templates/reviewing/public.html:170
+#: indico/modules/events/abstracts/templates/reviewing/public.html:411
 #, python-format
 msgid "<strong>%(name)s</strong> submitted this abstract"
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг хүргүүлэв"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:211
-#: indico/modules/events/abstracts/templates/reviewing/public.html:216
+#: indico/modules/events/abstracts/templates/reviewing/public.html:209
+#: indico/modules/events/abstracts/templates/reviewing/public.html:214
 msgid "Reset judgment"
 msgstr "Шүүлтийн шийдвэрийг дахин тогтоох"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:217
+#: indico/modules/events/abstracts/templates/reviewing/public.html:215
 msgid ""
 "Do you really want to reset the judgment? This operation is irreversible."
 msgstr "Та шүүлтийн шийдвэрийг үнэхээр дахин тогтоомоор байна уу? Энэ үйлдлийг буцаах боломжгүй."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:233
+#: indico/modules/events/abstracts/templates/reviewing/public.html:231
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6829,7 +6829,7 @@ msgid ""
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "Мөр %(track)s дээр <span class=\"abstract-contribution-type\">%(type)s</span>хэлбэрээр тоймыг хүлээн зөвшөөрсөн ба %(link_start)s хувь нэмэр%(link_end)s-г үйл явдал дотор үүсгэв."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:240
+#: indico/modules/events/abstracts/templates/reviewing/public.html:238
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6837,65 +6837,65 @@ msgid ""
 "created in the event."
 msgstr "Тоймыг <span class=\"abstract-contribution-type\">%(type)s</span>гэж хүлээн зөвшөөрсөн ба %(link_start)sхувь нэмэр%(link_end)s-ийг үйл явдал дээр үүсгэсэн."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:246
+#: indico/modules/events/abstracts/templates/reviewing/public.html:244
 #, python-format
 msgid ""
 "The abstract was accepted for track %(track)s and a "
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "Мөр %(track)s дээр тоймыг хүлээн зөвшөөрсөн ба %(link_start)s хувь нэмэр%(link_end)s-г үйл явдал дотор үүсгэв."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:252
+#: indico/modules/events/abstracts/templates/reviewing/public.html:250
 #, python-format
 msgid ""
 "The abstract was accepted and a %(link_start)scontribution%(link_end)s was "
 "created in the event."
 msgstr "Тоймыг хүлээн зөвшөөрсөн ба %(link_start)s хувь нэмэр%(link_end)s-г үйл явдал дотор үүсгэв."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:257
+#: indico/modules/events/abstracts/templates/reviewing/public.html:255
 msgid "The abstract was rejected."
 msgstr "Хураангуйгаас татгалзсан."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:261
+#: indico/modules/events/abstracts/templates/reviewing/public.html:259
 #, python-format
 msgid "The abstract was merged into %(link_start)s%(other)s%(link_end)s."
 msgstr "Тоймыг %(link_start)s %(other)s%(link_end)s руу нэгтгэв."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:267
+#: indico/modules/events/abstracts/templates/reviewing/public.html:265
 #, python-format
 msgid ""
 "The abstract was marked as a duplicate of "
 "%(link_start)s%(other)s%(link_end)s"
 msgstr "Тоймыг %(link_start)s %(other)s%(link_end)s-н хувь болгож тэмдэглэв."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:287
+#: indico/modules/events/abstracts/templates/reviewing/public.html:285
 msgid "As contribution type:"
 msgstr "Өгүүллийн төрлөөр"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:295
-#: indico/modules/events/abstracts/templates/reviewing/public.html:420
+#: indico/modules/events/abstracts/templates/reviewing/public.html:293
+#: indico/modules/events/abstracts/templates/reviewing/public.html:418
 msgid "For track:"
 msgid_plural "For tracks:"
 msgstr[0] "Мөрүүдэд зориулсан"
 msgstr[1] "Мөрүүдэд зориулсан"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:357
+#: indico/modules/events/abstracts/templates/reviewing/public.html:355
 msgid "Speaker:"
 msgid_plural "Speakers:"
 msgstr[0] "Илтгэгчүүд"
 msgstr[1] "Илтгэгч нар"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:381
+#: indico/modules/events/abstracts/templates/reviewing/public.html:379
 msgid "More information"
 msgstr "Илүү мэдээлэл"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:409
+#: indico/modules/events/abstracts/templates/reviewing/public.html:407
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this <span class=\"abstract-"
 "contribution-type\">%(type)s</span>"
 msgstr "<strong>%(name)s</strong> нь энэхүү <span class=\"abstract-contribution-type\">%(type)s</span>-г хүргүүлэв"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:431
+#: indico/modules/events/abstracts/templates/reviewing/public.html:429
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
@@ -6903,94 +6903,94 @@ msgid ""
 "type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг хүргүүлсэн ба үүнийг мөр %(track)sдээр <span class=\"abstract-contribution-type\">%(type)s</span>болгож хүлээн авав."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:439
+#: indico/modules/events/abstracts/templates/reviewing/public.html:437
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted as <span class=\"abstract-contribution-type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг хүргүүлсэн ба үүнийг эцэст нь <span class=\"abstract-contribution-type\">%(type)s</span>болгож хүлээн авав."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:445
+#: indico/modules/events/abstracts/templates/reviewing/public.html:443
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s."
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг хүргүүлсэн ба үүнийг мөр %(track)sболгож хүлээн авав."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:451
+#: indico/modules/events/abstracts/templates/reviewing/public.html:449
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted."
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг хүргүүлсэн ба үүнийг эцэст нь хүлээн авав."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:465
+#: indico/modules/events/abstracts/templates/reviewing/public.html:463
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was merged into "
 "another."
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг хүргүүлсэн ба үүнийг өөр зүйл рүү нэгтгэв."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:471
-#: indico/modules/events/abstracts/templates/reviewing/public.html:482
+#: indico/modules/events/abstracts/templates/reviewing/public.html:469
+#: indico/modules/events/abstracts/templates/reviewing/public.html:480
 #, python-format
 msgid "<a href=\"%(url)s\">Go to abstract</a>"
 msgstr "<a href=\"%(url)s\">Тойм руу очих</a>"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:477
+#: indico/modules/events/abstracts/templates/reviewing/public.html:475
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was marked as "
 "duplicate of another."
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг хүргүүлсэн ба үүнийг өөр зүйлийн хуулбар гэж тэмдэглэв."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:488
+#: indico/modules/events/abstracts/templates/reviewing/public.html:486
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit this abstract"
 msgstr "Энэхүү тоймыг хүргүүлэхээр <strong>%(name)s</strong>-г урив"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:524
+#: indico/modules/events/abstracts/templates/reviewing/public.html:522
 msgid "No answer"
 msgstr "Хариулт байхгүй"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:533
+#: indico/modules/events/abstracts/templates/reviewing/public.html:531
 #, python-format
 msgid "<strong>%(name)s</strong> withdrew this abstract"
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг татаж авав"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:538
+#: indico/modules/events/abstracts/templates/reviewing/public.html:536
 #, python-format
 msgid "<strong>%(name)s</strong> accepted this abstract"
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймыг хүлээж авав"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:542
+#: indico/modules/events/abstracts/templates/reviewing/public.html:540
 #, python-format
 msgid "<strong>%(name)s</strong> rejected this abstract"
 msgstr "<strong>%(name)s</strong> нь энэхүү тоймоос татгалзав"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:546
+#: indico/modules/events/abstracts/templates/reviewing/public.html:544
 #, python-format
 msgid "<strong>%(name)s</strong> merged this abstract into another"
 msgstr "<strong>%(name)s</strong>нь энэхүү тоймыг өөр нэг рүү нэгтгэв"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:550
+#: indico/modules/events/abstracts/templates/reviewing/public.html:548
 #, python-format
 msgid "<strong>%(name)s</strong> marked this abstract as duplicate of another"
 msgstr "<strong>%(name)s</strong>нь энэхүү тоймыг өөр нэгийн хуулбар гэж тэмдэглэв"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:556
+#: indico/modules/events/abstracts/templates/reviewing/public.html:554
 msgid "This abstract was accepted"
 msgstr "Энэ хураангуйг хүлээн зөвшөөрсөн."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:558
+#: indico/modules/events/abstracts/templates/reviewing/public.html:556
 msgid "This abstract was rejected"
 msgstr "Энэ хураангуйгаас татгалзсан."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:560
+#: indico/modules/events/abstracts/templates/reviewing/public.html:558
 msgid "This abstract was merged"
 msgstr "Энэ хураангуйг нэгтгэсэн"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:562
+#: indico/modules/events/abstracts/templates/reviewing/public.html:560
 msgid "This abstract was marked as duplicate"
 msgstr "Энэ хураангуйг давхардсан гэж тэмдэглэсэн"
 
@@ -9680,10 +9680,9 @@ msgstr "Хамгаалалтын тохиргоонууд шинэчлэгдлэ
 #: indico/modules/events/management/templates/_action_menu.html:2
 #, python-format
 msgid ""
-"Changing the event type to <strong>%(type)s</strong> will change the look of"
-" the event page and may disable some features not available for the new "
-"event type."
-msgstr "Үйл явдлын төрлийг <strong>%(type)s</strong>руу өөрчлөх нь үйл явдлын хуудасны харагдацыг өөрчилж үйл явдлын шинэ төрөлд ашиглаж болох зарим шинж чанарыг идэвхгүй болгож болно."
+"Changing the event type to %(type)s will change the look of the event page "
+"and may disable some features not available for the new event type."
+msgstr ""
 
 #: indico/modules/events/management/templates/_action_menu.html:11
 msgid "Change type"
@@ -15195,10 +15194,10 @@ msgstr "Оффлайн хуулбар үүсгэх"
 
 #: indico/modules/events/static/templates/static_sites.html:14
 msgid ""
-"Are you sure you want to build an offline copy of this event?<br>Beware that"
-" it is a heavy operation, especially for large events, and it might take "
-"some time to finish."
-msgstr "Та энэхүү үйл явдлын оффлайн хуулбар үүсгэхийг хүсэж байгаадаа итгэлтэй байна уу?<br>Энэ нь томоохон үйл ажиллагаа гэдгийг анхаарна уу. Ялангуяа томоохон үйл явдлууд дээр бөгөөд дуусгахын тулд хэсэг хугацаа зарцуулж болно."
+"Are you sure you want to build an offline copy of this event? Beware that it"
+" is a heavy operation, especially for large events, and it might take some "
+"time to finish."
+msgstr ""
 
 #: indico/modules/events/static/templates/static_sites.html:15
 msgid "Build offline copy"
@@ -15760,13 +15759,13 @@ msgstr "Нэр тодорхойгүй"
 msgid "Are you sure you want to remove this submission?"
 msgstr "Та энэхүү хүргэлтийг устгахыг хүсэж байгаадаа итгэлтэй байна уу?"
 
-#: indico/modules/events/surveys/templates/management/survey.html:198
+#: indico/modules/events/surveys/templates/management/survey.html:197
 msgid ""
 "Note: Authenticated users will not be able to submit an anonymous survey "
 "again even if you delete their submission."
 msgstr ""
 
-#: indico/modules/events/surveys/templates/management/survey.html:205
+#: indico/modules/events/surveys/templates/management/survey.html:207
 msgid "Remove submission"
 msgstr ""
 
@@ -17694,9 +17693,9 @@ msgstr "Сүүлд ашигласан:"
 #: indico/modules/oauth/templates/user_apps.html:39
 #, python-format
 msgid ""
-"%(app_name)s will no longer have access to your Indico data.<br> Are you "
-"sure you want to revoke its access?"
-msgstr "%(app_name)sнь таны Indico мэдээлэлд нэвтрэх эрхгүй боллоо.<br> Та хандалтыг буцаахыг хүсэж байгаадаа итгэлтэй байна уу?"
+"%(app_name)s will no longer have access to your Indico data. Are you sure "
+"you want to revoke its access?"
+msgstr ""
 
 #: indico/modules/oauth/templates/user_apps.html:41
 msgid "Revoke"
@@ -17761,7 +17760,7 @@ msgid ""
 "access the Indico API. You cannot undo this action."
 msgstr ""
 
-#: indico/modules/oauth/templates/user_tokens.html:114
+#: indico/modules/oauth/templates/user_tokens.html:112
 msgid ""
 "Warning: You will not be able to create a new API token since only Indico "
 "admins can create API tokens."
@@ -18867,9 +18866,9 @@ msgstr "Үндсэн болгож тохируулах"
 
 #: indico/modules/users/templates/personal_data.html:17
 msgid ""
-"This user will no longer have access to Indico.<br> Are you sure you want to"
-" revoke their access?"
-msgstr "Энэхүү хэрэглэгч Indico руу дахин нэвтрэх боломжгүй боллоо. <br>Та тэдгээрийн хандалтыг хасахдаа итгэлтэй байна уу?"
+"This user will no longer have access to Indico. Are you sure you want to "
+"revoke their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:21
 msgid "Block User"
@@ -18877,9 +18876,9 @@ msgstr "Хэрэглэгчийг хаах"
 
 #: indico/modules/users/templates/personal_data.html:28
 msgid ""
-"This user will regain access to Indico.<br> Are you sure you want to restore"
-" their access?"
-msgstr "Энэхүү хэрэглэгч Indico руу нэвтрэх хандалтаа дахин авлаа. <br>Та тэдгээрийн хандалтыг сэргээхдээ итгэлтэй байна уу?"
+"This user will regain access to Indico. Are you sure you want to restore "
+"their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:31
 msgid "Unblock User"

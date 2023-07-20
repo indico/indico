@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2023-07-20 15:21+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021-2022\n"
 "Language-Team: Turkish (Turkey) (http://app.transifex.com/indico/indico/language/tr_TR/)\n"
@@ -727,16 +727,16 @@ msgid "Board:"
 msgstr ""
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:130
-#: indico/modules/events/abstracts/templates/reviewing/public.html:129
-#: indico/modules/events/abstracts/templates/reviewing/public.html:307
+#: indico/modules/events/abstracts/templates/reviewing/public.html:127
+#: indico/modules/events/abstracts/templates/reviewing/public.html:305
 msgid "Author:"
 msgid_plural "Authors:"
 msgstr[0] "Ortak yazarlar:"
 msgstr[1] "Yazarlar:"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:143
-#: indico/modules/events/abstracts/templates/reviewing/public.html:142
-#: indico/modules/events/abstracts/templates/reviewing/public.html:332
+#: indico/modules/events/abstracts/templates/reviewing/public.html:140
+#: indico/modules/events/abstracts/templates/reviewing/public.html:330
 msgid "Co-author:"
 msgid_plural "Co-authors:"
 msgstr[0] "Ortak yazarlar:"
@@ -1521,9 +1521,9 @@ msgstr "Kaldır"
 #: indico/modules/attachments/templates/_attachments.html:56
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the attachment permanently."
-msgstr "Kaldırmak istediğinizden emin misiniz &quot;%(name)s&quot;?<br> Bu işlem eki kalıcı olarak kaldıracaktır."
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"attachment permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:73
 msgid ""
@@ -1551,9 +1551,9 @@ msgstr ""
 #: indico/modules/attachments/templates/_attachments.html:96
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the folder and its contents permanently."
-msgstr "%(name)s'i kaldırmak istediğinizden emin misiniz? <br>Dizin ve içindekilerini kalıcı olarak silecektir."
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"folder and its contents permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:126
 msgid "empty folder"
@@ -3239,30 +3239,30 @@ msgstr "Bu kategoride etkinlik bulunmamaktadır"
 
 #: indico/modules/categories/templates/management/base.html:5
 #, python-format
-msgid "Do you really want to delete the category \"%(category)s\"?"
-msgstr "\"%(category)s\" kategorisini silmek istediğinizden emin misiniz?"
+msgid "Do you really want to delete the category &quot;%(category)s&quot;?"
+msgstr ""
 
-#: indico/modules/categories/templates/management/base.html:9
-#: indico/modules/categories/templates/management/base.html:20
+#: indico/modules/categories/templates/management/base.html:11
+#: indico/modules/categories/templates/management/base.html:22
 #: indico/modules/categories/templates/management/delete_categories.html:3
 msgid "Delete category"
 msgid_plural "Delete categories"
 msgstr[0] "Kategorileri sil"
 msgstr[1] "Kategorileri sil"
 
-#: indico/modules/categories/templates/management/base.html:14
+#: indico/modules/categories/templates/management/base.html:16
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Kategori boş olmadığı için silinememektedir."
 
-#: indico/modules/categories/templates/management/base.html:27
+#: indico/modules/categories/templates/management/base.html:29
 msgid "Move to another category"
 msgstr "Başka bir kategoriye taşı"
 
-#: indico/modules/categories/templates/management/base.html:61
+#: indico/modules/categories/templates/management/base.html:63
 msgid "See the display page of the category"
 msgstr "Kategorinin görüntüleme sayfasını gör"
 
-#: indico/modules/categories/templates/management/base.html:62
+#: indico/modules/categories/templates/management/base.html:64
 #: indico/modules/events/management/templates/base.html:27
 msgid "Switch to display view"
 msgstr "Görüntüleme görünümüne geç"
@@ -5016,8 +5016,8 @@ msgstr "Mevcut özetin yazar ve konuşmacıları, seçilen özete eklenecek"
 #: indico/modules/events/abstracts/forms.py:235
 #: indico/modules/events/abstracts/forms.py:296
 #: indico/modules/events/abstracts/forms.py:671
-#: indico/modules/events/abstracts/templates/reviewing/public.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:391
+#: indico/modules/events/abstracts/templates/reviewing/public.html:271
+#: indico/modules/events/abstracts/templates/reviewing/public.html:389
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75
 #: indico/modules/events/papers/forms.py:74
@@ -6171,7 +6171,7 @@ msgid "You have reviewed this abstract"
 msgstr "Bu özeti gözden geçirdiniz"
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:459
+#: indico/modules/events/abstracts/templates/reviewing/public.html:457
 msgid "Go to contribution"
 msgstr "Katkıya git"
 
@@ -6716,26 +6716,26 @@ msgstr "<strong>Şablon:</strong> <span class=\"template\">%(name)s</span>"
 msgid "Do you really want to withdraw this abstract?"
 msgstr "Gerçekten bu özeti geri çekmek istiyor musunuz?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:23
+#: indico/modules/events/abstracts/templates/reviewing/public.html:22
 msgid ""
 "Withdrawing this abstract will permanently delete its corresponding "
 "contribution."
 msgstr "Bu özeti geri çekmek, ona karşılık gelen katkının kalıcı olarak silinmesine neden olacaktır."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:28
+#: indico/modules/events/abstracts/templates/reviewing/public.html:26
 msgid "This operation is irreversible."
 msgstr "Bu işlem geri alınamaz."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:32
+#: indico/modules/events/abstracts/templates/reviewing/public.html:30
 msgid "Withdraw abstract"
 msgstr "Özeti geri çek"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:33
+#: indico/modules/events/abstracts/templates/reviewing/public.html:31
 msgid "Withdraw Abstract"
 msgstr "Özeti Geri Çek"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:39
-#: indico/modules/events/abstracts/templates/reviewing/public.html:50
+#: indico/modules/events/abstracts/templates/reviewing/public.html:37
+#: indico/modules/events/abstracts/templates/reviewing/public.html:48
 #: indico/modules/events/management/templates/settings.html:26
 #: indico/modules/events/registration/templates/display/registration_summary.html:72
 #: indico/modules/events/registration/templates/display/registration_summary.html:74
@@ -6745,84 +6745,84 @@ msgstr "Özeti Geri Çek"
 msgid "Withdraw"
 msgstr "Geri çek"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:43
+#: indico/modules/events/abstracts/templates/reviewing/public.html:41
 msgid ""
 "You cannot withdraw this abstract as it has already been accepted. Please "
 "contact the event organizers if you want to withdraw the abstract anyway."
 msgstr "Önceden kabul edildiği için bu özeti geri çekemezsiniz. Yine de bu özeti geri çekmek istiyorsanız etkinlik yöneticileri ile iletişime geçiniz."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:54
+#: indico/modules/events/abstracts/templates/reviewing/public.html:52
 msgid "This abstract has been withdrawn but can be restored."
 msgstr "Bu özet geri çekildi ancak geri yüklenebilir."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:55
+#: indico/modules/events/abstracts/templates/reviewing/public.html:53
 msgid "Restore Abstract"
 msgstr "Özeti Geri Yükle"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:56
+#: indico/modules/events/abstracts/templates/reviewing/public.html:54
 msgid "Do you really want to restore this abstract?"
 msgstr "Gerçekten bu özeti geri yüklemek istiyor musunuz?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:61
+#: indico/modules/events/abstracts/templates/reviewing/public.html:59
 msgid "Restore"
 msgstr "Geri getir"
 
+#: indico/modules/events/abstracts/templates/reviewing/public.html:68
 #: indico/modules/events/abstracts/templates/reviewing/public.html:70
-#: indico/modules/events/abstracts/templates/reviewing/public.html:72
 msgid "Edit abstract"
 msgstr "Özeti düzenle"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:78
+#: indico/modules/events/abstracts/templates/reviewing/public.html:76
 msgid "The abstract cannot be edited because it was withdrawn"
 msgstr "Bu özet geri çekildiği için düzenlenemez"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:82
+#: indico/modules/events/abstracts/templates/reviewing/public.html:80
 msgid "The abstract cannot be edited because it is already under review"
 msgstr "Bu özet gözden geçirme sürecinde olduğu için düzenlenemez"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:86
+#: indico/modules/events/abstracts/templates/reviewing/public.html:84
 msgid "The abstract cannot be edited because it has already been processed"
 msgstr "Bu özet önceden işlendiği için düzenlenemez"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:90
+#: indico/modules/events/abstracts/templates/reviewing/public.html:88
 msgid ""
 "The abstract cannot be edited because the modification deadline has passed"
 msgstr "Bu özet değişiklik yapma son tarihi geçtiği için düzenlenemez"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:94
+#: indico/modules/events/abstracts/templates/reviewing/public.html:92
 msgid "You are not authorized to edit this abstract"
 msgstr "Bu özeti düzenleme yetkiniz yok"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:108
+#: indico/modules/events/abstracts/templates/reviewing/public.html:106
 msgid "PDF with reviews"
 msgstr "Gözden geçirmelerin olduğu PDF"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:117
+#: indico/modules/events/abstracts/templates/reviewing/public.html:115
 msgid "Download abstract submission in PDF"
 msgstr "Özet gönderisini PDF olarak indir"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:168
+#: indico/modules/events/abstracts/templates/reviewing/public.html:166
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit an abstract"
 msgstr "<strong>%(name)s</strong> bir özet göndermesi için davet edilmiştir"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:172
-#: indico/modules/events/abstracts/templates/reviewing/public.html:413
+#: indico/modules/events/abstracts/templates/reviewing/public.html:170
+#: indico/modules/events/abstracts/templates/reviewing/public.html:411
 #, python-format
 msgid "<strong>%(name)s</strong> submitted this abstract"
 msgstr "<strong>%(name)s</strong> bu özeti göndermiştir"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:211
-#: indico/modules/events/abstracts/templates/reviewing/public.html:216
+#: indico/modules/events/abstracts/templates/reviewing/public.html:209
+#: indico/modules/events/abstracts/templates/reviewing/public.html:214
 msgid "Reset judgment"
 msgstr "Kararı sıfırlar"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:217
+#: indico/modules/events/abstracts/templates/reviewing/public.html:215
 msgid ""
 "Do you really want to reset the judgment? This operation is irreversible."
 msgstr "Gerçekten kararı sıfırlamak ister misiniz? Bu işlem geri alınamaz."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:233
+#: indico/modules/events/abstracts/templates/reviewing/public.html:231
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6830,7 +6830,7 @@ msgid ""
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "Özet <span class=\"abstract-contribution-type\">%(type)s</span> grubu için kabul edilmiştir %(track)s ve etkinlikte %(link_start)scontribution%(link_end)s bir katkı oluşturulmuştur."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:240
+#: indico/modules/events/abstracts/templates/reviewing/public.html:238
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6838,65 +6838,65 @@ msgid ""
 "created in the event."
 msgstr "Özet <span class=\"abstract-contribution-type\">%(type)s</span> olarak kabul edilmiştir %(link_start)sve etkinlikte bir katkı%(link_end)s oluşturulmuştur."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:246
+#: indico/modules/events/abstracts/templates/reviewing/public.html:244
 #, python-format
 msgid ""
 "The abstract was accepted for track %(track)s and a "
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "Özet  %(track)s grubu için kabul edilmiştir%(link_start)s ve etkinlikte bir katkı%(link_end)s oluşturulmuştur."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:252
+#: indico/modules/events/abstracts/templates/reviewing/public.html:250
 #, python-format
 msgid ""
 "The abstract was accepted and a %(link_start)scontribution%(link_end)s was "
 "created in the event."
 msgstr "Özet kabul edilmiştir ve %(link_start)s etkinlikte bir katkı %(link_end)s oluşturulmuştur."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:257
+#: indico/modules/events/abstracts/templates/reviewing/public.html:255
 msgid "The abstract was rejected."
 msgstr "Özet reddedilmiştir."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:261
+#: indico/modules/events/abstracts/templates/reviewing/public.html:259
 #, python-format
 msgid "The abstract was merged into %(link_start)s%(other)s%(link_end)s."
 msgstr "Özet %(link_start)s%(other)s%(link_end)s ile birleştirilmiştir."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:267
+#: indico/modules/events/abstracts/templates/reviewing/public.html:265
 #, python-format
 msgid ""
 "The abstract was marked as a duplicate of "
 "%(link_start)s%(other)s%(link_end)s"
 msgstr "Özet %(link_start)s%(other)s%(link_end)s bir kopyası olarak işaretlendi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:287
+#: indico/modules/events/abstracts/templates/reviewing/public.html:285
 msgid "As contribution type:"
 msgstr "Katkı türü olarak:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:295
-#: indico/modules/events/abstracts/templates/reviewing/public.html:420
+#: indico/modules/events/abstracts/templates/reviewing/public.html:293
+#: indico/modules/events/abstracts/templates/reviewing/public.html:418
 msgid "For track:"
 msgid_plural "For tracks:"
 msgstr[0] "Gruplar için:"
 msgstr[1] "Gruplar için:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:357
+#: indico/modules/events/abstracts/templates/reviewing/public.html:355
 msgid "Speaker:"
 msgid_plural "Speakers:"
 msgstr[0] "Konuşmacı Listesi"
 msgstr[1] "Konuşmacılar:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:381
+#: indico/modules/events/abstracts/templates/reviewing/public.html:379
 msgid "More information"
 msgstr "Daha fazla bildi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:409
+#: indico/modules/events/abstracts/templates/reviewing/public.html:407
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this <span class=\"abstract-"
 "contribution-type\">%(type)s</span>"
 msgstr "<strong>%(name)s</strong> bu <span class=\"abstract-contribution-type\">%(type)s</span> özet türünü gönderdi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:431
+#: indico/modules/events/abstracts/templates/reviewing/public.html:429
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
@@ -6904,94 +6904,94 @@ msgid ""
 "type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> bu özeti gönderdi ve özet en sonunda %(track)s grubu için<span class=\"abstract-contribution-type\">%(type)s</span> olarak kabul edildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:439
+#: indico/modules/events/abstracts/templates/reviewing/public.html:437
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted as <span class=\"abstract-contribution-type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> bu özeti gönderdi ve özet en sonunda <span class=\"abstract-contribution-type\">%(type)s</span> türü olarak kabul edildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:445
+#: indico/modules/events/abstracts/templates/reviewing/public.html:443
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s."
 msgstr "<strong>%(name)s</strong>bu özeti gönderdi ve özet en sonunda %(track)s grubu için kabul edildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:451
+#: indico/modules/events/abstracts/templates/reviewing/public.html:449
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted."
 msgstr "<strong>%(name)s</strong> bu özeti gönderdi ve özet en sonunda kabul edildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:465
+#: indico/modules/events/abstracts/templates/reviewing/public.html:463
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was merged into "
 "another."
 msgstr "<strong>%(name)s</strong>  bu özeti gönderdi ancak özet başka bir özetle birleştirildi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:471
-#: indico/modules/events/abstracts/templates/reviewing/public.html:482
+#: indico/modules/events/abstracts/templates/reviewing/public.html:469
+#: indico/modules/events/abstracts/templates/reviewing/public.html:480
 #, python-format
 msgid "<a href=\"%(url)s\">Go to abstract</a>"
 msgstr "<a href=\"%(url)s\">Özete git</a>"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:477
+#: indico/modules/events/abstracts/templates/reviewing/public.html:475
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was marked as "
 "duplicate of another."
 msgstr "<strong>%(name)s</strong>  bu özeti gönderdi ancak özet başka bir özetin kopyası olarak işaretlendi."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:488
+#: indico/modules/events/abstracts/templates/reviewing/public.html:486
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit this abstract"
 msgstr "<strong>%(name)s</strong>bu özeti göndermesi için davet edildi "
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:524
+#: indico/modules/events/abstracts/templates/reviewing/public.html:522
 msgid "No answer"
 msgstr "Cevap yok"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:533
+#: indico/modules/events/abstracts/templates/reviewing/public.html:531
 #, python-format
 msgid "<strong>%(name)s</strong> withdrew this abstract"
 msgstr "<strong>%(name)s</strong> bu özeti geri çekti"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:538
+#: indico/modules/events/abstracts/templates/reviewing/public.html:536
 #, python-format
 msgid "<strong>%(name)s</strong> accepted this abstract"
 msgstr "<strong>%(name)s</strong> bu özeti kabul etti"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:542
+#: indico/modules/events/abstracts/templates/reviewing/public.html:540
 #, python-format
 msgid "<strong>%(name)s</strong> rejected this abstract"
 msgstr "<strong>%(name)s</strong> bu özeti reddetti"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:546
+#: indico/modules/events/abstracts/templates/reviewing/public.html:544
 #, python-format
 msgid "<strong>%(name)s</strong> merged this abstract into another"
 msgstr "<strong>%(name)s</strong> bu özeti başka bir özetle birleştirdi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:550
+#: indico/modules/events/abstracts/templates/reviewing/public.html:548
 #, python-format
 msgid "<strong>%(name)s</strong> marked this abstract as duplicate of another"
 msgstr "<strong>%(name)s</strong> bu özeti başka bir özetin kopyası olarak işaretledi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:556
+#: indico/modules/events/abstracts/templates/reviewing/public.html:554
 msgid "This abstract was accepted"
 msgstr "Bu özet kabul edildi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:558
+#: indico/modules/events/abstracts/templates/reviewing/public.html:556
 msgid "This abstract was rejected"
 msgstr "Bu özet reddedildi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:560
+#: indico/modules/events/abstracts/templates/reviewing/public.html:558
 msgid "This abstract was merged"
 msgstr "Bu özet birleştirildi"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:562
+#: indico/modules/events/abstracts/templates/reviewing/public.html:560
 msgid "This abstract was marked as duplicate"
 msgstr "Bu özet kopya olarak işaretlendi"
 
@@ -9681,10 +9681,9 @@ msgstr "Koruma ayarları güncellendi"
 #: indico/modules/events/management/templates/_action_menu.html:2
 #, python-format
 msgid ""
-"Changing the event type to <strong>%(type)s</strong> will change the look of"
-" the event page and may disable some features not available for the new "
-"event type."
-msgstr "Etkinlik türünü <strong>%(type)s</strong> değiştirmek, etkinlik sayfasının görünümünü değiştirecektir ve yeni etkinlik türü için mevcut olmayan bazı özellikleri devre dışı bırakabilir."
+"Changing the event type to %(type)s will change the look of the event page "
+"and may disable some features not available for the new event type."
+msgstr ""
 
 #: indico/modules/events/management/templates/_action_menu.html:11
 msgid "Change type"
@@ -15196,10 +15195,10 @@ msgstr "Bir çevrimdışı kopya oluştur"
 
 #: indico/modules/events/static/templates/static_sites.html:14
 msgid ""
-"Are you sure you want to build an offline copy of this event?<br>Beware that"
-" it is a heavy operation, especially for large events, and it might take "
-"some time to finish."
-msgstr "Bu etkinliğin çevrim dışı bir kopyasını oluşturmak istediğinizden emin misiniz?<br>Bunun özellikle büyük etkinlikler için ağır bir işlem olduğunun ve bitmesinin belirli bir süre alabileceğinin farkında olun."
+"Are you sure you want to build an offline copy of this event? Beware that it"
+" is a heavy operation, especially for large events, and it might take some "
+"time to finish."
+msgstr ""
 
 #: indico/modules/events/static/templates/static_sites.html:15
 msgid "Build offline copy"
@@ -15761,13 +15760,13 @@ msgstr "Adsız"
 msgid "Are you sure you want to remove this submission?"
 msgstr "Bu gönderiyi kaldırmak istediğinizden emin misiniz?"
 
-#: indico/modules/events/surveys/templates/management/survey.html:198
+#: indico/modules/events/surveys/templates/management/survey.html:197
 msgid ""
 "Note: Authenticated users will not be able to submit an anonymous survey "
 "again even if you delete their submission."
 msgstr "Not: Kimliği doğrulanmış kullanıcılar, gönderilerini silseniz bile anonim bir anketi tekrar gönderemez."
 
-#: indico/modules/events/surveys/templates/management/survey.html:205
+#: indico/modules/events/surveys/templates/management/survey.html:207
 msgid "Remove submission"
 msgstr ""
 
@@ -17695,9 +17694,9 @@ msgstr "Son kullanma tarihi:"
 #: indico/modules/oauth/templates/user_apps.html:39
 #, python-format
 msgid ""
-"%(app_name)s will no longer have access to your Indico data.<br> Are you "
-"sure you want to revoke its access?"
-msgstr "%(app_name)s artık Indico verilerinize erişemeyecek<br> Onun erişimini iptal etmek istediğinizden emin misiniz?"
+"%(app_name)s will no longer have access to your Indico data. Are you sure "
+"you want to revoke its access?"
+msgstr ""
 
 #: indico/modules/oauth/templates/user_apps.html:41
 msgid "Revoke"
@@ -17762,7 +17761,7 @@ msgid ""
 "access the Indico API. You cannot undo this action."
 msgstr "Bu jetonu kullanan herhangi bir uygulama veya komut dosyası artık Indico API'sine erişemez. Bu işlemi geri alamazsınız."
 
-#: indico/modules/oauth/templates/user_tokens.html:114
+#: indico/modules/oauth/templates/user_tokens.html:112
 msgid ""
 "Warning: You will not be able to create a new API token since only Indico "
 "admins can create API tokens."
@@ -18868,9 +18867,9 @@ msgstr "Başlıca olarak ayarla"
 
 #: indico/modules/users/templates/personal_data.html:17
 msgid ""
-"This user will no longer have access to Indico.<br> Are you sure you want to"
-" revoke their access?"
-msgstr "Bu kullanıcı artık Indico'ya erişemeyecektir.<br> Erişimi iptal etmek istediğinizden emin misiniz?"
+"This user will no longer have access to Indico. Are you sure you want to "
+"revoke their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:21
 msgid "Block User"
@@ -18878,9 +18877,9 @@ msgstr "Kullanıcıyı Engelle"
 
 #: indico/modules/users/templates/personal_data.html:28
 msgid ""
-"This user will regain access to Indico.<br> Are you sure you want to restore"
-" their access?"
-msgstr "Bu kullanıcı Indico'ya tekrar erişecektir.<br> Erişimi geri getirmek istediğinizden emin misiniz?"
+"This user will regain access to Indico. Are you sure you want to restore "
+"their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:31
 msgid "Unblock User"

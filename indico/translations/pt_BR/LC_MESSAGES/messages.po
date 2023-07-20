@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2023-07-20 15:21+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Sedir G. Morais <philippi.sedir@gmail.com>, 2020-2021,2023\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/indico/indico/language/pt_BR/)\n"
@@ -738,8 +738,8 @@ msgid "Board:"
 msgstr "Quadro:"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:130
-#: indico/modules/events/abstracts/templates/reviewing/public.html:129
-#: indico/modules/events/abstracts/templates/reviewing/public.html:307
+#: indico/modules/events/abstracts/templates/reviewing/public.html:127
+#: indico/modules/events/abstracts/templates/reviewing/public.html:305
 msgid "Author:"
 msgid_plural "Authors:"
 msgstr[0] "Autor"
@@ -747,8 +747,8 @@ msgstr[1] "Autores"
 msgstr[2] "Autores"
 
 #: indico/legacy/pdfinterface/latex_templates/inc/contribution.tex:143
-#: indico/modules/events/abstracts/templates/reviewing/public.html:142
-#: indico/modules/events/abstracts/templates/reviewing/public.html:332
+#: indico/modules/events/abstracts/templates/reviewing/public.html:140
+#: indico/modules/events/abstracts/templates/reviewing/public.html:330
 msgid "Co-author:"
 msgid_plural "Co-authors:"
 msgstr[0] "Co-autor"
@@ -1540,9 +1540,9 @@ msgstr "Apagar"
 #: indico/modules/attachments/templates/_attachments.html:56
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the attachment permanently."
-msgstr "Você tem certeza que você quer apagar &quot;%(name)s&quot;?<br> Isto irá remover o anexo PERMANENTEMENTE."
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"attachment permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:73
 msgid ""
@@ -1570,9 +1570,9 @@ msgstr "Editar pasta"
 #: indico/modules/attachments/templates/_attachments.html:96
 #, python-format
 msgid ""
-"Are you sure you want to remove &quot;%(name)s&quot;?<br> This will remove "
-"the folder and its contents permanently."
-msgstr "Você tem certeza que você deseja apagar &quot;%(name)s&quot;?<br> Isso irá remover a pasta e os conteúdos PERMANENTEMENTE."
+"Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
+"folder and its contents permanently."
+msgstr ""
 
 #: indico/modules/attachments/templates/_attachments.html:126
 msgid "empty folder"
@@ -3268,11 +3268,11 @@ msgstr "Não há eventos nesta categoria"
 
 #: indico/modules/categories/templates/management/base.html:5
 #, python-format
-msgid "Do you really want to delete the category \"%(category)s\"?"
-msgstr "Você realmente quer apagar a categoria \"%(category)s\"?"
+msgid "Do you really want to delete the category &quot;%(category)s&quot;?"
+msgstr ""
 
-#: indico/modules/categories/templates/management/base.html:9
-#: indico/modules/categories/templates/management/base.html:20
+#: indico/modules/categories/templates/management/base.html:11
+#: indico/modules/categories/templates/management/base.html:22
 #: indico/modules/categories/templates/management/delete_categories.html:3
 msgid "Delete category"
 msgid_plural "Delete categories"
@@ -3280,19 +3280,19 @@ msgstr[0] "Apagar categoria"
 msgstr[1] "Apagar categorias"
 msgstr[2] "Apagar categorias"
 
-#: indico/modules/categories/templates/management/base.html:14
+#: indico/modules/categories/templates/management/base.html:16
 msgid "This category cannot be deleted because it is not empty."
 msgstr "Esta categoria não pode ser deletada porque não está vazia."
 
-#: indico/modules/categories/templates/management/base.html:27
+#: indico/modules/categories/templates/management/base.html:29
 msgid "Move to another category"
 msgstr "Mover para outra categoria"
 
-#: indico/modules/categories/templates/management/base.html:61
+#: indico/modules/categories/templates/management/base.html:63
 msgid "See the display page of the category"
 msgstr "Veja a página de exibição da categoria"
 
-#: indico/modules/categories/templates/management/base.html:62
+#: indico/modules/categories/templates/management/base.html:64
 #: indico/modules/events/management/templates/base.html:27
 msgid "Switch to display view"
 msgstr "Alternar para mostrar detalhes"
@@ -5051,8 +5051,8 @@ msgstr "Autores e palestrantes do resumo atual serão adicionados ao selecionado
 #: indico/modules/events/abstracts/forms.py:235
 #: indico/modules/events/abstracts/forms.py:296
 #: indico/modules/events/abstracts/forms.py:671
-#: indico/modules/events/abstracts/templates/reviewing/public.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:391
+#: indico/modules/events/abstracts/templates/reviewing/public.html:271
+#: indico/modules/events/abstracts/templates/reviewing/public.html:389
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75
 #: indico/modules/events/papers/forms.py:74
@@ -6215,7 +6215,7 @@ msgid "You have reviewed this abstract"
 msgstr "Você revisou este resumo"
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:273
-#: indico/modules/events/abstracts/templates/reviewing/public.html:459
+#: indico/modules/events/abstracts/templates/reviewing/public.html:457
 msgid "Go to contribution"
 msgstr "Ir para a contribuição"
 
@@ -6761,26 +6761,26 @@ msgstr "<strong>Modelo:</strong> <span class=\"template\">%(name)s</span>"
 msgid "Do you really want to withdraw this abstract?"
 msgstr "Você realmente quer retirar este resumo?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:23
+#: indico/modules/events/abstracts/templates/reviewing/public.html:22
 msgid ""
 "Withdrawing this abstract will permanently delete its corresponding "
 "contribution."
 msgstr "Retirar este resumo irá PERMANENTEMENTE APAGAR as contribuições correspondentes."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:28
+#: indico/modules/events/abstracts/templates/reviewing/public.html:26
 msgid "This operation is irreversible."
 msgstr "Esta operação é irreversível."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:32
+#: indico/modules/events/abstracts/templates/reviewing/public.html:30
 msgid "Withdraw abstract"
 msgstr "Retirar resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:33
+#: indico/modules/events/abstracts/templates/reviewing/public.html:31
 msgid "Withdraw Abstract"
 msgstr "Retirar Resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:39
-#: indico/modules/events/abstracts/templates/reviewing/public.html:50
+#: indico/modules/events/abstracts/templates/reviewing/public.html:37
+#: indico/modules/events/abstracts/templates/reviewing/public.html:48
 #: indico/modules/events/management/templates/settings.html:26
 #: indico/modules/events/registration/templates/display/registration_summary.html:72
 #: indico/modules/events/registration/templates/display/registration_summary.html:74
@@ -6790,84 +6790,84 @@ msgstr "Retirar Resumo"
 msgid "Withdraw"
 msgstr "Retirar"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:43
+#: indico/modules/events/abstracts/templates/reviewing/public.html:41
 msgid ""
 "You cannot withdraw this abstract as it has already been accepted. Please "
 "contact the event organizers if you want to withdraw the abstract anyway."
 msgstr "Você não pode retirar este resumo pois já foi aceito. Entre em contato com os organizadores do evento se quiser retirar o resumo de qualquer maneira."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:54
+#: indico/modules/events/abstracts/templates/reviewing/public.html:52
 msgid "This abstract has been withdrawn but can be restored."
 msgstr "Este resumo foi retirado, mas pode ser restaurado."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:55
+#: indico/modules/events/abstracts/templates/reviewing/public.html:53
 msgid "Restore Abstract"
 msgstr "Restaurar Resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:56
+#: indico/modules/events/abstracts/templates/reviewing/public.html:54
 msgid "Do you really want to restore this abstract?"
 msgstr "Você realmente quer restaurar esse resumo?"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:61
+#: indico/modules/events/abstracts/templates/reviewing/public.html:59
 msgid "Restore"
 msgstr "Restaurar"
 
+#: indico/modules/events/abstracts/templates/reviewing/public.html:68
 #: indico/modules/events/abstracts/templates/reviewing/public.html:70
-#: indico/modules/events/abstracts/templates/reviewing/public.html:72
 msgid "Edit abstract"
 msgstr "Editar resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:78
+#: indico/modules/events/abstracts/templates/reviewing/public.html:76
 msgid "The abstract cannot be edited because it was withdrawn"
 msgstr "O resumo não pode ser editado porque foi retirado"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:82
+#: indico/modules/events/abstracts/templates/reviewing/public.html:80
 msgid "The abstract cannot be edited because it is already under review"
 msgstr "O resumo não pode ser editado porque já está em revisão"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:86
+#: indico/modules/events/abstracts/templates/reviewing/public.html:84
 msgid "The abstract cannot be edited because it has already been processed"
 msgstr "O resumo não pode ser editado porque já foi processado"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:90
+#: indico/modules/events/abstracts/templates/reviewing/public.html:88
 msgid ""
 "The abstract cannot be edited because the modification deadline has passed"
 msgstr "O resumo não pode ser editado porque o prazo de modificação passou"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:94
+#: indico/modules/events/abstracts/templates/reviewing/public.html:92
 msgid "You are not authorized to edit this abstract"
 msgstr "Você não está autorizado a editar este resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:108
+#: indico/modules/events/abstracts/templates/reviewing/public.html:106
 msgid "PDF with reviews"
 msgstr "PDF com revisões"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:117
+#: indico/modules/events/abstracts/templates/reviewing/public.html:115
 msgid "Download abstract submission in PDF"
 msgstr "Download de submissão de resumos em PDF"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:168
+#: indico/modules/events/abstracts/templates/reviewing/public.html:166
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit an abstract"
 msgstr "<strong>%(name)s</strong> foi convidado a submeter um resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:172
-#: indico/modules/events/abstracts/templates/reviewing/public.html:413
+#: indico/modules/events/abstracts/templates/reviewing/public.html:170
+#: indico/modules/events/abstracts/templates/reviewing/public.html:411
 #, python-format
 msgid "<strong>%(name)s</strong> submitted this abstract"
 msgstr "<strong>%(name)s</strong> enviou este resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:211
-#: indico/modules/events/abstracts/templates/reviewing/public.html:216
+#: indico/modules/events/abstracts/templates/reviewing/public.html:209
+#: indico/modules/events/abstracts/templates/reviewing/public.html:214
 msgid "Reset judgment"
 msgstr "Reiniciar julgament"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:217
+#: indico/modules/events/abstracts/templates/reviewing/public.html:215
 msgid ""
 "Do you really want to reset the judgment? This operation is irreversible."
 msgstr "Você realmente quer redefinir o julgamento? ESTA OPERAÇÃO É IRREVERSÍVEL."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:233
+#: indico/modules/events/abstracts/templates/reviewing/public.html:231
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6875,7 +6875,7 @@ msgid ""
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "O resumo foi aceito como <span class=\"abstract-contribution-type\">%(type)s</span> para trilha%(track)s e uma%(link_start)scontribuição%(link_end)s foi criada no evento."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:240
+#: indico/modules/events/abstracts/templates/reviewing/public.html:238
 #, python-format
 msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
@@ -6883,67 +6883,67 @@ msgid ""
 "created in the event."
 msgstr "O resumo foi aceito como <span class=\"abstract-contribution-type\">%(type)s</span> e uma %(link_start)scontribuição%(link_end)s foi criada no evento."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:246
+#: indico/modules/events/abstracts/templates/reviewing/public.html:244
 #, python-format
 msgid ""
 "The abstract was accepted for track %(track)s and a "
 "%(link_start)scontribution%(link_end)s was created in the event."
 msgstr "O resumo foi aceito para a trilha %(track)s e uma %(link_start)scontribuição%(link_end)s foi criada no evento."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:252
+#: indico/modules/events/abstracts/templates/reviewing/public.html:250
 #, python-format
 msgid ""
 "The abstract was accepted and a %(link_start)scontribution%(link_end)s was "
 "created in the event."
 msgstr "O resumo foi aceito e uma %(link_start)scontribuição %(link_end)s foi criada no evento."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:257
+#: indico/modules/events/abstracts/templates/reviewing/public.html:255
 msgid "The abstract was rejected."
 msgstr "O resumo foi rejeitado."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:261
+#: indico/modules/events/abstracts/templates/reviewing/public.html:259
 #, python-format
 msgid "The abstract was merged into %(link_start)s%(other)s%(link_end)s."
 msgstr "O resumo foi mesclado em %(link_start)s%(other)s%(link_end)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:267
+#: indico/modules/events/abstracts/templates/reviewing/public.html:265
 #, python-format
 msgid ""
 "The abstract was marked as a duplicate of "
 "%(link_start)s%(other)s%(link_end)s"
 msgstr "O resumo foi marcado como uma duplicata de %(link_start)s%(other)s%(link_end)s"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:287
+#: indico/modules/events/abstracts/templates/reviewing/public.html:285
 msgid "As contribution type:"
 msgstr "Como um tipo de contribuição:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:295
-#: indico/modules/events/abstracts/templates/reviewing/public.html:420
+#: indico/modules/events/abstracts/templates/reviewing/public.html:293
+#: indico/modules/events/abstracts/templates/reviewing/public.html:418
 msgid "For track:"
 msgid_plural "For tracks:"
 msgstr[0] "Para trilha:"
 msgstr[1] "Para trilhas:"
 msgstr[2] "Para trilhas:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:357
+#: indico/modules/events/abstracts/templates/reviewing/public.html:355
 msgid "Speaker:"
 msgid_plural "Speakers:"
 msgstr[0] "Palestrante:"
 msgstr[1] "Palestrantes:"
 msgstr[2] "Palestrantes:"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:381
+#: indico/modules/events/abstracts/templates/reviewing/public.html:379
 msgid "More information"
 msgstr "Mais informações"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:409
+#: indico/modules/events/abstracts/templates/reviewing/public.html:407
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this <span class=\"abstract-"
 "contribution-type\">%(type)s</span>"
 msgstr "<strong>%(name)s</strong> submeteu este <span class=\"abstract-contribution-type\">%(type)s</span>"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:431
+#: indico/modules/events/abstracts/templates/reviewing/public.html:429
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
@@ -6951,94 +6951,94 @@ msgid ""
 "type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> enviou e este resumo foi aceito para a trilha  %(track)s como <span class=\"abstract-contribution-type\">%(type)s</span>."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:439
+#: indico/modules/events/abstracts/templates/reviewing/public.html:437
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted as <span class=\"abstract-contribution-type\">%(type)s</span>."
 msgstr "<strong>%(name)s</strong> submeteu este resumo e foi finalmente aceito como <span class=\"abstract-contribution-type\">%(type)s</span>."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:445
+#: indico/modules/events/abstracts/templates/reviewing/public.html:443
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s."
 msgstr "<strong>%(name)s</strong> enviou este resumo e foi finalmente aceito para a trilha %(track)s."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:451
+#: indico/modules/events/abstracts/templates/reviewing/public.html:449
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted."
 msgstr "<strong>%(name)s</strong> enviou este resumo e ele finalmente foi aceito."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:465
+#: indico/modules/events/abstracts/templates/reviewing/public.html:463
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was merged into "
 "another."
 msgstr "<strong>%(name)s</strong> enviou este resumo mas ele foi mesclado em outro."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:471
-#: indico/modules/events/abstracts/templates/reviewing/public.html:482
+#: indico/modules/events/abstracts/templates/reviewing/public.html:469
+#: indico/modules/events/abstracts/templates/reviewing/public.html:480
 #, python-format
 msgid "<a href=\"%(url)s\">Go to abstract</a>"
 msgstr "<a href=\"%(url)s\">Ir para resumo</a>"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:477
+#: indico/modules/events/abstracts/templates/reviewing/public.html:475
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was marked as "
 "duplicate of another."
 msgstr "<strong>%(name)s</strong> enviou este resumo mas ele foi marcado como duplicado de outro."
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:488
+#: indico/modules/events/abstracts/templates/reviewing/public.html:486
 #, python-format
 msgid "<strong>%(name)s</strong> was invited to submit this abstract"
 msgstr "<strong>%(name)s</strong> foi convidado a enviar este resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:524
+#: indico/modules/events/abstracts/templates/reviewing/public.html:522
 msgid "No answer"
 msgstr "Sem resposta"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:533
+#: indico/modules/events/abstracts/templates/reviewing/public.html:531
 #, python-format
 msgid "<strong>%(name)s</strong> withdrew this abstract"
 msgstr "<strong>%(name)s</strong> retirou este resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:538
+#: indico/modules/events/abstracts/templates/reviewing/public.html:536
 #, python-format
 msgid "<strong>%(name)s</strong> accepted this abstract"
 msgstr "<strong>%(name)s</strong> aceitou este resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:542
+#: indico/modules/events/abstracts/templates/reviewing/public.html:540
 #, python-format
 msgid "<strong>%(name)s</strong> rejected this abstract"
 msgstr "<strong>%(name)s</strong> rejeitou este resumo"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:546
+#: indico/modules/events/abstracts/templates/reviewing/public.html:544
 #, python-format
 msgid "<strong>%(name)s</strong> merged this abstract into another"
 msgstr "<strong>%(name)s</strong> mesclou este resumo em outro"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:550
+#: indico/modules/events/abstracts/templates/reviewing/public.html:548
 #, python-format
 msgid "<strong>%(name)s</strong> marked this abstract as duplicate of another"
 msgstr "<strong>%(name)s</strong> marcou este resumo como duplicado de outro"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:556
+#: indico/modules/events/abstracts/templates/reviewing/public.html:554
 msgid "This abstract was accepted"
 msgstr "O resumo foi aceito"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:558
+#: indico/modules/events/abstracts/templates/reviewing/public.html:556
 msgid "This abstract was rejected"
 msgstr "O resumo foi rejeitado"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:560
+#: indico/modules/events/abstracts/templates/reviewing/public.html:558
 msgid "This abstract was merged"
 msgstr "O resumo foi mesclado"
 
-#: indico/modules/events/abstracts/templates/reviewing/public.html:562
+#: indico/modules/events/abstracts/templates/reviewing/public.html:560
 msgid "This abstract was marked as duplicate"
 msgstr "O resumo foi marcado como duplicado"
 
@@ -9742,10 +9742,9 @@ msgstr "As configurações de proteção foram atualizadas"
 #: indico/modules/events/management/templates/_action_menu.html:2
 #, python-format
 msgid ""
-"Changing the event type to <strong>%(type)s</strong> will change the look of"
-" the event page and may disable some features not available for the new "
-"event type."
-msgstr "Mudando o tipo do evento para <strong>%(type)s</strong> mudará a aparência da página do evento e poderá desativar alguns recursos que não estão disponíveis para o novo tipo de evento."
+"Changing the event type to %(type)s will change the look of the event page "
+"and may disable some features not available for the new event type."
+msgstr ""
 
 #: indico/modules/events/management/templates/_action_menu.html:11
 msgid "Change type"
@@ -15282,10 +15281,10 @@ msgstr "Gerar uma cópia offline"
 
 #: indico/modules/events/static/templates/static_sites.html:14
 msgid ""
-"Are you sure you want to build an offline copy of this event?<br>Beware that"
-" it is a heavy operation, especially for large events, and it might take "
-"some time to finish."
-msgstr "Tem certeza de que deseja criar uma cópia off-line deste evento? <br>Tome cuidado, pois é uma operação pesada, especialmente para grandes eventos, e pode levar algum tempo para ser concluída."
+"Are you sure you want to build an offline copy of this event? Beware that it"
+" is a heavy operation, especially for large events, and it might take some "
+"time to finish."
+msgstr ""
 
 #: indico/modules/events/static/templates/static_sites.html:15
 msgid "Build offline copy"
@@ -15850,13 +15849,13 @@ msgstr "Anônimo"
 msgid "Are you sure you want to remove this submission?"
 msgstr "Você tem certeza de que deseja remover as submissões?"
 
-#: indico/modules/events/surveys/templates/management/survey.html:198
+#: indico/modules/events/surveys/templates/management/survey.html:197
 msgid ""
 "Note: Authenticated users will not be able to submit an anonymous survey "
 "again even if you delete their submission."
 msgstr "Observação: os usuários autenticados não poderão enviar uma pesquisa anônima novamente, mesmo que você exclua o envio."
 
-#: indico/modules/events/surveys/templates/management/survey.html:205
+#: indico/modules/events/surveys/templates/management/survey.html:207
 msgid "Remove submission"
 msgstr ""
 
@@ -17790,9 +17789,9 @@ msgstr "Último uso:"
 #: indico/modules/oauth/templates/user_apps.html:39
 #, python-format
 msgid ""
-"%(app_name)s will no longer have access to your Indico data.<br> Are you "
-"sure you want to revoke its access?"
-msgstr "%(app_name)s não terá mais acesso aos seus dados do Indico. <br>Tem certeza de que deseja revogar seu acesso?"
+"%(app_name)s will no longer have access to your Indico data. Are you sure "
+"you want to revoke its access?"
+msgstr ""
 
 #: indico/modules/oauth/templates/user_apps.html:41
 msgid "Revoke"
@@ -17857,7 +17856,7 @@ msgid ""
 "access the Indico API. You cannot undo this action."
 msgstr "Quaisquer aplicativos ou scripts que usam este token não serão mais capazes de acessar a API Indico. Você não pode desfazer esta ação."
 
-#: indico/modules/oauth/templates/user_tokens.html:114
+#: indico/modules/oauth/templates/user_tokens.html:112
 msgid ""
 "Warning: You will not be able to create a new API token since only Indico "
 "admins can create API tokens."
@@ -18963,9 +18962,9 @@ msgstr "Definir como primário"
 
 #: indico/modules/users/templates/personal_data.html:17
 msgid ""
-"This user will no longer have access to Indico.<br> Are you sure you want to"
-" revoke their access?"
-msgstr "Este usuário não terá mais acesso ao Indico.<br> Você tem certeza de que deseja revogar o acesso?"
+"This user will no longer have access to Indico. Are you sure you want to "
+"revoke their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:21
 msgid "Block User"
@@ -18973,9 +18972,9 @@ msgstr "Bloquear Usuário"
 
 #: indico/modules/users/templates/personal_data.html:28
 msgid ""
-"This user will regain access to Indico.<br> Are you sure you want to restore"
-" their access?"
-msgstr "Este usuário irá recuperar o acesso ao Indico.<br> Você tem certeza de que deseja restaurar o acesso?"
+"This user will regain access to Indico. Are you sure you want to restore "
+"their access?"
+msgstr ""
 
 #: indico/modules/users/templates/personal_data.html:31
 msgid "Unblock User"
