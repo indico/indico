@@ -218,7 +218,7 @@ def cli(version, dry_run, sign, no_assets, no_changelog, next_changelog):
     _git_commit(release_msg, ['CHANGES.rst', 'indico/__init__.py'], dry_run=dry_run)
     _git_tag(new_version, release_msg, sign=sign, dry_run=dry_run)
     prompt = 'Build release wheel before bumping version?' if next_version else 'Build release wheel now?'
-    if click.confirm(click.style(prompt, fg='blue', bold=True), default=True):
+    if click.confirm(click.style(prompt, fg='blue', bold=True), default=False):
         _build_wheel(no_assets, dry_run=dry_run)
     if next_version:
         next_message = f'Bump version to {next_version}'
