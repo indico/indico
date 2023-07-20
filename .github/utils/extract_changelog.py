@@ -28,13 +28,15 @@ def fail(msg):
     sys.exit(1)
 
 
-def extract_changelog(text, version):
+def extract_changelog(text, version, *, allow_unreleased=False):
     """Extract the changelog for a given version."""
     START_RE = rf'^Version {re.escape(version)}\n-+\n\n\*(Unreleased|Released on .+)\*\n$'
     END_RE = r'(^----$)|(^Version [0-9.abrc]+$)'
 
     if not (match := re.search(START_RE, text, re.MULTILINE)):
         fail(f'Version {version} not found in text')
+    if match.group(1) == 'Unreleased' and not allow_unreleased:
+        fail(f'Version {version} is marked as unreleased')
 
     text = text[match.end():]
 
@@ -113,7 +115,7 @@ def main():
         destfile = None
     with open('CHANGES.rst') as f:
         changelog = f.read()
-    changelog = extract_changelog(changelog, version)
+    changelog = extract_changelog(changelog, version, allow_unreleased=(not destfile))
     changelog = convert_to_markdown(changelog)
     if not destfile:
         print(changelog)
