@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-07-23 14:32+0200\n"
+"POT-Creation-Date: 2023-07-23 12:29+0200\n"
 "Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2023\n"
 "Language-Team: Ukrainian (Ukraine) (https://app.transifex.com/indico/teams/6478/uk_UA/)\n"
 "MIME-Version: 1.0\n"
@@ -2693,7 +2693,7 @@ msgid "Checkbox"
 msgstr "Галочка"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:108
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:99
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:101
 msgid "Date"
 msgstr "Дата"
 
@@ -3459,7 +3459,7 @@ msgstr "Коментарі"
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:120
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:150
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:141
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:189
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:190
 #: indico/modules/rb/client/js/modules/roomList/filters/LocationForm.jsx:45
 msgid "Location"
 msgstr "Розташування "
@@ -3470,7 +3470,7 @@ msgid "Site"
 msgstr "Розташування"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:40
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:206
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:207
 #: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:55
 msgid "Building"
 msgstr "Будівля"
@@ -3825,7 +3825,7 @@ msgid "Room Booking"
 msgstr "Бронювання аудиторій"
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:55
-#: indico/web/client/js/react/components/PersonLinkField.jsx:343
+#: indico/web/client/js/react/components/PersonLinkField.jsx:369
 #: indico/web/client/js/react/components/principals/Search.jsx:126
 msgid "Search"
 msgstr "Пошук"
@@ -4739,11 +4739,11 @@ msgstr "Створити бронювання"
 msgid "Create Pre-booking"
 msgstr "Створити попереднє бронювання"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:81
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:83
 msgid "Recurrence"
 msgstr "Повторюваність"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:117
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:119
 msgid "Time"
 msgstr "Час"
 
@@ -4928,21 +4928,21 @@ msgstr "Відкриті запити на бронювання"
 msgid "Your bookings"
 msgstr "Мої бронювання"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:48
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:163
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:49
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:164
 msgid "Equipment"
 msgstr "Обладнання "
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:79
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:80
 msgid "Building {building}"
 msgstr "Будівля {building}"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:223
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:224
 #: indico/modules/rb/client/js/modules/roomList/filters/CapacityForm.jsx:34
 msgid "Min. Capacity"
 msgstr "Мінімальна місткість "
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:243
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:244
 msgid "Show only..."
 msgstr "Показати лише..."
 
@@ -5364,28 +5364,28 @@ msgstr ""
 msgid "This email is currently not linked to this event."
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:72
+#: indico/web/client/js/react/components/PersonLinkField.jsx:70
 msgid "Edit person"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:82
+#: indico/web/client/js/react/components/PersonLinkField.jsx:80
 msgid "Delete person"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:197
-#: indico/web/client/js/react/components/PersonLinkField.jsx:316
+#: indico/web/client/js/react/components/PersonLinkField.jsx:195
+#: indico/web/client/js/react/components/PersonLinkField.jsx:342
 msgid "There are no persons"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:308
+#: indico/web/client/js/react/components/PersonLinkField.jsx:334
 msgid "Others"
 msgstr "Інші"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:333
+#: indico/web/client/js/react/components/PersonLinkField.jsx:359
 msgid "Add myself"
 msgstr "Додати себе"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:355
+#: indico/web/client/js/react/components/PersonLinkField.jsx:381
 msgid "Enter manually"
 msgstr "Ввести вручну"
 

@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-11 14:32+0200\n"
+"POT-Creation-Date: 2023-07-20 12:28+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021-2022\n"
 "Language-Team: Turkish (Turkey) (http://app.transifex.com/indico/indico/language/tr_TR/)\n"
@@ -172,7 +172,8 @@ msgstr "varsayılan"
 
 #: indico/core/db/sqlalchemy/links.py:23
 #: indico/modules/attachments/controllers/management/base.py:55
-#: indico/modules/categories/forms.py:177 indico/modules/events/forms.py:76
+#: indico/modules/categories/forms.py:177 indico/modules/designer/forms.py:28
+#: indico/modules/events/forms.py:80
 #: indico/modules/events/management/forms.py:367
 #: indico/modules/events/templates/emails/event_creation.txt:20
 #: indico/modules/logs/models/entries.py:31
@@ -813,7 +814,7 @@ msgid "Settings have been saved"
 msgstr "Ayarlar kaydedildi"
 
 #: indico/modules/announcement/forms.py:18 indico/modules/core/forms.py:24
-#: indico/modules/events/forms.py:110
+#: indico/modules/events/forms.py:117
 #: indico/modules/events/payment/plugins.py:30
 #: indico/modules/events/registration/forms.py:106
 #: indico/modules/events/surveys/forms.py:44 indico/modules/oauth/forms.py:46
@@ -1207,7 +1208,7 @@ msgstr "Materyale erişmesine izin verilen kullanıcı ve grupların listesi"
 #: indico/modules/categories/forms.py:136
 #: indico/modules/categories/templates/management/_events_list.html:63
 #: indico/modules/categories/templates/management/content.html:91
-#: indico/modules/core/forms.py:19 indico/modules/designer/forms.py:19
+#: indico/modules/core/forms.py:19 indico/modules/designer/forms.py:21
 #: indico/modules/designer/placeholders.py:237
 #: indico/modules/events/abstracts/forms.py:428
 #: indico/modules/events/abstracts/forms.py:476
@@ -1255,7 +1256,7 @@ msgstr "Başlık"
 #: indico/modules/events/contributions/forms.py:220
 #: indico/modules/events/contributions/templates/display/contribution_display.html:166
 #: indico/modules/events/contributions/templates/management/types_dialog.html:22
-#: indico/modules/events/forms.py:105
+#: indico/modules/events/forms.py:112
 #: indico/modules/events/management/forms.py:61
 #: indico/modules/events/management/templates/_settings.html:44
 #: indico/modules/events/papers/forms.py:134
@@ -2420,7 +2421,7 @@ msgstr ""
 msgid "Allows requesting for an event to be moved to this category"
 msgstr ""
 
-#: indico/modules/categories/forms.py:41 indico/modules/events/forms.py:80
+#: indico/modules/categories/forms.py:41 indico/modules/events/forms.py:87
 #: indico/modules/events/management/forms.py:102
 #: indico/modules/events/management/templates/_settings.html:84
 #: indico/modules/events/templates/emails/event_creation.txt:67
@@ -2523,7 +2524,7 @@ msgstr "İzinler"
 
 #: indico/modules/categories/forms.py:88
 #: indico/modules/events/contributions/forms.py:108
-#: indico/modules/events/forms.py:82
+#: indico/modules/events/forms.py:89
 #: indico/modules/events/management/forms.py:254
 #: indico/modules/events/sessions/forms.py:57
 msgid "Protection mode"
@@ -3330,7 +3331,7 @@ msgstr "Rol Ekle"
 #: indico/modules/events/layout/templates/layout_conference.html:62
 #: indico/modules/events/layout/templates/layout_conference.html:76
 #: indico/modules/events/management/templates/_action_menu.html:100
-#: indico/modules/events/reminders/templates/reminders.html:36
+#: indico/modules/events/reminders/templates/reminders.html:38
 #: indico/modules/events/surveys/templates/management/survey.html:137
 #: indico/modules/events/templates/admin/_event_label_list.html:25
 #: indico/modules/events/templates/admin/_reference_type_list.html:25
@@ -3559,7 +3560,7 @@ msgstr "Bu ayarlar sunucudaki indico.conf dosyasında değiştirilebilir."
 
 #: indico/modules/core/templates/admin/settings.html:66
 #: indico/modules/events/management/forms.py:483
-#: indico/modules/events/management/templates/_settings.html:223
+#: indico/modules/events/management/templates/_settings.html:230
 msgid "Default language"
 msgstr "Varsayılan dil"
 
@@ -3615,50 +3616,62 @@ msgstr "Yalnızca ön taraf"
 msgid "Posters/Badges"
 msgstr "Posterler/Rozetler"
 
-#: indico/modules/designer/controllers.py:209
+#: indico/modules/designer/controllers.py:214
 msgid "Created copy of template '{}'"
 msgstr "'{}' şablonunun oluşturulan kopyası"
 
-#: indico/modules/designer/controllers.py:228
+#: indico/modules/designer/controllers.py:218
+msgid "Go to category"
+msgstr ""
+
+#: indico/modules/designer/controllers.py:229
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
+#: indico/modules/events/management/forms.py:403
+#: indico/modules/events/management/templates/_action_menu.html:135
+#: indico/modules/events/management/templates/clone_event.html:108
+msgid "Clone"
+msgstr "Klon"
+
+#: indico/modules/designer/controllers.py:249
 msgid "Added new template '{}'"
 msgstr "Yeni '{}' şablonu eklendi"
 
-#: indico/modules/designer/controllers.py:309
+#: indico/modules/designer/controllers.py:332
 msgid "A Fixed Image element must contain an image"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:311
+#: indico/modules/designer/controllers.py:334
 msgid "The image file does not belong to this template"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:316
+#: indico/modules/designer/controllers.py:339
 msgid "Template successfully saved."
 msgstr "Şablon başarıyla kaydedilmiştir"
 
-#: indico/modules/designer/controllers.py:356
+#: indico/modules/designer/controllers.py:379
 #: indico/modules/events/layout/controllers/images.py:72
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
 msgstr[0] "Görüntü yüklendi"
 msgstr[1] "{count} görüntü yüklendi"
 
-#: indico/modules/designer/controllers.py:377
+#: indico/modules/designer/controllers.py:400
 msgid "The template has been deleted"
 msgstr "Şablon silindi"
 
-#: indico/modules/designer/forms.py:20
+#: indico/modules/designer/forms.py:22
 #: indico/modules/events/management/forms.py:323
 #: indico/modules/events/papers/forms.py:135
 #: indico/modules/events/registration/forms.py:428
 msgid "Template"
 msgstr "Şablon "
 
-#: indico/modules/designer/forms.py:21
+#: indico/modules/designer/forms.py:23
 #: indico/modules/designer/templates/template.html:74
 msgid "Allow cloning"
 msgstr "Eşlemlemeye izin ver"
 
-#: indico/modules/designer/forms.py:22
+#: indico/modules/designer/forms.py:24
 #: indico/modules/designer/templates/template.html:73
 msgid "Allow cloning this template in subcategories and events"
 msgstr "Bu şablonun alt kategorilerde ve etkinliklerde eşlemlenmesine izin ver"
@@ -3820,12 +3833,12 @@ msgid "Registration Form has no registrations"
 msgstr "Kayıt Formunda hiç kayıt yoktur"
 
 #: indico/modules/designer/templates/_list.html:8
-#: indico/modules/designer/templates/_list.html:162
+#: indico/modules/designer/templates/_list.html:165
 msgid "Print tickets"
 msgstr "Biletleri yazdır"
 
 #: indico/modules/designer/templates/_list.html:10
-#: indico/modules/designer/templates/_list.html:164
+#: indico/modules/designer/templates/_list.html:167
 msgid "Print badges"
 msgstr "Rozetleri yazdır"
 
@@ -3862,71 +3875,76 @@ msgstr "Bu kategori için varsayılan rozet şablonunu değiştir"
 msgid "This template cannot be cloned"
 msgstr "Bu şablon eşlemlenemiyor"
 
-#: indico/modules/designer/templates/_list.html:112
+#: indico/modules/designer/templates/_list.html:113
 msgid "Clone this template"
 msgstr "Bu şablonu eşlemle"
 
-#: indico/modules/designer/templates/_list.html:116
+#: indico/modules/designer/templates/_list.html:117
 #, python-format
 msgid "Are you sure you want to clone template '%(title)s'?"
 msgstr "'%(title)s' şablonunu eşlemlemek istediğinizden emin misiniz?"
 
-#: indico/modules/designer/templates/_list.html:124
+#: indico/modules/designer/templates/_list.html:119
+#, python-format
+msgid "Clone '%(title)s' template into a category"
+msgstr ""
+
+#: indico/modules/designer/templates/_list.html:127
 msgid "Edit template"
 msgstr "Şablonu düzenle"
 
-#: indico/modules/designer/templates/_list.html:131
+#: indico/modules/designer/templates/_list.html:134
 msgid "This template cannot be deleted."
 msgstr "Bu şablon silinememektedir."
 
-#: indico/modules/designer/templates/_list.html:133
+#: indico/modules/designer/templates/_list.html:136
 msgid ""
 "This template cannot be deleted because it is used in a registration form or"
 " as a backside for another template."
 msgstr "Bu şablon, bir kayıt formunda veya başka bir şablon için arka taraf olarak kullanıldığı için silinememektedir."
 
-#: indico/modules/designer/templates/_list.html:136
+#: indico/modules/designer/templates/_list.html:139
 #: indico/modules/events/abstracts/templates/management/_notification_tpl_list.html:63
 #: indico/modules/events/abstracts/templates/management/_notification_tpl_list.html:68
 msgid "Delete template"
 msgstr "Şablonu sil"
 
-#: indico/modules/designer/templates/_list.html:140
+#: indico/modules/designer/templates/_list.html:143
 #, python-format
 msgid "Are you sure you want to delete the template '%(title)s'?"
 msgstr "'%(title)s' şablonunu silmek istediğinizden emin misiniz?"
 
-#: indico/modules/designer/templates/_list.html:150
+#: indico/modules/designer/templates/_list.html:153
 msgid "Print poster for the event"
 msgstr "Etkinlik için poster bastır"
 
-#: indico/modules/designer/templates/_list.html:152
+#: indico/modules/designer/templates/_list.html:155
 msgid "Poster Printing Settings"
 msgstr "Poster Yazdırma Ayarları"
 
-#: indico/modules/designer/templates/_list.html:170
+#: indico/modules/designer/templates/_list.html:173
 msgid "There are no registration forms in this event"
 msgstr "Bu etkinlikte hiçbir kayıt formu yoktur"
 
-#: indico/modules/designer/templates/_list.html:191
+#: indico/modules/designer/templates/_list.html:194
 #: indico/modules/designer/templates/backside_list.html:40
 msgid "Inherited templates"
 msgstr "Kalıtsal şablonlar"
 
-#: indico/modules/designer/templates/_list.html:206
+#: indico/modules/designer/templates/_list.html:209
 #: indico/modules/designer/templates/backside_list.html:44
 msgid "Custom templates"
 msgstr "Özel şablonlar"
 
-#: indico/modules/designer/templates/_list.html:209
+#: indico/modules/designer/templates/_list.html:212
 msgid "Add a new blank designer template"
 msgstr "Yeni bir boş tasarımcı şablonu ekle"
 
-#: indico/modules/designer/templates/_list.html:212
+#: indico/modules/designer/templates/_list.html:215
 msgid "Add new"
 msgstr "Yeni ekle"
 
-#: indico/modules/designer/templates/_list.html:227
+#: indico/modules/designer/templates/_list.html:230
 #: indico/modules/designer/templates/backside_list.html:26
 msgid "No templates"
 msgstr "Şablon yok"
@@ -4263,7 +4281,7 @@ msgstr "Hedef etkinlikte zaten kişiler var"
 #: indico/modules/events/contributions/forms.py:71
 #: indico/modules/events/contributions/forms.py:129
 #: indico/modules/events/contributions/lists.py:54
-#: indico/modules/events/forms.py:104
+#: indico/modules/events/forms.py:111
 #: indico/modules/events/layout/models/menu.py:40
 #: indico/modules/events/management/forms.py:187
 #: indico/modules/events/management/templates/_settings.html:130
@@ -4316,7 +4334,7 @@ msgstr "Verileri içe aktarma desteklenmiyor"
 msgid "Value"
 msgstr "Değer"
 
-#: indico/modules/events/fields.py:162
+#: indico/modules/events/fields.py:170
 msgid "There is already a person with the email {email}"
 msgstr ""
 
@@ -4325,25 +4343,25 @@ msgstr ""
 #: indico/modules/events/abstracts/settings.py:74
 #: indico/modules/events/contributions/fields.py:29
 #: indico/modules/events/contributions/templates/display/user_contribution_list.html:12
-#: indico/modules/events/fields.py:196
+#: indico/modules/events/fields.py:204
 #: indico/modules/events/management/templates/_settings.html:141
 #: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html:19
 msgid "Submitter"
 msgstr "Gönderici"
 
-#: indico/modules/events/fields.py:201
+#: indico/modules/events/fields.py:209
 msgid "There are no chairpersons"
 msgstr "Hiçbir başkan yok"
 
-#: indico/modules/events/fields.py:207
+#: indico/modules/events/fields.py:215
 msgid "There are no speakers"
 msgstr "Hiçbir konuşmacı yok"
 
-#: indico/modules/events/fields.py:225
+#: indico/modules/events/fields.py:233
 msgid "Person with email '{}' is duplicated"
 msgstr "'{}' e-postasına sahip kişi mükerrerdir"
 
-#: indico/modules/events/fields.py:238
+#: indico/modules/events/fields.py:246
 msgid "Category default"
 msgstr "Varsayılan kategori"
 
@@ -4376,30 +4394,40 @@ msgstr "Bu ad adresi zaten kullanılıyor."
 msgid "The URL template must contain the placeholder '{value}'."
 msgstr "URL şablonu, yer tutucuyu  '{value}'  içermelidir."
 
-#: indico/modules/events/forms.py:69
+#: indico/modules/events/forms.py:59
+msgid "Event does not happen"
+msgstr ""
+
+#: indico/modules/events/forms.py:60
+msgid ""
+"Enable this to indicate that an event with this label does not happen (e.g. "
+"cancelled or postponed). This will prevent event reminders from being sent."
+msgstr ""
+
+#: indico/modules/events/forms.py:73
 #: indico/modules/events/registration/forms.py:507
 msgid "This title is already in use."
 msgstr "Bu başlık adresi zaten kullanılıyor."
 
-#: indico/modules/events/forms.py:73
+#: indico/modules/events/forms.py:77
 msgid "Listing"
 msgstr "Listeleme"
 
-#: indico/modules/events/forms.py:74
+#: indico/modules/events/forms.py:78
 msgid "List in a category"
 msgstr "Kategoride listele"
 
-#: indico/modules/events/forms.py:75
+#: indico/modules/events/forms.py:79
 msgid "Keep unlisted"
 msgstr "Liste dışı tut"
 
-#: indico/modules/events/forms.py:79
+#: indico/modules/events/forms.py:86
 #: indico/modules/events/management/forms.py:60
 msgid "Event title"
 msgstr "Etkinlik başlığı"
 
 #: indico/modules/events/contributions/forms.py:51
-#: indico/modules/events/forms.py:81
+#: indico/modules/events/forms.py:88
 #: indico/modules/events/management/forms.py:170
 #: indico/modules/events/sessions/forms.py:74
 #: indico/modules/events/sessions/forms.py:85
@@ -4409,13 +4437,13 @@ msgstr "Etkinlik başlığı"
 msgid "Location"
 msgstr "Yer"
 
-#: indico/modules/events/forms.py:88
+#: indico/modules/events/forms.py:95
 #: indico/modules/events/templates/forms/event_creation_form.html:119
 msgid "You are not allowed to create events in this category."
 msgstr "Bu kategoride etkinlikler oluşturmanıza izin verilmemektedir."
 
 #: indico/modules/events/abstracts/forms.py:656
-#: indico/modules/events/forms.py:94
+#: indico/modules/events/forms.py:101
 #: indico/modules/events/management/forms.py:103
 #: indico/modules/events/management/forms.py:109
 #: indico/modules/events/papers/forms.py:60
@@ -4425,7 +4453,7 @@ msgid "Start"
 msgstr "Başlangıç"
 
 #: indico/modules/events/abstracts/forms.py:658
-#: indico/modules/events/forms.py:95
+#: indico/modules/events/forms.py:102
 #: indico/modules/events/management/forms.py:104
 #: indico/modules/events/management/forms.py:112
 #: indico/modules/events/papers/forms.py:62
@@ -4434,30 +4462,30 @@ msgstr "Başlangıç"
 msgid "End"
 msgstr "Bitiş"
 
-#: indico/modules/events/forms.py:103
+#: indico/modules/events/forms.py:110
 msgid "Dates"
 msgstr "Tarihler"
 
-#: indico/modules/events/forms.py:106 indico/modules/events/layout/forms.py:94
+#: indico/modules/events/forms.py:113 indico/modules/events/layout/forms.py:94
 #: indico/modules/events/layout/forms.py:99
 #: indico/modules/events/layout/forms.py:187
 #: indico/modules/events/layout/templates/layout_conference.html:27
 msgid "Theme"
 msgstr "Tema"
 
-#: indico/modules/events/forms.py:111
+#: indico/modules/events/forms.py:118
 msgid "Restrict creation"
 msgstr ""
 
-#: indico/modules/events/forms.py:113
+#: indico/modules/events/forms.py:120
 msgid "Restrict creation of unlisted events to the authorized users below."
 msgstr ""
 
-#: indico/modules/events/forms.py:114
+#: indico/modules/events/forms.py:121
 msgid "Authorized users"
 msgstr "Yetkili kullanıcılar"
 
-#: indico/modules/events/forms.py:116
+#: indico/modules/events/forms.py:123
 msgid "These users may create unlisted events."
 msgstr ""
 
@@ -4467,10 +4495,15 @@ msgstr ""
 msgid "The title of the event"
 msgstr "Etkinliğin başlığı"
 
-#: indico/modules/events/placeholders.py:25
-#: indico/modules/events/registration/placeholders/registrations.py:45
+#: indico/modules/events/placeholders.py:35
+#: indico/modules/events/registration/placeholders/registrations.py:56
 msgid "Link to the event"
 msgstr "Etkinliğe bağla"
+
+#: indico/modules/events/placeholders.py:36
+#: indico/modules/events/registration/placeholders/registrations.py:57
+msgid "Custom link text instead of the full URL"
+msgstr ""
 
 #: indico/modules/events/reviewing_questions_fields.py:19
 msgid "Exclude from score"
@@ -5872,7 +5905,15 @@ msgstr "Listeyi özelleştir"
 msgid "Download attachments"
 msgstr "Ekleri indir"
 
-#: indico/modules/events/abstracts/templates/display/abstracts.html:86
+#: indico/modules/events/abstracts/templates/display/abstracts.html:78
+#: indico/modules/events/abstracts/templates/management/abstract_list.html:221
+#: indico/modules/events/contributions/templates/management/contributions.html:178
+#: indico/modules/events/papers/templates/_paper_list.html:377
+#: indico/modules/events/registration/templates/management/regform_reglist.html:232
+msgid "Adapt columns width"
+msgstr "Sütun genişliğini uyarla"
+
+#: indico/modules/events/abstracts/templates/display/abstracts.html:89
 msgid "Search by #id or string"
 msgstr ""
 
@@ -6134,13 +6175,6 @@ msgstr "Bu özeti gözden geçirdiniz"
 msgid "Go to contribution"
 msgstr "Katkıya git"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
-#: indico/modules/events/management/forms.py:403
-#: indico/modules/events/management/templates/_action_menu.html:135
-#: indico/modules/events/management/templates/clone_event.html:108
-msgid "Clone"
-msgstr "Klon"
-
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:282
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:283
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:51
@@ -6332,13 +6366,6 @@ msgstr "Seçili özetleri birleştir"
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:153
 msgid "Mark selected abstracts as duplicate"
 msgstr "Seçili özetleri kopya olarak işaretle"
-
-#: indico/modules/events/abstracts/templates/management/abstract_list.html:221
-#: indico/modules/events/contributions/templates/management/contributions.html:178
-#: indico/modules/events/papers/templates/_paper_list.html:377
-#: indico/modules/events/registration/templates/management/regform_reglist.html:232
-msgid "Adapt columns width"
-msgstr "Sütun genişliğini uyarla"
 
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:229
 #: indico/modules/events/registration/templates/management/regform_reglist.html:239
@@ -8033,7 +8060,7 @@ msgid "There are no subcontributions in this contribution yet"
 msgstr "Bu katkıda henüz hiçbir alt katkı yoktur"
 
 #: indico/modules/events/contributions/templates/management/_types_table.html:5
-#: indico/modules/events/management/templates/_settings.html:227
+#: indico/modules/events/management/templates/_settings.html:234
 #: indico/modules/events/registration/fields/simple.py:108
 #: indico/modules/events/registration/fields/simple.py:252
 #: indico/modules/events/registration/lists.py:52
@@ -8053,7 +8080,7 @@ msgid "Yes"
 msgstr "Evet"
 
 #: indico/modules/events/contributions/templates/management/_types_table.html:5
-#: indico/modules/events/management/templates/_settings.html:227
+#: indico/modules/events/management/templates/_settings.html:234
 #: indico/modules/events/registration/fields/simple.py:109
 #: indico/modules/events/registration/fields/simple.py:253
 #: indico/modules/events/registration/lists.py:51
@@ -9417,7 +9444,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/management/forms.py:485
-#: indico/modules/events/management/templates/_settings.html:226
+#: indico/modules/events/management/templates/_settings.html:233
 msgid "Enforce language"
 msgstr ""
 
@@ -9430,7 +9457,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/management/forms.py:491
-#: indico/modules/events/management/templates/_settings.html:229
+#: indico/modules/events/management/templates/_settings.html:236
 msgid "Additional languages"
 msgstr ""
 
@@ -9851,7 +9878,13 @@ msgstr "Anahtar sözcükleri / atıfları / etiketi düzenle"
 msgid "Edit keywords / label"
 msgstr "Anahtar sözcükleri / etiketi düzenle"
 
-#: indico/modules/events/management/templates/_settings.html:220
+#: indico/modules/events/management/templates/_settings.html:214
+msgid ""
+"This label indicates that the event is not happening. Reminders are "
+"disabled."
+msgstr ""
+
+#: indico/modules/events/management/templates/_settings.html:227
 msgid "Edit supported languages"
 msgstr ""
 
@@ -12819,15 +12852,15 @@ msgstr "Herkese görüntele"
 msgid "Link to accept/decline the invitation"
 msgstr "Daveti kabul/ret bağlantısı"
 
-#: indico/modules/events/registration/placeholders/registrations.py:56
+#: indico/modules/events/registration/placeholders/registrations.py:62
 msgid "The ID of the registration"
 msgstr "Kaydın kimliği"
 
-#: indico/modules/events/registration/placeholders/registrations.py:65
+#: indico/modules/events/registration/placeholders/registrations.py:71
 msgid "The link to the registration details"
 msgstr "Kayıt detaylarına bağlantı"
 
-#: indico/modules/events/registration/placeholders/registrations.py:75
+#: indico/modules/events/registration/placeholders/registrations.py:81
 msgid "The reason why the registration was rejected"
 msgstr "Kaydın reddedilme neeni"
 
@@ -14356,7 +14389,7 @@ msgstr "Kayıtları yeniden zamanla"
 
 #: indico/modules/events/reminders/__init__.py:33
 #: indico/modules/events/reminders/__init__.py:60
-#: indico/modules/events/reminders/templates/reminders.html:8
+#: indico/modules/events/reminders/templates/reminders.html:10
 msgid "Reminders"
 msgstr "Anımsatıcılar"
 
@@ -14476,36 +14509,42 @@ msgstr "Bu anımsatıcının süresi geçmiştir ve birkaç dakika içinde gönd
 msgid "Misc"
 msgstr "Çeşitli"
 
-#: indico/modules/events/reminders/templates/reminders.html:17
+#: indico/modules/events/reminders/templates/reminders.html:19
 msgid "Reminder details"
 msgstr "Anımsatıcı detayları"
 
-#: indico/modules/events/reminders/templates/reminders.html:17
+#: indico/modules/events/reminders/templates/reminders.html:19
 msgid "Edit reminder"
 msgstr "Anımsatıcıyı düzenle"
 
-#: indico/modules/events/reminders/templates/reminders.html:34
+#: indico/modules/events/reminders/templates/reminders.html:36
 msgid "Delete reminder"
 msgstr "Anımsatıcıyı sil"
 
-#: indico/modules/events/reminders/templates/reminders.html:35
+#: indico/modules/events/reminders/templates/reminders.html:37
 msgid "Do you really want to delete this reminder?"
 msgstr "Gerçekten bu anımsatıcıyı silmek ister misiniz?"
 
-#: indico/modules/events/reminders/templates/reminders.html:49
+#: indico/modules/events/reminders/templates/reminders.html:50
+#, python-format
+msgid ""
+"Since this event has the %(label)s label, no reminders will be sent for it."
+msgstr ""
+
+#: indico/modules/events/reminders/templates/reminders.html:59
 msgid "Pending Reminders"
 msgstr "Bekleyen Anımsatıcılar"
 
-#: indico/modules/events/reminders/templates/reminders.html:52
-#: indico/modules/events/reminders/templates/reminders.html:55
+#: indico/modules/events/reminders/templates/reminders.html:62
+#: indico/modules/events/reminders/templates/reminders.html:65
 msgid "Add Reminder"
 msgstr "Anımsatıcı Ekle"
 
-#: indico/modules/events/reminders/templates/reminders.html:63
+#: indico/modules/events/reminders/templates/reminders.html:73
 msgid "There are no pending reminders."
 msgstr "Bekleyen hiçbir anımsatıcı yoktur."
 
-#: indico/modules/events/reminders/templates/reminders.html:70
+#: indico/modules/events/reminders/templates/reminders.html:80
 msgid "Sent Reminders"
 msgstr "Gönderilen anımsatıcılar"
 

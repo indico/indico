@@ -10,7 +10,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-07-23 14:32+0200\n"
+"POT-Creation-Date: 2023-07-23 12:29+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2023\n"
 "Language-Team: French (France) (https://app.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -2768,7 +2768,7 @@ msgid "Checkbox"
 msgstr "Case à cocher"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:108
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:99
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:101
 msgid "Date"
 msgstr "Date"
 
@@ -3537,7 +3537,7 @@ msgstr "Commentaires"
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:120
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:150
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:141
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:189
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:190
 #: indico/modules/rb/client/js/modules/roomList/filters/LocationForm.jsx:45
 msgid "Location"
 msgstr "Emplacement"
@@ -3548,7 +3548,7 @@ msgid "Site"
 msgstr "Site"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:40
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:206
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:207
 #: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:55
 msgid "Building"
 msgstr "Bâtiment"
@@ -3900,7 +3900,7 @@ msgid "Room Booking"
 msgstr "Réservation de Salle"
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:55
-#: indico/web/client/js/react/components/PersonLinkField.jsx:343
+#: indico/web/client/js/react/components/PersonLinkField.jsx:369
 #: indico/web/client/js/react/components/principals/Search.jsx:126
 msgid "Search"
 msgstr "Chercher"
@@ -4813,11 +4813,11 @@ msgstr "Créer la Réservation"
 msgid "Create Pre-booking"
 msgstr "Créer une Pré-réservation"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:81
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:83
 msgid "Recurrence"
 msgstr "Récurrence"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:117
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:119
 msgid "Time"
 msgstr "Horaire"
 
@@ -4998,21 +4998,21 @@ msgstr "Demandes de réservations actives"
 msgid "Your bookings"
 msgstr "Vos réservations"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:48
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:163
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:49
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:164
 msgid "Equipment"
 msgstr "Equipement"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:79
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:80
 msgid "Building {building}"
 msgstr "Bâtiment {building}"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:223
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:224
 #: indico/modules/rb/client/js/modules/roomList/filters/CapacityForm.jsx:34
 msgid "Min. Capacity"
 msgstr "Capacité minimum"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:243
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:244
 msgid "Show only..."
 msgstr "Montrer seulement..."
 
@@ -5442,28 +5442,28 @@ msgstr ""
 msgid "This email is currently not linked to this event."
 msgstr "Cette adresse nést actuellement pas liée à cet événement."
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:72
+#: indico/web/client/js/react/components/PersonLinkField.jsx:70
 msgid "Edit person"
 msgstr "Modifier la personne"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:82
+#: indico/web/client/js/react/components/PersonLinkField.jsx:80
 msgid "Delete person"
 msgstr "Supprimer la personne"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:197
-#: indico/web/client/js/react/components/PersonLinkField.jsx:316
+#: indico/web/client/js/react/components/PersonLinkField.jsx:195
+#: indico/web/client/js/react/components/PersonLinkField.jsx:342
 msgid "There are no persons"
 msgstr "Aucune personne"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:308
+#: indico/web/client/js/react/components/PersonLinkField.jsx:334
 msgid "Others"
 msgstr "Autres"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:333
+#: indico/web/client/js/react/components/PersonLinkField.jsx:359
 msgid "Add myself"
 msgstr "M'ajouter moi-même"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:355
+#: indico/web/client/js/react/components/PersonLinkField.jsx:381
 msgid "Enter manually"
 msgstr "Entrer manuellement"
 

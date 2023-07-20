@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-11 14:32+0200\n"
+"POT-Creation-Date: 2023-07-20 12:28+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Batbayar Bat-Erdene <yertonts@gmail.com>, 2021\n"
 "Language-Team: Mongolian (Mongolia) (http://app.transifex.com/indico/indico/language/mn_MN/)\n"
@@ -171,7 +171,8 @@ msgstr "үндсэн"
 
 #: indico/core/db/sqlalchemy/links.py:23
 #: indico/modules/attachments/controllers/management/base.py:55
-#: indico/modules/categories/forms.py:177 indico/modules/events/forms.py:76
+#: indico/modules/categories/forms.py:177 indico/modules/designer/forms.py:28
+#: indico/modules/events/forms.py:80
 #: indico/modules/events/management/forms.py:367
 #: indico/modules/events/templates/emails/event_creation.txt:20
 #: indico/modules/logs/models/entries.py:31
@@ -812,7 +813,7 @@ msgid "Settings have been saved"
 msgstr "Тохиргоог хадгаллаа"
 
 #: indico/modules/announcement/forms.py:18 indico/modules/core/forms.py:24
-#: indico/modules/events/forms.py:110
+#: indico/modules/events/forms.py:117
 #: indico/modules/events/payment/plugins.py:30
 #: indico/modules/events/registration/forms.py:106
 #: indico/modules/events/surveys/forms.py:44 indico/modules/oauth/forms.py:46
@@ -1206,7 +1207,7 @@ msgstr "Материалд нэвтрэхийг зөвшөөрсөн хэрэг�
 #: indico/modules/categories/forms.py:136
 #: indico/modules/categories/templates/management/_events_list.html:63
 #: indico/modules/categories/templates/management/content.html:91
-#: indico/modules/core/forms.py:19 indico/modules/designer/forms.py:19
+#: indico/modules/core/forms.py:19 indico/modules/designer/forms.py:21
 #: indico/modules/designer/placeholders.py:237
 #: indico/modules/events/abstracts/forms.py:428
 #: indico/modules/events/abstracts/forms.py:476
@@ -1254,7 +1255,7 @@ msgstr "Гарчиг"
 #: indico/modules/events/contributions/forms.py:220
 #: indico/modules/events/contributions/templates/display/contribution_display.html:166
 #: indico/modules/events/contributions/templates/management/types_dialog.html:22
-#: indico/modules/events/forms.py:105
+#: indico/modules/events/forms.py:112
 #: indico/modules/events/management/forms.py:61
 #: indico/modules/events/management/templates/_settings.html:44
 #: indico/modules/events/papers/forms.py:134
@@ -2419,7 +2420,7 @@ msgstr ""
 msgid "Allows requesting for an event to be moved to this category"
 msgstr ""
 
-#: indico/modules/categories/forms.py:41 indico/modules/events/forms.py:80
+#: indico/modules/categories/forms.py:41 indico/modules/events/forms.py:87
 #: indico/modules/events/management/forms.py:102
 #: indico/modules/events/management/templates/_settings.html:84
 #: indico/modules/events/templates/emails/event_creation.txt:67
@@ -2522,7 +2523,7 @@ msgstr "Зөвшөөрөл"
 
 #: indico/modules/categories/forms.py:88
 #: indico/modules/events/contributions/forms.py:108
-#: indico/modules/events/forms.py:82
+#: indico/modules/events/forms.py:89
 #: indico/modules/events/management/forms.py:254
 #: indico/modules/events/sessions/forms.py:57
 msgid "Protection mode"
@@ -3329,7 +3330,7 @@ msgstr "Үүрэг нэмэх"
 #: indico/modules/events/layout/templates/layout_conference.html:62
 #: indico/modules/events/layout/templates/layout_conference.html:76
 #: indico/modules/events/management/templates/_action_menu.html:100
-#: indico/modules/events/reminders/templates/reminders.html:36
+#: indico/modules/events/reminders/templates/reminders.html:38
 #: indico/modules/events/surveys/templates/management/survey.html:137
 #: indico/modules/events/templates/admin/_event_label_list.html:25
 #: indico/modules/events/templates/admin/_reference_type_list.html:25
@@ -3558,7 +3559,7 @@ msgstr "Эдгээр тохиргоог сервер дэхь indico.conf file �
 
 #: indico/modules/core/templates/admin/settings.html:66
 #: indico/modules/events/management/forms.py:483
-#: indico/modules/events/management/templates/_settings.html:223
+#: indico/modules/events/management/templates/_settings.html:230
 msgid "Default language"
 msgstr "Анхдагч хэл"
 
@@ -3614,50 +3615,62 @@ msgstr "Зөвхөн нүүрэн тал"
 msgid "Posters/Badges"
 msgstr "Зурагт хуудсууд/Тэмдгүүд"
 
-#: indico/modules/designer/controllers.py:209
+#: indico/modules/designer/controllers.py:214
 msgid "Created copy of template '{}'"
 msgstr "'{}' загвараас үүсгэсэн хуулбар"
 
-#: indico/modules/designer/controllers.py:228
+#: indico/modules/designer/controllers.py:218
+msgid "Go to category"
+msgstr ""
+
+#: indico/modules/designer/controllers.py:229
+#: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
+#: indico/modules/events/management/forms.py:403
+#: indico/modules/events/management/templates/_action_menu.html:135
+#: indico/modules/events/management/templates/clone_event.html:108
+msgid "Clone"
+msgstr "Олшруулах"
+
+#: indico/modules/designer/controllers.py:249
 msgid "Added new template '{}'"
 msgstr "'{}' шинэ загвар нэмсэн"
 
-#: indico/modules/designer/controllers.py:309
+#: indico/modules/designer/controllers.py:332
 msgid "A Fixed Image element must contain an image"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:311
+#: indico/modules/designer/controllers.py:334
 msgid "The image file does not belong to this template"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:316
+#: indico/modules/designer/controllers.py:339
 msgid "Template successfully saved."
 msgstr "Загвар амжилттай хадгалагдсан."
 
-#: indico/modules/designer/controllers.py:356
+#: indico/modules/designer/controllers.py:379
 #: indico/modules/events/layout/controllers/images.py:72
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
 msgstr[0] "Зураг байршуулагдсан байна"
 msgstr[1] "{count} зураг байршуулсан"
 
-#: indico/modules/designer/controllers.py:377
+#: indico/modules/designer/controllers.py:400
 msgid "The template has been deleted"
 msgstr "Загварыг устгалаа"
 
-#: indico/modules/designer/forms.py:20
+#: indico/modules/designer/forms.py:22
 #: indico/modules/events/management/forms.py:323
 #: indico/modules/events/papers/forms.py:135
 #: indico/modules/events/registration/forms.py:428
 msgid "Template"
 msgstr "Загвар"
 
-#: indico/modules/designer/forms.py:21
+#: indico/modules/designer/forms.py:23
 #: indico/modules/designer/templates/template.html:74
 msgid "Allow cloning"
 msgstr "Олшруулахыг зөвшөөрөх"
 
-#: indico/modules/designer/forms.py:22
+#: indico/modules/designer/forms.py:24
 #: indico/modules/designer/templates/template.html:73
 msgid "Allow cloning this template in subcategories and events"
 msgstr "Дэд ангилалууд болон үйл явдлуудад энэ загварыг олшруулахыг зөвшөөрөх"
@@ -3819,12 +3832,12 @@ msgid "Registration Form has no registrations"
 msgstr "Бүртгэлгүй Бүртгэлийн Маягт"
 
 #: indico/modules/designer/templates/_list.html:8
-#: indico/modules/designer/templates/_list.html:162
+#: indico/modules/designer/templates/_list.html:165
 msgid "Print tickets"
 msgstr "Тасалбаруудыг хэвлэх"
 
 #: indico/modules/designer/templates/_list.html:10
-#: indico/modules/designer/templates/_list.html:164
+#: indico/modules/designer/templates/_list.html:167
 msgid "Print badges"
 msgstr "Тэмдгүүдийг хэвлэх"
 
@@ -3861,71 +3874,76 @@ msgstr "Энэ ангилалд зориулан анхдагч тэмдгийн
 msgid "This template cannot be cloned"
 msgstr "Энэ загварыг олшруулах боломжгүй"
 
-#: indico/modules/designer/templates/_list.html:112
+#: indico/modules/designer/templates/_list.html:113
 msgid "Clone this template"
 msgstr "Энэ загварыг олшруул"
 
-#: indico/modules/designer/templates/_list.html:116
+#: indico/modules/designer/templates/_list.html:117
 #, python-format
 msgid "Are you sure you want to clone template '%(title)s'?"
 msgstr "Та загвар '%(title)s'-г хувилахыг хүсэж байгаадаа итгэлтэй байна уу?"
 
-#: indico/modules/designer/templates/_list.html:124
+#: indico/modules/designer/templates/_list.html:119
+#, python-format
+msgid "Clone '%(title)s' template into a category"
+msgstr ""
+
+#: indico/modules/designer/templates/_list.html:127
 msgid "Edit template"
 msgstr "Загварыг засварлах"
 
-#: indico/modules/designer/templates/_list.html:131
+#: indico/modules/designer/templates/_list.html:134
 msgid "This template cannot be deleted."
 msgstr "Энэ загварыг устгах боломжгүй."
 
-#: indico/modules/designer/templates/_list.html:133
+#: indico/modules/designer/templates/_list.html:136
 msgid ""
 "This template cannot be deleted because it is used in a registration form or"
 " as a backside for another template."
 msgstr "Энэ загвар бүртгэлийн маягт дээр эсвэл өөр загварын ар тал болж ашиглагдаж буй тул устгах боломжгүй."
 
-#: indico/modules/designer/templates/_list.html:136
+#: indico/modules/designer/templates/_list.html:139
 #: indico/modules/events/abstracts/templates/management/_notification_tpl_list.html:63
 #: indico/modules/events/abstracts/templates/management/_notification_tpl_list.html:68
 msgid "Delete template"
 msgstr "Загварыг устгах"
 
-#: indico/modules/designer/templates/_list.html:140
+#: indico/modules/designer/templates/_list.html:143
 #, python-format
 msgid "Are you sure you want to delete the template '%(title)s'?"
 msgstr "Та загвар '%(title)s'-г устгахыг хүсэж байгаадаа итгэлтэй байна уу?"
 
-#: indico/modules/designer/templates/_list.html:150
+#: indico/modules/designer/templates/_list.html:153
 msgid "Print poster for the event"
 msgstr "Үйл явдалд зориулан зурагт хуудас хэвлэх"
 
-#: indico/modules/designer/templates/_list.html:152
+#: indico/modules/designer/templates/_list.html:155
 msgid "Poster Printing Settings"
 msgstr "Зурагт Хуудас Хэвлэх Тохиргоо"
 
-#: indico/modules/designer/templates/_list.html:170
+#: indico/modules/designer/templates/_list.html:173
 msgid "There are no registration forms in this event"
 msgstr "Энэ үйл явдал дээр бүртгэлийн маягт байхгүй байна."
 
-#: indico/modules/designer/templates/_list.html:191
+#: indico/modules/designer/templates/_list.html:194
 #: indico/modules/designer/templates/backside_list.html:40
 msgid "Inherited templates"
 msgstr "Өвлөсөн загварууд"
 
-#: indico/modules/designer/templates/_list.html:206
+#: indico/modules/designer/templates/_list.html:209
 #: indico/modules/designer/templates/backside_list.html:44
 msgid "Custom templates"
 msgstr "Хэвшмэл загварууд"
 
-#: indico/modules/designer/templates/_list.html:209
+#: indico/modules/designer/templates/_list.html:212
 msgid "Add a new blank designer template"
 msgstr "Загвар зохион бүтээгчийн шинэ хоосон загвар нэмэх"
 
-#: indico/modules/designer/templates/_list.html:212
+#: indico/modules/designer/templates/_list.html:215
 msgid "Add new"
 msgstr "Шинээр нэмэх"
 
-#: indico/modules/designer/templates/_list.html:227
+#: indico/modules/designer/templates/_list.html:230
 #: indico/modules/designer/templates/backside_list.html:26
 msgid "No templates"
 msgstr "Загварууд байхгүй"
@@ -4262,7 +4280,7 @@ msgstr ""
 #: indico/modules/events/contributions/forms.py:71
 #: indico/modules/events/contributions/forms.py:129
 #: indico/modules/events/contributions/lists.py:54
-#: indico/modules/events/forms.py:104
+#: indico/modules/events/forms.py:111
 #: indico/modules/events/layout/models/menu.py:40
 #: indico/modules/events/management/forms.py:187
 #: indico/modules/events/management/templates/_settings.html:130
@@ -4315,7 +4333,7 @@ msgstr ""
 msgid "Value"
 msgstr "Ач холбогдол"
 
-#: indico/modules/events/fields.py:162
+#: indico/modules/events/fields.py:170
 msgid "There is already a person with the email {email}"
 msgstr ""
 
@@ -4324,25 +4342,25 @@ msgstr ""
 #: indico/modules/events/abstracts/settings.py:74
 #: indico/modules/events/contributions/fields.py:29
 #: indico/modules/events/contributions/templates/display/user_contribution_list.html:12
-#: indico/modules/events/fields.py:196
+#: indico/modules/events/fields.py:204
 #: indico/modules/events/management/templates/_settings.html:141
 #: indico/modules/events/papers/templates/forms/paper_email_settings_widget.html:19
 msgid "Submitter"
 msgstr "Илгээгч"
 
-#: indico/modules/events/fields.py:201
+#: indico/modules/events/fields.py:209
 msgid "There are no chairpersons"
 msgstr "Хурлын дарга байхгүй байна"
 
-#: indico/modules/events/fields.py:207
+#: indico/modules/events/fields.py:215
 msgid "There are no speakers"
 msgstr "Илтгэгч нар байхгүй байна"
 
-#: indico/modules/events/fields.py:225
+#: indico/modules/events/fields.py:233
 msgid "Person with email '{}' is duplicated"
 msgstr "'{}' цахим шуудантай хүн давхардсан байна."
 
-#: indico/modules/events/fields.py:238
+#: indico/modules/events/fields.py:246
 msgid "Category default"
 msgstr "Ангилалын өгөгдмөл"
 
@@ -4375,30 +4393,40 @@ msgstr "Энэ нэрийг аль хэдийн ашиглаж байна."
 msgid "The URL template must contain the placeholder '{value}'."
 msgstr "URL-н загвар нь байр хадгалагчийн '{value}' агуулах ёсгүй."
 
-#: indico/modules/events/forms.py:69
+#: indico/modules/events/forms.py:59
+msgid "Event does not happen"
+msgstr ""
+
+#: indico/modules/events/forms.py:60
+msgid ""
+"Enable this to indicate that an event with this label does not happen (e.g. "
+"cancelled or postponed). This will prevent event reminders from being sent."
+msgstr ""
+
+#: indico/modules/events/forms.py:73
 #: indico/modules/events/registration/forms.py:507
 msgid "This title is already in use."
 msgstr "Энэ гарчигийг аль хэдийн ашиглаж байна. "
 
-#: indico/modules/events/forms.py:73
+#: indico/modules/events/forms.py:77
 msgid "Listing"
 msgstr ""
 
-#: indico/modules/events/forms.py:74
+#: indico/modules/events/forms.py:78
 msgid "List in a category"
 msgstr ""
 
-#: indico/modules/events/forms.py:75
+#: indico/modules/events/forms.py:79
 msgid "Keep unlisted"
 msgstr ""
 
-#: indico/modules/events/forms.py:79
+#: indico/modules/events/forms.py:86
 #: indico/modules/events/management/forms.py:60
 msgid "Event title"
 msgstr "Үйл явдлын гарчиг"
 
 #: indico/modules/events/contributions/forms.py:51
-#: indico/modules/events/forms.py:81
+#: indico/modules/events/forms.py:88
 #: indico/modules/events/management/forms.py:170
 #: indico/modules/events/sessions/forms.py:74
 #: indico/modules/events/sessions/forms.py:85
@@ -4408,13 +4436,13 @@ msgstr "Үйл явдлын гарчиг"
 msgid "Location"
 msgstr "Байршил"
 
-#: indico/modules/events/forms.py:88
+#: indico/modules/events/forms.py:95
 #: indico/modules/events/templates/forms/event_creation_form.html:119
 msgid "You are not allowed to create events in this category."
 msgstr "Танд энэ ангилалд үйл явдал үүсгэх эрх байхгүй байна. "
 
 #: indico/modules/events/abstracts/forms.py:656
-#: indico/modules/events/forms.py:94
+#: indico/modules/events/forms.py:101
 #: indico/modules/events/management/forms.py:103
 #: indico/modules/events/management/forms.py:109
 #: indico/modules/events/papers/forms.py:60
@@ -4424,7 +4452,7 @@ msgid "Start"
 msgstr "Эхлэх"
 
 #: indico/modules/events/abstracts/forms.py:658
-#: indico/modules/events/forms.py:95
+#: indico/modules/events/forms.py:102
 #: indico/modules/events/management/forms.py:104
 #: indico/modules/events/management/forms.py:112
 #: indico/modules/events/papers/forms.py:62
@@ -4433,30 +4461,30 @@ msgstr "Эхлэх"
 msgid "End"
 msgstr "Дуусах"
 
-#: indico/modules/events/forms.py:103
+#: indico/modules/events/forms.py:110
 msgid "Dates"
 msgstr "Огноо"
 
-#: indico/modules/events/forms.py:106 indico/modules/events/layout/forms.py:94
+#: indico/modules/events/forms.py:113 indico/modules/events/layout/forms.py:94
 #: indico/modules/events/layout/forms.py:99
 #: indico/modules/events/layout/forms.py:187
 #: indico/modules/events/layout/templates/layout_conference.html:27
 msgid "Theme"
 msgstr "Сэдэв"
 
-#: indico/modules/events/forms.py:111
+#: indico/modules/events/forms.py:118
 msgid "Restrict creation"
 msgstr ""
 
-#: indico/modules/events/forms.py:113
+#: indico/modules/events/forms.py:120
 msgid "Restrict creation of unlisted events to the authorized users below."
 msgstr ""
 
-#: indico/modules/events/forms.py:114
+#: indico/modules/events/forms.py:121
 msgid "Authorized users"
 msgstr "Эрх бүхий хэрэглэгчид"
 
-#: indico/modules/events/forms.py:116
+#: indico/modules/events/forms.py:123
 msgid "These users may create unlisted events."
 msgstr ""
 
@@ -4466,10 +4494,15 @@ msgstr ""
 msgid "The title of the event"
 msgstr "Үйл явдлын нэр"
 
-#: indico/modules/events/placeholders.py:25
-#: indico/modules/events/registration/placeholders/registrations.py:45
+#: indico/modules/events/placeholders.py:35
+#: indico/modules/events/registration/placeholders/registrations.py:56
 msgid "Link to the event"
 msgstr "Үйл явдлын холбоос"
+
+#: indico/modules/events/placeholders.py:36
+#: indico/modules/events/registration/placeholders/registrations.py:57
+msgid "Custom link text instead of the full URL"
+msgstr ""
 
 #: indico/modules/events/reviewing_questions_fields.py:19
 msgid "Exclude from score"
@@ -5871,7 +5904,15 @@ msgstr "Тохируулах жагсаалт"
 msgid "Download attachments"
 msgstr "Хавсралтуудыг татах"
 
-#: indico/modules/events/abstracts/templates/display/abstracts.html:86
+#: indico/modules/events/abstracts/templates/display/abstracts.html:78
+#: indico/modules/events/abstracts/templates/management/abstract_list.html:221
+#: indico/modules/events/contributions/templates/management/contributions.html:178
+#: indico/modules/events/papers/templates/_paper_list.html:377
+#: indico/modules/events/registration/templates/management/regform_reglist.html:232
+msgid "Adapt columns width"
+msgstr "Баганын өргөнг тааруулах"
+
+#: indico/modules/events/abstracts/templates/display/abstracts.html:89
 msgid "Search by #id or string"
 msgstr ""
 
@@ -6133,13 +6174,6 @@ msgstr "Та энэ хураангуйг хянасан байна"
 msgid "Go to contribution"
 msgstr "Өгүүлэл рүү очих"
 
-#: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
-#: indico/modules/events/management/forms.py:403
-#: indico/modules/events/management/templates/_action_menu.html:135
-#: indico/modules/events/management/templates/clone_event.html:108
-msgid "Clone"
-msgstr "Олшруулах"
-
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:282
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:283
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:51
@@ -6331,13 +6365,6 @@ msgstr "Сонгосон хураангуйнуудыг нэгтгэх"
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:153
 msgid "Mark selected abstracts as duplicate"
 msgstr "Сонгосон хураангуйнуудыг давхардснаар тэмдэглэх"
-
-#: indico/modules/events/abstracts/templates/management/abstract_list.html:221
-#: indico/modules/events/contributions/templates/management/contributions.html:178
-#: indico/modules/events/papers/templates/_paper_list.html:377
-#: indico/modules/events/registration/templates/management/regform_reglist.html:232
-msgid "Adapt columns width"
-msgstr "Баганын өргөнг тааруулах"
 
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:229
 #: indico/modules/events/registration/templates/management/regform_reglist.html:239
@@ -8032,7 +8059,7 @@ msgid "There are no subcontributions in this contribution yet"
 msgstr "Энэ өгүүлэлд хараахан дагалдах өгүүлэл байхгүй байна"
 
 #: indico/modules/events/contributions/templates/management/_types_table.html:5
-#: indico/modules/events/management/templates/_settings.html:227
+#: indico/modules/events/management/templates/_settings.html:234
 #: indico/modules/events/registration/fields/simple.py:108
 #: indico/modules/events/registration/fields/simple.py:252
 #: indico/modules/events/registration/lists.py:52
@@ -8052,7 +8079,7 @@ msgid "Yes"
 msgstr "Тийм"
 
 #: indico/modules/events/contributions/templates/management/_types_table.html:5
-#: indico/modules/events/management/templates/_settings.html:227
+#: indico/modules/events/management/templates/_settings.html:234
 #: indico/modules/events/registration/fields/simple.py:109
 #: indico/modules/events/registration/fields/simple.py:253
 #: indico/modules/events/registration/lists.py:51
@@ -9416,7 +9443,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/management/forms.py:485
-#: indico/modules/events/management/templates/_settings.html:226
+#: indico/modules/events/management/templates/_settings.html:233
 msgid "Enforce language"
 msgstr ""
 
@@ -9429,7 +9456,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/events/management/forms.py:491
-#: indico/modules/events/management/templates/_settings.html:229
+#: indico/modules/events/management/templates/_settings.html:236
 msgid "Additional languages"
 msgstr ""
 
@@ -9850,7 +9877,13 @@ msgstr "Түлхүүр үгс / иш татсан материал / шошгы�
 msgid "Edit keywords / label"
 msgstr "Түлхүүр үгс / шошгыг засварлах"
 
-#: indico/modules/events/management/templates/_settings.html:220
+#: indico/modules/events/management/templates/_settings.html:214
+msgid ""
+"This label indicates that the event is not happening. Reminders are "
+"disabled."
+msgstr ""
+
+#: indico/modules/events/management/templates/_settings.html:227
 msgid "Edit supported languages"
 msgstr ""
 
@@ -12818,15 +12851,15 @@ msgstr ""
 msgid "Link to accept/decline the invitation"
 msgstr "Энэхүү урилгыг хүлээн авах/татгалзах холбоос"
 
-#: indico/modules/events/registration/placeholders/registrations.py:56
+#: indico/modules/events/registration/placeholders/registrations.py:62
 msgid "The ID of the registration"
 msgstr "Бүртгэлийн ID"
 
-#: indico/modules/events/registration/placeholders/registrations.py:65
+#: indico/modules/events/registration/placeholders/registrations.py:71
 msgid "The link to the registration details"
 msgstr "Бүртгэлийн мэдээлэл руу хийсэн холбоос"
 
-#: indico/modules/events/registration/placeholders/registrations.py:75
+#: indico/modules/events/registration/placeholders/registrations.py:81
 msgid "The reason why the registration was rejected"
 msgstr "Бүртгэлийг яагаад татгалзсан шалтгаан"
 
@@ -14355,7 +14388,7 @@ msgstr "Бүртгэлийг дахин төлөвлөх"
 
 #: indico/modules/events/reminders/__init__.py:33
 #: indico/modules/events/reminders/__init__.py:60
-#: indico/modules/events/reminders/templates/reminders.html:8
+#: indico/modules/events/reminders/templates/reminders.html:10
 msgid "Reminders"
 msgstr "Сануулгууд"
 
@@ -14475,36 +14508,42 @@ msgstr "Энэхүү сануулгын хугацаа хэтэрсэн ба ц�
 msgid "Misc"
 msgstr "Дэлгэрэнгүй"
 
-#: indico/modules/events/reminders/templates/reminders.html:17
+#: indico/modules/events/reminders/templates/reminders.html:19
 msgid "Reminder details"
 msgstr "Сануулгын дэлгэрэнгүй мэдээлэл"
 
-#: indico/modules/events/reminders/templates/reminders.html:17
+#: indico/modules/events/reminders/templates/reminders.html:19
 msgid "Edit reminder"
 msgstr "Сануулга засварлах"
 
-#: indico/modules/events/reminders/templates/reminders.html:34
+#: indico/modules/events/reminders/templates/reminders.html:36
 msgid "Delete reminder"
 msgstr "Сануулгыг устгах"
 
-#: indico/modules/events/reminders/templates/reminders.html:35
+#: indico/modules/events/reminders/templates/reminders.html:37
 msgid "Do you really want to delete this reminder?"
 msgstr "Та энэхүү сануулгыг устгахыг үнэхээр хүсэж байна уу?"
 
-#: indico/modules/events/reminders/templates/reminders.html:49
+#: indico/modules/events/reminders/templates/reminders.html:50
+#, python-format
+msgid ""
+"Since this event has the %(label)s label, no reminders will be sent for it."
+msgstr ""
+
+#: indico/modules/events/reminders/templates/reminders.html:59
 msgid "Pending Reminders"
 msgstr "Боловсруулж буй Сануулга"
 
-#: indico/modules/events/reminders/templates/reminders.html:52
-#: indico/modules/events/reminders/templates/reminders.html:55
+#: indico/modules/events/reminders/templates/reminders.html:62
+#: indico/modules/events/reminders/templates/reminders.html:65
 msgid "Add Reminder"
 msgstr "Сануулга Нэмэх"
 
-#: indico/modules/events/reminders/templates/reminders.html:63
+#: indico/modules/events/reminders/templates/reminders.html:73
 msgid "There are no pending reminders."
 msgstr "Боловсруулаагүй сануулга байхгүй байна."
 
-#: indico/modules/events/reminders/templates/reminders.html:70
+#: indico/modules/events/reminders/templates/reminders.html:80
 msgid "Sent Reminders"
 msgstr "Сануулгыг Илгээсэн"
 

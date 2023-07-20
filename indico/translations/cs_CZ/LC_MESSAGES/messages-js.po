@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-11 14:32+0200\n"
+"POT-Creation-Date: 2023-07-20 12:28+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2023\n"
 "Language-Team: Czech (Czech Republic) (http://app.transifex.com/indico/indico/language/cs_CZ/)\n"
@@ -431,7 +431,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "Máte neuložené změny, které budou ztraceny."
 
 #: indico/web/client/js/jquery/utils/declarative.js:256
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:708
 msgid "Confirm action"
 msgstr "Potvrdit činnost"
 
@@ -571,78 +571,82 @@ msgstr "Není možné pro kategorie, kde nemůžete navrhovat/vytvářet událos
 msgid "Not possible for categories where you cannot create events"
 msgstr "Není možné pro kategorie, kde nemůžete vytvářet události"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:49
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:47
+msgid "Not possible for categories where you are not a manager"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "Není možné pro kategorie pocházející z kategorie \"{0}\""
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:57
 msgid "Not possible for this category"
 msgstr "Není možné pro tuto kategorii"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:142
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:146
 msgid "Search"
 msgstr "Hledat"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:199
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:203
 msgid "Go to: {0}"
 msgstr "Jít na: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:236
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:240
 msgid "This category is protected"
 msgstr "Tato kategorie je chráněna"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:284
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:288
 msgid "Go to parent: {0}"
 msgstr "Jít na rodiče: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:333
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:337
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "Můžete pouze <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> tuto."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:342
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
 " class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
 "class=\"js-search\">search</a>."
 msgstr "Můžete položku <a class=\"js-action\" data-category-id=\"{0}\">{1}</a>, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">jít o úroveň výš,</a>, nebo <a class=\"js-search\">hledat</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:346
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:350
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "Můžete <a class=\"js-navigate-up\" data-parent-id=\"{2}\">jít o úroveň výš,</a> nebo <a class=\"js-search\">hledat</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:361
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:365
 msgid "Your search doesn't match any category"
 msgstr "Vašemu hledání neodpovídá žádná kategorie"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:366
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:370
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "Můžete <a class=\"js-search\">změnit</a> nebo <a class=\"js-clear-search\">vyčistit</a> své hledání."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:440
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:444
 msgid "In favorite categories"
 msgstr "V oblíbených kategoriích"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:447
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:451
 msgid "Search result"
 msgstr "Výsledky hledání"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:468
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:472
 msgid "Displaying {0} out of {1} results."
 msgstr "Zobrazuje se {0} z {1} výsledků."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:469
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:473
 msgid "There are no results."
 msgstr "Žádné výsledky."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:478
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:482
 msgid "Clear search"
 msgstr "Vymazat vyhledávání"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:702
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Vybrali jste kategorii <em>{0}</em>. Jste si jistí, že chcete pokračovat?"
 

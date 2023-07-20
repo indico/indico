@@ -7,7 +7,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-07-23 14:32+0200\n"
+"POT-Creation-Date: 2023-07-23 12:29+0200\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2023\n"
 "Language-Team: Chinese (China) (GB2312) (https://app.transifex.com/indico/teams/6478/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
@@ -2608,7 +2608,7 @@ msgid "Checkbox"
 msgstr "复选框"
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js:108
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:99
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:101
 msgid "Date"
 msgstr "日期"
 
@@ -3343,7 +3343,7 @@ msgstr "注释"
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:120
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:150
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:141
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:189
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:190
 #: indico/modules/rb/client/js/modules/roomList/filters/LocationForm.jsx:45
 msgid "Location"
 msgstr "位置"
@@ -3354,7 +3354,7 @@ msgid "Site"
 msgstr "站点"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:40
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:206
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:207
 #: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:55
 msgid "Building"
 msgstr "建筑"
@@ -3690,7 +3690,7 @@ msgid "Room Booking"
 msgstr "会议室预订"
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:55
-#: indico/web/client/js/react/components/PersonLinkField.jsx:343
+#: indico/web/client/js/react/components/PersonLinkField.jsx:369
 #: indico/web/client/js/react/components/principals/Search.jsx:126
 msgid "Search"
 msgstr "查询"
@@ -4522,11 +4522,11 @@ msgstr "创建预订"
 msgid "Create Pre-booking"
 msgstr "创建预先预定"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:81
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:83
 msgid "Recurrence"
 msgstr "重现"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:117
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:119
 msgid "Time"
 msgstr "时间"
 
@@ -4690,21 +4690,21 @@ msgstr "有效预订请求"
 msgid "Your bookings"
 msgstr "您的预订"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:48
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:163
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:49
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:164
 msgid "Equipment"
 msgstr "设备"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:79
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:80
 msgid "Building {building}"
 msgstr "建筑 {building}"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:223
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:224
 #: indico/modules/rb/client/js/modules/roomList/filters/CapacityForm.jsx:34
 msgid "Min. Capacity"
 msgstr "最小容量"
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:243
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:244
 msgid "Show only..."
 msgstr "只显示..."
 
@@ -5115,28 +5115,28 @@ msgstr ""
 msgid "This email is currently not linked to this event."
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:72
+#: indico/web/client/js/react/components/PersonLinkField.jsx:70
 msgid "Edit person"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:82
+#: indico/web/client/js/react/components/PersonLinkField.jsx:80
 msgid "Delete person"
 msgstr "删除人"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:197
-#: indico/web/client/js/react/components/PersonLinkField.jsx:316
+#: indico/web/client/js/react/components/PersonLinkField.jsx:195
+#: indico/web/client/js/react/components/PersonLinkField.jsx:342
 msgid "There are no persons"
 msgstr ""
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:308
+#: indico/web/client/js/react/components/PersonLinkField.jsx:334
 msgid "Others"
 msgstr "其他"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:333
+#: indico/web/client/js/react/components/PersonLinkField.jsx:359
 msgid "Add myself"
 msgstr "添加自己"
 
-#: indico/web/client/js/react/components/PersonLinkField.jsx:355
+#: indico/web/client/js/react/components/PersonLinkField.jsx:381
 msgid "Enter manually"
 msgstr "手工录入"
 

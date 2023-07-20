@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-11 14:32+0200\n"
+"POT-Creation-Date: 2023-07-20 12:28+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Dirk Hoffmann <Hoffmann@cppm.in2p3.fr>, 2012,2015,2017,2020,2022\n"
 "Language-Team: German (Germany) (http://app.transifex.com/indico/indico/language/de_DE/)\n"
@@ -417,7 +417,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "Ungespeicherte Änderungen gehen verloren."
 
 #: indico/web/client/js/jquery/utils/declarative.js:256
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:708
 msgid "Confirm action"
 msgstr "Vorgang bestätigen"
 
@@ -547,78 +547,82 @@ msgstr "Dies steht nicht zu Verfügung für Kategorien für die sie keine Verans
 msgid "Not possible for categories where you cannot create events"
 msgstr "Nicht möglich für Kategorien wo Sie keine Rechte zur Erstellung von Veranstaltungen besitzen"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:49
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:47
+msgid "Not possible for categories where you are not a manager"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "Nicht möglich für Kategorien, die von Kategorie {0} ausgehen."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:57
 msgid "Not possible for this category"
 msgstr "Für diese Kategorie nicht möglich"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:142
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:146
 msgid "Search"
 msgstr "Suche"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:199
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:203
 msgid "Go to: {0}"
 msgstr "Gehe zu: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:236
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:240
 msgid "This category is protected"
 msgstr "Diese Kategorie ist geschützt"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:284
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:288
 msgid "Go to parent: {0}"
 msgstr "Gehe zu übergeordnetem Element: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:333
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:337
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "Sie können nur dieses <a class=\"js-action\" data-category-id=\"{0}\">{1}</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:342
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
 " class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
 "class=\"js-search\">search</a>."
 msgstr "Sie können dieses <a class=\"js-action\" data-category-id=\"{0}\">{1}</a>, <a class=\"js-navigate-up\" data-parent-id=\"{2}\">nach oben navigieren</a> oder <a class=\"js-search\">suchen</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:346
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:350
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "Sie können <a class=\"js-navigate-up\" data-parent-id=\"{2}\">hoch navigieren</a> oder <a class=\"js-search\">suchen</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:361
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:365
 msgid "Your search doesn't match any category"
 msgstr "Ihre Suche passt zu keiner Kategorie."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:366
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:370
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "Sie können Ihre Suche <a class=\"js-search\">modifizieren</a> oder <a class=\"js-clear-search\">löschen</a>."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:440
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:444
 msgid "In favorite categories"
 msgstr "In Favoriten-Kategorien"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:447
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:451
 msgid "Search result"
 msgstr "Suchergebnis"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:468
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:472
 msgid "Displaying {0} out of {1} results."
 msgstr "{0} von {1} Ergebnissen angezeigt."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:469
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:473
 msgid "There are no results."
 msgstr "Keine Suchergebnisse."
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:478
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:482
 msgid "Clear search"
 msgstr "Suche zurücksetzten"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:702
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "Sie haben Kategorie <em>{0}</em> ausgewählt. Sind Sie sicher, dass Sie fortfahren möchten?"
 

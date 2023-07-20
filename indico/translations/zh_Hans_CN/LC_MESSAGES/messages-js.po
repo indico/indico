@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-11 14:32+0200\n"
+"POT-Creation-Date: 2023-07-20 12:28+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2019-2022\n"
 "Language-Team: Chinese (China) (GB2312) (http://app.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
@@ -391,7 +391,7 @@ msgid "You have unsaved changes that will be lost."
 msgstr "您尚未保存的更改将丢失。"
 
 #: indico/web/client/js/jquery/utils/declarative.js:256
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:704
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:708
 msgid "Confirm action"
 msgstr "确认操作"
 
@@ -516,78 +516,82 @@ msgstr "不能用于您无法提议/创建事件的类别"
 msgid "Not possible for categories where you cannot create events"
 msgstr "不适用于不能建立事件的类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:49
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:47
+msgid "Not possible for categories where you are not a manager"
+msgstr ""
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
 msgid "Not possible for categories descending from category \"{0}\""
 msgstr "不适用于从类别 \"{0}\" 降序的类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:57
 msgid "Not possible for this category"
 msgstr "不适用此类别"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:142
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:146
 msgid "Search"
 msgstr "查询"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:199
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:203
 msgid "Go to: {0}"
 msgstr "转到：{0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:236
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:240
 msgid "This category is protected"
 msgstr "此类别是受保护的"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:284
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:288
 msgid "Go to parent: {0}"
 msgstr "转到父级: {0}"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:333
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:337
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
 msgstr "您只可以 <a class=\"js-action\" data-category-id=\"{0}\"> {1} </a> 这个。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:338
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:342
 msgid ""
 "You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
 " class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
 "class=\"js-search\">search</a>."
 msgstr "您可以 <a class=\"js-action\" data-category-id=\"{0}\"> {1} </a> 此类别，<a class=\"js-navigate-up\" data-parent-id=\"{2}\"> 向上导航 </a> 或 <a class=\"js-search\"> 搜索 </a>。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:346
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:350
 msgid ""
 "You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
 "or <a class=\"js-search\">search</a>."
 msgstr "你可以 <a class=\"js-navigate-up\" data-parent-id=\"{2}\"> 向上导航 </a> 或 <a class=\"js-search\"> 搜索 </a>。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:361
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:365
 msgid "Your search doesn't match any category"
 msgstr "你的搜索与任何类别都不匹配"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:366
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:370
 msgid ""
 "You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
 "search\">clear</a> your search."
 msgstr "你可以 <a class=\"js-search\"> 修改 </a> 或 <a class=\"js-clear-search\"> 清除 </a> 你的搜索。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:440
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:444
 msgid "In favorite categories"
 msgstr "在收藏的类别中"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:447
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:451
 msgid "Search result"
 msgstr "查询结果"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:468
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:472
 msgid "Displaying {0} out of {1} results."
 msgstr "显示 {1} 个结果中的 {0}个。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:469
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:473
 msgid "There are no results."
 msgstr "无结果。"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:478
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:482
 msgid "Clear search"
 msgstr "清空查询"
 
-#: indico/web/client/js/jquery/widgets/categorynavigator.js:702
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
 msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
 msgstr "你选择了类别 <em> {0} </em>。 你确定要继续吗？"
 
