@@ -62,15 +62,6 @@ def step(message, *args, **kwargs):
     click.echo(click.style(message.format(*args) + suffix, fg='white', bold=True), err=True)
 
 
-def run(cmd, title, shell=False):
-    if shell:
-        cmd = ' '.join(cmd)
-    try:
-        subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=shell)
-    except subprocess.CalledProcessError as exc:
-        fail(f'{title} failed', verbose_msg=exc.output)
-
-
 def _bump_version(version):
     try:
         parts = [int(v) for v in version.split('.')]
@@ -144,7 +135,7 @@ def _tag_name(version):
 
 def _check_tag(version):
     tag_name = _tag_name(version)
-    if tag_name in subprocess.check_output(['git', 'tag']).splitlines():
+    if tag_name in subprocess.check_output(['git', 'tag'], encoding='utf-8').splitlines():
         fail('Git tag already exists: {}', tag_name)
 
 
@@ -152,7 +143,7 @@ def _check_git_clean():
     cmds = [['git', 'diff', '--stat', '--color=always'],
             ['git', 'diff', '--stat', '--color=always', '--staged']]
     for cmd in cmds:
-        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, encoding='utf-8')
         if rv:
             fail('Git working tree is not clean', verbose_msg=rv)
 
