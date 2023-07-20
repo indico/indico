@@ -16,6 +16,31 @@ from babel.dates import format_date
 from packaging.version import Version
 
 
+CHANGELOG_STUB = '''
+{version_line}
+{underline}
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- None so far :(
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- None so far
+
+
+'''.lstrip()
+
+
 def fail(message, *args, **kwargs):
     click.echo(click.style('Error: ' + message.format(*args), fg='red', bold=True), err=True)
     if 'verbose_msg' in kwargs:
@@ -157,18 +182,39 @@ def _build_wheel(no_assets, dry_run):
     subprocess.check_call(['./bin/maintenance/build-wheel.py', 'indico'] + args)
 
 
+def _create_changelog_stub(released_version, next_version, *, dry_run=False):
+    with open('CHANGES.rst') as f:
+        content = f.read()
+    released_version_line = f'Version {released_version}'
+    version_line = f'Version {next_version}'
+    underline = '-' * len(version_line)
+    stub = CHANGELOG_STUB.format(version_line=version_line, underline=underline)
+    if version_line in content:
+        warn('Changelog entry for {} already exists, not creating stub', next_version)
+        return
+    pos = content.index(released_version_line)
+    content = content[:pos] + stub + content[pos:]
+    step('Creating changelog stub for {}', next_version, dry_run=dry_run)
+    if not dry_run:
+        with open('CHANGES.rst', 'w') as f:
+            f.write(content)
+
+
 @click.command()
 @click.argument('version', required=False)
 @click.option('--dry-run', '-n', is_flag=True, help='Do not modify any files or run commands')
 @click.option('--sign', '-s', is_flag=True, help='Sign the Git commit/tag with GPG')
 @click.option('--no-assets', '-D', is_flag=True, help='Skip building assets when building the wheel')
 @click.option('--no-changelog', '-C', is_flag=True, help='Do not update the date in the changelog')
-def cli(version, dry_run, sign, no_assets, no_changelog):
+@click.option('--next-changelog', '-N', is_flag=True, help='Add changelog stub for next version')
+def cli(version, dry_run, sign, no_assets, no_changelog, next_changelog):
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     cur_version, new_version, next_version = _get_versions(version)
     _check_tag(new_version)
     if next_version:
         _check_tag(next_version)
+    elif next_changelog:
+        fail('Next version unknown, cannot generate changelog stub')
     _check_git_clean()
     info('Current version is {}', cur_version)
     info('Going to release {}', new_version)
@@ -187,6 +233,10 @@ def cli(version, dry_run, sign, no_assets, no_changelog):
         next_message = f'Bump version to {next_version}'
         _set_version(next_version, dry_run=dry_run)
         _git_commit(next_message, ['indico/__init__.py'], dry_run=dry_run)
+    if next_changelog:
+        next_release_version = next_version.replace('-dev', '')
+        _create_changelog_stub(new_version, next_release_version, dry_run=dry_run)
+        _git_commit(f'Add {next_release_version} changelog stub', ['CHANGES.rst'], dry_run=dry_run)
 
 
 if __name__ == '__main__':
