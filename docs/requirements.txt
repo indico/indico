@@ -74,7 +74,7 @@ sphinx==5.3.0
     #   sphinxcontrib-jquery
 sphinx-issues==3.0.1
     # via -r docs/requirements.in
-sphinx-rtd-theme==1.2.0
+sphinx-rtd-theme==1.2.2
     # via -r docs/requirements.in
 sphinxcontrib-applehelp==1.0.4
     # via sphinx

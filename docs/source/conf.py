@@ -44,6 +44,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.imgmath',
               'sphinx.ext.intersphinx',
               'sphinx_issues',
+              'sphinxcontrib.jquery',
               'sphinxcontrib.mermaid',
               'exec_directive',
               'indico_uml_directive']
