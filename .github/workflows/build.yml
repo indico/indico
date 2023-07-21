@@ -3,8 +3,12 @@ name: Build
 on:
   push:
     branches:
-      - master
+      - 'master'
       - '*.x'
+      - '!1.*'
+      - '!2.*'
+      - '!3.0.*'
+      - '!3.1.*'
 
 jobs:
   build:

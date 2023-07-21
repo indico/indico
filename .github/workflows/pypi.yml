@@ -2,7 +2,12 @@ name: PyPI release 🐍 📦
 
 on:
   push:
-    tags: [v*]
+    tags:
+      - 'v*'
+      - '!v1.*'
+      - '!v2.*'
+      - '!v3.0.*'
+      - '!v3.1.*'
 
 jobs:
   build:
