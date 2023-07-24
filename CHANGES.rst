@@ -15,7 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix not being able to remove the last entry from a room ACL (:pr:`5863`, thanks
+  :user:`SegiNyn`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
