@@ -129,8 +129,8 @@ def get_category_stats(category_id=None):
 
 
 @memoize_redis(3600)
-@materialize_iterable()
 @make_interceptable
+@materialize_iterable()
 def get_upcoming_events():
     """Get the global list of upcoming events."""
     from indico.modules.events import Event
