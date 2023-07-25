@@ -32,10 +32,8 @@ build==0.10.0
     # via
     #   -r requirements.dev.in
     #   pip-tools
-certifi==2023.5.7
-    # via
-    #   -c requirements.txt
-    #   requests
+certifi==2023.7.22
+    # via requests
 charset-normalizer==3.1.0
     # via
     #   -c requirements.txt
