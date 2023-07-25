@@ -28,6 +28,7 @@ from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.iterables import materialize_iterable
+from indico.util.signals import make_interceptable
 
 
 def get_events_by_year(category_id=None):
@@ -129,6 +130,7 @@ def get_category_stats(category_id=None):
 
 @memoize_redis(3600)
 @materialize_iterable()
+@make_interceptable
 def get_upcoming_events():
     """Get the global list of upcoming events."""
     from indico.modules.events import Event
