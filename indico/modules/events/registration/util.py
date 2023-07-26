@@ -659,6 +659,7 @@ def generate_ticket_qr_code(registration):
     )
     qr_data = {
         'registrant_id': registration.id,
+        'regform_id': registration.registration_form_id,
         'checkin_secret': registration.ticket_uuid,
         'event_id': str(registration.event.id),
         'server_url': config.BASE_URL,
