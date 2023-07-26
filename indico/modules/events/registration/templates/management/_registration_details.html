@@ -212,11 +212,13 @@
 
 {% macro _render_reset_registration_button(registration, action_text, conflict=false) %}
     {% set confirm_notification -%}
-        {%- if registration.state.name == 'withdrawn' -%}
-            {% trans %}This will trigger a notification email.{% endtrans %}
-        {%- else -%}
-            {% trans %}This action will not be notified to the registrant.{% endtrans %}
-        {%- endif -%}
+        {%- block reset_registration_button_confirm_notification_text -%}
+            {%- if registration.state.name == 'withdrawn' -%}
+                {% trans %}This will trigger a notification email.{% endtrans %}
+            {%- else -%}
+                {% trans %}This action will not be notified to the registrant.{% endtrans %}
+            {%- endif -%}
+        {%- endblock -%}
     {%- endset %}
     {% block reset_registration_button scoped %}
         <button class="i-button warning {{ 'disabled' if conflict }}"
