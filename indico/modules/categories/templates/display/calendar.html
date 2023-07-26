@@ -7,20 +7,6 @@
         <div class="js-calendar-datepicker"></div>
         <input type="hidden" id="date" name="date">
     </div>
-    <script>
-        (function(){
-            'use strict';
-
-            $('.js-calendar-datepicker').datepicker({
-                beforeShowDay: function(date) {
-                    return [date.getDate() == 1, ''];
-                },
-                onSelect: function(date) {
-                    $('#event-calendar').fullCalendar('gotoDate', new moment(date, 'DD/MM/YYYY'));
-                }
-            });
-        })();
-    </script>
 {% endblock %}
 
 {% block display_view_button %}
@@ -40,6 +26,10 @@
         <div id="event-calendar"></div>
     </div>
     <script>
-        setupCategoryCalendar('#event-calendar', {{ url_for('categories.calendar_events', category) | tojson }});
+        setupCategoryCalendar(
+            '#event-calendar',
+            {{ category.display_tzinfo.zone | tojson }},
+            {{ url_for('categories.calendar_events', category) | tojson }}
+        );
     </script>
 {% endblock %}
