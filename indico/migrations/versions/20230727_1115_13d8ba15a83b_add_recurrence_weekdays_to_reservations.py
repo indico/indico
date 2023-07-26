@@ -1,8 +1,8 @@
 """add recurrence_weekdays to reservations
 
 Revision ID: 13d8ba15a83b
-Revises: 5d05eda06776
-Create Date: 2023-07-05 11:15:22.561512
+Revises: aba7935f9226
+Create Date: 2023-07-27 11:15:22.561512
 """
 
 import sqlalchemy as sa
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '13d8ba15a83b'
-down_revision = '5d05eda06776'
+down_revision = 'aba7935f9226'
 branch_labels = None
 depends_on = None
 

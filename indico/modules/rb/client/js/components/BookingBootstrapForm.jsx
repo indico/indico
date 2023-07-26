@@ -81,6 +81,7 @@ class BookingBootstrapForm extends React.Component {
           type: 'single',
           number: 1,
           interval: 'week',
+          weekdays: {},
         },
         dates: {
           startDate: startsNextDay ? moment().add(1, 'd') : moment(),
@@ -93,6 +94,7 @@ class BookingBootstrapForm extends React.Component {
       },
       defaults
     );
+    console.log('this.state -> ', this.state);
   }
 
   componentDidMount() {
@@ -120,9 +122,9 @@ class BookingBootstrapForm extends React.Component {
 
   updateBookingType = newType => {
     const {
-      recurrence: {number, interval},
+      recurrence: {number, interval, weekdays},
     } = this.state;
-    const newState = {...this.state, recurrence: {type: newType, number, interval}};
+    const newState = {...this.state, recurrence: {type: newType, number, interval, weekdays}};
     sanitizeRecurrence(newState);
     this.setState(newState, () => {
       this.triggerChange();
@@ -131,12 +133,12 @@ class BookingBootstrapForm extends React.Component {
 
   updateNumber = number => {
     const {
-      recurrence: {type, interval},
+      recurrence: {type, interval, weekdays},
     } = this.state;
     this.setState({number});
     this.setState(
       {
-        recurrence: {type, number: parseInt(number, 10), interval},
+        recurrence: {type, number: parseInt(number, 10), interval, weekdays},
       },
       () => {
         this.triggerChange();
@@ -146,11 +148,11 @@ class BookingBootstrapForm extends React.Component {
 
   updateInterval = interval => {
     const {
-      recurrence: {type, number},
+      recurrence: {type, number, weekdays},
     } = this.state;
     this.setState(
       {
-        recurrence: {type, number, interval},
+        recurrence: {type, number, interval, weekdays},
       },
       () => {
         this.triggerChange();
@@ -172,6 +174,20 @@ class BookingBootstrapForm extends React.Component {
     );
   };
 
+  updateRecurrenceWeekdays = selectedDays => {
+    const {
+      recurrence: {type, number, interval},
+    } = this.state;
+    this.setState(
+      {
+        recurrence: {type, number, interval, weekdays: selectedDays},
+      },
+      () => {
+        this.triggerChange();
+      }
+    );
+  };
+
   get serializedState() {
     const {dayBased} = this.props;
     const {
@@ -186,6 +202,7 @@ class BookingBootstrapForm extends React.Component {
         startDate: serializeDate(startDate),
         endDate: serializeDate(endDate),
       },
+      weekdays: recurrence.weekdays,
     };
 
     if (!dayBased) {
@@ -323,7 +340,11 @@ class BookingBootstrapForm extends React.Component {
             />
           </Form.Group>
         )}
-        {type === 'every' && <WeekdayRecurrencePicker onChange={this.handleRecurrenceChange} />}
+        {type === 'every' && (
+          <Form.Group>
+            <WeekdayRecurrencePicker onSelect={this.updateRecurrenceWeekdays} />
+          </Form.Group>
+        )}
         {children}
         <Button primary disabled={buttonDisabled || !isStartDtValid} onClick={this.onSearch}>
           {buttonCaption}

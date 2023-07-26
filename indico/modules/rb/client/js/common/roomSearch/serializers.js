@@ -9,11 +9,13 @@ import {
   filterDTHandler,
   recurrenceFrequencySerializer,
   recurrenceIntervalSerializer,
+  recurrenceWeekdaysSerializer,
 } from '../../serializers';
 
 export const ajax = {
   repeat_frequency: recurrenceFrequencySerializer,
   repeat_interval: recurrenceIntervalSerializer,
+  recurrence_weekdays: recurrenceWeekdaysSerializer,
   capacity: ({capacity}) => capacity,
   favorite: {
     onlyIf: ({onlyFavorites}) => onlyFavorites,

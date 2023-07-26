@@ -136,6 +136,7 @@ class RHCreateBooking(RHRoomBookingBase):
     @use_args(CreateBookingSchema)
     def _process_args(self, args):
         self.args = args
+        print(f'*** create booking args -> {args}')
         self.prebook = args.pop('is_prebooking')
         self.room = Room.get_or_404(self.args.pop('room_id'), is_deleted=False)
 

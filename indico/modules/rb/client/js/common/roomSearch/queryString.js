@@ -20,6 +20,9 @@ export const rules = {
     validator: v.isIn(['single', 'daily', 'every']),
     stateField: 'filters.recurrence.type',
   },
+  weekdays: {
+    stateField: 'filters.recurrence.weekdays',
+  },
   number: {
     validator: v.isInt({min: 1, max: 99}),
     sanitizer: v.toInt(),

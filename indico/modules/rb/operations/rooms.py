@@ -140,6 +140,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
              .order_by(favorite_room_table.c.user_id.is_(None), db.func.indico.natsort(Room.full_name)))
 
     criteria = {}
+    print(f'filters: {filters}')
     if 'capacity' in filters:
         query = query.filter(Room.capacity >= filters['capacity'])
     if 'building' in filters:

@@ -140,7 +140,7 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Reservation
         fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted', 'start_dt', 'end_dt',
-                  'is_repeating', 'repeat_frequency', 'repeat_interval')
+                  'is_repeating', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays')
 
 
 class ReservationLinkedObjectDataSchema(mm.Schema):
@@ -241,7 +241,8 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_object', 'link', 'state', 'external_details_url', 'internal_note')
+                  'is_linked_to_object', 'link', 'state', 'external_details_url', 'internal_note',
+                  'recurrence_weekdays')
 
     def _get_permissions(self, booking):
         methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
@@ -355,6 +356,8 @@ class CreateBookingSchema(mm.Schema):
     end_dt = fields.DateTime(required=True)
     repeat_frequency = EnumField(RepeatFrequency, required=True)
     repeat_interval = fields.Int(load_default=0, validate=lambda x: x >= 0)
+    recurrence_weekdays = fields.List(fields.Str(
+        validate=validate.OneOf(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])))
     room_id = fields.Int(required=True)
     booked_for_user = Principal(data_key='user', allow_external_users=True)
     booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), required=True)

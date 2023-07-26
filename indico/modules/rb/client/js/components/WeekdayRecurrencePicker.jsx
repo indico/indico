@@ -6,10 +6,11 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {Button} from 'semantic-ui-react';
 
-function WeekdayRecurrencePicker() {
+function WeekdayRecurrencePicker({onSelect}) {
   const [selectedDays, setSelectedDays] = useState({});
   let delayTimeout = null;
 
@@ -51,6 +52,10 @@ function WeekdayRecurrencePicker() {
 
     clearTimeout(delayTimeout);
   };
+
+  useEffect(() => {
+    onSelect(selectedDays);
+  }, [selectedDays, onSelect]);
 
   const validateSelectedDays = () => {
     if (Object.keys(selectedDays).length === 0) {
@@ -96,5 +101,9 @@ function WeekdayRecurrencePicker() {
     </div>
   );
 }
+
+WeekdayRecurrencePicker.propTypes = {
+  onSelect: PropTypes.func.isRequired,
+};
 
 export default WeekdayRecurrencePicker;
