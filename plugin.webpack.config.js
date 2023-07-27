@@ -57,6 +57,7 @@ module.exports = env => {
       'semantic-ui-react': '_IndicoCoreSUIR',
       'react-final-form': '_IndicoCoreReactFinalForm',
       'indico/react/components': '_IndicoReactComponents',
+      'indico/react/i18n': '_IndicoReactI18n',
       'indico/utils/axios': '_IndicoUtilsAxios',
       'indico/utils/date': '_IndicoUtilsDate',
       'indico/utils/plugins': '_IndicoUtilsPlugins',
