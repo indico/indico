@@ -69,12 +69,12 @@ def build_rooms_spritesheet():
     # Placeholder image at position 0
     no_photo_path = 'web/static/images/rooms/large_photos/NoPhoto.jpg'
     no_photo_image = Image.open(os.path.join(current_app.root_path, no_photo_path))
-    image = no_photo_image.resize(ROOM_PHOTO_DIMENSIONS, Image.ANTIALIAS)
+    image = no_photo_image.resize(ROOM_PHOTO_DIMENSIONS, Image.LANCZOS)
     sprite.paste(image, (0, 0))
     mapping = {}
     for count, room in enumerate(rooms, start=1):
         location = image_width * count
-        image = Image.open(BytesIO(room.photo.data)).resize(ROOM_PHOTO_DIMENSIONS, Image.ANTIALIAS)
+        image = Image.open(BytesIO(room.photo.data)).resize(ROOM_PHOTO_DIMENSIONS, Image.LANCZOS)
         sprite.paste(image, (location, 0))
         mapping[room.id] = count
 
@@ -91,7 +91,7 @@ def build_rooms_spritesheet():
 
 
 def get_resized_room_photo(room):
-    photo = Image.open(BytesIO(room.photo.data)).resize(ROOM_PHOTO_DIMENSIONS, Image.ANTIALIAS)
+    photo = Image.open(BytesIO(room.photo.data)).resize(ROOM_PHOTO_DIMENSIONS, Image.LANCZOS)
     output = BytesIO()
     photo.save(output, 'JPEG')
     return output.getvalue()
