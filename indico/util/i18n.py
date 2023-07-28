@@ -220,7 +220,6 @@ def force_locale(locale, *, default=True):
     return _force_locale(locale or 'en_US')
 
 
-@babel.localeselector
 def set_best_lang(check_session=True):
     """Get the best language/locale for the current user.
 
@@ -286,7 +285,7 @@ def get_all_locales():
     """
     List all available locales/names e.g. ``{'pt_PT': ('Portuguese', 'Portugal)}``.
     """
-    if babel.app is None:
+    if not has_app_context():
         return {}
     else:
         missing = object()
