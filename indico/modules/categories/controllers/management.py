@@ -207,7 +207,7 @@ class RHManageCategoryIcon(RHCategoryImageUploadBase):
 
     def _resize(self, img):
         if img.size != CATEGORY_ICON_DIMENSIONS:
-            img = img.resize(CATEGORY_ICON_DIMENSIONS, Image.ANTIALIAS)
+            img = img.resize(CATEGORY_ICON_DIMENSIONS, Image.LANCZOS)
         return img
 
     def _set_image(self, data, metadata):
@@ -232,7 +232,7 @@ class RHManageCategoryLogo(RHCategoryImageUploadBase):
             width = int(width * ratio)
             height = int(height * ratio)
         if (width, height) != logo.size:
-            logo = logo.resize((width, height), Image.ANTIALIAS)
+            logo = logo.resize((width, height), Image.LANCZOS)
         return logo
 
     def _set_image(self, data, metadata):
