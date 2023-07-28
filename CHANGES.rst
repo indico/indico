@@ -17,6 +17,7 @@ Bugfixes
 
 - Fix not being able to remove the last entry from a room ACL (:pr:`5863`, thanks
   :user:`SegiNyn`)
+- Fix conditional fields remaining hidden in abstract judgment form (:pr:`5873`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
