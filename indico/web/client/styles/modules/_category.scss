@@ -633,10 +633,42 @@ ul.category-resource-qtip {
   .category-calendar-view {
     font-family: 'Roboto', sans-serif;
 
-    .fc-right {
+    .fc {
+      line-height: normal;
+    }
+
+    // limit size of "more events" popover
+    .fc-more-popover {
+      max-height: 95%;
+      max-width: 30%;
+      overflow-y: auto;
+    }
+
+    // <a> elements used for day headers aren't links
+    a.fc-col-header-cell-cushion,
+    a.fc-daygrid-day-number {
+      cursor: default;
+      color: $black;
+    }
+
+    .fc-header-toolbar {
       .fc-button {
+        // pretend it's an i-button...
         @include button();
-        margin-left: 5px;
+        @include transition(color);
+        @include i-button-states(
+          $i-button-background-color,
+          $default-border-color,
+          $gray,
+          $light-black,
+          $black,
+          false
+        );
+
+        &:disabled,
+        &.disabled {
+          @include button-disabled();
+        }
       }
 
       .ongoing-events-info {
