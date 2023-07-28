@@ -5,7 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-%badges-list {
+@use 'base' as *;
+
+@mixin badges-list {
   @extend .flexrow;
   flex-wrap: wrap;
 
@@ -14,7 +16,7 @@
 }
 
 .i-badges-list {
-  @extend %badges-list;
+  @include badges-list();
   text-align: center;
   justify-content: space-around;
 
@@ -24,21 +26,21 @@
 }
 
 .i-badges-list.left {
-  @extend %badges-list;
+  @include badges-list();
   float: none; // disable default .left style
   text-align: left;
   justify-content: flex-start;
 }
 
 .i-badges-list.center {
-  @extend %badges-list;
+  @include badges-list();
   margin: -0.8em 0 0.8em 0; // disable default .center style
   text-align: center;
   justify-content: center;
 }
 
 .i-badges-list-hover {
-  @extend %badges-list;
+  @include badges-list();
 
   & > .i-badge {
     @include transition(background-color $default-transition-duration $default-transition-function);
@@ -68,14 +70,14 @@
   }
 }
 
-%i-badge-elem {
+@mixin i-badge-elem {
   position: relative;
   display: block;
   margin: 0 auto;
 }
 
 .i-badge {
-  @extend %default-border-radius;
+  @include default-border-radius();
   position: relative;
   display: inline-block;
   min-width: 10em;
@@ -125,14 +127,14 @@
     padding: 0.4em 10% 0.8em;
 
     & > .i-badge-value {
-      @extend %i-badge-elem;
+      @include i-badge-elem();
 
       font-size: 3.6em;
       font-weight: bold;
     }
 
     & > .i-badge-img {
-      @extend %i-badge-elem;
+      @include i-badge-elem();
 
       width: 100%;
 
@@ -145,7 +147,7 @@
     }
 
     & > .i-badge-title {
-      @extend %i-badge-elem;
+      @include i-badge-elem();
 
       max-width: 100%;
       margin-top: 0.2em;
@@ -170,7 +172,7 @@
   }
 
   & > .i-badge-legend {
-    @extend %i-badge-elem;
+    @include i-badge-elem();
 
     display: block;
     position: absolute;

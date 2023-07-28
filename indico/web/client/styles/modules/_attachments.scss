@@ -5,14 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-%attachment-line {
+@use 'base' as *;
+
+@mixin attachment-line {
   line-height: 1rem;
 
   vertical-align: middle;
 }
 
-%attachment-icon {
-  @extend %attachment-line;
+@mixin attachment-icon {
+  @include attachment-line();
 
   font-size: 0.8rem;
 
@@ -61,7 +63,7 @@
         }
 
         > .custom-protection::before {
-          @extend %attachment-icon;
+          @include attachment-icon();
 
           color: $pastel-red;
         }
@@ -92,7 +94,7 @@
       }
 
       > * {
-        @extend %attachment-line;
+        @include attachment-line();
       }
 
       i {
@@ -122,7 +124,7 @@
         &.actions,
         &.actions > *,
         &.date {
-          @extend %attachment-icon;
+          @include attachment-icon();
 
           color: $gray;
         }
@@ -240,7 +242,7 @@
   }
 }
 
-%protected-colors {
+@mixin protected-colors {
   border-bottom: 2px solid $red;
 
   &:hover::before {
@@ -373,7 +375,7 @@
     margin-top: 0.2em;
 
     &.is-protected {
-      @extend %protected-colors;
+      @include protected-colors();
     }
 
     &.has-label {
@@ -388,7 +390,7 @@
 
     &.is-protected {
       .i-button.label {
-        @extend %protected-colors;
+        @include protected-colors();
 
         border-bottom-color: $red !important;
       }

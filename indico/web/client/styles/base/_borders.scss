@@ -5,7 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-%inner-border-base {
+@use './defaults' as *;
+
+@mixin inner-border-base {
   position: relative;
 
   &::before {
@@ -16,7 +18,7 @@
   }
 }
 
-%default-border-radius {
+@mixin default-border-radius {
   border-radius: $default-border-radius;
 }
 
@@ -84,7 +86,7 @@
   $style: $default-border-style,
   $width: $default-border-width
 ) {
-  @extend %inner-border-base;
+  @include inner-border-base();
 
   &::before {
     @include border-top($color, $style, $width);
@@ -99,7 +101,7 @@
   $style: $default-border-style,
   $width: $default-border-width
 ) {
-  @extend %inner-border-base;
+  @include inner-border-base();
 
   &::before {
     @include border-right($color, $style, $width);
@@ -114,7 +116,7 @@
   $style: $default-border-style,
   $width: $default-border-width
 ) {
-  @extend %inner-border-base;
+  @include inner-border-base();
 
   &::before {
     @include border-bottom($color, $style, $width);
@@ -129,7 +131,7 @@
   $style: $default-border-style,
   $width: $default-border-width
 ) {
-  @extend %inner-border-base;
+  @include inner-border-base();
 
   &::before {
     @include border-left($color, $style, $width);

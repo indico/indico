@@ -7,6 +7,8 @@
 
 /* Basic elements */
 
+@use 'base' as *;
+
 .right {
   float: right;
   margin-left: auto;

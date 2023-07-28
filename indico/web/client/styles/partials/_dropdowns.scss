@@ -5,9 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use './boxes' as *;
+
 .i-dropdown {
   @include border-all();
-  @extend %default-border-radius;
+  @include default-border-radius();
   @include single-box-shadow();
   background: $light-gray;
   margin-top: 0;

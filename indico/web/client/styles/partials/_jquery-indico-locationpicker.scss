@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/inputs' as *;
+
 .i-location-field {
   .wrapper {
     .typeahead__container,
@@ -100,7 +103,7 @@
       z-index: 1;
 
       &.disabled {
-        @extend %tilted-strips-bg;
+        @include tilted-strips-bg();
         opacity: 1;
       }
 
@@ -204,7 +207,7 @@
       margin-top: 0.4em;
 
       &.disabled {
-        @extend %tilted-strips-bg;
+        @include tilted-strips-bg();
       }
 
       &:-ms-input-placeholder {
@@ -227,7 +230,7 @@
 }
 
 .keyword-highlighter {
-  @extend %default-border-radius;
+  @include default-border-radius();
   @include ellipsis();
 
   display: none !important;

@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base';
+@use 'base' as *;
 
 $indico-theme-color: #1a63a0;
 $header-bg-color: $indico-theme-color !default;
@@ -83,7 +83,7 @@ body {
   }
 }
 
-%highlighted-data {
+@mixin highlighted-data {
   display: inline-block;
   padding: 0 0.25em 0 0.25em;
   line-height: 1.5rem;
@@ -91,16 +91,16 @@ body {
   color: $light-gray;
 }
 
-%highlighted-header-data {
-  @extend %highlighted-data;
-  @extend %default-border-radius;
+@mixin highlighted-header-data {
+  @include highlighted-data();
+  @include default-border-radius();
   color: $header-text-color !important;
   background-color: lighten($header-bg-color, 5%);
 }
 
 .event-time-data {
   time {
-    @extend %highlighted-header-data;
+    @include highlighted-header-data();
   }
 
   .date {
@@ -128,7 +128,7 @@ body {
 
 .event-location {
   .text {
-    @extend %highlighted-header-data;
+    @include highlighted-header-data();
   }
 
   .icon-location {
@@ -170,7 +170,7 @@ body {
 }
 
 .chairperson-list .author {
-  @extend %highlighted-header-data;
+  @include highlighted-header-data();
   margin-bottom: 2px;
 }
 
@@ -229,7 +229,7 @@ div.event-header {
 }
 
 .event-header {
-  @extend %font-family-title-light;
+  @include font-family-title-light();
 
   .event-label {
     margin-left: 1em !important;
@@ -259,7 +259,7 @@ div.event-header {
     margin-bottom: 0.5em;
   }
 
-  @extend %font-family-modern-body;
+  @include font-family-modern-body();
   color: $light-black;
 }
 
@@ -297,8 +297,8 @@ ul.day-list {
 }
 
 .meeting-timetable {
-  @extend %font-family-modern-body;
-  @extend %default-border-radius;
+  @include font-family-modern-body();
+  @include default-border-radius();
   @include drop-shadow();
 
   padding: 1em 1em 0.5em 0;
@@ -360,7 +360,7 @@ ul.day-list {
       font-weight: bold;
       font-size: 1.1em;
       padding-top: 0.5rem;
-      @extend %font-family-title;
+      @include font-family-title();
       flex: auto;
       line-height: 1rem;
 
@@ -400,7 +400,7 @@ ul.day-list {
 }
 
 .event-privacy-info-button {
-  @extend %font-family-body;
+  @include font-family-body();
   font-size: 12pt;
 
   .privacy-dropdown {
@@ -519,7 +519,7 @@ ul.day-list {
   }
 
   .start-time {
-    @extend %highlighted-data;
+    @include highlighted-data();
     border-radius: 2px 0 0 2px;
     @include transition(background-color 0.5s linear);
     color: $light-gray !important;
@@ -556,7 +556,7 @@ ul.day-list {
 .event-sub-header {
   border-radius: 0 0 2px 2px;
   @include drop-shadow();
-  @extend %font-family-title-light;
+  @include font-family-title-light();
 
   background: white;
   font-size: 12px;
@@ -566,7 +566,7 @@ ul.day-list {
 }
 
 .note-area-wrapper .note-area {
-  @extend %font-family-modern-body;
+  @include font-family-modern-body();
   margin-top: 10px;
 }
 
@@ -625,7 +625,7 @@ a.lecture-series-link {
 }
 
 .agenda-placeholder {
-  @extend %default-border-radius;
+  @include default-border-radius();
   background-color: white;
   margin-top: 10px;
   flex-grow: 1;

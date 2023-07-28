@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'partials/icons';
+@use 'partials/icons' as *;
 
-%adjacent-icon {
+@mixin adjacent-icon {
   font-family: 'icomoon-ultimate';
   font-style: normal;
   font-weight: normal;
@@ -20,7 +20,7 @@
   @extend .#{$icon-class}-after;
 
   &::after {
-    @extend %adjacent-icon;
+    @include adjacent-icon();
     margin-left: 0.2em;
   }
 }
@@ -29,7 +29,7 @@
   @extend .#{$icon-class};
 
   &::before {
-    @extend %adjacent-icon;
+    @include adjacent-icon();
   }
 }
 

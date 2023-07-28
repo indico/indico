@@ -5,10 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
-@import 'rb:styles/sui_fixes';
-@import 'rb:styles/palette';
-@import 'rb:styles/responsive';
+@use 'base/palette' as *;
+@use 'rb:styles/sui_fixes' as *;
+@use 'rb:styles/palette' as *;
+@use 'rb:styles/responsive' as *;
 
 $indico-top-bar-height: 50px;
 
@@ -148,7 +148,7 @@ a {
   }
 }
 
-%banner-bar {
+@mixin banner-bar {
   height: 50px;
   display: flex;
   justify-content: space-between;
@@ -171,7 +171,7 @@ a {
 }
 
 .announcement-bar {
-  @extend %banner-bar;
+  @include banner-bar();
 
   &.highlight {
     background-color: $light-blue;
@@ -198,7 +198,7 @@ a {
 $text-yellow: lighten($yellow, 15%);
 
 .impersonation-bar {
-  @extend %banner-bar;
+  @include banner-bar();
   height: 50px;
   background-color: $dark-black;
   color: $text-yellow;

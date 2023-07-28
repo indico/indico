@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import '../common';
+@use '../common' as *;
 
 :global(.ui.modal) {
   :global(.disabled.field) {
@@ -21,7 +21,7 @@
 }
 
 .judgment-type-button:global(.ui.button) {
-  @extend %editing-states-bg;
+  @include editing-states-bg();
   color: white;
 
   &:global(.active),

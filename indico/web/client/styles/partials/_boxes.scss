@@ -5,27 +5,28 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'partials/toolbars';
+@use 'base' as *;
+@use 'partials/toolbars' as *;
 
 // ============================================================================
 // Base classes and mixins
 // ============================================================================
 
-%i-box-title {
-  @extend %font-family-title-light;
+@mixin i-box-title {
+  @include font-family-title-light();
   color: $dark-blue;
   display: inline-block;
   font-size: 1.5em;
   font-weight: bold;
 }
 
-%i-box-description {
-  @extend %font-family-description;
+@mixin i-box-description {
+  @include font-family-description();
   color: $dark-gray;
   font-size: 14px;
 }
 
-%box-hr {
+@mixin box-hr {
   @include border-bottom();
   height: 0;
   overflow: hidden;
@@ -40,7 +41,7 @@
   }
 }
 
-%i-box-empty {
+@mixin i-box-empty {
   color: $dark-gray;
   display: block;
   font-size: 1em;
@@ -48,7 +49,7 @@
   text-align: left;
 }
 
-%i-box-sortable-handle-background {
+@mixin i-box-sortable-handle-background {
   @include transition(background-color $default-transition-duration $default-transition-function);
   background-color: lighten($dark-gray, $color-variation);
   cursor: move;
@@ -69,13 +70,13 @@
   }
 }
 
-%i-box-sortable-handle-grip {
+@mixin i-box-sortable-handle-grip {
   @include icon-before('icon-handle');
 }
 
-%i-box-sortable-handle {
-  @extend %i-box-sortable-handle-background;
-  @extend %i-box-sortable-handle-grip;
+@mixin i-box-sortable-handle {
+  @include i-box-sortable-handle-background();
+  @include i-box-sortable-handle-grip();
 }
 
 // ============================================================================
@@ -84,39 +85,39 @@
 
 $i-box-padding: 10px;
 
-%i-box-horizontal-padding {
+@mixin i-box-horizontal-padding {
   padding-left: $i-box-padding;
   padding-right: $i-box-padding;
 }
 
-%i-box-cancel-horizontal-margin {
+@mixin i-box-cancel-horizontal-margin {
   margin-left: -$i-box-padding;
   margin-right: -$i-box-padding;
 }
 
-%i-box-vertical-padding {
+@mixin i-box-vertical-padding {
   padding-top: $i-box-padding;
   padding-bottom: $i-box-padding;
 }
 
-%i-box-cancel-vertical-margin {
+@mixin i-box-cancel-vertical-margin {
   margin-top: -$i-box-padding;
   margin-bottom: -$i-box-padding;
 }
 
-%i-box-padding {
-  @extend %i-box-horizontal-padding;
-  @extend %i-box-vertical-padding;
+@mixin i-box-padding {
+  @include i-box-horizontal-padding();
+  @include i-box-vertical-padding();
 }
 
-%i-box-cancel-margin {
-  @extend %i-box-cancel-horizontal-margin;
-  @extend %i-box-cancel-vertical-margin;
+@mixin i-box-cancel-margin {
+  @include i-box-cancel-horizontal-margin();
+  @include i-box-cancel-vertical-margin();
 }
 
 // Use the titled-rule as the top border of the i-box. Combine with .titled on the i-box.
-%i-box-titled-rule-header {
-  @extend %i-box-cancel-horizontal-margin;
+@mixin i-box-titled-rule-header {
+  @include i-box-cancel-horizontal-margin();
   margin-top: -18px; // Pure magic number to align the rule with the i-box border
 }
 
@@ -132,11 +133,10 @@ $i-box-padding: 10px;
 }
 
 .i-box {
-  @extend %i-box-padding;
-  @extend %default-border-radius;
+  @include i-box-padding();
+  @include default-border-radius();
   @include border-all();
   @include single-box-shadow();
-  @include transition();
   @include transition(padding-bottom);
 
   box-sizing: border-box;
@@ -144,15 +144,15 @@ $i-box-padding: 10px;
   color: $black;
 
   hr {
-    @extend %box-hr;
+    @include box-hr();
   }
 
   > .empty {
-    @extend %i-box-empty;
+    @include i-box-empty();
   }
 
   .ui-i-box-sortable-handle {
-    @extend %i-box-sortable-handle;
+    @include i-box-sortable-handle();
     @include transition(
       background-color $default-transition-duration $default-transition-function,
       height $default-transition-duration $default-transition-function
@@ -190,7 +190,7 @@ $i-box-padding: 10px;
 
   > .titled-rule:first-child,
   > *:first-child > .titled-rule:first-child {
-    @extend %i-box-titled-rule-header;
+    @include i-box-titled-rule-header();
   }
 
   // For i-box without headers where the first child is a .titled-rule
@@ -199,7 +199,7 @@ $i-box-padding: 10px;
   }
 
   .i-box-footer {
-    @extend %i-box-cancel-margin;
+    @include i-box-cancel-margin();
     background-color: $light-gray;
     box-shadow: inset 0 15px 20px -20px $gray;
     overflow: auto;
@@ -208,8 +208,8 @@ $i-box-padding: 10px;
   }
 
   .i-box-header {
-    @extend %i-box-cancel-margin;
-    @extend %i-box-padding;
+    @include i-box-cancel-margin();
+    @include i-box-padding();
     @include border-bottom();
     @include transition(margin-bottom);
     display: flex;
@@ -222,11 +222,11 @@ $i-box-padding: 10px;
     word-break: break-word;
 
     .i-box-title {
-      @extend %i-box-title;
+      @include i-box-title();
     }
 
     .i-box-description {
-      @extend %i-box-description;
+      @include i-box-description();
     }
 
     .i-box-buttons {
@@ -259,14 +259,14 @@ $i-box-padding: 10px;
   }
 
   .i-box-table-widget {
-    @extend %i-box-cancel-margin;
+    @include i-box-cancel-margin();
 
     > table.i-table-widget {
       border: none;
     }
 
     > *:not(table) {
-      @extend %i-box-padding;
+      @include i-box-padding();
     }
   }
 
@@ -292,7 +292,7 @@ $i-box-padding: 10px;
 }
 
 .i-box.no-shadow {
-  @include single-box-shadow(none);
+  box-shadow: none;
 }
 
 .i-box.highlight {
@@ -308,7 +308,7 @@ $i-box-padding: 10px;
   padding-top: 0;
 
   .i-box-footer {
-    @include single-box-shadow(none);
+    box-shadow: none;
     margin-top: 0;
   }
 }
@@ -435,14 +435,14 @@ $i-box-padding: 10px;
       margin: 0;
 
       > .ui-sortable-handle {
-        @extend %i-box-sortable-handle-background;
+        @include i-box-sortable-handle-background();
         display: flex;
         align-items: center;
         visibility: hidden;
         width: 1em;
 
         > .handle {
-          @extend %i-box-sortable-handle-grip;
+          @include i-box-sortable-handle-grip();
         }
       }
 

@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
+@use 'base/palette' as *;
 
 @mixin editing-state($state, $color) {
   &:global(.#{$state}) {
@@ -22,7 +22,7 @@
   }
 }
 
-%editing-states-bg {
+@mixin editing-states-bg {
   @include editing-state('accepted', $pastel-green);
   @include editing-state('rejected', $pastel-red);
   @include editing-state('needs-submitter-confirmation', $yellow);

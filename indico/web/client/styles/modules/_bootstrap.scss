@@ -5,8 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 .bootstrap-header {
-  @extend %font-family-form;
+  @include font-family-form();
 
   line-height: initial;
 
@@ -34,7 +36,7 @@
   }
 
   .header-title {
-    @extend %font-family-logo;
+    @include font-family-logo();
 
     font-size: 54px;
 
@@ -42,7 +44,7 @@
   }
 
   .header-subtitle {
-    @extend %font-family-logo;
+    @include font-family-logo();
 
     font-size: 26px;
 
@@ -103,7 +105,7 @@
 }
 
 .bootstrap-body {
-  @extend %font-family-form;
+  @include font-family-form();
 
   width: 100%;
   min-width: 800px;
@@ -187,7 +189,7 @@
         text-align: left;
 
         .step-title {
-          @extend %font-family-logo;
+          @include font-family-logo();
 
           font-size: 4em;
           font-weight: bold;
@@ -246,7 +248,7 @@
       }
 
       .i-button {
-        @extend %font-family-logo;
+        @include font-family-logo();
       }
     }
   }

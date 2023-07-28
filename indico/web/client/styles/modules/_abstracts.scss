@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'abstracts/abstract_list';
-@import 'abstracts/abstract_page';
-@import 'abstracts/cfa_page';
-@import 'abstracts/email_templates';
-@import 'abstracts/notification_logs';
-@import 'abstracts/roles';
+@forward 'abstracts/abstract_list';
+@forward 'abstracts/abstract_page';
+@forward 'abstracts/cfa_page';
+@forward 'abstracts/email_templates';
+@forward 'abstracts/notification_logs';
+@forward 'abstracts/roles';

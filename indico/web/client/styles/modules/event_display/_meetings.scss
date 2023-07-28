@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 #event-note-section {
   @include border-bottom($gray);
   background: white;
@@ -12,7 +14,7 @@
 }
 
 .timetable-title {
-  @extend %font-family-title;
+  @include font-family-title();
   color: $black;
 
   &.top-level {
@@ -49,7 +51,6 @@ li > table + .note-area-wrapper {
     float: right;
 
     a {
-      @include transition();
       @include transition(opacity);
       color: darken($pastel-blue, $color-variation);
 
@@ -149,7 +150,7 @@ li > table + .note-area-wrapper {
   }
 
   ul.participant-list {
-    @extend %font-family-title;
+    @include font-family-title();
 
     padding: 0;
     margin: 0 0 0 -0.2em;
@@ -158,7 +159,7 @@ li > table + .note-area-wrapper {
 }
 
 .ui.image.label.meeting-participant {
-  @extend %font-family-modern-body;
+  @include font-family-modern-body();
   font-weight: normal;
   font-size: 0.95em;
 

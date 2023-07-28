@@ -5,6 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/forms' as *;
+@use 'partials/inputs' as *;
+
 .i-color-field {
   max-width: 400px;
 
@@ -13,16 +17,16 @@
     display: inline-block;
 
     .color-preview {
-      @extend %form-field-input;
+      @include form-field-input();
       @include border-all();
-      @extend %default-border-radius;
+      @include default-border-radius();
       display: inline-block;
       width: 3em;
       float: left;
       margin-right: 0.5em;
 
       &.no-value {
-        @extend %tilted-strips-bg;
+        @include tilted-strips-bg();
       }
     }
 

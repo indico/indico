@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 /* ************* */
 
 /* Ordered Lists */
@@ -45,7 +47,7 @@
 }
 
 dl.i-data-list {
-  @extend %font-family-form;
+  @include font-family-form();
   max-width: 800px;
   color: $light-black;
   margin-top: 1em;

@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/boxes' as *;
+
 .agreement-form-sections {
-  @extend .i-box-group;
-  @extend .i-box-group.vert;
+  @extend .i-box-group, .vert;
   color: $black;
   margin-bottom: 1em;
 

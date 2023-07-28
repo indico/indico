@@ -5,8 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use './boxes' as *;
+
 .palette-picker-qtip {
-  @extend %default-border-radius;
+  @include default-border-radius();
   @include single-box-shadow();
   background: #fff;
   background-clip: padding-box;

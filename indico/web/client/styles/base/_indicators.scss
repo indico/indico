@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use './palette' as *;
+@use './defaults' as *;
+
 @mixin _indicator-base($top) {
   &::after,
   &::before {

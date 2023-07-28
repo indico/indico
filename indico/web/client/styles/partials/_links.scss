@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 a,
 .fake-link,
 .ui-widget-content a {
@@ -22,7 +24,7 @@ a,
 }
 
 .i-link {
-  @extend %semantic-link;
+  @include semantic-link();
   @include transition(color);
   cursor: pointer;
 
@@ -47,7 +49,7 @@ a.discreet-link {
 }
 
 .anchor-link {
-  @extend %font-family-body;
+  @include font-family-body();
   @include transition(opacity 0.25s ease-out);
   opacity: 0;
   margin-left: 0.5em;

@@ -7,6 +7,9 @@
 
 /* Animation utility constructs */
 
+@use './palette' as *;
+@use './defaults' as *;
+
 @mixin indico-animation($name, $duration, $timing-function, $count) {
   animation-name: $name;
   -webkit-animation-name: $name;

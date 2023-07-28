@@ -5,9 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base';
-@import 'base/animation';
-@import 'partials/icons';
+@use 'base' as *;
+@use 'partials/icons' as *;
 
 @mixin sortable-table-header() {
   &.tablesorter-header:not(.sorter-false) {
@@ -32,7 +31,7 @@
   }
 }
 
-%i-table-base {
+@mixin i-table-base {
   width: 100%;
 
   th,
@@ -56,7 +55,7 @@
 }
 
 table.i-table {
-  @extend %i-table-base;
+  @include i-table-base();
   border-collapse: collapse;
   margin-top: 1.6em;
   table-layout: fixed;
@@ -230,9 +229,9 @@ th {
 // ============================================================================
 
 .i-table-widget {
-  @extend %default-border-radius;
+  @include default-border-radius();
   @include border-all();
-  @extend %i-table-base;
+  @include i-table-base();
   max-width: 100%;
   border-spacing: 0;
   text-align: left;

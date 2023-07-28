@@ -5,18 +5,20 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 .i-tag {
-  @extend %semantic-background;
-  @extend %default-border-radius;
+  @include semantic-background();
+  @include default-border-radius();
   padding: 0.3em 0.6em;
   font-weight: bold;
   box-sizing: initial;
 
   &.outline {
-    @extend %semantic-outline;
+    @include semantic-outline();
     background: transparent;
 
-    @include _semantic-versions() {
+    @include semantic-versions() {
       background: transparent;
     }
 
@@ -25,7 +27,7 @@
     }
 
     &.contrast {
-      background: white;
+      background: $white;
     }
   }
 }

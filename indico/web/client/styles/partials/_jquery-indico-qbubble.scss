@@ -5,11 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'partials/qtips';
+@use 'base' as *;
+@use './qtips' as *;
+@use './boxes' as *;
 
 .qtip-default.qbubble {
-  @extend %qtip-light;
-  @extend %default-border-radius;
+  @include qtip-light();
+  @include default-border-radius();
   @include single-box-shadow();
   @include border-all();
   color: $light-black;

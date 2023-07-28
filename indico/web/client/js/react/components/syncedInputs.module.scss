@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
-@import 'base/defaults';
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
 
 .syncable {
   input[readonly],

@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/animation';
-@import 'base/utilities';
+@use 'base' as *;
+@use './boxes' as *;
 
 .sideBar {
   float: right;
@@ -29,7 +29,7 @@
   }
 
   .content {
-    @extend %default-border-radius;
+    @include default-border-radius();
     background-color: #ececec;
     padding: 2em;
   }
@@ -47,11 +47,11 @@
 }
 
 .side-menu {
-  @extend %font-family-title;
+  @include font-family-title();
   user-select: none;
   @include single-box-shadow();
   @include border-all();
-  @extend %default-border-radius;
+  @include default-border-radius();
   font-size: 1.1em;
 
   ul.menu-items > li.section {

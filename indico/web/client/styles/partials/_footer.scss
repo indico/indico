@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 .footer {
   color: $light-black;
   padding: 10px 5px 10px 10px;

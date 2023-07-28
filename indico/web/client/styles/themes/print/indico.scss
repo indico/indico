@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 $header-bg-color: white;
 $header-icon-color: black;
 $header-text-color: black;
@@ -17,19 +19,19 @@ $tt-additional-text-color: black;
 
 $gray: black;
 
-@import 'themes/indico';
+@use 'themes/indico' as indico;
 
-%black-and-white {
+@mixin black-and-white {
   background-color: white !important;
   color: black !important;
 }
 
-%no-shadow {
+@mixin no-shadow {
   box-shadow: none !important;
 }
 
 body {
-  @extend %black-and-white;
+  @include black-and-white();
 }
 
 .manage-button,
@@ -47,13 +49,13 @@ body {
 .dayList .day,
 .dayList .day-title,
 .participant-list-wrapper {
-  @extend %black-and-white;
+  @include black-and-white();
 }
 
 .timetable-time {
   .start-time,
   .end-time {
-    @extend %black-and-white;
+    @include black-and-white();
   }
 }
 
@@ -62,7 +64,7 @@ body {
     background: transparent !important;
 
     .timetable-title {
-      @extend %black-and-white;
+      @include black-and-white();
     }
   }
 }
@@ -72,7 +74,7 @@ body {
 }
 
 .event-service-row {
-  @extend %no-shadow;
+  @include no-shadow();
   border: none !important;
 
   .event-service-toolbar {
@@ -81,11 +83,11 @@ body {
 }
 
 .meeting-timetable {
-  @extend %no-shadow;
+  @include no-shadow();
   border: 1px solid $gray;
 
   .start-time {
-    @extend %no-shadow;
+    @include no-shadow();
     border: 1px solid $gray;
 
     &::before {
@@ -95,7 +97,7 @@ body {
 }
 
 .event-sub-header {
-  @extend %no-shadow;
+  @include no-shadow();
   border: none;
 }
 

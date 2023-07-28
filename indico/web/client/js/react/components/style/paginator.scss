@@ -17,9 +17,8 @@
     margin-right: 0.2em;
   }
 
+  .page-number,
   .page-arrow {
-    a {
-      height: 100%;
-    }
+    display: flex;
   }
 }

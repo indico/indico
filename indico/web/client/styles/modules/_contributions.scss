@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'contributions/display';
-@import 'contributions/editor';
-@import 'types_dialog';
+@use 'base' as *;
+@use 'contributions/display' as *;
+@use 'contributions/editor' as *;
+@use 'types_dialog' as *;
 
 @mixin picker-root-element-label() {
   .label {

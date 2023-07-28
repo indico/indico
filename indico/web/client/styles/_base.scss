@@ -5,16 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
-@import 'base/defaults';
+@forward 'base/palette';
+@forward 'base/defaults';
 
-@import 'base/animation';
-@import 'base/borders';
-@import 'base/flex';
-@import 'base/indicators';
-@import 'base/layout';
-@import 'base/pages';
-@import 'base/reset';
-@import 'base/theme';
-@import 'base/typography';
-@import 'base/utilities';
+@forward 'base/animation';
+@forward 'base/borders';
+@forward 'base/flex';
+@forward 'base/indicators';
+@forward 'base/layout';
+@forward 'base/pages';
+@forward 'base/reset';
+@forward 'base/theme';
+@forward 'base/typography';
+@forward 'base/utilities';

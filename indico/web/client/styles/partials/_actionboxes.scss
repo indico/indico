@@ -9,9 +9,14 @@
 // Base definitions
 // ============================================================================
 
-%action-box {
+@use 'base/layout' as *;
+@use 'base/palette' as *;
+@use 'base/borders' as *;
+@use 'base/animation' as *;
+
+@mixin action-box {
   box-sizing: border-box;
-  @extend %default-border-radius;
+  @include default-border-radius();
   margin-bottom: 1rem;
   padding: 10px;
   width: 100%;
@@ -109,7 +114,7 @@
 // ============================================================================
 
 .action-box {
-  @extend %action-box;
+  @include action-box();
   @include action-box-colors(
     $color: $dark-gray,
     $emphasis-color: $light-black,

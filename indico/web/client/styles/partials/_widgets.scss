@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use './inputs' as *;
+
 .dateField {
   display: inline-block;
   position: relative;
@@ -91,14 +94,14 @@ i.info-helper {
   > input:checked + label {
     + .i-linking-dropdown,
     + span {
-      @extend %dropdown-visible;
+      @include dropdown-visible();
     }
   }
 
   > input:not(:checked) + label {
     + .i-linking-dropdown,
     + span {
-      @extend %dropdown-hidden;
+      @include dropdown-hidden();
     }
   }
 }

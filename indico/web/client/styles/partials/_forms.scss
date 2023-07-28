@@ -5,24 +5,31 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/inputs' as *;
+
 $i-form-height: 2.5em;
 $i-form-line-height: 1.5;
 $i-form-button-line-height: 1.8;
 
-%form-field-block {
+@mixin form-field-block {
   padding-left: 1em;
   padding-right: 1em;
   margin-bottom: 0.7em;
 }
 
-%form-field-input {
+@mixin form-field-input {
   line-height: $i-form-line-height;
   padding: 0.5em 1em;
   vertical-align: top;
   height: $i-form-height;
 }
 
-%form-field-button {
+.form-field-input {
+  @include form-field-input();
+}
+
+@mixin form-field-button {
   height: $i-form-height;
 }
 
@@ -39,7 +46,7 @@ form {
 }
 
 .i-form {
-  @extend %font-family-form;
+  @include font-family-form();
   box-sizing: border-box;
   max-width: 800px;
   display: block;
@@ -156,7 +163,7 @@ form {
       textarea,
       .ui.dropdown,
       .i-table-widget {
-        @extend %input-invalid;
+        @include input-invalid();
       }
     }
   }
@@ -207,7 +214,7 @@ form {
   margin-bottom: 0.7em;
 
   @include apply-to-text-inputs('.i-form-field-fluid');
-  @include apply-to-inputs('%form-field-input');
+  @include apply-to-inputs('.form-field-input');
 
   > select,
   > textarea {
@@ -215,12 +222,12 @@ form {
   }
 
   textarea {
-    @extend %form-field-input;
+    @include form-field-input();
     height: auto;
   }
 
   select {
-    @extend %form-field-input;
+    @include form-field-input();
     padding-left: 0.7em;
 
     &[multiple] {
@@ -245,11 +252,11 @@ form {
   button,
   input[type='button'],
   input[type='submit'] {
-    @extend %form-field-button;
+    @include form-field-button();
   }
 
   a.i-button {
-    @extend %form-field-button;
+    @include form-field-button();
     line-height: $i-form-button-line-height;
   }
 
@@ -305,7 +312,7 @@ form {
 
 .i-form .form-group-footer {
   .i-button {
-    @extend %form-field-button;
+    @include form-field-button();
     line-height: 1 !important;
   }
 

@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/boxes' as *;
+
 .rule-list {
   list-style-type: none;
   padding-left: 0;

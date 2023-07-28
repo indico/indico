@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 $i-button-background-color: darken($light-gray, 5%);
 $i-button-spacing: 0.3rem;
 
-%button {
+@mixin button {
   user-select: none;
-  @extend %default-border-radius;
+  @include default-border-radius();
   @include border-all();
   box-sizing: border-box;
   display: inline-block;
@@ -20,7 +22,7 @@ $i-button-spacing: 0.3rem;
   vertical-align: middle;
 }
 
-%button-disabled {
+@mixin button-disabled {
   border-color: $default-border-color !important;
   background: $i-button-background-color !important;
   box-shadow: none !important;
@@ -75,7 +77,7 @@ $i-button-spacing: 0.3rem;
   }
 }
 
-@mixin _i-button-states(
+@mixin i-button-states(
   $flavor-color,
   $border-color,
   $border-accent-color,
@@ -114,13 +116,13 @@ $i-button-spacing: 0.3rem;
 
 @mixin i-button-flavor($flavor-color, $border-color) {
   $flavor-darkened-color: darken($flavor-color, 5%);
-  @include _i-button-states($flavor-color, $border-color, $border-color, $light-gray, white);
+  @include i-button-states($flavor-color, $border-color, $border-color, $light-gray, white);
   @include _i-button-borderless($flavor-color, $flavor-darkened-color);
   @include _i-button-outlines($flavor-color, $flavor-darkened-color);
 }
 
 @mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
-  @extend %button;
+  @include button();
   box-sizing: content-box;
 
   border: none;
@@ -138,9 +140,9 @@ $i-button-spacing: 0.3rem;
 }
 
 .i-button {
-  @extend %button;
+  @include button();
   @include transition(color);
-  @include _i-button-states(
+  @include i-button-states(
     $i-button-background-color,
     $default-border-color,
     $gray,
@@ -173,7 +175,7 @@ $i-button-spacing: 0.3rem;
 
   &:disabled,
   &.disabled {
-    @extend %button-disabled;
+    @include button-disabled();
   }
 
   &[class*='icon-'] {
@@ -245,7 +247,7 @@ input.i-button[type='submit'] {
 
 a.i-big-button {
   $size: 60px;
-  @extend %button;
+  @include button();
 
   background: #fff;
   width: $size;

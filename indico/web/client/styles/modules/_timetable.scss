@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/boxes' as *;
+
 @mixin base-list-properties() {
   overflow: auto;
   list-style-type: none;
@@ -60,7 +63,7 @@
 
 .timeTableLegend {
   @include border-all();
-  @extend %default-border-radius;
+  @include default-border-radius();
   background: $light-gray;
   font-size: 11px;
   overflow: hidden;
@@ -79,7 +82,7 @@
   }
 
   .legendItem {
-    @extend %default-border-radius;
+    @include default-border-radius();
     background: $pastel-gray;
     color: $black;
     float: left;
@@ -272,7 +275,7 @@
 
 .bottomTip {
   @include border-all();
-  @extend %default-border-radius;
+  @include default-border-radius();
   background: $light-gray;
   color: $light-black;
   display: none;
@@ -290,14 +293,14 @@
   }
 }
 
-%timetable-entry-button {
+@mixin timetable-entry-button {
   background: white;
   height: 19px;
   padding: 2px;
 }
 
 .entry-arrows {
-  @extend %timetable-entry-button;
+  @include timetable-entry-button();
   @include border-horz();
   @include border-bottom();
   border-bottom-left-radius: $default-border-radius;
@@ -324,7 +327,7 @@
 }
 
 .entry-attachments {
-  @extend %timetable-entry-button;
+  @include timetable-entry-button();
   border-bottom-left-radius: $default-border-radius;
   border-top-right-radius: $default-border-radius;
   @include border-left();

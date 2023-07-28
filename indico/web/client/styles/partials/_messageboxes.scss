@@ -5,10 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use './boxes' as *;
+
 $default-spacing: 10px;
 
-%message-box {
-  @extend %default-border-radius;
+@mixin message-box {
+  @include default-border-radius();
   @extend .flexrow;
   flex-wrap: wrap;
   color: $light-black;
@@ -39,6 +42,13 @@ $default-spacing: 10px;
     }
   }
 
+  &.large-icon {
+    .icon {
+      font-size: 2.7em;
+      margin-bottom: $default-spacing;
+    }
+  }
+
   .icon {
     flex-shrink: 0;
     font-size: 1.5em;
@@ -61,15 +71,8 @@ $default-spacing: 10px;
   }
 }
 
-%message-box.large-icon {
-  .icon {
-    font-size: 2.7em;
-    margin-bottom: $default-spacing;
-  }
-}
-
-%message-tag {
-  @extend %default-border-radius;
+@mixin message-tag {
+  @include default-border-radius();
   padding: 0 4px;
 }
 
@@ -128,7 +131,7 @@ $default-spacing: 10px;
 .info-message-box,
 .message-message-box {
   // Needed for default category 'message' of flash() in flashed_messages.html
-  @extend %message-box;
+  @include message-box();
   background-color: #fafafa;
   border: 1px solid #ddd;
 
@@ -142,7 +145,7 @@ $default-spacing: 10px;
 }
 
 .highlight-message-box {
-  @extend %message-box;
+  @include message-box();
   background-color: $light-blue;
   border: 1px solid $dark-blue;
 
@@ -157,7 +160,7 @@ $default-spacing: 10px;
 }
 
 .success-message-box {
-  @extend %message-box;
+  @include message-box();
   background-color: #eefaee;
   border: 1px solid #cdc;
 
@@ -175,7 +178,7 @@ $default-spacing: 10px;
 }
 
 .warning-message-box {
-  @extend %message-box;
+  @include message-box();
   background-color: #fff3e2;
   border: 1px solid #be9056;
 
@@ -190,7 +193,7 @@ $default-spacing: 10px;
 }
 
 .error-message-box {
-  @extend %message-box;
+  @include message-box();
   background-color: $light-red;
   border: 1px solid $dark-red;
 
@@ -205,7 +208,7 @@ $default-spacing: 10px;
 }
 
 .danger-message-box {
-  @extend %message-box;
+  @include message-box();
   background-color: $light-red;
   border: 1px solid $dark-red;
 
@@ -220,7 +223,7 @@ $default-spacing: 10px;
 }
 
 .error-message-tag {
-  @extend %message-tag;
+  @include message-tag();
   background-color: $red;
   color: $light-gray;
   margin-left: $default-spacing;

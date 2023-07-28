@@ -5,13 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base';
+@forward 'base';
 
-@import 'partials';
-@import 'widgets';
-@import 'custom';
-@import 'modules';
+@forward 'partials';
+@forward 'widgets';
+@forward 'custom';
+@forward 'modules';
 
 // Legacy CSS code
-@import './legacy/Default.css';
-@import './legacy/timetable.css';
+@forward './legacy/Default.css';
+@forward './legacy/timetable.css';

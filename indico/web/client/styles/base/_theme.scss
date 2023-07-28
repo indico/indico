@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use './palette' as *;
+@use './borders' as *;
+
 $semantic-color-map: (
   highlight: $blue,
   success: $green,
@@ -42,7 +45,7 @@ $semantic-styles: (
   color: $color;
 }
 
-@mixin _semantic-versions {
+@mixin semantic-versions {
   @each $style in $semantic-styles {
     &.#{$style} {
       @content;
@@ -58,7 +61,7 @@ $semantic-styles: (
   }
 }
 
-%semantic-background {
+@mixin semantic-background {
   @include _semantic-background($dark-gray);
   color: white;
 
@@ -69,7 +72,7 @@ $semantic-styles: (
   }
 }
 
-%semantic-outline {
+@mixin semantic-outline {
   @include _semantic-outline($dark-gray);
 
   @each $style in $semantic-styles {
@@ -79,7 +82,7 @@ $semantic-styles: (
   }
 }
 
-%semantic-link {
+@mixin semantic-link {
   color: $gray;
 
   &:not(.disabled) {
@@ -102,5 +105,5 @@ $semantic-styles: (
 }
 
 .semantic-background {
-  @extend %semantic-background;
+  @include semantic-background();
 }

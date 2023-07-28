@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/inputs' as *;
+
 .designer-canvas-wrapper {
   margin-top: 2em;
 
@@ -202,7 +205,7 @@
 
   input[type='text'],
   input[type='number'] {
-    @extend %text-input-base;
+    @include text-input-base();
   }
 
   input[type='number'] {

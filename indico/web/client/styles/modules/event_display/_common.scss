@@ -5,6 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/buttons' as *;
+@use 'partials/boxes' as *;
+
 #flashed-messages {
   &:empty {
     display: none;
@@ -28,7 +32,7 @@
 }
 
 .speaker-list {
-  @extend %font-family-modern-body;
+  @include font-family-modern-body();
 
   color: $black;
 
@@ -74,7 +78,7 @@
     align-self: stretch;
 
     .i-button {
-      @include _i-button-states($black, transparent, transparent, $gray, white, false);
+      @include i-button-states($black, transparent, transparent, $gray, white, false);
       border-radius: 0;
       padding: 0 0.8em;
       font-size: 1.1em;

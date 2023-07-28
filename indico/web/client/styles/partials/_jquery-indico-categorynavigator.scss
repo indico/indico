@@ -5,21 +5,25 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-%categorynav-sizing {
+@use 'base' as *;
+@use 'partials/forms' as *;
+@use 'partials/boxes' as *;
+
+@mixin categorynav-sizing {
   width: 800px;
   height: 600px;
 }
 
 .categorynav-dialog-content {
-  @extend %categorynav-sizing;
+  @include categorynav-sizing();
 }
 
 .categorynav {
-  @extend %categorynav-sizing;
+  @include categorynav-sizing();
   @extend .flexcol;
 
   :not(.ui) > input[type='search'] {
-    @extend %form-field-input;
+    @include form-field-input();
     width: 100%;
     flex-shrink: 0;
     padding-left: 10px;
@@ -38,11 +42,7 @@
 }
 
 .categorynav .category-list {
-  @extend .i-box;
-  @extend .i-box.no-shadow;
-  @extend .i-box.just-group-list;
-  @extend .i-box.just-group-list.with-hover-effect;
-  @extend .flexcol;
+  @extend .i-box, .no-shadow, .just-group-list, .with-hover-effect, .flexcol;
 
   background: $light-gray;
   flex-grow: 1;
@@ -105,7 +105,7 @@
     flex-grow: 1;
 
     .title {
-      @extend %font-family-title-light;
+      @include font-family-title-light();
       display: block;
     }
   }
@@ -129,8 +129,8 @@
     }
 
     .action-button {
-      @extend .i-button;
-      @extend .i-button.highlight;
+      @extend .i-button, .highlight;
+      padding: 4px 10px 4px;
       visibility: hidden;
     }
   }
@@ -298,6 +298,6 @@
   }
 
   .title strong {
-    @extend %font-family-title;
+    @include font-family-title();
   }
 }

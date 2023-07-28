@@ -5,12 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+@use 'partials/boxes' as *;
+
 .ui-widget-content {
   color: $black;
 }
 
 .ui-corner-all {
-  @extend %default-border-radius;
+  @include default-border-radius();
 
   .ui-dialog-content {
     /* For some reason the dialogs don't get their bottom corners rounded without this. */
@@ -33,11 +36,11 @@
 }
 
 .ui-widget {
-  @extend %font-family-body;
+  @include font-family-body();
 
   textarea,
   button {
-    @extend %font-family-body;
+    @include font-family-body();
   }
 }
 

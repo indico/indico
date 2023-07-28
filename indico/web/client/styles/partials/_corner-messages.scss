@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 @keyframes _fadein {
   from {
     opacity: 0;
@@ -51,7 +53,7 @@
 }
 
 .corner-message {
-  @extend %font-family-title;
+  @include font-family-title();
   @include border-all($light-black);
   box-shadow: 0 3px 2px rgba(150, 150, 150, 0.2);
   @include transition(background-color 0.5s, color 0.5s, border-color 0.5s, width 0.5s);

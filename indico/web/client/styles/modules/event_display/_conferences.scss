@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base' as *;
+
 .author-info {
   table-layout: auto;
 
@@ -30,7 +32,7 @@
 }
 
 .conference-page {
-  @extend %font-family-modern-body;
+  @include font-family-modern-body();
 
   .item-text {
     clear: both;
@@ -67,7 +69,7 @@
 
   .description,
   .infogrid {
-    @extend %font-family-modern-body;
+    @include font-family-modern-body();
     margin-bottom: 1em;
 
     li p {
@@ -181,7 +183,7 @@
 
 .contribution-list,
 .track-review-list {
-  @extend %font-family-modern-body;
+  @include font-family-modern-body();
 
   .contribution-row,
   .track-review-row {
@@ -225,7 +227,7 @@
 .contrib-track,
 .contrib-type,
 .contrib-state {
-  @extend %default-border-radius;
+  @include default-border-radius();
   @include ellipsis();
 
   display: inline-block;

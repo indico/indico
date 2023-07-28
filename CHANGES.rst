@@ -30,7 +30,8 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Use (dart-)sass instead of the deprecated node-sass/libsass for CSS compilation
+  (:pr:`5734`)
 
 
 ----
