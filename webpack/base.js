@@ -110,14 +110,14 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
   }
 
   /**
-   * This function resolves SASS files using a [~][module:]path syntax
+   * This function resolves SASS files using a [module:][~]path syntax
    */
   function sassResolver(url) {
-    const match = url.match(/^(~?)(?:(\w+):)?([\w/_-]+)/);
+    const match = url.match(/^(?:(\w+):)?(~?[\w/_-]+)/);
     if (match) {
-      const skipOverride = match[1] === '~';
-      const mod = match[2];
-      const file = match[3];
+      const skipOverride = match[2].startsWith('~');
+      const mod = match[1];
+      const file = skipOverride ? match[2].slice(1) : match[2];
       if (config.isPlugin) {
         const {sassOverrides} = bundles;
         if (skipOverride) {
