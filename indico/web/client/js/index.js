@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import 'core-js/es6';
+import 'core-js/es';
 
 import './legacy/presentation.js';
 import './legacy/indico.js';
