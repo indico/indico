@@ -44,7 +44,7 @@ from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProv
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util import date_time as date_time_util
 from indico.util.i18n import (_, babel, get_all_locales, get_current_locale, gettext_context, ngettext_context,
-                              npgettext_context, pgettext_context)
+                              npgettext_context, pgettext_context, set_best_lang)
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
@@ -264,6 +264,13 @@ def setup_jinja_customization(app):
     app.jinja_env.loader.fs_loader.searchpath += sorted(paths)
 
 
+def configure_babel(app):
+    app.config['BABEL_DEFAULT_LOCALE'] = 'en_US'
+    babel.init_app(app, locale_selector=set_best_lang)
+    if config.DEFAULT_LOCALE not in get_all_locales():
+        Logger.get('i18n').error(f'Configured DEFAULT_LOCALE ({config.DEFAULT_LOCALE}) does not exist')
+
+
 def configure_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -408,9 +415,7 @@ def make_app(testing=False, config_override=None):
             init_sentry(app)
         celery.init_app(app)
         cache.init_app(app)
-        babel.init_app(app)
-        if config.DEFAULT_LOCALE not in get_all_locales():
-            Logger.get('i18n').error(f'Configured DEFAULT_LOCALE ({config.DEFAULT_LOCALE}) does not exist')
+        configure_babel(app)
         multipass.init_app(app)
         setup_oauth_provider(app)
         webpack.init_app(app)
