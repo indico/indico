@@ -31,14 +31,14 @@ def review_and_publish_editable(revision, action, comment, tags=set(), files=Non
 
 
 def confirm_and_publish_changes(revision, action, comment):
-    confirm_editable_changes(revision, session.user, action, comment)
+    new_revision = confirm_editable_changes(revision, session.user, action, comment)
     service_url = editing_settings.get(revision.editable.event, 'service_url')
     publish = True
     if service_url:
         try:
-            resp = service_handle_review_editable(revision.editable, session.user, action, revision)
+            resp = service_handle_review_editable(revision.editable, session.user, action, revision) #TODO check if this is correct
             publish = resp.get('publish', True)
         except ServiceRequestFailed:
             raise ServiceUnavailable(_('Failed processing review, please try again later.'))
     if publish and action == EditingConfirmationAction.accept:
-        publish_editable_revision(revision)
+        publish_editable_revision(new_revision or revision)

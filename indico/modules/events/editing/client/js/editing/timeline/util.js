@@ -43,19 +43,22 @@ export function processRevisions(revisions) {
   });
 }
 
-export function getPreviousRevisionWithFiles(revisions, index) {
+function getPreviousRevisionWithFiles(revisions, index) {
   return revisions
     .slice(0, index)
     .reverse()
     .find(revision => revision.isValid && revision.files?.length);
 }
 
-export function getNextValidRevision(revisions, index) {
-  return revisions.slice(index + 1).find(revision => revision.isValid);
+function getRevisedRevision(revisions, revision) {
+  return revisions
+    .slice(0, revisions.indexOf(revision))
+    .reverse()
+    .find(r => r.isValid || !revision.isValid);
 }
 
 function getRevisionHeader(revisions, revision) {
-  const revisedRevisionType = revisions.find(r => r.id === revision.revisesId)?.type.name;
+  const revisedRevisionType = getRevisedRevision(revisions, revision)?.type.name;
   switch (revision.type.name) {
     case RevisionType.ready_for_review:
       if ([RevisionType.new, RevisionType.ready_for_review].includes(revisedRevisionType)) {
@@ -68,10 +71,9 @@ function getRevisionHeader(revisions, revision) {
       });
     case RevisionType.changes_acceptance:
       return Translate.string('Submitter has accepted proposed changes');
+    case RevisionType.changes_rejection:
+      return Translate.string('Submitter has rejected proposed changes');
     case RevisionType.needs_submitter_changes:
-      if (revisedRevisionType === RevisionType.needs_submitter_confirmation) {
-        return Translate.string('Submitter rejected proposed changes');
-      }
       return Translate.string('Submitter has been asked to make some changes');
     case RevisionType.acceptance:
       if (revisedRevisionType === RevisionType.needs_submitter_confirmation) {
@@ -90,16 +92,6 @@ function getRevisionHeader(revisions, revision) {
       return null;
   }
 }
-
-export const typeStateMap = {
-  [RevisionType.new]: 'new',
-  [RevisionType.ready_for_review]: 'ready_for_review',
-  [RevisionType.needs_submitter_confirmation]: 'needs_submitter_confirmation',
-  [RevisionType.changes_acceptance]: 'accepted',
-  [RevisionType.needs_submitter_changes]: 'needs_submitter_changes',
-  [RevisionType.acceptance]: 'accepted',
-  [RevisionType.rejection]: 'rejected',
-};
 
 export const userPropTypes = {
   identifier: PropTypes.string.isRequired,
@@ -121,7 +113,6 @@ export const blockItemPropTypes = {
   revisionId: PropTypes.number.isRequired,
   createdDt: PropTypes.string,
   modifiedDt: PropTypes.string,
-  reviewedDt: PropTypes.string,
   canModify: PropTypes.bool,
   user: PropTypes.shape(userPropTypes),
   header: PropTypes.string,

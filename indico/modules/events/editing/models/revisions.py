@@ -31,21 +31,22 @@ class RevisionType(RichIntEnum):
     needs_submitter_confirmation = 3
     #: A submitter revision that accepts the changes made by the editor
     changes_acceptance = 4
-    #: A revision that requires the submitter to submit a new revision
-    needs_submitter_changes = 5
+    #: A submitter revision that rejects the changes made by the editor
+    changes_rejection = 5
+    #: An editor revision that requires the submitter to submit a new revision
+    needs_submitter_changes = 6
     #: An editor revision that accepts the editable
-    acceptance = 6
+    acceptance = 7
     #: An editor revision that rejects the editable
-    rejection = 7
-    #: An editor revision that undoes the previous revision
-    undo = 8
+    rejection = 8
     #: An editor revision that resets the state of the editable to "ready for review"
     reset = 9
 
 
 class EditingRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
-    __table_args__ = (db.CheckConstraint(f'type IN ({RevisionType.new}, {RevisionType.ready_for_review}) OR revises_id IS NOT NULL', name='revises_set_unless_new'),
+    __table_args__ = (db.CheckConstraint(f'type != {RevisionType.new} OR is_undone = false',
+                                         name='new_revision_not_undone'),
                       {'schema': 'event_editing'})
     # TODO revisions can only be revised by one not undone revision
 
@@ -66,11 +67,6 @@ class EditingRevision(RenderModeMixin, db.Model):
         index=True,
         nullable=False
     )
-    revises_id = db.Column(
-        db.ForeignKey('event_editing.revisions.id'),
-        index=True,
-        nullable=True
-    )
     created_dt = db.Column(
         UTCDateTime,
         nullable=False,
@@ -80,6 +76,11 @@ class EditingRevision(RenderModeMixin, db.Model):
         PyIntEnum(RevisionType),
         nullable=False,
         default=RevisionType.new
+    )
+    is_undone = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
     _comment = db.Column(
         'comment',
@@ -95,7 +96,7 @@ class EditingRevision(RenderModeMixin, db.Model):
         backref=db.backref(
             'revisions',
             primaryjoin=('(EditingRevision.editable_id == Editable.id) & '
-                         '~EditingRevision.type.in_(({}, {}))').format(RevisionType.undo, RevisionType.reset),
+                         f'(EditingRevision.type != {RevisionType.reset})'),
             lazy=True,
             order_by=created_dt,
             cascade='all, delete-orphan'
@@ -108,19 +109,6 @@ class EditingRevision(RenderModeMixin, db.Model):
         backref=db.backref(
             'editing_revisions',
             lazy='dynamic'
-        )
-    )
-    revises = db.relationship(
-        'EditingRevision',
-        lazy=True,
-        remote_side=id,
-        foreign_keys=revises_id,
-        backref=db.backref(
-            'revised_by',
-            uselist=False,
-            #primaryjoin='(EditingRevision.revises_id == EditingRevision.id) & ~EditingRevision.is_undone',
-            #primaryjoin=(db.remote(revises_id) == id) & ~db.remote(is_undone),
-            lazy=True
         )
     )
     tags = db.relationship(
@@ -166,43 +154,16 @@ class EditingRevision(RenderModeMixin, db.Model):
         return dict(files)
 
     @hybrid_property
-    def is_replaced(self):
-        return self.revised_by is not None and self.revised_by.type == RevisionType.ready_for_review
-
-    @is_replaced.expression
-    def is_replaced(cls):
-        return cls.revised_by.has(type=RevisionType.ready_for_review)
-
-    @hybrid_property
-    def is_undone(self):
-        return self.revised_by is not None and self.revised_by.type == RevisionType.undo
-
-    @is_undone.expression
-    def is_undone(cls):
-        return cls.revised_by.has(type=RevisionType.undo)
-
-    @hybrid_property
     def is_valid(self):
-        #TODO make reset revisions invalid?
-        return self.type != RevisionType.undo and not self.is_undone
+        return self.type != RevisionType.reset and not self.is_undone
 
     @is_valid.expression
     def is_valid(cls):
-        return (cls.type != RevisionType.undo) & ~cls.is_undone
-
-    @property
-    def reviewed(self):
-        return (self.is_valid and
-                self.revised_by is not None and
-                self.revised_by.is_valid and
-                self.revised_by.type not in (RevisionType.new, RevisionType.ready_for_review))
+        return (cls.type != RevisionType.reset) & ~cls.is_undone
 
     @property
     def is_editor(self):
-        if self.type in (RevisionType.needs_submitter_confirmation, RevisionType.acceptance, RevisionType.rejection,
-                         RevisionType.undo, RevisionType.reset):
-            return True
-        if (self.type == RevisionType.needs_submitter_changes and
-                self.revises.type != RevisionType.needs_submitter_confirmation):
+        if self.type in (RevisionType.needs_submitter_confirmation, RevisionType.acceptance,
+                         RevisionType.rejection, RevisionType.reset, RevisionType.needs_submitter_changes):
             return True
         return False

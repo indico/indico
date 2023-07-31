@@ -12,9 +12,21 @@ export const RevisionType = {
   ready_for_review: 'ready_for_review',
   needs_submitter_confirmation: 'needs_submitter_confirmation',
   changes_acceptance: 'changes_acceptance',
+  changes_rejection: 'changes_rejection',
   needs_submitter_changes: 'needs_submitter_changes',
   acceptance: 'acceptance',
   rejection: 'rejection',
+};
+
+export const RevisionTypeStates = {
+  [RevisionType.new]: 'new',
+  [RevisionType.ready_for_review]: 'ready_for_review',
+  [RevisionType.needs_submitter_confirmation]: 'needs_submitter_confirmation',
+  [RevisionType.changes_acceptance]: 'accepted',
+  [RevisionType.changes_rejection]: 'needs_submitter_changes',
+  [RevisionType.needs_submitter_changes]: 'needs_submitter_changes',
+  [RevisionType.acceptance]: 'accepted',
+  [RevisionType.rejection]: 'rejected',
 };
 
 export const EditingReviewAction = {

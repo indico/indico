@@ -152,7 +152,7 @@ class EditingRevisionCommentSchema(mm.SQLAlchemyAutoSchema):
 class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevision
-        fields = ('id', 'created_dt', 'revises_id', 'user', 'files', 'comment', 'comment_html',
+        fields = ('id', 'created_dt', 'user', 'files', 'comment', 'comment_html',
                   'comments', 'type', 'is_valid', 'is_undone', 'is_editor', 'tags', 'create_comment_url',
                   'download_files_url', 'review_url', 'confirm_url', 'custom_actions', 'custom_action_url')
 
@@ -171,7 +171,7 @@ class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     custom_actions = fields.Function(lambda revision, ctx: ctx.get('custom_actions', {}).get(revision, []))
 
     def _get_confirm_url(self, revision):
-        if revision.type == RevisionType.needs_submitter_confirmation and not revision.reviewed:
+        if revision.type == RevisionType.needs_submitter_confirmation and revision == revision.editable.latest_revision:
             return url_for('event_editing.api_confirm_changes', revision)
 
     def _get_comments(self, revision):

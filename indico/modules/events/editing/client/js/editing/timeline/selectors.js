@@ -53,7 +53,11 @@ export const canReviewLastRevision = createSelector(
 );
 export const needsSubmitterChanges = createSelector(
   getLastRevision,
-  lastRevision => lastRevision && lastRevision.type.name === RevisionType.needs_submitter_changes
+  lastRevision =>
+    lastRevision &&
+    [RevisionType.changes_rejection, RevisionType.needs_submitter_changes].includes(
+      lastRevision.type.name
+    )
 );
 export const needsSubmitterConfirmation = createSelector(
   getLastRevision,

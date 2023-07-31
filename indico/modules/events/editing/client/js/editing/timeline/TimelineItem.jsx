@@ -15,6 +15,8 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
+import {RevisionTypeStates} from '../../models';
+
 import ChangesConfirmation from './ChangesConfirmation';
 import CustomActions from './CustomActions';
 import FileDisplay from './FileDisplay';
@@ -23,7 +25,7 @@ import ReviewForm from './ReviewForm';
 import RevisionLog from './RevisionLog';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
-import {blockPropTypes, typeStateMap} from './util';
+import {blockPropTypes} from './util';
 
 import '../../../styles/timeline.module.scss';
 import './TimelineItem.module.scss';
@@ -98,7 +100,7 @@ export default function TimelineItem({block, index}) {
                   {visible ? <Translate>Hide</Translate> : <Translate>Show details</Translate>}
                 </a>
               )}
-              <StateIndicator state={typeStateMap[block.type.name]} circular />
+              <StateIndicator state={RevisionTypeStates[block.type.name]} circular />
             </div>
             {visible && hasContent && (
               <div className="i-box-content">

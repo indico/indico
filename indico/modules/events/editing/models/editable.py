@@ -280,6 +280,7 @@ def _mappers_configured():
         RevisionType.ready_for_review: EditableState.ready_for_review,
         RevisionType.needs_submitter_confirmation: EditableState.needs_submitter_confirmation,
         RevisionType.changes_acceptance: EditableState.accepted,
+        RevisionType.changes_rejection: EditableState.needs_submitter_changes,
         RevisionType.needs_submitter_changes: EditableState.needs_submitter_changes,
         RevisionType.acceptance: EditableState.accepted,
         RevisionType.rejection: EditableState.rejected,
