@@ -23,11 +23,14 @@ $i-button-spacing: 0.3rem;
 }
 
 @mixin button-disabled {
-  border-color: $default-border-color !important;
-  background: $i-button-background-color !important;
-  box-shadow: none !important;
   color: $gray !important;
   cursor: default;
+
+  &:not(.borderless) {
+    border-color: $default-border-color !important;
+    background: $i-button-background-color !important;
+    box-shadow: none !important;
+  }
 }
 
 @mixin _i-button-borderless($color, $dark-color) {
