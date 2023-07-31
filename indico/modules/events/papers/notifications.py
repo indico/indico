@@ -100,7 +100,7 @@ def notify_paper_assignment(user, role, contributions, event, assign):
 def notify_comment(person, paper, comment, submitter):
     event = paper.event
     receiver_name = person.first_name or 'user'
-    with person.force_user_locale() if type(person) == User else event.force_event_locale():
+    with person.force_user_locale() if isinstance(person, User) else event.force_event_locale():
         template = get_template_module('events/papers/emails/comment.html', event=event, receiver=receiver_name,
                                        contribution=paper.contribution, comment=comment, submitter=submitter)
         email = make_email(to_list=person.email, template=template, html=True)

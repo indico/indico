@@ -399,7 +399,6 @@ class PersonLinkBase(PersonMixin, db.Model):
     """Base class for EventPerson associations."""
 
     __abstract__ = True
-    __auto_table_args = {'schema': 'events'}
     #: The name of the backref on the `EventPerson`
     person_link_backref_name = None
     #: The columns which should be included in the unique constraint.
