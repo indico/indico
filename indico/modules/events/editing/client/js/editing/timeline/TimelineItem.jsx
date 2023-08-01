@@ -116,15 +116,13 @@ export default function TimelineItem({block, index}) {
                     dangerouslySetInnerHTML={{__html: block.commentHtml}}
                   />
                 )}
-                {block.commentHtml && !!block.files.length && <Divider />}
-                {!!block.files.length && (
-                  <FileDisplay
-                    fileTypes={fileTypes}
-                    files={block.files}
-                    downloadURL={block.downloadFilesURL}
-                    tags={block.tags}
-                  />
-                )}
+                {block.commentHtml && !!(block.files.length || block.tags.length) && <Divider />}
+                <FileDisplay
+                  fileTypes={fileTypes}
+                  files={block.files}
+                  downloadURL={block.downloadFilesURL}
+                  tags={block.tags}
+                />
                 {canPerformSubmitterActions && needsSubmitterConfirmation && isLastValidBlock && (
                   <ChangesConfirmation />
                 )}
@@ -136,7 +134,7 @@ export default function TimelineItem({block, index}) {
           </div>
         </div>
       </div>
-      {visible && (
+      {visible && (!!block.items.length || isLastBlock) && (
         <RevisionLog items={block.items} separator={isLastBlock}>
           {isLastValidBlock && canComment && <ReviewForm block={block} />}
         </RevisionLog>

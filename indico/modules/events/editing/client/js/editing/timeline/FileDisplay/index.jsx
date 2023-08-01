@@ -77,11 +77,13 @@ FileTypeDisplay.propTypes = {
 export default function FileDisplay({downloadURL, fileTypes, files, tags}) {
   return (
     <div styleName="file-display-wrapper">
-      <div styleName="file-display">
-        {mapFileTypes(fileTypes, files).map(fileType => (
-          <FileTypeDisplay key={fileType.id} fileType={fileType} />
-        ))}
-      </div>
+      {files.length !== 0 && (
+        <div styleName="file-display">
+          {mapFileTypes(fileTypes, files).map(fileType => (
+            <FileTypeDisplay key={fileType.id} fileType={fileType} />
+          ))}
+        </div>
+      )}
       <div styleName="download-tag-wrapper">
         <div styleName="tag-display">
           {tags.map(tag => (

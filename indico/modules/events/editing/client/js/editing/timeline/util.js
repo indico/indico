@@ -34,11 +34,19 @@ export function processRevisions(revisions) {
         return f;
       });
     }
+    let tags = revision.tags;
+    if (files?.length && !tags?.length) {
+      const nextRevision = revisions.slice(i + 1).find(r => !r.isUndone);
+      if (nextRevision?.isEditor) {
+        tags = nextRevision.tags;
+      }
+    }
     return {
       ...revision,
       header: getRevisionHeader(revisions, revision) || revision.header,
       items: _.sortBy(revision.comments, 'createdDt'),
       files,
+      tags,
     };
   });
 }

@@ -27,12 +27,13 @@ export default function SubmitRevision() {
   const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
   const fileTypes = useSelector(selectors.getFileTypes);
   const lastRevision = useSelector(selectors.getLastRevision);
+  const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
   const dispatch = useDispatch();
   const currentUser = {
     fullName: Indico.User.name,
     avatarURL: Indico.User.avatarURL,
   };
-  const files = getFilesFromRevision(fileTypes, lastRevision);
+  const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
 
   const submitRevision = async formData => {
     const rv = await dispatch(
@@ -71,7 +72,7 @@ export default function SubmitRevision() {
                   <FinalFileManager
                     name="files"
                     fileTypes={fileTypes}
-                    files={lastRevision.files}
+                    files={lastRevisionWithFiles.files}
                     uploadURL={uploadURL({
                       event_id: eventId,
                       contrib_id: contributionId,

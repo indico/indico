@@ -47,6 +47,15 @@ export const getLastRevision = createSelector(
   getValidRevisions,
   revisions => revisions && revisions[revisions.length - 1]
 );
+export const getLastRevisionWithFiles = createSelector(
+  getValidRevisions,
+  revisions =>
+    revisions &&
+    revisions
+      .slice()
+      .reverse()
+      .find(revision => revision.files.length)
+);
 export const canReviewLastRevision = createSelector(
   getLastRevision,
   lastRevision => lastRevision && lastRevision.type.name === RevisionType.ready_for_review
@@ -111,7 +120,10 @@ export const getLastRevertableRevisionId = createSelector(
       return null;
     }
     const latestRevision = revisions[revisions.length - 1];
-    if (latestRevision.isUndone) {
+    if (
+      latestRevision.isUndone ||
+      [RevisionType.new, RevisionType.ready_for_review].includes(latestRevision.type.name)
+    ) {
       return null;
     }
     return latestRevision.id;
