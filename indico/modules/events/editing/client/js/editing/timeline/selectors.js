@@ -25,7 +25,7 @@ export const getLastTimelineBlock = createSelector(
   blocks => blocks && blocks[blocks.length - 1]
 );
 export const getValidTimelineBlocks = state =>
-  state.timeline.timelineBlocks.filter(({isValid}) => isValid);
+  state.timeline.timelineBlocks.filter(({isUndone}) => !isUndone);
 export const getLastValidTimelineBlock = createSelector(
   getValidTimelineBlocks,
   blocks => blocks && blocks[blocks.length - 1]
@@ -41,7 +41,7 @@ export const getLastTimelineBlockWithFiles = createSelector(
 );
 export const getValidRevisions = createSelector(
   getDetails,
-  details => details && details.revisions.filter(({isValid}) => isValid)
+  details => details && details.revisions.filter(({isUndone}) => !isUndone)
 );
 export const getLastRevision = createSelector(
   getValidRevisions,
@@ -111,7 +111,7 @@ export const getLastRevertableRevisionId = createSelector(
       return null;
     }
     const latestRevision = revisions[revisions.length - 1];
-    if (!latestRevision.isValid) {
+    if (latestRevision.isUndone) {
       return null;
     }
     return latestRevision.id;

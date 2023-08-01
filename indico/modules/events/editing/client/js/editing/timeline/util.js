@@ -47,14 +47,14 @@ function getPreviousRevisionWithFiles(revisions, index) {
   return revisions
     .slice(0, index)
     .reverse()
-    .find(revision => revision.isValid && revision.files?.length);
+    .find(revision => !revision.isUndone && revision.files?.length);
 }
 
 function getRevisedRevision(revisions, revision) {
   return revisions
     .slice(0, revisions.indexOf(revision))
     .reverse()
-    .find(r => r.isValid || !revision.isValid);
+    .find(r => !r.isUndone || revision.isUndone);
 }
 
 function getRevisionHeader(revisions, revision) {

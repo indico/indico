@@ -14,90 +14,49 @@ from indico.modules.events.editing.models.revisions import EditingRevision, Revi
 def test_cannot_undo_review_old_rev(dummy_contribution, dummy_user):
     from indico.modules.events.editing.operations import InvalidEditableState, undo_review
     editable = Editable(contribution=dummy_contribution, type=EditableType.paper)
-    rev1 = EditingRevision(editable=editable, submitter=dummy_user,
-                           type=RevisionType.ready_for_review)
-    rev2 = EditingRevision(editable=editable, submitter=dummy_user,
-                           type=RevisionType.needs_submitter_confirmation)
-    rev3 = EditingRevision(editable=editable, submitter=dummy_user,
-                           type=RevisionType.needs_submitter_changes)
+    rev1 = EditingRevision(editable=editable, user=dummy_user, type=RevisionType.ready_for_review)
+    rev2 = EditingRevision(editable=editable, user=dummy_user, type=RevisionType.needs_submitter_confirmation)
+    rev3 = EditingRevision(editable=editable, user=dummy_user, type=RevisionType.changes_rejection)
     with pytest.raises(InvalidEditableState):
         undo_review(rev1)
     with pytest.raises(InvalidEditableState):
         undo_review(rev2)
     undo_review(rev3)
-
-
-@pytest.mark.parametrize(('t1', 'ok1', 't2', 'ok2'), (
-    (RevisionType.ready_for_review, RevisionType.accepted, True,
-     None, None, None),
-
-    (RevisionType.ready_for_review, RevisionType.rejected, True,
-     None, None, None),
-
-    (RevisionType.ready_for_review, RevisionType.needs_submitter_changes, True,
-     None, None, None),
-
-    (RevisionType.ready_for_review, RevisionType.needs_submitter_confirmation, True,
-     RevisionType.needs_submitter_confirmation, RevisionType.none, False),
-
-    (RevisionType.ready_for_review, RevisionType.needs_submitter_confirmation, False,
-     RevisionType.needs_submitter_confirmation, RevisionType.accepted, True),
-
-    (RevisionType.ready_for_review, RevisionType.needs_submitter_confirmation, False,
-     RevisionType.needs_submitter_confirmation, RevisionType.needs_submitter_changes, True),
-
-    (RevisionType.ready_for_review, RevisionType.needs_submitter_changes, False,
-     RevisionType.ready_for_review, RevisionType.none, False),
-
-    (RevisionType.ready_for_review, RevisionType.needs_submitter_changes, False,
-     RevisionType.ready_for_review, RevisionType.needs_submitter_changes, True),
-))
-def test_can_undo_review(db, dummy_contribution, dummy_user, t1, ok1, t2, ok2):
-    from indico.modules.events.editing.operations import InvalidEditableState, undo_review
-    editable = Editable(contribution=dummy_contribution, type=EditableType.paper)
-    rev1 = EditingRevision(editable=editable, submitter=dummy_user, type=t1)
-    if t2 is not None:
-        rev2 = EditingRevision(editable=editable, submitter=dummy_user, type=t2)
-    db.session.flush()
-
-    if ok1:
-        undo_review(rev1)
-    else:
-        pytest.raises(InvalidEditableState, undo_review, rev1)
-
-    if t2 is not None:
-        if ok2:
-            undo_review(rev2)
-        else:
-            pytest.raises(InvalidEditableState, undo_review, rev2)
-
-    db.session.expire(editable)  # so a deleted revision shows up in the relationship
-    if ok1:
-        assert rev1.final_state == RevisionType.none
-        if t2 is None:
-            assert len(editable.revisions) == 1
-        else:
-            assert rev2.final_state == RevisionType.undone
-            assert len(editable.revisions) == 2
-    elif ok2:
-        assert rev2.final_state == RevisionType.none
-        assert len(editable.revisions) == 2
-
-
-def test_can_undo_review_request_changes(db, dummy_contribution, dummy_user):
-    from indico.modules.events.editing.operations import InvalidEditableState, undo_review
-    editable = Editable(contribution=dummy_contribution, type=EditableType.paper)
-    rev1 = EditingRevision(editable=editable, submitter=dummy_user,
-                           type=RevisionType.ready_for_review)
-    rev2 = EditingRevision(editable=editable, submitter=dummy_user, editor=dummy_user,
-                           type=RevisionType.needs_submitter_changes)
-    db.session.flush()
-
-    with pytest.raises(InvalidEditableState):
-        undo_review(rev1)
-    undo_review(rev2)
-
-    db.session.expire(editable)  # so a deleted revision shows up in the relationship
     assert not rev1.is_undone
-    assert rev2.is_undone
-    assert len(editable.revisions) == 2
+    assert not rev2.is_undone
+    assert rev3.is_undone
+
+
+@pytest.mark.parametrize(('type', 'ok'), (
+    (RevisionType.new, False),
+    (RevisionType.ready_for_review, False),
+    (RevisionType.needs_submitter_changes, True),
+    (RevisionType.changes_acceptance, True),
+    (RevisionType.changes_rejection, True),
+    (RevisionType.needs_submitter_confirmation, True),
+    (RevisionType.acceptance, True),
+    (RevisionType.rejection, True),
+    (RevisionType.reset, True),
+))
+def test_can_undo_review(db, dummy_contribution, dummy_user, type, ok):
+    from indico.modules.events.editing.operations import InvalidEditableState, undo_review
+    editable = Editable(contribution=dummy_contribution, type=EditableType.paper)
+    rev = EditingRevision(editable=editable, user=dummy_user, type=type)
+    db.session.flush()
+
+    if ok:
+        undo_review(rev)
+        assert rev.is_undone
+    else:
+        pytest.raises(InvalidEditableState, undo_review, rev)
+        assert not rev.is_undone
+
+    db.session.expire(editable)  # so a deleted revision shows up in the relationship
+    if type == RevisionType.reset:
+        assert len(editable.revisions) == 0
+    else:
+        assert len(editable.revisions) == 1
+    if ok or type == RevisionType.reset:
+        assert len(editable.valid_revisions) == 0
+    else:
+        assert len(editable.valid_revisions) == 1

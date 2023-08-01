@@ -112,7 +112,7 @@ class Editable(db.Model):
 
     @property
     def valid_revisions(self):
-        return [r for r in self.revisions if r.is_valid]
+        return [r for r in self.revisions if not r.is_undone]
 
     @property
     def latest_revision(self):
@@ -123,7 +123,7 @@ class Editable(db.Model):
         from .revisions import EditingRevision
         from .revision_files import EditingRevisionFile
         return (EditingRevision.query
-                .filter_by(editable=self, is_valid=True)
+                .filter_by(editable=self, is_undone=False)
                 .join(EditingRevisionFile)
                 .order_by(EditingRevision.created_dt.desc())
                 .first())
@@ -287,7 +287,7 @@ def _mappers_configured():
         RevisionType.reset: EditableState.ready_for_review,
     }, value=EditingRevision.type), PyIntEnum(EditableState))
     query = (select([cases])
-             .where((EditingRevision.editable_id == Editable.id) & EditingRevision.is_valid)
+             .where((EditingRevision.editable_id == Editable.id) & ~EditingRevision.is_undone)
              .order_by(EditingRevision.created_dt.desc())
              .limit(1)
              .correlate_except(EditingRevision)
@@ -297,7 +297,7 @@ def _mappers_configured():
     # Editable.revision_count -- the number of revisions the editable has
     #TODO count only revisions with files
     query = (select([db.func.count(EditingRevision.id)])
-             .where((EditingRevision.editable_id == Editable.id) & EditingRevision.is_valid)
+             .where((EditingRevision.editable_id == Editable.id) & ~EditingRevision.is_undone)
              .correlate_except(EditingRevision)
              .scalar_subquery())
     Editable.revision_count = column_property(query)

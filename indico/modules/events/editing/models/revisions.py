@@ -45,10 +45,9 @@ class RevisionType(RichIntEnum):
 
 class EditingRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
-    __table_args__ = (db.CheckConstraint(f'type != {RevisionType.new} OR is_undone = false',
+    __table_args__ = (db.CheckConstraint(f'type != {RevisionType.new} OR is_undone = false', #TODO consider adding r4r as well
                                          name='new_revision_not_undone'),
                       {'schema': 'event_editing'})
-    # TODO revisions can only be revised by one not undone revision
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
@@ -152,14 +151,6 @@ class EditingRevision(RenderModeMixin, db.Model):
             if file.file_type.publishable:
                 files[file.file_type].append(file)
         return dict(files)
-
-    @hybrid_property
-    def is_valid(self):
-        return self.type != RevisionType.reset and not self.is_undone
-
-    @is_valid.expression
-    def is_valid(cls):
-        return (cls.type != RevisionType.reset) & ~cls.is_undone
 
     @property
     def is_editor(self):
