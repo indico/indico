@@ -179,45 +179,6 @@
     "url": "https://github.com/indico/indico/issues"
   },
   "homepage": "https://github.com/indico/indico#readme",
-  "jest": {
-    "transformIgnorePatterns": [
-      "/node_modules/(?!geodesy|semantic-ui-react)"
-    ],
-    "moduleNameMapper": {
-      "^.+\\.(s?css)$": "identity-obj-proxy",
-      "^indico/modules/events/(reviewing|util)/(.*)$": "<rootDir>/indico/modules/events/client/js/$1/$2",
-      "^indico/modules/events/([\\w]+)/(.*)$": "<rootDir>/indico/modules/events/$1/client/js/$2",
-      "^indico/modules/([\\w]+)/(.*)$": "<rootDir>/indico/modules/$1/client/js/$2",
-      "^indico/(.*)$": "<rootDir>/indico/web/client/js/$1"
-    },
-    "setupFilesAfterEnv": [
-      "<rootDir>/setupTests.js"
-    ],
-    "globals": {
-      "Indico": {
-        "Urls": {
-          "BasePath": ""
-        }
-      },
-      "REACT_TRANSLATIONS": {
-        "indico": {
-          "": {
-            "domain": "indico",
-            "lang": "en_GB"
-          }
-        }
-      },
-      "TRANSLATIONS": {
-        "indico": {
-          "": {
-            "domain": "indico",
-            "lang": "en_GB"
-          }
-        }
-      }
-    },
-    "testEnvironment": "jsdom"
-  },
   "husky": {
     "hooks": {
       "pre-commit": "bash pre-commit.githook"
