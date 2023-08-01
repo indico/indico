@@ -10,6 +10,7 @@
 :global(.ui.table).table {
   // fix to allow the table to be wider than
   // 800px set by .page-content
+  /* stylelint-disable-next-line scss/media-feature-value-dollar-variable */
   @media (min-width: 1500px) {
     max-width: 1200px;
     width: max-content;
