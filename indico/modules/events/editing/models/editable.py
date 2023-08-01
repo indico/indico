@@ -284,6 +284,7 @@ def _mappers_configured():
         RevisionType.needs_submitter_changes: EditableState.needs_submitter_changes,
         RevisionType.acceptance: EditableState.accepted,
         RevisionType.rejection: EditableState.rejected,
+        RevisionType.replacement: EditableState.ready_for_review,
         RevisionType.reset: EditableState.ready_for_review,
     }, value=EditingRevision.type), PyIntEnum(EditableState))
     query = (select([cases])

@@ -7,8 +7,6 @@
 
 from collections import defaultdict
 
-from sqlalchemy.ext.hybrid import hybrid_property
-
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
@@ -21,8 +19,9 @@ from indico.util.string import format_repr
 
 class RevisionType(RichIntEnum):
     __titles__ = [None, _('New'), _('Ready for Review'), _('Needs Confirmation'), _('Accepted'), _('Needs Changes'),
-                  _('Accepted'), _('Rejected'), _('Undone'), _('Reset')]
-    __css_classes__ = [None, 'highlight', 'ready', 'warning', 'success', 'warning', 'success', 'error', None, None]
+                  _('Needs Changes'), _('Accepted'), _('Rejected'), _('Replaced'), _('Reset')]
+    __css_classes__ = [None, 'highlight', 'ready', 'warning', 'success', 'warning', 'warning', 'success', 'error',
+                       'highlight', None]
     #: A submitter revision that hasn't been exposed to editors yet
     new = 1
     #: A submitter revision that can be reviewed by editors
@@ -39,13 +38,15 @@ class RevisionType(RichIntEnum):
     acceptance = 7
     #: An editor revision that rejects the editable
     rejection = 8
-    #: An editor revision that resets the state of the editable to "ready for review"
-    reset = 9
+    #: A microsservice revision that replaces the current revision
+    replacement = 9
+    #: A microsservice revision that resets the state of the editable to "ready for review"
+    reset = 10
 
 
 class EditingRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
-    __table_args__ = (db.CheckConstraint(f'type != {RevisionType.new} OR is_undone = false', #TODO consider adding r4r as well
+    __table_args__ = (db.CheckConstraint(f'type != {RevisionType.new} OR is_undone = false',
                                          name='new_revision_not_undone'),
                       {'schema': 'event_editing'})
 

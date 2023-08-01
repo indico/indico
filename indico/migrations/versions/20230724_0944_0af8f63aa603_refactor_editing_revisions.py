@@ -30,7 +30,8 @@ class _RevisionType(int, Enum):
     needs_submitter_changes = 6
     acceptance = 7
     rejection = 8
-    reset = 9
+    replacement = 9
+    reset = 10
 
 
 class _FinalRevisionState(int, Enum):
@@ -115,6 +116,17 @@ def upgrade():
     op.drop_constraint('ck_revisions_valid_state_combination', 'revisions', schema='event_editing')
     op.drop_constraint('ck_revisions_valid_enum_initial_state', 'revisions', schema='event_editing')
     op.alter_column('revisions', 'submitter_id', new_column_name='user_id', schema='event_editing')
+    # deal with the "replacement" revisions
+    op.execute('''
+        WITH revs_lag AS (
+            SELECT id, LAG(final_state) OVER (PARTITION BY editable_id ORDER BY created_dt) AS prev_final_state
+            FROM event_editing.revisions
+        )
+        UPDATE event_editing.revisions AS revs
+        SET initial_state = 9
+        FROM revs_lag
+        WHERE revs.id = revs_lag.id AND revs_lag.prev_final_state = 1
+    ''')
     # deal with "request changes with files" revisions
     op.execute('''
         WITH revised_rev AS (

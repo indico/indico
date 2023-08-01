@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {FinalRevisionState, InitialRevisionState} from 'indico/modules/events/editing/models';
+import {RevisionType} from 'indico/modules/events/editing/models';
 
 import {processRevisions, revisionStates} from '../util';
 
@@ -21,44 +21,40 @@ describe('timeline selectors', () => {
             user: {
               fullName: 'Indico Janitor',
             },
-            undoneJudgment: {
-              name: FinalRevisionState.none,
-            },
           },
         ],
-        initialState: {
-          name: InitialRevisionState.new,
-        },
-        finalState: {
-          name: FinalRevisionState.replaced,
+        type: {
+          name: RevisionType.new,
         },
       },
       {
         id: 2,
         comments: [],
-        initialState: {
-          name: InitialRevisionState.ready_for_review,
+        type: {
+          name: RevisionType.replacement,
         },
-        finalState: {
-          name: FinalRevisionState.needs_submitter_changes,
+      },
+      {
+        id: 3,
+        comments: [],
+        type: {
+          name: RevisionType.needs_submitter_changes,
         },
       },
     ];
     const result = processRevisions(revisions);
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
     expect(result[0].id).toBe(1);
-    expect(result[0].items).toStrictEqual([
-      expect.objectContaining({text: 'revision replaced'}),
-      expect.objectContaining({
-        header: revisionStates.any[FinalRevisionState.replaced],
-      }),
-    ]);
+    expect(result[0].header).toStrictEqual(undefined);
+    expect(result[0].items).toStrictEqual([expect.objectContaining({text: 'revision replaced'})]);
     expect(result[1].id).toBe(2);
-    expect(result[1].items).toStrictEqual([
-      expect.objectContaining({
-        header: revisionStates.any[FinalRevisionState.needs_submitter_changes],
-      }),
-    ]);
+    expect(result[1].header).toStrictEqual(revisionStates[RevisionType.replacement].any);
+    expect(result[1].items).toStrictEqual([]);
+    expect(result[2].id).toBe(3);
+    expect(result[2].header).toStrictEqual(
+      revisionStates[RevisionType.needs_submitter_changes].any
+    );
+    expect(result[2].items).toStrictEqual([]);
   });
 
   it('should order revisions', () => {
@@ -66,62 +62,60 @@ describe('timeline selectors', () => {
       {
         id: 1,
         comments: [],
-        initialState: {
-          name: InitialRevisionState.ready_for_review,
+        type: {
+          name: RevisionType.ready_for_review,
         },
-        finalState: {
-          name: FinalRevisionState.needs_submitter_confirmation,
+      },
+      {
+        id: 2,
+        user: {
+          fullName: 'Indico Janitor',
+        },
+        comments: [],
+        type: {
+          name: RevisionType.needs_submitter_confirmation,
         },
         commentHtml: 'hey',
       },
       {
-        id: 2,
+        id: 3,
         comments: [],
-        initialState: {
-          name: InitialRevisionState.needs_submitter_confirmation,
-        },
-        finalState: {
-          name: FinalRevisionState.needs_submitter_changes,
+        type: {
+          name: RevisionType.changes_rejection,
         },
       },
       {
-        id: 3,
+        id: 4,
         comments: [],
-        initialState: {
-          name: InitialRevisionState.ready_for_review,
-        },
-        finalState: {
-          name: FinalRevisionState.none,
+        type: {
+          name: RevisionType.ready_for_review,
         },
       },
     ];
     const result = processRevisions(revisions);
-    expect(result).toHaveLength(3);
+    expect(result).toHaveLength(4);
     expect(result[0].id).toBe(1);
-    expect(result[0].items).toStrictEqual([
-      expect.objectContaining({
-        header: revisionStates.any[FinalRevisionState.needs_submitter_confirmation](result[0]),
-        html: 'hey',
-      }),
-    ]);
+    expect(result[0].header).toStrictEqual(undefined);
+    expect(result[0].items).toStrictEqual([]);
     expect(result[1].id).toBe(2);
-    expect(result[1].items).toStrictEqual([
-      expect.objectContaining({
-        header: revisionStates[InitialRevisionState.needs_submitter_confirmation][
-          FinalRevisionState.needs_submitter_changes
-        ](result[1], {isLatestRevision: false}),
-      }),
-    ]);
+    expect(result[1].header).toStrictEqual(
+      revisionStates[RevisionType.needs_submitter_confirmation].any(result[1])
+    );
+    expect(result[1].commentHtml).toBe('hey');
+    expect(result[1].items).toStrictEqual([]);
     expect(result[2].id).toBe(3);
-    expect(result[2].items).toHaveLength(0);
+    expect(result[2].header).toStrictEqual(revisionStates[RevisionType.changes_rejection].any);
+    expect(result[2].items).toStrictEqual([]);
+    expect(result[3].id).toBe(4);
+    expect(result[3].items).toHaveLength(0);
   });
 
   it('should render comments', () => {
     const revisions = [
       {
         id: 1,
-        editor: {
-          fullName: 'service',
+        user: {
+          fullName: 'james',
         },
         comments: [
           {
@@ -130,22 +124,16 @@ describe('timeline selectors', () => {
             user: {
               fullName: 'Indico Janitor',
             },
-            undoneJudgment: {
-              name: FinalRevisionState.none,
-            },
           },
         ],
-        initialState: {
-          name: InitialRevisionState.new,
-        },
-        finalState: {
-          name: FinalRevisionState.replaced,
+        type: {
+          name: RevisionType.new,
         },
       },
       {
         id: 2,
-        editor: {
-          fullName: 'john',
+        user: {
+          fullName: 'service',
         },
         comments: [
           {
@@ -154,9 +142,6 @@ describe('timeline selectors', () => {
             user: {
               fullName: 'Indico Janitor',
             },
-            undoneJudgment: {
-              name: FinalRevisionState.none,
-            },
           },
           {
             id: 2,
@@ -164,37 +149,33 @@ describe('timeline selectors', () => {
             user: {
               fullName: 'Indico Janitor',
             },
-            undoneJudgment: {
-              name: FinalRevisionState.none,
-            },
           },
         ],
-        initialState: {
-          name: InitialRevisionState.ready_for_review,
+        type: {
+          name: RevisionType.replacement,
         },
-        finalState: {
-          name: FinalRevisionState.needs_submitter_changes,
+      },
+      {
+        id: 3,
+        user: {
+          fullName: 'john',
+        },
+        comments: [],
+        type: {
+          name: RevisionType.needs_submitter_changes,
         },
       },
     ];
     const result = processRevisions(revisions);
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
     expect(result[0].id).toBe(1);
-    expect(result[0].items).toStrictEqual([
-      expect.objectContaining({text: 'first comment'}),
-      expect.objectContaining({
-        header: revisionStates.any[FinalRevisionState.replaced],
-        user: result[0].editor,
-      }),
-    ]);
+    expect(result[0].header).toStrictEqual(undefined);
+    expect(result[0].items).toStrictEqual([expect.objectContaining({text: 'first comment'})]);
     expect(result[1].id).toBe(2);
+    expect(result[1].header).toStrictEqual(revisionStates[RevisionType.replacement].any);
     expect(result[1].items).toStrictEqual([
       expect.objectContaining({text: 'my test comment'}),
       expect.objectContaining({text: 'done'}),
-      expect.objectContaining({
-        header: revisionStates.any[FinalRevisionState.needs_submitter_changes],
-        user: result[1].editor,
-      }),
     ]);
   });
 });

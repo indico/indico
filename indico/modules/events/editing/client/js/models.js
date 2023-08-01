@@ -16,6 +16,7 @@ export const RevisionType = {
   needs_submitter_changes: 'needs_submitter_changes',
   acceptance: 'acceptance',
   rejection: 'rejection',
+  replacement: 'replacement',
 };
 
 export const RevisionTypeStates = {
@@ -27,6 +28,7 @@ export const RevisionTypeStates = {
   [RevisionType.needs_submitter_changes]: 'needs_submitter_changes',
   [RevisionType.acceptance]: 'accepted',
   [RevisionType.rejection]: 'rejected',
+  [RevisionType.replacement]: 'replaced',
 };
 
 export const EditingReviewAction = {

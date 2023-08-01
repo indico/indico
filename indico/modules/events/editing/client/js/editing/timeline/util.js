@@ -57,40 +57,48 @@ function getRevisedRevision(revisions, revision) {
     .find(r => !r.isUndone || revision.isUndone);
 }
 
+export const revisionStates = {
+  [RevisionType.needs_submitter_confirmation]: {
+    any: revision =>
+      Translate.string('{editorName} (editor) has made some changes to the paper', {
+        editorName: revision.user.fullName,
+      }),
+  },
+  [RevisionType.changes_acceptance]: {
+    any: Translate.string('Submitter has accepted proposed changes'),
+  },
+  [RevisionType.changes_rejection]: {
+    any: Translate.string('Submitter has rejected proposed changes'),
+  },
+  [RevisionType.needs_submitter_changes]: {
+    any: Translate.string('Submitter has been asked to make some changes'),
+  },
+  [RevisionType.acceptance]: {
+    [RevisionType.needs_submitter_confirmation]: revision =>
+      Translate.string('{editorName} (editor) has accepted after making some changes', {
+        editorName: revision.user.fullName,
+      }),
+    any: revision =>
+      Translate.string('{editorName} (editor) has accepted this revision', {
+        editorName: revision.user.fullName,
+      }),
+  },
+  [RevisionType.rejection]: {
+    any: revision =>
+      Translate.string('{editorName} (editor) has rejected this revision', {
+        editorName: revision.user.fullName,
+      }),
+  },
+  [RevisionType.replacement]: {
+    any: Translate.string('Revision has been replaced'),
+  },
+};
+
 function getRevisionHeader(revisions, revision) {
   const revisedRevisionType = getRevisedRevision(revisions, revision)?.type.name;
-  switch (revision.type.name) {
-    case RevisionType.ready_for_review:
-      if ([RevisionType.new, RevisionType.ready_for_review].includes(revisedRevisionType)) {
-        return Translate.string('Revision has been replaced');
-      }
-      return null;
-    case RevisionType.needs_submitter_confirmation:
-      return Translate.string('{editorName} (editor) has made some changes to the paper', {
-        editorName: revision.user.fullName,
-      });
-    case RevisionType.changes_acceptance:
-      return Translate.string('Submitter has accepted proposed changes');
-    case RevisionType.changes_rejection:
-      return Translate.string('Submitter has rejected proposed changes');
-    case RevisionType.needs_submitter_changes:
-      return Translate.string('Submitter has been asked to make some changes');
-    case RevisionType.acceptance:
-      if (revisedRevisionType === RevisionType.needs_submitter_confirmation) {
-        return Translate.string('{editorName} (editor) has accepted after making some changes', {
-          editorName: revision.user.fullName,
-        });
-      }
-      return Translate.string('{editorName} (editor) has accepted this revision', {
-        editorName: revision.user.fullName,
-      });
-    case RevisionType.rejection:
-      return Translate.string('{editorName} (editor) has rejected this revision', {
-        editorName: revision.user.fullName,
-      });
-    default:
-      return null;
-  }
+  const headerStates = revisionStates[revision.type.name];
+  const header = headerStates?.[revisedRevisionType] || headerStates?.any;
+  return typeof header === 'function' ? header(revision) : header;
 }
 
 export const userPropTypes = {

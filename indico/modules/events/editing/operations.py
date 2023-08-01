@@ -163,7 +163,7 @@ def replace_revision(revision, user, comment, files, tags):
     _ensure_type(revision, (RevisionType.new, RevisionType.ready_for_review))
     revision.tags = tags
     new_revision = EditingRevision(user=user,
-                                   type=RevisionType.ready_for_review,
+                                   type=RevisionType.replacement,
                                    comment=comment,
                                    files=_make_editable_files(revision.editable, files))
     revision.editable.revisions.append(new_revision)
