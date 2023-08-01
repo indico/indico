@@ -295,7 +295,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
         filename: 'css/[name].[contenthash:8].css',
       }),
       new webpack.ProvidePlugin({
-        process: 'process/browser',
+        process: 'process/browser.js',
       }),
     ],
     resolve: {
