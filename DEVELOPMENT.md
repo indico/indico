@@ -40,3 +40,40 @@ dependencies. Afterwards, check the diff for the requirements.txt files and cons
 important changes in case of direct dependencies that aren't just patch releases. Once that's done, you MUST install
 Indico with `pip install -e '.[dev]'` and ensure nothing is broken (depending on what changed, make sure to test affected
 parts manually).
+
+
+## JS dependencies
+To update deps within semver ranges, `rm -rf package-lock.json node_modules` followed by `npm install` usually does
+the job. Make sure to restart the `build-assets.py` script afterwards to ensure things like the webpack build aren't
+broken. It's also recommended to test both dev and prod builds, and to build plugins. For plugins, it's recommended
+to try both the normal and CERN plugins (since some of those such as the Burotel plugin use more 'magic' than the
+standard ones).
+
+Once that's done, `npm outdated -l` will list the remaining packages to be updated. Often the semver-major changes
+are simply dropping support for old node versions and similar harmless things. But certain other packages are known
+to be problematic. Here's a list to save some time during the next updates:
+
+- `@dr.pogodin/babel-plugin-react-css-modules`, `css-loader` and `mini-css-extract-plugin` are very prone to problems
+  if not all of them have the versions the other packages expect. Trying to update `css-loader` to the latest major
+  version is not straightforward either. It's best to leave those packages alone until we either drop webpack or
+  look into webpack's [asset modules](https://webpack.js.org/guides/asset-modules/) feature.
+- `dropzone` is still on a stable release, the new version is still in beta so not worth considering.
+- `prettier`, `eslint-plugin-prettier` and `stylelint-prettier` cannot be updated for now due to prettier 1.19
+  introducing a very shitty heuristic for function composition detection (compared to a simple list of function
+  names that are doing function composition), so updating would mess up the formatting of our `createSelector` calls
+  in a way that's much less readable than what we have right now. Check prettier/prettier#6921 for updates on this.
+- `history`, `react-router` and `react-router-dom` have some major changes e.g. regarding navigation blocking. It
+  looks like they finally added `unstable_useBlocker()` to block navigation though. In the Room Booking module we
+  are using `connected-react-router` though, which is dead, and not compatible with react-router 6 so it would need
+  to be replaced with something else first.
+- `husky` could in principle be updated, but we use it in a very basic way (to setup and run the pre-commit git hook),
+  and there is no need to switch to the newer and slightly more complex configuration of newer versions.
+- `jquery-ui` stays on `^1.12.1` until we can get rid of it one day. Newer versions break focusing input elements inside
+  react dialogs opened from a jquery ui modal.
+- `react-dnd` and `react-dnd-html5-backend`: TODO
+- `react` and `react-dom` would be great candidates to update, but it's stuck until react-dates starts supporting React 18
+  (react-dates/react-dates#2199) which depends on Enzyme supporting it (enzymejs/enzyme#2524)
+- `react-dropzone` requires MIME types instead of just file extensions for the files it should accept in newer versions,
+  but we have various places where we have only file extensions, so we can't easily update.
+- `react-leaflet`, `react-leaflet-draw` and `react-leaflet-markercluster` are stuck because react-leaflet v3 decided to
+  adept some dumb "ethical" license (PaulLeCam/react-leaflet#698) which is not considered a proper Open Source license.
