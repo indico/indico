@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import axios from 'axios';
-import isURLSameOrigin from 'axios/lib/helpers/isURLSameOrigin';
+import isURLSameOrigin from 'axios/unsafe/helpers/isURLSameOrigin';
 import qs from 'qs';
 
 import showReactErrorDialog from 'indico/react/errors';
@@ -21,11 +21,11 @@ export const indicoAxios = axios.create({
 indicoAxios.isCancel = axios.isCancel;
 
 indicoAxios.interceptors.request.use(config => {
-  if (isURLSameOrigin(config.url)) {
-    config.headers.common['X-Requested-With'] = 'XMLHttpRequest'; // needed for `request.is_xhr`
-    config.headers.common['X-CSRF-Token'] = document
-      .getElementById('csrf-token')
-      .getAttribute('content');
+  // only set the headers on local requests and not when we are inside a unit test since the
+  // axios mock does not have `config.headers`
+  if (isURLSameOrigin(config.url) && !process.env.JEST_WORKER_ID) {
+    config.headers['X-Requested-With'] = 'XMLHttpRequest'; // needed for `request.is_xhr`
+    config.headers['X-CSRF-Token'] = document.getElementById('csrf-token').getAttribute('content');
   }
   return config;
 });
