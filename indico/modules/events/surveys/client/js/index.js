@@ -5,8 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import Chartist from 'chartist';
-import 'chartist/dist/chartist.css';
+/* global ajaxDialog:false, handleAjaxError:false, handleFlashes:false, build_url:false,
+          setupQuestionnaireSorter:false */
+
+import {BarChart, PieChart} from 'chartist';
+import 'chartist/dist/index.css';
 
 (function(global) {
   $(document).ready(function() {
@@ -17,7 +20,7 @@ import 'chartist/dist/chartist.css';
 
   function setupSurveyResultCharts() {
     $('#survey-results .survey-pie-chart').each(function(idx, elem) {
-      var chart = new Chartist.Pie(
+      const chart = new PieChart(
         elem,
         {
           labels: $(elem).data('labels'),
@@ -45,7 +48,7 @@ import 'chartist/dist/chartist.css';
       const containerHeight = $(elem)
         .parents('.i-box-content')
         .outerHeight();
-      new Chartist.Bar(
+      new BarChart(
         elem,
         {
           labels,
