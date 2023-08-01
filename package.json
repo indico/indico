@@ -166,7 +166,7 @@
     "build": "webpack -p --env.NODE_ENV=production",
     "profile": "webpack --profile --json -p --env.NODE_ENV=production > webpack-stats.json",
     "eslint": "eslint ./indico",
-    "update-browsers": "node ./bin/maintenance/update_browsers.js",
+    "update-browsers": "node ./bin/maintenance/update_browsers.mjs",
     "test": "jest"
   },
   "repository": {
