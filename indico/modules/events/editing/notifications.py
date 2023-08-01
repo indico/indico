@@ -23,21 +23,20 @@ def notify_comment(comment):
     revision = comment.revision
     editable = revision.editable
     editor = editable.editor
+    submitter = editable.revisions[0].user
     author = comment.user
     if comment.internal:
         # internal comments notify the editor and anyone who commented + can see internal comments
         recipients = _get_commenting_users(revision, check_internal_access=True) | {editor}
     elif author == editor:
         # editor comments notify the submitter and anyone else who commented
-        #TODO check if revision is the submitter's revision or the editor's revision
-        recipients = _get_commenting_users(revision) | {revision.user}
+        recipients = _get_commenting_users(revision) | {submitter}
     elif editable.can_perform_submitter_actions(author):
         # submitter comments notify the editor and anyone else who commented
         recipients = _get_commenting_users(revision) | {editor}
     else:
         # comments from someone else (managers) notify everyone
-        #TODO check if revision is the submitter's revision or the editor's revision
-        recipients = _get_commenting_users(revision) | {editor, revision.user}
+        recipients = _get_commenting_users(revision) | {editor, submitter}
 
     recipients.discard(None)  # in case there's no editor assigned
     recipients.discard(author)  # never bother people about their own comments
@@ -54,7 +53,6 @@ def notify_comment(comment):
 
 def notify_editor_judgment(revision, editor):
     """Notify the submitter about a judgment made by an editor."""
-    # TODO check if revision is the submitter's revision or the editor's revision
     submitter = revision.user
     editable = revision.editable
     editor_name = editor.first_name if editable.can_see_editor_names(submitter) else None
@@ -70,7 +68,6 @@ def notify_editor_judgment(revision, editor):
 def notify_submitter_upload(revision):
     """Notify the editor about the submitter uploading a new revision."""
     editable = revision.editable
-    # TODO check if revision is the submitter's revision or the editor's revision
     submitter = revision.user
     editor = revision.editable.editor
     if not editor:
