@@ -34,6 +34,7 @@ from indico.util.i18n import _, force_locale
 from indico.util.marshmallow import LowercaseString, ModelField, not_empty
 from indico.util.passwords import validate_secure_password
 from indico.util.signing import secure_serializer
+from indico.util.string import crc32
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -726,10 +727,12 @@ class RHResetPassword(RH):
 
     def _process(self):
         if 'token' in request.args:
-            identity_id = secure_serializer.loads(request.args['token'], max_age=3600, salt='reset-password')
-            identity = Identity.get(identity_id)
+            data = secure_serializer.loads(request.args['token'], max_age=3600, salt='reset-password')
+            identity = Identity.get(data['id'])
             if not identity:
                 raise BadData('Identity does not exist')
+            elif crc32(identity.password_hash) != data['hash']:
+                raise BadData('Password already changed')
             return self._reset_password(identity)
         else:
             return self._request_token()
@@ -745,7 +748,8 @@ class RHResetPassword(RH):
             # secure as we'd expose valid usernames for a specific user to an untrusted person.
             identity = next(iter(user.local_identities))
             _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
-                               {'user': user, 'username': identity.identifier}, data=identity.id)
+                               {'user': user, 'username': identity.identifier},
+                               data={'id': identity.id, 'hash': crc32(identity.password_hash)})
             session['resetpass_email_sent'] = True
             logger.info('Password reset requested for user %s', user)
             return redirect(url_for('.resetpass'))
