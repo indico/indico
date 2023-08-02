@@ -5,7 +5,7 @@ Changelog
 Version 3.2.7
 -------------
 
-*Unreleased*
+*Released on August 02, 2023*
 
 Bugfixes
 ^^^^^^^^
