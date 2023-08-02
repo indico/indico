@@ -20,7 +20,7 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far
+- Invalidate password reset links once the password has been changed (:pr:`5878`)
 
 Bugfixes
 ^^^^^^^^
