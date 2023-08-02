@@ -17,7 +17,6 @@ from indico.util.i18n import _
 from indico.util.string import is_legacy_id
 
 
-# XXX: force_overview is not used by passed by flask, so it needs to remain here
 def event_or_shorturl(event_id, shorturl_namespace=False, force_overview=False):
     event = Event.get(int(event_id)) if event_id.isdigit() and (event_id[0] != '0' or event_id == '0') else None
     if event and event.is_deleted:
@@ -28,7 +27,7 @@ def event_or_shorturl(event_id, shorturl_namespace=False, force_overview=False):
         # we call the RH to display the event
         if shorturl_namespace:
             return redirect(event.url)
-        elif not request.path.endswith('/'):
+        elif not force_overview and not request.path.endswith('/'):
             return redirect(event.url, 301)
         else:
             request.view_args['event_id'] = int(event_id)

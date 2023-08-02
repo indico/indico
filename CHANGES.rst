@@ -17,6 +17,8 @@ Bugfixes
 
 - Fix error when sending registration invitation reminders (:issue:`5879`, :pr:`5880`,
   thanks :user:`bpedersen2`)
+- Fix accessing the conference overview page when the default conference home page is
+  set to a custom page (:pr:`5882`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
