@@ -58,7 +58,11 @@ class RHDisplayEvent(RHDisplayEventBase):
         if self.event.type_ == EventType.conference:
             if self.theme_override:
                 return redirect(url_for('timetable.timetable', self.event, view=self.theme_id))
-            elif self.event.default_page and not self.force_overview:
+            elif (
+                not self.force_overview and
+                self.event.default_page and
+                self.event.default_page.menu_entry.can_access(session.user)
+            ):
                 return self._display_conference_page()
             else:
                 return self._display_conference()
