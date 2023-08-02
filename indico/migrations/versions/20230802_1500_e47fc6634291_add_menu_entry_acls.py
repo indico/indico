@@ -76,39 +76,24 @@ def _upgrade_access_data():
 
     # Migrate "Registered participants" to principal entries for each registration form
     conn.execute(
-        sa.text(
-            '''
-               INSERT INTO events.menu_entry_principals(menu_entry_id, type, registration_form_id)
-                    SELECT me.id AS menu_entry_id,
-                           :principal_type AS type,
-                           frm.id AS registration_form_id
-                      FROM events.menu_entries me
-          RIGHT OUTER JOIN event_registration.forms frm ON me.event_id = frm.event_id
-                     WHERE me.type NOT IN (:internal_link, :separator)
-                       AND me.access = :registered
-            '''
-        ),
+        sa.text('''
+            INSERT INTO events.menu_entry_principals (menu_entry_id, type, registration_form_id)
+            SELECT me.id, :principal_type, regforms.id
+            FROM events.menu_entries me
+            RIGHT OUTER JOIN event_registration.forms regforms ON (
+                me.event_id = regforms.event_id AND NOT regforms.is_deleted
+            )
+            WHERE me.type IN (:user_link, :page) AND me.access = :registered
+        '''),
         principal_type=_PrincipalType.registration_form.value,
-        internal_link=_MenuEntryType.internal_link.value,
-        separator=_MenuEntryType.separator.value,
+        user_link=_MenuEntryType.user_link.value,
+        page=_MenuEntryType.page.value,
         registered=_MenuEntryAccess.registered_participants.value,
     )
 
-    # Migrate "Speaker" access to allowing speaker access, unless we've already provided broader
-    # access for registered participants
+    # Migrate "Speaker" access to allowing speaker access
     conn.execute(
-        sa.text(
-            '''
-                    UPDATE events.menu_entries
-                       SET speaker_allowed = TRUE
-                     WHERE access = :speakers
-                       AND id NOT IN (
-                         SELECT menu_entry_id AS id
-                           FROM events.menu_entry_principals mep
-                          WHERE mep.type = :regform
-                       )
-            '''
-        ),
+        sa.text('UPDATE events.menu_entries SET speaker_allowed = true WHERE access = :speakers'),
         speakers=_MenuEntryAccess.speakers.value,
         regform=_PrincipalType.registration_form.value,
     )
@@ -147,6 +132,11 @@ def _downgrade_access_data():
     """
     conn = op.get_bind()
 
+    res = conn.execute(sa.text('SELECT COUNT(*) FROM events.menu_entry_principals WHERE type != :regforms'),
+                       regforms=_PrincipalType.registration_form)
+    if res.fetchone()[0]:
+        raise Exception('Cannot downgrade; some menu items contain complex ACLs and would become unprotected')
+
     # The server_default is set to give everyone access to all menu entries. We need to restrict
     # those appropriately now. Start with locking down for speakers, and then open up to registered
     # participants if applicable
@@ -154,14 +144,11 @@ def _downgrade_access_data():
     # Any menu entry that is accessible to speakers should only be open to speakers. If it is also
     # open to registrants, we'll expand this later on.
     conn.execute(
-        sa.text(
-            '''
-                    UPDATE events.menu_entries
-                       SET access = :speakers
-                     WHERE speaker_allowed = TRUE
-                       AND protection_mode = :protected
-            '''
-        ),
+        sa.text('''
+            UPDATE events.menu_entries
+            SET access = :speakers
+            WHERE speaker_allowed AND protection_mode = :protected
+        '''),
         speakers=_MenuEntryAccess.speakers.value,
         protected=_ProtectionMode.protected.value
     )
@@ -169,26 +156,24 @@ def _downgrade_access_data():
     # Inheriting menu entries with the parent accessible to speakers should be only open to
     # speakers. Again expanding to others later on.
     conn.execute(
-        sa.text(
-            '''
-                    UPDATE events.menu_entries
-                       SET access = :speakers
-                     WHERE menu_entries.id IN (
-                                      SELECT me.id
-                                        FROM events.menu_entries me
-                             LEFT OUTER JOIN events.menu_entries parent_me ON me.parent_id = parent_me.id
-                                       WHERE me.type NOT IN (:internal_link, :separator)
-                                         AND me.parent_id IS NOT NULL
-                                         AND me.protection_mode = :inheriting
-                                         AND parent_me.protection_mode = :protected
-                                         AND parent_me.speaker_allowed = TRUE
-                    )
-
-            '''
-        ),
+        sa.text('''
+            UPDATE events.menu_entries
+            SET access = :speakers
+            WHERE menu_entries.id IN (
+                SELECT me.id
+                FROM events.menu_entries me
+                LEFT OUTER JOIN events.menu_entries parent_me ON (me.parent_id = parent_me.id)
+                WHERE
+                    me.type IN (:user_link, :page) AND
+                    me.parent_id IS NOT NULL AND
+                    me.protection_mode = :inheriting AND
+                    parent_me.protection_mode = :protected AND
+                    parent_me.speaker_allowed
+            )
+        '''),
         speakers=_MenuEntryAccess.speakers.value,
-        internal_link=_MenuEntryType.internal_link.value,
-        separator=_MenuEntryType.separator.value,
+        user_link=_MenuEntryType.user_link.value,
+        page=_MenuEntryType.page.value,
         inheriting=_ProtectionMode.inheriting.value,
         protected=_ProtectionMode.protected.value,
     )
@@ -196,18 +181,17 @@ def _downgrade_access_data():
     # Any menu entry that has a registration attached to it should be registered participants only,
     # provided its protection mode is set to protected
     conn.execute(
-        sa.text(
-            '''
-                    UPDATE events.menu_entries
-                       SET access = :registered
-                     WHERE menu_entries.id IN (
-                             SELECT menu_entry_id
-                               FROM events.menu_entry_principals
-                              WHERE type = :regform
-                           )
-                       AND protection_mode = :protected
-            '''
-        ),
+        sa.text('''
+            UPDATE events.menu_entries
+            SET access = :registered
+            WHERE
+                protection_mode = :protected AND
+                menu_entries.id IN (
+                    SELECT DISTINCT menu_entry_id
+                    FROM events.menu_entry_principals
+                    WHERE type = :regform
+                )
+        '''),
         registered=_MenuEntryAccess.registered_participants.value,
         regform=_PrincipalType.registration_form.value,
         protected=_ProtectionMode.protected.value,
@@ -216,26 +200,25 @@ def _downgrade_access_data():
     # Menu entries that are inheriting with their parent set to protected and containing
     # registrations get the same treatment
     conn.execute(
-        sa.text(
-            '''
-                    UPDATE events.menu_entries
-                       SET access = :registered
-                     WHERE id IN (
-                                      SELECT me.id
-                                        FROM events.menu_entries me
-                             LEFT OUTER JOIN events.menu_entries parent_me ON me.parent_id = parent_me.id
-                            RIGHT OUTER JOIN events.menu_entry_principals mep ON mep.menu_entry_id = parent_me.id
-                                       WHERE me.type NOT IN (:internal_link, :separator)
-                                         AND me.parent_id IS NOT NULL
-                                         AND me.protection_mode = :inheriting
-                                         AND parent_me.protection_mode = :protected
-                                         AND mep.type = :regform
-                           )
-            '''
-        ),
+        sa.text('''
+            UPDATE events.menu_entries
+            SET access = :registered
+            WHERE id IN (
+                SELECT me.id
+                FROM events.menu_entries me
+                LEFT OUTER JOIN events.menu_entries parent_me ON me.parent_id = parent_me.id
+                RIGHT OUTER JOIN events.menu_entry_principals mep ON mep.menu_entry_id = parent_me.id
+                WHERE
+                    me.type IN (:user_link, :page) AND
+                    me.parent_id IS NOT NULL AND
+                    me.protection_mode = :inheriting AND
+                    parent_me.protection_mode = :protected AND
+                    mep.type = :regform
+                )
+        '''),
         registered=_MenuEntryAccess.registered_participants.value,
-        internal_link=_MenuEntryType.internal_link.value,
-        separator=_MenuEntryType.separator.value,
+        user_link=_MenuEntryType.user_link.value,
+        page=_MenuEntryType.page.value,
         inheriting=_ProtectionMode.inheriting.value,
         protected=_ProtectionMode.protected.value,
         regform=_PrincipalType.registration_form.value,
