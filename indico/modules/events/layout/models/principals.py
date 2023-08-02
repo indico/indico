@@ -17,8 +17,8 @@ class MenuEntryPrincipal(PrincipalMixin, db.Model):
     allow_category_roles = True
     allow_registration_forms = True
 
-    __tablename__ = 'menu_entries_principals'
-    principal_backref_name = 'in_menuentry_acls'
+    __tablename__ = 'menu_entry_principals'
+    principal_backref_name = 'in_menu_entry_acls'
     unique_columns = ('menu_entry_id',)
 
     @declared_attr

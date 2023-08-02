@@ -66,7 +66,7 @@ class EventRole(db.Model):
     # - in_contribution_acls (ContributionPrincipal.event_role)
     # - in_event_acls (EventPrincipal.event_role)
     # - in_event_settings_acls (EventSettingPrincipal.event_role)
-    # - in_menuentry_acls (MenuEntryPrincipal.event_role)
+    # - in_menu_entry_acls (MenuEntryPrincipal.event_role)
     # - in_session_acls (SessionPrincipal.event_role)
     # - in_track_acls (TrackPrincipal.event_role)
 
