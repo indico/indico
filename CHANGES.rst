@@ -21,6 +21,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Invalidate password reset links once the password has been changed (:pr:`5878`)
+- Add full ACLs for custom conference menu items, instead of just being able to
+  restrict them to speakers or registrants (:pr:`5670`, thanks :user:`kewisch`)
 
 Bugfixes
 ^^^^^^^^
@@ -215,8 +217,6 @@ Improvements
   (:pr:`5784`)
 - Allow admins to change the password of local accounts (:pr:`5789`, thanks
   :user:`omegak`)
-- Menu entries now have full ACLs. This can be used to created pages that are restricted
-  to certain users, groups, registrations, or roles. (:pr:`5670`, thanks :user:`kewisch`)
 
 Bugfixes
 ^^^^^^^^
