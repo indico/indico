@@ -15,7 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix error when sending registration invitation reminders (:issue:`5879`, :pr:`5880`,
+  thanks :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

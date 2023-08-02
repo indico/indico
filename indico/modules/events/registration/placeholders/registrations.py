@@ -52,7 +52,7 @@ class EventLinkPlaceholder(ParametrizedPlaceholder):
                                                                            text=(param or event.short_external_url))
 
     @classmethod
-    def iter_param_info(cls, regform, registration, **kwargs):
+    def iter_param_info(cls, **kwargs):
         yield None, _('Link to the event')
         yield 'custom-text', _('Custom link text instead of the full URL')
 
