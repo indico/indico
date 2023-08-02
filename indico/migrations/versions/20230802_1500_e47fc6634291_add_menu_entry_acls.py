@@ -8,8 +8,7 @@ Create Date: 2023-03-06 09:05:08.848298
 from enum import Enum
 
 import sqlalchemy as sa
-from alembic import op
-from sqlalchemy.sql import expression
+from alembic import context, op
 
 from indico.core.db.sqlalchemy import PyIntEnum
 
@@ -58,25 +57,19 @@ def _upgrade_access_data():
 
     Here is the mapping:
         access                  || protection_mode | speaker_allowed | menu_entry_principals
-        ========================++=================+=================+==========================
+        ========================++=================+=================+===========================
         everyone                ||  inheriting     |   false         | none set
-        ------------------------++-----------------+-----------------+--------------------------
-        registered_participants ||  protected      |   false         | One reg pincipal for each
-                                ||                 |                 | registration in the event
-        ------------------------++-----------------+-----------------+--------------------------
+        ------------------------++-----------------+-----------------+---------------------------
+        registered_participants ||  protected      |   false         | One reg principal for each
+                                ||                 |                 | regform in the event
+        ------------------------++-----------------+-----------------+---------------------------
         speakers                ||  protected      |   true          | none set
     """
     conn = op.get_bind()
 
     # Update access mode to protected for registered_participants and speakers
     conn.execute(
-        sa.text(
-            '''
-                    UPDATE events.menu_entries
-                       SET protection_mode = :protected
-                     WHERE access != :everyone
-            '''
-        ),
+        sa.text('UPDATE events.menu_entries SET protection_mode = :protected WHERE access != :everyone'),
         protected=_ProtectionMode.protected.value,
         everyone=_MenuEntryAccess.everyone.value,
     )
@@ -85,7 +78,7 @@ def _upgrade_access_data():
     conn.execute(
         sa.text(
             '''
-               INSERT INTO events.menu_entries_principals(menu_entry_id, type, registration_form_id)
+               INSERT INTO events.menu_entry_principals(menu_entry_id, type, registration_form_id)
                     SELECT me.id AS menu_entry_id,
                            :principal_type AS type,
                            frm.id AS registration_form_id
@@ -111,7 +104,7 @@ def _upgrade_access_data():
                      WHERE access = :speakers
                        AND id NOT IN (
                          SELECT menu_entry_id AS id
-                           FROM events.menu_entries_principals mep
+                           FROM events.menu_entry_principals mep
                           WHERE mep.type = :regform
                        )
             '''
@@ -209,7 +202,7 @@ def _downgrade_access_data():
                        SET access = :registered
                      WHERE menu_entries.id IN (
                              SELECT menu_entry_id
-                               FROM events.menu_entries_principals
+                               FROM events.menu_entry_principals
                               WHERE type = :regform
                            )
                        AND protection_mode = :protected
@@ -231,7 +224,7 @@ def _downgrade_access_data():
                                       SELECT me.id
                                         FROM events.menu_entries me
                              LEFT OUTER JOIN events.menu_entries parent_me ON me.parent_id = parent_me.id
-                            RIGHT OUTER JOIN events.menu_entries_principals mep ON mep.menu_entry_id = parent_me.id
+                            RIGHT OUTER JOIN events.menu_entry_principals mep ON mep.menu_entry_id = parent_me.id
                                        WHERE me.type NOT IN (:internal_link, :separator)
                                          AND me.parent_id IS NOT NULL
                                          AND me.protection_mode = :inheriting
@@ -250,12 +243,16 @@ def _downgrade_access_data():
 
 
 def upgrade():
+    if context.is_offline_mode():
+        raise Exception('This upgrade is only possible in online mode')
+
     # Principals table
     op.create_table(
-        'menu_entries_principals',
-        sa.Column('id', sa.Integer(), nullable=False),
+        'menu_entry_principals',
+        sa.Column('id', sa.Integer(), nullable=False, primary_key=True),
         sa.Column('menu_entry_id', sa.Integer(), nullable=False),
-        sa.Column('type', PyIntEnum(_PrincipalType, exclude_values={_PrincipalType.email, _PrincipalType.network}), nullable=False),
+        sa.Column('type', PyIntEnum(_PrincipalType, exclude_values={_PrincipalType.email, _PrincipalType.network}),
+                  nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=True),
         sa.Column('local_group_id', sa.Integer(), nullable=True),
         sa.Column('mp_group_provider', sa.String(), nullable=True),
@@ -264,57 +261,83 @@ def upgrade():
         sa.Column('category_role_id', sa.Integer(), nullable=True),
         sa.Column('registration_form_id', sa.Integer(), nullable=True),
         sa.CheckConstraint(
-            'type != 1 OR (category_role_id IS NULL AND event_role_id IS NULL AND local_group_id IS NULL AND mp_group_name IS NULL AND mp_group_provider IS NULL AND registration_form_id IS NULL AND user_id IS NOT NULL)',
-            name=op.f('ck_menu_entries_principals_valid_user'),
+            'type != 1 OR (category_role_id IS NULL AND event_role_id IS NULL AND local_group_id IS NULL AND '
+            'mp_group_name IS NULL AND mp_group_provider IS NULL AND registration_form_id IS NULL AND '
+            'user_id IS NOT NULL)',
+            name='valid_user',
         ),
         sa.CheckConstraint(
-            'type != 2 OR (category_role_id IS NULL AND event_role_id IS NULL AND mp_group_name IS NULL AND mp_group_provider IS NULL AND registration_form_id IS NULL AND user_id IS NULL AND local_group_id IS NOT NULL)',
-            name=op.f('ck_menu_entries_principals_valid_local_group'),
+            'type != 2 OR (category_role_id IS NULL AND event_role_id IS NULL AND mp_group_name IS NULL AND '
+            'mp_group_provider IS NULL AND registration_form_id IS NULL AND user_id IS NULL AND '
+            'local_group_id IS NOT NULL)',
+            name='valid_local_group',
         ),
         sa.CheckConstraint(
-            'type != 3 OR (category_role_id IS NULL AND event_role_id IS NULL AND local_group_id IS NULL AND registration_form_id IS NULL AND user_id IS NULL AND mp_group_name IS NOT NULL AND mp_group_provider IS NOT NULL)',
-            name=op.f('ck_menu_entries_principals_valid_multipass_group'),
+            'type != 3 OR (category_role_id IS NULL AND event_role_id IS NULL AND local_group_id IS NULL AND '
+            'registration_form_id IS NULL AND user_id IS NULL AND mp_group_name IS NOT NULL AND '
+            'mp_group_provider IS NOT NULL)',
+            name='valid_multipass_group',
         ),
         sa.CheckConstraint(
-            'type != 6 OR (category_role_id IS NULL AND local_group_id IS NULL AND mp_group_name IS NULL AND mp_group_provider IS NULL AND registration_form_id IS NULL AND user_id IS NULL AND event_role_id IS NOT NULL)',
-            name=op.f('ck_menu_entries_principals_valid_event_role'),
+            'type != 6 OR (category_role_id IS NULL AND local_group_id IS NULL AND mp_group_name IS NULL AND '
+            'mp_group_provider IS NULL AND registration_form_id IS NULL AND user_id IS NULL AND '
+            'event_role_id IS NOT NULL)',
+            name='valid_event_role',
         ),
         sa.CheckConstraint(
-            'type != 7 OR (event_role_id IS NULL AND local_group_id IS NULL AND mp_group_name IS NULL AND mp_group_provider IS NULL AND registration_form_id IS NULL AND user_id IS NULL AND category_role_id IS NOT NULL)',
-            name=op.f('ck_menu_entries_principals_valid_category_role'),
+            'type != 7 OR (event_role_id IS NULL AND local_group_id IS NULL AND mp_group_name IS NULL AND '
+            'mp_group_provider IS NULL AND registration_form_id IS NULL AND user_id IS NULL AND '
+            'category_role_id IS NOT NULL)',
+            name='valid_category_role',
         ),
         sa.CheckConstraint(
-            'type != 8 OR (category_role_id IS NULL AND event_role_id IS NULL AND local_group_id IS NULL AND mp_group_name IS NULL AND mp_group_provider IS NULL AND user_id IS NULL AND registration_form_id IS NOT NULL)',
-            name=op.f('ck_menu_entries_principals_valid_registration_form'),
+            'type != 8 OR (category_role_id IS NULL AND event_role_id IS NULL AND local_group_id IS NULL AND '
+            'mp_group_name IS NULL AND mp_group_provider IS NULL AND user_id IS NULL AND '
+            'registration_form_id IS NOT NULL)',
+            name='valid_registration_form',
         ),
-        sa.ForeignKeyConstraint(['category_role_id'], ['categories.roles.id'], name=op.f('fk_menu_entries_principals_category_role_id_roles')),
-        sa.ForeignKeyConstraint(['event_role_id'], ['events.roles.id'], name=op.f('fk_menu_entries_principals_event_role_id_roles')),
-        sa.ForeignKeyConstraint(['local_group_id'], ['users.groups.id'], name=op.f('fk_menu_entries_principals_local_group_id_groups')),
-        sa.ForeignKeyConstraint(['menu_entry_id'], ['events.menu_entries.id'], name=op.f('fk_menu_entries_principals_menu_entry_id_menu_entries')),
-        sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id'], name=op.f('fk_menu_entries_principals_registration_form_id_forms')),
-        sa.ForeignKeyConstraint(['user_id'], ['users.users.id'], name=op.f('fk_menu_entries_principals_user_id_users')),
-        sa.PrimaryKeyConstraint('id', name=op.f('pk_menu_entries_principals')),
+        sa.ForeignKeyConstraint(['category_role_id'], ['categories.roles.id']),
+        sa.ForeignKeyConstraint(['event_role_id'], ['events.roles.id']),
+        sa.ForeignKeyConstraint(['local_group_id'], ['users.groups.id']),
+        sa.ForeignKeyConstraint(['menu_entry_id'], ['events.menu_entries.id']),
+        sa.ForeignKeyConstraint(['registration_form_id'], ['event_registration.forms.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         schema='events',
     )
-    op.create_index(op.f('ix_menu_entries_principals_category_role_id'), 'menu_entries_principals', ['category_role_id'], unique=False, schema='events')
-    op.create_index(op.f('ix_menu_entries_principals_event_role_id'), 'menu_entries_principals', ['event_role_id'], unique=False, schema='events')
-    op.create_index(op.f('ix_menu_entries_principals_local_group_id'), 'menu_entries_principals', ['local_group_id'], unique=False, schema='events')
-    op.create_index(op.f('ix_menu_entries_principals_mp_group_provider_mp_group_name'), 'menu_entries_principals', ['mp_group_provider', 'mp_group_name'], unique=False, schema='events')
-    op.create_index(op.f('ix_menu_entries_principals_registration_form_id'), 'menu_entries_principals', ['registration_form_id'], unique=False, schema='events')
-    op.create_index(op.f('ix_menu_entries_principals_user_id'), 'menu_entries_principals', ['user_id'], unique=False, schema='events')
-    op.create_index('ix_uq_menu_entries_principals_local_group', 'menu_entries_principals', ['local_group_id', 'menu_entry_id'], unique=True, schema='events', postgresql_where=sa.text('type = 2'))
+    op.create_index(None, 'menu_entry_principals', ['category_role_id'], schema='events')
+    op.create_index(None, 'menu_entry_principals', ['event_role_id'], schema='events')
+    op.create_index(None, 'menu_entry_principals', ['local_group_id'], schema='events')
+    op.create_index(None, 'menu_entry_principals', ['mp_group_provider', 'mp_group_name'], schema='events')
+    op.create_index(None, 'menu_entry_principals', ['registration_form_id'], schema='events')
+    op.create_index(None, 'menu_entry_principals', ['user_id'], schema='events')
     op.create_index(
-        'ix_uq_menu_entries_principals_mp_group', 'menu_entries_principals', ['mp_group_provider', 'mp_group_name', 'menu_entry_id'], unique=True, schema='events', postgresql_where=sa.text('type = 3')
+        'ix_uq_menu_entry_principals_local_group',
+        'menu_entry_principals', ['local_group_id', 'menu_entry_id'],
+        unique=True, schema='events', postgresql_where=sa.text('type = 2')
     )
-    op.create_index('ix_uq_menu_entries_principals_user', 'menu_entries_principals', ['user_id', 'menu_entry_id'], unique=True, schema='events', postgresql_where=sa.text('type = 1'))
+    op.create_index(
+        'ix_uq_menu_entry_principals_mp_group',
+        'menu_entry_principals', ['mp_group_provider', 'mp_group_name', 'menu_entry_id'],
+        unique=True, schema='events', postgresql_where=sa.text('type = 3')
+    )
+    op.create_index(
+        'ix_uq_menu_entry_principals_user',
+        'menu_entry_principals', ['user_id', 'menu_entry_id'],
+        unique=True, schema='events', postgresql_where=sa.text('type = 1')
+    )
 
     # Menu entries columns - protection_mode, speaker_allowed
     op.add_column(
         'menu_entries',
-        sa.Column('protection_mode', PyIntEnum(_ProtectionMode, exclude_values={_ProtectionMode.public}), nullable=False, server_default=str(_ProtectionMode.inheriting.value)),
+        sa.Column('protection_mode', PyIntEnum(_ProtectionMode, exclude_values={_ProtectionMode.public}),
+                  nullable=False, server_default=str(_ProtectionMode.inheriting.value)),
         schema='events',
     )
-    op.add_column('menu_entries', sa.Column('speaker_allowed', sa.Boolean(), nullable=False, server_default=expression.false()), schema='events')
+    op.add_column(
+        'menu_entries',
+        sa.Column('speaker_allowed', sa.Boolean(), nullable=False, server_default='false'),
+        schema='events'
+    )
     op.alter_column('menu_entries', 'speaker_allowed', server_default=None, schema='events')
     op.alter_column('menu_entries', 'protection_mode', server_default=None, schema='events')
 
@@ -326,8 +349,16 @@ def upgrade():
 
 
 def downgrade():
+    if context.is_offline_mode():
+        raise Exception('This upgrade is only possible in online mode')
+
     # Add back access column
-    op.add_column('menu_entries', sa.Column('access', sa.SMALLINT(), autoincrement=False, nullable=False, server_default=str(_MenuEntryAccess.everyone.value)), schema='events')
+    op.add_column(
+        'menu_entries',
+        sa.Column('access', PyIntEnum(_MenuEntryAccess), nullable=False,
+                  server_default=str(_MenuEntryAccess.everyone.value)),
+        schema='events'
+    )
     op.alter_column('menu_entries', 'access', server_default=None, schema='events')
 
     # Unmigrate data
@@ -337,14 +368,5 @@ def downgrade():
     op.drop_column('menu_entries', 'speaker_allowed', schema='events')
     op.drop_column('menu_entries', 'protection_mode', schema='events')
 
-    # Drop menu_entries_principals and their indices
-    op.drop_index('ix_uq_menu_entries_principals_user', table_name='menu_entries_principals', schema='events', postgresql_where=sa.text('type = 1'))
-    op.drop_index('ix_uq_menu_entries_principals_mp_group', table_name='menu_entries_principals', schema='events', postgresql_where=sa.text('type = 3'))
-    op.drop_index('ix_uq_menu_entries_principals_local_group', table_name='menu_entries_principals', schema='events', postgresql_where=sa.text('type = 2'))
-    op.drop_index(op.f('ix_menu_entries_principals_user_id'), table_name='menu_entries_principals', schema='events')
-    op.drop_index(op.f('ix_menu_entries_principals_registration_form_id'), table_name='menu_entries_principals', schema='events')
-    op.drop_index(op.f('ix_menu_entries_principals_mp_group_provider_mp_group_name'), table_name='menu_entries_principals', schema='events')
-    op.drop_index(op.f('ix_menu_entries_principals_local_group_id'), table_name='menu_entries_principals', schema='events')
-    op.drop_index(op.f('ix_menu_entries_principals_event_role_id'), table_name='menu_entries_principals', schema='events')
-    op.drop_index(op.f('ix_menu_entries_principals_category_role_id'), table_name='menu_entries_principals', schema='events')
-    op.drop_table('menu_entries_principals', schema='events')
+    # Drop menu_entry_principals
+    op.drop_table('menu_entry_principals', schema='events')
