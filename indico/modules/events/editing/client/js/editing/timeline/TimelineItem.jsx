@@ -68,7 +68,7 @@ export default function TimelineItem({block, index}) {
           >
             <div className="i-box-header flexrow">
               <div className="f-self-stretch" styleName="item-header">
-                <span styleName="item-index">#{index + 1}</span>{' '}
+                {!!block.files.length && <span styleName="item-index">#{index}</span>}{' '}
                 <span>
                   {block.header ? (
                     <strong>{block.header}</strong>
@@ -134,7 +134,7 @@ export default function TimelineItem({block, index}) {
           </div>
         </div>
       </div>
-      {visible && (!!block.items.length || isLastBlock) && (
+      {visible && (!!block.items.length || isLastBlock || isLastValidBlock) && (
         <RevisionLog items={block.items} separator={isLastBlock}>
           {isLastValidBlock && canComment && <ReviewForm block={block} />}
         </RevisionLog>

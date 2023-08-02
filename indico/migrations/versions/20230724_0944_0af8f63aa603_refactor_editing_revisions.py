@@ -76,7 +76,7 @@ def _create_new_revisions(conn):
 
 
 def _process_undone_judgment_comments(conn):
-    #TODO support more undone judgment types
+    #TODO support more undone judgment types (2,3 in particular)
     query = '''
         SELECT r.editable_id, c.user_id, c.created_dt, c.undone_judgment, c.text
         FROM event_editing.comments c

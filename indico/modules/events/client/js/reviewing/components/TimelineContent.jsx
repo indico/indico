@@ -9,7 +9,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 export default function TimelineContent({blocks, itemComponent: Component}) {
-  return blocks.map((block, index) => {
+  let index = 0;
+  return blocks.map(block => {
+    if (block.files.length) {
+      index += 1;
+    }
     return (
       <React.Fragment key={block.id}>
         {index !== 0 && (

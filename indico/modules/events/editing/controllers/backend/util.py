@@ -36,7 +36,7 @@ def confirm_and_publish_changes(revision, action, comment):
     publish = True
     if service_url:
         try:
-            resp = service_handle_review_editable(revision.editable, session.user, action, revision) #TODO check if this is correct
+            resp = service_handle_review_editable(revision.editable, session.user, action, revision)
             publish = resp.get('publish', True)
         except ServiceRequestFailed:
             raise ServiceUnavailable(_('Failed processing review, please try again later.'))

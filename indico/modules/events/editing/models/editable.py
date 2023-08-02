@@ -273,6 +273,7 @@ class Editable(db.Model):
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
     from .revisions import EditingRevision, RevisionType
+    from .revision_files import EditingRevisionFile
 
     # Editable.state -- the state of the editable itself
     cases = db.cast(db.case({
@@ -295,10 +296,10 @@ def _mappers_configured():
              .scalar_subquery())
     Editable.state = column_property(query)
 
-    # Editable.revision_count -- the number of revisions the editable has
-    #TODO count only revisions with files
-    query = (select([db.func.count(EditingRevision.id)])
+    # Editable.revision_count -- the number of revisions with files the editable has
+    query = (select([db.func.count(EditingRevision.id.distinct())])
              .where((EditingRevision.editable_id == Editable.id) & ~EditingRevision.is_undone)
+             .join(EditingRevisionFile)
              .correlate_except(EditingRevision)
              .scalar_subquery())
     Editable.revision_count = column_property(query)
