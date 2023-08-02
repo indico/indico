@@ -16,7 +16,8 @@
       "indico/modules/events/management/*": ["./indico/modules/events/management/client/js/*"],
       "indico/modules/events/persons/*": ["./indico/modules/events/persons/client/js/*"],
       "indico/modules/events/*": ["./indico/modules/events/client/js/*"],
-      "indico/*": ["./indico/web/client/js/*"]
+      "indico/*": ["./indico/web/client/js/*"],
+      "axios/unsafe/*": ["./node_modules/axios/lib/*"]
     }
   },
   "exclude": [

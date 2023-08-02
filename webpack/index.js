@@ -10,4 +10,4 @@
 
 require('@babel/register');
 
-module.exports = require('./base');
+module.exports = require('./base.babel.js');

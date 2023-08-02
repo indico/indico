@@ -5,17 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-'use strict';
+import fs from 'fs';
 
-const fs = require('fs');
-const path = require('path');
-const browserslist = require('browserslist');
-const semver = require('semver');
-const diff = require('diff');
-const chalk = require('chalk');
+import browserslist from 'browserslist';
+import chalk from 'chalk';
+import {diffWords, diffArrays} from 'diff';
+import semver from 'semver';
 
-const README_PATH = path.join(__dirname, '..', '..', 'README.md');
-const BROWSERSLIST_PATH = path.join(__dirname, '..', '..', '.browserslistrc');
+const README_PATH = new URL('../../README.md', import.meta.url).pathname;
+const BROWSERSLIST_PATH = new URL('../../.browserslistrc', import.meta.url).pathname;
 
 function updateReadme() {
   console.log(chalk.whiteBright('Checking README'));
@@ -65,7 +63,7 @@ However, if you have an issue with a browser [on this list](${productionURL}), p
     /^([\s\S]*^<!-- BROWSERS .* -->)($[\s\S]+)([\n\r]+^<!-- ENDBROWSERS -->$[\s\S]*)$/m
   );
 
-  const d = diff.diffWords(m[2], newContent);
+  const d = diffWords(m[2], newContent);
 
   d.forEach(part => {
     // green for additions, red for deletions
@@ -111,7 +109,7 @@ function updateBrowserslist() {
     config: BROWSERSLIST_PATH,
   });
 
-  const d = diff.diffArrays(data.production, production);
+  const d = diffArrays(data.production, production);
   d.forEach(part => {
     // green for additions, red for deletions
     // grey for common parts
