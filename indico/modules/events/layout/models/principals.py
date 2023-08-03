@@ -31,7 +31,6 @@ class MenuEntryPrincipal(PrincipalMixin, db.Model):
         primary_key=True
     )
     #: The ID of the associated menu entry
-    # TODO This isn't filled out in the test, figure out why
     menu_entry_id = db.Column(
         db.Integer,
         db.ForeignKey('events.menu_entries.id'),
