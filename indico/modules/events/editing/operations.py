@@ -213,6 +213,8 @@ def reset_editable(revision):
     if revision.editable.state != EditableState.accepted:
         return
     revision.editable.published_revision = None
+    db.session.flush()
+    revision.is_undone = True
     new_revision = EditingRevision(user=revision.editable.editor, type=RevisionType.reset)
     revision.editable.revisions.append(new_revision)
     db.session.flush()

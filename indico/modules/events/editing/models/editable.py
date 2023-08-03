@@ -196,6 +196,10 @@ class Editable(db.Model):
         """Whether the user can create/see internal comments."""
         return self._has_general_editor_permissions(user)
 
+    def can_see_restricted_revisions(self, user):
+        """Whether the user can see restricted revisions."""
+        return self._has_general_editor_permissions(user)
+
     def can_see_editor_names(self, user, actor=None):
         """Whether the user can see the names of editing team members.
 

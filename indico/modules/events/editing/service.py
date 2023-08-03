@@ -9,7 +9,6 @@ from urllib.parse import urlsplit
 
 import requests
 from marshmallow import ValidationError
-from sqlalchemy.orm.exc import ObjectDeletedError
 
 import indico
 from indico.core.config import config
@@ -18,10 +17,10 @@ from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.models.revisions import RevisionType
 from indico.modules.events.editing.operations import create_revision_comment, publish_editable_revision
-from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingReviewAction,
-                                                   EditingRevisionSignedSchema, ServiceActionResultSchema,
-                                                   ServiceActionSchema, ServiceCreateEditableResultSchema,
-                                                   ServiceReviewEditableSchema, ServiceUserSchema)
+from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingRevisionSignedSchema,
+                                                   ServiceActionResultSchema, ServiceActionSchema,
+                                                   ServiceCreateEditableResultSchema, ServiceReviewEditableSchema,
+                                                   ServiceUserSchema)
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.users import User
 from indico.util.caching import memoize_redis
@@ -185,12 +184,7 @@ def service_handle_review_editable(editable, user, action, parent_revision, revi
             parent_revision.comment = resp['comment']
         if 'tags' in resp:
             resp_tag_ids = set(map(int, resp['tags']))
-            if action == EditingReviewAction.update_accept:
-                # When we accept and update, it's similar to just accepting, so we want to set the
-                # tags on the final revision
-                new_revision.tags = {tag for tag in editable.event.editing_tags if tag.id in resp_tag_ids}
-            else:
-                parent_revision.tags = {tag for tag in editable.event.editing_tags if tag.id in resp_tag_ids}
+            new_revision.tags = {tag for tag in editable.event.editing_tags if tag.id in resp_tag_ids}
         for comment in resp.get('comments', []):
             create_revision_comment(new_revision, User.get_system_user(), comment['text'], internal=comment['internal'])
 
@@ -245,11 +239,8 @@ def service_handle_custom_action(editable, revision, user, action):
 
     db.session.expire(revision)
     db.session.expire(editable)
-    try:
-        # check if the revision still exists...
-        revision.final_state
-    except ObjectDeletedError:
-        # if the revision got deleted, we're done
+    # if the revision got undone, we're done
+    if revision.is_undone:
         return resp
 
     if revision.type == RevisionType.acceptance:

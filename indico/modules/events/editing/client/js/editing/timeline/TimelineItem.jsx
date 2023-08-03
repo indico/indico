@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Divider, Icon, Message} from 'semantic-ui-react';
 
@@ -15,7 +15,7 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-import {RevisionTypeStates} from '../../models';
+import {RevisionType, RevisionTypeStates} from '../../models';
 
 import ChangesConfirmation from './ChangesConfirmation';
 import CustomActions from './CustomActions';
@@ -25,13 +25,13 @@ import ReviewForm from './ReviewForm';
 import RevisionLog from './RevisionLog';
 import * as selectors from './selectors';
 import StateIndicator from './StateIndicator';
-import {blockPropTypes} from './util';
+import {blockPropTypes, INDICO_BOT_USER} from './util';
 
 import '../../../styles/timeline.module.scss';
 import './TimelineItem.module.scss';
 
 export default function TimelineItem({block, index}) {
-  const {user, createdDt, isUndone} = block;
+  const {createdDt, isUndone} = block;
   const lastTimelineBlock = useSelector(selectors.getLastTimelineBlock);
   const lastValidTimelineBlock = useSelector(selectors.getLastValidTimelineBlock);
   const lastTimelineBlockWithFiles = useSelector(selectors.getLastTimelineBlockWithFiles);
@@ -43,17 +43,15 @@ export default function TimelineItem({block, index}) {
   const {fileTypes} = useSelector(selectors.getStaticData);
   const isLastBlock = lastTimelineBlock.id === block.id;
   const isLastValidBlock = lastValidTimelineBlock.id === block.id;
-  const hasContent = block.commentHtml || !!block.files.length;
+  const hasContent =
+    block.commentHtml ||
+    !!block.files.length ||
+    !!block.tags.length ||
+    !!block.customActions.length;
   const isAlwaysVisible = isLastValidBlock || lastTimelineBlockWithFiles.id === block.id;
-  const [visible, setVisible] = useState(isAlwaysVisible);
-
-  useEffect(() => {
-    // when undoing a judgment deletes the last revision this revision may become the
-    // latest one, and thus needs to be unhidden if it had been collapsed before.
-    if (isAlwaysVisible && !visible) {
-      setVisible(true);
-    }
-  }, [isAlwaysVisible, visible]);
+  const [visibilityToggle, setVisibilityToggle] = useState(false);
+  const visible = visibilityToggle || isAlwaysVisible;
+  const user = block.type.name === RevisionType.replacement ? INDICO_BOT_USER : block.user;
 
   return (
     <>
@@ -95,7 +93,7 @@ export default function TimelineItem({block, index}) {
                 <a
                   className="i-link"
                   styleName="item-visibility-toggle"
-                  onClick={() => setVisible(!visible)}
+                  onClick={() => setVisibilityToggle(!visible)}
                 >
                   {visible ? <Translate>Hide</Translate> : <Translate>Show details</Translate>}
                 </a>
@@ -126,10 +124,10 @@ export default function TimelineItem({block, index}) {
                 {canPerformSubmitterActions && needsSubmitterConfirmation && isLastValidBlock && (
                   <ChangesConfirmation />
                 )}
+                {!!block.customActions.length && (
+                  <CustomActions url={block.customActionURL} actions={block.customActions} />
+                )}
               </div>
-            )}
-            {!!block.customActions.length && (
-              <CustomActions url={block.customActionURL} actions={block.customActions} />
             )}
           </div>
         </div>

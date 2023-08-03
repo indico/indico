@@ -206,7 +206,7 @@ class EditableSchema(mm.SQLAlchemyAutoSchema):
 
     contribution = fields.Nested(BasicContributionSchema)
     editor = fields.Nested(EditingUserSchema)
-    revisions = fields.List(fields.Nested(EditingRevisionSchema))
+    revisions = fields.Method('_get_revisions')
     can_perform_editor_actions = fields.Function(
         lambda editable, ctx: editable.can_perform_editor_actions(ctx.get('user')))
     can_perform_submitter_actions = fields.Function(
@@ -222,6 +222,11 @@ class EditableSchema(mm.SQLAlchemyAutoSchema):
     editing_enabled = fields.Boolean()
     state = fields.Nested(EditableStateSchema)
     has_published_revision = fields.Function(lambda editable: editable.published_revision is not None)
+
+    def _get_revisions(self, editable):
+        revisions = [rev for rev in editable.revisions
+                     if not rev.is_undone or rev.editable.can_see_restricted_revisions(self.context.get('user'))]
+        return EditingRevisionSchema(context=self.context).dump(revisions, many=True)
 
     @post_dump(pass_original=True)
     def anonymize_editor(self, data, orig, **kwargs):

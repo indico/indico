@@ -102,6 +102,12 @@ def upgrade():
     if context.is_offline_mode():
         raise Exception('This upgrade is only possible in online mode')
     conn = op.get_bind()
+    # deal with erratic reviewed_dt's
+    op.execute('''
+        UPDATE event_editing.revisions
+        SET reviewed_dt = created_dt + interval '1 millisecond'
+        WHERE reviewed_dt <= created_dt
+    ''')
     new_revisions = _create_new_revisions(conn)
     new_revisions.extend(_process_undone_judgment_comments(conn))
     op.drop_column('comments', 'undone_judgment', schema='event_editing')
@@ -190,7 +196,7 @@ def upgrade():
     op.drop_column('revisions', 'editor_id', schema='event_editing')
     op.alter_column('revisions', 'initial_state', new_column_name='type', schema='event_editing')
     op.create_check_constraint('valid_enum_type', 'revisions',
-                               '(type = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9]))', schema='event_editing')
+                               '(type = ANY (ARRAY[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))', schema='event_editing')
     op.drop_column('revisions', 'final_state', schema='event_editing')
     op.drop_column('revisions', 'reviewed_dt', schema='event_editing')
     for rev in new_revisions:

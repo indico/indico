@@ -109,6 +109,10 @@ function getRevisionHeader(revisions, revision) {
   return typeof header === 'function' ? header(revision) : header;
 }
 
+export const INDICO_BOT_USER = {
+  fullName: 'Indico Bot',
+};
+
 export const userPropTypes = {
   identifier: PropTypes.string.isRequired,
   fullName: PropTypes.string.isRequired,
@@ -117,9 +121,7 @@ export const userPropTypes = {
 };
 
 const typePropTypes = {
-  cssClass: PropTypes.string,
   name: PropTypes.string.isRequired,
-  title: PropTypes.string,
 };
 
 // Type that represents a revision comment block
