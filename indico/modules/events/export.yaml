@@ -222,12 +222,10 @@ export:
       - event_role_id
 
   MenuEntryPrincipal:
-    skipif: ROW.type.name not in ('user', 'group', 'category_role', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
     fks_out:
       - registration_form_id
-      - category_role_id
       - event_role_id
-
 
   # misc stuff
   EventLogEntry: {}
@@ -485,6 +483,7 @@ import:
     ContributionPrincipal.user_id: skip
     AttachmentPrincipal.user_id: skip
     AttachmentFolderPrincipal.user_id: skip
+    MenuEntryPrincipal.user_id: skip
     AbstractComment.user_id: skip
     AbstractReview.user_id: skip
     PaperCompetence.user_id: skip
@@ -493,7 +492,6 @@ import:
     Contribution.paper_content_reviewers.prop.secondary.c.user_id: skip
     Contribution.paper_layout_reviewers.prop.secondary.c.user_id: skip
     Contribution.paper_judges.prop.secondary.c.user_id: skip
-    MenuEntryPrincipal.user_id: skip
     # run custom code
     SurveySubmission.user_id: is_anonymous = True
 
