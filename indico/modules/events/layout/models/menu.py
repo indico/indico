@@ -183,8 +183,8 @@ class TransientMenuEntry(MenuEntryMixin):
     :param position: int -- The position in the menu the entry is at
     :param children: list[MenuEntry] -- The child entries of this menu entry
     :param new_tab: bool -- If the link/page should be opened in a new tab
-
     """
+
     def __init__(self, event, is_enabled, name, position, children, new_tab=False):
         super().__init__(event=event)
         self.is_enabled = is_enabled
