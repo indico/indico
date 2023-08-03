@@ -211,9 +211,9 @@ class ProtectionMixin:
         elif self.protection_mode == ProtectionMode.protected:
             # if it's protected, we also ignore the parent protection
             # and only check our own ACL
-            if self.check_speaker_access(user):
+            if self._check_principal_access(user):
                 rv = True
-            elif self.check_principal_access(user):
+            elif self._check_speaker_access(user):
                 rv = True
             elif isinstance(self, ProtectionManagersMixin):
                 rv = self.can_manage(user, allow_admin=allow_admin)
@@ -223,9 +223,9 @@ class ProtectionMixin:
             # if it's inheriting, we only check the parent protection
             # unless `inheriting_have_acl` is set, in which case we
             # might not need to check the parents at all
-            if self.inheriting_have_acl and self.check_speaker_access(user):
+            if self.inheriting_have_acl and self._check_principal_access(user):
                 rv = True
-            if self.inheriting_have_acl and self.check_principal_access(user):
+            elif self.inheriting_have_acl and self._check_speaker_access(user):
                 rv = True
             elif self.allow_none_protection_parent and self.protection_parent is None:
                 # This is the case for unlisted events, which are inheriting
@@ -271,25 +271,17 @@ class ProtectionMixin:
             return False
         return self.access_key == access_key
 
-    def check_speaker_access(self, user):
-        """Check whether speakers can access this protected object. Prefer use
-        of can_acces for checking if a user has access.
-
-        :param user: The :class:`.User` to check.
-        """
+    def _check_speaker_access(self, user):
+        """Check whether speakers can access this protected object."""
         return (
-            self.allow_speakers         # The class supports allowing speakers
-            and self.speaker_allowed    # The database says speakers are allowed here
-            and self.event
+            self.allow_speakers  # The class supports allowing speakers
+            and self.speaker_allowed  # The database says speakers are allowed here
+            and getattr(self, 'event', None)  # We actually have an event!
             and self.event.is_user_speaker(user)
         )
 
-    def check_principal_access(self, user):
-        """Check whether the user is allowed per ACL entries. Prefer use of
-        can_access for checking if a user has access, as this is only one aspect.
-
-        :param user: The :class:`.User` to check.
-        """
+    def _check_principal_access(self, user):
+        """Check whether the user is allowed per ACL entries."""
         return any(user in entry.principal for entry in iter_acl(self.acl_entries))
 
     def set_session_access_key(self, access_key):
