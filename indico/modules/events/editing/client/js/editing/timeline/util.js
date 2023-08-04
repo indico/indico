@@ -16,7 +16,6 @@ import {filePropTypes} from './FileManager/util';
 // This method defines each revision as a block
 // with a label referring to its previous state transition
 export function processRevisions(revisions) {
-  console.log(revisions);
   return revisions.map((revision, i) => {
     const previousRevision = getPreviousRevisionWithFiles(revisions, i);
     // Set the state on the files that were added/modified in this revision

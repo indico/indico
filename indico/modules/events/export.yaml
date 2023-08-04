@@ -465,7 +465,7 @@ import:
     Abstract.judge_id: system
     PaperRevision.submitter_id: system
     PaperRevision.judge_id: system
-    EditingRevision.submitter_id: system
+    EditingRevision.user_id: system
     # set to none
     EventPerson.user_id: none
     EventLogEntry.user_id: none

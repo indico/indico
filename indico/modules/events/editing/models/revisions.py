@@ -33,9 +33,9 @@ class RevisionType(IndicoIntEnum):
     acceptance = 7
     #: An editor revision that rejects the editable
     rejection = 8
-    #: A microsservice revision that replaces the current revision
+    #: A system revision that replaces the current revision
     replacement = 9
-    #: A microsservice revision that resets the state of the editable to "ready for review"
+    #: A system revision that resets the state of the editable to "ready for review"
     reset = 10
 
 

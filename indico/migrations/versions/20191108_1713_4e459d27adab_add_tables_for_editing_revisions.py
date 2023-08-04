@@ -6,6 +6,7 @@ Create Date: 2019-11-08 17:13:48.096553
 """
 
 from enum import Enum
+
 import sqlalchemy as sa
 from alembic import op
 

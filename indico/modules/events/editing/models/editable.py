@@ -120,8 +120,8 @@ class Editable(db.Model):
 
     @property
     def latest_revision_with_files(self):
-        from .revisions import EditingRevision
         from .revision_files import EditingRevisionFile
+        from .revisions import EditingRevision
         return (EditingRevision.query
                 .filter_by(editable=self, is_undone=False)
                 .join(EditingRevisionFile)
@@ -276,8 +276,8 @@ class Editable(db.Model):
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
-    from .revisions import EditingRevision, RevisionType
     from .revision_files import EditingRevisionFile
+    from .revisions import EditingRevision, RevisionType
 
     # Editable.state -- the state of the editable itself
     cases = db.cast(db.case({
