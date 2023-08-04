@@ -93,7 +93,7 @@ class ProtectionMixin:
             )
 
     @declared_attr
-    def speaker_allowed(cls):
+    def speakers_can_access(cls):
         if cls.allow_speakers:
             return db.Column(
                 db.Boolean,
@@ -275,7 +275,7 @@ class ProtectionMixin:
         """Check whether speakers can access this protected object."""
         return (
             self.allow_speakers  # The class supports allowing speakers
-            and self.speaker_allowed  # The database says speakers are allowed here
+            and self.speakers_can_access  # The database says speakers are allowed here
             and getattr(self, 'event', None)  # We actually have an event!
             and self.event.is_user_speaker(user)
         )

@@ -53,17 +53,17 @@ class _MenuEntryType(int, Enum):
 
 def _upgrade_access_data():
     """
-    Upgrade the access column to protection_mode, speaker_allowed, and the principals.
+    Upgrade the access column to protection_mode, speakers_can_access, and the principals.
 
     Here is the mapping:
-        access                  || protection_mode | speaker_allowed | menu_entry_principals
-        ========================++=================+=================+===========================
-        everyone                ||  inheriting     |   false         | none set
-        ------------------------++-----------------+-----------------+---------------------------
-        registered_participants ||  protected      |   false         | One reg principal for each
-                                ||                 |                 | regform in the event
-        ------------------------++-----------------+-----------------+---------------------------
-        speakers                ||  protected      |   true          | none set
+        access                  || protection_mode | speakers_can_access | menu_entry_principals
+        ========================++=================+=====================+===========================
+        everyone                ||  inheriting     |   false             | none set
+        ------------------------++-----------------+---------------------+---------------------------
+        registered_participants ||  protected      |   false             | One reg principal for each
+                                ||                 |                     | regform in the event
+        ------------------------++-----------------+---------------------+---------------------------
+        speakers                ||  protected      |   true              | none set
     """
     conn = op.get_bind()
 
@@ -93,7 +93,7 @@ def _upgrade_access_data():
 
     # Migrate "Speaker" access to allowing speaker access
     conn.execute(
-        sa.text('UPDATE events.menu_entries SET speaker_allowed = true WHERE access = :speakers'),
+        sa.text('UPDATE events.menu_entries SET speakers_can_access = true WHERE access = :speakers'),
         speakers=_MenuEntryAccess.speakers.value,
         regform=_PrincipalType.registration_form.value,
     )
@@ -101,34 +101,34 @@ def _upgrade_access_data():
 
 def _downgrade_access_data():
     """
-    Downgrade the protection_mode, speaker_allowed and principals to the access column. This isn't
+    Downgrade the protection_mode, speakers_can_access and principals to the access column. This isn't
     lossless given the new feature is more fine-grained, but best effort.
 
     Here is the mapping:
 
-         protection_mode | speaker_allowed | menu_entry_principals     || access
-        =================+=================+===========================++========================
-          protected      | true            | doesn't contain regform   ||  speakers
-                         |                 | principals                ||
-        -----------------+-----------------+---------------------------++------------------------
-          inheriting     |                 | doesn't contain regform   ||  speakers
-        parent=protected | parent=true     | principals                ||
-        -----------------+-----------------+---------------------------++------------------------
-          protected      | regardless      | at least one regform      ||  registered_participants
-                         |                 | principal                 ||
-        -----------------+-----------------+---------------------------++------------------------
-          inheriting     | regardless      | parent has at least one   ||  registered_participants
-                         |                 | regform principal         ||
-        -----------------+-----------------+---------------------------++------------------------
-          protected      | false           | doesn't contain regform   ||  everyone
-                         |                 | principals                ||  (no good mapping)
-        -----------------+-----------------+---------------------------++------------------------
-          inheriting     | false           | doesn't contain regform   ||  everyone
-                         |                 | principals                ||
-        -----------------+-----------------+---------------------------++------------------------
-          all other combinations                                       ||  everyone
-                                                                       ||  (no good mapping)
-        -----------------+-----------------+---------------------------++------------------------
+         protection_mode | speakers_can_access | menu_entry_principals     || access
+        =================+=====================+===========================++========================
+          protected      | true                | doesn't contain regform   ||  speakers
+                         |                     | principals                ||
+        -----------------+---------------------+---------------------------++------------------------
+          inheriting     |                     | doesn't contain regform   ||  speakers
+        parent=protected | parent=true         | principals                ||
+        -----------------+---------------------+---------------------------++------------------------
+          protected      | regardless          | at least one regform      ||  registered_participants
+                         |                     | principal                 ||
+        -----------------+---------------------+---------------------------++------------------------
+          inheriting     | regardless          | parent has at least one   ||  registered_participants
+                         |                     | regform principal         ||
+        -----------------+---------------------+---------------------------++------------------------
+          protected      | false               | doesn't contain regform   ||  everyone
+                         |                     | principals                ||  (no good mapping)
+        -----------------+---------------------+---------------------------++------------------------
+          inheriting     | false               | doesn't contain regform   ||  everyone
+                         |                     | principals                ||
+        -----------------+---------------------+---------------------------++------------------------
+          all other combinations                                           ||  everyone
+                                                                           ||  (no good mapping)
+        -----------------+---------------------+---------------------------++------------------------
     """
     conn = op.get_bind()
 
@@ -147,7 +147,7 @@ def _downgrade_access_data():
         sa.text('''
             UPDATE events.menu_entries
             SET access = :speakers
-            WHERE speaker_allowed AND protection_mode = :protected
+            WHERE speakers_can_access AND protection_mode = :protected
         '''),
         speakers=_MenuEntryAccess.speakers.value,
         protected=_ProtectionMode.protected.value
@@ -168,7 +168,7 @@ def _downgrade_access_data():
                     me.parent_id IS NOT NULL AND
                     me.protection_mode = :inheriting AND
                     parent_me.protection_mode = :protected AND
-                    parent_me.speaker_allowed
+                    parent_me.speakers_can_access
             )
         '''),
         speakers=_MenuEntryAccess.speakers.value,
@@ -309,7 +309,7 @@ def upgrade():
         unique=True, schema='events', postgresql_where=sa.text('type = 1')
     )
 
-    # Menu entries columns - protection_mode, speaker_allowed
+    # Menu entries columns - protection_mode, speakers_can_access
     op.add_column(
         'menu_entries',
         sa.Column('protection_mode', PyIntEnum(_ProtectionMode, exclude_values={_ProtectionMode.public}),
@@ -318,10 +318,10 @@ def upgrade():
     )
     op.add_column(
         'menu_entries',
-        sa.Column('speaker_allowed', sa.Boolean(), nullable=False, server_default='false'),
+        sa.Column('speakers_can_access', sa.Boolean(), nullable=False, server_default='false'),
         schema='events'
     )
-    op.alter_column('menu_entries', 'speaker_allowed', server_default=None, schema='events')
+    op.alter_column('menu_entries', 'speakers_can_access', server_default=None, schema='events')
     op.alter_column('menu_entries', 'protection_mode', server_default=None, schema='events')
 
     # Migrate data
@@ -347,8 +347,8 @@ def downgrade():
     # Unmigrate data
     _downgrade_access_data()
 
-    # Drop menu entries columns - protection_mode, speaker_allowed
-    op.drop_column('menu_entries', 'speaker_allowed', schema='events')
+    # Drop menu entries columns - protection_mode, speakers_can_access
+    op.drop_column('menu_entries', 'speakers_can_access', schema='events')
     op.drop_column('menu_entries', 'protection_mode', schema='events')
 
     # Drop menu_entry_principals

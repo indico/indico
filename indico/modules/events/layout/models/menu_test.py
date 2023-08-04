@@ -112,5 +112,5 @@ def test_update_principal(
     subcontrib_person_link = SubContributionPersonLink(person=person)
     subcontrib.person_links.append(subcontrib_person_link)
     assert not menu_entry.can_access(speakeruser)
-    menu_entry.speaker_allowed = True
+    menu_entry.speakers_can_access = True
     assert menu_entry.can_access(speakeruser)

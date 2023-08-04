@@ -171,7 +171,7 @@ class MenuUserEntryFormBase(IndicoForm):
         allow_category_roles=True,
         allow_registration_forms=True,
     )
-    speaker_allowed = BooleanField(
+    speakers_can_access = BooleanField(
         _('Speaker Visibility'),
         widget=SwitchWidget(),
         description=_('In addition to the visibility settings, speakers will be allowed access to this entry'),
