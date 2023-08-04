@@ -414,7 +414,7 @@ class MenuEntry(MenuEntryMixin, ProtectionMixin, db.Model):
 
     @property
     def protection_parent(self):
-        return self.parent or getattr(self, '_event_ref', self.event)
+        return self.parent or self.event_ref
 
 
 class EventPage(db.Model):
