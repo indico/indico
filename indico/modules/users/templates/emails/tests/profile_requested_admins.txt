@@ -8,6 +8,6 @@ Email address: cat@meow.cat
 Manage pending requests:
 http://localhost/admin/users/registration-requests/
 
---
+-- 
 Indico :: Email Notifier
 http://localhost/

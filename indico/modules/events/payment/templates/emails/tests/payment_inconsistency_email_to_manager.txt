@@ -4,6 +4,6 @@ It appears that the payment of the registration with ID 1 has an incorrect
 amount of money (received €404.00 while expecting US$1,337.00). Please, check
 with the registrant to see if there was some misunderstanding.
 
---
+-- 
 Indico :: Email Notifier
 http://localhost/

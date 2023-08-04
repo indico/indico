@@ -5,6 +5,6 @@ Your revision changes have been confirmed by Jane Doe.
 You can view details on the following URL:
 http://localhost/timeline-url
 
---
+-- 
 Indico :: Email Notifier
 http://localhost/

@@ -7,6 +7,6 @@ http://localhost/login/
 After logging in your can finish setting up your profile:
 http://localhost/user/profile/
 
---
+-- 
 Indico :: Email Notifier
 http://localhost/

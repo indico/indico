@@ -10,6 +10,6 @@ comment!
 You may proceed to your paper page:
 http://localhost/event/0/papers/0/
 
---
+-- 
 Indico :: Email Notifier
 http://localhost/event/0/
