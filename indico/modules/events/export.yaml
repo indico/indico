@@ -397,6 +397,8 @@ export:
   # conference menu
   MenuEntry:
     skipif: ROW.type.name == 'plugin_link'
+    fks:
+      - MenuEntryPrincipal.menu_entry_id
 
   EventPage: {}
 
