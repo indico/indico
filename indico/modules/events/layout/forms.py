@@ -10,6 +10,7 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.config import config
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.models.menu import MenuEntry
 from indico.modules.events.layout.util import get_css_file_data, get_logo_data, get_plugin_conference_themes
@@ -163,8 +164,10 @@ class MenuUserEntryFormBase(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     is_enabled = BooleanField(_('Show'), widget=SwitchWidget())
     new_tab = BooleanField(_('Open in a new tab'), widget=SwitchWidget())
+    protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
     acl = PrincipalListField(
-        _('Visibility'),
+        _('Access control list'),
+        [HiddenUnless('protection_mode', ProtectionMode.protected, preserve_data=True)],
         event=lambda form: form.event,
         allow_groups=True,
         allow_event_roles=True,
@@ -172,16 +175,21 @@ class MenuUserEntryFormBase(IndicoForm):
         allow_registration_forms=True,
     )
     speakers_can_access = BooleanField(
-        _('Speaker Visibility'),
+        _('Grant speakers access'),
+        [HiddenUnless('protection_mode', ProtectionMode.protected, preserve_data=True)],
         widget=SwitchWidget(),
-        description=_('In addition to the visibility settings, speakers will be allowed access to this entry'),
+        description=_('In addition to anyone listed in the Access control list, speakers will have access.'),
     )
-    protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object)
 
     def __init__(self, *args, event, **kwargs):
         self.event = event
         self.protected_object = kwargs.get('entry', MenuEntry(event=event))
         super().__init__(*args, **kwargs)
+
+    def __iter__(self):
+        # keep acl fields last when rendering the form
+        return iter(sorted(super().__iter__(),
+                           key=lambda x: x.short_name in ('protection_mode', 'acl', 'speakers_can_access')))
 
 
 class MenuLinkForm(MenuUserEntryFormBase):
