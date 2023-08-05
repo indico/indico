@@ -12,6 +12,9 @@
             <span class="title">
                 {% if config.DEBUG %}<span class="position">{{ entry.position + 1}}</span>{% endif %}
                 {{ entry.localized_title }}
+                {% if entry.is_self_protected %}
+                    <span class="icon-shield" title="{% trans %}Protected{% endtrans %}"></span>
+                {% endif %}
             </span>
             <span class="actions hide-if-locked">
                 {% if entry.type.name == 'page' %}
