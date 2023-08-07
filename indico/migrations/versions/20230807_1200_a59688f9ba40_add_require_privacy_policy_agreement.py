@@ -1,7 +1,7 @@
 """Add require_privacy_policy_agreement to regforms
 
 Revision ID: a59688f9ba40
-Revises: 5d05eda06776
+Revises: e47fc6634291
 Create Date: 2023-05-04 14:05:51.778169
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'a59688f9ba40'
-down_revision = '5d05eda06776'
+down_revision = 'e47fc6634291'
 branch_labels = None
 depends_on = None
 
