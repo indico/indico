@@ -52,6 +52,8 @@ class ProtectionMixin:
     inheriting_have_acl = False
     #: Whether the object can have an access key that grants read access
     allow_access_key = False
+    #: Whether an option to allow speakers should be included
+    allow_speakers = False
     #: Whether the object can have contact information shown in case of
     #: no access
     allow_no_access_contact = False
@@ -88,6 +90,15 @@ class ProtectionMixin:
                 db.String,
                 nullable=False,
                 default=''
+            )
+
+    @declared_attr
+    def speakers_can_access(cls):
+        if cls.allow_speakers:
+            return db.Column(
+                db.Boolean,
+                nullable=False,
+                default=False
             )
 
     @declared_attr
@@ -200,7 +211,9 @@ class ProtectionMixin:
         elif self.protection_mode == ProtectionMode.protected:
             # if it's protected, we also ignore the parent protection
             # and only check our own ACL
-            if any(user in entry.principal for entry in iter_acl(self.acl_entries)):
+            if self._check_principal_access(user):
+                rv = True
+            elif self._check_speaker_access(user):
                 rv = True
             elif isinstance(self, ProtectionManagersMixin):
                 rv = self.can_manage(user, allow_admin=allow_admin)
@@ -210,7 +223,9 @@ class ProtectionMixin:
             # if it's inheriting, we only check the parent protection
             # unless `inheriting_have_acl` is set, in which case we
             # might not need to check the parents at all
-            if self.inheriting_have_acl and any(user in entry.principal for entry in iter_acl(self.acl_entries)):
+            if self.inheriting_have_acl and self._check_principal_access(user):
+                rv = True
+            elif self.inheriting_have_acl and self._check_speaker_access(user):
                 rv = True
             elif self.allow_none_protection_parent and self.protection_parent is None:
                 # This is the case for unlisted events, which are inheriting
@@ -255,6 +270,19 @@ class ProtectionMixin:
         if not access_key:
             return False
         return self.access_key == access_key
+
+    def _check_speaker_access(self, user):
+        """Check whether speakers can access this protected object."""
+        return (
+            self.allow_speakers  # The class supports allowing speakers
+            and self.speakers_can_access  # The database says speakers are allowed here
+            and getattr(self, 'event', None)  # We actually have an event!
+            and self.event.is_user_speaker(user)
+        )
+
+    def _check_principal_access(self, user):
+        """Check whether the user is allowed per ACL entries."""
+        return any(user in entry.principal for entry in iter_acl(self.acl_entries))
 
     def set_session_access_key(self, access_key):
         """Store an access key for the object in the session.

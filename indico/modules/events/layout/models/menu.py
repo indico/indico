@@ -6,11 +6,14 @@
 # LICENSE file for more details.
 
 from flask import g, session
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.db.sqlalchemy.protection import ProtectionMixin
+from indico.modules.events.layout.models.principals import MenuEntryPrincipal
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.string import format_repr, slugify, text_to_repr
@@ -36,16 +39,9 @@ class MenuEntryType(RichIntEnum):
     page = 5
 
 
-class MenuEntryAccess(RichIntEnum):
-    __titles__ = [None, _('Everyone'), _('Registered participants'), _('Speakers')]
-    everyone = 1
-    registered_participants = 2
-    speakers = 3
-
-
 class MenuEntryMixin:
     def __init__(self, **kwargs):
-        event = kwargs.pop('event', kwargs.get('event'))
+        event = kwargs.pop('event', None)
         super().__init__(**kwargs)
         # XXX: not calling this `event` since this one should NOT use
         # the relationship to avoid mixing data from different DB sessions
@@ -175,19 +171,20 @@ class MenuEntryMixin:
             self.position,
         )
 
-    def can_access(self, user):
-        if self.access == MenuEntryAccess.everyone:
-            return True
-        elif self.event_ref.can_manage(user):
-            return True
-        elif self.access == MenuEntryAccess.registered_participants:
-            return self.event_ref.is_user_registered(user)
-        elif self.access == MenuEntryAccess.speakers:
-            return self.event_ref.is_user_speaker(user)
-        assert False, 'should not happen'
-
 
 class TransientMenuEntry(MenuEntryMixin):
+    """
+    Transient menu entries are used in case menu customization is disabled. They provide a
+    lightweight alternative for the internal links that appear by default.
+
+    :param event: Event -- The event reference the entry applies to
+    :param is_enabled: bool -- True, if the entry is enabled
+    :param name: str -- The name of the menu entry
+    :param position: int -- The position in the menu the entry is at
+    :param children: list[MenuEntry] -- The child entries of this menu entry
+    :param new_tab: bool -- If the link/page should be opened in a new tab
+    """
+
     def __init__(self, event, is_enabled, name, position, children, new_tab=False):
         super().__init__(event=event)
         self.is_enabled = is_enabled
@@ -201,7 +198,6 @@ class TransientMenuEntry(MenuEntryMixin):
         self.link_url = None
         self.page_id = None
         self.is_root = True
-        self.access = MenuEntryAccess.everyone
         for child in self.children:
             child.is_root = False
 
@@ -209,8 +205,14 @@ class TransientMenuEntry(MenuEntryMixin):
     def id(self):
         return self.name
 
+    def can_access(self, user, allow_admin=True):
+        return True
 
-class MenuEntry(MenuEntryMixin, db.Model):
+
+class MenuEntry(MenuEntryMixin, ProtectionMixin, db.Model):
+    #: Allow speakers in the ProtectionMixin
+    allow_speakers = True
+
     __tablename__ = 'menu_entries'
     __table_args__ = (
         db.CheckConstraint(
@@ -292,12 +294,15 @@ class MenuEntry(MenuEntryMixin, db.Model):
         nullable=False,
         default=False
     )
-    #: Which group of people should the menu entry be viewable by
-    access = db.Column(
-        PyIntEnum(MenuEntryAccess),
-        nullable=False,
-        default=MenuEntryAccess.everyone,
+    #: ACLs for page visibility
+    acl_entries = db.relationship(
+        'MenuEntryPrincipal',
+        backref='menu_entry',
+        cascade='all, delete-orphan',
+        collection_class=set
     )
+    acl = association_proxy('acl_entries', 'principal', creator=lambda v: MenuEntryPrincipal(principal=v))
+
     #: The target URL of a custom link
     link_url = db.Column(
         db.String,
@@ -406,6 +411,10 @@ class MenuEntry(MenuEntryMixin, db.Model):
 
         self.parent = parent
         self.position = position + 1
+
+    @property
+    def protection_parent(self):
+        return self.parent or self.event_ref
 
 
 class EventPage(db.Model):

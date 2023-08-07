@@ -451,6 +451,7 @@ class User(PersonMixin, db.Model):
     # - in_contribution_acls (ContributionPrincipal.user)
     # - in_event_acls (EventPrincipal.user)
     # - in_event_settings_acls (EventSettingPrincipal.user)
+    # - in_menu_entry_acls (MenuEntryPrincipal.user)
     # - in_room_acls (RoomPrincipal.user)
     # - in_session_acls (SessionPrincipal.user)
     # - in_settings_acls (SettingPrincipal.user)

@@ -12,6 +12,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.settings.converters import EnumConverter
 from indico.modules.events.features.base import EventFeature
+from indico.modules.events.layout.models.principals import MenuEntryPrincipal
 from indico.modules.events.models.events import EventType
 from indico.modules.events.settings import EventSettingsProxy, ThemeSettingsProxy
 from indico.modules.logs import EventLogRealm, LogKind
@@ -112,6 +113,11 @@ def _log_image_deleted(image, user, **kwargs):
                     f'Deleted image "{image.filename}"', user, data={
                         'File name': image.filename
                     })
+
+
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    MenuEntryPrincipal.merge_users(target, source, 'menu_entry')
 
 
 class ImagesFeature(EventFeature):

@@ -325,6 +325,7 @@ class RegistrationForm(db.Model):
     # - in_attachment_folder_acls (AttachmentFolderPrincipal.registration_form)
     # - in_contribution_acls (ContributionPrincipal.registration_form)
     # - in_event_acls (EventPrincipal.registration_form)
+    # - in_menu_entry_acls (MenuEntryPrincipal.registration_form)
     # - in_session_acls (SessionPrincipal.registration_form)
 
     def __contains__(self, user):
