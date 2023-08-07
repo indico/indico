@@ -147,6 +147,9 @@ export default function RegistrationFormSubmission() {
   const showConsentToPublish = !isManagement && publishToParticipants !== 'hide_all';
 
   const onSubmit = async (data, form) => {
+    // There is no need to store whether the user accepted the privacy policy
+    // as it is not possible to submit the form without accepting it.
+    data = _.omit(data, 'agreed_to_privacy_policy');
     let resp;
     const formData = isUpdateMode ? getChangedValues(data, form, ['notify_user']) : data;
     try {
