@@ -82,7 +82,7 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
             self.regform.require_privacy_policy_agreement = form.require_privacy_policy_agreement.data
             db.session.flush()
             self.event.log(EventLogRealm.management, LogKind.change, 'Privacy',
-                           f'Participant visibility for "{self.regform.title}" modified', session.user,
+                           f'Privacy settings for "{self.regform.title}" modified', session.user,
                            data={'Changes': changes})
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.manage_registration_privacy_settings', self.regform))
