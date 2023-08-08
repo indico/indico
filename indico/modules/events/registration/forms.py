@@ -538,6 +538,9 @@ class RegistrationPrivacyForm(IndicoForm):
                                                     'Retention periods for individual fields can be set in the '
                                                     'registration form designer'),
                                       render_kw={'placeholder': _('Indefinite')})
+    require_privacy_policy_agreement = BooleanField(_('Privacy policy'), widget=SwitchWidget(),
+                                                    description=_('Specify whether users are required to agree to '
+                                                                  "the event's privacy policy when registering"))
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')

@@ -32,6 +32,7 @@ export default function setupRegformSubmission(root) {
     publishToParticipants,
     publishToPublic,
     consentToPublish = null,
+    policyAgreementRequired,
     captchaRequired = false,
     captchaSettings = null,
     ...extraData
@@ -54,6 +55,7 @@ export default function setupRegformSubmission(root) {
       currency,
       publishToParticipants,
       publishToPublic,
+      policyAgreementRequired: JSON.parse(policyAgreementRequired),
       captchaRequired: JSON.parse(captchaRequired),
       captchaSettings: JSON.parse(captchaSettings),
       // XXX: do NOT use extraData for anything in the core; this is solely meant as a way to
