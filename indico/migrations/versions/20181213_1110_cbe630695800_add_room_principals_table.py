@@ -7,6 +7,7 @@ Create Date: 2018-12-13 11:10:12.684382
 
 
 import json
+from enum import Enum
 
 import sqlalchemy as sa
 from alembic import context, op
@@ -14,8 +15,6 @@ from sqlalchemy.dialects import postgresql
 
 from indico.core.auth import multipass
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.core.db.sqlalchemy.principals import PrincipalType
-from indico.core.db.sqlalchemy.protection import ProtectionMode
 
 
 # revision identifiers, used by Alembic.
@@ -23,6 +22,21 @@ revision = 'cbe630695800'
 down_revision = '252c0015c9a0'
 branch_labels = None
 depends_on = None
+
+
+class _PrincipalType(int, Enum):
+    user = 1
+    local_group = 2
+    multipass_group = 3
+    email = 4
+    network = 5
+    event_role = 6
+
+
+class _ProtectionMode(int, Enum):
+    public = 0
+    inheriting = 1
+    protected = 2
 
 
 def _create_acl_entry(conn, room_id, user_id=None, group_id=None, mp_group_provider=None, mp_group_name=None,
@@ -33,19 +47,19 @@ def _create_acl_entry(conn, room_id, user_id=None, group_id=None, mp_group_provi
             INSERT INTO roombooking.room_principals
             (room_id, user_id, type, read_access, full_access, permissions) VALUES
             (%s,      %s,      %s,   false,       %s,          %s)
-        ''', (room_id, user_id, PrincipalType.user.value, full_access, permissions))
+        ''', (room_id, user_id, _PrincipalType.user.value, full_access, permissions))
     elif group_id is not None:
         conn.execute('''
             INSERT INTO roombooking.room_principals
             (room_id, local_group_id, type, read_access, full_access, permissions) VALUES
             (%s,      %s,             %s,   false,       %s,          %s)
-        ''', (room_id, group_id, PrincipalType.local_group.value, full_access, permissions))
+        ''', (room_id, group_id, _PrincipalType.local_group.value, full_access, permissions))
     else:
         conn.execute('''
             INSERT INTO roombooking.room_principals
             (room_id, mp_group_provider, mp_group_name, type, read_access, full_access, permissions) VALUES
             (%s,      %s,                %s,            %s,   false,       %s,          %s)
-        ''', (room_id, mp_group_provider, mp_group_name, PrincipalType.multipass_group.value, full_access, permissions))
+        ''', (room_id, mp_group_provider, mp_group_name, _PrincipalType.multipass_group.value, full_access, permissions))
 
 
 def _get_attr_value(conn, room_id, attr_id):
@@ -91,7 +105,7 @@ def _upgrade_permissions():
 
         if not booking_group and is_reservable:
             conn.execute('UPDATE roombooking.rooms SET protection_mode = %s WHERE id = %s',
-                         (ProtectionMode.public.value, room_id))
+                         (_ProtectionMode.public.value, room_id))
         if booking_group:
             group_kwargs = _group_to_kwargs(booking_group)
             if group_kwargs is None:
@@ -153,17 +167,17 @@ def _downgrade_permissions():
     query = 'SELECT id, owner_id, protection_mode FROM roombooking.rooms'
     for room_id, owner_id, protection_mode in conn.execute(query):
         res = conn.execute('SELECT * FROM roombooking.room_principals WHERE room_id = %s', (room_id,))
-        if not res.rowcount and protection_mode == ProtectionMode.protected:
+        if not res.rowcount and protection_mode == _ProtectionMode.protected:
             conn.execute('UPDATE roombooking.rooms SET is_reservable = false WHERE id = %s', (room_id,))
         for row in res:
-            if row.type == PrincipalType.user and row.user_id == owner_id:
+            if row.type == _PrincipalType.user and row.user_id == owner_id:
                 continue
-            if row.type == PrincipalType.local_group and not default_group_provider:
+            if row.type == _PrincipalType.local_group and not default_group_provider:
                 if row.full_access:
                     _set_attribute_value(conn, room_id, manager_group_attr_id, str(row.local_group_id))
                 if 'book' in row.permissions or 'prebook' in row.permissions:
                     _set_attribute_value(conn, room_id, booking_group_attr_id, str(row.local_group_id))
-            elif (row.type == PrincipalType.multipass_group and default_group_provider and
+            elif (row.type == _PrincipalType.multipass_group and default_group_provider and
                     row.mp_group_provider == default_group_provider.name):
                 if row.full_access:
                     _set_attribute_value(conn, room_id, manager_group_attr_id, row.mp_group_name)
@@ -185,8 +199,8 @@ def upgrade():
         sa.Column('mp_group_provider', sa.String(), nullable=True),
         sa.Column('mp_group_name', sa.String(), nullable=True),
         sa.Column('user_id', sa.Integer(), nullable=True, index=True),
-        sa.Column('type', PyIntEnum(PrincipalType, exclude_values={PrincipalType.email, PrincipalType.network,
-                                                                   PrincipalType.event_role}), nullable=False),
+        sa.Column('type', PyIntEnum(_PrincipalType, exclude_values={_PrincipalType.email, _PrincipalType.network,
+                                                                    _PrincipalType.event_role}), nullable=False),
         sa.CheckConstraint('NOT read_access', name='no_read_access'),
         sa.CheckConstraint('read_access OR full_access OR array_length(permissions, 1) IS NOT NULL', name='has_privs'),
         sa.CheckConstraint('type != 1 OR (local_group_id IS NULL AND mp_group_name IS NULL AND '
@@ -210,8 +224,8 @@ def upgrade():
                     ['mp_group_provider', 'mp_group_name', 'room_id'], unique=True, schema='roombooking',
                     postgresql_where=sa.text('type = 3'))
     op.add_column('rooms', sa.Column('protection_mode',
-                                     PyIntEnum(ProtectionMode, exclude_values={ProtectionMode.inheriting}),
-                                     nullable=False, server_default=str(ProtectionMode.protected.value)),
+                                     PyIntEnum(_ProtectionMode, exclude_values={_ProtectionMode.inheriting}),
+                                     nullable=False, server_default=str(_ProtectionMode.protected.value)),
                   schema='roombooking')
     _upgrade_permissions()
     op.alter_column('rooms', 'protection_mode', server_default=None, schema='roombooking')
