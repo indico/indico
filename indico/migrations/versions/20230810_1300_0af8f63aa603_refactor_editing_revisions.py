@@ -123,6 +123,10 @@ def upgrade():
     op.drop_constraint('ck_revisions_valid_state_combination', 'revisions', schema='event_editing')
     op.drop_constraint('ck_revisions_valid_enum_initial_state', 'revisions', schema='event_editing')
     op.alter_column('revisions', 'submitter_id', new_column_name='user_id', schema='event_editing')
+    op.execute('''
+        ALTER TABLE event_editing.revisions RENAME CONSTRAINT fk_revisions_submitter_id_users TO fk_revisions_user_id_users;
+        ALTER INDEX event_editing.ix_revisions_submitter_id RENAME TO ix_revisions_user_id;
+    ''')
     # deal with the "replacement" revisions
     op.execute(f'''
         WITH revs_lag AS (
@@ -288,6 +292,10 @@ def downgrade():
                                '(initial_state = ANY (ARRAY[1, 2, 3]))', schema='event_editing')
     op.drop_column('revisions', 'is_undone', schema='event_editing')
     op.alter_column('revisions', 'user_id', new_column_name='submitter_id', schema='event_editing')
+    op.execute('''
+        ALTER TABLE event_editing.revisions RENAME CONSTRAINT fk_revisions_user_id_users TO fk_revisions_submitter_id_users;
+        ALTER INDEX event_editing.ix_revisions_user_id RENAME TO ix_revisions_submitter_id;
+    ''')
     op.create_check_constraint('valid_state_combination', 'revisions',
                                '(initial_state=1 AND final_state IN (0,1)) OR (initial_state=2) OR '
                                '(initial_state=3 AND (final_state IN (0,3,4,6)))', schema='event_editing')
