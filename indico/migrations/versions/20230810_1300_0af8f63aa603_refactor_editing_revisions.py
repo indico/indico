@@ -7,9 +7,9 @@ Create Date: 2023-08-07 09:44:11.504348
 
 import sqlalchemy as sa
 from alembic import context, op
-from sqlalchemy.dialects import postgresql
 
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.util.enum import IndicoIntEnum
 
 
@@ -216,9 +216,11 @@ def upgrade():
 
 
 def downgrade():
-    op.add_column('revisions', sa.Column('reviewed_dt', postgresql.TIMESTAMP(), autoincrement=False, nullable=True), schema='event_editing')
-    op.add_column('revisions', sa.Column('final_state', PyIntEnum(_FinalRevisionState), nullable=False, server_default='0'), schema='event_editing')
-    op.create_check_constraint('reviewed_dt_set_when_final_state', 'revisions', '((final_state = 0) OR (reviewed_dt IS NOT NULL))', schema='event_editing')
+    op.add_column('revisions', sa.Column('reviewed_dt', UTCDateTime, nullable=True), schema='event_editing')
+    op.add_column('revisions', sa.Column('final_state', PyIntEnum(_FinalRevisionState), nullable=False,
+                                         server_default='0'), schema='event_editing')
+    op.create_check_constraint('reviewed_dt_set_when_final_state', 'revisions',
+                               '((final_state = 0) OR (reviewed_dt IS NOT NULL))', schema='event_editing')
     op.alter_column('revisions', 'final_state', server_default=None, schema='event_editing')
     op.drop_constraint('ck_revisions_new_revision_not_undone', 'revisions', schema='event_editing')
     op.drop_constraint('ck_revisions_valid_enum_type', 'revisions', schema='event_editing')
