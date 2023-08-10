@@ -1,7 +1,7 @@
 """Refactor editing revisions
 
 Revision ID: 0af8f63aa603
-Revises: e47fc6634291
+Revises: a59688f9ba40
 Create Date: 2023-08-07 09:44:11.504348
 """
 
@@ -15,7 +15,7 @@ from indico.util.enum import IndicoIntEnum
 
 # revision identifiers, used by Alembic.
 revision = '0af8f63aa603'
-down_revision = 'e47fc6634291'
+down_revision = 'a59688f9ba40'
 branch_labels = None
 depends_on = None
 
