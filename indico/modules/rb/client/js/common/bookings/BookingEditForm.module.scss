@@ -5,8 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .booking-edit-form {
-  margin-top: 15px;
+  margin-top: px(15);
 
   :global(.field .SingleDatePicker),
   :global(.field .DateRangePicker) {

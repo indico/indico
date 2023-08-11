@@ -6,13 +6,14 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'base/utilities' as *;
 
 .admin-override-bar {
   display: flex;
-  padding: 0 20px 0 10px;
+  padding: 0 px(20) 0 px(10);
   margin: 0;
-  height: 30px;
-  line-height: 30px;
+  height: px(30);
+  line-height: px(30);
   background-color: $orange;
   color: $white;
 

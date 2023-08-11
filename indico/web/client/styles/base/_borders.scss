@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use './defaults' as *;
+@use 'utilities' as *;
 
 @mixin inner-border-base {
   position: relative;

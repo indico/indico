@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .role-list-row {
   background: #eee;
@@ -15,16 +16,16 @@
 
     .content-area {
       background: #fff;
-      margin: 0 0 0 58px !important;
+      margin: 0 0 0 px(58) !important;
 
       .empty {
-        padding: 10px;
+        padding: px(10);
         font-style: italic;
         color: $dark-gray;
       }
 
       .toolbar {
-        padding: 10px;
+        padding: px(10);
       }
     }
   }
@@ -37,12 +38,12 @@
 }
 
 .role-list {
-  padding: 10px;
+  padding: px(10);
   box-sizing: border-box;
   list-style-type: none;
 
   li {
-    font-size: 11px !important;
+    font-size: px(11) !important;
     display: inline-block;
     margin-right: 0.3em;
     margin-bottom: 0.7em;
@@ -54,12 +55,12 @@
 }
 
 .badge-column {
-  width: 20px;
+  width: px(20);
 }
 
 .role-badge {
   display: inline-block;
-  width: 25px;
+  width: px(25);
   text-align: center;
 }
 

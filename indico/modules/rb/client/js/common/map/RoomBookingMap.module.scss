@@ -7,11 +7,12 @@
 
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/util' as *;
+@use 'base/utilities' as *;
 
 .map-container {
   :global(.leaflet-container) {
-    @include remaining-screen-height(40px);
-    font-size: 14px;
+    @include remaining-screen-height(px(40));
+    font-size: px(14);
   }
 
   // Overrides leaflet control styles to match Semantic-UI ones.
@@ -33,30 +34,30 @@
 
   :global(.rb-map-cluster) {
     background-color: rgba($highlight-color, 0.8);
-    border: 2px solid darken($highlight-color, 10%);
+    border: px(2) solid darken($highlight-color, 10%);
     color: $light-gray;
-    height: 50px;
-    width: 50px;
-    line-height: 37px;
+    height: px(50);
+    width: px(50);
+    line-height: px(37);
     text-align: center;
     font-weight: bold;
     font-size: 1.1em;
     font-family: $sui-font-family;
-    text-shadow: 1px 1px $light-black;
+    text-shadow: px(1) px(1) $light-black;
 
     &:global(.highlight) {
       background-color: rgba($orange, 0.9);
-      border: 2px solid darken($orange, 10%);
+      border: px(2) solid darken($orange, 10%);
     }
   }
 
   :global(.rb-map-marker) {
     background-color: saturate(rgba($highlight-color, 0.9), 30%);
-    border: 2px solid darken($highlight-color, 20%);
+    border: px(2) solid darken($highlight-color, 20%);
 
     &:global(.highlight) {
       background-color: saturate(rgba($orange, 0.9), 30%);
-      border: 2px solid darken($orange, 10%);
+      border: px(2) solid darken($orange, 10%);
     }
   }
 

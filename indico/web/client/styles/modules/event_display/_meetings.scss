@@ -10,7 +10,7 @@
 #event-note-section {
   @include border-bottom($gray);
   background: white;
-  padding: 10px 50px;
+  padding: px(10) px(50);
 }
 
 .timetable-title {
@@ -164,7 +164,7 @@ li > table + .note-area-wrapper {
   font-size: 0.95em;
 
   display: inline-block;
-  margin-bottom: 4px;
+  margin-bottom: px(4);
   margin-left: 0.2em;
 
   &.checked-in {
@@ -174,5 +174,5 @@ li > table + .note-area-wrapper {
 }
 
 .session-block-form {
-  width: 840px !important;
+  width: px(840) !important;
 }

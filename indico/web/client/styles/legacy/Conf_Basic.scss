@@ -14,6 +14,8 @@
 
 /*     this is the wrapper of whole conference page */
 
+@use 'base/utilities' as *;
+
 .conf {
   width: 100%;
   border: none;
@@ -35,19 +37,19 @@
 .confLogoBox {
   height: 100%;
   float: left;
-  padding-right: 10px;
+  padding-right: px(10);
   background: transparent none repeat scroll 0 0;
 }
 
 .confTitleBox {
   color: white;
-  min-height: 90px;
+  min-height: px(90);
   text-align: left;
   background: #1a64a0;
 }
 
 .confTitle {
-  width: 950px;
+  width: px(950);
   margin: 0 auto;
 }
 
@@ -59,14 +61,14 @@
 .conference-title-link {
   font-size: 22pt;
   display: block;
-  padding: 25px 0;
+  padding: px(25) 0;
   color: white;
 }
 
 .confSubTitleBox {
   background: #f5faff;
-  border-bottom: 1px solid #d5e4f1;
-  border-top: 1px solid #d5e4f1;
+  border-bottom: px(1) solid #d5e4f1;
+  border-top: px(1) solid #d5e4f1;
   padding: 0.5rem 0;
 }
 
@@ -75,7 +77,7 @@
 }
 
 .confSubTitleContent {
-  width: 950px;
+  width: px(950);
   margin: 0 auto;
   font-size: 11pt;
   color: #24425a;
@@ -90,7 +92,7 @@
 }
 
 div.datePlace > div.timezone {
-  font-size: 12px;
+  font-size: px(12);
   color: #777;
 }
 
@@ -105,7 +107,7 @@ div.event-details {
   }
 
   .event-details-label {
-    width: 120px;
+    width: px(120);
     text-align: right;
     font-weight: bold;
     margin-right: 1em;
@@ -123,9 +125,9 @@ div.event-details {
 /* ------Main content------ */
 
 #confSectionsBox {
-  width: 950px;
+  width: px(950);
   margin: 0 auto;
-  margin-top: 30px;
+  margin-top: px(30);
 }
 
 /* ------Menu------ */
@@ -139,7 +141,7 @@ div.event-details {
   position: relative;
   background: #f6f6f6;
 
-  border: 1px solid #ccc;
+  border: px(1) solid #ccc;
 
   list-style-image: none;
   list-style-position: outside;
@@ -170,7 +172,7 @@ div.event-details {
 
 .conf_leftMenu {
   float: left;
-  width: 200px;
+  width: px(200);
   background: transparent none repeat scroll 0 0;
 }
 
@@ -180,7 +182,7 @@ div.event-details {
 
 .menuConfTitle a {
   color: #275c86;
-  padding: 7px 12px;
+  padding: px(7) px(12);
 }
 
 /* sub menu item */
@@ -194,7 +196,7 @@ li.menuConfMiddleCell {
 }
 
 li.menuConfMiddleCell a {
-  padding: 0 0 0 30px;
+  padding: 0 0 0 px(30);
 }
 
 /* selected menu item */
@@ -203,8 +205,8 @@ li.menuConfMiddleCell a {
 .menuConfMiddleCellSelected {
   color: #bd891a;
   background: #dadada;
-  border-bottom: 1px solid #d0d0d0;
-  border-top: 1px solid #d0d0d0;
+  border-bottom: px(1) solid #d0d0d0;
+  border-top: px(1) solid #d0d0d0;
 }
 
 .menuConfBottomCell {
@@ -225,7 +227,7 @@ li.menuConfMiddleCell a {
   list-style-image: none;
   list-style-position: outside;
   list-style-type: none;
-  margin: 0 0 5px 0;
+  margin: 0 0 px(5) 0;
   padding: 0;
   width: 100%;
 }
@@ -249,8 +251,8 @@ li.menuConfMiddleCell a {
 /* End */
 
 li ul.inner li a {
-  padding: 3px 12px 3px 30px;
-  background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
+  padding: px(3) px(12) px(3) px(30);
+  background: transparent url(/images/conf/left_menu_bullet.png) scroll no-repeat px(15) center;
 } /* Sub Menu Styles */
 
 li:hover ul,
@@ -263,7 +265,7 @@ li.over ul {
 /* wrapper of content and bradcrumps */
 
 .confBodyBox {
-  margin-left: 230px;
+  margin-left: px(230);
   background: transparent none repeat scroll 0 0;
 }
 
@@ -296,7 +298,7 @@ table.conferenceDetails .displayField {
   text-align: left;
   font-weight: bold;
   font-size: 10pt;
-  padding-right: 20px;
+  padding-right: px(20);
   color: #444;
 }
 
@@ -317,9 +319,9 @@ pre {
 }
 
 .simpleTextAnnouncement {
-  background: #f5faff url(static:images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
-  border-top: 1px solid #c2d6e7;
-  padding: 8px 0;
+  background: #f5faff url(static:images/conf/sprites_blue.png) repeat-x scroll 0 px(-400);
+  border-top: px(1) solid #c2d6e7;
+  padding: px(8) 0;
   font-family: Verdana, sans-serif;
   font-weight: bold;
   font-size: 10pt;
@@ -340,24 +342,24 @@ ul.chair_list {
 }
 
 .support_box {
-  margin-top: 10px !important;
+  margin-top: px(10) !important;
   width: 100%;
   color: #aaa;
   background: #f6f6f6;
-  border: 1px solid #ccc;
+  border: px(1) solid #ccc;
 }
 
 .support_box > h3 {
   color: #f3f3f3;
   background: #1a64a0;
-  margin: 0 0 5px 0;
-  padding: 5px;
+  margin: 0 0 px(5) 0;
+  padding: px(5);
   font-weight: normal;
 }
 
 .support_box > ul > li {
   white-space: nowrap;
-  margin: 0 5px 5px 10px;
+  margin: 0 px(5) px(5) px(10);
   vertical-align: middle;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -370,7 +372,7 @@ ul.chair_list {
 }
 
 .support_box > ul > li > a {
-  margin-left: 5px;
+  margin-left: px(5);
   line-height: 1.5em;
   vertical-align: middle;
   min-width: 0;

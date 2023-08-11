@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .manage-types {
-  max-width: 600px;
+  max-width: px(600);
 
   table.i-table {
     table-layout: auto;
-    min-width: 360px;
+    min-width: px(360);
     margin-bottom: 1.5em;
 
     th,
@@ -20,7 +22,7 @@
 
     .action-column {
       white-space: nowrap;
-      width: 1px;
+      width: px(1);
     }
   }
 }

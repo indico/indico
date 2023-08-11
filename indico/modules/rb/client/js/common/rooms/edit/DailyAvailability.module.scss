@@ -5,8 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .availability-container {
   display: flex;
   align-items: center;
-  padding-bottom: 5px;
+  padding-bottom: px(5);
 }

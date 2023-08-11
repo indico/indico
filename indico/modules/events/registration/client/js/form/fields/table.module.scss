@@ -5,17 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 table.choice-table {
   border-collapse: collapse;
 
   tr {
     td:first-child {
-      padding-top: 15px;
-      padding-bottom: 15px;
+      padding-top: px(15);
+      padding-bottom: px(15);
     }
 
     td:not(:first-child) {
-      padding-left: 10px;
+      padding-left: px(10);
     }
 
     td :global(.ui.label) {
@@ -24,25 +26,25 @@ table.choice-table {
   }
 
   .dropdown:global(.ui.dropdown) {
-    padding-top: 6px;
-    padding-left: 12px;
-    min-height: 30px;
-    height: 30px;
-    min-width: 50px;
+    padding-top: px(6);
+    padding-left: px(12);
+    min-height: px(30);
+    height: px(30);
+    min-width: px(50);
 
     i:global(.dropdown.icon) {
-      padding-top: 7px;
+      padding-top: px(7);
       right: 0.8em;
     }
   }
 
   .row:not(:last-child) {
-    border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+    border-bottom: px(1) solid rgba(34, 36, 38, 0.15);
   }
 
   .checkbox,
   .radio {
-    max-width: 300px;
+    max-width: px(300);
 
     label {
       overflow-wrap: anywhere;

@@ -9,6 +9,7 @@
 @use './typography' as *;
 @use './layout' as *;
 @use './flex' as *;
+@use './utilities' as *;
 
 @mixin indico-page {
   header {
@@ -34,9 +35,9 @@
 
     .back-button {
       position: absolute;
-      top: 11px;
-      left: -20px;
-      font-size: 15px;
+      top: px(11);
+      left: px(-20);
+      font-size: px(15);
       color: $pastel-gray;
 
       &:hover {
@@ -49,7 +50,7 @@
       align-items: flex-start;
       padding-top: 0.4rem;
       min-height: 2rem;
-      border-bottom: 1px solid $separator-color;
+      border-bottom: px(1) solid $separator-color;
       margin-bottom: 1rem;
 
       > .text {
@@ -106,11 +107,11 @@
   $banner-color: #000;
   $banner-title-color: $dark-orange;
   $banner-subtitle-color: $dark-gray;
-  $banner-title-margin: 19px;
+  $banner-title-margin: px(19);
 
   color: $banner-color;
-  max-width: 800px;
-  margin-top: 10px;
+  max-width: px(800);
+  margin-top: px(10);
 
   &.full-width {
     max-width: none;
@@ -140,7 +141,7 @@
       font-size: 0.5em;
 
       a {
-        border-bottom: 1px dashed;
+        border-bottom: px(1) dashed;
       }
     }
 
@@ -155,7 +156,7 @@
 .dialog-page {
   @include indico-page();
 
-  max-width: 800px;
+  max-width: px(800);
 }
 
 .management-page {
@@ -167,7 +168,7 @@
 
   &.wide {
     .page-content {
-      max-width: 1000px !important;
+      max-width: px(1000) !important;
     }
   }
 }
@@ -177,10 +178,10 @@
 
   margin-left: auto;
   margin-right: auto;
-  width: 1000px;
+  width: px(1000);
 
   .page-content {
-    max-width: 1000px;
+    max-width: px(1000);
   }
 }
 
@@ -190,10 +191,10 @@
   // which is rather small
   @extend .fixed-width-standalone-page;
 
-  width: 800px;
+  width: px(800);
 
   .page-content {
-    max-width: 800px;
+    max-width: px(800);
     font-size: 1.2em;
 
     p:first-child {
@@ -211,7 +212,7 @@
 
   header h2 {
     color: $dark-orange;
-    padding-right: 5px;
+    padding-right: px(5);
 
     .track-name {
       font-style: italic;
@@ -220,7 +221,7 @@
 }
 
 .meeting-header {
-  max-width: 800px;
+  max-width: px(800);
   margin: 2em auto 0 auto;
 
   h1 {
@@ -230,18 +231,18 @@
 
 .meeting-page {
   @include indico-page();
-  max-width: 800px;
+  max-width: px(800);
   margin: 2em auto 0 auto;
 }
 
 .event-wrapper {
-  width: 1000px;
-  margin: 30px auto;
-  margin-top: 18px;
+  width: px(1000);
+  margin: px(30) auto;
+  margin-top: px(18);
 }
 
 .conference-title-link {
-  font-size: 33px;
+  font-size: px(33);
   background: transparent;
   color: white;
 }

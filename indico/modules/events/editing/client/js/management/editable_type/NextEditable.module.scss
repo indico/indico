@@ -6,10 +6,11 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .filetype-list {
   text-align: end;
-  padding: 0 8px 8px 8px;
+  padding: 0 px(8) px(8) px(8);
 }
 
 .filtered-editables {

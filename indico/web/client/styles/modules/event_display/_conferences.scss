@@ -12,7 +12,7 @@
 
   td {
     &.caption {
-      width: 150px;
+      width: px(150);
     }
   }
 }
@@ -50,7 +50,7 @@
 
     &[class^='icon-']::before,
     &[class*=' icon-']::before {
-      margin-right: 5px;
+      margin-right: px(5);
     }
   }
 
@@ -63,7 +63,7 @@
       color: $dark-orange;
       text-align: right;
       vertical-align: top;
-      max-width: 220px;
+      max-width: px(220);
     }
   }
 
@@ -168,7 +168,7 @@
 
         &[class^='icon-']::before,
         &[class*=' icon-']::before {
-          margin-right: 5px;
+          margin-right: px(5);
         }
       }
 
@@ -187,8 +187,8 @@
 
   .contribution-row,
   .track-review-row {
-    padding: 0 10px;
-    border-left: 3px solid $pastel-gray;
+    padding: 0 px(10);
+    border-left: px(3) solid $pastel-gray;
     margin-bottom: 1em;
 
     .contrib-title {
@@ -231,7 +231,7 @@
   @include ellipsis();
 
   display: inline-block;
-  margin-left: 5px;
+  margin-left: px(5);
   padding: 0.5em;
   max-width: 12em;
 
@@ -243,7 +243,7 @@
 }
 
 .contrib-type {
-  margin: 6px 3px 0 0;
+  margin: px(6) px(3) 0 0;
   padding: 0.5em;
   color: $light-gray;
   background-color: $dark-blue;
@@ -269,7 +269,7 @@ ul.author-list {
   padding: 0;
 
   .speaker-item {
-    border-bottom: 1px solid $pastel-gray;
+    border-bottom: px(1) solid $pastel-gray;
     margin-bottom: 0.5em;
 
     .affiliation {

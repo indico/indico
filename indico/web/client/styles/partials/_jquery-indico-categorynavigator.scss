@@ -10,8 +10,8 @@
 @use 'partials/boxes' as *;
 
 @mixin categorynav-sizing {
-  width: 800px;
-  height: 600px;
+  width: px(800);
+  height: px(600);
 }
 
 .categorynav-dialog-content {
@@ -26,13 +26,13 @@
     @include form-field-input();
     width: 100%;
     flex-shrink: 0;
-    padding-left: 10px;
-    padding-right: 35px !important;
+    padding-left: px(10);
+    padding-right: px(35) !important;
   }
 
   .clearableinput {
     .button-box {
-      padding-right: 10px;
+      padding-right: px(10);
 
       a {
         padding-right: 0;
@@ -46,7 +46,7 @@
 
   background: $light-gray;
   flex-grow: 1;
-  margin-top: 10px;
+  margin-top: px(10);
 
   // Needed for Firefox to actually overflow on .group-list
   overflow: hidden;
@@ -68,10 +68,10 @@
     overflow-y: auto;
 
     // Needed to avoid double border in case of overflow
-    margin-bottom: -1px !important;
+    margin-bottom: px(-1) !important;
 
     &.with-protected .item {
-      padding-left: 27px;
+      padding-left: px(27);
     }
   }
 
@@ -90,11 +90,11 @@
   background: white;
 
   &:last-child {
-    border-bottom: 1px solid lighten($gray, $color-variation);
+    border-bottom: px(1) solid lighten($gray, $color-variation);
   }
 
   &:hover {
-    @include inner-border-left($indico-blue, $width: 3px);
+    @include inner-border-left($indico-blue, $width: px(3));
 
     .action-button {
       visibility: visible !important;
@@ -130,13 +130,13 @@
 
     .action-button {
       @extend .i-button, .highlight;
-      padding: 4px 10px 4px;
+      padding: px(4) px(10) px(4);
       visibility: hidden;
     }
   }
 
   .protection {
-    min-width: 13px;
+    min-width: px(13);
     display: inline-block;
 
     &::before {
@@ -175,13 +175,13 @@
 }
 
 .categorynav .category-list .item.current-category {
-  box-shadow: 0 2px 2px 0 $light-gray;
-  @include inner-border-left($indico-blue, $width: 3px);
-  border-bottom: 1px solid lighten($gray, $color-variation);
-  min-height: 40px;
-  margin-left: -10px;
-  margin-right: -10px;
-  padding: 10px 10px;
+  box-shadow: 0 px(2) px(2) 0 $light-gray;
+  @include inner-border-left($indico-blue, $width: px(3));
+  border-bottom: px(1) solid lighten($gray, $color-variation);
+  min-height: px(40);
+  margin-left: px(-10);
+  margin-right: px(-10);
+  padding: px(10) px(10);
   position: relative;
   overflow: hidden;
   color: $light-black;
@@ -198,7 +198,7 @@
   }
 
   .navigate-up {
-    padding: 10px;
+    padding: px(10);
 
     &:hover {
       background-color: $pastel-gray;
@@ -218,10 +218,10 @@
 
     i {
       border-radius: 50%;
-      border: 2px solid $blue;
+      border: px(2) solid $blue;
       color: $blue;
-      font-size: 16px;
-      margin-right: 10px;
+      font-size: px(16);
+      margin-right: px(10);
       text-align: center;
       height: 1.5em;
       width: 1.5em;
@@ -241,7 +241,7 @@
     line-height: 0.85;
 
     &::before {
-      margin-right: 5px;
+      margin-right: px(5);
     }
 
     .events-count {
@@ -275,10 +275,10 @@
 .categorynav .category-list .search-result-info {
   @extend .flexrow;
   align-items: center;
-  border-bottom: 1px solid lighten($gray, $color-variation);
+  border-bottom: px(1) solid lighten($gray, $color-variation);
   background-color: $light-gray;
-  margin: 0 -10px;
-  padding: 5px 10px;
+  margin: 0 px(-10);
+  padding: px(5) px(10);
   color: $light-black;
 
   .clear {

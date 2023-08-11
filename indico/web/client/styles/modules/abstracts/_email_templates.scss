@@ -40,7 +40,7 @@
 }
 
 #email-template-manager {
-  max-width: 800px;
+  max-width: px(800);
 
   .email-template-wrapper {
     padding: 0 0 1em 1em;
@@ -50,17 +50,17 @@
     }
 
     .email-templates {
-      width: 800px;
-      max-height: 800px;
+      width: px(800);
+      max-height: px(800);
       overflow: auto;
 
       > ul {
         list-style-type: none;
         padding-left: 0;
-        padding-right: 20px;
+        padding-right: px(20);
 
         > li {
-          width: 775px;
+          width: px(775);
         }
       }
     }
@@ -69,7 +69,7 @@
       display: none;
 
       .email-subject {
-        padding-bottom: 10px;
+        padding-bottom: px(10);
       }
 
       .email-body {
@@ -86,7 +86,7 @@
     }
 
     .email-preview-btn {
-      padding-right: 5px;
+      padding-right: px(5);
       color: $link;
 
       &:hover {
@@ -113,6 +113,6 @@
   }
 
   .rule-list {
-    width: 700px;
+    width: px(700);
   }
 }

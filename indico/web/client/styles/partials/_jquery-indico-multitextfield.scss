@@ -10,10 +10,10 @@
 
 .multi-text-fields {
   $height: 1.6em;
-  $width: 200px;
-  $input-width: 160px;
+  $width: px(200);
+  $input-width: px(160);
 
-  max-height: 150px;
+  max-height: px(150);
   overflow-y: auto;
   overflow-x: hidden;
 
@@ -44,7 +44,7 @@
   .ui-sortable-helper {
     input,
     .handle {
-      box-shadow: 2px 2px 3px $gray;
+      box-shadow: px(2) px(2) px(3) $gray;
     }
   }
 
@@ -75,7 +75,7 @@
   }
 
   li {
-    margin-bottom: 3px;
+    margin-bottom: px(3);
     overflow: initial;
     width: $width;
 
@@ -84,7 +84,7 @@
     }
 
     &:last-of-type {
-      margin-bottom: 1px;
+      margin-bottom: px(1);
 
       .handle {
         cursor: default;

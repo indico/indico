@@ -6,22 +6,23 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
-$border: 1px solid $pastel-gray;
+$border: px(1) solid $pastel-gray;
 
 .editable-topbar {
   display: flex;
   justify-content: space-between;
-  min-width: 1000px;
+  min-width: px(1000);
 
   .editable-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: px(5);
 
     :global(.ui.button) {
       margin-right: 0;
-      min-height: 37px;
+      min-height: px(37);
     }
   }
 }
@@ -29,8 +30,8 @@ $border: 1px solid $pastel-gray;
 .editable-list {
   .table {
     font-family: 'Muli', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-    margin-top: 20px;
-    margin-bottom: 50px;
+    margin-top: px(20);
+    margin-bottom: px(50);
   }
 
   .rowcolumn-tooltip {
@@ -67,14 +68,14 @@ $border: 1px solid $pastel-gray;
 
   :global(.ReactVirtualized__Table__headerColumn),
   :global(.ReactVirtualized__Table__rowColumn) {
-    margin-right: 10px;
+    margin-right: px(10);
     align-items: center;
     display: flex;
   }
 
   :global(.ReactVirtualized__Table__headerColumn:first-of-type),
   :global(.ReactVirtualized__Table__rowColumn:first-of-type) {
-    margin-left: 10px;
+    margin-left: px(10);
   }
 
   :global(.ReactVirtualized__Table__sortableHeaderColumn) {
@@ -88,7 +89,7 @@ $border: 1px solid $pastel-gray;
   }
 
   :global(.ReactVirtualized__Table__sortableHeaderIcon) {
-    flex: 0 0 24px;
+    flex: 0 0 px(24);
     height: 1em;
     width: 1em;
     /* stylelint-disable-next-line value-keyword-case */

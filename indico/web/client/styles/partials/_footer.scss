@@ -9,7 +9,7 @@
 
 .footer {
   color: $light-black;
-  padding: 10px 5px 10px 10px;
+  padding: px(10) px(5) px(10) px(10);
 
   &.dark {
     color: $gray;
@@ -20,11 +20,11 @@
   }
 
   .footer-logo {
-    height: 40px;
+    height: px(40);
   }
 
   * {
-    line-height: 40px;
+    line-height: px(40);
   }
 
   .footer-links {
@@ -60,7 +60,7 @@
 
 .social-button-container {
   display: none;
-  border-radius: 10px;
+  border-radius: px(10);
   opacity: 0.5;
 
   .social-button:hover {

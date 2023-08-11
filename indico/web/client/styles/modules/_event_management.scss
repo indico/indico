@@ -50,7 +50,7 @@
 }
 
 .static-sites {
-  width: 650px;
+  width: px(650);
 
   .i-table-widget {
     // date
@@ -78,7 +78,7 @@
 }
 
 .reminders {
-  width: 650px;
+  width: px(650);
 }
 
 #menu-entries > .menu-entries {
@@ -86,13 +86,13 @@
 }
 
 .menu-entries {
-  padding: 5px 10px;
+  padding: px(5) px(10);
   margin-top: 0;
 
   list-style: none;
 
   > li {
-    margin-top: 5px;
+    margin-top: px(5);
 
     &:first-child {
       margin-top: 0;
@@ -145,7 +145,7 @@
 
         > .actions {
           max-width: 33%;
-          margin-right: -5px;
+          margin-right: px(-5);
 
           a,
           a:active,
@@ -154,7 +154,7 @@
           }
 
           > * {
-            padding: 0 2px;
+            padding: 0 px(2);
 
             color: $dark-gray;
             opacity: 0.6;
@@ -242,15 +242,15 @@
 
     &.menu-entry-placeholder {
       background: $light-gray;
-      border: 1px dashed $gray;
-      margin: 4px -5px -1px 5px;
+      border: px(1) dashed $gray;
+      margin: px(4) px(-5) px(-1) px(5);
     }
   }
 
   > .ui-sortable-helper:first-child + .menu-entry-placeholder,
   > .menu-entry-placeholder:first-child {
     margin-top: 0;
-    margin-bottom: -2px;
+    margin-bottom: px(-2);
   }
 
   &.empty,
@@ -272,7 +272,7 @@
       font-style: italic;
       line-height: 2.8em;
       position: absolute;
-      padding-left: 20px;
+      padding-left: px(20);
     }
   }
 }
@@ -280,9 +280,9 @@
 // sub list of entries
 .menu-entry {
   > .menu-entries {
-    margin-left: 20px;
+    margin-left: px(20);
     padding-right: 0;
-    padding-left: 10px;
+    padding-left: px(10);
 
     > li > .menu-entry > .i-label {
       font-weight: normal;
@@ -306,36 +306,36 @@
   padding: 0;
 
   li {
-    border-radius: 2px;
+    border-radius: px(2);
     position: relative;
     display: inline-block;
 
-    margin: 5px;
+    margin: px(5);
 
-    width: 200px;
-    height: 200px;
-    box-shadow: 0 0 1px 2px rgba($gray, 0.4);
+    width: px(200);
+    height: px(200);
+    box-shadow: 0 0 px(1) px(2) rgba($gray, 0.4);
 
     img {
-      border-radius: 2px;
+      border-radius: px(2);
       object-fit: cover;
-      width: 200px;
-      height: 200px;
+      width: px(200);
+      height: px(200);
     }
 
     .menu {
       color: white;
       text-align: right;
       background-image: linear-gradient(to top, $black, rgba($black, 0));
-      border-radius: 0 0 2px 2px;
+      border-radius: 0 0 px(2) px(2);
       box-sizing: border-box;
       padding: 0.5em 1em;
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 50px;
-      line-height: 50px;
+      height: px(50);
+      line-height: px(50);
 
       a:not(:hover) {
         color: inherit;
@@ -345,7 +345,7 @@
 }
 
 form#upload-images.full-width .dropzone {
-  width: 770px;
+  width: px(770);
 
   .select-files-btn,
   .dropzone-previews {
@@ -359,7 +359,7 @@ form#upload-images.full-width .dropzone {
     font-size: 1.2em;
     border-radius: 0.2em;
     width: 100%;
-    border: 1px solid $gray;
+    border: px(1) solid $gray;
     padding: 0.2em;
   }
 
@@ -493,7 +493,7 @@ th.i-table {
     }
 
     ~ tr td {
-      border-top-width: 1px;
+      border-top-width: px(1);
     }
   }
 }
@@ -502,13 +502,13 @@ th.i-table {
   padding: 0.15em 0;
 
   &:not(:last-child) {
-    border-bottom: 1px solid $pastel-gray;
+    border-bottom: px(1) solid $pastel-gray;
   }
 }
 
 #contribution-field-list {
   .contribution-field {
-    margin-bottom: 5px;
+    margin-bottom: px(5);
 
     .field-type {
       font-weight: bold;
@@ -524,57 +524,57 @@ th.i-table {
     @include default-border-radius();
 
     display: inline-block;
-    padding-left: 5px;
+    padding-left: px(5);
     width: 100%;
 
     button {
       position: absolute;
-      right: 15px;
+      right: px(15);
       top: 0;
       background: none;
       border: none;
-      padding: 0 5px;
+      padding: 0 px(5);
     }
   }
 
   .text p {
     word-wrap: break-word;
     width: 90%;
-    margin-top: 7px;
-    margin-bottom: 5px;
+    margin-top: px(7);
+    margin-bottom: px(5);
   }
 
   .recipients-smaller {
     @extend .flexrow;
     justify-content: space-between;
     width: 85%;
-    margin-right: 15px;
-    max-height: 200px;
+    margin-right: px(15);
+    max-height: px(200);
     overflow-y: auto;
     white-space: normal;
 
     a {
-      height: 30px;
+      height: px(30);
     }
 
     button {
-      right: 110px;
+      right: px(110);
     }
   }
 
   .scroll button {
-    right: 120px;
+    right: px(120);
   }
 
   .truncate {
     .text p {
       @include ellipsis();
 
-      max-height: 30px;
+      max-height: px(30);
     }
 
     button {
-      right: 110px;
+      right: px(110);
     }
   }
 }
@@ -585,10 +585,10 @@ th.i-table {
   background: rgba($light-blue, 0.2);
 
   & > .section {
-    margin-left: -10px;
-    margin-right: -10px;
-    padding-left: 10px;
-    padding-right: 10px;
+    margin-left: px(-10);
+    margin-right: px(-10);
+    padding-left: px(10);
+    padding-right: px(10);
     overflow: visible;
 
     & > .icon {
@@ -606,8 +606,8 @@ th.i-table {
     }
 
     &:not(:first-child) {
-      margin-top: 10px;
-      padding-top: 10px;
+      margin-top: px(10);
+      padding-top: px(10);
     }
   }
 
@@ -644,8 +644,8 @@ th.i-table {
 }
 
 .clone-event-dialog-content {
-  width: 600px;
-  min-height: 500px;
+  width: px(600);
+  min-height: px(500);
 }
 
 .qtip.cloned-event-list-qtip ul {
@@ -672,11 +672,11 @@ form.horizontal .clone-event-dialog-content {
 }
 
 .clone-event-dialog-content ul.steps {
-  margin-bottom: 30px;
+  margin-bottom: px(30);
 }
 
 form.horizontal .clone-event-dialog-footer .form-field {
-  margin-top: 10px;
+  margin-top: px(10);
   width: 100%;
 
   .clone-action-button {

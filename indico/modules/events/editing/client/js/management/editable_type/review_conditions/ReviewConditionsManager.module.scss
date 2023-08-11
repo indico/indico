@@ -5,13 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .conditions-container {
-  max-width: 600px;
+  max-width: px(600);
 
   .condition-row {
     display: flex;
     align-items: center;
     margin: 1em 0;
-    min-height: 35px;
+    min-height: px(35);
   }
 }

@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .outer-dropzone {
   margin-top: auto;
@@ -13,8 +14,8 @@
 
 .dropzone {
   width: 100%;
-  border: 2px dashed $gray;
-  border-radius: 3px;
+  border: px(2) dashed $gray;
+  border-radius: px(3);
   text-align: center;
   padding: 0.5em;
   cursor: pointer;
@@ -42,8 +43,8 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 1em;
-    border: 1px solid $gray;
-    border-radius: 3px;
+    border: px(1) solid $gray;
+    border-radius: px(3);
     padding: 1em;
     width: 31%;
     margin-left: 0.9em;

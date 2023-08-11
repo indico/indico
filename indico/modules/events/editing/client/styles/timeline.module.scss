@@ -6,10 +6,15 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .undone-item {
   :global(.i-box-header) {
-    background-image: repeating-linear-gradient(-45deg, $pastel-gray 0 2px, $light-gray 3px 15px);
+    background-image: repeating-linear-gradient(
+      -45deg,
+      $pastel-gray 0 px(2),
+      $light-gray px(3) px(15)
+    );
   }
 
   .undone-indicator {

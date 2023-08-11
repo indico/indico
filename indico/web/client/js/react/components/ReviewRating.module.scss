@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .rating-field {
   display: flex;
@@ -17,8 +18,8 @@
   }
 
   .rating-value {
-    margin-left: 5px;
+    margin-left: px(5);
     text-align: center;
-    min-width: 15px;
+    min-width: px(15);
   }
 }

@@ -14,7 +14,7 @@
 
 .abstract-content {
   @extend .text-paper;
-  padding: 10px 10em;
+  padding: px(10) 10em;
 
   .abstract-authorship-block {
     margin-top: 0.5em;

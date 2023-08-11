@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 .dimmable-image {
   position: relative;
@@ -25,7 +26,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    width: 160px;
+    width: px(160);
   }
   @media (max-width: $tablet-width) {
     .hover-content {
@@ -39,7 +40,7 @@
 
   @media (min-width: $tablet-width) {
     &:hover :global(.img) {
-      filter: blur(2px) contrast(150%) brightness(40%);
+      filter: blur(px(2)) contrast(150%) brightness(40%);
       transition: all 30ms ease;
     }
 

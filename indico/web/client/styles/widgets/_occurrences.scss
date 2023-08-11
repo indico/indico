@@ -9,7 +9,7 @@
 
 .occurrences-widget {
   .occurrence + .occurrence {
-    margin-top: 5px;
+    margin-top: px(5);
   }
 
   .DateInput_input {
@@ -30,8 +30,8 @@
 
   .rc-time-picker-panel-input-wrap {
     // make sure time does not jump when opening the time picker
-    padding-left: calc(1em - 1px);
-    padding-top: calc(0.5em + 1px);
+    padding-left: calc(1em - #{px(1)});
+    padding-top: calc(0.5em + #{px(1)});
   }
 
   .rc-time-picker-panel-input,
@@ -63,16 +63,16 @@
     @include icon-before('icon-earth');
     color: $light-black;
     position: relative;
-    right: 24px;
-    top: 2px;
+    right: px(24);
+    top: px(2);
   }
 
   .duration-info {
     @include icon-before('icon-time');
     color: $light-black;
     position: relative;
-    right: 24px;
-    top: 2px;
+    right: px(24);
+    top: px(2);
   }
 
   .remove-occurrence {

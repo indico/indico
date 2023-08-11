@@ -6,13 +6,14 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .path {
   white-space: nowrap;
 
   :global(.breadcrumb) {
     display: inline-block;
-    font-size: 13px;
+    font-size: px(13);
     line-height: 1.2;
     font-style: italic;
     width: 100%;

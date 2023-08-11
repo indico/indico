@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'base/utilities' as *;
 
 .carousel {
   padding: 1em 0 0 0;
@@ -30,9 +31,9 @@
 .progress-indicator {
   transition: background-color 0.25s ease-in;
   background-color: $pastel-gray;
-  width: 100px;
-  height: 2px;
-  margin: 10px auto;
+  width: px(100);
+  height: px(2);
+  margin: px(10) auto;
 
   &:global(.disabled),
   &:global(.disabled) .progress-bar {
@@ -54,9 +55,9 @@
 
   .pane-switcher-item {
     display: inline-block;
-    border: 1px solid $primary-color;
-    width: 15px;
-    height: 15px;
+    border: px(1) solid $primary-color;
+    width: px(15);
+    height: px(15);
     border-radius: 100%;
     cursor: pointer;
     transition: background-color 0.25s ease-in;

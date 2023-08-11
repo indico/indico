@@ -8,15 +8,15 @@
 @use 'base' as *;
 
 .balloon-qtip {
-  max-width: 300px;
-  min-width: 300px;
+  max-width: px(300);
+  min-width: px(300);
 
   .qtip-content {
-    padding: 10px !important;
+    padding: px(10) !important;
   }
 
   .title-container {
-    margin-bottom: 10px;
+    margin-bottom: px(10);
 
     .title {
       font-size: 1.3em;
@@ -63,7 +63,7 @@
 
   .section-title-container {
     .title-header {
-      margin-bottom: 5px;
+      margin-bottom: px(5);
     }
 
     .title-caption {
@@ -114,8 +114,8 @@
   }
 
   .i-data-list {
-    max-width: 300px;
-    margin: 10px 0;
+    max-width: px(300);
+    margin: px(10) 0;
 
     dt,
     dd {
@@ -151,18 +151,18 @@
   span.hr {
     width: 100%;
     display: block;
-    margin: 10px 0;
-    border-bottom: 1px solid $pastel-gray;
+    margin: px(10) 0;
+    border-bottom: px(1) solid $pastel-gray;
   }
 
   .bottom-link {
-    margin-top: 10px;
+    margin-top: px(10);
   }
 }
 
 .balloon-time-qtip {
-  max-width: 410px;
-  min-width: 410px;
+  max-width: px(410);
+  min-width: px(410);
 
   .i-form {
     input {

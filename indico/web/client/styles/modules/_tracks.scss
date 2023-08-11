@@ -13,10 +13,10 @@
   padding-left: 0;
 
   .track-row {
-    padding: 10px 10px 0 10px;
+    padding: px(10) px(10) 0 px(10);
 
     &:last-child {
-      margin-bottom: 150px;
+      margin-bottom: px(150);
     }
 
     .i-box-header {
@@ -25,7 +25,7 @@
 
     .i-box-content {
       word-wrap: break-word;
-      padding: 10px 0;
+      padding: px(10) 0;
     }
 
     .default-session::before {
@@ -43,25 +43,25 @@
 
   .track-content-collapsed {
     @extend .transparent-overlay;
-    max-height: 50px;
+    max-height: px(50);
     overflow: hidden;
   }
 }
 
 ul.sub-tracks {
   list-style-type: none;
-  padding-left: 30px;
+  padding-left: px(30);
 
   li h3 {
-    font-size: 14px !important;
+    font-size: px(14) !important;
   }
 }
 
 .embedded-track-list {
-  padding: 30px 20px;
-  border: 1px solid $pastel-gray;
+  padding: px(30) px(20);
+  border: px(1) solid $pastel-gray;
   background-color: $light-gray;
-  margin: 10px 0;
+  margin: px(10) 0;
 }
 
 .track-group-handle {
@@ -78,13 +78,13 @@ ul.sub-tracks {
 
 .track-placeholder {
   background: $light-gray;
-  border: 1px dashed $gray;
-  margin-bottom: 15px;
+  border: px(1) dashed $gray;
+  margin-bottom: px(15);
 }
 
 .track-review-list {
   ul {
-    padding-left: 10px;
+    padding-left: px(10);
   }
 }
 
@@ -100,8 +100,8 @@ ul.sub-tracks {
     border: none;
     cursor: default;
     display: inline-block;
-    margin: 10px 5px 10px 0;
-    padding: 3px;
+    margin: px(10) px(5) px(10) 0;
+    padding: px(3);
 
     &.no-unreviewed {
       background-color: $green;

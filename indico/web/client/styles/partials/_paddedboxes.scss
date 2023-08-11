@@ -10,7 +10,7 @@
 
 .padded-box {
   box-sizing: border-box;
-  @include border-all($color: $pastel-gray, $width: 2px);
+  @include border-all($color: $pastel-gray, $width: px(2));
   background: $pastel-gray;
   display: table;
   table-layout: fixed;
@@ -23,25 +23,25 @@
   .padded-box-pad {
     color: $light-black;
     display: table-cell;
-    font-size: 25px;
-    padding: 10px 0 5px;
+    font-size: px(25);
+    padding: px(10) 0 px(5);
     text-align: center;
-    width: 40px;
+    width: px(40);
   }
 
   .padded-box-content {
     @include default-border-radius();
     color: $black;
     display: table-cell;
-    padding: 10px;
-    margin-left: 40px;
+    padding: px(10);
+    margin-left: px(40);
     background: white;
     vertical-align: middle;
     word-break: break-word;
 
     hr {
       @include box-hr();
-      @include border-bottom($color: $pastel-gray, $width: 2px);
+      @include border-bottom($color: $pastel-gray, $width: px(2));
     }
   }
 }

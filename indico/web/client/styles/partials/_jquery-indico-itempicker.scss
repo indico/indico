@@ -14,7 +14,7 @@
   @include border-all();
 
   .qtip-content {
-    width: 210px;
+    width: px(210);
   }
 
   .dropdown-container {
@@ -34,14 +34,14 @@
     .dropdown-items-container {
       overflow-x: hidden;
       overflow-y: auto;
-      margin: 0 -5px;
-      max-height: 250px;
+      margin: 0 px(-5);
+      max-height: px(250);
 
       .dropdown-item {
         @extend .flexrow;
         align-items: center;
-        margin-top: 5px;
-        padding: 5px 5px;
+        margin-top: px(5);
+        padding: px(5) px(5);
         cursor: pointer;
         font-size: 1em;
 
@@ -58,7 +58,7 @@
         }
 
         .active-item-icon {
-          margin: 0 4px;
+          margin: 0 px(4);
           visibility: hidden;
         }
 
@@ -68,7 +68,7 @@
 
         .item-title {
           flex-grow: 1;
-          margin: 0 2px;
+          margin: 0 px(2);
           white-space: normal;
           color: $black;
           overflow: hidden;
@@ -78,8 +78,8 @@
 
     .divider {
       background: $separator-color;
-      height: 1px;
-      margin: 5px -5px;
+      height: px(1);
+      margin: px(5) px(-5);
     }
   }
 }

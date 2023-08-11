@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'base/utilities' as *;
 
 :global(.ui.list) > .upcoming-bookings-item:global(.item) {
   cursor: pointer;
@@ -22,7 +23,7 @@
 
 .upcoming-bookings-list {
   overflow: hidden;
-  max-height: 150px;
+  max-height: px(150);
 }
 
 .upcoming-item-img-container {
@@ -38,7 +39,7 @@
     .upcoming-item-room-name {
       background: $white;
       padding: 0.2em 0.5em;
-      border-radius: 2px 0 0 2px;
+      border-radius: px(2) 0 0 px(2);
     }
   }
 }

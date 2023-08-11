@@ -10,17 +10,17 @@
 .titled-rule {
   color: $gray;
   font-size: 0.9em;
-  margin: 10px 0;
+  margin: px(10) 0;
   overflow: hidden;
   text-align: center;
 
   &::before,
   &::after {
-    box-shadow: 1px 1px 1px $light-gray;
+    box-shadow: px(1) px(1) px(1) $light-gray;
     background-color: $default-border-color;
     content: '';
     display: inline-block;
-    height: 1px;
+    height: px(1);
     position: relative;
     vertical-align: middle;
     width: 50%;

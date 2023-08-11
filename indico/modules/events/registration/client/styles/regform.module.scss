@@ -20,7 +20,7 @@
     justify-content: space-between;
 
     .actions {
-      min-width: 50px;
+      min-width: px(50);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -35,11 +35,11 @@
 
 .form-item {
   display: flex;
-  margin-top: 10px;
-  padding-top: 3px;
+  margin-top: px(10);
+  padding-top: px(3);
 
   &:last-child {
-    padding-bottom: 7px;
+    padding-bottom: px(7);
   }
 
   &.disabled {
@@ -54,9 +54,9 @@
     background: repeating-linear-gradient(
       45deg,
       rgba(255, 229, 184, 0.5),
-      rgba(255, 229, 184, 0.5) 10px,
-      #fff 10px,
-      #fff 20px
+      rgba(255, 229, 184, 0.5) px(10),
+      #fff px(10),
+      #fff px(20)
     );
   }
 
@@ -64,9 +64,9 @@
     background: repeating-linear-gradient(
       45deg,
       rgba(255, 201, 184, 0.5),
-      rgba(255, 201, 184, 0.5) 10px,
-      #fff 10px,
-      #fff 20px
+      rgba(255, 201, 184, 0.5) px(10),
+      #fff px(10),
+      #fff px(20)
     );
   }
 
@@ -83,12 +83,12 @@
     }
 
     .label {
-      max-width: 500px;
+      max-width: px(500);
       overflow-wrap: anywhere;
     }
 
     .field {
-      margin-bottom: 3px;
+      margin-bottom: px(3);
 
       .price-tag {
         float: unset;
@@ -127,7 +127,7 @@
           display: flex;
           flex-direction: row;
           align-items: center;
-          margin-top: 10px;
+          margin-top: px(10);
         }
       }
 
@@ -136,7 +136,7 @@
         flex-direction: column;
 
         ul {
-          max-width: 500px;
+          max-width: px(500);
           padding-left: 1.5rem;
 
           li {
@@ -151,7 +151,7 @@
             }
 
             &:not(:last-child) {
-              border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+              border-bottom: px(1) solid rgba(34, 36, 38, 0.15);
             }
 
             .light {
@@ -180,7 +180,7 @@
       }
 
       .country-dropdown {
-        max-width: 500px;
+        max-width: px(500);
       }
 
       .single-choice-dropdown {
@@ -199,8 +199,8 @@
           }
 
           .labels {
-            margin-top: -11px;
-            margin-bottom: -11px;
+            margin-top: px(-11);
+            margin-bottom: px(-11);
             margin-left: 0.5em;
             white-space: nowrap;
 
@@ -229,18 +229,18 @@
       input[type='email'],
       input[type='file'],
       input[type='text'] {
-        max-width: 500px;
+        max-width: px(500);
       }
 
       input[type='tel'],
       input[type='number'] {
-        max-width: 250px;
+        max-width: px(250);
       }
     }
 
     > .description {
-      max-width: 500px;
-      padding-left: 2px;
+      max-width: px(500);
+      padding-left: px(2);
       text-align: justify;
       font-style: italic;
       font-size: 0.9em;
@@ -252,19 +252,19 @@
     visibility: hidden;
 
     a + a {
-      margin-left: 3px;
+      margin-left: px(3);
     }
   }
 
   &.editable {
     .sortable-handle {
       color: $dark-gray;
-      margin-left: -10px;
-      width: 25px;
+      margin-left: px(-10);
+      width: px(25);
 
       &::before {
         position: relative;
-        left: 8px;
+        left: px(8);
       }
     }
 
@@ -295,19 +295,19 @@
   }
 
   :global(.SingleDatePickerInput) {
-    border-radius: 4px;
+    border-radius: px(4);
 
     & > :global(.DateInput) {
-      max-width: 130px;
+      max-width: px(130);
     }
 
     & > button {
-      margin-left: 5px;
+      margin-left: px(5);
     }
   }
 
   :global(.rc-time-picker) {
-    max-width: 110px;
+    max-width: px(110);
   }
 
   :global(.rc-time-picker-input) {
@@ -332,7 +332,7 @@
 
   .section-sortable-handle {
     font-size: 1.2em;
-    flex-basis: 20px;
+    flex-basis: px(20);
     align-self: flex-start;
   }
 
@@ -360,7 +360,7 @@
 
   a + a,
   a + div {
-    margin-left: 5px;
+    margin-left: px(5);
   }
 }
 
@@ -369,7 +369,7 @@
   grid-template-columns: 1fr 1fr;
 
   & > div:first-child {
-    border-right: 1px solid rgba(34, 36, 38, 0.15);
+    border-right: px(1) solid rgba(34, 36, 38, 0.15);
   }
 }
 
@@ -377,12 +377,12 @@
   cursor: pointer;
   line-height: 1em;
   color: rgba(0, 0, 0, 0.87);
-  padding: 11px 16px;
+  padding: px(11) px(16);
   font-size: 1rem;
   font-weight: normal;
 
   i {
-    padding-right: 10px;
+    padding-right: px(10);
 
     &::before {
       cursor: pointer;

@@ -19,7 +19,7 @@
 
 @mixin regform-section {
   @extend .i-box;
-  margin-top: 25px;
+  margin-top: px(25);
 }
 
 // ============================================================================
@@ -37,7 +37,7 @@
     }
 
     .clearableinput + .clearableinput {
-      margin-top: 3px;
+      margin-top: px(3);
     }
   }
 
@@ -45,7 +45,7 @@
     & > span {
       color: $gray;
       font-size: 1.2em;
-      margin-left: 4px;
+      margin-left: px(4);
       vertical-align: -8%;
     }
   }
@@ -57,7 +57,7 @@
 
 .regform-done {
   @include regform-section();
-  margin-bottom: 15px;
+  margin-bottom: px(15);
 
   table.registration-info {
     border-collapse: collapse;
@@ -65,7 +65,7 @@
 
     &.payment-info {
       td {
-        padding: 3px;
+        padding: px(3);
       }
     }
   }
@@ -73,7 +73,7 @@
   tr.regform-done-title {
     td {
       @include border-bottom(lighten($gray, $color-variation));
-      padding: 15px 0 5px 0;
+      padding: px(15) 0 px(5) 0;
       font-size: 1.3em;
     }
 
@@ -87,24 +87,24 @@
   }
 
   .regform-done-caption {
-    border-bottom: 1px dashed lighten($gray, $color-variation);
-    border-right: 1px dashed lighten($gray, $color-variation);
+    border-bottom: px(1) dashed lighten($gray, $color-variation);
+    border-right: px(1) dashed lighten($gray, $color-variation);
     color: $dark-gray;
     font-weight: normal;
     text-align: right;
-    padding: 0 8px 0 0;
-    width: 120px;
+    padding: 0 px(8) 0 0;
+    width: px(120);
   }
 
   .regform-done-data {
-    padding: 0 0 0 5px;
+    padding: 0 0 0 px(5);
     vertical-align: top;
 
     .regform-participant-visibility {
       display: flex;
       align-items: center;
       gap: 0.5em;
-      margin: 2px 0;
+      margin: px(2) 0;
 
       .old-visibility {
         color: $light-black;
@@ -122,7 +122,7 @@
     font-weight: bold;
 
     &:not(:first-child) {
-      padding: 0 0 0 15px;
+      padding: 0 0 0 px(15);
     }
   }
 
@@ -131,7 +131,7 @@
       vertical-align: top;
 
       &:not(:first-child) {
-        padding: 0 0 0 15px;
+        padding: 0 0 0 px(15);
       }
 
       span.section-name {
@@ -147,7 +147,7 @@
   .regform-done-table-total {
     @include border-top(lighten($gray, $color-variation));
     font-weight: bold;
-    padding-top: 5px;
+    padding-top: px(5);
 
     strong {
       padding-right: 1em;
@@ -155,11 +155,11 @@
   }
 
   .regform-done-footer {
-    margin-top: 20px;
+    margin-top: px(20);
 
     input[type='checkbox'] {
       float: left;
-      margin-left: 1px;
+      margin-left: px(1);
     }
 
     label {
@@ -179,7 +179,7 @@
 
   .regform-done-checkout {
     font-size: 1.1em;
-    margin-top: 10px;
+    margin-top: px(10);
   }
 
   .not-selected {
@@ -279,12 +279,12 @@
       thead {
         tr:last-child th {
           font-weight: bold;
-          border-bottom: 2px solid $gray;
-          padding-right: 5px;
+          border-bottom: px(2) solid $gray;
+          padding-right: px(5);
         }
 
         th {
-          padding-right: 10px;
+          padding-right: px(10);
           text-align: center;
         }
       }
@@ -307,7 +307,7 @@
             position: relative;
 
             &::after {
-              border-bottom: 2px solid $light-black;
+              border-bottom: px(2) solid $light-black;
               content: '';
               left: 1%;
               position: absolute;
@@ -319,7 +319,7 @@
         }
 
         td {
-          border-top: 1px solid $gray;
+          border-top: px(1) solid $gray;
 
           &:first-child,
           &:last-child {
@@ -359,11 +359,11 @@
           }
 
           &.stick-left {
-            padding-right: 1px;
+            padding-right: px(1);
           }
 
           &.stick-right {
-            padding-left: 1px;
+            padding-left: px(1);
           }
         }
       }
@@ -407,7 +407,7 @@
 
       th,
       td {
-        padding: 5px;
+        padding: px(5);
         text-align: right;
 
         &:first-child {
@@ -507,10 +507,10 @@
     width: 100%;
 
     td {
-      padding: 0.35rem 5px 0.35rem 0;
+      padding: 0.35rem px(5) 0.35rem 0;
 
       &:first-child {
-        padding-left: 5px;
+        padding-left: px(5);
       }
 
       &.name {
@@ -528,7 +528,7 @@
 
       &.actions {
         font-size: 1.2em;
-        padding: 0 5px;
+        padding: 0 px(5);
         width: 2%;
         white-space: nowrap;
 
@@ -616,15 +616,15 @@
 
 .disabled-caption {
   color: $dark-gray;
-  margin: 30px 0 0 0;
+  margin: px(30) 0 0 0;
 
   a {
-    padding: 0 10px;
+    padding: 0 px(10);
     box-sizing: border-box;
     color: $dark-gray;
   }
 }
 
 .registration-tags-assign-form {
-  width: 600px;
+  width: px(600);
 }

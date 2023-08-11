@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 :global(.ui.list).evt-list {
   max-height: 30vh;
@@ -13,8 +14,8 @@
 
   :global(.item).evt-item {
     .detail {
-      margin-top: 2px;
-      width: 350px;
+      margin-top: px(2);
+      width: px(350);
       display: inline-block;
       overflow: hidden;
       white-space: nowrap;
@@ -31,7 +32,7 @@
 .list-flex {
   display: flex;
   justify-content: start;
-  gap: 15px;
+  gap: px(15);
 
   &.disabled {
     background-color: $pastel-gray;
@@ -41,7 +42,7 @@
 .date-span {
   flex-basis: 10%;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: px(12);
   color: $dark-gray;
 }
 
@@ -56,7 +57,7 @@
   overflow: hidden;
 
   a {
-    margin-right: 5px;
+    margin-right: px(5);
   }
 }
 
@@ -80,5 +81,5 @@
 
 .load-more > div {
   text-align: center;
-  padding: 11px 16px; // Same as <Dropdown.Item>
+  padding: px(11) px(16); // Same as <Dropdown.Item>
 }

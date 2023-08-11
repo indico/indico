@@ -5,16 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .types-list {
   display: flex;
   flex: 1;
   flex-wrap: wrap;
   align-items: center;
-  margin-top: -5px;
-  margin-bottom: -5px;
+  margin-top: px(-5);
+  margin-bottom: px(-5);
 
   & > :global(.label) {
-    margin: 5px !important;
+    margin: px(5) !important;
     max-width: 150;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -14,10 +14,10 @@
   margin-bottom: 1em;
 
   .i-box.info-body {
-    padding: 20px 10px;
+    padding: px(20) px(10);
 
     .info-section {
-      padding: 0 20px;
+      padding: 0 px(20);
     }
 
     .info-person {
@@ -93,7 +93,7 @@
 
   .legal-body {
     @extend .text-paper;
-    padding: 10px 10em;
+    padding: px(10) 10em;
   }
 
   .legal-confirmation {
@@ -146,10 +146,10 @@
     width: 100%;
 
     td {
-      padding: 0.35rem 5px 0.35rem 0;
+      padding: 0.35rem px(5) 0.35rem 0;
 
       &:first-child {
-        padding-left: 5px;
+        padding-left: px(5);
       }
 
       &.agreement-checkbox,
@@ -157,7 +157,7 @@
         width: 1%;
 
         i {
-          margin: 4px;
+          margin: px(4);
 
           &.icon-disable {
             color: $red;
@@ -180,7 +180,7 @@
 
       &.agreement-actions {
         font-size: 1.2em;
-        padding: 0 5px;
+        padding: 0 px(5);
         width: 7%;
         white-space: nowrap;
 

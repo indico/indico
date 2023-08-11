@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .payment-conditions-text {
   color: $black;
   font-size: 1.1em;
   line-height: 1.5em;
-  max-width: 400px;
+  max-width: px(400);
   text-align: justify;
 }

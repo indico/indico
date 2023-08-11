@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .editing-view {
   display: flex;
@@ -16,8 +17,8 @@
     flex: 1;
 
     .timeline {
-      max-width: 800px;
-      margin-top: 25px;
+      max-width: px(800);
+      margin-top: px(25);
     }
 
     .timeline.header {

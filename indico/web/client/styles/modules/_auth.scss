@@ -26,25 +26,25 @@
 
     .centered-column-wrapper {
       margin: auto;
-      width: 800px;
+      width: px(800);
 
       // stylelint-disable-next-line scss/media-feature-value-dollar-variable
-      @media (max-width: 800px) {
-        width: 400px;
+      @media (max-width: px(800)) {
+        width: px(400);
       }
 
       .centered-column {
-        width: 300px;
-        margin: 100px auto;
+        width: px(300);
+        margin: px(100) auto;
 
         &.wide {
-          width: 500px;
+          width: px(500);
         }
       }
 
       .header-logo {
-        margin-bottom: 20px;
-        height: 100px;
+        margin-bottom: px(20);
+        height: px(100);
       }
 
       .footer {
@@ -57,7 +57,7 @@
   }
 
   form {
-    margin-bottom: 10px;
+    margin-bottom: px(10);
   }
 
   @mixin login-form-button() {
@@ -65,7 +65,7 @@
     height: 2.5em;
     padding: 0.5em 1em;
     line-height: 1.5;
-    margin-bottom: 10px;
+    margin-bottom: px(10);
     position: relative;
 
     &:last-of-type {
@@ -84,8 +84,8 @@
     line-height: 1.5;
     width: 100%;
     color: #555;
-    border: 1px solid #bbb;
-    margin-top: -1px;
+    border: px(1) solid #bbb;
+    margin-top: px(-1);
 
     &:first-of-type {
       border-top-right-radius: 0.2em;
@@ -100,7 +100,7 @@
   }
 
   .login-providers {
-    margin-top: 20px;
+    margin-top: px(20);
 
     .i-button {
       @include login-form-button();
@@ -147,7 +147,7 @@
   .titled-rule {
     color: $gray;
     font-size: 1em;
-    margin: 20px 0;
+    margin: px(20) 0;
 
     &::before,
     &::after {
@@ -157,12 +157,12 @@
 
   .link {
     text-align: left;
-    margin-top: 20px;
+    margin-top: px(20);
   }
 
   .forgot-my-password {
     text-align: right;
-    margin-top: 10px;
+    margin-top: px(10);
   }
 
   .register {
@@ -189,7 +189,7 @@
   font-size: 1.1em;
 
   .row {
-    padding: 20px;
+    padding: px(20);
 
     & + .row {
       padding-top: 0;
@@ -198,7 +198,7 @@
 }
 
 .auth-stakeholder-info {
-  width: 120px;
+  width: px(120);
 
   i {
     font-size: 4em;

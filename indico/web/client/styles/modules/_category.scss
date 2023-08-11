@@ -9,11 +9,11 @@
 @use 'partials/buttons' as *;
 
 .confirmation-dialog .body ul.categ-list {
-  padding-left: 13px;
+  padding-left: px(13);
   margin: 0;
 
   span.event-date {
-    padding-left: 10px;
+    padding-left: px(10);
     color: #888;
     font-size: 0.9em;
     margin: 0;
@@ -27,15 +27,15 @@
 .category-container {
   font-family: 'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif;
   background: #fff;
-  margin-bottom: 10px;
+  margin-bottom: px(10);
   overflow: hidden;
 }
 
 .category-header {
   background-image: linear-gradient(to bottom, #fcfcfc, #f2f2f2);
-  border-bottom: 1px solid #e6e6e6;
-  border-top: 1px solid #fff;
-  padding: 20px;
+  border-bottom: px(1) solid #e6e6e6;
+  border-top: px(1) solid #fff;
+  padding: px(20);
   line-height: initial;
 
   .back-button {
@@ -48,7 +48,7 @@
   color: $dark-orange;
   font-weight: normal;
   margin: auto;
-  max-width: 850px;
+  max-width: px(850);
   margin-left: 0;
   text-align: left;
 
@@ -64,7 +64,7 @@
 }
 
 .category-stats-container {
-  padding-top: 40px;
+  padding-top: px(40);
 
   .ui.segments > .segment {
     width: 50%;
@@ -77,7 +77,7 @@
 
 .category-content {
   width: 100%;
-  max-width: 850px;
+  max-width: px(850);
   padding: 0 1em 0 0;
   margin: auto;
 }
@@ -96,7 +96,7 @@
 }
 
 .category-statistics {
-  max-width: 1600px;
+  max-width: px(1600);
 
   .i-box {
     margin-left: 0.8em;
@@ -115,7 +115,7 @@
       display: inline-block;
 
       width: 96%;
-      height: 350px;
+      height: px(350);
       padding: 2% 2% 0 2%;
     }
   }
@@ -129,22 +129,22 @@
   box-sizing: border-box;
   background: #fafafa;
   background-image: linear-gradient(to bottom, #fafafa 95%, #fff 100%);
-  border-left: 1px solid #f2f2f2;
+  border-left: px(1) solid #f2f2f2;
   color: #666;
   float: right;
   height: 100%;
   padding: 1em;
-  width: 340px;
+  width: px(340);
 
   &:empty {
     padding: 0;
   }
 
   > .title {
-    border-bottom: 1px solid #ebebeb;
-    box-shadow: 0 1px 0 #fafafa;
-    margin-top: 20px;
-    margin-bottom: 10px;
+    border-bottom: px(1) solid #ebebeb;
+    box-shadow: 0 px(1) 0 #fafafa;
+    margin-top: px(20);
+    margin-bottom: px(10);
     padding-bottom: 0.2em;
     display: flex;
     align-items: center;
@@ -236,7 +236,7 @@
       display: block;
       margin-top: 0.2em;
       color: #777;
-      text-shadow: 1px 1px 0 #fefefe;
+      text-shadow: px(1) px(1) 0 #fefefe;
     }
   }
 }
@@ -256,8 +256,8 @@ ul.category-list {
   list-style-type: none;
   padding: 0;
 
-  border-left: 1px solid #fafafa;
-  border-right: 1px solid #e6e6e6;
+  border-left: px(1) solid #fafafa;
+  border-right: px(1) solid #e6e6e6;
 
   li {
     @include transition(color);
@@ -272,8 +272,8 @@ ul.category-list {
     color: #b3b3b3;
     cursor: pointer;
 
-    border-top: 1px solid #fafafa;
-    border-bottom: 1px solid #e6e6e6;
+    border-top: px(1) solid #fafafa;
+    border-bottom: px(1) solid #e6e6e6;
 
     .number-events {
       float: right;
@@ -330,8 +330,8 @@ ul.category-resource-qtip {
   padding-left: 0;
   margin: 0;
   color: #888;
-  font-size: 11px;
-  line-height: 15px;
+  font-size: px(11);
+  line-height: px(15);
 }
 
 #eventCreationForm {
@@ -344,30 +344,30 @@ ul.category-resource-qtip {
 
 .event-list {
   h3 {
-    font-size: 26px;
+    font-size: px(26);
     color: #999;
-    margin: 20px 10px;
+    margin: px(20) px(10);
     padding: 0;
   }
 
   h4 {
     color: #555;
     font-weight: normal;
-    font-size: 18px;
-    margin-top: 20px;
-    margin-left: 40px;
+    font-size: px(18);
+    margin-top: px(20);
+    margin-left: px(40);
     padding: 0;
-    border-bottom: 1px solid #ebebeb;
+    border-bottom: px(1) solid #ebebeb;
 
     &.current-month {
-      border-bottom: 1px solid #aaa;
+      border-bottom: px(1) solid #aaa;
 
       span {
-        padding: 5px 5px 0 5px;
+        padding: px(5) px(5) 0 px(5);
         color: #2f2506;
         background-color: #f6e8bd;
-        border-radius: 5px 5px 0 0;
-        border-bottom: 1px solid #aaa;
+        border-radius: px(5) px(5) 0 0;
+        border-bottom: px(1) solid #aaa;
       }
     }
   }
@@ -380,7 +380,7 @@ ul.category-resource-qtip {
   }
 
   li {
-    margin: 0 0 10px 60px;
+    margin: 0 0 px(10) px(60);
     padding: 0;
     display: flex;
     align-items: baseline;
@@ -391,20 +391,20 @@ ul.category-resource-qtip {
     }
 
     .date {
-      padding: 5px;
-      margin-right: 10px;
-      font-size: 13px;
+      padding: px(5);
+      margin-right: px(10);
+      font-size: px(13);
       color: #444;
       flex-shrink: 0;
     }
 
     .event-icons {
-      padding: 0 15px;
+      padding: 0 px(15);
       font-size: 1.2em;
       white-space: nowrap;
       color: $dark-gray;
-      max-width: 56px;
-      min-width: 56px;
+      max-width: px(56);
+      min-width: px(56);
 
       a,
       a:hover {
@@ -413,14 +413,14 @@ ul.category-resource-qtip {
     }
 
     .list-name a {
-      font-size: 17px;
+      font-size: px(17);
     }
 
     .today {
-      font-size: 13px;
+      font-size: px(13);
       color: #444;
       background-color: #f6e8bd;
-      border-radius: 5px;
+      border-radius: px(5);
     }
 
     .protected {
@@ -435,20 +435,20 @@ ul.category-resource-qtip {
 }
 
 .category-overview {
-  width: calc(100vw - 300px);
+  width: calc(100vw - #{px(300)});
 
   > .title {
-    height: 30px;
+    height: px(30);
 
     .text {
       font-size: 1.2em;
       font-style: italic;
-      margin-left: 5px;
-      margin-right: 5px;
+      margin-left: px(5);
+      margin-right: px(5);
     }
 
     .navigation a {
-      padding: 5px;
+      padding: px(5);
     }
   }
 
@@ -457,9 +457,9 @@ ul.category-resource-qtip {
     overflow-x: auto;
 
     > table:not(.day) {
-      border: 1px solid #aaa;
+      border: px(1) solid #aaa;
       border-collapse: separate;
-      border-spacing: 1px;
+      border-spacing: px(1);
 
       tr {
         background-color: #eee;
@@ -476,7 +476,7 @@ ul.category-resource-qtip {
         text-align: center;
         font-weight: normal;
         white-space: nowrap;
-        padding: 1px 15px;
+        padding: px(1) px(15);
       }
     }
 
@@ -486,10 +486,10 @@ ul.category-resource-qtip {
 
       &.day {
         vertical-align: top;
-        padding: 5px;
+        padding: px(5);
 
         &:not(:empty) {
-          min-width: 180px;
+          min-width: px(180);
         }
 
         > .calendar-date {
@@ -510,7 +510,7 @@ ul.category-resource-qtip {
               font-size: inherit;
 
               &.content-info {
-                padding-left: 10px;
+                padding-left: px(10);
               }
 
               .location-info,
@@ -529,12 +529,12 @@ ul.category-resource-qtip {
 
     tr.event {
       & > td {
-        padding: 8px 3px;
+        padding: px(8) px(3);
         font-size: 1.1em;
       }
 
       &:not(:first-of-type) td {
-        border-top: 1px dotted #aaa;
+        border-top: px(1) dotted #aaa;
       }
 
       .title .ui.label {
@@ -543,18 +543,18 @@ ul.category-resource-qtip {
 
       .category-icon {
         float: right;
-        margin-left: 3px;
+        margin-left: px(3);
       }
     }
 
     td.time {
       font-style: italic;
       white-space: nowrap;
-      width: 40px;
+      width: px(40);
     }
 
     td.content-info {
-      padding-left: 20px;
+      padding-left: px(20);
 
       table.timetable-entries {
         tr {
@@ -572,19 +572,19 @@ ul.category-resource-qtip {
 
           &:not(:first-of-type) {
             td {
-              border-top: 1px dashed #aaa;
+              border-top: px(1) dashed #aaa;
             }
           }
 
           td {
-            padding: 3px 2px;
+            padding: px(3) px(2);
           }
         }
       }
     }
 
     .location-info {
-      max-width: 220px;
+      max-width: px(220);
       text-overflow: ellipsis;
       overflow: hidden;
       color: darkblue;
@@ -598,7 +598,7 @@ ul.category-resource-qtip {
 
 .category-overview-side-menu {
   .ui-datepicker {
-    width: 192px;
+    width: px(192);
   }
 
   #display-options {
@@ -623,7 +623,7 @@ ul.category-resource-qtip {
 
 .category-calendar-side-menu {
   .ui-datepicker {
-    width: 192px;
+    width: px(192);
   }
 }
 
@@ -674,7 +674,7 @@ ul.category-resource-qtip {
       .ongoing-events-info {
         font-style: italic;
         line-height: 2.1em;
-        margin-right: 5px;
+        margin-right: px(5);
       }
     }
   }
@@ -682,12 +682,12 @@ ul.category-resource-qtip {
 
 .ongoing-events-dialog,
 .all-events-dialog {
-  max-height: 600px !important;
+  max-height: px(600) !important;
   overflow-y: scroll;
 
   ul {
     list-style-type: none;
-    padding: 0 10px;
+    padding: 0 px(10);
     margin-top: 0;
   }
 }

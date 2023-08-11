@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .ui-multiselect-widget {
   background: none repeat scroll 0 0 #fafafa;
-  border: 1px solid #dadada;
+  border: px(1) solid #dadada;
 }
 
 .ui-multiselect-checkboxes {

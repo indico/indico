@@ -11,6 +11,7 @@
 @use 'base/palette' as *;
 @use 'base/animation' as *;
 @use 'base/typography' as *;
+@use 'base/utilities' as *;
 @use 'partials/boxes' as *;
 @use 'modules/contributions/display' as *;
 
@@ -21,23 +22,23 @@ $editor-preview-bg-color: $light-gray;
   @include transition(height 0.25s ease-out);
 
   &:focus {
-    height: 300px;
+    height: px(300);
   }
 
-  height: 100px;
+  height: px(100);
 
   width: 100%;
-  max-width: 800px;
+  max-width: px(800);
   padding: 1em;
   font-size: 0.9em;
 }
 
 .wmd-panel {
-  max-width: 800px;
+  max-width: px(800);
 }
 
 .wmd-button-row {
-  max-width: 800px;
+  max-width: px(800);
   position: relative;
   padding: 0.5em;
   height: 2em;
@@ -46,7 +47,7 @@ $editor-preview-bg-color: $light-gray;
 }
 
 .wmd-spacer {
-  width: 1px;
+  width: px(1);
   height: 1em;
   margin: 0 1em 0 1em;
   display: inline-block;
@@ -60,13 +61,13 @@ $editor-preview-bg-color: $light-gray;
   .save-button {
     @include transition(opacity);
     @include transition(background-color);
-    @include single-box-shadow(0, 0, 1px, 1px, #fff);
+    @include single-box-shadow(0, 0, px(1), px(1), #fff);
     position: absolute;
-    right: 50px;
+    right: px(50);
     display: inline-block;
     color: white;
     z-index: 1;
-    top: 8px;
+    top: px(8);
     opacity: 0;
     visibility: hidden;
 
@@ -163,7 +164,7 @@ $editor-preview-bg-color: $light-gray;
 }
 
 .wmd-prompt-dialog {
-  border: 1px solid #999;
+  border: px(1) solid #999;
   background-color: #f5f5f5;
 }
 
@@ -173,18 +174,18 @@ $editor-preview-bg-color: $light-gray;
 }
 
 .wmd-prompt-dialog > form > input[type='text'] {
-  border: 1px solid #999;
+  border: px(1) solid #999;
   color: black;
 }
 
 .wmd-prompt-dialog > form > input[type='button'] {
-  border: 1px solid #888;
+  border: px(1) solid #888;
   font-family: trebuchet MS, helvetica, sans-serif;
   font-size: 0.8em;
   font-weight: bold;
 }
 
 .md-preview-wrapper.edit {
-  max-width: 800px;
+  max-width: px(800);
   @include md-preview-wrapper-mixin($editor-preview-bg-color);
 }

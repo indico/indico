@@ -91,34 +91,34 @@ ul.steps {
     text-align: center;
 
     &.top {
-      margin-bottom: 20px;
+      margin-bottom: px(20);
     }
 
     &.bottom {
-      margin-top: 10px;
+      margin-top: px(10);
     }
   }
 
   .horizontal-line {
-    height: 3px;
+    height: px(3);
     background-color: $pastel-gray;
   }
 
   .circle {
     &::before {
-      @include border-all($width: 2px);
-      border-radius: 25px;
+      @include border-all($width: px(2));
+      border-radius: px(25);
       content: '';
-      width: 25px;
-      height: 25px;
+      width: px(25);
+      height: px(25);
       background-color: white;
-      margin-top: -15px;
+      margin-top: px(-15);
     }
   }
 
   .text {
     position: relative;
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: px(10);
   }
 }

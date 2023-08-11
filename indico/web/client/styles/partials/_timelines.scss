@@ -23,7 +23,7 @@
   position: relative;
 
   & .i-timeline {
-    margin-left: 51px;
+    margin-left: px(51);
   }
 
   .with-line::before {
@@ -32,9 +32,9 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 19px;
+    left: px(19);
     display: block;
-    width: 2px;
+    width: px(2);
     z-index: -1;
   }
 
@@ -45,7 +45,7 @@
 
 .i-timeline-item {
   @extend .flexrow;
-  $min-height: 19px;
+  $min-height: px(19);
 
   align-items: start;
   margin-top: 1rem;
@@ -54,12 +54,12 @@
     @include default-border-radius();
     @include border-all($color: transparent);
     box-sizing: border-box;
-    margin-right: 12px;
-    outline: 2px solid white;
+    margin-right: px(12);
+    outline: px(2) solid white;
     flex-shrink: 0;
     // To match i-box-header height
-    height: 39px;
-    width: 39px;
+    height: px(39);
+    width: px(39);
   }
 
   .i-timeline-item-box {
@@ -74,7 +74,7 @@
       min-height: $min-height;
 
       &.header-only {
-        margin-bottom: -10px;
+        margin-bottom: px(-10);
       }
     }
 
@@ -111,8 +111,8 @@
     color: $light-black;
     // Matches .i-timeline-item-label height
     // Also keeps correct v-alignment and separation with i-timeline-item-box on multiline
-    min-height: 19px;
-    padding: 10px 0;
+    min-height: px(19);
+    padding: px(10) 0;
   }
 }
 
@@ -131,20 +131,20 @@
 }
 
 .ui.avatar.image.profile-picture {
-  width: 39px;
-  height: 39px;
-  max-width: 39px;
-  margin-right: 10px;
+  width: px(39);
+  height: px(39);
+  max-width: px(39);
+  margin-right: px(10);
 }
 
 .i-timeline-separator {
-  @include border-top($width: 2px);
+  @include border-top($width: px(2));
   margin: 2em 0;
 }
 
 .i-timeline-connect-down {
-  @include border-left($width: 2px);
-  margin-left: 19px;
+  @include border-left($width: px(2));
+  margin-left: px(19);
   height: 2em;
 
   &.to-separator {
@@ -153,8 +153,8 @@
 }
 
 .i-timeline-connect-up {
-  @include border-left($width: 2px);
-  margin-left: 19px;
+  @include border-left($width: px(2));
+  margin-left: px(19);
   height: 2em;
 
   &.from-separator {

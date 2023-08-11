@@ -10,13 +10,13 @@
 
 .sideBar {
   float: right;
-  width: 340px;
+  width: px(340);
 
   h1 {
     margin: 0;
     padding: 0;
     color: $light-black;
-    font-size: 15px;
+    font-size: px(15);
   }
 
   ul {
@@ -41,7 +41,7 @@
 
     &.subLink {
       font-style: italic;
-      font-size: 14px;
+      font-size: px(14);
     }
   }
 }
@@ -98,11 +98,11 @@
         display: block;
         min-height: 2.6em;
         line-height: 2.6em;
-        padding-left: 9px;
+        padding-left: px(9);
 
         .title {
           display: inline;
-          padding-left: 3px;
+          padding-left: px(3);
         }
       }
 
@@ -112,7 +112,7 @@
         min-height: 2.6em;
         line-height: 2.6em;
         color: $black;
-        padding-left: 26px;
+        padding-left: px(26);
 
         &::before {
           margin-right: 0.5em;
@@ -132,7 +132,7 @@
           display: flex;
           min-height: 2em;
           line-height: 2em;
-          padding-left: 51px;
+          padding-left: px(51);
         }
       }
 
@@ -150,9 +150,9 @@
       }
 
       i.icon {
-        width: 14.3px;
+        width: px(14.3);
         height: auto;
-        margin-right: 7.15px;
+        margin-right: px(7.15);
         font-size: 0.83em;
       }
     }
@@ -160,7 +160,7 @@
 }
 
 ul.menu-items li.active {
-  @include inner-border-left($link, $width: 2px);
+  @include inner-border-left($link, $width: px(2));
   position: relative;
   background-color: $light-blue;
 

@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .room-selector {
   .selected-rooms-row {
     padding-top: 0 !important;
 
     .rooms-list {
-      max-height: 140px;
+      max-height: px(140);
       overflow: hidden;
       overflow-y: auto;
 

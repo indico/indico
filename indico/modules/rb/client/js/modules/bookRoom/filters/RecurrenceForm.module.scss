@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .recurrence-every:global(.fields.inline) {
   :global .ui.selection.dropdown {
-    min-width: 100px;
+    min-width: px(100);
   }
 
   :global .field .ui.input input {
-    width: 80px;
+    width: px(80);
   }
 }

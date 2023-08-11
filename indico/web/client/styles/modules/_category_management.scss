@@ -10,7 +10,7 @@
 table.category-management,
 table.event-management {
   margin-top: 0;
-  margin-bottom: 25px;
+  margin-bottom: px(25);
 
   th {
     &.sortable-column {
@@ -58,7 +58,7 @@ table.event-management {
   }
 
   & + .pagination {
-    margin-top: 8px;
+    margin-top: px(8);
     float: right;
   }
 }

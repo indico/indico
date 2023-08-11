@@ -6,15 +6,16 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'base/utilities' as *;
 
 .dropzone {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
-  border-width: 2px;
-  border-radius: 2px;
+  padding: px(10);
+  border-width: px(2);
+  border-radius: px(2);
   border-color: $pastel-gray;
   border-style: dashed;
   background-color: $light-gray;
@@ -27,7 +28,7 @@
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  padding-top: 10px;
+  padding-top: px(10);
 
   .upload-icon {
     background-color: $indico-blue !important;

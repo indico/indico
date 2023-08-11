@@ -13,7 +13,7 @@ div.event-service-association-title {
 
   span.event-service-association-subtitle {
     color: #bbb;
-    font-size: 17px;
+    font-size: px(17);
     margin-left: 0.5em;
   }
 }
@@ -22,8 +22,8 @@ div.event-service-association-title {
   align-self: center;
 
   .event-service-row {
-    border-radius: 2px;
-    border: 1px solid $pastel-blue;
+    border-radius: px(2);
+    border: px(1) solid $pastel-blue;
     background-color: $light-gray;
   }
 }
@@ -33,9 +33,9 @@ div.event-service-association-title {
 }
 
 div.event-service-row {
-  border: 1px solid $pastel-gray;
+  border: px(1) solid $pastel-gray;
   background-color: $light-gray;
-  box-shadow: 0 2px 1px -1px $pastel-gray;
+  box-shadow: 0 px(2) px(1) px(-1) $pastel-gray;
   padding: 0.3em 0.6em;
   margin-bottom: 0.5em;
   position: relative;
@@ -43,7 +43,7 @@ div.event-service-row {
   &.info {
     background-color: $light-blue;
     border-color: $pastel-blue;
-    box-shadow: 0 2px 1px -1px $pastel-blue;
+    box-shadow: 0 px(2) px(1) px(-1) $pastel-blue;
   }
 
   & > .event-service-row-collapsed {
@@ -106,7 +106,7 @@ div.event-service-row {
       }
 
       & > dd {
-        margin-left: 100px;
+        margin-left: px(100);
         display: block;
       }
 
@@ -159,7 +159,7 @@ div.event-service-row {
     }
 
     & > dd {
-      margin-left: 100px;
+      margin-left: px(100);
       display: block;
     }
 

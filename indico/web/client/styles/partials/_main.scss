@@ -17,7 +17,7 @@
   height: 3em;
   line-height: 3em;
 
-  padding: 0 0 0 20px;
+  padding: 0 0 0 px(20);
   background: $black;
   border: none;
   margin-bottom: 0;
@@ -30,7 +30,7 @@
     line-height: 3em;
 
     color: white;
-    padding: 0 20px;
+    padding: 0 px(20);
 
     &:first-child,
     &.arrow:last-of-type {
@@ -60,9 +60,9 @@ div.page-header {
   width: 100%;
 
   img.header-logo {
-    margin: 17px 0 10px 40px;
+    margin: px(17) 0 px(10) px(40);
     border: none;
-    height: 60px;
+    height: px(60);
   }
 }
 
@@ -141,8 +141,8 @@ div.main-breadcrumb {
   @include font-family-title();
 
   background-color: darken($light-gray, 5%);
-  border-bottom: 1px solid $gray;
-  padding: 0.6em 0 0.6em 40px;
+  border-bottom: px(1) solid $gray;
+  padding: 0.6em 0 0.6em px(40);
 
   &.management {
     background-color: #fff;
@@ -156,7 +156,7 @@ div.main-breadcrumb {
 
     .item {
       color: $light-black;
-      font-size: 12px;
+      font-size: px(12);
     }
 
     a.item:hover {
@@ -202,7 +202,7 @@ div.session-bar {
     box-shadow: none;
     right: 0;
     margin-top: 0;
-    padding: 0 0 5px 5px;
+    padding: 0 0 px(5) px(5);
     z-index: 999;
   }
 }
@@ -239,7 +239,7 @@ div.impersonation-header {
       color: lighten($yellow, 30%);
       margin: 0.1em;
       line-height: 1em;
-      max-width: 200px;
+      max-width: px(200);
     }
 
     &::before {
@@ -253,7 +253,7 @@ div.impersonation-header {
   .undo-login-as {
     color: inherit;
     float: right;
-    margin-right: 2px;
+    margin-right: px(2);
     vertical-align: middle;
     font-size: 1.5em;
     line-height: 1em;

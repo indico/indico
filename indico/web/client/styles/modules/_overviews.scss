@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 $result-group-padding: 1rem;
 $result-group-header-padding: 0.55rem;
@@ -70,7 +71,7 @@ $result-group-header-padding: 0.55rem;
       @include result-group();
 
       td .title {
-        border-bottom: 1px dotted $gray;
+        border-bottom: px(1) dotted $gray;
         color: $dark-gray;
         margin-bottom: -$result-group-header-padding;
         padding-bottom: $result-group-header-padding;

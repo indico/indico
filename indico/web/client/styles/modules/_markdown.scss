@@ -49,7 +49,7 @@ $display-preview-bg-color: white;
 
   blockquote {
     font-style: italic;
-    border-left: 2px solid darken($blockquote-color, 10%);
+    border-left: px(2) solid darken($blockquote-color, 10%);
     padding: 0.2em 0.2em 0.2em 1em;
     margin-left: 0;
     background-color: darken($blockquote-color, 5%);
@@ -57,7 +57,7 @@ $display-preview-bg-color: white;
   }
 }
 
-@mixin md-preview-wrapper-mixin($background-color, $max-height: 500px) {
+@mixin md-preview-wrapper-mixin($background-color, $max-height: px(500)) {
   @include md-display-rules($background-color);
   @include transition(height 0.25s ease-out, background-color 1s ease-in, color 1s ease-in);
   @include border-all();
@@ -83,7 +83,7 @@ $display-preview-bg-color: white;
     font-size: 1em;
 
     .instructions {
-      padding: 10px;
+      padding: px(10);
       display: block;
     }
 
@@ -97,7 +97,7 @@ $display-preview-bg-color: white;
   }
 
   .wmd-preview {
-    padding: 10px;
+    padding: px(10);
 
     p {
       white-space: pre-line;
@@ -117,9 +117,9 @@ $display-preview-bg-color: white;
   box-shadow: none;
   @include border-all($width: 0);
 
-  min-height: 200px;
+  min-height: px(200);
   width: 100%;
-  max-width: 800px;
+  max-width: px(800);
   padding: 1em;
   font-size: 0.9em;
 
@@ -134,7 +134,7 @@ $display-preview-bg-color: white;
   border-top-left-radius: $default-border-radius;
   box-shadow: none;
   position: relative;
-  max-width: 800px;
+  max-width: px(800);
 
   &.focused {
     @include transition(border);
@@ -143,7 +143,7 @@ $display-preview-bg-color: white;
 }
 
 .wmd-button-row {
-  max-width: 800px;
+  max-width: px(800);
   position: relative;
   padding: 0.5em;
   height: 2em;
@@ -155,7 +155,7 @@ $display-preview-bg-color: white;
 }
 
 .wmd-spacer {
-  width: 1px;
+  width: px(1);
   height: 1em;
   margin: 0 1em 0 1em;
   display: inline-block;
@@ -170,13 +170,13 @@ $display-preview-bg-color: white;
   .save-button {
     @include transition(opacity);
     @include transition(background-color);
-    @include single-box-shadow(0, 0, 1px, 1px, #fff);
+    @include single-box-shadow(0, 0, px(1), px(1), #fff);
     position: absolute;
-    right: 50px;
+    right: px(50);
     display: inline-block;
     color: white;
     z-index: 1;
-    top: 8px;
+    top: px(8);
     opacity: 0;
     visibility: hidden;
 
@@ -279,7 +279,7 @@ $display-preview-bg-color: white;
 }
 
 .wmd-prompt-dialog {
-  border: 1px solid #999;
+  border: px(1) solid #999;
   background-color: #f5f5f5;
 }
 
@@ -289,24 +289,24 @@ $display-preview-bg-color: white;
 }
 
 .wmd-prompt-dialog > form > input[type='text'] {
-  border: 1px solid #999;
+  border: px(1) solid #999;
   color: black;
 }
 
 .wmd-prompt-dialog > form > input[type='button'] {
-  border: 1px solid #888;
+  border: px(1) solid #888;
   font-family: trebuchet MS, helvetica, sans-serif;
   font-size: 0.8em;
   font-weight: bold;
 }
 
 .md-preview-wrapper.edit {
-  max-width: 800px;
+  max-width: px(800);
   @include md-preview-wrapper-mixin($editor-preview-bg-color);
 }
 
 .markdown-help-qtip {
-  max-width: 500px;
+  max-width: px(500);
 }
 
 .max-length-info {

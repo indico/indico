@@ -6,23 +6,24 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .profile-picture-selection {
-  margin: 15px 10px;
+  margin: px(15) px(10);
 
   :global(.ui.cards) {
     text-align: center;
 
     :global(.description) {
-      height: 160px;
-      margin: 0 8px;
+      height: px(160);
+      margin: 0 px(8);
       color: rgb(85, 85, 85);
     }
 
     :global(.ui.image) {
-      margin: 15px auto;
-      height: 80px;
-      width: 80px;
+      margin: px(15) auto;
+      height: px(80);
+      width: px(80);
       object-fit: cover;
     }
 
@@ -32,14 +33,14 @@
     }
 
     .placeholder {
-      font-size: 80px;
-      margin: 15px auto;
+      font-size: px(80);
+      margin: px(15) auto;
       display: table;
       color: $pastel-gray;
     }
   }
 
   :global(.ui.form .field) {
-    margin-top: 15px;
+    margin-top: px(15);
   }
 }

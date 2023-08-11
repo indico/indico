@@ -43,7 +43,7 @@
 }
 
 .revision-file-row {
-  @include border-left($width: 3px);
+  @include border-left($width: px(3));
 
   &:hover {
     border-color: $blue;
@@ -63,7 +63,7 @@
     .label {
       @include ellipsis();
 
-      line-height: 15px;
+      line-height: px(15);
       vertical-align: middle;
     }
 
@@ -117,19 +117,19 @@
 }
 
 #subcontribution-list {
-  width: 600px;
+  width: px(600);
 
   table {
     td.subcontribution-title {
       @include ellipsis();
 
-      max-width: 150px;
+      max-width: px(150);
     }
   }
 }
 
 .qbubble-contrib-start-date {
-  max-width: 450px !important;
+  max-width: px(450) !important;
 
   .datetime-widget {
     width: 100% !important;
@@ -141,7 +141,7 @@
 }
 
 .qbubble-contrib-duration {
-  max-width: 420px !important;
+  max-width: px(420) !important;
 
   .qtip-content {
     overflow: visible;
@@ -149,7 +149,7 @@
 }
 
 #contributions-fixed-fields {
-  margin-bottom: 5px;
+  margin-bottom: px(5);
 }
 
 #display-contribution-list {

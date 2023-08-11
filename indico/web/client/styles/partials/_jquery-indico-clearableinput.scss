@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .clearableinput {
   display: flex;
   align-items: center;
@@ -20,12 +22,12 @@
 
   .button-box {
     position: absolute;
-    padding: 0 2px;
+    padding: 0 px(2);
     right: 0;
     height: 1.1em;
 
     a.i-link {
-      padding-left: 2px;
+      padding-left: px(2);
       visibility: hidden;
 
       &::before {
@@ -33,7 +35,7 @@
       }
 
       &:last-child {
-        padding-right: 2px;
+        padding-right: px(2);
       }
     }
   }

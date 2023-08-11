@@ -7,10 +7,11 @@
 
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 .filter-dropdown {
   .filter-dropdown-actions {
-    margin-top: 15px;
+    margin-top: px(15);
   }
 }
 
@@ -55,5 +56,5 @@
 }
 
 .filter-dropdown-footer:global(.ui.buttons) {
-  margin-top: 10px;
+  margin-top: px(10);
 }

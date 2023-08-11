@@ -23,7 +23,7 @@
   color: $black;
   font-family: inherit;
   outline: none;
-  padding: 0 4px;
+  padding: 0 px(4);
 
   &:focus {
     @include border-all($blue);
@@ -99,8 +99,8 @@ input[type='time'] {
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {
     cursor: pointer;
-    margin-left: 4px;
-    padding-top: 1px;
+    margin-left: px(4);
+    padding-top: px(1);
     position: relative;
   }
 }
@@ -187,11 +187,11 @@ ul {
 .checkbox-with-text {
   input[type='checkbox'] {
     float: left;
-    margin-left: 1px;
+    margin-left: px(1);
   }
 
   div {
-    margin-left: 21px;
+    margin-left: px(21);
   }
 }
 
@@ -258,8 +258,8 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
   .rc-time-picker-panel-input-wrap {
     // make sure time does not jump when opening the time picker
-    padding-left: calc(1em - 1px);
-    padding-top: calc(0.5em + 1px);
+    padding-left: calc(1em - #{px(1)});
+    padding-top: calc(0.5em + #{px(1)});
   }
 
   .rc-time-picker-panel-input,
@@ -274,7 +274,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 
   .SingleDatePicker {
-    width: 170px;
+    width: px(170);
   }
 
   .DayPicker_weekHeader_ul {
@@ -290,16 +290,16 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     @include icon-before('icon-earth');
     color: $light-black;
     position: relative;
-    left: 15px;
-    top: 2px;
+    left: px(15);
+    top: px(2);
   }
 
   .clear-pickers {
     @include icon-before('icon-cross');
     font-size: 1.3em;
     position: relative;
-    left: 20px;
-    top: 4px;
+    left: px(20);
+    top: px(4);
 
     &:hover {
       color: $red;
@@ -317,7 +317,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   .date-widget {
     input[type='text'] {
       font-size: 1em;
-      width: 150px;
+      width: px(150);
     }
   }
 }
@@ -333,7 +333,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   input {
     flex-shrink: 0;
     flex-grow: 0;
-    margin-top: 2px;
+    margin-top: px(2);
   }
 
   label {
@@ -342,7 +342,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 
   i.icon-padding {
-    padding-left: 5px;
+    padding-left: px(5);
   }
 
   span.checkbox-label {
@@ -355,9 +355,9 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   background: repeating-linear-gradient(
     -40deg,
     lighten($gray, 0.7 * $color-variation),
-    lighten($gray, 0.7 * $color-variation) 10px,
-    lighten($gray, 0.9 * $color-variation) 10px,
-    lighten($gray, 0.9 * $color-variation) 20px
+    lighten($gray, 0.7 * $color-variation) px(10),
+    lighten($gray, 0.9 * $color-variation) px(10),
+    lighten($gray, 0.9 * $color-variation) px(20)
   ) !important;
   font-style: italic;
   color: $light-black !important;
@@ -414,7 +414,7 @@ dd > .i-has-action {
   }
 
   > input {
-    width: 110px;
+    width: px(110);
   }
 }
 

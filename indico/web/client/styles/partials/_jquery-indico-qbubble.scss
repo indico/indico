@@ -17,7 +17,7 @@
   color: $light-black;
 
   .qtip-content {
-    padding: 5px;
+    padding: px(5);
     text-align: left;
   }
 
@@ -25,8 +25,8 @@
     @include transition(background);
     cursor: pointer;
     display: block;
-    margin: 0 -5px;
-    padding: 5px 10px;
+    margin: 0 px(-5);
+    padding: px(5) px(10);
 
     &:hover {
       color: $black;
@@ -35,8 +35,8 @@
   }
 
   .titled-rule {
-    margin-bottom: 5px;
-    margin-top: 5px;
+    margin-bottom: px(5);
+    margin-top: px(5);
   }
 
   &.no-max-width {

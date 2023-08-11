@@ -26,20 +26,20 @@
     color: $light-black;
 
     &::before {
-      margin-right: 5px;
+      margin-right: px(5);
       color: $dark-gray;
     }
   }
 }
 
 #assign-role-table {
-  min-width: 500px;
-  margin-bottom: 15px;
+  min-width: px(500);
+  margin-bottom: px(15);
 
   .i-tag {
     display: inline-block;
     background-color: $pastel-blue;
-    margin-right: 5px;
+    margin-right: px(5);
     font-weight: normal;
     color: $light-black;
     border-width: 0;
@@ -77,8 +77,8 @@
   @include font-family-modern-body();
 
   .contribution-row {
-    @include border-left($width: 3px);
-    padding-left: 10px;
+    @include border-left($width: px(3));
+    padding-left: px(10);
     margin-bottom: 1em;
 
     &:hover {
@@ -92,12 +92,12 @@
 
     .submitter {
       color: $light-black;
-      margin-top: 7px;
+      margin-top: px(7);
     }
 
     .submission-link {
       color: inherit;
-      margin-left: -3px;
+      margin-left: px(-3);
     }
 
     .align-icon::before {
@@ -122,7 +122,7 @@
 
   .cfp-announcement {
     color: $light-black;
-    padding: 20px 0 10px;
+    padding: px(20) 0 px(10);
   }
 
   .template-list {
@@ -137,8 +137,8 @@
 }
 
 #select-contribution-dialog {
-  min-width: 500px;
-  padding: 0 20px;
+  min-width: px(500);
+  padding: 0 px(20);
 
   ul {
     list-style-type: none;
@@ -147,28 +147,28 @@
 
   ul li {
     @include border-bottom($light-gray);
-    padding-bottom: 3px;
-    margin-bottom: 10px;
+    padding-bottom: px(3);
+    margin-bottom: px(10);
     font-size: 1.1em;
   }
 
   .contrib-list {
-    max-height: 600px;
+    max-height: px(600);
     overflow-y: auto;
-    margin-bottom: 15px;
+    margin-bottom: px(15);
   }
 }
 
 .deadline-info {
   @include border-all($blue);
   background: $light-blue;
-  padding: 10px;
+  padding: px(10);
 
   .label {
     font-size: 11pt;
     font-weight: bold;
     color: $blue;
-    margin-bottom: 5px;
+    margin-bottom: px(5);
   }
 
   .text {
@@ -184,14 +184,14 @@
   }
 
   span {
-    margin-right: 5px;
+    margin-right: px(5);
   }
 }
 
 .paper-content {
   .paper-file {
     background-color: $light-gray !important;
-    border-bottom: 1px solid $pastel-gray !important;
+    border-bottom: px(1) solid $pastel-gray !important;
   }
 
   .spotlight-file {
@@ -210,7 +210,7 @@
 
     &::before {
       font-size: 2em;
-      margin-right: 5px;
+      margin-right: px(5);
     }
   }
 
@@ -219,17 +219,17 @@
   }
 
   .paper-files {
-    margin: 0 0 0 10px;
+    margin: 0 0 0 px(10);
     padding: 0;
     list-style-type: none;
-    margin-bottom: -5px; // In order to remove the margin of the last list items row
+    margin-bottom: px(-5); // In order to remove the margin of the last list items row
 
     li {
-      margin-right: 5px;
+      margin-right: px(5);
 
       a {
-        max-width: 150px;
-        margin-bottom: 5px;
+        max-width: px(150);
+        margin-bottom: px(5);
       }
     }
   }
@@ -246,12 +246,12 @@
 .paper-metadata {
   align-self: flex-end;
   color: $gray;
-  margin-top: 10px;
+  margin-top: px(10);
 
   .paper-metadata-dt {
-    border-bottom: 1px dotted $gray;
+    border-bottom: px(1) dotted $gray;
     color: $gray;
-    margin: 0 3px;
+    margin: 0 px(3);
 
     &:hover {
       color: $light-black;
@@ -260,5 +260,5 @@
 }
 
 .paper-timeline {
-  min-height: 500px;
+  min-height: px(500);
 }

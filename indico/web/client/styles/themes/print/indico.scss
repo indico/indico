@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 $header-bg-color: white;
 $header-icon-color: black;
@@ -84,11 +85,11 @@ body {
 
 .meeting-timetable {
   @include no-shadow();
-  border: 1px solid $gray;
+  border: px(1) solid $gray;
 
   .start-time {
     @include no-shadow();
-    border: 1px solid $gray;
+    border: px(1) solid $gray;
 
     &::before {
       display: none !important;

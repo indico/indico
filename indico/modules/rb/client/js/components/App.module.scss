@@ -8,6 +8,7 @@
 @use 'rb:styles/util' as *;
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 .rb-layout {
   // this will reset the stacking context,
@@ -18,7 +19,7 @@
 
 .rb-menu-bar {
   background-color: $highlight-color;
-  padding: 0 20px;
+  padding: 0 px(20);
   margin: 0;
   height: $menu-height;
   line-height: $menu-height;
@@ -93,13 +94,13 @@
 
 .rb-pushable {
   // make sure that side bar takes the whole remaining height of the page
-  min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
+  min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * #{px(50)} - #{px(50)});
   // unset `transform` which breaks the Sticky filter bar and set `position` here
   // so that rb-pusher positions itself correctly
   transform: unset !important;
   position: relative;
 
   .rb-pusher:global(.pusher) {
-    min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
+    min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * #{px(50)} - #{px(50)});
   }
 }

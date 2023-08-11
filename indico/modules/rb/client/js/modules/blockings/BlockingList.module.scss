@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 .blockings-container {
   padding: 2em;
@@ -15,10 +16,10 @@
 
   .blockings-list,
   :global(.blockings-placeholders) {
-    margin: 10px 0 0 -5px;
+    margin: px(10) 0 0 px(-5);
   }
 
   :global(.ui.stuck-container) + .blockings-list {
-    padding-top: 60px;
+    padding-top: px(60);
   }
 }

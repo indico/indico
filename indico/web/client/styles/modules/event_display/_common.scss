@@ -53,14 +53,14 @@
 }
 
 .event-message {
-  margin: 20px auto 5px auto;
-  width: 1000px !important;
+  margin: px(20) auto px(5) auto;
+  width: px(1000) !important;
   box-sizing: border-box;
   line-height: initial;
 }
 
 .search-box {
-  width: 250px;
+  width: px(250);
 }
 
 .event-page-header {
@@ -70,8 +70,8 @@
   }
 
   .main-action-bar {
-    height: 50px;
-    min-height: 50px;
+    height: px(50);
+    min-height: px(50);
   }
 
   .button-bar {
@@ -87,9 +87,9 @@
     }
 
     .separator {
-      margin: 10px 5px;
-      width: 1px;
-      border-right: 1px dotted $light-black;
+      margin: px(10) px(5);
+      width: px(1);
+      border-right: px(1) dotted $light-black;
     }
 
     .i-dropdown {
@@ -125,10 +125,10 @@
   }
 
   .event-filters {
-    margin-top: 5px;
-    padding: 10px 10px 10px 75px;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
+    margin-top: px(5);
+    padding: px(10) px(10) px(10) px(75);
+    border-top: px(1) solid black;
+    border-bottom: px(1) solid black;
     background-color: #777;
     display: none;
 
@@ -147,7 +147,7 @@
   li {
     display: inline-block;
     margin: 0.2em 0.2em;
-    border-radius: 2px;
+    border-radius: px(2);
 
     .type-name {
       color: $light-black;

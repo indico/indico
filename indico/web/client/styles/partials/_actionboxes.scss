@@ -13,12 +13,13 @@
 @use 'base/palette' as *;
 @use 'base/borders' as *;
 @use 'base/animation' as *;
+@use 'base/utilities' as *;
 
 @mixin action-box {
   box-sizing: border-box;
   @include default-border-radius();
   margin-bottom: 1rem;
-  padding: 10px;
+  padding: px(10);
   width: 100%;
 
   > .section {
@@ -53,9 +54,9 @@
     }
 
     &:not(:first-child) {
-      margin-top: 5px;
-      padding-top: 5px;
-      border-top: 1px solid $gray;
+      margin-top: px(5);
+      padding-top: px(5);
+      border-top: px(1) solid $gray;
     }
   }
 
@@ -173,13 +174,13 @@
   }
 
   &.draft-mode {
-    max-width: 800px;
+    max-width: px(800);
   }
 
   ul:not(.i-dropdown):not(.ck) {
     margin: 0;
     padding-left: 1.5em;
-    max-height: 100px;
+    max-height: px(100);
     overflow: auto;
   }
 
@@ -188,7 +189,7 @@
   }
 
   &.mid-form {
-    margin-top: 5px;
-    margin-bottom: 6px;
+    margin-top: px(5);
+    margin-bottom: px(6);
   }
 }

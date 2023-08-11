@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .ck {
   height: auto;
   width: auto;
@@ -65,9 +67,9 @@
 
   // Nicer quote & code formatting
   blockquote {
-    padding: 5px 8px 5px 30px;
+    padding: px(5) px(8) px(5) px(30);
     background-color: rgba(102, 128, 153, 0.05);
-    border-left: 10px solid #d6dbdf;
+    border-left: px(10) solid #d6dbdf;
   }
 
   pre,

@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .height-full {
   height: 100%;
@@ -40,11 +41,11 @@
 
 .export-option::before,
 .export-option::after {
-  box-shadow: 1px 1px 1px $light-gray;
+  box-shadow: px(1) px(1) px(1) $light-gray;
   background-color: $pastel-gray;
   content: '';
   display: inline-block;
-  height: 1px;
+  height: px(1);
   position: relative;
   vertical-align: middle;
   width: 10%;
@@ -65,8 +66,8 @@
 
 .popup:global(.ui.wide.popup) {
   display: inline-flex;
-  min-width: 350px;
-  max-width: 450px;
+  min-width: px(350);
+  max-width: px(450);
 }
 
 .popup .content {

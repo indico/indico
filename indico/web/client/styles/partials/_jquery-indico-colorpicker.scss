@@ -10,7 +10,7 @@
 @use 'partials/inputs' as *;
 
 .i-color-field {
-  max-width: 400px;
+  max-width: px(400);
 
   .clickable-wrapper {
     float: left;

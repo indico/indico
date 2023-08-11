@@ -5,10 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 @import 'rb:styles/palette';
 
 .booking-time-info {
-  margin-top: 10px;
+  margin-top: px(10);
 }
 
 .occurrences-details {

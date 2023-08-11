@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .room-item {
   .room-item-image {
-    height: 90px !important;
+    height: px(90) !important;
   }
 
   .room-item-header {

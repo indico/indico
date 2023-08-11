@@ -19,7 +19,7 @@
 
       &.venue-container {
         width: 40%;
-        padding-right: 10px;
+        padding-right: px(10);
       }
 
       &.room-container {
@@ -50,7 +50,7 @@
           }
 
           &.empty {
-            border-width: 0 0 1px 0;
+            border-width: 0 0 px(1) 0;
             border-style: solid;
             border-color: $gray;
 
@@ -64,7 +64,7 @@
           display: none;
           background-color: white;
           text-align: center;
-          border-width: 0 1px 1px 1px;
+          border-width: 0 px(1) px(1) px(1);
           border-style: solid;
           border-color: $gray;
           font-style: italic;
@@ -75,7 +75,7 @@
           }
 
           a {
-            padding: 6px 20px;
+            padding: px(6) px(20);
             display: block;
             color: $black;
           }
@@ -108,8 +108,8 @@
       }
 
       &:focus {
-        box-shadow: 0 0 5px $blue;
-        @include border-all($color: $blue !important, $width: 1px);
+        box-shadow: 0 0 px(5) $blue;
+        @include border-all($color: $blue !important, $width: px(1));
       }
 
       &::-ms-clear {
@@ -146,7 +146,7 @@
 
     .availability-message-container {
       display: none;
-      padding-top: 50px;
+      padding-top: px(50);
 
       .availability-message {
         align-items: center;
@@ -235,7 +235,7 @@
 
   display: none !important;
   background-color: $pastel-blue;
-  padding: 2px;
+  padding: px(2);
   position: absolute;
   top: 0.6em;
   left: 0.95em;

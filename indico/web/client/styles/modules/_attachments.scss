@@ -18,7 +18,7 @@
 
   font-size: 0.8rem;
 
-  width: 1px;
+  width: px(1);
 
   white-space: nowrap;
 }
@@ -34,7 +34,7 @@
 }
 
 .attachment-editor {
-  width: 800px;
+  width: px(800);
 }
 
 .dialog-window .attachments-container {
@@ -56,7 +56,7 @@
       &:first-child {
         @include ellipsis();
 
-        max-width: 1px;
+        max-width: px(1);
 
         &::before {
           display: inline-block;
@@ -186,8 +186,8 @@
 
       > td {
         &:first-child {
-          border-top-left-radius: 2px;
-          border-bottom-left-radius: 2px;
+          border-top-left-radius: px(2);
+          border-bottom-left-radius: px(2);
 
           font-weight: bold;
 
@@ -205,7 +205,7 @@
         }
 
         &:last-child {
-          border-top-right-radius: 2px;
+          border-top-right-radius: px(2);
         }
       }
 
@@ -224,7 +224,7 @@
       }
 
       > div > .tree {
-        border-radius: 2px;
+        border-radius: px(2);
 
         background-color: $light-gray;
 
@@ -243,7 +243,7 @@
 }
 
 @mixin protected-colors {
-  border-bottom: 2px solid $red;
+  border-bottom: px(2) solid $red;
 
   &:hover::before {
     color: $red !important;
@@ -279,7 +279,7 @@
 }
 
 .attachments-box {
-  padding: 5px;
+  padding: px(5);
 
   > .attachments-box-header {
     > * {
@@ -309,11 +309,11 @@
 }
 
 .category-sidebar > .attachments-box > .attachments-box-header {
-  margin-top: 20px;
+  margin-top: px(20);
   padding-bottom: 0.2em;
 
-  border-bottom: 1px solid #ebebeb;
-  box-shadow: 0 1px 0 #fafafa;
+  border-bottom: px(1) solid #ebebeb;
+  box-shadow: 0 px(1) 0 #fafafa;
 
   > h2 {
     padding-bottom: 0;
@@ -334,7 +334,7 @@
     margin: 0 !important;
   }
   padding-bottom: 0.5em;
-  border-bottom: 1px solid darken($light-gray, 10%);
+  border-bottom: px(1) solid darken($light-gray, 10%);
 }
 
 .inline-attachments-icon {
@@ -354,7 +354,7 @@
   .folder .attachment {
     @include ellipsis();
 
-    max-width: 150px;
+    max-width: px(150);
     padding-left: 0.2em !important;
 
     .title {
@@ -402,7 +402,7 @@
       padding: 0.1em 0.2em !important;
 
       .attachment {
-        max-width: 250px;
+        max-width: px(250);
 
         &.is-protected {
           color: $red;
@@ -414,7 +414,7 @@
 
 .folder-main,
 div.main > .attachments-package {
-  max-width: 1024px;
+  max-width: px(1024);
   margin: auto;
   margin-top: 2em;
   padding: 2em;
@@ -428,7 +428,7 @@ div.main > .attachments-package {
   width: 100%;
   background-color: $black;
   color: white;
-  padding: 10px;
+  padding: px(10);
   z-index: 10;
   box-sizing: border-box;
   align-items: center;
@@ -473,7 +473,7 @@ div.main > .attachments-package {
       height: auto;
       width: 100%;
       position: absolute;
-      top: 50px;
+      top: px(50);
       bottom: 0;
 
       .attachment-preview-content {
@@ -495,7 +495,7 @@ div.main > .attachments-package {
           left: 0;
           right: 0;
           height: 100%;
-          width: 900px;
+          width: px(900);
         }
 
         > .text-preview-content {
@@ -529,7 +529,7 @@ div.main > .attachments-package {
 }
 
 form#attachment-upload-form.full-width .dropzone {
-  width: 770px;
+  width: px(770);
 
   .select-files-btn,
   .dropzone-previews {

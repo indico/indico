@@ -8,12 +8,13 @@
 @use 'base/palette' as *;
 @use 'base/defaults' as *;
 @use 'base/borders' as *;
+@use 'base/utilities' as *;
 
 .event-info-header {
   color: white;
   text-align: left;
-  border-top: 3px solid #234173;
-  border-bottom: 1px solid #0f4c80;
+  border-top: px(3) solid #234173;
+  border-bottom: px(1) solid #0f4c80;
   background: #1a64a0;
 }
 
@@ -37,7 +38,7 @@
 .week-timetable {
   font-family: helvetica, verdana, sans-serif;
   font-size: 8pt;
-  line-height: 18px;
+  line-height: px(18);
 }
 
 .week-timetable + .week-timetable {
@@ -56,12 +57,12 @@
   float: left;
   width: 13.95%;
   display: inline-block;
-  border: 1px #bbb solid;
+  border: px(1) #bbb solid;
   background: #fff;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   border-radius: 0.2em;
-  box-shadow: 1px 1px 1px #e1e1e1;
+  box-shadow: px(1) px(1) px(1) #e1e1e1;
 }
 
 .week-timetable > ul > li.spacer {
@@ -78,9 +79,9 @@
 }
 
 .week-timetable .row {
-  height: 18px;
+  height: px(18);
   position: relative;
-  border-top: solid 1px #f9f9f9;
+  border-top: solid px(1) #f9f9f9;
   box-sizing: border-box;
 }
 
@@ -93,15 +94,15 @@
   color: #1756b5;
   text-align: center;
   font-weight: bold;
-  border-bottom: 1px solid #bbb;
+  border-bottom: px(1) solid #bbb;
 }
 
 .week-timetable .row.placeholder {
-  border-top: 1px solid #f9f9f9;
+  border-top: px(1) solid #f9f9f9;
 }
 
 .week-timetable .row.placeholder + .placeholder {
-  border-top: 1px dashed #ddd;
+  border-top: px(1) dashed #ddd;
 }
 
 .week-timetable .row.day-header + .row {
@@ -129,7 +130,7 @@
   background: rgba(0, 0, 0, 0.3);
   color: white;
   font-weight: bold;
-  width: 35px;
+  width: px(35);
   height: 100%;
   display: inline-block;
   text-align: center;
@@ -140,14 +141,14 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 35px;
+  width: px(35);
   margin: auto 0;
   color: #ccc;
 }
 
 .week-timetable .row .main {
   position: absolute;
-  padding-left: 40px;
+  padding-left: px(40);
   width: 100%;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -155,11 +156,11 @@
 
 .week-timetable .row.has-session .main,
 .week-timetable .row.has-multi .main {
-  padding-right: 19px;
+  padding-right: px(19);
 }
 
 .week-timetable .row.has-session.has-multi .main {
-  padding-right: 29px;
+  padding-right: px(29);
 }
 
 .week-timetable .row .more-contribs {
@@ -167,11 +168,11 @@
   position: absolute;
   right: 0;
   display: inline-block;
-  padding: 1px 5px 0 5px;
+  padding: px(1) px(5) 0 px(5);
 }
 
 .week-timetable .row .session-mark + .more-contribs {
-  margin-right: 18px;
+  margin-right: px(18);
 }
 
 .week-timetable .row .session-mark {
@@ -179,8 +180,8 @@
   position: absolute;
   right: 0;
   display: inline-block;
-  margin: 1px 2px 0 0;
-  text-shadow: -1px 0 #ccc, 0 1px #ccc, 1px 0 #ccc, 0 -1px #ccc;
+  margin: px(1) px(2) 0 0;
+  text-shadow: px(-1) 0 #ccc, 0 px(1) #ccc, px(1) 0 #ccc, 0 px(-1) #ccc;
 }
 
 .week-anchor {
@@ -189,7 +190,7 @@
 
 .qtip-content {
   display: inline-block;
-  padding: 10px;
+  padding: px(10);
   box-sizing: border-box;
 
   span {
@@ -231,7 +232,7 @@
 
       .time {
         height: 100%;
-        margin-right: 5px;
+        margin-right: px(5);
       }
 
       .title {

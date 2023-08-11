@@ -6,11 +6,14 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'base/utilities' as *;
 
 .sidebar:global(.inverted.menu) {
   background-color: darken($primary-color, 10%);
-  top: calc(125px + var(--extra-bars, 0) * 50px - var(--offset, 0) * 1px);
-  height: calc(100% - 125px - var(--extra-bars, 0) * 50px + var(--offset, 0) * 1px) !important;
+  top: calc(px(125) + var(--extra-bars, 0) * #{px(50)} - var(--offset, 0) * #{px(1)});
+  height: calc(
+    100% - px(125) - var(--extra-bars, 0) * #{px(50)} + var(--offset, 0) * #{px(1)}
+  ) !important;
   position: fixed !important;
 
   .bottom-align {

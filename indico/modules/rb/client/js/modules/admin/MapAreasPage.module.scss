@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/util' as *;
+@use 'base/utilities' as *;
 
 .areas-map-container {
   :global(.leaflet-container) {
-    height: 1000px;
-    font-size: 14px;
+    height: px(1000);
+    font-size: px(14);
   }
 
   :global(.leaflet-draw-section) {
@@ -20,7 +21,7 @@
 }
 
 :global(.area-default) {
-  margin-left: 5px;
+  margin-left: px(5);
   font-weight: bold;
 }
 

@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .file-types-container {
-  max-width: 300px !important;
+  max-width: px(300) !important;
 
   .filetype-segment {
     .filetype-header {

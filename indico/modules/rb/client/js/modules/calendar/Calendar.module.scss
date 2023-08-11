@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 :global(.ui.grid > .row).row {
   display: block;
@@ -16,7 +17,7 @@
   justify-content: space-between;
 
   > :not(:first-child) {
-    margin-bottom: 10px;
+    margin-bottom: px(10);
   }
 
   .view-switch {

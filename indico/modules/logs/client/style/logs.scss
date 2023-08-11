@@ -42,7 +42,7 @@
   position: absolute;
   font-size: 5em;
   left: 45%;
-  top: 250px;
+  top: px(250);
 }
 
 .event-log-list {
@@ -103,7 +103,7 @@
     display: flex;
     align-items: center;
     width: 100%;
-    border-bottom: 1px solid $pastel-gray;
+    border-bottom: px(1) solid $pastel-gray;
 
     .log-module {
       @extend .flexrow;
@@ -122,8 +122,8 @@
           line-height: 1em;
           font-size: 0.7em;
           position: absolute;
-          right: 3px;
-          top: 1px;
+          right: px(3);
+          top: px(1);
         }
       }
     }
@@ -149,8 +149,8 @@
 
       .user-picture {
         opacity: 0.8;
-        width: 25px;
-        height: 25px;
+        width: px(25);
+        height: px(25);
         border-radius: 50%;
       }
 
@@ -176,7 +176,7 @@ table.log-modal-details {
   margin: 0;
 
   td.log-caption {
-    width: 200px;
+    width: px(200);
   }
 
   td.email-body .html {

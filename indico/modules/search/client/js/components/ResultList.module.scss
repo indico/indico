@@ -6,20 +6,21 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .item {
   padding: 1em 0;
   margin-bottom: 0.3em;
 
   .header {
-    font-size: 18px;
+    font-size: px(18);
     line-height: 1.2;
   }
 
   .description {
     padding-top: 0.7em;
     margin-bottom: 0 !important; // `.conference-page .description` sets 1em
-    font-size: 13px;
+    font-size: px(13);
     font-style: italic;
     color: $black;
 

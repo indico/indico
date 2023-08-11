@@ -10,9 +10,9 @@
 #abstract-notification-log {
   $padding: 0.25rem;
 
-  width: 800px;
-  min-height: 400px;
-  max-height: 400px;
+  width: px(800);
+  min-height: px(400);
+  max-height: px(400);
   overflow-y: auto;
 
   .log-entry {
@@ -48,14 +48,14 @@
 
     &:hover,
     &.open {
-      @include inner-border-left($gray, $width: 2px);
+      @include inner-border-left($gray, $width: px(2));
       background-color: $light-gray;
       background-origin: border-box;
     }
   }
 
   .log-entry .content {
-    @include inner-border-left($gray, $width: 2px);
+    @include inner-border-left($gray, $width: px(2));
     display: none;
     margin-left: -$padding;
     margin-top: $padding * 2;

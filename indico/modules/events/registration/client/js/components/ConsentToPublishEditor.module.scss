@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .consent-dropdown-container {
   display: flex;
   gap: 0.5em;
   align-items: center;
 
   :global(.ui.dropdown) {
-    margin-top: 5px;
+    margin-top: px(5);
   }
 }

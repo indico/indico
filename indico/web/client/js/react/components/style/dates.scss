@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .ui.form input[type='text'].DateInput_input {
   border: none;
   text-align: center;
@@ -20,7 +22,7 @@
 }
 
 .CalendarMonth_caption {
-  padding-bottom: 42px !important;
+  padding-bottom: px(42) !important;
 }
 
 .DateRangePicker_picker,

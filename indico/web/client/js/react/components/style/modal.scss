@@ -6,10 +6,11 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 $max-modal-height: 70vh;
-$modal-header-height: 60px;
-$modal-footer-height: 60px;
+$modal-header-height: px(60);
+$modal-footer-height: px(60);
 
 .modal-dialog {
   position: fixed;
@@ -20,7 +21,7 @@ $modal-footer-height: 60px;
   outline: none;
   padding: 0;
   width: 80%;
-  max-width: 900px;
+  max-width: px(900);
   max-height: $max-modal-height;
 
   .modal-overflow-container {
@@ -41,7 +42,7 @@ $modal-footer-height: 60px;
     .modal-dialog-header {
       box-sizing: border-box;
       background-color: $light-gray;
-      border-bottom: 1px solid darken($light-gray, 5%);
+      border-bottom: px(1) solid darken($light-gray, 5%);
       padding: 1em;
       height: $modal-header-height;
       width: 100%;
@@ -60,7 +61,7 @@ $modal-footer-height: 60px;
   %modal-dialog-footer {
     box-sizing: border-box;
     background-color: $light-gray;
-    border-top: 1px solid darken($light-gray, 5%);
+    border-top: px(1) solid darken($light-gray, 5%);
     padding: 1em;
     height: $modal-footer-height;
     width: 100%;

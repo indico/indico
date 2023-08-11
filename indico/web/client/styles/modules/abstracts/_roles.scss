@@ -16,9 +16,9 @@
 }
 
 .abstract-role-widget {
-  padding-right: 20px;
-  max-height: 700px;
-  width: 800px;
+  padding-right: px(20);
+  max-height: px(700);
+  width: px(800);
   overflow-y: auto;
 }
 
@@ -27,7 +27,7 @@
   padding-left: 0;
 
   li.i-box {
-    margin: 20px 0;
+    margin: px(20) 0;
     display: block;
 
     &:first-child {
@@ -72,9 +72,9 @@
   }
 
   .reviewer-container {
-    margin: 0 -10px;
-    padding-left: 10px;
-    padding-right: 10px;
+    margin: 0 px(-10);
+    padding-left: px(10);
+    padding-right: px(10);
 
     &:not(:first-child) {
       @include border-top();

@@ -38,7 +38,7 @@ form {
 }
 
 .i-form-field-fixed-width {
-  width: 400px;
+  width: px(400);
 }
 
 .i-form-field-fluid {
@@ -48,7 +48,7 @@ form {
 .i-form {
   @include font-family-form();
   box-sizing: border-box;
-  max-width: 800px;
+  max-width: px(800);
   display: block;
   font-size: 1em;
   color: $light-black;
@@ -61,9 +61,9 @@ form {
   }
 
   &.management-area {
-    box-shadow: 0 2px 1px -1px $pastel-gray;
+    box-shadow: 0 px(2) px(1) px(-1) $pastel-gray;
     padding-top: 1em;
-    border: 1px solid $pastel-gray;
+    border: px(1) solid $pastel-gray;
     background-color: $light-gray;
   }
 
@@ -138,7 +138,7 @@ form {
       padding: 0.5em 0.5em 0 0;
       line-height: $i-form-line-height;
       color: $black;
-      width: 400px;
+      width: px(400);
 
       .form-field-description {
         font-style: italic;
@@ -188,7 +188,7 @@ form {
   }
 
   &.form-label-empty {
-    height: 1px;
+    height: px(1);
   }
 
   &.form-label-middle {
@@ -201,7 +201,7 @@ form {
 }
 
 .i-form .form-group .form-checkbox-label {
-  bottom: 1px;
+  bottom: px(1);
   display: inline-block;
   margin-left: 0.5em;
   position: relative;
@@ -236,7 +236,7 @@ form {
   }
 
   input[type='number'] {
-    min-width: 80px;
+    min-width: px(80);
   }
 
   input[type='number'],
@@ -266,16 +266,16 @@ form {
 
   .hasDatepicker {
     margin: 0;
-    padding-right: 26px !important;
+    padding-right: px(26) !important;
   }
 
   .ui-datepicker-trigger {
-    right: 24px;
+    right: px(24);
   }
 
   .multi-text-fields {
     max-height: none;
-    max-width: 400px;
+    max-width: px(400);
 
     .handle {
       height: $i-form-height;
@@ -305,7 +305,7 @@ form {
     }
 
     input:focus {
-      border-left: 1px solid $blue;
+      border-left: px(1) solid $blue;
     }
   }
 }
@@ -333,7 +333,7 @@ form {
   legend {
     font-weight: bold;
     font-size: 1.3em;
-    border-bottom: 1px solid #ebebeb;
+    border-bottom: px(1) solid #ebebeb;
     width: 100%;
     padding-left: 0;
     padding-bottom: 0.5em;
@@ -343,7 +343,7 @@ form {
   p.description {
     margin: 0.2em 0 0 0;
     font-size: 1.1em;
-    padding-left: 2px; // align it with the legend
+    padding-left: px(2); // align it with the legend
     color: $dark-gray;
   }
 
@@ -365,5 +365,5 @@ form {
 }
 
 .i-form .form-field-warning {
-  margin-top: 2px;
+  margin-top: px(2);
 }

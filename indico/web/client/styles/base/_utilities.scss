@@ -7,6 +7,10 @@
 
 @use 'partials/icons' as *;
 
+@function px($length) {
+  @return $length * 1px;
+}
+
 @mixin adjacent-icon {
   font-family: 'icomoon-ultimate';
   font-style: normal;

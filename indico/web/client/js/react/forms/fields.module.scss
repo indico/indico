@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .field-error {
   color: $red !important;
@@ -28,7 +29,7 @@
   legend {
     font-weight: bold;
     font-size: 1.3em;
-    border-bottom: 1px solid $separator-color;
+    border-bottom: px(1) solid $separator-color;
     width: 100%;
     padding-left: 0;
     padding-bottom: 0.5em;

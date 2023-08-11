@@ -5,12 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .trigger-container {
   display: inline-block;
 }
 
 .dropdown-container {
-  padding: 2px;
+  padding: px(2);
   z-index: 1000;
   overflow: auto;
 

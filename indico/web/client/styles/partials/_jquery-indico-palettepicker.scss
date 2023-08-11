@@ -14,33 +14,33 @@
   background: #fff;
   background-clip: padding-box;
   border: thin solid lighten($gray, $color-variation);
-  box-shadow: 0 6px 12px lighten($gray, $color-variation);
-  padding: 3px;
+  box-shadow: 0 px(6) px(12) lighten($gray, $color-variation);
+  padding: px(3);
 }
 
 table.palette-picker {
-  border-spacing: 8px;
+  border-spacing: px(8);
 
   .palette-color {
     cursor: pointer;
-    padding: 2px;
-    border-radius: 15px;
+    padding: px(2);
+    border-radius: px(15);
 
     .text-box {
-      width: 8px;
-      height: 8px;
+      width: px(8);
+      height: px(8);
       margin: auto;
-      border-radius: 3px;
+      border-radius: px(3);
     }
 
     .background-box {
       @extend .flexrow;
       justify-content: center;
       align-items: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 15px;
-      border: 2px solid transparent;
+      width: px(22);
+      height: px(22);
+      border-radius: px(15);
+      border: px(2) solid transparent;
     }
 
     &.selected {

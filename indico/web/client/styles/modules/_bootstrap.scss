@@ -19,15 +19,15 @@
   display: block;
 
   width: 100%;
-  height: 350px;
-  padding-top: 20px;
+  height: px(350);
+  padding-top: px(20);
 
   text-align: center;
 
-  border-bottom: 5px solid white;
+  border-bottom: px(5) solid white;
   background-color: $darker-blue;
   background-repeat: no-repeat;
-  background-position: 20px 20px;
+  background-position: px(20) px(20);
 
   .header-logo {
     height: 50%;
@@ -38,7 +38,7 @@
   .header-title {
     @include font-family-logo();
 
-    font-size: 54px;
+    font-size: px(54);
 
     color: $pastel-blue;
   }
@@ -46,7 +46,7 @@
   .header-subtitle {
     @include font-family-logo();
 
-    font-size: 26px;
+    font-size: px(26);
 
     color: white;
   }
@@ -55,7 +55,7 @@
     position: fixed;
     top: 0;
 
-    height: 120px;
+    height: px(120);
 
     text-align: left;
 
@@ -63,21 +63,21 @@
       float: left;
 
       height: 75%;
-      margin-left: 50px;
-      padding-right: 30px;
+      margin-left: px(50);
+      padding-right: px(30);
     }
   }
 
   .language-selector {
     position: fixed;
     z-index: 1;
-    top: 10px;
-    right: 10px;
+    top: px(10);
+    right: px(10);
 
     padding: 0;
 
     .i-button.arrow {
-      width: 102px;
+      width: px(102);
 
       color: darken(white, 10%) !important;
       border: 0;
@@ -88,7 +88,7 @@
     }
 
     .i-dropdown {
-      width: 200px;
+      width: px(200);
 
       text-align: left;
     }
@@ -108,32 +108,32 @@
   @include font-family-form();
 
   width: 100%;
-  min-width: 800px;
-  max-width: 1140px;
+  min-width: px(800);
+  max-width: px(1140);
   margin-right: auto;
   margin-left: auto;
-  padding-top: 30px;
-  padding-bottom: 50px;
+  padding-top: px(30);
+  padding-bottom: px(50);
 
-  border-left: 3px $darker-blue solid;
+  border-left: px(3) $darker-blue solid;
   background: white;
   // stylelint-disable-next-line scss/media-feature-value-dollar-variable
-  @media only screen and (min-width: 481px) and (max-width: 768px) {
-    min-width: 480px;
-    max-width: 492px;
+  @media only screen and (min-width: px(481)) and (max-width: px(768)) {
+    min-width: px(480);
+    max-width: px(492);
   }
   // stylelint-disable-next-line scss/media-feature-value-dollar-variable
-  @media only screen and (min-width: 769px) and (max-width: 1024px) {
-    min-width: 600px;
-    max-width: 680px;
+  @media only screen and (min-width: px(769)) and (max-width: px(1024)) {
+    min-width: px(600);
+    max-width: px(680);
   }
   // stylelint-disable-next-line scss/media-feature-value-dollar-variable
-  @media only screen and (min-width: 1025px) and (max-width: 1230px) {
-    max-width: 937px;
+  @media only screen and (min-width: px(1025)) and (max-width: px(1230)) {
+    max-width: px(937);
   }
 
   &.mini {
-    margin-top: 120px;
+    margin-top: px(120);
   }
 
   #flashed-messages {
@@ -148,7 +148,7 @@
 
     .step-wrapper {
       width: 100%;
-      padding-top: 75px;
+      padding-top: px(75);
 
       color: $black;
 
@@ -161,23 +161,23 @@
 
         float: left;
 
-        width: 100px;
-        height: 100px;
+        width: px(100);
+        height: px(100);
         margin-top: 1em;
-        margin-left: -50px;
+        margin-left: px(-50);
         padding: 0;
 
-        border: 5px solid white;
+        border: px(5) solid white;
         border-radius: 50%;
         background-color: $darker-blue;
 
         i {
-          font-size: 50px;
+          font-size: px(50);
 
           position: relative;
           z-index: 0;
-          top: 20px;
-          left: 20px;
+          top: px(20);
+          left: px(20);
 
           color: white;
         }
@@ -232,7 +232,7 @@
 
           > .warning-message-box {
             margin-left: 1.2em;
-            width: 400px;
+            width: px(400);
           }
         }
 

@@ -6,15 +6,16 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .call-for-abstracts {
   .cfa-announcement {
     color: $light-black;
-    padding: 20px 0 10px;
+    padding: px(20) 0 px(10);
   }
 
   .actions {
-    margin-top: 20px;
+    margin-top: px(20);
   }
 
   .info-message-box {
@@ -23,7 +24,7 @@
 
   .message-text {
     line-height: 1.3em;
-    padding-left: 5px;
+    padding-left: px(5);
   }
 
   .submit-abstract-btn {

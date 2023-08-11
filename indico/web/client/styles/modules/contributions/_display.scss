@@ -11,6 +11,7 @@
 @use 'base/palette' as *;
 @use 'base/animation' as *;
 @use 'base/typography' as *;
+@use 'base/utilities' as *;
 
 $display-preview-bg-color: white;
 
@@ -52,7 +53,7 @@ $display-preview-bg-color: white;
 
   blockquote {
     font-style: italic;
-    border-left: 2px solid darken($blockquote-color, 10%);
+    border-left: px(2) solid darken($blockquote-color, 10%);
     padding: 0.2em 0.2em 0.2em 1em;
     margin-left: 0;
     background-color: darken($blockquote-color, 5%);
@@ -60,7 +61,7 @@ $display-preview-bg-color: white;
   }
 }
 
-@mixin md-preview-wrapper-mixin($background-color, $max-height: 500px) {
+@mixin md-preview-wrapper-mixin($background-color, $max-height: px(500)) {
   @include md-display-rules($background-color);
   @include transition(height 0.25s ease-out, background-color 1s ease-in, color 1s ease-in);
   @include font-family-serif();
@@ -82,7 +83,7 @@ $display-preview-bg-color: white;
     font-size: 1em;
 
     .instructions {
-      padding: 10px;
+      padding: px(10);
       display: block;
     }
 
@@ -96,7 +97,7 @@ $display-preview-bg-color: white;
   }
 
   .wmd-preview {
-    padding: 10px;
+    padding: px(10);
   }
 }
 

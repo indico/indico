@@ -23,7 +23,7 @@
   }
 
   to {
-    background-position: 50px 50px;
+    background-position: px(50) px(50);
   }
 }
 
@@ -41,21 +41,21 @@
       $light 75%,
       $light
     );
-    background-size: 50px 50px;
+    background-size: px(50) px(50);
   }
 }
 
 #corner-message-container {
   position: fixed;
-  bottom: 60px;
-  right: 20px;
-  max-width: 500px;
+  bottom: px(60);
+  right: px(20);
+  max-width: px(500);
 }
 
 .corner-message {
   @include font-family-title();
   @include border-all($light-black);
-  box-shadow: 0 3px 2px rgba(150, 150, 150, 0.2);
+  box-shadow: 0 px(3) px(2) rgba(150, 150, 150, 0.2);
   @include transition(background-color 0.5s, color 0.5s, border-color 0.5s, width 0.5s);
   @include indico-animation(_fadein, 0.5s, normal forwards ease-in-out, 1);
   @include _progress(darken($light-gray, 0.3 * $color-variation), $light-gray);
@@ -65,7 +65,7 @@
   margin-bottom: 1em;
   color: $light-black;
   background-color: $light-gray;
-  border-radius: 2px;
+  border-radius: px(2);
 
   &.success {
     @include _progress($light-green, lighten($light-green, 0.5 * $color-variation));

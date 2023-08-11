@@ -8,13 +8,14 @@
 @use 'base/palette' as *;
 @use 'base/defaults' as *;
 @use 'base/borders' as *;
+@use 'base/utilities' as *;
 
 .item,
 :global(.ui.list) > .item,
 :global(.ui.list.list) > .item {
   display: flex;
   align-items: center;
-  min-height: 32px;
+  min-height: px(32);
 }
 
 .event-role {
@@ -51,8 +52,8 @@
 }
 
 .loader {
-  margin-right: 5px;
-  margin-bottom: 5px;
+  margin-right: px(5);
+  margin-bottom: px(5);
 }
 
 .actions {

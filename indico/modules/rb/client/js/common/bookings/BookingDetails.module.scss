@@ -7,6 +7,7 @@
 
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 :global(.ui.icon.message).message-icon :global(.icon) {
   font-size: 2em;
@@ -17,7 +18,7 @@
 }
 
 .log-list {
-  max-height: 140px;
+  max-height: px(140);
   overflow: auto;
 }
 
@@ -27,7 +28,7 @@
 
 .booking-logs,
 .concurrent-reservations {
-  margin-top: 20px;
+  margin-top: px(20);
 }
 
 :global(.ui.modal .header).booking-modal-header {
@@ -53,17 +54,17 @@
 }
 
 .rejection-form {
-  width: 350px;
+  width: px(350);
 }
 
 .accept-with-message {
-  border-left: 1px solid darken($green, 5%) !important;
+  border-left: px(1) solid darken($green, 5%) !important;
 }
 
 .concurrent-reservations-list {
-  max-height: 150px;
+  max-height: px(150);
   overflow: auto;
-  min-height: 20px;
+  min-height: px(20);
 }
 
 .weekday {

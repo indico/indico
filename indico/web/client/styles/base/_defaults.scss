@@ -10,23 +10,24 @@
 // -----------------------------------------------------------------------------
 
 @use './palette' as *;
+@use './utilities' as *;
 
-$default-border-radius: 2px;
+$default-border-radius: px(2);
 $default-transition-duration: 0.25s;
 $default-transition-function: ease-out;
 $default-transition-delay: null;
 
 $default-border-color: $pastel-gray;
 $default-border-style: solid;
-$default-border-width: 1px;
+$default-border-width: px(1);
 
 $color-variation: 15%;
 $light-color-variation: 5%;
 
 $default-box-shadow-inset: null;
-$default-box-shadow-h-offset: 1px;
-$default-box-shadow-v-offset: 1px;
-$default-box-shadow-blur: 1px;
+$default-box-shadow-h-offset: px(1);
+$default-box-shadow-v-offset: px(1);
+$default-box-shadow-blur: px(1);
 $default-box-shadow-spread: null;
 $default-box-shadow-color: lighten($gray, $color-variation);
 

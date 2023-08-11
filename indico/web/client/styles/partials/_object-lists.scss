@@ -12,7 +12,7 @@
   .i-table {
     thead {
       font-weight: bold;
-      border-bottom: 2px solid $pastel-gray;
+      border-bottom: px(2) solid $pastel-gray;
       color: $black;
 
       tr {
@@ -54,7 +54,7 @@
 
     td {
       vertical-align: top;
-      padding: 12px 5px;
+      padding: px(12) px(5);
 
       .vertical-aligner {
         display: block;
@@ -66,7 +66,7 @@
   .entry-action-buttons {
     > a {
       font-size: 1.2em;
-      margin-left: 3px;
+      margin-left: px(3);
     }
   }
 
@@ -75,7 +75,7 @@
 
     &::before {
       color: $gray;
-      margin-right: 5px;
+      margin-right: px(5);
     }
 
     &.inline {
@@ -113,7 +113,7 @@
 }
 
 .list-filter-dialog {
-  max-width: 1200px;
+  max-width: px(1200);
 }
 
 @mixin enabled-action {
@@ -131,7 +131,7 @@
 
   .list-column {
     @extend .flexrow;
-    margin: 5px;
+    margin: px(5);
     width: 14.2em;
 
     > .filter {
@@ -188,7 +188,7 @@
 
         flex-grow: 1;
         color: $dark-gray;
-        margin-left: 4px;
+        margin-left: px(4);
 
         &::before {
           margin-right: 0.5em;

@@ -5,7 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .selection-add-btn {
   pointer-events: all;
-  margin: 10px !important;
+  margin: px(10) !important;
 }

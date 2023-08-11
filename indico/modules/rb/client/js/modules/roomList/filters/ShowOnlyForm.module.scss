@@ -5,17 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .show-only-filter {
   display: flex;
   align-items: center;
-  width: 300px;
+  width: px(300);
 
   &:not(:nth-last-child(2)) {
-    margin-bottom: 10px;
+    margin-bottom: px(10);
   }
 
   :global(.toggle.checkbox) {
-    margin-right: 10px;
+    margin-right: px(10);
   }
 
   :global(.icon) {

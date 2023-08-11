@@ -10,13 +10,13 @@
 .message {
   color: #555;
   background: #f8f5f4;
-  border: 1px solid #e7e0dd;
+  border: px(1) solid #e7e0dd;
   padding: 1em;
 }
 
 .message.info {
   background: #ebf2f3;
-  border: 1px solid #cfdee0;
+  border: px(1) solid #cfdee0;
 }
 
 .confirmation-dialog {
@@ -25,11 +25,11 @@
 }
 
 .confirmation-dialog .body {
-  max-width: 600px;
-  padding: 8px 15px 8px 15px;
+  max-width: px(600);
+  padding: px(8) px(15) px(8) px(15);
   margin-bottom: 0.5em;
   background-color: #eee;
-  border: 1px solid;
+  border: px(1) solid;
   border-color: #dbdbdb #dbdbdb #c0c0c0 #dbdbdb;
 
   color: #555;
@@ -39,7 +39,7 @@
 
 .confirmation-dialog .body .target {
   font-family: Georgia, Times, serif;
-  padding-left: 10px;
+  padding-left: px(10);
   color: #777;
   margin: 1em 0 1em 0;
   font-size: 1.2em;
@@ -50,7 +50,7 @@
 }
 
 .confirmation-dialog .body.bordered {
-  border-left: 1px solid #cacaca;
+  border-left: px(1) solid #cacaca;
 }
 
 .confirmation-dialog .body h3 {
@@ -68,7 +68,7 @@
   margin-bottom: 0.1em;
   font-size: 1.7em;
   font-weight: bold;
-  padding-bottom: 10px;
+  padding-bottom: px(10);
 }
 
 .confirmation-dialog > h3.warning {
@@ -88,12 +88,12 @@
 }
 
 .confirmation-dialog .body ul.categ-list {
-  padding-left: 13px;
+  padding-left: px(13);
   margin: 0;
 }
 
 .confirmation-dialog ul.categ-list span.event-date {
-  padding-left: 10px;
+  padding-left: px(10);
   color: #888;
   font-size: 0.9em;
   margin: 0;
@@ -113,15 +113,15 @@
 
 .dialog-subtitle {
   background-color: $light-gray;
-  border-bottom: 1px solid $pastel-gray;
-  padding: 5px 15px;
-  box-shadow: inset 0 15px 20px -20px $gray;
+  border-bottom: px(1) solid $pastel-gray;
+  padding: px(5) px(15);
+  box-shadow: inset 0 px(15) px(20) px(-20) $gray;
   color: $black;
 }
 
 .confirmation-dialog-content {
   font-size: 1.2em;
-  margin-bottom: 15px;
+  margin-bottom: px(15);
 
   strong {
     font-size: 1.2em;
@@ -129,13 +129,13 @@
 
   ul {
     font-size: 0.85em;
-    max-height: 100px;
+    max-height: px(100);
     overflow: auto;
   }
 }
 
 form.confirmation-dialog {
-  max-width: 800px;
+  max-width: px(800);
 
   label {
     font-weight: bold;

@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 @use 'rb:styles/responsive' as *;
 
 .banner.user-dashboard,
@@ -47,35 +48,35 @@
 
 .dashboard-col:last-child {
   @media (min-width: $computer-width) {
-    padding-left: 10px;
+    padding-left: px(10);
   }
 }
 
 .dashboard-col:first-child {
   @media (min-width: $computer-width) {
-    padding-right: 10px;
+    padding-right: px(10);
     padding-left: 0;
   }
 }
 
 .dashboard-box {
-  border: 1px solid #ddd;
+  border: px(1) solid #ddd;
   border-radius: 0.3em;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
-  margin-bottom: 44px;
+  margin-bottom: px(44);
 }
 
 .dashboard-box h3 {
   background: #f7f7f7;
-  border-bottom: 1px solid #ddd;
+  border-bottom: px(1) solid #ddd;
   border-top-left-radius: 0.3em;
   border-top-right-radius: 0.3em;
-  font-size: 14px;
+  font-size: px(14);
   line-height: 100%;
   margin: 0;
-  padding: 10px;
+  padding: px(10);
 }
 
 .dashboard-box.suggestions h3 {
@@ -90,14 +91,14 @@
 }
 
 .dashboard-box ul li {
-  border-bottom: 1px solid #e5e5e5;
-  padding: 10px 10px 5px 10px;
+  border-bottom: px(1) solid #e5e5e5;
+  padding: px(10) px(10) px(5) px(10);
 }
 
 .dashboard-box ul li a,
 .dashboard-box ul li.no-event span {
   font-size: 1.2em;
-  line-height: 18px;
+  line-height: px(18);
   position: relative;
   user-select: none;
   -webkit-touch-callout: none;
@@ -107,12 +108,12 @@
 }
 
 .dashboard-box.suggestions ul li > a {
-  margin-right: 15px;
+  margin-right: px(15);
 }
 
 .dashboard-box ul li .actions {
-  font-size: 10px;
-  padding: 0 0 5px 10px;
+  font-size: px(10);
+  padding: 0 0 px(5) px(10);
 }
 
 .dashboard-box ul li .actions a:hover span {
@@ -146,8 +147,8 @@
 
 .dashboard-box ul .event-date {
   display: inline-block;
-  font-size: 12px;
-  width: 95px;
+  font-size: px(12);
+  width: px(95);
 }
 
 .dashboard-box ul .event-category {
@@ -156,18 +157,18 @@
 }
 
 .dashboard-box ul .item-legend {
-  max-width: 150px;
+  max-width: px(150);
   position: relative;
   float: right;
 }
 
 .dashboard-box ul li .close-box {
   display: none;
-  font-size: 18px;
+  font-size: px(18);
   position: absolute;
   right: 0;
   top: 0;
-  margin: 10px 10px 0 0;
+  margin: px(10) px(10) 0 0;
 }
 
 .dashboard-box ul li:hover .close-box {
@@ -176,7 +177,7 @@
 
 .item-legend [class*='icon-'] {
   color: #ddd;
-  font-size: 18px;
+  font-size: px(18);
 }
 
 .item-legend [class*='icon-'].active {
@@ -186,7 +187,7 @@
 .your-details {
   display: flex;
   flex-flow: row nowrap;
-  margin-bottom: 15px;
+  margin-bottom: px(15);
 
   .avatar-image {
     display: none;
@@ -197,14 +198,14 @@
 
     .ui.label {
       color: $light-gray;
-      margin-right: 34px;
+      margin-right: px(34);
 
       &.default-avatar {
-        font-size: 70px;
+        font-size: px(70);
       }
 
       &:not(.default-avatar) {
-        height: 140px;
+        height: px(140);
       }
     }
   }
@@ -213,17 +214,17 @@
     color: $black;
     font-size: 1.2em;
     line-height: 1.5;
-    max-width: 300px;
-    margin-right: 5px;
+    max-width: px(300);
+    margin-right: px(5);
 
     h3 {
       margin-top: 0;
-      margin-bottom: 10px;
+      margin-bottom: px(10);
     }
 
     i {
       color: $dark-gray;
-      margin-right: 10px;
+      margin-right: px(10);
     }
 
     .your-labels {
@@ -232,7 +233,7 @@
       margin-bottom: 1rem;
 
       .label {
-        margin: 0 7px 7px 0;
+        margin: 0 px(7) px(7) 0;
       }
     }
   }

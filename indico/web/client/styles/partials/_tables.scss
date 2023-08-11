@@ -65,7 +65,7 @@ table.i-table {
   }
 
   thead th {
-    padding: 10px 5px;
+    padding: px(10) px(5);
     font-weight: bold;
     text-align: left;
 
@@ -76,7 +76,7 @@ table.i-table {
 }
 
 tr.i-table {
-  border-top: 1px solid $pastel-gray;
+  border-top: px(1) solid $pastel-gray;
 
   &.selected,
   &.selected + tr.details-row {
@@ -91,7 +91,7 @@ tr.i-table {
 
 tr.i-table:last-child,
 tr.details-row:last-child {
-  border-bottom: 1px solid $pastel-gray;
+  border-bottom: px(1) solid $pastel-gray;
 }
 
 tr.details-row {
@@ -103,7 +103,7 @@ th.i-table {
   box-sizing: border-box;
   @include ellipsis();
 
-  padding: 5px 3px 5px 3px;
+  padding: px(5) px(3) px(5) px(3);
   vertical-align: middle;
 
   &.empty {
@@ -123,14 +123,14 @@ h3.i-table {
   font-weight: bold;
   margin-bottom: 0;
   margin-top: 1em;
-  padding: 3px 3px 5px 3px;
+  padding: px(3) px(3) px(5) px(3);
 
   &.emphasis {
     font-style: italic;
   }
 
   &.border {
-    border-bottom: 1px solid $pastel-gray;
+    border-bottom: px(1) solid $pastel-gray;
   }
 
   & + table.i-table {
@@ -187,7 +187,7 @@ tr.i-table.content {
 
   > td.i-table.caption,
   > td.i-table.value {
-    padding: 3px 5px 3px 5px;
+    padding: px(3) px(5) px(3) px(5);
   }
 
   > td.i-table.caption {
@@ -199,7 +199,7 @@ tr.i-table.content {
   }
 
   > td.i-table.value {
-    border-bottom: 1px solid transparent;
+    border-bottom: px(1) solid transparent;
     color: $light-black;
 
     &.plain-text-email {
@@ -220,7 +220,7 @@ th {
   &.small-column,
   &.action-column {
     white-space: nowrap;
-    width: 1px;
+    width: px(1);
   }
 }
 
@@ -238,7 +238,7 @@ th {
 
   tr > td,
   tr > th {
-    padding: 8px;
+    padding: px(8);
     line-height: 1.5;
     vertical-align: top;
   }
@@ -262,7 +262,7 @@ th {
   }
 
   a.action-icon {
-    margin-right: 5px;
+    margin-right: px(5);
 
     &:first-child {
       margin-left: 0;
@@ -285,7 +285,7 @@ th {
 
   dl.details-container {
     text-align: left;
-    padding: 8px;
+    padding: px(8);
     overflow: hidden;
     display: none;
 
@@ -330,7 +330,7 @@ th {
 
     color: $gray;
     font-size: 1.2em;
-    height: 10px;
+    height: px(10);
     cursor: move;
     text-align: left;
     padding: 0;
@@ -338,7 +338,7 @@ th {
     &:hover,
     &:active {
       @include border-left();
-      height: 20px;
+      height: px(20);
 
       &::before {
         color: $dark-gray;
@@ -350,12 +350,12 @@ th {
       @include transition(top);
       display: inline-block;
       position: relative;
-      top: 1px;
+      top: px(1);
     }
   }
 
   .sortable-placeholder {
     @include border-all($style: dashed);
-    margin-bottom: 15px;
+    margin-bottom: px(15);
   }
 }

@@ -7,6 +7,7 @@
 
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 .photo-dimmable-width {
   width: 100%;
@@ -29,18 +30,18 @@
   pointer-events: none;
   position: absolute;
   display: flex;
-  bottom: -1px;
+  bottom: px(-1);
   width: 100%;
 
   .feature-entries {
     cursor: default;
     pointer-events: auto;
     background-color: $white;
-    border-radius: 3px 3px 0 0;
+    border-radius: px(3) px(3) 0 0;
     border-color: $pastel-gray $pastel-gray $white $pastel-gray;
-    border-width: 1px 1px 2px 1px;
+    border-width: px(1) px(1) px(2) px(1);
     border-style: solid;
-    padding: 5px;
+    padding: px(5);
     margin: auto;
   }
 
@@ -54,7 +55,7 @@
   overflow: hidden;
 
   .image-container {
-    border: 1px solid $pastel-gray;
+    border: px(1) solid $pastel-gray;
     position: relative;
     height: 100%;
     width: 100%;

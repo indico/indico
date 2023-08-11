@@ -25,7 +25,7 @@
   padding-bottom: 2em;
 
   .permissions-widget-list {
-    @include border-left($width: 3px);
+    @include border-left($width: px(3));
     padding-left: 1em;
 
     & > li {
@@ -58,7 +58,7 @@
       .role-code {
         flex-shrink: 0;
         text-align: center;
-        width: 35px;
+        width: px(35);
       }
 
       .entry-icon {
@@ -193,7 +193,7 @@
         line-height: normal;
         text-align: center;
         vertical-align: middle;
-        width: 35px;
+        width: px(35);
 
         &.role-code {
           @include role-code();
@@ -215,7 +215,7 @@
 
 @mixin circle-checkbox-checked() {
   background-color: $pastel-blue;
-  border: 2px solid $darker-blue;
+  border: px(2) solid $darker-blue;
 }
 
 .permissions-dialog {
@@ -227,7 +227,7 @@
       color: $light-black;
       cursor: pointer;
       font-family: 'Roboto', sans-serif;
-      font-size: 14px;
+      font-size: px(14);
       font-weight: normal;
     }
 
@@ -236,21 +236,21 @@
     }
 
     .permissions > .item {
-      @include border-left(lighten($pastel-gray, 7%), $width: 2px);
+      @include border-left(lighten($pastel-gray, 7%), $width: px(2));
     }
 
     .circle-checkbox {
       display: none;
 
       & + label::before {
-        @include border-all($gray, $width: 2px);
+        @include border-all($gray, $width: px(2));
         border-radius: 3em;
         content: '';
         display: inline-block;
         margin-right: 0.25em;
         vertical-align: middle;
-        height: 23px;
-        width: 23px;
+        height: px(23);
+        width: px(23);
       }
 
       &:hover:not(:checked) + label::before {

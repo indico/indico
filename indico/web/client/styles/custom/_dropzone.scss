@@ -13,24 +13,24 @@ $dropzone-padding: 20;
 $dropzone-border-width: 2;
 
 .dropzone {
-  border-radius: 2px;
-  border: 2px dashed $dark-blue;
-  padding: 30px 20px;
+  border-radius: px(2);
+  border: px(2) dashed $dark-blue;
+  padding: px(30) px(20);
   margin-bottom: 3em;
   width: (
       ($dropzone-padding + $dropzone-border-width) * 2 +
         ($image-preview-width + ($image-preview-margin * 2)) * 5
-    ) * 1px;
+    ) * px(1);
   cursor: pointer;
 
   .dz-preview.dz-file-preview .dz-image,
   .dz-preview .dz-image {
-    border-radius: 5px;
+    border-radius: px(5);
 
     > img {
       object-fit: cover;
-      width: 120px;
-      height: 120px;
+      width: px(120);
+      height: px(120);
     }
   }
 
@@ -68,7 +68,7 @@ $dropzone-border-width: 2;
   .dropzone {
     padding: 0;
     margin-bottom: 1em;
-    width: 400px;
+    width: px(400);
     display: table;
 
     .dropzone-inner {
@@ -89,7 +89,7 @@ $dropzone-border-width: 2;
         text-align: center;
 
         button {
-          margin: $image-preview-margin * 1px;
+          margin: $image-preview-margin * px(1);
           height: inherit;
         }
       }
@@ -100,7 +100,7 @@ $dropzone-border-width: 2;
 
       .dropzone-inner {
         display: block;
-        padding: 10px;
+        padding: px(10);
       }
 
       .dropzone-previews {
@@ -111,7 +111,7 @@ $dropzone-border-width: 2;
       .dz-preview {
         display: flex;
         min-height: inherit;
-        margin: 0 0 5px 0;
+        margin: 0 0 px(5) 0;
 
         &:hover {
           @include transition(background-color 0.2s);
@@ -129,14 +129,14 @@ $dropzone-border-width: 2;
         position: inherit;
         flex-grow: 1;
         cursor: inherit;
-        width: 300px;
+        width: px(300);
       }
 
       .select-files-btn {
         display: block;
 
         button {
-          margin: 5px 0 0 0;
+          margin: px(5) 0 0 0;
         }
       }
 
@@ -167,7 +167,7 @@ $dropzone-border-width: 2;
       }
 
       .dz-remove {
-        margin-left: 5px;
+        margin-left: px(5);
         color: $link;
 
         i::before {

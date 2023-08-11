@@ -19,7 +19,7 @@
 .qtip-default {
   @include default-border-radius();
   @include border-all($black);
-  box-shadow: 1px 0 0 1px rgba(0, 0, 0, 0.2);
+  box-shadow: px(1) 0 0 px(1) rgba(0, 0, 0, 0.2);
 
   color: $light-gray;
   background-color: $black;
@@ -27,7 +27,7 @@
 
   .qtip-titlebar {
     background-color: #f0f0f0;
-    border-bottom: solid 1px #888;
+    border-bottom: solid px(1) #888;
   }
 
   .qtip-content {
@@ -70,19 +70,19 @@
 
   &.qtip-popup {
     @include qtip-light();
-    border: solid 1px #e2e2e2;
+    border: solid px(1) #e2e2e2;
     color: #454545;
   }
 
   &.qtip-balloon {
-    border: solid 1px #c0c0c0;
+    border: solid px(1) #c0c0c0;
     background-color: #ffed92;
-    width: 120px;
+    width: px(120);
   }
 
   &.qtip-timezone {
     color: $black;
-    min-width: 320px;
+    min-width: px(320);
   }
 
   &.qtip-allow-overflow {
@@ -101,7 +101,7 @@
 
     .qtip-titlebar {
       @include border-bottom();
-      padding: 5px 0;
+      padding: px(5) 0;
     }
 
     .qtip-title {
@@ -111,7 +111,7 @@
     }
 
     .i-big-button {
-      margin: 2px 0;
+      margin: px(2) 0;
 
       .caption {
         font-size: 1.1em;
@@ -121,7 +121,7 @@
 
   &.informational {
     @include qtip-light();
-    box-shadow: rgba($dark-gray, 0.2) 0 0 3px 3px, lighten($light-gray, 20%) 0 1px 0 0 inset;
+    box-shadow: rgba($dark-gray, 0.2) 0 0 px(3) px(3), lighten($light-gray, 20%) 0 px(1) 0 0 inset;
     @include border-all(#add9ed);
     background-color: #edf3fd;
     color: $light-black;

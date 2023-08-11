@@ -6,14 +6,15 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .menu-bar {
   color: $white;
-  padding: 20px 30px;
-  margin-right: 25px;
+  padding: px(20) px(30);
+  margin-right: px(25);
 
   .header {
-    border-radius: 3px;
+    border-radius: px(3);
     background-color: $dark-blue;
     text-align: center;
     padding: 0.5rem;

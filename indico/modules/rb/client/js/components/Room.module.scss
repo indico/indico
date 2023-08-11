@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .room-card {
-  height: 320px;
-  width: 300px;
+  height: px(320);
+  width: px(300);
 
   .room-title {
     font-size: 1em;
@@ -33,7 +35,7 @@
 
     :global(.img) {
       width: 100%;
-      height: 170px !important;
+      height: px(170) !important;
     }
   }
 
@@ -45,12 +47,12 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      height: 40px;
+      height: px(40);
     }
   }
 
   :global(.content) {
-    max-height: 105px;
+    max-height: px(105);
   }
 
   .room-content {

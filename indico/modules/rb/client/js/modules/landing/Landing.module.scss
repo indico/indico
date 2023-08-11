@@ -8,6 +8,7 @@
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/util' as *;
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 @keyframes fade-slide-down {
   0% {
@@ -88,11 +89,11 @@
     }
 
     @media (min-width: $tablet-width) {
-      min-width: 520px;
+      min-width: px(520);
     }
 
     // stylelint-disable-next-line scss/media-feature-value-dollar-variable
-    @media (max-height: 600px) {
+    @media (max-height: px(600)) {
       margin-top: auto;
     }
 
@@ -106,7 +107,7 @@
   }
 
   .landing-page-lower-row {
-    height: 300px;
+    height: px(300);
     background-color: #fff;
     padding: 1em 0 0 0;
     // to compensate margin from SUI containers
@@ -120,7 +121,7 @@
         }
 
         &:not(:last-child) {
-          margin-right: 70px;
+          margin-right: px(70);
         }
 
         :global(.statistic + .statistic) {

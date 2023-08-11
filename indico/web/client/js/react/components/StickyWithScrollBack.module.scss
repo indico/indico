@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .sticky-content {
-  margin-bottom: 10px;
+  margin-bottom: px(10);
 
   > :nth-child(2) {
     z-index: 15;
@@ -16,12 +17,12 @@
   }
 
   &:global(.ui.stuck-container + div) {
-    padding-top: 130px;
+    padding-top: px(130);
   }
 
   :global(.ui.sticky.fixed.top) {
-    padding-top: 30px;
-    box-shadow: rgba($black, 0.2) 0 25px 30px -20px;
+    padding-top: px(30);
+    box-shadow: rgba($black, 0.2) 0 px(25) px(30) px(-20);
     transition: all, 0.25s ease-in;
   }
 }

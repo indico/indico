@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .original-booking-header,
 .new-booking-header {
   align-self: center;
@@ -39,14 +41,14 @@
   }
 
   .ongoing-booking-explanation {
-    height: 130px;
+    height: px(130);
 
     :global(.content) {
-      padding-top: 10px;
-      padding-bottom: 10px;
+      padding-top: px(10);
+      padding-bottom: px(10);
 
       :global(.ui.list) {
-        margin-top: 5px !important;
+        margin-top: px(5) !important;
       }
     }
   }

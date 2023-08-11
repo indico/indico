@@ -9,7 +9,7 @@
 
 .code {
   @include default-border-radius();
-  border: 1px solid $gray;
+  border: px(1) solid $gray;
   background: $light-gray;
   padding: 1em 1.5em;
 }

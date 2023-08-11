@@ -18,7 +18,7 @@ $tt-nested-time-color: $light-black !default;
 $tt-additional-text-color: $light-black !default;
 $selected-color: $indico-blue !default;
 
-@mixin header-logo($image, $position: 15px, $padding-left: 150px, $scale: none) {
+@mixin header-logo($image, $position: px(15), $padding-left: px(150), $scale: none) {
   div.event-header {
     background: $header-bg-color url($image) left top no-repeat;
     background-position: $position;
@@ -28,12 +28,12 @@ $selected-color: $indico-blue !default;
 }
 
 @mixin drop-shadow {
-  box-shadow: 0 2px 10px 1px rgba(50, 50, 50, 0.4);
+  box-shadow: 0 px(2) px(10) px(1) rgba(50, 50, 50, 0.4);
 }
 
 @mixin ribbon($color) {
   @include transition(background-color 0.5s linear);
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 px(2) px(2) 0;
   $darkened-color: darken($color, 10%);
 
   background-color: $color;
@@ -45,7 +45,7 @@ $selected-color: $indico-blue !default;
     height: 0;
     left: 0;
     top: 100%;
-    border-width: 5px 5px;
+    border-width: px(5) px(5);
     border-style: solid;
     border-color: $darkened-color $darkened-color transparent transparent;
   }
@@ -69,7 +69,7 @@ body {
   color: $tt-secondary-color;
   font-size: 1em;
   float: right;
-  max-width: 200px;
+  max-width: px(200);
   margin: 0.5rem 0.7em 0 0;
 
   &::before {
@@ -115,7 +115,7 @@ body {
 .header-data {
   &::before {
     color: $header-icon-color;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: px(1) px(1) px(2) rgba(0, 0, 0, 0.1);
     margin-right: 0.4em;
     vertical-align: middle;
   }
@@ -157,7 +157,7 @@ body {
 .speaker-list,
 .chairperson-list,
 .convener-list {
-  margin: 0.1em 55px 0 0;
+  margin: 0.1em px(55) 0 0;
 
   .label {
     font-weight: bold;
@@ -171,7 +171,7 @@ body {
 
 .chairperson-list .author {
   @include highlighted-header-data();
-  margin-bottom: 2px;
+  margin-bottom: px(2);
 }
 
 .speaker-list,
@@ -181,7 +181,7 @@ body {
 
 .details .address {
   color: #aaa;
-  font-size: 12px;
+  font-size: px(12);
   text-shadow: none;
 }
 
@@ -194,21 +194,21 @@ div.event-header {
   font-size: 12pt;
   position: relative;
 
-  min-height: 125px;
+  min-height: px(125);
   margin: 0;
-  padding: 10px 30px 10px;
+  padding: px(10) px(30) px(10);
 
   .event-title {
     display: flex;
     justify-content: space-between;
     gap: 0.5em;
-    margin-bottom: 10px;
+    margin-bottom: px(10);
 
     h1 {
       font-size: 20pt;
       color: $header-text-color;
       font-weight: normal;
-      margin-top: 10px;
+      margin-top: px(10);
     }
 
     .event-actions {
@@ -218,7 +218,7 @@ div.event-header {
         // XXX somehow this breaks printing in chrome (23k pages)
         gap: 0.2em;
       }
-      margin-top: 10px;
+      margin-top: px(10);
     }
   }
 
@@ -269,11 +269,11 @@ ul.day-list {
   list-style-type: none;
   padding-left: 0;
   margin-left: 0;
-  margin-top: 10px;
+  margin-top: px(10);
 }
 
 .day-header {
-  margin-top: 25px;
+  margin-top: px(25);
   position: relative;
   text-align: center;
 
@@ -415,9 +415,9 @@ ul.day-list {
       top: 1.8em;
       right: 0.2em;
       min-width: 10em;
-      border-radius: 2px;
+      border-radius: px(2);
       background-color: $light-gray;
-      box-shadow: 0 2px 10px 1px rgba(50, 50, 50, 0.4);
+      box-shadow: 0 px(2) px(10) px(1) rgba(50, 50, 50, 0.4);
       padding-top: 0.2em;
 
       .item,
@@ -439,7 +439,7 @@ ul.day-list {
       }
 
       .divider {
-        border-top: 1px dotted $dark-gray;
+        border-top: px(1) dotted $dark-gray;
         height: 0;
         margin-bottom: 0.2em;
       }
@@ -460,7 +460,7 @@ ul.day-list {
   padding: 0;
 
   .timetable-item.timetable-subcontrib {
-    border-left: 2px dotted $gray;
+    border-left: px(2) dotted $gray;
     padding-left: 1em;
 
     .timetable-title {
@@ -482,9 +482,9 @@ ul.day-list {
     .start-time {
       background-color: $tt-primary-color;
       font-weight: bold;
-      box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.1);
-      margin-left: -10px;
-      padding: 0 10px 0 20px;
+      box-shadow: px(1) px(1) px(2) px(1) rgba(0, 0, 0, 0.1);
+      margin-left: px(-10);
+      padding: 0 px(10) 0 px(20);
       position: relative;
       @include ribbon($tt-primary-color);
     }
@@ -493,10 +493,10 @@ ul.day-list {
   &.nested {
     @include transition(border-color 0.5s linear);
     margin-right: 0.5em;
-    border-right: 3px solid $tt-nested-time-color;
+    border-right: px(3) solid $tt-nested-time-color;
 
     .start-time {
-      padding: 0 5px 0 10px;
+      padding: 0 px(5) 0 px(10);
       background-color: $tt-nested-time-color;
     }
   }
@@ -520,7 +520,7 @@ ul.day-list {
 
   .start-time {
     @include highlighted-data();
-    border-radius: 2px 0 0 2px;
+    border-radius: px(2) 0 0 px(2);
     @include transition(background-color 0.5s linear);
     color: $light-gray !important;
   }
@@ -554,20 +554,20 @@ ul.day-list {
 }
 
 .event-sub-header {
-  border-radius: 0 0 2px 2px;
+  border-radius: 0 0 px(2) px(2);
   @include drop-shadow();
   @include font-family-title-light();
 
   background: white;
-  font-size: 12px;
+  font-size: px(12);
   color: black;
   margin: 0;
-  padding: 3px 10px;
+  padding: px(3) px(10);
 }
 
 .note-area-wrapper .note-area {
   @include font-family-modern-body();
-  margin-top: 10px;
+  margin-top: px(10);
 }
 
 // Lectures
@@ -627,11 +627,11 @@ a.lecture-series-link {
 .agenda-placeholder {
   @include default-border-radius();
   background-color: white;
-  margin-top: 10px;
+  margin-top: px(10);
   flex-grow: 1;
   color: $gray;
   text-align: center;
-  height: 250px;
+  height: px(250);
 
   .placeholder-icon {
     font-size: 5em;
@@ -665,7 +665,7 @@ div.event-details {
   }
 
   .event-details-label {
-    width: 120px;
+    width: px(120);
     text-align: right;
     font-weight: bold;
     margin-right: 1em;

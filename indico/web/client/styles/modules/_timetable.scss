@@ -18,7 +18,7 @@
       background: $light-blue;
     }
 
-    padding: 5px;
+    padding: px(5);
     cursor: pointer;
 
     &.selected {
@@ -26,13 +26,13 @@
     }
 
     &:not(:last-child) {
-      border-bottom: 1px solid $separator-color;
+      border-bottom: px(1) solid $separator-color;
     }
   }
 }
 
 #wholeLegend {
-  margin: 60px 0 0 0;
+  margin: px(60) 0 0 0;
 }
 
 #legendMainToggle {
@@ -41,11 +41,11 @@
   background: $gray;
   color: $black;
   cursor: pointer;
-  font-size: 11px;
-  padding: 4px 5px 3px 5px;
+  font-size: px(11);
+  padding: px(4) px(5) px(3) px(5);
   position: absolute;
   text-align: center;
-  width: 116px;
+  width: px(116);
 
   &:hover {
     color: white;
@@ -65,16 +65,16 @@
   @include border-all();
   @include default-border-radius();
   background: $light-gray;
-  font-size: 11px;
+  font-size: px(11);
   overflow: hidden;
-  padding: 5px;
+  padding: px(5);
   z-index: 1;
   box-sizing: initial;
 
   &.sticky-scrolling {
     @include single-box-shadow();
     position: fixed;
-    top: 1px;
+    top: px(1);
   }
 
   #legendItemContainer {
@@ -86,21 +86,21 @@
     background: $pastel-gray;
     color: $black;
     float: left;
-    height: 15px;
-    margin: 2px;
-    padding: 5px;
+    height: px(15);
+    margin: px(2);
+    padding: px(5);
     overflow: hidden;
-    max-width: 200px;
+    max-width: px(200);
   }
 
   .timeTableItemColour {
     border-radius: 50%;
-    @include border-all(white, $width: 2px);
+    @include border-all(white, $width: px(2));
     float: left;
-    margin-right: 3px;
-    margin-top: -2px;
-    height: 15px;
-    width: 15px;
+    margin-right: px(3);
+    margin-top: px(-2);
+    height: px(15);
+    width: px(15);
   }
 
   .legendCloseButton {
@@ -109,7 +109,7 @@
     cursor: pointer;
     float: right;
     font-size: 1.2em;
-    margin: 1px 2px 0 2px;
+    margin: px(1) px(2) 0 px(2);
 
     &:hover {
       color: $gray;
@@ -129,19 +129,19 @@
 }
 
 #move-timetable-entry-dialog {
-  width: 800px;
-  height: 440px;
+  width: px(800);
+  height: px(440);
 
   .section-title {
     font-size: 1.2em;
     color: $black;
-    margin-bottom: 5px;
-    margin-top: 10px;
+    margin-bottom: px(5);
+    margin-top: px(10);
   }
 
   .days {
     &.scrollable-container {
-      height: 70px;
+      height: px(70);
     }
 
     .scroll-btn {
@@ -156,11 +156,11 @@
 
       &.scroll-left {
         transform: rotate(180deg);
-        margin-right: 10px;
+        margin-right: px(10);
       }
 
       &.scroll-right {
-        margin-left: 10px;
+        margin-left: px(10);
       }
     }
   }
@@ -172,7 +172,7 @@
     position: relative;
 
     &.scrollable {
-      padding: 5px;
+      padding: px(5);
     }
 
     .day:not(:last-child) {
@@ -181,7 +181,7 @@
   }
 
   .days-container-wrapper {
-    max-width: 730px;
+    max-width: px(730);
     position: relative;
   }
 
@@ -219,7 +219,7 @@
   }
 
   .blocks {
-    max-height: 300px;
+    max-height: px(300);
     overflow: auto;
     overflow-y: auto;
   }
@@ -232,23 +232,23 @@
     }
 
     &.selected {
-      border-left: 4px solid $blue;
+      border-left: px(4) solid $blue;
     }
 
     .icon {
-      font-size: 22px;
+      font-size: px(22);
 
       &::before {
-        margin-right: 10px;
+        margin-right: px(10);
       }
     }
 
     .item-icon {
       flex-shrink: 0;
-      width: 22px;
-      height: 22px;
-      border-radius: 15px;
-      margin-right: 10px;
+      width: px(22);
+      height: px(22);
+      border-radius: px(15);
+      margin-right: px(10);
     }
 
     .start-dt {
@@ -259,8 +259,8 @@
 
     .move-btn {
       position: relative;
-      padding-left: 10px;
-      max-height: 22px; // Workaround to avoid jQuery "jumping" effect
+      padding-left: px(10);
+      max-height: px(22); // Workaround to avoid jQuery "jumping" effect
 
       &:not(.active) {
         display: none;
@@ -279,24 +279,24 @@
   background: $light-gray;
   color: $light-black;
   display: none;
-  padding: 10px;
+  padding: px(10);
   position: fixed;
-  bottom: 15px;
-  right: 20px;
+  bottom: px(15);
+  right: px(20);
   text-align: center;
 
   .circle {
     float: left;
     background: transparent url('static:images/circle.png') scroll no-repeat;
-    width: 20px;
-    height: 14px;
+    width: px(20);
+    height: px(14);
   }
 }
 
 @mixin timetable-entry-button {
   background: white;
-  height: 19px;
-  padding: 2px;
+  height: px(19);
+  padding: px(2);
 }
 
 .entry-arrows {
@@ -308,14 +308,14 @@
   cursor: default;
   position: absolute;
   right: 0;
-  right: 18px;
+  right: px(18);
   visibility: hidden;
 
   a {
     background: transparent !important;
 
     &:first-child {
-      margin-right: 2px;
+      margin-right: px(2);
     }
   }
 }

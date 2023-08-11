@@ -6,24 +6,25 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 :global(.ui.button).submit-button {
-  margin-top: 15px;
+  margin-top: px(15);
 }
 
 :global(.ui.list).fav-list {
   :global(.item).fav-item {
-    margin: 0 -10px;
+    margin: 0 px(-10);
 
     .list-flex {
       display: flex;
       justify-content: start;
-      margin: 7px 0;
+      margin: px(7) 0;
     }
 
     .detail {
-      margin-top: 7px;
-      width: 350px;
+      margin-top: px(7);
+      width: px(350);
       display: inline-block;
       overflow: hidden;
       white-space: nowrap;
@@ -39,22 +40,22 @@
 }
 
 .empty-favorites {
-  margin: 5px;
+  margin: px(5);
 }
 
 :global(.ui.inline.loader.active).fav-loader {
-  margin: 10px 50%;
+  margin: px(10) 50%;
   width: auto;
 }
 
 .favorite-event-container {
-  margin-top: 15px;
+  margin-top: px(15);
 }
 
 .date-span {
   width: 15%;
-  margin-right: 7px;
-  font-size: 12px;
+  margin-right: px(7);
+  font-size: px(12);
   color: $dark-gray;
 }
 
@@ -65,6 +66,6 @@
   overflow: hidden;
 
   a {
-    margin-right: 5px;
+    margin-right: px(5);
   }
 }

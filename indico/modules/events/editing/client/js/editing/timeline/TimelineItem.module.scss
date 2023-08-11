@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .item-index {
   color: $gray;
 }
 
 .item-visibility-toggle {
-  margin-right: 5px;
+  margin-right: px(5);
 }

@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .equipment-accordion {
-  margin-top: 15px;
+  margin-top: px(15);
 }

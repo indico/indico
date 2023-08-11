@@ -37,19 +37,19 @@
   }
 
   .ruler#horizontal-ruler {
-    top: -16px;
-    left: 16px;
+    top: px(-16);
+    left: px(16);
   }
 
   .ruler#vertical-ruler {
-    width: 10px;
-    left: -6px;
+    width: px(10);
+    left: px(-6);
   }
 
   .ruler .marking {
     box-sizing: border-box;
     position: absolute;
-    border: 1px solid #aaa;
+    border: px(1) solid #aaa;
     color: #aaa;
     background: #eee;
     vertical-align: middle;
@@ -57,28 +57,28 @@
   }
 
   .ruler#vertical-ruler .marking {
-    border-width: 1px 0 0 0;
+    border-width: px(1) 0 0 0;
     text-align: center;
-    width: 15px;
+    width: px(15);
   }
 
   .ruler#horizontal-ruler .marking {
-    border-width: 0 0 0 1px;
-    padding-left: 5px;
-    line-height: 15px;
-    height: 15px;
+    border-width: 0 0 0 px(1);
+    padding-left: px(5);
+    line-height: px(15);
+    height: px(15);
   }
 
   .designer-item {
-    border: 1px dashed $dark-blue;
+    border: px(1) dashed $dark-blue;
     line-height: initial;
 
     &.selected {
-      border-width: 3px;
+      border-width: px(3);
       background-color: $pastel-blue;
 
       &[data-type='fixed_image'] img {
-        padding: 3px;
+        padding: px(3);
       }
 
       &[data-type='fixed'] {
@@ -92,14 +92,14 @@
   }
 
   .template-container {
-    border: 1px solid $gray;
+    border: px(1) solid $gray;
     user-select: none;
-    width: 425px;
-    height: 270px;
+    width: px(425);
+    height: px(270);
     position: relative;
     left: 0;
     top: 0;
-    perspective: 1000px;
+    perspective: px(1000);
 
     .template-content {
       width: 100%;
@@ -140,24 +140,24 @@
 }
 
 #badge-settings-form .form-group-footer {
-  margin-top: 10px;
+  margin-top: px(10);
 }
 
 .margin-editor .form-group {
-  max-width: 120px;
+  max-width: px(120);
 
   .form-label {
     width: inherit;
   }
 
   .form-field input {
-    max-width: 90px;
+    max-width: px(90);
   }
 }
 
 .margin-editor .margins-between .form-group {
   .form-label {
-    width: 200px;
+    width: px(200);
   }
 
   &#form-group-margin_columns .form-label {
@@ -185,11 +185,11 @@
 }
 
 .custom-template-list {
-  margin-top: 20px;
+  margin-top: px(20);
 }
 
 .designer-tools {
-  min-height: 120px;
+  min-height: px(120);
 
   .designer-tools-row {
     display: flex;
@@ -199,7 +199,7 @@
 
     &:not(:first-child) {
       @include transition(opacity 0.2s);
-      border-top: 1px dashed $pastel-gray;
+      border-top: px(1) dashed $pastel-gray;
     }
   }
 
@@ -224,11 +224,11 @@
     display: flex;
     align-items: center;
     margin: 1em 0;
-    min-height: 37px;
+    min-height: px(37);
 
     &:not(:first-child) {
       padding-left: 1em;
-      border-left: 1px solid $gray;
+      border-left: px(1) solid $gray;
     }
 
     &:first-child {
@@ -301,7 +301,7 @@
   height: 100%;
 
   .placeholder-content {
-    padding: 40px;
+    padding: px(40);
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -335,7 +335,7 @@
     a {
       display: flex;
       align-items: center;
-      padding: 10px;
+      padding: px(10);
     }
 
     .template-icon-badge {
@@ -393,8 +393,8 @@
 #bg-color-preview {
   width: 1em;
   height: 1.6em;
-  margin-right: -2px;
-  border: 1px solid rgb(223, 223, 223);
+  margin-right: px(-2);
+  border: px(1) solid rgb(223, 223, 223);
 }
 
 #text-color-selector,

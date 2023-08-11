@@ -6,8 +6,9 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .opaque {
   background-color: $light-gray;
-  padding: 15px !important;
+  padding: px(15) !important;
 }

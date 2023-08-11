@@ -7,6 +7,7 @@
 
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/util' as *;
+@use 'base/utilities' as *;
 
 .timeline-item {
   position: relative;
@@ -22,7 +23,7 @@
     padding: 0.7em 0.2em;
     z-index: 3;
     border-radius: 0;
-    border: 0.5px solid rgba(0, 0, 0, 0.2);
+    border: px(0.5) solid rgba(0, 0, 0, 0.2);
 
     &:hover:not(:global(.other)) {
       opacity: 0.75;
@@ -157,39 +158,39 @@
 
     &:global(.unbookable-periods) {
       @include thin-stripes($unbookable-stripe-colors...);
-      background-size: 30px 30px;
+      background-size: px(30) px(30);
       z-index: 2;
-      height: 30px;
-      border: 1px solid $unbookable-color;
+      height: px(30);
+      border: px(1) solid $unbookable-color;
     }
 
     &:global(.unbookable-hours) {
       @include thin-stripes($unbookable-stripe-colors...);
-      background-size: 30px 30px;
+      background-size: px(30) px(30);
       z-index: 1;
-      height: 30px;
-      border: 1px solid $unbookable-color;
+      height: px(30);
+      border: px(1) solid $unbookable-color;
     }
 
     &:global(.blocking) {
       @include thin-stripes($blocking-stripe-colors...);
-      background-size: 30px 30px;
+      background-size: px(30) px(30);
       z-index: 1;
-      border: 1px solid lighten($conflict-color, 20%);
+      border: px(1) solid lighten($conflict-color, 20%);
       padding: 0.9em 0.2em;
     }
 
     &:global(.overridable-blocking) {
       @include thin-stripes($overridable-blocking-stripe-colors...);
-      background-size: 30px 30px;
+      background-size: px(30) px(30);
       z-index: 1;
-      border: 1px solid $overridable-blocking-color;
+      border: px(1) solid $overridable-blocking-color;
       padding: 0.9em 0.2em;
     }
 
     &:global(.cancellation) {
       background-color: $cancellation-color;
-      border: 1px solid darken($cancellation-color, 15%);
+      border: px(1) solid darken($cancellation-color, 15%);
 
       &.overflow-right {
         @include right-fade-out($conflicting-candidate-fadeout-colors...);
@@ -227,7 +228,7 @@
 
     &:global(.rejection) {
       background-color: $rejection-color;
-      border: 1px solid darken($rejection-color, 25%);
+      border: px(1) solid darken($rejection-color, 25%);
 
       &.overflow-right {
         @include right-fade-out($rejection-fadeout-colors...);
@@ -246,7 +247,7 @@
 
     &:global(.other) {
       background-color: $other-booking-color;
-      border: 1px solid darken($other-booking-color, 10%);
+      border: px(1) solid darken($other-booking-color, 10%);
 
       &.overflow-right {
         @include right-fade-out($other-booking-fadeout-colors...);
@@ -264,7 +265,7 @@
 
       &:hover {
         background-color: lighten($other-booking-color, 1%);
-        border: 1px solid darken($other-booking-color, 30%);
+        border: px(1) solid darken($other-booking-color, 30%);
         z-index: 4;
       }
     }

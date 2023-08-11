@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .header {
   min-height: 4.55rem;
@@ -54,12 +55,12 @@
 }
 
 .search-results .list {
-  max-height: 490px;
+  max-height: px(490);
   overflow-y: auto;
 }
 
 .has-avatar {
-  margin-left: 8px;
+  margin-left: px(8);
 }
 
 :global(.ui.list .item).result-item:first-child {

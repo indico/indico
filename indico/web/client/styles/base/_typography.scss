@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use './palette' as *;
+@use './utilities' as *;
 
 @mixin font-family-body {
   font-family: 'Liberation Sans', sans-serif;
@@ -52,7 +53,7 @@
 }
 
 @mixin font-size-body {
-  font-size: 13px;
+  font-size: px(13);
 }
 
 html,
@@ -137,7 +138,7 @@ pre {
 }
 
 .group-title {
-  border-bottom: 2px solid #eaeaea;
+  border-bottom: px(2) solid #eaeaea;
   display: block;
   font-size: 2em;
   font-weight: normal;
@@ -155,11 +156,11 @@ pre {
   display: block;
   width: 100%;
   font-family: 'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif;
-  font-size: 24px;
+  font-size: px(24);
   font-weight: normal;
   color: #4a4a4a;
-  padding: 3px 3px 5px 3px;
-  border-bottom: 1px solid #aaa;
+  padding: px(3) px(3) px(5) px(3);
+  border-bottom: px(1) solid #aaa;
   margin-bottom: 1em;
 }
 
@@ -180,9 +181,9 @@ td.groupSubTitle {
   font-family: 'Times New Roman', Verdana, Arial, sans-serif;
   font-size: 15pt;
   color: #4e4c46;
-  letter-spacing: 1px;
-  padding: 3px;
-  margin: 10px 0;
+  letter-spacing: px(1);
+  padding: px(3);
+  margin: px(10) 0;
 }
 
 .groupTitleNoBorder {
@@ -190,10 +191,10 @@ td.groupSubTitle {
 }
 
 .quotation {
-  margin: 10px;
-  padding-left: 10px;
+  margin: px(10);
+  padding-left: px(10);
   color: #777;
-  border-left: 4px solid #ddd;
+  border-left: px(4) solid #ddd;
 }
 
 /* Quick rules */
@@ -257,7 +258,7 @@ td.groupSubTitle {
 
 a.small-link {
   color: $light-black;
-  font-size: 11px;
+  font-size: px(11);
 }
 
 .mono,

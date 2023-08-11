@@ -20,7 +20,7 @@
     vertical-align: middle;
   }
   overflow: hidden;
-  min-width: 100px;
+  min-width: px(100);
   background-color: $dark-gray;
 
   & > .i-progress-bar {

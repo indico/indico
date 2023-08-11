@@ -29,9 +29,9 @@
         background: repeating-linear-gradient(
           -40deg,
           $dark-blue,
-          $dark-blue 10px,
-          lighten($dark-blue, 0.5 * $light-color-variation) 10px,
-          lighten($dark-blue, 0.5 * $light-color-variation) 20px
+          $dark-blue px(10),
+          lighten($dark-blue, 0.5 * $light-color-variation) px(10),
+          lighten($dark-blue, 0.5 * $light-color-variation) px(20)
         );
       }
 

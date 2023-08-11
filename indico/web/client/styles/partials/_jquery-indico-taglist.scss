@@ -38,7 +38,7 @@
         margin-right: 0.5rem;
         background: $pastel-blue;
         padding: 0.3rem 0.7rem;
-        border-radius: 2px;
+        border-radius: px(2);
         position: relative;
         cursor: pointer;
         transition: all 0.3s;
@@ -59,7 +59,7 @@
           top: 0.55em;
           right: 0;
           text-decoration: none;
-          padding-left: 2px;
+          padding-left: px(2);
           line-height: 0.5;
           color: #ccc;
           color: rgba(0, 0, 0, 0.2);
@@ -98,7 +98,7 @@
     padding: 0;
     margin: 0;
     position: absolute;
-    top: -500px;
+    top: px(-500);
     z-index: -1;
     visibility: hidden;
   }

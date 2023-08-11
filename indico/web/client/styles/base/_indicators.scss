@@ -7,6 +7,7 @@
 
 @use './palette' as *;
 @use './defaults' as *;
+@use './utilities' as *;
 
 @mixin _indicator-base($top) {
   &::after,
@@ -18,12 +19,12 @@
   }
 
   &::after {
-    margin-top: 1px;
-    border-width: 7px;
+    margin-top: px(1);
+    border-width: px(7);
   }
 
   &::before {
-    border-width: 8px;
+    border-width: px(8);
   }
 }
 
@@ -34,22 +35,26 @@
     border-style: solid outset solid;
     content: '';
     position: absolute;
-    top: -15px;
+    top: px(-15);
   }
 
   &::after {
-    margin-top: 1px;
-    border-width: 7px;
+    margin-top: px(1);
+    border-width: px(7);
     border-bottom-color: $background-color;
   }
 
   &::before {
-    border-width: 7px;
+    border-width: px(7);
     border-bottom-color: $border-color;
   }
 }
 
-@mixin indicator-left($background-color: white, $border-color: $default-border-color, $top: 10px) {
+@mixin indicator-left(
+  $background-color: white,
+  $border-color: $default-border-color,
+  $top: px(10)
+) {
   @include _indicator-base($top);
 
   &::after,
@@ -60,7 +65,7 @@
 
   &::after {
     border-right-color: $background-color;
-    margin-left: 2px;
+    margin-left: px(2);
   }
 
   &::before {
@@ -68,7 +73,11 @@
   }
 }
 
-@mixin indicator-right($background-color: white, $border-color: $default-border-color, $top: 10px) {
+@mixin indicator-right(
+  $background-color: white,
+  $border-color: $default-border-color,
+  $top: px(10)
+) {
   @include _indicator-base($top);
 
   &::after,
@@ -79,7 +88,7 @@
 
   &::after {
     border-left-color: $background-color;
-    margin-right: 2px;
+    margin-right: px(2);
   }
 
   &::before {
@@ -90,7 +99,7 @@
 @mixin indicator-top-left(
   $background-color: white,
   $border-color: $default-border-color,
-  $left: 10px
+  $left: px(10)
 ) {
   @include _indicator-top-base($background-color, $border-color);
 
@@ -100,14 +109,14 @@
   }
 
   &::after {
-    margin-right: 2px;
+    margin-right: px(2);
   }
 }
 
 @mixin indicator-top-right(
   $background-color: white,
   $border-color: $default-border-color,
-  $right: 10px
+  $right: px(10)
 ) {
   @include _indicator-top-base($background-color, $border-color);
 

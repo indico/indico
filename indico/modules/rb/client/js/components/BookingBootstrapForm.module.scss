@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
 .booking-type-field {
   display: flex;
@@ -21,7 +22,7 @@
 
     :global(.ui.input input) {
       width: 100%;
-      min-width: 60px;
+      min-width: px(60);
     }
   }
 
@@ -32,6 +33,6 @@
 
 @media (max-width: $tablet-width) {
   :global(.DateInput) {
-    width: 110px;
+    width: px(110);
   }
 }

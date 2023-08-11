@@ -85,7 +85,7 @@
   padding: 0;
   vertical-align: top;
   text-align: center;
-  box-shadow: 0 2px 1px 0 $gray;
+  box-shadow: 0 px(2) px(1) 0 $gray;
   background-color: $dark-blue;
   box-sizing: initial;
   line-height: initial;
@@ -183,7 +183,7 @@
     padding: 0.4em 0.6em 0;
     font-size: 1em;
     height: 1em;
-    border-top: 1px solid $light-blue;
+    border-top: px(1) solid $light-blue;
 
     & > .i-badge-legend-left {
       float: left;
@@ -201,7 +201,7 @@
 }
 
 span.badge {
-  border-radius: 5px;
+  border-radius: px(5);
   padding: 0.1em 0.4em;
   font-size: 0.8em;
   margin-left: 0.5em;

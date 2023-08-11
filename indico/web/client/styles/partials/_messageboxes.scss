@@ -8,7 +8,7 @@
 @use 'base' as *;
 @use './boxes' as *;
 
-$default-spacing: 10px;
+$default-spacing: px(10);
 
 @mixin message-box {
   @include default-border-radius();
@@ -16,7 +16,7 @@ $default-spacing: 10px;
   flex-wrap: wrap;
   color: $light-black;
   padding: $default-spacing;
-  margin-bottom: 18px;
+  margin-bottom: px(18);
   // overrides custom line-height set by semantic ui that breaks message-boxes
   line-height: normal;
 
@@ -73,58 +73,58 @@ $default-spacing: 10px;
 
 @mixin message-tag {
   @include default-border-radius();
-  padding: 0 4px;
+  padding: 0 px(4);
 }
 
 .info-message {
   color: #3a87ad;
   background-color: #d9edf7;
-  padding: 8px 14px 8px 14px;
-  margin-bottom: 18px;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  border: 1px solid #bce8f1;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+  padding: px(8) px(14) px(8) px(14);
+  margin-bottom: px(18);
+  text-shadow: 0 px(1) 0 rgba(255, 255, 255, 0.5);
+  border: px(1) solid #bce8f1;
+  -webkit-border-radius: px(4);
+  -moz-border-radius: px(4);
+  border-radius: px(4);
   text-align: center;
 }
 
 .error-message {
   color: #a76766;
   background-color: #f2dede;
-  padding: 8px 14px 8px 14px;
-  margin-bottom: 18px;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  border: 1px solid #a76766;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+  padding: px(8) px(14) px(8) px(14);
+  margin-bottom: px(18);
+  text-shadow: 0 px(1) 0 rgba(255, 255, 255, 0.5);
+  border: px(1) solid #a76766;
+  -webkit-border-radius: px(4);
+  -moz-border-radius: px(4);
+  border-radius: px(4);
   text-align: center;
 }
 
 .warning-message {
   color: #be9056;
   background-color: #fff3e2;
-  padding: 8px 14px 8px 14px;
-  margin-bottom: 18px;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  border: 1px solid #be9056;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+  padding: px(8) px(14) px(8) px(14);
+  margin-bottom: px(18);
+  text-shadow: 0 px(1) 0 rgba(255, 255, 255, 0.5);
+  border: px(1) solid #be9056;
+  -webkit-border-radius: px(4);
+  -moz-border-radius: px(4);
+  border-radius: px(4);
   text-align: center;
 }
 
 .success-message {
   color: #638864;
   background-color: #dbeed3;
-  padding: 8px 14px 8px 14px;
-  margin-bottom: 18px;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  border: 1px solid #638864;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+  padding: px(8) px(14) px(8) px(14);
+  margin-bottom: px(18);
+  text-shadow: 0 px(1) 0 rgba(255, 255, 255, 0.5);
+  border: px(1) solid #638864;
+  -webkit-border-radius: px(4);
+  -moz-border-radius: px(4);
+  border-radius: px(4);
   text-align: center;
 }
 
@@ -133,7 +133,7 @@ $default-spacing: 10px;
   // Needed for default category 'message' of flash() in flashed_messages.html
   @include message-box();
   background-color: #fafafa;
-  border: 1px solid #ddd;
+  border: px(1) solid #ddd;
 
   .icon {
     @include icon-before('icon-info');
@@ -147,7 +147,7 @@ $default-spacing: 10px;
 .highlight-message-box {
   @include message-box();
   background-color: $light-blue;
-  border: 1px solid $dark-blue;
+  border: px(1) solid $dark-blue;
 
   .icon {
     @include icon-before('icon-lamp');
@@ -162,7 +162,7 @@ $default-spacing: 10px;
 .success-message-box {
   @include message-box();
   background-color: #eefaee;
-  border: 1px solid #cdc;
+  border: px(1) solid #cdc;
 
   .icon {
     @include icon-before('icon-checkmark');
@@ -180,7 +180,7 @@ $default-spacing: 10px;
 .warning-message-box {
   @include message-box();
   background-color: #fff3e2;
-  border: 1px solid #be9056;
+  border: px(1) solid #be9056;
 
   .icon {
     @include icon-before('icon-warning');
@@ -195,7 +195,7 @@ $default-spacing: 10px;
 .error-message-box {
   @include message-box();
   background-color: $light-red;
-  border: 1px solid $dark-red;
+  border: px(1) solid $dark-red;
 
   .icon {
     @include icon-before('icon-disable');
@@ -210,7 +210,7 @@ $default-spacing: 10px;
 .danger-message-box {
   @include message-box();
   background-color: $light-red;
-  border: 1px solid $dark-red;
+  border: px(1) solid $dark-red;
 
   .icon {
     @include icon-before('icon-warning');

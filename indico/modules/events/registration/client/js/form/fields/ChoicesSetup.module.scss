@@ -19,7 +19,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1em;
-  padding-bottom: 25px;
+  padding-bottom: px(25);
 
   tr:hover .table-sortable-handle,
   td:active .table-sortable-handle {
@@ -28,7 +28,7 @@
 
   .table-sortable-handle {
     color: $dark-gray;
-    width: 15px;
+    width: px(15);
     cursor: grab;
 
     &:active {
@@ -39,7 +39,7 @@
   thead {
     th {
       @include border-bottom();
-      padding-bottom: 4px;
+      padding-bottom: px(4);
       vertical-align: top;
     }
 
@@ -54,7 +54,7 @@
 
   td,
   th {
-    padding: 4px 4px;
+    padding: px(4) px(4);
   }
 
   tr {
@@ -71,7 +71,11 @@
 
       input[type='text'],
       input[type='number'] {
-        background-image: repeating-linear-gradient(-45deg, $pastel-gray 0 2px, white 3px 15px);
+        background-image: repeating-linear-gradient(
+          -45deg,
+          $pastel-gray 0 px(2),
+          white px(3) px(15)
+        );
         border-color: $gray;
         color: $dark-black;
       }
@@ -82,7 +86,7 @@
     }
 
     td a {
-      padding: 2px;
+      padding: px(2);
     }
   }
 }

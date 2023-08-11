@@ -40,8 +40,8 @@
   }
 
   .open-review-notification-log {
-    margin-top: 5px;
-    margin-right: 10px;
+    margin-top: px(5);
+    margin-right: px(10);
     position: absolute;
     right: 0;
     z-index: 1;
@@ -68,12 +68,12 @@
 
   .submission-code {
     font-size: 0.8em;
-    border: 1px solid $dark-gray;
-    border-radius: 3px;
+    border: px(1) solid $dark-gray;
+    border-radius: px(3);
     padding: 0 0.2em;
     background-color: $dark-gray;
     color: $light-gray;
-    margin-left: 5px;
+    margin-left: px(5);
   }
 
   .toolbar {
@@ -276,7 +276,7 @@
   .global-state-icon {
     @include semantic-background();
     align-self: flex-start;
-    margin-right: 10px;
+    margin-right: px(10);
     border-radius: 50%;
     width: 2em;
     height: 2em;
@@ -285,9 +285,9 @@
   .group-state-icon {
     @include semantic-outline();
     border: none !important;
-    margin-right: 10px;
+    margin-right: px(10);
     // Align with header icon by adding its width and border
-    width: calc(2em + 2px);
+    width: calc(2em + #{px(2)});
 
     > span {
       display: flex;
@@ -299,7 +299,7 @@
   }
 
   .global-review-summary {
-    margin-bottom: 10px;
+    margin-bottom: px(10);
     color: $light-black;
 
     .summary-title {
@@ -319,7 +319,7 @@
     padding: 0;
 
     &__summary {
-      padding: 5px 10px;
+      padding: px(5) px(10);
       min-height: 2em;
       min-width: 0;
     }
@@ -329,7 +329,7 @@
 
       .details-content-row {
         color: $dark-gray;
-        padding: 5px 10px 5px calc(22px + 2em);
+        padding: px(5) px(10) px(5) calc(#{px(22)} + 2em);
 
         &:not(:first-child) {
           @include border-top($style: dashed);
@@ -339,12 +339,12 @@
 
     &__link {
       font-size: small;
-      margin-right: 10px;
+      margin-right: px(10);
       flex-shrink: 0;
     }
 
     &__track {
-      margin-right: 10px;
+      margin-right: px(10);
     }
   }
 
@@ -353,7 +353,7 @@
   }
 
   .details-content-inner {
-    box-shadow: inset 0 15px 20px -20px $gray;
+    box-shadow: inset 0 px(15) px(20) px(-20) $gray;
 
     .i-tag {
       border-color: transparent;
@@ -375,7 +375,7 @@
     font-weight: bold;
     background: $pastel-gray;
     color: $light-black;
-    padding: 0 6px;
+    padding: 0 px(6);
   }
 
   .question-text {
@@ -484,7 +484,7 @@
       cursor: pointer;
 
       &::after {
-        @include border-all($color: $pastel-gray, $width: 2px);
+        @include border-all($color: $pastel-gray, $width: px(2));
         background: transparent;
       }
     }
@@ -501,8 +501,8 @@
 }
 
 .profile-picture {
-  width: 39px;
-  height: 39px;
-  max-width: 39px !important;
-  margin-right: 10px;
+  width: px(39);
+  height: px(39);
+  max-width: px(39) !important;
+  margin-right: px(10);
 }

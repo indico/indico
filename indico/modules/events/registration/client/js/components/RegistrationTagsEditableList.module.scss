@@ -5,14 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .removable-tags-container {
   display: flex;
   flex-wrap: wrap;
-  grid-gap: 4px;
+  grid-gap: px(4);
 }
 
 .selectable-tags-container {
-  max-height: 260px;
+  max-height: px(260);
   overflow-y: auto;
 
   & > div {

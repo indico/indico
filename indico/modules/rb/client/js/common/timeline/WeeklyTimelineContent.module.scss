@@ -7,12 +7,13 @@
 
 @use 'rb:styles/palette' as *;
 @use './TimelineContent.module.scss' as *;
+@use 'base/utilities' as *;
 
 .timeline-day-divider {
   position: absolute;
   top: 0;
   height: 100%;
-  border-left: 1px solid $pastel-gray;
+  border-left: px(1) solid $pastel-gray;
 
   &:global(.hidden) {
     opacity: 0.35;

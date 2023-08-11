@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .group-review-form {
   :global(.form-preface) {
-    font-size: 13px;
+    font-size: px(13);
     font-weight: bold;
   }
 

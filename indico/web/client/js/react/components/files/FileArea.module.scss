@@ -5,16 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .dropzone-area {
   :global(.ui.segment) {
-    border: 2px dashed #007cac !important;
+    border: px(2) dashed #007cac !important;
   }
 
   .file-card {
     .action {
       position: absolute;
-      top: 3px;
-      right: 2px;
+      top: px(3);
+      right: px(2);
       cursor: pointer;
     }
 
@@ -35,7 +37,7 @@
   }
 
   .file-selection-btn {
-    margin-top: 10px;
+    margin-top: px(10);
     max-width: none !important;
   }
 }

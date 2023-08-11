@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .menu {
   flex-wrap: wrap;
-  padding-bottom: 2px;
+  padding-bottom: px(2);
 }
 
 .grid {

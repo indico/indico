@@ -7,8 +7,9 @@
 
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/util' as *;
+@use 'base/utilities' as *;
 
-$row-height: 40px;
+$row-height: px(40);
 $split-row-height: $row-height / 2;
 
 @keyframes rotate90 {
@@ -49,7 +50,7 @@ $split-row-height: $row-height / 2;
   }
 
   .timeline-header-actions {
-    width: 70px;
+    width: px(70);
   }
 }
 
@@ -62,7 +63,7 @@ $split-row-height: $row-height / 2;
     position: absolute;
     top: 0;
     height: 100%;
-    border-left: 1px solid $light-gray;
+    border-left: px(1) solid $light-gray;
   }
 }
 
@@ -90,7 +91,7 @@ $split-row-height: $row-height / 2;
         text-align: right;
 
         &.gutter {
-          border-left: 5px solid lighten($highlight-color, 25%);
+          border-left: px(5) solid lighten($highlight-color, 25%);
           background-color: lighten($highlight-color, 35%);
         }
 
@@ -117,7 +118,7 @@ $split-row-height: $row-height / 2;
       font-size: 1.8em;
       z-index: 4;
       text-align: right;
-      width: 70px;
+      width: px(70);
     }
 
     &:hover .timeline-row-actions :global(.icon) {
@@ -144,7 +145,7 @@ $split-row-height: $row-height / 2;
   margin-top: 2em !important;
   color: rgba(0, 0, 0, 0.87) !important;
   position: fixed;
-  bottom: 10px;
+  bottom: px(10);
   top: auto;
 
   &::before {

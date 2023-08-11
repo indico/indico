@@ -5,8 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-$indico-top-bar-height: 50px;
-$menu-height: 75px;
+@use 'base/utilities' as *;
+
+$indico-top-bar-height: px(50);
+$menu-height: px(75);
 $rb-content-padding: 2em;
 $sui-font-family: 'Muli', 'Helvetica Neue', 'Arial', 'Helvetica', sans-serif;
 
@@ -14,14 +16,14 @@ $sui-font-family: 'Muli', 'Helvetica Neue', 'Arial', 'Helvetica', sans-serif;
   background-image: repeating-linear-gradient(
     45deg,
     $first,
-    $first 15px,
-    $second 15px,
-    $second 30px
+    $first px(15),
+    $second px(15),
+    $second px(30)
   );
 }
 
 @mixin thiner-stripes($first, $second) {
-  background-image: repeating-linear-gradient(45deg, $first 0 5px, $second 5px 10px);
+  background-image: repeating-linear-gradient(45deg, $first 0 px(5), $second px(5) px(10));
 }
 
 @mixin thin-stripes($first, $second) {
@@ -43,37 +45,37 @@ $sui-font-family: 'Muli', 'Helvetica Neue', 'Arial', 'Helvetica', sans-serif;
 }
 
 @mixin left-fade-out($base, $fade) {
-  background-image: linear-gradient(to right, $fade, $base 30px);
+  background-image: linear-gradient(to right, $fade, $base px(30));
 }
 
 @mixin right-fade-out($base, $fade) {
-  background-image: linear-gradient(to left, $fade, $base 30px);
+  background-image: linear-gradient(to left, $fade, $base px(30));
 }
 
 @mixin fade-out($base, $fade) {
-  background-image: linear-gradient(to left, $fade, $base 30px, $base 50%, rgba(1, 1, 1, 0) 51%),
-    linear-gradient(to right, $fade, $base 30px, $base 50%, rgba(1, 1, 1, 0) 51%);
+  background-image: linear-gradient(to left, $fade, $base px(30), $base 50%, rgba(1, 1, 1, 0) 51%),
+    linear-gradient(to right, $fade, $base px(30), $base 50%, rgba(1, 1, 1, 0) 51%);
 }
 
 @mixin right-fade-out-stripes($first, $second) {
-  background-image: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
-    repeating-linear-gradient(45deg, $first, $first 15px, $second 15px, $second 30px);
+  background-image: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) px(30)),
+    repeating-linear-gradient(45deg, $first, $first px(15), $second px(15), $second px(30));
 }
 
 @mixin left-fade-out-stripes($first, $second) {
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
-    repeating-linear-gradient(45deg, $first, $first 15px, $second 15px, $second 30px);
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) px(30)),
+    repeating-linear-gradient(45deg, $first, $first px(15), $second px(15), $second px(30));
 }
 
 @mixin fade-out-stripes($first, $second) {
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
-    linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
-    repeating-linear-gradient(45deg, $first, $first 15px, $second 15px, $second 30px);
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) px(30)),
+    linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) px(30)),
+    repeating-linear-gradient(45deg, $first, $first px(15), $second px(15), $second px(30));
 }
 
 // stylelint-disable-next-line length-zero-no-unit
-@mixin remaining-screen-height($offset: 0px) {
+@mixin remaining-screen-height($offset: px(0)) {
   height: calc(
-    100vh - (#{$indico-top-bar-height} + #{$menu-height} + var(--extra-bars, 0) * 50px) - #{$offset}
+    100vh - (#{$indico-top-bar-height} + #{$menu-height} + var(--extra-bars, 0) * px(50)) - #{$offset}
   );
 }

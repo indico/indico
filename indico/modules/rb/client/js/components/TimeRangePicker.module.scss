@@ -5,24 +5,26 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .time-range-picker {
   display: flex;
   justify-content: space-between;
-  width: 200px;
+  width: px(200);
 
   .start-time-dropdown {
-    max-width: 100px !important;
-    min-width: 90px !important;
+    max-width: px(100) !important;
+    min-width: px(90) !important;
     text-align: center !important;
   }
 
   .end-time-dropdown {
-    max-width: 100px !important;
-    min-width: 90px !important;
+    max-width: px(100) !important;
+    min-width: px(90) !important;
     text-align: center !important;
 
     :global(.menu) {
-      min-width: 140px !important;
+      min-width: px(140) !important;
     }
   }
 

@@ -15,14 +15,14 @@
   img {
     cursor: pointer;
     float: right;
-    padding: 2px;
+    padding: px(2);
     position: absolute;
-    right: 2px;
+    right: px(2);
   }
 
   input {
-    width: 150px;
-    padding-right: 20px;
+    width: px(150);
+    padding-right: px(20);
   }
 }
 
@@ -73,7 +73,7 @@ i.info-helper {
 }
 
 .i-linking {
-  width: 400px;
+  width: px(400);
   min-height: 2.5em;
 
   > label {
@@ -109,8 +109,8 @@ i.info-helper {
 .text-holder-box {
   @include border-all($style: dashed);
   color: $light-black;
-  min-height: 25px;
-  min-width: 320px;
-  margin-bottom: 10px;
-  padding: 5px 10px;
+  min-height: px(25);
+  min-width: px(320);
+  margin-bottom: px(10);
+  padding: px(5) px(10);
 }

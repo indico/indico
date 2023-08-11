@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .news-toolbar {
   padding: 1em;
@@ -14,8 +15,8 @@
 .news-item {
   background-color: lighten($light-gray, 1%);
   overflow: hidden;
-  border: 1px $gray solid;
-  box-shadow: 0 2px 1px -1px $pastel-gray;
+  border: px(1) $gray solid;
+  box-shadow: 0 px(2) px(1) px(-1) $pastel-gray;
   padding: 1em;
 
   &:not(:last-child) {

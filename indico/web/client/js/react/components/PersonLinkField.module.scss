@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .person-link-field {
   color: rgba(0, 0, 0, 0.87);
@@ -15,12 +16,12 @@
   max-height: 40vh;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
-  scroll-padding: 4px;
+  scroll-padding: px(4);
 }
 
 .person-link {
   display: flex;
-  padding: 1px 0;
+  padding: px(1) 0;
   scroll-snap-align: start;
 }
 
@@ -30,7 +31,7 @@
 
 .person-link .handle {
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: px(8);
 }
 
 .principal {
@@ -66,7 +67,7 @@
   content: '';
   flex: 1;
   background-color: #d4d4d5;
-  height: 1px;
+  height: px(1);
   display: inline-block;
   margin-left: 1rem;
 }
@@ -102,5 +103,5 @@
 }
 
 .icon {
-  width: 32px !important;
+  width: px(32) !important;
 }

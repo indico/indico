@@ -156,7 +156,7 @@ $i-button-spacing: 0.3rem;
   @include _i-button-borderless($light-black, $black);
   @include _i-button-outlines($light-black, $black);
   margin: 0;
-  padding: 4px 10px 4px;
+  padding: px(4) px(10) px(4);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -168,12 +168,12 @@ $i-button-spacing: 0.3rem;
   }
 
   &:hover {
-    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+    box-shadow: px(1) px(1) px(4) rgba(20, 20, 20, 0.1);
   }
 
   &:active,
   &.open {
-    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+    box-shadow: px(1) px(1) px(4) rgba(20, 20, 20, 0.1) inset;
   }
 
   &:disabled,
@@ -249,7 +249,7 @@ input.i-button[type='submit'] {
 }
 
 a.i-big-button {
-  $size: 60px;
+  $size: px(60);
   @include button();
 
   background: #fff;
@@ -290,7 +290,7 @@ a.i-big-button {
 .i-button.signin {
   display: block;
   text-align: left;
-  margin-top: 5px;
+  margin-top: px(5);
 
   .auth-id {
     font-weight: bold;
@@ -321,8 +321,8 @@ button::-moz-focus-inner {
 
   border-color: #b6ad6f;
   color: #e2e28b !important;
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 0 6px #e6db64;
+  text-shadow: 0 0 px(1) rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 px(6) #e6db64;
 }
 
 /* ******************** */
@@ -345,9 +345,9 @@ button::-moz-focus-inner {
 }
 
 .i-button-small {
-  font-size: 11px;
-  line-height: 16px;
-  padding: 9px;
+  font-size: px(11);
+  line-height: px(16);
+  padding: px(9);
 }
 
 .i-button.inline {
@@ -355,8 +355,8 @@ button::-moz-focus-inner {
 }
 
 .i-button.right {
-  margin-left: 5px;
-  margin-top: 5px;
+  margin-left: px(5);
+  margin-top: px(5);
 }
 
 .i-button.bottom {
@@ -380,7 +380,7 @@ a.arrow,
 .i-button.color-button {
   @include icon-before(icon-text-color);
 
-  padding: 1px;
+  padding: px(1);
   border-radius: 50%;
   vertical-align: baseline;
 }

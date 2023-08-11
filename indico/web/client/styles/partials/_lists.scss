@@ -16,30 +16,30 @@
   margin: 0;
   padding: 0;
   display: inline-block;
-  min-width: 450px;
+  min-width: px(450);
 }
 
 .ordered-list > li {
-  border-bottom: 1px solid #ddd;
-  padding: 5px 0;
+  border-bottom: px(1) solid #ddd;
+  padding: px(5) 0;
   list-style-type: none;
 }
 
 .ordered-list > li > .list-item-title {
-  font-size: 14px;
+  font-size: px(14);
   font-weight: bold;
   color: #666;
-  padding-bottom: 5px;
+  padding-bottom: px(5);
 }
 
 .ordered-list > li > .list-item-content {
   color: #888;
-  padding-top: 2px;
+  padding-top: px(2);
 }
 
 .ordered-list > li > .list-item-content > .list-item-content-title {
   font-weight: bold;
-  padding-right: 5px;
+  padding-right: px(5);
 }
 
 .ordered-list > li > .list-item-content > .list-item-content-data {
@@ -48,7 +48,7 @@
 
 dl.i-data-list {
   @include font-family-form();
-  max-width: 800px;
+  max-width: px(800);
   color: $light-black;
   margin-top: 1em;
   line-height: 1.5;

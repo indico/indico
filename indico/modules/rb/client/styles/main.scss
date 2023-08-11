@@ -9,8 +9,9 @@
 @use 'rb:styles/sui_fixes' as *;
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'base/utilities' as *;
 
-$indico-top-bar-height: 50px;
+$indico-top-bar-height: px(50);
 
 input {
   font-size: 100%;
@@ -37,14 +38,14 @@ a {
   height: $indico-top-bar-height;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 px(20);
 
   .indico-top-bar-logo {
     display: flex;
     align-items: center;
 
     img {
-      height: 30px;
+      height: px(30);
     }
   }
 
@@ -54,13 +55,13 @@ a {
 }
 
 .room-edit-modal-add-btn {
-  margin-bottom: 15px !important;
+  margin-bottom: px(15) !important;
 }
 
 .flex-container {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: px(5);
 
   .DateRangePicker {
     padding-bottom: 0 !important;
@@ -71,7 +72,7 @@ a {
   cursor: pointer;
   color: $red;
   opacity: 0.5 !important;
-  padding-left: 15px;
+  padding-left: px(15);
 
   &:hover {
     opacity: 1 !important;
@@ -95,7 +96,7 @@ a {
   display: flex;
   align-items: baseline;
   flex-direction: row;
-  margin-bottom: 10px;
+  margin-bottom: px(10);
 
   .filter-row-filters {
     display: flex;
@@ -103,8 +104,8 @@ a {
     flex-wrap: wrap;
 
     > * {
-      margin-right: 10px !important;
-      margin-bottom: 10px !important;
+      margin-right: px(10) !important;
+      margin-bottom: px(10) !important;
     }
   }
 }
@@ -149,11 +150,11 @@ a {
 }
 
 @mixin banner-bar {
-  height: 50px;
+  height: px(50);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 px(20);
 
   .content {
     display: flex;
@@ -199,10 +200,10 @@ $text-yellow: lighten($yellow, 15%);
 
 .impersonation-bar {
   @include banner-bar();
-  height: 50px;
+  height: px(50);
   background-color: $dark-black;
   color: $text-yellow;
-  box-shadow: 0 -5px 1px -2px rgba(#000, 0.2) inset;
+  box-shadow: 0 px(-5) px(1) px(-2) rgba(#000, 0.2) inset;
 
   strong {
     color: lighten($yellow, 30%);
