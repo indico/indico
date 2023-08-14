@@ -248,7 +248,7 @@ tomli==2.0.1
     #   pip-tools
     #   pyproject-hooks
     #   pytest
-tornado==6.3.2
+tornado==6.3.3
     # via livereload
 urllib3==1.26.16
     # via
