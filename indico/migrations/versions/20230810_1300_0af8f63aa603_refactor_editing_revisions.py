@@ -64,7 +64,9 @@ def _create_new_revisions(conn):
     new_revisions = []
     for editable_id, submitter_id, editor_id, reviewed_dt, final_state, comment in conn.execute(query):
         revision_type = {
-            _FinalRevisionState.needs_submitter_changes: _RevisionType.changes_rejection,
+            _FinalRevisionState.needs_submitter_changes: (_RevisionType.needs_submitter_changes
+                                                          if editor_id is not None
+                                                          else _RevisionType.changes_rejection),
             _FinalRevisionState.accepted: _RevisionType.acceptance,
             _FinalRevisionState.rejected: _RevisionType.rejection,
         }[final_state]
@@ -104,6 +106,24 @@ def upgrade():
         raise Exception('This upgrade is only possible in online mode')
     conn = op.get_bind()
     # deal with some revisions being reviewed before being created
+    # the "request changes with files" are trickier because we can't change the reviewed_dt
+    # since it's used to determine their state
+    op.execute(f'''
+        UPDATE event_editing.revisions AS a
+        SET created_dt = reviewed_dt - interval '1 millisecond'
+        WHERE reviewed_dt <= created_dt AND
+              EXISTS (SELECT 1
+                      FROM event_editing.revisions AS b
+                      WHERE a.id != b.id AND
+                            a.editable_id = b.editable_id AND
+                            a.final_state = {_FinalRevisionState.needs_submitter_changes} AND
+                            b.final_state = {_FinalRevisionState.needs_submitter_changes} AND
+                            a.editor_id IS NOT NULL AND
+                            a.editor_id = b.editor_id AND
+                            a.reviewed_dt IS NOT NULL AND
+                            a.reviewed_dt = b.reviewed_dt AND
+                            a.created_dt > b.created_dt)
+    ''')
     op.execute('''
         UPDATE event_editing.revisions
         SET reviewed_dt = created_dt + interval '1 millisecond'
