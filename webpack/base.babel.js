@@ -11,6 +11,7 @@ import path from 'path';
 
 import autoprefixer from 'autoprefixer';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import pxToRem from 'postcss-pxtorem';
 import postcssURL from 'postcss-url';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
@@ -97,6 +98,12 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
     url: true,
   };
 
+  const _pxToRemOptions = {
+    rootValue: 14,
+    mediaQuery: true,
+    propList: ['*'],
+  };
+
   const scssIncludePath = path.join(
     config.isPlugin
       ? path.resolve(config.build.indicoSourcePath, './indico/web/client')
@@ -172,6 +179,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
           sourceMap: true,
           url: !config.isPlugin,
           ...cssLoaderOptions,
+          importLoaders: 2,
         },
       },
       {
@@ -186,6 +194,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
           sourceMap: true,
           postcssOptions: {
             plugins: [
+              pxToRem(_pxToRemOptions),
               autoprefixer,
               postcssURL({
                 url: postCSSURLResolver,
@@ -263,7 +272,18 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
                 },
                 {
                   loader: 'css-loader',
-                  options: _cssLoaderOptions,
+                  options: {
+                    ..._cssLoaderOptions,
+                  },
+                },
+                {
+                  loader: 'postcss-loader',
+                  options: {
+                    sourceMap: true,
+                    postcssOptions: {
+                      plugins: [pxToRem(_pxToRemOptions), autoprefixer],
+                    },
+                  },
                 },
               ],
             },
@@ -274,7 +294,6 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
                   localIdentContext: path.resolve(globalBuildConfig.clientPath, '../../modules'),
                   localIdentName: '[path]___[name]__[local]___[contenthash:base64:5]',
                 },
-                importLoaders: 1,
               }),
             },
             {
