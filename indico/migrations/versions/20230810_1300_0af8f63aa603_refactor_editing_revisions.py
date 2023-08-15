@@ -231,7 +231,7 @@ def upgrade():
             (editable_id, user_id, created_dt, type, is_undone, comment) VALUES
             (%s,          %s,      %s,         %s,   %s,        %s)
         ''', rev)
-    op.create_check_constraint('new_revision_not_undone', 'revisions', 'type != 1 OR is_undone = false',
+    op.create_check_constraint('new_revision_not_undone', 'revisions', 'type != 1 OR NOT is_undone',
                                schema='event_editing')
 
 

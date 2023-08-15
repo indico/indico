@@ -41,7 +41,7 @@ class RevisionType(IndicoIntEnum):
 
 class EditingRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
-    __table_args__ = (db.CheckConstraint(f'type != {RevisionType.new} OR is_undone = false',
+    __table_args__ = (db.CheckConstraint(f'type != {RevisionType.new} OR NOT is_undone',
                                          name='new_revision_not_undone'),
                       {'schema': 'event_editing'})
 
