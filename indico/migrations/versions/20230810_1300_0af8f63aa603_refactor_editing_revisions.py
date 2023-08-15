@@ -45,7 +45,7 @@ class _FinalRevisionState(IndicoIntEnum):
 
 def _create_new_revisions(conn):
     query = f'''
-        SELECT editable_id, submitter_id, editor_id, reviewed_dt, final_state, comment
+        SELECT id, editable_id, submitter_id, editor_id, reviewed_dt, final_state, comment
         FROM event_editing.revisions AS a
         WHERE a.final_state IN ({_FinalRevisionState.needs_submitter_changes},
                                 {_FinalRevisionState.accepted},
@@ -62,7 +62,7 @@ def _create_new_revisions(conn):
                                 a.reviewed_dt = b.reviewed_dt)
     '''
     new_revisions = []
-    for editable_id, submitter_id, editor_id, reviewed_dt, final_state, comment in conn.execute(query):
+    for id, editable_id, submitter_id, editor_id, reviewed_dt, final_state, comment in conn.execute(query):
         user_id = editor_id if editor_id is not None else submitter_id
         revision_type = {
             _FinalRevisionState.needs_submitter_changes: (_RevisionType.needs_submitter_changes
@@ -84,7 +84,16 @@ def _create_new_revisions(conn):
                 LIMIT 1
             '''
             user_id = conn.execute(query, (editable_id,)).scalar()
-        new_revisions.append((editable_id, user_id, reviewed_dt, revision_type, False, comment))
+        # get the comments to transfer to the new revision
+        query = '''
+            SELECT id
+            FROM event_editing.comments
+            WHERE revision_id = %s AND
+                  created_dt >= %s AND
+                  undone_judgment = 0
+        '''
+        comment_list = conn.execute(query, (id, reviewed_dt)).fetchall()
+        new_revisions.append((editable_id, user_id, reviewed_dt, revision_type, False, comment, comment_list))
     return new_revisions
 
 
@@ -102,7 +111,7 @@ def _process_undone_judgment_comments(conn):
             _FinalRevisionState.accepted: _RevisionType.acceptance,
             _FinalRevisionState.rejected: _RevisionType.rejection,
         }[undone_judgment]
-        new_revisions.append((editable_id, user_id, created_dt, revision_type, True, text))
+        new_revisions.append((editable_id, user_id, created_dt, revision_type, True, text, []))
     op.execute(f'''
         UPDATE event_editing.comments
         SET is_deleted = true
@@ -240,7 +249,13 @@ def upgrade():
             INSERT INTO event_editing.revisions
             (editable_id, user_id, created_dt, type, is_undone, comment) VALUES
             (%s,          %s,      %s,         %s,   %s,        %s)
-        ''', rev)
+        ''', rev[:-1])
+        for comment in rev[-1]:
+            conn.execute('''
+                UPDATE event_editing.comments
+                SET revision_id = (SELECT id FROM event_editing.revisions ORDER BY id DESC LIMIT 1)
+                WHERE id = %s
+            ''', comment)
     op.create_check_constraint('new_revision_not_undone', 'revisions', 'type != 1 OR NOT is_undone',
                                schema='event_editing')
 
