@@ -85,7 +85,7 @@ def notify_submitter_confirmation(revision, submitter, action):
     """Notify the editor(s) about submitter accepting/rejecting revision changes."""
     editable = revision.editable
     current_editor = editable.editor
-    prev_revision_editor = next(rev.user for rev in editable.valid_revisions[::-1] if rev.is_editor)
+    prev_revision_editor = next(rev.user for rev in editable.valid_revisions[::-1] if rev.is_editor_revision)
     recipients = {current_editor, prev_revision_editor}
     recipients.discard(None)
     if action == EditingConfirmationAction.accept:

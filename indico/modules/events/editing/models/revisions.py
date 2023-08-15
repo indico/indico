@@ -38,6 +38,16 @@ class RevisionType(IndicoIntEnum):
     #: A system revision that resets the state of the editable to "ready for review"
     reset = 10
 
+    @property
+    def is_editor_action(self):
+        return self in (
+            RevisionType.needs_submitter_confirmation,
+            RevisionType.acceptance,
+            RevisionType.rejection,
+            RevisionType.reset,
+            RevisionType.needs_submitter_changes
+        )
+
 
 class EditingRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
@@ -149,8 +159,5 @@ class EditingRevision(RenderModeMixin, db.Model):
         return dict(files)
 
     @property
-    def is_editor(self):
-        if self.type in (RevisionType.needs_submitter_confirmation, RevisionType.acceptance, RevisionType.rejection,
-                         RevisionType.reset, RevisionType.needs_submitter_changes):
-            return True
-        return False
+    def is_editor_revision(self):
+        return self.type.is_editor_action
