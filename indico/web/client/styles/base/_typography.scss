@@ -51,13 +51,10 @@
   font-family: 'Maven Pro', sans-serif;
 }
 
-@mixin font-size-body {
-  font-size: 13px;
-}
-
 html,
 body {
   height: 100%;
+  font-size: inherit; // override specific sizes set in semantic UI
 }
 
 body {
@@ -65,7 +62,6 @@ body {
   padding: 0;
   margin: 0;
   @include font-family-body();
-  @include font-size-body();
 }
 
 .ui {
