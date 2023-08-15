@@ -63,18 +63,28 @@ def _create_new_revisions(conn):
     '''
     new_revisions = []
     for editable_id, submitter_id, editor_id, reviewed_dt, final_state, comment in conn.execute(query):
+        user_id = editor_id if editor_id is not None else submitter_id
         revision_type = {
             _FinalRevisionState.needs_submitter_changes: (_RevisionType.needs_submitter_changes
                                                           if editor_id is not None
                                                           else _RevisionType.changes_rejection),
-            _FinalRevisionState.accepted: _RevisionType.acceptance,
+            _FinalRevisionState.accepted: (_RevisionType.acceptance
+                                           if editor_id is not None
+                                           else _RevisionType.changes_acceptance),
             _FinalRevisionState.rejected: _RevisionType.rejection,
         }[final_state]
-        if revision_type == _RevisionType.acceptance and editor_id is None:
-            revision_type = _RevisionType.changes_acceptance
-        # note: for initial_state=needs_submitter_confirmation revisions which were undone, it's not possible to
-        # know who was the editor
-        new_revisions.append((editable_id, editor_id or submitter_id, reviewed_dt, revision_type, False, comment))
+        # for initial_state=needs_submitter_confirmation revisions approved by the submitter, it is not possible
+        # to know who was the approving submitter. thus, we use the submitter of the first revision as a fallback
+        if revision_type == _RevisionType.changes_acceptance:
+            query = '''
+                SELECT submitter_id
+                FROM event_editing.revisions
+                WHERE editable_id = %s
+                ORDER BY created_dt
+                LIMIT 1
+            '''
+            user_id = conn.execute(query, (editable_id,)).scalar()
+        new_revisions.append((editable_id, user_id, reviewed_dt, revision_type, False, comment))
     return new_revisions
 
 

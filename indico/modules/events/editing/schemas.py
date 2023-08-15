@@ -153,7 +153,7 @@ class EditingRevisionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevision
         fields = ('id', 'created_dt', 'user', 'files', 'comment', 'comment_html',
-                  'comments', 'type', 'is_undone', 'is_editor', 'tags', 'create_comment_url',
+                  'comments', 'type', 'is_undone', 'is_editor_revision', 'tags', 'create_comment_url',
                   'download_files_url', 'review_url', 'confirm_url', 'custom_actions', 'custom_action_url')
 
     comment_html = fields.Function(lambda rev: escape(rev.comment))

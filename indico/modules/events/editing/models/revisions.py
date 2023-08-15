@@ -39,6 +39,15 @@ class RevisionType(IndicoIntEnum):
     reset = 10
 
     @property
+    def is_submitter_action(self):
+        return self in (
+            RevisionType.new,
+            RevisionType.ready_for_review,
+            RevisionType.changes_acceptance,
+            RevisionType.changes_rejection
+        )
+
+    @property
     def is_editor_action(self):
         return self in (
             RevisionType.needs_submitter_confirmation,
@@ -157,6 +166,10 @@ class EditingRevision(RenderModeMixin, db.Model):
             if file.file_type.publishable:
                 files[file.file_type].append(file)
         return dict(files)
+
+    @property
+    def is_submitter_revision(self):
+        return self.type.is_submitter_action
 
     @property
     def is_editor_revision(self):

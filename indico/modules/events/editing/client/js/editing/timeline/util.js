@@ -36,7 +36,7 @@ export function processRevisions(revisions) {
     let tags = revision.tags;
     if (files?.length && !tags?.length) {
       const nextRevision = revisions.slice(i + 1).find(r => !r.isUndone);
-      if (nextRevision?.isEditor) {
+      if (nextRevision?.isEditorRevision) {
         tags = nextRevision.tags;
       }
     }
@@ -138,7 +138,7 @@ export const blockItemPropTypes = {
   internal: PropTypes.bool,
   system: PropTypes.bool,
   isUndone: PropTypes.bool,
-  isEditor: PropTypes.bool,
+  isEditorRevision: PropTypes.bool,
   modifyCommentURL: PropTypes.string,
 };
 
@@ -149,7 +149,7 @@ export const blockPropTypes = {
   createdDt: PropTypes.string.isRequired,
   type: PropTypes.shape(typePropTypes).isRequired,
   isUndone: PropTypes.bool,
-  isEditor: PropTypes.bool,
+  isEditorRevision: PropTypes.bool,
   comment: PropTypes.string.isRequired,
   commentHtml: PropTypes.string.isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,

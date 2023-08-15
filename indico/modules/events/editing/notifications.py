@@ -23,7 +23,7 @@ def notify_comment(comment):
     revision = comment.revision
     editable = revision.editable
     editor = editable.editor
-    submitter = editable.revisions[0].user
+    submitter = next((r.user for r in editable.revisions[::-1] if r.is_submitter_revision), None)
     author = comment.user
     if comment.internal:
         # internal comments notify the editor and anyone who commented + can see internal comments
