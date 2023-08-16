@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask_cors import CORS
-
 from indico.modules.events.registration import api
 from indico.modules.events.registration.controllers import display
 from indico.modules.events.registration.controllers.compat import compat_registration
@@ -18,8 +16,6 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<int:event_id>', template_folder='templates',
                       virtual_template_folder='events/registration', event_feature='registration')
-# Enable CORS for the the Check-in app API endpoints
-CORS(_bp, resources=r'/api/checkin/*')
 
 # Management
 _bp.add_url_rule('/manage/registration/', 'manage_regform_list', regforms.RHManageRegistrationForms)

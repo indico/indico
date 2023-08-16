@@ -17,10 +17,11 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
 from indico.web.args import use_kwargs
-from indico.web.rh import RH, json_errors, oauth_scope
+from indico.web.rh import RH, cors, json_errors, oauth_scope
 
 
 @json_errors
+@cors
 @oauth_scope('registrants')
 class RHAPICheckinBase(RHProtectedEventBase):
     """Base class for the Check-in API."""

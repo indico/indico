@@ -408,3 +408,18 @@ def json_errors(rh):
     """
     rh._JSON_ERRORS = True
     return rh
+
+
+def cors(rh=None, /, **options):
+    """Enable CORS for the decorated RH."""
+
+    def decorator(rh):
+        rh._CORS = options
+        return rh
+
+    if rh is None:
+        # if we used `@cors()` we need to return the inner decorator
+        return decorator
+
+    # in case of `@cors` we have the RH and can apply the actual decorator
+    return decorator(rh)

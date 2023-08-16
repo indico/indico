@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from flask import request
-from flask_cors import CORS
 
 from indico.modules.oauth.controllers import (RHCreatePersonalToken, RHEditPersonalToken, RHOAuthAdmin,
                                               RHOAuthAdminApplication, RHOAuthAdminApplicationDelete,
@@ -19,8 +18,6 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('oauth', __name__, template_folder='templates', virtual_template_folder='oauth')
-# Enable CORS so that the Check-In app can fetch the oauth config
-CORS(_bp, resources=r'/\.well-known/oauth-authorization-server')
 
 # Application endpoints
 _bp.add_url_rule('/.well-known/oauth-authorization-server', 'oauth_metadata', RHOAuthMetadata)
