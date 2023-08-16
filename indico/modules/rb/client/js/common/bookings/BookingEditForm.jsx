@@ -29,6 +29,7 @@ import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
+import WeekdayRecurrencePicker from '../../components/WeekdayRecurrencePicker';
 import {sanitizeRecurrence} from '../../util';
 import {selectors as userSelectors} from '../user';
 
@@ -86,6 +87,28 @@ class BookingEditForm extends React.Component {
     form.change('recurrence', filters.recurrence);
     form.change('dates', filters.dates);
 
+    onBookingPeriodChange(filters.dates, timeSlot, filters.recurrence);
+  };
+
+  handleWeekdaySelect = selectedWeekday => {
+    const {
+      formProps: {
+        form,
+        values: {recurrence, dates, timeSlot},
+      },
+      onBookingPeriodChange,
+    } = this.props;
+    const updatedRecurrence = {
+      ...recurrence,
+      weekday: selectedWeekday,
+    };
+    const filters = {dates, recurrence: updatedRecurrence};
+    sanitizeRecurrence(filters);
+    console.log('** HIT **');
+    console.log('filters ->', filters);
+
+    form.change('recurrence', filters.recurrence);
+    form.change('dates', filters.dates);
     onBookingPeriodChange(filters.dates, timeSlot, filters.recurrence);
   };
 
@@ -197,7 +220,9 @@ class BookingEditForm extends React.Component {
                       },
                     ]}
                     onChange={newInterval => {
+                      console.log('recurrence ->', recurrence);
                       const newRecurrence = {...recurrence, interval: newInterval};
+                      console.log('newRecurrence ->', newRecurrence);
                       onBookingPeriodChange(dates, timeSlot, newRecurrence);
                     }}
                   />
@@ -236,6 +261,16 @@ class BookingEditForm extends React.Component {
               }}
               allowPastTimes
               disabled={submitSucceeded || bookingFinished}
+            />
+          )}
+          {console.log('recurrence ->', recurrence)}
+          {recurrence.type === 'every' && (
+            <WeekdayRecurrencePicker
+              onSelect={this.handleWeekdaySelect}
+              onChange={newWeekdays => {
+                console.log('newWeekdays ->', newWeekdays);
+                onBookingPeriodChange(dates, timeSlot, newWeekdays);
+              }}
             />
           )}
           {!room.canUserBook && room.canUserPrebook && isAccepted && (

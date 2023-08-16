@@ -73,8 +73,8 @@ def get_existing_room_occurrences(room, start_dt, end_dt, repeat_frequency=Repea
                                           allow_overlapping, only_accepted, skip_booking_id).get(room.id, [])
 
 
-def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, allow_overlapping=False,
-                                   only_accepted=False, skip_booking_id=None):
+def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays,
+                                   allow_overlapping=False, only_accepted=False, skip_booking_id=None):
     room_ids = [room.id for room in rooms]
     query = (ReservationOccurrence.query
              .filter(ReservationOccurrence.is_valid, Reservation.room_id.in_(room_ids))
@@ -89,7 +89,8 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
     if only_accepted:
         query = query.filter(Reservation.is_accepted)
     if repeat_frequency != RepeatFrequency.NEVER:
-        candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+        candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
+                                                         recurrence_weekdays)
         dates = [candidate.start_dt for candidate in candidates]
         query = query.filter(db.cast(ReservationOccurrence.start_dt, db.Date).in_(dates))
     if skip_booking_id is not None:
@@ -99,13 +100,15 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
                       sort_by=lambda obj: (obj.reservation.room_id, obj.start_dt))
 
 
-def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, skip_conflicts_with=None,
-                           admin_override_enabled=False, skip_past_conflicts=False):
+def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays,
+                           skip_conflicts_with=None, admin_override_enabled=False, skip_past_conflicts=False):
     availability = {}
-    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
+                                                     recurrence_weekdays)
     date_range = sorted({cand.start_dt.date() for cand in candidates})
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
-                                                 end_dt.replace(hour=23, minute=59), repeat_frequency, repeat_interval)
+                                                 end_dt.replace(hour=23, minute=59), repeat_frequency, repeat_interval,
+                                                 recurrence_weekdays)
     blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
     nonoverridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
                                                                             nonoverridable_only=True,
@@ -117,7 +120,8 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
     conflicts, pre_conflicts, conflicting_candidates = get_rooms_conflicts(
         rooms, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
-        repeat_frequency, repeat_interval, nonoverridable_blocked_rooms,
+        repeat_frequency, repeat_interval, recurrence_weekdays,
+        nonoverridable_blocked_rooms,
         nonbookable_periods, unbookable_hours, skip_conflicts_with,
         allow_admin=admin_override_enabled, skip_past_conflicts=skip_past_conflicts
     )
@@ -439,13 +443,14 @@ def split_booking(booking, new_booking_data):
     return resv
 
 
-def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval):
+def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays):
     """Get events suitable for booking linking.
 
     This finds events that overlap with an occurrence of a booking
     with the given dates where the user is a manager.
     """
-    occurrences = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+    occurrences = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
+                                                      recurrence_weekdays)
     excluded_categories = rb_settings.get('excluded_categories')
     return (Event.query
             .filter(~Event.is_deleted,

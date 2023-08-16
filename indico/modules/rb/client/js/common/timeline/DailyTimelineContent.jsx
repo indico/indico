@@ -374,7 +374,7 @@ export function TimelineRowLabel({
 }
 
 TimelineRowLabel.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   verboseLabel: PropTypes.string,
   longLabel: PropTypes.bool,
   gutterAllowed: PropTypes.bool,

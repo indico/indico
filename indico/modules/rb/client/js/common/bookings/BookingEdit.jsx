@@ -99,7 +99,15 @@ class BookingEdit extends React.Component {
   get initialFormValues() {
     const {
       user: sessionUser,
-      booking: {repetition, startDt, endDt, bookedForUser, bookingReason, internalNote},
+      booking: {
+        repetition,
+        startDt,
+        endDt,
+        bookedForUser,
+        bookingReason,
+        internalNote,
+        recurrenceWeekdays,
+      },
     } = this.props;
     const recurrence = getRecurrenceInfo(repetition);
     const isSingleBooking = recurrence.type === 'single';
@@ -109,6 +117,7 @@ class BookingEdit extends React.Component {
     };
     const timeSlot = {startTime: serializeTime(startDt), endTime: serializeTime(endDt)};
     const usage = bookedForUser.id === sessionUser.id ? 'myself' : 'someone';
+    console.log('recurrence info --> ', recurrence);
 
     return {
       recurrence,
@@ -118,6 +127,7 @@ class BookingEdit extends React.Component {
       user: bookedForUser.identifier,
       reason: bookingReason,
       internalNote,
+      recurrenceWeekdays,
     };
   }
 
@@ -283,6 +293,7 @@ class BookingEdit extends React.Component {
   };
 
   updateBooking = async data => {
+    console.log('data', data);
     const {
       dates: {startDate, endDate},
       timeSlot: {startTime, endTime},
@@ -306,6 +317,7 @@ class BookingEdit extends React.Component {
       end_dt: `${endDate ? endDate : startDate} ${endTime}`,
       repeat_frequency: repeatFrequency,
       repeat_interval: repeatInterval,
+      weekdays: recurrence.weekdays,
       room_id: roomId,
       user,
       reason,

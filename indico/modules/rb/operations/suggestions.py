@@ -28,13 +28,15 @@ DURATION_FACTOR = 0.25
 def get_suggestions(filters, limit=None):
     blocked_rooms = get_blocked_rooms(filters['start_dt'], filters['end_dt'], [BlockedRoomState.accepted])
     rooms = [room for room in search_for_rooms(filters, availability=False) if room not in blocked_rooms]
+    recurrence_weekdays = filters.get('recurrence_weekdays', None)
     if filters['repeat_frequency'] == RepeatFrequency.NEVER:
         suggestions = sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
                                                                       limit=limit))
     else:
         suggestions = sort_suggestions(get_recurring_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
                                                                          filters['repeat_frequency'],
-                                                                         filters['repeat_interval'], limit=limit))
+                                                                         filters['repeat_interval'],
+                                                                         recurrence_weekdays, limit=limit))
     for entry in suggestions:
         entry['room_id'] = entry.pop('room').id
     return suggestions
@@ -52,7 +54,7 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
 
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     rooms_occurrences = get_existing_rooms_occurrences(rooms, new_start_dt, new_end_dt, RepeatFrequency.NEVER, None,
-                                                       allow_overlapping=True)
+                                                       recurrence_weekdays=None, allow_overlapping=True)
     for room in rooms:
         if limit and len(data) == limit:
             break
@@ -79,16 +81,18 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
     return data
 
 
-def get_recurring_booking_suggestions(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, limit=None):
+def get_recurring_booking_suggestions(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays,
+                                      limit=None):
     data = []
     booking_days = end_dt - start_dt
     booking_length = booking_days.days + 1
-    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
+                                                     recurrence_weekdays)
     blocked_rooms = group_blocked_rooms(get_rooms_blockings(rooms, start_dt.date(), end_dt.date()))
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
-    conflicts = get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
-                                    nonbookable_periods, unbookable_hours)[0]
+    conflicts = get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays,
+                                    blocked_rooms, nonbookable_periods, unbookable_hours)[0]
     for room in rooms:
         if limit and len(data) == limit:
             break

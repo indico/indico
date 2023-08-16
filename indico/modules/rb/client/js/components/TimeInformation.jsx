@@ -72,6 +72,14 @@ function TimeInformation({
           </div>
         </Segment>
         {timeInfo}
+        {/* <Segment>
+          <div>
+            <div>
+              <Icon name="sync alternate" />
+              <strong>Recurs every X, Y and Z.</strong>
+            </div>
+          </div>
+        </Segment> //TODO: Clearly show booked weekdays in some way here */}
         <Segment>
           <div styleName="occurrences-details">
             <div>

@@ -62,6 +62,7 @@ class RHTimeline(RHRoomBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
+        'recurrence_weekdays': fields.List(fields.Str(), load_default=None),
         'skip_conflicts_with': fields.List(fields.Int(), load_default=None),
         'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
@@ -136,7 +137,6 @@ class RHCreateBooking(RHRoomBookingBase):
     @use_args(CreateBookingSchema)
     def _process_args(self, args):
         self.args = args
-        print(f'*** create booking args -> {args}')
         self.prebook = args.pop('is_prebooking')
         self.room = Room.get_or_404(self.args.pop('room_id'), is_deleted=False)
 
@@ -289,6 +289,7 @@ class RHBookingEditCalendars(RHBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
+        'recurrence_weekdays': fields.List(fields.Str(), load_default=None)
     }, location='query')
     def _process(self, **kwargs):
         return jsonify(get_booking_edit_calendar_data(self.booking, kwargs))
@@ -367,9 +368,10 @@ class RHMatchingEvents(RHRoomBookingBase):
         'end_dt': fields.DateTime(),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
+        'recurrence_weekdays': fields.List(fields.Str(), load_default=None)
     }, location='query')
-    def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
-        events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval)
+    def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays):
+        events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays)
         return jsonify(reservation_user_event_schema.dump(events))
 
 

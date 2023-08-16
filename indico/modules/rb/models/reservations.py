@@ -334,7 +334,8 @@ class Reservation(db.Model):
         """
         from indico.modules.rb import rb_settings
 
-        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booking_reason'}
+        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id',
+                           'booking_reason', 'recurrence_weekdays'}
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
 

@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
@@ -51,7 +52,11 @@ const _getRowSerializer = (day, room) => {
       overridableBlockings: overridableBlockings[day] || [],
       concurrentPreBookings: concurrentPreBookings[day] || [],
     },
-    label: serializeDate(day, 'L'),
+    label: (
+      <>
+        <span styleName="weekday">{moment(day).format('ddd')}</span> {serializeDate(day, 'L')}
+      </>
+    ),
     key: day,
     room,
   });

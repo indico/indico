@@ -121,25 +121,47 @@ class ReservationOccurrence(db.Model):
 
     @classmethod
     def create_series_for_reservation(cls, reservation):
-        for o in cls.iter_create_occurrences(reservation.start_dt, reservation.end_dt, reservation.repetition):
+        for o in cls.iter_create_occurrences(reservation.start_dt, reservation.end_dt, reservation.repetition,
+                                             reservation.recurrence_weekdays):
             o.reservation = reservation
 
     @classmethod
-    def create_series(cls, start, end, repetition):
-        return list(cls.iter_create_occurrences(start, end, repetition))
+    def create_series(cls, start, end, repetition, recurrence_weekdays):
+        return list(cls.iter_create_occurrences(start, end, repetition, recurrence_weekdays))
 
     @classmethod
-    def iter_create_occurrences(cls, start, end, repetition):
-        for start in cls.iter_start_time(start, end, repetition):
+    def iter_create_occurrences(cls, start, end, repetition, recurrence_weekdays):
+        for start in cls.iter_start_time(start, end, repetition, recurrence_weekdays):
             end = datetime.combine(start.date(), end.time())
             yield ReservationOccurrence(start_dt=start, end_dt=end)
 
     @staticmethod
-    def iter_start_time(start, end, repetition):
+    def map_recurrence_weekdays_to_rrule(weekdays):
+        """
+        Map weekdays from the weekday recurrence picker to dateutil.rrule constants.
+        """
+
+        # Return empty if no weekdays are provided; used after booking creation/viewing details
+        if not weekdays:
+            return []
+
+        weekdays_map = {
+            'mon': rrule.MO,
+            'tue': rrule.TU,
+            'wed': rrule.WE,
+            'thu': rrule.TH,
+            'fri': rrule.FR,
+            'sat': rrule.SA,
+            'sun': rrule.SU
+        }
+
+        return [weekdays_map[day] for day in weekdays]
+
+    @staticmethod
+    def iter_start_time(start, end, repetition, recurrence_weekdays):
         from indico.modules.rb.models.reservations import RepeatFrequency
 
         repeat_frequency, repeat_interval = repetition
-
         if repeat_frequency == RepeatFrequency.NEVER:
             return [start]
 
@@ -151,7 +173,10 @@ class ReservationOccurrence(db.Model):
         elif repeat_frequency == RepeatFrequency.WEEK:
             if repeat_interval <= 0:
                 raise IndicoError('Unsupported interval')
-            return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_interval)
+
+            return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end,
+                               interval=repeat_interval,
+                               byweekday=ReservationOccurrence.map_recurrence_weekdays_to_rrule(recurrence_weekdays))
 
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 0:
@@ -160,8 +185,14 @@ class ReservationOccurrence(db.Model):
             if position == 5:
                 # The fifth weekday of the month will always be the last one
                 position = -1
-            return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(),
-                               bysetpos=position, interval=repeat_interval)
+
+            by_weekday = ReservationOccurrence.map_recurrence_weekdays_to_rrule(recurrence_weekdays)
+            # If no weekdays are provided (from the mapping), use the weekday from the start date
+            if not by_weekday:
+                by_weekday = start.weekday()
+
+            return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=by_weekday, bysetpos=position,
+                               interval=repeat_interval)
 
         raise IndicoError(f'Unexpected frequency {repeat_frequency}')
 

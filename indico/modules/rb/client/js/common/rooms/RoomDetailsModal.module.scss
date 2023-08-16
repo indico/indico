@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/palette';
+
 :global(.ui.modal .header).room-details-header {
   display: flex;
   justify-content: space-between;
@@ -23,4 +25,8 @@
 :global(.ui.basic.blue.button).all-bookings {
   margin-left: auto;
   box-shadow: none !important;
+}
+
+.weekday {
+  color: $dark-gray;
 }

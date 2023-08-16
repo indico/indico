@@ -176,7 +176,11 @@ function RoomDetails({
       blockings: blockings || [],
       overridableBlockings: overridableBlockings || [],
     },
-    label: moment(day).format('L'),
+    label: (
+      <>
+        <span styleName="weekday">{moment(day).format('ddd')}</span> {moment(day).format('L')}
+      </>
+    ),
     key: day,
     room,
   });

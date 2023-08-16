@@ -59,10 +59,8 @@ class RHSearchRooms(RHRoomBookingBase):
         'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
     def _process(self, args):
-        print(f'args -> {args}')
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval',
                                                       'recurrence_weekdays'))
-        print(f'recurrence_weekdays -> {args.get("recurrence_weekdays")}')
         only_unavailable = args.pop('unavailable')
         admin_override_enabled = args.pop('admin_override_enabled')
         if not filter_availability:
@@ -90,9 +88,11 @@ class RHSearchRooms(RHRoomBookingBase):
         try:
             start_dt, end_dt = filters['start_dt'], filters['end_dt']
             repetition = filters['repeat_frequency'], filters['repeat_interval']
+            recurrence_weekdays = filters['recurrence_weekdays']
         except KeyError:
             return None
-        return [dt.date().isoformat() for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)]
+        return [dt.date().isoformat() for dt in ReservationOccurrence.iter_start_time(
+            start_dt, end_dt, repetition, recurrence_weekdays)]
 
     def _adjust_blockings(self, rooms, filters, availability, admin_override_enabled):
         if availability is None:

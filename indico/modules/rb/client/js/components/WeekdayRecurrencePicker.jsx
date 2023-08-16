@@ -22,21 +22,19 @@ function WeekdayRecurrencePicker({onSelect}) {
     };
   }, [delayTimeout]);
 
-  const preselectFirstWeekday = () => {
-    const firstWeekday = moment()
-      .weekday(0)
-      .locale('en')
+  const preselectWeekdayToday = () => {
+    const weekdayToday = moment()
       .format('ddd')
       .toLowerCase();
 
     setSelectedDays(prevSelectedDays => ({
       ...prevSelectedDays,
-      [firstWeekday]: true,
+      [weekdayToday]: true,
     }));
   };
 
   useEffect(() => {
-    preselectFirstWeekday();
+    preselectWeekdayToday();
   }, []);
 
   const handleDayClick = day => {
@@ -61,7 +59,7 @@ function WeekdayRecurrencePicker({onSelect}) {
     if (Object.keys(selectedDays).length === 0) {
       clearTimeout(delayTimeout);
       delayTimeout = setTimeout(() => {
-        preselectFirstWeekday();
+        preselectWeekdayToday();
       }, 250);
     } else {
       clearTimeout(delayTimeout);

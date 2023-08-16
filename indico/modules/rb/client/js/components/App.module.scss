@@ -103,3 +103,7 @@
     min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
   }
 }
+
+:global(.ui.dimmer) {
+  backdrop-filter: blur(0.5rem);
+}
