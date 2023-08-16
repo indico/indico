@@ -92,8 +92,8 @@ def _create_new_revisions(conn):
                   created_dt >= %s AND
                   undone_judgment = 0
         '''
-        comment_list = conn.execute(query, (id, reviewed_dt)).fetchall()
-        new_revisions.append((editable_id, user_id, reviewed_dt, revision_type, False, comment, comment_list))
+        comment_ids = tuple(id_ for id_, in conn.execute(query, (id, reviewed_dt)).fetchall())
+        new_revisions.append((editable_id, user_id, reviewed_dt, revision_type, False, comment, comment_ids))
     return new_revisions
 
 
@@ -245,17 +245,15 @@ def upgrade():
     op.drop_column('revisions', 'final_state', schema='event_editing')
     op.drop_column('revisions', 'reviewed_dt', schema='event_editing')
     for rev in new_revisions:
-        conn.execute('''
+        res = conn.execute('''
             INSERT INTO event_editing.revisions
             (editable_id, user_id, created_dt, type, is_undone, comment) VALUES
             (%s,          %s,      %s,         %s,   %s,        %s)
+            RETURNING id
         ''', rev[:-1])
-        for comment in rev[-1]:
-            conn.execute('''
-                UPDATE event_editing.comments
-                SET revision_id = (SELECT id FROM event_editing.revisions ORDER BY id DESC LIMIT 1)
-                WHERE id = %s
-            ''', comment)
+        revision_id = res.fetchone()[0]
+        if rev[-1]:
+            conn.execute('UPDATE event_editing.comments SET revision_id = %s WHERE id IN %s', (revision_id, rev[-1]))
     op.create_check_constraint('new_revision_not_undone', 'revisions', 'type != 1 OR NOT is_undone',
                                schema='event_editing')
 
