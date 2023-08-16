@@ -94,10 +94,6 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
     nodeModules.push(path.resolve(config.build.rootPath, '../node_modules'));
   }
 
-  const _cssLoaderOptions = {
-    url: true,
-  };
-
   const _pxToRemOptions = {
     rootValue: 14,
     mediaQuery: true,
@@ -272,9 +268,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
                 },
                 {
                   loader: 'css-loader',
-                  options: {
-                    ..._cssLoaderOptions,
-                  },
+                  options: {url: true},
                 },
                 {
                   loader: 'postcss-loader',
