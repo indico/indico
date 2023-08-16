@@ -23,6 +23,7 @@ Improvements
 - Invalidate password reset links once the password has been changed (:pr:`5878`)
 - Add full ACLs for custom conference menu items, instead of just being able to
   restrict them to speakers or registrants (:pr:`5670`, thanks :user:`kewisch`)
+- Make editing timeline display much more straightforward (:pr:`5674`)
 
 Bugfixes
 ^^^^^^^^
