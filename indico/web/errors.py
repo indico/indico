@@ -50,7 +50,7 @@ def load_error_data(uuid):
 
 def _handle_error_cors():
     """Set CORS on error response based on RH's CORS settings."""
-    if not hasattr(g, 'rh') or (cors_config := getattr(g.rh, '_CORS', False)) is False:
+    if not hasattr(g, 'rh') or (cors_config := getattr(g.rh, '_CORS', None)) is None:
         return
 
     cors_options = get_cors_options(current_app, cors_config)
