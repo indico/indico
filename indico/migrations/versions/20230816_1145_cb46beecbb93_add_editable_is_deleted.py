@@ -26,5 +26,20 @@ def upgrade():
 
 
 def downgrade():
+    op.execute('''
+        DELETE FROM event_editing.revision_files fi
+        USING event_editing.revisions rev, event_editing.editables ed
+        WHERE fi.revision_id = rev.id AND rev.editable_id = ed.id AND ed.is_deleted;
+
+        DELETE FROM event_editing.revision_tags tag
+        USING event_editing.revisions rev, event_editing.editables ed
+        WHERE tag.revision_id = rev.id AND rev.editable_id = ed.id AND ed.is_deleted;
+
+        DELETE FROM event_editing.revisions rev
+        USING event_editing.editables ed
+        WHERE rev.editable_id = ed.id AND ed.is_deleted;
+
+        DELETE FROM event_editing.editables WHERE is_deleted;
+    ''')
     op.drop_column('editables', 'is_deleted', schema='event_editing')
     op.create_unique_constraint(None, 'editables', ['contribution_id', 'type'], schema='event_editing')
