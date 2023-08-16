@@ -28,6 +28,7 @@ export default function Timeline() {
   const needsSubmitterChanges = useSelector(selectors.needsSubmitterChanges);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
   const lastRevision = useSelector(selectors.getLastRevision);
+  const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
   const {eventId, contributionId, editableType, fileTypes} = useSelector(selectors.getStaticData);
   const isOutdated = useSelector(selectors.isTimelineOutdated);
@@ -74,14 +75,14 @@ export default function Timeline() {
       <TimelineHeader
         contribution={details.contribution}
         state={details.state}
-        submitter={timelineBlocks[0].submitter}
+        submitter={timelineBlocks[0].user}
         eventId={eventId}
       >
         {details.hasPublishedRevision && (
           <FileDisplay
             fileTypes={fileTypes}
-            files={lastRevision.files}
-            downloadURL={lastRevision.downloadFilesURL}
+            files={lastRevisionWithFiles.files}
+            downloadURL={lastRevisionWithFiles.downloadFilesURL}
             tags={lastRevision.tags}
           />
         )}

@@ -10,7 +10,6 @@ import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Confirm} from 'semantic-ui-react';
 
-import {blockItemPropTypes} from 'indico/modules/events/editing/editing/timeline/util';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
@@ -18,10 +17,7 @@ import {serializeDate} from 'indico/utils/date';
 import {deleteRevisionComment, modifyRevisionComment} from './actions';
 import CommentForm from './CommentForm';
 import {getLastRevision} from './selectors';
-
-const INDICO_BOT_USER = {
-  fullName: 'Indico Bot',
-};
+import {blockItemPropTypes, INDICO_BOT_USER} from './util';
 
 export default function Comment({
   revisionId,

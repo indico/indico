@@ -23,19 +23,20 @@ def notify_comment(comment):
     revision = comment.revision
     editable = revision.editable
     editor = editable.editor
+    submitter = next((r.user for r in editable.revisions[::-1] if r.is_submitter_revision), None)
     author = comment.user
     if comment.internal:
         # internal comments notify the editor and anyone who commented + can see internal comments
         recipients = _get_commenting_users(revision, check_internal_access=True) | {editor}
     elif author == editor:
         # editor comments notify the submitter and anyone else who commented
-        recipients = _get_commenting_users(revision) | {revision.submitter}
+        recipients = _get_commenting_users(revision) | {submitter}
     elif editable.can_perform_submitter_actions(author):
         # submitter comments notify the editor and anyone else who commented
         recipients = _get_commenting_users(revision) | {editor}
     else:
         # comments from someone else (managers) notify everyone
-        recipients = _get_commenting_users(revision) | {editor, revision.submitter}
+        recipients = _get_commenting_users(revision) | {editor, submitter}
 
     recipients.discard(None)  # in case there's no editor assigned
     recipients.discard(author)  # never bother people about their own comments
@@ -52,7 +53,7 @@ def notify_comment(comment):
 
 def notify_editor_judgment(revision, editor):
     """Notify the submitter about a judgment made by an editor."""
-    submitter = revision.submitter
+    submitter = revision.user
     editable = revision.editable
     editor_name = editor.first_name if editable.can_see_editor_names(submitter) else None
     with submitter.force_user_locale():
@@ -67,7 +68,7 @@ def notify_editor_judgment(revision, editor):
 def notify_submitter_upload(revision):
     """Notify the editor about the submitter uploading a new revision."""
     editable = revision.editable
-    submitter = revision.submitter
+    submitter = revision.user
     editor = revision.editable.editor
     if not editor:
         return
@@ -84,7 +85,7 @@ def notify_submitter_confirmation(revision, submitter, action):
     """Notify the editor(s) about submitter accepting/rejecting revision changes."""
     editable = revision.editable
     current_editor = editable.editor
-    prev_revision_editor = editable.valid_revisions[-2].editor
+    prev_revision_editor = next(rev.user for rev in editable.valid_revisions[::-1] if rev.is_editor_revision)
     recipients = {current_editor, prev_revision_editor}
     recipients.discard(None)
     if action == EditingConfirmationAction.accept:

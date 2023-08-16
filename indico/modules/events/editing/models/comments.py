@@ -6,13 +6,11 @@
 # LICENSE file for more details.
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, text_to_repr
-
-from .revisions import FinalRevisionState
 
 
 class EditingRevisionComment(RenderModeMixin, db.Model):
@@ -63,12 +61,6 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
         nullable=False,
         default=False
     )
-    #: Undone revision state if the comment comes from an undone judgment
-    undone_judgment = db.Column(
-        PyIntEnum(FinalRevisionState),
-        nullable=False,
-        default=FinalRevisionState.none
-    )
     _text = db.Column(
         'text',
         db.Text,
@@ -115,7 +107,5 @@ class EditingRevisionComment(RenderModeMixin, db.Model):
         elif self.system:
             return False
         elif self.internal and not authorized_editor:
-            return False
-        elif self.undone_judgment != FinalRevisionState.none:
             return False
         return authorized_editor or authorized_submitter

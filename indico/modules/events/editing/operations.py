@@ -16,18 +16,17 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.comments import EditingRevisionComment
-from indico.modules.events.editing.models.editable import Editable
+from indico.modules.events.editing.models.editable import Editable, EditableState
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.review_conditions import EditingReviewCondition
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
+from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.events.editing.notifications import (notify_comment, notify_editor_judgment,
                                                          notify_submitter_confirmation, notify_submitter_upload)
 from indico.modules.events.editing.schemas import (EditableDumpSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction)
 from indico.modules.logs import EventLogRealm, LogKind
-from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, orig_string
@@ -53,14 +52,10 @@ def ensure_latest_revision(revision):
         raise InvalidEditableState
 
 
-def _ensure_state(revision, initial=None, final=None):
-    if isinstance(initial, InitialRevisionState):
-        initial = {initial}
-    if isinstance(final, FinalRevisionState):
-        final = {final}
-    if initial is not None and revision.initial_state not in initial:
-        raise InvalidEditableState
-    if final is not None and revision.final_state not in final:
+def _ensure_type(revision, type):
+    if isinstance(type, RevisionType):
+        type = {type}
+    if revision.type not in type:
         raise InvalidEditableState
 
 
@@ -78,10 +73,10 @@ def _make_editable_files(editable, files):
 
 
 @no_autoflush
-def create_new_editable(contrib, type_, submitter, files, initial_state=InitialRevisionState.ready_for_review):
+def create_new_editable(contrib, type_, submitter, files, type=RevisionType.ready_for_review):
     editable = Editable(contribution=contrib, type=type_)
-    revision = EditingRevision(submitter=submitter,
-                               initial_state=initial_state,
+    revision = EditingRevision(user=submitter,
+                               type=type,
                                files=_make_editable_files(editable, files))
     editable.revisions.append(revision)
     db.session.flush()
@@ -108,48 +103,31 @@ def publish_editable_revision(revision):
 @no_autoflush
 def review_editable_revision(revision, editor, action, comment, tags, files=None):
     ensure_latest_revision(revision)
-    _ensure_state(revision, initial=InitialRevisionState.ready_for_review, final=FinalRevisionState.none)
-    revision.editor = editor
-    revision.comment = comment
-    revision.reviewed_dt = now_utc()
-    revision.tags = tags
-    revision.final_state = {
-        EditingReviewAction.accept: FinalRevisionState.accepted,
-        EditingReviewAction.reject: FinalRevisionState.rejected,
-        EditingReviewAction.update: FinalRevisionState.needs_submitter_confirmation,
-        EditingReviewAction.update_accept: FinalRevisionState.needs_submitter_confirmation,
-        EditingReviewAction.request_update: FinalRevisionState.needs_submitter_changes,
+    _ensure_type(revision, RevisionType.ready_for_review)
+    revision_type = {
+        EditingReviewAction.accept: RevisionType.acceptance,
+        EditingReviewAction.reject: RevisionType.rejection,
+        EditingReviewAction.update: RevisionType.needs_submitter_confirmation,
+        EditingReviewAction.update_accept: RevisionType.needs_submitter_confirmation,
+        EditingReviewAction.request_update: RevisionType.needs_submitter_changes,
     }[action]
 
     db.session.flush()
     new_revision = None
     if action == EditingReviewAction.accept:
         _ensure_publishable_files(revision)
-    elif files:
-        if action == EditingReviewAction.update:
-            initial_state = InitialRevisionState.needs_submitter_confirmation
-            final_state = FinalRevisionState.none
-            editable_editor = None
-        elif action == EditingReviewAction.update_accept:
-            initial_state = InitialRevisionState.needs_submitter_confirmation
-            final_state = FinalRevisionState.accepted
-            editable_editor = editor
-        elif action == EditingReviewAction.request_update:
-            initial_state = revision.initial_state
-            final_state = FinalRevisionState.needs_submitter_changes
-            editable_editor = editor
-        else:
-            raise InvalidEditableState
-        new_revision = EditingRevision(submitter=editor,
-                                       editor=editable_editor,
-                                       initial_state=initial_state,
-                                       final_state=final_state,
-                                       files=_make_editable_files(revision.editable, files),
-                                       tags=revision.tags)
-        if action in (EditingReviewAction.update_accept, EditingReviewAction.request_update):
-            new_revision.reviewed_dt = revision.reviewed_dt
-        if action != EditingReviewAction.request_update:
-            _ensure_publishable_files(new_revision)
+    new_revision = EditingRevision(user=editor,
+                                   type=revision_type,
+                                   files=_make_editable_files(revision.editable, files) if files else [],
+                                   comment=comment,
+                                   tags=tags)
+    if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
+        _ensure_publishable_files(new_revision)
+    revision.editable.revisions.append(new_revision)
+    if action == EditingReviewAction.update_accept:
+        new_revision = EditingRevision(user=editor,
+                                       type=RevisionType.acceptance,
+                                       tags=tags)
         revision.editable.revisions.append(new_revision)
     db.session.flush()
     notify_editor_judgment(revision, editor)
@@ -160,35 +138,33 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
 @no_autoflush
 def confirm_editable_changes(revision, submitter, action, comment):
     ensure_latest_revision(revision)
-    _ensure_state(revision, initial=InitialRevisionState.needs_submitter_confirmation, final=FinalRevisionState.none)
-    revision.final_state = {
-        EditingConfirmationAction.accept: FinalRevisionState.accepted,
-        EditingConfirmationAction.reject: FinalRevisionState.needs_submitter_changes,
+    _ensure_type(revision, RevisionType.needs_submitter_confirmation)
+    revision_type = {
+        EditingConfirmationAction.accept: RevisionType.changes_acceptance,
+        EditingConfirmationAction.reject: RevisionType.changes_rejection,
     }[action]
-    if comment:
-        revision.comment = comment
-    revision.reviewed_dt = now_utc()
+    new_revision = EditingRevision(user=submitter,
+                                   type=revision_type,
+                                   comment=comment,
+                                   tags=revision.tags)
+    revision.editable.revisions.append(new_revision)
     db.session.flush()
     if action == EditingConfirmationAction.accept:
         _ensure_publishable_files(revision)
     db.session.flush()
     notify_submitter_confirmation(revision, submitter, action)
     logger.info('Revision %r confirmed by %s [%s]', revision, submitter, action.name)
+    return new_revision
 
 
 @no_autoflush
-def replace_revision(revision, user, comment, files, tags, initial_state=None):
+def replace_revision(revision, user, comment, files, tags):
     ensure_latest_revision(revision)
-    _ensure_state(revision,
-                  initial=(InitialRevisionState.new, InitialRevisionState.ready_for_review),
-                  final=FinalRevisionState.none)
-    revision.comment = comment
-    revision.reviewed_dt = now_utc()
+    _ensure_type(revision, (RevisionType.new, RevisionType.ready_for_review))
     revision.tags = tags
-    revision.final_state = FinalRevisionState.replaced
-    revision.editor = user
-    new_revision = EditingRevision(submitter=revision.submitter,
-                                   initial_state=(initial_state or revision.initial_state),
+    new_revision = EditingRevision(user=user,
+                                   type=RevisionType.replacement,
+                                   comment=comment,
                                    files=_make_editable_files(revision.editable, files))
     revision.editable.revisions.append(new_revision)
     db.session.flush()
@@ -199,13 +175,13 @@ def replace_revision(revision, user, comment, files, tags, initial_state=None):
 def create_submitter_revision(prev_revision, user, files):
     ensure_latest_revision(prev_revision)
     try:
-        _ensure_state(prev_revision, initial=InitialRevisionState.ready_for_review, final=FinalRevisionState.none)
+        _ensure_type(prev_revision, RevisionType.ready_for_review)
         if prev_revision.editable.editor:
             raise InvalidEditableState
     except InvalidEditableState:
-        _ensure_state(prev_revision, final=FinalRevisionState.needs_submitter_changes)
-    new_revision = EditingRevision(submitter=user,
-                                   initial_state=InitialRevisionState.ready_for_review,
+        _ensure_type(prev_revision, (RevisionType.changes_rejection, RevisionType.needs_submitter_changes))
+    new_revision = EditingRevision(user=user,
+                                   type=RevisionType.ready_for_review,
                                    files=_make_editable_files(prev_revision.editable, files),
                                    tags=prev_revision.tags)
     prev_revision.editable.revisions.append(new_revision)
@@ -215,87 +191,32 @@ def create_submitter_revision(prev_revision, user, files):
     return new_revision
 
 
-@memoize_request
-def _is_request_changes_with_files(revision):
-    if not revision or len(revision.editable.valid_revisions) < 2:
-        return False
-    previous_revision = revision.editable.valid_revisions[-2]
-    # when a request-changes-with-files revision is made, the previous revision's final_state
-    # is set to needs_submitter_changes, and a new one is created with the same reviewed_dt,
-    # editor, and final_state. if any of these are different, then the two revisions are
-    # actually separate request-changes, and not a request-changes-with-files
-    return (revision != previous_revision and
-            revision.reviewed_dt and
-            revision.editor and
-            previous_revision.final_state == FinalRevisionState.needs_submitter_changes and
-            revision.final_state == FinalRevisionState.needs_submitter_changes and
-            revision.reviewed_dt == previous_revision.reviewed_dt and
-            revision.editor == previous_revision.editor)
-
-
-def _ensure_latest_revision_with_final_state(revision):
-    final_revisions = (r for r in revision.editable.revisions[::-1]
-                       if r.final_state not in (FinalRevisionState.none, FinalRevisionState.undone))
-    expected = next(final_revisions, None)
-    if _is_request_changes_with_files(expected):
-        expected = next(final_revisions, None)
-    if revision != expected:
+def _ensure_revision_is_undoable(revision):
+    if (revision != revision.editable.latest_revision or
+            revision.type in (RevisionType.new, RevisionType.ready_for_review)):
         raise InvalidEditableState
 
 
 @no_autoflush
 def undo_review(revision):
-    _ensure_latest_revision_with_final_state(revision)
-    latest_revision = revision.editable.latest_revision
-    if revision != latest_revision and not _is_request_changes_with_files(latest_revision):
-        if revision.editable.valid_revisions[-2:] != [revision, latest_revision]:
-            raise InvalidEditableState
-        _ensure_state(revision, final=FinalRevisionState.needs_submitter_confirmation)
-        _ensure_state(latest_revision,
-                      initial=InitialRevisionState.needs_submitter_confirmation,
-                      final=FinalRevisionState.none)
-        latest_revision.final_state = FinalRevisionState.undone
-        latest_revision.reviewed_dt = now_utc()
-    if ((revision.initial_state == InitialRevisionState.needs_submitter_confirmation and
-         revision.final_state == FinalRevisionState.accepted and revision.editor is not None)
-            or _is_request_changes_with_files(latest_revision)):
-        revision.editable.published_revision = None
-        db.session.flush()
-        revision = revision.editable.valid_revisions[-2]
-        latest_revision.final_state = FinalRevisionState.undone
-        latest_revision.reviewed_dt = now_utc()
-    elif revision.final_state == FinalRevisionState.accepted:
-        revision.editable.published_revision = None
+    _ensure_revision_is_undoable(revision)
+    revision.editable.published_revision = None
     db.session.flush()
-    # Keep comment history:
-    comment = EditingRevisionComment(user=revision.editor or revision.submitter, created_dt=revision.reviewed_dt,
-                                     undone_judgment=revision.final_state, text=revision.comment)
-    num_revisions = len(revision.editable.valid_revisions)
-    revision.tags = {tag for tag in revision.tags if tag.system}
-    if num_revisions >= 3 or (num_revisions >= 2 and revision == latest_revision):
-        previous_revision = revision.editable.valid_revisions[-2 if revision == latest_revision else -3]
-        revision.tags |= {tag for tag in previous_revision.tags if not tag.system}
-    revision.comments.append(comment)
-    revision.final_state = FinalRevisionState.none
-    revision.comment = ''
-    revision.reviewed_dt = None
+    revision.is_undone = True
     db.session.flush()
-    logger.info('Revision %r review undone', revision)
+    logger.info('Revision %r review undone by %r', revision.editable.editor)
 
 
 @no_autoflush
 def reset_editable(revision):
-    _ensure_latest_revision_with_final_state(revision)
-    if revision.final_state != FinalRevisionState.accepted:
+    _ensure_revision_is_undoable(revision)
+    if revision.editable.state != EditableState.accepted:
         return
     revision.editable.published_revision = None
-    revision.initial_state = InitialRevisionState.ready_for_review
-    revision.final_state = FinalRevisionState.none
-    comment = EditingRevisionComment(user=revision.editor or revision.submitter, created_dt=revision.reviewed_dt,
-                                     undone_judgment=FinalRevisionState.accepted, text=revision.comment)
-    revision.comments.append(comment)
-    revision.comment = ''
-    revision.reviewed_dt = None
+    db.session.flush()
+    revision.is_undone = True
+    new_revision = EditingRevision(user=revision.editable.editor, type=RevisionType.reset)
+    revision.editable.revisions.append(new_revision)
     db.session.flush()
     logger.info('Revision %r review reset', revision)
 
