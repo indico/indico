@@ -13,7 +13,7 @@ import {useSelector} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 import {Icon, Popup} from 'semantic-ui-react';
 
-import {RequestConfirm} from 'indico/react/components';
+import {RequestConfirmDelete} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
@@ -24,7 +24,6 @@ import * as selectors from './selectors';
 export default function DeleteEditable() {
   const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
   const allowed = useSelector(selectors.canDeleteEditable);
-  const [submitting, setSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const history = useHistory();
 
@@ -39,7 +38,6 @@ export default function DeleteEditable() {
   }
 
   const deleteEditable = async () => {
-    setSubmitting(true);
     try {
       await indicoAxios.delete(
         deleteEditableURL({
@@ -49,9 +47,8 @@ export default function DeleteEditable() {
         })
       );
     } catch (error) {
-      return handleAxiosError(error);
-    } finally {
-      setSubmitting(false);
+      handleAxiosError(error);
+      return true;
     }
     history.push(editableTypeListURL({event_id: eventId, type: editableType}));
   };
@@ -60,26 +57,17 @@ export default function DeleteEditable() {
     <>
       <Popup
         content={title}
-        trigger={
-          <Icon
-            name="trash"
-            disabled={submitting}
-            onClick={() => setIsOpen(true)}
-            color="grey"
-            link
-          />
-        }
+        trigger={<Icon name="trash" onClick={() => setIsOpen(true)} color="grey" link />}
       />
-      <RequestConfirm
+      <RequestConfirmDelete
         header={title}
-        confirmText={Translate.string('Delete')}
         onClose={() => setIsOpen(false)}
         requestFunc={deleteEditable}
         open={isOpen}
-        negative
+        persistent
       >
         <Translate>This operation is not reversible. Are you sure you want to procceed?</Translate>
-      </RequestConfirm>
+      </RequestConfirmDelete>
     </>
   );
 }
