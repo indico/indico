@@ -26,17 +26,11 @@ from indico.web.rh import RH, cors, json_errors, oauth_scope
 class RHAPICheckinBase(RHProtectedEventBase):
     """Base class for the Check-in API."""
 
-    def _check_access(self):
-        RHProtectedEventBase._check_access(self)
-
-    def _process_args(self):
-        RHProtectedEventBase._process_args(self)
-
 
 class RHAPIEvent(RHAPICheckinBase):
     """Manage a single event."""
 
-    def _process_GET(self):
+    def _process(self):
         from indico.modules.events.registration.schemas import CheckinEventSchema
         return jsonify(CheckinEventSchema().dump(self.event))
 
@@ -59,7 +53,7 @@ class RHAPIRegFormBase(RHAPICheckinBase):
 class RHAPIRegForm(RHAPIRegFormBase):
     """Manage a single registration form."""
 
-    def _process_GET(self):
+    def _process(self):
         from indico.modules.events.registration.schemas import CheckinRegFormSchema
         return jsonify(CheckinRegFormSchema().dump(self.regform))
 
@@ -67,7 +61,7 @@ class RHAPIRegForm(RHAPIRegFormBase):
 class RHAPIRegistrations(RHAPIRegFormBase):
     """Manage registrations."""
 
-    def _process_GET(self):
+    def _process(self):
         from indico.modules.events.registration.schemas import CheckinRegistrationSchema
         registrations = (Registration.query.with_parent(self.regform)
                          .filter(~Registration.is_deleted)
