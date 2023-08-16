@@ -21,11 +21,10 @@ def upgrade():
                   schema='event_editing')
     op.alter_column('editables', 'is_deleted', server_default=None, schema='event_editing')
     op.drop_constraint('uq_editables_contribution_id_type', 'editables', schema='event_editing')
-    op.create_index(op.f('ix_uq_editables_contribution_id_type'), 'editables', ['contribution_id', 'type'], unique=True,
-                    schema='event_editing', postgresql_where=sa.text('NOT is_deleted'))
+    op.create_index(None, 'editables', ['contribution_id', 'type'], unique=True, schema='event_editing',
+                    postgresql_where=sa.text('NOT is_deleted'))
 
 
 def downgrade():
     op.drop_column('editables', 'is_deleted', schema='event_editing')
-    op.drop_index('ix_uq_editables_contribution_id_type', table_name='editables', schema='event_editing')
     op.create_unique_constraint(None, 'editables', ['contribution_id', 'type'], schema='event_editing')
