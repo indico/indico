@@ -25,6 +25,7 @@ Improvements
   restrict them to speakers or registrants (:pr:`5670`, thanks :user:`kewisch`)
 - Make editing timeline display much more straightforward (:pr:`5674`)
 - Allow event managers to delete editables from contributions (:pr:`5778`)
+- Allow room managers to add internal notes to bookings (:issue:`5746`, :pr:`5791`)
 
 Bugfixes
 ^^^^^^^^
@@ -219,7 +220,6 @@ Improvements
   (:pr:`5784`)
 - Allow admins to change the password of local accounts (:pr:`5789`, thanks
   :user:`omegak`)
-- Allow room managers to add internal notes to bookings (:issue:`5746`, :pr:`5791`)
 
 Bugfixes
 ^^^^^^^^
