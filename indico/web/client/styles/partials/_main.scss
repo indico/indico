@@ -8,36 +8,44 @@
 @use 'base' as *;
 @use 'partials/icons' as *;
 @use 'partials/buttons' as *;
+@use '_toolbars';
 
 /* Styles for the main menu */
 
-.toolbar.global-menu {
+.global-menu {
+  @extend .toolbar;
   @include font-family-title-light();
-
-  height: 3em;
-  line-height: 3em;
 
   padding: 0 0 0 20px;
   background: $black;
   border: none;
   margin-bottom: 0;
 
-  > a {
+  > menu {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+  }
+
+  > menu > li {
+    list-style: none;
+    padding: 0;
+  }
+
+  > menu > li > a {
     @include transition(background-color);
-
-    display: inline-block;
+    display: flex;
+    flex: none;
+    align-items: center;
     height: 3em;
-    line-height: 3em;
-
-    color: white;
     padding: 0 20px;
 
-    &:first-child,
-    &.arrow:last-of-type {
-      border-radius: 0;
-    }
+    color: white;
 
     &:hover,
+    &:focus,
     &.open {
       background: $light-black !important;
     }
@@ -48,6 +56,10 @@
       &::after {
         vertical-align: middle;
       }
+    }
+
+    &.open.arrow::after {
+      transform: rotate(180deg);
     }
   }
 }

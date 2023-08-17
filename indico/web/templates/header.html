@@ -21,8 +21,9 @@
         </div>
     </div>
 
-    <div class="global-menu toolbar">
+    <nav class="global-menu toolbar">
         {% block global_menu %}
+            <menu>
             {% for item in top_menu_items recursive %}
                 {% if loop.depth0 %}
                     {# we're inside a section #}
@@ -35,16 +36,21 @@
                         {% endif %}
                     </li>
                 {% elif not item.is_section %}
-                    <a href="{{ item.url }}">{{ item.title }}</a>
+                    <li>
+                        <a href="{{ item.url }}">{{ item.title }}</a>
+                    </li>
                 {% elif item.items %}
-                    <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{{ item.title }}</a>
-                    <ul class="i-dropdown">
-                        {{ loop(item.items) }}
-                    </ul>
+                    <li>
+                        <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{{ item.title }}</a>
+                        <menu class="i-dropdown">
+                            {{ loop(item.items) }}
+                        </menu>
+                    </li>
                 {% endif %}
             {% endfor %}
+            </menu>
         {% endblock %}
-    </div>
+    </nav>
 </div>
 
 <script type="text/html" id="event-type-tooltip-lecture">
