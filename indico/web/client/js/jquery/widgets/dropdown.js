@@ -19,13 +19,13 @@
     },
 
     _close: function(elem, effect) {
-      var ul = elem.next('ul');
+      var menu = elem.next('.i-dropdown');
 
       elem.removeClass('open');
       elem.removeData('no-qtip');
 
-      this._effect('off', ul, effect);
-      ul.find('ul').hide();
+      this._effect('off', menu, effect);
+      menu.find('ul').hide();
       elem.data('on', false);
       elem.parent().removeClass('selected');
       elem
@@ -44,19 +44,19 @@
 
     _open: function(elem) {
       var self = this;
-      var sibl = elem.next('ul.i-dropdown');
+      var menu = elem.next('.i-dropdown');
       var positionReference = this.options.relative_to || elem;
 
       elem.addClass('open');
       elem.data('no-qtip', true).trigger('indico:closeAutoTooltip');
 
-      this._effect('on', sibl);
+      this._effect('on', menu);
       elem.data('on', true);
       elem.parent().addClass('selected');
-      sibl.position(
+      menu.position(
         $.extend(
           {of: positionReference},
-          this.options.positioning[sibl.data('level')] || {
+          this.options.positioning[menu.data('level')] || {
             my: 'left top',
             at: 'left bottom',
             offset: '0px 0px',
@@ -101,7 +101,7 @@
         }
       });
 
-      elem.find('ul.i-dropdown > li > a').each(function() {
+      elem.find('.i-dropdown > li > a').each(function() {
         var $this = $(this);
         if (
           !$this.attr('href') ||
@@ -122,7 +122,7 @@
         }
       });
 
-      elem.find('ul.i-dropdown > li.toggle').each(function() {
+      elem.find('.i-dropdown > li.toggle').each(function() {
         var li = $(this);
         var link = $('<a>', {
           href: '#',
