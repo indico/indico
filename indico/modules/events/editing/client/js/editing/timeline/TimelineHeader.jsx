@@ -19,6 +19,7 @@ import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {loadTimeline} from './actions';
+import DeleteEditable from './DeleteEditable';
 import {getDetails} from './selectors';
 
 export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
@@ -64,6 +65,9 @@ export default function TimelineHeader({children, contribution, state, submitter
             {contribution.code && <span className="submission-code">{contribution.code}</span>}
           </h3>
         </MathJax>
+        <div style={{marginLeft: 'auto'}}>
+          <DeleteEditable />
+        </div>
       </div>
       <div className="editable-public">
         <div className="review-summary flexrow f-a-center">

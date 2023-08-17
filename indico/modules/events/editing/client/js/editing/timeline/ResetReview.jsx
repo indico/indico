@@ -18,8 +18,6 @@ import {Translate} from 'indico/react/i18n';
 import {resetReviews} from './actions';
 import * as selectors from './selectors';
 
-import './ResetReviews.module.scss';
-
 export default function ResetReview({revisionId}) {
   const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
   const allowed = useSelector(selectors.canPerformEditorActions);
@@ -52,12 +50,12 @@ export default function ResetReview({revisionId}) {
         content={Translate.string('Undo review')}
         trigger={
           <Icon
-            styleName="reset-button"
             name="undo"
             disabled={submitting}
             onClick={() => setIsOpen(true)}
             color="grey"
             size="large"
+            link
           />
         }
       />

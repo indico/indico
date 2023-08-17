@@ -84,12 +84,17 @@ def create_new_editable(contrib, type_, submitter, files, type=RevisionType.read
     return editable
 
 
-def delete_editable(editable):
+def delete_editable(editable, *, soft=True):
+    log_msg = f'"{editable.contribution.title}" ({orig_string(editable.type.title)}) deleted'
+    editable.log(EventLogRealm.management, LogKind.negative, 'Editing', log_msg, session.user)
     db.session.expire(editable)
-    for revision in editable.revisions:
-        for ef in revision.files:
-            ef.file.claimed = False
-    db.session.delete(editable)
+    if soft:
+        editable.is_deleted = True
+    else:
+        for revision in editable.revisions:
+            for ef in revision.files:
+                ef.file.claimed = False
+        db.session.delete(editable)
     db.session.flush()
 
 

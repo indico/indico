@@ -25,9 +25,10 @@ from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
 from indico.modules.events.editing.operations import (assign_editor, create_new_editable, create_revision_comment,
-                                                      create_submitter_revision, delete_revision_comment,
-                                                      ensure_latest_revision, replace_revision, reset_editable,
-                                                      unassign_editor, undo_review, update_revision_comment)
+                                                      create_submitter_revision, delete_editable,
+                                                      delete_revision_comment, ensure_latest_revision, replace_revision,
+                                                      reset_editable, unassign_editor, undo_review,
+                                                      update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
 from indico.modules.events.editing.service import (ServiceRequestFailed, service_get_custom_actions,
@@ -189,6 +190,19 @@ class RHCreateEditable(RHContributionEditableBase):
                 raise ServiceUnavailable(_('Submission failed, please try again later.'))
 
         return '', 201
+
+
+class RHDeleteEditable(RHContributionEditableBase):
+    """Delete a contribution's editable."""
+
+    def _check_access(self):
+        RHContributionEditableBase._check_access(self)
+        if not self.editable.can_delete(session.user):
+            raise Forbidden
+
+    def _process(self):
+        delete_editable(self.editable)
+        return '', 204
 
 
 class RHReviewEditable(RHContributionEditableRevisionBase):

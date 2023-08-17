@@ -73,7 +73,7 @@ class RHDownloadArchive(RHEditableTypeManagementBase):
         revisions_strategy.subqueryload('tags')
         revisions_strategy.joinedload('user')
         editables = (Editable.query
-                     .filter(Editable.id.in_(editable_ids))
+                     .filter(Editable.id.in_(editable_ids), ~Editable.is_deleted)
                      .options(joinedload('editor'), joinedload('contribution'), revisions_strategy)
                      .all())
         fn = {
@@ -196,6 +196,7 @@ class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):
                         ),
                         Editable.type == self.editable_type,
                         Editable.state == EditableState.ready_for_review,
+                        ~Editable.is_deleted,
                     )
                 )
             )
