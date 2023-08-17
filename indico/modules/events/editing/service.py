@@ -195,6 +195,20 @@ def service_handle_review_editable(editable, user, action, parent_revision, revi
         raise ServiceRequestFailed(exc)
 
 
+def service_handle_delete_editable(editable):
+    path = '/event/{}/editable/{}/{}'.format(
+        _get_event_identifier(editable.event),
+        editable.type.name,
+        editable.contribution_id
+    )
+    try:
+        resp = requests.delete(_build_url(editable.event, path), headers=_get_headers(editable.event))
+        resp.raise_for_status()
+    except requests.RequestException as exc:
+        _log_service_error(exc, 'Calling listener for delete editable failed')
+        raise ServiceRequestFailed(exc)
+
+
 def service_get_custom_actions(editable, revision, user):
     data = {
         'revision': EditingRevisionSignedSchema().dump(revision),

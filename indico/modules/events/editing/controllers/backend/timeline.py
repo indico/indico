@@ -32,8 +32,8 @@ from indico.modules.events.editing.operations import (assign_editor, create_new_
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingReviewAction,
                                                    ReviewEditableArgs)
 from indico.modules.events.editing.service import (ServiceRequestFailed, service_get_custom_actions,
-                                                   service_handle_custom_action, service_handle_new_editable,
-                                                   service_handle_review_editable)
+                                                   service_handle_custom_action, service_handle_delete_editable,
+                                                   service_handle_new_editable, service_handle_review_editable)
 from indico.modules.events.editing.settings import editing_settings
 from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users import User
@@ -202,6 +202,11 @@ class RHDeleteEditable(RHContributionEditableBase):
 
     def _process(self):
         delete_editable(self.editable)
+        if editing_settings.get(self.event, 'service_url'):
+            try:
+                service_handle_delete_editable(self.editable)
+            except ServiceRequestFailed:
+                raise ServiceUnavailable(_('Deletion failed, please try again later.'))
         return '', 204
 
 
