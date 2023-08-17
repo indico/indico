@@ -35,6 +35,7 @@ import RoomStats from './RoomStats';
 import * as roomsSelectors from './selectors';
 
 import './RoomDetailsModal.module.scss';
+import '../../components/WeekdayInformation.module.scss';
 
 class RoomDetailsModal extends React.Component {
   static propTypes = {

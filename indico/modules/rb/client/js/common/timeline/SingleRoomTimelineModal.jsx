@@ -22,6 +22,7 @@ import DailyTimelineContent from './DailyTimelineContent';
 import TimelineLegend from './TimelineLegend';
 
 import './SingleRoomTimelineModal.module.scss';
+import '../../components/WeekdayInformation.module.scss';
 
 const _getRowSerializer = (day, room) => {
   return ({

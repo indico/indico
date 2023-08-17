@@ -16,6 +16,7 @@ import {toMoment} from 'indico/utils/date';
 import {renderRecurrence} from '../util';
 
 import './TimeInformation.module.scss';
+import './WeekdayInformation.module.scss';
 
 function TimeInformation({
   recurrence,

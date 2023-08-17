@@ -22,6 +22,7 @@ import OccurrencesCounter from './OccurrencesCounter';
 import * as bookingsSelectors from './selectors';
 
 import './BookingEditCalendar.module.scss';
+import '../../components/WeekdayInformation.module.scss';
 
 class BookingEditCalendar extends React.Component {
   static propTypes = {

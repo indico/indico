@@ -51,6 +51,7 @@ import LazyBookingObjectLink from './LazyBookingObjectLink';
 import * as bookingsSelectors from './selectors';
 
 import './BookingDetails.module.scss';
+import '../../components/WeekdayInformation.module.scss';
 
 class BookingDetails extends React.Component {
   static propTypes = {
