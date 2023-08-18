@@ -1,6 +1,6 @@
 {#- Base template for standalone pages (no "indico look") -#}
 <!DOCTYPE html>
-<html>
+<html lang="{{ current_locale.language }}">
 <head>
     <title>Indico{% if self.title() %} - {% endif %}{% block title %}{% endblock %}</title>
     <meta charset="UTF-8">

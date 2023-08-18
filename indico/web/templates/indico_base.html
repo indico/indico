@@ -1,7 +1,8 @@
 {#- Base template for indico pages (standard "indico look") -#}
 <!DOCTYPE html>
 
-<html prefix="og: http://ogp.me/ns#"
+<html lang="{{ current_locale.language }}"
+      prefix="og: http://ogp.me/ns#"
       data-static-site="{{ g.get('static_site', false)|tojson|forceescape }}">
 <head>
     <title>
