@@ -176,8 +176,8 @@ class RHCreateBooking(RHRoomBookingBase):
             raise ExpectedError(msg)
 
         # Prevent the submission of notes if the setting is disabled
-        if not rb_settings.get('internal_notes_enabled'):
-            del args['internal_note']
+        if not rb_settings.get('internal_notes_enabled') or not self.room.can_manage(session.user):
+            args.pop('internal_note', None)
 
         try:
             resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook,
@@ -315,7 +315,11 @@ class RHUpdateBooking(RHBookingBase):
         }
 
         # allow updating the internal notes only if the setting is enabled
-        if rb_settings.get('internal_notes_enabled'):
+        if (
+            rb_settings.get('internal_notes_enabled') and
+            'internal_note' in args and
+            self.booking.room.can_manage(session.user)
+        ):
             new_booking_data['internal_note'] = args['internal_note']
 
         additional_booking_attrs = {}
