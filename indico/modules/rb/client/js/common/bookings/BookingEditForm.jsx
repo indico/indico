@@ -300,14 +300,10 @@ class BookingEditForm extends React.Component {
           <Segment inverted styleName="booking-notes-section">
             <p style={{marginBottom: '0.5em'}}>
               <Translate>
-                Internal notes about the booking that will only be shown to managers
+                Internal notes about the booking are only visible to room managers.
               </Translate>
             </p>
-            <FinalTextArea
-              name="internalNote"
-              placeholder={Translate.string('(Optional)')}
-              disabled={submitSucceeded}
-            />
+            <FinalTextArea name="internalNote" disabled={submitSucceeded} />
           </Segment>
         )}
       </Form>

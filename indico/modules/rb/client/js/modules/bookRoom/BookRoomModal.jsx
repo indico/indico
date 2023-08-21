@@ -639,19 +639,14 @@ class BookRoomModal extends React.Component {
                   <Segment inverted styleName="booking-notes-section">
                     <h3 style={{marginBottom: '0.5em'}}>
                       <Icon name="clipboard list" />
-                      <Translate>Notes</Translate>
+                      <Translate>Internal notes (optional)</Translate>
                     </h3>
                     <p>
                       <Translate>
-                        Internal notes about the booking that will only be shown to room booking
-                        managers
+                        Internal notes about the booking are only visible to room managers.
                       </Translate>
                     </p>
-                    <FinalTextArea
-                      name="internalNote"
-                      placeholder={Translate.string('(Optional)')}
-                      disabled={fprops.submitSucceeded}
-                    />
+                    <FinalTextArea name="internalNote" disabled={fprops.submitSucceeded} />
                   </Segment>
                 </Form>
               )}
