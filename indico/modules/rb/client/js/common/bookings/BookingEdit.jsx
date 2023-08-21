@@ -51,6 +51,7 @@ class BookingEdit extends React.Component {
     user: PropTypes.object.isRequired,
     booking: PropTypes.object.isRequired,
     isOngoingBooking: PropTypes.bool.isRequired,
+    isAdminOverrideEnabled: PropTypes.bool.isRequired,
     actionButtons: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     onClose: PropTypes.func,
@@ -297,6 +298,7 @@ class BookingEdit extends React.Component {
         room: {id: roomId},
       },
       onSubmit,
+      isAdminOverrideEnabled,
     } = this.props;
     const [repeatFrequency, repeatInterval] = serializeRecurrenceInfo(recurrence);
     const params = {
@@ -309,6 +311,9 @@ class BookingEdit extends React.Component {
       reason,
       internal_note: internalNote,
     };
+    if (isAdminOverrideEnabled) {
+      params.admin_override_enabled = true;
+    }
 
     const rv = await updateBooking(id, params);
     if (rv.error) {
@@ -342,6 +347,7 @@ export default connect(
   (state, {booking: {id}}) => ({
     user: userSelectors.getUserInfo(state),
     isOngoingBooking: bookingsSelectors.isOngoingBooking(state, {bookingId: id}),
+    isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
   }),
   dispatch => ({
     actions: bindActionCreators(
