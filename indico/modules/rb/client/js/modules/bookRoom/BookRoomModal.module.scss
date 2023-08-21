@@ -65,6 +65,6 @@
   }
 }
 
-.booking-notes-section {
-  background: $booking-notes-section-color !important;
+:global(.ui.segment).internal-notes-segment {
+  background: $internal-notes-segment-color;
 }

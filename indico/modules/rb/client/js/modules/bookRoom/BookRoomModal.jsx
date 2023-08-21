@@ -636,7 +636,7 @@ class BookRoomModal extends React.Component {
                   onSubmit={fprops.handleSubmit}
                   style={{paddingTop: '1em'}}
                 >
-                  <Segment inverted styleName="booking-notes-section">
+                  <Segment inverted styleName="internal-notes-segment">
                     <h3 style={{marginBottom: '0.5em'}}>
                       <Icon name="clipboard list" />
                       <Translate>Internal notes (optional)</Translate>

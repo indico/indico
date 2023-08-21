@@ -297,7 +297,7 @@ class BookingEditForm extends React.Component {
         </Segment>
 
         {room.canUserViewInternalNotes && (
-          <Segment inverted styleName="booking-notes-section">
+          <Segment inverted styleName="internal-notes-segment">
             <p style={{marginBottom: '0.5em'}}>
               <Translate>
                 Internal notes about the booking are only visible to room managers.
