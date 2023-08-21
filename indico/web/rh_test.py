@@ -121,6 +121,10 @@ def test_cors_headers_set_after_error(app):
     app.add_url_rule('/test/cors/error', 'test_cors_error', make_view_func(DummyRH))
 
     with app.test_client() as client:
-        resp = client.get('/test/cors/error')
+        # Force a json response in `render_error`.
+        # Otherwise, Indico will try to render an HTML error which requires webpack
+        # which we don't use in the python tests workflow.
+        headers = {'Content-Type': 'application/json'}
+        resp = client.get('/test/cors/error', headers=headers)
         # Ensure the CORS headers are set even if an error was raised
         assert resp.headers['Access-Control-Allow-Origin'] == 'localhost'
