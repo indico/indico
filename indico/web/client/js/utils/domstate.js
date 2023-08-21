@@ -5,11 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use './variables';
-@use 'utils';
-
-%popup-title {
-  @extend %reset-font-and-color;
-  font-weight: bold;
-  font-size: var(--text-size-rel-l);
-}
+export const domReady = new Promise(resolve => {
+  if (document.readyState === 'completed') {
+    resolve();
+  } else {
+    window.addEventListener('DOMContentLoaded', resolve);
+  }
+});

@@ -94,6 +94,7 @@ Accessibility
   :thanks:`foxbunny`)
 - Associate form labels with form controls in the registration form (:issue:`6059`, :issue:`6073`,
   :pr:`6076`, thanks :user:`foxbunny`)
+- Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -116,6 +117,8 @@ Internal Changes
 - Improve ``indico i18n`` CLI to support plugin-related i18n operations (:issue:`5906`, :pr:`5961`,
   thanks :user:`SegiNyn`)
 - Use `ruff <https://docs.astral.sh/ruff/>`_ for linting Python code (:pr:`6037`)
+- Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
+  thanks :user:`foxbunny`)
 
 
 ----

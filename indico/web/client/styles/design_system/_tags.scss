@@ -1,0 +1,22 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+%tag {
+  --tag-surface-color: var(--surface-inverse-color);
+  --tag-text-color: var(--text-inverse-color);
+
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1em 1ch 0; // XXX: top 0.1em to align vertically
+
+  background: var(--tag-surface-color);
+  color: var(--tag-text-color);
+  border-radius: var(--control-border-radius);
+  font-size: var(--text-size-rel-xs);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}

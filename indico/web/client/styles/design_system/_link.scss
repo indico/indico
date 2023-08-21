@@ -8,22 +8,48 @@
 @use './variables';
 
 %link {
-  color: var(--clickable-text-color);
+  --link-color: var(--clickable-text-color);
+  --link-highlight-color: var(--clickable-text-highlight-color);
+  --link-active-color: var(--clickable-text-active-color);
+  --link-disabled-color: var(--clickable-text-disabled-color);
+
+  color: var(--link-color);
   text-decoration: none;
+  transition: color var(--transition-quick);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--link-highlight-color);
+  }
 
   &:active {
-    color: var(--clickable-text-active-color);
+    color: var(--link-active-color);
   }
 
   &[aria-disabled='true'] {
-    color: var(--clickable-text-disabled-color);
+    color: var(--link-disabled-color);
   }
 }
 
 %link-with-visited-state {
   @extend %link;
 
+  --link-visited-color: var(--clickable-text-used-color);
+
   &:visited {
-    color: var(--clickable-text-used-color);
+    color: var(--link-visited-color);
+  }
+}
+
+%link-button {
+  @extend %link;
+  font: inherit;
+  background: transparent;
+  padding: 0;
+  border: 0;
+
+  &:disabled {
+    color: var(--link-disabled-color);
+    cursor: not-allowed;
   }
 }

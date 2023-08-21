@@ -1,0 +1,139 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use './variables';
+@use './link';
+
+%secondary-text-normal {
+  color: var(--text-secondary-color);
+}
+
+%key-heading {
+  color: var(--accent-secondary-color);
+  font-size: var(--text-size-rel-xl);
+  font-weight: normal; // TODO: This needs to be moved to reset
+  margin: 0; // TODO: move this to reset once all text-related things are fixed
+  line-height: 1.2;
+}
+
+%formatted-text-block {
+  font: inherit;
+  line-height: 1.4;
+  --table-first-column-alignment: left;
+  --table-other-column-alignment: right;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 1em 0 0.5em;
+    font: inherit;
+  }
+
+  h1 {
+    font-size: var(--text-size-rel-xxl);
+  }
+
+  h2 {
+    font-size: var(--text-size-rel-xl);
+  }
+
+  h3 {
+    font-size: var(--text-size-rel-l);
+  }
+
+  h4 {
+    font-size: var(--text-size-rel-n);
+  }
+
+  h5 {
+    font-size: var(--test-size-rel-s);
+  }
+
+  h6 {
+    font-size: var(--text-size-rel-xs);
+    font-weight: bold;
+  }
+
+  h4,
+  h5,
+  h6 {
+    text-transform: uppercase;
+  }
+
+  p,
+  ul,
+  blockquote,
+  pre {
+    margin-bottom: 1em;
+  }
+
+  p {
+    max-width: var(--content-max-readable-width);
+  }
+
+  ul,
+  ol {
+    margin-left: 1em;
+  }
+
+  code {
+    font-family: monospace;
+  }
+
+  pre {
+    background: var(--background-secondary);
+    padding: 0.5em 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    font-weight: bold;
+  }
+
+  th,
+  td {
+    border-top: var(--table-border-width) solid var(--table-border-color);
+    border-bottom: var(--table-border-width) solid var(--table-border-color);
+    padding: 0.5em 0.2em;
+  }
+
+  thead tr:last-child th {
+    border-bottom: var(--table-header-border-width) solid var(--table-header-border-color);
+  }
+
+  tr :first-child {
+    text-align: var(--table-first-column-alignment);
+  }
+
+  tr :not(:first-child) {
+    text-align: var(--table-other-column-alignment);
+  }
+
+  tbody tr:hover :is(td, th) {
+    background: var(--highlight-color);
+  }
+
+  blockquote {
+    padding: 0.2em 0 0.2em 1em;
+    border-left: 2px solid var(--container-separator-color);
+  }
+
+  blockquote p:last-child {
+    margin-bottom: 0;
+  }
+
+  a {
+    @extend %link;
+  }
+}

@@ -10,15 +10,32 @@ body {
   --text-color: #333;
   --text-inverse-color: #fff;
   --text-disabled-color: #999;
+  --text-secondary-color: #6e6e6e;
+  --background-secondary: #f7f7f7;
   --surface-default: #e8e8e8;
+  --surface-inverse-color: #555;
+  --surface-accent-color: var(--accent-color);
   --surface-highlight-color: #c4c4c4;
+  --surface-highlight-inverse-color: var(--text-secondary-color);
   --surface-disabled-color: #f9f9f9;
+  --surface-disabled-inverse-color: #757575;
   --border-default-color: #5a5a5a;
   --border-disabled-color: #c4c4c4;
-  --accent-color: #007cac;
+  --accent-color: #0075a3;
+  --accent-secondary-color: #cc6300; // XXX: min font size 1.2rem or 1rem bold (or solid icon)
   --accent-highlight-color: #035e81;
+  --accent-border-color: #05425b;
   --active-color: #db1a1a;
-  --visited-color: #8d14f0;
+  --visited-color: #5c079b;
+  --protected-color: #cc6300; // XXX: min font size 1.2rem or 1rem bold (or solid icon)
+  --highlight-color: #fff9b8; // XXX: Subtle highlight / background of large highlighted areas
+  --attention-color: #fd0; // XXX: Small UI bits that scream for attention
+
+  --text-red-color: #db1a1a;
+  --text-green-color: #216901;
+  --text-blue-color: #0164c1;
+  --text-brown-color: #60331f;
+  --text-orange-color: #b73701;
 
   // Generic controls
   --control-border-color: var(--border-default-color);
@@ -29,35 +46,51 @@ body {
   --control-alt-text-color: var(--text-inverse-color);
   --control-alt-clickable-surface-color: var(--accent-color);
   --control-alt-clickable-surface-focus-color: var(--accent-highlight-color);
-  --control-alt-border-color: var(--accent-color);
+  --control-alt-border-color: var(--accent-border-color);
   --control-disabled-text-color: var(--text-disabled-color);
   --control-disabled-clickable-surface-color: var(--surface-disabled-color);
   --control-disabled-border-color: var(--surface-disabled-color);
   --control-indented-bg-color: var(--surface-disabled-color);
   --control-disabled-indented-bg-color: var(--text-disabled-color);
   --control-disabled-inset-indented-color: var(--text-disabled-color);
-  --control-border: 1px solid var(--control-border-color);
+  --control-border-width: 1px;
   --control-border-radius: 0.15em;
   --control-padding: 0.5em;
   --control-internal-gap: 0.2em;
 
   // Clickable texts (e.g., link)
   --clickable-text-color: var(--accent-color);
+  --clickable-text-highlight-color: var(--accent-secondary-color);
   --clickable-text-active-color: var(--active-color);
   --clickable-text-used-color: var(--visited-color);
   --clickable-text-disabled-color: var(--text-disabled-color);
 
-  // Generic container
+  // Tables
+  --table-border-color: var(--control-border-color);
+  --table-border-width: 1px;
+  --table-header-border-color: var(--control-border-color);
+  --table-header-border-width: 2px;
+
+  // Containers
   --container-padding: 1em;
   --container-narrow-padding: 1em 0.5em;
   --container-element-spacing: 0.5em;
+  --container-separator-color: #d0d0d0;
+
+  // Layouts
+  --content-gap-within-inline: 0.2em;
+  --content-gap-normal: 0.5em;
+  --content-gap-between-groups: 1em;
+  --content-gap-between-sections: 2em;
+  --content-max-readable-width: 40em;
 
   // Messages (banners, notifications, etc)
-  --message-important-surface-color: #fff9b8;
+  --message-important-surface-color: var(--highlight-color);
   --message-important-text-color: var(--text-color);
 
   // Text sizes (relative)
-  --text-size-rel-s: 75%;
+  --text-size-rel-xs: 75%; // XXX: use only for all-caps text
+  --text-size-rel-s: 87.5%;
   --text-size-rel-n: 100%;
   --text-size-rel-l: 120%;
   --text-size-rel-xl: 150%;
@@ -84,4 +117,14 @@ body {
   //
   // You don't need to do this for descendants. Just once in the outermost container.
   --text-size-global-adjust: 1.14;
+
+  // Animations
+  --transition-quick: 0.2s;
+
+  // Tags
+  --tag-generic-color: var(--accent-color);
+  --tag-disabled-color: var(--surface-disabled-inverse-color);
+
+  // Modal controls
+  --modal-control-box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.3);
 }
