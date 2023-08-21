@@ -245,7 +245,8 @@ const SettingsPage = props => {
               label={Translate.string('Enable internal booking notes')}
               description={
                 <Translate>
-                  Enable managers to add notes to a booking that can only be seen by other managers.
+                  Allow room owners/managers to add internal notes to bookings which are only
+                  visible to other room owners/managers.
                 </Translate>
               }
             />
