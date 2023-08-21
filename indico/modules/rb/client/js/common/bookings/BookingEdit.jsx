@@ -51,6 +51,7 @@ class BookingEdit extends React.Component {
     user: PropTypes.object.isRequired,
     booking: PropTypes.object.isRequired,
     isOngoingBooking: PropTypes.bool.isRequired,
+    isAdminOverrideEnabled: PropTypes.bool.isRequired,
     actionButtons: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     onClose: PropTypes.func,
@@ -98,7 +99,7 @@ class BookingEdit extends React.Component {
   get initialFormValues() {
     const {
       user: sessionUser,
-      booking: {repetition, startDt, endDt, bookedForUser, bookingReason},
+      booking: {repetition, startDt, endDt, bookedForUser, bookingReason, internalNote},
     } = this.props;
     const recurrence = getRecurrenceInfo(repetition);
     const isSingleBooking = recurrence.type === 'single';
@@ -116,6 +117,7 @@ class BookingEdit extends React.Component {
       usage,
       user: bookedForUser.identifier,
       reason: bookingReason,
+      internalNote,
     };
   }
 
@@ -287,6 +289,7 @@ class BookingEdit extends React.Component {
       user,
       reason,
       recurrence,
+      internalNote,
     } = data;
     const {
       actions: {updateBooking},
@@ -295,6 +298,7 @@ class BookingEdit extends React.Component {
         room: {id: roomId},
       },
       onSubmit,
+      isAdminOverrideEnabled,
     } = this.props;
     const [repeatFrequency, repeatInterval] = serializeRecurrenceInfo(recurrence);
     const params = {
@@ -305,7 +309,11 @@ class BookingEdit extends React.Component {
       room_id: roomId,
       user,
       reason,
+      internal_note: internalNote,
     };
+    if (isAdminOverrideEnabled) {
+      params.admin_override_enabled = true;
+    }
 
     const rv = await updateBooking(id, params);
     if (rv.error) {
@@ -339,6 +347,7 @@ export default connect(
   (state, {booking: {id}}) => ({
     user: userSelectors.getUserInfo(state),
     isOngoingBooking: bookingsSelectors.isOngoingBooking(state, {bookingId: id}),
+    isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
   }),
   dispatch => ({
     actions: bindActionCreators(

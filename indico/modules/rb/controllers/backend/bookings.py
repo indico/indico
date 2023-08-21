@@ -301,8 +301,23 @@ class RHUpdateBooking(RHBookingBase):
 
     @use_args(CreateBookingSchema)
     def _process(self, args):
+        room = self.booking.room
+
+        # XXX this is a bit of an ugly hack: usually it's checked in the reservation create/update code
+        # whether internal notes are enabled and the user can touch them. but when splitting we need to
+        # create a new booking and want to preserve internal notes regardless of whether the user who does
+        # the splitting is allowed to manage them or not. however, if the user does have access to internal
+        # notes, we want to allow them to change it as well.
+        if (
+            not rb_settings.get('internal_notes_enabled') or
+            not room.can_manage(session.user, allow_admin=args['admin_override_enabled'])
+        ):
+            # remove the user-provided note (we fall back to the one from the xisting booking below)
+            args.pop('internal_note', None)
+
         new_booking_data = {
             'booking_reason': args['booking_reason'],
+            'internal_note': args.get('internal_note', self.booking.internal_note),
             'booked_for_user': args.get('booked_for_user', self.booking.booked_for_user),
             'start_dt': args['start_dt'],
             'end_dt': args['end_dt'],
@@ -313,7 +328,6 @@ class RHUpdateBooking(RHBookingBase):
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):
             has_slot_changed = not has_same_slots(self.booking, new_booking_data)
-            room = self.booking.room
             self.booking.modify(new_booking_data, session.user)
             if (has_slot_changed and not room.can_book(session.user, allow_admin=False) and
                     room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):

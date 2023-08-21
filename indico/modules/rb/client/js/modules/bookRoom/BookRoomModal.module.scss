@@ -64,3 +64,7 @@
     padding-bottom: 0.5em;
   }
 }
+
+:global(.ui.segment).internal-notes-segment {
+  background: $internal-notes-segment-color;
+}

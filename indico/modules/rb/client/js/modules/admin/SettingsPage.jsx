@@ -240,6 +240,16 @@ const SettingsPage = props => {
                 </Form.Group>
               </Message>
             </FieldCondition>
+            <FinalCheckbox
+              name="internal_notes_enabled"
+              label={Translate.string('Enable internal booking notes')}
+              description={
+                <Translate>
+                  Allow room owners/managers to add internal notes to bookings which are only
+                  visible to other room owners/managers.
+                </Translate>
+              }
+            />
             <FinalField
               name="excluded_categories"
               component={CategoryList}

@@ -10,7 +10,7 @@ import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
 
-import {canManagersEditRooms} from '../config/selectors';
+import {canManagersEditRooms, hasInternalNotesEnabled} from '../config/selectors';
 import {getAllUserRoomPermissions, isUserRBAdmin} from '../user/selectors';
 
 export const hasLoadedEquipmentTypes = ({rooms}) =>
@@ -65,7 +65,15 @@ export const getAllRooms = createSelector(
   getAllUserRoomPermissions,
   isUserRBAdmin,
   canManagersEditRooms,
-  (rawRooms, equipmentTypes, allUserPermissions, isRBAdmin, managersEditRooms) => {
+  hasInternalNotesEnabled,
+  (
+    rawRooms,
+    equipmentTypes,
+    allUserPermissions,
+    isRBAdmin,
+    managersEditRooms,
+    internalNotesEnabled
+  ) => {
     equipmentTypes = equipmentTypes.reduce((obj, eq) => ({...obj, [eq.id]: eq}), {});
     return _.fromPairs(
       rawRooms.map(room => {
@@ -99,6 +107,7 @@ export const getAllRooms = createSelector(
             ...roomData,
             equipment: equipment.map(id => equipmentTypes[id].name).sort(),
             features: sortedFeatures,
+            canUserViewInternalNotes: permissions.manage && internalNotesEnabled,
             canUserEdit: permissions.manage && (isRBAdmin || managersEditRooms),
             canUserBook: permissions.book,
             canUserPrebook: permissions.prebook,

@@ -45,6 +45,7 @@ class RHConfig(RHRoomBookingBase):
                        tileserver_url=rb_settings.get('tileserver_url'),
                        grace_period=rb_settings.get('grace_period'),
                        managers_edit_rooms=rb_settings.get('managers_edit_rooms'),
+                       internal_notes_enabled=rb_settings.get('internal_notes_enabled'),
                        help_url=config.HELP_URL,
                        contact_email=config.PUBLIC_SUPPORT_EMAIL,
                        has_tos=bool(tos_url or tos_html),

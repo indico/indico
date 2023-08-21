@@ -23,6 +23,7 @@ export const ajax = {
   },
   room_id: ({room: {id}}) => id,
   is_prebooking: ({isPrebooking}) => isPrebooking,
+  internal_note: ({internalNote}) => internalNote,
   link_type: ({linkType}) => linkType,
   link_id: ({linkId}) => linkId,
   link_back: ({linkBack}) => linkBack,

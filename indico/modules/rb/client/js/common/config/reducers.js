@@ -23,6 +23,7 @@ export const initialState = {
   hasTOS: false,
   tosHTML: null,
   hasPrivacyPolicy: false,
+  internalNotesEnabled: false,
   privacyPolicyHTML: null,
   contactEmail: null,
 };
@@ -47,6 +48,7 @@ export default combineReducers({
           tosHtml: tosHTML,
           privacyPolicyHtml: privacyPolicyHTML,
           tileserverURL: tileServerURL,
+          internalNotesEnabled,
         } = camelizeKeys(action.data);
         const {languages} = action.data;
         return {
@@ -61,6 +63,7 @@ export default combineReducers({
           hasPrivacyPolicy,
           privacyPolicyHTML,
           contactEmail,
+          internalNotesEnabled,
         };
       }
       case adminActions.SETTINGS_RECEIVED:

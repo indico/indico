@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/palette';
+
 .booking-edit-form {
   margin-top: 15px;
 
@@ -16,4 +18,8 @@
       z-index: 1000;
     }
   }
+}
+
+:global(.ui.segment).internal-notes-segment {
+  background: $internal-notes-segment-color;
 }

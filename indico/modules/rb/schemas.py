@@ -241,7 +241,7 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_object', 'link', 'state', 'external_details_url')
+                  'is_linked_to_object', 'link', 'state', 'external_details_url', 'internal_note')
 
     def _get_permissions(self, booking):
         methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
@@ -250,6 +250,12 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
         if rb_is_admin(session.user):
             admin_permissions = {x: getattr(booking, x)(session.user) for x in methods}
         return {'user': user_permissions, 'admin': admin_permissions}
+
+    @post_dump(pass_original=True)
+    def _hide_sensitive_data(self, data, booking, **kwargs):
+        if not booking.room.can_manage(session.user):
+            del data['internal_note']
+        return data
 
 
 class BlockedRoomSchema(mm.SQLAlchemyAutoSchema):
@@ -352,6 +358,7 @@ class CreateBookingSchema(mm.Schema):
     room_id = fields.Int(required=True)
     booked_for_user = Principal(data_key='user', allow_external_users=True)
     booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), required=True)
+    internal_note = fields.String()
     is_prebooking = fields.Bool(load_default=False)
     link_type = EnumField(LinkType)
     link_id = fields.Int()
@@ -488,6 +495,7 @@ class SettingsSchema(mm.Schema):
     end_notification_daily = fields.Int(validate=validate.Range(min=1, max=30))
     end_notification_weekly = fields.Int(validate=validate.Range(min=1, max=30))
     end_notification_monthly = fields.Int(validate=validate.Range(min=1, max=30))
+    internal_notes_enabled = fields.Bool()
     excluded_categories = ModelList(Category)
     grace_period = fields.Int(validate=validate.Range(min=0, max=24), allow_none=True)
 

@@ -203,6 +203,11 @@ class Reservation(db.Model):
         nullable=False,
         default=False
     )
+    internal_note = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
 
     edit_logs = db.relationship(
         'ReservationEditLog',
@@ -307,7 +312,7 @@ class Reservation(db.Model):
         return format_repr(self, 'id', 'room_id', 'start_dt', 'end_dt', 'state', _text=self.booking_reason)
 
     @classmethod
-    def create_from_data(cls, room, data, user, prebook=None, ignore_admin=False):
+    def create_from_data(cls, room, data, user, *, prebook=None, ignore_admin=False, force_internal_note=False):
         """Create a new reservation.
 
         :param room: The Room that's being booked.
@@ -316,9 +321,11 @@ class Reservation(db.Model):
         :param prebook: Instead of determining the booking type from the user's
                         permissions, always use the given mode.
         :param ignore_admin: Whether to ignore the user's admin status.
+        :param force_internal_note: Always set internal note regardless of config/permissions
         """
+        from indico.modules.rb import rb_settings
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booking_reason')
+        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booking_reason'}
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
 
@@ -329,6 +336,12 @@ class Reservation(db.Model):
 
         room.check_advance_days(data['end_dt'].date(), user)
         room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
+
+        if (
+            force_internal_note or
+            (rb_settings.get('internal_notes_enabled') and room.can_manage(user, allow_admin=(not ignore_admin)))
+        ):
+            populate_fields.add('internal_note')
 
         reservation = cls()
         for field in populate_fields:
@@ -566,9 +579,10 @@ class Reservation(db.Model):
         :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
         :param user: The :class:`.User` who modifies the booking.
         """
+        from indico.modules.rb import rb_settings
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
-                           'booking_reason')
+        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
+                           'booking_reason'}
         # fields affecting occurrences
         occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'}
         # fields where date and time are compared separately
@@ -588,6 +602,9 @@ class Reservation(db.Model):
 
         self.room.check_advance_days(data['end_dt'].date(), user)
         self.room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
+
+        if rb_settings.get('internal_notes_enabled') and self.room.can_manage(user):
+            populate_fields.add('internal_note')
 
         changes = {}
         update_occurrences = False
@@ -609,6 +626,9 @@ class Reservation(db.Model):
                 # If any occurrence-related field changed we need to recreate the occurrences
                 if field in occurrence_fields:
                     update_occurrences = True
+                # If the internal notes are being updated then we don't bother updating the edit log with this
+                if field == 'internal_note':
+                    continue
                 # Record change for history entry
                 if field in date_time_fields:
                     # The date/time fields create separate entries for the date and time parts

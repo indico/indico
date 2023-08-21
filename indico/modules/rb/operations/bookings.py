@@ -420,7 +420,7 @@ def split_booking(booking, new_booking_data):
 
     prebook = not room.can_book(session.user, allow_admin=False) and room.can_prebook(session.user, allow_admin=False)
     resv = Reservation.create_from_data(room, dict(new_booking_data, start_dt=new_start_dt), session.user,
-                                        prebook=prebook, ignore_admin=True)
+                                        prebook=prebook, ignore_admin=True, force_internal_note=True)
     for new_occ in resv.occurrences:
         new_occ_start = new_occ.start_dt.date()
         if new_occ_start in cancelled_dates:
