@@ -558,8 +558,7 @@ class Registration(db.Model):
                  .with_parent(self)
                  .join(RegistrationFormFieldData)
                  .filter(RegistrationFormFieldData.field.has(input_type='accompanying_persons')))
-        return list(itertools.chain.from_iterable(d.data for d in query.all()
-                                                  if d.field_data.field.is_active))
+        return list(itertools.chain.from_iterable(d.data for d in query.all() if not d.field_data.field.is_deleted))
 
     @classproperty
     @classmethod
