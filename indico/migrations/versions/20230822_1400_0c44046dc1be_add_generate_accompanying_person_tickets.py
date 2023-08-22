@@ -1,7 +1,7 @@
 """Add generate accompanying person tickets
 
 Revision ID: 0c44046dc1be
-Revises: cb46beecbb93
+Revises: cd7038a37646
 Create Date: 2023-08-17 14:12:32.880804
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '0c44046dc1be'
-down_revision = 'cb46beecbb93'
+down_revision = 'cd7038a37646'
 branch_labels = None
 depends_on = None
 
