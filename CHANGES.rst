@@ -28,6 +28,7 @@ Improvements
 - Allow room managers to add internal notes to bookings (:issue:`5746`, :pr:`5791`)
 - Support generating tickets and badges for each of the registrant's accompanying
   persons (:pr:`5424`)
+- Include current language in page metadata (:pr:`5894`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
