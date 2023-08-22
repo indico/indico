@@ -26,6 +26,8 @@ Improvements
 - Make editing timeline display much more straightforward (:pr:`5674`)
 - Allow event managers to delete editables from contributions (:pr:`5778`, :pr:`5892`)
 - Allow room managers to add internal notes to bookings (:issue:`5746`, :pr:`5791`)
+- Support generating tickets and badges for each of the registrant's accompanying
+  persons (:pr:`5424`)
 
 Bugfixes
 ^^^^^^^^
@@ -37,6 +39,8 @@ Internal Changes
 
 - Use (dart-)sass instead of the deprecated node-sass/libsass for CSS compilation
   (:pr:`5734`)
+- Add ``event.is_field_data_locked`` signal, allowing plugins to lock registration form
+  fields on a per-registration basis (:pr:`5424`)
 
 
 ----

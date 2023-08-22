@@ -54,6 +54,14 @@ PurgedItemLocked.propTypes = {
   isUpdateMode: PropTypes.bool.isRequired,
 };
 
+function ItemLocked({reason}) {
+  return <Popup trigger={<Icon name="lock" />}>{reason}</Popup>;
+}
+
+ItemLocked.propTypes = {
+  reason: PropTypes.string.isRequired,
+};
+
 export default function FormItem({
   title,
   description,
@@ -62,6 +70,7 @@ export default function FormItem({
   isEnabled,
   isRequired,
   isPurged,
+  lockedReason,
   sortHandle,
   setupMode,
   setupActions,
@@ -77,7 +86,7 @@ export default function FormItem({
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isEnabled, ...rest};
   const showPurged = !setupMode && isPurged;
-  const disabled = !isEnabled || showPurged || (paidItemLocked && !isManagement);
+  const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
 
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
@@ -141,8 +150,11 @@ export default function FormItem({
         )}
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
-      {showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
-      {!showPurged && paidItemLocked && <PaidItemLocked management={isManagement} />}
+      {lockedReason && <ItemLocked reason={lockedReason} />}
+      {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
+      {!lockedReason && !showPurged && paidItemLocked && (
+        <PaidItemLocked management={isManagement} />
+      )}
     </div>
   );
 }
@@ -157,6 +169,8 @@ FormItem.propTypes = {
   isRequired: PropTypes.bool,
   /** Whether the field's registration data have been deleted due to an expired retention period */
   isPurged: PropTypes.bool.isRequired,
+  /** If the field is locked for some external reason, the reason for it */
+  lockedReason: PropTypes.string,
   /** The retention period of the field's data in weeks */
   retentionPeriod: PropTypes.number,
   /** Whether the field is a special "personal data" field */
@@ -180,6 +194,7 @@ FormItem.defaultProps = {
   fieldIsPersonalData: false,
   fieldIsRequired: false,
   isRequired: false,
+  lockedReason: '',
   retentionPeriod: null,
   htmlName: null,
   sortHandle: null,

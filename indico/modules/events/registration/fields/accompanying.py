@@ -9,6 +9,7 @@ from uuid import uuid4
 
 from marshmallow import ValidationError, fields, post_load, pre_load, validate
 
+from indico.core import signals
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import RegistrationFormBillableField
 from indico.util.i18n import _
@@ -22,8 +23,11 @@ class AccompanyingPersonSchema(mm.Schema):
 
     @pre_load
     def _generate_new_uuid(self, data, **kwargs):
-        if data.get('id', '').startswith('new:'):
+        old_id = data.get('id', '')
+        if old_id.startswith('new:'):
             data['id'] = str(uuid4())
+            signals.event.registration.generate_accompanying_person_id.send(self, temporary_id=old_id,
+                                                                            permanent_id=data['id'])
         return data
 
     @post_load

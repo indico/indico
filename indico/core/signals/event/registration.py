@@ -92,6 +92,15 @@ both users trying to get their own ticket and managers trying to get a
 ticket for a registrant.
 ''')
 
+is_field_data_locked = _signals.signal('is-field-data-locked', '''
+Called when resolving whether Indico should let a registrant change a data value
+in their registration.  The participant's `Registration` is passed as `registration`.
+The `sender` is the `RegistrationFormItem` object.
+
+This signal returns a string containing the reason for the item being locked,
+or `None` if the item is not locked.
+''')
+
 filter_selectable_badges = _signals.signal('filter-selectable-badges', '''
 Called when composing lists of badge templates. The `sender` may be either
 ``BadgeSettingsForm``, ``RHListEventTemplates`` or ``RHListCategoryTemplates``.
@@ -111,4 +120,10 @@ after_registration_form_clone = _signals.signal('after-registration-form-clone',
 Executed after a registration form is cloned. The sender is the old ``RegistrationForm``
 object being cloned. The new ``RegistrationForm`` object is passed in the ``new_form``
 kwarg.
+''')
+
+generate_accompanying_person_id = _signals.signal('generate-accompanying-person-id', '''
+Called after a permanent UUID is assigned to an accompanying person. The sender is the
+``AccompanyingPersonSchema`` object. The temporary ID is passed in the ``temporary_id``
+kwarg and the permanent UUID is passed in the ``permanent_id`` kwarg.
 ''')
