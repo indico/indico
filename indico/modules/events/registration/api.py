@@ -88,8 +88,6 @@ class RHAPIRegistration(RHAPIRegFormBase):
     @use_kwargs({'checked_in': fields.Bool(required=True)})
     def _process_PATCH(self, checked_in):
         from indico.modules.events.registration.schemas import CheckinRegistrationSchema
-        if self.registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
-            raise BadRequest('This registration cannot be marked as checked-in')
         self.registration.checked_in = checked_in
         signals.event.registration_checkin_updated.send(self.registration)
         return jsonify(CheckinRegistrationSchema().dump(self.registration))
