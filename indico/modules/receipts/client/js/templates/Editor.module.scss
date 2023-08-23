@@ -5,30 +5,28 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
+@use 'base/palette' as *;
 
 :global(.ui.form) .buttons:global(.fields) {
   justify-content: flex-end;
   margin-top: 1em;
 }
 
-:global(.react-pdf) {
-  &__Document {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
+:global(.react-pdf__Document) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-  &__Page {
-    max-width: calc('100% - 2em');
-    border: 1px solid $pastel-gray;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-    margin: 1em 0 0 0;
+:global(.react-pdf__Page) {
+  max-width: calc(100% - 2em);
+  border: 1px solid $pastel-gray;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  margin: 1em 0 0 0;
 
-    canvas {
-      max-width: 100%;
-      height: auto !important;
-    }
+  canvas {
+    max-width: 100%;
+    height: auto !important;
   }
 }
 
