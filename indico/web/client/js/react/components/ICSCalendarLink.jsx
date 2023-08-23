@@ -59,7 +59,6 @@ const ICSExportOptions = ({options, selected, handleSetOption}) => (
             />
           }
         />
-        {idx < options.length - 1 && <Button.Or text={Translate.string('or')} />}
       </React.Fragment>
     ))}
   </Button.Group>
