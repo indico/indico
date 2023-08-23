@@ -35,7 +35,7 @@ function reducer(state, action) {
       return {
         ...state,
         ownTemplates: [...state.ownTemplates, action.template],
-        message: Translate.string(`Template "${action.template.title}" was added`),
+        message: Translate.string('Template "{title}" was added', {title: action.template.title}),
       };
     case 'UPDATE_TEMPLATE':
       return {
@@ -43,7 +43,7 @@ function reducer(state, action) {
         ownTemplates: state.ownTemplates.map(tpl =>
           tpl.id === action.id ? {...tpl, ...action.changes} : tpl
         ),
-        message: Translate.string(`Template "${action.changes.title}" was updated`),
+        message: Translate.string('Template "{title}" was updated', {title: action.changes.title}),
       };
     case 'DELETE_TEMPLATE':
       return {
