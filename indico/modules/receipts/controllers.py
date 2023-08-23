@@ -6,8 +6,10 @@
 # LICENSE file for more details.
 
 import re
+import typing as t
+from dataclasses import dataclass, field
 
-from flask import jsonify, request, session
+from flask import g, json, jsonify, request, session
 from marshmallow import fields, validate
 from werkzeug.exceptions import Forbidden
 
@@ -17,9 +19,12 @@ from indico.modules.categories.controllers.management import RHManageCategoryBas
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import Event
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import ReceiptTemplateSchema, ReceiptTplMetadataSchema
-from indico.modules.receipts.util import compile_jinja_code, create_pdf, get_inherited_templates
+from indico.modules.receipts.util import (compile_jinja_code, create_pdf, get_inherited_templates,
+                                          get_useful_registration_data)
 from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
 from indico.util.marshmallow import YAML
 from indico.web.args import use_kwargs
@@ -27,6 +32,12 @@ from indico.web.flask.util import send_file
 
 
 TITLE_ENUM_RE = re.compile(r'^(.*) \((\d+)\)$')
+
+
+@dataclass
+class TemplateStackEntry:
+    registration: Registration
+    undefined: t.Set[str] = field(default_factory=set)
 
 
 class ReceiptAreaMixin:
@@ -78,6 +89,13 @@ class TemplateListMixin(ReceiptAreaRenderMixin):
         )
 
 
+class AllTemplateMixin(ReceiptAreaMixin):
+    def _process(self, **data):
+        inherited_templates = ReceiptTemplateSchema(many=True).dump(get_inherited_templates(self.target))
+        own_templates = ReceiptTemplateSchema(many=True).dump(self.target.receipt_templates)
+        return jsonify(inherited_templates + own_templates)
+
+
 class RHListEventTemplates(TemplateListMixin, RHManageEventBase):
     pass
 
@@ -95,7 +113,7 @@ class RHAddTemplate(ReceiptAreaRenderMixin, RHAdminBase):
         'css': fields.String(load_default=''),
         'yaml': YAML(ReceiptTplMetadataSchema, load_default=None)
     })
-    def _process_POST(self, title, html, css, yaml):
+    def _process(self, title, html, css, yaml):
         if yaml is None:
             yaml = {'custom_fields': []}
         template = ReceiptTemplate(title=title, html=html, css=css, custom_fields=yaml['custom_fields'],
@@ -144,6 +162,14 @@ class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):
         self.template.custom_fields = yaml['custom_fields'] if yaml else []
 
 
+class RHAllEventTemplates(AllTemplateMixin, RHManageEventBase):
+    pass
+
+
+class RHAllCategoryTemplates(AllTemplateMixin, RHManageCategoryBase):
+    pass
+
+
 class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
     def _process(self):
         # XXX: correctly set registration, events, etc... to "dummy" values
@@ -153,8 +179,49 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
             event=self.target,
             registration=None
         )
-        f = create_pdf(self.target, html, self.template.css)
+        f = create_pdf(self.target, {html}, self.template.css)
+
         return send_file('receipt.pdf', f, 'application/pdf')
+
+
+class RHPrintReceipts(ReceiptTemplateMixin, RHManageEventBase):
+    @use_kwargs({
+        'registration_ids': fields.List(fields.Integer()),
+        'notify_email': fields.Bool(load_default=True),
+        'custom_fields': fields.Dict(keys=fields.String)
+    })
+    def _process(self, registration_ids=None, notify_email=None, custom_fields=None):
+        # fetch corresponding Registration objects, among those belonging to the event
+        registrations = Registration.query.filter(
+            Registration.id.in_(registration_ids), RegistrationForm.event == self.target
+        ).join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
+
+        g.template_stack = []
+        html_sources = []
+        for registration in registrations:
+            g.template_stack.append(TemplateStackEntry(registration))
+            html_sources.append(compile_jinja_code(
+                self.template.html,
+                use_stack=True,
+                custom_fields={f['name']: custom_fields.get(f['name']) for f in self.template.custom_fields},
+                event=self.target,
+                **get_useful_registration_data(registration.registration_form, registration)
+            ))
+
+        response = send_file(
+            'receipt.pdf', create_pdf(self.target, html_sources, self.template.css), 'application/pdf'
+        )
+        undefineds = [
+            {
+                'registration': dict(entry.registration.get_personal_data(), id=entry.registration.id),
+                'undefineds': list(entry.undefined)
+            }
+            for entry in g.template_stack if entry.undefined
+        ]
+        if undefineds:
+            response.headers['X-Indico-Template-Errors'] = json.dumps(undefineds)
+        del g.template_stack
+        return response
 
 
 class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):

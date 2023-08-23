@@ -22,7 +22,10 @@ class OwnerDataSchema(mm.Schema):
 class CustomFieldSchema(mm.Schema):
     name = fields.String(required=True, validate=not_empty)
     type = fields.String(required=True, validate=validate.OneOf(['str', 'bool', 'choice']))
-    default = fields.String()
+    options = fields.List(fields.String())
+
+    class Meta:
+        additional = ('default',)
 
 
 class ReceiptTplMetadataSchema(mm.Schema):

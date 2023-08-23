@@ -5,9 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.receipts.controllers import (RHAddTemplate, RHCategoryTemplate, RHCloneTemplate, RHDeleteTemplate,
-                                                 RHEditTemplate, RHEventTemplate, RHListCategoryTemplates,
-                                                 RHListEventTemplates, RHPreviewTemplate)
+from indico.modules.receipts.controllers import (RHAddTemplate, RHAllCategoryTemplates, RHAllEventTemplates,
+                                                 RHCategoryTemplate, RHCloneTemplate, RHDeleteTemplate, RHEditTemplate,
+                                                 RHEventTemplate, RHListCategoryTemplates, RHListEventTemplates,
+                                                 RHPreviewTemplate, RHPrintReceipts)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -42,9 +43,13 @@ for object_type in ('event', 'category'):
                      defaults={'object_type': object_type}, methods=('GET',))
     _bp.add_url_rule(prefix + '/<int:template_id>/preview', 'template_preview', RHPreviewTemplate,
                      defaults={'object_type': object_type}, methods=('GET',))
+    _bp.add_url_rule(prefix + '/<int:template_id>/print', 'print_receipts', RHPrintReceipts,
+                     defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'edit_template', RHEditTemplate,
                      defaults={'object_type': object_type}, methods=('PATCH',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'delete_template', RHDeleteTemplate,
                      defaults={'object_type': object_type}, methods=('DELETE',))
     _bp.add_url_rule(prefix + '/<int:template_id>/clone', 'clone_template', RHCloneTemplate,
                      defaults={'object_type': object_type}, methods=('POST',))
+    _bp.add_url_rule(prefix + '/templates', 'all_templates', _dispatch(RHAllEventTemplates, RHAllCategoryTemplates),
+                     defaults={'object_type': object_type}, methods=('GET',))
