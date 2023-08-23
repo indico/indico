@@ -5,15 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
-@import 'base/typography';
+@use 'base/palette' as *;
+@use 'base/typography' as *;
 
 :global(.ui.form .fields) .stacked-fields {
   flex: 1 1 auto;
   width: 100%;
 
   textarea {
-    @extend %font-family-monospace;
+    @include font-family-monospace();
   }
 
   > :global(.field):not(:last-child) {
