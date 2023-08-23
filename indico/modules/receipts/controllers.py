@@ -195,7 +195,7 @@ class RHAllCategoryTemplates(AllTemplateMixin, RHManageCategoryBase):
 
 class RHGetDummyData(ReceiptAreaMixin, RHAdminBase):
     @use_kwargs({
-        'template_id': fields.Integer(default=None)
+        'template_id': fields.Integer(load_default=None)
     })
     def _process(self, template_id=None):
         if template_id:
