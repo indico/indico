@@ -46,7 +46,8 @@ class RHAPIRegFormBase(RHAPICheckinBase):
     def _process_args(self):
         RHAPICheckinBase._process_args(self)
         self.regform = (RegistrationForm.query
-                        .filter_by(id=request.view_args['reg_form_id'], is_deleted=False)
+                        .with_parent(self.event)
+                        .filter_by(id=request.view_args['reg_form_id'])
                         .first_or_404())
 
 
@@ -72,13 +73,18 @@ class RHAPIRegistrations(RHAPIRegFormBase):
 class RHAPIRegistration(RHAPIRegFormBase):
     """Manage a single registration."""
 
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.registration
+        }
+    }
+
     def _process_args(self):
         RHAPIRegFormBase._process_args(self)
         registration_id = request.view_args['registration_id']
         self.registration = (Registration.query
+                             .with_parent(self.regform)
                              .filter_by(id=registration_id, is_deleted=False)
-                             .join(RegistrationForm, RegistrationForm.id == Registration.registration_form_id)
-                             .filter_by(is_deleted=False)
                              .first_or_404())
 
     def _process_GET(self):
