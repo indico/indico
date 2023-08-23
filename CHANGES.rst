@@ -30,6 +30,7 @@ Improvements
   persons (:pr:`5424`)
 - Include current language in page metadata (:pr:`5894`, thanks :user:`foxbunny`)
 - Add keyboard shortcut (CTRL-SHIFT-A) to toggle room booking admin override (:pr:`5909`)
+- Make language list accessible (:pr:`5903`)
 
 Bugfixes
 ^^^^^^^^
