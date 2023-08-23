@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
+import ReactDOM from 'react-dom';
+
 export function toClasses(...params) {
   const obj = params.length === 1 ? params[0] : params;
   if (Array.isArray(obj)) {
@@ -16,4 +19,24 @@ export function toClasses(...params) {
     .map(([k, v]) => (v ? ` ${k}` : ''))
     .join('')
     .trim();
+}
+
+/*
+ * This mounts a React component (usually a modal) in a temporary location.
+ * It takes a function which will be called with `resolve, reject` and render
+ * the actual component.
+ */
+export function injectModal(renderFunc) {
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+
+  const cleanup = () =>
+    _.defer(() => {
+      ReactDOM.unmountComponentAtNode(container);
+      document.body.removeChild(container);
+    });
+
+  return new Promise((resolve, reject) => {
+    ReactDOM.render(renderFunc(resolve, reject), container);
+  }).finally(cleanup);
 }

@@ -7,7 +7,7 @@
 
 export {default as Preloader} from './Preloader';
 export {default as Slot} from './Slot';
-export {toClasses} from './html';
+export {toClasses, injectModal} from './html';
 export {default as IndicoPropTypes} from './propTypes';
 export {default as Markdown} from './Markdown';
 export {default as ConditionalRoute} from './ConditionalRoute';
