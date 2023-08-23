@@ -44,18 +44,15 @@ class RegistrationTagSchema(mm.SQLAlchemyAutoSchema):
 class CheckinEventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
-        fields = ('event_id', 'title', 'description', 'start_dt', 'end_dt')
-
-    event_id = fields.Int(attribute='id')
+        fields = ('id', 'title', 'description', 'start_dt', 'end_dt')
 
 
 class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = RegistrationForm
-        fields = ('regform_id', 'event_id', 'title', 'introduction', 'start_dt', 'end_dt',
+        fields = ('id', 'event_id', 'title', 'introduction', 'start_dt', 'end_dt',
                   'registration_count', 'checked_in_count')
 
-    regform_id = fields.Int(attribute='id')
     registration_count = fields.Function(lambda regform: len(regform.registrations))
     checked_in_count = fields.Function(lambda regform: len(regform.checked_in_registrations))
 
@@ -63,10 +60,10 @@ class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
 class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Registration
-        fields = ('registration_id', 'full_name', 'email', 'state', 'checked_in', 'checked_in_dt',
+        fields = ('id', 'regform_id', 'event_id', 'full_name', 'email', 'state', 'checked_in', 'checked_in_dt',
                   'checkin_secret', 'tags', 'registration_date', 'registration_data')
 
-    registration_id = fields.Int(attribute='id')
+    regform_id = fields.Int(attribute='registration_form_id')
     full_name = fields.Str(attribute='display_full_name')
     state = fields.Enum(RegistrationState)
     checkin_secret = fields.UUID(attribute='ticket_uuid')
