@@ -8,6 +8,7 @@
 from flask import session
 
 from indico.core import signals
+from indico.modules.events.registration.util import ActionMenuEntry
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -25,3 +26,16 @@ def _category_sidemenu_items(sender, category, **kwargs):
     if session.user.is_admin:
         return SideMenuItem('receipts', _('Receipt Templates'), url_for('receipts.template_list', category),
                             icon='agreement')
+
+
+@signals.event.registrant_list_action_menu.connect
+def _get_action_menu_items(reg_form, **kwargs):
+    yield ActionMenuEntry(
+        'callback',
+        'agreement',
+        _('Print Receipts'),
+        _('Print Receipts'),
+        callback='printReceipts',
+        params={'event_id': reg_form.event_id},
+        weight=70
+    )
