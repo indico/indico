@@ -66,7 +66,7 @@
 .popup:global(.ui.wide.popup) {
   display: inline-flex;
   min-width: 350px;
-  max-width: 450px;
+  max-width: unset;
 }
 
 .popup .content {
