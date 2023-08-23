@@ -52,7 +52,7 @@ class CheckinEventSchema(mm.SQLAlchemyAutoSchema):
 class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = RegistrationForm
-        fields = ('regform_id', 'title', 'introduction', 'start_dt', 'end_dt',
+        fields = ('regform_id', 'event_id', 'title', 'introduction', 'start_dt', 'end_dt',
                   'registration_count', 'checked_in_count')
 
     regform_id = fields.Int(attribute='id')
@@ -74,10 +74,17 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
     registration_date = fields.DateTime(attribute='submitted_dt')
     registration_data = fields.Method('_get_registration_data')
 
+    def _get_filenames(self, registration):
+        """Extract filenames from file fields."""
+        return {r.field_data.field.id: r.filename
+                for r in registration.data
+                if r.field_data.field.field_impl.is_file_field and r.storage_file_id is not None}
+
     def _get_registration_data(self, registration):
         regform = registration.registration_form
         form_data = get_flat_section_submission_data(regform, registration=registration, management=True)
         reg_data = get_form_registration_data(regform, registration, management=True)
+        filenames = self._get_filenames(registration)
         data = {}
 
         for section_id, section in form_data['sections'].items():
@@ -104,6 +111,10 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
                 field_data['price'] = field['price']
             if 'choices' in field:
                 field_data['choices'] = field['choices']
+            # File field stores the uuid as data which is not helpful.
+            # We want to show the filename instead.
+            if field_id in filenames:
+                field_data['data'] = filenames[field_id]
             section['fields'].append(field_data)
 
         # Sort sections and fields based on 'position'
