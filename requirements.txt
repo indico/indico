@@ -41,6 +41,8 @@ blinker==1.7.0
     #   flask-multipass
     #   flask-pluginengine
     #   sentry-sdk
+brotli==1.1.0
+    # via fonttools
 cachelib==0.9.0
     # via flask-caching
 captcha==0.5.0
@@ -55,7 +57,9 @@ certifi==2023.7.22
     #   requests
     #   sentry-sdk
 cffi==1.16.0
-    # via cryptography
+    # via
+    #   cryptography
+    #   weasyprint
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
@@ -76,6 +80,8 @@ colorclass==2.2.2
     # via -r requirements.in
 cryptography==41.0.5
     # via authlib
+cssselect2==0.7.0
+    # via weasyprint
 decorator==5.1.1
     # via ipython
 deprecated==1.2.14
@@ -135,12 +141,16 @@ flask-webpackext==1.0.2
     # via -r requirements.in
 flask-wtf==1.2.1
     # via -r requirements.in
+fonttools==4.45.0
+    # via weasyprint
 hiredis==2.2.3
     # via redis
 html2text==2020.1.16
     # via -r requirements.in
 html5lib==1.1
-    # via lxml
+    # via
+    #   lxml
+    #   weasyprint
 icalendar==5.0.11
     # via -r requirements.in
 idna==3.4
@@ -243,6 +253,7 @@ pillow==10.1.0
     #   -r requirements.in
     #   captcha
     #   reportlab
+    #   weasyprint
 prompt-toolkit==3.0.40
     # via
     #   -r requirements.in
@@ -260,6 +271,8 @@ pycountry==22.3.5
     # via -r requirements.in
 pycparser==2.21
     # via cffi
+pydyf==0.8.0
+    # via weasyprint
 pygments==2.16.1
     # via
     #   -r requirements.in
@@ -271,6 +284,8 @@ pynpm==0.1.2
     #   pywebpack
 pypdf==3.17.0
     # via -r requirements.in
+pyphen==0.14.0
+    # via weasyprint
 pypng==0.20220715.0
     # via qrcode
 python-dateutil==2.8.2
@@ -336,7 +351,10 @@ stack-data==0.6.3
 terminaltables==3.1.10
     # via -r requirements.in
 tinycss2==1.2.1
-    # via bleach
+    # via
+    #   bleach
+    #   cssselect2
+    #   weasyprint
 traitlets==5.13.0
     # via
     #   ipython
@@ -372,11 +390,14 @@ vine==5.1.0
     #   kombu
 wcwidth==0.2.9
     # via prompt-toolkit
+weasyprint==60.1
+    # via -r requirements.in
 webargs==8.3.0
     # via -r requirements.in
 webencodings==0.5.1
     # via
     #   bleach
+    #   cssselect2
     #   html5lib
     #   tinycss2
 werkzeug==3.0.1
@@ -401,6 +422,8 @@ zipp==3.17.0
     # via
     #   importlib-metadata
     #   importlib-resources
+zopfli==0.2.3
+    # via fonttools
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
