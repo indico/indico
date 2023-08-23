@@ -10,6 +10,8 @@ alembic==1.12.1
     #   flask-migrate
 amqp==5.2.0
     # via kombu
+appnope==0.1.3
+    # via ipython
 asttokens==2.4.1
     # via
     #   sentry-sdk
@@ -133,8 +135,6 @@ flask-webpackext==1.0.2
     # via -r requirements.in
 flask-wtf==1.2.1
     # via -r requirements.in
-greenlet==3.0.1
-    # via sqlalchemy
 hiredis==2.2.3
     # via redis
 html2text==2020.1.16
