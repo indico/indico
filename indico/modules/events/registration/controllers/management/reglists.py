@@ -110,6 +110,16 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 url=url_for('.registrations_attachments_export', reg_form),
                 weight=60,
                 extra_classes='js-submit-list-form regform-download-attachments',
+            ),
+            ActionMenuEntry(
+                'ajax-dialog',
+                'tag',
+                _('Edit Tags'),
+                url=url_for('.manage_registration_tags_assign', reg_form),
+                weight=50,
+                # XXX this is a hack to keep the item disabled when there are no tags defined
+                requires_selected=bool(reg_form.event.registration_tags),
+                reload_page=True
             )
         ]
 
