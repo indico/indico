@@ -88,9 +88,9 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
         reg_list_kwargs = self.list_generator.get_list_kwargs()
-        reg_form = reg_list_kwargs['regform']
+        regform = self.regform
 
-        event = reg_form.event
+        event = regform.event
         badge_templates = [tpl for tpl in set(event.designer_templates) | get_inherited_templates(event)
                            if tpl.type == TemplateType.badge]
 
@@ -100,14 +100,14 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 'mail',
                 _('E-mail'),
                 dialog_title=_('Send e-mail'),
-                url=url_for('.email_registrants', reg_form),
+                url=url_for('.email_registrants', regform),
                 weight=100,
                 hide_if_locked=True,
             ), ActionMenuEntry(
                 'ajax-dialog',
                 'attachment',
                 _('Download Attachments'),
-                url=url_for('.registrations_attachments_export', reg_form),
+                url=url_for('.registrations_attachments_export', regform),
                 weight=60,
                 extra_classes='js-submit-list-form regform-download-attachments',
             ),
@@ -115,38 +115,38 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 'ajax-dialog',
                 'tag',
                 _('Edit Tags'),
-                url=url_for('.manage_registration_tags_assign', reg_form),
+                url=url_for('.manage_registration_tags_assign', regform),
                 weight=50,
                 # XXX this is a hack to keep the item disabled when there are no tags defined
-                requires_selected=bool(reg_form.event.registration_tags),
+                requires_selected=bool(regform.event.registration_tags),
                 reload_page=True
             )
         ]
 
-        # the reg. form has at least a ticket template
+        # the regform has at least one ticket template
         if any(tpl.is_ticket for tpl in badge_templates):
             action_menu_items.append(ActionMenuEntry(
                 'ajax-dialog',
                 'id-badge',
                 _('Print Badges'),
-                url=url_for('.registrations_config_badges', reg_form),
+                url=url_for('.registrations_config_badges', regform),
                 weight=90,
             ))
 
-        # the reg. form has at least a badge template
+        # the regform has at least one badge template
         if any(not tpl.is_ticket for tpl in badge_templates):
             action_menu_items.append(ActionMenuEntry(
                 'ajax-dialog',
                 'ticket',
                 _('Print Tickets'),
-                url=url_for('.registrations_config_tickets', reg_form),
+                url=url_for('.registrations_config_tickets', regform),
                 weight=80,
             ))
 
         action_menu_items = sorted(
             itertools.chain(
                 action_menu_items,
-                values_from_signal(signals.event.registrant_list_action_menu.send(reg_form), as_list=True)
+                values_from_signal(signals.event.registrant_list_action_menu.send(regform), as_list=True)
             ),
             key=attrgetter('weight'),
             reverse=True
