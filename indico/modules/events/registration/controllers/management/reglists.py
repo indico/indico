@@ -5,9 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import itertools
 import os
 import uuid
 from io import BytesIO
+from operator import attrgetter
 
 from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload, subqueryload
@@ -42,7 +44,8 @@ from indico.modules.events.registration.models.items import PersonalDataType, Re
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
-from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
+from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
+                                                     generate_spreadsheet_from_registrations,
                                                      get_flat_section_submission_data, get_initial_form_values,
                                                      get_ticket_attachments, get_title_uuid, get_user_data,
                                                      import_registrations_from_csv, make_registration_schema)
@@ -53,6 +56,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
 from indico.util.placeholders import replace_placeholders
+from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -84,12 +88,67 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
         reg_list_kwargs = self.list_generator.get_list_kwargs()
-        badge_templates = [tpl for tpl in set(self.event.designer_templates) | get_inherited_templates(self.event)
+        regform = self.regform
+
+        event = regform.event
+        badge_templates = [tpl for tpl in set(event.designer_templates) | get_inherited_templates(event)
                            if tpl.type == TemplateType.badge]
-        has_tickets = any(tpl.is_ticket for tpl in badge_templates)
-        has_badges = any(not tpl.is_ticket for tpl in badge_templates)
+
+        action_menu_items = [
+            ActionMenuEntry(
+                _('E-mail'),
+                'mail',
+                url=url_for('.email_registrants', regform),
+                dialog_title=_('Send e-mail'),
+                weight=100,
+                hide_if_locked=True,
+            ), ActionMenuEntry(
+                _('Download Attachments'),
+                'attachment',
+                url=url_for('.registrations_attachments_export', regform),
+                weight=60,
+                extra_classes='js-submit-list-form regform-download-attachments',
+            ),
+            ActionMenuEntry(
+                _('Edit Tags'),
+                'tag',
+                url=url_for('.manage_registration_tags_assign', regform),
+                weight=50,
+                # XXX this is a hack to keep the item disabled when there are no tags defined
+                requires_selected=bool(regform.event.registration_tags),
+                reload_page=True
+            )
+        ]
+
+        # the regform has at least one ticket template
+        if any(tpl.is_ticket for tpl in badge_templates):
+            action_menu_items.append(ActionMenuEntry(
+                _('Print Badges'),
+                'id-badge',
+                url=url_for('.registrations_config_badges', regform),
+                weight=90,
+            ))
+
+        # the regform has at least one badge template
+        if any(not tpl.is_ticket for tpl in badge_templates):
+            action_menu_items.append(ActionMenuEntry(
+                _('Print Tickets'),
+                'ticket',
+                url=url_for('.registrations_config_tickets', regform),
+                weight=80,
+            ))
+
+        action_menu_items = sorted(
+            itertools.chain(
+                action_menu_items,
+                values_from_signal(signals.event.registrant_list_action_menu.send(regform), as_list=True)
+            ),
+            key=attrgetter('weight'),
+            reverse=True
+        )
+
         return WPManageRegistration.render_template('management/regform_reglist.html', self.event,
-                                                    has_badges=has_badges, has_tickets=has_tickets, **reg_list_kwargs)
+                                                    action_menu_items=action_menu_items, **reg_list_kwargs)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):

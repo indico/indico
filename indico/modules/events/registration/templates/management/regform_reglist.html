@@ -118,60 +118,31 @@
                         {%- trans %}Actions{% endtrans -%}
                     </button>
                     <ul class="i-dropdown">
-                        <li class="hide-if-locked">
-                            <a href="#" class="icon-mail js-requires-selected-row disabled"
-                               data-href="{{ url_for('.email_registrants', regform) }}"
-                               data-title="{% trans %}Send email{% endtrans %}"
-                               data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                               data-method="POST"
-                               data-ajax-dialog>
-                                {%- trans %}Email{% endtrans -%}
-                            </a>
-                        </li>
-                        {% if has_badges %}
-                            <li>
-                                <a href="#" class="icon-id-badge js-requires-selected-row disabled"
-                                   style="padding-left: 3px;"
-                                   data-href="{{ url_for('.registrations_config_badges', regform) }}"
-                                   data-title="{% trans %}Print Badges{% endtrans %}"
-                                   data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                                   data-method="POST"
-                                   data-ajax-dialog>
-                                    {%- trans %}Print Badges{% endtrans -%}
+                        {% for item in action_menu_items %}
+                            <li {% if item.hide_if_locked %}class="hide-if-locked"{% endif %}>
+                                <a href="#"
+                                   class="icon-{{ item.icon_name }}
+                                          disabled
+                                          {{ 'js-requires-selected-row' if item.requires_selected }}
+                                          {{ item.extra_classes }}"
+                                   data-weight="{{ item.weight }}"
+                                   data-params="{{ item.params | tojson | forceescape }}"
+                                   {% if item.type == "callback" %}
+                                       data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                                       data-callback="{{ item.callback }}"
+                                   {% elif item.type == "ajax-dialog" %}
+                                       data-href="{{ item.url }}"
+                                       data-title="{{ item.dialog_title or item.text }}"
+                                       data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                                       data-method="POST"
+                                       data-ajax-dialog
+                                       {{ 'data-reload-after' if item.reload_page }}
+                                   {% endif %}
+                                >
+                                    {{ item.text }}
                                 </a>
                             </li>
-                        {% endif %}
-                        {% if has_tickets %}
-                            <li>
-                                <a href="#" class="icon-ticket js-requires-selected-row disabled"
-                                   data-href="{{ url_for('.registrations_config_tickets', regform) }}"
-                                   data-title="{% trans %}Print Tickets{% endtrans %}"
-                                   data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                                   data-method="POST"
-                                   data-ajax-dialog>
-                                    {%- trans %}Print Tickets{% endtrans -%}
-                                </a>
-                            </li>
-                        {% endif %}
-                        <li>
-                            <a href="#"
-                               class="icon-attachment js-requires-selected-row disabled js-submit-list-form regform-download-attachments"
-                               data-href="{{ url_for('.registrations_attachments_export', regform) }}">
-                                {%- trans %}Download attachments{% endtrans -%}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               class="icon-tag {% if event.registration_tags %}js-requires-selected-row{% endif %} disabled"
-                               data-href="{{ url_for('.manage_registration_tags_assign', regform) }}"
-                               data-title="{% trans %}Edit tags{% endtrans %}"
-                               data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                               data-method="POST"
-                               data-ajax-dialog
-                               data-reload-after>
-                                {%- trans %}Edit tags{% endtrans -%}
-                            </a>
-                        </li>
+                        {% endfor %}
                     </ul>
                     {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
                     {% if (regform.moderation_enabled or pending_registrations) and not event.is_locked %}
