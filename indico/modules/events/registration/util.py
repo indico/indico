@@ -56,12 +56,12 @@ from indico.util.string import camelize_keys, validate_email, validate_email_ver
 
 @dataclasses.dataclass
 class ActionMenuEntry:
-    type: str
-    icon_name: str
     text: str
-    dialog_title: str = None  # defaults to `text`
+    icon_name: str
     # _: dataclasses.KW_ONLY  # TODO uncomment once we require python3.10+; until then consider everything below kw-only
     weight: int = 0
+    dialog_title: str = None  # defaults to `text`
+    type: str = 'ajax-dialog'  # use 'callback' to call a global JS function
     params: dict = dataclasses.field(default_factory=dict)
     url: str = ''
     callback: str = ''

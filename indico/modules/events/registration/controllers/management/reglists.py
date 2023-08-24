@@ -96,25 +96,22 @@ class RHRegistrationsListManage(RHManageRegFormBase):
 
         action_menu_items = [
             ActionMenuEntry(
-                'ajax-dialog',
-                'mail',
                 _('E-mail'),
-                dialog_title=_('Send e-mail'),
+                'mail',
                 url=url_for('.email_registrants', regform),
+                dialog_title=_('Send e-mail'),
                 weight=100,
                 hide_if_locked=True,
             ), ActionMenuEntry(
-                'ajax-dialog',
-                'attachment',
                 _('Download Attachments'),
+                'attachment',
                 url=url_for('.registrations_attachments_export', regform),
                 weight=60,
                 extra_classes='js-submit-list-form regform-download-attachments',
             ),
             ActionMenuEntry(
-                'ajax-dialog',
-                'tag',
                 _('Edit Tags'),
+                'tag',
                 url=url_for('.manage_registration_tags_assign', regform),
                 weight=50,
                 # XXX this is a hack to keep the item disabled when there are no tags defined
@@ -126,9 +123,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         # the regform has at least one ticket template
         if any(tpl.is_ticket for tpl in badge_templates):
             action_menu_items.append(ActionMenuEntry(
-                'ajax-dialog',
-                'id-badge',
                 _('Print Badges'),
+                'id-badge',
                 url=url_for('.registrations_config_badges', regform),
                 weight=90,
             ))
@@ -136,9 +132,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         # the regform has at least one badge template
         if any(not tpl.is_ticket for tpl in badge_templates):
             action_menu_items.append(ActionMenuEntry(
-                'ajax-dialog',
-                'ticket',
                 _('Print Tickets'),
+                'ticket',
                 url=url_for('.registrations_config_tickets', regform),
                 weight=80,
             ))

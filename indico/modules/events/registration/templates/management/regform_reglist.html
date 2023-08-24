@@ -118,29 +118,29 @@
                         {%- trans %}Actions{% endtrans -%}
                     </button>
                     <ul class="i-dropdown">
-                        {% for item in action_menu_items: %}
+                        {% for item in action_menu_items %}
                             <li {% if item.hide_if_locked %}class="hide-if-locked"{% endif %}>
-                              <a href="#" class="icon-{{ item.icon_name }} {% if item.requires_selected %}js-requires-selected-row{% endif %} disabled {{ item.extra_classes }}"
-                                data-weight="{{ item.weight }}"
-                                data-params="{{ item.params | tojson | forceescape }}"
-                                {% if item.type == "callback" %}
-                                  data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                                  data-callback="{{ item.callback }}"
-                                {% else %}
-                                  data-href="{{ item.url }}"
-                                  {% if item.type == "ajax-dialog" %}
-                                    data-title="{{ item.dialog_title or item.text }}"
-                                    data-params-selector="#registration-list tr input[type=checkbox]:checked"
-                                    data-method="POST"
-                                    data-ajax-dialog
-                                    {% if item.reload_page %}
-                                      data-reload-after
-                                    {% endif %}
-                                  {% endif %}
-                                {% endif %}
-                              >
-                                {{ item.text }}
-                              </a>
+                                <a href="#"
+                                   class="icon-{{ item.icon_name }}
+                                          disabled
+                                          {{ 'js-requires-selected-row' if item.requires_selected }}
+                                          {{ item.extra_classes }}"
+                                   data-weight="{{ item.weight }}"
+                                   data-params="{{ item.params | tojson | forceescape }}"
+                                   {% if item.type == "callback" %}
+                                       data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                                       data-callback="{{ item.callback }}"
+                                   {% elif item.type == "ajax-dialog" %}
+                                       data-href="{{ item.url }}"
+                                       data-title="{{ item.dialog_title or item.text }}"
+                                       data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                                       data-method="POST"
+                                       data-ajax-dialog
+                                       {{ 'data-reload-after' if item.reload_page }}
+                                   {% endif %}
+                                >
+                                    {{ item.text }}
+                                </a>
                             </li>
                         {% endfor %}
                     </ul>
