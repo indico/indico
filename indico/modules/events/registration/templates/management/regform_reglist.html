@@ -130,6 +130,8 @@
                                    {% if item.type == "callback" %}
                                        data-params-selector="#registration-list tr input[type=checkbox]:checked"
                                        data-callback="{{ item.callback }}"
+                                   {% elif item.type == "href-custom" %}
+                                       data-href="{{ item.url }}"
                                    {% elif item.type == "ajax-dialog" %}
                                        data-href="{{ item.url }}"
                                        data-title="{{ item.dialog_title or item.text }}"

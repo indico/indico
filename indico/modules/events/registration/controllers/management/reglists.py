@@ -105,6 +105,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
             ), ActionMenuEntry(
                 _('Download Attachments'),
                 'attachment',
+                type='href-custom',
                 url=url_for('.registrations_attachments_export', regform),
                 weight=60,
                 extra_classes='js-submit-list-form regform-download-attachments',
