@@ -59,7 +59,7 @@ class ActionMenuEntry:
     type: str
     icon_name: str
     text: str
-    tooltip_text: str
+    dialog_title: str = None  # defaults to `text`
     # _: dataclasses.KW_ONLY  # TODO uncomment once we require python3.10+; until then consider everything below kw-only
     weight: int = 0
     params: dict = dataclasses.field(default_factory=dict)

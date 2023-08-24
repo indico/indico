@@ -128,8 +128,8 @@
                                   data-callback="{{ item.callback }}"
                                 {% else %}
                                   data-href="{{ item.url }}"
-                                  data-title="{{ item.tooltip_text }}"
                                   {% if item.type == "ajax-dialog" %}
+                                    data-title="{{ item.dialog_title or item.text }}"
                                     data-params-selector="#registration-list tr input[type=checkbox]:checked"
                                     data-method="POST"
                                     data-ajax-dialog

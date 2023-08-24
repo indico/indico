@@ -99,14 +99,13 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 'ajax-dialog',
                 'mail',
                 _('E-mail'),
-                _('Send e-mail'),
+                dialog_title=_('Send e-mail'),
                 url=url_for('.email_registrants', reg_form),
                 weight=100,
                 hide_if_locked=True,
             ), ActionMenuEntry(
                 'ajax-dialog',
                 'attachment',
-                _('Download Attachments'),
                 _('Download Attachments'),
                 url=url_for('.registrations_attachments_export', reg_form),
                 weight=60,
@@ -120,7 +119,6 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 'ajax-dialog',
                 'id-badge',
                 _('Print Badges'),
-                _('Print Badges'),
                 url=url_for('.registrations_config_badges', reg_form),
                 weight=90,
             ))
@@ -130,7 +128,6 @@ class RHRegistrationsListManage(RHManageRegFormBase):
             action_menu_items.append(ActionMenuEntry(
                 'ajax-dialog',
                 'ticket',
-                _('Print Tickets'),
                 _('Print Tickets'),
                 url=url_for('.registrations_config_tickets', reg_form),
                 weight=80,

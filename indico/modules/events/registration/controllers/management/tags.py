@@ -30,7 +30,6 @@ def _get_action_menu_items(reg_form, **kwargs):
         'ajax-dialog',
         'tag',
         _('Edit Tags'),
-        _('Edit Tags'),
         url=url_for('.manage_registration_tags_assign', reg_form),
         weight=50,
         requires_selected=bool(reg_form.event.registration_tags),
