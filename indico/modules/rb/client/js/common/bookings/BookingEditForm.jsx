@@ -104,8 +104,6 @@ class BookingEditForm extends React.Component {
     };
     const filters = {dates, recurrence: updatedRecurrence};
     sanitizeRecurrence(filters);
-    console.log('** HIT **');
-    console.log('filters ->', filters);
 
     form.change('recurrence', filters.recurrence);
     form.change('dates', filters.dates);
@@ -220,9 +218,7 @@ class BookingEditForm extends React.Component {
                       },
                     ]}
                     onChange={newInterval => {
-                      console.log('recurrence ->', recurrence);
                       const newRecurrence = {...recurrence, interval: newInterval};
-                      console.log('newRecurrence ->', newRecurrence);
                       onBookingPeriodChange(dates, timeSlot, newRecurrence);
                     }}
                   />
@@ -263,14 +259,12 @@ class BookingEditForm extends React.Component {
               disabled={submitSucceeded || bookingFinished}
             />
           )}
-          {console.log('recurrence ->', recurrence)}
           {recurrence.type === 'every' && (
             <>
               <div styleName="recurring-every-label">{Translate.string('Recurring every')}</div>
               <WeekdayRecurrencePicker
                 onSelect={this.handleWeekdaySelect}
                 onChange={newWeekdays => {
-                  console.log('newWeekdays ->', newWeekdays);
                   onBookingPeriodChange(dates, timeSlot, newWeekdays);
                 }}
               />

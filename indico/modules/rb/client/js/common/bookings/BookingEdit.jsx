@@ -117,7 +117,6 @@ class BookingEdit extends React.Component {
     };
     const timeSlot = {startTime: serializeTime(startDt), endTime: serializeTime(endDt)};
     const usage = bookedForUser.id === sessionUser.id ? 'myself' : 'someone';
-    console.log('recurrence info --> ', recurrence);
 
     return {
       recurrence,
@@ -293,7 +292,6 @@ class BookingEdit extends React.Component {
   };
 
   updateBooking = async data => {
-    console.log('data', data);
     const {
       dates: {startDate, endDate},
       timeSlot: {startTime, endTime},
