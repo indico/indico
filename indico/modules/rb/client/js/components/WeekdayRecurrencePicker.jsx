@@ -5,12 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {Button} from 'semantic-ui-react';
 
-export function WeekdayRecurrencePicker({onSelect, disabled, weekdays}) {
+import {FinalField} from 'indico/react/forms';
+
+export function WeekdayRecurrencePicker({onSelect, disabled, requireOneSelected, weekdays}) {
   const [selectedDays, setSelectedDays] = useState({});
   let delayTimeout = null;
 
@@ -44,6 +47,13 @@ export function WeekdayRecurrencePicker({onSelect, disabled, weekdays}) {
 
   const handleDayClick = day => {
     if (!disabled) {
+      if (
+        selectedDays[day] &&
+        requireOneSelected &&
+        Object.values(selectedDays).filter(x => x).length === 1
+      ) {
+        return;
+      }
       setSelectedDays(prevSelectedDays => {
         const newSelectedDays = {...prevSelectedDays};
         if (newSelectedDays[day]) {
@@ -112,12 +122,38 @@ export function WeekdayRecurrencePicker({onSelect, disabled, weekdays}) {
 WeekdayRecurrencePicker.propTypes = {
   onSelect: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
+  requireOneSelected: PropTypes.bool,
   weekdays: PropTypes.object,
 };
 
 WeekdayRecurrencePicker.defaultProps = {
   disabled: false,
+  requireOneSelected: false,
   weekdays: {},
 };
 
 export default WeekdayRecurrencePicker;
+
+function ValuedWeekdayRecurrencePicker({value, onChange, ...rest}) {
+  return <WeekdayRecurrencePicker onSelect={onChange} weekdays={value} {...rest} />;
+}
+
+ValuedWeekdayRecurrencePicker.propTypes = {
+  value: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+export function FinalWeekdayRecurrencePicker({name, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      component={ValuedWeekdayRecurrencePicker}
+      isEqual={_.isEqual}
+      {...rest}
+    />
+  );
+}
+
+FinalWeekdayRecurrencePicker.propTypes = {
+  name: PropTypes.string.isRequired,
+};

@@ -7,6 +7,7 @@
 
 import bookingEditTimelineURL from 'indico-url:rb.booking_edit_calendars';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
@@ -109,7 +110,10 @@ class BookingEdit extends React.Component {
         recurrenceWeekdays,
       },
     } = this.props;
-    const recurrence = getRecurrenceInfo(repetition);
+    const recurrence = getRecurrenceInfo(
+      repetition,
+      Object.fromEntries(recurrenceWeekdays.map(x => [x, true]))
+    );
     const isSingleBooking = recurrence.type === 'single';
     const dates = {
       startDate: serializeDate(startDt),
@@ -126,7 +130,6 @@ class BookingEdit extends React.Component {
       user: bookedForUser.identifier,
       reason: bookingReason,
       internalNote,
-      recurrenceWeekdays,
     };
   }
 
@@ -339,6 +342,7 @@ class BookingEdit extends React.Component {
         onSubmit={this.updateBooking}
         render={this.renderBookingEditModal}
         initialValues={this.initialFormValues}
+        initialValuesEqual={_.isEqual}
         subscription={{
           submitting: true,
           submitSucceeded: true,

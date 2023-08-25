@@ -203,23 +203,26 @@ export function renderRecurrence({type, number, interval}, shortcut = true) {
   }
 }
 
-export function getRecurrenceInfo(repetition) {
+export function getRecurrenceInfo(repetition, recurrenceWeekdays) {
   const [repeatFrequency, repeatInterval] = repetition;
   let type = 'single';
   let number = '1';
   let interval = 'week';
+  let weekdays = {};
   if (repeatFrequency === 1) {
     type = 'daily';
   } else if (repeatFrequency === 2) {
     type = 'every';
     interval = 'week';
     number = repeatInterval;
+    weekdays = recurrenceWeekdays;
   } else if (repeatFrequency === 3) {
     type = 'every';
     interval = 'month';
     number = repeatInterval;
+    weekdays = recurrenceWeekdays;
   }
-  return {type, number, interval};
+  return {type, number, interval, weekdays};
 }
 
 export function serializeRecurrenceInfo({type, number, interval}) {

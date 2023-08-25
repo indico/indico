@@ -29,7 +29,7 @@ import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
-import WeekdayRecurrencePicker from '../../components/WeekdayRecurrencePicker';
+import {FinalWeekdayRecurrencePicker} from '../../components/WeekdayRecurrencePicker';
 import {sanitizeRecurrence} from '../../util';
 import {selectors as userSelectors} from '../user';
 
@@ -87,26 +87,6 @@ class BookingEditForm extends React.Component {
     form.change('recurrence', filters.recurrence);
     form.change('dates', filters.dates);
 
-    onBookingPeriodChange(filters.dates, timeSlot, filters.recurrence);
-  };
-
-  handleWeekdaySelect = selectedWeekday => {
-    const {
-      formProps: {
-        form,
-        values: {recurrence, dates, timeSlot},
-      },
-      onBookingPeriodChange,
-    } = this.props;
-    const updatedRecurrence = {
-      ...recurrence,
-      weekdays: selectedWeekday,
-    };
-    const filters = {dates, recurrence: updatedRecurrence};
-    sanitizeRecurrence(filters);
-
-    form.change('recurrence', filters.recurrence);
-    form.change('dates', filters.dates);
     onBookingPeriodChange(filters.dates, timeSlot, filters.recurrence);
   };
 
@@ -262,10 +242,12 @@ class BookingEditForm extends React.Component {
           {recurrence.type === 'every' && (
             <>
               <div styleName="recurring-every-label">{Translate.string('Recurring every')}</div>
-              <WeekdayRecurrencePicker
-                onSelect={this.handleWeekdaySelect}
+              <FinalWeekdayRecurrencePicker
+                name="recurrence.weekdays"
+                requireOneSelected
                 onChange={newWeekdays => {
-                  onBookingPeriodChange(dates, timeSlot, newWeekdays);
+                  const newRecurrence = {...recurrence, weekdays: newWeekdays};
+                  onBookingPeriodChange(dates, timeSlot, newRecurrence);
                 }}
               />
             </>
