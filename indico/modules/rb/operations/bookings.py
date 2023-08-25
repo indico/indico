@@ -370,6 +370,7 @@ def has_same_slots(old_booking, new_booking):
     if (
         old_booking.repeat_interval != new_booking['repeat_interval']
         or old_booking.repeat_frequency != new_booking['repeat_frequency']
+        # TODO check if new recurrence weekdays have been added
     ):
         return False
     return old_booking.start_dt <= new_booking['start_dt'] and old_booking.end_dt >= new_booking['end_dt']

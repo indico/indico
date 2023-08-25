@@ -325,6 +325,7 @@ class RHUpdateBooking(RHBookingBase):
             'end_dt': args['end_dt'],
             'repeat_frequency': args['repeat_frequency'],
             'repeat_interval': args['repeat_interval'],
+            'recurrence_weekdays': args['recurrence_weekdays'],
         }
 
         additional_booking_attrs = {}

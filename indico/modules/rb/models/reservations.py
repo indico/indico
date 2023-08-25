@@ -596,10 +596,10 @@ class Reservation(db.Model):
         """
         from indico.modules.rb import rb_settings
 
-        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
-                           'booking_reason'}
+        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays',
+                           'booked_for_user', 'booking_reason'}
         # fields affecting occurrences
-        occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'}
+        occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays'}
         # fields where date and time are compared separately
         date_time_fields = {'start_dt', 'end_dt'}
         # fields for the repetition
@@ -611,6 +611,7 @@ class Reservation(db.Model):
             'start_dt/time': 'start time',
             'end_dt/time': 'end time',
             'repetition': 'booking type',
+            'recurrence_weekdays': 'weekday',
             'booked_for_user': "'Booked for' user",
             'booking_reason': 'booking reason',
         }
