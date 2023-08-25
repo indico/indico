@@ -208,7 +208,7 @@ export function getRecurrenceInfo(repetition, recurrenceWeekdays) {
   let type = 'single';
   let number = '1';
   let interval = 'week';
-  let weekdays = {};
+  let weekdays = [];
   if (repeatFrequency === 1) {
     type = 'daily';
   } else if (repeatFrequency === 2) {

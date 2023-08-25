@@ -110,10 +110,7 @@ class BookingEdit extends React.Component {
         recurrenceWeekdays,
       },
     } = this.props;
-    const recurrence = getRecurrenceInfo(
-      repetition,
-      Object.fromEntries(recurrenceWeekdays.map(x => [x, true]))
-    );
+    const recurrence = getRecurrenceInfo(repetition, recurrenceWeekdays);
     const isSingleBooking = recurrence.type === 'single';
     const dates = {
       startDate: serializeDate(startDt),
@@ -318,7 +315,7 @@ class BookingEdit extends React.Component {
       end_dt: `${endDate ? endDate : startDate} ${endTime}`,
       repeat_frequency: repeatFrequency,
       repeat_interval: repeatInterval,
-      weekdays: recurrence.weekdays,
+      recurrence_weekdays: recurrence.weekdays,
       room_id: roomId,
       user,
       reason,

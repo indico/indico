@@ -21,7 +21,22 @@ export const rules = {
     stateField: 'filters.recurrence.type',
   },
   weekdays: {
-    stateField: 'filters.recurrence.weekdays',
+    validator: () => true,
+    stateField: {
+      serialize: ({filters}) => filters?.recurrence?.weekdays,
+      parse: (value, state) => {
+        if (!Array.isArray(value)) {
+          value = [value];
+        }
+        if (!state.filters) {
+          state.filters = {};
+        }
+        if (!state.filters.recurrence) {
+          state.filters.recurrence = {};
+        }
+        state.filters.recurrence.weekdays = value;
+      },
+    },
   },
   number: {
     validator: v.isInt({min: 1, max: 99}),

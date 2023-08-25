@@ -5,13 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Button} from 'semantic-ui-react';
 
-import {FinalField} from 'indico/react/forms';
+import {FinalField, unsortedArraysEqual} from 'indico/react/forms';
 
 export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
   const WEEKDAYS = moment.weekdays(true).map(wd => ({
@@ -26,17 +25,18 @@ export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSe
   }));
 
   const handleDayClick = day => {
-    if (disabled) {
+    const selected = value.includes(day);
+    if (disabled || (requireOneSelected && selected && value.length === 1)) {
       return;
     }
-    if (value[day] && requireOneSelected && Object.values(value).filter(x => x).length === 1) {
-      return;
-    }
-    if (value[day]) {
-      onChange(_.omit(value, day));
+    let newValue;
+    if (selected) {
+      newValue = value.filter(v => v !== day);
     } else {
-      onChange({...value, [day]: true});
+      newValue = [...value, day];
     }
+    newValue.sort();
+    onChange(newValue);
   };
 
   return (
@@ -49,7 +49,7 @@ export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSe
             value={weekday.value}
             compact
             disabled={disabled}
-            primary={value[weekday.value]}
+            primary={value.includes(weekday.value)}
             onClick={() => handleDayClick(weekday.value)}
           >
             {weekday.text}
@@ -62,13 +62,13 @@ export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSe
 
 WeekdayRecurrencePicker.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.object,
+  value: PropTypes.arrayOf(PropTypes.string),
   disabled: PropTypes.bool,
   requireOneSelected: PropTypes.bool,
 };
 
 WeekdayRecurrencePicker.defaultProps = {
-  value: {},
+  value: [],
   disabled: false,
   requireOneSelected: false,
 };
@@ -77,7 +77,12 @@ export default WeekdayRecurrencePicker;
 
 export function FinalWeekdayRecurrencePicker({name, ...rest}) {
   return (
-    <FinalField name={name} component={WeekdayRecurrencePicker} isEqual={_.isEqual} {...rest} />
+    <FinalField
+      name={name}
+      component={WeekdayRecurrencePicker}
+      isEqual={unsortedArraysEqual}
+      {...rest}
+    />
   );
 }
 

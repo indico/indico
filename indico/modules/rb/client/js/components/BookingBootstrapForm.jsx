@@ -81,7 +81,7 @@ class BookingBootstrapForm extends React.Component {
           type: 'single',
           number: 1,
           interval: 'week',
-          weekdays: {},
+          weekdays: [],
         },
         dates: {
           startDate: startsNextDay ? moment().add(1, 'd') : moment(),

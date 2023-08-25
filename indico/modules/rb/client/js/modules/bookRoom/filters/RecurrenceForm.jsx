@@ -21,7 +21,7 @@ export default class RecurrenceForm extends FilterFormComponent {
     type: PropTypes.string,
     interval: PropTypes.string,
     number: PropTypes.number,
-    weekdays: PropTypes.object,
+    weekdays: PropTypes.arrayOf(PropTypes.string),
     ...FilterFormComponent.propTypes,
   };
 
@@ -29,7 +29,7 @@ export default class RecurrenceForm extends FilterFormComponent {
     type: null,
     interval: null,
     number: null,
-    weekdays: {},
+    weekdays: [],
   };
 
   constructor(props) {
