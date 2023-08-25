@@ -265,13 +265,16 @@ class BookingEditForm extends React.Component {
           )}
           {console.log('recurrence ->', recurrence)}
           {recurrence.type === 'every' && (
-            <WeekdayRecurrencePicker
-              onSelect={this.handleWeekdaySelect}
-              onChange={newWeekdays => {
-                console.log('newWeekdays ->', newWeekdays);
-                onBookingPeriodChange(dates, timeSlot, newWeekdays);
-              }}
-            />
+            <>
+              <div styleName="recurring-every-label">{Translate.string('Recurring every')}</div>
+              <WeekdayRecurrencePicker
+                onSelect={this.handleWeekdaySelect}
+                onChange={newWeekdays => {
+                  console.log('newWeekdays ->', newWeekdays);
+                  onBookingPeriodChange(dates, timeSlot, newWeekdays);
+                }}
+              />
+            </>
           )}
           {!room.canUserBook && room.canUserPrebook && isAccepted && (
             <FormSpy subscription={{dirtyFields: true, initialValues: true, values: true}}>

@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {Button} from 'semantic-ui-react';
 
-function WeekdayRecurrencePicker({onSelect}) {
+export function WeekdayRecurrencePicker({onSelect, disabled, weekdays}) {
   const [selectedDays, setSelectedDays] = useState({});
   let delayTimeout = null;
 
@@ -24,6 +24,7 @@ function WeekdayRecurrencePicker({onSelect}) {
 
   const preselectWeekdayToday = () => {
     const weekdayToday = moment()
+      .locale('en')
       .format('ddd')
       .toLowerCase();
 
@@ -34,21 +35,27 @@ function WeekdayRecurrencePicker({onSelect}) {
   };
 
   useEffect(() => {
-    preselectWeekdayToday();
-  }, []);
+    if (!weekdays || weekdays.length === 0) {
+      preselectWeekdayToday();
+    } else {
+      setSelectedDays(weekdays);
+    }
+  }, [weekdays]);
 
   const handleDayClick = day => {
-    setSelectedDays(prevSelectedDays => {
-      const newSelectedDays = {...prevSelectedDays};
-      if (newSelectedDays[day]) {
-        delete newSelectedDays[day];
-      } else {
-        newSelectedDays[day] = true;
-      }
-      return newSelectedDays;
-    });
+    if (!disabled) {
+      setSelectedDays(prevSelectedDays => {
+        const newSelectedDays = {...prevSelectedDays};
+        if (newSelectedDays[day]) {
+          delete newSelectedDays[day];
+        } else {
+          newSelectedDays[day] = true;
+        }
+        return newSelectedDays;
+      });
 
-    clearTimeout(delayTimeout);
+      clearTimeout(delayTimeout);
+    }
   };
 
   useEffect(() => {
@@ -89,7 +96,9 @@ function WeekdayRecurrencePicker({onSelect}) {
             key={weekday.value}
             value={weekday.value}
             compact
-            className={selectedDays[weekday.value] ? 'primary' : ''}
+            className={`${selectedDays[weekday.value] ? 'primary ' : ''}${
+              disabled ? 'disabled' : ''
+            }`}
             onClick={() => handleDayClick(weekday.value)}
           >
             {weekday.text}
@@ -102,6 +111,13 @@ function WeekdayRecurrencePicker({onSelect}) {
 
 WeekdayRecurrencePicker.propTypes = {
   onSelect: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+  weekdays: PropTypes.object,
+};
+
+WeekdayRecurrencePicker.defaultProps = {
+  disabled: false,
+  weekdays: {},
 };
 
 export default WeekdayRecurrencePicker;

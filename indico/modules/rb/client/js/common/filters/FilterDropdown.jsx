@@ -124,8 +124,11 @@ export default class FilterDropdown extends React.Component {
   };
 
   hasValuesChanged = () => {
+    console.log('hasValuesChanged hit!');
     const {initialValues} = this.props;
     const {fieldValues} = this.state;
+    console.log('initialValues', initialValues);
+    console.log('fieldValues', fieldValues);
     return !_.isEqual(initialValues, fieldValues);
   };
 
@@ -152,6 +155,7 @@ export default class FilterDropdown extends React.Component {
       <Popup
         position="bottom left"
         styleName="filter-dropdown"
+        style={{maxWidth: 'unset'}}
         trigger={renderTrigger(title, renderedValue, counter, disabled)}
         on="click"
         open={open}

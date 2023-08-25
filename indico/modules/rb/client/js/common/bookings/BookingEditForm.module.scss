@@ -23,3 +23,9 @@
 :global(.ui.segment).internal-notes-segment {
   background: $internal-notes-segment-color;
 }
+
+.recurring-every-label {
+  font-size: 13px;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}

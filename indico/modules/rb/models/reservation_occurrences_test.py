@@ -23,7 +23,8 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 def creation_params():
     return {'start': date.today() + relativedelta(hour=8),
             'end': date.today() + relativedelta(days=1, hour=17),
-            'repetition': (RepeatFrequency.DAY, 1)}
+            'repetition': (RepeatFrequency.DAY, 1),
+            'recurrence_weekdays': ['mon', 'tue', 'wed', 'thu', 'fri']}
 
 
 @pytest.fixture(params=(
@@ -70,9 +71,9 @@ def test_date(dummy_occurrence):
 
 
 def test_create_series_for_reservation(dummy_reservation):
-    occurrences = ReservationOccurrence.iter_create_occurrences(start=dummy_reservation.start_dt,
-                                                                end=dummy_reservation.end_dt,
-                                                                repetition=dummy_reservation.repetition)
+    occurrences = ReservationOccurrence.iter_create_occurrences(
+        start=dummy_reservation.start_dt, end=dummy_reservation.end_dt, repetition=dummy_reservation.repetition,
+        recurrence_weekdays=dummy_reservation.recurrence_weekdays)
     for occ1, occ2 in zip(dummy_reservation.occurrences, occurrences):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt
@@ -98,15 +99,18 @@ def test_iter_create_occurrences(creation_params):
 
 def test_iter_start_time_invalid():
     invalid_frequency = -1
+    invalid_weekdays = ['foo', 'bar']
     with pytest.raises(IndicoError):
-        ReservationOccurrence.iter_start_time(start=date.today(), end=date.today(), repetition=(invalid_frequency, 0))
+        ReservationOccurrence.iter_start_time(start=date.today(), end=date.today(), repetition=(invalid_frequency, 0),
+                                              recurrence_weekdays=invalid_weekdays)
 
 
 @pytest.mark.parametrize('interval', (0, 1, 2))
 def test_iter_start_time_single(interval):
     days = list(ReservationOccurrence.iter_start_time(start=date.today() + relativedelta(hour=8),
                                                       end=date.today() + relativedelta(hour=17),
-                                                      repetition=(RepeatFrequency.NEVER, interval)))
+                                                      repetition=(RepeatFrequency.NEVER, interval),
+                                                      recurrence_weekdays=[]))
     assert len(days) == 1
 
 
@@ -120,7 +124,8 @@ def test_iter_start_time_daily(interval, days_elapsed, expected_length):
     assert days_elapsed >= 0
     params = {'start': date.today() + relativedelta(hour=8),
               'end': date.today() + relativedelta(days=days_elapsed, hour=17),
-              'repetition': (RepeatFrequency.DAY, interval)}
+              'repetition': (RepeatFrequency.DAY, interval),
+              'recurrence_weekdays': []}
     if expected_length is None:
         with pytest.raises(IndicoError):
             ReservationOccurrence.iter_start_time(**params)
@@ -134,7 +139,7 @@ def test_iter_start_time_daily(interval, days_elapsed, expected_length):
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
     (0, 0,  None),
     (1, 0,  1),
-    (1, 7,  2),
+    (1, 7,  2),  # !!!
     (1, 21, 4),
     (2, 7,  1),
     (2, 14, 2),
@@ -152,7 +157,8 @@ def test_iter_start_time_weekly(interval, days_elapsed, expected_length):
     assert days_elapsed >= 0
     params = {'start': date.today() + relativedelta(hour=8),
               'end': date.today() + relativedelta(days=days_elapsed, hour=17),
-              'repetition': (RepeatFrequency.WEEK, interval)}
+              'repetition': (RepeatFrequency.WEEK, interval),
+              'recurrence_weekdays': []}  # !!!
     if expected_length is None:
         with pytest.raises(IndicoError):
             ReservationOccurrence.iter_start_time(**params)
