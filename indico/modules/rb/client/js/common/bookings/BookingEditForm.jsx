@@ -100,7 +100,7 @@ class BookingEditForm extends React.Component {
     } = this.props;
     const updatedRecurrence = {
       ...recurrence,
-      weekday: selectedWeekday,
+      weekdays: selectedWeekday,
     };
     const filters = {dates, recurrence: updatedRecurrence};
     sanitizeRecurrence(filters);

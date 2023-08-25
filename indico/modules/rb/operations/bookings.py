@@ -362,7 +362,8 @@ def has_same_dates(old_booking, new_booking):
     return (old_booking.start_dt == new_booking['start_dt'] and
             old_booking.end_dt == new_booking['end_dt'] and
             old_booking.repeat_interval == new_booking['repeat_interval'] and
-            old_booking.repeat_frequency == new_booking['repeat_frequency'])
+            old_booking.repeat_frequency == new_booking['repeat_frequency'] and
+            old_booking.recurrence_weekdays == new_booking['recurrence_weekdays'])
 
 
 def has_same_slots(old_booking, new_booking):
@@ -381,11 +382,13 @@ def should_split_booking(booking, new_data):
     old_end_time = booking.end_dt.time()
     old_repeat_frequency = booking.repeat_frequency
     old_repeat_interval = booking.repeat_interval
+    old_recurrence_weekdays = booking.recurrence_weekdays
     times_changed = new_data['start_dt'].time() != old_start_time or new_data['end_dt'].time() != old_end_time
     new_repeat_frequency = new_data['repeat_frequency']
     new_repeat_interval = new_data['repeat_interval']
     repetition_changed = (new_repeat_frequency, new_repeat_interval) != (old_repeat_frequency, old_repeat_interval)
-    return is_ongoing_booking and (times_changed or repetition_changed)
+    weekdays_changed = new_data['recurrence_weekdays'] != old_recurrence_weekdays
+    return is_ongoing_booking and (times_changed or repetition_changed or weekdays_changed)
 
 
 def split_booking(booking, new_booking_data):

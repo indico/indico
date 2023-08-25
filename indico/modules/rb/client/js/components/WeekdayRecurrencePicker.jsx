@@ -93,12 +93,12 @@ export function WeekdayRecurrencePicker({onSelect, disabled, weekdays}) {
       <Button.Group>
         {WEEKDAYS.map(weekday => (
           <Button
+            type="button"
             key={weekday.value}
             value={weekday.value}
             compact
-            className={`${selectedDays[weekday.value] ? 'primary ' : ''}${
-              disabled ? 'disabled' : ''
-            }`}
+            disabled={disabled}
+            primary={selectedDays[weekday.value]}
             onClick={() => handleDayClick(weekday.value)}
           >
             {weekday.text}
