@@ -124,11 +124,8 @@ export default class FilterDropdown extends React.Component {
   };
 
   hasValuesChanged = () => {
-    console.log('hasValuesChanged hit!');
     const {initialValues} = this.props;
     const {fieldValues} = this.state;
-    console.log('initialValues', initialValues);
-    console.log('fieldValues', fieldValues);
     return !_.isEqual(initialValues, fieldValues);
   };
 

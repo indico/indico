@@ -74,6 +74,14 @@ class BookingFilterBar extends React.Component {
       bookingGracePeriod
     );
 
+    // TODO fix properly and remove
+    const fixedRecurrence = {
+      ...recurrence,
+      weekdays: Object.fromEntries(
+        Object.entries(recurrence.weekdays).map(([k, v]) => [k, v === 'true' || v === true])
+      ),
+    };
+
     return (
       <Button.Group size="small" styleName="recurrence-bar">
         <Button icon="calendar alternate outline" as="div" disabled />
@@ -88,7 +96,7 @@ class BookingFilterBar extends React.Component {
               setGlobalState={({type, number, interval, weekdays}) => {
                 setFilterParameter('recurrence', {type, number, interval, weekdays});
               }}
-              initialValues={recurrence}
+              initialValues={fixedRecurrence}
               defaults={{
                 type: 'single',
                 number: 1,

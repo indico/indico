@@ -94,7 +94,6 @@ class BookingBootstrapForm extends React.Component {
       },
       defaults
     );
-    console.log('this.state -> ', this.state);
   }
 
   componentDidMount() {
@@ -223,7 +222,7 @@ class BookingBootstrapForm extends React.Component {
   render() {
     const {
       timeSlot: {startTime, endTime},
-      recurrence: {type, number, interval},
+      recurrence: {type, number, interval, weekdays},
       dates: {startDate, endDate},
     } = this.state;
 
@@ -343,7 +342,7 @@ class BookingBootstrapForm extends React.Component {
         {type === 'every' && (
           <Form.Group inline style={{marginLeft: '1em', marginRight: '1em'}}>
             <label>{Translate.string('Recurring every')}</label>
-            <WeekdayRecurrencePicker onSelect={this.updateRecurrenceWeekdays} />
+            <WeekdayRecurrencePicker onChange={this.updateRecurrenceWeekdays} value={weekdays} />
           </Form.Group>
         )}
         {children}

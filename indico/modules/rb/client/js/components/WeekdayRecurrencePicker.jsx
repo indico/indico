@@ -8,95 +8,36 @@
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Button} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
 
-export function WeekdayRecurrencePicker({onSelect, disabled, requireOneSelected, weekdays}) {
-  const [selectedDays, setSelectedDays] = useState({});
-  let delayTimeout = null;
-
-  useEffect(() => {
-    return () => {
-      if (delayTimeout) {
-        clearTimeout(delayTimeout);
-      }
-    };
-  }, [delayTimeout]);
-
-  const preselectWeekdayToday = () => {
-    const weekdayToday = moment()
-      .locale('en')
-      .format('ddd')
-      .toLowerCase();
-
-    setSelectedDays(prevSelectedDays => ({
-      ...prevSelectedDays,
-      [weekdayToday]: true,
-    }));
-  };
-
-  useEffect(() => {
-    if (!weekdays || weekdays.length === 0) {
-      preselectWeekdayToday();
-    } else {
-      setSelectedDays(weekdays);
-    }
-  }, [weekdays]);
-
-  const handleDayClick = day => {
-    if (!disabled) {
-      if (
-        selectedDays[day] &&
-        requireOneSelected &&
-        Object.values(selectedDays).filter(x => x).length === 1
-      ) {
-        return;
-      }
-      setSelectedDays(prevSelectedDays => {
-        const newSelectedDays = {...prevSelectedDays};
-        if (newSelectedDays[day]) {
-          delete newSelectedDays[day];
-        } else {
-          newSelectedDays[day] = true;
-        }
-        return newSelectedDays;
-      });
-
-      clearTimeout(delayTimeout);
-    }
-  };
-
-  useEffect(() => {
-    onSelect(selectedDays);
-  }, [selectedDays, onSelect]);
-
-  const validateSelectedDays = () => {
-    if (Object.keys(selectedDays).length === 0) {
-      clearTimeout(delayTimeout);
-      delayTimeout = setTimeout(() => {
-        preselectWeekdayToday();
-      }, 250);
-    } else {
-      clearTimeout(delayTimeout);
-    }
-  };
-
-  useEffect(() => {
-    validateSelectedDays();
-  });
-
-  const WEEKDAYS = moment.weekdays(true).map(weekday => ({
+export function WeekdayRecurrencePicker({onChange, value, disabled, requireOneSelected}) {
+  const WEEKDAYS = moment.weekdays(true).map(wd => ({
     value: moment()
-      .day(weekday)
+      .day(wd)
       .locale('en')
       .format('ddd')
       .toLowerCase(),
     text: moment()
-      .isoWeekday(weekday)
+      .isoWeekday(wd)
       .format('ddd'),
   }));
+
+  const handleDayClick = day => {
+    if (disabled) {
+      return;
+    }
+    if (value[day] && requireOneSelected && Object.values(value).filter(x => x).length === 1) {
+      return;
+    }
+    if (value[day]) {
+      onChange(_.omit(value, day));
+    } else {
+      onChange({...value, [day]: true});
+    }
+  };
 
   return (
     <div>
@@ -108,7 +49,7 @@ export function WeekdayRecurrencePicker({onSelect, disabled, requireOneSelected,
             value={weekday.value}
             compact
             disabled={disabled}
-            primary={selectedDays[weekday.value]}
+            primary={value[weekday.value]}
             onClick={() => handleDayClick(weekday.value)}
           >
             {weekday.text}
@@ -120,37 +61,23 @@ export function WeekdayRecurrencePicker({onSelect, disabled, requireOneSelected,
 }
 
 WeekdayRecurrencePicker.propTypes = {
-  onSelect: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.object,
   disabled: PropTypes.bool,
   requireOneSelected: PropTypes.bool,
-  weekdays: PropTypes.object,
 };
 
 WeekdayRecurrencePicker.defaultProps = {
+  value: {},
   disabled: false,
   requireOneSelected: false,
-  weekdays: {},
 };
 
 export default WeekdayRecurrencePicker;
 
-function ValuedWeekdayRecurrencePicker({value, onChange, ...rest}) {
-  return <WeekdayRecurrencePicker onSelect={onChange} weekdays={value} {...rest} />;
-}
-
-ValuedWeekdayRecurrencePicker.propTypes = {
-  value: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
 export function FinalWeekdayRecurrencePicker({name, ...rest}) {
   return (
-    <FinalField
-      name={name}
-      component={ValuedWeekdayRecurrencePicker}
-      isEqual={_.isEqual}
-      {...rest}
-    />
+    <FinalField name={name} component={WeekdayRecurrencePicker} isEqual={_.isEqual} {...rest} />
   );
 }
 

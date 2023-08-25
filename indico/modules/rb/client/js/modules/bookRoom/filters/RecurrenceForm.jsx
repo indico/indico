@@ -40,11 +40,10 @@ export default class RecurrenceForm extends FilterFormComponent {
     this.onTypeChange = this.stateChanger('type');
     this.onNumberChange = this.stateChanger('number', num => Math.abs(parseInt(num, 10)));
     this.onIntervalChange = this.stateChanger('interval');
-    this.onWeekdaysChange = this.stateChanger('weekdays', this.weekdays);
+    this.onWeekdaysChange = this.stateChanger('weekdays');
   }
 
   stateChanger(param, sanitizer = v => v) {
-    console.log('props ---> ', this.props);
     const {setParentField} = this.props;
     return (_, {value}) => {
       value = sanitizer(value);
@@ -55,14 +54,6 @@ export default class RecurrenceForm extends FilterFormComponent {
       });
     };
   }
-
-  handleWeekdaysChange = weekdays => {
-    this.setState({weekdays});
-    console.log('weekdays ---> ', weekdays);
-    console.log('this.props ---> ', this.props);
-    // console.log('weekday -> ', weekdays);
-    // console.log('onWeekdaysChange -> ', this.onWeekdaysChange);
-  };
 
   render() {
     const {type, interval, number, weekdays} = this.state;
@@ -130,10 +121,9 @@ export default class RecurrenceForm extends FilterFormComponent {
         <Form.Field styleName="weekday-recurrence-section" inline>
           <label>{Translate.string('Recurring every')}</label>
           <WeekdayRecurrencePicker
-            onSelect={this.handleWeekdaysChange}
+            onChange={value => this.onWeekdaysChange(null, {value})}
+            value={weekdays}
             disabled={type !== 'every'}
-            weekdays={weekdays}
-            onChange={this.onWeekdaysChange}
           />
         </Form.Field>
       </Form>
