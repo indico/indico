@@ -22,11 +22,10 @@ def test_session_hard_expiry_dt_without_tz():
         session.hard_expiry = datetime(2021, 1, 1, 0, 0, 0)
 
 
-def test_get_storage_lifetime_with_hard_expiry(app, mocker):
+def test_get_storage_lifetime_with_hard_expiry(app, freeze_time):
     """Test that the storage lifetime is the hard expiry."""
-    dt_mock = Mock(spec_set=datetime)
-    dt_now = dt_mock.now.return_value = datetime.now(timezone.utc)
-    mocker.patch('indico.web.flask.session.datetime', dt_mock)
+    dt_now = datetime.now(timezone.utc)
+    freeze_time(dt_now)
     session = IndicoSession()
     session.hard_expiry = dt_now + timedelta(days=2)
 
@@ -40,9 +39,7 @@ def test_save_session_with_hard_expiry(app):
     session.hard_expiry = expiry
     resp_mock = Mock(spec_set=Response)
 
-    with app.test_request_context(
-        '/user/2/edit', method='POST', data={'name': ''}
-    ):
+    with app.test_request_context('/ping', method='GET'):
         IndicoSessionInterface().save_session(app, session, resp_mock)
 
     assert session.permanent
