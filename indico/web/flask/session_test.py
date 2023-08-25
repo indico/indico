@@ -33,14 +33,6 @@ def test_get_storage_lifetime_with_hard_expiry(app, mocker):
     assert IndicoSessionInterface().get_storage_lifetime(app, session) == timedelta(days=2)
 
 
-def test_should_refresh_session_with_hard_expiry(app):
-    """Test that a session with a hard expiry should never be refreshed"""
-    session = IndicoSession()
-    session.hard_expiry = datetime.now(timezone.utc)
-
-    assert not IndicoSessionInterface().should_refresh_session(app, session)
-
-
 def test_save_session_with_hard_expiry(app):
     """Test that a session with a hard expiry sets the cookie expiry to the hard expiry."""
     session = IndicoSession()

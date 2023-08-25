@@ -181,7 +181,7 @@ class IndicoSessionInterface(SessionInterface):
             return self.temporary_session_lifetime
 
     def should_refresh_session(self, app, session):
-        if session.new or session.hard_expiry or '_expires' not in session:
+        if session.new or '_expires' not in session:
             return False
         threshold = self.get_storage_lifetime(app, session) / 2
         return session['_expires'] - datetime.now() < threshold
