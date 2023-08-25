@@ -30,18 +30,27 @@ class RHAPICheckinBase(RHProtectedEventBase):
 class RHAPIEvent(RHAPICheckinBase):
     """Manage a single event."""
 
+    def _check_access(self):
+        RHAPICheckinBase._check_access(self)
+        if not self.event.can_manage(session.user, permission='registration'):
+            raise Forbidden()
+
     def _process(self):
         from indico.modules.events.registration.schemas import CheckinEventSchema
         return jsonify(CheckinEventSchema().dump(self.event))
 
 
+class RHAPIRegForms(RHAPIEvent):
+    """Manage registration forms."""
+
+    def _process(self):
+        from indico.modules.events.registration.schemas import CheckinRegFormSchema
+        regforms = RegistrationForm.query.with_parent(self.event).all()
+        return jsonify(CheckinRegFormSchema(many=True).dump(regforms))
+
+
 class RHAPIRegFormBase(RHAPICheckinBase):
     """Base class for registration forms management."""
-
-    def _check_access(self):
-        RHAPICheckinBase._check_access(self)
-        if not self.event.can_manage(session.user, permission='registration'):
-            raise Forbidden()
 
     def _process_args(self):
         RHAPICheckinBase._process_args(self)

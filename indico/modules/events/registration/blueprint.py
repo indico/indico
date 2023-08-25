@@ -210,6 +210,8 @@ _bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_reg
 
 # Check-in app API
 _bp.add_url_rule('!/api/checkin/event/<int:event_id>', 'api_checkin_event', api.RHAPIEvent)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/registrations', 'api_checkin_regforms',
+                 api.RHAPIRegForms)
 _bp.add_url_rule('!/api/checkin/event/<int:event_id>/registration/<int:reg_form_id>', 'api_checkin_regform',
                  api.RHAPIRegForm)
 _bp.add_url_rule('!/api/checkin/event/<int:event_id>/registration/<int:reg_form_id>/registrations',
