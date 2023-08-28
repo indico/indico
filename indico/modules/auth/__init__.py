@@ -32,6 +32,12 @@ logger = Logger.get('auth')
 @multipass.identity_handler
 def process_identity(identity_info):
     logger.info('Received identity info: %s', identity_info)
+
+    if session_expiry := identity_info.multipass_data.get('session_expiry'):
+        if not isinstance(session_expiry, datetime):
+            raise ValueError('Session expiry must be a datetime object')
+        session.hard_expiry = session_expiry
+
     identity = Identity.query.filter_by(provider=identity_info.provider.name,
                                         identifier=identity_info.identifier).first()
     if identity is None:
@@ -74,10 +80,6 @@ def process_identity(identity_info):
     if user.is_blocked:
         raise MultipassException(_('Your Indico profile has been blocked.'))
 
-    if session_expiry := identity.multipass_data.get('session_expiry'):
-        if not isinstance(session_expiry, datetime):
-            raise ValueError('Session expiry must be a datetime object')
-        session.hard_expiry = identity.multipass_data['session_expiry']
     login_user(user, identity)
 
 
