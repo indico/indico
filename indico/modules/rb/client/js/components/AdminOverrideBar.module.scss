@@ -20,4 +20,15 @@
     margin-left: auto;
     cursor: pointer;
   }
+
+  kbd {
+    display: inline-block;
+    border-radius: 0.25em;
+    padding: 0.1em 0.5em;
+    margin: 0 0.2em;
+    line-height: 1.25em;
+    background-color: $dark-black;
+    border: 0.031em solid $dark-gray;
+    box-shadow: inset 0 -0.1em 0 $dark-gray;
+  }
 }

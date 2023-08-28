@@ -11,7 +11,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Icon, Popup} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
+import {Translate, Param} from 'indico/react/i18n';
 
 import {actions as userActions, selectors as userSelectors} from '../common/user';
 
@@ -26,6 +26,19 @@ const AdminOverrideBar = ({visible, disable}) => {
     <span>
       <Icon name="exclamation triangle" />
       <Translate>Admin override enabled</Translate>
+      {' - '}
+      <Translate>
+        Use{' '}
+        <Param
+          name="shortcut"
+          value={
+            <>
+              <kbd>Ctrl</kbd> + <kbd>A</kbd>
+            </>
+          }
+        />{' '}
+        to toggle.
+      </Translate>
     </span>
   );
 
