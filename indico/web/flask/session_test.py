@@ -23,13 +23,34 @@ def test_session_hard_expiry_dt_without_tz():
 
 
 def test_get_storage_lifetime_with_hard_expiry(app, freeze_time):
-    """Test that the storage lifetime is the hard expiry."""
+    """Test the storage lifetime with hard expiry set on the session.
+
+    The returned value should always be the minimum of the hard expiry and the
+    app's permanent/temporary session lifetime.
+    """
     dt_now = datetime.now(timezone.utc)
     freeze_time(dt_now)
     session = IndicoSession()
     session.hard_expiry = dt_now + timedelta(days=2)
+    session_interface = IndicoSessionInterface()
 
-    assert IndicoSessionInterface().get_storage_lifetime(app, session) == timedelta(days=2)
+    # hard expiry shorter than permanent session lifetime
+    session.permanent = True
+    assert session_interface.get_storage_lifetime(app, session) == timedelta(days=2)
+
+    # hard expiry longer than permanent session lifetime
+    app.permanent_session_lifetime = timedelta(days=1)
+    assert session_interface.get_storage_lifetime(
+        app, session) == app.permanent_session_lifetime
+
+    # hard expiry shorter than temporary session lifetime
+    session.permanent = False
+    assert session_interface.get_storage_lifetime(app, session) == timedelta(days=2)
+
+    # hard expiry longer than temporary session lifetime
+    session_interface.temporary_session_lifetime = timedelta(days=1)
+    assert session_interface.get_storage_lifetime(
+        app, session) == session_interface.temporary_session_lifetime
 
 
 def test_save_session_with_hard_expiry(app):

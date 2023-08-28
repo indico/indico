@@ -169,16 +169,22 @@ class IndicoSessionInterface(SessionInterface):
         return request.is_secure
 
     def get_storage_lifetime(self, app, session):
-        # Sessions with hard expiry are stored for exactly as long as they are valid.
         # Permanent sessions are stored for exactly the same duration as the session id cookie.
         # "Temporary" session are stored for a period that is not too short/long as some people
         # close their browser very rarely and thus shouldn't be logged out that often.
-        if session.hard_expiry:
-            return session.hard_expiry - datetime.now(timezone.utc)
-        elif session.permanent:
-            return app.permanent_session_lifetime
+        # Beyond that, we also consider an optional hard expiry set on the session, in which case the
+        # minimum of the lifetime determined by the hard expiry and the permanent/temporary
+        # session lifetime is used.
+
+        if session.permanent:
+            session_lifetime = app.permanent_session_lifetime
         else:
-            return self.temporary_session_lifetime
+            session_lifetime = self.temporary_session_lifetime
+
+        if session.hard_expiry:
+            return min(session_lifetime, session.hard_expiry - datetime.now(timezone.utc))
+
+        return session_lifetime
 
     def should_refresh_session(self, app, session):
         if session.new or '_expires' not in session:
