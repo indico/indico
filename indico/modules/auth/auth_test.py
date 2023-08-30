@@ -15,7 +15,7 @@ from flask_multipass.providers.static import StaticIdentityProvider
 from indico.modules.auth import process_identity
 
 
-@pytest.mark.usefixtures('database')
+@pytest.mark.usefixtures('db')
 def test_process_identity_sets_hard_expiry(app):
     """Test that hard expiry is set on the session object if it is present in the multipass data."""
     dt_now = datetime.now(timezone.utc)
@@ -32,7 +32,7 @@ def test_process_identity_sets_hard_expiry(app):
         assert session.hard_expiry == dt_now
 
 
-@pytest.mark.usefixtures('database')
+@pytest.mark.usefixtures('db')
 def test_process_identity_raises_exc_for_non_dt_hard_expiry(app):
     """Test that a ValueError is raised if the hard expiry is not a datetime object."""
     identity_info = IdentityInfo(
