@@ -33,6 +33,7 @@ import RoomList from '../modules/roomList';
 import * as globalSelectors from '../selectors';
 
 import AdminOverrideBar from './AdminOverrideBar';
+import AdminOverrideShortcut from './AdminOverrideShortcut';
 import Menu from './Menu';
 import SidebarMenu, {SidebarTrigger} from './SidebarMenu';
 import './App.module.scss';
@@ -165,6 +166,7 @@ class App extends React.Component {
             </div>
           </header>
           <AdminOverrideBar />
+          <AdminOverrideShortcut />
           <LinkBar />
           {this.renderContent()}
           <Dimmer.Dimmable>
