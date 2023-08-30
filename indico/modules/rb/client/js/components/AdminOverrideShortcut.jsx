@@ -14,9 +14,11 @@ import {actions as userActions, selectors as userSelectors} from '../common/user
 export function AdminOverrideShortcut({isAdmin, toggleAdminOverride}) {
   const handleAdminKeypress = useCallback(
     event => {
-      if (isAdmin && event.ctrlKey && event.key === 'a') {
-        event.preventDefault();
-        toggleAdminOverride();
+      if (event.ctrlKey && event.shiftKey && event.key === 'A') {
+        if (isAdmin) {
+          event.preventDefault();
+          toggleAdminOverride();
+        }
       }
     },
     [isAdmin, toggleAdminOverride]

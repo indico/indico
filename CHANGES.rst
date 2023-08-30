@@ -29,7 +29,7 @@ Improvements
 - Support generating tickets and badges for each of the registrant's accompanying
   persons (:pr:`5424`)
 - Include current language in page metadata (:pr:`5894`, thanks :user:`foxbunny`)
-- Add keyboard shortcut to toggle room booking admin override (:pr:`5909`)
+- Add keyboard shortcut (CTRL-SHIFT-A) to toggle room booking admin override (:pr:`5909`)
 
 Bugfixes
 ^^^^^^^^

@@ -25,15 +25,14 @@ const AdminOverrideBar = ({visible, disable}) => {
   const trigger = (
     <span>
       <Icon name="exclamation triangle" />
-      <Translate>Admin override enabled</Translate>
-      {' - '}
+      <Translate>Admin override enabled</Translate>.{' '}
       <Translate>
         Use{' '}
         <Param
           name="shortcut"
           value={
             <>
-              <kbd>Ctrl</kbd> + <kbd>A</kbd>
+              <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>A</kbd>
             </>
           }
         />{' '}
