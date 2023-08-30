@@ -33,7 +33,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far
+- Prevent room booking sidebar menu from overlapping with the user dropdown menu
+  (:pr:`5910`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

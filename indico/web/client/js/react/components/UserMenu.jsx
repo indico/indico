@@ -97,7 +97,8 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
   const [langName, langTerritory] = languages[language] || [language, null, false];
   return (
     <Dropdown trigger={avatar} pointing="top right">
-      <Dropdown.Menu>
+      {/* Set the z-index of the dropdown menu to a higher value than the sidebar menu to prevent overlapping */}
+      <Dropdown.Menu style={{zIndex: 103}}>
         <Dropdown.Header content={headerContent} />
         <Dropdown.Divider />
         <Dropdown.Item as="a" href={userDashboard()}>
