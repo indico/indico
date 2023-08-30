@@ -245,6 +245,10 @@ class IndicoSessionInterface(SessionInterface):
             cookie_lifetime = self.get_expiration_time(app, session)
             session['_expires'] = datetime.now() + storage_ttl
 
+        if refresh_sid:
+            self.storage.delete(session.sid)
+            session.sid = self.generate_sid()
+
         session['_secure'] = request.is_secure
         self.storage.set(session.sid, self.serializer.dumps(dict(session)), storage_ttl)
         response.set_cookie(app.session_cookie_name, session.sid, expires=cookie_lifetime, httponly=True,
