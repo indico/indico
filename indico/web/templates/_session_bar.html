@@ -171,40 +171,45 @@
         {%- if ambiguous and territory %} ({{ territory }}){% endif -%}
     {%- endset %}
     {% if lightweight %}
+        {# FIXME: [A11Y] Replace with button with appropriate state (requires new dropdown impl.) #}
         <a id="language-selector-link"
-           href=""
+           href="#language-list"
+           data-ignore-href="true"
            class="{{ 'arrow' if can_choose }} js-dropdown" {% if can_choose %}data-toggle="dropdown"{% endif %}>
             {%- trans %}My language ({{ language }}){% endtrans %}
         </a>
     {% else %}
         <button id="language-selector-link" class="icon-earth i-button {{ 'arrow js-dropdown' if can_choose }}"
-                {% if can_choose %}data-toggle="dropdown"{% else %}disabled{% endif %}>
+                {% if can_choose %}data-toggle="dropdown"{% else %}disabled{% endif %}
+                aria-label="{% trans %}The current language is {{ language }}. Use a different language.{% endtrans %}">
             {{- language -}}
         </button>
     {% endif %}
     {% if can_choose %}
-        <ul class="i-dropdown">
+        <ul id="language-list" class="i-dropdown">
             {% for name, (title, territory, __) in languages|dictsort(by='value') %}
+                {% set html_lang = name.replace('_', '-') %}
                 <li>
                     {% if force_locale and name not in force_locale_alts %}
-                        <a class="disabled" title="{% trans %}This language is not available here.{% endtrans %}">
+                        <button disabled title="{% trans %}This language is not available here.{% endtrans %}" lang="{{ html_lang }}">
                             {{- title -}}
                             {%- if territory %} ({{ territory }}){% endif -%}
-                        </a>
+                        </button>
                     {% elif name == session.lang %}
-                        <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">
+                        <button disabled title="{% trans %}This is your current language.{% endtrans %}" lang="{{ html_lang }}">
                             {{- title -}}
                             {%- if territory %} ({{ territory }}){% endif -%}
-                        </a>
+                        </button>
                     {% else %}
-                        <a data-href="{{ url_for('core.change_lang') }}"
-                           data-method="POST"
-                           data-params='{{ {'lang': name}|tojson|forceescape }}'
-                           data-reload-after
-                           data-ajax>
+                        <button data-href="{{ url_for('core.change_lang') }}"
+                                data-method="POST"
+                                data-params='{{ {'lang': name}|tojson|forceescape }}'
+                                data-reload-after
+                                data-ajax
+                                lang="{{ html_lang }}">
                             {{- title -}}
                             {%- if territory %} ({{ territory }}){% endif -%}
-                        </a>
+                        </button>
                     {% endif %}
                 </li>
             {% endfor %}
