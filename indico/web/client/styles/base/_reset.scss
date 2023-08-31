@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
 button,
 input,
 textarea,
@@ -13,7 +19,24 @@ isindex {
   font: inherit;
 }
 
+fieldset,
+legend {
+  padding: 0;
+}
+
+fieldset {
+  margin: 0;
+  border: none;
+}
+
+legend {
+  padding: 0;
+}
+
 button:not(:disabled),
+select:not(:disabled),
+input[type='checkbox']:not(:disabled),
+input[type='radio']:not(:disabled),
 label {
   cursor: pointer;
 }

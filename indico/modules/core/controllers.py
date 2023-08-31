@@ -132,11 +132,11 @@ class RHChangeTimezone(RH):
             session.timezone = session.user.settings.get('timezone', config.DEFAULT_TIMEZONE)
         elif mode == 'custom' and tz in common_timezones_set:
             session.timezone = tz
+            if update_user and session.user:
+                session.user.settings.set('timezone', tz)
 
         if update_user and session.user:
             session.user.settings.set('force_timezone', mode != 'local')
-            if tz and tz in common_timezones_set:
-                session.user.settings.set('timezone', tz)
 
         return '', 204
 

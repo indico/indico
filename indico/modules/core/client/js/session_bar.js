@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+// eslint-disable-next-line import/unambiguous
 (function() {
   function setupProtection() {
     $('#protection-details-link').qtip({
@@ -40,20 +41,10 @@
 
   function setupTimezone() {
     const widget = $('#tz-selector-widget');
-    widget.on('change', 'input[name=tz_mode]', function() {
-      const customTZ = this.value === 'custom';
-      const customTZSelect = widget.find('select[name=tz]');
-      customTZSelect.prop('disabled', !customTZ);
-      if (customTZ) {
-        customTZSelect.focus();
-        scrollToCurrentTZ();
-      }
-    });
 
     $('#tz-selector-link').qtip({
       style: {
-        width: '300px',
-        classes: 'qtip-rounded qtip-shadow qtip-popup qtip-timezone',
+        classes: 'qtip-rounded qtip-shadow qtip-popup qtip-timezone qtip-wide',
         tip: {
           corner: true,
           width: 20,
@@ -80,6 +71,7 @@
       },
       events: {
         show() {
+          // eslint-disable-next-line no-undef
           _.defer(scrollToCurrentTZ);
         },
       },

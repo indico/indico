@@ -1,0 +1,50 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use "base/defaults" as *;
+@use "base/palette" as *;
+
+body {
+  --color-text: #{$dark-black};
+  --color-accent: #{$dark-blue};
+
+  --control-border-color: #{$dark-gray};
+  --control-text-color: var(--color-text);
+  --control-clickable-surface-color: #{$pastel-gray};
+  --control-clickable-surface-focus-color: #{darken($pastel-gray, $color-variation)};
+  --control-alt-text-color: #{$white};
+  --control-alt-clickable-surface-color: #{$dark-blue};
+  --control-alt-clickable-surface-focus-color: #{darken($dark-blue, $color-variation)};
+  --control-alt-border-color: #{darken($dark-blue, $color-variation)};
+  --control-disabled-text-color: #{$dark-gray};
+  --control-disabled-clickable-surface-color: #{$light-gray};
+  --control-disabled-border-color: #{$pastel-gray};
+  --control-indented-bg-color: #{$light-gray};
+  --control-disabled-indented-bg-color: #{$light-gray};
+  --control-disabled-inset-indented-color: #{$dark-gray};
+
+  --control-border: 1px solid var(--control-border-color);
+  --control-border-radius: #{$default-border-radius};
+  --control-padding: 0.5em;
+  --control-internal-gap: 0.2em;
+
+  --container-padding: 1em;
+  --container-narrow-padding: 1em 0.5em;
+  --container-element-spacing: 0.5em;
+
+  --text-size-rel-s: 75%;
+  --text-size-rel-n: 100%;
+  --text-size-rel-l: 120%;
+  --text-size-rel-xl: 150%;
+  --text-size-rel-xxl: 200%;
+
+  --text-size-abs-s: 0.875rem;
+  --text-size-abs-n: 1rem;
+  --text-size-abs-l: 1.2rem;
+  --text-size-abs-xl: 1.5rem;
+  --text-size-abs-xxl: 2rem;
+}

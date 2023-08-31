@@ -51,6 +51,7 @@ Accessibility
 - Make search result status messages more accessible (:issue:`5949`, :pr:`5950`,
   thanks :user:`foxbunny`)
 - Make search results tabs accessible (:issues:`5964`, :pr:`5965`, thanks :user:`foxbunny`)
+- Make timezone list accessible (:issue:`5908`, :pr:`5914`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -61,6 +62,7 @@ Internal Changes
   fields on a per-registration basis (:pr:`5424`)
 - Replace WYSIWYG (rich-text) editor with TinyMCE, due to the license and branding
   requirements of the previous editor (:pr:`5938`)
+- Add a new Indico design system (:pr:`5914`, thanks :user:`foxbunny`)
 
 
 ----
