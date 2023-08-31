@@ -1,0 +1,89 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+.dropzone-area {
+  :global(.ui.segment) {
+    border: 2px dashed #007cac !important;
+  }
+
+  .picture-card {
+    .action {
+      position: absolute;
+      top: -15px;
+      cursor: pointer;
+      right: -15px;
+    }
+
+    :global(.ui.progress) {
+      margin: 0;
+    }
+  }
+
+  .picture-placeholder {
+    color: $pastel-gray;
+  }
+
+  .picture-selection-btn {
+    max-width: none !important;
+
+    &:last-of-type {
+      margin-left: 22px !important;
+    }
+  }
+}
+
+.picture-outer-div {
+  width: 100%;
+  background-color: #444;
+  border-radius: 3px;
+
+  .picture-inner-div {
+    color: $light-gray;
+    width: 100%;
+    margin: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    cursor: cell;
+  }
+
+  .back {
+    position: absolute;
+    top: 25px;
+    cursor: pointer;
+    left: 30px;
+  }
+
+  .cropper-inner-div {
+    height: 90%;
+  }
+
+  .cropper-action-btn {
+    margin-top: 30px !important;
+    border-radius: 6px !important;
+    max-width: none !important;
+
+    &:last-of-type {
+      margin-left: 20px !important;
+    }
+  }
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 50%;
+  left: 45%;
+}
+
+.hidden {
+  display: none;
+}
+
+.show {
+  display: block;
+}

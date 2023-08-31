@@ -12,7 +12,7 @@ import {Button, Card, Divider, Grid, Header, Segment, Icon, Progress} from 'sema
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
 
-import {fileDetailsShape} from './props';
+import {fileDetailsShape, dropzoneShape, fileActionShape} from './props';
 
 import './FileArea.module.scss';
 
@@ -40,19 +40,6 @@ function humanReadableBytes(bytes) {
     );
   }
 }
-
-const dropzoneShape = PropTypes.shape({
-  getRootProps: PropTypes.func.isRequired,
-  getInputProps: PropTypes.func.isRequired,
-  isDragActive: PropTypes.bool.isRequired,
-  open: PropTypes.func,
-});
-
-const fileActionShape = PropTypes.shape({
-  icon: PropTypes.string.isRequired,
-  color: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
-});
 
 export function FileArea({
   dropzone: {getRootProps, getInputProps, isDragActive, open: openFileDialog},

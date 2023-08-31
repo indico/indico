@@ -1,0 +1,240 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import PropTypes from 'prop-types';
+import React from 'react';
+import {
+  Button,
+  Card,
+  Divider,
+  Grid,
+  Header,
+  Segment,
+  Image,
+  Icon,
+  Popup,
+  Progress,
+  Message,
+} from 'semantic-ui-react';
+
+import {Translate} from 'indico/react/i18n';
+
+import {dropzoneShape, fileActionShape} from '../files/props';
+
+import './Picture.module.scss';
+
+export function PictureArea({
+  dropzone: {getRootProps, getInputProps, isDragActive, open: openUploadDialog, fileRejections},
+  capture: {pictureCamera: PictureCamera, onOpenCameraDialog, isCameraActive, isCameraAllowed},
+  cropper: {pictureCropper: PictureCropper, isEditActive},
+  picture,
+  dragText,
+  descriptionText,
+  picturePlaceholder,
+  pictureAction,
+  picturePreview,
+  customFileRejections,
+}) {
+  const uploadButtonIcon = picture ? 'exchange' : 'upload';
+  const uploadButtonText = picture
+    ? Translate.string('Choose a new picture from your computer')
+    : Translate.string('Choose from your computer');
+  const captureButtonIcon = 'camera';
+  const captureButtonText = picture
+    ? Translate.string('Take a new picture')
+    : Translate.string('Take a picture');
+  const dropzoneDisabled = openUploadDialog === null;
+
+  return (
+    <div {...getRootProps()} styleName="dropzone-area">
+      <input {...getInputProps()} />
+      <Segment textAlign="center" placeholder>
+        {picture && picture.imageSrc && isEditActive && <PictureCropper />}
+        {isCameraActive && <PictureCamera />}
+        {!isEditActive && !isCameraActive && (
+          <Grid celled="internally">
+            <Grid.Row columns={picture ? 2 : 1}>
+              {!isDragActive && picture && (
+                <Grid.Column width={10} verticalAlign="middle">
+                  <Card styleName="picture-card" key={picture.filename} centered>
+                    <Image src={picturePreview()} size="large" rounded />
+                    {picture.upload && !picture.upload.finished && (
+                      <Progress
+                        percent={picture.upload.progress}
+                        error={picture.upload.failed}
+                        size="tiny"
+                        active
+                        color="blue"
+                      />
+                    )}
+                    {pictureAction && (
+                      <Icon
+                        styleName="action"
+                        name={pictureAction.icon}
+                        color={pictureAction.color}
+                        onClick={() => pictureAction.onClick(picture)}
+                      />
+                    )}
+                  </Card>
+                </Grid.Column>
+              )}
+              <Grid.Column verticalAlign="middle" width={!isDragActive && picture ? 6 : 16}>
+                {!picture && (
+                  <Icon name={picturePlaceholder} size="massive" styleName="picture-placeholder" />
+                )}
+                <Header>
+                  {!isDragActive ? dragText : <Translate>Drop picture here</Translate>}
+                </Header>
+                {!isDragActive && (
+                  <>
+                    <Divider horizontal>
+                      <Translate>Or</Translate>
+                    </Divider>
+                    {picture ? (
+                      <>
+                        <Button
+                          type="button"
+                          styleName="picture-selection-btn"
+                          icon={uploadButtonIcon}
+                          content={uploadButtonText}
+                          onClick={() => openUploadDialog()}
+                          disabled={dropzoneDisabled}
+                        />
+                        <Divider horizontal>
+                          <Translate>Or</Translate>
+                        </Divider>
+                        <Popup
+                          position="top center"
+                          trigger={
+                            <span>
+                              <Button
+                                type="button"
+                                styleName="picture-selection-btn"
+                                icon={captureButtonIcon}
+                                content={captureButtonText}
+                                onClick={() => onOpenCameraDialog()}
+                                disabled={!isCameraAllowed}
+                              />
+                            </span>
+                          }
+                          content={
+                            isCameraAllowed
+                              ? Translate.string('Take a picture with your camera')
+                              : Translate.string(
+                                  'You need to grant this site camera permissions before taking a picture'
+                                )
+                          }
+                        />
+                      </>
+                    ) : (
+                      <Grid columns={2} verticalAlign="middle" celled="internally" centered>
+                        <Grid.Column>
+                          <Button
+                            type="button"
+                            styleName="picture-selection-btn"
+                            icon={uploadButtonIcon}
+                            content={uploadButtonText}
+                            onClick={() => openUploadDialog()}
+                            disabled={dropzoneDisabled}
+                          />
+                        </Grid.Column>
+                        <Grid.Column>
+                          <Popup
+                            position="top center"
+                            trigger={
+                              <span>
+                                <Button
+                                  type="button"
+                                  styleName="picture-selection-btn"
+                                  icon={captureButtonIcon}
+                                  content={captureButtonText}
+                                  onClick={() => onOpenCameraDialog()}
+                                  disabled={!isCameraAllowed}
+                                />
+                              </span>
+                            }
+                            content={
+                              isCameraAllowed
+                                ? Translate.string('Take a picture with your camera')
+                                : Translate.string(
+                                    'You need to grant this site camera permissions before taking a picture'
+                                  )
+                            }
+                          />
+                        </Grid.Column>
+                      </Grid>
+                    )}
+                  </>
+                )}
+                <Divider horizontal />
+                <p>{descriptionText}</p>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        )}
+        {(fileRejections.length > 0 || customFileRejections) && (
+          <Message negative>
+            <Message.Header>
+              <Translate>There were some problems with the picture</Translate>
+            </Message.Header>
+            {fileRejections.map(({file, errors}) => (
+              <Message.List key={file.size}>
+                {errors.map(e => (
+                  <Message.Item key={e.code}>
+                    {file.name}:- {e.message}
+                  </Message.Item>
+                ))}
+              </Message.List>
+            ))}
+            {customFileRejections && (
+              <Message.List>
+                <Message.Item key={customFileRejections.code}>
+                  {customFileRejections.message}
+                </Message.Item>
+              </Message.List>
+            )}
+          </Message>
+        )}
+      </Segment>
+    </div>
+  );
+}
+
+const pictureDetailsShape = PropTypes.shape({
+  filename: PropTypes.string,
+  size: PropTypes.number,
+  uuid: PropTypes.string,
+  imageSrc: PropTypes.string,
+  upload: PropTypes.shape({
+    failed: PropTypes.bool.isRequired,
+    ongoing: PropTypes.bool.isRequired,
+    finished: PropTypes.bool.isRequired,
+    progress: PropTypes.number.isRequired,
+  }),
+});
+
+PictureArea.propTypes = {
+  dropzone: dropzoneShape.isRequired,
+  capture: PropTypes.object.isRequired,
+  cropper: PropTypes.object.isRequired,
+  picture: pictureDetailsShape,
+  dragText: PropTypes.string,
+  descriptionText: PropTypes.string,
+  picturePlaceholder: PropTypes.string,
+  pictureAction: fileActionShape,
+  picturePreview: PropTypes.func.isRequired,
+  customFileRejections: PropTypes.object,
+};
+
+PictureArea.defaultProps = {
+  picture: null,
+  dragText: Translate.string('Drag a picture here'),
+  descriptionText: Translate.string('Allowed file types: .jpg, .png, .gif.'),
+  picturePlaceholder: 'picture',
+  pictureAction: null,
+  customFileRejections: null,
+};

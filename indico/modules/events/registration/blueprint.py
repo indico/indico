@@ -214,6 +214,8 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/receipts/<int:file_id>/<filen
                  display.RHReceiptDownload)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar', 'registration_avatar',
                  display.RHRegistrationAvatar)
+_bp.add_url_rule('/<int:reg_form_id>/registrations/<int:registration_id>/picture/<int:field_data_id>-<filename>',
+                 'registration_picture', display.RHRegistrationDownloadPicture)
 
 
 # API

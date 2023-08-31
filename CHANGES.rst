@@ -64,6 +64,7 @@ Improvements
 - Add option to allow people to register using an invitation link even if the event is
   restricted (:pr:`6094`)
 - Improve editing notifications emails (:issue:`6027`, :pr:`6042`)
+- Add support for Picture fields in registration forms (:pr:`5922` :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
