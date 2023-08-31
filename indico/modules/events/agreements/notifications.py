@@ -40,7 +40,7 @@ def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None, fro
 
 @email_sender
 def notify_new_signature_to_manager(agreement):
-    with agreement.event.force_event_locale(agreement.user):
+    with agreement.event.force_event_locale():
         template = get_template_module('events/agreements/emails/new_signature_email_to_manager.txt',
                                        agreement=agreement)
         return make_email(agreement.event.all_manager_emails, template=template)
