@@ -12,8 +12,15 @@ from marshmallow import ValidationError, fields, post_load, pre_load, validate
 from indico.core import signals
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import RegistrationFormBillableField
+from indico.modules.users.models.users import PersonMixin
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
+
+
+class AccompanyingPerson(PersonMixin):
+    def __init__(self, entry):
+        self.first_name = entry['firstName']
+        self.last_name = entry['lastName']
 
 
 class AccompanyingPersonSchema(mm.Schema):
@@ -79,15 +86,10 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
         return versioned_data.get('price', 0) * len(reg_data)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
-        def _format_person(entry):
-            first_name = entry['firstName']
-            last_name = entry['lastName']
-            return f'{first_name} {last_name}'
-
         reg_data = registration_data.data
         if not reg_data:
             return ''
-        return ', '.join(_format_person(entry) for entry in reg_data)
+        return '; '.join(AccompanyingPerson(entry).display_full_name for entry in reg_data)
 
     def _get_field_available_places(self, registration):
         max_persons = self.form_item.data.get('max_persons') or None
