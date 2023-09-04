@@ -24,7 +24,7 @@ jobs:
           - { name: '3.11', python: '3.11', tox: py311 }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/cache@v3
         id: cache-npm
@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # BEGIN common steps - edit all occurrences if needed!
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -226,7 +226,7 @@ jobs:
 
     steps:
       # BEGIN common steps - edit all occurrences if needed!
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -282,7 +282,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # BEGIN common steps - edit all occurrences if needed!
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
