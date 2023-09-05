@@ -1,7 +1,7 @@
 """Add data_export_requests table
 
 Revision ID: e2b69fe5155d
-Revises: 5d05eda06776
+Revises: 0c44046dc1be
 Create Date: 2023-05-08 15:37:24.134940
 """
 
@@ -15,7 +15,7 @@ from indico.modules.users.models.export import DataExportOptions, DataExportRequ
 
 # revision identifiers, used by Alembic.
 revision = 'e2b69fe5155d'
-down_revision = '5d05eda06776'
+down_revision = '0c44046dc1be'
 branch_labels = None
 depends_on = None
 
