@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@import 'base/palette';
-@import 'base/defaults';
-@import 'base/borders';
+@use 'base/palette' as *;
+@use 'base/defaults' as *;
+@use 'base/borders' as *;
 
 .divider {
   @include border-top();
