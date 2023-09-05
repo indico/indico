@@ -13,7 +13,7 @@ import {Button, Icon, Segment} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 
-import {renderRecurrence} from '../util';
+import {renderRecurrence, renderRecurrenceWeekdays} from '../util';
 
 import './TimeInformation.module.scss';
 import './WeekdayInformation.module.scss';
@@ -24,6 +24,7 @@ function TimeInformation({
   timeSlot,
   onClickOccurrences,
   occurrenceCount,
+  recurrenceWeekdays,
 }) {
   const mStartDate = toMoment(startDate);
   const mEndDate = endDate ? toMoment(endDate) : null;
@@ -73,14 +74,16 @@ function TimeInformation({
           </div>
         </Segment>
         {timeInfo}
-        {/* <Segment>
-          <div>
+        {recurrence.type === 'every' && recurrenceWeekdays && (
+          <Segment>
             <div>
-              <Icon name="sync alternate" />
-              <strong>Recurs every X, Y and Z.</strong>
+              <div>
+                <Icon name="sync alternate" />
+                <strong>{renderRecurrenceWeekdays(recurrenceWeekdays)}</strong>
+              </div>
             </div>
-          </div>
-        </Segment> //TODO: Clearly show booked weekdays in some way here */}
+          </Segment>
+        )}
         <Segment>
           <div styleName="occurrences-details">
             <div>
@@ -120,11 +123,13 @@ TimeInformation.propTypes = {
   }),
   onClickOccurrences: PropTypes.func.isRequired,
   occurrenceCount: PropTypes.number,
+  recurrenceWeekdays: PropTypes.arrayOf(PropTypes.string),
 };
 
 TimeInformation.defaultProps = {
   timeSlot: null,
   occurrenceCount: 0,
+  recurrenceWeekdays: null,
 };
 
 export default Overridable.component('TimeInformation', TimeInformation);

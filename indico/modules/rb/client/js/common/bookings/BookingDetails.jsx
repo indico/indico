@@ -863,6 +863,7 @@ class BookingDetails extends React.Component {
         isLinkedToObject,
         link,
         externalDetailsURL,
+        recurrenceWeekdays,
       },
     } = this.props;
     const dates = {startDate: startDt, endDate: endDt};
@@ -909,6 +910,7 @@ class BookingDetails extends React.Component {
                   timeSlot={times}
                   onClickOccurrences={this.showOccurrences}
                   occurrenceCount={occurrenceCount}
+                  recurrenceWeekdays={recurrenceWeekdays}
                 />
               </Grid.Column>
               <Grid.Column>

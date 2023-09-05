@@ -100,6 +100,15 @@ class BookingBootstrapForm extends React.Component {
     this.triggerChange();
   }
 
+  componentDidUpdate() {
+    const {recurrence} = this.state;
+    if (recurrence.type === 'every' && recurrence.weekdays.length === 0) {
+      this.preselectWeekday();
+    } else {
+      this.triggerChange();
+    }
+  }
+
   triggerChange() {
     const {onChange} = this.props;
     onChange(this.serializedState);
@@ -217,6 +226,26 @@ class BookingBootstrapForm extends React.Component {
     const {onSearch} = this.props;
     onSearch(this.serializedState);
     e.preventDefault();
+  };
+
+  preselectWeekday = () => {
+    const {recurrence} = this.state;
+    const weekdayToday = moment()
+      .locale('en')
+      .format('ddd')
+      .toLocaleLowerCase();
+    if (recurrence.weekdays.includes(weekdayToday)) {
+      return;
+    }
+    const weekdays = [...recurrence.weekdays, weekdayToday];
+    this.setState(
+      {
+        recurrence: {...recurrence, weekdays},
+      },
+      () => {
+        this.triggerChange();
+      }
+    );
   };
 
   render() {

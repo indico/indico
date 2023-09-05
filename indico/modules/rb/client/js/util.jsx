@@ -237,6 +237,59 @@ export function serializeRecurrenceInfo({type, number, interval}) {
   }
 }
 
+/**
+ * Renders the array of recurrence weekdays into a nicely formatted string
+ * @param {array} weekdays Array of weekdays
+ * @returns {string} Formatted string of weekdays
+ */
+export function renderRecurrenceWeekdays(weekdays) {
+  const weekdaysMap = {
+    mon: moment.weekdays(1),
+    tue: moment.weekdays(2),
+    wed: moment.weekdays(3),
+    thu: moment.weekdays(4),
+    fri: moment.weekdays(5),
+    sat: moment.weekdays(6),
+    sun: moment.weekdays(0),
+  };
+
+  if (weekdays.length === 0) {
+    return null;
+  }
+
+  if (weekdays.length === 1) {
+    return (
+      <Translate>
+        Recurs every <Param name="weekday" value={weekdaysMap[weekdays[0]]} />
+      </Translate>
+    );
+  }
+
+  if (weekdays.length === 2) {
+    return (
+      <Translate>
+        Recurs every <Param name="weekdays_1" value={weekdaysMap[weekdays[0]]} /> and{' '}
+        <Param name="weekdays_2" value={weekdaysMap[weekdays[1]]} />
+      </Translate>
+    );
+  }
+
+  // join weekdays with commas and replace last comma with 'and'
+  // (i.e. ['mon', 'wed', 'tue'] -> 'Monday, Tuesday and Wednesday')
+  const weekdaysString = weekdays
+    .slice(0, -1)
+    .map(weekday => weekdaysMap[weekday])
+    .join(', ');
+  const lastWeekday = weekdaysMap[weekdays[weekdays.length - 1]];
+
+  return (
+    <Translate>
+      Recurs every <Param name="weekdays" value={weekdaysString} /> and{' '}
+      <Param name="last_weekday" value={lastWeekday} />
+    </Translate>
+  );
+}
+
 const _legendLabels = {
   candidates: {label: Translate.string('Available'), style: 'available'},
   bookings: {label: Translate.string('Booking'), style: 'booking'},

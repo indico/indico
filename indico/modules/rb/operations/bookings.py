@@ -370,7 +370,7 @@ def has_same_slots(old_booking, new_booking):
     if (
         old_booking.repeat_interval != new_booking['repeat_interval']
         or old_booking.repeat_frequency != new_booking['repeat_frequency']
-        # TODO check if new recurrence weekdays have been added
+        or old_booking.recurrence_weekdays != new_booking['recurrence_weekdays']
     ):
         return False
     return old_booking.start_dt <= new_booking['start_dt'] and old_booking.end_dt >= new_booking['end_dt']
@@ -410,8 +410,8 @@ def split_booking(booking, new_booking_data):
         new_start_dt = datetime.combine(occurrences_to_cancel[0].start_dt.date(), new_booking_data['start_dt'].time())
         cancelled_dates = [occ.start_dt.date() for occ in occurrences if occ.is_cancelled]
         rejected_occs = {occ.start_dt.date(): occ.rejection_reason for occ in occurrences if occ.is_rejected}
+        new_end_dt = datetime.combine(occurrences_to_cancel[-1].start_dt.date(), new_booking_data['end_dt'].time())
 
-        new_end_dt = [occ for occ in occurrences if occ.start_dt < datetime.now()][-1].end_dt
         old_booking_data = {
             'booking_reason': booking.booking_reason,
             'booked_for_user': booking.booked_for_user,
@@ -419,6 +419,7 @@ def split_booking(booking, new_booking_data):
             'end_dt': new_end_dt,
             'repeat_frequency': booking.repeat_frequency,
             'repeat_interval': booking.repeat_interval,
+            'recurrence_weekdays': booking.recurrence_weekdays,
         }
 
         booking.modify(old_booking_data, session.user)

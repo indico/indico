@@ -34,7 +34,7 @@ export const rules = {
         if (!state.filters.recurrence) {
           state.filters.recurrence = {};
         }
-        state.filters.recurrence.weekdays = value;
+        state.filters.recurrence.weekdays = [...new Set(value)];
       },
     },
   },

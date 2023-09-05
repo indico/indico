@@ -576,6 +576,7 @@ class BookRoomModal extends React.Component {
                 recurrence={recurrence}
                 onClickOccurrences={this.showConflicts}
                 occurrenceCount={occurrenceCount}
+                recurrenceWeekdays={recurrence.weekdays}
               />
             </Grid.Column>
             <Grid.Column width={8}>
