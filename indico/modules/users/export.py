@@ -80,5 +80,5 @@ def get_editables(user):
             .outerjoin(ContributionPersonLink, ContributionPersonLink.contribution_id == Contribution.id)
             .outerjoin(EditingRevision, EditingRevision.editable_id == Editable.id)
             .filter(db.or_(Contribution.person_links.any(ContributionPersonLink.person.has(user=user)),
-                           EditingRevision.submitter == user))
+                           EditingRevision.user == user))
             .all())

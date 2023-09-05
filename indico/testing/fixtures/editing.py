@@ -10,7 +10,7 @@ import pytest
 from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
+from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
 from indico.util.date_time import now_utc
 
 
@@ -33,10 +33,8 @@ def dummy_editable(dummy_contribution, create_editable):
 @pytest.fixture
 def create_editing_revision(db):
     """Return a callable which lets you create editing revisions."""
-    def _create_editing_revision(editable, submitter, initial_state, final_state, reviewed_dt, **kwargs):
-        revision = EditingRevision(editable=editable, submitter=submitter,
-                                   initial_state=initial_state,
-                                   final_state=final_state, reviewed_dt=reviewed_dt, **kwargs)
+    def _create_editing_revision(editable, user, type, created_dt, **kwargs):
+        revision = EditingRevision(editable=editable, user=user, type=type, created_dt=created_dt, **kwargs)
         db.session.flush()
         return revision
     return _create_editing_revision
@@ -45,9 +43,8 @@ def create_editing_revision(db):
 @pytest.fixture
 def dummy_editing_revision(dummy_user, dummy_editable, create_editing_revision):
     """Create a dummy editing revision."""
-    return create_editing_revision(dummy_editable, submitter=dummy_user, id=42,
-                                   initial_state=InitialRevisionState.ready_for_review,
-                                   final_state=FinalRevisionState.accepted, reviewed_dt=now_utc())
+    return create_editing_revision(dummy_editable, user=dummy_user, id=42, type=RevisionType.acceptance,
+                                   created_dt=now_utc())
 
 
 @pytest.fixture

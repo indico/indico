@@ -9,7 +9,7 @@ import pytest
 
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
-from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
+from indico.modules.events.editing.models.revisions import RevisionType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.users.export import (get_abstracts, get_attachments, get_contributions, get_editables, get_papers,
                                          get_registration_data, get_subcontributions)
@@ -131,9 +131,7 @@ def test_get_editables_from_contribution_link(db, dummy_event, dummy_user, creat
     assert not editables
 
     submitter = create_user(42)
-    create_editing_revision(dummy_editable, submitter, reviewed_dt=now_utc(),
-                            initial_state=InitialRevisionState.ready_for_review,
-                            final_state=FinalRevisionState.accepted)
+    create_editing_revision(dummy_editable, submitter, created_dt=now_utc(), type=RevisionType.acceptance)
     db.session.flush()
     editables = get_editables(dummy_user)
     assert not editables
@@ -150,9 +148,7 @@ def test_get_editables_from_editing_revision(db, dummy_user, dummy_editable, cre
     editables = get_editables(dummy_user)
     assert not editables
 
-    create_editing_revision(dummy_editable, dummy_user, reviewed_dt=now_utc(),
-                            initial_state=InitialRevisionState.ready_for_review,
-                            final_state=FinalRevisionState.accepted)
+    create_editing_revision(dummy_editable, dummy_user, created_dt=now_utc(), type=RevisionType.acceptance)
     db.session.flush()
 
     editables = get_editables(dummy_user)
