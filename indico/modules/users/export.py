@@ -8,7 +8,7 @@
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -31,7 +31,7 @@ def get_registration_data(user):
 
 def get_attachments(user):
     """Get all attachments uploaded by the user."""
-    return Attachment.query.filter(Attachment.user == user).all()
+    return Attachment.query.filter(Attachment.user == user, Attachment.type == AttachmentType.file).all()
 
 
 def get_contributions(user):

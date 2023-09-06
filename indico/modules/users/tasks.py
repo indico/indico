@@ -149,7 +149,7 @@ def generate_zip(export_request, temp_file, max_size_mb):
 
 def get_size_mb(file):
     file = getattr(file, 'file', file)
-    return file.size / 1024  # file size is in KB
+    return file.size / 1024**2  # file size is in bytes
 
 
 def collect_files(export_request):
