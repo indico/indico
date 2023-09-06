@@ -46,7 +46,7 @@ def all_data_yamls():
     yamls = []
     for opt in DataExportOptions:
         yamls.extend(options_map.get(opt, (opt.name,)))
-    return [f'/{x}.yaml' for x in yamls]
+    return [f'{x}.yaml' for x in yamls]
 
 
 def test_build_storage_path(dummy_reg_with_file_field, dummy_attachment, dummy_abstract_file,
@@ -96,7 +96,7 @@ def test_generate_zip_no_files(dummy_user):
     buffer.seek(0)
 
     zip = ZipFile(buffer)
-    assert zip.namelist() == ['/personal_data.yaml']
+    assert zip.namelist() == ['personal_data.yaml']
 
 
 @pytest.mark.usefixtures('dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
@@ -162,7 +162,7 @@ def test_export_user_data(mocker, dummy_user):
     file = File.query.filter(File.filename == 'data-export.zip').first()
     with file.open() as f:
         zip = ZipFile(f)
-        assert zip.namelist() == ['/personal_data.yaml']
+        assert zip.namelist() == ['personal_data.yaml']
 
 
 @pytest.mark.usefixtures('mock_io', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
