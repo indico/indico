@@ -92,7 +92,7 @@ def export_user_data(user, options):
 
 
 def _export_user_data(export_request, buffer):
-    generate_zip(export_request, buffer, config.MAX_DATA_EXPORT_SIZE)
+    generate_zip(export_request, buffer, config.MAX_DATA_EXPORT_SIZE * 1024**2)
     buffer.seek(0)
 
     file = File(filename='data-export.zip', content_type='application/zip')
@@ -131,25 +131,20 @@ def get_data(export_request):
     return UserDataExportSchema(only=fields).dump(user)
 
 
-def generate_zip(export_request, temp_file, max_size_mb):
+def generate_zip(export_request, temp_file, max_size):
     data = get_data(export_request)
     with ZipFile(temp_file, 'w', allowZip64=True) as zip_file:
         zip_file.writestr('/data.yml', yaml.dump(data))
-        size_mb = 0
+        size = 0
         for file in collect_files(export_request):
-            size_mb += get_size_mb(file)
-            if size_mb <= max_size_mb:
+            size += getattr(file, 'file', file).size
+            if size <= max_size:
                 write_file(zip_file, file)
             else:
                 export_request.max_size_exceeded = True
                 logger.warning('User data export exceeds size limit, exporting only partial data: %r',
                                export_request)
                 break
-
-
-def get_size_mb(file):
-    file = getattr(file, 'file', file)
-    return file.size / 1024**2  # file size is in bytes
 
 
 def collect_files(export_request):

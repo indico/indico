@@ -79,7 +79,7 @@ def test_get_data_convert_options_to_fields(mocker, dummy_user):
 def test_generate_zip_no_files(dummy_user):
     request = DataExportRequest(user=dummy_user, selected_options=[DataExportOptions.personal_data])
     buffer = BytesIO()
-    generate_zip(request, buffer, max_size_mb=0)
+    generate_zip(request, buffer, max_size=0)
     buffer.seek(0)
 
     zip = ZipFile(buffer)
@@ -91,7 +91,7 @@ def test_generate_zip_no_files(dummy_user):
 def test_generate_zip_all_options(dummy_user):
     request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
     buffer = BytesIO()
-    generate_zip(request, buffer, max_size_mb=100)
+    generate_zip(request, buffer, max_size=100_000_000)
     buffer.seek(0)
 
     zip = ZipFile(buffer)
@@ -110,11 +110,11 @@ def test_generate_zip_all_options(dummy_user):
 def test_generate_zip_max_size_exceeds_1(dummy_user):
     request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
     buffer = BytesIO()
-    generate_zip(request, buffer, max_size_mb=0)
+    generate_zip(request, buffer, max_size=0)
     buffer.seek(0)
 
     zip = ZipFile(buffer)
-    # max_size_mb is set 0, so only the data file should be exported
+    # max_size is set 0, so only the data file should be exported
     assert request.max_size_exceeded
     assert zip.namelist() == ['/data.yml']
 
@@ -122,9 +122,9 @@ def test_generate_zip_max_size_exceeds_1(dummy_user):
 @pytest.mark.usefixtures('dummy_abstract_file')
 def test_generate_zip_max_size_exceeds_2(dummy_user, dummy_attachment):
     request = DataExportRequest(user=dummy_user, selected_options=list(DataExportOptions))
-    # Set max_size_mb to cover only the attachment, but no the abstract file
+    # Set max_size to cover only the attachment, but no the abstract file
     buffer = BytesIO()
-    generate_zip(request, buffer, max_size_mb=dummy_attachment.file.size / 1024)
+    generate_zip(request, buffer, max_size=dummy_attachment.file.size)
     buffer.seek(0)
 
     zip = ZipFile(buffer)
