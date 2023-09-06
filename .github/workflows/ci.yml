@@ -1,5 +1,10 @@
 name: CI
 
+env:
+  PYTHON_VERSION_39: '3.9.18'
+  PYTHON_VERSION_310: '3.10.13'
+  PYTHON_VERSION_311: '3.11.5'
+
 on:
   push:
     branches:
@@ -19,9 +24,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: '3.9', python: '3.9', tox: py39 }
-          - { name: '3.10', python: '3.10', tox: py310 }
-          - { name: '3.11', python: '3.11', tox: py311 }
+          - { name: '3.9', python: '3.9', python_version_var: 'PYTHON_VERSION_39', tox: py39 }
+          - { name: '3.10', python: '3.10', python_version_var: 'PYTHON_VERSION_310', tox: py310 }
+          - { name: '3.11', python: '3.11', python_version_var: 'PYTHON_VERSION_311', tox: py311 }
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +40,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ env[matrix.python_version_var] }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -97,7 +102,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION_311 }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -211,9 +216,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: '3.9', python: '3.9', tox: py39 }
-          - { name: '3.10', python: '3.10', tox: py310 }
-          - { name: '3.11', python: '3.11', tox: py311 }
+          - { name: '3.9', python: '3.9', python_version_var: 'PYTHON_VERSION_39', tox: py39 }
+          - { name: '3.10', python: '3.10', python_version_var: 'PYTHON_VERSION_310', tox: py310 }
+          - { name: '3.11', python: '3.11', python_version_var: 'PYTHON_VERSION_311', tox: py311 }
 
     services:
       postgres:
@@ -231,7 +236,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ env[matrix.python_version_var] }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -287,7 +292,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION_311 }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
