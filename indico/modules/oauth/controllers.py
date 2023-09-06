@@ -99,13 +99,12 @@ class RHOAuthAuthorize(RHProtected):
                                new_scopes=[_f for _f in [SCOPES.get(s) for s in new_scopes] if _f])
 
 
+@cors
 class RHOAuthToken(RH):
     CSRF_ENABLED = False
 
     def _process(self):
         resp = auth_server.create_token_response()
-        resp.headers['Access-Control-Allow-Methods'] = 'POST'
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
 
 
