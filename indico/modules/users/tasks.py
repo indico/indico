@@ -134,7 +134,8 @@ def get_data(export_request):
 def generate_zip(export_request, temp_file, max_size):
     data = get_data(export_request)
     with ZipFile(temp_file, 'w', allowZip64=True) as zip_file:
-        zip_file.writestr('/data.yml', yaml.dump(data))
+        for key, subdata in data.items():
+            zip_file.writestr(f'/{key}.yaml', yaml.dump(subdata))
         size = 0
         for file in collect_files(export_request):
             size += getattr(file, 'file', file).size
