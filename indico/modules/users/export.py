@@ -50,9 +50,7 @@ def get_subcontributions(user):
 
 
 def get_abstracts(user):
-    """Get all abstracts where the user is either
-    the submitter or is linked to the abstract.
-    """
+    """Get all abstracts where the user is either the submitter or is linked to the abstract."""
     return (Abstract.query.options(joinedload('person_links'))
             .filter(db.or_(Abstract.submitter == user,
                            Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
@@ -60,9 +58,7 @@ def get_abstracts(user):
 
 
 def get_papers(user):
-    """Get all papers where the user is either linked to the
-    parent contribution or has submitted a paper revision.
-    """
+    """Get all papers where the user is either linked to the parent contribution or has submitted a paper revision."""
     contribs = (Contribution.query.options(joinedload('person_links'))
                 .filter(db.or_(db.and_(Contribution.person_links.any(ContributionPersonLink.person.has(user=user)),
                                        Contribution._paper_revisions.any()),
@@ -72,8 +68,8 @@ def get_papers(user):
 
 
 def get_editables(user):
-    """Get all editables where the user is either linked to the
-    parent contribution or has submitted an editing revision.
+    """
+    Get all editables where the user is either linked to the parent contribution or has submitted an editing revision.
     """
     return (Editable.query
             .join(Contribution, Contribution.id == Editable.contribution_id)
