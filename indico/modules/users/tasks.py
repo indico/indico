@@ -120,7 +120,7 @@ def export_user_data_task(user, options):
 
 
 def get_data(export_request):
-    from indico.modules.users.schemas import UserDataExportSchema
+    from indico.modules.users.export_schemas import UserDataExportSchema
 
     user = export_request.user
     options = export_request.selected_options

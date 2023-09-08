@@ -36,6 +36,7 @@ from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
+from indico.modules.users.export_schemas import DataExportRequestSchema
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
                                         SearchForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.affiliations import Affiliation
@@ -43,8 +44,8 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.export import DataExportOptions, DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
-from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, DataExportRequestSchema,
-                                          FavoriteEventSchema, UserPersonalDataSchema)
+from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
+                                          UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
                                        merge_users, search_users, send_avatar, serialize_user, set_user_avatar)

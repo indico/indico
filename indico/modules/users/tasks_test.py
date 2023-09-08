@@ -75,7 +75,7 @@ def test_get_data(dummy_user):
 
 
 def test_get_data_convert_options_to_fields(mocker, dummy_user):
-    mock = mocker.patch('indico.modules.users.schemas.UserDataExportSchema')
+    mock = mocker.patch('indico.modules.users.export_schemas.UserDataExportSchema')
 
     request = DataExportRequest(user=dummy_user, selected_options=[DataExportOptions.contribs])
     get_data(request)
