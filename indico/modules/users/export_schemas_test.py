@@ -26,13 +26,12 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
 SNAPSHOT_DIR = Path(__file__).parent / 'tests'
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def freeze_time_for_snapshots(freeze_time):
     """Ensure the tests use the same as the saved snapshots."""
     freeze_time(datetime(2022, 5, 22, 12, 0, 0))
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots')
 def test_data_export_request_schema(db, dummy_user):
     from indico.modules.users.export_schemas import DataExportRequestSchema
 
@@ -125,7 +124,6 @@ def test_subcontribution_export_schema(snapshot, db, dummy_user, dummy_subcontri
     assert_json_snapshot(snapshot, data, 'subcontribution_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots')
 def test_registration_export_schema(snapshot, dummy_reg_with_file_field):
     from indico.modules.users.export_schemas import RegistrationExportSchema
 
@@ -139,7 +137,7 @@ def setup_room_booking(user, room):
     user.owned_rooms.append(room)
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_reservation')
+@pytest.mark.usefixtures('dummy_reservation')
 def test_room_booking_export_schema(snapshot, db, dummy_user, dummy_room):
     from indico.modules.users.export_schemas import RoomBookingExportSchema
 
@@ -151,7 +149,7 @@ def test_room_booking_export_schema(snapshot, db, dummy_user, dummy_room):
     assert_json_snapshot(snapshot, data, 'room_booking_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_abstract_file')
+@pytest.mark.usefixtures('dummy_abstract_file')
 def test_abstract_export_schema(snapshot, dummy_abstract):
     from indico.modules.users.export_schemas import AbstractExportSchema
 
@@ -160,7 +158,7 @@ def test_abstract_export_schema(snapshot, dummy_abstract):
     assert_json_snapshot(snapshot, data, 'abstract_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_paper_file')
+@pytest.mark.usefixtures('dummy_paper_file')
 def test_paper_export_schema(snapshot, dummy_paper):
     from indico.modules.users.export_schemas import PaperExportSchema
 
@@ -169,7 +167,6 @@ def test_paper_export_schema(snapshot, dummy_paper):
     assert_json_snapshot(snapshot, data, 'paper_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots')
 def test_attachment_export_schema(snapshot, dummy_attachment):
     from indico.modules.users.export_schemas import AttachmentExportSchema
 
@@ -178,7 +175,7 @@ def test_attachment_export_schema(snapshot, dummy_attachment):
     assert_json_snapshot(snapshot, data, 'attachment_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_editing_revision_file')
+@pytest.mark.usefixtures('dummy_editing_revision_file')
 def test_editable_export_schema(snapshot, dummy_paper):
     from indico.modules.users.export_schemas import EditableExportSchema
 
@@ -192,7 +189,7 @@ def setup_misc_data(user, event):
     StaticSite(creator=user, event=event)
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_app_link', 'dummy_personal_token', 'dummy_identity')
+@pytest.mark.usefixtures('dummy_app_link', 'dummy_personal_token', 'dummy_identity')
 def test_misc_data_export_schema(snapshot, db, dummy_user, dummy_event):
     from indico.modules.users.export_schemas import MiscDataExportSchema
 
@@ -212,9 +209,8 @@ def test_empty_user_data_export_schema(snapshot, dummy_user):
     assert_json_snapshot(snapshot, data, 'empty_user_data_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_reservation', 'dummy_attachment',
-                         'dummy_abstract_file', 'dummy_paper_file', 'dummy_reg_with_file_field',
-                         'dummy_editing_revision_file')
+@pytest.mark.usefixtures('dummy_reservation', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
+                         'dummy_reg_with_file_field', 'dummy_editing_revision_file')
 def test_user_data_export_schema(snapshot, db, dummy_user, dummy_category, dummy_event, dummy_contribution,
                                  dummy_subcontribution, dummy_event_person, dummy_room):
     from indico.modules.users.export_schemas import UserDataExportSchema
