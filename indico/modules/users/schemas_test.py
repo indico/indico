@@ -9,7 +9,6 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-import freezegun
 import pytest
 from marshmallow import ValidationError
 
@@ -27,10 +26,8 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
 
 
 @pytest.fixture
-def freeze_time():
-    dt = datetime(2022, 5, 22, 12, 0, 0)
-    with freezegun.freeze_time(dt):
-        yield
+def freeze_time_for_snapshots(freeze_time):
+    freeze_time(datetime(2022, 5, 22, 12, 0, 0))
 
 
 @pytest.fixture
@@ -53,7 +50,7 @@ def test_personal_data_schema():
         schema.load({'first_name': 'Test', 'is_admin': True})
 
 
-@pytest.mark.usefixtures('freeze_time')
+@pytest.mark.usefixtures('freeze_time_for_snapshots')
 def test_data_export_request_schema(db, dummy_user):
     from indico.modules.users.schemas import DataExportRequestSchema
 
@@ -142,7 +139,7 @@ def test_subcontribution_export_schema(snapshot, db, dummy_user, dummy_subcontri
     snapshot.assert_json_match(data, 'subcontribution_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time')
+@pytest.mark.usefixtures('freeze_time_for_snapshots')
 def test_registration_export_schema(snapshot, dummy_reg_with_file_field):
     from indico.modules.users.schemas import RegistrationExportSchema
 
@@ -155,7 +152,7 @@ def setup_room_booking(user, room):
     user.owned_rooms.append(room)
 
 
-@pytest.mark.usefixtures('freeze_time', 'dummy_reservation')
+@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_reservation')
 def test_room_booking_export_schema(snapshot, db, dummy_user, dummy_room):
     from indico.modules.users.schemas import RoomBookingExportSchema
 
@@ -166,7 +163,7 @@ def test_room_booking_export_schema(snapshot, db, dummy_user, dummy_room):
     snapshot.assert_json_match(data, 'room_booking_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time', 'dummy_abstract_file')
+@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_abstract_file')
 def test_abstract_export_schema(snapshot, dummy_abstract):
     from indico.modules.users.schemas import AbstractExportSchema
 
@@ -174,7 +171,7 @@ def test_abstract_export_schema(snapshot, dummy_abstract):
     snapshot.assert_json_match(data, 'abstract_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time', 'dummy_paper_file')
+@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_paper_file')
 def test_paper_export_schema(snapshot, dummy_paper):
     from indico.modules.users.schemas import PaperExportSchema
 
@@ -182,7 +179,7 @@ def test_paper_export_schema(snapshot, dummy_paper):
     snapshot.assert_json_match(data, 'paper_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time')
+@pytest.mark.usefixtures('freeze_time_for_snapshots')
 def test_attachment_export_schema(snapshot, dummy_attachment):
     from indico.modules.users.schemas import AttachmentExportSchema
 
@@ -190,7 +187,7 @@ def test_attachment_export_schema(snapshot, dummy_attachment):
     snapshot.assert_json_match(data, 'attachment_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time', 'dummy_editing_revision_file')
+@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_editing_revision_file')
 def test_editable_export_schema(snapshot, dummy_paper):
     from indico.modules.users.schemas import EditableExportSchema
 
@@ -203,7 +200,7 @@ def setup_misc_data(user, event):
     StaticSite(creator=user, event=event)
 
 
-@pytest.mark.usefixtures('freeze_time', 'dummy_app_link', 'dummy_personal_token', 'dummy_identity')
+@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_app_link', 'dummy_personal_token', 'dummy_identity')
 def test_misc_data_export_schema(snapshot, db, dummy_user, dummy_event):
     from indico.modules.users.schemas import MiscDataExportSchema
 
@@ -221,9 +218,9 @@ def test_empty_user_data_export_schema(snapshot, dummy_user):
     snapshot.assert_json_match(data, 'empty_user_data_export_schema.json')
 
 
-@pytest.mark.usefixtures('freeze_time', 'dummy_reservation', 'dummy_attachment',
-                         'dummy_abstract_file', 'dummy_paper_file',
-                         'dummy_reg_with_file_field', 'dummy_editing_revision_file')
+@pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_reservation', 'dummy_attachment',
+                         'dummy_abstract_file', 'dummy_paper_file', 'dummy_reg_with_file_field',
+                         'dummy_editing_revision_file')
 def test_user_data_export_schema(snapshot, db, dummy_user, dummy_category, dummy_event, dummy_contribution,
                                  dummy_subcontribution, dummy_event_person, dummy_room):
     from indico.modules.users.schemas import UserDataExportSchema
