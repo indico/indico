@@ -1,3 +1,10 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2023 CERN
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the MIT License; see the
+# LICENSE file for more details.
+
 from marshmallow import Schema, fields, post_dump
 from marshmallow.fields import DateTime, Dict, Enum, Function, List, Method, Nested, String, TimeDelta
 from speaklater import _LazyString
