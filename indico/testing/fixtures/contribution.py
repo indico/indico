@@ -28,7 +28,7 @@ def create_contribution(db):
 
 @pytest.fixture
 def dummy_contribution(create_contribution, dummy_event):
-    return create_contribution(dummy_event, 'Dummy Contribution', id=42)
+    return create_contribution(dummy_event, 'Dummy Contribution', id=420)
 
 
 @pytest.fixture
@@ -46,4 +46,4 @@ def create_subcontribution(db):
 @pytest.fixture
 def dummy_subcontribution(dummy_contribution, create_subcontribution):
     """Create a dummy subcontribution."""
-    return create_subcontribution(dummy_contribution, 'Dummy SubContribution', id=42)
+    return create_subcontribution(dummy_contribution, 'Dummy SubContribution', id=420)

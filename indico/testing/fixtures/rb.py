@@ -64,7 +64,7 @@ def create_reservation(db, dummy_room, dummy_user):
 @pytest.fixture
 def dummy_reservation(create_reservation):
     """Give you a dummy reservation."""
-    return create_reservation(id=42)
+    return create_reservation(id=420)
 
 
 @pytest.fixture
@@ -111,7 +111,7 @@ def create_room(db, dummy_location, dummy_user):
 @pytest.fixture
 def dummy_room(create_room):
     """Give you a dummy room."""
-    return create_room(id=42)
+    return create_room(id=420)
 
 
 @pytest.fixture

@@ -51,4 +51,4 @@ def create_paper_file(db):
 @pytest.fixture
 def dummy_paper_file(create_paper_file, dummy_paper_revision, dummy_file):
     """Create a dummy paper file."""
-    return create_paper_file(dummy_paper_revision, dummy_file, id=42)
+    return create_paper_file(dummy_paper_revision, dummy_file, id=420)

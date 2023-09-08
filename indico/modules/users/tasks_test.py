@@ -52,20 +52,20 @@ def all_data_yamls():
 def test_build_storage_path(dummy_reg_with_file_field, dummy_attachment, dummy_abstract_file,
                             dummy_paper_file, dummy_editing_revision_file):
     path = build_storage_path(dummy_reg_with_file_field.data[0])
-    assert path == 'registrations/0_dummy0/43_73_registration_upload.txt'
+    assert path == 'registrations/0_dummy0/730_730_registration_upload.txt'
 
     path = build_storage_path(dummy_attachment.file)
-    assert path == 'attachments/42_dummy_file.txt'
+    assert path == 'attachments/420_dummy_file.txt'
 
     path = build_storage_path(dummy_abstract_file)
-    assert path == ('abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
-                    '42_dummy_abstract_file.txt')
+    assert path == ('abstracts/0_dummy0/420_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
+                    '420_dummy_abstract_file.txt')
 
     path = build_storage_path(dummy_paper_file)
-    assert path == 'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt'
+    assert path == 'papers/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt'
 
     path = build_storage_path(dummy_editing_revision_file)
-    assert path == 'editables/paper/0_dummy0/42_Dummy_Contribution/revision_42/42_dummy_file.txt'
+    assert path == 'editables/paper/0_dummy0/420_Dummy_Contribution/revision_420/420_dummy_file.txt'
 
 
 def test_get_data(dummy_user):
@@ -110,12 +110,12 @@ def test_generate_zip_all_options(dummy_user, all_data_yamls):
     zip = ZipFile(buffer)
     assert zip.namelist() == [
         *all_data_yamls,
-        'attachments/42_dummy_file.txt',
-        ('abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
-         '42_dummy_abstract_file.txt'),
-        'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
-        'editables/paper/0_dummy0/42_Dummy_Contribution/revision_42/42_dummy_file.txt',
-        'registrations/0_dummy0/43_73_registration_upload.txt'
+        'attachments/420_dummy_file.txt',
+        ('abstracts/0_dummy0/420_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
+         '420_dummy_abstract_file.txt'),
+        'papers/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt',
+        'editables/paper/0_dummy0/420_Dummy_Contribution/revision_420/420_dummy_file.txt',
+        'registrations/0_dummy0/730_730_registration_upload.txt'
     ]
 
 
@@ -143,7 +143,7 @@ def test_generate_zip_max_size_exceeds_2(dummy_user, dummy_attachment, all_data_
     zip = ZipFile(buffer)
     # Only the attachment should be exported
     assert request.max_size_exceeded
-    assert zip.namelist() == [*all_data_yamls, 'attachments/42_dummy_file.txt',]
+    assert zip.namelist() == [*all_data_yamls, 'attachments/420_dummy_file.txt',]
 
 
 @pytest.mark.usefixtures('mock_io')
@@ -184,12 +184,12 @@ def test_export_user_data_all_options(mocker, dummy_user, all_data_yamls):
         zip = ZipFile(f)
         assert zip.namelist() == [
             *all_data_yamls,
-            'attachments/42_dummy_file.txt',
-            ('abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
-             '42_dummy_abstract_file.txt'),
-            'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
-            'editables/paper/0_dummy0/42_Dummy_Contribution/revision_42/42_dummy_file.txt',
-            'registrations/0_dummy0/43_73_registration_upload.txt'
+            'attachments/420_dummy_file.txt',
+            ('abstracts/0_dummy0/420_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
+             '420_dummy_abstract_file.txt'),
+            'papers/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt',
+            'editables/paper/0_dummy0/420_Dummy_Contribution/revision_420/420_dummy_file.txt',
+            'registrations/0_dummy0/730_730_registration_upload.txt'
         ]
 
 

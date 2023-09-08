@@ -62,7 +62,7 @@ def create_attachment(db):
 def dummy_attachment(dummy_user, dummy_event, create_attachment):
     """Create a dummy attachment."""
     return create_attachment(dummy_user, dummy_event, title='dummy_attachment', description='Dummy attachment',
-                             id=42, attachment_folder_id=42, attachment_file_id=42)
+                             id=420, attachment_folder_id=420, attachment_file_id=420)
 
 
 @pytest.fixture
@@ -80,4 +80,4 @@ def create_file(db):
 @pytest.fixture
 def dummy_file(create_file):
     """Create a dummy (unclaimed) file."""
-    return create_file('dummy_file.txt', 'text/plain', 'dummy_context', 'A dummy file', id=42)
+    return create_file('dummy_file.txt', 'text/plain', 'dummy_context', 'A dummy file', id=420)

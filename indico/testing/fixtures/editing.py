@@ -27,7 +27,7 @@ def create_editable(db):
 @pytest.fixture
 def dummy_editable(dummy_contribution, create_editable):
     """Create a dummy editable."""
-    return create_editable(dummy_contribution, EditableType.paper, id=42)
+    return create_editable(dummy_contribution, EditableType.paper, id=420)
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ def create_editing_revision(db):
 @pytest.fixture
 def dummy_editing_revision(dummy_user, dummy_editable, create_editing_revision):
     """Create a dummy editing revision."""
-    return create_editing_revision(dummy_editable, user=dummy_user, id=42, type=RevisionType.acceptance,
+    return create_editing_revision(dummy_editable, user=dummy_user, id=420, type=RevisionType.acceptance,
                                    created_dt=now_utc())
 
 
@@ -61,7 +61,7 @@ def create_editing_file_type(db):
 @pytest.fixture
 def dummy_editing_file_type(create_editing_file_type):
     """Create a dummy editing file type."""
-    return create_editing_file_type(id=42, name='TXT', extensions=['txt'], type=EditableType.paper)
+    return create_editing_file_type(id=420, name='TXT', extensions=['txt'], type=EditableType.paper)
 
 
 @pytest.fixture

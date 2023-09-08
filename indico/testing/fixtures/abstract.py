@@ -42,7 +42,7 @@ def create_dummy_person(db, create_event_person):
 @pytest.fixture
 def dummy_abstract(db, dummy_event, dummy_user, create_dummy_person):
     """Create a dummy abstract."""
-    abstract = Abstract(id=42,
+    abstract = Abstract(id=420,
                         friendly_id=314,
                         title='Broken Symmetry and the Mass of Gauge Vector Mesons',
                         event=dummy_event,
@@ -77,5 +77,5 @@ def create_abstract_file():
 @pytest.fixture
 def dummy_abstract_file(dummy_abstract, create_abstract_file):
     """Create a dummy abstract file."""
-    return create_abstract_file(dummy_abstract, id=42, filename='dummy_abstract_file.txt',
+    return create_abstract_file(dummy_abstract, id=420, filename='dummy_abstract_file.txt',
                                 content_type='text/plain', data='A dummy file')
