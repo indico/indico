@@ -204,6 +204,8 @@ class RegistrationDataExportSchema(Schema):
         if original.filename:
             file_data = RegistrationFileExportSchema().dump(original)
             return data | {'file': file_data}
+        else:
+            return data
 
 
 class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
@@ -211,13 +213,13 @@ class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
         model = Registration
         fields = ('id', 'url', 'event_id', 'event_title', 'event_url', 'state', 'currency', 'price', 'submitted_dt',
                   'email', 'first_name', 'last_name', 'is_deleted', 'checked_in', 'checked_in_dt', 'rejection_reason',
-                  'consent_to_publish', 'created_by_manager', 'tags', 'data')
+                  'consent_to_publish', 'created_by_manager', 'tags', 'fields')
 
     price = fields.Decimal(as_string=True)
     url = Function(lambda reg: url_for('event_registration.registration_details', reg, _external=True))
     event_title = Function(lambda reg: reg.event.title)
     event_url = Function(lambda reg: url_for('events.display', reg.event, _external=True))
-    data = Method('_serialize_data')
+    fields = Method('_serialize_data')
 
     def _serialize_data(self, registration):
         registration_data = [data for data in registration.data if not data.field_data.field.is_manager_only]

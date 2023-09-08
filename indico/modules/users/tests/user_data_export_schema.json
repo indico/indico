@@ -156,7 +156,11 @@
       "consent_to_publish": "nobody",
       "created_by_manager": false,
       "currency": "USD",
-      "data": [
+      "email": "1337@example.test",
+      "event_id": 0,
+      "event_title": "dummy#0",
+      "event_url": "http://localhost/event/0/",
+      "fields": [
         {
           "data": "registration_upload.txt",
           "description": "",
@@ -171,10 +175,6 @@
           "title": "File field"
         }
       ],
-      "email": "1337@example.test",
-      "event_id": 0,
-      "event_title": "dummy#0",
-      "event_url": "http://localhost/event/0/",
       "first_name": "Guinea",
       "id": 43,
       "is_deleted": false,
