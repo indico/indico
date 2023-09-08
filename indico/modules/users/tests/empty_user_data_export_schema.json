@@ -4,9 +4,11 @@
   "contributions": [],
   "editables": [],
   "miscellaneous": {
+    "api_key": null,
     "created_events": [],
     "identities": [],
     "oauth_applications": [],
+    "old_api_keys": [],
     "personal_tokens": [],
     "static_sites": []
   },

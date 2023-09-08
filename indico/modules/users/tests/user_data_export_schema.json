@@ -75,6 +75,7 @@
     }
   ],
   "miscellaneous": {
+    "api_key": null,
     "created_events": [
       {
         "id": 0,
@@ -84,6 +85,7 @@
     ],
     "identities": [],
     "oauth_applications": [],
+    "old_api_keys": [],
     "personal_tokens": [],
     "static_sites": [
       {

@@ -12,6 +12,7 @@ from speaklater import _LazyString
 from indico.core.marshmallow import mm
 from indico.core.oauth.models.applications import OAuthApplication
 from indico.core.oauth.models.personal_tokens import PersonalToken
+from indico.modules.api.models.keys import APIKey
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.auth.models.identities import Identity
 from indico.modules.categories.models.categories import Category
@@ -123,6 +124,13 @@ class PersonalTokenExportSchema(mm.SQLAlchemyAutoSchema):
         fields = ('name', 'revoked_dt', 'created_dt', 'last_used_dt', 'last_used_ip', 'use_count', 'scopes')
 
     scopes = Function(lambda token: sorted(list(token.scopes)))
+
+
+class APIKeyExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = APIKey
+        fields = ('is_active', 'is_blocked', 'is_persistent_allowed', 'created_dt', 'lat_used_dt', 'last_used_ip',
+                  'last_used_uri', 'last_used_auth', 'use_count')
 
 
 class OAuthApplicationExportSchema(mm.SQLAlchemyAutoSchema):
@@ -343,6 +351,8 @@ class MiscDataExportSchema(Schema):
     static_sites = List(Nested(StaticSiteExportSchema))
     identities = List(Nested(IdentityExportSchema))
     personal_tokens = List(Nested(PersonalTokenExportSchema))
+    api_key = Nested(APIKeyExportSchema)
+    old_api_keys = List(Nested(APIKeyExportSchema))
     oauth_applications = Method('_serialize_oauth_apps')
 
     def _serialize_oauth_apps(self, user):
