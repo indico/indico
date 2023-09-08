@@ -65,6 +65,3 @@ def upgrade():
 
 def downgrade():
     op.drop_table('data_export_requests', schema='users')
-    # alembic does not automatically delete custom types
-    # https://github.com/miguelgrinberg/Flask-Migrate/issues/48
-    op.execute('DROP TYPE dataexportoptions')
