@@ -754,6 +754,8 @@ Storage
     any additional files such as attachments, papers, etc., that the user might
     have and that do not fit within the limit are not included in the exported
     archive. The default size is 10GB.
+    
+    Default: ``10 * 1024``
 
 
 System

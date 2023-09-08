@@ -144,9 +144,6 @@ def test_subcontribution_export_schema(snapshot, db, dummy_user, dummy_subcontri
 
 @pytest.mark.usefixtures('freeze_time')
 def test_registration_export_schema(snapshot, dummy_reg_with_file_field):
-    """Test RegistrationExportSchema
-
-    """
     from indico.modules.users.schemas import RegistrationExportSchema
 
     data = RegistrationExportSchema().dump(dummy_reg_with_file_field)
