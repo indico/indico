@@ -35,7 +35,6 @@ def test_get_countries(mocker, country):
     assert countries[country] == MockConfig.CUSTOM_COUNTRIES[country]
 
 
-@pytest.mark.usefixtures('unmemoize_get_countries')
 @pytest.mark.parametrize('country', list(MockConfig.CUSTOM_COUNTRIES))
 def test_get_country(mocker, country):
     mocker.patch('indico.util.countries.config', MockConfig())
