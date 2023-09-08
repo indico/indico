@@ -3,7 +3,7 @@
     {
       "building": "1",
       "floor": "2",
-      "id": 42,
+      "id": 420,
       "location_name": "Test",
       "map_url": null,
       "name": "1/2-3",
@@ -16,7 +16,7 @@
     {
       "building": "1",
       "floor": "2",
-      "id": 42,
+      "id": 420,
       "location_name": "Test",
       "map_url": null,
       "name": "1/2-3",
@@ -30,12 +30,12 @@
       "booked_for_name": "Guinea Pig",
       "booking_reason": "Testing",
       "end_dt": "2022-05-22T17:30:00",
-      "id": 42,
+      "id": 420,
       "is_accepted": true,
       "is_repeating": false,
       "repeat_frequency": "NEVER",
       "repeat_interval": 0,
-      "room_id": 42,
+      "room_id": 420,
       "start_dt": "2022-05-22T08:30:00"
     }
   ]

@@ -2,16 +2,16 @@
   "description": "Dummy attachment",
   "file": {
     "filename": "dummy_file.txt",
-    "id": 42,
+    "id": 420,
     "md5": "5eb63bbbe01eeed093cb22bb8f5acdc3",
-    "path": "attachments/42_dummy_file.txt"
+    "path": "attachments/420_dummy_file.txt"
   },
-  "folder": 42,
-  "folder_id": 42,
-  "id": 42,
+  "folder": 420,
+  "folder_id": 420,
+  "id": 420,
   "link_url": null,
   "modified_dt": "2022-05-22T12:00:00+00:00",
   "title": "dummy_attachment",
   "type": "file",
-  "url": "http://localhost/event/0/attachments/42/42/dummy_file.txt"
+  "url": "http://localhost/event/0/attachments/420/420/dummy_file.txt"
 }

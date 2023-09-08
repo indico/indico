@@ -3,13 +3,13 @@
   "files": [
     {
       "filename": "dummy_file.txt",
-      "id": 42,
+      "id": 420,
       "md5": "d659f3992a4861fbba98e728e8ab5d8e",
-      "path": "papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt",
-      "url": "http://localhost/event/0/papers/42/files/42-dummy_file.txt"
+      "path": "papers/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt",
+      "url": "http://localhost/event/0/papers/420/files/420-dummy_file.txt"
     }
   ],
   "submitted_dt": "2022-05-22T12:00:00+00:00",
   "title": "Dummy Contribution",
-  "url": "http://localhost/event/0/papers/42/"
+  "url": "http://localhost/event/0/papers/420/"
 }
