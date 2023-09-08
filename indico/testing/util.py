@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import json
 import operator
 import os
 import re
@@ -201,3 +202,14 @@ def assert_email_snapshot(snapshot, template, snapshot_filename):
     snapshot.assert_match(body, snapshot_filename)
     # we add a trailing linebreak so make manually editing the snapshot easier
     snapshot.assert_match(subject + '\n', snapshot_filename_subject)
+
+
+def assert_json_snapshot(snapshot, obj, snapshot_filename):
+    """Assert that a json object matches a snapshot.
+
+    :param snapshot: The pytest snapshot fixture
+    :param obj: The json object to compare
+    :param snapshot_filename: The filename for the snapshot
+    """
+    __tracebackhide__ = True
+    snapshot.assert_match(json.dumps(obj, indent=2, sort_keys=True), snapshot_filename)

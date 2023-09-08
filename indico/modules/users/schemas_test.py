@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import json
 from datetime import datetime
 from pathlib import Path
 
@@ -19,26 +18,19 @@ from indico.modules.events.static.models.static import StaticSite
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest, DataExportRequestState
 from indico.modules.users.models.users import NameFormat
+from indico.testing.util import assert_json_snapshot
 
 
 pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
                   'indico.modules.users.testing.fixtures')
 
+SNAPSHOT_DIR = Path(__file__).parent / 'tests'
+
 
 @pytest.fixture
 def freeze_time_for_snapshots(freeze_time):
+    """Ensure the tests use the same as the saved snapshots."""
     freeze_time(datetime(2022, 5, 22, 12, 0, 0))
-
-
-@pytest.fixture
-def snapshot(snapshot):
-    def assert_json_match(data, filename):
-        __tracebackhide__ = True
-        snapshot.assert_match(json.dumps(data, indent=2, sort_keys=True), filename)
-
-    snapshot.snapshot_dir = Path(__file__).parent / 'tests'
-    snapshot.assert_json_match = assert_json_match
-    yield snapshot
 
 
 def test_personal_data_schema():
@@ -82,7 +74,8 @@ def test_settings_export_schema(snapshot, dummy_user):
 
     setup_settings(dummy_user.settings)
     data = SettingsExportSchema().dump(dummy_user.settings.get_all())
-    snapshot.assert_json_match(data, 'settings_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'settings_export_schema.json')
 
 
 def setup_personal_data(dummy_user, dummy_event, dummy_category):
@@ -98,7 +91,8 @@ def test_personal_data_export_schema(snapshot, db, dummy_event, dummy_category, 
     db.session.flush()
 
     data = PersonalDataExportSchema().dump(dummy_user)
-    snapshot.assert_json_match(data, 'personal_data_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'personal_data_export_schema.json')
 
 
 def setup_contributions(db, user, contribution, event_person):
@@ -117,7 +111,8 @@ def test_contribution_export_schema(snapshot, db, dummy_user, dummy_contribution
     db.session.flush()
 
     data = ContributionExportSchema(context={'user': dummy_user}).dump(dummy_contribution)
-    snapshot.assert_json_match(data, 'contribution_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'contribution_export_schema.json')
 
 
 def setup_subcontributions(db, user, subcontribution, event_person):
@@ -136,7 +131,8 @@ def test_subcontribution_export_schema(snapshot, db, dummy_user, dummy_subcontri
     db.session.flush()
 
     data = SubContributionExportSchema(context={'user': dummy_user}).dump(dummy_subcontribution)
-    snapshot.assert_json_match(data, 'subcontribution_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'subcontribution_export_schema.json')
 
 
 @pytest.mark.usefixtures('freeze_time_for_snapshots')
@@ -144,7 +140,8 @@ def test_registration_export_schema(snapshot, dummy_reg_with_file_field):
     from indico.modules.users.schemas import RegistrationExportSchema
 
     data = RegistrationExportSchema().dump(dummy_reg_with_file_field)
-    snapshot.assert_json_match(data, 'registration_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'registration_export_schema.json')
 
 
 def setup_room_booking(user, room):
@@ -160,7 +157,8 @@ def test_room_booking_export_schema(snapshot, db, dummy_user, dummy_room):
     db.session.flush()
 
     data = RoomBookingExportSchema().dump(dummy_user)
-    snapshot.assert_json_match(data, 'room_booking_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'room_booking_export_schema.json')
 
 
 @pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_abstract_file')
@@ -168,7 +166,8 @@ def test_abstract_export_schema(snapshot, dummy_abstract):
     from indico.modules.users.schemas import AbstractExportSchema
 
     data = AbstractExportSchema().dump(dummy_abstract)
-    snapshot.assert_json_match(data, 'abstract_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'abstract_export_schema.json')
 
 
 @pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_paper_file')
@@ -176,7 +175,8 @@ def test_paper_export_schema(snapshot, dummy_paper):
     from indico.modules.users.schemas import PaperExportSchema
 
     data = PaperExportSchema().dump(dummy_paper)
-    snapshot.assert_json_match(data, 'paper_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'paper_export_schema.json')
 
 
 @pytest.mark.usefixtures('freeze_time_for_snapshots')
@@ -184,7 +184,8 @@ def test_attachment_export_schema(snapshot, dummy_attachment):
     from indico.modules.users.schemas import AttachmentExportSchema
 
     data = AttachmentExportSchema().dump(dummy_attachment)
-    snapshot.assert_json_match(data, 'attachment_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'attachment_export_schema.json')
 
 
 @pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_editing_revision_file')
@@ -192,7 +193,8 @@ def test_editable_export_schema(snapshot, dummy_paper):
     from indico.modules.users.schemas import EditableExportSchema
 
     data = EditableExportSchema().dump(dummy_paper)
-    snapshot.assert_json_match(data, 'editable_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'editable_export_schema.json')
 
 
 def setup_misc_data(user, event):
@@ -208,14 +210,16 @@ def test_misc_data_export_schema(snapshot, db, dummy_user, dummy_event):
     db.session.flush()
 
     data = MiscDataExportSchema().dump(dummy_user)
-    snapshot.assert_json_match(data, 'misc_data_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'misc_data_export_schema.json')
 
 
 def test_empty_user_data_export_schema(snapshot, dummy_user):
     from indico.modules.users.schemas import UserDataExportSchema
 
     data = UserDataExportSchema().dump(dummy_user)
-    snapshot.assert_json_match(data, 'empty_user_data_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'empty_user_data_export_schema.json')
 
 
 @pytest.mark.usefixtures('freeze_time_for_snapshots', 'dummy_reservation', 'dummy_attachment',
@@ -234,4 +238,5 @@ def test_user_data_export_schema(snapshot, db, dummy_user, dummy_category, dummy
     db.session.flush()
 
     data = UserDataExportSchema().dump(dummy_user)
-    snapshot.assert_json_match(data, 'user_data_export_schema.json')
+    snapshot.snapshot_dir = SNAPSHOT_DIR
+    assert_json_snapshot(snapshot, data, 'user_data_export_schema.json')
