@@ -72,7 +72,7 @@ class DataExportRequest(db.Model):
     )
     #: The items which where requested to be exported
     selected_options = db.Column(
-        ARRAY(sa.Enum(DataExportOptions)),
+        ARRAY(sa.Enum(DataExportOptions, native_enum=False)),
         nullable=False,
         default=[],
     )

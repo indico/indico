@@ -133,7 +133,7 @@ function DataExport({userId, request, exportOptions}) {
           </Translate>
           <div styleName="divider" />
           <div styleName="data-export-body">
-            {state === 'pending' && (
+            {state === 'none' && (
               <DataExportForm onSubmit={onSubmit} exportOptions={exportOptions} />
             )}
             {state === 'running' && (
@@ -173,7 +173,7 @@ function DataExport({userId, request, exportOptions}) {
                       <Translate>Download</Translate>
                       <Icon name="download" />
                     </Button>
-                    <Button onClick={() => setState('pending')}>
+                    <Button onClick={() => setState('none')}>
                       <Translate>New export</Translate>
                     </Button>
                   </div>
@@ -191,7 +191,7 @@ function DataExport({userId, request, exportOptions}) {
                   </Translate>
                 </Message>
                 <div>
-                  <Button primary icon labelPosition="right" onClick={() => setState('pending')}>
+                  <Button primary icon labelPosition="right" onClick={() => setState('none')}>
                     <Translate>Retry</Translate>
                     <Icon name="redo" />
                   </Button>
@@ -206,7 +206,7 @@ function DataExport({userId, request, exportOptions}) {
                   </Message.Header>
                 </Message>
                 <div>
-                  <Button primary onClick={() => setState('pending')} icon labelPosition="right">
+                  <Button primary onClick={() => setState('none')} icon labelPosition="right">
                     <Translate>New export</Translate>
                     <Icon name="zip" />
                   </Button>

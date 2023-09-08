@@ -72,9 +72,14 @@ def export_user_data(user, options):
     if export_request and export_request.is_running:
         return
 
-    # ughh why isn't there an ORM upsert..
+    # If an export request already exists we delete it
+    # along with the actual file (if any) and create a new request
     if export_request:
+        f = export_request.file
         db.session.delete(export_request)
+        if f:
+            with suppress(Exception):
+                f.delete(delete_from_db=True)
         db.session.commit()
     export_request = DataExportRequest(user=user, selected_options=options, state=DataExportRequestState.running)
     db.session.commit()
