@@ -103,9 +103,11 @@ class DataExportRequest(db.Model):
 
     file = db.relationship(
         'File',
-        lazy=False,
-        cascade='all, delete-orphan',
-        single_parent=True
+        lazy=True,
+        backref=db.backref(
+            'data_export_of',
+            lazy=True
+        )
     )
 
     @property
