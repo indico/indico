@@ -65,7 +65,7 @@ def test_build_storage_path(dummy_reg_with_file_field, dummy_attachment, dummy_a
     assert path == 'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt'
 
     path = build_storage_path(dummy_editing_revision_file)
-    assert path == 'editables/paper/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt'
+    assert path == 'editables/paper/0_dummy0/42_Dummy_Contribution/revision_42/42_dummy_file.txt'
 
 
 def test_get_data(dummy_user):
@@ -114,7 +114,7 @@ def test_generate_zip_all_options(dummy_user, all_data_yamls):
         ('abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
          '42_dummy_abstract_file.txt'),
         'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
-        'editables/paper/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
+        'editables/paper/0_dummy0/42_Dummy_Contribution/revision_42/42_dummy_file.txt',
         'registrations/0_dummy0/43_73_registration_upload.txt'
     ]
 
@@ -188,7 +188,7 @@ def test_export_user_data_all_options(mocker, dummy_user, all_data_yamls):
             ('abstracts/0_dummy0/42_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
              '42_dummy_abstract_file.txt'),
             'papers/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
-            'editables/paper/0_dummy0/42_Dummy_Contribution/42_dummy_file.txt',
+            'editables/paper/0_dummy0/42_Dummy_Contribution/revision_42/42_dummy_file.txt',
             'registrations/0_dummy0/43_73_registration_upload.txt'
         ]
 

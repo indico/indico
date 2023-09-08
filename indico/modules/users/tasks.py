@@ -201,10 +201,11 @@ def build_storage_path(file):
         prefix = 'papers'
         path = f'{event.id}_{event.title}/{file._contribution.id}_{file.paper.title}'
     else:
-        editable = file.revision.editable
+        revision = file.revision
+        editable = revision.editable
         event = editable.contribution.event
         prefix = f'editables/{editable.type.name}'
-        path = f'{event.id}_{event.title}/{editable.id}_{editable.contribution.title}'
+        path = f'{event.id}_{event.title}/{editable.id}_{editable.contribution.title}/revision_{revision.id}'
 
     path = secure_path(path)
     filename = build_filename(file)
