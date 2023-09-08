@@ -47,7 +47,7 @@ class MemoryStorage(Storage):
 @pytest.fixture
 def create_attachment(db):
     """Return a callable which lets you create attachments."""
-    def _create_attachment(user, object, *, title, attachment_folder_id=None, attachment_file_id=None, **kwargs):
+    def _create_attachment(user, object, title, *, attachment_folder_id=None, attachment_file_id=None, **kwargs):
         folder = AttachmentFolder(id=attachment_folder_id, object=object, title='dummy_folder',
                                   description='a dummy folder')
         file = AttachmentFile(user=user, filename='dummy_file.txt', content_type='text/plain', id=attachment_file_id)
