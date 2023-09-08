@@ -22,19 +22,8 @@
   ],
   "oauth_applications": [
     {
-      "allow_pkce_flow": true,
-      "allowed_scopes": [
-        "read:legacy_api",
-        "write:legacy_api",
-        "read:user"
-      ],
       "description": "",
-      "is_enabled": true,
-      "is_trusted": false,
-      "name": "dummy",
-      "redirect_uris": [
-        "http://localhost:10500/"
-      ]
+      "name": "dummy"
     }
   ],
   "personal_tokens": [

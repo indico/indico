@@ -25,7 +25,6 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.papers import PaperRevisionState
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.static.models.static import StaticSite
 from indico.modules.events.surveys.schemas import SurveySubmissionSchema
 from indico.modules.rb.models.rooms import Room
@@ -129,8 +128,7 @@ class PersonalTokenExportSchema(mm.SQLAlchemyAutoSchema):
 class OAuthApplicationExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = OAuthApplication
-        fields = ('name', 'description', 'allowed_scopes', 'redirect_uris', 'is_enabled', 'is_trusted',
-                  'allow_pkce_flow')
+        fields = ('name', 'description')
 
 
 class IdentityExportSchema(mm.SQLAlchemyAutoSchema):
@@ -171,12 +169,6 @@ class StaticSiteExportSchema(mm.SQLAlchemyAutoSchema):
 
     url = Function(lambda site: url_for('static_site.download', site, _external=True))
     event_url = Function(lambda site: url_for('events.display', site.event, _external=True))
-
-
-class RegistrationTagExportSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = RegistrationTag
-        fields = ('title',)
 
 
 class RegistrationFileExportSchema(Schema):
@@ -225,7 +217,6 @@ class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
     url = Function(lambda reg: url_for('event_registration.registration_details', reg, _external=True))
     event_title = Function(lambda reg: reg.event.title)
     event_url = Function(lambda reg: url_for('events.display', reg.event, _external=True))
-    tags = List(Nested(RegistrationTagExportSchema))
     data = Method('_serialize_data')
 
     def _serialize_data(self, registration):
