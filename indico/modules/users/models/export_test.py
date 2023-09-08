@@ -31,7 +31,7 @@ def test_data_export_request_success_must_have_file_2(db, dummy_user, dummy_file
 
 def test_data_export_request_success_must_have_file_3(db, dummy_user):
     request = DataExportRequest(user=dummy_user, selected_options=[],
-                                state=DataExportRequestState.pending)
+                                state=DataExportRequestState.none)
 
     request.state = DataExportRequestState.success
     with pytest.raises(IntegrityError):

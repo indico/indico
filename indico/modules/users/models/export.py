@@ -16,8 +16,8 @@ from indico.util.i18n import L_
 
 
 class DataExportRequestState(RichIntEnum):
-    __titles__ = [L_('Pending'), L_('Running'), L_('Success'), L_('Failed'), L_('Expired')]
-    pending = 0  # Default value when there is no request
+    __titles__ = [L_('None'), L_('Running'), L_('Success'), L_('Failed'), L_('Expired')]
+    none = 0  # Default value when there is no request
     running = 1
     success = 2
     failed = 3
@@ -25,19 +25,19 @@ class DataExportRequestState(RichIntEnum):
 
 
 class DataExportOptions(RichIntEnum):
-    __titles__ = [L_('Personal data'), L_('Settings'), L_('Minutes & Contributions'), L_('Registrations'),
+    __titles__ = [None, L_('Personal data'), L_('Settings'), L_('Minutes & Contributions'), L_('Registrations'),
                   L_('Room booking data'), L_('Abstracts & Papers'), L_('Survey submissions'),
                   L_('Attachments & Materials'), L_('Editables'), L_('Miscellaneous')]
-    personal_data = 0
-    settings = 1
-    contribs = 2
-    registrations = 3
-    room_booking = 4
-    abstracts_papers = 5
-    survey_submissions = 6
-    attachments = 7
-    editables = 8
-    misc = 9
+    personal_data = 1
+    settings = 2
+    contribs = 3
+    registrations = 4
+    room_booking = 5
+    abstracts_papers = 6
+    survey_submissions = 7
+    attachments = 8
+    editables = 9
+    misc = 10
 
 
 class DataExportRequest(db.Model):
@@ -80,7 +80,7 @@ class DataExportRequest(db.Model):
     state = db.Column(
         PyIntEnum(DataExportRequestState),
         nullable=False,
-        default=DataExportRequestState.pending
+        default=DataExportRequestState.none
     )
     # Whether the export archive exceeded config.MAX_DATA_EXPORT_SIZE
     max_size_exceeded = db.Column(

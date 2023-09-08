@@ -221,7 +221,7 @@ class RHUserDataExport(RHUserBase):
         if req := self.user.data_export_request:
             data = DataExportRequestSchema().dump(req)
         else:
-            data = {'state': DataExportRequestState.pending.name}
+            data = {'state': DataExportRequestState.none.name}
         export_options = [(opt.name, str(opt.title)) for opt in DataExportOptions]
         return WPUserDataExport.render_template('data_export.html', 'data_export', user=self.user,
                                                 export_request=data, export_options=export_options)
