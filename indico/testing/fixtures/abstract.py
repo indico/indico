@@ -68,7 +68,7 @@ def create_abstract_file():
     """Return a callable which lets you create an abstract file."""
     def _create_abstract_file(abstract, filename, content_type, data, **kwargs):
         file_ = AbstractFile(filename=filename, content_type=content_type, abstract=abstract, **kwargs)
-        file_.save(data.encode('utf-8'))
+        file_.save(data.encode())
         return file_
 
     return _create_abstract_file
