@@ -30,7 +30,7 @@ function DataExportForm({onSubmit, exportOptions}) {
       initialValues={{}}
       initialValuesEqual={_.isEqual}
       validate={values => {
-        if (!_.values(values).some(v => v)) {
+        if (!Object.values(values).some(v => v)) {
           return {
             [FORM_ERROR]: Translate.string('At least one option must be selected'),
           };
@@ -108,7 +108,7 @@ function DataExport({userId, request, exportOptions}) {
   const [state, setState] = useState(request.state);
 
   const onSubmit = async data => {
-    const selection = _.keys(_.pickBy(data));
+    const selection = Object.keys(_.pickBy(data));
     let resp;
     try {
       resp = await indicoAxios.post(requestURL(userIdArgs), {options: selection});
