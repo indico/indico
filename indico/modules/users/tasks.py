@@ -170,11 +170,20 @@ def collect_files(export_request):
 
     if DataExportOptions.editables in options:
         for editable in get_editables(user):
-            for revision in editable.revisions:
-                yield from revision.files
+            yield from dedup_editable_files(editable)
 
     if DataExportOptions.registrations in options:
         yield from get_registration_data(user)
+
+
+def dedup_editable_files(editable):
+    """Return deduplicated editable files.
+
+    When a file is not changed between revisions, multiple revisions might refer to
+    the same physical file. We don't want to include duplicate files in the export.
+    """
+    files = {file.file_id: file for revision in editable.revisions for file in revision.files}
+    return files.values()
 
 
 def write_file(zip_file, file):
@@ -201,11 +210,10 @@ def build_storage_path(file):
         prefix = 'papers'
         path = f'{event.id}_{event.title}/{file._contribution.id}_{file.paper.title}'
     else:
-        revision = file.revision
-        editable = revision.editable
+        editable = file.revision.editable
         event = editable.contribution.event
         prefix = f'editables/{editable.type.name}'
-        path = f'{event.id}_{event.title}/{editable.id}_{editable.contribution.title}/revision_{revision.id}'
+        path = f'{event.id}_{event.title}/{editable.id}_{editable.contribution.title}'
 
     path = secure_path(path)
     filename = build_filename(file)

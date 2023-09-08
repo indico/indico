@@ -23,6 +23,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.editing.models.editable import Editable, EditableState, EditableType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
+from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.papers import PaperRevisionState
 from indico.modules.events.registration.models.registrations import Registration
@@ -318,26 +319,33 @@ class AttachmentExportSchema(mm.SQLAlchemyAutoSchema):
 class EditableFileExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevisionFile
-        fields = ('uuid', 'filename', 'md5', 'signed_download_url', 'path')
+        fields = ('filename', 'md5', 'signed_download_url', 'path')
 
+    filename = String(attribute='file.filename')
+    md5 = String(attribute='file.md5')
+    signed_download_url = String(attribute='file.signed_download_url')
     path = Function(lambda file: build_storage_path(file))
+
+
+class EditingRevisionExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EditingRevision
+        fields = ('id', 'created_dt', 'type', 'is_undone', 'comment', 'files')
+
+    type = Enum(RevisionType)
+    comment = String()  # Coerce MarkdownText to string
+    files = List(Nested(EditableFileExportSchema))
 
 
 class EditableExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'contribution_id', 'contribution_title', 'state', 'files')
+        fields = ('id', 'type', 'contribution_id', 'contribution_title', 'state', 'revisions')
 
     type = Enum(EditableType)
     contribution_title = Function(lambda editable: editable.contribution.title)
     state = Enum(EditableState, attribute='latest_revision.state')
-    files = Method('_get_files')
-
-    def _get_files(self, editable):
-        files = []
-        for rev in editable.revisions:
-            files += rev.files
-        return EditableFileExportSchema(many=True).dump(files)
+    revisions = List(Nested(EditingRevisionExportSchema))
 
 
 class SettingsExportSchema(Schema):
