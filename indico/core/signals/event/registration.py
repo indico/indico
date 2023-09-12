@@ -93,8 +93,9 @@ ticket for a registrant.
 ''')
 
 is_field_data_locked = _signals.signal('is-field-data-locked', '''
-Called when resolving whether Indico should let a registrant change a data value
-in their registration.  The participant's `Registration` is passed as `registration`.
+Called when resolving whether Indico should let a data value be modified
+in a registration, or let the corresponding field be deleted.
+The participant's `Registration` is passed as `registration`.
 The `sender` is the `RegistrationFormItem` object.
 
 This signal returns a string containing the reason for the item being locked,

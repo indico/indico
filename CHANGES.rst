@@ -63,6 +63,7 @@ Internal Changes
 - Replace WYSIWYG (rich-text) editor with TinyMCE, due to the license and branding
   requirements of the previous editor (:pr:`5938`)
 - Add a new Indico design system (:pr:`5914`, thanks :user:`foxbunny`)
+  fields on a per-registration basis (:pr:`5424`, :pr:`5924`)
 
 
 ----
