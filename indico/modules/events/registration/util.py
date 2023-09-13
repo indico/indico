@@ -681,6 +681,7 @@ def generate_ticket_qr_code(person):
     checkin_secret = person['registration'].ticket_uuid if not person['is_accompanying'] else ''
     qr_data = {
         'registrant_id': person['id'],
+        'registration_id': person['registration'].id,
         'regform_id': registration.registration_form_id,
         'checkin_secret': checkin_secret,
         'event_id': str(registration.event.id),
