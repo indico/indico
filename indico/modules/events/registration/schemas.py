@@ -54,15 +54,15 @@ class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
                   'is_open', 'registration_count', 'checked_in_count')
 
     is_open = fields.Bool(attribute='is_open')
-    registration_count = fields.Function(lambda regform: len(regform.registrations))
-    checked_in_count = fields.Function(lambda regform: len(regform.checked_in_registrations))
+    registration_count = fields.Int(attribute='existing_registrations_count')
+    checked_in_count = fields.Int(attribute='checked_in_registrations_count')
 
 
 class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Registration
         fields = ('id', 'regform_id', 'event_id', 'full_name', 'email', 'state', 'checked_in', 'checked_in_dt',
-                  'checkin_secret', 'tags', 'registration_date', 'registration_data')
+                  'checkin_secret', 'tags', 'occupied_slots', 'registration_date', 'registration_data')
 
     regform_id = fields.Int(attribute='registration_form_id')
     full_name = fields.Str(attribute='display_full_name')

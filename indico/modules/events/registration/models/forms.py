@@ -545,3 +545,10 @@ def _mappers_configured():
              .correlate_except(Registration)
              .scalar_subquery())
     RegistrationForm.existing_registrations_count = column_property(query, deferred=True)
+
+    query = (select([db.func.coalesce(db.func.sum(Registration.occupied_slots), 0)])
+             .where((Registration.registration_form_id == RegistrationForm.id) &
+                    ~Registration.is_deleted & Registration.checked_in)
+             .correlate_except(Registration)
+             .scalar_subquery())
+    RegistrationForm.checked_in_registrations_count = column_property(query, deferred=True)
