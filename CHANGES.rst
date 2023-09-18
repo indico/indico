@@ -19,6 +19,8 @@ Bugfixes
   thanks :user:`bpedersen2`)
 - Fix accessing the conference overview page when the default conference home page is
   set to a custom page (:pr:`5882`)
+- Show percentages for multi-choice survey answers based on number of answers instead of
+  total number of choices selected (:pr:`5930`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
