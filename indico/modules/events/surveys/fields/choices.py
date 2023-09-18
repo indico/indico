@@ -31,7 +31,7 @@ class SurveySingleChoiceField(_AddUUIDMixin, SingleChoiceField, SurveyField):
         counter = Counter()
         for answer in self.object.answers:
             counter[answer.data] += 1
-        total = sum(counter.values())
+        total = len(self.object.answers)
         options = self.object.field_data['options']
         if counter[None]:
             no_option = {'id': None, 'option': _('No selection')}
@@ -47,7 +47,7 @@ class SurveyMultiSelectField(_AddUUIDMixin, MultiSelectField, SurveyField):
         counter = Counter()
         for answer in self.object.answers:
             counter.update(answer.data)
-        total = sum(counter.values())
+        total = len(self.object.answers)
         options = self.object.field_data['options']
         return {'total': total,
                 'labels': [alpha_enum(val).upper() for val in range(len(options))],
