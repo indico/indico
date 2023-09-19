@@ -8,17 +8,21 @@
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
-from distutils.dist import Distribution
+from contextlib import contextmanager
 from functools import wraps
 from itertools import chain
+from pathlib import Path
 from pkgutil import walk_packages
 
 import click
 from babel.messages import frontend
 from babel.messages.pofile import read_po
 from flask.helpers import get_root_path
+from setuptools import find_packages
+from setuptools.dist import Distribution
 
 from indico.util.console import cformat
 
@@ -28,6 +32,7 @@ def cli():
     os.chdir(os.path.join(get_root_path('indico'), '..'))
 
 
+INDICO_DIR = os.path.join(get_root_path('indico'), '..')
 TRANSLATIONS_DIR = 'indico/translations'
 MESSAGES_POT = os.path.join(TRANSLATIONS_DIR, 'messages.pot')
 MESSAGES_JS_POT = os.path.join(TRANSLATIONS_DIR, 'messages-js.pot')
@@ -35,7 +40,9 @@ MESSAGES_REACT_POT = os.path.join(TRANSLATIONS_DIR, 'messages-react.pot')
 
 DEFAULT_OPTIONS = {
     'init_catalog': {
-        'output_dir': TRANSLATIONS_DIR
+        'input_file': MESSAGES_POT,
+        'output_dir': TRANSLATIONS_DIR,
+        'domain': 'messages'
     },
     'extract_messages': {
         'keywords': 'L_',
@@ -55,6 +62,7 @@ DEFAULT_OPTIONS = {
 
     # JavaScript
     'init_catalog_js': {
+        'input_file': MESSAGES_JS_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-js'
     },
@@ -73,6 +81,7 @@ DEFAULT_OPTIONS = {
 
     # JavaScript / React
     'init_catalog_react': {
+        'input_file': MESSAGES_REACT_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-react'
     },
@@ -84,7 +93,115 @@ DEFAULT_OPTIONS = {
 }
 
 
-def find_packages(path, prefix=''):
+def _get_plugin_options(cmd_name, plugin_dir):
+    return {
+        'init_catalog': {
+            'input_file': _get_messages_pot(plugin_dir),
+            'output_dir': _get_translations_dir(plugin_dir),
+        },
+        'extract_messages': {
+            'output_file': _get_messages_pot(plugin_dir),
+            'mapping_file': 'babel.cfg' if os.path.isfile(os.path.join(plugin_dir, 'babel.cfg')) else '../babel.cfg'
+        },
+        'compile_catalog': {
+            'directory': _get_translations_dir(plugin_dir)
+        },
+        'update_catalog': {
+            'input_file': _get_messages_pot(plugin_dir),
+            'output_dir': _get_translations_dir(plugin_dir),
+        },
+
+        # JavaScript
+        'init_catalog_js': {
+            'input_file': _get_js_messages_pot(plugin_dir),
+            'output_dir': _get_translations_dir(plugin_dir),
+        },
+        'extract_messages_js': {
+            'keywords': '$t gettext ngettext:1,2 pgettext:1c,2 npgettext:1c,2,3',
+            'output_file': _get_js_messages_pot(plugin_dir),
+            'mapping_file': 'babel-js.cfg' if os.path.isfile(os.path.join(plugin_dir, 'babel-js.cfg'))
+                            else '../babel-js.cfg'
+        },
+        'update_catalog_js': {
+            'input_file': _get_js_messages_pot(plugin_dir),
+            'output_dir': _get_translations_dir(plugin_dir),
+        },
+
+        # JavaScript / React
+        'init_catalog_react': {
+            'input_file': _get_react_messages_pot(plugin_dir),
+            'output_dir': _get_translations_dir(plugin_dir),
+        },
+        'update_catalog_react': {
+            'input_file': _get_react_messages_pot(plugin_dir),
+            'output_dir': _get_translations_dir(plugin_dir),
+        },
+    }[cmd_name]
+
+
+@contextmanager
+def _chdir(path):
+    cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(cwd)
+
+
+def _validate_plugin_dir(plugin_dir):
+    if not os.path.exists(os.path.join(plugin_dir, 'setup.py')):
+        raise click.BadParameter(f'no setup.py found in {plugin_dir}.')
+    if not list(Path(plugin_dir).glob('*/translations')):
+        raise click.BadParameter(f'no translations folder found in {plugin_dir}.')
+
+
+def _validate_plugin_dirs(ctx, param, values):
+    for value in values:
+        _validate_plugin_dir(value)
+    return values
+
+
+def _validate_all_plugins_dir(ctx, param, value):
+    plugin_dirs = []
+    for plugin_dir in os.listdir(value):
+        try:
+            _validate_plugin_dir(os.path.join(value, plugin_dir))
+        except click.BadParameter:
+            continue
+        plugin_dirs.append(os.path.join(value, plugin_dir))
+    if not plugin_dirs:
+        raise click.BadParameter(f'{value} does not contain valid plugins or a plugin with a translation directory.')
+    return plugin_dirs
+
+
+def _get_translations_dir(path):
+    if translation_dir := list(Path(path).glob('*/translations')):
+        return translation_dir[0]
+    return None
+
+
+def _get_messages(path, resource_name):
+    if resource_name not in ('messages.pot', 'messages-js.pot', 'messages-react.pot'):
+        return None
+    if translations_dir := _get_translations_dir(path):
+        return os.path.join(translations_dir, resource_name)
+    return None
+
+
+def _get_messages_pot(path):
+    return _get_messages(path, 'messages.pot')
+
+
+def _get_js_messages_pot(path):
+    return _get_messages(path, 'messages-js.pot')
+
+
+def _get_react_messages_pot(path):
+    return _get_messages(path, 'messages-react.pot')
+
+
+def find_indico_packages(path, prefix=''):
     yield prefix
     prefix = prefix + '.'
     for _, name, ispkg in walk_packages(path, prefix):
@@ -92,17 +209,31 @@ def find_packages(path, prefix=''):
             yield name
 
 
-def wrap_distutils_command(command_class):
+def _get_indico_distribution():
+    import indico
+
+    return Distribution({
+        'name': 'indico',
+        'version': indico.__version__,
+        'packages': list(find_indico_packages(indico.__path__, indico.__name__))
+    })
+
+
+def _get_plugin_distribution(plugin_dir):
+    packages = [x for x in find_packages(plugin_dir) if '.' not in x]
+    assert len(packages) == 1
+    return Distribution({
+        'name': packages[0],
+        'packages': packages
+    })
+
+
+def wrap_distutils_command(command_class, plugin_dir=None):
     @wraps(command_class)
     def _wrapper(**kwargs):
 
-        import indico
-
-        command = command_class(Distribution({
-            'name': 'indico',
-            'version': indico.__version__,
-            'packages': list(find_packages(indico.__path__, indico.__name__))
-        }))
+        dist = _get_plugin_distribution(plugin_dir) if plugin_dir else _get_indico_distribution()
+        command = command_class(dist)
 
         for key, val in kwargs.items():
             setattr(command, key, val)
@@ -113,62 +244,241 @@ def wrap_distutils_command(command_class):
     return _wrapper
 
 
-def _make_command(cmd_name):
+def _run_command(cmd_name, extra=None):
     cmd_class = getattr(frontend, re.sub(r'_(js|react)$', '', cmd_name))
-    cmd = click.command(cmd_name.replace('_', '-'))(wrap_distutils_command(cmd_class))
-    for opt, short_opt, description in cmd_class.user_options:
-        long_opt_name = opt.rstrip('=')
-        var_name = long_opt_name.replace('-', '_')
-        opts = ['--' + long_opt_name]
-
-        if short_opt:
-            opts.append('-' + short_opt)
-
-        default = DEFAULT_OPTIONS.get(cmd_name, {}).get(var_name)
-        is_flag = not opt.endswith('=')
-        cmd = click.option(*(opts + [var_name]), is_flag=is_flag, default=default, help=description)(cmd)
-    return cmd
+    options = DEFAULT_OPTIONS.get(cmd_name, {})
+    if extra:
+        options.update(extra)
+    if plugin_dir := options.get('plugin_dir', None):
+        options.update(_get_plugin_options(cmd_name, plugin_dir))
+    cmd = wrap_distutils_command(cmd_class, plugin_dir=plugin_dir)
+    cmd(**options)
 
 
-cmd_list = ['init_catalog', 'extract_messages', 'update_catalog', 'compile_catalog',
-            'init_catalog_js', 'extract_messages_js', 'update_catalog_js',
-            'init_catalog_react', 'update_catalog_react']
+def _common_translation_options(require_js=True, require_locale=False, plugins=False, all_plugins=False):
+    def decorator(fn):
+        fn = click.option('--python', is_flag=True, help='i18n used in python and Jinja code.')(fn)
+        fn = click.option('--react', is_flag=True, help='i18n used in react code.')(fn)
+        if require_js:
+            fn = click.option('--javascript', is_flag=True, help='i18n used in javascript code.')(fn)
+        else:  # the only command that does not require js is compile_catalog which checks the string format at the end
+            fn = click.option('--no-check', is_flag=True, required=False,
+                              help='Skip running the string format validation.')(fn)
+        if require_locale:
+            fn = click.option('--locale', required=True)(fn)
+        if plugins:
+            fn = click.argument('plugin_dirs', required=True, type=click.Path(exists=True, file_okay=False,
+                                                                              resolve_path=True),
+                                nargs=-1, callback=_validate_plugin_dirs)(fn)
+        elif all_plugins:
+            fn = click.argument('plugin_dirs', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+                                callback=_validate_all_plugins_dir)(fn)
+        return fn
+    return decorator
 
 
-for cmd_name in cmd_list:
-    cli.add_command(_make_command(cmd_name))
+def compile_catalog_react(directory=INDICO_DIR):
+    """Compile react catalogs."""
+    translations_dir = _get_translations_dir(directory)
+    try:
+        for locale in os.listdir(translations_dir):
+            po_file = os.path.join(translations_dir, locale, 'LC_MESSAGES', 'messages-react.po')
+            json_file = os.path.join(translations_dir, locale, 'LC_MESSAGES', 'messages-react.json')
+            if not os.path.exists(po_file):
+                continue
+            output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file])
+            json.loads(output)  # just to be sure the JSON is valid
+            with open(json_file, 'wb') as f:
+                f.write(output)
+    except subprocess.CalledProcessError as err:
+        click.secho('Error: ' + err, fg='red', bold=True, err=True)
 
 
-@cli.command()
-def extract_messages_react():
-    output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', 'indico/web/client/', 'indico/modules/'],
-                                     env=dict(os.environ, FORCE_COLOR='1'))
-    with open(MESSAGES_REACT_POT, 'wb') as f:
+def extract_messages_react(directory=INDICO_DIR):
+    """Extract messagges for react."""
+    if directory is INDICO_DIR:
+        client_path = os.path.join('indico', 'web', 'client')
+        module_path = os.path.join('indico', 'modules')
+    else:
+        packages = [x for x in find_packages(directory) if '.' not in x]
+        assert len(packages) == 1
+        client_path = os.path.join(directory, packages[0], 'client')
+        module_path = os.path.join(directory, packages[0], 'modules')
+        if not os.path.exists(client_path) and not os.path.exists(module_path):
+            return
+    with _chdir(INDICO_DIR):
+        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', client_path, module_path],
+                                         env=dict(os.environ, FORCE_COLOR='1'))
+    with open(_get_react_messages_pot(directory), 'wb') as f:
         f.write(output)
 
 
-@cli.command()
-def compile_catalog_react():
-    for locale in os.listdir(TRANSLATIONS_DIR):
-        po_file = os.path.join(TRANSLATIONS_DIR, locale, 'LC_MESSAGES', 'messages-react.po')
-        json_file = os.path.join(TRANSLATIONS_DIR, locale, 'LC_MESSAGES', 'messages-react.json')
-        if not os.path.exists(po_file):
-            continue
-        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file])
-        json.loads(output)  # just to be sure the JSON is valid
-        with open(json_file, 'wb') as f:
-            f.write(output)
+@cli.group('compile', short_help='Catalog compilation command for indico and indico plugins.')
+def compile_catalog():
+    """Catalog compilation command for indico and indico plugins."""
 
 
-@cli.command()
-def check_format_strings():
-    """Check whether format strings match.
+@cli.group('extract', short_help='Message extraction command for indico and indico plugins.')
+def extract_messages():
+    """Message extraction command for indico and indico plugins."""
 
-    This helps finding cases where e.g. the original string uses
-    ``{error}`` but the translation uses ``{erro}``, resulting
-    in errors when using the translated string.
+
+@cli.group('init', short_help='New catalog initialization command for indico and indico plugins.')
+def init_catalog():
+    """Catalog initialization command for indico and indico plugin.
+
+    The sub commands take the new locale to be initialized as argument.
     """
-    root_path = 'indico/translations'
+
+
+@cli.group('update', short_help='Catalog merging command for indico and indico plugins.')
+def update_catalog():
+    """Catalog merging command for indico and indico plugins."""
+
+
+def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
+    extra = {}
+    if locale:
+        extra['locale'] = locale
+    if not no_check:
+        if not _check_format_strings():
+            click.secho('Exiting compile command for indico due to invalid format strings.', fg='red', bold=True,
+                        err=True)
+            sys.exit(1)
+    try:
+        if python:
+            _run_command(babel_cmd, extra=extra)
+        if javascript:
+            _run_command(f'{babel_cmd}_js', extra=extra)
+        if react:
+            if babel_cmd == 'compile_catalog':
+                compile_catalog_react()
+            elif babel_cmd == 'extract_messages':
+                extract_messages_react()
+            else:
+                _run_command(f'{babel_cmd}_react', extra=extra)
+    except Exception as err:
+        click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
+
+
+def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir):
+    extra = {}
+    if locale:
+        extra['locale'] = locale
+    extra['plugin_dir'] = plugin_dir
+
+    with _chdir(plugin_dir):
+        click.secho(f'plugin: {plugin_dir}', fg='white', bold=True)
+        if not no_check:
+            translations_dir = _get_translations_dir(plugin_dir)
+            if not _check_format_strings(translations_dir):
+                click.secho(f'Exiting compile command for {plugin_dir} due to invalid format strings.', fg='red',
+                            bold=True, err=True)
+                return
+        try:
+            if python:
+                _run_command(babel_cmd, extra=extra)
+            if javascript:
+                _run_command(f'{babel_cmd}_js', extra=extra)
+            if react:
+                if babel_cmd == 'compile_catalog':
+                    compile_catalog_react(plugin_dir)
+                elif babel_cmd == 'extract_messages':
+                    extract_messages_react(plugin_dir)
+                else:
+                    _run_command(f'{babel_cmd}_react', extra=extra)
+        except Exception as err:
+            click.secho(f'Error running {babel_cmd} for {plugin_dir} - {err}', fg='red', bold=True, err=True)
+
+
+def _command(**kwargs):
+    babel_cmd = kwargs.get('babel_cmd')
+    python = kwargs.get('python')
+    javascript = kwargs.get('javascript')
+    react = kwargs.get('react')
+    locale = kwargs.get('locale')
+    plugin_dirs = kwargs.get('plugin_dirs')
+    no_check = kwargs.get('no_check', True)
+
+    if not (python or react or javascript):
+        python = react = javascript = True
+        if babel_cmd == 'compile_catalog':
+            javascript = False
+
+    if not plugin_dirs:
+        _indico_command(babel_cmd, python, javascript, react, locale, no_check)
+    else:
+        for plugin_dir in plugin_dirs:
+            _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir)
+
+
+def _make_command(group, cmd_name, babel_cmd, func, **kwargs):
+    cmd_group = group.command(cmd_name, short_help=f'Perform {babel_cmd} operation on {cmd_name}')
+
+    @_common_translation_options(**kwargs)
+    def wrapper(**kwargs):
+        func(babel_cmd=babel_cmd, **kwargs)
+
+    return cmd_group(wrapper)
+
+
+_make_command(compile_catalog, 'indico', 'compile_catalog', _command, require_js=False)
+_make_command(extract_messages, 'indico', 'extract_messages', _command)
+_make_command(update_catalog, 'indico', 'update_catalog', _command)
+_make_command(init_catalog, 'indico', 'init_catalog', _command, require_locale=True)
+
+_make_command(compile_catalog, 'plugins', 'compile_catalog', _command, require_js=False,
+              plugins=True)
+_make_command(extract_messages, 'plugins', 'extract_messages', _command, plugins=True)
+_make_command(update_catalog, 'plugins', 'update_catalog', _command, plugins=True)
+_make_command(init_catalog, 'plugins', 'init_catalog', _command, require_locale=True,
+              plugins=True)
+
+_make_command(compile_catalog, 'all-plugins', 'compile_catalog', _command, require_js=False,
+              all_plugins=True)
+_make_command(extract_messages, 'all-plugins', 'extract_messages', _command, all_plugins=True)
+_make_command(update_catalog, 'all-plugins', 'update_catalog', _command, all_plugins=True)
+_make_command(init_catalog, 'all-plugins', 'init_catalog', _command, require_locale=True,
+              all_plugins=True)
+
+
+@cli.command(short_help='Push .pot files to Transifex.')
+def push():
+    """Push .pot files to Transifex."""
+    try:
+        subprocess.run(['tx', 'push', '-s'], check=True)
+    except subprocess.CalledProcessError:
+        click.secho('Error pushing to transifex ', fg='red', bold=True, err=True)
+
+
+@cli.command(short_help='Pull translated .po files from Transifex.')
+@click.argument('languages', nargs=-1, required=False)
+def pull(languages):
+    """Pull translations from Transifex.
+
+    Pulls only the language codes specified in `languages` if present.
+    If no `languages`, it pulls all the languages currently available in the translations folder.
+    To pull a new language available on Transifex, simply pass the new language code in the argument.
+    """
+    if not languages:
+        languages = [d for d in os.listdir(TRANSLATIONS_DIR) if os.path.isdir(os.path.join(TRANSLATIONS_DIR, d))]
+    try:
+        for language in languages:
+            subprocess.run(['tx', 'pull', '-l', language, '-f'], check=True)
+            click.secho(f'Translations updated for {language}.', fg='green', bold=True)
+    except subprocess.CalledProcessError:
+        click.secho('Error pulling from transifex', fg='red', bold=True, err=True)
+    finally:
+        language_renames = {'zh_CN.GB2312': 'zh_Hans_CN'}  # other lang codes requiring rename should be added here
+        languages = set(languages) & set(language_renames.keys())
+        for code in languages:
+            if os.path.exists(os.path.join(TRANSLATIONS_DIR, code)):
+                shutil.rmtree(os.path.join(TRANSLATIONS_DIR, language_renames[code]))
+                shutil.move(os.path.join(TRANSLATIONS_DIR, code),
+                            os.path.join(TRANSLATIONS_DIR, language_renames[code]))
+
+
+def _check_format_strings(root_path='indico/translations'):
     paths = set()
     for root, dirs, files in os.walk(root_path):
         for file in files:
@@ -185,6 +495,18 @@ def check_format_strings():
                            .format(item['orig'], item['trans'],
                                    list(item['orig_placeholders']), list(item['trans_placeholders'])))
             click.echo()
+    return all_valid
+
+
+@cli.command()
+def check_format_strings():
+    """Check whether format strings match.
+
+    This helps finding cases where e.g. the original string uses
+    ``{error}`` but the translation uses ``{erro}``, resulting
+    in errors when using the translated string.
+    """
+    all_valid = _check_format_strings()
     if all_valid:
         click.secho('No issues found!', fg='green', bold=True)
     sys.exit(0 if all_valid else 1)

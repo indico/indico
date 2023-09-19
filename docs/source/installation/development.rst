@@ -162,8 +162,7 @@ To build the locales, use:
 
 .. code-block:: shell
 
-    indico i18n compile-catalog
-    indico i18n compile-catalog-react
+    indico i18n compile indico
 
 .. _run-dev:
 

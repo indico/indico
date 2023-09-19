@@ -160,7 +160,7 @@ jobs:
 
       - name: Try extracting i18n strings (Python)
         if: success() || failure()
-        run: indico i18n extract-messages
+        run: indico i18n extract indico
 
       - name: Try extracting i18n strings (JS)
         if: success() || failure()
