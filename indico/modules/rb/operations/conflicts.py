@@ -28,8 +28,14 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     rooms_conflicting_candidates = defaultdict(set)
     skip_conflicts_with = skip_conflicts_with or []
 
+    print("hit get_rooms_conflicts")
+    print(f"{start_dt=} {end_dt=}")
+
+    print(f"{start_dt=} {end_dt=} {repeat_frequency=} {repeat_interval=} {recurrence_weekdays=}")
+
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
                                                      recurrence_weekdays)
+    print(f"{candidates=}")
     room_ids = [room.id for room in rooms]
     query = (ReservationOccurrence.query
              .filter(Reservation.room_id.in_(room_ids),

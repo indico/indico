@@ -136,29 +136,29 @@ def test_iter_start_time_daily(interval, days_elapsed, expected_length):
             assert day.date() == date.today() + relativedelta(days=i)
 
 
-@pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
-    (0, 0,  None),
-    (1, 0,  1),
-    (1, 7,  2),  # !!!
-    (1, 21, 4),
-    (2, 7,  1),
-    (2, 14, 2),
-    (2, 42, 4),
-    (3, 14, 1),
-    (3, 21, 2),
-    (3, 63, 4),
-    (4, 0,  1),
-    (4, 27, 1),
-    (4, 28, 2),
-    (4, 83, 3),
-    (4, 84, 4),
+@pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length', 'recurrence_weekdays'), (
+    (0, 0,  None, []),
+    (1, 0,  1, []),
+    (1, 7,  2, []),
+    (1, 21, 4, []),
+    (2, 7,  1, []),
+    (2, 14, 2, []),
+    (2, 42, 4, []),
+    (3, 14, 1, []),
+    (3, 21, 2, []),
+    (3, 63, 4, []),
+    (4, 0,  1, []),
+    (4, 27, 1, []),
+    (4, 28, 2, []),
+    (4, 83, 3, []),
+    (4, 84, 4, []),
 ))
-def test_iter_start_time_weekly(interval, days_elapsed, expected_length):
+def test_iter_start_time_weekly(interval, days_elapsed, expected_length, recurrence_weekdays):
     assert days_elapsed >= 0
     params = {'start': date.today() + relativedelta(hour=8),
               'end': date.today() + relativedelta(days=days_elapsed, hour=17),
               'repetition': (RepeatFrequency.WEEK, interval),
-              'recurrence_weekdays': []}  # !!!
+              'recurrence_weekdays': recurrence_weekdays}
     if expected_length is None:
         with pytest.raises(IndicoError):
             ReservationOccurrence.iter_start_time(**params)
@@ -169,16 +169,17 @@ def test_iter_start_time_weekly(interval, days_elapsed, expected_length):
             assert day.date() == date.today() + relativedelta(weeks=i * interval)
 
 
-@pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
-    (0, 0,  None),
-    (1, 0,  1),
-    (1, 40, 2)
+@pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length', 'recurrence_weekdays'), (
+    (0, 0,  None, []),
+    (1, 0,  1, []),
+    (1, 40, 2, [])
 ))
-def test_iter_start_time_monthly(interval, days_elapsed, expected_length):
+def test_iter_start_time_monthly(interval, days_elapsed, expected_length, recurrence_weekdays):
     assert days_elapsed >= 0
     params = {'start': date.today() + relativedelta(hour=8),
               'end': date.today() + relativedelta(days=days_elapsed, hour=17),
-              'repetition': (RepeatFrequency.MONTH, interval)}
+              'repetition': (RepeatFrequency.MONTH, interval),
+              'recurrence_weekdays': recurrence_weekdays}
     if expected_length is None:
         with pytest.raises(IndicoError):
             ReservationOccurrence.iter_start_time(**params)
@@ -192,8 +193,7 @@ def test_iter_start_time_monthly(interval, days_elapsed, expected_length):
 def test_iter_start_time_monthly_5th_monday_is_always_last():
     start_dt = date(2014, 9, 29) + relativedelta(hour=8)  # 5th monday of september
     end_dt = start_dt + relativedelta(days=100, hour=17)
-    params = {'start': start_dt, 'end': end_dt, 'repetition': (RepeatFrequency.MONTH, 1)}
-
+    params = {'start': start_dt, 'end': end_dt, 'repetition': (RepeatFrequency.MONTH, 1), 'recurrence_weekdays': []}
     days = list(ReservationOccurrence.iter_start_time(**params))
     assert len(days) == 4
     assert days[1].date() == date(2014, 10, 27)  # 4th monday of october
