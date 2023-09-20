@@ -16,6 +16,7 @@ import {useHistory} from 'react-router';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import {Message} from 'semantic-ui-react';
 
+import {ManagementPageBackButton} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {routerPathFromFlask, useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios} from 'indico/utils/axios';
@@ -63,14 +64,11 @@ function reducer(state, action) {
 
 function EditTemplatePane({templates, dispatch, targetLocator}) {
   const templateId = useNumericParam('template_id');
-  const history = useHistory();
 
   const saveTemplate = async data => {
     try {
       await indicoAxios.patch(editTemplateURL({template_id: templateId, ...targetLocator}), data);
       dispatch({type: 'UPDATE_TEMPLATE', id: templateId, changes: data});
-      // back to list of templates
-      history.push(templateListURL(targetLocator));
     } catch ({
       response: {
         data: {webargs_errors: errors},
@@ -81,11 +79,14 @@ function EditTemplatePane({templates, dispatch, targetLocator}) {
   };
 
   return (
-    <TemplatePane
-      targetLocator={targetLocator}
-      template={templates.find(tpl => tpl.id === templateId)}
-      onSubmit={saveTemplate}
-    />
+    <>
+      <ManagementPageBackButton url={templateListURL(targetLocator)} />
+      <TemplatePane
+        targetLocator={targetLocator}
+        template={templates.find(tpl => tpl.id === templateId)}
+        onSubmit={saveTemplate}
+      />
+    </>
   );
 }
 
