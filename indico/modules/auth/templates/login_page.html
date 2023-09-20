@@ -2,11 +2,28 @@
 {% from 'auth/_login_form.html' import login_form %}
 {% from 'message_box.html' import message_box %}
 
+{% block head %}
+    {% set external_providers = providers|selectattr('is_external')|sort(attribute='title') %}
+    {% if external_providers %}
+        <style>
+        {% for provider in external_providers %}
+            {% if provider.settings.get('logo_url', None) %}
+            .login-page .login-providers .i-button.external-provider-{{ provider.name }} {
+                background-image: url('{{ provider.settings['logo_url'] }}');
+                background-repeat: no-repeat;
+            }
+            {% endif %}
+        {% endfor %}
+        </style>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <div class="centered-column">
+        {%- set logo_url = indico_config.LOGIN_LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico.png') -%}
         {% if active_provider %}
             <div class="login-container clearfix">
-                <img class="header-logo" src="{{ indico_config.IMAGES_BASE_URL }}/logo_indico.png">
+                <img class="header-logo" src="{{ logo_url }}">
                 {% if login_reason %}
                     <div class="login-reason-box">
                         {{ login_reason }}
@@ -42,9 +59,16 @@
                     {% endfor %}
                 </div>
             {% endif %}
+            {% if indico_config.LOCAL_IDENTITIES and indico_config.LOCAL_REGISTRATION %}
+                <p class="register">
+                    {% trans url=url_for('.register', next=request.args.get('next')) -%}
+                        If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
+                    {%- endtrans %}
+                </p>
+            {% endif %}
         {% else %}
             <div class="login-container clearfix">
-                <img class="header-logo" src="{{ indico_config.IMAGES_BASE_URL }}/logo_indico.png">
+                <img class="header-logo" src="{{ logo_url }}">
                 {% include 'flashed_messages.html' %}
             </div>
         {% endif %}
@@ -64,13 +88,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-        {% if indico_config.LOCAL_IDENTITIES and indico_config.LOCAL_REGISTRATION %}
-            <p class="register">
-                {% trans url=url_for('.register', next=request.args.get('next')) -%}
-                    If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
-                {%- endtrans %}
-            </p>
-        {% elif indico_config.EXTERNAL_REGISTRATION_URL %}
+        {% if indico_config.EXTERNAL_REGISTRATION_URL %}
             <p class="register">
                 {% trans url=indico_config.EXTERNAL_REGISTRATION_URL -%}
                     If you do not have an account yet, you can <a href="{{ url }}" target="_blank" rel="noopener noreferrer">create one here</a>.
@@ -81,8 +99,9 @@
             <a class="icon-prev" href="/">{% trans %}Back{% endtrans %}</a>
         </div>
 
-        {% include 'footer.html' %}
     </div>
+
+    {% include 'footer.html' %}
 
     <script>
         (function() {

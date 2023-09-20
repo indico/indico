@@ -57,6 +57,7 @@ DEFAULTS = {
     'LOCAL_REGISTRATION': True,
     'LOCAL_GROUPS': True,
     'LOGGING_CONFIG_FILE': 'logging.yaml',
+    'LOGIN_LOGO_URL': None,
     'LOGO_URL': None,
     'LOG_DIR': '/opt/indico/log',
     'MAX_UPLOAD_FILES_TOTAL_SIZE': 0,
