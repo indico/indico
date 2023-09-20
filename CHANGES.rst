@@ -58,6 +58,8 @@ Internal Changes
   (:pr:`5734`)
 - Add ``event.is_field_data_locked`` signal, allowing plugins to lock registration form
   fields on a per-registration basis (:pr:`5424`)
+- Replace WYSIWYG (rich-text) editor with TinyMCE, due to the license and branding
+  requirements of the previous editor (:pr:`5938`)
 
 
 ----

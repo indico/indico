@@ -46,7 +46,7 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.fields.simple import IndicoLinkListField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
-from indico.web.forms.widgets import CKEditorWidget, PrefixedTextWidget, SwitchWidget
+from indico.web.forms.widgets import PrefixedTextWidget, SwitchWidget, TinyMCEWidget
 
 
 CLONE_REPEAT_CHOICES = (
@@ -58,7 +58,7 @@ CLONE_REPEAT_CHOICES = (
 
 class EventDataForm(IndicoForm):
     title = StringField(_('Event title'), [DataRequired()])
-    description = TextAreaField(_('Description'), widget=CKEditorWidget(images=True, html_embed=True, height=250))
+    description = TextAreaField(_('Description'), widget=TinyMCEWidget(images=True, height=250))
     url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
 
     def __init__(self, *args, event, **kwargs):
@@ -196,7 +196,7 @@ class EventContactInfoForm(IndicoForm):
                                       sortable=True)
     organizer_info = TextAreaField(_('Organizers'))
     additional_info = TextAreaField(_('Additional information'),
-                                    widget=CKEditorWidget(images=True, height=250),
+                                    widget=TinyMCEWidget(images=True, height=250),
                                     description=_('This text is displayed on the main conference page.'))
 
     def __init__(self, *args, event, **kwargs):
@@ -241,7 +241,7 @@ class EventPrivacyForm(IndicoForm):
     privacy_policy_urls = IndicoLinkListField(_('External page'),
                                               description=_('List of URLs to external pages containing privacy '
                                                             'notices.'))
-    privacy_policy = TextAreaField(_('Text'), widget=CKEditorWidget(),
+    privacy_policy = TextAreaField(_('Text'), widget=TinyMCEWidget(),
                                    description=_('Only used if no URL is provided'))
 
     def validate_privacy_policy(self, field):

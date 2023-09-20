@@ -37,7 +37,7 @@ from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import (HiddenFieldList, IndicoEmailRecipientsField, IndicoMultipleTagSelectField,
                                             IndicoParticipantVisibilityField)
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
-from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 
 def _check_if_payment_required(form, field):
@@ -188,7 +188,7 @@ class InvitationFormBase(IndicoForm):
     _email_fields = ('email_from', 'email_subject', 'email_body')
     email_from = SelectField(_('From'), [DataRequired()])
     email_subject = StringField(_('Email subject'), [DataRequired()])
-    email_body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget())
+    email_body = TextAreaField(_('Email body'), [DataRequired()], widget=TinyMCEWidget())
     skip_moderation = BooleanField(_('Skip moderation'), widget=SwitchWidget(),
                                    description=_("If enabled, the user's registration will be approved automatically."))
 
@@ -273,7 +273,7 @@ class EmailRegistrantsForm(IndicoForm):
                                   description=_('Beware, addresses in this field will receive one mail per '
                                                 'registrant.'))
     subject = StringField(_('Subject'), [DataRequired()])
-    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget())
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=TinyMCEWidget())
     recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
                                    description=_('Send copy of each email to my mailbox'))

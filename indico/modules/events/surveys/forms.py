@@ -19,7 +19,7 @@ from indico.util.placeholders import get_missing_placeholders, render_placeholde
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf, ValidationError
-from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 
 class SurveyForm(IndicoForm):
@@ -114,7 +114,7 @@ class ImportQuestionnaireForm(IndicoForm):
 class InvitationForm(IndicoForm):
     from_address = SelectField(_('From'), [DataRequired()])
     subject = StringField(_('Subject'), [DataRequired()])
-    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget())
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=TinyMCEWidget())
     recipients = EmailListField(_('Recipients'), [DataRequired()], description=_('One email address per line.'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget())
     submitted = HiddenField()

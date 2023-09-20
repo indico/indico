@@ -20,7 +20,7 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EditableFileField, FileField, IndicoEnumSelectField, IndicoProtectionField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.validators import HiddenUnless, UsedIf
-from indico.web.forms.widgets import CKEditorWidget, ColorPickerWidget, SwitchWidget
+from indico.web.forms.widgets import ColorPickerWidget, SwitchWidget, TinyMCEWidget
 
 
 THEMES = [('', _('No theme selected')),
@@ -197,7 +197,7 @@ class MenuLinkForm(MenuUserEntryFormBase):
 
 
 class MenuPageForm(MenuUserEntryFormBase):
-    html = TextAreaField(_('Content'), [DataRequired()], widget=CKEditorWidget(images=True, html_embed=True))
+    html = TextAreaField(_('Content'), [DataRequired()], widget=TinyMCEWidget(images=True))
 
     def __init__(self, *args, ckeditor_upload_url, **kwargs):
         self.ckeditor_upload_url = ckeditor_upload_url

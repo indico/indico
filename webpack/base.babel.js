@@ -256,6 +256,11 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
         {
           oneOf: [
             {
+              // tinymce content css is imported as an inline string
+              test: /tinymce\/.*\/content\.css$/i,
+              use: ['css-loader'],
+            },
+            {
               test: /\.css$/,
               use: [
                 {

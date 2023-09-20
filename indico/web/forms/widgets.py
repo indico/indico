@@ -5,8 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import itertools
 import re
 
+from flask import current_app
 from markupsafe import Markup
 from wtforms.widgets import CheckboxInput, HiddenInput
 
@@ -124,6 +126,27 @@ class CKEditorWidget(JinjaWidget):
 
     def __init__(self, *, images=False, html_embed=False, height=475):
         super().__init__('forms/ckeditor_widget.html', images=images, html_embed=html_embed, height=height)
+
+
+class TinyMCEWidget(JinjaWidget):
+    """Render a TinyMCE WYSIWYG editor.
+
+    :param images: Whether to allow images.
+    :param html_embed: Whether to enable raw HTML embedding.
+    :param height: The height of the editor.
+
+    If the form has a ``ckeditor_upload_url`` attribute and images are enabled,
+    the editor will allow pasting/selecting images and upload them using that URL.
+    """
+
+    def __init__(self, *, images=False, height=600):
+        super().__init__('forms/tinymce_widget.html', images=images, height=height)
+
+    def __call__(self, field, **kwargs):
+        # Include our usual CSS as content CSS in the editor iframe
+        bundles = ('common.css', 'react.css', 'semantic-ui.css', 'jquery.css', 'main.css')
+        content_css = list(itertools.chain.from_iterable(current_app.manifest[x] for x in bundles))
+        return super().__call__(field, **kwargs, content_css=content_css)
 
 
 class SwitchWidget(JinjaWidget):
