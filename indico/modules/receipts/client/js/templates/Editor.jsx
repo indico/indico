@@ -83,7 +83,6 @@ VariablesPopup.propTypes = {
 export default function Editor({template, onChange, onSubmit, editorHeight, targetLocator}) {
   const [currentFileExt, setFileExt] = useState('html');
   const codeValues = _.pick(template, ['html', 'css', 'yaml']);
-
   const editorRef = useRef(null);
 
   useEffect(() => {
@@ -154,8 +153,13 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
                         onChange({...values, [fileExt]: value});
                         input.onChange(value);
                       }}
-                      onMount={editor => {
+                      onMount={(editor, monaco) => {
                         editorRef.current = editor;
+                        editor.addCommand(
+                          // eslint-disable-next-line no-bitwise
+                          monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
+                          handleSubmit
+                        );
                       }}
                       options={{minimap: {enabled: false}}}
                     />
@@ -168,7 +172,7 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
             </FinalField>
           ))}
           <Form.Group styleName="buttons">
-            <FinalSubmitButton label={Translate.string('Submit')} />
+            <FinalSubmitButton label={Translate.string('Save')} />
             <Link to={templateListURL(targetLocator)} className="ui button">
               <Translate>Cancel</Translate>
             </Link>
