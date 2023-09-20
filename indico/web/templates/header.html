@@ -9,8 +9,12 @@
     <div class="flexrow f-j-space-between f-a-start">
         {% block logo %}
             {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.svg') -%}
-            <a style="min-height: 60px;" href="{{ url_for_index() }}">
-                <img class="header-logo" src="{{ logo_url }}">
+            <a id="header-logo"
+               href="{{ url_for_index() }}"
+               aria-label="{% trans %}Indico main page{% endtrans %}"
+               aria-current="{{ url_for_index() == request.path }}"
+            >
+                <img class="header-logo" src="{{ logo_url }}" alt="{% trans %}Indico logo{% endtrans %}">
             </a>
         {% endblock %}
 

@@ -31,6 +31,7 @@ Improvements
 - Include current language in page metadata (:pr:`5894`, thanks :user:`foxbunny`)
 - Add keyboard shortcut (CTRL-SHIFT-A) to toggle room booking admin override (:pr:`5909`)
 - Make language list accessible (:issue:`5899`, :pr:`5903`, thanks :user:`foxbunny`)
+- Add accessible label to the main page link (:issue:`5934`, :pr:`5935`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
