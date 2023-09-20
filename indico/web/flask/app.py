@@ -19,7 +19,7 @@ from packaging.version import Version
 from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.pool import QueuePool
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 from werkzeug.local import LocalProxy
 from werkzeug.middleware.proxy_fix import ProxyFix
 from wtforms.widgets import html_params
@@ -33,6 +33,7 @@ from indico.core.config import IndicoConfig, config, load_config
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.errors import NoReportError
 from indico.core.limiter import limiter
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
@@ -331,7 +332,7 @@ def extend_url_map(app):
 
 def add_handlers(app):
     app.before_request(canonicalize_url)
-    app.before_request(reject_nuls)
+    app.before_request(reject_nuls_or_too_large_content)
     app.after_request(inject_current_url)
     app.register_blueprint(errors_bp)
 
@@ -367,10 +368,13 @@ def canonicalize_url():
         return render_template('bad_url_error.html'), 404
 
 
-def reject_nuls():
-    for key, values in request.values.lists():
-        if '\0' in key or any('\0' in x for x in values):
-            raise BadRequest('NUL byte found in request data')
+def reject_nuls_or_too_large_content():
+    try:
+        for key, values in request.values.lists():
+            if '\0' in key or any('\0' in x for x in values):
+                raise BadRequest('NUL byte found in request data')
+    except RequestEntityTooLarge:
+        raise NoReportError('Request content too large')
 
 
 def inject_current_url(response):
