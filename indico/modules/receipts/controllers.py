@@ -196,8 +196,8 @@ class RHAllCategoryTemplates(AllTemplateMixin, RHManageCategoryBase):
 class RHGetDummyData(ReceiptAreaMixin, RHAdminBase):
     @use_kwargs({
         'template_id': fields.Integer(load_default=None)
-    })
-    def _process(self, template_id=None):
+    }, location='query')
+    def _process(self, template_id):
         if template_id:
             template = ReceiptTemplate.get_or_404(template_id)
             custom_fields = template.custom_fields
