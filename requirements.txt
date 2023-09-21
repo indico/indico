@@ -74,7 +74,7 @@ click-repl==0.3.0
     # via celery
 colorclass==2.2.2
     # via -r requirements.in
-cryptography==41.0.3
+cryptography==41.0.4
     # via authlib
 decorator==5.1.1
     # via ipython
