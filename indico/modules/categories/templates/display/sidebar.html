@@ -66,9 +66,11 @@
         <ul class="main-page-list">
             {% for event in upcoming_events %}
                 <li>
-                    <a href="{{ event.url }}" class="title" title="{{ event.title|striptags }}" >
-                        {{ event.title|striptags }}
-                    </a>
+                    {% block upcoming_title scoped %}
+                        <a href="{{ event.url }}" class="title" title="{{ event.title|striptags }}" >
+                            {{ event.title|striptags }}
+                        </a>
+                    {% endblock %}
                     <span class="timing">
                         {% if happening_now(event) %}
                             {% trans time=event.end_dt|format_pretty_date(tzinfo=tzinfo) -%}
