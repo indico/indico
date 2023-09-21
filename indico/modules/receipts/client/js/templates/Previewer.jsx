@@ -11,10 +11,14 @@ import React, {useEffect, useState} from 'react';
 import {pdfjs, Document, Page} from 'react-pdf';
 import {Loader, Message, Pagination} from 'semantic-ui-react';
 
-import './TemplatePane.module.scss';
-
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+import './TemplatePane.module.scss';
+
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const MESSAGE_HEADERS = {

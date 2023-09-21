@@ -63,7 +63,7 @@ function VariablesPopup({targetLocator, children}) {
     url: dummyDataURL(targetLocator),
   });
 
-  return data ? (
+  return data && children ? (
     <Popup trigger={<a>{children}</a>} on="click">
       <Popup.Header>
         <Translate>Template Variables</Translate>
@@ -77,7 +77,11 @@ function VariablesPopup({targetLocator, children}) {
 
 VariablesPopup.propTypes = {
   targetLocator: targetLocatorSchema.isRequired,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
+};
+
+VariablesPopup.defaultProps = {
+  children: null,
 };
 
 export default function Editor({template, onChange, onSubmit, editorHeight, targetLocator}) {
