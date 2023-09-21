@@ -1,5 +1,9 @@
 {% macro category_list(parent_category) %}
     {% if parent_category.children %}
+        {% set category_title = parent_category.title %}
+        <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
+            {%- trans %}Categories in {{ category_title }}{% endtrans -%}
+        </h2>
         <ul class="category-list" data-subcat-info-url="{{ url_for('.subcat_info', parent_category) }}">
             {% for category in parent_category.children %}
                 <li>

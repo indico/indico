@@ -1,0 +1,35 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use "base/palette" as *;
+@use "base/utilities";
+
+ind-bypass-block-links {
+  // FIXME: Local reset, should be fixed in the base
+  * {
+    box-sizing: border-box;
+  }
+
+  font-size: 1.5em;
+}
+
+ind-bypass-block-links:not(:focus-within) {
+  @extend %visually-hidden;
+}
+
+ind-bypass-block-links:focus-within {
+  --color-bypass-block-links-bg: #{$postit-yellow};
+  --color-bypass-block-links-fg: #{$dark-black};
+
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 1em;
+
+  background: var(--color-bypass-block-links-bg);
+  color: var(--color-bypass-block-links-fg);
+}

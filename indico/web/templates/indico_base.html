@@ -59,6 +59,7 @@
 </head>
 <body data-user-id="{{ session.user.id if session.user else 'null' }}"
       data-debug="{{ config.DEBUG|tojson|forceescape }}">
+    <ind-bypass-block-links></ind-bypass-block-links>
     {% block html_body %}
         {#-
         XXX: Using a block and inheritance would be nicer but for now this
