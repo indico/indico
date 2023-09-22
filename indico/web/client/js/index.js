@@ -11,6 +11,8 @@ import './legacy/presentation.js';
 import './legacy/indico.js';
 import './legacy/timetable.js';
 
+import './custom_elements/ind_bypass_block_links.js';
+
 import '../styles/screen.scss';
 import '../styles/ckeditor.scss';
 import 'indico-sui-theme/semantic.css';

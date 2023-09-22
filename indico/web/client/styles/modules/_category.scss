@@ -691,3 +691,7 @@ ul.category-resource-qtip {
     margin-top: 0;
   }
 }
+
+#category-list {
+  @extend %visually-hidden;
+}
