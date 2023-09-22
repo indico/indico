@@ -10,7 +10,7 @@ from marshmallow.fields import DateTime, Dict, Enum, Function, List, Method, Nes
 from speaklater import _LazyString
 
 from indico.core.marshmallow import mm
-from indico.core.oauth.models.applications import OAuthApplication
+from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
 from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.modules.api.models.keys import APIKey
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
@@ -68,6 +68,14 @@ class OAuthApplicationExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = OAuthApplication
         fields = ('name', 'description')
+
+
+class OAuthApplicationUserLinkExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = OAuthApplicationUserLink
+        fields = ('scopes', 'application')
+
+    application = Nested(OAuthApplicationExportSchema)
 
 
 class IdentityExportSchema(mm.SQLAlchemyAutoSchema):
@@ -284,11 +292,7 @@ class MiscDataExportSchema(Schema):
     personal_tokens = List(Nested(PersonalTokenExportSchema))
     api_key = Nested(APIKeyExportSchema)
     old_api_keys = List(Nested(APIKeyExportSchema))
-    oauth_applications = Method('_serialize_oauth_apps')
-
-    def _serialize_oauth_apps(self, user):
-        oauth_apps = [link.application for link in user.oauth_app_links]
-        return OAuthApplicationExportSchema(many=True).dump(oauth_apps)
+    oauth_applications = List(Nested(OAuthApplicationUserLinkExportSchema), attribute='oauth_app_links')
 
 
 class AttachmentFileExportSchema(mm.SQLAlchemyAutoSchema):
