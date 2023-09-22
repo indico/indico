@@ -173,10 +173,10 @@ def test_attachment_export_schema(snapshot, dummy_attachment):
 
 
 @pytest.mark.usefixtures('dummy_editing_revision_file')
-def test_editable_export_schema(snapshot, dummy_paper):
+def test_editable_export_schema(snapshot, dummy_editable):
     from indico.modules.users.export_schemas import EditableExportSchema
 
-    data = EditableExportSchema().dump(dummy_paper)
+    data = EditableExportSchema().dump(dummy_editable)
     _assert_json_snapshot(snapshot, data, 'editable_export_schema.json')
 
 

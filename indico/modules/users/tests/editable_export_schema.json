@@ -1,4 +1,22 @@
 {
+  "contribution_id": 420,
   "contribution_title": "Dummy Contribution",
-  "revisions": []
+  "id": 420,
+  "revisions": [
+    {
+      "comment": "",
+      "created_dt": "2022-05-22T12:00:00+00:00",
+      "files": [
+        {
+          "filename": "dummy_file.txt",
+          "md5": "d659f3992a4861fbba98e728e8ab5d8e",
+          "path": "editables/paper/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt"
+        }
+      ],
+      "id": 420,
+      "is_undone": false,
+      "type": "acceptance"
+    }
+  ],
+  "type": "paper"
 }
