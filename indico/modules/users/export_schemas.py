@@ -60,7 +60,7 @@ class PersonalTokenExportSchema(mm.SQLAlchemyAutoSchema):
 class APIKeyExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = APIKey
-        fields = ('is_active', 'is_blocked', 'is_persistent_allowed', 'created_dt', 'lat_used_dt', 'last_used_ip',
+        fields = ('is_active', 'is_blocked', 'is_persistent_allowed', 'created_dt', 'last_used_dt', 'last_used_ip',
                   'last_used_uri', 'last_used_auth', 'use_count')
 
 

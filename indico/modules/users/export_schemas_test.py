@@ -28,7 +28,7 @@ SNAPSHOT_DIR = Path(__file__).parent / 'tests'
 
 @pytest.fixture(autouse=True)
 def freeze_time_for_snapshots(freeze_time):
-    """Ensure the tests use the same as the saved snapshots."""
+    """Ensure the tests use the same time as the saved snapshots."""
     freeze_time(datetime(2022, 5, 22, 12, 0, 0))
 
 
