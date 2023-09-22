@@ -130,11 +130,35 @@ def get_data(export_request):
     return UserDataExportSchema(only=fields).dump(user)
 
 
+def convert_to_yaml(data):
+    """Convert to yaml with a nicer indentation style.
+
+    Normal output does not indent lists, e.g.:
+
+        key:
+        - 1
+        - 2
+
+    With this, the list is indented:
+
+        key:
+          - 1
+          - 2
+
+    See: https://github.com/yaml/pyyaml/issues/234
+    """
+    class Dumper(yaml.Dumper):
+        def increase_indent(self, flow=False, indentless=False):
+            return super().increase_indent(flow, indentless=False)
+
+    return yaml.dump(data, Dumper=Dumper, allow_unicode=True)
+
+
 def generate_zip(export_request, temp_file, max_size):
     data = get_data(export_request)
     with ZipFile(temp_file, 'w', allowZip64=True) as zip_file:
         for key, subdata in data.items():
-            zip_file.writestr(f'{key}.yaml', yaml.dump(subdata, allow_unicode=True))
+            zip_file.writestr(f'{key}.yaml', convert_to_yaml(subdata))
         size = 0
         for file in collect_files(export_request):
             size += getattr(file, 'file', file).size
