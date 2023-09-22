@@ -131,5 +131,10 @@ class DataExportRequest(db.Model):
         self.file = None
         self.state = DataExportRequestState.failed
 
+    def delete(self):
+        if self.file:
+            self.file.claimed = False
+        db.session.delete(self)
+
     def __repr__(self):
         return f'<DataExportRequest({self.id}, {self.user_id}, {self.state}, {self.file})>'
