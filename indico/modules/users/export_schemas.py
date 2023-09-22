@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from marshmallow import Schema, fields, post_dump
-from marshmallow.fields import DateTime, Dict, Enum, Function, List, Method, Nested, String, TimeDelta
 from speaklater import _LazyString
 
 from indico.core.marshmallow import mm
@@ -46,7 +45,7 @@ class DataExportRequestSchema(mm.SQLAlchemyAutoSchema):
         model = DataExportRequest
         fields = ('state', 'requested_dt', 'selected_options', 'max_size_exceeded', 'url')
 
-    selected_options = List(Enum(DataExportOptions))
+    selected_options = fields.List(fields.Enum(DataExportOptions))
 
 
 class PersonalTokenExportSchema(mm.SQLAlchemyAutoSchema):
@@ -54,7 +53,7 @@ class PersonalTokenExportSchema(mm.SQLAlchemyAutoSchema):
         model = PersonalToken
         fields = ('name', 'revoked_dt', 'created_dt', 'last_used_dt', 'last_used_ip', 'use_count', 'scopes')
 
-    scopes = Function(lambda token: sorted(list(token.scopes)))
+    scopes = fields.Function(lambda token: sorted(list(token.scopes)))
 
 
 class APIKeyExportSchema(mm.SQLAlchemyAutoSchema):
@@ -75,7 +74,7 @@ class OAuthApplicationUserLinkExportSchema(mm.SQLAlchemyAutoSchema):
         model = OAuthApplicationUserLink
         fields = ('scopes', 'application')
 
-    application = Nested(OAuthApplicationExportSchema)
+    application = fields.Nested(OAuthApplicationExportSchema)
 
 
 class IdentityExportSchema(mm.SQLAlchemyAutoSchema):
@@ -83,7 +82,7 @@ class IdentityExportSchema(mm.SQLAlchemyAutoSchema):
         model = Identity
         fields = ('provider', 'identifier', 'data', 'last_login_dt', 'last_login_ip')
 
-    data = Dict(attribute='_data')
+    data = fields.Dict(attribute='_data')
 
 
 class EventExportSchema(mm.SQLAlchemyAutoSchema):
@@ -91,7 +90,7 @@ class EventExportSchema(mm.SQLAlchemyAutoSchema):
         model = Event
         fields = ('id', 'title', 'url')
 
-    url = Function(lambda event: url_for('events.display', event, _external=True))
+    url = fields.Function(lambda event: url_for('events.display', event, _external=True))
 
 
 class CategoryExportSchema(mm.SQLAlchemyAutoSchema):
@@ -99,7 +98,7 @@ class CategoryExportSchema(mm.SQLAlchemyAutoSchema):
         model = Category
         fields = ('id', 'title', 'url')
 
-    url = Function(lambda category: url_for('categories.display', category, _external=True))
+    url = fields.Function(lambda category: url_for('categories.display', category, _external=True))
 
 
 class RoomExportSchema(mm.SQLAlchemyAutoSchema):
@@ -114,22 +113,23 @@ class StaticSiteExportSchema(mm.SQLAlchemyAutoSchema):
         model = StaticSite
         fields = ('id', 'event_id', 'event_url', 'state', 'requested_dt', 'url')
 
-    url = Function(lambda site: url_for('static_site.download', site, _external=True))
-    event_url = Function(lambda site: url_for('events.display', site.event, _external=True))
+    url = fields.Function(lambda site: url_for('static_site.download', site, _external=True))
+    event_url = fields.Function(lambda site: url_for('events.display', site.event, _external=True))
 
 
 class RegistrationFileExportSchema(Schema):
     class Meta:
         fields = ('registration_id', 'field_data_id', 'filename', 'md5', 'url', 'path')
 
-    url = Function(lambda data: url_for('event_registration.registration_file', data.locator.file, _external=True))
-    path = Function(lambda file: build_storage_path(file))
+    url = fields.Function(lambda data: url_for('event_registration.registration_file', data.locator.file,
+                                               _external=True))
+    path = fields.Function(lambda file: build_storage_path(file))
 
 
 class RegistrationDataExportSchema(Schema):
-    title = Function(lambda data: data.field_data.field.title)
-    description = Function(lambda data: data.field_data.field.description)
-    data = Method('_get_data')
+    title = fields.Function(lambda data: data.field_data.field.title)
+    description = fields.Function(lambda data: data.field_data.field.description)
+    data = fields.Method('_get_data')
 
     def _get_data(self, data):
         friendly_data = data.field_data.field.get_friendly_data(data, for_humans=True)
@@ -163,10 +163,10 @@ class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
                   'consent_to_publish', 'created_by_manager', 'fields')
 
     price = fields.Decimal(as_string=True)
-    url = Function(lambda reg: url_for('event_registration.registration_details', reg, _external=True))
-    event_title = Function(lambda reg: reg.event.title)
-    event_url = Function(lambda reg: url_for('events.display', reg.event, _external=True))
-    fields = Method('_serialize_data')
+    url = fields.Function(lambda reg: url_for('event_registration.registration_details', reg, _external=True))
+    event_title = fields.Function(lambda reg: reg.event.title)
+    event_url = fields.Function(lambda reg: url_for('events.display', reg.event, _external=True))
+    fields = fields.Method('_serialize_data')
 
     def _serialize_data(self, registration):
         registration_data = [data for data in registration.data if not data.field_data.field.is_manager_only]
@@ -180,10 +180,12 @@ class SubContributionExportSchema(mm.SQLAlchemyAutoSchema):
                   'url', 'event_url', 'duration', 'venue_name', 'room_name',
                   'minutes', 'is_deleted')
 
-    duration = TimeDelta(precision=TimeDelta.MINUTES)
-    minutes = Method('_get_minutes')
-    url = Function(lambda subcontrib: url_for('contributions.display_subcontribution', subcontrib, _external=True))
-    event_url = Function(lambda subcontrib: url_for('events.display', subcontrib.contribution.event, _external=True))
+    duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
+    minutes = fields.Method('_get_minutes')
+    url = fields.Function(lambda subcontrib: url_for('contributions.display_subcontribution', subcontrib,
+                                                     _external=True))
+    event_url = fields.Function(lambda subcontrib: url_for('events.display', subcontrib.contribution.event,
+                                                           _external=True))
 
     def _get_minutes(self, subcontrib):
         if note := subcontrib.note:
@@ -197,12 +199,12 @@ class ContributionExportSchema(mm.SQLAlchemyAutoSchema):
                   'url', 'event_url', 'start_dt', 'end_dt', 'duration', 'venue_name', 'room_name', 'address',
                   'minutes', 'keywords', 'is_deleted', 'is_author', 'is_speaker')
 
-    duration = TimeDelta(precision=TimeDelta.MINUTES)
-    url = Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=True))
-    event_url = Function(lambda contrib: url_for('events.display', contrib.event, _external=True))
-    is_author = Method('_is_author')
-    is_speaker = Method('_is_speaker')
-    minutes = Method('_get_minutes')
+    duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
+    url = fields.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=True))
+    event_url = fields.Function(lambda contrib: url_for('events.display', contrib.event, _external=True))
+    is_author = fields.Method('_is_author')
+    is_speaker = fields.Method('_is_speaker')
+    minutes = fields.Method('_get_minutes')
 
     def _is_author(self, contrib):
         user = self.context['user']
@@ -222,8 +224,8 @@ class AbstractFileExportSchema(mm.SQLAlchemyAutoSchema):
         model = AbstractFile
         fields = ('id', 'filename', 'md5', 'url', 'path')
 
-    url = Function(lambda f: url_for('abstracts.download_attachment', f, management=False, _external=True))
-    path = Function(lambda file: build_storage_path(file))
+    url = fields.Function(lambda f: url_for('abstracts.download_attachment', f, management=False, _external=True))
+    path = fields.Function(lambda file: build_storage_path(file))
 
 
 class AbstractExportSchema(mm.SQLAlchemyAutoSchema):
@@ -232,11 +234,12 @@ class AbstractExportSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'contribution_id', 'event_id', 'title', 'description', 'files',
                   'submission_comment', 'submitted_dt', 'state', 'url', 'event_url')
 
-    description = String(attribute='_description')
-    state = Enum(AbstractState)
-    url = Function(lambda abstract: url_for('abstracts.display_abstract', abstract, management=False, _external=True))
-    event_url = Function(lambda abstract: url_for('events.display', abstract.event, _external=True))
-    files = List(Nested(AbstractFileExportSchema))
+    description = fields.String(attribute='_description')
+    state = fields.Enum(AbstractState)
+    url = fields.Function(lambda abstract: url_for('abstracts.display_abstract', abstract, management=False,
+                                                   _external=True))
+    event_url = fields.Function(lambda abstract: url_for('events.display', abstract.event, _external=True))
+    files = fields.List(fields.Nested(AbstractFileExportSchema))
 
 
 class PaperFileExportSchema(mm.SQLAlchemyAutoSchema):
@@ -244,8 +247,8 @@ class PaperFileExportSchema(mm.SQLAlchemyAutoSchema):
         model = PaperFile
         fields = ('id', 'filename', 'md5', 'url', 'path')
 
-    url = Function(lambda f: url_for('papers.download_file', f.paper.contribution, f, _external=True))
-    path = Function(lambda file: build_storage_path(file))
+    url = fields.Function(lambda f: url_for('papers.download_file', f.paper.contribution, f, _external=True))
+    path = fields.Function(lambda file: build_storage_path(file))
 
 
 class PaperExportSchema(mm.SQLAlchemyAutoSchema):
@@ -253,14 +256,14 @@ class PaperExportSchema(mm.SQLAlchemyAutoSchema):
         model = Contribution
         fields = ('id', 'title', 'description', 'submitted_dt', 'url', 'event_url', 'files')
 
-    submitted_dt = Method('_get_submitted_dt')
-    state = Enum(PaperRevisionState)
-    url = Function(lambda paper: url_for('papers.paper_timeline', paper, _external=True))
-    event_url = Function(lambda paper: url_for('events.display', paper.event, _external=True))
-    files = List(Nested(PaperFileExportSchema))
+    submitted_dt = fields.Method('_get_submitted_dt')
+    state = fields.Enum(PaperRevisionState)
+    url = fields.Function(lambda paper: url_for('papers.paper_timeline', paper, _external=True))
+    event_url = fields.Function(lambda paper: url_for('events.display', paper.event, _external=True))
+    files = fields.List(fields.Nested(PaperFileExportSchema))
 
     def _get_submitted_dt(self, paper):
-        return DateTime().serialize('submitted_dt', paper.revisions[0])
+        return fields.DateTime().serialize('submitted_dt', paper.revisions[0])
 
 
 class PersonalDataExportSchema(mm.SQLAlchemyAutoSchema):
@@ -271,28 +274,28 @@ class PersonalDataExportSchema(mm.SQLAlchemyAutoSchema):
                   'favorite_events', 'favorite_categories')
 
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
-    secondary_emails = Function(lambda user: list(user.secondary_emails))
-    affiliation = Nested(AffiliationSchema, attribute='affiliation_link')
-    favorite_events = List(Nested(EventExportSchema))
-    favorite_categories = List(Nested(CategoryExportSchema))
+    secondary_emails = fields.Function(lambda user: list(user.secondary_emails))
+    affiliation = fields.Nested(AffiliationSchema, attribute='affiliation_link')
+    favorite_events = fields.List(fields.Nested(EventExportSchema))
+    favorite_categories = fields.List(fields.Nested(CategoryExportSchema))
 
 
 class RoomBookingExportSchema(Schema):
     from indico.modules.rb.schemas import ReservationSchema
 
-    favorite_rooms = List(Nested(RoomExportSchema))
-    owned_rooms = List(Nested(RoomExportSchema))
-    reservations = List(Nested(ReservationSchema))
+    favorite_rooms = fields.List(fields.Nested(RoomExportSchema))
+    owned_rooms = fields.List(fields.Nested(RoomExportSchema))
+    reservations = fields.List(fields.Nested(ReservationSchema))
 
 
 class MiscDataExportSchema(Schema):
-    created_events = List(Nested(EventExportSchema))
-    static_sites = List(Nested(StaticSiteExportSchema))
-    identities = List(Nested(IdentityExportSchema))
-    personal_tokens = List(Nested(PersonalTokenExportSchema))
-    api_key = Nested(APIKeyExportSchema)
-    old_api_keys = List(Nested(APIKeyExportSchema))
-    oauth_applications = List(Nested(OAuthApplicationUserLinkExportSchema), attribute='oauth_app_links')
+    created_events = fields.List(fields.Nested(EventExportSchema))
+    static_sites = fields.List(fields.Nested(StaticSiteExportSchema))
+    identities = fields.List(fields.Nested(IdentityExportSchema))
+    personal_tokens = fields.List(fields.Nested(PersonalTokenExportSchema))
+    api_key = fields.Nested(APIKeyExportSchema)
+    old_api_keys = fields.List(fields.Nested(APIKeyExportSchema))
+    oauth_applications = fields.List(fields.Nested(OAuthApplicationUserLinkExportSchema), attribute='oauth_app_links')
 
 
 class AttachmentFileExportSchema(mm.SQLAlchemyAutoSchema):
@@ -300,7 +303,7 @@ class AttachmentFileExportSchema(mm.SQLAlchemyAutoSchema):
         model = AttachmentFile
         fields = ('id', 'filename', 'md5', 'path')
 
-    path = Function(lambda file: build_storage_path(file))
+    path = fields.Function(lambda file: build_storage_path(file))
 
 
 class AttachmentExportSchema(mm.SQLAlchemyAutoSchema):
@@ -309,8 +312,8 @@ class AttachmentExportSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'folder_id', 'folder', 'title', 'url', 'link_url',
                   'type', 'modified_dt', 'description')
 
-    url = String(attribute='absolute_download_url')
-    type = Enum(AttachmentType)
+    url = fields.String(attribute='absolute_download_url')
+    type = fields.Enum(AttachmentType)
 
     @post_dump(pass_original=True)
     def _add_file(self, data, original, **kwargs):
@@ -325,10 +328,10 @@ class EditableFileExportSchema(mm.SQLAlchemyAutoSchema):
         model = EditingRevisionFile
         fields = ('filename', 'md5', 'signed_download_url', 'path')
 
-    filename = String(attribute='file.filename')
-    md5 = String(attribute='file.md5')
-    signed_download_url = String(attribute='file.signed_download_url')
-    path = Function(lambda file: build_storage_path(file))
+    filename = fields.String(attribute='file.filename')
+    md5 = fields.String(attribute='file.md5')
+    signed_download_url = fields.String(attribute='file.signed_download_url')
+    path = fields.Function(lambda file: build_storage_path(file))
 
 
 class EditingRevisionExportSchema(mm.SQLAlchemyAutoSchema):
@@ -336,9 +339,9 @@ class EditingRevisionExportSchema(mm.SQLAlchemyAutoSchema):
         model = EditingRevision
         fields = ('id', 'created_dt', 'type', 'is_undone', 'comment', 'files')
 
-    type = Enum(RevisionType)
-    comment = String()  # Coerce MarkdownText to string
-    files = List(Nested(EditableFileExportSchema))
+    type = fields.Enum(RevisionType)
+    comment = fields.String()  # Coerce MarkdownText to string
+    files = fields.List(fields.Nested(EditableFileExportSchema))
 
 
 class EditableExportSchema(mm.SQLAlchemyAutoSchema):
@@ -346,10 +349,10 @@ class EditableExportSchema(mm.SQLAlchemyAutoSchema):
         model = Editable
         fields = ('id', 'type', 'contribution_id', 'contribution_title', 'state', 'revisions')
 
-    type = Enum(EditableType)
-    contribution_title = Function(lambda editable: editable.contribution.title)
-    state = Enum(EditableState, attribute='latest_revision.state')
-    revisions = List(Nested(EditingRevisionExportSchema))
+    type = fields.Enum(EditableType)
+    contribution_title = fields.Function(lambda editable: editable.contribution.title)
+    state = fields.Enum(EditableState, attribute='latest_revision.state')
+    revisions = fields.List(fields.Nested(EditingRevisionExportSchema))
 
 
 class SettingsExportSchema(Schema):
@@ -359,7 +362,7 @@ class SettingsExportSchema(Schema):
                   'suggest_categories', 'synced_fields', 'timezone', 'use_markdown_for_minutes',
                   'use_previewer_pdf')
 
-    name_format = Function(lambda settings: NameFormat(settings['name_format']).name)
+    name_format = fields.Function(lambda settings: NameFormat(settings['name_format']).name)
 
 
 class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
@@ -368,18 +371,18 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
         fields = ('personal_data', 'settings', 'contributions', 'subcontributions', 'registrations', 'room_booking',
                   'survey_submissions', 'abstracts', 'papers', 'miscellaneous', 'editables', 'attachments')
 
-    personal_data = Function(lambda user: PersonalDataExportSchema().dump(user))
-    settings = Method('_get_settings')
-    contributions = Method('_get_contributions')
-    subcontributions = Method('_get_subcontributions')
-    registrations = List(Nested(RegistrationExportSchema))
-    room_booking = Function(lambda user: RoomBookingExportSchema().dump(user))
-    survey_submissions = List(Nested(SurveySubmissionSchema))
-    abstracts = Method('_get_abstracts')
-    papers = Method('_get_papers')
-    attachments = Method('_get_attachments')
-    editables = Method('_get_editables')
-    miscellaneous = Function(lambda user: MiscDataExportSchema().dump(user))
+    personal_data = fields.Function(lambda user: PersonalDataExportSchema().dump(user))
+    settings = fields.Method('_get_settings')
+    contributions = fields.Method('_get_contributions')
+    subcontributions = fields.Method('_get_subcontributions')
+    registrations = fields.List(fields.Nested(RegistrationExportSchema))
+    room_booking = fields.Function(lambda user: RoomBookingExportSchema().dump(user))
+    survey_submissions = fields.List(fields.Nested(SurveySubmissionSchema))
+    abstracts = fields.Method('_get_abstracts')
+    papers = fields.Method('_get_papers')
+    attachments = fields.Method('_get_attachments')
+    editables = fields.Method('_get_editables')
+    miscellaneous = fields.Function(lambda user: MiscDataExportSchema().dump(user))
 
     def _get_settings(self, user):
         settings = user.settings.get_all()
