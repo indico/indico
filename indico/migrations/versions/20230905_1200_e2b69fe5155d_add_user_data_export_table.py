@@ -5,16 +5,15 @@ Revises: 0c44046dc1be
 Create Date: 2023-05-08 15:37:24.134940
 """
 
-from enum import Enum
-
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.util.enum import IndicoIntEnum
 
 
-class _DataExportRequestState(int, Enum):
+class _DataExportRequestState(IndicoIntEnum):
     none = 0
     running = 1
     success = 2
@@ -22,7 +21,7 @@ class _DataExportRequestState(int, Enum):
     expired = 4
 
 
-class _DataExportOptions(int, Enum):
+class _DataExportOptions(IndicoIntEnum):
     personal_data = 1
     settings = 2
     contribs = 3
