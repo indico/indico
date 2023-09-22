@@ -33,6 +33,7 @@ Improvements
 - Make language list accessible (:issue:`5899`, :pr:`5903`, thanks :user:`foxbunny`)
 - Add accessible label to the main page link (:issue:`5934`, :pr:`5935`, thanks :user:`foxbunny`)
 - Add bypass block links (:issue:`5932`, :pr:`5939`, thanks :user:`foxbunny`)
+- Fix heading levels on category pages (:issue:`5942`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^

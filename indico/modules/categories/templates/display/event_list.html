@@ -59,6 +59,10 @@
     <div class="event-list"
          data-show-future-events-url="{{ url_for('.show_future_events', category) }}"
          data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
+        <h2 id="event-list">
+            {% set category_title = category.title %}
+            {% trans %}Events in {{ category_title }}{% endtrans %}
+        </h2>
         {% if future_event_count %}
             {% call _hidden_events_block('future-events', category, future_events_by_month, format_event_date,
                                         is_recent, happening_now, after=future_threshold) %}
@@ -93,9 +97,9 @@
 
 {% macro event_list_block(events_by_month, format_event_date, is_recent, happening_now) %}
     {% for month in events_by_month %}
-        <h4 class="{% if month.is_current %}current-month{% endif %}">
+        <h3 class="{% if month.is_current %}current-month{% endif %}">
             <span>{{ month.name }}</span>
-        </h4>
+        </h3>
         <ul>
             {% for event in month.events %}
                 {% set is_lecture = (event.type == 'lecture') %}

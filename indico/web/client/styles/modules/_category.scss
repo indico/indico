@@ -80,6 +80,10 @@
   max-width: 850px;
   padding: 0 1em 0 0;
   margin: auto;
+
+  h2 {
+    @extend %visually-hidden;
+  }
 }
 
 .category-info {
@@ -343,14 +347,11 @@ ul.category-resource-qtip {
 }
 
 .event-list {
-  h3 {
-    font-size: 26px;
-    color: #999;
-    margin: 20px 10px;
-    padding: 0;
+  h2 {
+    @extend %visually-hidden;
   }
 
-  h4 {
+  h3 {
     color: #555;
     font-weight: normal;
     font-size: 18px;
