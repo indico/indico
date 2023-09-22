@@ -160,7 +160,7 @@ class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
         model = Registration
         fields = ('id', 'url', 'event_id', 'event_title', 'event_url', 'state', 'currency', 'price', 'submitted_dt',
                   'email', 'first_name', 'last_name', 'is_deleted', 'checked_in', 'checked_in_dt', 'rejection_reason',
-                  'consent_to_publish', 'created_by_manager', 'tags', 'fields')
+                  'consent_to_publish', 'created_by_manager', 'fields')
 
     price = fields.Decimal(as_string=True)
     url = Function(lambda reg: url_for('event_registration.registration_details', reg, _external=True))
