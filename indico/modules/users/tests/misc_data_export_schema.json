@@ -23,8 +23,14 @@
   ],
   "oauth_applications": [
     {
-      "description": "",
-      "name": "dummy"
+      "application": {
+        "description": "",
+        "name": "dummy"
+      },
+      "scopes": [
+        "read:legacy_api",
+        "read:user"
+      ]
     }
   ],
   "old_api_keys": [],
