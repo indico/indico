@@ -23,6 +23,68 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import './DataExport.module.scss';
 
+function DataExport({userId, request, exportOptions}) {
+  const userIdArgs = userId !== null ? {user_id: userId} : {};
+  const [state, setState] = useState(request.state);
+
+  const onSubmit = async data => {
+    const selection = Object.keys(_.pickBy(data));
+    let resp;
+    try {
+      resp = await indicoAxios.post(requestURL(userIdArgs), {options: selection});
+    } catch (e) {
+      return handleSubmitError(e);
+    }
+    setState(resp.data.state);
+  };
+
+  return (
+    <div className="i-box-group vert">
+      <div className="i-box">
+        <div className="i-box-header">
+          <div className="i-box-title">
+            <Translate>Data export</Translate>
+          </div>
+        </div>
+        <div className="i-box-content ui">
+          <Translate as="p">
+            Here, you can request to export all data concerning you that is currently stored in
+            Indico.
+          </Translate>
+          <div styleName="divider" />
+          <div styleName="data-export-body">
+            {state === 'none' && (
+              <DataExportForm onSubmit={onSubmit} exportOptions={exportOptions} />
+            )}
+            {state === 'running' && <ExportRunning />}
+            {state === 'success' && (
+              <ExportSuccess request={request} exportOptions={exportOptions} setState={setState} />
+            )}
+            {state === 'failed' && <ExportFailed setState={setState} />}
+            {state === 'expired' && <ExportExpired setState={setState} />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+DataExport.propTypes = {
+  userId: PropTypes.number,
+  request: PropTypes.shape({
+    state: PropTypes.string.isRequired,
+    requestedDt: PropTypes.string,
+    selectedOptions: PropTypes.array,
+    maxSizeExceeded: PropTypes.bool,
+    url: PropTypes.string,
+  }).isRequired,
+  exportOptions: PropTypes.array.isRequired,
+};
+
+DataExport.defaultProps = {
+  userId: null,
+};
+
 function DataExportForm({onSubmit, exportOptions}) {
   return (
     <FinalForm
@@ -65,6 +127,108 @@ DataExportForm.propTypes = {
   exportOptions: PropTypes.array.isRequired,
 };
 
+function ExportRunning() {
+  return (
+    <div>
+      <Message info>
+        <Message.Header>
+          <Translate>
+            We are preparing your data. We will notify you via email when the export is finished
+          </Translate>
+        </Message.Header>
+      </Message>
+    </div>
+  );
+}
+
+function ExportSuccess({request, exportOptions, setState}) {
+  return (
+    <div>
+      <div>
+        <Message positive>
+          <Message.Header>
+            <Translate>Your data export is ready</Translate>
+          </Message.Header>
+          <Translate as="p" context="user data export">
+            You can download it from the link below
+          </Translate>
+        </Message>
+        {request.maxSizeExceeded && (
+          <Message warning>
+            <Translate as="p" context="user data export">
+              Some files were not exported due to exceeding the maximum allowed size of the archive.
+              Consider selecting less options
+            </Translate>
+          </Message>
+        )}
+        <InfoTable request={request} exportOptions={exportOptions} />
+        <div style={{display: 'flex', justifyContent: 'flex-end', gap: '0.5em'}}>
+          <Button onClick={() => setState('none')}>
+            <Translate>New export</Translate>
+          </Button>
+          <Button primary icon labelPosition="right" as="a" href={request.url}>
+            <Translate>Download</Translate>
+            <Icon name="download" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ExportSuccess.propTypes = {
+  request: PropTypes.object.isRequired,
+  exportOptions: PropTypes.array.isRequired,
+  setState: PropTypes.func.isRequired,
+};
+
+function ExportFailed({setState}) {
+  return (
+    <div>
+      <Message negative>
+        <Message.Header>
+          <Translate>Data export failed</Translate>
+        </Message.Header>
+        <Translate as="p" context="user data export">
+          You can request a new one
+        </Translate>
+      </Message>
+      <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+        <Button primary icon labelPosition="right" onClick={() => setState('none')}>
+          <Translate>Retry</Translate>
+          <Icon name="redo" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+ExportFailed.propTypes = {
+  setState: PropTypes.func.isRequired,
+};
+
+function ExportExpired({setState}) {
+  return (
+    <div>
+      <Message warning>
+        <Message.Header>
+          <Translate>Download link expired</Translate>
+        </Message.Header>
+      </Message>
+      <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+        <Button primary onClick={() => setState('none')} icon labelPosition="right">
+          <Translate>New export</Translate>
+          <Icon name="zip" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+ExportExpired.propTypes = {
+  setState: PropTypes.func.isRequired,
+};
+
 function InfoTable({request, exportOptions}) {
   return (
     <Table celled>
@@ -101,139 +265,6 @@ InfoTable.propTypes = {
     selectedOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   exportOptions: PropTypes.array.isRequired,
-};
-
-function DataExport({userId, request, exportOptions}) {
-  const userIdArgs = userId !== null ? {user_id: userId} : {};
-  const [state, setState] = useState(request.state);
-
-  const onSubmit = async data => {
-    const selection = Object.keys(_.pickBy(data));
-    let resp;
-    try {
-      resp = await indicoAxios.post(requestURL(userIdArgs), {options: selection});
-    } catch (e) {
-      return handleSubmitError(e);
-    }
-    setState(resp.data.state);
-  };
-
-  return (
-    <div className="i-box-group vert">
-      <div className="i-box">
-        <div className="i-box-header">
-          <div className="i-box-title">
-            <Translate>Data export</Translate>
-          </div>
-        </div>
-        <div className="i-box-content ui">
-          <Translate as="p">
-            Here, you can request to export all data concerning you that is currently stored in
-            Indico.
-          </Translate>
-          <div styleName="divider" />
-          <div styleName="data-export-body">
-            {state === 'none' && (
-              <DataExportForm onSubmit={onSubmit} exportOptions={exportOptions} />
-            )}
-            {state === 'running' && (
-              <div>
-                <Message info>
-                  <Message.Header>
-                    <Translate>
-                      We are preparing your data. We will notify you via email when the export is
-                      finished.
-                    </Translate>
-                  </Message.Header>
-                </Message>
-              </div>
-            )}
-            {state === 'success' && (
-              <div>
-                <div>
-                  <Message positive>
-                    <Message.Header>
-                      <Translate>Your data export is ready</Translate>
-                    </Message.Header>
-                    <Translate as="p" context="user data export">
-                      You can download it from the link below
-                    </Translate>
-                  </Message>
-                  {request.maxSizeExceeded && (
-                    <Message warning>
-                      <Translate as="p" context="user data export">
-                        Some files were not exported due to exceeding the maximum allowed size of
-                        the archive. Consider selecting less options
-                      </Translate>
-                    </Message>
-                  )}
-                  <InfoTable request={request} exportOptions={exportOptions} />
-                  <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                    <Button primary icon labelPosition="right" as="a" href={request.url}>
-                      <Translate>Download</Translate>
-                      <Icon name="download" />
-                    </Button>
-                    <Button onClick={() => setState('none')}>
-                      <Translate>New export</Translate>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-            {state === 'failed' && (
-              <div>
-                <Message negative>
-                  <Message.Header>
-                    <Translate>Data export failed</Translate>
-                  </Message.Header>
-                  <Translate as="p" context="user data export">
-                    You can request a new one
-                  </Translate>
-                </Message>
-                <div>
-                  <Button primary icon labelPosition="right" onClick={() => setState('none')}>
-                    <Translate>Retry</Translate>
-                    <Icon name="redo" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            {state === 'expired' && (
-              <div>
-                <Message warning>
-                  <Message.Header>
-                    <Translate>Download link expired</Translate>
-                  </Message.Header>
-                </Message>
-                <div>
-                  <Button primary onClick={() => setState('none')} icon labelPosition="right">
-                    <Translate>New export</Translate>
-                    <Icon name="zip" />
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-DataExport.propTypes = {
-  userId: PropTypes.number,
-  request: PropTypes.shape({
-    state: PropTypes.string.isRequired,
-    requestedDt: PropTypes.string,
-    selectedOptions: PropTypes.array,
-    maxSizeExceeded: PropTypes.bool,
-    url: PropTypes.string,
-  }).isRequired,
-  exportOptions: PropTypes.array.isRequired,
-};
-
-DataExport.defaultProps = {
-  userId: null,
 };
 
 window.setupDataExport = function setupDataExport(userId, request, exportOptions) {
