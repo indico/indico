@@ -20,7 +20,6 @@ from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.notifications import email_sender, make_email
-from indico.core.storage.backend import StorageError
 from indico.modules.attachments.models.attachments import AttachmentFile
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.papers.models.files import PaperFile
@@ -278,24 +277,19 @@ def notify_data_export_failure(export_request):
 def user_data_export_cleanup(days=30):
     """Clean up old user data exports.
 
-    :param days: number of days after which to remove the data exports
+    Files belonging to old data exports are marked for deletion
+    by setting `claimed=False`. The files will then be automatically
+    deleted by the daily `delete_unclaimed_files` task.
+
+    :param days: minimum age of the data export to be marked for removal
     """
     old_requests = _get_old_requests(days)
 
-    logger.info('Removing %d expired user data exports from the past %d days', len(old_requests), days)
+    logger.info('Marking for deletion %d expired user data exports from the past %d days', len(old_requests), days)
     for request in old_requests:
         request.state = DataExportRequestState.expired
-        if not request.file:
-            continue
-        try:
-            request.file.delete()
-        except StorageError as exc:
-            logger.warning('Could not delete user data export %r: %s', request, exc)
-        else:
-            logger.info('Removed user data export %r', request)
-        finally:
-            # This will automatically delete the File object associated with the request
-            request.file = None
+        if request.file:
+            request.file.claimed = False
     db.session.commit()
 
 
