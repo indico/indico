@@ -16,7 +16,7 @@ from flask import flash, g, has_request_context, jsonify, render_template, reque
 from itsdangerous import Signer
 from markupsafe import Markup
 from werkzeug.datastructures import MultiDict
-from werkzeug.exceptions import BadRequest, Forbidden, ImATeapot
+from werkzeug.exceptions import BadRequest, Forbidden, ImATeapot, RequestEntityTooLarge
 
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
@@ -161,6 +161,14 @@ def get_request_info(hide_passwords=True):
         } if session.user else None
     except Exception as exc:
         user_info = f'ERROR: {exc}'
+    try:
+        request_data = {
+            'get': _format_request_data(request.args),
+            'post': _format_request_data(request.form, hide_passwords=hide_passwords),
+            'json': request.get_json(silent=True),
+        }
+    except RequestEntityTooLarge as exc:
+        request_data = {'ERROR': str(exc)}
     return {
         'id': request.id,
         'time': datetime.now().isoformat(),
@@ -174,9 +182,7 @@ def get_request_info(hide_passwords=True):
         'referrer': request.referrer,
         'data': {
             'url': _format_request_data(request.view_args) if request.view_args is not None else None,
-            'get': _format_request_data(request.args),
-            'post': _format_request_data(request.form, hide_passwords=hide_passwords),
-            'json': request.get_json(silent=True),
+            **request_data,
             'headers': _format_request_data(request.headers, False),
         }
     }
