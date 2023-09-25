@@ -159,7 +159,6 @@ class ReservationOccurrence(db.Model):
 
     @staticmethod
     def iter_start_time(start, end, repetition, recurrence_weekdays):
-        print("hit iter_start_time")
         from indico.modules.rb.models.reservations import RepeatFrequency
 
         repeat_frequency, repeat_interval = repetition
@@ -174,10 +173,9 @@ class ReservationOccurrence(db.Model):
         elif repeat_frequency == RepeatFrequency.WEEK:
             if repeat_interval <= 0:
                 raise IndicoError('Unsupported interval')
-            print(f"*** {start=} {end=} {repeat_interval=} {recurrence_weekdays=}")
             return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end,
-                           interval=repeat_interval,
-                           byweekday=ReservationOccurrence.map_recurrence_weekdays_to_rrule(recurrence_weekdays))
+                               interval=repeat_interval,
+                               byweekday=ReservationOccurrence.map_recurrence_weekdays_to_rrule(recurrence_weekdays))
 
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 0:
@@ -199,7 +197,6 @@ class ReservationOccurrence(db.Model):
 
     @staticmethod
     def filter_overlap(occurrences):
-        print("hit filter_overlap")
         if not occurrences:
             raise RuntimeError('Cannot check for overlap with empty occurrence list')
         return or_(db_dates_overlap(ReservationOccurrence, 'start_dt', occ.start_dt, 'end_dt', occ.end_dt)

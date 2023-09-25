@@ -342,6 +342,11 @@ def get_prebooking_collisions(reservation):
 
 
 def check_impossible_repetition(data):
+    """Check for broken repetition data
+
+    This checks that a repetition using weekdays has a date range
+    containing at least one of the specified weekdays.
+    """
     from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
     try:
         start_dt, end_dt = data['start_dt'], data['end_dt']
@@ -350,4 +355,4 @@ def check_impossible_repetition(data):
     except KeyError:
         return
     if not any(ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition, recurrence_weekdays)):
-        raise ExpectedError(_('The selected date range does not contain any of the weekdays you selected.'))
+        raise ExpectedError(_('The chosen date range does not include any of the weekdays you specified.'))

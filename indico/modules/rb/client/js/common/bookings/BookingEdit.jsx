@@ -165,9 +165,11 @@ class BookingEdit extends React.Component {
 
     const res = await this.fetchBookingTimelineInfo({dates, timeSlot, recurrence});
     if (!res) {
-      // request failed
+      // request failed - stop here as the backend will have raised an error
       return;
     }
+    // otherwise, clear the error (for when the request succeeds after a previous failure)
+    this.setState({timelineError: null});
     const {calendars, willBeSplit} = res;
     const [currentBooking, newBooking] = calendars;
 
